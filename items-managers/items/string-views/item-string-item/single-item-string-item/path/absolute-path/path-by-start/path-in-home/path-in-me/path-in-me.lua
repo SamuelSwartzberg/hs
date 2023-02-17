@@ -1,0 +1,35 @@
+--- @type ItemSpecifier
+PathInMeItemSpecifier = {
+  type = "path-in-me-item",
+  properties = {
+    getables = {
+      ["is-path-in-maudiovisual"] = function (self)
+        return stringy.startswith(self:get("contents"), env.MAUDIOVISUAL)
+      end,
+      ["is-path-in-mspec"] = function (self)
+        return stringy.startswith(self:get("contents"), env.MSPEC)
+      end,
+      ["local-server-path"] = function(self)
+        local path = self:get("contents")
+        return path:gsub(env.ME, env.FS_HTTP_SERVER)
+      end,
+    },
+    doThisables = {
+     
+    }
+  },
+  potential_interfaces = ovtable.init({
+    { key = "path-in-maudiovisual", value = CreatePathInMaudiovisualItem },
+    { key = "path-in-mspec", value = CreatePathInMspecItem },
+  }),
+  action_table = listConcat(getChooseItemTable({
+    {
+      description = "srvpth",
+      emoji_icon = "🚚",
+      key = "local-server-path",
+    }
+  }),{})
+}
+
+--- @type BoundNewDynamicContentsComponentInterface
+CreatePathInMeItem = bindArg(NewDynamicContentsComponentInterface, PathInMeItemSpecifier)

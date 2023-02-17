@@ -1,0 +1,10 @@
+local rrq = bindArg(relative_require, "utils.functions")
+
+rrq("simple-returners")
+rrq("args")
+rrq("eval")
+rrq("iterators-generators")
+rrq("functions")
+rrq("processing")
+a = rrq("async")
+rrq("memo")

@@ -1,0 +1,38 @@
+post 'lua is working':  
+  - add/rename missing m3us
+  - history
+    - move images to hydrus
+      - date string parsing
+      - eliminate binres images
+      - js to rewrite filenames on e.g. g.e-hentai to whatever I choose for hydrus
+      - need to think on how to handle other file transmission & parsing (e.g. downloads, images from phone)
+      - parse manga panels -> add to hydrus
+    - shrinking, moving other documents
+    - consider how to integrate email into history
+    - is self-renaming of dated dirs implemented?
+  - window switcher is limited to spaces, can't deal with minimized items
+  - process bookmarks to sessions, urls
+  - old contact importing
+  - newsboat formatting, interface
+  - test:
+    - calendar interfacing
+    - ics files
+    - ics urls
+  - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them
+  - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
+  - repo, file in repo to github path (may already be implemented), also in action table
+  - interface with upkg in hs
+  - citations
+    - add citations and test citation usage workflow
+    - rename, sort books based on what is needed for citation workflow, and what is desirable
+    - enable book sync to phone  
+post: 'stuff is implemented'
+  - performance
+    - optimize checks by using new stringy functions & memoization where necessary
+    - fix memory leak
+    - more memoization
+    - more item cache
+  - some shell to lua
+    - don't check dependencies on shell start, instead check them regularly and write missing ones to extra file
+    - delete git-paths once we're not using it anymore
+  - clean up android

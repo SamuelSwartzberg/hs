@@ -1,0 +1,13 @@
+local rrq = bindArg(relative_require, "utils.string")
+
+rrq("string-booleans")
+rrq("string-transformers")
+rrq("ascii-utils")
+rrq("equivalents")
+rrq("escaping")
+rrq("string-array")
+rrq("string-assoc-arr")
+rrq("date-parser")
+rrq("string-formatters")
+rrq("string-metrics")
+rrq("string")
