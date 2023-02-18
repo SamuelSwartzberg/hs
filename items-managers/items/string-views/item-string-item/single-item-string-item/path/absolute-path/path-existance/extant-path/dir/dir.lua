@@ -118,7 +118,7 @@ DirItemSpecifier = {
       end,
       ["create-empty-dir-in-dir"] = function(self, name)
         local path = self:get("path-ensure-final-slash") .. name
-        createDir(path)
+        createPath(path)
       end,
       ["create-child-as-project-dir"] = function(self, specifier)
         self:doThis("create-empty-dir-in-dir", specifier.name)
@@ -197,7 +197,7 @@ DirItemSpecifier = {
       end,
       ["create-child-dir-and-choose-action"] = function(self, dirname)
         local path = self:get("contents") .. "/" .. dirname
-        createDir(path)
+        createPath(path)
         CreateStringItem(path):doThis("choose-action")
       end,
       ["create-descendant-file-and-choose-action"] = function(self, filename)
@@ -215,7 +215,7 @@ DirItemSpecifier = {
   potential_interfaces = ovtable.init({
     { key = "parent-dir", value = CreateParentDirItem },
     { key = "empty-dir", value = CreateEmptyDirItem },
-    { key = "dir-by-path", value = CreateDirByPathItem },
+    { key = "dir-by-path", value = createPathByPathItem },
     { key = "logging-dir", value = CreateLoggingDir },
   }),
   action_table = listConcat(getChooseItemTable({
@@ -278,4 +278,4 @@ DirItemSpecifier = {
 
 
 --- @type BoundNewDynamicContentsComponentInterface
-CreateDirItem = bindArg(NewDynamicContentsComponentInterface, DirItemSpecifier)
+createPathItem = bindArg(NewDynamicContentsComponentInterface, DirItemSpecifier)

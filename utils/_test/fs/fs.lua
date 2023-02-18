@@ -14,6 +14,30 @@ assertMessage(
 )
 
 assertMessage(
+  pathIsRemote("/Applications"),
+  false
+)
+
+assertMessage(
+  pathIsRemote("foo:/bar"),
+  true
+)
+
+assertMessage(
+  pathExists("/Applications"),
+  true
+)
+
+local remote_dir_path = env.MB_WEBDAV_TMPDIR .. "/foo/bar"
+
+createPath(remote_dir_path)
+
+assertMessage(
+  pathExists(remote_dir_path),
+  true
+)
+
+assertMessage(
   isDir("/Applications"),
   true
 )
@@ -39,8 +63,39 @@ assertMessage(
 )
 
 assertMessage(
+  isDir(remote_dir_path),
+  true
+)
+
+local remote_file_path = env.MB_WEBDAV_TMPDIR .. "/foo/bar/baz.txt"
+
+writeFile(remote_file_path, "hello world", "any", true)
+
+assertMessage(
+  readFile(remote_file_path),
+  "hello world"
+)
+
+assertMessage(
+  isDir(remote_file_path),
+  false
+)
+
+assertMessage(
   dirIsEmpty("/Applications"),
   false
+)
+
+assertMessage(
+  dirIsEmpty(remote_dir_path),
+  false
+)
+
+delete(remote_file_path)
+
+assertMessage(
+  dirIsEmpty(remote_dir_path),
+  true
 )
 
 assertMessage(
@@ -48,10 +103,25 @@ assertMessage(
   true
 )
 
+writeFile(env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt", "hello world", "any", true)
+writeFile(env.MB_WEBDAV_TMPDIR .. "/foo/test2.txt", "hello world", "any", true)
+
 --- all in path 
+
 assertValuesContain(
   getAllInPath(env.HOME),
   { env.HOME .. "/Desktop", env.HOME .. "/.profile" }
+)
+
+--- same but remote
+
+assertValuesContainExactly(
+  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo"),
+  { 
+    env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt", 
+    env.MB_WEBDAV_TMPDIR .. "/foo/test2.txt",
+    env.MB_WEBDAV_TMPDIR .. "/foo/bar"
+  }
 )
 
 --- all in path, exclude dirs
@@ -60,10 +130,27 @@ assertValuesContain(
   { env.HOME .. "/.profile" }
 )
 
+--- same but remote
+assertValuesContainExactly(
+  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo", false, false, true),
+  { 
+    env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt", 
+    env.MB_WEBDAV_TMPDIR .. "/foo/test2.txt"
+  }
+)
+
 --- all in path, exclude files
 assertValuesContain(
   getAllInPath(env.HOME, false, true, false),
   { env.HOME .. "/Desktop" }
+)
+
+--- same but remote
+assertValuesContainExactly(
+  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo", false, true, false),
+  { 
+    env.MB_WEBDAV_TMPDIR .. "/foo/bar"
+  }
 )
 
 --- all in path, don't search recursively
@@ -76,6 +163,20 @@ assertValuesNotContain(
 assertValuesContain(
   getAllInPath(env.MAC_FIREFOX, true),
   { env.MAC_FIREFOX_DEFAULT_RELEASE_PROFILE }
+)
+
+--- same but remote
+
+writeFile(env.MB_WEBDAV_TMPDIR .. "/foo/bar/new.txt", "hello world", "any", true)
+
+assertValuesContainExactly(
+  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo", true),
+  { 
+    env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt", 
+    env.MB_WEBDAV_TMPDIR .. "/foo/test2.txt",
+    env.MB_WEBDAV_TMPDIR .. "/foo/bar",
+    env.MB_WEBDAV_TMPDIR .. "/foo/bar/new.txt"
+  }
 )
 
 assertMessage(
@@ -104,6 +205,23 @@ assertMessage(
     "/Applications"
   ),
   true
+)
+
+-- same but remote
+
+assertMessage(
+  valuesContain(
+    getSiblings(env.MB_WEBDAV_TMPDIR .. "/foo", true, true),
+    env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt"
+  ),
+  true
+)
+
+delete(env.MB_WEBDAV_TMPDIR .. "/foo", "empty")
+
+assertTable(
+  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo", true),
+  {}
 )
 
 assertMessage(
@@ -246,6 +364,21 @@ assertMessage(
   "#text/plain " .. env.PROFILEFILE
 )
 
+assertMessage(
+  resolveRelativePath("/foo/bar/baz", env.HOME),
+  env.HOME .. "/foo/bar/baz"
+)
+
+assertMessage(
+  resolveRelativePath("/foo/bar/baz", env.HOME .. "/foo"),
+  env.HOME .. "/foo/bar/baz"
+)
+
+assertMessage(
+  resolveRelativePath("remote:/foo/bar/baz", env.HOME),
+  "remote:" .. env.HOME .. "/foo/bar/baz"
+)
+
 local temp_file_1_path = env.TMPDIR .. "/temp_file_lua_test_" .. os.time() .. ".txt"
 
 writeFile(temp_file_1_path, "foo", "any", false, "w")
@@ -374,7 +507,7 @@ delete(temp_file_3_path_pong)
 local temp_subdir_1_path = env.TMPDIR .. "/temp_subdir_lua_test_" .. os.time() .. "/"
 local ping_in_subdir_1_path = temp_subdir_1_path .. getLeafWithoutPath(temp_file_3_path_ping)
 
-createDir(temp_subdir_1_path)
+createPath(temp_subdir_1_path)
 
 srctgt("copy", temp_file_3_path_ping, temp_subdir_1_path, "any", false, true)
 
@@ -434,3 +567,80 @@ for _, n in ipairs(seq(1, 4)) do
     "lorem ipsum " .. n
   )
 end
+
+local remote_writing_file = env.MB_WEBDAV_TMPDIR .. "/foo/meep.txt"
+
+writeFile(remote_writing_file, "bar", "exists", false, "w")
+
+assertMessage(
+  readFile(remote_writing_file),
+  nil
+)
+
+writeFile(remote_writing_file, "bar", "not-exists", false, "w")
+
+assertMessage(
+  readFile(remote_writing_file),
+  "bar"
+)
+
+writeFile(remote_writing_file, "baz", "any", false, "a")
+
+assertMessage(
+  readFile(remote_writing_file),
+  "barbaz"
+)
+
+local local_file = createUniqueTempFile("local-origin content")
+
+srctgt("copy", local_file, remote_writing_file, "not-exists")
+
+assertMessage(
+  readFile(remote_writing_file),
+  "barbaz"
+)
+
+srctgt("copy", local_file, remote_writing_file, "exists")
+
+assertMessage(
+  readFile(remote_writing_file),
+  "local-origin content"
+)
+
+writeFile(local_file, "local-origin content 2")
+srctgt("move", local_file, remote_writing_file, "any")
+
+assertMessage(
+  readFile(remote_writing_file),
+  "local-origin content 2"
+)
+
+assertMessage(
+  readFile(local_file),
+  nil
+)
+
+srctgt("copy", remote_writing_file, env.TMPDIR, "any", false, true)
+
+assertMessage(
+  readFile(env.TMPDIR .. "/meep.txt"),
+  "local-origin content 2"
+)
+
+local tmpdirdir = env.TMPDIR .. "/testdir" .. os.time()
+
+writeFile(tmpdirdir .. "/natsume.txt", "natsume")
+writeFile(tmpdirdir .. "/keiko.txt", "keiko")
+
+srctgt("move", tmpdirdir, env.MB_WEBDAV_TMPDIR, "any", false, false, true)
+
+assertMessage(
+  readFile(env.MB_WEBDAV_TMPDIR .. "/natsume.txt"),
+  "natsume"
+)
+
+assertMessage(
+  readFile(env.MB_WEBDAV_TMPDIR .. "/keiko.txt"),
+  "keiko"
+)
+

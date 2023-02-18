@@ -216,6 +216,17 @@ k, v = next_foobar()
 assertMessage(k, "foo")
 assertMessage(v, "26")
 
+local nextValue = sivalues(list_from_a_to_f)
+
+assertMessage(nextValue(), "a")
+assertMessage(nextValue(), "b")
+assertMessage(nextValue(), "c")
+
+local nextKey = sikeys(foobar_table)
+
+assertMessage(nextKey(), "bar")
+assertMessage(nextKey(), "foo")
+
 assertTable(
   mapValueToStrippedValue({
     a = " 1 ",

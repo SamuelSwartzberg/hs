@@ -28,4 +28,4 @@ DirByPathItemSpecifier = {
 
 
 --- @type BoundNewDynamicContentsComponentInterface
-CreateDirByPathItem = bindArg(NewDynamicContentsComponentInterface, DirByPathItemSpecifier)
+createPathByPathItem = bindArg(NewDynamicContentsComponentInterface, DirByPathItemSpecifier)

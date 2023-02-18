@@ -177,7 +177,7 @@ ExtantPathItemSpecifier = {
     }
   },
   potential_interfaces = ovtable.init({
-    { key = "dir", value = CreateDirItem },
+    { key = "dir", value = createPathItem },
     { key = "file", value = CreateFileItem },
     { key = "in-git-dir-path", value = CreateInGitDirPathItem },
     { key = "dated-extant-path", value = CreateDatedExtantPathItem },

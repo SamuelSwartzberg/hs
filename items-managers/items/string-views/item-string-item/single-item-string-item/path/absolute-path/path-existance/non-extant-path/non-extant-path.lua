@@ -18,7 +18,7 @@ NonExtantPathItemSpecifier = {
         writeFile(self:get("contents"), contents, "not-exists") -- same as write-file-contents since file doesn't exist
       end,
       ["create-self-as-empty-dir"] = function(self)
-        createDir(self:get("contents"))
+        createPath(self:get("contents"))
       end,
         
       ["table-to-fs-children-dispatch"] = function(self, specifier)

@@ -1,12 +1,5 @@
 --- @param path string
 --- @return boolean
-function createDir(path)
-  path = resolveTilde(path)
-  return hs.fs.mkdir(path)
-end
-
---- @param path string
---- @return boolean
 function createPath(path)
   path = resolveTilde(path)
   local remote = pathIsRemote(path)

@@ -98,7 +98,7 @@ URLItemSpecifier = {
         })
         khal_config:doThis("append-file-contents", "\n\n" .. khal_data)
         vdirsyncer_config:doThis("append-file-contents", "\n\n" .. vdirsyncer_data.value)
-        createDir(vdirsyncer_data.at)
+        createPath(vdirsyncer_data.at)
         runHsTaskProcessOutput({
           "vdirsyncer",
           "discover",

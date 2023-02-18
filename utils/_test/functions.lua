@@ -52,3 +52,24 @@ assertValuesContainExactly(
     "a", "a", "a"
   }
 )
+
+local testtbl = {
+  a = "恋",
+  b = "爱",
+  c = "是",
+}
+
+
+assertTable(
+  statefulKeyIteratorToTable(spairs, testtbl),
+  testtbl
+)
+
+assertValuesContainExactly(
+  statefulNokeyIteratorToTable(spairs, testtbl),
+  {
+    { "a", "恋" },
+    { "b", "爱" },
+    { "c", "是" },
+  }
+)
