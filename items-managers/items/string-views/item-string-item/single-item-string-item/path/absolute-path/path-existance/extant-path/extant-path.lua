@@ -115,16 +115,16 @@ ExtantPathItemSpecifier = {
         openPathVscode(self:get("contents"))
       end,
       ["move-safe"] = function(self, target)
-        moveWithCreatePathIfDoesntExist(self:get("contents"), target)
+        srctgt("move", self:get("contents"), target, "not-exists")
       end,
       ["move-force"] = function(self, target)
-        moveWithCreatePath(self:get("contents"), target)
+        srctgt("move", self:get("contents"), target)
       end,
       ["move-replace-self"] = function(self, origin)
-        moveWithCreatePath(origin, self:get("contents"))
+        srctgt("move", origin, self:get("contents"))
       end,
       ["move-into-dir"] = function (self, target)
-        moveInto(self:get("contents"), target)
+        srctgt("move", self:get("contents"), target, nil, true, true)
       end,
       ["move-safe-and-choose-action"] = function(self, target)
         self:doThis("move-safe", target)
@@ -138,10 +138,10 @@ ExtantPathItemSpecifier = {
         self:doThis("move-safe-and-choose-action", self:get("parent-dir-path"))
       end,
       ["copy-safe"] = function(self, target)
-        copyWithCreatePathIfDoesntExist(self:get("contents"), target)
+        srctgt("copy", self:get("contents"), target, "not-exists")
       end,
       ["copy-force"] = function(self, target)
-        copyWithCreatePath(self:get("contents"), target)
+        srctgt("copy", self:get("contents"), target)
       end,
       ["copy-safe-and-choose-action"] = function(self, target)
         self:doThis("copy-safe", target)
@@ -170,7 +170,7 @@ ExtantPathItemSpecifier = {
       end,
       ["create-sibling-file-and-choose-action"] = function(self, filename)
         local path = self:get("parent-dir-path") .. "/" .. filename
-        createFile(path, "")
+        writeFile(path, "", "not-exists")
         CreateStringItem(path):doThis("choose-action")
       end,
 

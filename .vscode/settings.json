@@ -1,0 +1,10 @@
+{
+  "Lua.diagnostics.globals": [
+    "hs",
+    "mp"
+  ],
+  "Lua.diagnostics.disable": [
+    "lowercase-global",
+    "param-type-mismatch"
+  ]
+}

@@ -227,7 +227,7 @@ assertMessage(
   "foo"
 )
 
-deleteFile(unique_temp_file)
+delete(unique_temp_file)
 
 assertMessage(
   readFile(unique_temp_file),

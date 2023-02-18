@@ -135,7 +135,7 @@ function fsmemoize(fn, func_id)
       return table.unpack(json.decode(readFile(cache_path)))
     else
       local res = {fn(...)}
-      writePathAndFile(cache_path, json.encode(res))
+      writeFile(cache_path, json.encode(res))
       return table.unpack(res)
     end
   end
@@ -156,7 +156,7 @@ function fsmemoizeAsyncFunc(fn, func_id)
     else
       fn(arg, function(res)
         print "writing to cache"
-        writePathAndFile(cache_path, json.encode(res))
+        writeFile(cache_path, json.encode(res))
         callback(res)
       end)
     end

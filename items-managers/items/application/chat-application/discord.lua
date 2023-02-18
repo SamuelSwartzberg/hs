@@ -79,7 +79,7 @@ DiscordItemSpecifier = {
     },
     doThisables = {
       ["generate-backup"] = function(self, do_after)
-        emptyDir(env.TMP_DISCORD_EXPORT_PARENT)
+        delete(env.TMP_DISCORD_EXPORT_PARENT, "dir", "empty")
         runHsTaskErrorOnError( { 
           "dscexport",
           "exportdm",
@@ -95,7 +95,7 @@ DiscordItemSpecifier = {
       end,
       ["pre-process-chat-messages-hook"] = function (self, chat_obj)
         local media_dir = CreateStringItem(chat_obj.found_in):get("child-ending-with", "_Files")
-        moveAllInDir(media_dir, self:get("media-dir-for-chat", chat_obj))
+        srctgt("move", media_dir, self:get("media-dir-for-chat", chat_obj), "any", false, false, true)
       end,
     }
   },

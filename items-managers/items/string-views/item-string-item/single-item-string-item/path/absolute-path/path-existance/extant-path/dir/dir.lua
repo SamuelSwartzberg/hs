@@ -107,14 +107,14 @@ DirItemSpecifier = {
   
     doThisables = {
       ["copy-into"] = function(self, source)
-        copyFilelike(source, self:get("contents"))
+        srctgt("copy", source, self:get("contents"))
       end,
       ["move-into"] = function(self, source)
-        moveInto(source, self:get("contents"))
+        srctgt("move", source, self:get("contents"), "any", true, true)
       end,
       ["create-empty-file-in-dir"] = function(self, name)
         local path = self:get("path-ensure-final-slash") .. name
-        createFile(path, "")
+        writeFile(path, "", "not-exists")
       end,
       ["create-empty-dir-in-dir"] = function(self, name)
         local path = self:get("path-ensure-final-slash") .. name
@@ -167,7 +167,7 @@ DirItemSpecifier = {
         hs.fs.rmdir(self:get("contents"))
       end,
       ["empty-dir"] = function(self)
-        emptyDir(self:get("contents"))
+        delete(self:get("contents"), "dir", "empty")
       end,
       ["choose-descendant"] = function(self)
         self:get("descendant-string-array"):doThis("choose-item-and-then-action")
@@ -184,7 +184,7 @@ DirItemSpecifier = {
       ["send-in-email"] = function(self, do_after)
         local temp_file = createUniqueTempFile("", "email.zip")
         zipFile(self:get("contents"), temp_file, function()
-          deleteFile(temp_file)
+          delete(temp_file)
           if do_after then
             do_after()
           end
@@ -192,7 +192,7 @@ DirItemSpecifier = {
       end,
       ["create-child-file-and-choose-action"] = function(self, filename)
         local path = self:get("contents") .. "/" .. filename
-        createFile(path, "")
+        writeFile(path, "", "not-exists")
         CreateStringItem(path):doThis("choose-action")
       end,
       ["create-child-dir-and-choose-action"] = function(self, dirname)

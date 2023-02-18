@@ -50,7 +50,7 @@ PathInMaudiovisualItemSpecifier = {
       end,
       ["qf-unavailable-urls"] = function (self)
         self:doThis("do-unavailable-urls", function(url)
-          appendFile(env.MQFMUSIC, url .. " (unavailable)\n")
+          writeFile(env.MQFMUSIC, url .. " (unavailable)\n", "exists", false, "a")
         end)
       end
     }

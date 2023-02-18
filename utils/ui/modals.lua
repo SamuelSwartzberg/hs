@@ -292,9 +292,7 @@ function potentiallyCreateChildFile(path, prompt_spec)
   local file_name = prompt(prompt_spec)
   if file_name ~= nil then
     local final_path = ensureAdfix(path, "/", true, false, "suf") .. file_name
-    if not pathExists(final_path) then 
-      createFile(final_path, "")
-    end
+    writeFile(final_path, "", "not-exists")
     return final_path
   else
     return path

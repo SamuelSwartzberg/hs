@@ -34,19 +34,19 @@ FileItemSpecifier = {
   
     doThisables = {
       ["overwrite-file-contents"] = function (self, contents)
-        writeExistingFile(self:get("contents"), contents)
+        writeFile(self:get("contents"), contents, "exists")
       end,
       ["append-file-contents"] = function (self, contents)
-        appendFile(self:get("contents"), contents)
+        writeFile(self:get("contents"), contents, "exists", true, "a")
       end,
       ["rm-file"] = function (self)
-        deleteFile(self:get("contents"))
+        delete(self:get("contents"))
       end,
       ["rename-to-parent"] = function(self)
         self:doThis("move-safe", self:get("name-of-parent-with-current-extension"))
       end,
       ["empty-file"] = function(self)
-        writeExistingFile(self:get("contents"), "")
+        writeFile(self:get("contents"), "", "exists")
       end,
       ["send-in-email"] = function(self, do_after)
         sendEmailInteractive({}, asAttach(self:get("contents")), editorEditFunc, do_after)

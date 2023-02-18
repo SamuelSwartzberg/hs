@@ -21,70 +21,34 @@ function createParentPath(path)
   return createPath(parent_path)
 end
 
---- @param path string
---- @param contents string
---- @return boolean
-function writePathAndFile(path, contents)
-  path = resolveTilde(path)
-  createParentPath( path)
-  return writeFile(path, contents)
-end
+-- todo: remote?
 
 --- @param path string
 --- @param contents string
+--- @param condition? "exists" | "not-exists" | "any"
+--- @param create_path? boolean
+--- @param mode? "w" | "a"
 --- @return boolean
-function createPathAndFile(path, contents)
+function writeFile(path, contents, condition, create_path, mode)
+  condition = defaultIfNil(condition, "any")
+  create_path = defaultIfNil(create_path, true)
+  mode = defaultIfNil(mode, "w")
   path = resolveTilde(path)
-  createParentPath( path)
-  return createFile(path, contents)
-end
-
-
---- @param path string
---- @param contents string
---- @return boolean
-function writeFile(path, contents)
-  path = resolveTilde(path)
-  local file = io.open(path, "w")
+  if create_path then
+    createParentPath(path)
+  end
+  if pathExists(path) then
+    if condition == "not-exists" then
+      return false
+    end
+  else
+    if condition == "exists" then
+      return false
+    end
+  end
+  local file = io.open(path, mode)
   if file ~= nil then
     file:write(contents or "")
-    io.close(file)
-    return true
-  else
-    return false
-  end
-end
-
---- @param path string
---- @param contents string
---- @return boolean
-function writeExistingFile(path, contents)
-  if pathExists(path) then
-    return writeFile(path, contents)
-  else
-    return false
-  end
-end
-
---- @param path string
---- @param contents string
---- @return boolean
-function createFile(path, contents) -- create = write if not exists
-  if not pathExists(path) then
-    return writeFile(path, contents)
-  else
-    return false
-  end
-end
-
---- @param path string
---- @param contents string
---- @return boolean
-function appendFile(path, contents)
-  path = resolveTilde(path)
-  local file = io.open(path, "a")
-  if file ~= nil then
-    file:write(contents)
     io.close(file)
     return true
   else
@@ -100,7 +64,7 @@ function createUniqueTempFile(contents, filename, extension)
   extension = extension or "tmp"
   local unique_filename = os.time() .. "-" .. (filename or math.random(1000000))
   local path = ensureAdfix(env.TMPDIR, "/", true, false, "suf") .. unique_filename .. "." .. extension
-  createFile(path, contents or "")
+  writeFile(path, contents or "", "not-exists")
   return path
 end
 
@@ -111,7 +75,7 @@ end
 function doWithTempFile(contents, do_this, filename, extension)
   local tmp_file = createUniqueTempFile(contents, filename, extension)
   do_this(tmp_file)
-  deleteFile(tmp_file)
+  delete(tmp_file)
 end
 
 --- @param contents string
@@ -129,7 +93,7 @@ function doWithTempFileEditedInEditor(contents, do_this, filename, extension)
     if exit_code == 0 then 
       do_this(tmp_file)
     end
-    deleteFile(tmp_file)
+    delete(tmp_file)
   end)
 end
 
@@ -150,33 +114,9 @@ function zipFile(source, target, do_after)
   }, function() if do_after then do_after(target) end end)
 end
 
---- @param source string
---- @param target string
---- @param hard_link? boolean
-function link(source, target, hard_link)
-  source = resolveTilde(source)
-  target = resolveTilde(target)
-  hs.fs.link(source, target, not hard_link)
-end
-
---- @param source string
---- @param target string
---- @param hard_link? boolean
-function linkAllInDir(source, target, hard_link)
-  source = resolveTilde(source)
-  target = resolveTilde(target)
-  for _, file in ipairs(getChildren(source)) do
-    print("linking " .. file .. " to " .. target .. "/" .. getLeafWithoutPath(file))
-    link(file, target .. "/" .. getLeafWithoutPath(file), hard_link)
-  end
-end
-
 --- @param name string
 --- @param msg string
 function logFile(name, msg)
   local log_file = env.LOGGER_PATH .. "/hs/" .. name .. ".log"
-  if not pathExists(log_file) then
-    createPathAndFile(log_file, "")
-  end
-  appendFile(log_file, msg .. "\n")
+  writeFile(log_file,  msg .. "\n", "exists", true, "a")
 end

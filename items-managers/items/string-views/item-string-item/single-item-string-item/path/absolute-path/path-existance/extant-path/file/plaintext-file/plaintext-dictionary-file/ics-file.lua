@@ -9,14 +9,14 @@ IcsFileItemSpecifier = {
         local basename = self:get("leaf-without-extension")
         local tmpdir_ics_path = env.TMPDIR .. "/" .. basename .. ".ics"
         local tmpdir_json_path = env.TMPDIR .. "/" .. basename .. ".json"
-        copyFilelike(self:get("contents"), tmpdir_ics_path)
+        srctgt("copy", self:get("contents"), tmpdir_ics_path)
         getOutputArgs(
           "ical2json",
           { value = tmpdir_ics_path, type = "quoted" }
         )
         local res = json.decode(readFile(tmpdir_json_path))
-        deleteFile(tmpdir_ics_path)
-        deleteFile(tmpdir_json_path)
+        delete(tmpdir_ics_path)
+        delete(tmpdir_json_path)
         return res
       end,
       ["lua-table-to-string"] = function(self, tbl)
@@ -30,8 +30,8 @@ IcsFileItemSpecifier = {
           { value = tmpdir_ics_path, type = "quoted" }
         )
         local res = readFile(tmpdir_ics_path)
-        deleteFile(tmpdir_ics_path)
-        deleteFile(tmpdir_json_path)
+        delete(tmpdir_ics_path)
+        delete(tmpdir_json_path)
         return res
       end,
       

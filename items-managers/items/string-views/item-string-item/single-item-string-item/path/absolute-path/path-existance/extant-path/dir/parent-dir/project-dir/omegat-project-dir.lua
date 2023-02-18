@@ -156,19 +156,19 @@ OmegatProjectDirItemSpecifier = {
         end)
       end,
       ["pull-glossaries"] = function(self)
-        copyFilelike(self:get("global-universal-glossary"), self:get("local-universal-glossary"))
-        copyFilelike(self:get("global-client-glossary"), self:get("local-client-glossary"))
+        srctgt("copy", self:get("global-universal-glossary"), self:get("local-universal-glossary"))
+        srctgt("copy", self:get("global-client-glossary"), self:get("local-client-glossary"))
       end,
       ["push-glossaries"] = function(self)
-        copyFilelike(self:get("local-universal-glossary"), self:get("global-universal-glossary"))
-        copyFilelike(self:get("local-client-glossary"), self:get("global-client-glossary"))
+        srctgt("copy", self:get("local-universal-glossary"), self:get("global-universal-glossary"))
+        srctgt("copy", self:get("local-client-glossary"), self:get("global-client-glossary"))
       end,
       ["pull-tm"] = function(self)
-        copyAllInDir(self:get("global-universal-tm"), self:get("tm-dir"))
-        copyAllInDir(self:get("global-client-tm"), self:get("tm-dir"))
+        srctgt("copy", self:get("global-universal-tm"), self:get("tm-dir"), "any", false, false, true)
+        srctgt("copy", self:get("global-client-tm"), self:get("tm-dir"), "any", false, false, true)
       end,
       ["push-tm"] = function(self)
-        copyInto(self:get("local-resultant-tm"), self:get("global-client-tm"))
+        srctgt("copy", self:get("local-resultant-tm"), self:get("global-client-tm"), "any", false, true)
       end,
       ["pull-omegat"] = function(self)
         self:doThis("pull-glossaries")

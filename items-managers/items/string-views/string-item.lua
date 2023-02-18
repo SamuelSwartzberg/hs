@@ -164,7 +164,7 @@ StringItemSpecifier = {
         CreateStringItem(path):doThis("log-now", self:get("contents"))
       end,
       ["write-to-file"] = function(self, path)
-        writePathAndFile(path, self:get("contents"))
+        writeFile(path, self:get("contents"))
       end,
       ["quick-look-bash-eval"] = function(self)
         local parts = stringy.split(self:get("contents"), " ")

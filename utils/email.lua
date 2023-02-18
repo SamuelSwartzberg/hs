@@ -49,7 +49,7 @@ function buildEmailInteractive(headers, body, edit_func, do_after)
       { value = new_file, type = "quoted" },
     }, function (exitCode, std_out, std_err)
       if exitCode == 0 then
-        deleteFile(temp_file)
+        delete(temp_file)
         do_after(new_file)
       else
         print("mmime failed")
@@ -84,7 +84,7 @@ function sendEmail(email_file, do_after)
         "-c",
         { value = env.MBSYNC_ARCHIVE, type = "quoted" },
       }, function()
-        deleteFile(email_file)
+        delete(email_file)
         if do_after then
           do_after()
         end

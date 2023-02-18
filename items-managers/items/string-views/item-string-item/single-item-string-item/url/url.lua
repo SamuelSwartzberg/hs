@@ -86,8 +86,8 @@ URLItemSpecifier = {
       end,
       ["subscribe-to-calendar"] = function(self)
         local name = self:get("url-domain")
-        local khal_config = CreateStringItem(env.KHAL_CONFIG)
-        local vdirsyncer_config = CreateStringItem(env.VDIRSYNCER_CONFIG)
+        local khal_config = CreateStringItem(env.KHAL_CONFIG .. "/config")
+        local vdirsyncer_config = CreateStringItem(env.VDIRSYNCER_CONFIG .. "/config" )
         local vdirsyncer_data = vdirsyncer_config:get("vdirsyncer-pair-and-corresponding-storages-for-webcal", self:get("contents"))
         local khal_data = khal_config:get("table-to-ini-section", {
           header = "[ro:" .. name .. "]", -- this results in double [[ ]] in the file, which is the format khal expects (don't ask me why)

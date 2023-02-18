@@ -69,7 +69,7 @@ ParentDirItemSpecifier = {
         self:get("child-dir-only-string-item-array"):doThis("choose-item-and-then-action")
       end,
       ["move-contents"] = function(self, target)
-        moveAllInDir(self:get("contents"), target)
+        srctgt("move", self:get("contents"), target, "any", false, false, true)
       end,
     }
   },

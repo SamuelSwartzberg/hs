@@ -15,7 +15,7 @@ local project_type_init_map = {
     })
   end,
   omegat = function(path)
-    createFile(path .. "/omegat.project", comp.templates.omegat)
+    writeFile(path .. "/omegat.project", comp.templates.omegat, "not-exists")
   end,
 }
 

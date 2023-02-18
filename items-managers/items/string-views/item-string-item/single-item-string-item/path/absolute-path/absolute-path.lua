@@ -16,7 +16,7 @@ PathInterfaceItemSpecifier = {
       end,
     },
     doThisables = {
-      ["create-file"] = function(self, contents) createFile(self:get("contents"), contents) end,
+      ["create-file"] = function(self, contents) writeFile(self:get("contents"), contents, "not-exists") end,
       ["write-file"] = function(self, contents) writeFile(self:get("contents"), contents) end,
       ["create-as-path"] = function(self)
         createPath(self:get("contents"))
@@ -28,20 +28,20 @@ PathInterfaceItemSpecifier = {
           createPath(self:get("contents"))
         elseif type(specifier.payload) ~= "table" or isListOrEmptyTable(specifier.payload) then
          --[[  if specifier.mode == "copy" and specifier.overwrite == true then
-            copyWithCreatePath(self:get("contents"), specifier.payload)
+            srctgt("copy", self:get("contents"), specifier.payload)
           elseif specifier.mode == "copy" and specifier.overwrite == false then
-            copyWithCreatePathIfDoesntExist(self:get("contents"), specifier.payload)
+            srctgt("copy", self:get("contents"), specifier.payload, "not-exists")
           elseif specifier.mode == "move" and specifier.overwrite == true then
-            moveWithCreatePath(self:get("contents"), specifier.payload)
+            srctgt("move", (self:get("contents"), specifier.payload)
           elseif specifier.mode == "move" and specifier.overwrite == false then
-            moveWithCreatePathIfDoesntExist(self:get("contents"), specifier.payload)
+            srctgt("move", IfDoesntExist(self:get("contents"), specifier.payload)
           else ]]if specifier.mode == "write" then
             if self:get("is-non-extant-path") or specifier.overwrite then 
               local filename = self:get("contents")
               if specifier.extension then 
                 filename = filename .. "." .. specifier.extension 
               end
-              createPathAndFile(filename, "")
+              writeFile(filename, "", "not-exists")
               self = CreateStringItem(filename)
             end
             self:doThis("append-rows", specifier.payload)

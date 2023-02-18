@@ -9,13 +9,13 @@ NonExtantPathItemSpecifier = {
     },
     doThisables = {
       ["write-file-contents"] = function(self, contents)
-        createFile(self:get("contents"), contents)
+        writeFile(self:get("contents"), contents, "not-exists")
       end,
       ["overwrite-file-contents"] = function (self, contents)
-        createFile(self:get("contents"), contents) -- same as write-file-contents since file doesn't exist
+        writeFile(self:get("contents"), contents, "not-exists") -- same as write-file-contents since file doesn't exist
       end,
       ["append-file-contents"] = function (self, contents)
-        createFile(self:get("contents"), contents) -- same as write-file-contents since file doesn't exist
+        writeFile(self:get("contents"), contents, "not-exists") -- same as write-file-contents since file doesn't exist
       end,
       ["create-self-as-empty-dir"] = function(self)
         createDir(self:get("contents"))

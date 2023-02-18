@@ -67,7 +67,7 @@ LatexProjectDirItemSpecifier = {
       end,
       ["build-bibfile"] = function(self)
         for _, bib_item in ipairs(self:get("imported-bib-items")) do
-          appendFile(self:get("latex-bibfile"), bib_item)
+          writeFile(self:get("latex-bibfile"), bib_item, "any", true, "a")
         end
       end,
     }
