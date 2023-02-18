@@ -48,10 +48,21 @@ function processSetupDirectivesInFiles(path)
     for line in stringx.lines(contents) do
       line = stringy.strip(line)
       local args = stringy.split(line, " ")
+      args = mapValueNewValue(args, function (arg)
+        if arg == "true" then
+          return true
+        elseif arg == "false" then
+          return false
+        elseif arg == "nil" then
+          return nil
+        else
+          return arg
+        end
+      end)
       print(
         "Would execute"
         .. " _G[\"" .. command .. "\"]"
-        .. "(" .. table.concat(args, ", ") .. ")"
+        .. "(" .. table.concat(mapValueToStr(args), ", ") .. ")"
       )
       _G[command](table.unpack(args))
     end
@@ -67,16 +78,33 @@ function drainAllSubdirsTo(origin, target, validator)
   end
 end
 
-
+function isEmptyFilelike(path)
+  if isDir(path) then
+    return dirIsEmpty(path)
+  else
+    return readFile(path) == ""
+  end
+end
 
 --- @param path string
 --- @param thing? "notdir" | "dir" | "any"
 --- @param action? "delete" | "empty"
+--- @param onlyif? "empty" | "notempty" | "any"
 --- @return boolean
-function delete(path, thing, action)
+function delete(path, thing, action, onlyif)
+
+  -- set defaults
+
   thing = defaultIfNil(thing, "any")
   action = defaultIfNil(action, "delete")
+  onlyif = defaultIfNil(onlyif, "any")
+
+  -- resolve tilde
+
   path = resolveTilde(path)
+
+  -- return early if dirness of path doesn't match thing
+
   if 
     (
       isDir(path) and
@@ -89,19 +117,35 @@ function delete(path, thing, action)
   then
     return false
   end    
+
+
+  -- return early if onlyif is not met
+
+  if onlyif == "empty" and not isEmptyFilelike(path) then
+    return false
+  elseif onlyif == "notempty" and isEmptyFilelike(path) then
+    return false
+  end
+
+  -- delete
+
   if isDir(path) then
     if action == "empty" then
       local res = os.execute("rm -rf '" .. path .. "'/*")
       return not not res
-    else
-      local res os.execute("rm -rf '" .. path .. "'")
+    elseif action == "delete" then
+      local res = os.execute("rm -rf '" .. path .. "'")
       return not not res
+    else 
+      error("action must be 'empty' or 'delete'")
     end
   else
     if action == "empty" then
       return writeFile(path, "")
-    else
+    elseif action == "delete" then
       return os.remove(path)
+    else
+      error("action must be 'empty' or 'delete'")
     end
   end
 end
@@ -170,25 +214,28 @@ function srctgt(action, source, target, condition, create_path, into, all_in)
   end
 
   local returned_false = false
-  for _, source in ipairs(sources) do
+  local final_target = target
+  for _, final_source in ipairs(sources) do
     local res
-
+    
     -- if all_in, then change target to be the target directory + the leaf of the source
     -- this does mean that this doesn't play nice with the `into` option, but I don't think that's a problem
     if all_in then
-      target = target .. "/" .. getLeafWithoutPath(source)
+      final_target = target .. "/" .. getLeafWithoutPath(final_source)
+      createParentPath(final_target)
     end
+    print(final_source .. " -> " .. final_target)
 
     if action == "copy" then
-      if isDir(source) then
-        res =  dir.clonetree(source, target)
+      if isDir(final_source) then
+        res =  dir.clonetree(final_source, final_target)
       else
-        res =  file.copy(source, target)
+        res =  file.copy(final_source, final_target)
       end
     elseif action == "move" then
-      res =  os.rename(source, target)
+      res =  os.rename(final_source, final_target)
     elseif action == "link" then
-      res =  hs.fs.link(source, target, true)
+      res =  hs.fs.link(final_source, final_target, true)
     end
 
     if not res then returned_false = true end

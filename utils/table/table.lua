@@ -151,6 +151,14 @@ function mapValueToStrippedValue(tbl)
   end)
 end
 
+--- @param tbl table<any, any> | nil
+--- @return table<any, string>
+function mapValueToStr(tbl)
+  return mapValueNewValue(tbl, function(v)
+    return tostring(v)
+  end)
+end
+
 --- @generic K
 --- @generic V
 --- @param tbl { [`K`]: `V` } | nil

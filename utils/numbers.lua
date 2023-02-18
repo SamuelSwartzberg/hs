@@ -98,3 +98,21 @@ end
 function randBetween(lower, upper)
   return lower + math.random()  * (upper - lower);
 end
+
+--- @param start? number
+--- @param stop? number
+--- @param step? number
+--- @return number[]
+function seq(start, stop, step)
+  start = defaultIfNil(start, 1)
+  stop = defaultIfNil(stop, 10)
+  step = defaultIfNil(step, 1)
+
+  local res = {}
+
+  for i = start, stop, step do
+    table.insert(res, i)
+  end
+
+  return res
+end
