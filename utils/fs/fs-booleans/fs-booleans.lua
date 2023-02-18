@@ -6,3 +6,9 @@ function isGitRootDir(path)
     return stringy.endswith(child, "/.git")
   end)
 end
+
+--- @param path string
+--- @return boolean
+function pathIsRemote(path)
+  return not not path:find("^[^/:]-:") 
+end

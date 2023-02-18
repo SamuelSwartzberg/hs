@@ -41,8 +41,13 @@ InGitDirPathItemSpecifier = {
         return {
           interval = interval,
           fn = function()
-            self:doThis("git-commit-all")
-            self:doThis("git-push")
+            self:doThis("git-add-all")
+            hs.timer.doAfter(2, function ()
+              self:doThis("git-commit-all")
+              hs.timer.doAfter(2, function ()
+                self:doThis("git-push")
+              end)
+            end)
           end
         }
       end,
@@ -74,6 +79,13 @@ InGitDirPathItemSpecifier = {
           { value = self:get("contents"), type = "quoted"}
         })
       end,
+      ["git-add-all"] = function(self)
+        self:doThis("cd-and-run-this-task", {
+          "git",
+          "add",
+          "**",
+        })
+      end,
       ["git-commit-self"] = function(self, message)
         self:doThis("cd-and-run-this-task", {
           "git",
@@ -103,13 +115,6 @@ InGitDirPathItemSpecifier = {
       ["git-commit-all-and-push"] = function(self, message)
         self:doThis("git-commit-all", message)
         self:doThis("git-push")
-      end,
-      ["git-add-all"] = function(self)
-        self:doThis("cd-and-run-this-task", {
-          "git",
-          "add",
-          "-A",
-        })
       end,
       
     }

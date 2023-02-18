@@ -1,3 +1,4 @@
+---@diagnostic disable: cast-local-type
 --- @param path string
 --- @param app? string
 --- @return boolean
@@ -78,7 +79,10 @@ function drainAllSubdirsTo(origin, target, validator)
   end
 end
 
-function isEmptyFilelike(path)
+--- @param path string
+--- @return boolean
+function isEmpty(path)
+  path = resolveTilde(path)
   if isDir(path) then
     return dirIsEmpty(path)
   else
@@ -103,15 +107,21 @@ function delete(path, thing, action, onlyif)
 
   path = resolveTilde(path)
 
+  -- set local vars
+
+  local path_is_remote = pathIsRemote(path)
+  local is_dir = isDir(path)
+  local is_empty = isEmpty(path)
+
   -- return early if dirness of path doesn't match thing
 
   if 
     (
-      isDir(path) and
+      is_dir and
       thing == "notdir"
     ) or
     (
-      not isDir(path) and
+      not is_dir and
       thing == "dir"
     )
   then
@@ -121,33 +131,61 @@ function delete(path, thing, action, onlyif)
 
   -- return early if onlyif is not met
 
-  if onlyif == "empty" and not isEmptyFilelike(path) then
+  if onlyif == "empty" and not is_empty then
     return false
-  elseif onlyif == "notempty" and isEmptyFilelike(path) then
+  elseif onlyif == "notempty" and is_empty then
     return false
   end
 
   -- delete
 
-  if isDir(path) then
-    if action == "empty" then
-      local res = os.execute("rm -rf '" .. path .. "'/*")
-      return not not res
-    elseif action == "delete" then
-      local res = os.execute("rm -rf '" .. path .. "'")
-      return not not res
-    else 
-      error("action must be 'empty' or 'delete'")
+  local res 
+
+  if action ~= "delete" and action ~= "empty" then
+    error("action must be 'delete' or 'empty'")
+  end
+
+  if is_dir then
+    if not path_is_remote then
+      if action == "empty" then
+        res = not not os.execute("rm -rf '" .. path .. "'/*")
+      elseif action == "delete" then
+        res = not not os.execute("rm -rf '" .. path .. "'")
+      end
+    else
+      _, res = getOutputArgs(
+        "rclone",
+        "purge",
+        { value = path, type = "quoted"}
+      )
+
+      -- purge deletes the directory itself, so we need to recreate it if we want to empty it (there seems to be no rclone empty command, or equivalent)
+      if action == "empty" then
+        local _, status = getOutputArgs(
+          "rclone",
+          "mkdir",
+          { value = path, type = "quoted"}
+        )
+        res = res and status
+      end
     end
   else
     if action == "empty" then
-      return writeFile(path, "")
+      res = writeFile(path, "") -- works for remote files too, since writeFile is also implemented for rclone
     elseif action == "delete" then
-      return os.remove(path)
-    else
-      error("action must be 'empty' or 'delete'")
+      if not path_is_remote then
+        os.remove(path)
+      else
+        _, res = getOutputArgs(
+          "rclone",
+          "delete",
+          { value = path, type = "quoted"}
+        )
+      end
     end
   end
+
+  return res
 end
 
 --- @param action "copy" | "move" | "link" what to do with the source
@@ -157,8 +195,9 @@ end
 --- @param create_path? boolean whether to create the path of the target if it doesn't exist
 --- @param into? boolean whether to action the source into the target directory, rather than action the source to the target
 --- @param all_in? boolean whether to action all the files in the source directory, rather than the source directory itself
+--- @param relative_to? string allow specifying
 --- @return boolean
-function srctgt(action, source, target, condition, create_path, into, all_in)
+function srctgt(action, source, target, condition, create_path, into, all_in, relative_to)
 
   -- set defaults
 
@@ -171,6 +210,19 @@ function srctgt(action, source, target, condition, create_path, into, all_in)
 
   source = resolveTilde(source)
   target = resolveTilde(target)
+
+  -- check if path is remote, customize things accordingly
+
+  local source_is_remote = pathIsRemote(source)
+  local target_is_remote = pathIsRemote(target)
+  local has_remote_path = source_is_remote or target_is_remote
+
+  -- resolve relative_to
+
+  if relative_to then
+    source = resolveRelativePath(source, relative_to)
+    target = resolveRelativePath(target, relative_to)
+  end
 
   -- create (parent) path if necessary
 
@@ -226,16 +278,36 @@ function srctgt(action, source, target, condition, create_path, into, all_in)
     end
     print(final_source .. " -> " .. final_target)
 
-    if action == "copy" then
-      if isDir(final_source) then
-        res =  dir.clonetree(final_source, final_target)
-      else
-        res =  file.copy(final_source, final_target)
+    if not has_remote_path then 
+      if action == "copy" then
+        if isDir(final_source) then
+          res =  dir.clonetree(final_source, final_target)
+        else
+          res =  file.copy(final_source, final_target)
+        end
+      elseif action == "move" then
+        res =  os.rename(final_source, final_target)
+      elseif action == "link" then
+        res =  hs.fs.link(final_source, final_target, true)
       end
-    elseif action == "move" then
-      res =  os.rename(final_source, final_target)
-    elseif action == "link" then
-      res =  hs.fs.link(final_source, final_target, true)
+    else
+      if action == "copy" then
+        _, res = getOutputArgs(
+          "rclone",
+          "copy",
+          { value = final_source, type = "quoted"},
+          { value = final_target, type = "quoted"}
+        )
+      elseif action == "move" then
+        _, res = getOutputArgs(
+          "rclone",
+          "move",
+          { value = final_source, type = "quoted"},
+          { value = final_target, type = "quoted"}
+        )
+      elseif action == "link" then
+        error("linking remote files is not supported (not supported by rclone and also not really sensible)")
+      end
     end
 
     if not res then returned_false = true end

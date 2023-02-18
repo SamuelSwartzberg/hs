@@ -2,6 +2,10 @@
 hs = hs
 hs.ipc.cliInstall("/opt/homebrew") -- install the homebrew cli, stupidly has to be done on every launch
 
+--- typedef for placeholder var `_`
+--- @type any
+_=nil
+
 log = hs.logger.new("init", "debug")
 log.i("Log initialized.")
 
@@ -480,6 +484,8 @@ System:get("manager", "timer"):doThis("register-all", {
   CreateStringItem(env.MKEYS):get("autocommit-and-push-task", toSeconds(1, "h")),
   CreateStringItem(env.MMEMORY):get("autocommit-and-push-task", toSeconds(1, "h")),
   CreateStringItem(env.MPASS):get("autocommit-and-push-task", toSeconds(1, "h")),
+  CreateStringItem(env.MDOTCONFIG):get("autocommit-and-push-task", toSeconds(1, "h")),
+  CreateStringItem(env.MHOMECONFIG):get("autocommit-and-push-task", toSeconds(1, "h")),
   CreateStringItem(env.MSTATE):get("autocommit-and-push-task", toSeconds(1, "h")),
   --[[CreateApplicationItem("Firefox"):get("backup-timer"),
   CreateApplicationItem("Signal"):get("backup-timer"),

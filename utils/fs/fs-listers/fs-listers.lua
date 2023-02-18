@@ -38,7 +38,32 @@ function getAllInPath(path, recursion, include_dirs, include_files, validator)
   if recursion == nil then recursion = false end
   if include_dirs == nil then include_dirs = true end
   if include_files ==nil then include_files = true end
-  for file_name in hs.fs.dir(path) do
+
+  local remote = pathIsRemote(path)
+
+  local lister
+  if not remote then
+    lister = hs.fs.dir
+  else
+    lister = function(listerpath)
+      local output, status, reason, code = getOutputTask({"rclone", "lsf", {value = listerpath, type = "quoted"}})
+      local items
+      if status then
+        items = mapValueNewValue(
+          stringy.split(stringy.strip(output), "\n"),
+          function(item)
+            item = stringy.strip(item)
+            item = ensureAdfix(item, "/", false, false, "pre")
+          end
+        )
+      else
+        items = {}
+      end
+      return svalues(items)
+    end
+  end
+
+  for file_name in lister(path) do
     if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" and validator(file_name) then
       local file_path = path .. file_name
       if isDir(file_path) then 

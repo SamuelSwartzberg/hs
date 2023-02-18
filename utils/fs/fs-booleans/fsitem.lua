@@ -1,9 +1,16 @@
 --- @param path string
 --- @return boolean
 function isDir(path)
-  return not not hs.fs.chdir(path)
-end
+  path = resolveTilde(path)
+  local remote = pathIsRemote(path)
 
+  if not remote then
+    return not not hs.fs.chdir(path)
+  else 
+    local output, status, reason, code = getOutputTask({"rclone", "lsd", {value = path, type = "quoted"}})
+    return status and #output > 0
+  end
+end
 
 --- @param str string
 --- @return boolean
@@ -48,12 +55,19 @@ end
 --- @return boolean #Whether the path exists
 function pathExists(path)
   path = resolveTilde(path)
-  local file = io.open(path, "r")
-  if file ~= nil then
-    io.close(file)
-    return true
+  local remote = pathIsRemote(path)
+
+  if not remote then
+    local file = io.open(path, "r")
+    if file ~= nil then
+      io.close(file)
+      return true
+    else
+      return false
+    end
   else
-    return false
+    local output, status, reason, code = getOutputTask({"rclone", "ls", {value = path, type = "quoted"}})
+    return status and #output > 0
   end
 end
 

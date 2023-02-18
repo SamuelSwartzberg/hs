@@ -9,7 +9,13 @@ end
 --- @return boolean
 function createPath(path)
   path = resolveTilde(path)
-  local _, res = hs.execute("mkdir -p '" .. path .. "'")
+  local remote = pathIsRemote(path)
+  if not remote then
+    _, res = hs.execute("mkdir -p '" .. path .. "'")
+  else
+    local output, status, reason, code = getOutputTask({"rclone", "mkdir", {value = path, type = "quoted"}})
+    res = status
+  end
   return res
 end
 
@@ -34,6 +40,9 @@ function writeFile(path, contents, condition, create_path, mode)
   create_path = defaultIfNil(create_path, true)
   mode = defaultIfNil(mode, "w")
   path = resolveTilde(path)
+
+  local path_is_remote = pathIsRemote(path)
+
   if create_path then
     createParentPath(path)
   end
@@ -46,13 +55,38 @@ function writeFile(path, contents, condition, create_path, mode)
       return false
     end
   end
-  local file = io.open(path, mode)
-  if file ~= nil then
-    file:write(contents or "")
-    io.close(file)
-    return true
+  if not path_is_remote then 
+    local file = io.open(path, mode)
+    if file ~= nil then
+      file:write(contents or "")
+      io.close(file)
+      return true
+    else
+      return false
+    end
   else
-    return false
+    local temppath = env.TMPDIR .. "/" .. os.time() .. "-" .. math.random(1000000)
+    local res = true
+    local _, status = getOutputTask({
+      "rclone",
+      "cat",
+      {value = path, type = "quoted"},
+      ">", 
+      {value = temppath, type = "quoted"},
+    })
+    res = res and status
+    status = writeFile(temppath, contents, "any", false, mode)
+    res = res and status
+    _, status = getOutputTask({
+      "rclone",
+      "copy",
+      {value = temppath, type = "quoted"},
+      {value = path, type = "quoted"},
+    })
+    res = res and status
+    status = delete(temppath)
+    res = res and status
+    return res
   end
 end
 

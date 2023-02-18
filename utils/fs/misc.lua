@@ -102,3 +102,16 @@ function getSourceAndTarget(specifier)
   return source, target
 end
 
+
+--- @param path string
+--- @param prefix? string
+function resolveRelativePath(path, prefix)
+  prefix = prefix or ""
+  prefix = ensureAdfix(prefix, "/", false, false, "suf") -- ensure no trailing slash
+  local preprefix
+  if pathIsRemote(path) then
+    preprefix, path = path:match("^([^/:]-:)(.*)$")
+  end
+  path = ensureAdfix(path, "/", false, true, "pref") -- ensure leading slash
+  return preprefix .. prefix .. path
+end

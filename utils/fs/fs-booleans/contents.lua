@@ -23,7 +23,7 @@ end
 --- @return boolean
 function dirIsEmpty(path)
   path = resolveTilde(path)
-  for file_name in hs.fs.dir(path) do
+  for _, file_name in ipairs(getChildren(path)) do
     if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" then
       return false
     end

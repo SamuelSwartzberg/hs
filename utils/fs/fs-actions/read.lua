@@ -3,13 +3,23 @@
 --- @return string | nil
 function readFile(path)
   path = resolveTilde(path)
-  local file = io.open(path, "r")
-  if file ~= nil then
-    local contents = file:read("*a")
-    io.close(file)
-    return contents
+  local path_is_remote = pathIsRemote(path)
+  if not path_is_remote then 
+    local file = io.open(path, "r")
+    if file ~= nil then
+      local contents = file:read("*a")
+      io.close(file)
+      return contents
+    else
+      return nil
+    end
   else
-    return nil
+    local output, status, reason, code = getOutputTask({"rclone", "cat", {value = path, type = "quoted"}})
+    if status then
+      return output
+    else
+      return nil
+    end
   end
 end
 

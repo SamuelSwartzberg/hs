@@ -530,7 +530,7 @@ function combinations(list, k)
   if k == 0 then
     return {{}}
   else 
-    return statefulMultiReturnIteratorToTable(combine.combn, list, k)
+    return statefulNokeyIteratorToTable(combine.combn, list, k)
   end
 end
 
@@ -541,7 +541,7 @@ function permutations(list)
   if #list == 0 then
     return {{}}
   else
-    return statefulMultiReturnIteratorToTable(combine.permute, list)
+    return statefulNokeyIteratorToTable(combine.permute, list)
   end
 end
 
@@ -552,7 +552,7 @@ function powerset(list)
   if #list == 0 then
     return {{}}
   else
-    local output = listConcat( statefulMultiReturnIteratorToTable(combine.powerset, list), {{}} )
+    local output = listConcat( statefulNokeyIteratorToTable(combine.powerset, list), {{}} )
     return output
   end
 end
