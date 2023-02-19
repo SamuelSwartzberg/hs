@@ -12,7 +12,7 @@ MenvDirItemSpecifier = {
             self:doThis("write-env-file")
             self:doThis("source-env")
           end,
-          interval = 300,
+          interval = "*/5 * * * *",
         }
       end,
       

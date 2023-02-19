@@ -4,20 +4,20 @@ ManagedTimerArraySpecifier = {
     getables = {
     },
     doThisables = {
-      ["space-triggers"] = function(self)
-        local triggers = {}
+      ["space-firings"] = function(self)
+        local firings = {}
         for _, item in ipairs(self:get("contents")) do
-          local next_trigger = item:get("next-trigger")
+          local next_firing = item:get("next-firing")
           if not item:get("low-impact") and item:get("is-running") then -- no need to space out low-impact timers
-            if not triggers[next_trigger] then
-              triggers[next_trigger] = item
+            if not firings[next_firing] then
+              firings[next_firing] = item
             else
               print("Spacing")
-              while triggers[next_trigger] do
-                next_trigger = next_trigger + 1
+              while firings[next_firing] do
+                next_firing = next_firing + 1
               end
-              item:doThis("set-next-trigger", next_trigger)
-              triggers[next_trigger] = item
+              item:doThis("set-next-firing", next_firing)
+              firings[next_firing] = item
             end
           end
         end
@@ -51,10 +51,10 @@ function CreateManagedTimerArrayDirectly()
   local managed_timer_array = CreateArray({}, "timer")
 
   managed_timer_array:doThis("create", {
-    interval = 10,
+    interval = "*/10 * * * * *",
     low_impact = true,
     fn = function()
-      managed_timer_array:doThis("space-triggers")
+      managed_timer_array:doThis("space-firings")
     end
   })
     

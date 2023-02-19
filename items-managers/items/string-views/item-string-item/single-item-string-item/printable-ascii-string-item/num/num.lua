@@ -19,7 +19,7 @@ NumItemSpecifier = {
         return self:get("to-number-interface"):get("eutf8-to-unicode-prop-table")
       end,
       ["to-date-obj-item"] = function(self)
-        return CreateDate(date(tonumber(self:get("contents"))))
+        return CreateDate(date(tonumber(self:get("contents"))):tolocal())
       end
     },
   },

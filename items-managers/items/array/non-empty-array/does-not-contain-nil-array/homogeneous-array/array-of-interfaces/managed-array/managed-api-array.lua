@@ -27,10 +27,10 @@ CreateManagedApiArray = bindArg(NewDynamicContentsComponentInterface, ManagedApi
 function CreateManagedApiArrayDirectly(managed_timer_array)
   local managed_api_array = CreateArray({}, "api")
   managed_timer_array:doThis("create", {
-    interval = toSeconds(50, "m"),
+    interval = "*/2 * * * * *",
     fn = function()
       managed_api_array:doThis("for-all-staggered", {
-        interval = 90,
+        interval = "*/2 * * * *",
         fn = function(api)
           api:doThis("refresh-tokens")
         end

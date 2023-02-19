@@ -20,6 +20,7 @@ post 'lua is working':
     - ics urls
   - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
+  - unix date in ms to actual date in chooser
   - repo, file in repo to github path (may already be implemented), also in action table
   - interface with upkg in hs
   - citations

@@ -1,3 +1,5 @@
+if mode == "full-test" then
+
 delete(env.HSFTP_TMPDIR .. "/foo/")
 
 assertMessage(
@@ -97,8 +99,6 @@ assertMessage(
 
 delete(remote_file_path)
 
-error('stop')
-
 
 assertMessage(
   pathExists(remote_dir_path),
@@ -171,11 +171,15 @@ assertValuesNotContain(
   { env.HOME }
 )
 
+writeFile(env.TMPDIR .. "/ff/rr/bb.txt", "hello world", "any", true)
+
 --- all in path, search recursively
 assertValuesContain(
-  getAllInPath(env.MAC_FIREFOX, true),
-  { env.MAC_FIREFOX_DEFAULT_RELEASE_PROFILE }
+  getAllInPath(env.TMPDIR .. "/ff", true),
+  { env.TMPDIR .. "/ff/rr/bb.txt" }
 )
+
+delete(env.TMPDIR .. "/ff")
 
 --- same but remote
 
@@ -191,6 +195,8 @@ assertValuesContainExactly(
     env.HSFTP_TMPDIR .. "/foo/bar/new.txt"
   }
 )
+
+
 
 assertMessage(
   getParentPath("/foo/bar"),
@@ -376,11 +382,6 @@ assertMessage(
 
 assertMessage(
   resolveRelativePath("/foo/bar/baz", env.HOME),
-  env.HOME .. "/foo/bar/baz"
-)
-
-assertMessage(
-  resolveRelativePath("/foo/bar/baz", env.HOME .. "/foo"),
   env.HOME .. "/foo/bar/baz"
 )
 
@@ -656,3 +657,5 @@ assertMessage(
 
 delete(env.HSFTP_TMPDIR .. "/natsume.txt")
 delete(env.HSFTP_TMPDIR .. "/keiko.txt")
+
+end

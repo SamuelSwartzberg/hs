@@ -55,4 +55,6 @@ rrq("build-chooser")
 rrq("component-interface")
 env = getEnvAsTable()
 
-rrq("_test")
+if mode ~= "prod" then 
+  rrq("_test")
+end

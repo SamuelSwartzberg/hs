@@ -1,50 +1,86 @@
+--- replacement for the old timer, using cron specifiers instead
+
 --- @type ItemSpecifier
 TimerItemSpecifier = {
   type = "timer-item",
   properties = {
     getables = {
-      ["timer"] = function(self)
-        return self:get("contents").timer
-      end,
       ["interval"] = function (self)
         return self:get("contents").interval
       end,
       ["fn"] = function(self)
         return self:get("contents").fn
       end,
-      ["is-running"] = function(self)
-        return self:get("timer"):running()
+      ["next-firing"] = function(self)
+        return self:get("contents").next_firing
       end,
-      ["next-trigger"] = function(self)
-        return toInt(self:get("timer"):nextTrigger())
+      ["timer"] = function (self)
+        return self:get("contents").timer
+      end,
+      ["calculate-next-firing"] = function(self)
+        return tonumber(stringy.strip(getOutputArgsSimple(
+          "ncron",
+          { value = self:get("interval"), type = "quoted"}
+        )), 10)
       end,
       ["low-impact"] = function(self)
         return self:get("contents").low_impact
       end,
+      ["is-primed"] = function(self)
+        return self:get("timer") ~= nil
+      end,
+      ["is-running"] = function(self)
+        return self:get("timer"):running()
+      end,
 
     },
     doThisables = {
-      ["start"] = function (self)
-        self:get("timer"):start()
+      ["prime"] = function(self) -- prime by analogy with explosives: Set the timer for the next exection
+        self:get("contents").timer = doAtTimestamp(
+          self:get("next-firing"), 
+          function() 
+            self:doThis("fire-and-prime") 
+          end
+        )
       end,
-      ["stop"] = function (self)
-        self:get("timer"):stop()
+      ["unprime"] = function (self)
+        self:get("contents").timer = nil
       end,
-      ["set-next-trigger"] = function (self, seconds)
-        self:get("timer"):setNextTrigger(seconds)
+      ["calculate-and-prime"] = function(self)
+        self:get("contents").next_firing = self:get("calculate-next-firing")
+        self:doThis("prime")
       end,
-      ["delay-by"] = function (self, seconds)
-        self:get("timer"):setNextTrigger(self:get("next-trigger") + seconds)
+      ["fire"] = function (self) -- fire by analogy with explosives: Execute the function and unprime the timer
+        self:get("fn")()
+        self:get("contents").next_firing = nil
+        self:get("contents").timer = nil
       end,
-      ["fire"] = function (self)
-        self:get("timer"):fire()
+      ["fire-and-prime"] = function(self) 
+        self:get("fn")()
+        self:doThis("calculate-and-prime")
       end,
-      ["set-new-fn"] = function (self, fn)
-        self:get("contents").timer = hs.timer.doEvery(self:get("interval"), fn)
+      ["delay-by"] = function(self, seconds)
+        self:get("contents").next_firing = self:get("next-firing") + seconds
+        self:doThis("prime")
       end,
-      ["set-new-interval"] = function (self, interval)
-        self:get("contents").timer = hs.timer.doEvery(interval, self:get("fn"))
+      ["set-next-firing"] = function(self, seconds)
+        self:get("contents").next_firing = seconds
+        self:doThis("prime")
       end,
+      ["freeze"] = function(self) -- freezing = stopping a primed timer
+        local contents = self:get("contents")
+        if contents.timer then
+          contents.timer:stop()
+        end
+      end,
+      ["unfreeze"] = function(self) -- unfreezing = starting a primed timer
+        local contents = self:get("contents")
+        if contents.timer then
+          contents.timer:start()
+        end
+      end,
+
+
       
     }
   },
@@ -54,8 +90,9 @@ TimerItemSpecifier = {
 
 --- @type BoundRootInitializeInterface
 function CreateTimerItem(specifier)
-  specifier.timer = hs.timer.new(specifier.interval or toSeconds(10, "m"), specifier.fn)
-  specifier.timer:start()
-  return RootInitializeInterface(TimerItemSpecifier, specifier)
+  specifier.interval = specifier.interval or "*/10 * * * *"
+  local timer_item = RootInitializeInterface(TimerItemSpecifier, specifier)
+  timer_item:doThis("calculate-and-prime")
+  return timer_item
 end
 

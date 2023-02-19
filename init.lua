@@ -6,52 +6,16 @@ hs.ipc.cliInstall("/opt/homebrew") -- install the homebrew cli, stupidly has to 
 --- @type any
 _=nil
 
+mode = "dev" -- "full-test", "dev" or "prod"
+-- currently:
+-- full-test: run all tests
+-- dev: run all tests except those marked as "full-test"
+-- prod: run no tests
+
 log = hs.logger.new("init", "debug")
 log.i("Log initialized.")
 
---- @type pl.stringx
-stringx = require("pl.stringx")
---- @type pl.dir
-dir = require("pl.dir")
---- @type pl.file
-file = require("pl.file")
---- @type pl.tablex
-tablex = require("pl.tablex")
---- @type pl.array2d
-array2d = require("pl.array2d")
---- @type pl.data 
-data = require("pl.data")
---- @type ftcsv
-ftcsv = require('ftcsv')
---- @type date
-date = require("date")
-curl = require("cURL")
---- @type lyaml
-yaml = require("lyaml")
---- @type cjson
-json = require("cjson")
---- @type toml
-toml = require("toml")
-oldutf8 = utf8
---- @type eutf8
-eutf8 = require 'lua-utf8'
-onig = require("rex_onig") -- oniguruma regex engine. Not faster than lua's built in regex engine, but has more features, and can deal with unicode.
---- @type stringy
-stringy = require("stringy")
-xml = require "xmllpegparser"
---- @type basexx
-basexx = require("basexx")
---- @type memoize
-memoize = require 'memoize'
---- @type mimetypes
-mimetypes = require "mimetypes"
-combine = require "combine"
-
---- @type hashings 
-hashings = require("hashings")
-
---- @type promiselib | fun(fn: promisefn): PromiseObj
-Promise = require 'promise'
+require("package-imports")
 
 require("utils")
 
@@ -253,7 +217,7 @@ local keymap = {
           "map-to-table-of-path-and-path-content-items",
         },
         "invalidate",
-        toSeconds(1, "h")
+        "0 * * * *"
       ):exec():doThis("choose-item-and-then-action")
     end,
   },
@@ -328,7 +292,7 @@ local keymap = {
     explanation = "Choose a citation item, and then choose an action on it.",
     fn = function()
       memoizer
-        :getOrCreate(createCSLArray, "invalidate", toSeconds(1, "h"))
+        :getOrCreate(createCSLArray, "invalidate", "0 * * * *")
         :exec()
         :doThis("choose-item-and-then-action")
     end,
@@ -459,7 +423,9 @@ System:get("manager", "timer"):doThis("register-all", {
   bindArgsVararg(syncHomeRelativePath, "Pictures/Android", "pull", "move"),
   bindArgsVararg(syncHomeRelativePath, env.TACHIYOMI_STATE_DIR, "pull", "move"),
   bindArgsVararg(syncHomeRelativePath, env.NEWPIPE_STATE_DIR, "pull", "move"),
-  CreateStringItem(env.MEDIA_QUEUE):get("timer-that-does", { interval = 3, key = "lines-as-stream-queue" }),
+  CreateStringItem(env.MEDIA_QUEUE):get("timer-that-does", { 
+    interval = "*/3 * * * * *", 
+    key = "lines-as-stream-queue" }),
   { 
     fn = bindArg(runHsTask, {
       "mbsync",
@@ -467,30 +433,32 @@ System:get("manager", "timer"):doThis("register-all", {
       { value = "$XDG_CONFIG_HOME/isync/mbsyncrc", type = "quoted"},
       "mb-channel"
     }), 
-    interval = 60
+    interval = "* * * * *"
   },{
     fn = bindArgsVararg(runJsonServerAtPort, env.JSON_SERVER_PORT, env.LOCAL_JSON_SERVER_DIR),
-    interval = 60
+    interval = "* * * * *"
   },
   CreateStringItem(env.MENV):get("refresh-env-task"),
-  CreateStringItem(env.MURLS):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MCONTACTS):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MACTABLE_PATHS):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MCERTS):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MDEPENDENCIES):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MDICTIONARIES):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MENV):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MGNUPG):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MKEYS):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MMEMORY):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MPASS):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MDOTCONFIG):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MHOMECONFIG):get("autocommit-and-push-task", toSeconds(1, "h")),
-  CreateStringItem(env.MSTATE):get("autocommit-and-push-task", toSeconds(1, "h")),
+  CreateStringItem(env.MURLS):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MCONTACTS):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MACTABLE_PATHS):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MCERTS):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MDEPENDENCIES):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MDICTIONARIES):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MENV):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MGNUPG):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MKEYS):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MMEMORY):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MPASS):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MDOTCONFIG):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MHOMECONFIG):get("autocommit-and-push-task", "0 * * * *"),
+  CreateStringItem(env.MSTATE):get("autocommit-and-push-task", "0 * * * *"),
   --[[CreateApplicationItem("Firefox"):get("backup-timer"),
   CreateApplicationItem("Signal"):get("backup-timer"),
   CreateApplicationItem("Discord"):get("backup-timer"),]]
-  CreateStringItem(env.ME):get("timer-that-does", { interval = 300, key = "pull-all" }),
+  CreateStringItem(env.ME):get("timer-that-does", {
+     interval = "*/5 * * * *", key = "pull-all" 
+    }),
 }) 
 
 persistent_shell_tasks = {

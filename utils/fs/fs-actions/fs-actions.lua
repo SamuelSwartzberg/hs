@@ -291,17 +291,18 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
         res =  hs.fs.link(final_source, final_target, true)
       end
     else
+      local final_
       if action == "copy" then
         _, res = getOutputArgs(
           "rclone",
-          "copy",
+          "copyto",
           { value = final_source, type = "quoted"},
           { value = final_target, type = "quoted"}
         )
       elseif action == "move" then
         _, res = getOutputArgs(
           "rclone",
-          "move",
+          "moveto",
           { value = final_source, type = "quoted"},
           { value = final_target, type = "quoted"}
         )
