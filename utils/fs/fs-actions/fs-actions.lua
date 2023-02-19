@@ -178,7 +178,7 @@ function delete(path, thing, action, onlyif)
       else
         _, res = getOutputArgs(
           "rclone",
-          "delete",
+          "deletefile",
           { value = path, type = "quoted"}
         )
       end

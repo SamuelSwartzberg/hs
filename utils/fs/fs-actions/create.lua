@@ -60,19 +60,23 @@ function writeFile(path, contents, condition, create_path, mode)
   else
     local temppath = env.TMPDIR .. "/" .. os.time() .. "-" .. math.random(1000000)
     local res = true
-    local _, status = getOutputTask({
-      "rclone",
-      "cat",
-      {value = path, type = "quoted"},
-      ">", 
-      {value = temppath, type = "quoted"},
-    })
-    res = res and status
+    if mode == "a" then
+      local _, status = getOutputTask({
+        "rclone",
+        "cat",
+        {value = path, type = "quoted"},
+        ">", 
+        {value = temppath, type = "quoted"},
+      })
+      res = res and status
+    end
+    delete(path, "any", "delete") -- have to delete the original file, as rclone copyto does not overwrite
+    -- not a problem since we're handling appending locally anyway
     status = writeFile(temppath, contents, "any", false, mode)
     res = res and status
     _, status = getOutputTask({
       "rclone",
-      "copy",
+      "copyto",
       {value = temppath, type = "quoted"},
       {value = path, type = "quoted"},
     })

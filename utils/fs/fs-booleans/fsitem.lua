@@ -7,8 +7,17 @@ function isDir(path)
   if not remote then
     return not not hs.fs.chdir(path)
   else 
-    local output, status, reason, code = getOutputTask({"rclone", "lsd", {value = path, type = "quoted"}})
-    return status and #output > 0
+    local output, status, reason, code = getOutputTask({"rclone", "lsjson", "--stat", {value = path, type = "quoted"}})
+    if status then
+      local succ, parsed = pcall(json.decode, output)
+      if succ then
+        return parsed.IsDir
+      else
+        return false
+      end
+    else
+      return false
+    end
   end
 end
 
@@ -67,7 +76,7 @@ function pathExists(path)
     end
   else
     local output, status, reason, code = getOutputTask({"rclone", "ls", {value = path, type = "quoted"}})
-    return status and #output > 0
+    return status
   end
 end
 

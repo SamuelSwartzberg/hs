@@ -222,7 +222,7 @@ assertMessage(nextValue(), "a")
 assertMessage(nextValue(), "b")
 assertMessage(nextValue(), "c")
 
-local nextKey = sikeys(foobar_table)
+local nextKey = skeys(foobar_table)
 
 assertMessage(nextKey(), "bar")
 assertMessage(nextKey(), "foo")

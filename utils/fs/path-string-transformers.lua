@@ -26,7 +26,7 @@ end
 --- @param str string
 --- @return string
 function getLeafWithoutPath(str)
-  local leaf = str:match("^.*/([^/]*)$")
+  local leaf = str:match("^.*/([^/]+)/?$")
   if leaf == nil then
     return str
   else

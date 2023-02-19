@@ -48,22 +48,29 @@ function getAllInPath(path, recursion, include_dirs, include_files, validator)
     lister = function(listerpath)
       local output, status, reason, code = getOutputTask({"rclone", "lsf", {value = listerpath, type = "quoted"}})
       local items
+      print(output)
       if status then
+        items = stringy.split(stringy.strip(output), "\n")
+        items = listFilterEmptyString(items)
         items = mapValueNewValue(
-          stringy.split(stringy.strip(output), "\n"),
+          items,
           function(item)
             item = stringy.strip(item)
             item = ensureAdfix(item, "/", false, false, "pre")
+            item = ensureAdfix(item, "/", false, false, "suf")
+            return item
           end
         )
       else
         items = {}
       end
+      inspPrint(items)
       return svalues(items)
     end
   end
 
   for file_name in lister(path) do
+    print(file_name)
     if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" and validator(file_name) then
       local file_path = path .. file_name
       if isDir(file_path) then 
@@ -87,6 +94,7 @@ function getAllInPath(path, recursion, include_dirs, include_files, validator)
       end
     end
   end
+  print(getOutputArgs("rclone", "lsf", {value = path, type = "quoted"}))
   return files
 end
 

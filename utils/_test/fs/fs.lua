@@ -1,3 +1,5 @@
+delete(env.HSFTP_TMPDIR .. "/foo/")
+
 assertMessage(
   resolveTilde("~"),
   env.HOME
@@ -28,7 +30,7 @@ assertMessage(
   true
 )
 
-local remote_dir_path = env.MB_WEBDAV_TMPDIR .. "/foo/bar"
+local remote_dir_path = env.HSFTP_TMPDIR .. "/foo/bar"
 
 createPath(remote_dir_path)
 
@@ -67,7 +69,9 @@ assertMessage(
   true
 )
 
-local remote_file_path = env.MB_WEBDAV_TMPDIR .. "/foo/bar/baz.txt"
+local remote_file_path = env.HSFTP_TMPDIR .. "/foo/bar/baz.txt"
+
+
 
 writeFile(remote_file_path, "hello world", "any", true)
 
@@ -93,6 +97,14 @@ assertMessage(
 
 delete(remote_file_path)
 
+error('stop')
+
+
+assertMessage(
+  pathExists(remote_dir_path),
+  true
+)
+
 assertMessage(
   dirIsEmpty(remote_dir_path),
   true
@@ -103,8 +115,8 @@ assertMessage(
   true
 )
 
-writeFile(env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt", "hello world", "any", true)
-writeFile(env.MB_WEBDAV_TMPDIR .. "/foo/test2.txt", "hello world", "any", true)
+writeFile(env.HSFTP_TMPDIR .. "/foo/test1.txt", "hello world", "any", true)
+writeFile(env.HSFTP_TMPDIR .. "/foo/test2.txt", "hello world", "any", true)
 
 --- all in path 
 
@@ -116,11 +128,11 @@ assertValuesContain(
 --- same but remote
 
 assertValuesContainExactly(
-  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo"),
+  getAllInPath(env.HSFTP_TMPDIR .. "/foo"),
   { 
-    env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt", 
-    env.MB_WEBDAV_TMPDIR .. "/foo/test2.txt",
-    env.MB_WEBDAV_TMPDIR .. "/foo/bar"
+    env.HSFTP_TMPDIR .. "/foo/test1.txt", 
+    env.HSFTP_TMPDIR .. "/foo/test2.txt",
+    env.HSFTP_TMPDIR .. "/foo/bar"
   }
 )
 
@@ -132,10 +144,10 @@ assertValuesContain(
 
 --- same but remote
 assertValuesContainExactly(
-  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo", false, false, true),
+  getAllInPath(env.HSFTP_TMPDIR .. "/foo", false, false, true),
   { 
-    env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt", 
-    env.MB_WEBDAV_TMPDIR .. "/foo/test2.txt"
+    env.HSFTP_TMPDIR .. "/foo/test1.txt", 
+    env.HSFTP_TMPDIR .. "/foo/test2.txt"
   }
 )
 
@@ -147,9 +159,9 @@ assertValuesContain(
 
 --- same but remote
 assertValuesContainExactly(
-  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo", false, true, false),
+  getAllInPath(env.HSFTP_TMPDIR .. "/foo", false, true, false),
   { 
-    env.MB_WEBDAV_TMPDIR .. "/foo/bar"
+    env.HSFTP_TMPDIR .. "/foo/bar"
   }
 )
 
@@ -167,15 +179,16 @@ assertValuesContain(
 
 --- same but remote
 
-writeFile(env.MB_WEBDAV_TMPDIR .. "/foo/bar/new.txt", "hello world", "any", true)
+writeFile(env.HSFTP_TMPDIR .. "/foo/bar/new.txt", "hello world", "any", true)
+
 
 assertValuesContainExactly(
-  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo", true),
+  getAllInPath(env.HSFTP_TMPDIR .. "/foo", true),
   { 
-    env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt", 
-    env.MB_WEBDAV_TMPDIR .. "/foo/test2.txt",
-    env.MB_WEBDAV_TMPDIR .. "/foo/bar",
-    env.MB_WEBDAV_TMPDIR .. "/foo/bar/new.txt"
+    env.HSFTP_TMPDIR .. "/foo/test1.txt", 
+    env.HSFTP_TMPDIR .. "/foo/test2.txt",
+    env.HSFTP_TMPDIR .. "/foo/bar",
+    env.HSFTP_TMPDIR .. "/foo/bar/new.txt"
   }
 )
 
@@ -199,28 +212,25 @@ assertMessage(
   "foo"
 )
 
-assertMessage(
-  valuesContain(
-    getSiblings("/", true, true),
-    "/Applications"
-  ),
-  true
+assertValuesContain(
+  getSiblings("/", true, true),
+  {"/Applications"}
+  
 )
 
 -- same but remote
 
-assertMessage(
-  valuesContain(
-    getSiblings(env.MB_WEBDAV_TMPDIR .. "/foo", true, true),
-    env.MB_WEBDAV_TMPDIR .. "/foo/test1.txt"
-  ),
-  true
+
+
+assertValuesContain(
+  getSiblings(env.HSFTP_TMPDIR .. "/foo/bar", true, true),
+  {env.HSFTP_TMPDIR .. "/foo/test1.txt"}
 )
 
-delete(env.MB_WEBDAV_TMPDIR .. "/foo", "empty")
+delete(env.HSFTP_TMPDIR .. "/foo", "empty")
 
 assertTable(
-  getAllInPath(env.MB_WEBDAV_TMPDIR .. "/foo", true),
+  getAllInPath(env.HSFTP_TMPDIR .. "/foo", true),
   {}
 )
 
@@ -568,7 +578,7 @@ for _, n in ipairs(seq(1, 4)) do
   )
 end
 
-local remote_writing_file = env.MB_WEBDAV_TMPDIR .. "/foo/meep.txt"
+local remote_writing_file = env.HSFTP_TMPDIR .. "/foo/meep.txt"
 
 writeFile(remote_writing_file, "bar", "exists", false, "w")
 
@@ -632,15 +642,17 @@ local tmpdirdir = env.TMPDIR .. "/testdir" .. os.time()
 writeFile(tmpdirdir .. "/natsume.txt", "natsume")
 writeFile(tmpdirdir .. "/keiko.txt", "keiko")
 
-srctgt("move", tmpdirdir, env.MB_WEBDAV_TMPDIR, "any", false, false, true)
+srctgt("move", tmpdirdir, env.HSFTP_TMPDIR, "any", false, false, true)
 
 assertMessage(
-  readFile(env.MB_WEBDAV_TMPDIR .. "/natsume.txt"),
+  readFile(env.HSFTP_TMPDIR .. "/natsume.txt"),
   "natsume"
 )
 
 assertMessage(
-  readFile(env.MB_WEBDAV_TMPDIR .. "/keiko.txt"),
+  readFile(env.HSFTP_TMPDIR .. "/keiko.txt"),
   "keiko"
 )
 
+delete(env.HSFTP_TMPDIR .. "/natsume.txt")
+delete(env.HSFTP_TMPDIR .. "/keiko.txt")
