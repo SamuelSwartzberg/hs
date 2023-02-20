@@ -42,32 +42,52 @@ function processSetupDirectivesInFiles(path)
         ), 
         ""
       ),
-      1, 
+      1,
       "down"
     )
     local contents = stringy.strip(envsubstShell(readFile(child)))
     for line in stringx.lines(contents) do
       line = stringy.strip(line)
-      local args = stringy.split(line, " ")
-      args = mapValueNewValue(args, function (arg)
-        if arg == "true" then
-          return true
-        elseif arg == "false" then
-          return false
-        elseif arg == "nil" then
-          return nil
-        else
-          return arg
+      if not stringy.startswith(line, "#") then -- allow for simple comments
+        local interval, argstring = table.unpack(stringy.split(line, "\t"))
+        local args = stringy.split(argstring, " ")
+        args = mapValueNewValue(args, function (arg)
+          if arg == "true" then
+            return true
+          elseif arg == "false" then
+            return false
+          elseif arg == "nil" then
+            return nil
+          else
+            return arg
+          end
+        end)
+        print(
+          "Would execute"
+          .. " _G[\"" .. command .. "\"]"
+          .. "(" .. table.concat(mapValueToStr(args), ", ") .. ")"
+        )
+        print(
+          "with interval " .. interval
+        )
+        if stringy.startswith(interval, "@") then -- is an event
+          if interval == "@startup" then
+            _G[command](table.unpack(args))
+          else
+            -- in the future: add support for other events
+          end
+        else -- is a timer
+          System:get("manager", "timer"):doThis("create", {
+            interval = interval,
+            fn = function ()
+              _G[command](table.unpack(args))
+            end
+          })
         end
-      end)
-      print(
-        "Would execute"
-        .. " _G[\"" .. command .. "\"]"
-        .. "(" .. table.concat(mapValueToStr(args), ", ") .. ")"
-      )
-      _G[command](table.unpack(args))
+      end
     end
   end
+  error("stop")
 end
 
 

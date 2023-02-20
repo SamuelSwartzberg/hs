@@ -22,7 +22,7 @@ SystemSpecifier = {
       ["all-devices-of-type-audiodevice-array"] = function(self, subtype)
         return CreateArray(mapValueNewValue(
           values(
-            hs.audiodevice["all" .. changeCasePrefix(subtype) .. "Devices"]()
+            hs.audiodevice["all" .. changeCasePre(subtype, 1, "up") .. "Devices"]()
           ),
           bindNthArg(CreateAudiodeviceItem, 2, subtype)
         ))
@@ -59,6 +59,7 @@ function CreateSystem()
   system:get("contents")["global-stream-manager"] = CreateManagedStreamArrayDirectly(system:get("contents")["global-timer-manager"])
   system:get("contents")["global-api-manager"] = CreateManagedApiArrayDirectly(system:get("contents")["global-timer-manager"])
   system:get("contents")["global-watcher-manager"] = CreateManagedWatcherArrayDirectly()
+  system:get("contents")["global-task-manager"] = CreateManagedTaskArrayDirectly()
   system:get("contents")["global-input-method-manager"] = CreateManagedInputMethodArrayDirectly()
   return system
 end

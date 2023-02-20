@@ -62,6 +62,7 @@ local potential_interfaces_ignore_map = {
     "managed-stream-array",
     "managed-timer-array",
     "managed-watcher-array",
+    "managed-task-array",
     "managed-api-array",
     "managed-input-method-array",
   },

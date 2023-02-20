@@ -26,7 +26,7 @@ GrandparentDirItemSpecifier = {
   
     doThisables = {
       
-      ["pull-all"] = function (self)
+      ["git-pull-all"] = function (self)
         self:get("all-git-roots"):doThis("do-all", "git-pull")
       end
 

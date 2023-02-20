@@ -37,20 +37,6 @@ InGitDirPathItemSpecifier = {
       ["has-unpushed"] = function(self)
         return self:get("unpushed-commits") ~= ""
       end,
-      ["autocommit-and-push-task"] = function(self, interval)
-        return {
-          interval = interval,
-          fn = function()
-            self:doThis("git-add-all")
-            hs.timer.doAfter(2, function ()
-              self:doThis("git-commit-all")
-              hs.timer.doAfter(2, function ()
-                self:doThis("git-push")
-              end)
-            end)
-          end
-        }
-      end,
       
     },
     doThisables = {
@@ -113,8 +99,13 @@ InGitDirPathItemSpecifier = {
         })
       end,
       ["git-commit-all-and-push"] = function(self, message)
-        self:doThis("git-commit-all", message)
-        self:doThis("git-push")
+        self:doThis("git-add-all")
+        hs.timer.doAfter(2, function ()
+          self:doThis("git-commit-all", message)
+          hs.timer.doAfter(2, function ()
+            self:doThis("git-push")
+          end)
+        end)
       end,
       
     }

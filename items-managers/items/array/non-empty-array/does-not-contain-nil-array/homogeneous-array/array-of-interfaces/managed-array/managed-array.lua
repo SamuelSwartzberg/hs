@@ -91,6 +91,7 @@ ManagedArraySpecifier = {
     { key = "managed-stream-array", value = CreateManagedStreamArray },
     { key = "managed-timer-array", value = CreateManagedTimerArray },
     { key = "managed-watcher-array", value = CreateManagedWatcherArray },
+    { key = "managed-task-array", value = CreateManagedTaskArray },
     { key = "managed-api-array", value = CreateManagedApiArray },
     { key = "managed-input-method-array", value = CreateManagedInputMethodArray },
   }),

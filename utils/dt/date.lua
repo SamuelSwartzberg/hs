@@ -59,3 +59,13 @@ function processDateSpecification(specifier, orig_date)
   end
   return dt
 end
+
+
+--- @param cronspec string
+--- @return number
+function getCronNextTime(cronspec)
+  return tonumber(stringy.strip(getOutputArgsSimple(
+    "ncron",
+    { value = cronspec, type = "quoted"}
+  )), 10)
+end

@@ -18,10 +18,7 @@ TimerItemSpecifier = {
         return self:get("contents").timer
       end,
       ["calculate-next-firing"] = function(self)
-        return tonumber(stringy.strip(getOutputArgsSimple(
-          "ncron",
-          { value = self:get("interval"), type = "quoted"}
-        )), 10)
+        return memoized.getCronNextTime(self:get("interval"))
       end,
       ["low-impact"] = function(self)
         return self:get("contents").low_impact
@@ -30,7 +27,8 @@ TimerItemSpecifier = {
         return self:get("timer") ~= nil
       end,
       ["is-running"] = function(self)
-        return self:get("timer"):running()
+        local timer = self:get("timer")
+        return timer ~= nil and timer:isRunning()
       end,
 
     },

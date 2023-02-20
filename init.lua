@@ -419,10 +419,6 @@ System:get("manager", "timer"):doThis("register-all", {
   bindArg(runHsTask, {"newsboat", "-x", "reload"}),
   syncVdirSyncer,
   bindArgsVararg(syncHomeRelativePath, "me/state/todo", "push"),
-  -- bindArgsVararg(syncHomeRelativePath, "me/bin_res/papers", "push"),
-  bindArgsVararg(syncHomeRelativePath, "Pictures/Android", "pull", "move"),
-  bindArgsVararg(syncHomeRelativePath, env.TACHIYOMI_STATE_DIR, "pull", "move"),
-  bindArgsVararg(syncHomeRelativePath, env.NEWPIPE_STATE_DIR, "pull", "move"),
   CreateStringItem(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
@@ -434,45 +430,12 @@ System:get("manager", "timer"):doThis("register-all", {
       "mb-channel"
     }), 
     interval = "* * * * *"
-  },{
-    fn = bindArgsVararg(runJsonServerAtPort, env.JSON_SERVER_PORT, env.LOCAL_JSON_SERVER_DIR),
-    interval = "* * * * *"
   },
   CreateStringItem(env.MENV):get("refresh-env-task"),
-  CreateStringItem(env.MURLS):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MCONTACTS):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MACTABLE_PATHS):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MCERTS):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MDEPENDENCIES):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MDICTIONARIES):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MENV):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MGNUPG):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MKEYS):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MMEMORY):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MPASS):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MDOTCONFIG):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MHOMECONFIG):get("autocommit-and-push-task", "0 * * * *"),
-  CreateStringItem(env.MSTATE):get("autocommit-and-push-task", "0 * * * *"),
   --[[CreateApplicationItem("Firefox"):get("backup-timer"),
   CreateApplicationItem("Signal"):get("backup-timer"),
   CreateApplicationItem("Discord"):get("backup-timer"),]]
-  CreateStringItem(env.ME):get("timer-that-does", {
-     interval = "*/5 * * * *", key = "pull-all" 
-    }),
 }) 
-
-persistent_shell_tasks = {
-  runHsTask({
-    "http-server",
-    "-a",
-    "127.0.0.1",
-    "-p",
-    env.FS_HTTP_SERVER_PORT, 
-    "-c60",
-    env.ME
-  }),
-  
-}
 
 processSetupDirectivesInFiles(env.MACTABLE_PATHS)
 

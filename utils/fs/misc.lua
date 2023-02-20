@@ -113,5 +113,8 @@ function resolveRelativePath(path, prefix)
     preprefix, path = path:match("^([^/:]-:)(.*)$")
   end
   path = ensureAdfix(path, "/", true, false, "pre") -- ensure leading slash
+  if stringy.startswith(path, prefix) then
+    prefix = ""
+  end
   return preprefix .. prefix .. path
 end
