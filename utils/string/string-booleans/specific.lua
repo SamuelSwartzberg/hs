@@ -126,3 +126,18 @@ end
 function containsLargeWhitespace(str)
   return asciiStringContainsSome(str, {"\t", "\r", "\n"})
 end
+
+--- @param str string
+--- @return boolean
+function isPackageManager(str)
+  local package_managers = stringy.split(
+    stringy.strip(
+      getOutputArgsSimple(
+        "upkg",
+        "list-package-managers"
+      )
+    ),
+    "\n"
+  )
+  return not not valueFindKeyString(package_managers, str)
+end

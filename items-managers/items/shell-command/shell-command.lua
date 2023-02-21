@@ -30,6 +30,9 @@ ShellCommandSpecifier = {
       ["is-khal"] = function(self)
         return self:get("contents") == "khal"
       end,
+      ["is-upkg"] = function(self)
+        return self:get("contents") == "upkg"
+      end,
     },
     doThisables = {
       
@@ -45,6 +48,7 @@ ShellCommandSpecifier = {
     { key = "uni", value = CreateUniCommand },
     { key = "libreoffice", value = CreateLibreofficeCommand },
     { key = "pandoc", value = CreatePandocCommand },
+    { key = "upkg", value = CreateUpkgCommand },
   })
 }
 
