@@ -437,6 +437,10 @@ System:get("manager", "timer"):doThis("register-all", {
   CreateApplicationItem("Discord"):get("backup-timer"),]]
 }) 
 
+System:get("manager", "task"):doThis("register-all", {
+  { "jcwserve", env.JSON_SHELL_API_LAYER_SERVER_PORT }
+})
+
 processSetupDirectivesInFiles(env.MACTABLE_PATHS)
 
 GlobalChordManager = createGlobalChordManager()

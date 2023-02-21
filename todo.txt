@@ -20,14 +20,10 @@ post 'lua is working':
     - ics urls
   - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
-  - unix date in ms to actual date in chooser
   - repo, file in repo to github path (may already be implemented), also in action table
-  - permahoste the server
-  - local server url in string menu
-  - jcw in string menu?
+  - jcw/jcwserve in string menu?
   - fix timer bugs
   - interface with upkg in hs
-    - listing available package managers (easiest through listing $MDEPENDENCIES prob)
     - list installed packages for package manager
     - use timers and upkg to autofetch updates? (needs to be thorougly tested though)
   - citations

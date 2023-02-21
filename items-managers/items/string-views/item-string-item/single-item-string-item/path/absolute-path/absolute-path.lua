@@ -12,8 +12,15 @@ PathInterfaceItemSpecifier = {
         return true
       end,
       ["relative-path-from"] = function(self, starting_point)
+        starting_point = starting_point or env.HOME
         return self:get("difference-from-prefix-or-nil", ensureAdfix(starting_point, "/", true, false, "suf"))
       end,
+      ["local-http-server-url"] = function(self)
+        return env.FS_HTTP_SERVER .. self:get("contents")
+      end,
+      ["file-url"] = function (self)
+        return "file://" .. self:get("contents")
+      end
     },
     doThisables = {
       ["create-file"] = function(self, contents) writeFile(self:get("contents"), contents, "not-exists") end,
@@ -62,7 +69,23 @@ PathInterfaceItemSpecifier = {
     { key = "true-absolute-path", value = CreateTrueAbsolutePathItem },
     { key = "volume", value = CreateVolumeItem },
     { key = "path-by-start", value = CreatePathByStartItem },
-  })
+  }),
+  action_table = listConcat(
+    {
+
+    },
+    getChooseItemTable({
+      {
+        description = "httpsrvurl",
+        emoji_icon = "💻🌐🏠🔗",
+        key = "local-http-server-url",
+      },{
+        description = "flurl",
+        emoji_icon = "📄🔗",
+        key = "file-url",
+      }
+    })
+  )
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

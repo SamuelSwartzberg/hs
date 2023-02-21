@@ -15,6 +15,9 @@ URLItemSpecifier = {
       ["url-tld"] = function(self)
         return string.match(self:get("url-host"), "%w+%.(%w+)$") end,
       ["url-path"] = function(self) return self:get("parsed-url").path end,
+      ["url-path-components"] = function(self)
+        return getPathComponents(self:get("url-path"))
+      end,
       ["url-query"] = function(self) return self:get("parsed-url").query end,
       ["url-fragment"] = function(self) return self:get("parsed-url").fragment end,
       ["url-port"] = function(self) return self:get("parsed-url").port end,
@@ -25,6 +28,9 @@ URLItemSpecifier = {
       end,
       ["is-url-by-host"] = function(self)
         return self:get("url-host")
+      end,
+      ["is-url-by-path"] = function(self)
+        return self:get("url-path")
       end,
       ["by-selector"] = function(self, specifier)
         return memoized.querySelector(self:get("contents"), specifier.selector, specifier.only_text)
@@ -128,6 +134,7 @@ URLItemSpecifier = {
   potential_interfaces = ovtable.init({
     { key = "url-by-contenttype", value = CreateURLByContenttypeItem },
     { key = "url-by-host", value = CreateURLByHostItem },
+    { key = "url-by-path", value = CreateURLByPathItem },
   }),
   action_table = listConcat(getChooseItemTable({
     {
