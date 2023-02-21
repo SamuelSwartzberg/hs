@@ -217,7 +217,7 @@ local keymap = {
           "map-to-table-of-path-and-path-content-items",
         },
         "invalidate",
-        "0 * * * *"
+        toSeconds(1, "h")
       ):exec():doThis("choose-item-and-then-action")
     end,
   },
@@ -292,7 +292,7 @@ local keymap = {
     explanation = "Choose a citation item, and then choose an action on it.",
     fn = function()
       memoizer
-        :getOrCreate(createCSLArray, "invalidate", "0 * * * *")
+        :getOrCreate(createCSLArray, "invalidate", toSeconds(1, "h"))
         :exec()
         :doThis("choose-item-and-then-action")
     end,

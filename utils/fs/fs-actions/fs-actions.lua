@@ -49,7 +49,10 @@ function processSetupDirectivesInFiles(path)
     for line in stringx.lines(contents) do
       line = stringy.strip(line)
       if not stringy.startswith(line, "#") then -- allow for simple comments
-        local interval, argstring = table.unpack(stringy.split(line, "\t"))
+        print(child)
+        local tabbed_line = stringy.split(line, "\t")
+        local interval = tabbed_line[1]
+        local argstring = tabbed_line[2]
         local args = stringy.split(argstring, " ")
         args = mapValueNewValue(args, function (arg)
           if arg == "true" then
@@ -87,7 +90,6 @@ function processSetupDirectivesInFiles(path)
       end
     end
   end
-  error("stop")
 end
 
 

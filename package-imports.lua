@@ -14,7 +14,6 @@ data = require("pl.data")
 ftcsv = require('ftcsv')
 --- @type date
 date = require("date")
-curl = require("cURL")
 --- @type lyaml
 yaml = require("lyaml")
 --- @type cjson

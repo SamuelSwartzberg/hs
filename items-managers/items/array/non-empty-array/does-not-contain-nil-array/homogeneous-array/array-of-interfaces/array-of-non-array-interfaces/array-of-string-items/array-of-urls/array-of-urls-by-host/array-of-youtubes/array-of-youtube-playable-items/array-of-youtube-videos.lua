@@ -7,6 +7,7 @@ ArrayOfYoutubeVideosSpecifier = {
     },
     doThisables = {
       ["create-youtube-playlist-with-videos"] = function(self, name)
+        -- todo refactor to using new curl interface
         curl.easy({
           url = "https://www.googleapis.com/youtube/v3/playlists?part=snippet&key=" .. env.GOOGLE_API_KEY,
           httpheader = {
