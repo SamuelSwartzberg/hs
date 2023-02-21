@@ -36,7 +36,4 @@ post: 'stuff is implemented'
     - fix memory leak
     - more memoization
     - more item cache
-  - some shell to lua
-    - don't check dependencies on shell start, instead check them regularly and write missing ones to extra file
-    - delete git-paths once we're not using it anymore
   - clean up android
