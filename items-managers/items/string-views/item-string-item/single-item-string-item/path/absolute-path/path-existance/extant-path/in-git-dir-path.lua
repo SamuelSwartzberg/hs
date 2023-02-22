@@ -6,12 +6,35 @@ InGitDirPathItemSpecifier = {
     getables = {
       ["git-root-dir"] = function(self)
         if self:get("is-git-root-dir") then return self:get("contents") end
-        local dotgit = findInSiblingsOrAncestorSiblings(self:get("contents"), ".git", true, false)
+        local dotgit = memoized.findInSiblingsOrAncestorSiblings(self:get("contents"), ".git", true, false)
         print(dotgit)
         if not dotgit then
           return nil
         end
         return getParentPath(dotgit) or nil
+      end,
+      ["git-root-dir-relative-path"] = function(self)
+        return self:get("relative-path-from", self:get("git-root-dir"))
+      end,
+      ["git-remote"] = function(self)
+        local remote = self:get("cd-and-output-this-task", {
+          "git",
+          "config",
+          "--get",
+          "remote.origin.url",
+        })
+        remote = ensureAdfix(remote, ".git", false, false, "suf")
+        remote = ensureAdfix(remote, "/", false, false, "suf")
+        return remote
+      end,
+      ["git-remote-owner-item"] = function(self)
+        return self:get("git-remote"):find("/([^/]+[^/]+)$")
+      end,
+      ["url-on-master-remote"] = function(self)
+        return self:get("git-remote") .. "/blob/master" .. self:get("git-root-dir-relative-path")
+      end,
+      ["raw-url-on-github-remote"] = function(self)
+        return "https://raw.githubusercontent.com/" .. self:get("git-remote-owner-item") .. "/master" .. self:get("git-root-dir-relative-path")
       end,
       ["gitignore-path"] = function(self)
         return self:get("git-root-dir") .. "/.gitignore"
@@ -131,7 +154,23 @@ InGitDirPathItemSpecifier = {
     {
       emoji_icon = "🐙❗️",
       description = "gtig",
-      key = "open-gitignore"
+      key = "gitignore-path"
+    },{
+      emoji_icon = "🐙👩🏽‍💻🔗",
+      description = "gtremurl",
+      key = "git-remote"
+    },{
+      emoji_icon = "🐙👩🏽‍💻📄🔗",
+      description = "gtremitmurl",
+      key = "url-on-master-remote"
+    },{
+      emoji_icon = "🐙👩🏽‍💻🍣📄🔗",
+      description = "gtremitmrawurl",
+      key = "raw-url-on-github-remote"
+    },{
+      emoji_icon = "🐙🙋🏽‍♀️💼",
+      description = "gtremownitm",
+      key = "git-remote-owner-item"
     }
   }))
 }

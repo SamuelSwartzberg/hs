@@ -20,7 +20,6 @@ post 'lua is working':
     - ics urls
   - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
-  - repo, file in repo to github path (may already be implemented), also in action table
   - jcw/jcwserve in string menu?
   - fix timer bugs
   - interface with upkg in hs
