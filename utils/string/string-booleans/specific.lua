@@ -130,14 +130,12 @@ end
 --- @param str string
 --- @return boolean
 function isPackageManager(str)
-  local package_managers = stringy.split(
-    stringy.strip(
-      getOutputArgsSimple(
-        "upkg",
-        "list-package-managers"
-      )
-    ),
-    "\n"
+  local package_managers = splitLines(
+    getOutputArgsSimple(
+      "upkg",
+      "list-package-managers"
+    )
   )
+  
   return not not valueFindKeyString(package_managers, str)
 end

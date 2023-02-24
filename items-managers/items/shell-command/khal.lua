@@ -188,7 +188,7 @@ KhalCommandSpecifier = {
           "khal",
           "printcalendars"
         )
-        return stringy.split(stringy.strip(res), "\n")
+        return splitLines(res)
       end,
       ["writable-calendars"] = function(self)
         return fixListWithNil(filterValues(

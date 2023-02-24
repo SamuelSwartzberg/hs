@@ -22,6 +22,7 @@ post 'lua is working':
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
   - jcw/jcwserve in string menu?
   - fix timer bugs
+  - https://www.hammerspoon.org/docs/hs.application.watcher.html: use to deactivate mullvad when geforce now? wrap application watchers to make it easier to create stuff?
   - interface with upkg in hs
     - list installed packages for package manager
     - use timers and upkg to autofetch updates? (needs to be thorougly tested though)

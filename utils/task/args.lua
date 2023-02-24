@@ -2,6 +2,7 @@
 --- @return string
 function buildInnerCommand(command_parts)
   local command = ""
+  command_parts = fixListWithNil(command_parts) -- this allows us to have optional args simply by having them be nil
   inspPrint(command_parts)
   for _, command_part in ipairs(command_parts) do
     if type(command_part) == "string" then

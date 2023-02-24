@@ -49,7 +49,7 @@ function getAllInPath(path, recursion, include_dirs, include_files, validator)
       local output, status, reason, code = getOutputTask({"rclone", "lsf", {value = listerpath, type = "quoted"}})
       local items
       if status then
-        items = stringy.split(stringy.strip(output), "\n")
+        items = splitLines(output)
         items = listFilterEmptyString(items)
         items = mapValueNewValue(
           items,

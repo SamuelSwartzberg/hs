@@ -10,7 +10,7 @@ URLByPathItemSpecifier = {
     }
   },
   potential_interfaces = ovtable.init({
-    { key = "owner-item-url", value = CreateOwnerItemURLItem },
+    { key = "owner-item-url", value = CreateOwnerItemUrlItem },
   })
 }
 

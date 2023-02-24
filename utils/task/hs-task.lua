@@ -176,3 +176,17 @@ end
 function writeDefault(namespace, key, value)
   return runHsTask({"defaults", "write", namespace, key, value})
 end
+
+
+--- @param mgr? string
+--- @param thing? string
+--- @param arg? string
+--- @return string[]
+function upkgGetInner(mgr, thing, arg)
+  return splitLines(getOutputArgsSimple(
+    "upkg",
+    mgr,
+    thing,
+    arg
+  ))
+end

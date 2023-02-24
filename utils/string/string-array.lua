@@ -107,3 +107,12 @@ function splitChars(str)
   end
   return t
 end
+
+--- @param str string
+--- @return string[]
+function splitLines(str)
+  return stringy.split(
+    stringy.strip(str),
+    "\n"
+  )
+end
