@@ -54,7 +54,6 @@ RunningApplicationItemSpecifier = {
         return self:get("name")
       end,
       ["relevant-application-relative-dir"] = function(self, type)
-        print(env["M" .. type .. "_APPLICATIONS"] .. "/" .. self:get("name"))
         return env["M" .. type .. "_APPLICATIONS"] .. "/" .. self:get("name")
       end,
       ["relevant-application-relative-sessions"] = function(self)

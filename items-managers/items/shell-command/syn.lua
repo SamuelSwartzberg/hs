@@ -19,14 +19,10 @@ SynCommandSpecifier = {
         local synonym_tables = mapValueNewValue(
           synonym_parts,
           function (synonym_part)
-            print(synonym_part)
             local synonym_part_lines = stringy.split(synonym_part, "\n")
             local synonym_term = eutf8.sub(synonym_part_lines[1], 2) -- syntax: ❯<term>
-            print(synonym_term)
             local synonyms_raw = eutf8.sub(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
-            print(synonyms_raw)
             local antonyms_raw = eutf8.sub(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
-            print(antonyms_raw)
             local synonyms = mapValueNewValue(stringy.split(synonyms_raw, ", "), stringy.strip)
             local antonyms = mapValueNewValue(stringy.split(antonyms_raw, ", "), stringy.strip)
             return {
@@ -36,7 +32,6 @@ SynCommandSpecifier = {
             }
           end
         )
-        inspPrint(synonym_tables)
         return synonym_tables
       end,
       ["synonyms-to-array-of-synonyms-tables"] = function(self, str)

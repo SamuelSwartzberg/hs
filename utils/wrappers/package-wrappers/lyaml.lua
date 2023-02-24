@@ -56,12 +56,8 @@ function yamlDumpAlignedInner(table, key_stop, value_stop, depth)
       local comment_part = ""
       if value_v.comment then
         local value_padding_length = value_stop - value_length
-        print(value_padding_length)
         comment_part = string.rep(" ", value_padding_length) .. " # " .. value_v.comment
       end
-      print(key_part)
-      print(value_part)
-      print(comment_part)
       listPush(lines, key_part .. value_part .. comment_part)
     else
       -- do nothing
@@ -77,9 +73,6 @@ end
 --- @return string
 function yamlDumpAligned(tbl)
   local value_table = mapTableWithValueInCertainKeyToTableHoldingValueDirectly(tbl, "value", true, false)
-  inspPrint(value_table)
   local key_stop, value_stop = nestedAssocArrGetMaxStops(value_table)
-  print(key_stop)
-  print(value_stop)
   return table.concat(yamlDumpAlignedInner(tbl, key_stop, value_stop, 0), "\n")
 end

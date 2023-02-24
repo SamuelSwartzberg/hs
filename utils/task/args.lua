@@ -3,14 +3,11 @@
 function buildInnerCommand(command_parts)
   local command = ""
   command_parts = fixListWithNil(command_parts) -- this allows us to have optional args simply by having them be nil
-  inspPrint(command_parts)
   for _, command_part in ipairs(command_parts) do
     if type(command_part) == "string" then
       command = command .. " " .. command_part
     elseif type(command_part) == "table" then
       if command_part.type == "quoted" then
-        print(command_part.value)
-        print(escapeCharacter(command_part.value, '"', "\\"))
         command = command .. ' "' .. escapeCharacter(command_part.value, '"', "\\") .. '"'
       elseif command_part.type == "interpolated" then
         command = command .. '"$('  .. buildInnerCommand(command_part.value) .. ')"'
@@ -32,7 +29,6 @@ function buildTaskArgs(command_parts)
     "-c",
     "cd && source \"$HOME/.target/envfile\" &&" .. buildInnerCommand(command_parts)
   }
-  inspPrint(hs_task_args)
   return hs_task_args
 
 end

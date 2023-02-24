@@ -80,7 +80,7 @@ DiscordItemSpecifier = {
     doThisables = {
       ["generate-backup"] = function(self, do_after)
         delete(env.TMP_DISCORD_EXPORT_PARENT, "dir", "empty")
-        runHsTaskErrorOnError( { 
+        runHsTaskProcessOutput( { 
           "dscexport",
           "exportdm",
           "--media",

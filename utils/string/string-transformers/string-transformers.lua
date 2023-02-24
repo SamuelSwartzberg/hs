@@ -85,7 +85,6 @@ function romanize(str)
   local raw_romanized = getOutputTask(
     { "echo", "-n",  {value = str, type = "quoted"}, "|", "kakasi", "-iutf8", "-outf8", "-ka", "-Ea", "-Ka", "-Ha", "-Ja", "-s", "-ga" }
   )
-  print(raw_romanized)
   local is_ok, romanized = pcall(eutf8.gsub, raw_romanized, "(%w)%^", "%1%1")
   if not is_ok then
     return str -- if there's an error, just return the original string

@@ -74,11 +74,9 @@ YoutubePlayableItemItemSpecifier = {
           { value = "Video", presence = false, case_insensitive = true, adfix = "suf" },
         })
         local channel_cleaned = self:get("youtube-playable-item-channel-cleaned")
-        print("channel_cleaned:", channel_cleaned)
         if channel_cleaned ~= "" then
           title = eutf8.gsub(title, " *" .. channel_cleaned .. " *", "")
         end
-        print("title:", title) 
         return title
       end,
       ["youtube-playable-item-channel"] = function (self)
@@ -108,7 +106,6 @@ YoutubePlayableItemItemSpecifier = {
         runHsTaskProcessOutput(
           self:get("attrs-inner-task-args", specifier.attrs),
           function(output)
-            inspPrint(output)
             local res = self:get("process-raw-attrs", {
               raw_attr_string = output,
               attrs = specifier.attrs
@@ -168,7 +165,6 @@ YoutubePlayableItemItemSpecifier = {
             local cleaned = mapValueNewValue(tags, function(v)
               return romanizeToLowerAlphanumUnderscore(v)
             end)
-            inspPrint(cleaned)
             self:doThis("add-as-m3u", cleaned)
           end
         })
@@ -188,7 +184,6 @@ YoutubePlayableItemItemSpecifier = {
         specifier.path  = chooseDirAndPotentiallyCreateSubdir(env.MAUDIOVISUAL, specifier.tag.srs or specifier.tag.tcrea)
         specifier.extension = "m3u"
         local path_string = CreatePathLeafParts(specifier):get("str-item", "path-leaf-parts-as-string")
-        inspPrint(path_string)
         path_string:doThis("create-file", self:get("contents"))
       end,
       ["to-stream"] = function(self, specifier)

@@ -41,21 +41,15 @@ function buildEmailInteractive(headers, body, edit_func, do_after)
     local evaled_mail = le(mail)
     local temp_file = createUniqueTempFile(evaled_mail)
     local new_file = createUniqueTempFile("")
-    runHsTask({
+    runHsTaskProcessOutput({
       "mmime",
       "<",
       { value = temp_file, type = "quoted" },
       ">",
       { value = new_file, type = "quoted" },
-    }, function (exitCode, std_out, std_err)
-      if exitCode == 0 then
-        delete(temp_file)
-        do_after(new_file)
-      else
-        print("mmime failed")
-        print(std_out)
-        print(std_err)
-      end
+    }, function ()
+      delete(temp_file)
+      do_after(new_file)
     end)
   end)
 end

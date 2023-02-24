@@ -22,13 +22,11 @@ ArrayOfYoutubeVideosSpecifier = {
           }
         })
         ):setopt_headerfunction(function(headers)
-          -- print(hs.inspect(headers))
         end)
         :setopt_writefunction(function(data)
           local parsed_data = json.decode(data)
           local playlistid = parsed_data.id
           
-          -- print(hs.inspect(json.decode(data)))
           return true
         end):perform():close()
       end,

@@ -182,7 +182,6 @@ OmegatProjectDirItemSpecifier = {
         local generation_tasks = self:get("target-files-extension", "odt"):get("map", function(odt)
           return CreateShellCommand("libreoffice"):get("to-txt-command", odt:get("contents"))
         end)
-        inspPrint(generation_tasks)
         runHsTaskSequential(generation_tasks, do_after)
       end,
       ["generate-raw-rechnung"] = function(self, do_after)
@@ -207,10 +206,8 @@ OmegatProjectDirItemSpecifier = {
         )
           :get("to-string-item-array")
           :doThis("to-summary-line-body-path-table-parallel", function(table)
-            inspPrint(table:get("contents"))
             table:doThis("choose-item", function(_, choice)
 
-              print(CreateStringItem(choice.value):get("types-of-all-valid-interfaces"))
               CreateStringItem(choice.value)
                 :doThis(
                   "email-reply-interactive", 
@@ -228,11 +225,8 @@ OmegatProjectDirItemSpecifier = {
         local source_odts = self:get("source-files-extension", "odt"):get("contents")
         local target_odts = self:get("target-files-extension", "odt"):get("contents")
         local odts = tablex.zip(source_odts, target_odts)
-        inspPrint(odts)
         for i, odt_pair in ipairs(odts) do 
           for j, odt in ipairs(odt_pair) do
-            print(i, j)
-            print(odt:get("contents"))
             local client = self:get("local-data-object").client
             local path = CreatePathLeafParts({
               date = os.date(getRFC3339FormatStringForPrecision("day")),
@@ -267,7 +261,6 @@ OmegatProjectDirItemSpecifier = {
         }))
       end,
       ["specific-initialize"] = function(self)
-        print("specific-initialize")
         self:doThis("create-default-data-yaml")
         CreateStringItem(self:get("local-data-object-path")):doThis("edit-file-interactive", function()
           self:doThis("pull-omegat")

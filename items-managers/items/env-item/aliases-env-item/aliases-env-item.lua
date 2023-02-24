@@ -4,7 +4,6 @@ AliasesEnvItemSpecifier = {
   properties = {
     getables = {
       ["self-to-env-lines"] = function(self, specifier)
-        print("getting-aliases-env-lines")
         local val = self:get("value-to-env-line-value", specifier.pkey_var)
         if val ~= nil then 
           local keys = listPrepend(self:get("contents").aliases, specifier.key)

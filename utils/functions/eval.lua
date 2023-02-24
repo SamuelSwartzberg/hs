@@ -3,7 +3,6 @@
 --- @param env? table
 --- @return any
 function evaluateStringToValue(str, env)
-  print("evaling")
   local luaExecutable = load("return " .. str, "chunk", "t", env or _G)
   if luaExecutable ~= nil then -- expression
     return luaExecutable()

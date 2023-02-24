@@ -61,7 +61,6 @@ function promptPathInner(prompt_args)
   prompt_args.allows_multiple_selection  = defaultIfNil(prompt_args.allows_multiple_selection, false)
   prompt_args.allowed_file_types = defaultIfNil(prompt_args.allowed_file_types , {})
   prompt_args.resolves_aliases = defaultIfNil(prompt_args.resolves_aliases, true)
-  inspPrint(prompt_args)
   local rawReturn = hs.dialog.chooseFileOrFolder(prompt_args.message, prompt_args.default, prompt_args.can_choose_files, prompt_args.can_choose_directories, prompt_args.allows_multiple_selection, prompt_args.allowed_file_types, prompt_args.resolves_aliases)
   if rawReturn == nil then
     return nil, false

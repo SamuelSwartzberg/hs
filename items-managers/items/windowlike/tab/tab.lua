@@ -10,8 +10,6 @@ TabItemSpecifier = {
         return self:get("window"):snapshot()
       end,
       ["application-name"] = function(self)
-        print(self:get("types-of-all-valid-interfaces"))
-        inspPrint(self:get("running-application"))
         return self:get("running-application"):title()
       end,
       ["window-index"] = function(self)

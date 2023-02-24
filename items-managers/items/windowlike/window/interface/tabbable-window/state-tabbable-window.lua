@@ -7,7 +7,6 @@ StateTabbableWindowItemSpecifier = {
     getables = {
       ["list-of-tabs"] = function(self)
         local res = {}
-        print(self:get("types-of-all-valid-interfaces"))
         for i, tab in ipairs(self:get("window-in-state-json").tabs) do
           tab.window = self:get("contents")
           tab.type = "state"

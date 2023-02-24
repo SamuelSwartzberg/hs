@@ -155,7 +155,6 @@ function fillTemplateFromFieldsWithAI(opts, do_after)
   ai_request_str = ai_request_str .. "\nIf there seems to be no data for a field, just leave it blank.\n\n"
 
   makeSimpleGPT3Request(ai_request_str, function (result)
-    print(result)
     local out_fields = {}
     for _, field in ipairs(opts.out_fields) do
       local field_value = string.match(result, field.value .. "[^\n]-: *(.-)\n") or string.match(result, field.value .. "[^\n]-: *(.-)$")
@@ -186,7 +185,6 @@ end
 --- @param string_opts string
 function genList(string_opts)
   takeShellikeArgsAsOpts(generateList)(string_opts, function(res)
-    print(res)
     CreateArray(stringy.split(res, "\n")):doThis("choose-action")
   end)
 end

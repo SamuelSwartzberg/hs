@@ -14,7 +14,6 @@ ManagedTaskArraySpecifier = {
         self:doThis("add-to-end", CreateTaskItem(specifier))
       end,
       ["register-all"] = function(self, specifiers)
-        print("registering")
         for _, specifier in ipairs(specifiers) do
           self:doThis("create", specifier)
         end

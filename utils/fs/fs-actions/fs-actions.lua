@@ -49,7 +49,6 @@ function processSetupDirectivesInFiles(path)
     for line in stringx.lines(contents) do
       line = stringy.strip(line)
       if not stringy.startswith(line, "#") then -- allow for simple comments
-        print(child)
         local tabbed_line = stringy.split(line, "\t")
         local interval = tabbed_line[1]
         local argstring = tabbed_line[2]

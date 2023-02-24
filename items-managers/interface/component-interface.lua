@@ -340,13 +340,10 @@ InterfaceDefaultTemplate = {
   },
 
   get = function(self, key, value, not_recursive_children, not_recursive_super, previous_lower_node_id)
-    -- print("getting", key, "from", self.type)
     if self.properties.getables[key] then
-      -- print("has own key")
       return self.properties.getables[key](self, value)
     else
       if (not not_recursive_children) then
-       --  print("checking children")
         local res = actionInterfacesRecursive(self, "get", key, value, previous_lower_node_id)
         if res ~= nil then return res end -- this pattern is necessary so we check parents if we don't find anything in children
       end

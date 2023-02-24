@@ -20,7 +20,6 @@ JxaTabItemSpecifier = {
         return getOrDoAppWindowField(self:get("application-name"), self:get("contents").window_index, "title")
       end,
       ["window"] = function(self)
-        print(self:get("window-title"))
         return self:get("running-application-item"):get("get-window", self:get("window-title") .. " - " .. self:get("application-name"))
       end,
     },

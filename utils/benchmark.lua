@@ -19,7 +19,6 @@ function benchmarkFunctions(specifier)
       "Benchmarked %s at %s iterations, took %s seconds",
       func_specifier.name, specifier.iterations, elapsed
     )
-    print(res)
   end
 end
 

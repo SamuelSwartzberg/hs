@@ -35,7 +35,6 @@ ManagedArraySpecifier = {
       ["filter-in-place-valid"] = function(self)
         for i, item in ipairs(self:get("contents")) do
           if not item:get("is-valid") then
-            print("removing invalid item")
             self:get("remove-by-index", i)
           end
         end
@@ -45,7 +44,6 @@ ManagedArraySpecifier = {
         self:doThis("filter-in-place-valid")
       end,
       ["update-interface"] = function(self)
-        print(hs.inspect(self, {depth = 2}))
         self.root_super:setContents(self:get("contents")) -- this seems like it would be useless, but in fact setting the contents forces the interface to check which potential interfaces apply now
       end,
       ["update-interface-if-necessary"] = function(self, item) 
@@ -63,7 +61,6 @@ ManagedArraySpecifier = {
         self:doThis("for-all", function(item) item:doThis("update") end)
       end,
       ["move-to-index"] = function(self, args)
-        print("move-to-index")
         local index_of_item = self:get("find-index", function(item) return item == args.item end)
         self:get("remove-by-index", index_of_item)
         table.insert(self:get("contents"), args.index, args.item)

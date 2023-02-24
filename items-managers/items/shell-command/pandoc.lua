@@ -1,7 +1,6 @@
 
 
 function addMetadata(rawsource, metadata)
-  inspPrint(metadata)
   local metadata_string = yamlDump(metadata or {})
   local final_metadata, final_contents
   if stringy.startswith(rawsource, "---") then
@@ -35,7 +34,6 @@ PandocCommandSpecifier = {
     },
     doThisables = {
       ["convert-md"] = function(self, specifier)
-        print("converting md")
         local source, target = getSourceAndTarget(specifier)
         local rawsource = readFile(source)
         local processedsource = addMetadata(rawsource, specifier.metadata)
@@ -64,12 +62,10 @@ PandocCommandSpecifier = {
         table.insert(command_parts, "-o")
         table.insert(command_parts, {value = target, type ="quoted"})
         command_parts = listConcat(command_parts, specifier.extra_args)
-        runHsTask(command_parts, function (exitCode)
-          if exitCode == 0 then
-            -- deleteFile(temp_path)
-            if specifier.do_after then
-              specifier.do_after(target)
-            end
+        runHsTaskProcessOutput(command_parts, function ()
+          -- deleteFile(temp_path)
+          if specifier.do_after then
+            specifier.do_after(target)
           end
         end)
       end,
@@ -85,7 +81,6 @@ PandocCommandSpecifier = {
         }, specifier))
       end,
       ["md-to-latex-beamer-pdf"] = function(self, specifier)
-        inspPrint(specifier)
         self:doThis("convert-md", mergeAssocArrRecursive({
           format = "beamer",
           preprocess = {

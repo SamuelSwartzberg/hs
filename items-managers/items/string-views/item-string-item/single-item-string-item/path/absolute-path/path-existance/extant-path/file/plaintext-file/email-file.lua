@@ -156,25 +156,22 @@ EmailFileItemSpecifier = {
         })
       end,
       ["email-move-to"] = function(self, path)
-        runHsTask({
+        runHsTaskProcessOutput({
           "mdeliver",
           { value = path, type = "quoted" },
           "<",
           { value = self:get("contents"), type = "quoted" }
-        }, function(exitCode)
-          if exitCode == 0 then
-            runHsTask({
+        }, function()
+          runHsTaskProcessOutput({
               "minc", -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
               { value = path, type = "quoted" }
-            }, function(exitCode)
-              if exitCode == 0 then
+            }, function()
                 runHsTask({
                   "rm",
                   { value = self:get("contents"), type = "quoted" }
                 })
-              end
-            end)
-          end
+            end
+          )
         end)
       end,
     }

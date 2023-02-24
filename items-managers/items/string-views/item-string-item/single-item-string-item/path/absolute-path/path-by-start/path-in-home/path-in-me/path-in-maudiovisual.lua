@@ -32,7 +32,6 @@ PathInMaudiovisualItemSpecifier = {
           return url, {"youtube-dl", "--get-title", "--flat-playlist", { value = url, type = "quoted" }}
         end, function (command_results)
           for url, result in pairs(command_results) do
-            print(url)
             if type(result) == "table" then
               print("result was table")
               print(result.std_err)

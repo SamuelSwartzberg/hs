@@ -31,7 +31,6 @@ VdirsyncerConfigFileItemSpecifier = {
         local webcal_pair_keys = filterKeys(pairs, function(k)
           return stringy.startswith(k, "webcal_readonly_")
         end)
-        inspPrint(webcal_pair_keys)
         local indices = mapValueNewValue(keys(webcal_pair_keys), function(k)
           return tonumber(k:match("webcal_readonly_(%d+)"))
         end)
@@ -40,7 +39,6 @@ VdirsyncerConfigFileItemSpecifier = {
       ["vdirsyncer-pair-and-corresponding-storages"] = function(self, specifier)
         local local_name = specifier.name .. "_local"
         local remote_name = specifier.name .. "_remote"
-        print("hey")
         local pair = self:get("table-to-vdirsyncer-config-section", {
           type = "pair",
           name = specifier.name,
@@ -70,9 +68,6 @@ VdirsyncerConfigFileItemSpecifier = {
             password = specifier.remote_storage_password,
           }
         })
-        inspPrint(pair)
-        inspPrint(local_storage)
-        inspPrint(remote_storage)
         return table.concat({
           pair,
           local_storage,

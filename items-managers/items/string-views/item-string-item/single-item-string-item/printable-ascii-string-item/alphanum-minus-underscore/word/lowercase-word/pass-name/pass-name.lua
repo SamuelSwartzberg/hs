@@ -52,7 +52,6 @@ PassNameItemSpecifier = {
       ["fill-pass"] = function(self)
         local arr = self:get("username-and-password-as-string-array")
           :get("to-string-item-array")
-        print(arr:get("to-string"))
         arr:doThis("tab-fill-with")
       end,
       ["copy-pass"] = function(self)

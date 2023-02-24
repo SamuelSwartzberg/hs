@@ -18,8 +18,6 @@ StateWindowItemSpecifier = {
           function(json_window)
             -- inspPrint(json_window)
             for k, v in pairs(geometry) do
-              print(v)
-              print(json_window[k])
               if not isClose(v, json_window[k]) then
                 return false
               end

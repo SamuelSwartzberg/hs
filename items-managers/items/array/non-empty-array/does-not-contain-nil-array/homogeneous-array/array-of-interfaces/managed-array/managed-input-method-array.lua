@@ -11,11 +11,9 @@ ManagedInputMethodArraySpecifier = {
     },
     doThisables = {
       ["create"] = function(self, method_id)
-        print("crea")
         self:doThis("add-to-end", CreateInputMethodItem(method_id))
       end,
       ["register-all"] = function(self, specifier)
-        print("reg")
         for index, method_id in ipairs(specifier) do
           self:doThis("create", method_id)
         end

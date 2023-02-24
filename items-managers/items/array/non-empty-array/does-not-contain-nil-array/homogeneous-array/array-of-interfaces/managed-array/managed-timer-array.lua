@@ -12,7 +12,6 @@ ManagedTimerArraySpecifier = {
             if not firings[next_firing] then
               firings[next_firing] = item
             else
-              print("Spacing")
               while firings[next_firing] do
                 next_firing = next_firing + 1
               end

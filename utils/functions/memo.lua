@@ -26,7 +26,6 @@ function createMemoizer()
     }
     if mode == "refresh" then
       memoized_item.refresher = hs.timer.doEvery(interval, function()
-        print("memoized item refreshing regularly")
         memoized_item.memoized = memoize(memoized_item.original)
       end)
       memoized_item.exec = function(self, ...)
@@ -35,9 +34,7 @@ function createMemoizer()
     elseif mode == "invalidate" then
       memoized_item.created_at = os.time()
       memoized_item.exec = function(self, ...)
-        print("execing")
         if os.time() - self.created_at > interval then
-          print("memoized item expired, refreshing")
           self.memoized = memoize(self.original)
           self.created_at = os.time()
         end
@@ -149,13 +146,10 @@ end
 function fsmemoizeAsyncFunc(fn, func_id)
   return function(arg, callback)
     local cache_path = getFsCachePath("fsmemoizeAsyncFunc", func_id, arg)
-    print(cache_path)
     if pathExists(cache_path) then
-      print("path exists")
       callback(json.decode(readFile(cache_path)))
     else
       fn(arg, function(res)
-        print "writing to cache"
         writeFile(cache_path, json.encode(res))
         callback(res)
       end)

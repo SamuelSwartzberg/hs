@@ -13,19 +13,17 @@ PathWithLineAndorCharacterNumberItemSpecifier = {
     },
     doThisables = {
       ["vscode-open-and-go-to"] = function (self)
-        runHsTask({
+        runHsTaskProcessOutput({
           "open",
           "-a",
            { value = "Visual Studio Code", type = "quoted" },
           { value = self:get("path-part"), type = "quoted" }
-        }, function (exitCode)
-          if exitCode == 0 then 
-            doKeyboardSeries({ specifier_list = {
-              { modifiers = { "ctrl" }, text = "g" },
-              { text = self:get("number-part") },
-              { modifiers = {}, text = "return" },
-            }})
-          end
+        }, function ()
+          doKeyboardSeries({ specifier_list = {
+            { modifiers = { "ctrl" }, text = "g" },
+            { text = self:get("number-part") },
+            { modifiers = {}, text = "return" },
+          }})
         end)
       end
     },

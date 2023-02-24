@@ -160,14 +160,12 @@ end
 
 --- @param specifier { wait_time?: number, specifier_list: mouse_series_specifier[] }
 function doMouseSeries(specifier)
-  print(#specifier.specifier_list)
   if #specifier.specifier_list == 0 then
     return
   else 
     hs.timer.doAfter(
       specifier.wait_time or randBetween(0.07, 0.15), 
       function()
-        print("exec")
         local subspecifier = listShift(specifier.specifier_list)
         function do_after()
           doMouseSeries(specifier)
@@ -177,7 +175,6 @@ function doMouseSeries(specifier)
         elseif subspecifier.mode == "move" then
           moveMouse(subspecifier.target_point, subspecifier.duration, subspecifier.factor_of_deceleration, do_after)
         elseif subspecifier.mode == "moveandclick" then
-          print("moveandclick")
           moveAndClick(subspecifier.target_point, subspecifier.duration, subspecifier.factor_of_deceleration, do_after)
         elseif subspecifier.mode == "click" then
           leftclick(subspecifier.target_point, do_after)

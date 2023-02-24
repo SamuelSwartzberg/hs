@@ -19,7 +19,6 @@ JxaTabbableWindowItemSpecifier = {
       ["list-of-tabs"] = function(self)
         local res = {}
         local window_index = self:get("window-index-jxa")
-        print("window_index", window_index)
         for i = 0, self:get("amount-of-tabs") - 1 do
           table.insert(res, CreateWindowlikeItem({
             window_index = window_index,
@@ -36,7 +35,6 @@ JxaTabbableWindowItemSpecifier = {
       ["active-tab"] = function(self)
         local window_index = self:get("window-index-jxa")
         local tab_index = self:get("active-tab-index")
-        print(window_index, tab_index)
         return CreateWindowlikeItem({
           window_index = window_index,
           tab_index = tab_index ,

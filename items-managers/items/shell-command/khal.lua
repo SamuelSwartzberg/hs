@@ -62,8 +62,6 @@ function parseParseableKhalToSpecification(event)
   local parsed = ovtable.new()
   for i, component in ipairs(components) do
     local key = PARSEABLE_FORMAT_COMPONENTS[i]
-    print(key)
-    print(component)
     if key == "alarms" then
       parsed[key] = stringy.split(component, ",")
     elseif key == "description" then

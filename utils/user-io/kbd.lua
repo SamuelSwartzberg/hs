@@ -3,7 +3,6 @@
 
 --- @param specifier { wait_time?: number, specifier_list: kbd_specifier[] }
 function doKeyboardSeries(specifier)
-  print(#specifier.specifier_list)
   if #specifier.specifier_list == 0 then
     return
   else 

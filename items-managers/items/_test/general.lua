@@ -53,6 +53,9 @@ local is_method_ignore_map = { -- contains keys of specifiers and values of arra
   SassProjectDirItemSpecifier = {
     "is-actually-project-dir"
   },
+  UpkgCommandSpecifier = {
+    "is-installed"
+  },
 }
 
 local potential_interfaces_ignore_map = {

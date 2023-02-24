@@ -117,10 +117,8 @@ end
 function nestedAssocArrGetStopsForKeyValue(assoc_arr, indentation)
   if not indentation then indentation = 2 end
   local incl_path_and_depth = nestedAssocArrToListIncludingPathAndDepth(assoc_arr)
-  inspPrint(incl_path_and_depth)
   local list_of_stops = mapPairNewPairOvtable(incl_path_and_depth, function(k, item)
     local key = item.path[#item.path]
-    inspPrint(item.value)
     return key, {
       key_stop = (item.depth * indentation) + #key,
       value_stop = #item.value
@@ -134,15 +132,12 @@ end
 --- @return integer, integer
 function nestedAssocArrGetMaxStops(assoc_arr, indentation)
   local stops = nestedAssocArrGetStopsForKeyValue(assoc_arr, indentation)
-  inspPrint(stops)
   local key_stops = mapValueNewValue(values(stops), function(stop)
     return stop.key_stop
   end)
   local value_stops = mapValueNewValue(values(stops), function(stop)
     return stop.value_stop
   end)
-  inspPrint(key_stops)
-  inspPrint(value_stops)
   local max_key_stop = listMax(key_stops)
   local max_value_stop = listMax(value_stops)
   return max_key_stop, max_value_stop

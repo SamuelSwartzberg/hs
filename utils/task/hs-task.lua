@@ -126,22 +126,6 @@ function runHsTaskQuickLookResult(command_parts)
   end)
 end
 
---- @param command_parts command_parts
---- @param end_callback? end_callback
---- @return hs.task
-function runHsTaskErrorOnError(command_parts, end_callback)
-  return runHsTask(command_parts, function (exitCode, std_out, std_err)
-    if exitCode ~= 0 then 
-      error("Exited with non-zero code: " .. exitCode .. "\nstderr:\n\n" .. std_err .. "\n\nstdout:\n\n" .. std_out)
-    else 
-      if end_callback then
-        end_callback(exitCode, std_out, std_err)
-      end
-    end
-  end)
-end
-
-
 --- @param ... command_part
 --- @return hs.task
 function runArgs(...)

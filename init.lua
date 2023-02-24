@@ -390,9 +390,6 @@ System:get("manager", "watcher"):doThis("register-all", {
   {
     type = hs.fs.volume,
     fn = function(event, information)
-      print("hey")
-      print(hs.inspect(event == hs.fs.volume.didUnmount))
-      print(hs.inspect(information))
       if event == hs.fs.volume.didMount then
         local vol = CreateStringItem(information.path)
         if vol:get("is-time-machine-volume") then
@@ -402,7 +399,6 @@ System:get("manager", "watcher"):doThis("register-all", {
       elseif event == hs.fs.volume.didUnmount then
         local vol = CreateStringItem(information.path)
         if vol:get("is-dynamic-time-machine-volume") then
-          print("will eject")
           hs.timer.doAfter(30, function()
             hs.alert.show("Backup completed. Ejecting...")
             CreateStringItem(env.TMBACKUPVOL):doThis("eject")
