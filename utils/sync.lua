@@ -1,19 +1,24 @@
 --- @param path string
+--- @param other_root string must provide its own trailing slash if needed, to allow for relative hosts disallowing a trailing slash
 --- @return string, string
-function getHomeRemotePathPair(path)
+function getHomeOtherRootPathPair(path, other_root)
   local relative_path = ensureAdfix(path, env.HOME, false, false, "pre")
   relative_path = ensureAdfix(relative_path, "/", false, false, "pre")
   local local_path = env.HOME .. "/" .. relative_path
-  local remote_path = "hsftp:" .. path
+  local remote_path = other_root .. path
   return local_path, remote_path
 end
 
 ---@param path string
+---@param other_root string
 ---@return string
-function getRemotePath(path)
-  local _, remote_path = getHomeRemotePathPair(path)
-  return remote_path
+function getPathRelativeToOtherRoot(path, other_root)
+  local _, relative_path = getHomeOtherRootPathPair(path, other_root)
+  return relative_path
 end
+
+getOnRemote = bindNthArg(getPathRelativeToOtherRoot, 2, "hsftp:")
+getOnFsHttpServer = bindNthArg(getPathRelativeToOtherRoot, 2, env.FS_HTTP_SERVER .. "/")
 
 
 ---syncs files to and from the remote server using rclone
@@ -22,7 +27,7 @@ end
 ---@param action? "copy" | "move"
 ---@return nil
 function syncHomeRelativePath(path, push_or_pull, action)
-  local local_path, remote_path = getHomeRemotePathPair(path)
+  local local_path, remote_path = getHomeOtherRootPathPair(path, "hsftp:")
   local source, dest 
   if push_or_pull == "push" then
     source = local_path

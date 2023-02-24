@@ -2,6 +2,7 @@
 --- @param mode_if_not_number? "fail" | "nil" | "0"
 --- @return integer | nil
 function toInt(val, mode_if_not_number)
+  mode_if_not_number = mode_if_not_number or "0"
   if type(val) == "number" then
     return math.floor(tonumber(val) + 0.5)
   else
@@ -9,8 +10,10 @@ function toInt(val, mode_if_not_number)
       error("Value is not a number")
     elseif mode_if_not_number == "nil" then
       return nil
-    else -- 0 as default
+    elseif mode_if_not_number == "0" then
       return 0
+    else 
+      error("Invalid mode_if_not_number: " .. mode_if_not_number)
     end
   end
 end
@@ -19,6 +22,7 @@ end
 --- @param mode_if_not_positive_number? "fail" | "nil" | "-1"
 --- @return integer | nil
 function toPosInt(val, mode_if_not_positive_number)
+  mode_if_not_positive_number = mode_if_not_positive_number or "-1"
   if type(val) == "number" and val >= 0 then
     return math.floor(tonumber(val) + 0.5)
   else
@@ -26,8 +30,10 @@ function toPosInt(val, mode_if_not_positive_number)
       error("Value is not a positive number")
     elseif mode_if_not_positive_number == "nil" then
       return nil
-    else -- -1 mode as default
+    elseif mode_if_not_positive_number == "-1" then
       return -1
+    else 
+      error("Invalid mode_if_not_positive_number: " .. mode_if_not_positive_number)
     end
   end
 end
