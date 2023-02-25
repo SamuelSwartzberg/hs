@@ -13,12 +13,12 @@ function openPathVscode(path)
   if not type(path) == "string" then 
     error("path must be a string")
   end
-   runHsTask({
+   run({
     "open",
     "-a",
      { value = "Visual Studio Code", type = "quoted" },
     { value = path, type = "quoted" }
-  })
+  }, true)
 end
 
 --- @param contents string

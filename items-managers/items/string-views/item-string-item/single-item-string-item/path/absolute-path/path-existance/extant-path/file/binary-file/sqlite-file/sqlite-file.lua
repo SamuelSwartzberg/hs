@@ -38,11 +38,10 @@ SqliteFileItemSpecifier = {
     },
     doThisables = {
       ["write-to-csv"] = function(self, specifier)
-        local task = buildHsTask(self:get("command-write-to-csv", specifier))
-        if specifier.do_after then
-          task:setCallback(specifier.do_after)
-        end
-        task:start()
+        run({
+          args = self:get("command-write-to-csv", specifier),
+          and_then = specifier.do_after
+        }, true)
       end,
     },
   },

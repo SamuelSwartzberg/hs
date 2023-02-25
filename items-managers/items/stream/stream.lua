@@ -218,8 +218,6 @@ function CreateStreamItem(specified_contents)
   local interface = RootInitializeInterface(interface_specifier, contents)
 
   interface:get("contents").initial_stream_config.socket = interface:get("socket")
-  interface:get("contents")["task"] = buildHsTask(interface:get("command-parts"))
-  interface:get("contents")["task"]:start()
-
+  interface:get("contents")["task"] = run(interface:get("command-parts"), true)
   return interface
 end

@@ -152,11 +152,11 @@ ContactTableSpecifier = {
     },
     doThisables = {
       ["edit"] = function (self)
-        runHsTask({
+        run({
           "khard",
           "edit",
           {value =self:get("uid"), type = "quoted"}
-        })
+        }, true)
       end,
       ["add-encrypted-data"] = function(self, specifier)
         CreateShellCommand("pass"):doThis("add-json", {

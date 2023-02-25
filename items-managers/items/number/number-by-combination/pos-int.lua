@@ -14,13 +14,13 @@ PosIntSpecifier = {
         })
       end,
       ["get-random-alphanum-of-length"] = function(self)
-        local basis = longBase64RandomString()
+        local basis = base64RandomString()
         local filtered = basis:gsub("[^%d%a]", "")
         local truncated = filtered:sub(1, self:get("contents"))
         return truncated
       end,
       ["get-random-lower-alphanum-of-length"] = function(self)
-        local basis = longBase64RandomString()
+        local basis = base64RandomString()
         local filtered = basis:gsub("[^%d%l]", "")
         local truncated = filtered:sub(1, self:get("contents"))
         return truncated

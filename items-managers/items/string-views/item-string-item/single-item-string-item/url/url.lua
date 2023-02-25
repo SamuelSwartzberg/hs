@@ -63,7 +63,7 @@ URLItemSpecifier = {
     doThisables = {
       ["download-url"] = function(self, path)
         local url = self:get("contents")
-        runHsTask({
+        run({
           "cd",
           { value = path, type = "quoted" },
           "&&",
@@ -71,7 +71,7 @@ URLItemSpecifier = {
           "--location", -- Follow redirects
           { value = url, type = "quoted" },
           "-O"
-        })
+        }, true)
       end,
       ["download-url-to-downloads"] = function(self)
         self:doThis("download-url", { value = "$HOME/Downloads", type = "quoted" })
@@ -110,11 +110,11 @@ URLItemSpecifier = {
           "discover",
           { value = vdirsyncer_data.name, type = "quoted" }
         }, function(std_out)
-          runHsTask({
+          run({
             "vdirsyncer",
             "sync",
             { value = vdirsyncer_data.name, type = "quoted" }
-          })
+          }, true)
         end)
         khal_config:doThis("git-commit-self", "Add web-calendar " .. name)
         khal_config:doThis("git-push")

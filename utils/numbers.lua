@@ -68,9 +68,22 @@ function isFloat(val)
   end
 end
 
+--- @param val integer
+--- @return integer
+function lengthOfInt(val)
+  if isInt(val) then
+    return #tostring(val)
+  else
+    error("Value is not an integer")
+  end
+end
+
 --- @param length integer
 --- @return integer
 function smallestIntOfLength(length)
+  if length < 1 then
+    error("Length must be at least 1")
+  end
   return math.floor(1 * 10 ^ (length-1))
 end
 
@@ -87,13 +100,15 @@ function randomInt(length)
 end
 
 
+--- @param length? integer
 --- @return string
-function longBase64RandomString()
+function base64RandomString(length)
+  length = defaultIfNil(length, 200)
   local res = getOutputTask({
     "openssl",
     "rand",
     "-base64",
-    200
+    tostring(length)
   })
   return res
 end

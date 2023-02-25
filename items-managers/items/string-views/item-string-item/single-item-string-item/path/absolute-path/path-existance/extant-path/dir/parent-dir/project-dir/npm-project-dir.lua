@@ -21,13 +21,13 @@ NpmProjectDirItemSpecifier = {
     },
     doThisables = {
       ["bump-version"] = function(self, type)
-        runHsTask({
+        run({
           "npm",
           "version",
           type,
           "-m",
           "Bump version to %s"
-        })
+        }, true)
       end,
       ["open-project"] = function(self)
         self:doThis("open-in-new-vscode-window")

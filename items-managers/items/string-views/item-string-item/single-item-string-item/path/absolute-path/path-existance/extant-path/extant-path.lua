@@ -99,12 +99,12 @@ ExtantPathItemSpecifier = {
         hs.execute("open -R '" .. self:get("contents") .. "'")
       end,
       ["open-with-application"] = function(self, application)
-        runHsTask({
+        run({
           "open",
           "-a",
           application,
           { value = self:get("contents"), type = "quoted" }
-        })
+        }, true)
       end,
       ["open-contents-in-new-vscode-window"] = function(self)
         -- this should ideally use the `code` command, but it is currently broken

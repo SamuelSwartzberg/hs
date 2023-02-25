@@ -74,19 +74,19 @@ SignalItemSpecifier = {
       --- @param do_after function
       ["generate-backup"] = function(self, do_after)
         delete(env.TMP_SIGNAL_EXPORT_PARENT, "dir", "empty")
-        runHsTask({
+        run({ args = {
           "sigtop",
           "export-messages",
           "-f", "json",
           { value = "$TMP_SIGNAL_EXPORT_PARENT", type = "quoted" }
-        }, function()
+        }, and_then = function()
           delete(env.TMP_SIGNAL_EXPORT_MEDIA_PARENT, "dir", "empty")
           runHsTask({
             "sigtop",
             "export-attachments",
             { value = "$TMP_SIGNAL_EXPORT_MEDIA_PARENT", type = "quoted" }
           }, do_after)
-          end)
+          end})
       end,
       --- @param self ItemSpecifier
       --- @param func function

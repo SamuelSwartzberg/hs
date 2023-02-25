@@ -23,11 +23,11 @@ JsonFileItemSpecifier = {
     },
     doThisables = {
       ["host-on-json-server"] = function(self, port)
-        runHsTask({
+        run({
           "mockrs",
           "serve",
           "--port=" .. port,
-        })
+        }, true)
       end,
     }
   },

@@ -122,12 +122,12 @@ UpkgCommandSpecifier = {
         })
       end,
       ["do-single-arg"] = function(self,specifier)
-        runHsTask({
+        run({
           "upkg",
           specifier.mgr,
           specifier.action,
           specifier.arg,
-        })
+        }, true)
       end,
       ["install"] = function(self,specifier)
         specifier.action = "install"

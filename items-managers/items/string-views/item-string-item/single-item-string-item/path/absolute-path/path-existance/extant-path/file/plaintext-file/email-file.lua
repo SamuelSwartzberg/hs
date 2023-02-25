@@ -106,7 +106,7 @@ EmailFileItemSpecifier = {
     },
     doThisables = {
       ["download-attachment"] = function(self, name)
-        runHsTask({
+        run({
           "cd",
           env.TMPDIR,
           "&&",
@@ -114,7 +114,7 @@ EmailFileItemSpecifier = {
           "-x",
           { value = self:get("contents"), type = "quoted" },
           { value = name, type = "quoted" },
-        })
+        }, true)
       end,
       ["choose-save-act-on-attachment"] = function(self)
         CreateArray(self:get("attachments")):doThis("choose-item", function(attachment)
@@ -166,10 +166,10 @@ EmailFileItemSpecifier = {
               "minc", -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
               { value = path, type = "quoted" }
             }, function()
-                runHsTask({
+                run({
                   "rm",
                   { value = self:get("contents"), type = "quoted" }
-                })
+                }, true)
             end
           )
         end)

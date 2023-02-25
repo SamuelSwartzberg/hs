@@ -69,13 +69,15 @@ FacebookItemSpecifier = {
       ["generate-backup"] = function(self, do_after) 
         doWhenReady(
           function()
-            runHsTask({
-              "open",
-              "-a",
-              "Firefox",
-              { value = "https://www.facebook.com/dyi/?referrer=yfi_settings", type = "quoted"}
-            }, function()
-              hs.timer.doAfter(1, function()
+            run({
+              args = {
+                "open",
+                "-a",
+                "Firefox",
+                { value = "https://www.facebook.com/dyi/?referrer=yfi_settings", type = "quoted"}
+              },
+              delay = 1,
+              and_then = function()
                 hs.eventtap.keyStroke({"cmd"}, "0") -- reset zoom
                 local ff_window = CreateRunningApplicationItem(hs.application.get("Firefox")):get("focused-window-item")
                 ff_window:doThis("set-tile", {
@@ -92,10 +94,11 @@ FacebookItemSpecifier = {
                   { mode = "scroll", target_point = {x = 0, y = -4000}, duration = 2.5 }, -- scroll to end of page
                   { mode = "moveandclick", tl = { x = 530, y = 1548} } -- export button
                 })
-              end)
-            end)
-            do_after()
-          end)
+                do_after()
+              end
+            }, true)
+          end
+        )
       end,
       ["preprocess-backup-files"] = function()
         drainAllSubdirsTo(

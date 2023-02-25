@@ -16,11 +16,11 @@ BrowserApplicationApplicationSpecifier = {
     },
     doThisables = {
       ["open-url"] = function (self, url)
-        runHsTask({
+        run({
           "open",
           "-a", self:get("name"),
           { value = url, type = "quoted" }
-        })
+        }, true)
       end,
       ["load-session"] = function(self, session)
         session

@@ -57,37 +57,44 @@ end
 --- @param email_file string
 --- @param do_after? fun()
 function sendEmail(email_file, do_after)
-  runHsTask({
-    "msmtp",
-    "-t",
-    "<",
-    { value = email_file, type = "quoted" },
-  }, function(exitCode, std_out, std_err)
-    if exitCode == 0 then
-      runHsTask({
-        "cat",
-        { value = email_file, type = "quoted" },
-        "|",
-        "msed",
-        { value = "/Date/a/"..formatDateEmail(os.time()), type = "quoted" },
-        "|",
-        "msed",
-        { value = "/Status/a/S/", type = "quoted" },
-        "|",
-        "mdeliver",
-        "-c",
-        { value = env.MBSYNC_ARCHIVE, type = "quoted" },
-      }, function()
-        delete(email_file)
-        if do_after then
-          do_after()
+  run({
+    args = {
+      "msmtp",
+      "-t",
+      "<",
+      { value = email_file, type = "quoted" },
+    }, 
+    and_then = function()
+      run({
+        args = {
+          "cat",
+          { value = email_file, type = "quoted" },
+          "|",
+          "msed",
+          { value = "/Date/a/"..formatDateEmail(os.time()), type = "quoted" },
+          "|",
+          "msed",
+          { value = "/Status/a/S/", type = "quoted" },
+          "|",
+          "mdeliver",
+          "-c",
+          { value = env.MBSYNC_ARCHIVE, type = "quoted" },
+        }, 
+        and_then = function()
+          delete(email_file)
+          if do_after then
+            do_after()
+          end
         end
-      end)
-    else 
-      writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), email_file)
-    end
-    
-  end)
+      }, true)
+    end,
+    catch = function()
+      writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), readFileOrError(email_file))
+    end,
+    finally = function()
+      delete(email_file)
+    end,
+  }, true)
 end
 
 --- @param headers { [string]: string }

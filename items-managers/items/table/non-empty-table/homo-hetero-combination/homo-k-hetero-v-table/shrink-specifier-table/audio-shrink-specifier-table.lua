@@ -7,13 +7,13 @@ AudioShrinkSpecifierTableSpecifier = {
     },
     doThisables = {
       ["shrink"] = function(self, path)
-        runHsTask({
+        run({
           "fmmpeg",
           "-hide_banner", "-loglevel", "warning",
           "-i", { value = path, type = "quoted" },
           "-c:a","libvorbis", "-map", "0:a:0", "-q:a 4",
           { value = self:get("shrunken-path", path), type = "quoted" },
-        })
+        }, true)
       end,
     },
   },

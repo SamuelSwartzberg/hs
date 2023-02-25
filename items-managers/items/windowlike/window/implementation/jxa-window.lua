@@ -4,7 +4,7 @@ JxaWindowItemSpecifier = {
   properties = {
     getables = {
       ["window-index-jxa"] = function(self)
-        return getViaJXA(
+        return getViaOSA("js", 
           "Application('" .. self:get("application-name") .. "')" ..
             ".windows().findIndex(" ..
               "window => window.title() == '" .. self:get("filtered-title") .. "'" ..

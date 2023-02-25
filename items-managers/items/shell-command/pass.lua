@@ -24,14 +24,14 @@ PassCommandSpecifier = {
         if isListOrEmptyTable(specifier.thing) then
           specifier.thing = table.concat(specifier.thing, "/")
         end
-        runHsTask({
+        run({
           "yes",
           { value = specifier.payload, type = "quoted" },
           "|",
           "pass",
           "add",
           specifier.thing .. "/" .. specifier.name
-        })
+        }, true)
       end,
       ["add-json"] = function(self, specifier)
         specifier.payload = json.encode(specifier.data)
@@ -43,12 +43,12 @@ PassCommandSpecifier = {
         self:doThis("add-thing", specifier)
       end,
       ["add-username"] = function (self, specifier)
-        runHsTask({
+        run({
           "echo", "-n",
           { value = specifier.username, type = "quoted" },
           ">",
           env.MPASSUSERNAME .. "/" .. specifier.name .. ".txt"
-        })
+        }, true)
       end
     }
   },

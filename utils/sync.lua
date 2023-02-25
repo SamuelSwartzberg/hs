@@ -39,20 +39,20 @@ function syncHomeRelativePath(path, push_or_pull, action)
     error("push_or_pull must be 'push' or 'pull'")
   end
   action = defaultIfNil(action, "copy")
-  runHsTask({
+  run({
     "rclone",
     action,
     { value = source, type = "quoted" },
     { value = dest, type = "quoted" },
-  })
+  }, true)
 end
 
 ---@return nil
 function syncVdirSyncer()
-  runHsTask({
+  run({
     "vdirsyncer",
     "sync",
-  })
+  }, true)
 end
 
 ---@param path string

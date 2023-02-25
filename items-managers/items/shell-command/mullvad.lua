@@ -29,16 +29,16 @@ MullvadCommandSpecifier = {
     },
     doThisables = {
       ["connect"] = function()
-        runHsTask({
+        run({
           "mullvad",
           "connect",
-        })
+        }, true)
       end,
       ["disconnect"] = function()
-        runHsTask({
+        run({
           "mullvad",
           "disconnect",
-        })
+        }, true)
       end,
       ["toggle"] = function(self)
         if self:get("is-connected") then
@@ -48,13 +48,13 @@ MullvadCommandSpecifier = {
         end
       end,
       ["relay-set"] = function(self, relay)
-        runHsTask({
+        run({
           "mullvad",
           "relay",
           "set",
           "hostname",
           relay,
-        })
+        }, true)
       end,
       
     }

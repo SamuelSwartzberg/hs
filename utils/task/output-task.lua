@@ -26,7 +26,7 @@ function getOutputArgsSimple(...)
   return output
 end
 
---- @param command_parts command_parts
+--- @param command_parts command_parts  
 --- @return string
 function getOutputTaskSimple(command_parts)
   local output = getOutputTask(command_parts)

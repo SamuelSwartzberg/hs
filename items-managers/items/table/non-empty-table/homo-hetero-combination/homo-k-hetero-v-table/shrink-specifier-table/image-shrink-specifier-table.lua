@@ -48,13 +48,13 @@ ImageShrinkSpecifierTableSpecifier = {
     },
     doThisables = {
       ["shrink"] = function(self, path)
-        runHsTask({
+        run({
           "convert",
           { value = path, type = "quoted" },
           table.unpack(self:get("quality-part")),
           table.unpack(self:get("resize-part", path)),
           { value = self:get("shrunken-path", path), type = "quoted" },
-        })
+        }, true)
       end,
     },
   },

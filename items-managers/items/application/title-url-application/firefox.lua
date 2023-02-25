@@ -39,12 +39,12 @@ FirefoxItemSpecifier = {
         do_after() -- no pre-backup actions for firefox
       end,
       ["dump-state"] = function (self)
-        runHsTask({
+        run({
           "lz4jsoncat",
           { value = "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY", type = "quoted" },
           ">",
           { value = "$TMP_FIREFOX_STATE_JSON", type = "quoted"}
-        })
+        }, true)
       end,
       
     }

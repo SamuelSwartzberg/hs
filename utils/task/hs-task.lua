@@ -1,44 +1,125 @@
 local rrq = bindArg(relative_require, "utils.task")
 rrq("args")
 
+--- @class run_options_object
+--- @field args command_parts
+--- @field catch? fun(exit_code: integer, std_err: string): any
+--- @field finally? fun(exit_code: integer, std_err_or_out: string): any currently, finally may run before and_then if and_then is async or has a delay
+--- @field dont_clean_output? boolean
 
+--- @class run_options_object_async : run_options_object
+--- @field and_then? fun(std_out: string): any
+--- @field delay? number
+--- @field run_immediately? boolean
 
-local function doNothingCallback(_, std_out, std_err)
-  log.v("stdout: " .. std_out)
-  log.v("stderr: " .. std_err)
-  return true
+--- @alias run_overload_1 fun(opts: run_options_object_async | command_parts, async: true): hs.task
+--- @alias run_overload_2 fun(opts: run_options_object | command_parts, async: false): string|nil
+--- @alias run run_overload_1 | run_overload_2
+
+--- @type run
+function run(opts, async)
+  local args 
+  if not opts.args then
+    error("No args provided")
+  else
+    if isListOrEmptyTable(opts) then -- handle providing command_parts directly
+      opts = {args = args}
+    end
+    args = buildTaskArgs(opts.args)
+  end
+  opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
+  opts.catch = opts.catch or function(exit_code, std_err)
+    local err_str = "exit code " .. exit_code .. "\nstderr: \n" .. std_err
+    error(err_str)
+  end
+  async = defaultIfNil(async, true)
+
+  if async then
+    local task =  hs.task.new(
+      "/opt/homebrew/bin/bash",
+      function(exit_code, std_out, std_err)
+        local error_to_rethrow
+        if exit_code ~= 0 then
+          local status, res = pcall(opts.catch, exit_code, std_err) -- temporarily catch the error so we can run the finally block
+          if not status then
+            error_to_rethrow = res
+          end
+        else
+          if not opts.dont_clean_output then
+            std_out = stringy.strip(std_out)
+          end
+          if opts.delay then
+            hs.timer.doAfter(opts.delay, function()
+              opts.and_then(std_out)
+            end)
+          else
+            opts.and_then(std_out)
+          end
+        end
+        if opts.finally then
+          opts.finally(exit_code, std_out or std_err)
+          if error_to_rethrow then -- rethrow the error if it was caught
+            error(error_to_rethrow)
+          end
+        end
+      end,
+      args
+    )
+    if opts.run_immediately then
+      task:start()
+    end
+    return task
+  else
+    local command = string.format(
+      "/opt/homebrew/bin/bash %s '%s'",
+      args[1],
+      args[2]
+    )
+    local output, status, reason, code = hs.execute(command)
+    local error_to_rethrow
+    if status then
+      if not opts.dont_clean_output then
+        output = stringy.strip(output)
+      end
+      return output
+    else
+      local status, res = pcall(opts.catch, code, output)
+      if not status then
+        error_to_rethrow = res
+      end
+    end
+
+    if opts.finally then
+      opts.finally(code, output)
+    end
+
+    if error_to_rethrow then
+      error(error_to_rethrow)
+    end
+
+    return nil
+  end
+
 end
 
 --- @param command_parts command_parts
---- @param end_callback? end_callback
+--- @param and_then? and_then
 --- @return hs.task
-function buildHsTask(command_parts, end_callback)
-  local task = hs.task.new(
-    "/opt/homebrew/bin/bash",
-    end_callback or doNothingCallback,
-    buildTaskArgs(command_parts)
-  )
-  return task
-end
-
---- @param command_parts command_parts
---- @param end_callback? end_callback
---- @return hs.task
-function runHsTask(command_parts, end_callback)
-  local task = buildHsTask(command_parts, end_callback)
+function runHsTask(command_parts, and_then)
+  local task = buildHsTask(command_parts, and_then)
   task:start()
   return task
 end
 
 --- @param command_parts command_parts
---- @param end_callback? fun(std_out: string)
+--- @param and_then? fun(std_out: string)
 --- @return hs.task
-function runHsTaskProcessOutput(command_parts, end_callback)
-  local task = buildHsTask(command_parts, function(exitCode, std_out, std_err)
-    if exitCode == 0 then
-      end_callback(std_out)
+function runHsTaskProcessOutput(command_parts, and_then)
+  local task = buildHsTask(command_parts, function(exit_code, std_out, std_err)
+    if exit_code == 0 then
+      and_then(std_out)
     else
-      local err_str = "exit code " .. exitCode .. "\nstderr: \n" .. std_err
+      local err_str = "exit code " .. exit_code .. "\nstderr: \n" .. std_err
       error(err_str)
     end
   end)
@@ -51,12 +132,12 @@ end
 function runHsTaskParallel(command_specifier_list, do_after)
   local results = {}
   for command_id, command_parts in pairsSafe(command_specifier_list) do
-    local task = runHsTask(command_parts, function (exitCode, std_out, std_err)
-      if exitCode == 0 then 
+    local task = runHsTask(command_parts, function (exit_code, std_out, std_err)
+      if exit_code == 0 then 
         results[command_id] = std_out
       else
         results[command_id] = {
-          exitCode = exitCode,
+          exit_code = exit_code,
           std_err = std_err
         }
       end
@@ -114,11 +195,11 @@ end
 --- @param command_parts command_parts
 --- @return hs.task
 function runHsTaskQuickLookResult(command_parts)
-  return runHsTask(command_parts, function (exitCode, std_out, std_err)
+  return runHsTask(command_parts, function (exit_code, std_out, std_err)
     local command_run = table.concat(command_parts, " ")
     local outstr = "Command\n  " .. 
       command_run ..
-      "\nexited with code " .. exitCode ..
+      "\nexited with code " .. exit_code ..
       "\n\nstdout:\n\n````\n" .. std_out ..
       "\n```\n\nstderr:\n\n```\n" .. std_err
       .. "\n```"
@@ -138,16 +219,6 @@ function runOpenCommand(path)
   return runHsTask({"open", path})
 end
 
-local lang_voice_map = {
-  ["en"] = "Ava",
-  ["ja"] = "Kyoko",
-}
-
----@param text string
----@param lang "en" | "ja"
-function say(text, lang)
-  return runHsTask({"say", "-v", lang_voice_map[lang], {value = text, type = "quoted"}})
-end
 
 --- @return hs.task
 function emptyTrash()

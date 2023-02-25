@@ -115,17 +115,20 @@ end
 --- @param extension? string
 function doWithTempFileEditedInEditor(contents, do_this, filename, extension)
   local tmp_file = createUniqueTempFile(contents, filename, extension)
-  runHsTask({
-    "code",
-    "--wait",
-    "--disable-extensions",
-    {value = tmp_file, type = "quoted"},
-  }, function(exit_code)
-    if exit_code == 0 then 
+  run({
+    args = {
+      "code",
+      "--wait",
+      "--disable-extensions",
+      {value = tmp_file, type = "quoted"},
+    },
+    and_then = function()
       do_this(tmp_file)
+    end,
+    finally = function()
+      delete(tmp_file)
     end
-    delete(tmp_file)
-  end)
+  }, true)
 end
 
 --- @param source string
@@ -137,12 +140,15 @@ function zipFile(source, target, do_after)
     target = target,
     target_ext = "zip"
   })
-  runHsTask({
-    "zip",
-    "-r",
-    {value = target, type = "quoted"},
-    {value = source, type = "quoted"},
-  }, function() if do_after then do_after(target) end end)
+  run({
+    args = {
+      "zip",
+      "-r",
+      {value = target, type = "quoted"},
+      {value = source, type = "quoted"},
+    },
+    and_then = bindArg(do_after, target),
+  }, true)
 end
 
 --- @param name string

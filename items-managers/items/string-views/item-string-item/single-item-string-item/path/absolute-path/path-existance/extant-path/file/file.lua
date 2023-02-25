@@ -52,7 +52,7 @@ FileItemSpecifier = {
         sendEmailInteractive({}, asAttach(self:get("contents")), editorEditFunc, do_after)
       end,
       ["edit-file-interactive"] = function(self, do_after)
-        runHsTask({
+        run({
           "$VISUAL",
           { value = self:get("contents"), type = "quoted" },
         }, do_after)
@@ -63,7 +63,7 @@ FileItemSpecifier = {
     { key = "image-file", value = CreateImageFileItem },
     { key = "plaintext-file", value = CreatePlaintextFileItem },
     { key = "binary-file", value = CreateBinaryFileItem },
-  }),
+  }, true),
   action_table = {
     {
       text = "🗑 rmfl.",

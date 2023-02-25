@@ -4,7 +4,7 @@ JxaTabbableWindowItemSpecifier = {
   properties = {
     getables = {
       ["amount-of-tabs"] = function(self)
-        local parsed_res = getViaJXA(
+        local parsed_res = getViaOSA("js", 
           "Application('" .. self:get("application-name") .. "')" ..
             ".windows().find(" ..
               "window => window.title() == '" .. self:get("filtered-title") .. "'" ..

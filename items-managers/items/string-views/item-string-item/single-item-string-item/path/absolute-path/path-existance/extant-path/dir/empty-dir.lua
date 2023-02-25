@@ -1,6 +1,6 @@
 local project_type_init_map = {
   npm = function(path)
-    runHsTask({
+    run({
       "cd",
       { value = path, type = "quoted" },
       "&&",
@@ -12,7 +12,7 @@ local project_type_init_map = {
       "pkg",
       "set",
       { value = "name=" .. getLeafWithoutPath(path), type = "quoted" },
-    })
+    }, true)
   end,
   omegat = function(path)
     writeFile(path .. "/omegat.project", comp.templates.omegat, "not-exists")

@@ -408,13 +408,13 @@
 --- @field choices fun(self: hs.chooser, choices: chooser_item[] | fun(...): chooser_item[]): hs.chooser | chooser_item[]
 --- @field rows fun(self: hs.chooser, rows?: integer): hs.chooser | integer
 
---- @alias end_callback fun(exitCode?: number, std_out?: string, std_err?: string): nil
+--- @alias and_then fun(exit_code?: number, std_out?: string, std_err?: string): nil
 --- @alias stream_callback fun(task?: hs.task, std_out?: string, std_err?: string): boolean
 --- @alias command_part string | {value: string | command_parts, type: "quoted"  | "interpolated" | nil}
 --- @alias command_parts command_part[]
 
 --- @class hs.task
---- @field new fun(launchPath: string, terminationCallbackFn: end_callback, streamCallbackFn?: stream_callback, arguments?: string[]): hs.task
+--- @field new fun(launchPath: string, terminationCallbackFn: and_then, streamCallbackFn?: stream_callback, arguments?: string[]): hs.task
 --- @field start fun(self: hs.task): nil
 
 --- @class hs.image
