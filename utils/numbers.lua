@@ -19,26 +19,6 @@ function toInt(val, mode_if_not_number)
 end
 
 --- @param val any
---- @param mode_if_not_positive_number? "fail" | "nil" | "-1"
---- @return integer | nil
-function toPosInt(val, mode_if_not_positive_number)
-  mode_if_not_positive_number = mode_if_not_positive_number or "-1"
-  if type(val) == "number" and val >= 0 then
-    return math.floor(tonumber(val) + 0.5)
-  else
-    if mode_if_not_positive_number == "fail" then
-      error("Value is not a positive number")
-    elseif mode_if_not_positive_number == "nil" then
-      return nil
-    elseif mode_if_not_positive_number == "-1" then
-      return -1
-    else 
-      error("Invalid mode_if_not_positive_number: " .. mode_if_not_positive_number)
-    end
-  end
-end
-
---- @param val any
 --- @return boolean
 function isInt(val)
   if type(val) == "number" then
@@ -104,7 +84,7 @@ end
 --- @return string
 function base64RandomString(length)
   length = defaultIfNil(length, 200)
-  local res = getOutputTask({
+  local res = run({
     "openssl",
     "rand",
     "-base64",
@@ -136,4 +116,47 @@ function seq(start, stop, step)
   end
 
   return res
+end
+
+--- @param thing any
+--- @param target? "number" | "int" | "pos-int"
+--- @param mode? "fail" | "nil" | "invalid-number"
+--- @return number | nil
+function toNumber(thing, target, mode)
+  target = target or "number"
+  mode = mode or "nil"
+  local conv_func
+  if target == "number" then
+    conv_func = tonumber
+  elseif target == "int" then
+    conv_func = function(t)
+      local t = tonumber(t)
+      if not t then return nil end
+      return math.floor(tonumber(t) + 0.5)
+    end
+  elseif target == "pos-int" then
+    conv_func = function(t)
+      local t = tonumber(t)
+      if not t or t < 0 then return nil end
+      return math.floor(tonumber(t) + 0.5)
+    end
+  else
+    error("Invalid target: " .. target)
+  end
+
+  local res = conv_func(thing)
+
+  if res == nil then
+    if mode == "fail" then
+      error("Value cannot be converted to a " .. target)
+    elseif mode == "nil" then
+      return nil
+    elseif mode == "invalid-number" then
+      return -math.huge
+    else
+      error("Invalid mode: " .. mode)
+    end
+  else
+    return res
+  end
 end

@@ -104,7 +104,7 @@ function generateDummyText(opts, do_after)
   elseif opts.use_only then
     ai_request_str = ai_request_str .. "using only " .. opts.use_only .. " "
   end
-  ai_request_str = stringSlice(ai_request_str, 1, -2)
+  ai_request_str = slice(ai_request_str, 1, -1)
   if opts.format then
     ai_request_str = ai_request_str .. ", formatted as " .. opts.format
   end

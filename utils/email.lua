@@ -65,7 +65,7 @@ function sendEmail(email_file, do_after)
         { value = email_file, type = "quoted" },
       },
       catch = function()
-        writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), readFileOrError(email_file))
+        writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), readFile(email_file, "error"))
       end,
       finally = function()
         delete(email_file)
@@ -106,7 +106,7 @@ end
 
 function editorEditFunc(mail, do_after)
   doWithTempFileEditedInEditor(mail, function(mail_file)
-    do_after(readFileOrError(mail_file))
+    do_after(readFile(mail_file, "error"))
   end)
 end
 

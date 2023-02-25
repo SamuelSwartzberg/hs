@@ -1,8 +1,11 @@
 
---- @param path string
---- @return string | nil
-function readFile(path)
+--- @alias readFileResult fun(path: string, mode?: "nil"): string | nil
+--- @alias readFileOrError fun(path: string, mode: "error"): string
+
+--- @type readFileResult | readFileOrError
+function readFile(path, mode)
   path = resolveTilde(path)
+  mode = mode or "nil"
   local path_is_remote = pathIsRemote(path)
   if not path_is_remote then 
     local file = io.open(path, "r")
@@ -11,25 +14,19 @@ function readFile(path)
       io.close(file)
       return contents
     else
-      return nil
+      if mode == "error" then
+        error("Could not read file: " .. path)
+      else
+        return nil
+      end
     end
   else
-    local output, status, reason, code = getOutputTask({"rclone", "cat", {value = path, type = "quoted"}})
-    if status then
-      return output
-    else
-      return nil
-    end
-  end
-end
-
---- @param path string
---- @return string
-function readFileOrError(path)
-  local contents = readFile(path)
-  if contents == nil then
-    error("Could not read file: " .. path)
-  else
-    return contents
+    local opts = {
+      args = {"rclone", "cat", {value = path, type = "quoted"}},
+      catch = function()
+        return mode == "error" -- if catch returns true, then the default error handler will be called, which will error, which is what we want
+      end,
+    }
+    return run(opts)
   end
 end

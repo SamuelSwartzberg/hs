@@ -17,7 +17,7 @@ MPVInterfaceInnerSpecifier = {
         return self.contents:getResponse({ command = { "get_property", key } })
       end,
       ["as-int"] = function(self, key)
-        local res = toPosInt(self:get("key", key))
+        local res = toNumber(self:get("key", key), "pos-int")
         return res
       end,
     },

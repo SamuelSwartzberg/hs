@@ -33,16 +33,10 @@ PlaintextFileItemSpecifier = {
         return self:get("lines-of-file-contents")[n]
       end,
       ["range-lines-of-file-contents"] = function(self, specifier)
-        return listSliceSpec(self:get("lines-of-file-contents"), specifier)
-      end,
-      ["slice-lines-of-file-contents"] = function(self, slice_notation)
-        return self:get("range-lines-of-file-contents", parsePythonlikeSliceNotation(slice_notation))
+        return slice(self:get("lines-of-file-contents"), specifier)
       end,
       ["range-chars-of-file-contents"] = function(self, specifier)
-        return stringSliceSpec(self:get("file-contents"), specifier)
-      end,
-      ["slice-chars-of-file-contents"] = function(self, slice_notation)
-        return self:get("range-chars-of-file-contents", parsePythonlikeSliceNotation(slice_notation))
+        return slice(self:get("file-contents"), specifier)
       end,
       ["file-contents-to-string"] = function(self) return self:get("file-contents") end,
       ["file-contents-to-tsv-dict"] = function(self)

@@ -263,43 +263,6 @@ function listSplice(list1, list2, splice_before)
   return new_list
 end
 
---- both start and stop are 1-indexed, for both positive and negative values
---- both start and stop are inclusive
---- @generic T
---- @param list T[]
---- @param start_incl? integer
---- @param stop_incl? integer
---- @param step? integer
---- @return T[]
-function listSlice(list, start_incl, stop_incl, step)
-  if not step then step = 1 end
-  if not start_incl then start_incl = 1 end
-  if not stop_incl then stop_incl = #list end
-
-  if start_incl < 0 then
-    start_incl = #list + start_incl + 1
-  end
-  if stop_incl < 0 then
-    stop_incl = #list + stop_incl + 1
-  end
-
-  local new_list = {}
-  for i = start_incl, stop_incl, step do
-    new_list[#new_list + 1] = list[i]
-  end
-  return new_list
-end
-
---- @alias listSliceSpec {start: integer, stop: integer, step: integer}
-
---- @generic T
---- @param list T[]
---- @param spec listSliceSpec
---- @return T[]
-function listSliceSpec(list, spec)
-  return listSlice(list, spec.start, spec.stop, spec.step)
-end
-
 --- @generic T
 --- @param list T[]
 --- @return T[]
@@ -484,7 +447,7 @@ function listToAssocArray(list)
   local assoc_array = {}
   for _, v in ipairs(list) do
     local first_elem = v[1]
-    local rest_of_list = listSlice(v, 2)
+    local rest_of_list = slice(v, 2)
     assoc_array[first_elem] = rest_of_list
   end
   return assoc_array
@@ -510,7 +473,7 @@ end
 --- @return string
 function listSampleString(list, sample_size)
   if not sample_size then sample_size = 2 end
-  local listSample = listSlice(list, 1, sample_size)
+  local listSample = slice(list, 1, sample_size)
   local outstr = stringx.join(", ", listSample)
   if #list > sample_size then
     outstr = outstr .. ", ..."

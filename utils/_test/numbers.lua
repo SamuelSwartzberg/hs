@@ -19,22 +19,22 @@ assertMessage(
 )
 
 assertMessage(
-  toPosInt(1.6, "nil"),
+  toNumber(1.6, "int", "nil"),
   2
 )
 
 assertMessage(
-  toPosInt("1.6", "nil"),
+  toNumber("1.6", "pos-int", "nil"),
   nil
 )
 
 assertMessage(
-  toPosInt("1.6", "-1"),
-  -1
+  toNumber("1.6", "pos-int", "invalid-number"),
+  -math.huge
 )
 
 assertMessage(
-  pcall(toPosInt, "1.6", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
+  pcall(toNumber, "1.6", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
   false
 )
 

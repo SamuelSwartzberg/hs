@@ -16,7 +16,7 @@ FileItemSpecifier = {
       end,
       ["dir-or-file-any-pass"] = function(self, query) return query(self) end,
       ["file-contents"] = function(self)
-        return stringy.strip(readFileOrError(self:get("contents")))
+        return stringy.strip(readFile(self:get("contents"), "error"))
       end,
       ["descendant-file-only-string-item-array"] = function(self)
         return CreateArray({self.root_super})

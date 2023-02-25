@@ -49,8 +49,8 @@ function getStyledChooserItems(style_specifier, choices)
           styled_text = hs.styledtext.new(text_string_or_styledtext, item_style.styledtext[text])
         else
           local existing_style = text_string_or_styledtext:asTable()
-          local text_string = listSlice(existing_style, 1, 1)[1]
-          local style = listSlice(existing_style, 2, #existing_style)
+          local text_string = slice(existing_style, 1, 1)[1]
+          local style = slice(existing_style, 2, #existing_style)
           styled_text = hs.styledtext.new(text_string, item_style.styledtext[text])
           for _, v in ipairs(style) do
             styled_text = styled_text:setStyle(v.attributes, v.starts, v.ends)

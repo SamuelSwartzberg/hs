@@ -60,6 +60,6 @@ le = luaTemplateEval
 --- @param yaml_file string
 --- @return string
 function luaTemplateEvalFromYaml(template, yaml_file)
-  local d = yaml.load(readFileOrError(yaml_file))
+  local d = yaml.load(readFile(yaml_file, "error"))
   return luaTemplateEval(template, d)
 end

@@ -4,7 +4,7 @@ InputMethodItemSpecifier = {
   properties = {
     getables = {
       ["to-string"] = function(self)
-        return listSlice(stringy.split(self:get("contents"), "."), -1, -1)[1]
+        return slice(stringy.split(self:get("contents"), "."), -1, -1)[1]
       end,
       ["is-active"] = function(self)
         return hs.keycodes.currentSourceID() == self:get("contents")

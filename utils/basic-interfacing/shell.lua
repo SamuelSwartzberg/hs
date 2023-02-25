@@ -69,7 +69,7 @@ function run(opts, and_then, ...)
   end
   opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
   opts.catch = function(exit_code, std_err)
-    local should_run_default_catch 
+    local should_run_default_catch = true
     if opts.catch then
       should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch
     end

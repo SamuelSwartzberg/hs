@@ -331,7 +331,7 @@ KhalCommandSpecifier = {
         specifier = specifier or {}
         local temp_file_contents = le(generateCalendarTemplate(specifier.specifier or {}))
         doWithTempFileEditedInEditor(temp_file_contents, function(tmp_file)
-          local new_specifier = yamlLoad(readFileOrError(tmp_file))
+          local new_specifier = yamlLoad(readFile(tmp_file, "error"))
           new_specifier.do_after = specifier.do_after
           self:doThis("add-event-from-specifier", new_specifier )
         end, nil, "yaml")

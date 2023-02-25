@@ -15,12 +15,12 @@ MultilineStringItemSpecifier = {
       ["tail"] = function(self, n)
         n = n or 10
         local lines = self:get("lines")
-        return table.concat(listSlice(lines, #lines - n + 1, #lines), "\n")
+        return table.concat(slice(lines, #lines - n + 1, #lines), "\n")
       end,
       ["head"] = function(self, n)
         n = n or 10
         local lines = self:get("lines")
-        return table.concat(listSlice(lines, 1, n), "\n")
+        return table.concat(slice(lines, 1, n), "\n")
       end,
     },
     doThisables = {

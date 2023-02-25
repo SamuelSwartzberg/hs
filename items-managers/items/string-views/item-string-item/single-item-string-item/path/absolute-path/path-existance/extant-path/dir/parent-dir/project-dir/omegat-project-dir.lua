@@ -11,8 +11,9 @@ OmegatProjectDirItemSpecifier = {
       end,
       ["local-data-object"] = function(self)
         return yamlLoad(
-          readFileOrError(
-            self:get("local-data-object-path")
+          readFile(
+            self:get("local-data-object-path"),
+            "error"
           )
         )
       end,

@@ -58,7 +58,7 @@ end
 function ignoreFirstNArgs(func, n)
   return function(...)
     local args = {...}
-    local new_args = listSlice(args, n + 1)
+    local new_args = slice(args, n + 1)
     return func(table.unpack(new_args))
   end
 end

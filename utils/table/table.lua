@@ -706,7 +706,7 @@ end
 function resolveListOfListsByAssocArr(list, assoc_arr, n_elem_to_resolve)
   local t = {}
   for _, list_item in ipairs(list) do
-    local list_item_before, key_to_resolve, list_item_after = listSlice(list_item, 1, n_elem_to_resolve - 1), list_item[n_elem_to_resolve], listSlice(list_item, n_elem_to_resolve + 1)
+    local list_item_before, key_to_resolve, list_item_after = slice(list_item, 1, n_elem_to_resolve - 1), list_item[n_elem_to_resolve], slice(list_item, n_elem_to_resolve + 1)
     local resolved = assoc_arr[key_to_resolve]
     if resolved then
       local new_list = listFlatten({list_item_before, resolved, list_item_after})

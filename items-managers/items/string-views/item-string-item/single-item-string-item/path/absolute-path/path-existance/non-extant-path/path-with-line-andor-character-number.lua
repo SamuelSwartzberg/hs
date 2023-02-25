@@ -7,7 +7,7 @@ PathWithLineAndorCharacterNumberItemSpecifier = {
         return stringy.split(self:get("contents"), ":")[1]
       end,
       ["number-part"] = function(self)
-        local number_parts = listSlice(stringy.split(self:get("contents"), ":"), 2)
+        local number_parts = slice(stringy.split(self:get("contents"), ":"), 2)
         return stringx.join(":", number_parts)
       end,
     },

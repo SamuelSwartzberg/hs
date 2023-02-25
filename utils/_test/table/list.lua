@@ -78,82 +78,82 @@ assertTable(
   {1, 2, 3}
 )
 assertTable(
-  listSlice({1,2,3}, 1),
+  slice({1,2,3}, 1),
   {1,2,3}
 )
 
 assertTable(
-  listSlice({1,2,3}, 2),
+  slice({1,2,3}, 2),
   {2,3}
 )
 
 assertTable(
-  listSlice({1,2,3}, 4),
+  slice({1,2,3}, 4),
   {}
 )
 
 assertTable(
-  listSlice({1,2,3}, 1, 1),
+  slice({1,2,3}, 1, 1),
   {1}
 )
 
 assertTable(
-  listSlice({1,2,3}, 1, 2),
+  slice({1,2,3}, 1, 2),
   {1,2}
 )
 
 assertTable(
-  listSlice({1,2,3}, 1, 4),
+  slice({1,2,3}, 1, 4),
   {1,2,3}
 )
 
 assertTable(
-  listSlice({1,2,3}, 2, 1),
+  slice({1,2,3}, 2, 1),
   {}
 )
 
 assertTable(
-  listSlice({1,2,3}, 1, -1),
+  slice({1,2,3}, 1, -1),
   {1,2,3}
 )
 
 assertTable(
-  listSlice({1,2,3}, 1, -2),
+  slice({1,2,3}, 1, -2),
   {1,2}
 )
 
 assertTable(
-  listSlice({1,2,3}, 2, -1),
+  slice({1,2,3}, 2, -1),
   {2,3}
 )
 
 assertTable(
-  listSlice({1,2,3}, nil, 3),
+  slice({1,2,3}, nil, 3),
   {1,2,3}
 )
 
 assertTable(
-  listSlice({1,2,3}, 1, nil),
+  slice({1,2,3}, 1, nil),
   {1,2,3}
 )
 
 assertTable(
-  listSlice({1,2,3}),
+  slice({1,2,3}),
   {1,2,3}
 )
 
 assertTable(
-  listSlice({1,2,3}, 1, nil, 2),
+  slice({1,2,3}, 1, nil, 2),
   {1,3}
 )
 
 assertTable(
-  listSlice({1,2,3}, 2, nil, 2),
+  slice({1,2,3}, 2, nil, 2),
   {2}
 )
 
 assertTable(
-  listSlice({1,2,3}, 1, nil, 3),
+  slice({1,2,3}, 1, nil, 3),
   {1}
 )
 

@@ -41,16 +41,7 @@ function getLeafWithoutPathOrExtension(str)
   return getFilenameWithoutExtension(filename)
 end
 
---- will contain an empty string as the first element if path starts with a slash, which is what we want
---- @param path string
---- @return string[]
-function getPathComponents(path)
-  local raw_path_components = stringy.split(path, "/")
-  if raw_path_components[#raw_path_components] == "" then
-    listPop(raw_path_components) -- if path ends with a slash, remove the empty string at the end
-  end
-  return raw_path_components
-end
+
 
 --- @param path string
 --- @return string
@@ -95,6 +86,17 @@ function getStandartizedExtension(str)
   end
 end
 
+--- will contain an empty string as the first element if path starts with a slash, which is what we want
+--- @param path string
+--- @return string[]
+function getPathComponents(path)
+  local raw_path_components = stringy.split(path, "/")
+  if raw_path_components[#raw_path_components] == "" then
+    listPop(raw_path_components) -- if path ends with a slash, remove the empty string at the end
+  end
+  return raw_path_components
+end
+
 ---@param str string
 ---@return string | nil, string | nil
 function getFilenameParts(str)
@@ -112,3 +114,9 @@ function getFilenameParts(str)
   end
   return without_extension, extension
 end
+
+--- @param path string
+--- @param spec { start_incl?: integer, stop_incl?: integer, step?: integer }
+--- @param opts { ext_sep?: boolean, standartize_ext?: boolean }
+
+function pathSlice(path, spec, opts)

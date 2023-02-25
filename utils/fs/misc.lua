@@ -69,11 +69,11 @@ function hybridFsDictFileTreeToTable(path, also_include_json)
       if isDir(full_path) then 
         res[nodename] = hybridFsDictFileTreeToTable(full_path, also_include_json)
       elseif stringy.endswith(file, ".yaml") then
-        res[nodename] = yamlLoad(readFileOrError(full_path))
+        res[nodename] = yamlLoad(readFile(full_path, "error"))
       elseif also_include_json and stringy.endswith(file, ".json") then
-        res[nodename] = json.decode(readFileOrError(full_path))
+        res[nodename] = json.decode(readFile(full_path, "error"))
       else
-        res[nodename] = readFileOrError(full_path)
+        res[nodename] = readFile(full_path, "error")
       end
     end
   end

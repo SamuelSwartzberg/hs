@@ -13,7 +13,7 @@ function parseRelayTable(raw)
     local country_header = raw_country_lines[1]
     local country_code = extractFirstThingInParentheses(country_header)
     if country_code == nil then error("could not find country code in header. header was " .. country_header) end
-    local payload_lines = listSlice(raw_country_lines, 2, -1)
+    local payload_lines = slice(raw_country_lines, 2, -1)
     countries[country_code] = {}
     local city_code
     for _, payload_line in ipairs(payload_lines) do

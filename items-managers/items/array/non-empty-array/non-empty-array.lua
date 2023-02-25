@@ -13,16 +13,13 @@ NonEmptyArraySpecifier = {
       ["tail"] = function(self, n)
         n = n or 10
         local contents = self:get("contents")
-        return listSlice(contents, #contents - n + 1, #contents)
+        return slice(contents, #contents - n + 1, #contents)
       end,
       ["head"] = function(self, n)
         n = n or 10
-        return listSlice(self:get("contents"), 1, n)
+        return slice(self:get("contents"), 1, n)
       end,
-      ["range"] = function(self, specifier) return listSlice(self:get("contents"), specifier.start, specifier.stop, specifier.step) end,
-      ["slice"] = function(self, slice_notation)
-        return self:get("range", parsePythonlikeSliceNotation(slice_notation))
-      end,
+      ["range"] = function(self, specifier) return slice(self:get("contents"), specifier) end,
       ["range-to-new-array"] = function(self, specifier)
         return CreateArray(self:get("range", specifier))
       end,
@@ -177,7 +174,7 @@ NonEmptyArraySpecifier = {
     {
       text = "👉✂️ cslc.",
       key = "choose-action-on-result-of-get",
-      args = { key = "do-interactive", args = { key = "slice", thing = "python slice notation" } },
+      args = { key = "do-interactive", args = { key = "range", thing = "python slice notation" } },
     },
     {
       text = "👉👊全 cal.",
