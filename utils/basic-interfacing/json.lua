@@ -11,12 +11,17 @@ function runJSON(opts, and_then)
   if not and_then then -- since we're populating and_then when calling run(), we can't use it as a heuristic for if we're async or not, so we need to communicate that via force_sync
     opts.force_sync = true
   end
+  opts.error_on_empty_output = defaultIfNil(opts.error_on_empty_output, true) -- a well-formed json api should return something like an empty object or array, not an empty string, even if there's no data
   return run(
     opts,
     function(std_out)
       local status, res = pcall(json.decode, std_out)
       if not status then
-        error("Error decoding JSON: \n\n" .. res .. "\n\nInput was:\n\n" .. std_out)
+        error(("When running command:\n\n%s\n\nGot output:\n\n%s\n\nBut failed to decode it as JSON with error:\n\n%s"):format(
+          buildInnerCommand(opts.args),
+          std_out,
+          res
+        ))
       end
       if type(and_then) == "function" then
         return and_then(res)
@@ -37,8 +42,12 @@ function runJSONMessage(opts, and_then)
   return runJSON(
     opts,
     function(res)
-      if res.error then
-        error("JSON has .error field:\n\n" .. res.error .. "\n\nFull JSON:\n\n" .. json.encode(res))
+      if res.error and (not opts.error_that_is_success or res.error ~= opts.error_that_is_success) then
+        error(("When running command:\n\n%s\n\nGot output:\n\n%s\n\nBut it was an error payload:\n\n%s"):format(
+          buildInnerCommand(opts.args),
+          json.encode(res),
+          res.error
+        ))
       end
       if type(and_then) == "function" then
         return and_then(res)

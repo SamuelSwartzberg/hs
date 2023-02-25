@@ -19,30 +19,38 @@ function toInt(val, mode_if_not_number)
 end
 
 --- @param val any
+--- @param mode? "num" | "int" | "pos-int" | "neg-int" | "float"
 --- @return boolean
-function isInt(val)
+function isNumber(val, mode)
+  mode = mode or "num"
   if type(val) == "number" then
-    return math.floor(val) == val
-  else
-    return false
-  end
-end
-
---- @param val any
---- @return boolean
-function isNegInt(val)
-  if type(val) == "number" then
-    return math.floor(val) == val and val < 0
-  else
-    return false
-  end
-end
-
---- @param val any
---- @return boolean
-function isFloat(val)
-  if type(val) == "number" then
-    return math.floor(val) ~= val
+    if math.floor(val) == val then -- is int
+      if val > 0 then
+        if mode == "neg-int" then
+          return false
+        else
+          return true
+        end
+      elseif val < 0 then
+        if mode == "pos-int" then
+          return false
+        else
+          return true
+        end
+      else
+        if mode == "pos-int" or mode == "neg-int" then
+          return false
+        else
+          return true
+        end
+      end
+    else
+      if mode == "num" or mode == "float" then
+        return true
+      else 
+        return false
+      end
+    end
   else
     return false
   end
@@ -51,7 +59,7 @@ end
 --- @param val integer
 --- @return integer
 function lengthOfInt(val)
-  if isInt(val) then
+  if isNumber(val, "int") then
     return #tostring(val)
   else
     error("Value is not an integer")
@@ -59,46 +67,58 @@ function lengthOfInt(val)
 end
 
 --- @param length integer
+--- @param target "upper" | "lower" | "center"
 --- @return integer
-function smallestIntOfLength(length)
+function intOfLength(length, target)
+  target = target or "center"
   if length < 1 then
     error("Length must be at least 1")
   end
-  return math.floor(1 * 10 ^ (length-1))
-end
-
---- @param length integer
---- @return integer
-function largestIntOfLength(length)
-  return smallestIntOfLength(length + 1) - 1
+  local largest_plus_1 = math.floor(1 * 10 ^ length)
+  if target == "upper" then
+    return largest_plus_1 - 1
+  elseif target == "lower" then
+    return largest_plus_1 / 10
+  elseif target == "center" then
+    return largest_plus_1 / 2
+  else
+    error("Invalid target: " .. target)
+  end
 end
 
 --- @param length integer
 --- @return integer
 function randomInt(length)
-  return math.random(smallestIntOfLength(length), largestIntOfLength(length))
+  return math.random(intOfLength(length, "lower"), intOfLength(length, "upper"))
 end
 
-
---- @param length? integer
---- @return string
-function base64RandomString(length)
-  length = defaultIfNil(length, 200)
-  local res = run({
-    "openssl",
-    "rand",
-    "-base64",
-    tostring(length)
-  })
-  return res
+--- @param spec { low?: number, high?: number, len?: number }
+--- @param type? "number" | "b64"
+--- @return number | string
+function rand(spec, type)
+  spec = spec or {}
+  type = type or "number"
+  local low, high = spec.low, spec.high
+  if spec.len then
+    low = intOfLength(spec.len, "lower")
+    high = intOfLength(spec.len, "upper")
+  end
+  local randnr = low + math.random()  * (high - low);
+  if type == "number" then
+    return randnr
+  elseif type == "b64" then
+    local len = lengthOfInt(randnr)
+    return run({
+      "openssl",
+      "rand",
+      "-base64",
+      tostring(len)
+    })
+  else
+    error("Invalid type: " .. type)
+  end
 end
-
---- @param lower number
---- @param upper number
---- @return number
-function randBetween(lower, upper)
-  return lower + math.random()  * (upper - lower);
-end
+    
 
 --- @param start? number
 --- @param stop? number
@@ -110,6 +130,10 @@ function seq(start, stop, step)
   step = defaultIfNil(step, 1)
 
   local res = {}
+
+  if (start > stop and step > 0) or (start < stop and step < 0) then -- these would cause an infinite loop
+    return res
+  end
 
   for i = start, stop, step do
     table.insert(res, i)

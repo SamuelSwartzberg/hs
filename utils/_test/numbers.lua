@@ -39,52 +39,52 @@ assertMessage(
 )
 
 assertMessage(
-  isInt(1.6),
+  isNumber(1.6, "int"),
   false
 )
 
 assertMessage(
-  isInt(1),
+  isNumber(1, "int"),
   true
 )
 
 assertMessage(
-  isNegInt(-1.6),
+  isNumber(-1.6, "neg-int"),
   false
 )
 
 assertMessage(
-  isNegInt(-1),
+  isNumber(-1, "neg-int"),
   true
 )
 
 assertMessage(
-  isNegInt(1),
+  isNumber(1, "neg-int"),
   false
 )
 
 assertMessage(
-  isFloat(1.6),
+  isNumber(1.6, "float"),
   true
 )
 
 assertMessage(
-  isFloat(1),
+  isNumber(1, "float"),
   false
 )
 
 assertMessage(
-  isFloat(-1.2),
+  isNumber(-1.2, "float"),
   true
 )
 
 assertMessage(
-  smallestIntOfLength(3),
+  intOfLength(3),
   100
 )
 
 assertMessage(
-  smallestIntOfLength(1),
+  intOfLength(1),
   1
 )
 
@@ -99,24 +99,24 @@ assertMessage(
 )
 
 assertMessage(
-  lengthOfInt(randomInt(4)),
+  lengthOfInt(rand({len=4})),
   4
 )
 
 assertMessage(
-  lengthOfInt(randomInt(1)),
+  lengthOfInt(rand({len=1})),
   1
 )
 
 assertMessage(
-  isGeneralBase32(base64RandomString(50)),
+  isGeneralBase64(rand({len = 50}, "b64")),
   true
 )
 
 local lower = 22
 local upper = 179
 
-local rand = randBetween(lower, upper)
+local rand = rand({low = lower, high = upper})
 
 assertMessage(
   rand >= lower,

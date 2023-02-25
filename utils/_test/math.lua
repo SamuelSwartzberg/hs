@@ -24,12 +24,12 @@ assertMessage(
 )
 
 assertMessage(
-  decrementIfNumber(1),
+  crementIfNumber(1, "de"),
   0
 )
 
 assertMessage(
-  decrementIfNumber("1"),
+  crementIfNumber("1", "de"),
   "1"
 )
 

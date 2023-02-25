@@ -28,7 +28,8 @@ end
 function getJitter(delta, jitter_factor)
   local jitter_factor = jitter_factor or 0.1
   local jitter_delta = delta * jitter_factor
-  return randBetween(-jitter_delta, jitter_delta)
+---@diagnostic disable-next-line: return-type-mismatch
+  return rand({low=-jitter_delta, high=jitter_delta})
 end
 
 --- naive implementations of moving a thing such that applications that expect human-like movement will not notice / get confused
@@ -38,7 +39,8 @@ end
 --- @return nil
 function doDelta(specifier, do_after)
   specifier.factor_of_deceleration = specifier.factor_of_deceleration or 0.95
-  specifier.duration = specifier.duration or randBetween(0.1, 0.3)
+---@diagnostic disable-next-line: assign-type-mismatch
+  specifier.duration = specifier.duration or rand({low=0.1, high=0.3})
   local current_point = specifier.get_starting_point()
   local total_delta = pointdelta(specifier.target_point, current_point)
   local num_steps = math.ceil(specifier.duration / POLLING_INTERVAL)
@@ -164,7 +166,7 @@ function doMouseSeries(specifier)
     return
   else 
     hs.timer.doAfter(
-      specifier.wait_time or randBetween(0.07, 0.15), 
+      specifier.wait_time or rand({low=0.07, high=0.15}), 
       function()
         local subspecifier = listShift(specifier.specifier_list)
         function do_after()

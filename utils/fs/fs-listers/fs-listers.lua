@@ -79,7 +79,7 @@ function getAllInPath(path, recursion, include_dirs, include_files, validator)
           if recursion <= 0 then shouldRecurse = false end
         end
         if shouldRecurse then
-          local sub_files = getAllInPath(file_path, decrementIfNumber(recursion), include_dirs, include_files, validator)
+          local sub_files = getAllInPath(file_path, crementIfNumber(recursion, "de"), include_dirs, include_files, validator)
           for _, sub_file in ipairs(sub_files) do
             files[#files + 1] = sub_file
           end

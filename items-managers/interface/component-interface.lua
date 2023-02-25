@@ -208,7 +208,7 @@ InterfaceDefaultTemplate = {
             key = action.key,
             args = action.args,
             id = self:get("id"),
-            action_id = randomInt(10)
+            action_id = rand({len=10})
           }
         end
         return chooser_table
@@ -406,7 +406,7 @@ function NewDynamicContentsComponentInterface(interface_specifier, super)
   -- print("creating a " .. interface_specifier.type .. " interface")
   --- @type NonRootComponentInterface
   local interface = mergeAssocArrRecursive(InterfaceDefaultTemplate, interface_specifier)
-  interface.id = randomInt(10)
+  interface.id = rand({len=10})
   if super then 
     interface.super = super
     interface.root_super = super.root_super
@@ -437,7 +437,7 @@ function RootInitializeInterface(interface_specifier, contents)
   end
   --- @type RootComponentInterface
   local interface =  mergeAssocArrRecursive(InterfaceDefaultTemplate, interface_specifier)
-  interface.id = randomInt(10)
+  interface.id = rand({len=10})
   interface.properties.getables["is-" .. interface.type] = function() return true end -- in the root, we can be sure that the is-<type> is true
   interface.root_super = interface
   interface:setContents(contents)

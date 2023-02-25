@@ -16,3 +16,15 @@ function clamp(val, min, max)
   end
 end
 
+---@param a number
+---@param b number
+---@param distance? number
+---@return boolean
+function isClose(a, b, distance)
+  if not distance then distance = 1 end
+  if a > b then
+    return a - b < distance
+  else
+    return b - a < distance
+  end
+end

@@ -44,10 +44,13 @@ end
 --- @field finally? fun(exit_code: integer, std_err_or_out: string): any currently, finally may run before and_then if and_then is async or has a delay
 --- @field force_sync? boolean if true, will run the task synchronously, even if and_then is provided
 --- @field dont_clean_output? boolean
+--- @field run_raw_shell? boolean if true, will run the task in a raw shell, rather than first switching to bash and loading the envfile
+--- @field error_that_is_success? string only relevant for JSON, if the error message matches this, it will be treated as a success. For badly designed JSON APIs.
+--- @field error_on_empty_output? boolean error also if the output is empty
 
 --- @class run_options_object_async : run_options_object
 --- @field delay? number
---- @field run_immediately? boolean
+--- @field run_immediately? boolean if true, will run the task immediately, otherwise, you need to call :start() manually on the returned task object
 --- @field and_then? fun(std_out: string): any this shouldn't be here, but rather the second argument of run, but if it's here, we'll still accept it
 
 --- @alias run_first_arg run_options_object_async | command_parts
@@ -74,12 +77,13 @@ function run(opts, and_then, ...)
       should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch
     end
     if should_run_default_catch ~= false then
-      local err_str = "exit code " .. exit_code .. "\nstderr: \n" .. std_err
+      local err_str = ("Error running command:\n\n%s\n\nExit code: %s\n\nStderr: %s"):format(buildInnerCommand(opts.args), exit_code, std_err)
       error(err_str)
     end
   end
 
   if opts.and_then then and_then = opts.and_then end
+  opts.run_immediately = defaultIfNil(opts.run_immediately, true)
 
   if and_then and not opts.force_sync then
     if and_then == true then -- in this case, we're only using and_then to indicate that we want to run the task asyncly
@@ -101,6 +105,9 @@ function run(opts, and_then, ...)
         else
           if not opts.dont_clean_output then
             std_out = stringy.strip(std_out)
+          end
+          if opts.error_on_empty_output and std_out == "" then
+            opts.catch(-1, "Output was empty and error_on_empty_output was true.")
           end
           if opts.delay then
             hs.timer.doAfter(opts.delay, function()
@@ -124,16 +131,24 @@ function run(opts, and_then, ...)
     end
     return task
   else
-    local command = string.format(
-      "/opt/homebrew/bin/bash %s '%s'",
-      args[1],
-      args[2]
-    )
+    local command
+    if opts.run_raw_shell then
+      command = "LC_ALL=en_US.UTF-8 && LANG=en_US.UTF-8 && LANGUAGE=en_US.UTF-8 && " .. buildInnerCommand(opts.args)
+    else 
+      command = string.format(
+        "/opt/homebrew/bin/bash %s '%s'",
+        args[1],
+        args[2]
+      )
+    end
     local output, status, reason, code = hs.execute(command)
     local error_to_rethrow
     if status then
       if not opts.dont_clean_output then
         output = stringy.strip(output)
+      end
+      if opts.error_on_empty_output and output == "" then
+        opts.catch(-1, "Output was empty and error_on_empty_output was true.")
       end
       if and_then then
         return and_then(output)

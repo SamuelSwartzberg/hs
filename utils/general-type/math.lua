@@ -15,24 +15,20 @@ function subtractionRingModuloN(a, b, modulo)
   return (a - b) % modulo
 end
 
----@param a number
----@param b number
----@param distance? number
----@return boolean
-function isClose(a, b, distance)
-  if not distance then distance = 1 end
-  if a > b then
-    return a - b < distance
-  else
-    return b - a < distance
-  end
-end
-
----@param a any
+---@param a? any
+---@param crement? "in" | "de"
 ---@return any
-function decrementIfNumber(a)
+function crementIfNumber(a, crement)
+  a = a or 0
+  crement = crement or "in"
   if type(a) == "number" then
-    return a - 1
+    if crement == "in" then
+      return a + 1
+    elseif crement == "de" then
+      return a - 1
+    else
+      error("Invalid crement: " .. crement)
+    end
   else
     return a
   end

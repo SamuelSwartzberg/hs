@@ -7,7 +7,7 @@ function doKeyboardSeries(specifier)
     return
   else 
     hs.timer.doAfter(
-      specifier.wait_time or randBetween(0.10, 0.12), 
+      specifier.wait_time or rand({low = 0.10, high = 0.12}), 
       function()
         local subspecifier = listShift(specifier.specifier_list)
         function do_after()
