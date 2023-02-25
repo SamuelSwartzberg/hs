@@ -2,6 +2,7 @@
 --- run a json command, decode the output, and handle errors
 --- @param opts run_first_arg
 --- @param and_then? fun(std_out: table): (any) | boolean 
+--- @return any
 function runJSON(opts, and_then)
   if isListOrEmptyTable(opts) then
     opts = {
@@ -35,6 +36,7 @@ end
 --- run a json command, decode the output, and handle error payloads
 --- @param opts run_first_arg
 --- @param and_then? fun(res: table): (any) | boolean 
+--- @return any
 function runJSONMessage(opts, and_then)
   if not and_then then -- since we're populating and_then when calling run(), we can't use it as a heuristic for if we're async or not, so we need to communicate that via force_sync
     opts.force_sync = true

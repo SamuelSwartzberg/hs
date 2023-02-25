@@ -12,8 +12,7 @@ YoutubeApiItemSpecifier = {
     getables = {
       ["access-token"] = function() return nil end, -- todo
       ["refreshed-tokens"] = function(self)
-
-        local raw_output = getOutputTask({
+        local json_output = runJSONMessage({
           "curl",
           "--request", "POST",
           "--data", { 
@@ -25,7 +24,6 @@ YoutubeApiItemSpecifier = {
           },
           {value = "https://accounts.google.com/o/oauth2/token", type = "quoted"},
         })
-        local json_output = json.decode(raw_output)
         return {
           access_token = json_output.access_token,
           refresh_token = json_output.refresh_token,

@@ -4,13 +4,13 @@ PassNameItemSpecifier = {
   properties = {
     getables = {
       ["pass-value"] = function(self, type)
-        return stringy.strip(getOutputTask({
+        return run({
           "pass",
           {
             value = type .. "/" .. self:get("contents"),
             type = "quoted"
           }
-        }))
+        })
       end,
       ["as-gpg-file"] = function(self)
         return self:get("contents") .. ".gpg"

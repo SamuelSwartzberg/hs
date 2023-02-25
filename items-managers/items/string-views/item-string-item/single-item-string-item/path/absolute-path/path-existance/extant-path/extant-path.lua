@@ -39,8 +39,7 @@ ExtantPathItemSpecifier = {
         )
       end,
       ["cd-and-output-this-task"] = function(self, task)
-        local res = getOutputTask(self:get("cd-and-this-task", task))
-        return res
+        return run(self:get("cd-and-this-task", task))
       end,
       ["sibling-string-array"] = function(self)
         return CreateArray(getSiblings(self:get("contents"), true, true))

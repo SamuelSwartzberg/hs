@@ -6,7 +6,7 @@ BibFileItemSpecifier = {
   properties = {
     getables = {
       ["parse-to-lua-table"] = function(self)
-        return json.decode(getOutputTask({
+        return runJSONMessage({
           "citation-js",
           "--input",
           {
@@ -14,10 +14,10 @@ BibFileItemSpecifier = {
             type = "quoted"
           },
           "--output-language", "json"
-        }))
+        })
       end,
       ["lua-table-to-string"] = function(_, tbl)
-        local res = getOutputTask({
+        local res = run({
           "echo",
           {
             value = json.encode(tbl),
@@ -36,7 +36,7 @@ BibFileItemSpecifier = {
         end))
       end,
       ["to-citation"] = function(self, format)
-        return stringy.strip(getOutputTask({
+        return run({
           "pandoc",
           "--citeproc",
           "-t", "plain",
@@ -46,7 +46,7 @@ BibFileItemSpecifier = {
             value = self:get("contents"),
             type = "quoted"
           }
-        }))
+        })
       end,
     },
     doThisables = {

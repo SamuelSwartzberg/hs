@@ -1,7 +1,7 @@
 --- @param doi string
 --- @return string
 function getBibtexFromDoi(doi)
-  local res = getOutputTask({
+  return run({
     "curl",
     "-LH",
     "Accept: application/x-bibtex",
@@ -10,13 +10,12 @@ function getBibtexFromDoi(doi)
       type = "quoted"
     }
   })
-  return res
 end
 
 --- @param isbn string
 --- @return string
 function getBibtexFromIsbn(isbn)
-  local res = getOutputTask({
+  return run({
     "isbn_meta",
     {
       value = isbn,
@@ -24,13 +23,12 @@ function getBibtexFromIsbn(isbn)
     },
     "bibtex"
   })
-  return res
 end
 
 --- @param bibtex string
 --- @return string
 function convertBibtexToRawJson(bibtex)
-  local res = getOutputTask({
+  return run({
     "echo",
     "-n",
     {
@@ -44,7 +42,6 @@ function convertBibtexToRawJson(bibtex)
     "-t",
     "csljson"
   })
-  return res
 end
 
 --- @param bibtex string

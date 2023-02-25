@@ -4,7 +4,7 @@ YoutubePlaylistItemSpecifier = {
   properties = {
     getables = {
       ["playlist-attr"] = function(self, attr)
-        return stringy.strip(memoized.getOutputTask(
+        return run(
           {
             "youtube-dl",
             "--no-warnings",
@@ -15,7 +15,7 @@ YoutubePlaylistItemSpecifier = {
             "-r",
             {value = "." .. attr, type = "quoted"},
           }
-        ))
+        )
       end,
       ["all-attrs"] = function(self, attr)
         self:get("attr-inner", attr) -- attr-inner gets all values for a playlist

@@ -1,24 +1,4 @@
 --- @param val any
---- @param mode_if_not_number? "fail" | "nil" | "0"
---- @return integer | nil
-function toInt(val, mode_if_not_number)
-  mode_if_not_number = mode_if_not_number or "0"
-  if type(val) == "number" then
-    return math.floor(tonumber(val) + 0.5)
-  else
-    if mode_if_not_number == "fail" then
-      error("Value is not a number")
-    elseif mode_if_not_number == "nil" then
-      return nil
-    elseif mode_if_not_number == "0" then
-      return 0
-    else 
-      error("Invalid mode_if_not_number: " .. mode_if_not_number)
-    end
-  end
-end
-
---- @param val any
 --- @param mode? "num" | "int" | "pos-int" | "neg-int" | "float"
 --- @return boolean
 function isNumber(val, mode)
@@ -84,12 +64,6 @@ function intOfLength(length, target)
   else
     error("Invalid target: " .. target)
   end
-end
-
---- @param length integer
---- @return integer
-function randomInt(length)
-  return math.random(intOfLength(length, "lower"), intOfLength(length, "upper"))
 end
 
 --- @param spec { low?: number, high?: number, len?: number }

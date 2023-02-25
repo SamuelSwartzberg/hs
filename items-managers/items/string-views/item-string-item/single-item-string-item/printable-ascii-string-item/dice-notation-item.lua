@@ -4,7 +4,7 @@ DiceNotationItemSpecifier = {
   properties = {
     getables = {
       ["roll-result"] = function(self)
-        local res = getOutputTask({
+        local res = run({
           "roll",
           {
             value = self:get("contents"),

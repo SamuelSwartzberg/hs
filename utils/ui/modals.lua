@@ -177,7 +177,7 @@ end
 --- @return integer|nil
 function promptInteger(prompt_spec)
   prompt_spec = prompt_spec or {}
-  prompt_spec.transformer = prompt_spec.transformer or bindNthArg(toInt, 2, "nil")
+  prompt_spec.transformer = prompt_spec.transformer or bindNthArg(toNumber, 2, "int")
   prompt_spec.transformed_validator = prompt_spec.transformed_validator or function(x) return x ~= nil end 
   return prompt(prompt_spec)
 end

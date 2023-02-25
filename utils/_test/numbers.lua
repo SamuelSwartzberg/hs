@@ -1,20 +1,15 @@
 assertMessage(
-  toInt(1.6, "nil"),
+  toNumber(1.6, "int", "nil"),
   2
 )
 
 assertMessage(
-  toInt("1.6", "nil"),
+  toNumber("1.6", "int", "nil"),
   nil
 )
 
 assertMessage(
-  toInt("1.6", "0"),
-  0
-)
-
-assertMessage(
-  pcall(toInt, "1.6", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
+  pcall(toNumber, "1.6", "int", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
   false
 )
 

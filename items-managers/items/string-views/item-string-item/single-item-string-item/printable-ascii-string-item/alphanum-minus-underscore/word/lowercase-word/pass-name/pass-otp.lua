@@ -4,14 +4,14 @@ PassOtpItemSpecifier = {
   properties = {
     getables = {
       ["pass-otp"] = function(self)
-        return stringy.strip(getOutputTask({
+        return run({
           "pass",
           "otp",
           {
             value = "otp/" .. self:get("contents"),
             type = "quoted"
           }
-        }))
+        })
       end,
     },
   },

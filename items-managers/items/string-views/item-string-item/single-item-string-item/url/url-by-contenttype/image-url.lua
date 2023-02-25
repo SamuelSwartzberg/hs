@@ -4,7 +4,7 @@ ImageURLItemSpecifier = {
   properties = {
     getables = {
       ["booru-url"] = function(self)
-        local res = getOutputTask({
+        return run({
           "saucenao",
           "--url",
           {
@@ -14,8 +14,6 @@ ImageURLItemSpecifier = {
           "--output-properties",
           "booru-url"
         })
-
-        return res
       end,
     },
     doThisables = {

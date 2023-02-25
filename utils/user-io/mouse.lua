@@ -2,7 +2,7 @@
 --- @param _ hs_geometry_point_like
 --- @param deltas hs_geometry_point_like
 function scrollBy(_, deltas)
-  hs.eventtap.scrollWheel({toInt(deltas.x), toInt(deltas.y)}, {}, "pixel") 
+  hs.eventtap.scrollWheel({toNumber(deltas.x, "int"), toNumber(deltas.y, "int")}, {}, "pixel") 
 end
 
 --- @return { x: number, y: number }

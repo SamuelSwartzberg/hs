@@ -48,12 +48,11 @@ URLItemSpecifier = {
         return self:get("text-by-selector", "meta[name=description]")
       end,
       ["default-negotation-url-contents"] = function(self)
-        local res = getOutputTask({
+        return run({
           "curl",
           "-L",
           { value = self:get("contents"), type = "quoted"},
         })
-        return res
       end,
       ["url-in-wayback-machine"] = function (self)
         return "https://web.archive.org/web/*/" .. self:get("contents")

@@ -3,24 +3,19 @@ PosIntSpecifier = {
   properties = {
     getables = {
       ["get-random-pos-int-of-length"] = function(self)
-        return randomInt(self:get("contents"))
+        return rand(self:get("contents"))
       end,
       ["get-random-base64-of-length"] = function(self)
-        return getOutputTask({
-          "openssl",
-          "rand",
-          "-base64",
-          self:get("contents")
-        })
+        return rand(self:get("contents"), "b64")
       end,
       ["get-random-alphanum-of-length"] = function(self)
-        local basis = base64RandomString()
+        local basis = rand(nil, "b64")
         local filtered = basis:gsub("[^%d%a]", "")
         local truncated = filtered:sub(1, self:get("contents"))
         return truncated
       end,
       ["get-random-lower-alphanum-of-length"] = function(self)
-        local basis = base64RandomString()
+        local basis = rand(nil, "b64")
         local filtered = basis:gsub("[^%d%l]", "")
         local truncated = filtered:sub(1, self:get("contents"))
         return truncated

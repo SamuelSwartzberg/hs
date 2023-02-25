@@ -6,7 +6,7 @@ ShellscriptFileItemSpecifier = {
   properties = {
     getables = {
       ["lint-json"] = function(self, severity)
-        local res = getOutputTask({
+        local res = run({
           "shellcheck",
           "--format=json",
           "--severity=" .. severity,
@@ -15,7 +15,7 @@ ShellscriptFileItemSpecifier = {
         return res
       end,
       ["lint-simple-text"] = function(self, severity)
-        local res = getOutputTask({
+        local res = run({
           "shellcheck",
           "--format=gcc",
           "--severity=" .. severity,

@@ -46,7 +46,7 @@ CslTableSpecifier = {
           self:get("to-string-unique")
       end,
       ["to-citation"] = function(self, format)
-        return stringy.strip(getOutputTask({
+        return run({
           "echo",
           {
             value = self:get("to-json-string"),
@@ -59,7 +59,7 @@ CslTableSpecifier = {
           "-t", "plain",
           "--csl",
           { value = "styles/" .. format , type = "quoted" },
-        }))
+        })
       end,
       ["to-url-item"] = function(self)
         return CreateStringItem(self:get("value", "url"))

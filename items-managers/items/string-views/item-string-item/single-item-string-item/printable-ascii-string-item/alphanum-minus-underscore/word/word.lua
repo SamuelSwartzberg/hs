@@ -7,12 +7,11 @@ WordItemSpecifier = {
     doThisables = {},
     getables = {
       ["evaluated-as-shell-var"] = function(self)
-        local res = getOutputTask({
+        return run({
           "echo",
           "-n",
           "$" .. self:get("contents")
         })
-        return res
       end,
       ["is-lowercase-word"] = function(self)
         return not eutf8.find(self:get("contents"), "[^%l_]")

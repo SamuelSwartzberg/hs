@@ -98,9 +98,7 @@ EmailFileItemSpecifier = {
         }
       end,
       ["email-summary"] = function(self, format_specifier)
-        local res = getOutputTask(self:get("email-summary-task", format_specifier))
-        res = stringy.strip(res)
-        return res
+        return run(self:get("email-summary-task", format_specifier))
       end,
 
     },
