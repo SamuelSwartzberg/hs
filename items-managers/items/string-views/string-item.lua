@@ -90,7 +90,7 @@ StringItemSpecifier = {
       end,
       ["evaluated-as-bash"] = function(self)
         local parts = stringy.split(self:get("contents"), " ")
-        return getOutputArgsSimple(table.unpack(parts))
+        return run(parts)
       end,
       ["fold"] = function(self)
         return foldStr(self:get("contents"))

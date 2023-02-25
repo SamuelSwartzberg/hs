@@ -12,7 +12,7 @@ ImageFileItemSpecifier = {
         return self:get("as-hs-image")
       end,
       ["booru-url"] = function(self)
-        return getOutputArgsSimple(
+        return run({
           "saucenao",
           "--file",
           {
@@ -21,7 +21,7 @@ ImageFileItemSpecifier = {
           },
           "--output-properties",
           "booru-url"
-        )
+        })
       end,
     },
     doThisables = {

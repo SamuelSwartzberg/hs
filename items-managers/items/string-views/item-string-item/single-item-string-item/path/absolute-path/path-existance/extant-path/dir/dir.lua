@@ -98,10 +98,10 @@ DirItemSpecifier = {
         return CreateStringItem(chooseDirAndPotentiallyCreateSubdirs(self:get("contents") .. "/"))
       end,
       ["ls"] = function (self)
-        return getOutputArgsSimple("ls", "-F", "-1", { value = self:get("contents"), type = "quoted" })
+        return run({"ls", "-F", "-1", { value = self:get("contents"), type = "quoted" }})
       end,
       ["tree"] = function(self)
-        return getOutputArgsSimple("tree", "--noreport", "-F", { value = self:get("contents"), type = "quoted" })
+        return run({"tree", "--noreport", "-F", { value = self:get("contents"), type = "quoted" }})
       end,
     },
   

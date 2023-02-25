@@ -5,17 +5,14 @@ IniFileItemSpecifier = {
   type = "ini-file",
   properties = {
     getables = {
-      ["ini-as-json"] = function(self)
-        return getOutputArgsSimple(
+      ["parse-to-lua-table"] = function(self)
+        return runJSON({
           "cat",
           { value = self:get("contents"), type = "quoted" },
           "|",
           "jc",
           "--ini"
-        )
-      end,
-      ["parse-to-lua-table"] = function(self)
-        return json.decode(self:get("ini-as-json"))
+        })
       end,
       ["lua-table-to-string"] = function(_, tbl)
         -- not implemented yet

@@ -14,7 +14,7 @@ end
 --- @param tcp_port string|integer
 --- @return string
 function getPIDatTcpPort(tcp_port)
-  local pid = getOutputArgsSimple("lsof", "-t", "-i:" .. tcp_port)
+  local pid = run({"lsof", "-t", "-i:" .. tcp_port})
   return pid
 end
 

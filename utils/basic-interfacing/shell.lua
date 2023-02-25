@@ -1,10 +1,48 @@
 local rrq = bindArg(relative_require, "utils.task")
-rrq("args")
+
+--- @param command_parts command_part[] list of things to assemble into a command
+--- @return string
+function buildInnerCommand(command_parts)
+  local command = ""
+  command_parts = fixListWithNil(command_parts) -- this allows us to have optional args simply by having them be nil
+  for _, command_part in ipairs(command_parts) do
+    if type(command_part) == "string" then
+      command = command .. " " .. command_part
+    elseif type(command_part) == "table" then
+      if command_part.type == "quoted" then
+        command = command .. ' "' .. escapeCharacter(command_part.value, '"', "\\") .. '"'
+      elseif command_part.type == "interpolated" then
+        command = command .. '"$('  .. buildInnerCommand(command_part.value) .. ')"'
+      else
+        error("Unknown command_part type: " .. command_part.type)
+      end
+    else
+      error("Unknown command_part type: " .. type(command_part))
+    end
+  end
+
+  return command
+end
+
+--- @param command_parts (string | {value: string, type: "quoted" | nil})[]
+--- @return string[]
+function buildTaskArgs(command_parts)
+  local hs_task_args = {
+    "-c",
+    "cd && source \"$HOME/.target/envfile\" &&" .. buildInnerCommand(command_parts)
+  }
+  return hs_task_args
+
+end
+
+
+
 
 --- @class run_options_object
 --- @field args command_parts
 --- @field catch? fun(exit_code: integer, std_err: string): any
 --- @field finally? fun(exit_code: integer, std_err_or_out: string): any currently, finally may run before and_then if and_then is async or has a delay
+--- @field force_sync? boolean if true, will run the task synchronously, even if and_then is provided
 --- @field dont_clean_output? boolean
 
 --- @class run_options_object_async : run_options_object
@@ -15,9 +53,7 @@ rrq("args")
 --- @alias run_first_arg run_options_object_async | command_parts
 --- @alias run_and_then fun(std_out: string): (any) | true | run_first_arg
 
---- @alias run_overload_1 fun(opts: run_first_arg, and_then: run_and_then, ...?: run_and_then ): hs.task
---- @alias run_overload_2 fun(opts: run_first_arg, and_then: false|nil): string|nil
---- @alias run run_overload_1 | run_overload_2
+--- @alias run fun(opts: run_first_arg, and_then?: run_and_then, ...?: run_and_then ): any
 
 --- @type run
 function run(opts, and_then, ...)
@@ -45,7 +81,7 @@ function run(opts, and_then, ...)
 
   if opts.and_then then and_then = opts.and_then end
 
-  if and_then then
+  if and_then and not opts.force_sync then
     if and_then == true then -- in this case, we're only using and_then to indicate that we want to run the task asyncly
       and_then = function() end
     elseif type(and_then) == "table" then -- shorthand for and_then being another call to `run`, with and_then being opts of the second call, and the varargs being the and_then of the second call, and potentially further
@@ -99,7 +135,11 @@ function run(opts, and_then, ...)
       if not opts.dont_clean_output then
         output = stringy.strip(output)
       end
-      return output
+      if and_then then
+        return and_then(output)
+      else
+        return output
+      end
     else
       local status, res = pcall(opts.catch, code, output)
       if not status then
@@ -256,10 +296,10 @@ end
 --- @param arg? string
 --- @return string[]
 function upkgGetInner(mgr, thing, arg)
-  return splitLines(getOutputArgsSimple(
+  return splitLines(run({
     "upkg",
     mgr,
     thing,
     arg
-  ))
+  }))
 end

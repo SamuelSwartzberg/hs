@@ -19,20 +19,6 @@ function getOutputArgs(...)
   return getOutputTask({...})
 end
 
---- @param ... command_part
---- @return string
-function getOutputArgsSimple(...)
-  local output = getOutputArgs(...)
-  return output
-end
-
---- @param command_parts command_parts  
---- @return string
-function getOutputTaskSimple(command_parts)
-  local output = getOutputTask(command_parts)
-  return output
-end
-
 --- @return { [string]: string }
 function getEnvAsTable()
   local env = getOutputTask({"env"})

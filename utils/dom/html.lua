@@ -7,7 +7,7 @@ htmlEntities = rrq("html-entities")
 --- @param only_text boolean
 --- @return string
 function querySelector(url, selector, only_text)
-  return getOutputArgsSimple(
+  return run({
     "curl",
     "-Ls",
     { value = url, type = "quoted"},
@@ -15,6 +15,6 @@ function querySelector(url, selector, only_text)
     "htmlq",
     only_text and "--text" or nil,
     { value = selector, type = "quoted" }
-  )
+  })
 end
  

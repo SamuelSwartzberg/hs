@@ -4,15 +4,15 @@ SynCommandSpecifier = {
   properties = {
     getables = {
       ["synonyms-raw"] = function(self, str)
-        local res = memoized.getOutputArgsSimple(
+        return memoized.run({
           "syn",
           "-p",
           {
             value = str,
             type = "quoted"
           }
-        )
-        return res
+        })
+
       end,
       ["synonyms-to-raw-array-of-tables"] = function(self, str)
         local synonym_parts = stringx.split(stringy.strip(self:get("synonyms-raw", str)), "\n\n")

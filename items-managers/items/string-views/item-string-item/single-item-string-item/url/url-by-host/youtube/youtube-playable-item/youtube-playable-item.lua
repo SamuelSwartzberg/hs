@@ -31,7 +31,7 @@ YoutubePlayableItemItemSpecifier = {
         return res
       end,
       ["attrs-sync-inner"] = function (self, attrs)
-        local rawres = memoized.getOutputTaskSimple(
+        local rawres = memoized.run(
           self:get("attrs-inner-task-args", attrs)
         )
         return self:get("process-raw-attrs", {

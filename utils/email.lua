@@ -145,7 +145,5 @@ function getSortedEmailPaths(path, reverse, magrep, mpick)
 
   local command_parts = listJoin(steps, "|")
 
-  local rawres = stringy.strip(getOutputTaskSimple(command_parts))
-
-  return stringy.split(rawres, "\n")
+  return stringy.split(run(command_parts), "\n")
 end

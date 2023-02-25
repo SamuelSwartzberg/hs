@@ -131,10 +131,10 @@ end
 --- @return boolean
 function isPackageManager(str)
   local package_managers = splitLines(
-    getOutputArgsSimple(
+    run({
       "upkg",
       "list-package-managers"
-    )
+    })
   )
   
   return not not valueFindKeyString(package_managers, str)

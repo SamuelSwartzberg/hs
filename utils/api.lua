@@ -56,23 +56,7 @@ function makeSimpleRESTApiRequest(specifier, do_after)
     })
   end
   
-  runHsTaskProcessOutput(
-    curl_args, 
-    function(std_out)
-      local parsed_successfully, response = pcall(json.decode, std_out)
-      if parsed_successfully then 
-        if response.error then
-          inspPrint(response)
-          error("2xx response code but error in JSON response. See above.")
-        end
-        if do_after then
-           do_after(response)
-        end
-      else
-        error("Could not parse JSON response: " .. std_out)
-      end
-    end
-  )
+  runJSONMessage(curl_args, do_after or true)
 end
 
 --- @param text_content string

@@ -7,16 +7,20 @@ PassCommandSpecifier = {
         if isListOrEmptyTable(specifier.thing) then
           specifier.thing = table.concat(specifier.thing, "/")
         end
-        local raw = getOutputArgsSimple(
+        local runfunc = run
+        if specifier.json then
+          runfunc = runJSON
+        end
+        local raw = run({
           "pass",
           "show",
           specifier.thing .. "/" .. specifier.name
-        )
+        })
         return raw
       end,
       ["json"] = function(self,specifier)
-        local raw = self:get("get-thing", specifier)
-        return json.decode(raw)
+        specifier.json = true
+        return self:get("get-thing", specifier)
       end,
     },
     doThisables = {

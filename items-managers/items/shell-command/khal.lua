@@ -182,10 +182,10 @@ KhalCommandSpecifier = {
   properties = {
     getables = {
       ["calendars"] = function(_)
-        local res = getOutputArgsSimple(
+        local res = run({
           "khal",
           "printcalendars"
-        )
+        })
         return splitLines(res)
       end,
       ["writable-calendars"] = function(self)
@@ -207,8 +207,7 @@ KhalCommandSpecifier = {
         addFormatToCommand(command, specifier)
         addInclExclToCommand(command, specifier)
         listPush(command, { value = specifier.searchstr, type = "quoted" })
-        local res = getOutputTaskSimple(command)
-        return listFilterEmptyString(stringx.split(stringy.strip(res), RECORD_SEPARATOR))
+        return listFilterEmptyString(stringx.split(run(command), RECORD_SEPARATOR))
       end,
       ["search-events-parseable"] = function(self, specifier)
         specifier.format = PARSEABLE_FORMAT_SPECIFIER
@@ -256,8 +255,7 @@ KhalCommandSpecifier = {
         specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
         listPush(command, { value = specifier.start, type = "quoted" })
         listPush(command, { value = specifier["end"], type = "quoted" })
-        local res = getOutputTaskSimple(command)
-        return listFilterEmptyString(stringx.split(stringy.strip(res), RECORD_SEPARATOR ))
+        return listFilterEmptyString(stringx.split(run(command), RECORD_SEPARATOR ))
       end,
       ["list-events-parseable"] = function(self, specifier)
         specifier.format = PARSEABLE_FORMAT_SPECIFIER

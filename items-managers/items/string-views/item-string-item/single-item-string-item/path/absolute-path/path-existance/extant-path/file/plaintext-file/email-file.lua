@@ -13,7 +13,7 @@ EmailFileItemSpecifier = {
         }
       end,
       ["email-body-rendered"] = function(self)
-        return getOutputTaskSimple(
+        return run(
           self:get("email-body-rendered-task")
         )
       end,
@@ -26,36 +26,36 @@ EmailFileItemSpecifier = {
         return response .. "\n\n" .. self:get("email-body-quoted")
       end,
       ["email-useful-headers"] = function (self)
-        return getOutputArgsSimple(
+        return run({
           "mshow",
           "-q",
           { value = self:get("contents"), type = "quoted"}
-        )
+        })
       end,
       ["email-all-decoded-headers"] = function(self)
-        return getOutputArgsSimple(
+        return run({
           "mshow",
           "-L",
           { value = self:get("contents"), type = "quoted"}
-        )
+        })
       end,
       ["email-header"] = function(self, type)
-        local raw_res = getOutputArgsSimple(
+        local raw_res = run({
           "mhdr",
           "-h",
           { value = type, type = "quoted" },
           "-d",
           { value = self:get("contents"), type = "quoted"}
-        )
+        })
         return raw_res
       end,
       -- there is also -r to get the raw body, and -H to get all raw headers. However, those present a possible attack vector, so it's better to see if I can get by without them.
       ["mime-parts-raw"] = function(self)
-        return getOutputArgsSimple(
+        return run({
           "mshow",
           "-t",
           { value = self:get("contents"), type = "quoted"}
-        )
+        })
       end,
       ["attachments"] = function(self)
         local raw_mime = self:get("mime-parts-raw")
@@ -72,17 +72,17 @@ EmailFileItemSpecifier = {
       ["involved-email-addresses"] = function(self, type)
         local raw_res
         if type then
-          raw_res = getOutputArgsSimple(
+          raw_res = run({
             "maddr",
             "-h",
             { value = type, type = "quoted" },
             { value = self:get("contents"), type = "quoted"}  
-          )
+          })
         else
-          raw_res = getOutputArgsSimple(
+          raw_res = run({
             "maddr",
             { value = self:get("contents"), type = "quoted"}  
-          )
+          })
         end
         local all_addr = stringy.split(raw_res, "\n")
         local addr = listFilterUnique(listFilterEmptyString(all_addr))

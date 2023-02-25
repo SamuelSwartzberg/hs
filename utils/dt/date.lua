@@ -64,8 +64,8 @@ end
 --- @param cronspec string
 --- @return number
 function getCronNextTime(cronspec)
-  return tonumber(stringy.strip(getOutputArgsSimple(
+  return tonumber(run({
     "ncron",
     { value = cronspec, type = "quoted"}
-  )), 10)
+  }), 10)
 end

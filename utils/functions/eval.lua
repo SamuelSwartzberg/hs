@@ -26,12 +26,12 @@ evalEnv = bindNthArg(evaluateStringToValue, 2, env)
 --- @param template string
 --- @return string
 function envsubstShell(template)
-  return getOutputArgsSimple(
+  return run({
     "echo", 
     {value = template, type = "quoted"},
     "|",
     "envsubst"
-  )
+  })
 end
 
 --- @param template string

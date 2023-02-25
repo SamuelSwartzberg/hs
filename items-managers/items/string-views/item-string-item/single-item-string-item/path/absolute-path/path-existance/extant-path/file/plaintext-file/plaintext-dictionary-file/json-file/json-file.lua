@@ -14,21 +14,11 @@ JsonFileItemSpecifier = {
       ["is-tachiyomi-json-file"] = function(self)
         return self:get("path-leaf-starts-with", "tachiyomi")
       end,
-      ["port-of-hosting-json-server"] = function(self)
-        local port = getOutputArgsSimple("freeport")
-        self:doThis("host-on-json-server", port)
-        return port
-      end,
+     
 
     },
     doThisables = {
-      ["host-on-json-server"] = function(self, port)
-        run({
-          "mockrs",
-          "serve",
-          "--port=" .. port,
-        }, true)
-      end,
+     
     }
   },
   potential_interfaces = ovtable.init({
