@@ -81,7 +81,7 @@ UpkgCommandSpecifier = {
     },
     doThisables = {
       ["do-and-commit"]  = function(self, specifier)
-        runHsTaskProcessOutput({
+        run({
           "upkg",
           specifier.mgr,
           specifier.action,
@@ -94,7 +94,7 @@ UpkgCommandSpecifier = {
             mgr_backup:doThis("git-commit-self", message)
             mgr_backup:doThis("git-push")
           else 
-            local mdependencies =CreateStringItem(env.MDEPENDENCIES)
+            local mdependencies = CreateStringItem(env.MDEPENDENCIES)
             mdependencies:doThis("git-commit-all", message)
             mdependencies:doThis("git-push")
           end

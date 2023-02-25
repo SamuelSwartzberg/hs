@@ -38,10 +38,7 @@ SqliteFileItemSpecifier = {
     },
     doThisables = {
       ["write-to-csv"] = function(self, specifier)
-        run({
-          args = self:get("command-write-to-csv", specifier),
-          and_then = specifier.do_after
-        }, true)
+        run(self:get("command-write-to-csv", specifier), specifier.do_after)
       end,
     },
   },

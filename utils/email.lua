@@ -58,45 +58,39 @@ end
 --- @param do_after? fun()
 function sendEmail(email_file, do_after)
   run({
-    args = {
-      "msmtp",
-      "-t",
-      "<",
-      { value = email_file, type = "quoted" },
+      args = {
+        "msmtp",
+        "-t",
+        "<",
+        { value = email_file, type = "quoted" },
+      },
+      catch = function()
+        writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), readFileOrError(email_file))
+      end,
+      finally = function()
+        delete(email_file)
+      end,
     }, 
-    and_then = function()
-      run({
-        args = {
-          "cat",
-          { value = email_file, type = "quoted" },
-          "|",
-          "msed",
-          { value = "/Date/a/"..formatDateEmail(os.time()), type = "quoted" },
-          "|",
-          "msed",
-          { value = "/Status/a/S/", type = "quoted" },
-          "|",
-          "mdeliver",
-          "-c",
-          { value = env.MBSYNC_ARCHIVE, type = "quoted" },
-        }, 
-        and_then = function()
-          delete(email_file)
-          if do_after then
-            do_after()
-          end
-        end
-      }, true)
-    end,
-    catch = function()
-      writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), readFileOrError(email_file))
-    end,
-    finally = function()
+    {
+      "cat",
+      { value = email_file, type = "quoted" },
+      "|",
+      "msed",
+      { value = "/Date/a/"..formatDateEmail(os.time()), type = "quoted" },
+      "|",
+      "msed",
+      { value = "/Status/a/S/", type = "quoted" },
+      "|",
+      "mdeliver",
+      "-c",
+      { value = env.MBSYNC_ARCHIVE, type = "quoted" },
+    }, function()
       delete(email_file)
-    end,
-  }, true)
+      if do_after then
+        do_after()
+      end
+    end, true)
 end
-
 --- @param headers { [string]: string }
 --- @param body string
 --- @param edit_func? fun(mail: string, do_after: fun(mail: string))

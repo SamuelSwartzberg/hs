@@ -286,14 +286,14 @@ KhalCommandSpecifier = {
       end,
       ["delete-event"] = function(self, searchstr)
         -- ideally, the searchstr is an uid. If it is not, khal will delete the first event that matches the searchstr.
-        runHsTaskProcessOutput({
+        run({ args = {
           "echo",
           "$'D\ny\n'", -- answer D and y to the prompts
           "|",
           "khal",
           "edit",
           { value = searchstr, type = "quoted" },
-        })
+        }}, true)
       end,
       ["edit-event"] = function(self, searchstr)
         local specifier = self:get("search-events-parsed", { searchstr = searchstr })[1]
@@ -307,7 +307,7 @@ KhalCommandSpecifier = {
         
       ["add-event-from-url"] = function(self, specifier)
         local tmp_file = createUniqueTempFile("")
-        runHsTaskProcessOutput({
+        run({ args = {
           "curl",
           { value = specifier.url, type = "quoted" },
           "-O",
@@ -318,10 +318,10 @@ KhalCommandSpecifier = {
           "--include_calendar",
           { value = specifier.calendar, type = "quoted" },
           { value = tmp_file, type = "quoted" },
-        })
+        }}, true)
       end,
       ["add-event-from-file"] = function(self, specifier)
-        runHsTaskProcessOutput({
+        run({
           "khal",
           "import",
           "--include_calendar",

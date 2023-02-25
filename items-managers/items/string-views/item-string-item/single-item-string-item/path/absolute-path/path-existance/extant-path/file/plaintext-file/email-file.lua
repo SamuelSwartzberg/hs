@@ -156,23 +156,18 @@ EmailFileItemSpecifier = {
         })
       end,
       ["email-move-to"] = function(self, path)
-        runHsTaskProcessOutput({
+        run({
           "mdeliver",
           { value = path, type = "quoted" },
           "<",
           { value = self:get("contents"), type = "quoted" }
-        }, function()
-          runHsTaskProcessOutput({
-              "minc", -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
-              { value = path, type = "quoted" }
-            }, function()
-                run({
-                  "rm",
-                  { value = self:get("contents"), type = "quoted" }
-                }, true)
-            end
-          )
-        end)
+        }, {
+          "minc", -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
+          { value = path, type = "quoted" }
+        }, {
+          "rm",
+          { value = self:get("contents"), type = "quoted" }
+        }, true)
       end,
     }
   },

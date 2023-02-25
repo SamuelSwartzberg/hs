@@ -105,17 +105,15 @@ URLItemSpecifier = {
         khal_config:doThis("append-file-contents", "\n\n" .. khal_data)
         vdirsyncer_config:doThis("append-file-contents", "\n\n" .. vdirsyncer_data.value)
         createPath(vdirsyncer_data.at)
-        runHsTaskProcessOutput({
+        run({
           "vdirsyncer",
           "discover",
           { value = vdirsyncer_data.name, type = "quoted" }
-        }, function(std_out)
-          run({
-            "vdirsyncer",
-            "sync",
-            { value = vdirsyncer_data.name, type = "quoted" }
-          }, true)
-        end)
+        }, {
+          "vdirsyncer",
+          "sync",
+          { value = vdirsyncer_data.name, type = "quoted" }
+        }, true)
         khal_config:doThis("git-commit-self", "Add web-calendar " .. name)
         khal_config:doThis("git-push")
       end,

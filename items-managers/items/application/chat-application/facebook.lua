@@ -77,26 +77,25 @@ FacebookItemSpecifier = {
                 { value = "https://www.facebook.com/dyi/?referrer=yfi_settings", type = "quoted"}
               },
               delay = 1,
-              and_then = function()
-                hs.eventtap.keyStroke({"cmd"}, "0") -- reset zoom
-                local ff_window = CreateRunningApplicationItem(hs.application.get("Firefox")):get("focused-window-item")
-                ff_window:doThis("set-tile", {
-                  matrix = {2,1},
-                  position = {1,1}
-                })
-                ff_window:doThis("click-series", { 
-                  { mode = "moveandclick", c = { x = -100, y = -410} }, -- format open
-                  { mode = "moveandclick", c = { x = -100, y = -310} }, -- format select
-                  { mode = "moveandclick", c = { x = -100, y = -270} }, -- date open
-                  { mode = "moveandclick", c = { x = -100, y = -200} }, -- date select
-                  { mode = "moveandclick", tr = { x = -80, y = 690} }, -- deselect all
-                  { mode = "moveandclick", tr = { x = -63, y = 945} }, -- select messages
-                  { mode = "scroll", target_point = {x = 0, y = -4000}, duration = 2.5 }, -- scroll to end of page
-                  { mode = "moveandclick", tl = { x = 530, y = 1548} } -- export button
-                })
-                do_after()
-              end
-            }, true)
+            }, function()
+              hs.eventtap.keyStroke({"cmd"}, "0") -- reset zoom
+              local ff_window = CreateRunningApplicationItem(hs.application.get("Firefox")):get("focused-window-item")
+              ff_window:doThis("set-tile", {
+                matrix = {2,1},
+                position = {1,1}
+              })
+              ff_window:doThis("click-series", { 
+                { mode = "moveandclick", c = { x = -100, y = -410} }, -- format open
+                { mode = "moveandclick", c = { x = -100, y = -310} }, -- format select
+                { mode = "moveandclick", c = { x = -100, y = -270} }, -- date open
+                { mode = "moveandclick", c = { x = -100, y = -200} }, -- date select
+                { mode = "moveandclick", tr = { x = -80, y = 690} }, -- deselect all
+                { mode = "moveandclick", tr = { x = -63, y = 945} }, -- select messages
+                { mode = "scroll", target_point = {x = 0, y = -4000}, duration = 2.5 }, -- scroll to end of page
+                { mode = "moveandclick", tl = { x = 530, y = 1548} } -- export button
+              })
+              do_after()
+            end)
           end
         )
       end,

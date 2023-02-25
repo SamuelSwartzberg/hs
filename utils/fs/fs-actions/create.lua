@@ -122,13 +122,12 @@ function doWithTempFileEditedInEditor(contents, do_this, filename, extension)
       "--disable-extensions",
       {value = tmp_file, type = "quoted"},
     },
-    and_then = function()
-      do_this(tmp_file)
-    end,
     finally = function()
       delete(tmp_file)
     end
-  }, true)
+  }, function()
+    do_this(tmp_file)
+  end)
 end
 
 --- @param source string
@@ -141,14 +140,11 @@ function zipFile(source, target, do_after)
     target_ext = "zip"
   })
   run({
-    args = {
-      "zip",
-      "-r",
-      {value = target, type = "quoted"},
-      {value = source, type = "quoted"},
-    },
-    and_then = bindArg(do_after, target),
-  }, true)
+    "zip",
+    "-r",
+    {value = target, type = "quoted"},
+    {value = source, type = "quoted"},
+  }, bindArg(do_after, target))
 end
 
 --- @param name string

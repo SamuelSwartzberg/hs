@@ -8,16 +8,20 @@ rrq("args")
 --- @field dont_clean_output? boolean
 
 --- @class run_options_object_async : run_options_object
---- @field and_then? fun(std_out: string): any
 --- @field delay? number
 --- @field run_immediately? boolean
+--- @field and_then? fun(std_out: string): any this shouldn't be here, but rather the second argument of run, but if it's here, we'll still accept it
 
---- @alias run_overload_1 fun(opts: run_options_object_async | command_parts, async: true): hs.task
---- @alias run_overload_2 fun(opts: run_options_object | command_parts, async: false): string|nil
+--- @alias run_first_arg run_options_object_async | command_parts
+--- @alias run_and_then fun(std_out: string): (any) | true | run_first_arg
+
+--- @alias run_overload_1 fun(opts: run_first_arg, and_then: run_and_then, ...?: run_and_then ): hs.task
+--- @alias run_overload_2 fun(opts: run_first_arg, and_then: false|nil): string|nil
 --- @alias run run_overload_1 | run_overload_2
 
 --- @type run
-function run(opts, async)
+function run(opts, and_then, ...)
+  local varargs = {...}
   local args 
   if not opts.args then
     error("No args provided")
@@ -28,13 +32,27 @@ function run(opts, async)
     args = buildTaskArgs(opts.args)
   end
   opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
-  opts.catch = opts.catch or function(exit_code, std_err)
-    local err_str = "exit code " .. exit_code .. "\nstderr: \n" .. std_err
-    error(err_str)
+  opts.catch = function(exit_code, std_err)
+    local should_run_default_catch 
+    if opts.catch then
+      should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch
+    end
+    if should_run_default_catch ~= false then
+      local err_str = "exit code " .. exit_code .. "\nstderr: \n" .. std_err
+      error(err_str)
+    end
   end
-  async = defaultIfNil(async, true)
 
-  if async then
+  if opts.and_then then and_then = opts.and_then end
+
+  if and_then then
+    if and_then == true then -- in this case, we're only using and_then to indicate that we want to run the task asyncly
+      and_then = function() end
+    elseif type(and_then) == "table" then -- shorthand for and_then being another call to `run`, with and_then being opts of the second call, and the varargs being the and_then of the second call, and potentially further
+      and_then = function()
+        run(and_then, table.unpack(varargs))
+      end
+    end
     local task =  hs.task.new(
       "/opt/homebrew/bin/bash",
       function(exit_code, std_out, std_err)
@@ -50,10 +68,10 @@ function run(opts, async)
           end
           if opts.delay then
             hs.timer.doAfter(opts.delay, function()
-              opts.and_then(std_out)
+              and_then(std_out)
             end)
           else
-            opts.and_then(std_out)
+            and_then(std_out)
           end
         end
         if opts.finally then
