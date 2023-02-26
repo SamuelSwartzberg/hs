@@ -76,7 +76,7 @@ function run(opts, and_then, ...)
     if opts.catch then
       should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch
     end
-    if should_run_default_catch ~= false then
+    if should_run_default_catch == true then
       local err_str = ("Error running command:\n\n%s\n\nExit code: %s\n\nStderr: %s"):format(buildInnerCommand(opts.args), exit_code, std_err)
       error(err_str)
     end

@@ -68,10 +68,10 @@ end
 
 --- @param path string
 --- @param spec sliceSpec | string
---- @param opts? { ext_sep?: boolean, standartize_ext?: boolean, rejoin_at_end?: boolean }
+--- @param opts? { ext_sep?: boolean, standartize_ext?: boolean, rejoin_at_end?: boolean, entire_path_for_each?: boolean }
 --- @return string[] | string
 function pathSlice(path, spec, opts)
-  opts = opts or {}
+  opts = tablex.deepcopy(opts) or {}
   local raw_path_components = stringy.split(path, "/")
   if raw_path_components[#raw_path_components] == "" then
     listPop(raw_path_components) -- if path ends with a slash, remove the empty string at the end
@@ -114,6 +114,12 @@ function pathSlice(path, spec, opts)
       end
     else 
       return table.concat(res, "/")
+    end
+  elseif opts.entire_path_for_each then
+    if opts.ext_sep then error("Getting entire path for each component when treating filename and extension as separate components is difficult and thus currently not supported") end
+    for i = #res, 1, -1 do
+      local relevant_path_components = slice(raw_path_components, { start = 1, stop = i })
+      res[i] = table.concat(relevant_path_components, "/")
     end
   else
     return res

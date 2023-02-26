@@ -112,7 +112,7 @@ FacebookItemSpecifier = {
         drainAllSubdirsTo(env.TMP_FACEBOOK_EXPORT_PARENT, env.TMP_FACEBOOK_EXPORT_CHATS)
       end,
       ["foreach-chat"] = function(self, func)
-        for _, chat_dir in getAllInPath(env.TMP_FACEBOOK_EXPORT_CHATS, false, true, false) do 
+        for _, chat_dir in itemsInPath({path = env.TMP_FACEBOOK_EXPORT_CHATS, include_files = false}) do 
           func(chat_dir)
         end
       end,

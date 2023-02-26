@@ -5,7 +5,7 @@ ParentDirItemSpecifier = {
 
     getables = {
       ["child-string-array"] = function(self) 
-        return CreateArray(getAllInPath(self:get("contents"), false, true, true)) 
+        return CreateArray(itemsInPath(self:get("contents"))) 
       end,
       ["find-child"] = function(self, func)
         return self:get("child-string-array"):get("find", func)
@@ -18,7 +18,7 @@ ParentDirItemSpecifier = {
         return self:get("child-string-item-array"):get("filter-to-array-of-dirs")
       end,
       ["raw-child-string-array"] = function(self)
-        return CreateArray(getAllInPath(self:get("contents"), false, true, true))
+        return CreateArray(itemsInPath(self:get("contents")))
       end,
       ["children-any-pass"] = function(self, query) return self:get("child-string-item-array"):get("some-pass", query) end,
       ["is-grandparent-dir"] = function(self)

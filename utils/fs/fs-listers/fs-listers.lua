@@ -1,19 +1,4 @@
---- @param path string
---- @return string[]
-function getAncestors(path)
-  local parents = {}
-  local path_components = stringy.split(path, "/")
-  while true do
-    local _ = listPop(path_components)
-    if #path_components == 0 then
-      break
-    end
-    parents[#parents + 1] = "/" .. table.concat(path_components, "/")
-  end
-  return parents
-end
-
---- @class getAllInPathOpts
+--- @class itemsInPathOpts
 --- @field path string The path to the directory
 --- @field recursion? boolean | integer Whether to recurse into subdirectories, and how much
 --- @field include_dirs? boolean Whether to include directories in the returned table
@@ -21,12 +6,23 @@ end
 --- @field validator? fun(file_name: string): boolean A function that takes a file name and returns true if the file should be included in the returned table
 --- @field slice_results? sliceSpec | string A slice spec to slice the results with
 --- @field slice_results_opts? table A table of options to pass to pathSlice
+--- @field validator_result? fun(path: string): boolean A function that takes a path and returns true if the path should be included in the returned table
 
 --- Returns a table of all things in a directory
 
---- @param opts getAllInPathOpts
+--- @param opts itemsInPathOpts | string
 --- @return string[] #A table of all things in the directory
-function getAllInPath(opts)
+function itemsInPath(opts)
+  if type (opts) == "string" then
+    opts = {path = opts}
+  elseif type (opts) == "table" then
+    opts = tablex.deepcopy(opts)
+  elseif opts == nil then
+    opts = {}
+  else
+    error("itemsInPath: opts must be a string or a table")
+  end
+  
   if not isDir(opts.path) then 
     if opts.include_files then
       return {opts.path}
@@ -37,6 +33,7 @@ function getAllInPath(opts)
   local files = {}
   opts.path = resolveTilde(opts.path)
   opts.path = ensureAdfix(opts.path, "/", true, false, "suf")
+  if opts.path == "" then opts.path = "/" end
   opts.validator = defaultIfNil(opts.validator, usefulFileValidator)
   opts.recursion = defaultIfNil(opts.recursion, false)
   opts.include_dirs = defaultIfNil(opts.include_dirs, true)
@@ -49,9 +46,11 @@ function getAllInPath(opts)
     lister = hs.fs.dir
   else
     lister = function(listerpath)
-      local output, status, reason, code = getOutputTask({"rclone", "lsf", {value = listerpath, type = "quoted"}})
-      local items
-      if status then
+      local output = run({
+        args = {"rclone", "lsf", {value = listerpath, type = "quoted"}},
+        catch = function() return nil end,
+      }) 
+      if output then
         items = splitLines(output)
         items = listFilterEmptyString(items)
         items = mapValueNewValue(
@@ -82,7 +81,10 @@ function getAllInPath(opts)
           if opts.recursion <= 0 then shouldRecurse = false end
         end
         if shouldRecurse then
-          local sub_files = getAllInPath(file_path, crementIfNumber(opts.recursion, "de"), opts.include_dirs, opts.include_files, opts.validator)
+          local sub_opts = tablex.deepcopy(opts)
+          sub_opts.path = file_path
+          sub_opts.recursion = crementIfNumber(opts.recursion, "de")
+          local sub_files = itemsInPath(sub_opts)
           for _, sub_file in ipairs(sub_files) do
             files[#files + 1] = sub_file
           end
@@ -95,100 +97,32 @@ function getAllInPath(opts)
     end
   end
 
+  if opts.validator_result then
+    files = listFilter(files, opts.validator_result)
+  end
+
   if opts.slice_results then
-    files = pathSlice(files, opts.slice_results, opts.slice_results_opts) --[[ @as string[] ]]
+    files = mapValueNewValue(files, function(path)
+      return pathSlice(path, opts.slice_results, opts.slice_results_opts)
+    end)
   end
 
   return files
 end
 
-
-
---- @param opts getAllInPathOpts
---- 
-
-
 --- @param path string
---- @param depth? integer
---- @return string[]
-function getDirsThatAreGitRootsInPath(path, depth)
-  local dirs = getAllInPath(path, depth or true, true, false)
-  return listFilter(dirs, function(dir)
-    return isGitRootDir(dir)
-  end)
-end
-
-
-
---- @param path string
---- @param include_dirs? boolean
---- @param include_files? boolean
---- @return string[]
-function getSiblings(path, include_dirs, include_files)
-  return getAllInPath(getParentPath(path), false, include_dirs, include_files)
-end
-
---- @param path string
---- @param include_dirs? boolean
---- @param include_files? boolean
---- @return string[]
-function getOwnAndAncestorSiblings(path, include_dirs, include_files)
-  local siblings = getSiblings(path, include_dirs, include_files)
-  if path ~= "/" then
-    local ancestor_siblings = getOwnAndAncestorSiblings(getParentPath(path), include_dirs, include_files)
-    return listConcat(siblings, ancestor_siblings)
-  else
-    return siblings
+--- @param slice_spec? sliceSpec | string
+--- @param opts? itemsInPathOpts
+function getItemsForAllLevelsInSlice(path, slice_spec, opts)
+  slice_spec = slice_spec or { start = 1, stop = -1 }
+  opts = opts or {}
+  opts.recursion = false
+  local levels = pathSlice(path, slice_spec, { entire_path_for_each = true })
+  local res = {}
+  for _, level in ipairs(levels) do
+    opts.path = level -- this modifies the opts table, but that's fine, since it gets copied in itemsInPath
+    local items = itemsInPath(opts)
+    res = listConcat(res, items)
   end
-end
-
---- @param path string
---- @param include_dirs boolean
---- @param include_files boolean
---- @return string[]
-function getAllInPathOwnAndAncestorSiblings(path, include_dirs, include_files)
-  local children = getAllInPath(path, false, include_dirs, include_files)
-  local siblings_and_ancestor_siblings = getOwnAndAncestorSiblings(path, include_dirs, include_files)
-  return listConcat(children, siblings_and_ancestor_siblings)
-end
-
---- @param path string
---- @param filename string
---- @param include_dirs boolean
---- @param include_files boolean
---- @return string | nil
-function findInSiblingsOrAncestorSiblings(path, filename,  include_dirs, include_files)
-  local siblings = getSiblings(path, include_dirs, include_files)
-  local target_element = valueFind(siblings, function(path)
-    return pathSlice(path, "-1:-1")[1] == filename
-  end)
-  if target_element then
-    return target_element
-  else
-    if path ~= "/" then
-      return findInSiblingsOrAncestorSiblings(getParentPath(path), filename, include_dirs, include_files)
-    else
-      return nil
-    end
-  end
-end
-
---- @param path string
---- @param ends string
---- @param include_dirs? boolean
---- @param include_files? boolean
---- @return string | nil
-function findChildThatEndsWith(path, ends, include_dirs, include_files)
-  local children = getAllInPath(path, false, include_dirs, include_files)
-  return valueFindStringEndsWith(children, ends)
-end
-
-
-function getSortedDirArr(path)
-  local temp_dir_array = {}
-  for file_name in hs.fs.dir(path) do
-    temp_dir_array[#temp_dir_array + 1] = file_name
-  end
-  table.sort(temp_dir_array)
-  return temp_dir_array
+  return res
 end

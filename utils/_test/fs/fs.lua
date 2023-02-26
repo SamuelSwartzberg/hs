@@ -121,14 +121,14 @@ writeFile(env.HSFTP_TMPDIR .. "/foo/test2.txt", "hello world", "any", true)
 --- all in path 
 
 assertValuesContain(
-  getAllInPath(env.HOME),
+  itemsInPath(env.HOME),
   { env.HOME .. "/Desktop", env.HOME .. "/.profile" }
 )
 
 --- same but remote
 
 assertValuesContainExactly(
-  getAllInPath(env.HSFTP_TMPDIR .. "/foo"),
+  itemsInPath(env.HSFTP_TMPDIR .. "/foo"),
   { 
     env.HSFTP_TMPDIR .. "/foo/test1.txt", 
     env.HSFTP_TMPDIR .. "/foo/test2.txt",
@@ -138,13 +138,13 @@ assertValuesContainExactly(
 
 --- all in path, exclude dirs
 assertValuesContain(
-  getAllInPath(env.HOME, false, false, true),
+  itemsInPath({path = env.HOME, include_dirs = false}),
   { env.HOME .. "/.profile" }
 )
 
 --- same but remote
 assertValuesContainExactly(
-  getAllInPath(env.HSFTP_TMPDIR .. "/foo", false, false, true),
+  itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", include_dirs = false}),
   { 
     env.HSFTP_TMPDIR .. "/foo/test1.txt", 
     env.HSFTP_TMPDIR .. "/foo/test2.txt"
@@ -153,13 +153,13 @@ assertValuesContainExactly(
 
 --- all in path, exclude files
 assertValuesContain(
-  getAllInPath(env.HOME, false, true, false),
+  itemsInPath({path = env.HOME, include_files = false}),
   { env.HOME .. "/Desktop" }
 )
 
 --- same but remote
 assertValuesContainExactly(
-  getAllInPath(env.HSFTP_TMPDIR .. "/foo", false, true, false),
+  itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", include_files = false}),
   { 
     env.HSFTP_TMPDIR .. "/foo/bar"
   }
@@ -167,7 +167,7 @@ assertValuesContainExactly(
 
 --- all in path, don't search recursively
 assertValuesNotContain(
-  getAllInPath("/", false),
+  itemsInPath({path = "/", recursion = false}),
   { env.HOME }
 )
 
@@ -175,7 +175,7 @@ writeFile(env.TMPDIR .. "/ff/rr/bb.txt", "hello world", "any", true)
 
 --- all in path, search recursively
 assertValuesContain(
-  getAllInPath(env.TMPDIR .. "/ff", true),
+  itemsInPath({path = env.TMPDIR .. "/ff", recursion = true}),
   { env.TMPDIR .. "/ff/rr/bb.txt" }
 )
 
@@ -187,7 +187,7 @@ writeFile(env.HSFTP_TMPDIR .. "/foo/bar/new.txt", "hello world", "any", true)
 
 
 assertValuesContainExactly(
-  getAllInPath(env.HSFTP_TMPDIR .. "/foo", true),
+  itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", recursion = true}),
   { 
     env.HSFTP_TMPDIR .. "/foo/test1.txt", 
     env.HSFTP_TMPDIR .. "/foo/test2.txt",
@@ -219,7 +219,7 @@ assertMessage(
 )
 
 assertValuesContain(
-  getSiblings("/", true, true),
+  getItemsForAllLevelsInSlice("/", { start = -2, stop = -2 }  ),
   {"/Applications"}
   
 )
@@ -229,20 +229,20 @@ assertValuesContain(
 
 
 assertValuesContain(
-  getSiblings(env.HSFTP_TMPDIR .. "/foo/bar", true, true),
+  getItemsForAllLevelsInSlice(env.HSFTP_TMPDIR .. "/foo/bar", "-2:-2"),
   {env.HSFTP_TMPDIR .. "/foo/test1.txt"}
 )
 
 delete(env.HSFTP_TMPDIR .. "/foo", "empty")
 
 assertTable(
-  getAllInPath(env.HSFTP_TMPDIR .. "/foo", true),
+  itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", recursion = true}),
   {}
 )
 
 assertMessage(
   valuesContain(
-    getSiblings("/", true, true),
+    getItemsForAllLevelsInSlice("/", { start = -2, stop = -2 }  )
     "/nonextant"
   ),
   false
@@ -251,7 +251,7 @@ assertMessage(
 --- exclude dirs
 assertMessage(
   valuesContain(
-    getSiblings("/", false, true),
+    getItemsForAllLevelsInSlice('/', { start = -2, stop = -2 }, {include_dirs = false}  ),
     "/Applications"
   ),
   false
@@ -261,58 +261,10 @@ assertMessage(
 --- exclude files
 assertMessage(
   valuesContain(
-    getSiblings("/", true, false),
+    getItemsForAllLevelsInSlice('/', { start = -2, stop = -2 }, {include_files = false}  ),
     "/Applications"
   ),
   true
-)
-
---- extant file which is sibling
-assertMessage(
-  findInSiblingsOrAncestorSiblings(
-    env.MAC_DOWNLOADS,
-    "Pictures",
-    true,
-    true
-  ),
-  env.MAC_PICTURES
-)
-
-
---- extant file which is ancestor sibling
-assertMessage(
-  findInSiblingsOrAncestorSiblings(
-    env.HOME,
-    "Applications",
-    true,
-    true
-  ),
-  "/Applications"
-)
-
-
-
---- nonextant file which is sibling
-assertMessage(
-  findInSiblingsOrAncestorSiblings(
-    env.MAC_DOWNLOADS,
-    "nonextant",
-    true,
-    true
-  ),
-  nil
-)
-
-
---- nonextant file which is ancestor sibling
-assertMessage(
-  findInSiblingsOrAncestorSiblings(
-    env.HOME,
-    "/nonextant",
-    true,
-    true
-  ),
-  nil
 )
 
 assertMessage(

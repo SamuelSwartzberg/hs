@@ -39,7 +39,7 @@ item_cache = createItemCache()
 comp = hybridFsDictFileTreeToTable(env.MCOMPOSITE)
 require("items-managers")
 
-projectDirsArray = CreateArray(getAllInPath(env.ME, 2, true, false, usefulFileValidator)):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)
+projectDirsArray = CreateArray(itemsInPath({path = env.ME, recursion = 2, include_files = false})):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)
 
 
 envTable = CreateTable(env)
@@ -238,7 +238,7 @@ local keymap = {
     explanation = "Choose a pass and fill it",
     fn = function()
       CreateArray(
-        mapValueNewValue(getAllInPath(env.MPASSPASSW), function(fl) return getLeafWithoutPathOrExtension(fl) end)
+        mapValueNewValue(itemsInPath(env.MPASSPASSW), function(fl) return getLeafWithoutPathOrExtension(fl) end)
       ):doThis("choose-item-and-then-action")
     end,
   },

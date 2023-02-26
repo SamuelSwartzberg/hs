@@ -15,7 +15,7 @@ GitRootDirItemSpecifier = {
         })
       end,
       ["all-hooks"] = function(self)
-        return getAllInPath(self:get("hooks-dir"), true, false, true)
+        return itemsInPath({path = self:get("hooks-dir"), include_dirs = false})
       end,
     },
     doThisables = {
@@ -35,7 +35,7 @@ GitRootDirItemSpecifier = {
         self:doThis("copy-as-hook", env.GITCONFIGHOOKS  .. "/"  .. hook_name)
       end,
       ["sync-hooks"] = function(self)
-        for _, hook_path in pairs(getAllInPath(env.GITCONFIGHOOKS, true, false, true)) do
+        for _, hook_path in pairs(itemsInPath({path = env.GITCONFIGHOOKS, include_dirs = false})) do
           self:doThis("copy-as-hook", hook_path)
         end
       end,

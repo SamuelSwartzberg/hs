@@ -9,6 +9,9 @@
 --- @type sliceLArgOverload | sliceLSpecOverload | sliceSArgOverload | sliceSSpecOverload
 function slice(thing, start_incl_or_spec, stop_incl, step)
   local start_incl
+
+  -- parse the slice spec if it's a string or table
+
   if type(start_incl_or_spec) == "table" then
     start_incl = start_incl_or_spec.start
     stop_incl = start_incl_or_spec.stop
@@ -26,6 +29,8 @@ function slice(thing, start_incl_or_spec, stop_incl, step)
   else
     start_incl = start_incl_or_spec
   end
+
+  -- implement various functions polymorphically depending on the type of thing
 
   local len_func, new_thing
   if type(thing) == "string" then
@@ -45,9 +50,13 @@ function slice(thing, start_incl_or_spec, stop_incl, step)
     end
   end
 
+  -- set defaults
+
   if not step then step = 1 end
   if not start_incl then start_incl = 1 end
   if not stop_incl then stop_incl = #thing end
+
+  -- resolve negative indices
 
   if start_incl < 0 then
     start_incl = len_func(thing) + start_incl + 1
@@ -56,6 +65,22 @@ function slice(thing, start_incl_or_spec, stop_incl, step)
     stop_incl = len_func(thing) + stop_incl + 1
   end
 
+  -- clamp indices to ensure we don't go out of bounds
+
+  start_incl = clamp(start_incl, 1, len_func(thing))
+  stop_incl = clamp(stop_incl, 1, len_func(thing))
+
+  -- handle cases where users have passed conditions that will result in an infinite loop
+  -- currently: return empty thing
+  -- consider: reverse the step
+
+  if start_incl > stop_incl and step > 0 then
+    return new_thing
+  elseif start_incl < stop_incl and step < 0 then
+    return new_thing
+  end
+
+  -- build the slice and return it
   
   for i = start_incl, stop_incl, step do
     new_thing = append_func(new_thing, i)

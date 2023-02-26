@@ -20,7 +20,7 @@ SingleItemStringItemSpecifier = {
       end,
       ["is-application"] = function(self) 
         return valuesContain(
-          getAllInPath("/Applications/", false, true),
+          itemsInPath({ path = "/Applications/"}),
           self:get("contents") .. ".app"
         )
       end,

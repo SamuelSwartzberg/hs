@@ -15,11 +15,11 @@ ExtantPathItemSpecifier = {
           or path_leaf:match("^(%d[^%%]+)") 
       end, 
       ["get-ancestor-string-array"] = function(self)
-        return CreateArray(getAncestors(self:get("contents")))
+        return CreateArray(pathSlice(self:get("contents"), "1:-2", { entire_path_for_each = true }))
       end,
       ["is-in-git-dir-path"] = function(self) 
         return valueFind(
-          getAllInPathOwnAndAncestorSiblings(self:get("contents"), true, false),
+          getItemsForAllLevelsInSlice(self:get("contents"), "1:-1", { include_files = false }),
           function(item)
             return stringy.endswith(item, ".git")
           end
@@ -42,13 +42,13 @@ ExtantPathItemSpecifier = {
         return run(self:get("cd-and-this-task", task))
       end,
       ["sibling-string-array"] = function(self)
-        return CreateArray(getSiblings(self:get("contents"), true, true))
+        return CreateArray(getItemsForAllLevelsInSlice(self:get("contents"), "-2:-2"))
       end,
       ["sibling-file-only-string-array"] = function(self)
-        return CreateArray(getSiblings(self:get("contents"), false, true))
+        return CreateArray(getItemsForAllLevelsInSlice(self:get("contents"), "-2:-2", { include_dirs = false }))
       end,
       ["sibling-dir-only-string-array"] = function(self)
-        return CreateArray(getSiblings(self:get("contents"), true, false))
+        return CreateArray(getItemsForAllLevelsInSlice(self:get("contents"), "-2:-2", { include_files = false }))
       end,
       ["find-sibling"] = function(self, func)
         return self:get("sibling-string-array"):get("find", function(sibling)

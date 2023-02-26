@@ -29,7 +29,7 @@ end
 
 --- @param path string
 function processSetupDirectivesInFiles(path)
-  for _, child in ipairs(getAllInPath(path, false,true)) do
+  for _, child in ipairs(itemsInPath({path = path, include_dirs = false})) do
     logFile("processSetupDirectivesInFiles", child)
     local basename = getLeafWithoutPath(child)
     local command = changeCasePre(
@@ -93,7 +93,7 @@ end
 
 
 function drainAllSubdirsTo(origin, target, validator)
-  for _, subdir in getAllInPath(origin, false, true, false) do
+  for _, subdir in itemsInPath({path = origin, include_files = false}) do
     if not validator or validator(subdir) then
       return srctgt("move", subdir, target, "any", true, false, true) and delete(subdir, "dir")
     end
@@ -281,7 +281,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   local sources
   if all_in then
-    sources = getAllInPath(source, false, true, true)
+    sources = itemsInPath(source)
   else
     sources = {source}
   end
