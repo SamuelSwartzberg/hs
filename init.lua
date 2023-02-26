@@ -36,7 +36,7 @@ end
 memoizer = createMemoizer()
 item_cache = createItemCache()
 
-comp = hybridFsDictFileTreeToTable(env.MCOMPOSITE)
+comp = fsTree(env.MCOMPOSITE, "as-tree")
 require("items-managers")
 
 projectDirsArray = CreateArray(itemsInPath({path = env.ME, recursion = 2, include_files = false})):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)

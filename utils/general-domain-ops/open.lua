@@ -10,14 +10,21 @@ function open(opts)
     opts = { path = opts }
   end
   opts = opts or {}
+  local app_args
   if opts.url then 
-    opts.app = opts.app or "Firefox"
+    app_args = { "-a", opts.app or "Firefox"}
+  elseif opts.app then 
+    app_args = { "-a", opts.app}
   else
-    opts.app = opts.app or "Visual Studio Code"
+    app_args = "-t"
   end
   local path
   if opts.url then 
-    path = opts.url
+    if isUrl(opts.url) then 
+      path = opts.url
+    else
+      path = "https://www.google.com/search?q=" .. urlencode(opts.url)
+    end
   elseif opts.contents then 
     if opts.path then
       path = writeFile(opts.path, opts.contents)
@@ -34,11 +41,12 @@ function open(opts)
     error("Something went wrong when determining the path to open. Opts that caused this:\n\n" .. json.encode(opts))
   end
 
-  run({
+  local args = listConcat(
     "open",
-    "-a",
-     { value = opts.app, type = "quoted" },
+    app_args,
     { value = path, type = "quoted" }
-  }, true)
+  )
+
+  run(args, true)
 end
       

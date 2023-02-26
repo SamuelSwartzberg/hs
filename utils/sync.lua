@@ -1,8 +1,11 @@
 
 
-getOnRemote = bindNthArg(getPathRelativeToOtherRoot, 2, "hsftp:")
-getOnFsHttpServer = bindNthArg(getPathRelativeToOtherRoot, 2, env.FS_HTTP_SERVER .. "/")
-
+remote = function(path)
+  return select(2, resolve({s=path, t = {prefix = "hsftp:", root = ""}}))
+end
+fshttp = function(path)
+  return select(2, resolve({s=path, t = {prefix = env.FS_HTTP_SERVER, root = ""}}))
+end
 
 ---syncs files to and from the remote server using rclone
 ---@param path string
@@ -10,7 +13,8 @@ getOnFsHttpServer = bindNthArg(getPathRelativeToOtherRoot, 2, env.FS_HTTP_SERVER
 ---@param action? "copy" | "move"
 ---@return nil
 function syncHomeRelativePath(path, push_or_pull, action)
-  local local_path, remote_path = getHomeOtherRootPathPair(path, "hsftp:")
+  local local_path = resolve(path)
+  local remote_path = remote(path)
   local source, dest 
   if push_or_pull == "push" then
     source = local_path

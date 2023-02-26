@@ -4,7 +4,7 @@ function openInBrowser(str)
   if (isUrl(str)) then
     hs.urlevent.openURL(str)
   else
-    hs.urlevent.openURL("https://www.google.com/search?q=" .. urlencode(str))
+    hs.urlevent.openURL(str))
   end
 
 end

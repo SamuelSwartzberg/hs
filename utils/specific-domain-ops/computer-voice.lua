@@ -7,5 +7,5 @@ local lang_voice_map = {
 ---@param text string
 ---@param lang "en" | "ja"
 function say(text, lang)
-  return runHsTask({"say", "-v", lang_voice_map[lang], {value = text, type = "quoted"}})
+  return run({"say", "-v", lang_voice_map[lang], {value = text, type = "quoted"}}, true)
 end
