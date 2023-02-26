@@ -23,7 +23,7 @@ end
 
 --- @param contents string
 function openStringInVscode(contents)
-  local tmp_file = createUniqueTempFile(contents)
+  local tmp_file = writeFile(nil, contents)
   openPathVscode(tmp_file)
 end
 
@@ -209,7 +209,7 @@ function delete(path, thing, action, onlyif)
   return res
 end
 
---- @param action "copy" | "move" | "link" what to do with the source
+--- @param action "copy" | "move" | "link" | "zip" what to do with the source
 --- @param source string the source file or directory
 --- @param target string  the target file or directory
 --- @param condition? "exists" | "not-exists" | "any" when, related to the existence of the target, to action the source
@@ -217,7 +217,7 @@ end
 --- @param into? boolean whether to action the source into the target directory, rather than action the source to the target
 --- @param all_in? boolean whether to action all the files in the source directory, rather than the source directory itself
 --- @param relative_to? string allow specifying
---- @return boolean
+--- @return nil
 function srctgt(action, source, target, condition, create_path, into, all_in, relative_to)
 
   -- set defaults
@@ -226,6 +226,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
   create_path = defaultIfNil(create_path, true)
   into = defaultIfNil(into, false)
   all_in = defaultIfNil(all_in, false)
+  target = defaultIfNil(target, source .. "." .. action)
 
   -- resolve tilde
 
@@ -251,7 +252,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
     if isDir(target) then
       createPath(target)
     else
-      createParentPath(target)
+      createPath(target, "1:-2")
     end
   end
 
@@ -259,11 +260,11 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   if pathExists(target) then
     if condition == "not-exists" then
-      return false
+      return nil
     end
   else
     if condition == "exists" then
-      return false
+      return nil
     end
   end
 
@@ -271,10 +272,10 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   if into then
     if not isDir(target) then
-      return false
+      error("target must be a directory if into is true. Target: " .. target)
     end
     target = target .. "/" .. getLeafWithoutPath(source)
-    createParentPath(target)
+    createPath(target, "1:-2")
   end
 
   -- prepare a list of sources to action, or a 'list' of one if not all_in
@@ -286,42 +287,46 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
     sources = {source}
   end
 
-  local returned_false = false
   local final_target = target
-  for _, final_source in ipairs(sources) do
-    local res
-    
+  local tmptarget 
+  for _, final_source in ipairs(sources) do    
     -- if all_in, then change target to be the target directory + the leaf of the source
     -- this does mean that this doesn't play nice with the `into` option, but I don't think that's a problem
     if all_in then
       final_target = target .. "/" .. getLeafWithoutPath(final_source)
-      createParentPath(final_target)
+      createPath(final_target, "1:-2")
     end
     print(final_source .. " -> " .. final_target)
 
     if not has_remote_path then 
       if action == "copy" then
         if isDir(final_source) then
-          res =  dir.clonetree(final_source, final_target)
+          _, err_msg =  dir.clonetree(final_source, final_target)
         else
-          res =  file.copy(final_source, final_target)
+          _, err_msg  =  file.copy(final_source, final_target)
         end
       elseif action == "move" then
-        res =  os.rename(final_source, final_target)
+        _, err_msg =  os.rename(final_source, final_target)
       elseif action == "link" then
-        res =  hs.fs.link(final_source, final_target, true)
+        _, err_msg =  hs.fs.link(final_source, final_target, true)
+      elseif action == "zip" then
+        run(
+          "zip",
+          "-r",
+          { value = final_target, type = "quoted"},
+          { value = final_source, type = "quoted"}
+        )
       end
     else
-      local final_
       if action == "copy" then
-        _, res = getOutputArgs(
+        run(
           "rclone",
           "copyto",
           { value = final_source, type = "quoted"},
           { value = final_target, type = "quoted"}
         )
       elseif action == "move" then
-        _, res = getOutputArgs(
+        run(
           "rclone",
           "moveto",
           { value = final_source, type = "quoted"},
@@ -329,12 +334,29 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
         )
       elseif action == "link" then
         error("linking remote files is not supported (not supported by rclone and also not really sensible)")
+      elseif action == "zip" then
+        tmptarget = env.TMPDIR .. "/" .. os.time() .. "-" .. rand({len = 8}) .. ".zip"
+        run(
+          "zip",
+          "-r",
+          { value = tmptarget, type = "quoted"},
+          { value = final_source, type = "quoted"}
+        )
       end
+
     end
 
-    if not res then returned_false = true end
+    if err_msg then
+      error(err_msg)
+    end
   end
-  return not returned_false
+
+  -- finalize actions that could not be performed in the loop
+
+  if tmptarget then
+    srctgt("copy", tmptarget, final_target)
+    delete(tmptarget)
+  end
 end
 
 

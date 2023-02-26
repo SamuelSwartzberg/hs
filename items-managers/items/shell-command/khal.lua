@@ -304,7 +304,7 @@ KhalCommandSpecifier = {
       end,
         
       ["add-event-from-url"] = function(self, specifier)
-        local tmp_file = createUniqueTempFile("")
+        local tmp_file = writeFile(nil, "")
         run({ args = {
           "curl",
           { value = specifier.url, type = "quoted" },
@@ -330,11 +330,11 @@ KhalCommandSpecifier = {
       ["add-event-interactive"] = function(self, specifier)
         specifier = specifier or {}
         local temp_file_contents = le(generateCalendarTemplate(specifier.specifier or {}))
-        doWithTempFileEditedInEditor(temp_file_contents, function(tmp_file)
+        doWithTempFile({edit_before = true}, function(tmp_file)
           local new_specifier = yamlLoad(readFile(tmp_file, "error"))
           new_specifier.do_after = specifier.do_after
           self:doThis("add-event-from-specifier", new_specifier )
-        end, nil, "yaml")
+        end)
       end,
       ["add-event-from-specifier"] = function(self, specifier)
         specifier = specifier or {}

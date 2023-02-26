@@ -155,10 +155,10 @@ ExtantPathItemSpecifier = {
         self:get("move-safe", new_path)
       end,
       ["zip"] = function(self, target_path)
-        zipFile(self:get("contents"), target_path)
+        srctgt("zip", self:get("contents"), target_path)
       end,
       ["zip-and-choose-action"] = function(self, target_path)
-        zipFile(self:get("contents"), target_path, function(target)
+        srctgt("zip", self:get("contents"), target_path, function(target)
           CreateStringItem(target):doThis("choose-action")
         end)
       end,

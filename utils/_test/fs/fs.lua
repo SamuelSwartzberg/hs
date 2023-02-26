@@ -307,7 +307,7 @@ assertMessage(
   false
 )
 
-local unique_temp_file = createUniqueTempFile("foo")
+local unique_temp_file = writeFile(nil, "foo")
 assertMessage(
   readFile(unique_temp_file),
   "foo"
@@ -320,7 +320,7 @@ assertMessage(
   nil
 )
 
-doWithTempFile("foo", function(tmp_file)
+doWithTempFile({contents = "foo"}, function(tmp_file)
   assertMessage(
     readFile(tmp_file),
     "foo"
@@ -554,7 +554,7 @@ assertMessage(
   "barbaz"
 )
 
-local local_file = createUniqueTempFile("local-origin content")
+local local_file = writeFile(nil, "local-origin content")
 
 srctgt("copy", local_file, remote_writing_file, "not-exists")
 

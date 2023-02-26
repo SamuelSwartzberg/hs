@@ -119,3 +119,4 @@ function isPlaintextFile(path)
   end
   return true
 end
+

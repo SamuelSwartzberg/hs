@@ -39,8 +39,8 @@ function buildEmailInteractive(headers, body, edit_func, do_after)
   local mail = string.format("%s\n\n%s", header, body)
   edit_func(mail, function(mail)
     local evaled_mail = le(mail)
-    local temp_file = createUniqueTempFile(evaled_mail)
-    local new_file = createUniqueTempFile("")
+    local temp_file = writeFile(nil, evaled_mail)
+    local new_file = writeFile(nil, "")
     runHsTaskProcessOutput({
       "mmime",
       "<",

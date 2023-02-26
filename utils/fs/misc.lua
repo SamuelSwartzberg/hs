@@ -118,3 +118,10 @@ function resolveRelativePath(path, prefix)
   end
   return preprefix .. prefix .. path
 end
+
+--- @param name string
+--- @param msg string
+function logFile(name, msg)
+  local log_file = env.LOGGER_PATH .. "/hs/" .. name .. ".log"
+  writeFile(log_file,  msg .. "\n", "exists", true, "a")
+end

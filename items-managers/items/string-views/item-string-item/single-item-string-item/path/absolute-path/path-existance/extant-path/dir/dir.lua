@@ -182,13 +182,12 @@ DirItemSpecifier = {
         self:get("descendant-dir-only-string-item-array"):doThis("choose-item-and-then-action")
       end,
       ["send-in-email"] = function(self, do_after)
-        local temp_file = createUniqueTempFile("", "email.zip")
-        zipFile(self:get("contents"), temp_file, function()
-          delete(temp_file)
-          if do_after then
-            do_after()
-          end
-        end)
+        local temp_file = writeFile(nil, "")
+        srctgt("zip", self:get("contents"), temp_file)
+        delete(temp_file)
+        if do_after then
+          do_after()
+        end
       end,
       ["create-child-file-and-choose-action"] = function(self, filename)
         local path = self:get("contents") .. "/" .. filename
