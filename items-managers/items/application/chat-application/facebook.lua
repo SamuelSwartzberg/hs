@@ -100,16 +100,11 @@ FacebookItemSpecifier = {
         )
       end,
       ["preprocess-backup-files"] = function()
-        drainAllSubdirsTo(
-          env.TMP_FACEBOOK_EXPORT_PARENT, 
-          env.MCHATS_GLOBAL_FACEBOOK_MEDIA, 
-          function(subdir)
-            local leaf = getLeafWithoutPath(subdir)
-            return valuesContain({"photos", "stickers_used"}, leaf)
+        for _, subdir in itemsInPath({path = env.TMP_FACEBOOK_EXPORT_PARENT, include_files = false}) do
+          if not valuesContain({"photos", "stickers_used"}, getLeafWithoutPath(subdir)) then
+            srctgt("move", subdir, env.MCHATS_GLOBAL_FACEBOOK_MEDIA,, "any", true, false, true) delete(subdir, "dir")
           end
-        )
-
-        drainAllSubdirsTo(env.TMP_FACEBOOK_EXPORT_PARENT, env.TMP_FACEBOOK_EXPORT_CHATS)
+        end
       end,
       ["foreach-chat"] = function(self, func)
         for _, chat_dir in itemsInPath({path = env.TMP_FACEBOOK_EXPORT_CHATS, include_files = false}) do 
@@ -117,7 +112,10 @@ FacebookItemSpecifier = {
         end
       end,
       ["pre-process-chat-messages-hook"] = function (self, chat_obj)
-        drainAllSubdirsTo(env.TMP_FACEBOOK_EXPORT_CHATS .. "/" .. chat_obj.found_in, env.MCHATS_FACEBOOK_MEDIA .. "/" .. self:get("convo-id", chat_obj))
+        for _, subdir in itemsInPath({ path = env.TMP_FACEBOOK_EXPORT_CHATS .. "/" .. chat_obj.found_in, include_files = false }) do
+          srctgt("move", subdir,  env.MCHATS_FACEBOOK_MEDIA .. "/" .. self:get("convo-id", chat_obj), "any", true, false, true)
+          delete(subdir, "dir")
+        end
       end,
     }
   },

@@ -34,7 +34,7 @@ PandocCommandSpecifier = {
     },
     doThisables = {
       ["convert-md"] = function(self, specifier)
-        local source, target = getSourceAndTarget(specifier)
+        local source, target = resolve({s = {path = specifier.source}, t = {path = specifier.target, suffix = "." .. specifier.target_ext}}) -- the resolve function ensures that if one of these is nil, a path in the same dir as the other is returned, but with the target_ext
         local rawsource = readFile(source)
         local processedsource = addMetadata(rawsource, specifier.metadata)
         processedsource = preProcess(processedsource, specifier.preprocess)

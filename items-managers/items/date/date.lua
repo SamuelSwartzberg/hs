@@ -235,7 +235,7 @@ DateSpecifier = {
       end,
       ["log-open-diary"] = function(self)
         self:doThis("create-empty-log-entry", env.MENTRY_LOGS)
-        openPathVscode(CreateStringItem(env.MENTRY_LOGS):get("log-for-date", self:get("contents")))
+        open(CreateStringItem(env.MENTRY_LOGS):get("log-for-date", self:get("contents")))
       end,
       ["choose-surrounding-day"] = function(self, amount)
         CreateArray(self:get(

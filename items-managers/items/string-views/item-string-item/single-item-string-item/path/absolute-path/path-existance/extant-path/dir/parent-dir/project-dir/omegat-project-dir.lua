@@ -122,7 +122,7 @@ OmegatProjectDirItemSpecifier = {
     doThisables = {
       ["create-and-open-new-source-odt"] = function(self, name)
         local path = self:get("source-dir") .. "/" .. name .. ".odt"
-        openPath(path, "LibreOffice")
+        open({path = path, app =  "LibreOffice"})
       end,
       ["open-project"] = function(self)
         self:doThis("do-running-application-ensure", function(application)

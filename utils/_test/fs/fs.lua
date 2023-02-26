@@ -333,12 +333,12 @@ assertMessage(
 )
 
 assertMessage(
-  resolveRelativePath("/foo/bar/baz", env.HOME),
+  resolve({s = { path = "/foo/bar/baz", root = env.HOME} }),
   env.HOME .. "/foo/bar/baz"
 )
 
 assertMessage(
-  resolveRelativePath("remote:/foo/bar/baz", env.HOME),
+  resolve({s = { path = "/foo/bar/baz", root = env.HOME, prefix = "remote:"} }),
   "remote:" .. env.HOME .. "/foo/bar/baz"
 )
 

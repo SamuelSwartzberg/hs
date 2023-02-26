@@ -89,10 +89,10 @@ ExtantPathItemSpecifier = {
         runHsTask(self:get("cd-and-this-task", task))
       end,
       ["open-path"] = function (self, app)
-        openPath(self:get("contents"), app)
+        open({path = self:get("contents"), app = app})
       end,
-      ["open-parent"] = function (self)
-        openPath(self:get("parent-dir-path"))
+      ["open-parent"] = function (self, app)
+        open({path = self:get("parent-dir-path"), app = app})
       end,
       ["open-path-in-finder"] = function(self)
         hs.execute("open -R '" .. self:get("contents") .. "'")
@@ -107,11 +107,11 @@ ExtantPathItemSpecifier = {
       end,
       ["open-contents-in-new-vscode-window"] = function(self)
         -- this should ideally use the `code` command, but it is currently broken
-        openPathVscode(self:get("contents"))
+        open(self:get("contents"))
       end,
       ["open-contents-in-current-vscode-window"] = function(self)
         -- this should ideally use the `code` command, but it is currently broken
-        openPathVscode(self:get("contents"))
+        open(self:get("contents"))
       end,
       ["move-safe"] = function(self, target)
         srctgt("move", self:get("contents"), target, "not-exists")

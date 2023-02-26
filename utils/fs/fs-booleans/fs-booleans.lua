@@ -12,3 +12,14 @@ end
 function pathIsRemote(path)
   return not not path:find("^[^/:]-:") 
 end
+
+--- @param path string
+--- @return boolean
+function isEmpty(path)
+  path = resolveTilde(path)
+  if isDir(path) then
+    return dirIsEmpty(path)
+  else
+    return readFile(path) == ""
+  end
+end

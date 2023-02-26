@@ -174,7 +174,7 @@ StringItemSpecifier = {
         searchWith(self:get("fold"), search_engine)
       end,
       ["open-in-vscode"] = function(self)
-        openStringInVscode(self:get("contents"))
+        open({contents = self:get("contents")})
       end,
       ["open-contents-in-browser"] = function(self)
         self:doThis("open-result-of-get-in-browser", { key = "fold"})

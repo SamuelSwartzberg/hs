@@ -105,7 +105,7 @@ SignalItemSpecifier = {
         chat_obj.media_map = {}
         chat_obj.media_dir:get("child-string-array"):doThis("for-all", function(media_item)
           local mimetype = mimetypes.guess(media_item)
-          local filesize = filesize(media_item)
+          local filesize = hs.fs.attributes(media_item, "size")
           if not chat_obj.media_map[mimetype] then
             chat_obj.media_map[mimetype] = {}
           end
