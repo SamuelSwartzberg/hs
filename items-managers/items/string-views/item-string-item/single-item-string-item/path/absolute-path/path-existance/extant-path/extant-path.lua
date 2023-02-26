@@ -19,7 +19,7 @@ ExtantPathItemSpecifier = {
       end,
       ["is-in-git-dir-path"] = function(self) 
         return valueFind(
-          getChildrenOwnAndAncestorSiblings(self:get("contents"), true, false),
+          getAllInPathOwnAndAncestorSiblings(self:get("contents"), true, false),
           function(item)
             return stringy.endswith(item, ".git")
           end

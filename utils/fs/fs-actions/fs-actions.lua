@@ -29,7 +29,7 @@ end
 
 --- @param path string
 function processSetupDirectivesInFiles(path)
-  for _, child in ipairs(getChildren(path, false,true)) do
+  for _, child in ipairs(getAllInPath(path, false,true)) do
     logFile("processSetupDirectivesInFiles", child)
     local basename = getLeafWithoutPath(child)
     local command = changeCasePre(

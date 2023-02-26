@@ -21,6 +21,7 @@ post 'lua is working':
   - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
   - jcw/jcwserve in string menu?
+  - danbooru search links need their query to count as 'seen' for other queries
   - fix timer bugs
   - https://www.hammerspoon.org/docs/hs.application.watcher.html: use to deactivate mullvad when geforce now? wrap application watchers to make it easier to create stuff?
   - interface with upkg in hs

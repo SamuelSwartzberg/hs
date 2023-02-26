@@ -40,7 +40,7 @@ end
 --- @param path string
 --- @return boolean
 function pathHasExtension(path)
-  return not hasNoExtension(getLeafWithoutPath(path))
+  return not hasNoExtension(pathSlice(path, "-1:-1")[1])
 end
 
 local rrq = bindArg(relative_require, "utils.fs.fs-booleans")

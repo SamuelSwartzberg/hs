@@ -20,7 +20,7 @@ SingleItemStringItemSpecifier = {
       end,
       ["is-application"] = function(self) 
         return valuesContain(
-          getUserUsefulFilesInPath("/Applications/", false, true),
+          getAllInPath("/Applications/", false, true),
           self:get("contents") .. ".app"
         )
       end,

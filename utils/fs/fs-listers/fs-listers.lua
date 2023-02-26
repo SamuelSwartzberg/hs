@@ -13,33 +13,36 @@ function getAncestors(path)
   return parents
 end
 
+--- @class getAllInPathOpts
+--- @field path string The path to the directory
+--- @field recursion? boolean | integer Whether to recurse into subdirectories, and how much
+--- @field include_dirs? boolean Whether to include directories in the returned table
+--- @field include_files? boolean Whether to include files in the returned table
+--- @field validator? fun(file_name: string): boolean A function that takes a file name and returns true if the file should be included in the returned table
+--- @field slice_results? sliceSpec | string A slice spec to slice the results with
+--- @field slice_results_opts? table A table of options to pass to pathSlice
 
 --- Returns a table of all things in a directory
---- @param path string The path to the directory
---- @param recursion? boolean | integer Whether to recurse into subdirectories, and how much
---- @param include_dirs? boolean Whether to include directories in the returned table
---- @param include_files? boolean Whether to include files in the returned table
---- @param validator? fun(file_name: string): boolean A function that takes a file name and returns true if the file should be included in the returned table
+
+--- @param opts getAllInPathOpts
 --- @return string[] #A table of all things in the directory
-function getAllInPath(path, recursion, include_dirs, include_files, validator)
-  if not isDir(path) then 
-    if include_files then
-      return {path}
+function getAllInPath(opts)
+  if not isDir(opts.path) then 
+    if opts.include_files then
+      return {opts.path}
     else
       return {}
     end
   end
   local files = {}
-  path = resolveTilde(path)
-  path = ensureAdfix(path, "/", true, false, "suf")
-  if not validator then 
-    validator = function() return true end
-  end
-  if recursion == nil then recursion = false end
-  if include_dirs == nil then include_dirs = true end
-  if include_files ==nil then include_files = true end
+  opts.path = resolveTilde(opts.path)
+  opts.path = ensureAdfix(opts.path, "/", true, false, "suf")
+  opts.validator = defaultIfNil(opts.validator, usefulFileValidator)
+  opts.recursion = defaultIfNil(opts.recursion, false)
+  opts.include_dirs = defaultIfNil(opts.include_dirs, true)
+  opts.include_files = defaultIfNil(opts.include_files, true)
 
-  local remote = pathIsRemote(path)
+  local remote = pathIsRemote(opts.path)
 
   local lister
   if not remote then
@@ -67,62 +70,43 @@ function getAllInPath(path, recursion, include_dirs, include_files, validator)
     end
   end
 
-  for file_name in lister(path) do
-    if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" and validator(file_name) then
-      local file_path = path .. file_name
+  for file_name in lister(opts.path) do
+    if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" and opts.validator(file_name) then
+      local file_path = opts.path .. file_name
       if isDir(file_path) then 
-        if include_dirs then
+        if opts.include_dirs then
           files[#files + 1] = file_path
         end
-        local shouldRecurse = recursion
-        if type(recursion) == "number" then
-          if recursion <= 0 then shouldRecurse = false end
+        local shouldRecurse = opts.recursion
+        if type(opts.recursion) == "number" then
+          if opts.recursion <= 0 then shouldRecurse = false end
         end
         if shouldRecurse then
-          local sub_files = getAllInPath(file_path, crementIfNumber(recursion, "de"), include_dirs, include_files, validator)
+          local sub_files = getAllInPath(file_path, crementIfNumber(opts.recursion, "de"), opts.include_dirs, opts.include_files, opts.validator)
           for _, sub_file in ipairs(sub_files) do
             files[#files + 1] = sub_file
           end
         end
       else
-        if include_files then
+        if opts.include_files then
           files[#files + 1] = file_path
         end
       end
     end
   end
+
+  if opts.slice_results then
+    files = pathSlice(files, opts.slice_results, opts.slice_results_opts) --[[ @as string[] ]]
+  end
+
   return files
 end
 
 
---- @type fun(path: string, recursive?: boolean, include_dirs?: boolean, include_files?: boolean): string[]
-getUserUsefulFilesInPath = bindNthArg(getAllInPath, 5, usefulFileValidator)
 
---- Imitates `ls`/`tree -i`, i.e. returns a list of all leaves in a directory (or subdirectories), without their paths
---- @param path string The path to the directory
---- @param recursive? boolean Whether to recurse into subdirectories
---- @param include_dirs? boolean Whether to include directories in the returned table
---- @param include_files? boolean Whether to include files in the returned table
---- @return string[] #A table of all things in the directory
-function getLeavesInPath(path, recursive, include_dirs, include_files)
-  local paths = getAllInPath(path, recursive, include_dirs, include_files)
-  return mapValueNewValue(paths, function(path)
-    return getLeafWithoutPath(path)
-  end)
-end
+--- @param opts getAllInPathOpts
+--- 
 
---- returns a list of all leaves in a directory (or subdirectories), without their paths or extensions
---- @param path string The path to the directory
---- @param recursive? boolean Whether to recurse into subdirectories
---- @param include_dirs? boolean Whether to include directories in the returned table
---- @param include_files? boolean Whether to include files in the returned table
---- @return string[] #A table of all things in the directory
-function getLeavesWithoutExtensionInPath(path, recursive, include_dirs, include_files)
-  local paths = getAllInPath(path, recursive, include_dirs, include_files)
-  return mapValueNewValue(paths, function(path)
-    return getLeafWithoutPathOrExtension(path)
-  end)
-end
 
 --- @param path string
 --- @param depth? integer
@@ -148,14 +132,6 @@ end
 --- @param include_dirs? boolean
 --- @param include_files? boolean
 --- @return string[]
-function getChildren(path, include_dirs, include_files)
-  return getAllInPath(path, false, include_dirs, include_files)
-end
-
---- @param path string
---- @param include_dirs? boolean
---- @param include_files? boolean
---- @return string[]
 function getOwnAndAncestorSiblings(path, include_dirs, include_files)
   local siblings = getSiblings(path, include_dirs, include_files)
   if path ~= "/" then
@@ -170,7 +146,7 @@ end
 --- @param include_dirs boolean
 --- @param include_files boolean
 --- @return string[]
-function getChildrenOwnAndAncestorSiblings(path, include_dirs, include_files)
+function getAllInPathOwnAndAncestorSiblings(path, include_dirs, include_files)
   local children = getAllInPath(path, false, include_dirs, include_files)
   local siblings_and_ancestor_siblings = getOwnAndAncestorSiblings(path, include_dirs, include_files)
   return listConcat(children, siblings_and_ancestor_siblings)
@@ -184,7 +160,7 @@ end
 function findInSiblingsOrAncestorSiblings(path, filename,  include_dirs, include_files)
   local siblings = getSiblings(path, include_dirs, include_files)
   local target_element = valueFind(siblings, function(path)
-    return getLeafWithoutPath(path) == filename
+    return pathSlice(path, "-1:-1")[1] == filename
   end)
   if target_element then
     return target_element

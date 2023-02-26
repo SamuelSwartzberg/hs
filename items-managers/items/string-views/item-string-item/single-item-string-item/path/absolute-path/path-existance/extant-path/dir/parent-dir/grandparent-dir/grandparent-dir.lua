@@ -4,14 +4,14 @@ GrandparentDirItemSpecifier = {
   properties = {
 
     getables = {
-      ["descendant-string-array"] = function(self) return CreateArray(getUserUsefulFilesInPath(self:get("contents"), true, true, true)) end,
+      ["descendant-string-array"] = function(self) return CreateArray(getAllInPath(self:get("contents"), true, true, true)) end,
       ["raw-descendant-string-array"] = function(self) return CreateArray(getAllInPath(self:get("contents"), true, true, true)) end,
       ["is-git-root-dir"] = function(self) 
         return self:get("raw-child-string-array"):get("some-pass", function(item) return stringy.endswith(item,".git") end)
       end,
       ["grandchildren-string-array"] = function(self)
         return self:get("child-string-array"):get("map-to-new-array", function(item)
-          return getUserUsefulFilesInPath(item, false, true, true)
+          return getAllInPath(item, false, true, true)
         end):get("flatten")
       end,
       ["all-git-roots"] = function(self)

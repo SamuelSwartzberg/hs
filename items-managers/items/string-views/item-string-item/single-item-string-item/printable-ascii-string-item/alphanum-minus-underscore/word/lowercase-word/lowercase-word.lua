@@ -5,7 +5,13 @@ LowercaseWordItemSpecifier = {
     getables = {
       ["is-pass-name"] = function(self)
         return valuesContain(
-          memoized.getLeavesWithoutExtensionInPath(env.MPASS, true, false, true),
+          memoized.getAllInPath({
+            path = env.MPASS,
+            recursion = true,
+            include_dirs = false,
+            slice_results = "-2:-2",
+            slice_results_opts = { ext_sep = true },
+          }),
           self:get("contents")
         )
       end,

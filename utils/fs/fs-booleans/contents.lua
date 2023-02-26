@@ -23,7 +23,7 @@ end
 --- @return boolean
 function dirIsEmpty(path)
   path = resolveTilde(path)
-  for _, file_name in ipairs(getChildren(path)) do
+  for _, file_name in ipairs(getAllInPath(path)) do
     if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" then
       return false
     end

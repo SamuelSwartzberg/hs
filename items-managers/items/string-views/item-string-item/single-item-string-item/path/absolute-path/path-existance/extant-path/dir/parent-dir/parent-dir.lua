@@ -5,7 +5,7 @@ ParentDirItemSpecifier = {
 
     getables = {
       ["child-string-array"] = function(self) 
-        return CreateArray(getUserUsefulFilesInPath(self:get("contents"), false, true, true)) 
+        return CreateArray(getAllInPath(self:get("contents"), false, true, true)) 
       end,
       ["find-child"] = function(self, func)
         return self:get("child-string-array"):get("find", func)
