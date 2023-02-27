@@ -21,7 +21,7 @@ function evalWithLocal(str, d)
   env.d = d
   return evaluateStringToValue(str, env)
 end
-evalEnv = bindNthArg(evaluateStringToValue, 2, env)
+evalEnv = bind(evaluateStringToValue, {["2"] = env})
 
 --- @param template string
 --- @return string

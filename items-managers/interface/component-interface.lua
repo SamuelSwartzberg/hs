@@ -227,20 +227,20 @@ InterfaceDefaultTemplate = {
           return interface:get("type") == interface_type
         end)
       end,
-      ["str-item"] = bindNthArg(
-        getThenUse, 3, function (_, contents)
+      ["str-item"] = bind(
+        getThenUse, {["3"] = function (_, contents)
           return CreateStringItem(contents)
-        end
+        end}
       ),
-      ["array"] = bindNthArg(
-        getThenUse, 3, function (_, contents)
+      ["array"] = bind(
+        getThenUse, {["3"] = function (_, contents)
           return CreateArray(contents)
-        end
+        end}
       ),
-      ["new-array-from-result-of-get"] = bindNthArg(
-        getThenUse, 3, function (_, contents)
+      ["new-array-from-result-of-get"] = bind(
+        getThenUse, {["3"] = function (_, contents)
           return CreateArray(contents)
-        end
+        end}
       ),
       ["get-interactive"] = function(self, specifier)
         specifier.action = "get"
@@ -289,25 +289,25 @@ InterfaceDefaultTemplate = {
       ["get-as-do"] = function(self, key)
         self:get(key)
       end,
-      ["copy-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(hs.pasteboard.setContents, 1)),
-      ["paste-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(pasteMultilineString, 1)),
-      ["open-result-of-get-in-browser"] = bindNthArg(getThenUse, 3, function(_, thing) open({url=thing}) end),
-      ["view-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(hs.alert.show, 1)),
-      ["open-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(runOpenCommand, 1)),
-      ["quick-look-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(hs.alert.show, 1)),
-      ["code-quick-look-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(alert, 1)),
-      ["choose-action-on-result-of-get"] = bindNthArg(getThenUse, 3, function(_, item)
+      ["copy-result-of-get"] = bind(getThenUse, { ["3"] = bind(hs.pasteboard.setContents, {["1"] = arg_ignore})}),
+      ["paste-result-of-get"] = bind(getThenUse, { ["3"] = bind(pasteMultilineString, {["1"] = arg_ignore})}),
+      ["open-result-of-get-in-browser"] = bind(getThenUse, { ["3"] = function(_, thing) open({url=thing}) end}),
+      ["view-result-of-get"] = bind(getThenUse, { ["3"] = bind(hs.alert.show, {["1"] = arg_ignore})}),
+      ["open-result-of-get"] = bind(getThenUse, { ["3"] = bind(runOpenCommand, {["1"] = arg_ignore})}),
+      ["quick-look-result-of-get"] = bind(getThenUse, { ["3"] = bind(hs.alert.show, {["1"] = arg_ignore})}),
+      ["code-quick-look-result-of-get"] = bind(getThenUse, { ["3"] = bind(alert, {["1"] = arg_ignore})}),
+      ["choose-action-on-result-of-get"] = bind(getThenUse, { ["3"] = function(_, item)
         item:doThis("choose-action")
-      end),
-      ["choose-action-on-str-item-result-of-get"] = bindNthArg(getThenUse, 3, function(_, item)
+      end}),
+      ["choose-action-on-str-item-result-of-get"] = bind(getThenUse, { ["3"] = function(_, item)
         CreateStringItem(item):doThis("choose-action")
-      end),
-      ["choose-item-and-then-action-on-result-of-get"] = bindNthArg(getThenUse, 3, function(_, item)
+      end}),
+      ["choose-item-and-then-action-on-result-of-get"] = bind(getThenUse, { ["3"] = function(_, item)
         item:doThis("choose-item-and-then-action")
-      end),
-      ["choose-item-or-action-on-result-of-get"] = bindNthArg(getThenUse, 3, function(_, item)
+      end}),
+      ["choose-item-or-action-on-result-of-get"] = bind(getThenUse, { ["3"] = function(_, item)
         item:doThis("choose-item-or-action")
-      end),
+      end}),
       ["repeat-action"] = function(self, specifier)
         for i = 1, specifier.limit + 1 do
           self:doThis(specifier.key, specifier.args)
@@ -350,7 +350,7 @@ InterfaceDefaultTemplate = {
     end
     return nil
   end,
-  get_all = bindNthArg(getOrDoAll, 2, "get"),
+  get_all = bind(getOrDoAll, {["2"] = "get"}),
   doThis = function(self, key, value, not_recursive_children, not_recursive_super, previous_lower_node_id)
     if self.properties.doThisables[key] then
       self.properties.doThisables[key](self, value)
@@ -367,7 +367,7 @@ InterfaceDefaultTemplate = {
     end
     return nil
   end,
-  doThis_all = bindNthArg(getOrDoAll, 2, "doThis"),
+  doThis_all = bind(getOrDoAll, {["2"] = "doThis"}),
   setContents = function(self, value)
     if not self.super then self.contents = value end
     if self.potential_interfaces then

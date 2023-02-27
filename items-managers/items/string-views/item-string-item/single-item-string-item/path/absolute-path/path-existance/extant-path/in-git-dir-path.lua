@@ -8,7 +8,7 @@ InGitDirPathItemSpecifier = {
         if self:get("is-git-root-dir") then return self:get("contents") end
         local dotgit = memoized.getItemsForAllLevelsInSlice(self:get("contents"), "1:-2", {
           include_files = false,
-          validator_result = bindNthArg(stringy.endswith, 2, "/.git")
+          validator_result = bind(stringy.endswith, {["2"] = "/.git"})
         })[1]
         print(dotgit)
         if not dotgit then

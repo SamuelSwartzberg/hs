@@ -1,0 +1,39 @@
+arg_ignore = rand({len = 20})
+
+--- @param func function
+--- @param arg_spec { [string]: any } | any
+--- @return function
+function bind(func, arg_spec)
+  if type(arg_spec) == "table" and not tableIsListOrEmpty(arg_spec) then
+    -- no-op
+  else 
+    arg_spec = { ["1"] = arg_spec }
+  end
+
+  local inner_func = func
+
+  for index, arg_list in pairs(arg_spec) do
+    local int_index = toNumber(index, "int", "fail")
+    if arg_list == arg_ignore then
+      inner_func = function(...)
+        local args = {...}
+        local new_args = listConcat(
+          slice(args, 1, int_index - 1),
+          slice(args, int_index + 1, #args)
+        )
+        return func(table.unpack(new_args))
+      end
+    else
+      if not tableIsListOrEmpty(arg_list) then
+        arg_list = { arg_list }
+      end
+      inner_func = function(...)
+        local args = {...}
+        local new_args = listSplice(args, arg_list, int_index)
+        return inner_func(table.unpack(new_args))
+      end
+    end
+  end
+
+  return inner_func
+end

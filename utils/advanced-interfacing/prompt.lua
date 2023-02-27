@@ -164,7 +164,7 @@ function prompt(type, prompt_spec, loop)
   prompt_spec.prompt_args = tablex.deepcopy(prompt_spec.prompt_args) or {}
   if type == "int" then
     prompt_spec = prompt_spec or {}
-    prompt_spec.transformer = prompt_spec.transformer or bindNthArg(toNumber, 2, "int")
+    prompt_spec.transformer = prompt_spec.transformer or bind(toNumber, {["2"] = "int"})
     prompt_spec.transformed_validator = prompt_spec.transformed_validator or function(x) return x ~= nil end 
   elseif type == "number" then
     prompt_spec.transformer = prompt_spec.transformer or tonumber
