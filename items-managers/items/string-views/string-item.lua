@@ -86,7 +86,7 @@ StringItemSpecifier = {
         end)
       end,
       ["evaluated-as-lua"] = function(self)
-        return evaluateStringToValue(self:get("contents"))
+        return singleLe(self:get("contents"))
       end,
       ["evaluated-as-bash"] = function(self)
         local parts = stringy.split(self:get("contents"), " ")
@@ -96,7 +96,7 @@ StringItemSpecifier = {
         return foldStr(self:get("contents"))
       end,
       ["template-evaluated-contents"] = function (self)
-        return luaTemplateEval(self:get("contents"))
+        return le(self:get("contents"))
       end,
       ["contents-romanized"] = function (self) return romanize(self:get("contents")) end,
       ["contents-as-romanized-snake-case-string"] = function(self)
@@ -140,7 +140,12 @@ StringItemSpecifier = {
         return CreateShellCommand("khal"):get("search-events-items", {searchstr = self:get("fold")})
       end,
       ["envsubst"] = function(self)
-        return envsubstShell(self:get("contents"))
+        return run({
+          "echo", 
+          {value = self:get("contents"), type = "quoted"},
+          "|",
+          "envsubst"
+        })
       end,
     },
     doThisables = {

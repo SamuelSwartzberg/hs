@@ -51,3 +51,10 @@ function returnSameNTimes(value, n)
   end
   return table.unpack(result)
 end
+
+--- @param ... any
+--- @return integer
+function returnNumArgs(...)
+  local args = {...}
+  return #args
+end

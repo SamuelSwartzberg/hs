@@ -18,7 +18,7 @@ function processSetupDirectivesInFiles(path)
       1,
       "down"
     )
-    local contents = stringy.strip(envsubstShell(readFile(child)))
+    local contents = run({ "envsubst", "<", child })
     for line in stringx.lines(contents) do
       line = stringy.strip(line)
       if not stringy.startswith(line, "#") then -- allow for simple comments

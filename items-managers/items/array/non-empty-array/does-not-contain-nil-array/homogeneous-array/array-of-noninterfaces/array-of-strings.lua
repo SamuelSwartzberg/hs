@@ -54,7 +54,7 @@ ArrayOfStringsSpecifier = {
         end)
       end,
       ["tab-fill-with"] = function(self)
-        local str = luaTemplateEval(
+        local str = le(
           stringx.join("\t", self:get("to-string-array"):get("contents"))
         )
         pasteMultilineString(str)
