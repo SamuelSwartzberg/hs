@@ -1,36 +1,3 @@
---- @generic O, T
---- @param func fun(...: T): `O`
---- @param arg_list `T`[]
---- @return fun(...: T): O
-function bindArgs(func, arg_list)
-  for _, arg in ipairs(arg_list) do
-    func = bindArg(func, arg)
-  end
-  return func
-end
-
---- @generic O, T
---- @param func fun(...: T): `O`
---- @param ... `T`
---- @return fun(...: T): O
-function bindArgsVararg(func, ...)
-  return bindArgs(func, {...})
-end
-
-
-
---- @generic O, T
---- @param func fun(...: T): `O`
---- @param n integer
---- @param arg_list `T`[]
---- @return fun(...: T): O
-function bindNthArgs(func, n, arg_list)
-  return function(...)
-    local args = {...}
-    local new_args = listSplice(args, arg_list, n)
-    return func(table.unpack(new_args))
-  end
-end
 
 --- @generic O, T
 --- @param func fun(...: T): `O`
@@ -41,15 +8,33 @@ function bindNthArg(func, n, arg)
   return bindNthArgs(func, n,  {arg})
 end
 
---- @generic T, U, V
---- @param func fun(...: U): `V`
---- @param key_list `T`[]
---- @param tbl {[T]: `U`}
---- @return V
-function keysAsArgs(func, key_list, tbl)
-  local arg_list = mapKeyNewKey(key_list, getValue)
-  return func(table.unpack(arg_list))
+--- @param func function
+--- @param arg_spec { [string]: any } | any
+--- @return function
+function bind(func, arg_spec)
+  if type(arg_spec) == "table" and not tableIsListOrEmpty(arg_spec) then
+    -- no-op
+  else 
+    arg_spec = { ["1"] = arg_spec }
+  end
+
+  local inner_func = func
+
+  for index, arg_list in pairs(arg_spec) do
+    if not tableIsListOrEmpty(arg_list) then
+      arg_list = { arg_list }
+    end
+    inner_func = function(...)
+      local args = {...}
+      local new_args = listSplice(args, arg_list, tonumber(index))
+      return inner_func(table.unpack(new_args))
+    end
+  end
+
+  return inner_func
 end
+
+
 
 --- @generic O, T
 --- @param func fun(...: `T`): `O`

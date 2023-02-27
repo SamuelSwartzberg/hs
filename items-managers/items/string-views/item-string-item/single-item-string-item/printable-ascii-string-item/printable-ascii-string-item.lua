@@ -56,7 +56,7 @@ PrintableAsciiStringItemSpecifier = {
         CreateShellCommand("pass"):doThis("add-username", {name = name, username = self:get("contents")})
       end,
       ["add-as-password-with-prompt-username"] = function(self, name)
-        local username = promptString("Username")
+        local username = prompt("string", "Username")
         local pass = CreateShellCommand("pass")
         pass:doThis("add-password", {name = name, password = self:get("contents")})
         pass:doThis("add-username", {name = name, username = username})

@@ -71,13 +71,13 @@ function toPatternSeparator(str, pattern, sep, mode)
 end
 
 --- @type fun(str: string): string
-toLowerAlphanumUnderscore = bindNthArgs(toPatternSeparator, 2, {"%w%d", "_", "lower"})
+toLowerAlphanumUnderscore = bind(toPatternSeparator, {["2"] = {"%w%d", "_", "lower"}})
 --- @type fun(str: string): string
-toLowerAlphanumMinus = bindNthArgs(toPatternSeparator, 2, {"%w%d", "-", "lower"})
+toLowerAlphanumMinus = bind(toPatternSeparator, {["2"] = {"%w%d", "-", "lower"}})
 --- @type fun(str: string): string
-toUpperAlphanumUnderscore = bindNthArgs(toPatternSeparator, 2, {"%w%d", "_", "upper"})
+toUpperAlphanumUnderscore = bind(toPatternSeparator, {["2"] = {"%w%d", "_", "upper"}})
 --- @type fun(str: string): string
-toUpperAlphanumMinus = bindNthArgs(toPatternSeparator, 2, {"%w%d", "-", "upper"})
+toUpperAlphanumMinus = bind(toPatternSeparator, {["2"] = {"%w%d", "-", "upper"}})
 
 --- @param str string
 --- @return string

@@ -3,7 +3,7 @@ ArrayOfUrlsSpecifier = {
   type = "array-of-urls",
   properties = {
     getables = {
-      ["is-array-of-urls-by-host"] = bindNthArg(isArrayOfInterfacesOfType, 2, "url-by-host"),
+      ["is-array-of-urls-by-host"] = bind(isArrayOfInterfacesOfType, { ["2"] = "url-by-host" }),
     },
     doThisables = {
       ["create-session"] = function(self, session_name)

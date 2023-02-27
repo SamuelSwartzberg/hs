@@ -12,8 +12,8 @@ ArrayOfPlaintextFilesSpecifier = {
       ["map-to-line-array-of-file-contents-with-no-empty-strings"] = function(self)
         return self:get("map-to-array-of-contents"):get("to-resplit-string-array-assume-sep-no-empty-strings", "\n")
       end,
-      ["is-array-of-plaintext-dictionary-files"] = bindNthArg(isArrayOfInterfacesOfType, 2, "plaintext-dictionary-file"),
-      ["is-array-of-email-files"] = bindNthArg(isArrayOfInterfacesOfType, 2, "email-file"),
+      ["is-array-of-plaintext-dictionary-files"] = bind(isArrayOfInterfacesOfType, { ["2"] = "plaintext-dictionary-file" }),
+      ["is-array-of-email-files"] = bind(isArrayOfInterfacesOfType, { ["2"] = "email-file" }),
     },
     doThisables = {
       ["choose-file-and-tab-fill-with-items"] = function(self, item_sep)

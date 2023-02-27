@@ -213,9 +213,6 @@ DateSpecifier = {
           do_after(self:get("to-given-format", format))
         end)
       end,
-      ["choose-format-and-copy"] = function(self)
-        self:doThis("choose-format", copyAndView)
-      end,
       ["choose-format-and-action"] = function(self)
         self:doThis("choose-format", function(format)
           CreateStringItem(format):doThis("choose-action")
@@ -254,10 +251,6 @@ DateSpecifier = {
   },
   
   action_table = listConcat({
-    {
-      text = "👉📏📋 cfmtcp.",
-      key = "choose-format-and-copy"
-    },
     {
       text = "👉📏 cfmt.",
       key = "choose-format-and-action"

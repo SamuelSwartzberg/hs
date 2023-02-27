@@ -239,7 +239,7 @@ StringItemSpecifier = {
       key = "do-interactive",
       args = {
         thing = {
-          func = "chooseDirAndCreateSubdirsAndFiles",
+          func = "promptPathChildren",
           args = env.MSNIPPETS
         },
         key = "write-to-file"

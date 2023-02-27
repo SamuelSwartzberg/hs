@@ -3,10 +3,10 @@ ArrayOfExtantPathsSpecifier = {
   type = "array-of-extant-paths",
   properties = {
     getables = {
-      ["is-array-of-dirs"] = bindNthArg(isArrayOfInterfacesOfType, 2, "dir"),
-      ["is-array-of-files"] = bindNthArg(isArrayOfInterfacesOfType, 2, "file"),
-      ["is-array-of-dated-extant-paths"] = bindNthArg(isArrayOfInterfacesOfType, 2, "dated-extant-path"),
-      ["is-array-of-in-git-dir-path-items"] = bindNthArg(isArrayOfInterfacesOfType, 2, "in-git-dir-path-item"),
+      ["is-array-of-dirs"] = bind(isArrayOfInterfacesOfType, { ["2"] = "dir" }),
+      ["is-array-of-files"] = bind(isArrayOfInterfacesOfType, { ["2"] = "file" }),
+      ["is-array-of-dated-extant-paths"] = bind(isArrayOfInterfacesOfType, { ["2"] = "dated-extant-path" }),
+      ["is-array-of-in-git-dir-path-items"] = bind(isArrayOfInterfacesOfType, { ["2"] = "in-git-dir-path-item" }),
       ["filter-to-array-of-dirs"] = function(self)
         return self:get("filter-to-array-of-type", "dir")
       end,

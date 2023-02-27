@@ -12,7 +12,7 @@ MightBeBibItemSpecifier = {
     },
     doThisables = {
       ["save-as-citation-file"] = function(self)
-        local path = chooseDirAndPotentiallyCreateSubdirs(env.MCITATIONS)
+        local path = promptPathChildren(env.MCITATIONS)
         if path then
           local filename = self:get("to-citable-object-id"):get("to-bib-filename")
           local bibtex = self:get("contents")

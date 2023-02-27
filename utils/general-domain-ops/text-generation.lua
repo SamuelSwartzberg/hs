@@ -28,7 +28,7 @@ function generateDummyText(opts, do_after)
   ai_request_str = ai_request_str .. "."
   local ai_request = string.format(ai_request_str, opts.amount)
   print(ai_request)
-  makeSimpleGPT3Request(ai_request, do_after)
+  gpt3Request(ai_request, do_after)
 end
 
 local thing_formulation_map = {
@@ -44,5 +44,5 @@ function generateList(opts, do_after)
     formulation = formulation:format(opts.forwhat)
   end
   local ai_request_str = ("Generate a list of %d %s in the format <item>\\n<item>\\n..."):format(opts.amount, formulation)
-  makeSimpleGPT3Request(ai_request_str, do_after)
+  gpt3Request(ai_request_str, do_after)
 end

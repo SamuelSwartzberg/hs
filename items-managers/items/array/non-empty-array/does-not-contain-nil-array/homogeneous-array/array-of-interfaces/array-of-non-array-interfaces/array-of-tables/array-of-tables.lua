@@ -2,7 +2,7 @@ ArrayOfTablesSpecifier = {
   type = "array-of-tables",
   properties = {
     getables = {
-      ["is-array-of-non-empty-tables"] = bindNthArgs(isArrayOfInterfacesOfType, 2, "non-empty-table"),
+      ["is-array-of-non-empty-tables"] = bind(isArrayOfInterfacesOfType, {["2"] = "non-empty-table"}),
     },
     doThisables = {
       

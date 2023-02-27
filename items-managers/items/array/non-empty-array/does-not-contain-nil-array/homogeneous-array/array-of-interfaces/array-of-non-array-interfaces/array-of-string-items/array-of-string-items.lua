@@ -29,9 +29,9 @@ ArrayOfStringItemsSpecifier = {
       ["map-prepend-all"] = function(self, prefix)
         return self:get("to-string-array"):get("map-to-new-array", function(item) return prefix .. item end)
       end,
-      ["is-array-of-urls"] = bindNthArg(isArrayOfInterfacesOfType, 2, "url"),
-      ["is-array-of-paths"] = bindNthArg(isArrayOfInterfacesOfType, 2, "path"),
-      ["is-array-of-printable-ascii-string-items"] = bindNthArg(isArrayOfInterfacesOfType, 2, "printable-ascii-string-item"),
+      ["is-array-of-urls"] = bind(isArrayOfInterfacesOfType, { ["2"] = "url" }),
+      ["is-array-of-paths"] = bind(isArrayOfInterfacesOfType, { ["2"] = "path" }),
+      ["is-array-of-printable-ascii-string-items"] = bind(isArrayOfInterfacesOfType, { ["2"] = "printable-ascii-string-item" }),
     },
     doThisables = {
       ["tab-fill-with"] = function(self)

@@ -1,26 +1,6 @@
 
 
---- @param text_content string
---- @param do_after fun(result: string): nil
---- @param opts? { model?: string, max_tokens?: integer, temperature?: number, echo?: boolean }
-function makeSimpleGPT3Request(text_content, do_after, opts)
-  local request = mergeAssocArrRecursive({
-    model = "text-davinci-003",
-    max_tokens = 300,
-    temperature = 0.7,
-    echo = false,
-  }, opts or {})
-  request.prompt = text_content
-  makeSimpleRESTApiRequest({
-    url = "https://api.openai.com/v1/completions",
-    request_table = request,
-    api_key = env.OPENAI_API_KEY
-  },
-  function(result)
-    do_after(stringy.strip(result.choices[1].text))
-  end
-  )
-end
+
 
 --- @param string_opts string
 function dummyTxt(string_opts)
@@ -46,7 +26,7 @@ function fillTemplateFromFieldsWithAI(opts, do_after)
   end
   ai_request_str = ai_request_str .. "\nIf there seems to be no data for a field, just leave it blank.\n\n"
 
-  makeSimpleGPT3Request(ai_request_str, function (result)
+  gpt3Request(ai_request_str, function (result)
     local out_fields = {}
     for _, field in ipairs(opts.out_fields) do
       local field_value = string.match(result, field.value .. "[^\n]-: *(.-)\n") or string.match(result, field.value .. "[^\n]-: *(.-)$")

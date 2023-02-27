@@ -3,7 +3,7 @@ ArrayOfUrlsByHostSpecifier = {
   type = "array-of-urls-by-host",
   properties = {
     getables = {
-      ["is-array-of-youtubes"] = bindNthArg(isArrayOfInterfacesOfType, 2, "youtube"),
+      ["is-array-of-youtubes"] = bind(isArrayOfInterfacesOfType, { ["2"] = "youtube" }),
     },
     doThisables = {
     },

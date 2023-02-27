@@ -3,7 +3,7 @@ ArrayOfYoutubesSpecifier = {
   type = "array-of-youtubes",
   properties = {
     getables = {
-      ["is-array-of-youtube-playable-items"] = bindNthArg(isArrayOfInterfacesOfType, 2, "youtube-playable-item"),
+      ["is-array-of-youtube-playable-items"] = bind(isArrayOfInterfacesOfType, { ["2"] = "youtube-playable-item" }),
     },
     doThisables = {
     },

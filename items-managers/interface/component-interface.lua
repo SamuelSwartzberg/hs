@@ -51,9 +51,9 @@ local function singleInteractiveFunc(self, thing)
   if type(thing) == "string" then
     if stringy.startswith(thing, "path_from:") then
       local start = eutf8.sub(thing, 11)
-      return promptPath(start)
+      return prompt("path", start)
     else 
-      return promptString("Enter value for " .. thing)
+      return prompt("string", "Enter value for " .. thing)
     end
   elseif type(thing) == "table" and thing.func then -- we can't use functions directly since hs.chooser can't serialize them and doesn't like unserializable things
     return _G[thing.func](thing.args)
@@ -295,7 +295,7 @@ InterfaceDefaultTemplate = {
       ["view-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(hs.alert.show, 1)),
       ["open-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(runOpenCommand, 1)),
       ["quick-look-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(hs.alert.show, 1)),
-      ["code-quick-look-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(alertCode, 1)),
+      ["code-quick-look-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(alert, 1)),
       ["choose-action-on-result-of-get"] = bindNthArg(getThenUse, 3, function(_, item)
         item:doThis("choose-action")
       end),
@@ -308,11 +308,6 @@ InterfaceDefaultTemplate = {
       ["choose-item-or-action-on-result-of-get"] = bindNthArg(getThenUse, 3, function(_, item)
         item:doThis("choose-item-or-action")
       end),
-      ["copy-and-view-result-of-get"] = function(self, do_specifier)
-        getThenUse(self, do_specifier, function(_, result)
-          copyAndView(result)
-        end)
-      end,
       ["repeat-action"] = function(self, specifier)
         for i = 1, specifier.limit + 1 do
           self:doThis(specifier.key, specifier.args)

@@ -3,8 +3,8 @@ ArrayOfPathsSpecifier = {
   type = "array-of-paths",
   properties = {
     getables = {
-      ["is-array-of-absolute-paths"] = bindNthArg(isArrayOfInterfacesOfType, 2, "absolute-path"),
-      ["is-array-of-path-leafs"] = bindNthArg(isArrayOfInterfacesOfType, 2, "path-leaf"),
+      ["is-array-of-absolute-paths"] = bind(isArrayOfInterfacesOfType, { ["2"] = "absolute-path" }),
+      ["is-array-of-path-leafs"] = bind(isArrayOfInterfacesOfType, { ["2"] = "path-leaf" }),
       ["filter-to-array-of-path-leafs-with-tag-name"] = function(self, name)
         return self:get("filter-to-new-array", function(path)
           return path:get("has-tag-name", name)

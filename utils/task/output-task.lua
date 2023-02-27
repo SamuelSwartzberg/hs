@@ -134,7 +134,7 @@ function runHsTaskQuickLookResult(command_parts)
       "\n\nstdout:\n\n````\n" .. std_out ..
       "\n```\n\nstderr:\n\n```\n" .. std_err
       .. "\n```"
-    alertCode(outstr)
+    alert(outstr)
   end)
 end
 

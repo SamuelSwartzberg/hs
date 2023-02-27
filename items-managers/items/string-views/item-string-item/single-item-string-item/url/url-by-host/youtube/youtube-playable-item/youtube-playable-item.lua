@@ -174,14 +174,22 @@ YoutubePlayableItemItemSpecifier = {
         local specifier = {}
         local edited_tags = {}
         for k, v in pairs(deduced_tags) do
-          local new_v = promptUserToEditValue(v, k)
+          local new_v = prompt("string", {
+            prompt_args = {
+              prompt = "Confirm value for " .. k,
+              default = v
+            },
+          })
           if new_v ~= nil then
             edited_tags[k] = new_v
           end
         end
         specifier.tag = mergeAssocArrRecursive(edited_tags, promptUserToAddNKeyValuePairs("tag"))
 ---@diagnostic disable-next-line: param-type-mismatch
-        specifier.path  = chooseDirAndPotentiallyCreateSubdir(env.MAUDIOVISUAL, specifier.tag.srs or specifier.tag.tcrea)
+        specifier.path  = promptPipeline({
+          {"dir", {prompt_args = {default = env.MAUDIOVISUAL}}},
+          {"string-path", {prompt_args = {message = "Subdirectory name", default = specifier.tag.srs or specifier.tag.tcrea }}},
+        })
         specifier.extension = "m3u"
         local path_string = CreatePathLeafParts(specifier):get("str-item", "path-leaf-parts-as-string")
         path_string:doThis("create-file", self:get("contents"))

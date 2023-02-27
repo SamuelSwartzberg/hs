@@ -169,7 +169,7 @@ local keymap = {
       CreateTable(searches)
         :doThis("choose-item", function(val)
           local true_val = getLast(stringy.split(val, " ")) -- ignore all the `magrep -i` or `mpick -t` stuff, that's just for user comprehension
-          true_val = string.format(true_val, promptString("Search for: "))
+          true_val = string.format(true_val, prompt("string", "Search for: "))
           local results
           if stringy.startswith(val, "magrep") then
             results = getSortedEmailPaths(env.MBSYNC_ARCHIVE, true, true_val)
@@ -308,7 +308,7 @@ local keymap = {
   ["`"] = {
     explanation = "Choose an action on a user-entered string",
     fn = function()
-      local res = promptString("String to act on")
+      local res = prompt("string", "String to act on")
       if res then 
         CreateStringItem(res):doThis("choose-action")
       end
@@ -414,7 +414,7 @@ System:get("manager", "watcher"):doThis("register-all", {
 System:get("manager", "timer"):doThis("register-all", {
   bindArg(runHsTask, {"newsboat", "-x", "reload"}),
   syncVdirSyncer,
-  bindArgsVararg(syncHomeRelativePath, "me/state/todo", "push"),
+  bind(syncHomeRelativePath, {"me/state/todo", "push"}),
   CreateStringItem(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
@@ -438,8 +438,5 @@ System:get("manager", "task"):doThis("register-all", {
 })
 
 processSetupDirectivesInFiles(env.MACTABLE_PATHS)
-
-GlobalChordManager = createGlobalChordManager()
-AnkiChordManager = GlobalChordManager:createChordManager({ "cmd", "shift" }, ";")
 
 hs.alert.show("Config loaded")

@@ -92,10 +92,10 @@ DirItemSpecifier = {
         }
       end,
       ["related-path-gui"] = function(self)
-        return CreateStringItem(promptSingleDir(self:get("contents")))
+        return CreateStringItem(prompt("dir", self:get("contents")))
       end,
       ["related-path-with-subdirs-gui"] = function(self)
-        return CreateStringItem(chooseDirAndPotentiallyCreateSubdirs(self:get("contents") .. "/"))
+        return CreateStringItem(promptPathChildren(self:get("contents") .. "/"))
       end,
       ["ls"] = function (self)
         return run({"ls", "-F", "-1", { value = self:get("contents"), type = "quoted" }})

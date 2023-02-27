@@ -3,8 +3,8 @@ ArrayOfAbsolutePathsSpecifier = {
   type = "array-of-absolute-paths",
   properties = {
     getables = {
-      ["is-array-of-volumes"] = bindNthArg(isArrayOfInterfacesOfType, 2, "volume"),
-      ["is-array-of-extant-paths"] = bindNthArg(isArrayOfInterfacesOfType, 2, "extant-path"),
+      ["is-array-of-volumes"] = bind(isArrayOfInterfacesOfType, { ["2"] = "volume" }),
+      ["is-array-of-extant-paths"] = bind(isArrayOfInterfacesOfType, { ["2"] = "extant-path" }),
       ["common-ancestor"]  = function(self)
         return lolCommonPrefix(mapValueNewValue(self:get("to-string-array"), pathSlice))
       end,
