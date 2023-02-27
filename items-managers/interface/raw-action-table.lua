@@ -38,7 +38,7 @@ function getSearchEngineActionTable(search_engines)
   local res = {}
   for _, search_engine in ipairs(search_engines) do
     res[#res + 1] = {
-      text = string.format("%s🔎 s%s.", search_engine.emoji_icon, getShortForm(search_engine.name)),
+      text = string.format("%s🔎 s%s.", search_engine.emoji_icon, search_engine.short),
       key = "search-with",
       args = search_engine.name
     }

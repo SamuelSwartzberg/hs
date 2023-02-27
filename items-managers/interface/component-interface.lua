@@ -291,7 +291,7 @@ InterfaceDefaultTemplate = {
       end,
       ["copy-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(hs.pasteboard.setContents, 1)),
       ["paste-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(pasteMultilineString, 1)),
-      ["open-result-of-get-in-browser"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(openInBrowser, 1)),
+      ["open-result-of-get-in-browser"] = bindNthArg(getThenUse, 3, function(_, thing) open({url=thing}) end),
       ["view-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(hs.alert.show, 1)),
       ["open-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(runOpenCommand, 1)),
       ["quick-look-result-of-get"] = bindNthArg(getThenUse, 3, ignoreFirstNArgs(hs.alert.show, 1)),

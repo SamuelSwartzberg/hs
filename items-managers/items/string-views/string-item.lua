@@ -171,7 +171,14 @@ StringItemSpecifier = {
         runHsTaskQuickLookResult(parts)
       end,
       ["search-with"] = function(self, search_engine)
-        searchWith(self:get("fold"), search_engine)
+        open(
+          string.format(
+            self:get('fold'), 
+            urlencode(
+              g_search_engines[search_engine].url, g_search_engines[search_engine].spaces_percent
+            )
+          )
+        )
       end,
       ["open-in-vscode"] = function(self)
         open({contents = self:get("contents")})
@@ -341,80 +348,7 @@ StringItemSpecifier = {
       key = "to-title-case"
     }
   }),
-  getSearchEngineActionTable({
-    {
-      name = "jisho",
-      emoji_icon = "🟩", -- the color of jisho's logo/favicon
-    },
-    {
-      name = "wiktionary",
-      emoji_icon = "⬜️"
-    },
-    {
-      name = "wikipedia",
-      emoji_icon = "🏐" -- trying to imitate the wikipedia logo
-    },
-    {
-      name = "youtube",
-      emoji_icon = "🟥▶️" -- trying to imitate the youtube logo
-    },
-    {
-      name = "glottopedia",
-      emoji_icon = "🟧" -- the color of the glottopedia logo
-    },
-    {
-      name = "ruby-apidoc",
-      emoji_icon = "🔴"
-    },
-    {
-      name = "python-docs",
-      emoji_icon = "🐍"
-    },
-    {
-      name = "merriam-webster",
-      emoji_icon = "🆎" -- kinda might look like the merriam-webster logo if you squint hard enough
-    },
-    {
-      name = "dict-cc",
-      emoji_icon = "📙"
-    },
-    {
-      name = "deepl-en-ja",
-      emoji_icon = "🟦🇺🇸🇯🇵"
-    },
-    {
-      name = "deepl-de-en",
-      emoji_icon = "🟦🇩🇪🇺🇸"
-    },
-    {
-      name = "mdn",
-      emoji_icon = "🦊"
-    },
-    {
-      name = "libgen",
-      emoji_icon = "⛴"
-    },
-    {
-      name = "danbooru",
-      emoji_icon = "🟫"
-    },
-    {
-      name = "google-scholar",
-      emoji_icon = "🏳️‍🌈🎓"
-    },
-    {
-      name = "semantic-scholar",
-      emoji_icon = "👩‍🔧🎓"
-    },
-    {
-      name = "google-images",
-      emoji_icon = "🏳️‍🌈🖼"
-    },
-    {
-      name = "google-maps",
-      emoji_icon = "🏳️‍🌈🗺"
-    }
-  }))
+  getSearchEngineActionTable(g_search_engines))
 }
 
 --- @type BoundRootInitializeInterface

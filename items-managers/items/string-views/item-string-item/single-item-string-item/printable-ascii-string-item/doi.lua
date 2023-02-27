@@ -12,12 +12,6 @@ DoiItemSpecifier = {
   potential_interfaces = ovtable.init({
     { key = "citable-object-id", value = CreateCitableObjectIdItem },
   }),
-  action_table = getSearchEngineActionTable(
-    {
-      name = "scihub",
-      emoji_icon = "🦅" -- actually, scihub's logo is a raven, but tfw no raven emoji
-    }
-  )
 
 }
 
