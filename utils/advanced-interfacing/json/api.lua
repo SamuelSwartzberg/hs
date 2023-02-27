@@ -57,5 +57,5 @@ function makeSimpleRESTApiRequest(specifier, do_after)
     })
   end
   
-  return runJSONMessage(curl_args, do_after)
+  return runJSON(curl_args, do_after)
 end

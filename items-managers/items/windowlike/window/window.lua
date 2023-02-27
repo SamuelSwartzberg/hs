@@ -124,19 +124,7 @@ WindowItemSpecifier = {
         hs.eventtap.leftClick(click_point)
       end,
       ["click-series"] = function (self, specifier_list)
-        local points = { "tl", "tr", "bl", "br", "c" }
-        forEach(specifier_list, function(_, specifier)
-          for _, point in ipairs(points) do
-            if specifier[point] then
-              specifier.target_point = self:get("point-with-offset-from", {
-                from = point,
-                delta = specifier[point]
-              })
-              break
-            end
-          end
-        end)
-        doMouseSeries({specifier_list = specifier_list})
+        doSeries(specifier_list)
       end,
       ["scroll-relative-to"] = function (self, specifier)
         local scroll_point = self:get("point-with-offset-from", specifier)

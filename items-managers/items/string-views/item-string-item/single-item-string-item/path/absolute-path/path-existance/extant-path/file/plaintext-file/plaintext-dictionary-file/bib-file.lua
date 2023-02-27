@@ -6,7 +6,7 @@ BibFileItemSpecifier = {
   properties = {
     getables = {
       ["parse-to-lua-table"] = function(self)
-        return runJSONMessage({
+        return runJSON({
           "citation-js",
           "--input",
           {

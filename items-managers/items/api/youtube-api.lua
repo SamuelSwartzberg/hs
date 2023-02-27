@@ -12,7 +12,7 @@ YoutubeApiItemSpecifier = {
     getables = {
       ["access-token"] = function() return nil end, -- todo
       ["refreshed-tokens"] = function(self)
-        local json_output = runJSONMessage({
+        local json_output = runJSON({
           "curl",
           "--request", "POST",
           "--data", { 

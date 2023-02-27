@@ -85,14 +85,21 @@ FacebookItemSpecifier = {
                 position = {1,1}
               })
               ff_window:doThis("click-series", { 
-                { mode = "moveandclick", c = { x = -100, y = -410} }, -- format open
-                { mode = "moveandclick", c = { x = -100, y = -310} }, -- format select
-                { mode = "moveandclick", c = { x = -100, y = -270} }, -- date open
-                { mode = "moveandclick", c = { x = -100, y = -200} }, -- date select
-                { mode = "moveandclick", tr = { x = -80, y = 690} }, -- deselect all
-                { mode = "moveandclick", tr = { x = -63, y = 945} }, -- select messages
+                "-100x-410 %c", -- format open
+                ".",
+                "-100x-310 %c", -- format select
+                ".",
+                "-100x-270 %c", -- date open
+                ".",
+                "-100x-200 %c", -- date select
+                ".",
+                "-80x690 %tr", -- deselect all
+                ".",
+                "-63x945 %tr", -- select messages
+                ".",
                 { mode = "scroll", target_point = {x = 0, y = -4000}, duration = 2.5 }, -- scroll to end of page
-                { mode = "moveandclick", tl = { x = 530, y = 1548} } -- export button
+                "530x1548 %l", -- export button
+                ".",
               })
               do_after()
             end)

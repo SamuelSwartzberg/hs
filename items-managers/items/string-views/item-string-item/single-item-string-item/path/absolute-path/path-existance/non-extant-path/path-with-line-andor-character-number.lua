@@ -19,11 +19,11 @@ PathWithLineAndorCharacterNumberItemSpecifier = {
            { value = "Visual Studio Code", type = "quoted" },
           { value = self:get("path-part"), type = "quoted" }
         }, function ()
-          doKeyboardSeries({ specifier_list = {
-            { modifiers = { "ctrl" }, text = "g" },
-            { text = self:get("number-part") },
-            { modifiers = {}, text = "return" },
-          }})
+          doSeries( {
+            ":ctrl+g",
+            { keys = {self:get("number-part")} },
+            ":+return",
+          })
         end)
       end
     },
