@@ -8,7 +8,7 @@ PathLeafTagsSpecifier = {
         return leaf_without_extension:match("^[^%%]*(%%.*)$") or ""
       end,
       ["tag-string-inner-list"] = function (self)
-        return memoized.stringySplitFiltered(self:get("path-leaf-tags"), "%")
+        return memoize(stringySplitFiltered)(self:get("path-leaf-tags"), "%")
       end,
       ["tag-raw-value-map"] = function (self)
         local tag_string_inner_list = self:get("tag-string-inner-list")

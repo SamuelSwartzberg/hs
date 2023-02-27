@@ -6,7 +6,7 @@ ImageFileItemSpecifier = {
   properties = {
     getables = {
       ["as-hs-image"] = function(self)
-        return memoized.imageFromPath(self:get("contents"))
+        return memoize(hs.image.imageFromPath)(self:get("contents"))
       end,
       ["chooser-image"] = function(self)
         return self:get("as-hs-image")

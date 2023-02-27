@@ -9,7 +9,9 @@ assertTable(
   {}
 )
 
-local returnTrueFsMemoized = fsmemoize(returnTrue, "returnTrue")
+local returnTrueFsMemoized = memoize(returnTrue, {
+  mode = "fs"
+})
 returnTrueFsMemoized()
 
 assertMessage(
@@ -17,7 +19,9 @@ assertMessage(
   returnTrue()
 )
 
-local returnSameFsMemoized = fsmemoize(returnSame, "returnSame")
+local returnSameFsMemoized = memoize(returnSame, {
+  mode = "fs"
+})
 returnSameFsMemoized(1)
 
 assertMessage(
@@ -41,7 +45,9 @@ assertTable(
   }
 )
 
-local returnSameNTimesFsMemoized = fsmemoize(returnSameNTimes, "returnSameNTimes")
+local returnSameNTimesFsMemoized = memoize(returnSameNTimes, {
+  mode = "fs"
+})
 returnSameNTimesFsMemoized("a", 3)
 
 assertValuesContainExactly(

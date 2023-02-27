@@ -4,7 +4,7 @@ URLItemSpecifier = {
   properties = {
     getables = {
       ["parsed-url"] = function(self)
-        return memoized.parseGuessScheme(self:get("contents"))
+        return memoize(parseGuessScheme)(self:get("contents"))
       end,
       ["url-scheme"] = function(self) return self:get("parsed-url").scheme end,
       ["url-host"] = function(self) return self:get("parsed-url").host end,
@@ -33,7 +33,7 @@ URLItemSpecifier = {
         return self:get("url-path")
       end,
       ["by-selector"] = function(self, specifier)
-        return memoized.querySelector(self:get("contents"), specifier.selector, specifier.only_text)
+        return memoize(querySelector)(self:get("contents"), specifier.selector, specifier.only_text)
       end,
       ["text-by-selector"] = function(self, selector)
         return self:get("by-selector", {

@@ -7,7 +7,7 @@ WindowlikeItemSpecifier = {
         return CreateRunningApplicationItem(self:get("running-application"))
       end,
       ["application-icon"] = function(self)
-        return memoized.imageFromAppBundle(self:get("running-application"):bundleID())
+        return memoize(hs.image.imageFromAppBundle)(self:get("running-application"):bundleID())
       end,
       ["chooser-image"] = function(self)
         return self:get("application-icon")

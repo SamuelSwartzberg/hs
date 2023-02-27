@@ -13,17 +13,17 @@ MullvadCommandSpecifier = {
         return stringy.startswith(self:get("status"),"Connected")
       end,
       ["relay-list-raw-string"] = function(self)
-        return stringy.strip(memoized.getOutputArgs(
+        return stringy.strip(memoize(getOutputArgs)(
           "mullvad",
           "relay",
           "list"
         ))
       end,
       ["relay-list-raw-table"] = function(self)
-        return memoized.parseRelayTable(self:get("relay-list-raw-string"))
+        return memoize(parseRelayTable)(self:get("relay-list-raw-string"))
       end,
       ["flat-relay-array"] = function(self)
-        return CreateArray(memoized.collectLeaves(self:get("relay-list-raw-table")))
+        return CreateArray(memoize(collectLeaves)(self:get("relay-list-raw-table")))
       end,
               
     },

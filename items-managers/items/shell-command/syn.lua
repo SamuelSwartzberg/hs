@@ -4,7 +4,7 @@ SynCommandSpecifier = {
   properties = {
     getables = {
       ["synonyms-raw"] = function(self, str)
-        return memoized.run({
+        return memoize(run)({
           "syn",
           "-p",
           {

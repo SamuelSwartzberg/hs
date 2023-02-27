@@ -4,7 +4,7 @@ KhardCommandSpecifier = {
   properties = {
     getables = {
       ["khard-list"] = function(self)
-        return stringy.strip(memoized.getOutputArgs(
+        return stringy.strip(memoize(getOutputArgs)(
           "khard", "list", "--parsable"
         ))
       end,
@@ -27,10 +27,10 @@ KhardCommandSpecifier = {
       end,
       
       ["show-contact"] = function(self, uid)
-        return memoized.getOutputArgs( "khard", "show", "--format=yaml", "uid:" .. uid )
+        return memoize(getOutputArgs)( "khard", "show", "--format=yaml", "uid:" .. uid )
       end,
       ["find-contact"] = function(self, searchstr)
-        return memoized.getOutputArgs( "khard", "show", "--format=yaml", searchstr )
+        return memoize(getOutputArgs)( "khard", "show", "--format=yaml", searchstr )
       end,
       ["is-contact"] = function(self, uuid)
         local _, status = self:get("show-contact", uuid)

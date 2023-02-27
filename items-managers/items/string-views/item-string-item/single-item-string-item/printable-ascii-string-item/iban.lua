@@ -10,7 +10,7 @@ IbanItemSpecifier = {
     },
     doThisables = {
       ["get-iban-api-data"] = function(self, do_after)
-        fsmemoizedasync.makeSimpleRESTApiRequest({
+        memoize(makeSimpleRESTApiRequest, {mode="fs"})({
           host = "https://openiban.com/",
           endpoint = "validate/" .. self:get("cleaned-iban"),
           params = { getBIC = "true" },

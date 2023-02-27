@@ -41,10 +41,10 @@ PathLeafSpecifier = {
 
       ["is-path-leaf-date"] = function(self)
         local path_leaf =  self:get("path-leaf")
-        if not memoized.onigMatch(path_leaf,"^\\d") then return false end 
-        local date_part = memoized.stringxSplit(path_leaf, "--")[1]
-        local parts = memoized.stringxSplit(date_part, "_to_")
-        return memoized.isRFC3339Datelike(parts[1]) and (not parts[2] or memoized.isRFC3339Datelike(parts[2]))
+        if not memoize(onigMatch)(path_leaf,"^\\d") then return false end 
+        local date_part = memoize(stringxSplit)(path_leaf, "--")[1]
+        local parts = memoize(stringxSplit)(date_part, "_to_")
+        return memoize(isRFC3339Datelike)(parts[1]) and (not parts[2] or memoize(isRFC3339Datelike)(parts[2]))
       end,
       ["is-path-leaf-general-name"] = function(self) 
         local path_leaf =  self:get("path-leaf")

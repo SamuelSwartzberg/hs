@@ -45,7 +45,7 @@ RunningApplicationItemSpecifier = {
         return self:get("contents"):getMenuItems()
       end,
       ["menu-item-array"] = function(self)
-        return memoized.getMenuItemList(self:get("name"))
+        return memoize(getMenuItemList)(self:get("name"))
       end,
       ["name"] = function (self)
         return self:get("contents"):name()
@@ -67,7 +67,7 @@ RunningApplicationItemSpecifier = {
           )
       end,
       ["application-icon"] = function(self)
-        return memoized.imageFromAppBundle(self:get("contents"):bundleID())
+        return memoize(hs.image.imageFromAppBundle)(self:get("contents"):bundleID())
       end,
       
       

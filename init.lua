@@ -270,9 +270,7 @@ local keymap = {
   ["'"] = {
     explanation = "Choose a citation item, and then choose an action on it.",
     fn = function()
-      memoizer
-        :getOrCreate(createCSLArray, "invalidate", toSeconds(1, "h"))
-        :exec()
+      memoize(createCSLArray)()
         :doThis("choose-item-and-then-action")
     end,
   },
