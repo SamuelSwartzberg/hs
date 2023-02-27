@@ -19,22 +19,6 @@ require("package-imports")
 
 require("utils")
 
-memoized = {}
-fsmemoized = {}
-fsmemoizedasync = {}
-
-for key, item in pairs(_G) do
-  if type(item) == "function" then
-    memoized[key] = memoize(item) -- memoize all functions, though not all of them make sense to actually use memoized. Use your judgement.
-    fsmemoized[key] = fsmemoize(item, key)
-    fsmemoizedasync[key] = fsmemoizeAsyncFunc(item, key)
-  end
-end
-
-
-
-memoizer = createMemoizer()
-item_cache = createItemCache()
 
 comp = fsTree(env.MCOMPOSITE, "as-tree")
 require("items-managers")
@@ -209,16 +193,11 @@ local keymap = {
   u = {
     explanation = "Choose item and action on it in MAUDIOVISUAL (mostly for interacting with streams)",
     fn = function() 
-      item_cache:getOrCreate(
-        CreateStringItem,
-        env.MAUDIOVISUAL,
-        {
-          "descendant-string-item-array",
-          "map-to-table-of-path-and-path-content-items",
-        },
-        "invalidate",
-        toSeconds(1, "h")
-      ):exec():doThis("choose-item-and-then-action")
+      memoize(function()
+        return CreateStringItem(env.MAUDIOVISUAL)
+          :get("descendant-string-item-array")
+          :get("map-to-table-of-path-and-path-content-items")
+      end)():doThis("choose-item-and-then-action")
     end,
   },
   i = {

@@ -30,7 +30,7 @@ xml = require "xmllpegparser"
 --- @type basexx
 basexx = require("basexx")
 --- @type memoize
-memoize = require 'memoize'
+p_memoize = require 'memoize'
 --- @type mimetypes
 mimetypes = require "mimetypes"
 combine = require "combine"
