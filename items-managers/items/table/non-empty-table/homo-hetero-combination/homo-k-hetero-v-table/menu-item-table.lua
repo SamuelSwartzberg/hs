@@ -26,7 +26,7 @@ MenuItemTableSpecifier = {
         return self:get("contents").AXMenuItemCmdModifiers
       end,
       ["modifier-symbols"] = function(self)
-        return modsToSymbols(self:get("modifiers"))
+        return replace(self:get("modifiers"), "modsymbols")
       end,
       ["hotkey"] = function (self)
         return self:get("contents").AXMenuItemCmdChar

@@ -1,5 +1,5 @@
 -- Module options:
-local error_msg_htmlEntities = false
+local error_msg_htmlEntities = true
 local debug_htmlEntities = false
 local ASCII_htmlEntities = true
 local register_global_module_htmlEntities = false

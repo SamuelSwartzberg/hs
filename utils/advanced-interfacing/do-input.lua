@@ -158,25 +158,13 @@ function doInput(series_specifier, do_after)
     hs.eventtap[clickmap[parsed_series_specifier.button]]()
     hs.timer.doAfter(0.2 + DELAY, do_after) -- default click delay + a bit of extra time
   elseif parsed_series_specifier.mode == "key" then
-    local modmap = {
-      c = "cmd",
-      cmd = "cmd",
-      ["⌘"] = "cmd",
-      a = "alt",
-      alt = "alt",
-      ["⌥"] = "alt",
-      s = "shift",
-      shift = "shift",
-      ["⇧"] = "shift",
-      ct = "ctrl",
-      ctrl = "ctrl",
-      ["⌃"] = "ctrl",
-      f = "fn",
-      fn = "fn",
-    }
-    local mods = mapValueNewValue(
+    local mods = replace(
       slice(parsed_series_specifier.keys, 1, -2),
-      function(m) return modmap[m] end
+      {
+        matcher = "matcher_table_keys",
+        processor = processors.modmap,
+        must_match_entire_string = true
+      }
     )
     local key = slice(parsed_series_specifier.keys, -1, -1)[1]
     if mods and #mods > 0 then

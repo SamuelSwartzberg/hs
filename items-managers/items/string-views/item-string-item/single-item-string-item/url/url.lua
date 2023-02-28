@@ -33,7 +33,7 @@ URLItemSpecifier = {
         return self:get("url-path")
       end,
       ["by-selector"] = function(self, specifier)
-        return memoize(querySelector)(self:get("contents"), specifier.selector, specifier.only_text)
+        return memoize(queryPage)(self:get("contents"), specifier.selector, specifier.only_text)
       end,
       ["text-by-selector"] = function(self, selector)
         return self:get("by-selector", {

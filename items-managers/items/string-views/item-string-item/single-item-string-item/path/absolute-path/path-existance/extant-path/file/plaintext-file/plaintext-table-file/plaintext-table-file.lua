@@ -9,7 +9,7 @@ PlaintextTableFileItemSpecifier = {
         return ftcsv.parse(self:get("contents"), self:get("field-separator"), {headers = false})
       end,
       ["read-to-list-row-iter"] = function (self)
-        local iter = ftcsvParseLine(self:get("contents"), self:get("field-separator"), {headers = false})
+        local iter = ftcsv.parseLine(self:get("contents"), self:get("field-separator"), {headers = false})
         iter() -- skip the header
         return iter
       end,
@@ -17,7 +17,7 @@ PlaintextTableFileItemSpecifier = {
         return ftcsv.parse(self:get("contents"), self:get("field-separator"))
       end,
       ["read-to-assoc-row-iter"] = function (self)
-        return ftcsvParseLine(self:get("contents"), self:get("field-separator"))
+        return ftcsv.parseLine(self:get("contents"), self:get("field-separator"))
       end,
       ["is-timestamp-first-column-plaintext-table-file"] = function(self) -- this only checks the first line with content for performance reasons.
         local line = self:get("nth-line-of-file-contents", 2)

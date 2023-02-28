@@ -42,6 +42,9 @@ local gen_cache_methods = {
     end,
     reset = function(fnid)
       memstore[fnid] = {}
+    end,
+    get_created_time = function() -- no special functionality here, just needs to exist for polymorphic implementation with fscache
+      return os.time()
     end
   },
   fs = {
@@ -56,6 +59,10 @@ local gen_cache_methods = {
     reset = function(fnid)
       local cache_path = getFsCachePath("fsmemoize", fnid)
       delete(cache_path)
+    end,
+    get_created_time = function(fnid)
+      local cache_path = getFsCachePath("fsmemoize", fnid, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
+      return tonumber(readFile(cache_path))
     end
 
   }
@@ -65,7 +72,7 @@ local gen_cache_methods = {
 --- @class memoOpts
 --- @field mode? "mem" | "fs"
 --- @field is_async? boolean
---- @field invalidation_mode? "invalidate" | "refresh" | "none"
+--- @field invalidation_mode? "invalidate" | "reset" | "none"
 --- @field interval? number
 
 --- @generic I, O
@@ -86,16 +93,17 @@ function memoize(fn, opts)
   opts.interval = opts.interval or 0
 
 
-  local created_at = os.time()
-
+  
   if opts.mode == "mem" then
     memstore[fnid] = {}
   end
-
+  
   local cache_methods = gen_cache_methods[opts.mode]
   local timer
+  
+  local created_at = cache_methods.get_created_time(fnid)
 
-  if opts.invalidation_mode == "refresh" then
+  if opts.invalidation_mode == "reset" then
     timer = hs.timer.doEvery(opts.interval, function()
       cache_methods.reset(fnid)
     end)

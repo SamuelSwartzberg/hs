@@ -96,7 +96,7 @@ end
 --- @param extension string
 --- @return boolean
 function pathHasStartFilenameExtension(path, start, name, extension)
-  local regex = "^" .. escapeGeneralRegex(start) .. "/.*/" .. escapeGeneralRegex(name) .. "." .. escapeGeneralRegex(extension) .. "$"
+  local regex = "^" .. replace(start, "regex") .. "/.*/" .. replace(name, "regex") .. "." .. replace(extension, "regex") .. "$"
   return not not eutf8.find(path, regex)
 end
 

@@ -1,7 +1,9 @@
---- @alias sliceSpec {start: integer, stop?: integer, step?: integer}
---- @alias sliceLArgOverload fun(thing: any[], start_incl_or_spec?: integer, stop_incl?: integer, step?: integer): any[]
+--- @alias startstoplike integer | string
+
+--- @alias sliceSpec {start: startstoplike, stop?: startstoplike, step?: integer}
+--- @alias sliceLArgOverload fun(thing: any[], start_incl_or_spec?: startstoplike, stop_incl?: startstoplike, step?: integer): any[]
 --- @alias sliceLSpecOverload fun(thing: any[], start_incl_or_spec: sliceSpec | string): any[]
---- @alias sliceSArgOverload fun(thing: string, start_incl_or_spec?: integer, stop_incl?: integer, step?: integer): string
+--- @alias sliceSArgOverload fun(thing: string, start_incl_or_spec?: startstoplike, stop_incl?: startstoplike, step?: integer): string
 --- @alias sliceSSpecOverload fun(thing: string, start_incl_or_spec: sliceSpec | string): string
 
 --- both start and stop are 1-indexed, for both positive and negative values
@@ -29,6 +31,26 @@ function slice(thing, start_incl_or_spec, stop_incl, step)
   else
     start_incl = start_incl_or_spec
   end
+
+  local function startstoplike_pos(search, startsearch)
+    startsearch = (startsearch + 1) or 1
+    if type(thing) == "string" then
+      return onig.find(thing, search, startsearch) 
+    else
+      return valueFindKey(slice(thing, startsearch), function(v)
+        return v == search
+      end)
+    end
+  end
+
+  if type(start_incl) == "string" then
+    start_incl = startstoplike_pos(start_incl)
+  end
+
+  if type(stop_incl) == "string" then
+    stop_incl = startstoplike_pos(stop_incl, start_incl)
+  end
+
 
   -- implement various functions polymorphically depending on the type of thing
 

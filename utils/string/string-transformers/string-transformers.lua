@@ -25,18 +25,6 @@ function foldStr(str)
   return res
 end
 
---- extract a string between two other strings
---- @param str string
---- @param start string
---- @param stop string
-function extractBetween(str, start, stop)
-  local start_pos = onig.find(str, start)
-  if start_pos == nil then return nil end
-  local stop_pos = onig.find(str, stop, start_pos + 1)
-  if stop_pos == nil then return nil end
-  return onig.sub(str, start_pos + 1, stop_pos - 1)
-end
-
 ---@param str string
 ---@param to_remove string
 ---@return string
@@ -57,7 +45,7 @@ end
 --- @param sep string
 --- @param mode "lower"|"upper"
 function toPatternSeparator(str, pattern, sep, mode)
-  local escaped_sep = escapeLuaMetacharacter(sep)
+  local escaped_sep = escapeLuaMetacharacters(sep)
   if mode == "lower" then
     str = str:lower()
   elseif mode == "upper" then
@@ -122,27 +110,6 @@ function extractFirstThingInParentheses(str)
   end
 end
 
-
-KeyCodeMap = {
-  ['ctrl'] = '⌃',
-  ['shift'] = '⇧',
-  ['alt'] = '⌥',
-  ['cmd'] = '⌘',
-  ['fn'] = 'fn',
-  ['return'] = '↩',
-}
-
---- @param mods string[]
---- @return string[]
-function modsToSymbols(mods)
-  return mapValueNewValue(
-    mods,
-    function (value)
-      return KeyCodeMap[value]
-    end
-  )
-end
-
 --- @param mods string[]
 --- @param key string
 --- @return string | nil
@@ -195,3 +162,4 @@ function quoteLines(str, prefix)
   return stringx.join("\n", newlines)
 end
 
+ 

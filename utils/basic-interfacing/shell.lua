@@ -10,7 +10,7 @@ function buildInnerCommand(command_parts)
       command = command .. " " .. command_part
     elseif type(command_part) == "table" then
       if command_part.type == "quoted" then
-        command = command .. ' "' .. escapeCharacter(command_part.value, '"', "\\") .. '"'
+        command = command .. ' "' .. replace(command_part.value, {matcher = '"'}) .. '"'
       elseif command_part.type == "interpolated" then
         command = command .. '"$('  .. buildInnerCommand(command_part.value) .. ')"'
       else

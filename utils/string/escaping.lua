@@ -1,55 +1,149 @@
---- @param str string
---- @param chars_to_escape string[]
---- @param escape_char? string
+local matchers = {
+  lua_metacharacters = {"%", "^", "$", "(", ")", ".", "[", "]", "*", "+", "-", "?"},
+  regex_metacharacters =  {"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"},
+  doi_prefix_variants = { "doi:", {r = "(?:https?://)(?:dx.)doi.org/?" } },
+}
+
+processors = {
+  odd_whitespace = {
+    ["\n"] = "\\n",
+    ["\t"] = "\\t",
+    ["\f"] = "\\f",
+    ["\r"] = "\\r",
+    ["\0"] = "\\0"
+  },
+  single_char_readable_equivs = {
+    ["\t"] = "tab",
+    ["\n"] = "newline",
+    [","] = "comma",
+    [";"] = "semicolon",
+    ["."] = "period",
+    [":"] = "colon",
+    ["!"] = "exclamation mark",
+    ["?"] = "question mark",
+    ["("] = "left parenthesis",
+    [")"] = "right parenthesis",
+    ["["] = "left bracket",
+    ["]"] = "right bracket",
+    ["{"] = "left brace",
+    ["}"] = "right brace",
+    ["'"] = "single quote",
+    ['"'] = "double quote",
+    ["*"] = "asterisk",
+    ["-"] = "minus",
+    ["_"] = "underscore",
+    ["="] = "equals",
+    ["+"] = "plus",
+    ["<"] = "less than",
+    [">"] = "greater than",
+    ["/"] = "slash",
+    ["\\"] = "backslash",
+    ["|"] = "vertical bar",
+    ["~"] = "tilde",
+    ["`"] = "backtick",
+    ["@"] = "at sign",
+    ["#"] = "pound sign",
+    ["$"] = "dollar sign",
+    ["%"] = "percent sign",
+    ["^"] = "caret",
+    ["&"] = "ampersand",
+    [" "] = "space",
+  },
+  normalizing_modmap = {
+    c = "cmd",
+    cmd = "cmd",
+    ["⌘"] = "cmd",
+    a = "alt",
+    alt = "alt",
+    ["⌥"] = "alt",
+    s = "shift",
+    shift = "shift",
+    ["⇧"] = "shift",
+    ct = "ctrl",
+    ctrl = "ctrl",
+    ["⌃"] = "ctrl",
+    f = "fn",
+    fn = "fn",
+  },
+  mod_symbolmap = {
+    cmd = "⌘",
+    alt = "⌥",
+    shift = "⇧",
+    ctrl = "⌃",
+    fn = "fn",
+  }
+}
+
+
+--- @alias matcher string | {r: string} | "matcher_table_keys"
+
+--- @class replaceSpec
+--- @field matcher? matcher | matcher[] 
+--- @field must_match_entire_string? boolean
+--- @field processor? string | table | fun(str: string): string 
+--- @field mode? "replace" | "prepend" | "append"
+--- @field ignore_case? boolean
+
+--- @param str string | string[]
+--- @param specs? replaceSpec | replaceSpec[]
 --- @return string
-function escapeCharacters(str, chars_to_escape, escape_char)
-  local escape_char = escape_char or "\\"
-  local result = str
-  for _, char in ipairs(chars_to_escape) do
-    result = stringx.replace(result, char, escape_char .. char)
+function rawreplace(str, specs)
+  if specs == nil then return str end
+  if type(specs) ~= "table" then specs = {specs} end
+  local res = str
+  for _, spec in ipairs(specs) do 
+    spec = tablex.deepcopy(spec) or {}
+    spec.matcher = spec.matcher or matchers.lua_metacharacters
+    spec.processor = spec.processor or "\\"
+    spec.mode = spec.mode or "prepend"
+
+    if not isListOrEmptyTable(spec.matcher) then
+      spec.matcher = {spec.matcher}
+    end
+
+    for i, matcher in ipairs(spec.matcher) do
+      local match_func
+      if type(matcher) == "string" then
+        match_func = function(res)
+          return stringx.find(res, matcher)
+        end
+    end
   end
-  return result
+  return res
 end
 
 --- @param str string
---- @param char_to_escape string
---- @param escape_char? string
+--- @param type? "luaregex" | "regex" | "modsymbols"
 --- @return string
-function escapeCharacter(str, char_to_escape, escape_char)
-  return escapeCharacters(str, {char_to_escape}, escape_char)
-end
-
-local lua_metacharacters = {"%", "^", "$", "(", ")", ".", "[", "]", "*", "+", "-", "?"}
-
---- @param char string
---- @return string
-function escapeLuaMetacharacter(char)
-  if valuesContain(lua_metacharacters, char) then
-    return "%" .. char
-  else
-    return char
+function replace(str, type)
+  local res = str
+  type = type or "luaregex"
+  if type == "luaregex" then
+    res = rawreplace(
+      res, 
+      {matcher = matchers.lua_metacharacters, processor = "%", mode = "prepend"}
+    )
+  elseif type == "regex" then
+    res = rawreplace(
+      res, 
+      {
+        {matcher = matchers.regex_metacharacters, processor = "\\", mode = "prepend"},
+        {matcher = "matcher_table_keys", processor = matchers.odd_whitespace, mode = "replace" }
+      }
+    )
+  elseif type == "modsymbols" then 
+    res = rawreplace(
+      res, 
+      {
+        {matcher = "matcher_table_keys", processor = processors.normalizing_modmap, mode = "replace" },
+        {matcher = "matcher_table_keys", processor = processors.mod_symbolmap, mode = "replace" }
+      }
+    )
+  elseif type == "doi" then 
+    res = rawreplace(
+      res, 
+      {matcher = matchers.doi_prefix_variants, processor = "https://doi.org/", mode = "replace" }
+    )
   end
-end
-
---- @param str string
---- @return string
-function escapeAllLuaMetacharacters(str)
-  local outstr = str
-  for _, char in ipairs(lua_metacharacters) do
-    outstr = stringx.replace(outstr, char, "%" .. char)
-  end
-  return outstr
-end
-
---- @param str string
---- @return string
-function escapeGeneralRegex(str) -- not the lua kind, the general kind, where '\' is the escape character and % has no special meaning
-  local chars_to_escape = {"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"}
-  local escaped_result = escapeCharacters(str, chars_to_escape, "\\")
-  escaped_result = escapeCharacter(escaped_result, "\n", "\\n")
-  escaped_result = escapeCharacter(escaped_result, "\t", "\\t")
-  escaped_result = escapeCharacter(escaped_result, "\f", "\\f")
-  escaped_result = escapeCharacter(escaped_result, "\r", "\\r")
-  escaped_result = escapeCharacter(escaped_result, "\0", "\\0")
-  return escaped_result
+  return res
 end
