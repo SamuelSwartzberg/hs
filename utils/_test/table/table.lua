@@ -37,25 +37,25 @@ assertMessage(
 
 --- map list, map func returns primitive
 assertTable(
-  mapValueNewValue({ 1, 2, 3 }, function(value) return value + 1 end),
+  map({ 1, 2, 3 }, function(value) return value + 1 end),
   { 2, 3, 4 }
 )
 
 --- map assoc arr, map func returns primitive
 assertTable(
-  mapValueNewValue({ a = 1, b = 2, c = 3 }, function(value) return value + 1 end),
+  map({ a = 1, b = 2, c = 3 }, function(value) return value + 1 end),
   { a = 2, b = 3, c = 4 }
 )
 
 --- map list, map func returns table
 assertTable(
-  mapValueNewValue({ 1, 2, 3 }, function(value) return { value + 1 } end),
+  map({ 1, 2, 3 }, function(value) return { value + 1 } end),
   { { 2 }, { 3 }, { 4 } }
 )
 
 --- map assoc arr, map func returns table
 assertTable(
-  mapValueNewValue({ a = 1, b = 2, c = 3 }, function(value) return { value + 1 } end),
+  map({ a = 1, b = 2, c = 3 }, function(value) return { value + 1 } end),
   { a = { 2 }, b = { 3 }, c = { 4 } }
 )
 

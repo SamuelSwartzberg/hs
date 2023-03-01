@@ -57,7 +57,7 @@ function itemsInPath(opts)
       if output then
         items = splitLines(output)
         items = listFilterEmptyString(items)
-        items = mapValueNewValue(
+        items = map(
           items,
           function(item)
             item = stringy.strip(item)
@@ -106,7 +106,7 @@ function itemsInPath(opts)
   end
 
   if opts.slice_results then
-    files = mapValueNewValue(files, function(path)
+    files = map(files, function(path)
       return pathSlice(path, opts.slice_results, opts.slice_results_opts)
     end)
   end

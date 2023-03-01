@@ -20,7 +20,7 @@ SystemSpecifier = {
         return self:get("all-non-root-volumes-string-array"):get("to-string-item-array")
       end,
       ["all-devices-of-type-audiodevice-array"] = function(self, subtype)
-        return CreateArray(mapValueNewValue(
+        return CreateArray(map(
           values(
             hs.audiodevice["all" .. changeCasePre(subtype, 1, "up") .. "Devices"]()
           ),
@@ -35,7 +35,7 @@ SystemSpecifier = {
       end,
       ["all-windows-array"] = function(self)
         local all_windows_raw = hs.window.filter.default:getWindows()
-        return CreateArray(mapValueNewValue(
+        return CreateArray(map(
           all_windows_raw,
           CreateWindowlikeItem
         ))

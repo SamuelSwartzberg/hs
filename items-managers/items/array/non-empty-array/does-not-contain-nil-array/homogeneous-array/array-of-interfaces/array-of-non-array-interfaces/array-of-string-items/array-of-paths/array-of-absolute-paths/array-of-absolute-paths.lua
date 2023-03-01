@@ -6,7 +6,7 @@ ArrayOfAbsolutePathsSpecifier = {
       ["is-array-of-volumes"] = bind(isArrayOfInterfacesOfType, { ["2"] = "volume" }),
       ["is-array-of-extant-paths"] = bind(isArrayOfInterfacesOfType, { ["2"] = "extant-path" }),
       ["common-ancestor"]  = function(self)
-        return lolCommonPrefix(mapValueNewValue(self:get("to-string-array"), pathSlice))
+        return lolCommonPrefix(map(self:get("to-string-array"), pathSlice))
       end,
     },
     doThisables = {

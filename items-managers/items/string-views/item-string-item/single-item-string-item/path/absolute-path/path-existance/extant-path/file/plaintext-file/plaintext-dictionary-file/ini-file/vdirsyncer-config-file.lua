@@ -31,7 +31,7 @@ VdirsyncerConfigFileItemSpecifier = {
         local webcal_pair_keys = filterKeys(pairs, function(k)
           return stringy.startswith(k, "webcal_readonly_")
         end)
-        local indices = mapValueNewValue(keys(webcal_pair_keys), function(k)
+        local indices = map(keys(webcal_pair_keys), function(k)
           return tonumber(k:match("webcal_readonly_(%d+)"))
         end)
         return listMax(indices) + 1

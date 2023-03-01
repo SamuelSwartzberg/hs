@@ -21,7 +21,7 @@ UniCommandSpecifier = {
         return json.decode(self:get("uni", specifier))
       end,
       ["uni-to-parsed-table"] = function (self, specifier)
-        return mapValueNewValue(
+        return map(
           self:get("uni-raw-json", specifier),
           function (char)
             return CreateTable(char)

@@ -38,10 +38,10 @@ PlaintextTableFileItemSpecifier = {
     },
     doThisables = {
       ["append-rows"] = function(self, rows)
-        self:doThis("append-lines", mapValueNewValue(rows, bindArg(joinRow, self:get("field-separator"))))
+        self:doThis("append-lines", map(rows, bindArg(joinRow, self:get("field-separator"))))
       end,
       ["set-rows"] = function(self, rows)
-        self:doThis("set-lines", mapValueNewValue(rows, bindArg(joinRow, self:get("field-separator"))))
+        self:doThis("set-lines", map(rows, bindArg(joinRow, self:get("field-separator"))))
       end,
       ["append-assoc-arr-as-rows"] = function(self, assoc_arr)
         local rows = self:get("read-to-rows") or {}
@@ -55,7 +55,7 @@ PlaintextTableFileItemSpecifier = {
       end,
       ["transform-rows"] = function(self, transformer)
         local rows = self:get("read-to-rows")
-        local new_rows = mapValueNewValue(rows, transformer)
+        local new_rows = map(rows, transformer)
         self:doThis("set-rows", new_rows)
       end,
     }

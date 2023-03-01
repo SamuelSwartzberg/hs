@@ -26,7 +26,7 @@ CslTableSpecifier = {
       ["people-to-string"] = function(self, key)
         local people = self:get("value", key)
         if people then 
-          local names = mapValueNewValue(people, function(person)
+          local names = map(people, function(person)
             return person["given"] .. " " .. person["family"]
           end)
           return table.concat(names, ", ")

@@ -10,7 +10,7 @@ YoutubePlayableItemItemSpecifier = {
         return stringy.endswith(self:get("url-path"), "watch")
       end,
       ["attrs-inner-task-args"] = function(self, attrs)
-        local attrs_mapped = mapValueNewValue(attrs, function(attr)
+        local attrs_mapped = map(attrs, function(attr)
           return "%(" .. attr ..")s"
         end)
         local attrs_joined = table.concat(attrs_mapped, UNLIKELY_SEPARATOR)
@@ -162,7 +162,7 @@ YoutubePlayableItemItemSpecifier = {
             }
           },
           do_after = function(tags)
-            local cleaned = mapValueNewValue(tags, function(v)
+            local cleaned = map(tags, function(v)
               return romanizeToLowerAlphanumUnderscore(v)
             end)
             self:doThis("add-as-m3u", cleaned)

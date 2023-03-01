@@ -106,7 +106,7 @@ end
 --- @return { depth: integer, path: any[], value: any}[]
 function nestedAssocArrToListIncludingPathAndDepth(assoc_arr)
   local incl_path = nestedAssocArrToListIncludingPath(assoc_arr, {})
-  return mapValueNewValue(incl_path, function(item)
+  return map(incl_path, function(item)
     return {depth = #item.path - 1, path = item.path, value = item.value}
   end)
 end
@@ -132,10 +132,10 @@ end
 --- @return integer, integer
 function nestedAssocArrGetMaxStops(assoc_arr, indentation)
   local stops = nestedAssocArrGetStopsForKeyValue(assoc_arr, indentation)
-  local key_stops = mapValueNewValue(values(stops), function(stop)
+  local key_stops = map(values(stops), function(stop)
     return stop.key_stop
   end)
-  local value_stops = mapValueNewValue(values(stops), function(stop)
+  local value_stops = map(values(stops), function(stop)
     return stop.value_stop
   end)
   local max_key_stop = listMax(key_stops)
@@ -200,7 +200,7 @@ end
 --- @return { path: any[], [any]: any}[]
 function nestedAssocArrWithAssocArrLeavesToListIncludingPath(assoc_arr, path)
   local list_incl_path = nestedAssocArrToListIncludingPath(assoc_arr, path)
-  return mapValueNewValue(list_incl_path, function(item)
+  return map(list_incl_path, function(item)
     local val = item.value
     val.path = item.path
     return val
@@ -211,7 +211,7 @@ end
 --- @param assoc_arr table
 --- @return table[]
 function mergeAssocArrWithAllListElements(list, assoc_arr)
-  return mapValueNewValue(list, function(item)
+  return map(list, function(item)
     return mergeAssocArrRecursive(item, assoc_arr)
   end)
 end

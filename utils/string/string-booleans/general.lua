@@ -83,3 +83,64 @@ function isLastIfAny(str, last)
     return not eutf8.find(str, last)
   end
 end
+
+
+--- @alias stringConditionThatCantBeConfusedForListOfStringConditions boolean | string | {[any]: any} | {_r?: string, _start?: string, _stop?: string} | function
+--- @alias stringCondition stringConditionThatCantBeConfusedForListOfStringConditions | string[]
+
+--- @class stringTestOpts
+--- @field tostring boolean
+
+
+--- @param str? string
+--- @param conditions? stringConditionThatCantBeConfusedForListOfStringConditions | stringCondition[]
+--- @param opts? stringTestOpts
+--- @return boolean
+function stringTest(str, conditions, opts)
+  str = str or ""
+  conditions = conditions or true
+  opts = opts or {}
+  opts.tostring = defaultIfNil(opts.tostring, true)
+
+  if opts.tostring then str = tostring(str) end
+
+  if not isListOrEmptyTable(conditions) then
+    conditions = {conditions}
+  end
+
+  if not type(str) == "string" then return false end
+  local results
+
+  for _, condition in wdefarg(ipairs)(conditions) do 
+    if type(condition) == "boolean" then
+      listPush(results, (str ~= "") == condition)
+    elseif type(condition) == "table" then
+      local found_other_use_for_table = false
+      if condition.r then -- regex
+        listPush(results, not not onig.find(str, condition._r))
+        found_other_use_for_table = true
+      end
+      if condition._start then -- starts with
+        listPush(results, stringy.startswith(str, condition._start))
+        found_other_use_for_table = true
+      end
+      if condition._stop then -- ends with
+        listPush(results, stringy.endswith(str, condition._stop))
+        found_other_use_for_table = true
+      end
+
+      if not found_other_use_for_table then
+        listPush(results, valuesContain(condition, str))
+      end
+    elseif type(condition) == "function" then
+      listPush(results, condition(str))
+    else
+      listPush(results, str == condition)
+    end
+  end
+
+  return allValuesPass(results, returnSame)
+end
+
+
+      

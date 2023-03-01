@@ -53,7 +53,7 @@ function getTileRect(tile_specifier)
   tile_specifier.span = tile_specifier.span or { 1, 1 }
   local stops = getStopsForCoords(tile_specifier.matrix)
   local position = coordsFromStops(stops, tile_specifier.position)
-  local span = coordsFromStops(stops, mapValueNewValue(tile_specifier.span, function (value)
+  local span = coordsFromStops(stops, map(tile_specifier.span, function (value)
     return value + 1
   end))
   return hs.geometry.rect(

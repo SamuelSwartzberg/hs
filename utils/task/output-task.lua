@@ -62,7 +62,7 @@ end
 ---@param do_after? fun(command_results: { [string]: string })
 function runHsTaskParallel(command_specifier_list, do_after)
   local results = {}
-  for command_id, command_parts in pairsSafe(command_specifier_list) do
+  for command_id, command_parts in wdefarg(pairs)(command_specifier_list) do
     local task = runHsTask(command_parts, function (exit_code, std_out, std_err)
       if exit_code == 0 then 
         results[command_id] = std_out
@@ -92,7 +92,7 @@ function runHsTaskNThreads(command_specifier_list, threads, do_after)
     local _, chunk = next_pair()
     if chunk then
       runHsTaskParallel(chunk, function (chunk_results)
-        for command_id, result in pairsSafe(chunk_results) do
+        for command_id, result in wdefarg(pairs)(chunk_results) do
           results[command_id] = result
         end
         runNext()

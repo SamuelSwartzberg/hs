@@ -69,12 +69,12 @@ PathLeafSpecifier = {
         return filter:getWindows()[self:get("path-leaf")]
       end,
       ["window-items-path-leaf-as-title"] = function(self)
-        return mapValueNewValue(self:get("windows-with-path-leaf-as-title"), function(window)
+        return map(self:get("windows-with-path-leaf-as-title"), function(window)
           return CreateWindowlikeItem(window)
         end)
       end,
       ["window-items-of-app-path-leaf-as-title"] = function(self, apps)
-        return mapValueNewValue(self:get("windows-of-app-with-path-leaf-as-title", apps), function(window)
+        return map(self:get("windows-of-app-with-path-leaf-as-title", apps), function(window)
           return CreateWindowlikeItem(window)
         end)
       end,

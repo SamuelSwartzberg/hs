@@ -40,6 +40,10 @@ function returnSame(value)
   return value
 end
 
+function returnAny(...)
+  return ...
+end
+
 --- @generic T
 --- @param value T
 --- @param n integer

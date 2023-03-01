@@ -9,7 +9,7 @@ KhardCommandSpecifier = {
         ))
       end,
       ["all-contact-uids"] = function(self)
-        local res = mapValueNewValue(
+        local res = map(
           stringy.split(self:get("khard-list"), "\n"), 
           function (line)
             return stringy.split(line, "\t")[1]
@@ -18,7 +18,7 @@ KhardCommandSpecifier = {
         return res
       end,
       ["all-contacts-to-string-items"] = function(self)
-        return mapValueNewValue(
+        return map(
           self:get("all-contact-uids"),
           function (contact)
             return CreateStringItem(contact)
@@ -53,7 +53,7 @@ KhardCommandSpecifier = {
           return uid, {"khard", "show", "--format=yaml", "uid:" .. uid }
         end, function(raw_contact_table)
           local counter = 0
-          local arr = mapPairNewPair(raw_contact_table, function(uid, contact)
+          local arr = mapPairNewPairOvtable(raw_contact_table, function(uid, contact)
             contact = yamlLoad(contact)
             contact.uid = uid
             counter = counter + 1

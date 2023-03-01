@@ -31,7 +31,7 @@ BibFileItemSpecifier = {
       end,
       ["to-csl-table"] = function(self)
         local raw_table = self:get("parse-to-lua-table")
-        return CreateArray(mapValueNewValue(raw_table, function(entry)
+        return CreateArray(map(raw_table, function(entry)
           return CreateTable(entry)
         end))
       end,

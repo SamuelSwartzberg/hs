@@ -36,7 +36,7 @@ ImageFileItemSpecifier = {
         hs.eventtap.keyStroke({"cmd"}, "v")
       end,
       ["shrink"] = function(self)
-        local shrink_specifier_array = CreateArray(mapValueNewValue( {
+        local shrink_specifier_array = CreateArray(map( {
           { type = "image", format = "png" },
           { type = "image", format = "jpg" },
           { type = "image", format = "png", resize = true },

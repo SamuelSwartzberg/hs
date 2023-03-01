@@ -35,7 +35,7 @@ end
 ---@return string
 function toTitleCase(str)
   local words = splitByMultiple(str, word_separators)
-  local title_cased_words = mapValueNewValue(words, titleCaseWordNoContext)
+  local title_cased_words = map(words, titleCaseWordNoContext)
   title_cased_words[1] = firstCharToUpper(title_cased_words[1])
   title_cased_words[#title_cased_words] = firstCharToUpper(title_cased_words[#title_cased_words])
   -- it would be tempting to think that we could just join the words with a space, but that would normalize all word separators to spaces, which is not what we want, so we have to search for the correct occurrence of the non-capitalized word and replace it with the capitalized version

@@ -1,6 +1,3 @@
-
-
-local rrq = bindArg(relative_require, "utils.fs.fs-booleans")
 local filetype_list = {
   ["plaintext-table"] = {"csv", "tsv"},
   ["plaintext-dictionary"] = { "", "yaml", "json", "toml", "ini", "bib", "ics"},
@@ -29,7 +26,6 @@ function isUsableAsFiletype(str, filetype)
   end
 end
 
---- @alias stringCondition boolean | string | string[] | {r: string} | {[string]: any} | function
 
 --- @class sliceTest
 --- @field slice sliceSpec | string
@@ -41,6 +37,7 @@ end
 --- @class testPathOpts
 --- @field slice? sliceTest | (sliceTest | (string|table)[] )[]
 --- @field existence? boolean | dirness | { exists?: boolean, dirness?: dirness, contents?: stringCondition}
+--- @field ext stringCondition
 
 --- @param path string
 --- @param opts? testPathOpts | string | boolean
@@ -60,15 +57,33 @@ function testPath(path, opts)
 
   local results = {}
 
+  -- process slice shorthand
+
+  if opts.slice and not isListOrEmptyTable(opts.slice) then
+    opts.slice = {opts.slice}
+  end
+
+  if opts.ext then
+    local condition 
+    if type(opts.ext) == "table" and opts.ext.containedin then 
+      condition = function(ext)
+        return valuesContain(filetype_list[opts.ext.containedin], ext)
+      end
+    else
+      condition = opts.ext
+    end
+    opts.slice = opts.slice or {}
+    listPush(opts.slice, {
+      slice = {start = -1, stop = -1},
+      condition = condition,
+      sliceOpts = {ext_sep = true, standartize_ext = true}
+    })
+  end
+    
+
   -- test slices
 
   if opts.slice then
-
-    -- process slice shorthand
-
-    if not isListOrEmptyTable(opts.slice) then
-      opts.slice = {opts.slice}
-    end
 
     for _, slice_spec in ipairs(opts.slice) do
 
@@ -88,19 +103,7 @@ function testPath(path, opts)
         slice_spec.condition = {slice_spec.condition}
       end
 
-      if type(slice_spec.condition) == "boolean" then
-        listPush(results, (slice ~= "") == slice_spec.condition)
-      elseif isListOrEmptyTable(slice_spec.condition) then
-        listPush(results, valuesContain(slice_spec.condition, slice))
-      elseif type(slice_spec.condition) == "table" then
-        if slice_spec.condition.r then -- regex
-          listPush(results, not not onig.find(slice, slice_spec.condition.r))
-        else -- table of values
-          listPush(results, valuesContain(slice_spec.condition, slice))
-        end
-      elseif type(slice_spec.condition) == "function" then
-        listPush(results, slice_spec.condition(slice))
-      end
+      listPush(results, stringTest(slice, slice_spec.condition))
 
       if results[#results] == false then -- return early if any slice test fails. This may be removed at some point if I allow for 'or'-logic at some point
         return false

@@ -137,7 +137,7 @@ function prependAllWith(str, splitter, prefix)
   else
     parts = stringx.split(str, splitter)
   end
-  local prefixed_parts = mapValueNewValue(
+  local prefixed_parts = map(
     parts,
     function (value)
       return prefix .. value

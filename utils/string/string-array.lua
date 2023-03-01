@@ -57,7 +57,7 @@ end
 --- @param str_list string[]
 --- @return string
 function longestCommonSuffix(str_list)
-  local reversed_str_list = mapValueNewValue(str_list, function(str) return eutf8.reverse(str) end)
+  local reversed_str_list = map(str_list, function(str) return eutf8.reverse(str) end)
   local reversed_prefix = longestCommonPrefix(reversed_str_list)
   return eutf8.reverse(reversed_prefix)
 end
@@ -68,7 +68,7 @@ end
 function splitByMultiple(str, separators)
   local res = {str}
   for _, sep in ipairs(separators) do
-    res = mapValueNewValue(res, function(str) return stringy.split(str, sep) end)
+    res = map(res, function(str) return stringy.split(str, sep) end)
   end
   res = filterValues(res, function(str) return str ~= "" end)
   return res

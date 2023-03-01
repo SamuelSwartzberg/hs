@@ -15,7 +15,7 @@ ArrayOfEmailFilesSpecifier = {
         runHsTaskNThreadsOnArray(self:get("contents"), function(_, path)
           return path:get("contents"), path:get("email-summary-task")
         end, function(raw_summary_path_table)
-          mapValueNewValue(raw_summary_path_table, function(text)
+          map(raw_summary_path_table, function(text)
             return stringy.strip(text)
           end)
           do_after(CreateTable(raw_summary_path_table))
@@ -29,7 +29,7 @@ ArrayOfEmailFilesSpecifier = {
             { value = path:get("email-body-rendered-task"), type = "interpolated"},
           }
         end, function(raw_summary_path_table)
-          raw_summary_path_table = mapValueNewValue(raw_summary_path_table, function(text)
+          raw_summary_path_table = map(raw_summary_path_table, function(text)
             return stringx.shorten(text, 500)
           end)
           do_after(CreateTable(raw_summary_path_table))

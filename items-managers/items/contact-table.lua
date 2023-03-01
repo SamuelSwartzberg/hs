@@ -99,7 +99,7 @@ ContactTableSpecifier = {
       end,
       ["addresses-table"] = function(self)
         local raw = self:get("table-prop-policy", "Address")
-        local processed = mapPairNewPair(raw, function(k,v)
+        local processed = mapPairNewPairOvtable(raw, function(k,v)
           local raw_single = mergeAssocArrRecursive(
           v,
           {

@@ -22,7 +22,7 @@ ArrayOfDatesSpecifier = {
         )
       end,
       ["item-range"] = function(self, specifier)
-        return mapValueNewValue(
+        return map(
           self:get("range", specifier),
           function(dt)
             return CreateDate(dt)

@@ -24,7 +24,7 @@ NonEmptyArraySpecifier = {
         return CreateArray(self:get("range", specifier))
       end,
       ["map"] = function(self, callback)
-        return mapValueNewValue(self:get("contents"), callback)
+        return map(self:get("contents"), callback)
       end,
       ["map-to-new-array"] = function(self, callback)
         return CreateArray(self:get("map", callback))

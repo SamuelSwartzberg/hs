@@ -81,7 +81,7 @@ StringItemSpecifier = {
         else return {res} end
       end,
       ["window-item-contents-as-title"] = function(self)
-        return mapValueNewValue(self:get("windows-with-contents-as-title"), function(window)
+        return map(self:get("windows-with-contents-as-title"), function(window)
           return CreateWindowlikeItem(window)
         end)
       end,

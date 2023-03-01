@@ -7,7 +7,7 @@ function processSetupDirectivesInFiles(path)
     local basename = getLeafWithoutPath(child)
     local command = changeCasePre(
       table.concat(
-        mapValueNewValue(
+        map(
           stringy.split(basename, "-"),
           function (part)
             return changeCasePre(part, 1, "up")
@@ -26,7 +26,7 @@ function processSetupDirectivesInFiles(path)
         local interval = tabbed_line[1]
         local argstring = tabbed_line[2]
         local args = stringy.split(argstring, " ")
-        args = mapValueNewValue(args, function (arg)
+        args = map(args, function (arg)
           if arg == "true" then
             return true
           elseif arg == "false" then

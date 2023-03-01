@@ -64,7 +64,7 @@ DateSpecifier = {
         return dateRange(startdt, enddt, specifier.step, specifier.unit)
       end,
       ["item-range"] = function(self, specifier)
-        return mapValueNewValue(
+        return map(
           self:get("range", specifier),
           function(dt)
             return CreateDate(dt)
@@ -79,7 +79,7 @@ DateSpecifier = {
         })
       end,
       ["hours-in-day-item-range"] = function(self)
-        return mapValueNewValue(
+        return map(
           self:get("hours-in-day-range"),
           function(dt)
             return CreateDate(dt)
@@ -95,7 +95,7 @@ DateSpecifier = {
         })
       end,
       ["quarters-in-day-item-range"] = function(self)
-        return mapValueNewValue(
+        return map(
           self:get("quarters-in-day-range"),
           function(dt)
             return CreateDate(dt)

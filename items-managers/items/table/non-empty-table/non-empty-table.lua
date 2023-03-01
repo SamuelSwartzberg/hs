@@ -110,7 +110,7 @@ NonEmptyTableSpecifier = {
         return mapKeyNewKey(self:get("keys"), callback)
       end,
       ["map-values"] = function(self, callback)
-        return mapValueNewValue(self:get("values"), callback)
+        return map(self:get("values"), callback)
       end,
       ["map-keys-to-new-array"] = function(self, callback)
         return CreateArray(self:get("map-keys", callback))
@@ -170,7 +170,7 @@ NonEmptyTableSpecifier = {
       end,
       ["chooser-list-of-pairs"] = function(self)
         local list = {}
-        for k, v in pairsSafe(self:get("map-pairs-to-string")) do
+        for k, v in wdefarg(pairs)(self:get("map-pairs-to-string")) do
           list[#list + 1] = {
             text = v,
             value = k

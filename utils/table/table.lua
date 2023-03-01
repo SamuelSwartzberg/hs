@@ -1,47 +1,73 @@
+-- new function map that generalizes over all map scenarios
 
+--- @alias k_or_v "k"|"v"
 
---[[ --- @param all_elems { key: string, value: any }[]
---- @return table
-function table.init(all_elems)
-  local out = {}
-  for i, v in ipairs(all_elems) do
-    out[v.key] = v.value
+--- @param tbl? table | nil
+--- @param f? function 
+--- @param opts? string | k_or_v[][] | {args: k_or_v | k_or_v[], useas: k_or_v | k_or_v[], noovtable: boolean} 
+function map(tbl, f, opts)
+  tbl = tbl or {}
+  f = f or returnAny
+  if type(opts) == "string" then
+    opts = {args = opts, useas = opts}
+  elseif isListOrEmptyTable(opts) then
+    opts = {args = opts[1] or "v", useas = opts[2] or "v"}
+  else
+    opts = opts or {}
+    opts.args = opts.args or "v"
+    opts.useas = opts.useas or "v"
   end
-  return out
+
+  if type(opts.args) == "string" then
+    opts.args = {opts.args}
+  end
+  if type(opts.useas) == "string" then
+    opts.useas = {opts.useas}
+  end
+
+  local mapped_useas = {}
+  for index, useas in ipairs(opts.useas) do
+    mapped_useas[useas] = index
+  end
+
+  local res
+  local is_list = isListOrEmptyTable(tbl)
+
+  if is_list then -- a list has int keys, which ovtable doesn't support, and we don't want the overhead of ovtable for a list anyway
+    opts.noovtable = true
+  end
+  
+
+  if opts.noovtable then
+    res = {}
+  else 
+    res = ovtable.new()
+  end
+
+  for k, v in wdefarg(pairs)(tbl) do
+    local retriever = {
+      k = k,
+      v = v
+    }
+    local args = {}
+    for _, arg in ipairs(opts.args) do
+      table.insert(args, retriever[arg])
+    end
+    local itemres = {f(table.unpack(args))}
+    local newkey = itemres[mapped_useas.k]
+    local newval = itemres[mapped_useas.v]
+    if newkey == false then -- use false as a key to indicate to push to array instead
+      table.insert(res, newval)
+    else
+      res[newkey] = newval
+    end
+  end
+
+  return res
 end
 
---- no difference to vanilla pairs on non-ordered tables
-table.revpairs = pairs
 
-table.pairs = pairs
-table.ipairs = ipairs
 
---- @return table
-function table.new()
-  local tbl = {}
-  local mt = { __index = table }
-  setmetatable(tbl, mt)
-  return tbl
-end ]]
-
---- @generic T : table
---- @generic K
---- @generic V
---- @param tbl T | nil
---- @return (fun(table: table<K, V>,index?: K):K, V), T, nil
-function pairsSafe(tbl)
-  if not tbl then return pairs({}) end
-  return pairs(tbl)
-end
-
---- @generic T : table
---- @generic V
---- @param tbl T | nil
---- @return (fun(table: `V`[],i?: integer):integer, V), T, integer
-function ipairsSafe(tbl)
-  if not tbl then return ipairs({}) end
-  return ipairs(tbl)
-end
 
 --- @generic K
 --- @generic V
@@ -51,7 +77,7 @@ end
 --- @return {[O]: V}
 function mapKeyNewKey(tbl, f)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     t[f(k)] = v
   end
   return t
@@ -72,9 +98,9 @@ end
 --- @param tbl { [`K`]: `V` } | nil
 --- @param f fun(value?: V): `O`
 --- @return { [K]: O }
-function mapValueNewValue(tbl, f)
+function map(tbl, f)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     t[k] = f(v)
   end
   return t
@@ -84,7 +110,7 @@ end
 --- @param f fun(value?: any): any
 function mapValueNewValueRecursive(tbl, f)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if type(v) == "table" then
       t[k] = mapValueNewValueRecursive(v, f)
     else
@@ -94,28 +120,12 @@ function mapValueNewValueRecursive(tbl, f)
   return t
 end
 
---- @generic K
---- @generic V
---- @generic O1
---- @generic O2
---- @param tbl { [`K`]: `V` } | nil
---- @param f fun(key?: K, value?: V): `O1`, `O2`
---- @return { [O1]: O2 }
-function mapPairNewPair(tbl, f)
-  local t = {}
-  for k, v in pairsSafe(tbl) do
-    local new_k, new_v = f(k, v)
-    t[new_k] = new_v
-  end
-  return t
-end
-
 --- @param tbl table | nil
 --- @param f fun(key?: any, value?: any): any, any
 --- @return orderedtable
 function mapPairNewPairOvtable(tbl, f)
   local t = ovtable.new()
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     local new_k, new_v = f(k, v)
     t[new_k] = new_v
   end
@@ -132,7 +142,7 @@ end
 --- @return O[]
 function mapTableToArray(tbl, f)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     t[#t + 1] = f(k, v)
   end
   return t
@@ -154,7 +164,7 @@ end
 --- @param tbl table<any, any> | nil
 --- @return table<any, string>
 function mapValueToStr(tbl)
-  return mapValueNewValue(tbl, function(v)
+  return map(tbl, function(v)
     return tostring(v)
   end)
 end
@@ -165,7 +175,7 @@ end
 --- @return K[]
 function keys(tbl)
   local t = {}
-  for k, _ in pairsSafe(tbl) do
+  for k, _ in wdefarg(pairs)(tbl) do
     t[#t + 1] = k
   end
   return t
@@ -175,7 +185,7 @@ end
 --- @return integer
 function tbllength(tbl)
   local i = 0
-  for _, _ in pairsSafe(tbl) do
+  for _, _ in wdefarg(pairs)(tbl) do
     i = i + 1
   end
   return i
@@ -187,7 +197,7 @@ end
 --- @return V[]
 function values(tbl)
   local t = {}
-  for _, v in pairsSafe(tbl) do
+  for _, v in wdefarg(pairs)(tbl) do
     t[#t + 1] = v
   end
   return t
@@ -195,7 +205,7 @@ end
 
 function pairsList(tbl)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     t[#t + 1] = {k, v}
   end
   return t
@@ -227,7 +237,7 @@ end
 --- @param key any
 --- @return boolean
 function keysContain(tbl, key)
-  for k, _ in pairsSafe(tbl) do
+  for k, _ in wdefarg(pairs)(tbl) do
     if k == key then return true end
   end
   return false
@@ -239,7 +249,7 @@ end
 --- @param value any
 --- @return boolean
 function valuesContain(tbl, value)
-  for _, v in pairsSafe(tbl) do
+  for _, v in wdefarg(pairs)(tbl) do
     if v == value then return true end
   end
   return false
@@ -251,7 +261,7 @@ end
 --- @param value any
 --- @return boolean
 function valuesContainShape(tbl, value)
-  for _, v in pairsSafe(tbl) do
+  for _, v in wdefarg(pairs)(tbl) do
     if hs.inspect(v, {depth = 5}) == hs.inspect(value, {depth = 5}) then return true end
   end
   return false
@@ -263,10 +273,10 @@ end
 --- @return { [K1|K2]: V1|V2 }
 function tableConcat(t1, t2)
   local new_table = {}
-  for k, v in pairsSafe(t1) do
+  for k, v in wdefarg(pairs)(t1) do
     new_table[k] = v
   end
-  for k, v in pairsSafe(t2) do
+  for k, v in wdefarg(pairs)(t2) do
     new_table[k] = v
   end
   return new_table
@@ -279,7 +289,7 @@ end
 function copyKeysT1ToT2(t1, t2) -- in-place!
   if type(t1) ~= "table" or type(t2) ~= "table" then error("copyKeysT1ToT2: t1 and t2 must be tables") end
   if not t2 then t2 = {} end
-  for k, v in pairsSafe(t1) do
+  for k, v in wdefarg(pairs)(t1) do
     t2[k] = v
   end
   return t2
@@ -357,7 +367,7 @@ end
 --- @param tbl {[`K`]: `V`} | nil
 --- @param f fun(key?: K, value?: V)
 function forEach(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     f(k, v)
   end
 end
@@ -367,7 +377,7 @@ end
 --- @param tbl {[`K`]: `V`} | nil
 --- @param f fun(key?: K)
 function forKeys(tbl, f)
-  for k, _ in pairsSafe(tbl) do
+  for k, _ in wdefarg(pairs)(tbl) do
     f(k)
   end
 end
@@ -377,7 +387,7 @@ end
 --- @param tbl {[`K`]: `V`} | nil
 --- @param f fun(value?: V)
 function forValues(tbl, f)
-  for _, v in pairsSafe(tbl) do
+  for _, v in wdefarg(pairs)(tbl) do
     f(v)
   end
 end
@@ -388,7 +398,7 @@ end
 --- @return { [K]: V }
 function filterKeysInList(tbl, list)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if valuesContain(list, k) then
       t[k] = v
     end
@@ -402,7 +412,7 @@ end
 --- @return { [K]: V }
 function filterKeysNotInList(tbl, list)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if not valuesContain(list, k) then
       t[k] = v
     end
@@ -416,7 +426,7 @@ end
 --- @return { [K]: V }
 function filterKeys(tbl, f)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(k, v) then
       t[k] = v
     end
@@ -430,7 +440,7 @@ end
 --- @return { [K]: V }
 function filterValues(tbl, f)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(k, v) then
       t[k] = v
     end
@@ -445,7 +455,7 @@ end
 --- @return T | U
 function reduceKeys(tbl, f, initial)
   local acc = initial
-  for k, _ in pairsSafe(tbl) do
+  for k, _ in wdefarg(pairs)(tbl) do
     acc = f(acc, k)
   end
   return acc
@@ -458,7 +468,7 @@ end
 --- @return T | U
 function reduceValues(tbl, f, initial)
   local acc = initial
-  for _, v in pairsSafe(tbl) do
+  for _, v in wdefarg(pairs)(tbl) do
     acc = f(acc, v)
   end
   return acc
@@ -471,7 +481,7 @@ end
 --- @return T | U
 function reduceKeyValuePairs(tbl, f, initial)
   local acc = initial
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     acc = f(acc, k, v)
   end
   return acc
@@ -482,7 +492,7 @@ end
 --- @param f fun(key?: K): boolean
 --- @return boolean
 function allKeysPass(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if not f(k) then return false end
   end
   return true
@@ -493,7 +503,7 @@ end
 --- @param f fun(value?: V): boolean
 --- @return boolean
 function allValuesPass(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if not f(v) then return false end
   end
   return true
@@ -504,7 +514,7 @@ end
 --- @param f fun(key?: K, value?: V): boolean
 --- @return boolean
 function allPairsPass(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if not f(k, v) then return false end
   end
   return true
@@ -515,7 +525,7 @@ end
 --- @param f fun(key?: K): boolean
 --- @return boolean
 function someKeysPass(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(k) then return true end
   end
   return false
@@ -526,7 +536,7 @@ end
 --- @param f fun(value?: V): boolean
 --- @return boolean
 function someValuesPass(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(v) then return true end
   end
   return false
@@ -537,7 +547,7 @@ end
 --- @param f fun(key?: K, value?: V): boolean
 --- @return boolean
 function somePairsPass(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(k, v) then return true end
   end
   return false
@@ -572,7 +582,7 @@ end
 --- @param f fun(key?: K): boolean
 --- @return K | nil
 function keyFind(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(k) then return k end
   end
   return nil
@@ -583,7 +593,7 @@ end
 --- @param f fun(value?: V): boolean
 --- @return V | nil
 function valueFind(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(v) then return v end
   end
   return nil
@@ -594,7 +604,7 @@ end
 --- @param f fun(key?: K, value?: V): boolean
 --- @return K, V | nil
 function pairFind(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(k, v) then return k, v end
   end
   return nil
@@ -606,7 +616,7 @@ end
 --- @return K | nil
 function keyFindLast(tbl, f)
   local last_key = nil
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(k) then last_key = k end
   end
   return last_key
@@ -618,7 +628,7 @@ end
 --- @return V | nil
 function valueFindLast(tbl, f)
   local last_value = nil
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(v) then last_value = v end
   end
   return last_value
@@ -629,7 +639,7 @@ end
 --- @param str string 
 --- @return K | nil
 function keyFindString(tbl, str)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if k == str then return k end
   end
   return nil
@@ -640,7 +650,7 @@ end
 --- @param str string
 --- @return V | nil
 function valueFindString(tbl, str)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if v == str then return v end
   end
   return nil
@@ -651,7 +661,7 @@ end
 --- @param str string 
 --- @return K | nil
 function keyFindStringEndsWith(tbl, str)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if stringy.endswith(k, str) then return k end
   end
   return nil
@@ -662,7 +672,7 @@ end
 --- @param str string 
 --- @return V | nil
 function valueFindStringEndsWith(tbl, str)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if stringy.endswith(v, str) then return v end
   end
   return nil
@@ -673,7 +683,7 @@ end
 --- @param f fun(key?: K): boolean
 --- @return V | nil
 function keyFindValue(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(k) then return v end
   end
   return nil
@@ -684,7 +694,7 @@ end
 --- @param f fun(value?: V): boolean
 --- @return K | nil
 function valueFindKey(tbl, f)
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if f(v) then return k end
   end
   return nil
@@ -722,7 +732,7 @@ end
 --- @return { [V]: K }
 function switchKeysAndValues(tbl)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     t[v] = k
   end
   return t
@@ -793,7 +803,7 @@ end
 ---@return any[]
 function collectLeaves(tbl)
   local t = {}
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     if type(v) == "table" then
       local leaves = collectLeaves(v)
       for _, leaf in ipairs(leaves) do
@@ -814,7 +824,7 @@ function chunk(tbl, chunk_size)
   local t = {}
   local chunk = {}
   if chunk_size < 1 then return {tbl} end -- chunk size of 0 or less  = no chunking
-  for k, v in pairsSafe(tbl) do
+  for k, v in wdefarg(pairs)(tbl) do
     chunk[k] = v
     if tbllength(chunk) == chunk_size then
       t[#t+1] = chunk

@@ -168,7 +168,7 @@ PARSEABLE_FORMAT_COMPONENTS = {
 }
 
 PARSEABLE_FORMAT_SPECIFIER = table.concat(
-  mapValueNewValue(
+  map(
     PARSEABLE_FORMAT_COMPONENTS,
     function (component)
       return "{" .. component .. "}"
@@ -215,13 +215,13 @@ KhalCommandSpecifier = {
       end,
       ["search-events-parsed"] = function(self, specifier)
         local res = self:get("search-events-parseable", specifier)
-        return mapValueNewValue(
+        return map(
           res,
           parseParseableKhalToSpecification
         )
       end,
       ["search-events-items"] = function(self, specifier)
-        return mapValueNewValue(
+        return map(
           self:get("search-events-parsed", specifier),
           function (event)
             return CreateEventTableItem(event)
@@ -230,7 +230,7 @@ KhalCommandSpecifier = {
       end,
       ["search-events-templates"] = function(self, specifier)
         local res = self:get("search-events-parsed", specifier)
-        return mapValueNewValue(
+        return map(
           res,
           function (event)
             return generateCalendarTemplate(event)
@@ -263,13 +263,13 @@ KhalCommandSpecifier = {
       end,
       ["list-events-parsed"] = function(self, specifier)
         local res = self:get("list-events-parseable", specifier)
-        return mapValueNewValue(
+        return map(
           res,
           parseParseableKhalToSpecification
         )
       end,
       ["list-events-items"] = function(self, specifier)
-        return mapValueNewValue(
+        return map(
           self:get("list-events-parsed", specifier),
           function (event)
             return CreateEventTableItem(event)

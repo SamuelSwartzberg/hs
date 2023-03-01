@@ -303,7 +303,7 @@ for create_function, test_specifers in pairs(item_creation_map) do
       value = value()
     end
     local item = create_function(value)
-    for _, must_be in ipairsSafe(test_specifier.must_be) do
+    for _, must_be in wdefarg(ipairs)(test_specifier.must_be) do
       if not valuesContain(item:get_all("type"), must_be) then
         error("Item created by " .. 
         tostring(create_function) .. 
@@ -313,7 +313,7 @@ for create_function, test_specifers in pairs(item_creation_map) do
         
       end
     end
-    for _, must_not_be in ipairsSafe(test_specifier.must_not_be) do
+    for _, must_not_be in wdefarg(ipairs)(test_specifier.must_not_be) do
       if valuesContain(item:get_all("type"), must_not_be) then
         error("Item created by " .. tostring(create_function) .. " with value " .. tostring(test_specifier.value) .. " has type " .. tostring(must_not_be) .. " but should not")
       end

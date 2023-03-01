@@ -76,7 +76,7 @@ end
 --- @return { [T]: true }
 function listToBoolTable(tbl)
   local value_bool_table = {}
-  for _, v in ipairsSafe(tbl) do
+  for _, v in wdefarg(ipairs)(tbl) do
     value_bool_table[v] = true
   end
   return value_bool_table
@@ -177,7 +177,7 @@ end
 --- @param func fun(value: T): O|O[]
 --- @return O[]
 function flatMap(tbl, func)
-  local res = listFlatten(mapValueNewValue(tbl, func), 1)
+  local res = listFlatten(map(tbl, func), 1)
   return res
 end
 
@@ -525,7 +525,7 @@ end
 --- @param transformer fun(input: T[]):O
 --- @return O[][]
 function allTransformedCombinations(list, transformer)
-  return mapValueNewValue(powerset(list), transformer)
+  return map(powerset(list), transformer)
 end
 
 --- @generic T
@@ -548,7 +548,7 @@ end
 --- @return (T | U)[]
 function listJoin(list, joiner)
   local new_list = {}
-  for i, v in ipairsSafe(list) do
+  for i, v in wdefarg(ipairs)(list) do
     new_list = listConcat(new_list, v)
     if i < #list then
       new_list = listConcat(new_list, joiner)

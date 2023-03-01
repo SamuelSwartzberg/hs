@@ -217,7 +217,7 @@ local keymap = {
     explanation = "Choose a pass and fill it",
     fn = function()
       CreateArray(
-        mapValueNewValue(itemsInPath(env.MPASSPASSW), function(fl) return getLeafWithoutPathOrExtension(fl) end)
+        map(itemsInPath(env.MPASSPASSW), function(fl) return getLeafWithoutPathOrExtension(fl) end)
       ):doThis("choose-item-and-then-action")
     end,
   },
