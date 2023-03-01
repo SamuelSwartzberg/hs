@@ -74,3 +74,17 @@ function returnNumArgs(...)
   local args = {...}
   return #args
 end
+
+--- @param a any
+--- @param b any
+--- @return boolean
+function returnEqual(a, b)
+  return a == b
+end
+
+--- @param a any
+--- @param b any
+--- @return boolean
+function returnLarger(a, b)
+  return a > b
+end

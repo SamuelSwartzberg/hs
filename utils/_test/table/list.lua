@@ -49,12 +49,16 @@ assertTable(
 )
 
 assertTable(
-  flatMap({ 1, 2 , 3}, function(item) return {item, item + 1} end),
+  map({ 1, 2 , 3}, function(item) return false, {item, item + 1} end, {
+    args = "k",
+    useas = "kv",
+    flatten = true
+  }),
   {1, 2, 2, 3, 3, 4}
 )
 
 assertTable(
-  flatMap({1,2,3}, function(x) return x end),
+  map({1,2,3}, function(x) return x end),
   {1,2,3}
 )
 

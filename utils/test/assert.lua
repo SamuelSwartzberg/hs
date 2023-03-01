@@ -5,6 +5,18 @@ function assertTable(a, b)
   assert(string_table_a == string_table_b, ("Expected %s, but got %s"):format(string_table_b, string_table_a))
 end
 
+--- @generic K
+--- @generic V
+--- @param tbl { [`K`]: `V` } | nil
+--- @param value any
+--- @return boolean
+function valuesContainShape(tbl, value)
+  for _, v in wdefarg(pairs)(tbl) do
+    if hs.inspect(v, {depth = 5}) == hs.inspect(value, {depth = 5}) then return true end
+  end
+  return false
+end
+
 --- @param a table
 --- @param values any[]
 --- @return nil
