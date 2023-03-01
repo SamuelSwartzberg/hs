@@ -219,11 +219,11 @@ InterfaceDefaultTemplate = {
         return table.concat(types, "\n")
       end,
       ["is-a"] = function(self, interface_type)
-        return valueFindString(self:get_all("type"), interface_type)
+        return find(self:get_all("type"), interface_type)
       end,
       ["interface-by-type"] = function(self, interface_type)
         local all_interfaces = self:get_all("self")
-        return valueFind(all_interfaces, function(interface)
+        return find(all_interfaces, function(interface)
           return interface:get("type") == interface_type
         end)
       end,

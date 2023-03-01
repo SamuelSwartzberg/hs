@@ -6,32 +6,32 @@ assertMessage(
 )
 
 assertMessage(
-  valuesContain({"foo", "bar", "baz"}, "bar"),
+  find({"foo", "bar", "baz"}, "bar"),
   true
 )
 
 assertMessage(
-  valuesContain({"foo", "bar", "baz"}, "qux"),
+  find({"foo", "bar", "baz"}, "qux"),
   false
 )
 
 assertMessage(
-  valuesContain({ a = 1, b = 2, c = 3 }, 2),
+  find({ a = 1, b = 2, c = 3 }, 2),
   true
 )
 
 assertMessage(
-  valuesContain({ a = 1, b = 2, c = 3 }, "b"),
+  find({ a = 1, b = 2, c = 3 }, "b"),
   false
 )
 
 assertMessage(
-  valueFindString({"foo", "bar", "baz"}, "bar"),
+  find({"foo", "bar", "baz"}, "bar"),
   "bar"
 )
 
 assertMessage(
-  valueFindString({"foo", "bar", "baz"}, "qux"),
+  find({"foo", "bar", "baz"}, "qux"),
   nil
 )
 
@@ -93,7 +93,7 @@ assertTable(
 )
 
 assertMessage(
-  valueFind(
+  find(
     { 1, 2, 3 },
     function(value) return value == 2 end
   ),
@@ -101,9 +101,10 @@ assertMessage(
 )
 
 assertMessage(
-  valueFindKeyString(
+  find(
     { a = 1, b = 2, c = 3 },
-    2
+    2,
+    {"v", "k"}
   ),
   "b"
 )

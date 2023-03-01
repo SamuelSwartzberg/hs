@@ -18,7 +18,7 @@ end
 function assocArrFilterUnique(assoc_arr)
   local result = {}
   for k, v in pairs(assoc_arr) do
-    if not valuesContain(result, v) then
+    if not find(result, v) then
       result[k] = v
     end
   end

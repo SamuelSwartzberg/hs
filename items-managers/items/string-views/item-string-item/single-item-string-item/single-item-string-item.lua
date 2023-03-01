@@ -19,7 +19,7 @@ SingleItemStringItemSpecifier = {
         return not eutf8.find(self:get("contents"), "[^%w%p%s]")
       end,
       ["is-application"] = function(self) 
-        return valuesContain(
+        return find(
           itemsInPath({ path = "/Applications/"}),
           self:get("contents") .. ".app"
         )

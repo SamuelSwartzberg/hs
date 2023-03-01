@@ -4,14 +4,14 @@ WindowImplementationItemSpecifier = {
   properties = {
     getables = {
       ["is-jxa-window"] = function(self) 
-        return valuesContain({
+        return find({
           "Google Chrome",
           "Microsoft Edge",
           "Firefox",
         }, self:get("application-name"))
       end,
       ["is-state-window"] = function(self) 
-        return valuesContain({
+        return find({
           "Firefox"
         }, self:get("application-name"))
       end,

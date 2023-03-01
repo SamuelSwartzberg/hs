@@ -92,7 +92,7 @@ ContactTableSpecifier = {
       end,
       ["all-contact-addr"] = function(self, type)
         local all_contact_addr_raw = values(self:get("contact-addr-table", type))
-        return listFilterUnique(all_contact_addr_raw)
+        return toSet(all_contact_addr_raw)
       end,
       ["has-at-least-one-contact-addr"] = function (self, type)
         return #self:get("all-contact-addr", type) > 0

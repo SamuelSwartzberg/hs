@@ -5,7 +5,7 @@ RunningApplicationItemSpecifier = {
     getables = {
       ["is-omegat"] = function(self) return self:get("contents"):title() == "OmegaT" end,
       ["is-libreoffice"] = function(self) return self:get("contents"):title() == "LibreOffice" end,
-      ["is-browser-application"] = function(self) return valuesContain({"Firefox", "Google Chrome"}, self:get("contents"):title()) end,
+      ["is-browser-application"] = function(self) return find({"Firefox", "Google Chrome"}, self:get("contents"):title()) end,
       ["main-window"] = function(self)
         return self:get("contents"):mainWindow()
       end,
@@ -38,8 +38,8 @@ RunningApplicationItemSpecifier = {
       end,
       ["window-index"] = function(self, window)
         local windows = self:get("all-windows")
-        return valueFindKey(windows, function(w) 
-          return w:id() == window:id() end)
+        return find(windows, function(w) 
+          return w:id() == window:id() end, {"v", "k"})
       end,
       ["menu-item-table"] = function(self)
         return self:get("contents"):getMenuItems()

@@ -36,7 +36,7 @@ PathInMaudiovisualItemSpecifier = {
               print("result was table")
               print(result.std_err)
               local err_lines = stringy.split(result.std_err, "\n")
-              local is_unavailable = valueFind(err_lines, function(line)
+              local is_unavailable = find(err_lines, function(line)
                 return stringy.startswith(line, "ERROR: Private video")
               end)
               print("is_unavailable: " .. tostring(is_unavailable))

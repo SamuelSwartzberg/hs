@@ -19,7 +19,7 @@ local filetype_list = {
 --- @return boolean
 function isUsableAsFiletype(str, filetype)
   local extension = pathSlice(str, "-1:-1", { ext_sep = true, standartize_ext = true })[1]
-  if valuesContain(filetype_list[filetype], extension) then
+  if find(filetype_list[filetype], extension) then
     return true
   else
     return false
@@ -67,7 +67,7 @@ function testPath(path, opts)
     local condition 
     if type(opts.ext) == "table" and opts.ext.containedin then 
       condition = function(ext)
-        return valuesContain(filetype_list[opts.ext.containedin], ext)
+        return find(filetype_list[opts.ext.containedin], ext)
       end
     else
       condition = opts.ext
@@ -187,7 +187,7 @@ function testPath(path, opts)
                 if opts.existence.contents.r then
                   listPush(results, not not onig.find(contents, opts.existence.contents.r))
                 else
-                  listPush(results, valuesContain(opts.existence.contents, contents))
+                  listPush(results, find(opts.existence.contents, contents))
                 end
               end
             end

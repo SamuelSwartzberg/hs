@@ -56,7 +56,7 @@ DirItemSpecifier = {
         return self:get("descendant-filename-only-array"):get("to-string-item-array")
       end,
       ["find-descendant"] = function(self, func)
-        return valueFind(self:get("descendants-string-array"), func)
+        return find(self:get("descendants-string-array"), func)
       end,
       ["descendant-ending-with"] = function(self, ending)
         return self:get("find-descendant", function(item)

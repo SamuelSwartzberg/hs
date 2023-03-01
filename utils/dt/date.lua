@@ -9,7 +9,7 @@ number_weekday_map = {
   [7] = "Sunday"
 }
 
-weekday_number_map = switchKeysAndValues(number_weekday_map)
+weekday_number_map = map(number_weekday_map, returnAny, {"kv", "vk"})
 
 --- @param start dateObj
 --- @param finish dateObj

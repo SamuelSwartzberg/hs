@@ -18,7 +18,7 @@ ExtantPathItemSpecifier = {
         return CreateArray(pathSlice(self:get("contents"), "1:-2", { entire_path_for_each = true }))
       end,
       ["is-in-git-dir-path"] = function(self) 
-        return valueFind(
+        return find(
           getItemsForAllLevelsInSlice(self:get("contents"), "1:-1", { include_files = false }),
           function(item)
             return stringy.endswith(item, ".git")

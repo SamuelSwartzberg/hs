@@ -12,7 +12,7 @@ local component_precision_map = {
   sec = 6
 }
 
-local precision_component_map = switchKeysAndValues(component_precision_map)
+local precision_component_map = map(component_precision_map,returnAny, {"kv", "vk"})
 
 local component_variant_form_map = {
   years = "year",

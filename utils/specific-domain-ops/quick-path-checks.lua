@@ -17,7 +17,7 @@ end
 --- @param path string
 --- @return boolean
 function isGitRootDir(path)
-  return not not valueFind(itemsInPath(path), function (child)
+  return not not find(itemsInPath(path), function (child)
     return stringy.endswith(child, "/.git")
   end)
 end

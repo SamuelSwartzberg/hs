@@ -254,7 +254,7 @@ assertTable(
 )
 
 assertMessage(
-  valuesContain(
+  find(
     getItemsForAllLevelsInSlice("/", { start = -2, stop = -2 }  )
     "/nonextant"
   ),
@@ -263,7 +263,7 @@ assertMessage(
 
 --- exclude dirs
 assertMessage(
-  valuesContain(
+  find(
     getItemsForAllLevelsInSlice('/', { start = -2, stop = -2 }, {include_dirs = false}  ),
     "/Applications"
   ),
@@ -273,7 +273,7 @@ assertMessage(
 
 --- exclude files
 assertMessage(
-  valuesContain(
+  find(
     getItemsForAllLevelsInSlice('/', { start = -2, stop = -2 }, {include_files = false}  ),
     "/Applications"
   ),

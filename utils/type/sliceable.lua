@@ -37,9 +37,7 @@ function slice(thing, start_incl_or_spec, stop_incl, step)
     if type(thing) == "string" then
       return onig.find(thing, search, startsearch) 
     else
-      return valueFindKey(slice(thing, startsearch), function(v)
-        return v == search
-      end)
+      return find(slice(thing, startsearch), search, {"v", "k"})
     end
   end
 

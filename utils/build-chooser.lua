@@ -100,9 +100,9 @@ function buildChooser(choices, process_chooser_table, hschooser_postprocessing_c
       log.i("No item chosen, doing nothing.")
     end
   end)  
-  local initial_row = valueFindKey(choices, function (choice)
+  local initial_row = find(choices, function (choice)
     return (not not choice["initial-selected"]) == true
-  end)
+  end, {"v", "k"})
   styleChooser(hschooser, style_object, choices)
   
   hschooser:show()

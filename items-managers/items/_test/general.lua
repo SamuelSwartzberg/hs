@@ -104,7 +104,7 @@ for key, item in pairs(_G) do
     end
     if item.potential_interfaces then
       for k, v in pairs(item.potential_interfaces) do 
-        if not valuesContain(potential_interfaces_ignore_map[key], k) then
+        if not find(potential_interfaces_ignore_map[key], k, "boolean") then
           if not item.properties.getables["is-" .. k] then
             passes = false
             print("potential_interfaces key " .. k .. " of item " .. key ..
@@ -116,7 +116,7 @@ for key, item in pairs(_G) do
     if item.properties.getables then 
       for k, v in pairs(item.properties.getables) do
         if stringy.startswith(k, "is-") then
-          if not valuesContain(is_method_ignore_map[key], k) then 
+          if not find(is_method_ignore_map[key], k, "boolean") then 
             local interface_name = k:sub(4)
             if not item.potential_interfaces or not item.potential_interfaces[interface_name] then
               passes = false
@@ -304,7 +304,7 @@ for create_function, test_specifers in pairs(item_creation_map) do
     end
     local item = create_function(value)
     for _, must_be in wdefarg(ipairs)(test_specifier.must_be) do
-      if not valuesContain(item:get_all("type"), must_be) then
+      if not find(item:get_all("type"), must_be, "boolean") then
         error("Item created by " .. 
         tostring(create_function) .. 
         " with value " .. tostring(test_specifier.value) .. 
@@ -314,7 +314,7 @@ for create_function, test_specifers in pairs(item_creation_map) do
       end
     end
     for _, must_not_be in wdefarg(ipairs)(test_specifier.must_not_be) do
-      if valuesContain(item:get_all("type"), must_not_be) then
+      if find(item:get_all("type"), must_not_be, "boolean") then
         error("Item created by " .. tostring(create_function) .. " with value " .. tostring(test_specifier.value) .. " has type " .. tostring(must_not_be) .. " but should not")
       end
     end

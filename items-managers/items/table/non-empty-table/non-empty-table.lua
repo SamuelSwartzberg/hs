@@ -12,7 +12,7 @@ NonEmptyTableSpecifier = {
         return self:get("contents")[key]
       end,
       ["key"] = function(self, value)
-        return valueFindKeyString(self:get("contents"), value)
+        return find(self:get("contents"), value, {"v", "k"})
       end,
       ["first-match-in-list-of-keys"] = function (self, list_of_keys)
         local contents = self:get("contents")
@@ -29,7 +29,7 @@ NonEmptyTableSpecifier = {
         return CreateArray(self:get("values"))
       end,
       ["pairs"] = function(self)
-        return pairsList(self:get("contents"))
+        return map(self:get("contents"), function(k,v) return false, {k,v} end, "kv")
       end,
       ["pairs-to-new-array"] = function(self)
         return CreateArray(self:get("pairs"))
@@ -53,55 +53,58 @@ NonEmptyTableSpecifier = {
         return self:get("pairs")[self:get("amount-of-elements")]
       end,
       ["all-keys-pass"] = function(self, predicate)
-        return allKeysPass(self:get("contents"), predicate)
+        return not find(self:get("contents"), function(k) return not predicate(k) end, "k")
       end,
       ["all-values-pass"] = function(self, predicate)
-        return allValuesPass(self:get("contents"), predicate)
+        return not find(self:get("contents"), function(v) return not predicate(v) end, "v")
       end,
       ["all-pairs-pass"] = function(self, predicate)
-        return allPairsPass(self:get("contents"), predicate)
+        return not find(self:get("contents"), function(k,v) return not predicate(k,v) end, "kv")
       end,
       ["some-keys-pass"] = function(self, predicate)
-        return someKeysPass(self:get("contents"), predicate)
+        return find(self:get("contents"), predicate, {"k", "boolean"})
       end,
       ["some-values-pass"] = function(self, predicate)
-        return someValuesPass(self:get("contents"), predicate)
+        return find(self:get("contents"), predicate, {"v", "boolean"})
       end,
       ["some-pairs-pass"] = function(self, predicate)
-        return somePairsPass(self:get("contents"), predicate)
+        return find(self:get("contents"), predicate, {"kv", "boolean"})
       end,
       ["none-keys-pass"] = function(self, predicate)
-        return noKeysPass(self:get("contents"), predicate)
+        return not find(self:get("contents"), predicate, {"k", "boolean"})
       end,
       ["none-values-pass"] = function(self, predicate)
-        return noValuesPass(self:get("contents"), predicate)
+        return not find(self:get("contents"), predicate, {"v", "boolean"})
       end,
       ["none-pairs-pass"] = function(self, predicate)
-        return noPairsPass(self:get("contents"), predicate)
+         return not find(self:get("contents"), predicate, {"kv", "boolean"})
       end,
       ["all-keys-are-in-list"] = function(self, list)
-        return allKeysPass(self:get("contents"), function(key)
-          return listHasValue(list, key)
-        end)
+        return not find(self:get("contents"), {
+          _list = list,
+          _invert = true,
+        }, "k")
       end,
       ["all-values-are-in-list"] = function(self, list)
-        return allValuesPass(self:get("contents"), function(value)
-          return listHasValue(list, value)
-        end)
+        return not find(self:get("contents"), {
+          _list = list,
+          _invert = true,
+        }, "v")
       end,
       ["all-pairs-are-in-list"] = function(self, list)
-        return allPairsPass(self:get("contents"), function(pair)
-          return listHasValue(list, pair)
-        end)
+        return not find(self:get("contents"), {
+          _list = list,
+          _invert = true,
+        }, "kv")
       end,
       ["find-key"] = function(self, predicate)
-        return keyFind(self:get("contents"), predicate)
+        return find(self:get("contents"), predicate, "k")
       end,
       ["find-value"] = function (self, predicate)
-        return valueFind(self:get("contents"), predicate)
+        return find(self:get("contents"), predicate)
       end,
       ["find-pair"] = function (self, predicate)
-        return pairFind(self:get("contents"), predicate)
+        return find(self:get("contents"), predicate, 
       end,
       ["map-table"] = function(self, callback)
         return map(self:get("contents"), callback, {"kv", "kv"})

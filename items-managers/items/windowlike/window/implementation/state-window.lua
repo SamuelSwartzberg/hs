@@ -13,7 +13,7 @@ StateWindowItemSpecifier = {
       end,
       ["window-in-state-json"] = function(self) -- utterly insanely, there is no better way to correlate hs.windows and the windows in the json we're using here than to check if they have the same height, width, and top left point
         local geometry = self:get("state-json-matched-geometry-table")
-        return valueFind(
+        return find(
           self:get("application-item"):get("state-as-json").windows,
           function(json_window)
             -- inspPrint(json_window)

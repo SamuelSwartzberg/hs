@@ -9,7 +9,7 @@ ArrayOfInterfacesSpecifier = {
         return CreateArray(self:get("all-queriable-properties"))
       end,
       ["all-possible-values"] = function(self, key)
-        return listFilterUnique(self:get("map", function(item) return item:get(key) end))
+        return toSet(self:get("map", function(item) return item:get(key) end))
       end,
       ["all-possible-values-to-string-array"] = function(self, key)
         return CreateArray(self:get("all-possible-values", key))

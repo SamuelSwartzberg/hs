@@ -14,7 +14,7 @@ UpkgCommandSpecifier = {
       ["which"] = function(self, specifier) return upkgGetInner(specifier.mgr, "which", specifier.arg)
       end,
       ["is-installed"] = function(self, specifier)
-        return valueFindString(
+        return find(
           upkgGetInner(
             specifier.mgr, 
             "list"

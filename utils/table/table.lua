@@ -10,11 +10,14 @@
 --- @field mapcondition conditionSpec TODO NOT USED YET
 
 --- @param tbl? table | nil
---- @param f? function 
+--- @param f? function | table | string
 --- @param opts? kvmult | kvmult[] | mapOpts
 function map(tbl, f, opts)
   tbl = tbl or {}
   f = f or returnAny
+
+  -- process shorthand opts into full opts
+
   if type(opts) == "string" then
     opts = {args = opts, useas = opts}
   elseif isListOrEmptyTable(opts) then
@@ -32,6 +35,22 @@ function map(tbl, f, opts)
     opts.useas = splitChars(opts.useas)
   end
 
+  -- process non-function f into function f
+
+  if type(f) == "table" then
+    local tbl = f
+    f = function(arg)
+      return tbl[arg]
+    end
+  elseif type(f) == "string" then
+    local str = f
+    f = function()
+      return str, str
+    end
+  end
+
+  -- set some vars we will need later
+
   local mapped_useas = {}
   for index, useas in ipairs(opts.useas) do
     mapped_useas[useas] = index
@@ -43,7 +62,6 @@ function map(tbl, f, opts)
   if is_list then -- a list has int keys, which ovtable doesn't support, and we don't want the overhead of ovtable for a list anyway
     opts.noovtable = true
   end
-  
 
   if opts.noovtable then
     res = {}
@@ -133,7 +151,7 @@ end
 --- @class findOpts
 --- @field args kvmult
 --- @field ret kvmult here, kvmult can also include "boolean", to return a boolean instead of the value
---- more tbd
+--- @field last boolean search from the end of the table TODO not yet implemented
 
 --- @param tbl? table | nil
 --- @param cond? conditionSpec
@@ -166,8 +184,10 @@ function find(tbl, cond, opts)
 
   if isListOrEmptyTable(tbl) then
     iterator = ipairs
+    if opts.last then tbl = listReverse(tbl) end
   else
     iterator = pairs
+    if opts.last then error("last option not yet implemented for non-list tables") end
   end
 
   for k, v in wdefarg(iterator)(tbl) do
@@ -175,6 +195,7 @@ function find(tbl, cond, opts)
       k = k,
       v = v
     }
+    local res = true
     for _, arg in ipairs(opts.args) do
       res = res and test(retriever[arg], cond)
       if res then
@@ -252,58 +273,6 @@ function values(tbl)
     t[#t + 1] = v
   end
   return t
-end
-
-function pairsList(tbl)
-  local t = {}
-  for k, v in wdefarg(pairs)(tbl) do
-    t[#t + 1] = {k, v}
-  end
-  return t
-end
-
---- @generic K
---- @generic V
---- @param tbl { [`K`]: `V` } | nil
---- @return K[]
-function sortedKeys(tbl)
-  local t = keys(tbl)
-  table.sort(t)
-  return t
-end
-
---- @generic K
---- @generic V
---- @param tbl { [`K`]: `V` } | nil
---- @return V[]
-function sortedValues(tbl)
-  local t = values(tbl)
-  table.sort(t)
-  return t
-end
-
---- @generic K
---- @generic V
---- @param tbl {[`K`]: `V`} | nil
---- @param key any
---- @return boolean
-function keysContain(tbl, key)
-  for k, _ in wdefarg(pairs)(tbl) do
-    if k == key then return true end
-  end
-  return false
-end
-
---- @generic K
---- @generic V
---- @param tbl {[`K`]: `V`} | nil
---- @param value any
---- @return boolean
-function valuesContain(tbl, value)
-  for _, v in wdefarg(pairs)(tbl) do
-    if v == value then return true end
-  end
-  return false
 end
 
 --- @generic K
@@ -413,36 +382,6 @@ function tableUnpackIfTable(potential_tbl)
   end
 end
 
---- @generic K
---- @generic V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K, value?: V)
-function forEach(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    f(k, v)
-  end
-end
-
---- @generic K
---- @generic V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K)
-function forKeys(tbl, f)
-  for k, _ in wdefarg(pairs)(tbl) do
-    f(k)
-  end
-end
-
---- @generic K
---- @generic V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(value?: V)
-function forValues(tbl, f)
-  for _, v in wdefarg(pairs)(tbl) do
-    f(v)
-  end
-end
-
 --- @generic K, V, T, U
 --- @param tbl {[`K`]: `V`} | nil
 --- @param f fun(acc?: T | U, key?: K): T | U
@@ -487,10 +426,11 @@ end
 --- @param f fun(key?: K): boolean
 --- @return boolean
 function allKeysPass(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if not f(k) then return false end
-  end
-  return true
+  return find(
+    tbl,
+    function(k) return not f(k) end,
+    {"k", "boolean"}
+  ) --[[ @as boolean ]]
 end
 
 --- @generic K, V
@@ -502,205 +442,6 @@ function allValuesPass(tbl, f)
     if not f(v) then return false end
   end
   return true
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K, value?: V): boolean
---- @return boolean
-function allPairsPass(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if not f(k, v) then return false end
-  end
-  return true
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K): boolean
---- @return boolean
-function someKeysPass(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(k) then return true end
-  end
-  return false
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(value?: V): boolean
---- @return boolean
-function someValuesPass(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(v) then return true end
-  end
-  return false
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K, value?: V): boolean
---- @return boolean
-function somePairsPass(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(k, v) then return true end
-  end
-  return false
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K): boolean
---- @return boolean
-function noKeysPass(tbl, f)
-  return not someKeysPass(tbl, f)
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(value?: V): boolean
---- @return boolean
-function noValuesPass(tbl, f)
-  return not someValuesPass(tbl, f)
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K, value?: V): boolean
---- @return boolean
-function noPairsPass(tbl, f)
-  return not somePairsPass(tbl, f)
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K): boolean
---- @return K | nil
-function keyFind(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(k) then return k end
-  end
-  return nil
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(value?: V): boolean
---- @return V | nil
-function valueFind(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(v) then return v end
-  end
-  return nil
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K, value?: V): boolean
---- @return K, V | nil
-function pairFind(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(k, v) then return k, v end
-  end
-  return nil
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K): boolean
---- @return K | nil
-function keyFindLast(tbl, f)
-  local last_key = nil
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(k) then last_key = k end
-  end
-  return last_key
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(value?: V): boolean
---- @return V | nil
-function valueFindLast(tbl, f)
-  local last_value = nil
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(v) then last_value = v end
-  end
-  return last_value
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param str string 
---- @return K | nil
-function keyFindString(tbl, str)
-  for k, v in wdefarg(pairs)(tbl) do
-    if k == str then return k end
-  end
-  return nil
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param str string
---- @return V | nil
-function valueFindString(tbl, str)
-  for k, v in wdefarg(pairs)(tbl) do
-    if v == str then return v end
-  end
-  return nil
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param str string 
---- @return K | nil
-function keyFindStringEndsWith(tbl, str)
-  for k, v in wdefarg(pairs)(tbl) do
-    if stringy.endswith(k, str) then return k end
-  end
-  return nil
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param str string 
---- @return V | nil
-function valueFindStringEndsWith(tbl, str)
-  for k, v in wdefarg(pairs)(tbl) do
-    if stringy.endswith(v, str) then return v end
-  end
-  return nil
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K): boolean
---- @return V | nil
-function keyFindValue(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(k) then return v end
-  end
-  return nil
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(value?: V): boolean
---- @return K | nil
-function valueFindKey(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(v) then return k end
-  end
-  return nil
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param target string
---- @return K | nil
-function valueFindKeyString(tbl, target)
-  return valueFindKey(tbl, function(v) return v == target end)
 end
 
 --- @generic T, V
@@ -721,44 +462,7 @@ function resolveListOfListsByAssocArr(list, assoc_arr, n_elem_to_resolve)
   return t
 end
 
---- @generic K
---- @generic V
---- @param tbl { [`K`]: `V` } | nil
---- @return { [V]: K }
-function switchKeysAndValues(tbl)
-  local t = {}
-  for k, v in wdefarg(pairs)(tbl) do
-    t[v] = k
-  end
-  return t
-end
-
--- simple helpers for higher-order functions
-
---- @generic K, V
---- @param k K
---- @param v? V 
---- @return K
-function returnKey(k, v)
-  return k
-end
-
---- @generic K, V
---- @param k K
---- @param v? V 
---- @return V
-function returnValue(k, v)
-  return v
-end
-
 -- generators, iterators
-
-sipairs = toStatefulGenerator(ipairs)
-spairs = toStatefulGenerator(pairs)
-skeys = toStatefulGenerator(pairs, 1, 1)
-svalues = toStatefulGenerator(pairs, 2, 2)
-sikeys = toStatefulGenerator(ipairs, 1, 1)
-sivalues = toStatefulGenerator(ipairs, 2, 2)
 
 --- tests that prevent errors in indexing 
 

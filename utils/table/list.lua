@@ -69,7 +69,7 @@ end
 --- @generic T
 --- @param tbl T[]|nil
 --- @return T[]
-function listFilterUnique(tbl)
+function toSet(tbl)
   return keys(listToBoolTable(tbl))
 end
 
@@ -181,21 +181,6 @@ function filterNilMap(tbl, func)
   return new_tbl
 end
 
---- @generic T, U
---- @param tbl T[] | nil
---- @param val U 
---- @return boolean
-function listHasValue(tbl, val)
-  if not tbl then return false end
-  for index, value in ipairs(tbl) do
-    if value == val then
-      return true
-    end
-  end
-
-  return false
-end
-
 function listOfTableFlatten(tbl) -- does not work on array tables
   local new_tbl = {}
   for k, v in pairs(tbl) do
@@ -249,17 +234,6 @@ end
 
 --- @generic T
 --- @param list T[]
---- @return T[]
-function listCopy(list)
-  local new_list = {}
-  for i, v in ipairs(list) do
-    new_list[i] = v
-  end
-  return new_list
-end
-
---- @generic T
---- @param list T[]
 --- @param joiner string
 --- @return string
 function listJoinIfNecessary(list, joiner)
@@ -278,7 +252,7 @@ end
 --- @param comp? fun(a: T, b: T):boolean
 --- @return T
 function listMax(list, comp)
-  list = listCopy(list) -- don't modify the original list
+  list = tablex.copy(list) -- don't modify the original list
   table.sort(list, comp)
   return list[#list]
 end
@@ -288,7 +262,7 @@ end
 --- @param comp fun(a: T, b: T):boolean
 --- @return T
 function listMin(list, comp)
-  list = listCopy(list) -- don't modify the original list
+  list = tablex.copy(list) -- don't modify the original list
   table.sort(list, comp)
   return list[1]
 end
@@ -300,7 +274,7 @@ end
 --- @return T
 function listMedian(list, comp, if_even)
   if_even = if_even or "lower"
-  list = listCopy(list) -- don't modify the original list
+  list = tablex.copy(list) -- don't modify the original list
   table.sort(list, comp)
   local mid = math.floor(#list / 2)
   if #list % 2 == 0 then
@@ -321,16 +295,9 @@ end
 --- @param sorter? fun(a: T, b: T):boolean
 --- @return T[]
 function listSort(list, sorter)
-  local new_list = listCopy(list)
+  local new_list = tablex.copy(list)
   table.sort(new_list, sorter)
   return new_list
-end
-
---- @generic K, V
---- @param list {[`K`]: `V`} | nil
---- @return { [K]: V }
-function toSet(list)
-  return listFilterUnique(list)
 end
 
 --- @generic T, U
@@ -349,7 +316,7 @@ end
 function setIntersection(set1, set2)
   local new_list = {}
   for _, v in ipairs(set1) do
-    if listHasValue(set2, v) then
+    if find(set2, v) then
       new_list[#new_list + 1] = v
     end
   end
@@ -363,7 +330,7 @@ end
 function setEquals(set1, set2)
   if #set1 ~= #set2 then return false end
   for _, v in ipairs(set1) do
-    if not listHasValue(set2, v) then
+    if not find(set2, v) then
       return false
     end
   end
@@ -376,7 +343,7 @@ end
 --- @return boolean
 function setIsSubset(set1, set2)
   for _, v in ipairs(set1) do
-    if not listHasValue(set2, v) then
+    if not find(set2, v) then
       return false
     end
   end
@@ -398,7 +365,7 @@ end
 function setDifference(set1, set2)
   local new_list = {}
   for _, v in ipairs(set1) do
-    if not listHasValue(set2, v) then
+    if not find(set2, v) then
       new_list[#new_list + 1] = v
     end
   end
@@ -412,12 +379,12 @@ end
 function setSymmetricDifference(set1, set2)
   local new_list = {}
   for _, v in ipairs(set1) do
-    if not listHasValue(set2, v) then
+    if not find(set2, v) then
       new_list[#new_list + 1] = v
     end
   end
   for _, v in ipairs(set2) do
-    if not listHasValue(set1, v) then
+    if not find(set1, v) then
       new_list[#new_list + 1] = v
     end
   end
@@ -465,66 +432,6 @@ function listSampleString(list, sample_size)
   return outstr
 end
 
--- sadly, since my language server doesn't support generics on class fields at the moment, we need to recreate all methods of 'combine' on our own so we can add type annotations using generics :(
--- while we're doing that, I'm also going to transform them into functions that return a table instead of an iterator
-
---- gets the k-combinations of a list
---- @generic T
---- @param list T[]
---- @param k integer 
---- @return T[][]
-function combinations(list, k)
-  if k == 0 then
-    return {{}}
-  else 
-    return statefulNokeyIteratorToTable(combine.combn, list, k)
-  end
-end
-
-wdefarg
-
---- @generic T
---- @param list T[]
---- @return T[][]
-function permutations(list)
-  if #list == 0 then
-    return {{}}
-  else
-    return statefulNokeyIteratorToTable(combine.permute, list)
-  end
-end
-
---- @generic T
---- @param list T[]
---- @return T[][]
-function powerset(list)
-  if #list == 0 then
-    return {{}}
-  else
-    local output = listConcat( statefulNokeyIteratorToTable(combine.powerset, list), {{}} )
-    return output
-  end
-end
-
---- @generic T, O
---- @param list T[]
---- @param transformer fun(input: T[]):O
---- @return O[][]
-function allTransformedCombinations(list, transformer)
-  return map(powerset(list), transformer)
-end
-
---- @generic T
---- @param list T[]
---- @param n integer
---- @return T[]
-function listMultiply(list, n)
-  local new_list = {}
-  for i = 1, n do
-    new_list = listConcat(new_list, list)
-  end
-  return new_list
-end
 
 --- joins a list of lists into a single list, optionally inserting 1 - n elements between each list
 --- @generic T

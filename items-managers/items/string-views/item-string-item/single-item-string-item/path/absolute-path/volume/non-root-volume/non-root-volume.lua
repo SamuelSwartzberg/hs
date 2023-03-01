@@ -13,7 +13,7 @@ NonRootVolumeItemSpecifier = {
     doThisables = {
       eject = function (self)
         hs.fs.volume.eject(self:get("contents"))
-        if valuesContain(hs.fs.volume.allVolumes(), self:get("contents")) then
+        if find(hs.fs.volume.allVolumes(), self:get("contents")) then
           error("Volume could not be ejected.", 0)
         else 
           hs.alert.show("Volume ejected successfully.")

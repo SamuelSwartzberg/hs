@@ -21,9 +21,7 @@ for k, v in pairs(test_ovtable) do
     v == test_nonov_assoc_arr[k],
     true
   )
-  local key_for_value = valueFindKey(test_nonov_assoc_arr, function (val)
-    return val == v
-  end)
+  local key_for_value = find(test_nonov_assoc_arr, v, {"v", "k"})
   assertMessage(
     k == key_for_value,
     true
@@ -35,9 +33,7 @@ for i, v in ipairs(test_ovtable) do
     v == test_nonov_list[i],
     true
   )
-  local index_for_value = valueFindKey(test_nonov_list, function (val)
-    return val == v
-  end)
+  local index_for_value = find(test_nonov_list, v, {"v", "k"})
   assertMessage(
     i == index_for_value,
     true

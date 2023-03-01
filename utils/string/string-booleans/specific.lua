@@ -137,5 +137,5 @@ function isPackageManager(str)
     })
   )
   
-  return not not valueFindKeyString(package_managers, str)
+  return not not find(package_managers, str, {"v", "k"})
 end

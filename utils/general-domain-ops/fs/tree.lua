@@ -21,9 +21,9 @@ function fsTree(path, do_files, tree_files)
         listPush(res, full_path)
       elseif do_files == "as-tree" then
         local nodename = getFilenameWithoutExtension(file)
-        if stringy.endswith(file, ".yaml") and valueFindString(tree_files, "yaml") then
+        if stringy.endswith(file, ".yaml") and find(tree_files, "yaml") then
           res[nodename] = yamlLoad(readFile(full_path, "error"))
-        elseif stringy.endswith(file, ".json") and valueFindString(tree_files, "json") then
+        elseif stringy.endswith(file, ".json") and find(tree_files, "json") then
           res[nodename] = json.decode(readFile(full_path, "error"))
         end
       end

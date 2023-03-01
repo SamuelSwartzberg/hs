@@ -59,7 +59,7 @@ assertTable(
 )
 
 assertTable(
-  listFilterUnique({1,1,1,2,3,3}),
+  toSet({1,1,1,2,3,3}),
   {1,2,3}
 )
 
@@ -229,7 +229,7 @@ assertValuesContainExactly(
 )
 
 assertValuesContainExactly(
-  allTransformedCombinations({1, 2, 3}, function(x) return listMultiply(x, 2) end),
+  map(powerset({1, 2, 3}), function(x) return listMultiply(x, 2) end),
   {
     {},
     {1, 1},

@@ -10,7 +10,7 @@ ApplicationItemSpecifier = {
         return "/Applications/" .. self:get("contents") .. ".app/"
       end,
       ["is-title-url-application"] = function(self)
-        return valuesContain({"Firefox", "Newpipe"}, self:get("contents"))
+        return find({"Firefox", "Newpipe"}, self:get("contents"))
       end,
       ["is-hydrus-network"] = function(self)
         return self:get("contents") == "Hydrus Network"
@@ -22,7 +22,7 @@ ApplicationItemSpecifier = {
         return self:get("contents") == "Git"
       end,
       ["is-chat-application"] = function(self)
-        return valuesContain({"Discord", "Telegram Lite", "WhatsApp", "Signal", "Facebook"}, self:get("contents"))
+        return find({"Discord", "Telegram Lite", "WhatsApp", "Signal", "Facebook"}, self:get("contents"))
       end,
       ["upper-name"] = function (self)
         return self:get("contents"):upper()

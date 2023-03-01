@@ -12,7 +12,7 @@ ArrayOfPathsSpecifier = {
       end,
       ["filter-to-array-of-path-leafs-with-tag-nv"] = function(self, nv)
         return self:get("filter-to-new-array", function(path)
-          return valuesContain(path:get("tag-value", nv.name), nv.value)
+          return find(path:get("tag-value", nv.name), nv.value)
         end)
       end,
       ["array-of-tag-names"] = function(self)

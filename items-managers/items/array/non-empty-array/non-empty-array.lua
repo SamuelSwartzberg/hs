@@ -62,13 +62,13 @@ NonEmptyArraySpecifier = {
         return res
       end,
       ["filter-to-unique-array"]= function(self)
-        return CreateArray(listFilterUnique(self:get("contents")))
+        return CreateArray(toSet(self:get("contents")))
       end,
       ["find"] = function(self, callback)
-        return valueFind(self:get("contents"), callback)
+        return find(self:get("contents"), callback)
       end,
       ["find-index"] = function(self, callback)
-        return valueFindKey(self:get("contents"), callback)
+        return find(self:get("contents"), callback, {"v", "k"})
       end,
       ["next"] = function(self, index)
         return self:get("contents")[index + 1]
@@ -89,10 +89,10 @@ NonEmptyArraySpecifier = {
         return allValuesPass(self:get("contents"), callback)
       end,
       ["some-pass"] = function(self, callback)
-        return someValuesPass(self:get("contents"), callback)
+        return find(self:get("contents"), callback, {"v", "boolean"})
       end,
       ["none-pass"] = function (self, callback)
-        return noValuesPass(self:get("contents"), callback)
+        return not find(self:get("contents"), callback, {"v", "boolean"})
       end,
       ["item-by-index"] = function(self, index)
         return self:get("contents")[index]

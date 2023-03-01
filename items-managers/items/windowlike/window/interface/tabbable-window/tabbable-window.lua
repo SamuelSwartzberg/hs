@@ -4,13 +4,13 @@ TabbableWindowItemSpecifier = {
   properties = {
     getables = {
       ["is-jxa-tabbable-window"] = function(self) 
-        return valuesContain({
+        return find({
           "Google Chrome",
           "Microsoft Edge",
         }, self:get("application-name"))
       end,
       ["is-state-tabbable-window"] = function(self) 
-        return valuesContain({
+        return find({
           "Firefox"
         }, self:get("application-name"))
       end,

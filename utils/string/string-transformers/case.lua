@@ -22,7 +22,7 @@ end
 ---@param word string
 ---@return string
 function titleCaseWordNoContext(word)
-  if valuesContain(small_words, word) then
+  if find(small_words, word) then
     return word
   elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
     return word

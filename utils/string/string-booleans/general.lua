@@ -92,6 +92,7 @@ end
 --- @field _type? "string" | "number" | "boolean" | "table" | "function" | "thread" | "userdata
 --- @field _exactly? string
 --- @field _invert? boolean
+--- @field _list? any[]
 
 
 --- @alias conditionThatCantBeConfusedForListOfConditions boolean | string | table | condition | function
@@ -172,8 +173,8 @@ function test(item, conditions, opts)
         found_other_use_for_table = true
       end
 
-      if not found_other_use_for_table then
-        listPush(results, ps(valuesContain(condition, item))) -- TODO: potential infinite loop since valuesContain may be refactored to use test
+      if condition._list or not found_other_use_for_table then
+        listPush(results, ps(find(condition, item))) -- TODO: potential infinite loop since find may be refactored to use test
       end
     elseif type(condition) == "function" then
       listPush(results, condition(item))

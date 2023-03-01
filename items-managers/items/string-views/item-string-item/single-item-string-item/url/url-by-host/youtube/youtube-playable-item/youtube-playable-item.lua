@@ -46,7 +46,7 @@ YoutubePlayableItemItemSpecifier = {
         local output, status = getOutputTask({"youtube-dl", "--get-title", self:get("contents")})
         if status ~= 0 then
           local lines = stringy.split(output, "\n")
-          return valueFind(lines, function(line)
+          return find(lines, function(line)
             return stringy.startswith(line, "ERROR: Private video")
           end)
         else

@@ -13,7 +13,7 @@ function createAliasMetatable(get_longer_shorter_thing)
       if v then
         return v
       else
-        local key = keyFind(t, function(testkey)
+        local key = find(t, function(testkey)
           local longer_thing, shorter_thing = get_longer_shorter_thing(testkey, k)
           local longer_parts = stringy.split(longer_thing, "_")
           local shorter_parts = splitBytes(shorter_thing)
@@ -26,7 +26,7 @@ function createAliasMetatable(get_longer_shorter_thing)
             end
           end
           return true
-        end)
+        end, "k")
         if key then
           return t[key]
         else

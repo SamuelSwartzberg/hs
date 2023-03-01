@@ -4,7 +4,7 @@ LowercaseWordItemSpecifier = {
   properties = {
     getables = {
       ["is-pass-name"] = function(self)
-        return valuesContain(
+        return find(
           memoize(getAllInPath)({
             path = env.MPASS,
             recursion = true,

@@ -13,7 +13,7 @@ TelegramItemSpecifier = {
         return chat_obj.messages
       end,
       ["find-messages-by-id"] = function(self, specifier)
-        return valueFind(
+        return find(
           self:get("raw-messages", specifier.chat_obj), 
           function (msg) return msg.id == specifier.id end
         )

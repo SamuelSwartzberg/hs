@@ -5,7 +5,7 @@ TabInterfaceItemSpecifier = {
     getables = {
       ["is-browser-tab"] = function(self) 
         local app = self:get("application-name")
-        return valuesContain({"Google Chrome", "Firefox", "Microsoft Edge"}, app)
+        return find({"Google Chrome", "Firefox", "Microsoft Edge"}, app)
       end,
     },
     doThisables = {

@@ -4,7 +4,7 @@ InnerNodeTableSpecifier = {
     getables = {
       ["child-by-tag-name"] = function(self, tag_name)
         local children = self:get("value", "children")
-        valueFind(children, function(child)
+        find(children, function(child)
           return child.tag == tag_name
         end)
       end,

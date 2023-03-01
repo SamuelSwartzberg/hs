@@ -5,11 +5,11 @@ WindowInterfaceItemSpecifier = {
     getables = {
       ["is-browser-window"] = function(self) 
         local app = self:get("application-name")
-        return valuesContain({"Google Chrome", "Firefox", "Microsoft Edge"}, app)
+        return find({"Google Chrome", "Firefox", "Microsoft Edge"}, app)
       end,
       ["is-tabbable-window"] = function (self)
         local app = self:get("application-name")
-        return valuesContain({"Google Chrome", "Firefox", "Microsoft Edge"}, app)
+        return find({"Google Chrome", "Firefox", "Microsoft Edge"}, app)
       end,
       ["is-window-combination"] = returnTrue
     },
