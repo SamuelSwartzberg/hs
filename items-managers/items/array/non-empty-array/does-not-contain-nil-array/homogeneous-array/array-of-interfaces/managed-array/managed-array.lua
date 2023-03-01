@@ -17,7 +17,7 @@ ManagedArraySpecifier = {
     },
     doThisables = {
       ["add-to-end"] = function(self, item)
-        pop(self:get("contents"), item)
+        push(self:get("contents"), item)
         self:doThis("update-interface-if-necessary", item)
       end,
       ["add-to-front"] = function(self, item)

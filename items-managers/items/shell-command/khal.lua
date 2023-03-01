@@ -207,7 +207,7 @@ KhalCommandSpecifier = {
         }
         addFormatToCommand(command, specifier)
         addInclExclToCommand(command, specifier)
-        pop(command, { value = specifier.searchstr, type = "quoted" })
+        push(command, { value = specifier.searchstr, type = "quoted" })
         return filter(stringx.split(run(command, true), RECORD_SEPARATOR))
       end,
       ["search-events-parseable"] = function(self, specifier)
@@ -247,15 +247,15 @@ KhalCommandSpecifier = {
         addFormatToCommand(command, specifier)
         addInclExclToCommand(command, specifier)
         if specifier.once then
-          pop(command, "--once")
+          push(command, "--once")
         end
         if specifier.notstarted then
-          pop(command, "--notstarted")
+          push(command, "--notstarted")
         end
         specifier.start = specifier.start or "today"
         specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
-        pop(command, { value = specifier.start, type = "quoted" })
-        pop(command, { value = specifier["end"], type = "quoted" })
+        push(command, { value = specifier.start, type = "quoted" })
+        push(command, { value = specifier["end"], type = "quoted" })
         return filter(stringx.split(run(command, true), RECORD_SEPARATOR ))
       end,
       ["list-events-parseable"] = function(self, specifier)
@@ -399,19 +399,19 @@ KhalCommandSpecifier = {
         )
 
         if specifier.start then
-          pop(command, specifier.start)
+          push(command, specifier.start)
         end
 
         if specifier["end"] then
-          pop(command, specifier["end"])
+          push(command, specifier["end"])
         end
 
         if specifier.timezone then
-          pop(command, specifier.timezone)
+          push(command, specifier.timezone)
         end
 
         if specifier.title then
-          pop(command, specifier.title)
+          push(command, specifier.title)
         end
 
         if specifier.description then

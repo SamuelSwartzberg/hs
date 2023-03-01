@@ -1,7 +1,7 @@
 --- @generic T
 --- @param tbl T[]
 --- @return T
-function push(tbl)
+function pop(tbl)
   local last = tbl[#tbl]
   tbl[#tbl] = nil
   return last
@@ -11,7 +11,7 @@ end
 --- @param tbl T[]
 --- @param value U
 --- @return true
-function pop(tbl, value)
+function push(tbl, value)
   tbl[#tbl + 1] = value
   return true
 end

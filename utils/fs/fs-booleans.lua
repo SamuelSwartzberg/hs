@@ -73,7 +73,7 @@ function testPath(path, opts)
       condition = opts.ext
     end
     opts.slice = opts.slice or {}
-    pop(opts.slice, {
+    push(opts.slice, {
       slice = {start = -1, stop = -1},
       condition = condition,
       sliceOpts = {ext_sep = true, standartize_ext = true}
@@ -103,7 +103,7 @@ function testPath(path, opts)
         slice_spec.condition = {slice_spec.condition}
       end
 
-      pop(results, test(slice, slice_spec.condition))
+      push(results, test(slice, slice_spec.condition))
 
       if results[#results] == false then -- return early if any slice test fails. This may be removed at some point if I allow for 'or'-logic at some point
         return false
@@ -139,7 +139,7 @@ function testPath(path, opts)
       exists = pcall(run,{"rclone", "ls", {value = path, type = "quoted"}})
     end
 
-    pop(results, exists == opts.existence.exists)
+    push(results, exists == opts.existence.exists)
 
     if exists and opts.existence.exists then -- if the path exists and we want it to exist, test the dirness and contents
 
@@ -157,7 +157,7 @@ function testPath(path, opts)
           })
 
         end
-        pop(results, dirness == (opts.existence.dirness == "dir"))
+        push(results, dirness == (opts.existence.dirness == "dir"))
 
         if results[#results] == false then -- return early if the dirness test fails. This may be removed at some point if I allow for 'or'-logic at some point
           return false
@@ -175,7 +175,7 @@ function testPath(path, opts)
           end
 
           if contents == nil then
-            pop(results, opts.existence.contents == (contents ~= nil))
+            push(results, opts.existence.contents == (contents ~= nil))
           else
             if dirness then
               error("not implemented yet")
@@ -185,9 +185,9 @@ function testPath(path, opts)
               end
               if type(opts.existence.contents) == "table" then
                 if opts.existence.contents.r then
-                  pop(results, not not onig.find(contents, opts.existence.contents.r))
+                  push(results, not not onig.find(contents, opts.existence.contents.r))
                 else
-                  pop(results, find(opts.existence.contents, contents))
+                  push(results, find(opts.existence.contents, contents))
                 end
               end
             end

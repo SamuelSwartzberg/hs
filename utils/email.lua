@@ -125,20 +125,20 @@ function getSortedEmailPaths(path, reverse, magrep, mpick)
     { value = path, type = "quoted" }
   }}
   if magrep then
-    pop(steps, {
+    push(steps, {
       "magrep",
       "-i",
       { value = magrep, type = "quoted" }
     })
   end
   if mpick then
-    pop(steps, {
+    push(steps, {
       "mpick",
       "-t",
       { value = mpick, type = "quoted" }
     })
   end
-  pop(steps, {
+  push(steps, {
     "msort",
     flags
   })

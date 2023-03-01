@@ -47,15 +47,15 @@ function nestedAssocArrToListIncludingPath(assoc_arr, path)
   for k, v in pairs(assoc_arr) do
     if type(v) == "table" and #values(v) > 0 then
       local cloned_path = tablex.copy(path)
-      pop(cloned_path, k)
+      push(cloned_path, k)
       local sub_result = nestedAssocArrToListIncludingPath(v, cloned_path)
       for i, sub_result_item in ipairs(sub_result) do
-        pop(result, sub_result_item)
+        push(result, sub_result_item)
       end
     else
       local cloned_path = tablex.copy(path)
-      pop(cloned_path, k)
-      pop(result, {path = cloned_path, value = v})
+      push(cloned_path, k)
+      push(result, {path = cloned_path, value = v})
     end
   end
   return result
@@ -135,7 +135,7 @@ function listWithChildrenKeyToListIncludingPath(list, path, specifier)
   local result = {}
   for i, item in ipairs(list) do
     local cloned_path = tablex.copy(path)
-    pop(cloned_path, item[specifier.title_key_name])
+    push(cloned_path, item[specifier.title_key_name])
     local children = item[specifier.children_key_name]
     if specifier.levels_of_nesting_to_skip > 0 and children then
       for i = 1, specifier.levels_of_nesting_to_skip do -- this is to handle cases in which instead of children being { item, item, ... }, it's {{ item, item, ... }} etc. Really, this shouldn't be necessary, but some of the data I'm working with is like that.
@@ -146,7 +146,7 @@ function listWithChildrenKeyToListIncludingPath(list, path, specifier)
     if specifier.include_inner_nodes or not children then -- if it doesn't have children (or we want to include inner nodes), add it to the result
       item.path = tablex.copy(path) -- not cloned_path as we want the path to be the path up to and including the parent, not the path up to and including the item. 
       item[specifier.children_key_name] = nil
-      pop(result, item)
+      push(result, item)
     end
     if children then -- if it has children, recurse
       result = listConcat(result, listWithChildrenKeyToListIncludingPath(children, cloned_path, specifier))

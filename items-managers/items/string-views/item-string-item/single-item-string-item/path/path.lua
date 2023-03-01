@@ -18,7 +18,7 @@ PathItemSpecifier = {
       end,
       ["parent-path-components"] = function(self)
         local path_components = self:get("path-components")
-        push(path_components)
+        pop(path_components)
         return path_components
       end,
       ["parent-dir-name"] = function(self)
