@@ -9,10 +9,10 @@ FileItemSpecifier = {
         return isUsableAsFiletype(self:get("contents"), "image") 
       end,
       ["is-plaintext-file"] = function(self) 
-        return isPlaintextFile(self:get("contents"))
+        return not isUsableAsFiletype(self:get("contents"), "binary")
       end,
       ["is-binary-file"] = function(self) 
-        return not isPlaintextFile(self:get("contents"))
+        return isUsableAsFiletype(self:get("contents"), "binary")
       end,
       ["dir-or-file-any-pass"] = function(self, query) return query(self) end,
       ["file-contents"] = function(self)

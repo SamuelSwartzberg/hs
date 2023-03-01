@@ -76,7 +76,7 @@ PlaintextFileItemSpecifier = {
         return stringy.endswith(self:get("contents"), "/urls")
       end,
       ["is-md-file"] = function(self)
-        return getStandartizedExtension(self:get("contents")) == "md"
+        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "md"
       end,
       ["file-contents-utf8-chars"] = function(self)
         return eutf8.len(self:get("file-contents"))

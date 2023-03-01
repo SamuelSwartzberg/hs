@@ -28,7 +28,7 @@ assertMessage(
 )
 
 assertMessage(
-  pathExists("/Applications"),
+  testPath("/Applications"),
   true
 )
 
@@ -37,37 +37,37 @@ local remote_dir_path = env.HSFTP_TMPDIR .. "/foo/bar"
 createPath(remote_dir_path)
 
 assertMessage(
-  pathExists(remote_dir_path),
+  testPath(remote_dir_path),
   true
 )
 
 assertMessage(
-  isDir("/Applications"),
+  testPath("/Applications", "dir"),
   true
 )
 
 assertMessage(
-  isDir("/Applications/"),
+  testPath("/Applications/", "dir"),
   true
 )
 
 assertMessage(
-  isDir("/nonextant"),
+  testPath("/nonextant", "dir"),
   false
 )
 
 assertMessage(
-  isDir(env.ENVFILE),
+  testPath(env.ENVFILE, "dir"),
   false
 )
 
 assertMessage(
-  isDir("/"),
+  testPath("/", "dir"),
   true
 )
 
 assertMessage(
-  isDir(remote_dir_path),
+  testPath(remote_dir_path, "dir"),
   true
 )
 
@@ -83,35 +83,48 @@ assertMessage(
 )
 
 assertMessage(
-  isDir(remote_file_path),
+  testPath(remote_file_path, "dir"),
   false
 )
 
 assertMessage(
-  dirIsEmpty("/Applications"),
-  false
+  testPath("/Applications", {
+    existence = {
+      dirness = "dir",
+      contents = true
+    }
+  }),
+  true
 )
 
 assertMessage(
-  dirIsEmpty(remote_dir_path),
-  false
+  testPath(remote_file_path, {
+    existence = {
+      dirness = "not-dir",
+      contents = "hello world"
+    }
+  })
 )
 
 delete(remote_file_path)
 
 
 assertMessage(
-  pathExists(remote_dir_path),
-  true
+  testPath(remote_dir_path, {
+    existence = {
+      dirness = "dir",
+      contents = false
+    }
+  })
 )
 
 assertMessage(
-  dirIsEmpty(remote_dir_path),
-  true
-)
-
-assertMessage(
-  dirIsEmpty("/Library/User Pictures/sam"), -- this may not always be empty, but it is on my machine. if it changes, I'll have to find a new example
+  testPath("/Library/User Pictures/sam",{
+    existence = {
+      dirness = "dir",
+      contents = false
+    }
+  }),
   true
 )
 
@@ -265,47 +278,7 @@ assertMessage(
     "/Applications"
   ),
   true
-)
 
-assertMessage(
-  pathHasStartFilenameExtension(
-    "/foo/bar/baz.txt",
-    "/foo",
-    "baz",
-    "txt"
-  ),
-  true
-)
-
-assertMessage(
-  pathHasStartFilenameExtension(
-    "/foo/bar/baz.txt",
-    "/foo",
-    "baz",
-    "jpg"
-  ),
-  false
-)
-
-assertMessage(
-  pathHasStartFilenameExtension(
-    "/foo/bar/baz.txt",
-    "/foo",
-    "bar",
-    "txt"
-  ),
-  false
-)
-
-assertMessage(
-  pathHasStartFilenameExtension(
-    "/foo/bar/baz.txt",
-    "/bar",
-    "baz",
-    "txt"
-  ),
-  false
-)
 
 local unique_temp_file = writeFile(nil, "foo")
 assertMessage(
@@ -482,7 +455,7 @@ assertMessage(
 delete(temp_subdir_1_path)
 
 assertMessage(
-  pathExists(temp_subdir_1_path),
+  testPath(temp_subdir_1_path),
   false
 )
 
@@ -514,7 +487,7 @@ assertMessage(
 )
 
 assertMessage(
-  pathExists(temp_subdir_1_path),
+  testPath(temp_subdir_1_path),
   false
 )
 

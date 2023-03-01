@@ -23,7 +23,7 @@ function itemsInPath(opts)
     error("itemsInPath: opts must be a string or a table")
   end
   
-  if not isDir(opts.path) then 
+  if not testPath(opts.path, "dir") then 
     if opts.include_files then
       return {opts.path}
     else
@@ -34,7 +34,11 @@ function itemsInPath(opts)
   opts.path = resolveTilde(opts.path)
   opts.path = ensureAdfix(opts.path, "/", true, false, "suf")
   if opts.path == "" then opts.path = "/" end
-  opts.validator = defaultIfNil(opts.validator, usefulFileValidator)
+  opts.validator = opts.validator or function(file_name)
+    return allValuesPass( {".git", "node_modules", ".vscode"}, function(non_user_useful_file)
+      return not stringy.endswith(file_name, non_user_useful_file)
+    end)
+  end
   opts.recursion = defaultIfNil(opts.recursion, false)
   opts.include_dirs = defaultIfNil(opts.include_dirs, true)
   opts.include_files = defaultIfNil(opts.include_files, true)
@@ -72,7 +76,7 @@ function itemsInPath(opts)
   for file_name in lister(opts.path) do
     if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" and opts.validator(file_name) then
       local file_path = opts.path .. file_name
-      if isDir(file_path) then 
+      if testPath(file_path, "dir") then 
         if opts.include_dirs then
           files[#files + 1] = file_path
         end

@@ -37,7 +37,7 @@ function writeFile(path, contents, condition, create_path, mode)
 
   -- check if existance matches condition, and if not fail by returning nil
 
-  if pathExists(path) then
+  if testPath(path) then
     if condition == "not-exists" then
       return nil
     end

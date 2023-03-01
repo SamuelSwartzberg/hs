@@ -6,7 +6,7 @@ ExtantPathItemSpecifier = {
     --[[   ["is-category-date-dir-structure-contained-item"] = function(self)
         return stringy.startswith(self:get("contents"), env.MDIARY) -- currently the only category-date-dir-structure-root is env.MDIARY, and this check is far cheaper then the alternative, so we'll use it for now
       end, ]]
-      ["is-dir"] = function(self) return isDir(self:get("contents")) end,
+      ["is-dir"] = function(self) return testPath(self:get("contents"), "dir") end,
       ["is-file"] = function(self) return not self:get("is-dir") end, 
       ["is-dated-extant-path"] = function(self) 
         local path_leaf = getLeafWithoutPath(self:get("contents"))

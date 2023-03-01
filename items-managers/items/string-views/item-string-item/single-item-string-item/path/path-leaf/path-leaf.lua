@@ -55,7 +55,7 @@ PathLeafSpecifier = {
        end,
       ["is-path-leaf-tags"] = function(self) return stringy.find(self:get("contents"), "%") end,
       ["is-path-leaf-extension"] = function(self)
-        return pathHasExtension(self:get("contents"))
+        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true } ) ~= ""
       end,
 
       ["windows-with-path-leaf-as-title"] = function(self)

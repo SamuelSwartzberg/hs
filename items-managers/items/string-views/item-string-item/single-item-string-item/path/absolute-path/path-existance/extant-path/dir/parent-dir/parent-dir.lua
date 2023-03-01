@@ -23,7 +23,7 @@ ParentDirItemSpecifier = {
       ["children-any-pass"] = function(self, query) return self:get("child-string-item-array"):get("some-pass", query) end,
       ["is-grandparent-dir"] = function(self)
         return self:get("child-string-array"):get("some-pass", function(item)
-          return isDir(item)
+          return testPath(item, "dir")
         end)
       end,
       ["is-parent-but-not-grandparent-dir"] = function(self)

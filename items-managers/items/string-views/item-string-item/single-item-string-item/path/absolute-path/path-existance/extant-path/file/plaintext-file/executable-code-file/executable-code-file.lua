@@ -6,7 +6,11 @@ ExecutableCodeFileItemSpecifier = {
   properties = {
     getables = {
       ["is-shellscript-file"] = function(self)
-        return isShellShebangLine(self:get("first-line-of-file-contents")) or isUsableAsFiletype(self:get("contents"), "shell-script")
+        return testPath(self:get("contents"), {
+          existence = {
+            contents = { r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" }
+          }
+        }) or isUsableAsFiletype(self:get("contents"), "shell-script")
       end,
       ["has-errors"] = function(self)
         return stringy.strip(self:get("lint-simple-text", "error")) ~= ""

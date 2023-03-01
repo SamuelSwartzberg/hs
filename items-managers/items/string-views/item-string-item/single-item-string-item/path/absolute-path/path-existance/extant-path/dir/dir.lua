@@ -5,10 +5,20 @@ DirItemSpecifier = {
 
     getables = {
       ["is-parent-dir"] = function(self)
-        return not dirIsEmpty(self:get("contents"))
+        return testPath(self:get("contents"), {
+          existence = {
+            dirness = "dir",
+            contents = true
+          }
+        })
       end, 
       ["is-empty-dir"] = function(self)
-        return dirIsEmpty(self:get("contents"))
+        return testPath(self:get("contents"), {
+          existence = {
+            dirness = "dir",
+            contents = false
+          }
+        })
       end,
       ["is-dir-by-path"] = function()
         return true
@@ -59,7 +69,7 @@ DirItemSpecifier = {
 
       ["find-or-create-child-dir"] = function(self, specifier)
         local child = self:get("find-child", specifier.find_func)
-        if child == nil or not isDir(child) then
+        if child == nil or not testPath(child, "dir") then
           self:doThis("create-empty-dir-in-dir", specifier.default_name)
           child = self:get("parent-dir-path") .. "/" .. specifier.default_name
         end

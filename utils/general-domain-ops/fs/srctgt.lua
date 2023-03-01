@@ -47,7 +47,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
   -- create (parent) path if necessary
 
   if create_path then
-    if isDir(target) then
+    if testPath(target, "dir") then
       createPath(target)
     else
       createPath(target, "1:-2")
@@ -56,7 +56,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   -- check if target exists, and if return early if it does not match the condition
 
-  if pathExists(target) then
+  if testPath(target) then
     if condition == "not-exists" then
       return nil
     end
@@ -69,7 +69,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
   -- if into, then change target to be the target directory + the leaf of the source
 
   if into then
-    if not isDir(target) then
+    if not testPath(target, "dir") then
       error("target must be a directory if into is true. Target: " .. target)
     end
     target = target .. "/" .. getLeafWithoutPath(source)
@@ -98,7 +98,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
     if not has_remote_path then 
       if action == "copy" then
-        if isDir(final_source) then
+        if testPath(final_source, "dir") then
           _, err_msg =  dir.clonetree(final_source, final_target)
         else
           _, err_msg  =  file.copy(final_source, final_target)

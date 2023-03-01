@@ -4,7 +4,7 @@ PathLeafExtensionSpecifier = {
   properties = {
     getables = {
       ["path-leaf-extension"] = function(self)
-        return getStandartizedExtension(self:get("path-leaf"))
+        return pathSlice(self:get("path-leaf"), "-1:-1", { ext_sep = true, standartize_ext = true })[1]
       end,
     }
   },

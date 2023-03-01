@@ -33,11 +33,11 @@ PassNameItemSpecifier = {
         return env.MPASSUSERNAME .. "/" .. self:get("contents") .. ".txt"
       end,
       
-      ["is-pass-otp"] = function(self) return pathExists(self:get("pass-otp-path")) end,
-      ["is-pass-passw"] = function(self) return pathExists(self:get("pass-passw-path")) end,
-      ["is-pass-recovery-keys"] = function(self) return pathExists(self:get("pass-recovery-path")) end,
-      ["is-pass-security-question"] = function(self) return pathExists(self:get("pass-security-question-path")) end,
-      ["is-pass-username"] = function(self) return pathExists(self:get("pass-username-path")) end,
+      ["is-pass-otp"] = function(self) return testPath(self:get("pass-otp-path")) end,
+      ["is-pass-passw"] = function(self) return testPath(self:get("pass-passw-path")) end,
+      ["is-pass-recovery-keys"] = function(self) return testPath(self:get("pass-recovery-path")) end,
+      ["is-pass-security-question"] = function(self) return testPath(self:get("pass-security-question-path")) end,
+      ["is-pass-username"] = function(self) return testPath(self:get("pass-username-path")) end,
       ["pass-username"] = function(self)
         return self:get("pass-username") or "me@samswartzberg.com"
       end,

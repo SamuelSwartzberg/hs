@@ -49,15 +49,12 @@ function getGrandparentPath(path)
   return pathSlice(path, ":-3", { rejoin_at_end = true }) --[[ @as string ]]
 end
 
-local rrq = bindArg(relative_require, "utils.fs")
-local extension_map = rrq("extension-map")
-
-
---- @param str string
---- @return string
-function getStandartizedExtension(str)
-  return pathSlice(str, "-1:-1", { ext_sep = true, standartize_ext = true })[1]
-end
+local extension_map = {
+  ["jpeg"] = "jpg",
+  ["htm"] = "html",
+  ["yml"] = "yaml",
+  ["markdown"] = "md"
+}
 
 --- will contain an empty string as the first element if path starts with a slash, which is what we want
 --- @param path string
@@ -66,9 +63,11 @@ function getPathComponents(path)
   return pathSlice(path, ":") --[[ @as string[] ]]
 end
 
+--- @alias sliceOpts { ext_sep?: boolean, standartize_ext?: boolean, rejoin_at_end?: boolean, entire_path_for_each?: boolean }
+
 --- @param path string
 --- @param spec sliceSpec | string
---- @param opts? { ext_sep?: boolean, standartize_ext?: boolean, rejoin_at_end?: boolean, entire_path_for_each?: boolean }
+--- @param opts? sliceOpts
 --- @return string[] | string
 function pathSlice(path, spec, opts)
   opts = tablex.deepcopy(opts) or {}
@@ -105,12 +104,23 @@ function pathSlice(path, spec, opts)
 
   if opts.rejoin_at_end then 
     if opts.ext_sep then 
-      local without_extension = listPop(res)
       local extension = listPop(res)
-      if extension == "" then
-        return table.concat(res, "/") .. "/" .. without_extension
+      if not extension then return "" end
+      local without_extension = listPop(res)
+      if without_extension == nil then -- in this case, we sliced everything but the last element
+        return extension
       else
-        return table.concat(res, "/") .. "/" .. without_extension .. "." .. extension
+        local filename
+        if extension == "" then
+          filename = without_extension
+        else
+          filename = without_extension .. "." .. extension
+        end
+        if #res == 0 then
+          return filename
+        else
+          return table.concat(res, "/") .. "/" .. filename
+        end
       end
     else 
       return table.concat(res, "/")

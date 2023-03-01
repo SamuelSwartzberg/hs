@@ -24,7 +24,7 @@ URLItemSpecifier = {
       ["url-user"] = function(self) return self:get("parsed-url").user end,
       ["url-password"] = function(self) return self:get("parsed-url").password end,
       ["is-url-by-contenttype"] = function(self)
-        return self:get("url-path") and pathHasExtension(self:get("url-path"))
+        return self:get("url-path") and pathSlice(self:get("url-path"), "-1:-1", { ext_sep = true } ) ~= ""
       end,
       ["is-url-by-host"] = function(self)
         return self:get("url-host")
