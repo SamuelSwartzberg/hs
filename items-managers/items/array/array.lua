@@ -4,7 +4,7 @@ ArraySpecifier = {
   type = "array",
   properties = {
     getables = {
-      ["length"] = function(self) return tableLength(self:get("contents")) end, -- must use own tableLength function, not # operator, because # operator does not work on sparse arrays
+      ["length"] = function(self) return #values(self:get("contents")) end,
       ["is-empty-array"] = function(self) return self:get("length") == 0 end,
       ["is-non-empty-array"] = function(self) return self:get("length") > 0 end,
       ["with-appended"] = function(self, other_array)

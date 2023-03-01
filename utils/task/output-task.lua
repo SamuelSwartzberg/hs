@@ -72,7 +72,7 @@ function runHsTaskParallel(command_specifier_list, do_after)
           std_err = std_err
         }
       end
-      if tableLength(results) == tableLength(command_specifier_list) then
+      if #values(results) == #values(command_specifier_list) then
         if do_after then
           do_after(results)
         end

@@ -3,7 +3,7 @@ local do_queue = {}
 local current_alert
 local alert_hotkey
 alert_hotkey =  hs.hotkey.bind({"cmd", "alt", "shift"}, "/", function()
-  local first_in = listShift(do_queue)
+  local first_in = table.remove(do_queue, 1)
   first_in.fn(tableUnpackIfTable(first_in.args))
   if #do_queue == 0 then 
     alert_hotkey:disable()
@@ -21,7 +21,7 @@ function doWhenReady(fn, args)
     hs.alert.closeSpecific(current_alert)
   end
   
-  listPush(do_queue, {
+  pop(do_queue, {
     fn = fn, 
     args = args
   })

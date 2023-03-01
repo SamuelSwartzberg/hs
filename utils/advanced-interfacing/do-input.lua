@@ -204,7 +204,7 @@ function doSeries(specifier)
   hs.timer.doAfter(
     specifier.wait_time, 
     function()
-      local subspecifier = listShift(specifier.specifier_list)
+      local subspecifier = table.remove(specifier.specifier_list, 1)
       function do_after()
         doSeries(specifier)
       end

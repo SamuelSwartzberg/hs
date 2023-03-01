@@ -19,7 +19,7 @@ function parseRelayTable(raw)
     for _, payload_line in ipairs(payload_lines) do
       if stringy.startswith(payload_line, "\t\t") then -- line specifying a single relay
         local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
-        listPush(countries[country_code][city_code], relay_code)
+        pop(countries[country_code][city_code], relay_code)
       elseif stringy.startswith(payload_line, "\t") then -- line specifying an entire city
         city_code = extractFirstThingInParentheses(payload_line) -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
         countries[country_code][city_code] = {}

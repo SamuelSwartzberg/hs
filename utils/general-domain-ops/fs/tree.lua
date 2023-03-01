@@ -18,7 +18,7 @@ function fsTree(path, do_files, tree_files)
       if do_files == "read" then 
         res[file] = readFile(full_path)
       elseif do_files == "append" then
-        listPush(res, full_path)
+        pop(res, full_path)
       elseif do_files == "as-tree" then
         local nodename = getFilenameWithoutExtension(file)
         if stringy.endswith(file, ".yaml") and find(tree_files, "yaml") then

@@ -148,40 +148,40 @@ function test(item, conditions, opts)
       if condition._r or condition._start or condition._stop then
         if type(item) == "string" then
           if condition._r then -- regex
-            listPush(results, ps(onig.find(item, condition._r)))
+            pop(results, ps(onig.find(item, condition._r)))
           end
           if condition._start then -- starts with
-            listPush(results, ps(stringy.startswith(item, condition._start)))
+            pop(results, ps(stringy.startswith(item, condition._start)))
           end
           if condition._stop then -- ends with
-            listPush(results, ps(stringy.endswith(item, condition._stop)))
+            pop(results, ps(stringy.endswith(item, condition._stop)))
           end
           found_other_use_for_table = true
         end
       end
       if condition._empty then -- empty
         local succ, rs = pcall(function() return #item == 0 end) -- pcall because # errors on failure
-        listPush(results, ps(succ and rs))
+        pop(results, ps(succ and rs))
         found_other_use_for_table = true
       end
       if condition._type then -- type
-        listPush(results, ps(type(item) == condition._type))
+        pop(results, ps(type(item) == condition._type))
         found_other_use_for_table = true
       end
       if condition._exactly then -- exactly
-        listPush(results, ps(item == condition._exactly))
+        pop(results, ps(item == condition._exactly))
         found_other_use_for_table = true
       end
 
       if condition._list or not found_other_use_for_table then
-        listPush(results, ps(find(condition, item))) -- TODO: potential infinite loop since find may be refactored to use test
+        pop(results, ps(find(condition, item))) -- TODO: potential infinite loop since find may be refactored to use test
       end
     elseif type(condition) == "function" then
-      listPush(results, condition(item))
+      pop(results, condition(item))
     end
   end
 
-  return allValuesPass(results, returnSame)
+  return not find(results, returnSame)
 end
 
 

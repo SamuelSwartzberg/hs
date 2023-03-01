@@ -79,7 +79,7 @@ local function interactiveFunc(self, specifier)
     --- @cast thing (string | function)[]
     args_to_pass = {}
     for _, thing in ipairs(thing) do
-      listPush(args_to_pass, singleInteractiveFunc(self, thing))
+      pop(args_to_pass, singleInteractiveFunc(self, thing))
     end
   elseif type(thing) == "table" and not thing.func then
     args_to_pass = {}

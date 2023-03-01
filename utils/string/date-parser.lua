@@ -55,7 +55,7 @@ function parseDate(date)
     return nil
   end
 
-  local date_table = list1list2assocArrZip({"year", "month", "day", "hour", "min", "sec"}, date_parts)
+  local date_table = map({"year", "month", "day", "hour", "min", "sec"}, function(k,v) return v, date_parts[k] end, "kv")
   local res, timestamp = pcall(os.time, date_table)
   if res then
     return timestamp

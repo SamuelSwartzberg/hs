@@ -35,9 +35,7 @@ function itemsInPath(opts)
   opts.path = ensureAdfix(opts.path, "/", true, false, "suf")
   if opts.path == "" then opts.path = "/" end
   opts.validator = opts.validator or function(file_name)
-    return allValuesPass( {".git", "node_modules", ".vscode"}, function(non_user_useful_file)
-      return not stringy.endswith(file_name, non_user_useful_file)
-    end)
+    return not test(file_name,{".git", "node_modules", ".vscode"})
   end
   opts.recursion = defaultIfNil(opts.recursion, false)
   opts.include_dirs = defaultIfNil(opts.include_dirs, true)

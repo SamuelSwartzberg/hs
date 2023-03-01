@@ -8,7 +8,7 @@ StateWindowItemSpecifier = {
       ["state-json-matched-geometry-table"] = function(self)
         local geometry = self:get("rect").table
         inspPrint(geometry)
-        geometry = transposeAssocArrKeys(geometry, {x = "screenX", y = "screenY", w = "width", h = "height"})
+        geometry = map(geometry, {x = "screenX", y = "screenY", w = "width", h = "height"}, {"k", "k"})
         return geometry
       end,
       ["window-in-state-json"] = function(self) -- utterly insanely, there is no better way to correlate hs.windows and the windows in the json we're using here than to check if they have the same height, width, and top left point

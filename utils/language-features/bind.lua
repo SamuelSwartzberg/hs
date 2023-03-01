@@ -4,7 +4,7 @@ arg_ignore = rand({len = 20})
 --- @param arg_spec { [string]: any } | any
 --- @return function
 function bind(func, arg_spec)
-  if type(arg_spec) == "table" and not tableIsListOrEmpty(arg_spec) then
+  if type(arg_spec) == "table" and not isListOrEmptyTable(arg_spec) then
     -- no-op
   else 
     arg_spec = { ["1"] = arg_spec }
@@ -24,7 +24,7 @@ function bind(func, arg_spec)
         return func(table.unpack(new_args))
       end
     else
-      if not tableIsListOrEmpty(arg_list) then
+      if not isListOrEmptyTable(arg_list) then
         arg_list = { arg_list }
       end
       inner_func = function(...)

@@ -82,11 +82,8 @@ NonEmptyArraySpecifier = {
       ["previous-wrapping"] = function(self, index)
         return self:get("contents")[index - 1] or self:get("contents")[#self:get("contents")]
       end,
-      ["reduce"] = function(self, specifier)
-        return reduceValues(self:get("contents"), specifier.callback, specifier.initial_value)
-      end,
       ["all-pass"] = function(self, callback)
-        return allValuesPass(self:get("contents"), callback)
+        return not find(self:get("contents"), function(v) return not callback(v) end, {"v", "boolean"})
       end,
       ["some-pass"] = function(self, callback)
         return find(self:get("contents"), callback, {"v", "boolean"})

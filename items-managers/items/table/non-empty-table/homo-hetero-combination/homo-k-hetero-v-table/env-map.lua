@@ -8,7 +8,7 @@ local function getDependencyLines(line_with_dependencies, lines_with_dependencie
       lines = listConcat(lines, getDependencyLines(dependency_line_with_dependencies, lines_with_dependencies))
     end
   end
-  listPush(lines, line_with_dependencies.line)
+  pop(lines, line_with_dependencies.line)
   return lines
 end
 
@@ -22,7 +22,7 @@ EnvMapSpecifier = {
         local pkey_var = pkey and "$" .. pkey .. "/" or ""
         for key, value in pairs(self:get("contents")) do
           if type(value) == "string" then
-            listPush(lines, string.format("%s=\"%s%s\"", key, pkey_var, value))
+            pop(lines, string.format("%s=\"%s%s\"", key, pkey_var, value))
           elseif value.type == "env-item" then
             lines = listConcat(lines, value:get("env-lines", { pkey_var = pkey_var, key = key }))
           end

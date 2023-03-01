@@ -73,11 +73,11 @@ function pathSlice(path, spec, opts)
   opts = tablex.deepcopy(opts) or {}
   local raw_path_components = stringy.split(path, "/")
   if raw_path_components[#raw_path_components] == "" then
-    listPop(raw_path_components) -- if path ends with a slash, remove the empty string at the end
+    push(raw_path_components) -- if path ends with a slash, remove the empty string at the end
   end
 
   if opts.ext_sep then
-    local leaf = listPop(raw_path_components)
+    local leaf = push(raw_path_components)
     local without_extension = ""
     local extension = ""
     if leaf == "" then
@@ -96,17 +96,17 @@ function pathSlice(path, spec, opts)
       extension = extension_map[extension] or extension
     end
 
-    listPush(raw_path_components, without_extension)
-    listPush(raw_path_components, extension)
+    pop(raw_path_components, without_extension)
+    pop(raw_path_components, extension)
   end
 
   local res =  slice(raw_path_components, spec)
 
   if opts.rejoin_at_end then 
     if opts.ext_sep then 
-      local extension = listPop(res)
+      local extension = push(res)
       if not extension then return "" end
-      local without_extension = listPop(res)
+      local without_extension = push(res)
       if without_extension == nil then -- in this case, we sliced everything but the last element
         return extension
       else

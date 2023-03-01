@@ -215,17 +215,6 @@ function find(tbl, cond, opts)
   return nil
 end
 
-  
-
-
---- @generic K
---- @generic V
---- @param tbl {[`K`]: `V`}
---- @param key K
---- @return V
-function getValue(tbl, key)
-  return tbl[key]
-end
 
 --- @param tbl table
 --- @param f fun(value?: any): any
@@ -244,40 +233,6 @@ end
 --- @generic K
 --- @generic V
 --- @param tbl { [`K`]: `V` } | nil
---- @return K[]
-function keys(tbl)
-  local t = {}
-  for k, _ in wdefarg(pairs)(tbl) do
-    t[#t + 1] = k
-  end
-  return t
-end
-
---- @param tbl table
---- @return integer
-function tbllength(tbl)
-  local i = 0
-  for _, _ in wdefarg(pairs)(tbl) do
-    i = i + 1
-  end
-  return i
-end
-
---- @generic K
---- @generic V
---- @param tbl { [`K`]: `V` } | nil
---- @return V[]
-function values(tbl)
-  local t = {}
-  for _, v in wdefarg(pairs)(tbl) do
-    t[#t + 1] = v
-  end
-  return t
-end
-
---- @generic K
---- @generic V
---- @param tbl { [`K`]: `V` } | nil
 --- @param value any
 --- @return boolean
 function valuesContainShape(tbl, value)
@@ -287,64 +242,29 @@ function valuesContainShape(tbl, value)
   return false
 end
 
---- @generic K1, V1, K2, V2
---- @param t1 { [`K1`]: `V1` } | nil
---- @param t2 { [`K2`]: `V2` } | nil
---- @return { [K1|K2]: V1|V2 }
-function tableConcat(t1, t2)
-  local new_table = {}
-  for k, v in wdefarg(pairs)(t1) do
-    new_table[k] = v
-  end
-  for k, v in wdefarg(pairs)(t2) do
-    new_table[k] = v
-  end
-  return new_table
-end
+--- @alias tle "table" | "empty" | "list-or-empty" 
 
---- @generic K1, V1, K2, V2
---- @param t1 { [`K1`]: `V1` } | nil
---- @param t2 { [`K2`]: `V2` } | nil
---- @return { [K1|K2]: V1|V2 }
-function copyKeysT1ToT2(t1, t2) -- in-place!
-  if type(t1) ~= "table" or type(t2) ~= "table" then error("copyKeysT1ToT2: t1 and t2 must be tables") end
-  if not t2 then t2 = {} end
-  for k, v in wdefarg(pairs)(t1) do
-    t2[k] = v
-  end
-  return t2
-end
-
---- @generic T : table
---- @param t T
+--- @param tbl table
+--- @param things tle|tle[]
 --- @return boolean
-function tableIsEmpty(t)
-  if not t then return true end
-  return next(t) == nil
-end
-
---- @param t table
---- @return boolean
-function tableIsListOrEmpty(t)
-  if tableIsEmpty(t) then return true end
-  for k, v in pairs(t) do
-    if type(k) ~= "number" then return false end
+function tRelIs(tbl, things)
+  if not tbl then return false end
+  if type(things) == "string" then
+    things = {things}
   end
-  return true
-end
+  local res = true
+  if find(things, "table") then
+    res = res and type(tbl) == "table"
+  end
 
 --- @param t any
 --- @return boolean
 function isListOrEmptyTable(t)
   if type(t) ~= "table" then return false end
-  return tableIsListOrEmpty(t)
-end
-
---- @param t any
---- @return boolean
-function isEmptyTable(t)
-  if type(t) ~= "table" then return false end
-  return tableIsEmpty(t)
+  for k, v in pairs(t) do
+    if type(k) ~= "number" then return false end
+  end
+  return next(t) == nil
 end
 
 --- determines if a table is a sparse list, i.e. a list with holes, which in lua doesn't support many list ops
@@ -359,109 +279,6 @@ function isSparseList(t)
   return false
 end
 
---- length function that works for tables, thus also for sparse lists
---- @param t table
---- @return number
-function tableLength(t)
-  if not t then return 0 end
-  local count = 0
-  for _ in pairs(t) do
-    count = count + 1
-  end
-  return count
-end
-
---- @generic T 
---- @param potential_tbl primitive | T[]
---- @return primitive | ...<T>
-function tableUnpackIfTable(potential_tbl)
-  if type(potential_tbl) == "table" then
-    return table.unpack(potential_tbl)
-  else
-    return potential_tbl
-  end
-end
-
---- @generic K, V, T, U
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(acc?: T | U, key?: K): T | U
---- @param initial T
---- @return T | U
-function reduceKeys(tbl, f, initial)
-  local acc = initial
-  for k, _ in wdefarg(pairs)(tbl) do
-    acc = f(acc, k)
-  end
-  return acc
-end
-
---- @generic K, V, T, U
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(acc?: T | U, value?: V): T | U
---- @param initial T
---- @return T | U
-function reduceValues(tbl, f, initial)
-  local acc = initial
-  for _, v in wdefarg(pairs)(tbl) do
-    acc = f(acc, v)
-  end
-  return acc
-end
-
---- @generic K, V, T, U
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(acc?: T | U, key?: K, value?: V): T | U
---- @param initial T
---- @return T | U
-function reduceKeyValuePairs(tbl, f, initial)
-  local acc = initial
-  for k, v in wdefarg(pairs)(tbl) do
-    acc = f(acc, k, v)
-  end
-  return acc
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K): boolean
---- @return boolean
-function allKeysPass(tbl, f)
-  return find(
-    tbl,
-    function(k) return not f(k) end,
-    {"k", "boolean"}
-  ) --[[ @as boolean ]]
-end
-
---- @generic K, V
---- @param tbl {[K]: V} | nil
---- @param f fun(value?: V): boolean
---- @return boolean
-function allValuesPass(tbl, f)
-  for k, v in wdefarg(pairs)(tbl) do
-    if not f(v) then return false end
-  end
-  return true
-end
-
---- @generic T, V
---- @param list T[][]
---- @param assoc_arr { [`T`]: `V` }
---- @param n_elem_to_resolve integer
---- @return (T|V)[][]
-function resolveListOfListsByAssocArr(list, assoc_arr, n_elem_to_resolve)
-  local t = {}
-  for _, list_item in ipairs(list) do
-    local list_item_before, key_to_resolve, list_item_after = slice(list_item, 1, n_elem_to_resolve - 1), list_item[n_elem_to_resolve], slice(list_item, n_elem_to_resolve + 1)
-    local resolved = assoc_arr[key_to_resolve]
-    if resolved then
-      local new_list = listFlatten({list_item_before, resolved, list_item_after})
-      t[#t+1] = new_list
-    end
-  end
-  return t
-end
-
 -- generators, iterators
 
 --- tests that prevent errors in indexing 
@@ -471,30 +288,6 @@ end
 --- @return boolean
 function hasKey(entity, key)
   return type(entity) == "table" and entity[key] ~= nil
-end
-
---- @param entity any
---- @param key string
---- @param method? string
---- @return boolean
-function methodTakesKey(entity, key, method)
-  if not method then method = "get" end
-  return 
-    type(entity) == "table" and 
-    type(entity[method]) == "function" and 
-    entity[method](entity, key) ~= nil
-end
-
---- @param entity any
---- @param key string
---- @param method? string
---- @return boolean
-function methodIsTruthyForKey(entity, key, method)
-  if not method then method = "get" end
-  return 
-    type(entity) == "table" and 
-    type(entity[method]) == "function" and 
-    entity[method](entity, key)
 end
 
 --- take an arbitrarily nested table and return a list of leaf values
@@ -525,12 +318,12 @@ function chunk(tbl, chunk_size)
   if chunk_size < 1 then return {tbl} end -- chunk size of 0 or less  = no chunking
   for k, v in wdefarg(pairs)(tbl) do
     chunk[k] = v
-    if tbllength(chunk) == chunk_size then
+    if #keys(chunk) == chunk_size then
       t[#t+1] = chunk
       chunk = {}
     end
   end
-  if tbllength(chunk) > 0 then
+  if #keys(chunk) > 0 then
     t[#t+1] = chunk
   end
   return t

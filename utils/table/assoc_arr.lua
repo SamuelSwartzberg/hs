@@ -1,80 +1,39 @@
---- @generic K, V
---- @param assoc_arr { [`K`]: `V`}
---- @param fn fun(key: `K`, value: `V`): boolean
---- @return { [`K`]: `V`}
-function assocArrFilter(assoc_arr, fn)
-  local result = {}
-  for k, v in pairs(assoc_arr) do
-    if fn(k, v) then
-      result[k] = v
-    end
-  end
-  return result
-end
+--- @class mergeOpts
+--- @field isopts "isopts"
+--- @field recursive boolean
 
---- @generic K, V
---- @param assoc_arr { [`K`]: `V`}
---- @return { [`K`]: `V`}
-function assocArrFilterUnique(assoc_arr)
-  local result = {}
-  for k, v in pairs(assoc_arr) do
-    if not find(result, v) then
-      result[k] = v
-    end
+--- @param opts? mergeOpts
+--- @param ... table[]
+--- @return table
+function mergeAssocArrRecursive(opts, ...)
+  local tables = {...}
+  if not opts then return {} end 
+  if opts.isopts == "isopts" then
+    -- no-op
+  else
+    table.insert(tables, 1, opts)
+    opts = {}
   end
-  return result
-end
 
---- @generic K1
---- @generic V1
---- @generic K2
---- @generic V2
---- @param assoc_arr1 { [`K1`]: `V1`}
---- @param assoc_arr2 { [`K2`]: `V2`}
---- @return { [K1 | K2]: V1 | V2 }
-function mergeAssocArrRecursive(assoc_arr1, assoc_arr2)
-  if not assoc_arr1 then return assoc_arr2 end
-  if not assoc_arr2 then return assoc_arr1 end
-  local result = {}
-  for k, v in pairs(assoc_arr1) do
-    result[k] = v
-  end
-  for k, v in pairs(assoc_arr2) do
-    if type(v) == "table" then
-      if type(result[k]) == "table" then
-        result[k] = mergeAssocArrRecursive(result[k], v)
-      else
-        result[k] = v
+  opts.recursive = defaultIfNil(opts.recursive, true)
+
+  if #tables == 0 then return {} end
+  local result = tablex.deepcopy(tables[1])
+  for _, mergetable in wdefarg(ipairs)(tables) do 
+    if type(mergetable) == "table" then
+      for k, v in pairs(mergetable) do
+        if type(v) == "table" then
+          if type(result[k]) == "table" and opts.recursive then
+            result[k] = mergeAssocArrRecursive(result[k], v)
+          else
+            result[k] = tablex.deepcopy(v)
+          end
+        else
+          result[k] = v
+        end
       end
     else
-      result[k] = v
-    end
-  end
-  return result
-end
-
---- @generic T
---- @generic U
---- @param list1 T[]
---- @param list2 U[]
---- @return { [`T`]: `U` }
-function list1list2assocArrZip(list1, list2)
-  local result = {}
-  for i, v in ipairs(list1) do
-    result[v] = list2[i]
-  end
-  return result
-end
-
---- @generic K
---- @generic V
---- @param list_of_assoc_arrs { [`K`]: `V`}[]
---- @return { [`K`]: `V`}
-function flattenListOfAssocArrs(list_of_assoc_arrs) -- will overwrite earlier keys with later keys, it's the caller's responsibility to deal with that
-  local result = {}
-  for i, assoc_arr in ipairs(list_of_assoc_arrs) do
-    for k, v in pairs(assoc_arr) do
-      result[k] = v
+      error("mergeAssocArrRecursive: expected table, got " .. type(mergetable) .. "with contents:\n\n" .. json.encode(mergetable))
     end
   end
   return result
@@ -86,17 +45,17 @@ end
 function nestedAssocArrToListIncludingPath(assoc_arr, path)
   local result = {}
   for k, v in pairs(assoc_arr) do
-    if type(v) == "table" and not isEmptyTable(v) then
+    if type(v) == "table" and #values(v) > 0 then
       local cloned_path = tablex.copy(path)
-      listPush(cloned_path, k)
+      pop(cloned_path, k)
       local sub_result = nestedAssocArrToListIncludingPath(v, cloned_path)
       for i, sub_result_item in ipairs(sub_result) do
-        listPush(result, sub_result_item)
+        pop(result, sub_result_item)
       end
     else
       local cloned_path = tablex.copy(path)
-      listPush(cloned_path, k)
-      listPush(result, {path = cloned_path, value = v})
+      pop(cloned_path, k)
+      pop(result, {path = cloned_path, value = v})
     end
   end
   return result
@@ -176,7 +135,7 @@ function listWithChildrenKeyToListIncludingPath(list, path, specifier)
   local result = {}
   for i, item in ipairs(list) do
     local cloned_path = tablex.copy(path)
-    listPush(cloned_path, item[specifier.title_key_name])
+    pop(cloned_path, item[specifier.title_key_name])
     local children = item[specifier.children_key_name]
     if specifier.levels_of_nesting_to_skip > 0 and children then
       for i = 1, specifier.levels_of_nesting_to_skip do -- this is to handle cases in which instead of children being { item, item, ... }, it's {{ item, item, ... }} etc. Really, this shouldn't be necessary, but some of the data I'm working with is like that.
@@ -187,7 +146,7 @@ function listWithChildrenKeyToListIncludingPath(list, path, specifier)
     if specifier.include_inner_nodes or not children then -- if it doesn't have children (or we want to include inner nodes), add it to the result
       item.path = tablex.copy(path) -- not cloned_path as we want the path to be the path up to and including the parent, not the path up to and including the item. 
       item[specifier.children_key_name] = nil
-      listPush(result, item)
+      pop(result, item)
     end
     if children then -- if it has children, recurse
       result = listConcat(result, listWithChildrenKeyToListIncludingPath(children, cloned_path, specifier))
@@ -206,28 +165,6 @@ function nestedAssocArrWithAssocArrLeavesToListIncludingPath(assoc_arr, path)
     return val
   end)
 end
-
---- @param list table[]
---- @param assoc_arr table
---- @return table[]
-function mergeAssocArrWithAllListElements(list, assoc_arr)
-  return map(list, function(item)
-    return mergeAssocArrRecursive(item, assoc_arr)
-  end)
-end
-
---- @param assoc_arr table
---- @param key_transpose_table {[string]: string}
---- @return table
-function transposeAssocArrKeys(assoc_arr, key_transpose_table)
-  local assoc_arr_copy = tablex.copy(assoc_arr)
-  for k, v in pairs(key_transpose_table) do
-    assoc_arr_copy[v] = assoc_arr_copy[k]
-    assoc_arr_copy[k] = nil
-  end
-  return assoc_arr_copy
-end
-  
 
 --- @param timestamp_key_table orderedtable
 --- @return { [string]: { [string]: { [string]: string[] } } }
@@ -268,6 +205,6 @@ function mapTableWithValueInCertainKeyToTableHoldingValueDirectly(tbl, key, igno
       result[k] = mapTableWithValueInCertainKeyToTableHoldingValueDirectly(v, key, ignore_plain_values, delete_key_if_empty)
     end
   end
-  if delete_key_if_empty and isEmptyTable(result) then result = nil end
+  if delete_key_if_empty and #values(result) > 0 then result = nil end
   return result
 end

@@ -39,3 +39,96 @@ function powerset(list)
     return output
   end
 end
+
+-- ops on sets
+
+--- @generic T, U
+--- @param set1 T[]
+--- @param set2 U[]
+--- @return (T|U)[]
+function setUnion(set1, set2)
+  local new_list = listConcat(set1, set2)
+  return toSet(new_list)
+end
+
+--- @generic T, U
+--- @param set1 T[]
+--- @param set2 U[]
+--- @return (T|U)[]
+function setIntersection(set1, set2)
+  local new_list = {}
+  for _, v in ipairs(set1) do
+    if find(set2, v) then
+      new_list[#new_list + 1] = v
+    end
+  end
+  return toSet(new_list)
+end
+
+--- @generic T, U
+--- @param set1 T[]
+--- @param set2 U[]
+--- @return boolean
+function setEquals(set1, set2)
+  if #set1 ~= #set2 then return false end
+  for _, v in ipairs(set1) do
+    if not find(set2, v) then
+      return false
+    end
+  end
+  return true
+end
+
+--- @generic T, U
+--- @param set1 T[]
+--- @param set2 U[]
+--- @return boolean
+function setIsSubset(set1, set2)
+  for _, v in ipairs(set1) do
+    if not find(set2, v) then
+      return false
+    end
+  end
+  return true
+end
+
+--- @generic T, U
+--- @param set1 T[]
+--- @param set2 U[]
+--- @return boolean
+function setIsSuperset(set1, set2)
+  return setIsSubset(set2, set1)
+end
+
+--- @generic T, U
+--- @param set1 T[]
+--- @param set2 U[]
+--- @return (T|U)[]
+function setDifference(set1, set2)
+  local new_list = {}
+  for _, v in ipairs(set1) do
+    if not find(set2, v) then
+      new_list[#new_list + 1] = v
+    end
+  end
+  return toSet(new_list)
+end
+
+--- @generic T, U
+--- @param set1 T[]
+--- @param set2 U[]
+--- @return (T|U)[]
+function setSymmetricDifference(set1, set2)
+  local new_list = {}
+  for _, v in ipairs(set1) do
+    if not find(set2, v) then
+      new_list[#new_list + 1] = v
+    end
+  end
+  for _, v in ipairs(set2) do
+    if not find(set1, v) then
+      new_list[#new_list + 1] = v
+    end
+  end
+  return toSet(new_list)
+end

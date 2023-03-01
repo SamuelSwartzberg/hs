@@ -1,5 +1,5 @@
 assertTable(
-  transposeAssocArrKeys(
+  map(
     {
       x = 1,
       y = 2,
@@ -11,7 +11,8 @@ assertTable(
       y = "screenY",
       w = "width",
       h = "height"
-    }
+    },
+    { "k", "k" }
   ),
   {
     screenX = 1,
@@ -279,7 +280,7 @@ assertTable(
 )
 
 assertTable(
-  flattenListOfAssocArrs({
+  mergeAssocArrRecursive(
     {
       a = 1,
       b = 2
@@ -288,7 +289,7 @@ assertTable(
       c = 3,
       d = 4
     }
-  }),
+  ),
   {
     a = 1,
     b = 2,
