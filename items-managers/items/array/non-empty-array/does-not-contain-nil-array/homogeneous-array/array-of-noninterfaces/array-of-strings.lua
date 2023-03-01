@@ -25,7 +25,13 @@ ArrayOfStringsSpecifier = {
         return CreateStringItem(self:get("joined-string-contents-with-no-blank-lines"))
       end,
       ["to-resplit-string-array-assume-sep"] = function(self, sep) -- the difference between this and to-resplit-string-array-assume-no-sep is that here we assume that the current array represents a string that was split by sep, and so we only need to split substrings that contain sep, and then flatten, while for to-resplit-string-array-assume-no-sep we assume that the divisions between the strings in the current array are arbitrary, and so we need to join the strings and then split by sep
-        return CreateArray(listFlatten(self:get("map", function (str) return stringy.split(str, sep) end)))
+        return CreateArray(
+          map(
+            self:get("contents"), 
+            function (str) return stringy.split(str, sep) end,
+            { flatten = true }
+          )   
+        )
       end,
       ["to-resplit-string-array-assume-sep-no-empty-strings"] = function(self, sep)
         return self:get("to-resplit-string-array-assume-sep", sep)

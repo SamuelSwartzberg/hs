@@ -24,31 +24,6 @@ assertTable(
 )
 
 assertTable(
-  listFlatten({ { 1, 2 }, 3, {4, {5}} }, 1),
-  {1, 2, 3, 4, {5}}
-)
-
-assertTable(
-  listFlatten({ { 1, 2 }, 3, {4, {5}} }, 2),
-  {1, 2, 3, 4, 5}
-)
-
-assertTable(
-  listFlatten({ { 1, 2 }, 3, {4, {5}} }, 3),
-  {1, 2, 3, 4, 5}
-)
-
-assertTable(
-  listFlatten({ { 1, 2 }, 3, {4, {5}} }, 0),
-  {{1, 2}, 3, {4, {5}}}
-)
-
-assertTable(
-  listFlatten({{a = 1}, {b = 2}}, 1),
-  {{a = 1}, {b = 2}}
-)
-
-assertTable(
   map({ 1, 2 , 3}, function(item) return false, {item, item + 1} end, {
     args = "k",
     useas = "kv",
@@ -247,13 +222,14 @@ assertValuesContainExactly(
 )
 
 assertTable(
-  listJoin(
+  listConcat(
     {
-      {1, 2},
-      4,
-      {5, 6}
+      isopts = "isopts",
+      sep = "|",
     },
-    "|"
+    {1, 2},
+    4,
+    {5, 6}
   ),
   {1, 2, "|", 4, "|", 5, 6}
 )

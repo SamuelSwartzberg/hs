@@ -29,53 +29,6 @@ function listFilterUniquePreserveFirst(tbl)
   return outtable
 end
 
---- @generic T : any | any[]
---- @param tbl T[]
---- @param depth? integer
---- @return any[]
-function listFlatten(tbl, depth) -- does not work on array tables
-  if not tbl then return {} end
-  if not isListOrEmptyTable(tbl) then return tbl end
-  if not depth then depth = 1 end
-
-  local new_tbl = {}
-  for i, v in ipairs(tbl) do
-    if type(v) == "table" and depth > 0 then
-      local deeper_res = listFlatten(v, depth - 1)
-      new_tbl = listConcat(new_tbl, deeper_res)
-    else
-      new_tbl[#new_tbl + 1] = v
-    end
-  end
-  return new_tbl
-end
-
---- @generic T
---- @generic O
---- @param tbl T[]
---- @param func fun(value: T): O|O[]
---- @return O[]
-function flatMap(tbl, func)
-  local res = listFlatten(map(tbl, func), 1)
-  return res
-end
-
---- @generic T
---- @generic O
---- @param tbl T[]
---- @param func fun(value: T): O
---- @return O[]
-function filterNilMap(tbl, func)
-  local new_tbl = {}
-  for _, v in ipairs(tbl) do
-    local new_v = func(v)
-    if new_v ~= nil then
-      new_tbl[#new_tbl + 1] = new_v
-    end
-  end
-  return new_tbl
-end
-
 --- @generic T
 --- @param list T[]
 --- @param comp? fun(a: T, b: T):boolean
@@ -121,16 +74,6 @@ end
 
 --- @generic T
 --- @param list T[]
---- @param sorter? fun(a: T, b: T):boolean
---- @return T[]
-function listSort(list, sorter)
-  local new_list = tablex.copy(list)
-  table.sort(new_list, sorter)
-  return new_list
-end
-
---- @generic T
---- @param list T[]
 --- @param sample_size? integer defaults to 2
 --- @return string
 function listSampleString(list, sample_size)
@@ -141,40 +84,4 @@ function listSampleString(list, sample_size)
     outstr = outstr .. ", ..."
   end
   return outstr
-end
-
-
---- joins a list of lists into a single list, optionally inserting 1 - n elements between each list
---- @generic T
---- @generic U
---- @param list T[]
---- @param joiner U[]
---- @return (T | U)[]
-function listJoin(list, joiner)
-  local new_list = {}
-  for i, v in wdefarg(ipairs)(list) do
-    new_list = listConcat(new_list, v)
-    if i < #list then
-      new_list = listConcat(new_list, joiner)
-    end
-  end
-  return new_list
-end
-
---- @generic T
---- @param list T[]
---- @return T
-function getLast(list)
-  return list[#list]
-end
-
---- @generic T
---- @param list T[]
---- @return T[]
-function listReverse(list)
-  local new_list = {}
-  for i = #list, 1, -1 do
-    new_list[#new_list + 1] = list[i]
-  end
-  return new_list
 end

@@ -127,11 +127,11 @@ NonEmptyArraySpecifier = {
         return CreateArray(self:get("flatten"))
       end,
       ["flat-map"] = function(self, callback)
-        local res = flatMap(self:get("contents"), callback)
+        local res = map(self:get("contents"), callback, {flatten = true})
         return CreateArray(res)
       end,
       ["filter-nil-map"] = function(self, callback)
-        return filterNilMap(self:get("contents"), callback)
+        return fixListWithNil(map(self:get("contents"), callback))
       end,
       ["filter-nil-map-to-new-array"] = function(self, callback)
         return CreateArray(self:get("filter-nil-map", callback))

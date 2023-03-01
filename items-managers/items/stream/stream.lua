@@ -71,11 +71,11 @@ function CreateStreamItem(specified_contents)
           )
         end,
         ["command-parts"] = function(self)
-          return listFlatten({
+          return listConcat(
             "mpv",
             self:get("to-initial-args"),
             self:get("urls-as-command-parts")
-          })
+          )
         end,
         ["chooser-text"] = function(self) return self:get("summary-line") end,
         ["chooser-subtext-part"] = function(self) 

@@ -88,3 +88,17 @@ end
 function returnLarger(a, b)
   return a > b
 end
+
+--- @param a any
+--- @param b any
+--- @return boolean
+function returnSmaller(a, b)
+  return a < b
+end
+
+--- @generic T
+--- @param list T[]
+--- @return T
+function returnLast(list)
+  return list[#list]
+end

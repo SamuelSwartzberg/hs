@@ -10,7 +10,7 @@ function mergeAssocArrRecursive(opts, ...)
   if not opts then return {} end 
   if opts.isopts == "isopts" then
     -- no-op
-  else
+  else -- opts is actually the first associative array
     table.insert(tables, 1, opts)
     opts = {}
   end

@@ -13,10 +13,12 @@ ArrayOfStringItemsSpecifier = {
       ["to-joined-string-item-with-no-blank-lines"] = function(self) return CreateStringItem(self:get("to-string-array"):get("joined-string-contents-with-no-blank-lines")) end,
       ["to-resplit-string-item-array-assume-sep"] = function(self, sep)
         return CreateArray(
-          listFlatten(
-            self:get("map", function (strItem) 
+          map(
+            self:get("contents"),
+            function (strItem) 
               return strItem:get("to-string-item-array", sep) 
-            end)
+            end,
+            { flatten = true }
           )
         )
       end,
