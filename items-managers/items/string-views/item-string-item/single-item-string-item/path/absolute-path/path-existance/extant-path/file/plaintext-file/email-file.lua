@@ -85,7 +85,7 @@ EmailFileItemSpecifier = {
           })
         end
         local all_addr = stringy.split(raw_res, "\n")
-        local addr = listFilterUnique(listFilterEmptyString(all_addr))
+        local addr = listFilterUnique(filter(all_addr, true))
         return addr
       end,
       ["email-summary-task"] = function(self, format_specifier)

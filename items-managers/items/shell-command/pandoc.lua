@@ -5,7 +5,7 @@ function addMetadata(rawsource, metadata)
   local final_metadata, final_contents
   if stringy.startswith(rawsource, "---") then
     -- splice in the metadata
-    local parts = listFilterEmptyString(stringy.split(rawsource, "---"))
+    local parts = filter(stringy.split(rawsource, "---", true))
     final_metadata = parts[1] .. "\n" .. metadata_string
     final_contents = parts[2]
   else

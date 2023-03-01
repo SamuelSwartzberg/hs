@@ -1,18 +1,20 @@
 
 
 list_from_1_to_10 = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
-cmds_from_1_to_10 = mapPairNewPairOvtable(
+cmds_from_1_to_10 = map(
   list_from_1_to_10,
-  function (ind, val)
+  function (ind)
     return tostring(ind), {"echo", tostring(ind)}
-  end
+  end,
+  {"k", "kv"}
 )
 
-results_from_1_to_10 = mapPairNewPairOvtable(
+results_from_1_to_10 = map(
   list_from_1_to_10,
-  function (ind, val)
+  function (ind)
     return tostring(ind), tostring(ind) .. "\n"
-  end
+  end,
+  {"k", "kv"}
 )
 
 runHsTaskParallel(

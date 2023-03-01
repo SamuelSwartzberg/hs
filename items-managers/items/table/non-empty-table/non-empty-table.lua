@@ -104,10 +104,10 @@ NonEmptyTableSpecifier = {
         return pairFind(self:get("contents"), predicate)
       end,
       ["map-table"] = function(self, callback)
-        return mapPairNewPairOvtable(self:get("contents"), callback)
+        return map(self:get("contents"), callback, {"kv", "kv"})
       end,
       ["map-keys"] = function(self, callback)
-        return mapKeyNewKey(self:get("keys"), callback)
+        return map(self:get("keys"), callback)
       end,
       ["map-values"] = function(self, callback)
         return map(self:get("values"), callback)
@@ -151,7 +151,7 @@ NonEmptyTableSpecifier = {
         return self:get("values-to-new-array"):get("chooser-list-of-all")
       end,
       ["map-pairs-to-string"] = function(self)
-        return mapPairNewPairOvtable(self:get("contents"), function(k, v)
+        return map(self:get("contents"), function(k, v)
           local pair_value_as_text
           if type(v) == "table" and v.get then 
             pair_value_as_text = v:get("to-string")
@@ -159,8 +159,8 @@ NonEmptyTableSpecifier = {
             pair_value_as_text = tostring(v)
           end
           pair_value_as_text = foldStr(pair_value_as_text)
-          return k, "[" .. tostring(k) .. "] = " .. pair_value_as_text
-        end)
+          return "[" .. tostring(k) .. "] = " .. pair_value_as_text
+        end, {"kv", "v"})
       end,
       ["to-string"] = function(self)
         return "table: " .. table.concat(values(self:get("map-pairs-to-string")), ", ")

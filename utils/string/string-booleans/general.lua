@@ -84,58 +84,99 @@ function isLastIfAny(str, last)
   end
 end
 
+--- @class condition
+--- @field _r? string
+--- @field _start? string
+--- @field _stop? string
+--- @field _empty? boolean
+--- @field _type? "string" | "number" | "boolean" | "table" | "function" | "thread" | "userdata
+--- @field _exactly? string
+--- @field _invert? boolean
 
---- @alias stringConditionThatCantBeConfusedForListOfStringConditions boolean | string | {[any]: any} | {_r?: string, _start?: string, _stop?: string} | function
---- @alias stringCondition stringConditionThatCantBeConfusedForListOfStringConditions | string[]
 
---- @class stringTestOpts
+--- @alias conditionThatCantBeConfusedForListOfConditions boolean | string | table | condition | function
+--- @alias anyCondition conditionThatCantBeConfusedForListOfConditions | any[]
+--- @alias conditionSpec conditionThatCantBeConfusedForListOfConditions | anyCondition[]
+
+--- @class testOpts
 --- @field tostring boolean
 
 
---- @param str? string
---- @param conditions? stringConditionThatCantBeConfusedForListOfStringConditions | stringCondition[]
---- @param opts? stringTestOpts
+--- @param item? string
+--- @param conditions? conditionSpec
+--- @param opts? testOpts
 --- @return boolean
-function stringTest(str, conditions, opts)
-  str = str or ""
+function test(item, conditions, opts)
+  item = item or ""
   conditions = conditions or true
   opts = opts or {}
   opts.tostring = defaultIfNil(opts.tostring, true)
 
-  if opts.tostring then str = tostring(str) end
+  if opts.tostring then item = tostring(item) end
 
   if not isListOrEmptyTable(conditions) then
     conditions = {conditions}
   end
 
-  if not type(str) == "string" then return false end
   local results
 
   for _, condition in wdefarg(ipairs)(conditions) do 
+
+    -- process shorthand conditions into full conditions
+
     if type(condition) == "boolean" then
-      listPush(results, (str ~= "") == condition)
-    elseif type(condition) == "table" then
+      condition = {_empty = condition}
+    elseif type(condition) == "string" or type(condition) == "number" then
+      condition = {_exactly = condition}
+    end
+  
+    -- process full conditions into results
+
+    if type(condition) == "table" then
+
+      local ps
+
+      if condition._invert then
+        ps = returnNot
+      else
+        ps = returnBool
+      end
+
       local found_other_use_for_table = false
-      if condition.r then -- regex
-        listPush(results, not not onig.find(str, condition._r))
+
+      if condition._r or condition._start or condition._stop then
+        if type(item) == "string" then
+          if condition._r then -- regex
+            listPush(results, ps(onig.find(item, condition._r)))
+          end
+          if condition._start then -- starts with
+            listPush(results, ps(stringy.startswith(item, condition._start)))
+          end
+          if condition._stop then -- ends with
+            listPush(results, ps(stringy.endswith(item, condition._stop)))
+          end
+          found_other_use_for_table = true
+        end
+      end
+      if condition._empty then -- empty
+        local succ, rs = pcall(function() return #item == 0 end) -- pcall because # errors on failure
+        listPush(results, ps(succ and rs))
         found_other_use_for_table = true
       end
-      if condition._start then -- starts with
-        listPush(results, stringy.startswith(str, condition._start))
+      if condition._type then -- type
+        listPush(results, ps(type(item) == condition._type))
         found_other_use_for_table = true
       end
-      if condition._stop then -- ends with
-        listPush(results, stringy.endswith(str, condition._stop))
+      if condition._exactly then -- exactly
+        listPush(results, ps(item == condition._exactly))
         found_other_use_for_table = true
       end
 
       if not found_other_use_for_table then
-        listPush(results, valuesContain(condition, str))
+        listPush(results, ps(valuesContain(condition, item))) -- TODO: potential infinite loop since valuesContain may be refactored to use test
       end
     elseif type(condition) == "function" then
-      listPush(results, condition(str))
-    else
-      listPush(results, str == condition)
+      listPush(results, condition(item))
     end
   end
 

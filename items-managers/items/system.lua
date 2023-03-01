@@ -4,11 +4,12 @@ SystemSpecifier = {
   properties = {
     getables = {
       ["all-non-root-volumes-string-array"] = function()
-        local volume_arr = CreateArray(listFilter(
+        local volume_arr = CreateArray(filter(
           keys(hs.fs.volume.allVolumes()),
-          function(volume)
-            return volume ~= "/"
-          end
+          {
+            _exactly = "/",
+            _invert = true
+          }
         ))
         if volume_arr:get("length") > 0 then
           return volume_arr

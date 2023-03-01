@@ -1,28 +1,35 @@
 -- new function map that generalizes over all map scenarios
 
---- @alias k_or_v "k"|"v"
+--- @alias kv "k"|"v"|string string here for stuff like "kv" or weirder stuff like "kkkkvkkvv"
+--- @alias kvmult kv | kv[]
+
+--- @class mapOpts
+--- @field args kvmult
+--- @field useas kvmult
+--- @field noovtable boolean
+--- @field mapcondition conditionSpec TODO NOT USED YET
 
 --- @param tbl? table | nil
 --- @param f? function 
---- @param opts? string | k_or_v[][] | {args: k_or_v | k_or_v[], useas: k_or_v | k_or_v[], noovtable: boolean} 
+--- @param opts? kvmult | kvmult[] | mapOpts
 function map(tbl, f, opts)
   tbl = tbl or {}
   f = f or returnAny
   if type(opts) == "string" then
     opts = {args = opts, useas = opts}
   elseif isListOrEmptyTable(opts) then
-    opts = {args = opts[1] or "v", useas = opts[2] or "v"}
+    opts = {args = opts[1] or {"v"}, useas = opts[2] or {"v"}}
   else
     opts = opts or {}
-    opts.args = opts.args or "v"
-    opts.useas = opts.useas or "v"
+    opts.args = opts.args or {"v"}
+    opts.useas = opts.useas or {"v"}
   end
 
   if type(opts.args) == "string" then
-    opts.args = {opts.args}
+    opts.args = splitChars(opts.args)
   end
   if type(opts.useas) == "string" then
-    opts.useas = {opts.useas}
+    opts.useas = splitChars(opts.useas)
   end
 
   local mapped_useas = {}
@@ -66,22 +73,129 @@ function map(tbl, f, opts)
   return res
 end
 
+--- @class filterOpts
+--- @field args kvmult
+--- @field noovtable boolean
+--- @field tolist boolean
 
-
-
---- @generic K
---- @generic V
---- @generic O
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key: K): `O`
---- @return {[O]: V}
-function mapKeyNewKey(tbl, f)
-  local t = {}
-  for k, v in wdefarg(pairs)(tbl) do
-    t[f(k)] = v
+--- @param tbl? table | nil
+--- @param cond? conditionSpec
+--- @param opts? kvmult | filterOpts
+function filter(tbl, cond, opts)
+  tbl = tbl or {}
+  cond = cond or false
+  if type(opts) == "string" or isListOrEmptyTable(opts) then
+    opts = {args = opts}
+  else
+    opts = tablex.deepcopy(opts) or {}
   end
-  return t
+
+  local iterator = pairs
+  
+  local is_list = isListOrEmptyTable(tbl)
+
+  if is_list then 
+    opts.noovtable = true
+    iterator = ipairs
+  end
+  
+
+  if opts.noovtable or opts.tolist then
+    res = {}
+  else 
+    res = ovtable.new()
+  end
+
+  for k, v in wdefarg(iterator)(tbl) do
+    local retriever = {
+      k = k,
+      v = v
+    }
+    local res = true
+    for _, arg in ipairs(opts.args) do
+      res = res and test(retriever[arg], cond)
+      if not res then
+        break -- exit early
+      end
+    end
+    if res then
+      if opts.tolist then
+        table.insert(res, v)
+      else
+        res[k] = v
+      end
+    end
+  end
+
+  return res
 end
+
+--- @class findOpts
+--- @field args kvmult
+--- @field ret kvmult here, kvmult can also include "boolean", to return a boolean instead of the value
+--- more tbd
+
+--- @param tbl? table | nil
+--- @param cond? conditionSpec
+--- @param opts? kvmult | kvmult[] | findOpts
+function find(tbl, cond, opts)
+  tbl = tbl or {}
+  cond = cond or false
+  if type(opts) == "string" then
+    opts = {args = opts, ret = opts}
+  elseif isListOrEmptyTable(opts) then
+    opts = {args = opts[1] or {"v"}, ret = opts[2] or {"v"}}
+  else
+    opts = opts or {}
+    opts.args = opts.args or {"v"}
+    opts.ret = opts.ret or {"v"}
+  end
+
+  if type(opts.args) == "string" then
+    opts.args = splitChars(opts.args)
+  end
+  if type(opts.ret) == "string" then
+    if opts.ret == "boolean" then
+      opts.ret = {"boolean"}
+    else
+      opts.ret = splitChars(opts.ret)
+    end
+  end
+
+  local iterator
+
+  if isListOrEmptyTable(tbl) then
+    iterator = ipairs
+  else
+    iterator = pairs
+  end
+
+  for k, v in wdefarg(iterator)(tbl) do
+    local retriever = {
+      k = k,
+      v = v
+    }
+    for _, arg in ipairs(opts.args) do
+      res = res and test(retriever[arg], cond)
+      if res then
+        local ret = {}
+        for _, retarg in ipairs(opts.ret) do
+          if retarg == "boolean" then
+            table.insert(ret, true)
+          else
+            table.insert(ret, retriever[retarg])
+          end
+        end
+        return table.unpack(ret)
+      end
+    end
+  end
+
+  return nil
+end
+
+  
+
 
 --- @generic K
 --- @generic V
@@ -90,20 +204,6 @@ end
 --- @return V
 function getValue(tbl, key)
   return tbl[key]
-end
-
---- @generic K
---- @generic V
---- @generic O
---- @param tbl { [`K`]: `V` } | nil
---- @param f fun(value?: V): `O`
---- @return { [K]: O }
-function map(tbl, f)
-  local t = {}
-  for k, v in wdefarg(pairs)(tbl) do
-    t[k] = f(v)
-  end
-  return t
 end
 
 --- @param tbl table
@@ -118,55 +218,6 @@ function mapValueNewValueRecursive(tbl, f)
     end
   end
   return t
-end
-
---- @param tbl table | nil
---- @param f fun(key?: any, value?: any): any, any
---- @return orderedtable
-function mapPairNewPairOvtable(tbl, f)
-  local t = ovtable.new()
-  for k, v in wdefarg(pairs)(tbl) do
-    local new_k, new_v = f(k, v)
-    t[new_k] = new_v
-  end
-  return t
-end
-
-
-
---- @generic K
---- @generic V
---- @generic O
---- @param tbl { [`K`]: `V` } | nil
---- @param f fun(key?: K, value?: V): `O`
---- @return O[]
-function mapTableToArray(tbl, f)
-  local t = {}
-  for k, v in wdefarg(pairs)(tbl) do
-    t[#t + 1] = f(k, v)
-  end
-  return t
-end
-
---- @generic T
---- @param tbl T | nil
---- @return T
-function mapValueToStrippedValue(tbl)
-  return mapPairNewPairOvtable(tbl, function(k, v)
-    if type(v) == "string" then
-      return k, stringy.strip(v)
-    else
-      return k, v
-    end
-  end)
-end
-
---- @param tbl table<any, any> | nil
---- @return table<any, string>
-function mapValueToStr(tbl)
-  return map(tbl, function(v)
-    return tostring(v)
-  end)
 end
 
 --- @generic K
@@ -390,62 +441,6 @@ function forValues(tbl, f)
   for _, v in wdefarg(pairs)(tbl) do
     f(v)
   end
-end
-
---- @generic K, V, T
---- @param tbl {[`K`]: `V`} | nil
---- @param list T[]
---- @return { [K]: V }
-function filterKeysInList(tbl, list)
-  local t = {}
-  for k, v in wdefarg(pairs)(tbl) do
-    if valuesContain(list, k) then
-      t[k] = v
-    end
-  end
-  return t
-end
-
---- @generic K, V, T
---- @param tbl {[`K`]: `V`} | nil
---- @param list T[]
---- @return { [K]: V }
-function filterKeysNotInList(tbl, list)
-  local t = {}
-  for k, v in wdefarg(pairs)(tbl) do
-    if not valuesContain(list, k) then
-      t[k] = v
-    end
-  end
-  return t
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K, value?: V): boolean
---- @return { [K]: V }
-function filterKeys(tbl, f)
-  local t = {}
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(k, v) then
-      t[k] = v
-    end
-  end
-  return t
-end
-
---- @generic K, V
---- @param tbl {[`K`]: `V`} | nil
---- @param f fun(key?: K, value?: V): boolean
---- @return { [K]: V }
-function filterValues(tbl, f)
-  local t = {}
-  for k, v in wdefarg(pairs)(tbl) do
-    if f(k, v) then
-      t[k] = v
-    end
-  end
-  return t
 end
 
 --- @generic K, V, T, U

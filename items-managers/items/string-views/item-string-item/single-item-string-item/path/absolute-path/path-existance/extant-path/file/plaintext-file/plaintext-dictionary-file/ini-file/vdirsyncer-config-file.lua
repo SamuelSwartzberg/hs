@@ -28,9 +28,9 @@ VdirsyncerConfigFileItemSpecifier = {
       end,
       ["vdirsyncer-config-next-webcal-readonly-index"] = function(self)
         local pairs = self:get("vdirsyncer-config-sections", "pair")
-        local webcal_pair_keys = filterKeys(pairs, function(k)
-          return stringy.startswith(k, "webcal_readonly_")
-        end)
+        local webcal_pair_keys = filter(pairs, {
+          _start = "webcal_readonly_"
+        }, "k")
         local indices = map(keys(webcal_pair_keys), function(k)
           return tonumber(k:match("webcal_readonly_(%d+)"))
         end)

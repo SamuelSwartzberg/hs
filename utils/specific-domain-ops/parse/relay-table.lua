@@ -5,11 +5,11 @@
 --- @return relay_table
 function parseRelayTable(raw)
   local raw_countries = stringx.split(raw, "\n\n") -- stringy does not support splitting by multiple characters
-  raw_countries = listFilterEmptyString(raw_countries)
+  raw_countries = filter(raw_countries, true)
   local countries = {}
   for _, raw_country in ipairs(raw_countries) do
     local raw_country_lines = stringy.split(raw_country, "\n")
-    raw_country_lines = listFilterEmptyString(raw_country_lines)
+    raw_country_lines = filter(raw_country_lines, true)
     local country_header = raw_country_lines[1]
     local country_code = extractFirstThingInParentheses(country_header)
     if country_code == nil then error("could not find country code in header. header was " .. country_header) end

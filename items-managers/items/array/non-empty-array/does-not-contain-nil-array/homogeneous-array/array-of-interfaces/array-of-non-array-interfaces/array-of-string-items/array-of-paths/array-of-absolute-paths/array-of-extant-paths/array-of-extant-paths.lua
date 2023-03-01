@@ -33,9 +33,9 @@ ArrayOfExtantPathsSpecifier = {
         end)
       end,
       ["map-to-table-of-path-and-path-content-items"] = function(self)
-        local tbl = mapPairNewPairOvtable(self:get("contents"), function(_, path_item)
+        local tbl = map(self:get("contents"), function(path_item)
           return path_item:get("contents"), path_item:get("path-content-item")
-        end)
+        end, { "k", "kv" })
         return CreateTable(tbl)
       end,
       ["sorted-path-attr"] = function(self, attr)

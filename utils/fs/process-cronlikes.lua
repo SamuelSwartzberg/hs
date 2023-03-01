@@ -40,7 +40,7 @@ function processSetupDirectivesInFiles(path)
         print(
           "Would execute"
           .. " _G[\"" .. command .. "\"]"
-          .. "(" .. table.concat(mapValueToStr(args), ", ") .. ")"
+          .. "(" .. table.concat(map(args, tostring), ", ") .. ")"
         )
         print(
           "with interval " .. interval

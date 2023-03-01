@@ -55,7 +55,7 @@ NonEmptyArraySpecifier = {
         return self:get("sorted-to-new-array-default"):get("reverse-to-new-array")
       end,
       ["filter"] = function(self, callback)
-        return listFilter(self:get("contents"), callback)
+        return filter(self:get("contents"), callback)
       end,
       ["filter-to-new-array"] = function(self, callback)
         local res = CreateArray(self:get("filter", callback))

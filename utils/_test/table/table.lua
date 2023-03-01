@@ -228,11 +228,13 @@ assertMessage(nextKey(), "bar")
 assertMessage(nextKey(), "foo")
 
 assertTable(
-  mapValueToStrippedValue({
+  map({
     a = " 1 ",
     b = "2",
     c = "ro aaa r   ",
     d = 3
+  }, stringy.strip, {
+    mapcondition = "TOOD ONLY STRING"
   }),
   {
     a = "1",

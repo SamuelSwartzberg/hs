@@ -11,11 +11,9 @@ PathItemSpecifier = {
         return self:get("contents")
       end,
       ["path-components"] = function (self)
-        return listFilter(
+        return filter(
           stringy.split(self:get("path"), "/"),
-          function(v)
-            return v ~= ""
-          end
+          true
         )
       end,
       ["parent-path-components"] = function(self)

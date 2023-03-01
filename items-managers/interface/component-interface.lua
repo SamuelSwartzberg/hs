@@ -181,7 +181,7 @@ InterfaceDefaultTemplate = {
       end,
       ["raw-action-table"] = function(self) return self.action_table end,
       ["filtered-action-table"] = function(self)
-        local filtered_action_table = listFilter(
+        local filtered_action_table = filter(
           self:get("raw-action-table") or {}, 
           function(action_table_entry)
             if action_table_entry.condition then

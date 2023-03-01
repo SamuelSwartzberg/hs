@@ -8,6 +8,18 @@ function returnFalse()
   return false
 end
 
+--- @param b any
+--- @return boolean
+function returnNot(b)
+  return not b
+end
+
+--- @param b any
+--- @return boolean
+function returnBool(b)
+  return not not b
+end
+
 --- @return nil
 function returnNil()
   return nil

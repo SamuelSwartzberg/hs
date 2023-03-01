@@ -13,12 +13,13 @@ PathLeafPartsSpecifier = {
         end
       end,
       ["tags-as-string-array"] = function(self)
-        local arr = mapTableToArray(
+        local arr = map(
             self:get("contents").tag,
             function(tag_key, tag_value)
               if type(tag_value) == "table" then tag_value = table.concat(tag_value, ",") end
-              return string.format("%s-%s", tag_key, tag_value)
-            end
+              return false, string.format("%s-%s", tag_key, tag_value)
+            end,
+            {{"k", "v"}}
           )
         table.sort(arr)
         return arr

@@ -34,22 +34,6 @@ function listUnshift(tbl, value)
   return true
 end
 
---- @generic T
---- @param tbl T[]
---- @param filter_func fun(value: T): boolean
---- @return T[]
-function listFilter(tbl, filter_func)
-  local new_tbl = {}
-  for _, v in ipairs(tbl) do
-    if filter_func(v) then
-      new_tbl[#new_tbl + 1] = v
-    end
-  end
-
-  return new_tbl
-
-end
-
 --- since lists with nil are not considered lists by lua, this function will need to be called for any operation that might return a list with nil
 --- @generic T
 --- @param tbl T[]
@@ -67,8 +51,8 @@ end
 --- @generic T
 --- @param tbl T[]
 --- @return T[]
-function listFilterEmptyString(tbl)
-  return listFilter(tbl, function(x) return x ~= "" end)
+function filter(tbl, true)
+  return filter(tbl, function(x) return x ~= "" end)
 end
 
 --- @generic T
@@ -496,6 +480,8 @@ function combinations(list, k)
     return statefulNokeyIteratorToTable(combine.combn, list, k)
   end
 end
+
+wdefarg
 
 --- @generic T
 --- @param list T[]

@@ -114,7 +114,10 @@ PlaintextFileItemSpecifier = {
       ["choose-item-remove-and-choose-action"] = function(self, splitter)
         local parts = stringx.split(self:get("file-contents"), splitter)
         CreateArray(parts):doThis("choose-item", function(part)
-          parts = listFilter(parts, function(p) return p ~= part end)
+          parts = filter(parts, {
+            _exactly = part,
+            _invert = true,
+          })
           self:doThis("overwrite-file-content", stringx.join(splitter, parts))
           CreateStringItem(part):doThis("choose-action")
         end)

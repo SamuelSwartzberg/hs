@@ -56,7 +56,7 @@ function itemsInPath(opts)
       }) 
       if output then
         items = splitLines(output)
-        items = listFilterEmptyString(items)
+        items = filter(items, true)
         items = map(
           items,
           function(item)
@@ -102,7 +102,7 @@ function itemsInPath(opts)
   end
 
   if opts.validator_result then
-    files = listFilter(files, opts.validator_result)
+    files = filter(files, opts.validator_result)
   end
 
   if opts.slice_results then

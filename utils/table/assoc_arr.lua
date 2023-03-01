@@ -117,13 +117,13 @@ end
 function nestedAssocArrGetStopsForKeyValue(assoc_arr, indentation)
   if not indentation then indentation = 2 end
   local incl_path_and_depth = nestedAssocArrToListIncludingPathAndDepth(assoc_arr)
-  local list_of_stops = mapPairNewPairOvtable(incl_path_and_depth, function(k, item)
+  local list_of_stops = map(incl_path_and_depth, function(item)
     local key = item.path[#item.path]
     return key, {
       key_stop = (item.depth * indentation) + #key,
       value_stop = #item.value
     }
-  end)
+  end, {"v", "kv"})
   return list_of_stops
 end
 
@@ -148,18 +148,18 @@ end
 --- @return table<string[], any>
 function nestedAssocArrToFlatPathAssocArr(assoc_arr)
   local list = nestedAssocArrToListIncludingPath(assoc_arr, {})
-  return mapPairNewPairOvtable(list, function(_, item)
+  return map(list, function(item)
     return item.path, item.value
-  end)
+  end, {"v", "kv"})
 end
 
 --- @param assoc_arr table<any, any>
 --- @return table<string, any>
 function nestedAssocArrToFlatPathAssocArrWithDotNotation(assoc_arr)
   local list = nestedAssocArrToListIncludingPath(assoc_arr, {})
-  return mapPairNewPairOvtable(list, function(_, item)
+  return map(list, function(item)
     return table.concat(item.path, "."), item.value
-  end)
+  end, {"v", "kv"})
 end
 
 --- @generic T : string

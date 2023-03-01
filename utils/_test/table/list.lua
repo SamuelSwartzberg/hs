@@ -64,17 +64,17 @@ assertTable(
 )
 
 assertTable(
-  listFilterEmptyString({1, "", 2, "", 3}),
+  filter({1, "", 2, "", 3}, true),
   {1, 2, 3}
 )
 
 assertTable(
-  listFilterEmptyString({1, " ", 2, " ", 3}),
+  filter({1, " ", 2, " ", 3}, true),
   {1, " ", 2, " ", 3}
 )
 
 assertTable(
-  listFilterEmptyString({1, 2, 3}),
+  filter({1, 2, 3}, true),
   {1, 2, 3}
 )
 assertTable(

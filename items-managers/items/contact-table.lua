@@ -99,15 +99,16 @@ ContactTableSpecifier = {
       end,
       ["addresses-table"] = function(self)
         local raw = self:get("table-prop-policy", "Address")
-        local processed = mapPairNewPairOvtable(raw, function(k,v)
+        local processed = map(raw, function(v)
           local raw_single = mergeAssocArrRecursive(
-          v,
-          {
-            ["Formatted name"] = self:get("name"),
-            ["First name"] = self:get("first-name"),
-            ["Last name"] = self:get("last-name"),
-          })
-          return k, CreateTable(raw_single)
+            v,
+            {
+              ["Formatted name"] = self:get("name"),
+              ["First name"] = self:get("first-name"),
+              ["Last name"] = self:get("last-name"),
+            }
+          )
+          return CreateTable(raw_single)
         end)
         return CreateTable(processed)
       end,

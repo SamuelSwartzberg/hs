@@ -4,9 +4,9 @@ ArrayOfEmailFilesSpecifier = {
   properties = {
     getables = {
       ["to-summary-line-path-table"] = function(self)
-        local raw_table = mapPairNewPairOvtable(self:get("contents"), function(_, path)
+        local raw_table = map(self:get("contents"), function(path)
           return path:get("contents"), path:get("email-summary")
-        end)
+        end, { "k", "kv" })
         return CreateTable(raw_table)
       end,
     },

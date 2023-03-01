@@ -70,7 +70,7 @@ function splitByMultiple(str, separators)
   for _, sep in ipairs(separators) do
     res = map(res, function(str) return stringy.split(str, sep) end)
   end
-  res = filterValues(res, function(str) return str ~= "" end)
+  res = filter(res, true)
   return res
 end
 

@@ -14,7 +14,7 @@ end
 function shellLikeArgsToOpts(opts)
   local opts_tbl = {}
   local opts_list = stringy.split(opts, " ")
-  opts_list = listFilterEmptyString(opts_list)
+  opts_list = filter(opts_list, true)
   local prev_opt_was_key = false
   local prev_opt_key = nil
   for _, opt_part in ipairs(opts_list) do

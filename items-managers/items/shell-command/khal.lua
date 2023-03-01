@@ -189,10 +189,11 @@ KhalCommandSpecifier = {
         return splitLines(res)
       end,
       ["writable-calendars"] = function(self)
-        return fixListWithNil(filterValues(
+        return filter(
           self:get("calendars"),
+          { _start =  "r-:" }
           function (_, cal)
-            return not stringy.startswith(cal, "r-:") -- inspired by rwx access rights
+            return not stringy.startswith(cal,) -- inspired by rwx access rights
           end
         ))
       end,
@@ -207,7 +208,7 @@ KhalCommandSpecifier = {
         addFormatToCommand(command, specifier)
         addInclExclToCommand(command, specifier)
         listPush(command, { value = specifier.searchstr, type = "quoted" })
-        return listFilterEmptyString(stringx.split(run(command), RECORD_SEPARATOR))
+        return filter(stringx.split(run(command, true), RECORD_SEPARATOR))
       end,
       ["search-events-parseable"] = function(self, specifier)
         specifier.format = PARSEABLE_FORMAT_SPECIFIER
@@ -255,7 +256,7 @@ KhalCommandSpecifier = {
         specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
         listPush(command, { value = specifier.start, type = "quoted" })
         listPush(command, { value = specifier["end"], type = "quoted" })
-        return listFilterEmptyString(stringx.split(run(command), RECORD_SEPARATOR ))
+        return filter(stringx.split(run(command, true), RECORD_SEPARATOR ))
       end,
       ["list-events-parseable"] = function(self, specifier)
         specifier.format = PARSEABLE_FORMAT_SPECIFIER
@@ -338,7 +339,9 @@ KhalCommandSpecifier = {
       end,
       ["add-event-from-specifier"] = function(self, specifier)
         specifier = specifier or {}
-        specifier = mapValueToStrippedValue(specifier)
+        specifier = map(specifier, stringy.strip, {
+          mapcondition = "TOOD ONLY STRING"
+        })
         local command = {"khal", "new" }
         if specifier.calendar then
           command = listConcat(
@@ -362,7 +365,9 @@ KhalCommandSpecifier = {
 
         if specifier.alarms then
           local alarms_str = table.concat(
-            mapValueToStrippedValue(specifier.alarms),
+            map(specifier.alarms, stringy.strip, {
+              mapcondition = "TOOD ONLY STRING"
+            }),
             ","
           )
           command = listConcat(
