@@ -4,7 +4,7 @@
 --- @return fun(opts: string, ...: any): any
 function takeShellikeArgsAsOpts(fn)
   return function(opts, ...)
-    local opts_tbl = newLAliastable(shellLikeArgsToOpts(opts))
+    local opts_tbl = newAliastable(shellLikeArgsToOpts(opts), "l")
     return fn(opts_tbl, ...)
   end
 end

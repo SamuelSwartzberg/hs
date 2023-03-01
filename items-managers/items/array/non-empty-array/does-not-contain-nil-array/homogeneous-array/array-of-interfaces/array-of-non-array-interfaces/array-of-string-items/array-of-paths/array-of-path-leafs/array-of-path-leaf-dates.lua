@@ -4,7 +4,7 @@ ArrayOfPathLeafDatesSpecifier = {
   properties = {
     getables = {
       ["whateverest-path-leaf-date-thing"] = function(self, specifier)
-        return listMax(self:get("map", function(path_leaf)
+        return reduce(self:get("map", function(path_leaf)
           return path_leaf:get(specifier.whateverest .. "-" .. specifier.thing)
         end))
       end,

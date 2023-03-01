@@ -159,7 +159,6 @@ function pkg.revpairs(t)
     end
 end
 
--- Returns a new orderedtable. Optionally override the `__pairs` metamethod.
 function pkg.new()
   local tbl = setmetatable({}, orderedmetatable)
   local id = predef_table_unqid or string.sub(tostring(tbl), 8)

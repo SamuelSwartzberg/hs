@@ -60,7 +60,7 @@ ArrayOfInterfacesSpecifier = {
         end)
       end,
       ["min-contents"] = function(self)
-        return listMin(self:get("map", function(item) return item:get("contents") end))
+        return reduce(self:get("map", function(item) return item:get("contents") end), returnSmaller)
       end,
       ["min-contents-item"] = function(self)
         local target
@@ -72,7 +72,7 @@ ArrayOfInterfacesSpecifier = {
         return target
       end,
       ["max-contents"] = function(self)
-        return listMax(self:get("map", function(item) return item:get("contents") end))
+        return reduce(self:get("map", function(item) return item:get("contents") end))
       end,
       ["max-contents-item"] = function(self)
         local target

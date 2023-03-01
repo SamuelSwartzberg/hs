@@ -3,9 +3,9 @@ ArrayOfShrinkSpecifierTablesSpecifier = {
   properties = {
     getables = {
       ["best-version"] = function(self)
-        return listMin(self:get("map", function(shrink_specifier_table)
+        return reduce(self:get("map", function(shrink_specifier_table)
           return shrink_specifier_table:get("score")
-        end))
+        end), returnSmaller)
       end,
     },
     doThisables = {

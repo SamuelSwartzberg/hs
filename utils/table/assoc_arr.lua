@@ -97,8 +97,8 @@ function nestedAssocArrGetMaxStops(assoc_arr, indentation)
   local value_stops = map(values(stops), function(stop)
     return stop.value_stop
   end)
-  local max_key_stop = listMax(key_stops)
-  local max_value_stop = listMax(value_stops)
+  local max_key_stop = reduce(key_stops)
+  local max_value_stop = reduce(value_stops)
   return max_key_stop, max_value_stop
 end
 
@@ -207,4 +207,11 @@ function mapTableWithValueInCertainKeyToTableHoldingValueDirectly(tbl, key, igno
   end
   if delete_key_if_empty and #values(result) > 0 then result = nil end
   return result
+end
+
+
+---@param v any
+---@return any[]
+function collectLeaves(v)
+  return map(v, collectLeaves, {flatten=true, tolist=true})
 end

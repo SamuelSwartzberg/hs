@@ -1,3 +1,10 @@
+--- @generic T
+--- @param tbl T[]|nil
+--- @return T[]
+function toSet(tbl)
+  return keys(map(tbl, function(v) return v, true end, { args = "v", useas = "kv", nooverwrite = true }))
+end
+
 
 -- sadly, since my language server doesn't support generics on class fields at the moment, we need to recreate all methods of 'combine' on our own so we can add type annotations using generics :(
 -- while we're doing that, I'm also going to transform them into functions that return a table instead of an iterator

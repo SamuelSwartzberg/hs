@@ -34,7 +34,7 @@ VdirsyncerConfigFileItemSpecifier = {
         local indices = map(keys(webcal_pair_keys), function(k)
           return tonumber(k:match("webcal_readonly_(%d+)"))
         end)
-        return listMax(indices) + 1
+        return reduce(indices) + 1
       end,
       ["vdirsyncer-pair-and-corresponding-storages"] = function(self, specifier)
         local local_name = specifier.name .. "_local"

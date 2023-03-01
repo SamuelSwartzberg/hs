@@ -9,6 +9,7 @@
 --- @field noovtable boolean
 --- @field tolist boolean
 --- @field flatten boolean
+--- @field nooverwrite boolean
 --- @field mapcondition conditionSpec TODO NOT USED YET
 
 --- @generic OT : string | number | boolean | nil
@@ -72,7 +73,9 @@ function map(tbl, f, opts)
     if newkey == false or opts.tolist then -- use false as a key to indicate to push to array instead
       table.insert(res, newval)
     else
-      res[newkey] = newval
+      if not (opts.nooverwrite and res[newkey]) then
+        res[newkey] = newval
+      end
     end
   end
 

@@ -48,7 +48,7 @@ EnvMapSpecifier = {
         for _, line_with_dependencies in pairs(lines_with_dependencies) do
           out_lines = listConcat(out_lines, getDependencyLines(line_with_dependencies, lines_with_dependencies))
         end
-        return listFilterUniquePreserveFirst(out_lines)
+        return toSet(out_lines)
       end,
           
       ["to-env-file-string"] = function(self)

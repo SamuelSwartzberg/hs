@@ -8,7 +8,7 @@ function createAllCreationEntryCombinations()
         text =  "🎸 pl" .. stringx.join("", chars) .. ".",
         key = "to-stream",
         args = { 
-          initial_flags = listToBoolTable(combination)
+          initial_flags = map(combination, function(flag) return flag, true end, {"k", "kv"})
         }
       }
     end

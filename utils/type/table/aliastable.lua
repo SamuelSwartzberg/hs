@@ -37,23 +37,18 @@ function createAliasMetatable(get_longer_shorter_thing)
   }
 end
 
-
-local laliasmetatable = createAliasMetatable(function(testkey, k)
-  return k, testkey
-end)
-local saliasmetatable = createAliasMetatable(function(testkey, k)
-  return testkey, k
-end)
-
+local aliasmetatable = {
+  l = createAliasMetatable(function(testkey, k)
+    return k, testkey
+  end),
+  s = createAliasMetatable(function(testkey, k)
+    return testkey, k
+  end)
+}
 --- @param t? table
+--- @param type? "l" | "s"
 --- @return table
-function newSAliastable(t)
-  return setmetatable(t or {}, saliasmetatable)
-end
-
-
---- @param t? table
---- @return table
-function newLAliastable(t)
-  return setmetatable(t or {}, laliasmetatable)
+function newAliastable(t, type)
+  type = type or "s"
+  return setmetatable(t or {}, aliasmetatable[type])
 end
