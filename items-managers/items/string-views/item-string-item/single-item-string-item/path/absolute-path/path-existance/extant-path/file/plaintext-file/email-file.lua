@@ -169,7 +169,7 @@ EmailFileItemSpecifier = {
       end,
     }
   },
-  action_table = listConcat({
+  action_table = concat({
     {
       text = "👉📎 cattch.",
       key = "choose-save-act-on-attachment"

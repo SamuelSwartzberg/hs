@@ -25,12 +25,12 @@ function makeSimpleRESTApiRequest(specifier, do_after)
   
   local curl_args = {"curl"}
 
-  curl_args = listConcat(curl_args, { {
+  curl_args = concat(curl_args, { {
     value = url,
     type = "quoted"
   } })
 
-  curl_args = listConcat(curl_args, {
+  curl_args = concat(curl_args, {
     "-H", 
     { value = "Content-Type: application/json", type = "quoted"},
     "-H",
@@ -38,20 +38,20 @@ function makeSimpleRESTApiRequest(specifier, do_after)
   })
   if specifier.api_key then 
     specifier.api_key_header = specifier.api_key_header or "Authorization: Bearer"
-    curl_args = listConcat(curl_args, {
+    curl_args = concat(curl_args, {
       "-H",
       { value =  specifier.api_key_header .. " " .. specifier.api_key, type = "quoted"}
     })
   end
   if specifier.request_verb then
-    curl_args = listConcat(curl_args, {
+    curl_args = concat(curl_args, {
       "--request",
       { value = specifier.request_verb, type = "quoted"}
     })
   end
   if specifier.request_table then
     local request_json = json.encode(specifier.request_table)
-    curl_args = listConcat(curl_args, {
+    curl_args = concat(curl_args, {
       "-d",
       { value = request_json, type = "quoted"}
     })

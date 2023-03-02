@@ -71,7 +71,7 @@ function CreateStreamItem(specified_contents)
           )
         end,
         ["command-parts"] = function(self)
-          return listConcat(
+          return concat(
             "mpv",
             self:get("to-initial-args"),
             self:get("urls-as-command-parts")

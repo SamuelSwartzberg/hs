@@ -240,7 +240,7 @@ NonEmptyTableSpecifier = {
     { key = "hetero-k-hetero-v-table", value = CreateHeteroKHeteroVTable },
 
   }),
-  action_table = listConcat({
+  action_table = concat({
     {
       text = "👉 c.",
       key = "choose-item-and-then-action"

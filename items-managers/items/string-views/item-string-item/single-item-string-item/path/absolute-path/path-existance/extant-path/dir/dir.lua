@@ -227,7 +227,7 @@ DirItemSpecifier = {
     { key = "dir-by-path", value = createPathByPathItem },
     { key = "logging-dir", value = CreateLoggingDir },
   }),
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     {
       description = "ls",
       emoji_icon = "🗂️",

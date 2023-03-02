@@ -20,7 +20,7 @@ ArrayOfYoutubePlayableItemsSpecifier = {
       end,
     },
   },
-  action_table = listConcat(
+  action_table = concat(
     {},
     createAllCreationEntryCombinations()
   ),

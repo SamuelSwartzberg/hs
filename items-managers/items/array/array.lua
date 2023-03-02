@@ -19,7 +19,7 @@ ArraySpecifier = {
           to_append = { other_array }
         end
         return CreateArray(
-          listConcat(
+          concat(
             self:get("contents"), 
             to_append
           )

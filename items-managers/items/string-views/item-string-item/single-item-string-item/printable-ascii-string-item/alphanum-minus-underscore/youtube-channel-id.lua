@@ -23,7 +23,7 @@ YoutubeChannelIdItemSpecifier = {
       end,
     },
   },
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     {
       description = "ytfeedurl",
       emoji_icon = "🟥▶️🔶🔗",

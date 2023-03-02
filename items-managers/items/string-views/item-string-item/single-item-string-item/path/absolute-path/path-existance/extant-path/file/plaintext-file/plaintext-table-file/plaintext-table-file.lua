@@ -23,7 +23,7 @@ PlaintextTableFileItemSpecifier = {
         local line = self:get("nth-line-of-file-contents", 2)
         if not line then return false end
         local leading_number = eutf8.match(line, "^(%d+)%D")
-        if leading_number and #leading_number < 11 then -- a unix timestamp will only be larger than 10 digits starting at 2286-11-20, at which point this code will need to be updated, but I'll be dead by then
+        if leading_number and #leading_number < 11 then -- a unix timestamp will only be larger than 10 digits starting at 2286-11-20, at which point this code will need to be updated
           return true
         else
           return false
@@ -35,19 +35,25 @@ PlaintextTableFileItemSpecifier = {
       ["is-tsv-table-file"] = function(self)
         return stringy.endswith(self:get("contents"), ".tsv")
       end,
+      ["rows-to-lines"] = function(self, rows)
+        return map(rows, function(row)
+          return table.concat(map(row, escapeField), self:get("field-separator"))
+        end)
+      end,
     },
     doThisables = {
+      
       ["append-rows"] = function(self, rows)
-        self:doThis("append-lines", map(rows, bindArg(joinRow, self:get("field-separator"))))
+        self:doThis("append-lines", self:get("rows-to-lines", rows))
       end,
       ["set-rows"] = function(self, rows)
-        self:doThis("set-lines", map(rows, bindArg(joinRow, self:get("field-separator"))))
+        self:doThis("set-lines", self:get("rows-to-lines", rows))
       end,
       ["append-assoc-arr-as-rows"] = function(self, assoc_arr)
         local rows = self:get("read-to-rows") or {}
         local field_sep = self:get("field-separator")
         for key, fields in pairs(assoc_arr) do 
-          local line = escapeField(key) .. field_sep .. joinRow(field_sep, fields)
+          local line = escapeField(key) .. field_sep .. table.concat(map(fields, escapeField), field_sep)
           table.insert(rows, line)
         end
         table.sort(rows)

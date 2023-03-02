@@ -7,7 +7,7 @@ Base64ItemSpecifier = {
     }
   },
   
-  action_table = listConcat({}, getChooseItemTable({
+  action_table = concat({}, getChooseItemTable({
     {
       description = "b64dc",
       emoji_icon = "🅱️6️⃣4️⃣📖",

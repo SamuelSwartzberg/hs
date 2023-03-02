@@ -66,7 +66,7 @@ SignalItemSpecifier = {
         return chat_obj
       end,
       ["backup-interval"] = function(self)
-        return toSeconds(10, "m")
+        return toSeconds(10, "M")
       end,
     },
     doThisables = {

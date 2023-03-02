@@ -6,7 +6,7 @@ AliasesEnvItemSpecifier = {
       ["self-to-env-lines"] = function(self, specifier)
         local val = self:get("value-to-env-line-value", specifier.pkey_var)
         if val ~= nil then 
-          local keys = listConcat(self:get("contents").aliases, specifier.key)
+          local keys = concat(self:get("contents").aliases, specifier.key)
           local lines = map(keys, function(k) return string.format("%s=\"%s\"", k, val) end)
           return lines
         else

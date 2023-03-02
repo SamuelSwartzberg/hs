@@ -23,7 +23,7 @@ HandleItemSpecifier = {
     }
   },
   
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     {
       description = "ytchannelid",
       emoji_icon = "🟥▶️📺🆔",

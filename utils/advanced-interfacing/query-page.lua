@@ -10,7 +10,7 @@ local rrq = bindArg(relative_require, "utils.dom")
 function queryPage(opts)
   opts = tablex.deepcopy(opts) or {}
   opts.url = opts.url or "https://example.com"
-  local webpage = memoized(run, {mode = "fs", invalidation_mode = "invalidate", interval = toSeconds(1, "D")})({
+  local webpage = memoized(run, {mode = "fs", invalidation_mode = "invalidate", interval = toSeconds(1, "d")})({
     "curl",
     "-Ls",
     { value = url, type = "quoted"}

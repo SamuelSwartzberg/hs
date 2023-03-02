@@ -133,7 +133,7 @@ URLItemSpecifier = {
     { key = "url-by-host", value = CreateURLByHostItem },
     { key = "url-by-path", value = CreateURLByPathItem },
   }),
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     {
       emoji_icon = "🏛⚙️🔗",
       description = "wbmchurl",

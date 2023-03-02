@@ -7,7 +7,7 @@ Base32ItemSpecifier = {
     }
   },
   
-  action_table = listConcat({}, getChooseItemTable({
+  action_table = concat({}, getChooseItemTable({
     {
       description = "b32dc",
       emoji_icon = "🅱️3️⃣2️⃣📖",

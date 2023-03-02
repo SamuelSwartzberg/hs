@@ -186,7 +186,7 @@ ContactTableSpecifier = {
     }
   },
   
-  action_table = listConcat(
+  action_table = concat(
     getChooseItemTable({
       { emoji_icon = "⏪🙋🏻‍♀️", description = "nmpr", key = "name-pre", check = true },
       { emoji_icon = "◀️🙋🏻‍♀️", description = "fnm", key = "first-name", check = true },

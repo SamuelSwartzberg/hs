@@ -15,7 +15,7 @@ SinglelineStringItemSpecifier = {
   },
 
   action_table = 
-    listConcat(
+    concat(
       {
         
       },

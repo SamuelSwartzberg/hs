@@ -250,7 +250,7 @@ DateSpecifier = {
     }
   },
   
-  action_table = listConcat({
+  action_table = concat({
     {
       text = "👉📏 cfmt.",
       key = "choose-format-and-action"

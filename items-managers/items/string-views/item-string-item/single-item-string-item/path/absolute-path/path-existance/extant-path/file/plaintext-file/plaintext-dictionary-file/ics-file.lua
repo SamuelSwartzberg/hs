@@ -48,7 +48,7 @@ IcsFileItemSpecifier = {
       end,
     }
   },
-  action_table = listConcat({
+  action_table = concat({
     {
       key = "add-events-to-calendar",
       text = "➕📅 addevcal",

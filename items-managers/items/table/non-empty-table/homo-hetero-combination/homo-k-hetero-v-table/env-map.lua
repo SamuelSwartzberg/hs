@@ -5,7 +5,7 @@ local function getDependencyLines(line_with_dependencies, lines_with_dependencie
   for _, dependency in ipairs(line_with_dependencies.dependencies) do
     local dependency_line_with_dependencies = lines_with_dependencies[dependency]
     if dependency_line_with_dependencies then
-      lines = listConcat(lines, getDependencyLines(dependency_line_with_dependencies, lines_with_dependencies))
+      lines = concat(lines, getDependencyLines(dependency_line_with_dependencies, lines_with_dependencies))
     end
   end
   push(lines, line_with_dependencies.line)
@@ -24,7 +24,7 @@ EnvMapSpecifier = {
           if type(value) == "string" then
             push(lines, string.format("%s=\"%s%s\"", key, pkey_var, value))
           elseif value.type == "env-item" then
-            lines = listConcat(lines, value:get("env-lines", { pkey_var = pkey_var, key = key }))
+            lines = concat(lines, value:get("env-lines", { pkey_var = pkey_var, key = key }))
           end
         end
         return lines
@@ -46,7 +46,7 @@ EnvMapSpecifier = {
         end
         local out_lines = {}
         for _, line_with_dependencies in pairs(lines_with_dependencies) do
-          out_lines = listConcat(out_lines, getDependencyLines(line_with_dependencies, lines_with_dependencies))
+          out_lines = concat(out_lines, getDependencyLines(line_with_dependencies, lines_with_dependencies))
         end
         return toSet(out_lines)
       end,

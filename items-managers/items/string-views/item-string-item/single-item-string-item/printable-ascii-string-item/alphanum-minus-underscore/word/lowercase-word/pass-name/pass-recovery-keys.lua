@@ -8,7 +8,7 @@ PassRecoveryKeysItemSpecifier = {
       end,
     }
   },
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     {
       description = "rcvry",
       emoji_icon = "🔧🔑",

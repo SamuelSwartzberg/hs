@@ -44,7 +44,7 @@ function yamlDumpAlignedInner(table, keystop, valuestop, depth)
     local key_padding_length = keystop - (key_length + pre_padding_length)
     if type(value_v) == "table" and not (value_v.value or value_v.comment) then 
       push(lines, string.rep(" ", depth * 2) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " ")
-      lines = listConcat(lines, yamlDumpAlignedInner(value_v, keystop, valuestop, depth + 1))
+      lines = concat(lines, yamlDumpAlignedInner(value_v, keystop, valuestop, depth + 1))
     elseif type(value_v) == "table" and (value_v.value or value_v.comment) then 
       local key_part = string.rep(" ", pre_padding_length) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " "
       local value_length = 0

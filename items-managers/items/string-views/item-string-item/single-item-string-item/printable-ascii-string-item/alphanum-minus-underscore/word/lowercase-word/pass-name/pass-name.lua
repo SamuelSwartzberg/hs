@@ -60,7 +60,7 @@ PassNameItemSpecifier = {
       end,
     }
   },
-  action_table = listConcat({
+  action_table = concat({
     {
       text = "✍️🔑 fllpss",
       key = "fill-pass"

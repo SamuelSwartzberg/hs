@@ -41,7 +41,7 @@ function open(opts)
     error("Something went wrong when determining the path to open. Opts that caused this:\n\n" .. json.encode(opts))
   end
 
-  local args = listConcat(
+  local args = concat(
     "open",
     app_args,
     { value = path, type = "quoted" }

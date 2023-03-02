@@ -7,7 +7,7 @@ MenuItemTableSpecifier = {
         return stringx.join(" > ", self:get("contents").path) 
       end,
       ["full-path"] = function(self)
-        return listConcat(self:get("contents").path, {self:get("contents").AXTitle})
+        return concat(self:get("contents").path, {self:get("contents").AXTitle})
       end,
       ["full-path-string"] = function (self)
         local prefix = self:get("path-string")

@@ -31,7 +31,7 @@ FirefoxItemSpecifier = {
         return state
       end,
       ["backup-interval"] = function(self)
-        return toSeconds(5, "m") -- frequent backup checks b/c backup won't run if firefox is running
+        return toSeconds(5, "M") -- frequent backup checks b/c backup won't run if firefox is running
       end,
     },
     doThisables = {

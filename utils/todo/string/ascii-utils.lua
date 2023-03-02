@@ -28,7 +28,7 @@ function partwiseAsciiRange(parts)
   local res = {}
   for _, part in ipairs(parts) do
     if type(part) == "table" then
-      res =  listConcat(res, printableAsciiRange(part[1], part[2]))
+      res =  concat(res, printableAsciiRange(part[1], part[2]))
     else
       table.insert(res, part)
     end

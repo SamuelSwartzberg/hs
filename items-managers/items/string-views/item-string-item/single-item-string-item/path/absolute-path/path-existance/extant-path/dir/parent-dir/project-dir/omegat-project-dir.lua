@@ -274,7 +274,7 @@ OmegatProjectDirItemSpecifier = {
 
     }
   },
-  action_table = listConcat({
+  action_table = concat({
     {
       text = "👉🌀🗄 copsrc.",
       key = "choose-and-open-odt",

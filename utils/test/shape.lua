@@ -1,5 +1,5 @@
 local types = { "string", "number", "boolean", "table", "function", "nil", "thread", "userdata" }
-local types_w_any = listConcat(types, {"any"})
+local types_w_any = concat(types, {"any"})
 
 --- @alias shape_table { [string]: string|shape_table }
 

@@ -50,7 +50,7 @@ EventTableSpecifier = {
     }
   },
   
-  action_table = listConcat(
+  action_table = concat(
     getChooseItemTable({
       { emoji_icon = "📇", description = "cl", key = "val", args = "calendar"},
       

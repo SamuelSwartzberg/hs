@@ -28,7 +28,7 @@ function listWithChildrenKeyToListIncludingPath(list, path, specifier)
       push(result, item)
     end
     if children then -- if it has children, recurse
-      result = listConcat(result, listWithChildrenKeyToListIncludingPath(children, cloned_path, specifier))
+      result = concat(result, listWithChildrenKeyToListIncludingPath(children, cloned_path, specifier))
     end
   end
   return result

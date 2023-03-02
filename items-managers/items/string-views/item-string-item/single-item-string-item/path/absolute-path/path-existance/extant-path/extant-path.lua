@@ -33,7 +33,7 @@ ExtantPathItemSpecifier = {
         }
       end,
       ["cd-and-this-task"] = function(self, task)
-        return listConcat(
+        return concat(
           self:get("cd-and-task"),
           task
         )
@@ -183,7 +183,7 @@ ExtantPathItemSpecifier = {
   --[[   { key = "category-date-dir-structure-contained-item", value = CreateCategoryDateDirStructureContainedItem },
  ]]
   }),
-  action_table = listConcat({
+  action_table = concat({
     {
       text = "🗄 op.",
       key = "open-path"

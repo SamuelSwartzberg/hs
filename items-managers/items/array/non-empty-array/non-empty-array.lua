@@ -38,7 +38,7 @@ NonEmptyArraySpecifier = {
         return CreateArray(self:get("sorted", callback))
       end,
       ["reverse"] = function(self)
-        return listReverse(self:get("contents"))
+        return rev(self:get("contents"))
       end,
       ["reverse-to-new-array"] = function(self)
         return CreateArray(self:get("reverse"))
@@ -46,7 +46,7 @@ NonEmptyArraySpecifier = {
       ["revsorted"] = function(self, callback)
         local res = tablex.copy(self:get("contents"))
         table.sort(res, callback)
-        return listReverse(res)
+        return rev(res)
       end,
       ["revsorted-to-new-array"] = function(self, callback)
         return CreateArray(self:get("revsorted", callback))
@@ -111,12 +111,12 @@ NonEmptyArraySpecifier = {
         for i, item in ipairs(self:get("contents")) do
           if type(item) == "table" and item.get and item:get("is-array") then
             if recursive then
-              new_arr = listConcat(new_arr, item:get("flatten", recursive))
+              new_arr = concat(new_arr, item:get("flatten", recursive))
             else
-              new_arr = listConcat(new_arr, item:get("contents"))
+              new_arr = concat(new_arr, item:get("contents"))
             end
           elseif isListOrEmptyTable(item) then
-            new_arr = listConcat(new_arr, item)
+            new_arr = concat(new_arr, item)
           else
             table.insert(new_arr, item)
           end

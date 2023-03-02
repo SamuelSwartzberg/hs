@@ -17,7 +17,7 @@ function bind(func, arg_spec)
     if arg_list == arg_ignore then
       inner_func = function(...)
         local args = {...}
-        local new_args = listConcat(
+        local new_args = concat(
           slice(args, 1, int_index - 1),
           slice(args, int_index + 1, #args)
         )

@@ -71,15 +71,56 @@ processors = {
     shift = "⇧",
     ctrl = "⌃",
     fn = "fn",
-  }
+  },
+  normalizing_dt_component_map = {
+    S = "second",
+    sec = "second",
+    second = "second",
+    seconds = "second",
+    [1] = "second",
+    M = "minute",
+    min = "minute",
+    minute = "minute",
+    minutes = "minute",
+    [60] = "minute",
+    H = "hour",
+    hour = "hour",
+    hours = "hour",
+    [3600] = "hour",
+    d = "day",
+    day = "day",
+    days = "day",
+    [86400] = "day",
+    w = "week",
+    week = "week",
+    weeks = "week",
+    [604800] = "week",
+    m = "month",
+    month = "month",
+    months = "month",
+    [2592000] = "month",
+    y = "year",
+    year = "year",
+    years = "year",
+    [31536000] = "year",
+  },
+  dt_component_seconds_map = {
+    second = 1,
+    minute = 60,
+    hour = 60 * 60,
+    day = 60 * 60 * 24,
+    week = 60 * 60 * 24 * 7,
+    month = 60 * 60 * 24 * 30,
+    year = 60 * 60 * 24 * 365,
+  },
 }
 
 
---- @alias matcher string | {r: string} | "matcher_table_keys"
+--- @alias matcher string | {r: string} | "processor_table_keys"
 
 --- @class replaceSpec
 --- @field matcher? matcher | matcher[] 
---- @field must_match_entire_string? boolean
+--- @field matchall? boolean
 --- @field processor? string | table | fun(str: string): string 
 --- @field mode? "replace" | "prepend" | "append"
 --- @field ignore_case? boolean
@@ -113,9 +154,10 @@ function rawreplace(str, specs)
 end
 
 --- @param str string
---- @param type? "luaregex" | "regex" | "modsymbols"
+--- @param type? "luaregex" | "regex" | "modsymbols" | "doi"
+--- @param ... any
 --- @return string
-function replace(str, type)
+function replace(str, type, ...)
   local res = str
   type = type or "luaregex"
   if type == "luaregex" then
@@ -128,21 +170,26 @@ function replace(str, type)
       res, 
       {
         {matcher = matchers.regex_metacharacters, processor = "\\", mode = "prepend"},
-        {matcher = "matcher_table_keys", processor = matchers.odd_whitespace, mode = "replace" }
+        {matcher = "processor_table_keys", processor = matchers.odd_whitespace, mode = "replace" }
       }
     )
   elseif type == "modsymbols" then 
     res = rawreplace(
       res, 
       {
-        {matcher = "matcher_table_keys", processor = processors.normalizing_modmap, mode = "replace" },
-        {matcher = "matcher_table_keys", processor = processors.mod_symbolmap, mode = "replace" }
+        {matcher = "processor_table_keys", processor = processors.normalizing_modmap, mode = "replace" },
+        {matcher = "processor_table_keys", processor = processors.mod_symbolmap, mode = "replace" }
       }
     )
   elseif type == "doi" then 
     res = rawreplace(
       res, 
       {matcher = matchers.doi_prefix_variants, processor = "https://doi.org/", mode = "replace" }
+    )
+  elseif type == "urlencode" then
+    res = rawreplace(
+      res, 
+      {matcher = "[^\\w _%\\-\\.~]", processor = char_to_hex, mode = "replace" }
     )
   end
   return res

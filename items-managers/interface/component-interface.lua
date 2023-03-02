@@ -28,18 +28,18 @@ end
 local function getOrDoAll(self, action, key, value, not_recursive_children, not_recursive_super,  previous_lower_node_id)
   local output = {}
   local result_for_self = self[action](self, key, value, true, true)
-  output = listConcat(output, result_for_self)
+  output = concat(output, result_for_self)
   if self.interface and not not_recursive_children then
     for _, interface in pairs(self.interface) do
       if (not previous_lower_node_id) or (not (interface.id == previous_lower_node_id)) then 
         local result_for_descendants = getOrDoAll(interface, action, key, value, false, true)
-        output = listConcat(output, result_for_descendants)
+        output = concat(output, result_for_descendants)
       end
     end
   end
   if self.super and not not_recursive_super then
     local result_for_super = getOrDoAll(self.super, action, key, value, false, false, self.id)
-    output = listConcat(output, result_for_super)
+    output = concat(output, result_for_super)
   end
   output = fixListWithNil(output)
   return output
@@ -436,7 +436,7 @@ function RootInitializeInterface(interface_specifier, contents)
   interface.properties.getables["is-" .. interface.type] = function() return true end -- in the root, we can be sure that the is-<type> is true
   interface.root_super = interface
   interface:setContents(contents)
-  interface.action_table = listConcat(interface.action_table, root_action_table)
+  interface.action_table = concat(interface.action_table, root_action_table)
   return interface
 end
 

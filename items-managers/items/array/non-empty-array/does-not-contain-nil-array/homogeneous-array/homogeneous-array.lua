@@ -28,7 +28,7 @@ HomogeneousArraySpecifier = {
     { key = "array-of-interfaces", value = CreateArrayOfInterfaces },
     { key = "array-of-noninterfaces", value = CreateArrayOfNoninterfaces },
   }),
-  action_table = listConcat({
+  action_table = concat({
       
   }, getChooseItemTable({
     {

@@ -16,7 +16,7 @@ BinaryDigitStringItemSpecifier = {
     },
   },
   
-  action_table = listConcat({}, getChooseItemTable({
+  action_table = concat({}, getChooseItemTable({
     {
       description = "bindc",
       emoji_icon = "2️⃣📖",

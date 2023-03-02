@@ -24,7 +24,7 @@ JsonFileItemSpecifier = {
   potential_interfaces = ovtable.init({
     { key = "tachiyomi-json-file", value = CreateTachiyomiJsonFileItem },
   }),
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     description = "srvjsonport",
     emoji_icon = "🚚｛：",
     key = "port-of-hosting-json-server",

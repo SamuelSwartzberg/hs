@@ -344,7 +344,7 @@ KhalCommandSpecifier = {
         })
         local command = {"khal", "new" }
         if specifier.calendar then
-          command = listConcat(
+          command = concat(
             command,
             {
               "--calendar",
@@ -354,7 +354,7 @@ KhalCommandSpecifier = {
         end
 
         if specifier.location then
-          command = listConcat(
+          command = concat(
             command,
             {
               "--location",
@@ -370,7 +370,7 @@ KhalCommandSpecifier = {
             }),
             ","
           )
-          command = listConcat(
+          command = concat(
             command,
             {
               "--alarm",
@@ -380,7 +380,7 @@ KhalCommandSpecifier = {
         end
 
         if specifier.url then 
-          command = listConcat(
+          command = concat(
             command,
             {
               "--url",
@@ -390,7 +390,7 @@ KhalCommandSpecifier = {
         end
 
         -- needed for postcreation modifications 
-        command = listConcat(
+        command = concat(
           command,
           {
             "--format",
@@ -415,7 +415,7 @@ KhalCommandSpecifier = {
         end
 
         if specifier.description then
-          command = listConcat(
+          command = concat(
             command,
             {
               "::",

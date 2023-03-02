@@ -23,7 +23,7 @@ NumItemSpecifier = {
       end
     },
   },
-  action_table = listConcat(
+  action_table = concat(
     getChooseItemTable({
       {
         description = "rndb64",

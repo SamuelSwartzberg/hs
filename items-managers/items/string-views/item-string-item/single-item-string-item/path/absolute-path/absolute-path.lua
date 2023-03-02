@@ -70,7 +70,7 @@ PathInterfaceItemSpecifier = {
     { key = "volume", value = CreateVolumeItem },
     { key = "path-by-start", value = CreatePathByStartItem },
   }),
-  action_table = listConcat(
+  action_table = concat(
     {
 
     },

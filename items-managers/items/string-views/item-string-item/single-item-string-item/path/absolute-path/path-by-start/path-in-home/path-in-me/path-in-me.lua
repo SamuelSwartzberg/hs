@@ -22,7 +22,7 @@ PathInMeItemSpecifier = {
     { key = "path-in-maudiovisual", value = CreatePathInMaudiovisualItem },
     { key = "path-in-mspec", value = CreatePathInMspecItem },
   }),
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     {
       description = "srvpth",
       emoji_icon = "🚚",

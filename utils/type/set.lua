@@ -42,7 +42,7 @@ function powerset(list)
   if #list == 0 then
     return {{}}
   else
-    local output = listConcat( statefulNokeyIteratorToTable(combine.powerset, list), {{}} )
+    local output = concat( statefulNokeyIteratorToTable(combine.powerset, list), {{}} )
     return output
   end
 end
@@ -54,7 +54,7 @@ end
 --- @param set2 U[]
 --- @return (T|U)[]
 function setUnion(set1, set2)
-  local new_list = listConcat(set1, set2)
+  local new_list = concat(set1, set2)
   return toSet(new_list)
 end
 

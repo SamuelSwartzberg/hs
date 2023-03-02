@@ -6,7 +6,7 @@
 function listSplice(list1, list2, splice_before)
   local new_list = {}
   if #list1 < splice_before then
-    return listConcat(list1, list2)
+    return concat(list1, list2)
   else
     for i, v in ipairs(list1) do
       if i == splice_before then

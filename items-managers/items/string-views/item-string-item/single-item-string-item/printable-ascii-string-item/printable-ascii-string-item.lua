@@ -81,7 +81,7 @@ PrintableAsciiStringItemSpecifier = {
     { key = "general-base32", value = CreateGeneralBase32Item },
     { key = "crockford-base32", value = CreateCrockfordBase32Item },
   }),
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     
   }),{
     {

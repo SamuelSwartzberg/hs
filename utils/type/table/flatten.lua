@@ -95,7 +95,7 @@ function flatten(tbl, opts)
     else
       local newitem = {}
       if opts.val.value then newitem.value = v end
-      if opts.val.path then newitem.path = listConcat(opts.path, k) end
+      if opts.val.path then newitem.path = concat(opts.path, k) end
       if opts.val.depth then newitem.depth = opts.depth end
       if opts.val.valuestop then newitem.valuestop = #v end
       if opts.val.keystop then newitem.keystop = (opts.depth) * opts.indentation + #k end
@@ -111,7 +111,7 @@ function flatten(tbl, opts)
     else
       if opts.recurse == true or opts.recurse > opts.depth then
         local newopts = tablex.deepcopy(opts)
-        newopts.path = listConcat(opts.path, k)
+        newopts.path = concat(opts.path, k)
         local subres = flatten(v, newopts)
         for k, v in pairs(subres) do
           valAddfunc(res, v, k)

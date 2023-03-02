@@ -1,25 +1,25 @@
 assertTable(
-  listConcat({1, 2}, nil),
+  concat({1, 2}, nil),
   {1, 2}
 )
 
 assertTable(
-  listConcat({1, 2}, false),
+  concat({1, 2}, false),
   {1, 2, false}
 )
 
 assertTable(
-  listConcat({1, 2}, { a  = 1}),
+  concat({1, 2}, { a  = 1}),
   {1, 2, { a = 1}}
 )
 
 assertTable(
-  listConcat({1, 2}, {3, 4}),
+  concat({1, 2}, {3, 4}),
   {1, 2, 3, 4}
 )
 
 assertTable(
-  listConcat({1, 2}, {{3, 4}}),
+  concat({1, 2}, {{3, 4}}),
   {1, 2, {3, 4}}
 )
 
@@ -208,7 +208,7 @@ assertValuesContainExactly(
 )
 
 assertValuesContainExactly(
-  map(powerset({1, 2, 3}), function(x) return listMultiply(x, 2) end),
+  map(powerset({1, 2, 3}), function(x) return multiply(x, 2) end),
   {
     {},
     {1, 1},
@@ -222,7 +222,7 @@ assertValuesContainExactly(
 )
 
 assertTable(
-  listConcat(
+  concat(
     {
       isopts = "isopts",
       sep = "|",

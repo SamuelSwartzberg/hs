@@ -15,7 +15,7 @@ PassOtpItemSpecifier = {
       end,
     },
   },
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     {
       description = "otp",
       emoji_icon = "⌚️🗝",

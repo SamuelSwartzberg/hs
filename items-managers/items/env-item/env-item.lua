@@ -21,7 +21,7 @@ EnvItemSpecifier = {
       ["env-lines"] = function(self, specifier)
         local my_lines = self:get("self-to-env-lines", specifier)
         local dependent_lines = self:get("dependents-to-env-lines", specifier.key) or {}
-        return listConcat(my_lines, dependent_lines)
+        return concat(my_lines, dependent_lines)
       end,
     },
     doThisables = {

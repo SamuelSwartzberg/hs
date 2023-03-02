@@ -22,7 +22,7 @@ ImageURLItemSpecifier = {
       end,
     }
   },
-  action_table = listConcat(
+  action_table = concat(
     getChooseItemTable({
       {
         emoji_icon = "🍡",

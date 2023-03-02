@@ -139,7 +139,7 @@ PlaintextFileItemSpecifier = {
     { key = "md-file", value = CreateMdFileItem },
     
   }),
-  action_table = listConcat(getChooseItemTable({
+  action_table = concat(getChooseItemTable({
     { 
       description = "cnt",
       emoji_icon = "🎒",

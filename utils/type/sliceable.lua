@@ -107,3 +107,134 @@ function slice(thing, start_incl_or_spec, stop_incl, step)
   end
   return new_thing
 end
+
+function elemAt(thing, ind)
+  if type(thing) == "string" then
+    return eutf8.sub(thing, ind, ind)
+  else
+    return thing[ind]
+  end
+end
+
+function rev(thing)
+  if type(thing) == "string" then
+    return eutf8.reverse(thing)
+  else
+    local new_list = {}
+    for i = #thing, 1, -1 do
+      new_list[#new_list + 1] = thing[i]
+    end
+    return new_list
+  end
+end
+
+function len(thing)
+  if type(thing) == "string" then
+    return eutf8.len(thing)
+  else
+    return #thing
+  end
+end
+
+function glue(base, addition)
+  if type(base) == "string" then
+    return base .. addition
+  else
+    if not base then base = {} 
+    else base = tablex.deepcopy(base) end
+    if type(addition) == "nil" then
+      -- do nothing
+    elseif not isListOrEmptyTable(addition) then
+      base[#base + 1] = addition
+    else
+      for _, v in ipairs(addition) do
+        base[#base + 1] = v
+      end
+    end
+    return base
+  end
+end
+
+
+--- @class prefixOpts
+--- @field rev boolean
+
+--- @generic T : string|any[]
+--- @param list `T`[]
+--- @param opts? prefixOpts
+--- @return T
+function longestCommonPrefix(list, opts)
+  opts = tablex.deepcopy(opts) or {}
+  if opts.rev then
+    list = map(list, rev)
+  end
+
+  local res = reduce(list, function(acc, thing)
+    local isstring =type(thing) == "string"
+    local last_matching_index = 0
+    for i = 1, len(thing) do
+      if elemAt(thing, i) == elemAt(acc, i) then
+        last_matching_index = i
+      else
+        break
+      end
+    end
+
+    return slice(acc, 1, last_matching_index) or ( isstring and "" or {} )
+  end, list[1])
+
+  if opts.rev then
+    res = rev(res)
+  end
+
+  return res
+end
+
+--- @class concatOpts
+--- @field isopts "isopts"
+--- @field sep? any | any[]
+
+--- @generic T, U
+--- @param ... T[] | T | nil
+--- @return (T | U)[]
+function concat(...)
+  local lists = {...}
+  if not opts then return {} end
+  if type(opts) == "table" and opts.isopts == "isopts" then
+    -- no-op
+  else -- opts is actually the first list
+    table.insert(lists, 1, opts)
+    opts = {}
+  end
+
+  if #lists == 1 and isListOrEmptyTable(lists[1]) then
+    lists = lists[1]
+  end
+
+  local new_list = {}
+  for i, list in ipairs(lists) do
+    glue(new_list, list)
+    if opts.sep then
+      local sep
+      if type(opts.sep) == "table" then
+        sep = opts.sep[i]
+      else
+        sep = opts.sep
+      end
+      glue(new_list, sep)
+    end
+  end
+  return new_list
+end
+
+--- @generic T : string|any[]
+--- @param thing T
+--- @param n integer
+--- @return T
+function multiply(thing, n)
+  local newthing = {}
+  for i = 1, n do
+    newthing = concat(newthing, thing)
+  end
+  return newthing
+end

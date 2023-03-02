@@ -143,7 +143,7 @@ function getSortedEmailPaths(path, reverse, magrep, mpick)
     flags
   })
 
-  local command_parts = listConcat({ isopts = "isopts", sep = "|" }, table.unpack(steps))
+  local command_parts = concat({ isopts = "isopts", sep = "|" }, table.unpack(steps))
 
   return stringy.split(run(command_parts), "\n")
 end

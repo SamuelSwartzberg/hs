@@ -77,7 +77,7 @@ RunningApplicationItemSpecifier = {
         self:get("contents"):selectMenuItem(item_arr)
       end,
       ["open-recent"] = function(self, recent_item)
-        local command = listConcat(self:get("open-recent-menu-command"), recent_item)
+        local command = concat(self:get("open-recent-menu-command"), recent_item)
         inspPrint(command)
         self:get("contents"):selectMenuItem(command)
       end,
@@ -105,7 +105,7 @@ RunningApplicationItemSpecifier = {
     { key = "libreoffice", value = CreateLibreofficeApplication },
     { key = "browser-application", value = CreateBrowserApplicationApplication },
   }),
-  action_table = listConcat({
+  action_table = concat({
     {
       text = "👉📎✂️ cpstsnp.",
       key = "choose-and-use-relevant-snippet",

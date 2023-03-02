@@ -124,7 +124,7 @@ function getItemsForAllLevelsInSlice(path, slice_spec, opts)
   for _, level in ipairs(levels) do
     opts.path = level -- this modifies the opts table, but that's fine, since it gets copied in itemsInPath
     local items = itemsInPath(opts)
-    res = listConcat(res, items)
+    res = concat(res, items)
   end
   return res
 end

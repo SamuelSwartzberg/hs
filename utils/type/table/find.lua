@@ -37,7 +37,7 @@ function find(tbl, cond, opts)
 
   if isListOrEmptyTable(tbl) then
     iterator = ipairs
-    if opts.last then tbl = listReverse(tbl) end
+    if opts.last then tbl = rev(tbl) end
   else
     iterator = pairs
     if opts.last then error("last option not yet implemented for non-list tables") end

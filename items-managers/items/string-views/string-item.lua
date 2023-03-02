@@ -213,7 +213,7 @@ StringItemSpecifier = {
     { key = "might-be-xml-item", value = CreateMightBeXmlItem },
     { key = "might-be-bib-item", value = CreateMightBeBibItem },
   }),
-  action_table = listConcat({
+  action_table = concat({
     {
       text = "📋 cp.",
       key = "copy-contents"

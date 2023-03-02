@@ -136,7 +136,7 @@ InGitDirPathItemSpecifier = {
       
     }
   },
-  action_table = listConcat({
+  action_table = concat({
     {
       text = "🐙⬆️ gtpsh.",
       key = "git-push"
