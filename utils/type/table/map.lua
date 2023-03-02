@@ -10,11 +10,14 @@
 --- @field tolist boolean
 --- @field flatten boolean
 --- @field nooverwrite boolean
+--- @field recurse boolean | integer
+--- @field depth integer
+--- @field treat_as_leaf "assoc" | "list" | false
 --- @field mapcondition conditionSpec TODO NOT USED YET
 
 --- @generic OT : string | number | boolean | nil
 --- @param tbl table | `OT`
---- @param f? function | table | string
+--- @param f? function | {_k: string | string[], _ret?: "orig" | nil} | table | string
 --- @param opts? kvmult | kvmult[] | mapOpts
 --- @return table | OT
 function map(tbl, f, opts)
@@ -43,12 +46,44 @@ function map(tbl, f, opts)
     opts.useas = splitChars(opts.useas)
   end
 
+  -- set defaults
+
+  opts.recurse = defaultIfNil(opts.recurse, false)
+  opts.depth = defaultIfNil(opts.depth, "in")
+  opts.treat_as_leaf = defaultIfNil(opts.treat_as_leaf, false)
+
+  local isLeaf = getIsLeaf(opts.treat_as_leaf)
+
   -- process non-function f into function f
 
   if type(f) == "table" then
     local tbl = f
-    f = function(arg)
-      return tbl[arg]
+    if #values(f) == 1 and f._k then 
+      if type(f._k) == "string" then
+        f = function(arg)
+          if type("arg") == table then
+            return arg[f._k]
+          else
+            return f._ret == "orig" and arg or nil
+          end
+        end
+      else
+        f = function(arg)
+          if type("arg") == table then
+            local res = {}
+            for _, k in ipairs(f._k) do
+              table.insert(res, arg[k])
+            end
+            return res
+          else
+            return f._ret == "orig" and arg or nil
+          end
+        end
+      end
+    else
+      f = function(arg)
+        return tbl[arg]
+      end
     end
   elseif type(f) == "string" then
     local str = f
@@ -90,24 +125,28 @@ function map(tbl, f, opts)
   end
 
   for k, v in wdefarg(pairs)(tbl) do
-    local retriever = {
-      k = k,
-      v = v
-    }
-    local args = {}
-    for _, arg in ipairs(opts.args) do
-      table.insert(args, retriever[arg])
-    end
-    local tempres = {f(table.unpack(args))}
-    if opts.flatten and type(tempres[1]) == "table" then -- flatten is enabled, and we've returned an element we want to flatten
-      for resk, resv in pairs(tempres) do
-        itemres = {resk,resv}
-        addfunc()
-      end
+    if opts.recurse == true or opts.recurse > opts.depth and not isLeaf(v) then
+      itemres = {k, map(v, f, opts)}
     else
-      itemres = tempres
-      addfunc()
-      
+      local retriever = {
+        k = k,
+        v = v
+      }
+      local args = {}
+      for _, arg in ipairs(opts.args) do
+        table.insert(args, retriever[arg])
+      end
+      local tempres = {f(table.unpack(args))}
+      if opts.flatten and type(tempres[1]) == "table" then -- flatten is enabled, and we've returned an element we want to flatten
+        for resk, resv in pairs(tempres) do
+          itemres = {resk,resv}
+          addfunc()
+        end
+      else
+        itemres = tempres
+        addfunc()
+        
+      end
     end
 
   

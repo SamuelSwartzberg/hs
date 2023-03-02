@@ -2,7 +2,7 @@
 --- @param do_after fun(result: string): nil
 --- @param opts? { model?: string, max_tokens?: integer, temperature?: number, echo?: boolean }
 function gpt3Request(text_content, do_after, opts)
-  local request = mergeAssocArrRecursive({
+  local request = merge({
     model = "text-davinci-003",
     max_tokens = 300,
     temperature = 0.7,

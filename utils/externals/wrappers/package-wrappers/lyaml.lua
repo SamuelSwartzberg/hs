@@ -32,19 +32,19 @@ function yamlDump(tbl)
 end
 
 ---@param table table
----@param key_stop integer
----@param value_stop integer
+---@param keystop integer
+---@param valuestop integer
 ---@param depth integer
 ---@return string[]
-function yamlDumpAlignedInner(table, key_stop, value_stop, depth)
+function yamlDumpAlignedInner(table, keystop, valuestop, depth)
   local lines = {}
   for value_k, value_v in pairs(table) do
     local pre_padding_length = depth * 2
     local key_length = #value_k
-    local key_padding_length = key_stop - (key_length + pre_padding_length)
+    local key_padding_length = keystop - (key_length + pre_padding_length)
     if type(value_v) == "table" and not (value_v.value or value_v.comment) then 
       push(lines, string.rep(" ", depth * 2) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " ")
-      lines = listConcat(lines, yamlDumpAlignedInner(value_v, key_stop, value_stop, depth + 1))
+      lines = listConcat(lines, yamlDumpAlignedInner(value_v, keystop, valuestop, depth + 1))
     elseif type(value_v) == "table" and (value_v.value or value_v.comment) then 
       local key_part = string.rep(" ", pre_padding_length) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " "
       local value_length = 0
@@ -55,7 +55,7 @@ function yamlDumpAlignedInner(table, key_stop, value_stop, depth)
       end
       local comment_part = ""
       if value_v.comment then
-        local value_padding_length = value_stop - value_length
+        local value_padding_length = valuestop - value_length
         comment_part = string.rep(" ", value_padding_length) .. " # " .. value_v.comment
       end
       push(lines, key_part .. value_part .. comment_part)
@@ -73,6 +73,12 @@ end
 --- @return string
 function yamlDumpAligned(tbl)
   local value_table = mapTableWithValueInCertainKeyToTableHoldingValueDirectly(tbl, "value", true, false)
-  local key_stop, value_stop = nestedAssocArrGetMaxStops(value_table)
-  return table.concat(yamlDumpAlignedInner(tbl, key_stop, value_stop, 0), "\n")
+  local stops = flatten(value_table, {
+    treat_as_leaf = "list",
+    mode = "assoc",
+    val = {"valuestop", "keystop"},
+  })
+  local valuestop = reduce(map(values(stops), {_k = "valuestop"}))
+  local keystop = reduce(map(values(stops), {_k = "keystop"}))
+  return table.concat(yamlDumpAlignedInner(tbl, keystop, valuestop, 0), "\n")
 end

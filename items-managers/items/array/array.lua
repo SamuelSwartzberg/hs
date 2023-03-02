@@ -42,7 +42,7 @@ function CreateArray(contents, managed_array_type)
   if contents == nil then contents = {} end
   local interface_specifier = ArraySpecifier 
   if managed_array_type then 
-    interface_specifier = mergeAssocArrRecursive(
+    interface_specifier = merge(
       ArraySpecifier,
       { properties = { getables = { 
         ["is-managed-array"] = function() return true end,

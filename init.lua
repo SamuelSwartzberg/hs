@@ -27,7 +27,12 @@ projectDirsArray = CreateArray(itemsInPath({path = env.ME, recursion = 2, includ
 
 
 envTable = CreateTable(env)
-compTable = CreateTable(nestedAssocArrToFlatPathAssocArrWithDotNotation(comp))
+compTable = CreateTable(flatten(comp, {
+  mode = "path-assoc",
+  val = "plain",
+  join_path = ".",
+  treat_as_leaf = "list",
+}))
 
 System = CreateSystem()
 

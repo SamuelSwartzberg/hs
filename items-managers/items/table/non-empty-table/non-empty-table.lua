@@ -122,7 +122,12 @@ NonEmptyTableSpecifier = {
         return CreateArray(self:get("map-values", callback))
       end,
       ["map-to-flat-path-dot-table"] = function(self)
-        return CreateTable(nestedAssocArrToFlatPathAssocArrWithDotNotation(self:get("contents")))
+        return CreateTable(flatten(self:get("contents"), {
+          mode = "path-assoc",
+          val = "plain",
+          join_path = ".",
+          treat_as_leaf = "list",
+        }))
       end,
       ["type-of-first-is-type-of-all"] = function(self, kv)
         local first = self:get("first-" .. kv)

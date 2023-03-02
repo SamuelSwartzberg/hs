@@ -166,7 +166,7 @@ assertTable(
 )
 
 assertTable(
-  mergeAssocArrRecursive(
+  merge(
     {
       {
         foo = "bar",
@@ -189,7 +189,7 @@ assertTable(
 )
 
 assertValuesContainExactly(
-  nestedAssocArrToListIncludingPath(
+  flatten(
     {
       a = {
         b = {
@@ -200,7 +200,11 @@ assertValuesContainExactly(
       },
       f = 4
     },
-    {}
+    {
+      treat_as_leaf = false,
+      mode = "assoc",
+      val = "path",
+    }
   ),
   {
     {
@@ -222,7 +226,7 @@ assertValuesContainExactly(
   }
 )
 assertValuesContainExactly(
-  nestedAssocArrToListIncludingPathAndDepth(
+  flatten(
     {
       a = {
         b = {
@@ -232,6 +236,11 @@ assertValuesContainExactly(
         e = 3
       },
       f = 4
+    },
+    {
+      treat_as_leaf = false,
+      mode = "assoc",
+      val = { "path", "depth" },
     }
   ),
   {
@@ -259,18 +268,21 @@ assertValuesContainExactly(
 )
 
 assertTable(
-  nestedAssocArrToFlatPathAssocArrWithDotNotation(
-    {
-      a = {
-        b = {
-          c = 1,
-          d = 2
-        },
-        e = 3
+  flatten({
+    a = {
+      b = {
+        c = 1,
+        d = 2
       },
-      f = 4
-    }
-  ),
+      e = 3
+    },
+    f = 4
+  }, {
+    mode = "path-assoc",
+    val = "plain",
+    join_path = ".",
+    treat_as_leaf = "list",
+  }),
   {
     ["a.b.c"] = 1,
     ["a.b.d"] = 2,
@@ -280,7 +292,7 @@ assertTable(
 )
 
 assertTable(
-  mergeAssocArrRecursive(
+  merge(
     {
       a = 1,
       b = 2
@@ -299,7 +311,7 @@ assertTable(
 )
 
 assertTable(
-  nestedAssocArrGetStopsForKeyValue({
+  flatten({
     l = {
       lll = "vvvvv",
       l = {
@@ -308,34 +320,22 @@ assertTable(
       llllll = "vv"
     },
     lllllll = "vvvvvvvvv"
-  }, 2),
+  },{
+    treat_as_leaf = false,
+    mode = "assoc",
+    val = { "keystop", "valuestop" },
+  }),
   {
-    lll = { key_stop = 5, value_stop = 5 },
-    ll = { key_stop = 6, value_stop = 3 },
-    llllll = { key_stop = 8, value_stop = 2 },
-    lllllll = { key_stop = 7, value_stop = 9 }
+    lll = { keystop = 5, valuestop = 5 },
+    ll = { keystop = 6, valuestop = 3 },
+    llllll = { keystop = 8, valuestop = 2 },
+    lllllll = { keystop = 7, valuestop = 9 }
   }
 
 )
 
 assertTable(
-  {nestedAssocArrGetMaxStops({
-    l = {
-      lll = "vvvvv",
-      l = {
-        ll = "vvv"
-      }, 
-      llllll = "vv"
-    },
-    lllllll = "vvvvvvvvv"
-  }, 2)},
-  {
-    8, 9
-  }
-)
-
-assertTable(
-  mapTableWithValueInCertainKeyToTableHoldingValueDirectly(
+  map(
     {
       a = { value = "foo" },
       b = "bar",
@@ -351,9 +351,8 @@ assertTable(
         f = "baz"
       }
     },
-    "value",
-    false,
-    false
+    { _k = "value", _ret = "orig" },
+    { recurse = true, treat_as_leaf = "list" }
   ),
   
   {
@@ -375,7 +374,7 @@ assertTable(
 )
 
 assertTable(
-  mapTableWithValueInCertainKeyToTableHoldingValueDirectly(
+  map(
     {
       a = { value = "foo" },
       b = "bar",
@@ -390,8 +389,10 @@ assertTable(
       e = {
         f = "baz"
       }
-    }
-  , "value", true, true),
+    },
+    { _k = "value" },
+    { recurse = true, treat_as_leaf = "list" }
+  ),
   {
     a = "foo",
     c = {

@@ -8,7 +8,7 @@ ArrayOfYoutubePlayableItemsSpecifier = {
     },
     doThisables = {
       ["to-stream"] = function(self, specifier)
-        local specified_contents = mergeAssocArrRecursive(
+        local specified_contents = merge(
           specifier,
           {
             initial_data = {

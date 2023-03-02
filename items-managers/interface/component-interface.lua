@@ -392,7 +392,7 @@ NonHeritableInterfacePropsTemplate = {
   }
 }
 
-BasicInterfaceDefaultTemplate = mergeAssocArrRecursive(InterfaceDefaultTemplate, {properties = NonHeritableInterfacePropsTemplate})
+BasicInterfaceDefaultTemplate = merge(InterfaceDefaultTemplate, {properties = NonHeritableInterfacePropsTemplate})
 
 --- @param interface_specifier ItemSpecifier
 --- @param super ComponentInterface
@@ -400,7 +400,7 @@ BasicInterfaceDefaultTemplate = mergeAssocArrRecursive(InterfaceDefaultTemplate,
 function NewDynamicContentsComponentInterface(interface_specifier, super)
   -- print("creating a " .. interface_specifier.type .. " interface")
   --- @type NonRootComponentInterface
-  local interface = mergeAssocArrRecursive(InterfaceDefaultTemplate, interface_specifier)
+  local interface = merge(InterfaceDefaultTemplate, interface_specifier)
   interface.id = rand({len=10})
   if super then 
     interface.super = super
@@ -431,7 +431,7 @@ function RootInitializeInterface(interface_specifier, contents)
     error("Contents for a component interface may not be nil.", 0)
   end
   --- @type RootComponentInterface
-  local interface =  mergeAssocArrRecursive(InterfaceDefaultTemplate, interface_specifier)
+  local interface =  merge(InterfaceDefaultTemplate, interface_specifier)
   interface.id = rand({len=10})
   interface.properties.getables["is-" .. interface.type] = function() return true end -- in the root, we can be sure that the is-<type> is true
   interface.root_super = interface

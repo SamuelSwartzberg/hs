@@ -40,7 +40,7 @@ PlaintextDictionaryFileItemSpecifier = {
       end,
       ["merge-file-contents-with-lua-table"] = function(self, tbl)
         local prev_contents = self:get("parse-to-lua-table")
-        local new_contents = mergeAssocArrRecursive(prev_contents, tbl)
+        local new_contents = merge(prev_contents, tbl)
         self:doThis("overwrite-file-contents-with-lua-table", new_contents)
       end,
     }

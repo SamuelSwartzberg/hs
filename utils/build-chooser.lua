@@ -37,7 +37,7 @@ DefaultStylesForChooser = {
 --- @return chooser_item[]
 function getStyledChooserItems(style_specifier, choices)
   --- @type item_style
-  local item_style = mergeAssocArrRecursive(DefaultStylesForChooser, style_specifier)
+  local item_style = merge(DefaultStylesForChooser, style_specifier)
   local new_choices = {}
   for i, choice in ipairs(choices) do
     choice.image = choice.image or item_style.image

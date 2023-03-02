@@ -200,7 +200,7 @@ function CreateStreamItem(specified_contents)
     
   }
 
-  local contents = mergeAssocArrRecursive(
+  local contents = merge(
     {
       initial_flags = {
         ["loop-playlist"] = false,
