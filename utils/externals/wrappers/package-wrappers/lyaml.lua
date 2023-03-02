@@ -72,7 +72,11 @@ end
 --- @param tbl table
 --- @return string
 function yamlDumpAligned(tbl)
-  local value_table = mapTableWithValueInCertainKeyToTableHoldingValueDirectly(tbl, "value", true, false)
+  local value_table = map(
+    tbl,
+    {_k = "value", _ret = "orig" },
+    { recurse = true, treat_as_leaf = "list" }
+  )
   local stops = flatten(value_table, {
     treat_as_leaf = "list",
     mode = "assoc",

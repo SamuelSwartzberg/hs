@@ -23,7 +23,7 @@ MullvadCommandSpecifier = {
         return memoize(parseRelayTable)(self:get("relay-list-raw-string"))
       end,
       ["flat-relay-array"] = function(self)
-        return CreateArray(memoize(collectLeaves)(self:get("relay-list-raw-table")))
+        return CreateArray(memoize(flatten)(self:get("relay-list-raw-table")))
       end,
               
     },

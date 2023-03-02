@@ -60,23 +60,28 @@ assertTable(
 )
 
 assertTable(
-  listSort(collectLeaves(
-    {
-      a = 1,
-      b = {
-        c = 2,
-        d = {
-          e = 3,
-          f = 4
+  listSort(
+    flatten(
+      {
+        a = 1,
+        b = {
+          c = 2,
+          d = {
+            e = 3,
+            f = 4
+          }
         }
+      },
+      {
+        treat_as_leaf = false,
+        mode = "list",
       }
-    }
   )),
   { 1, 2, 3, 4 }
 )
 
 assertTable(
-  listSort(collectLeaves(
+  listSort(flatten(
     {
       1,
       2,
@@ -87,6 +92,10 @@ assertTable(
         },
         5
       }
+    },
+    {
+      treat_as_leaf = false,
+      mode = "list",
     }
   )),
   { 1, 2, 3, 4, 5 }
