@@ -16,7 +16,7 @@ assertMessage(
 )
 
 assertValuesContainExactly(
-  dateRange(test_date:copy():adddays(-3), test_date:copy():adddays(3)),
+  seq(test_date:copy():adddays(-3), test_date:copy():adddays(3)),
   {
     date("2013-01-31T09:56:22Z"),
     date("2013-02-01T09:56:22Z"),
@@ -29,7 +29,7 @@ assertValuesContainExactly(
 )
 
 assertValuesContainExactly(
-  dateRange(test_date:copy():addhours(-5), test_date:copy():addhours(4), 2, "hours"),
+  seq(test_date:copy():addhours(-5), test_date:copy():addhours(4), 2, "hours"),
   {
     date("2013-02-03T04:56:22Z"),
     date("2013-02-03T06:56:22Z"),

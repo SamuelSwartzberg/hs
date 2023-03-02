@@ -14,7 +14,7 @@ ArrayOfDatesSpecifier = {
         return self:get("max-diff"):get("span", unit)
       end,
       ["range"] = function(self, specifier)
-        return dateRange(
+        return seq(
           self:get("min-content"),
           self:get("max-content"),
           specifier.step,

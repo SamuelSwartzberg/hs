@@ -11,26 +11,6 @@ number_weekday_map = {
 
 weekday_number_map = map(number_weekday_map, returnAny, {"kv", "vk"})
 
---- @param start dateObj
---- @param finish dateObj
---- @param step? number
---- @param unit? string
---- @return dateObj[]
-function dateRange(start, finish, step, unit)
-  if not step then step = 1 end
-  if not unit then unit = "days" end
-  start = start:copy()
-  finish = finish:copy()
-  local range = {}
-  local current = start
-  while current <= finish do
-    table.insert(range, current)
-    local current_copy = current:copy()
-    current = current_copy["add" .. unit](current_copy, step)
-  end
-  return range
-end
-
 --- @param dt dateObj
 --- @param precision string | integer
 --- @return dateObj

@@ -92,29 +92,6 @@ function rand(spec, type)
     error("Invalid type: " .. type)
   end
 end
-    
-
---- @param start? number
---- @param stop? number
---- @param step? number
---- @return number[]
-function seq(start, stop, step)
-  start = defaultIfNil(start, 1)
-  stop = defaultIfNil(stop, 10)
-  step = defaultIfNil(step, 1)
-
-  local res = {}
-
-  if (start > stop and step > 0) or (start < stop and step < 0) then -- these would cause an infinite loop
-    return res
-  end
-
-  for i = start, stop, step do
-    table.insert(res, i)
-  end
-
-  return res
-end
 
 --- @param thing any
 --- @param target? "number" | "int" | "pos-int"

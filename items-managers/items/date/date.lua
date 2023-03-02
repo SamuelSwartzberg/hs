@@ -61,7 +61,7 @@ DateSpecifier = {
       end,
       ["range"] = function(self, specifier)
         local startdt, enddt = table.unpack(self:get("start-end", specifier))
-        return dateRange(startdt, enddt, specifier.step, specifier.unit)
+        return seq(startdt, enddt, specifier.step, specifier.unit)
       end,
       ["item-range"] = function(self, specifier)
         return map(
