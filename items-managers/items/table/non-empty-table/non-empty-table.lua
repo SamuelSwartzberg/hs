@@ -166,7 +166,7 @@ NonEmptyTableSpecifier = {
           else 
             pair_value_as_text = tostring(v)
           end
-          pair_value_as_text = foldStr(pair_value_as_text)
+          pair_value_as_text = eutf8.gsub(pair_value_as_text, "\n", " ")
           return "[" .. tostring(k) .. "] = " .. pair_value_as_text
         end, {"kv", "v"})
       end,

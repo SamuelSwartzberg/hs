@@ -130,7 +130,7 @@ end
 --- @param str string
 --- @return boolean
 function isPackageManager(str)
-  local package_managers = splitLines(
+  local package_managers = lines(
     run({
       "upkg",
       "list-package-managers"

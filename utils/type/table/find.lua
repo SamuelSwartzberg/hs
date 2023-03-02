@@ -2,7 +2,7 @@
 --- @class findOpts
 --- @field args kvmult
 --- @field ret kvmult here, kvmult can also include "boolean", to return a boolean instead of the value
---- @field last boolean search from the end of the table TODO not yet implemented
+--- @field last boolean
 
 --- @param tbl? table | nil
 --- @param cond? conditionSpec
@@ -23,13 +23,13 @@ function find(tbl, cond, opts)
   end
 
   if type(opts.args) == "string" then
-    opts.args = splitChars(opts.args)
+    opts.args = chars(opts.args)
   end
   if type(opts.ret) == "string" then
     if opts.ret == "boolean" then
       opts.ret = {"boolean"}
     else
-      opts.ret = splitChars(opts.ret)
+      opts.ret = chars(opts.ret)
     end
   end
 

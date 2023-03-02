@@ -37,7 +37,7 @@ StringItemSpecifier = {
         end)
       end,
       ["to-string"] = function(self)
-        return foldStr(self:get("contents"))
+        return eutf8.gsub(self:get("contents"), "\n", " ")
       end,
       ["new-string-item-from-contents"] = function(self)
         return self:doThis("str-item", {key = "contents"})
@@ -93,7 +93,7 @@ StringItemSpecifier = {
         return run(parts)
       end,
       ["fold"] = function(self)
-        return foldStr(self:get("contents"))
+        return eutf8.gsub(self:get("contents"), "\n", " ")
       end,
       ["template-evaluated-contents"] = function (self)
         return le(self:get("contents"))
@@ -114,13 +114,13 @@ StringItemSpecifier = {
           or stringy.find(self:get("contents"), "&")
       end, -- 'decoded' = to be encoded
       ["extract-utf8"] = function(self, pattern)
-        return extractAllMatches(self:get("contents"), pattern, true)
+        return iterToList(eutf8.gmatch(self:get("contents"), pattern))
       end,
       ["extract-utf8-array"] = function(self, pattern)
         return CreateArray(self:get("extract-utf8", pattern))
       end,
       ["extract-onig"] = function(self, pattern)
-        return extractAllMatches(self:get("contents"), pattern, false)
+        return iterToList(onig.gmatch(self:get("contents"), pattern))
       end,
       ["extract-onig-array"] = function(self, pattern)
         return CreateArray(self:get("extract-onig", pattern))

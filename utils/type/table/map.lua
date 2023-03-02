@@ -17,7 +17,7 @@
 
 --- @generic OT : string | number | boolean | nil
 --- @param tbl table | `OT`
---- @param f? function | {_k: string | string[], _ret?: "orig" | nil} | table | string
+--- @param f? function | {_k: string | string[], _ret?: "orig" | nil} | {_f: string} | table | string
 --- @param opts? kvmult | kvmult[] | mapOpts
 --- @return table | OT
 function map(tbl, f, opts)
@@ -40,10 +40,10 @@ function map(tbl, f, opts)
   end
 
   if type(opts.args) == "string" then
-    opts.args = splitChars(opts.args)
+    opts.args = chars(opts.args)
   end
   if type(opts.useas) == "string" then
-    opts.useas = splitChars(opts.useas)
+    opts.useas = chars(opts.useas)
   end
 
   -- set defaults
@@ -58,26 +58,33 @@ function map(tbl, f, opts)
 
   if type(f) == "table" then
     local tbl = f
-    if #values(f) == 1 and f._k then 
-      if type(f._k) == "string" then
-        f = function(arg)
-          if type("arg") == table then
-            return arg[f._k]
-          else
-            return f._ret == "orig" and arg or nil
+    if #values(f) == 1 then 
+      if f._k then
+        if type(f._k) == "string" then
+          f = function(arg)
+            if type("arg") == table then
+              return arg[f._k]
+            else
+              return f._ret == "orig" and arg or nil
+            end
+          end
+        else
+          f = function(arg)
+            if type("arg") == table then
+              local res = {}
+              for _, k in ipairs(f._k) do
+                table.insert(res, arg[k])
+              end
+              return res
+            else
+              return f._ret == "orig" and arg or nil
+            end
           end
         end
-      else
-        f = function(arg)
-          if type("arg") == table then
-            local res = {}
-            for _, k in ipairs(f._k) do
-              table.insert(res, arg[k])
-            end
-            return res
-          else
-            return f._ret == "orig" and arg or nil
-          end
+      elseif f._f then
+        local frmt
+        f = function(...)
+          return string.format(frmt, ...)
         end
       end
     else

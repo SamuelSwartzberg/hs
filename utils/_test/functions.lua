@@ -1,11 +1,11 @@
 
 assertValuesContainExactly(
-  iteratorToList(string.gmatch("abc", ".")),
+  iterToList(string.gmatch("abc", ".")),
   { "a", "b", "c" }
 )
 
 assertTable(
-  iteratorToList(string.gmatch("abc", "d")),
+  iterToList(string.gmatch("abc", "d")),
   {}
 )
 

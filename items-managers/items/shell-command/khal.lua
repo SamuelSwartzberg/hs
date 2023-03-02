@@ -186,7 +186,7 @@ KhalCommandSpecifier = {
           "khal",
           "printcalendars"
         })
-        return splitLines(res)
+        return lines(res)
       end,
       ["writable-calendars"] = function(self)
         return filter(

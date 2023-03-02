@@ -38,7 +38,7 @@ EnvMapSpecifier = {
           local dependencies
           if value then
             local match = value:gmatch("%$([A-Z0-9_]+)")
-            dependencies = iteratorToList(match)
+            dependencies = iterToList(match)
           else
             dependencies = {}
           end

@@ -3,7 +3,10 @@ ManagedClipboardArraySpecifier = {
   properties = {
     getables = {
       ["format-noninterface-item-for-chooser"] = function(self, str)
-        return stringTruncate(str, 250, "...")
+        return slice(str, {
+          stop = 250,
+          sliced_indicator = "..."
+        })
       end
     },
     doThisables = {

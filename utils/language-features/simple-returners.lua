@@ -102,3 +102,14 @@ end
 function returnLast(list)
   return list[#list]
 end
+
+--- @generic T : string | any[]
+--- @param thing T
+--- @return T
+function returnEmpty(thing)
+  if type(thing) == "string" then
+    return ""
+  else
+    return {}
+  end
+end

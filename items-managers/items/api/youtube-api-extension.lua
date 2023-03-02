@@ -4,10 +4,10 @@ YoutubeApiExtensionItemSpecifier = {
   properties = {
     getables = {
       ["result"] = function(self, specifier)
-        return runJSON({
-          "curl",
-          "--request", "GET",
-          {value = self:get("contents") .. specifier.endpoint .. toUrlParams(specifier.params, "initial"), type = "quoted"},
+        return makeSimpleRESTApiRequest({
+          host = self:get("contents"),
+          endpoint = specifier.endpoint,
+          params = specifier.params,
         }).items
       end,
       ["result-youtube-data-api-wrapper"] = function(self, specifier)

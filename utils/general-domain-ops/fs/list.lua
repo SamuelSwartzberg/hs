@@ -53,7 +53,7 @@ function itemsInPath(opts)
         catch = function() return nil end,
       }) 
       if output then
-        items = splitLines(output)
+        items = lines(output)
         items = filter(items, true)
         items = map(
           items,

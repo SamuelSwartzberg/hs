@@ -12,10 +12,10 @@ SynonymsTableSpecifier = {
         local contents = self:get("contents")
         local outstr = contents.term .. ": "
         if contents.synonyms then 
-          outstr = outstr .. "synonyms: " .. listSampleString(contents.synonyms) .. "; "
+          outstr = outstr .. "synonyms: " .. table.concat(slice(contents.synonyms, {stop = 2, sliced_indicator = "..."})) .. "; "
         end
         if contents.antonyms then 
-          outstr = outstr .. "antonyms: " .. listSampleString(contents.antonyms) .. "; "
+          outstr = outstr .. "antonyms: " .. table.concat(slice(contents.antonyms, {stop = 2, sliced_indicator = "..."})) .. "; "
         end
         return outstr
       end,

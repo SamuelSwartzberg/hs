@@ -16,7 +16,7 @@ function createAliasMetatable(get_longer_shorter_thing)
         local key = find(t, function(testkey)
           local longer_thing, shorter_thing = get_longer_shorter_thing(testkey, k)
           local longer_parts = stringy.split(longer_thing, "_")
-          local shorter_parts = splitBytes(shorter_thing)
+          local shorter_parts = bytes(shorter_thing)
           if not (#longer_parts == #shorter_parts) then
             return false
           end

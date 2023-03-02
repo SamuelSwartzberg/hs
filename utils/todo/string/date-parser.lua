@@ -26,7 +26,7 @@ local date_regexes = {
 --- @return number | nil
 function parseDate(date)
   if eutf8.match(date, "^%D") then
-    parseDate(getSubstringAtStartOfFirstDigit(date))
+    parseDate(slice(date, {start = {_r = "%d"}}))
   end
   -- date is already a timestamp
 

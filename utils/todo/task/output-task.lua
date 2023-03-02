@@ -169,7 +169,7 @@ end
 --- @param arg? string
 --- @return string[]
 function upkgGetInner(mgr, thing, arg)
-  return splitLines(run({
+  return lines(run({
     "upkg",
     mgr,
     thing,

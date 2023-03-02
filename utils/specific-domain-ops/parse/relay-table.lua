@@ -11,7 +11,7 @@ function parseRelayTable(raw)
     local raw_country_lines = stringy.split(raw_country, "\n")
     raw_country_lines = filter(raw_country_lines, true)
     local country_header = raw_country_lines[1]
-    local country_code = extractFirstThingInParentheses(country_header)
+    local country_code = slice(country_header, "(", ")")
     if country_code == nil then error("could not find country code in header. header was " .. country_header) end
     local payload_lines = slice(raw_country_lines, 2, -1)
     countries[country_code] = {}
@@ -21,7 +21,7 @@ function parseRelayTable(raw)
         local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
         push(countries[country_code][city_code], relay_code)
       elseif stringy.startswith(payload_line, "\t") then -- line specifying an entire city
-        city_code = extractFirstThingInParentheses(payload_line) -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
+        city_code = slice(payload_line, "(", ")") -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
         countries[country_code][city_code] = {}
       end
     end

@@ -3,7 +3,7 @@
 --- @generic T, U, V, W, X
 --- @param gen fun(...: `V`): fun(state: `T`, control_var: `U`): (`W`, `X`), T, U
 --- @return table<W, X>
-function iteratorToTable(gen, ...)
+function iterToTable(gen, ...)
   local res = {}
   for k, v in gen do
     res[k] = v
@@ -11,7 +11,7 @@ function iteratorToTable(gen, ...)
   return res
 end
 
-function iteratorToList(gen)
+function iterToList(gen)
   if gen == nil then
     return {}
   end
