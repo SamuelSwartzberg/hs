@@ -28,7 +28,7 @@ end
 --- @param str string
 --- @return boolean
 function isSnakeCase(str)
-  return asciiStringContainsOnly(str, "a-z0-9_")
+  return not onig.find(str, "[^a-z0-9_]")
 end
 
 --- @param str string
@@ -118,13 +118,13 @@ end
 --- @param str string
 --- @return boolean
 function potentialEnvVar(str)
-  return asciiStringContainsOnly(str, "A-Z0-9_")
+  return not onig.find(str, "[^A-Z0-9_]")
 end
 
 --- @param str string
 --- @return boolean
 function containsLargeWhitespace(str)
-  return asciiStringContainsSome(str, {"\t", "\r", "\n"})
+  return onig.find(str, "[\\t\\r\\n]")
 end
 
 --- @param str string

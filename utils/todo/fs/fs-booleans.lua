@@ -103,7 +103,7 @@ function testPath(path, opts)
         slice_spec.condition = {slice_spec.condition}
       end
 
-      push(results, test(slice, slice_spec.condition))
+      push(results, findsingle(slice, slice_spec.condition))
 
       if results[#results] == false then -- return early if any slice test fails. This may be removed at some point if I allow for 'or'-logic at some point
         return false

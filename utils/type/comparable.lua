@@ -68,7 +68,12 @@ function seq(start, stop, step, unit)
       return a_copy["add" .. unit](a_copy, b) 
     end
   elseif mode == "string" then
-    -- todo
+    start = defaultIfNil(start, "a")
+    stop = defaultIfNil(stop, "z")
+    step = defaultIfNil(step, 1)
+    addmethod = function(a, b)
+      return string.char(string.byte(a) + b)
+    end
   end
 
   local range = {}

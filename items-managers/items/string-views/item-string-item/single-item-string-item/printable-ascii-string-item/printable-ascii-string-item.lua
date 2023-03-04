@@ -4,13 +4,13 @@ PrintableAsciiStringItemSpecifier = {
   properties = {
     getables = {
       ["is-alphanum-minus-underscore"] = function(self) 
-        return utf8StringContainsOnly(self:get("contents"), "%w%-_")
+        return not string.find(self:get("contents"), "[^%w%-_]")
       end,
       ["is-iban"] = function(self)
         local contents = self:get("contents")
         return contents:len() < 42 -- 30 (BBAN) + 2 (country code) + 2 (check digits) + 8 (optional spaces)
           and contents:find("^%w%w")
-          and utf8StringContainsOnly(contents, "%w%-%_ ")
+          and not contents:find("[^%w%-%_ ]")
       end,
       ["is-doi"] = function(self) return isDoi(self:get("contents")) end,
       ["is-num"] = function(self) return tonumber(self:get("contents")) ~= nil end,
@@ -21,7 +21,7 @@ PrintableAsciiStringItemSpecifier = {
       ["is-phone-number"] = function(self)
         return isPotentiallyPhoneNumber(self:get("contents"))
       end,
-      ["is-digit-string"] = function(self) return (not eutf8.find(self:get("contents"), "[^%x%.,%-]")) and isFirstIfAny(self:get("contents"), "%-") end,
+      ["is-digit-string"] = function(self) return onig.find(self:get("contents"), "^-?[0-9a-fA-F]*[\\.,]?[0-9a-fA-F]+$") end,
       ["is-date-related-item"] = function(self) 
         return isRFC3339Datelike(self:get("contents"))
       end,

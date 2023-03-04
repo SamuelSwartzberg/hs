@@ -39,7 +39,7 @@ function filter(tbl, cond, opts)
     }
     local res = true
     for _, arg in ipairs(opts.args) do
-      res = res and test(retriever[arg], cond)
+      res = res and findsingle(retriever[arg], cond)
       if not res then
         break -- exit early
       end

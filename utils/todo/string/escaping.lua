@@ -118,8 +118,10 @@ processors = {
 
 --- @alias matcher string | {r: string} | "processor_table_keys"
 
+-- TODO replace custom matcher implementation here with `find`
+
 --- @class replaceSpec
---- @field matcher? matcher | matcher[] 
+--- @field cond? conditionSpec
 --- @field matchall? boolean
 --- @field processor? string | table | fun(str: string): string 
 --- @field mode? "replace" | "prepend" | "append"
@@ -131,23 +133,23 @@ processors = {
 function rawreplace(str, specs)
   if specs == nil then return str end
   if type(specs) ~= "table" then specs = {specs} end
+  
   local res = str
   for _, spec in ipairs(specs) do 
     spec = tablex.deepcopy(spec) or {}
-    spec.matcher = spec.matcher or matchers.lua_metacharacters
     spec.processor = spec.processor or "\\"
     spec.mode = spec.mode or "prepend"
 
-    if not isListOrEmptyTable(spec.matcher) then
-      spec.matcher = {spec.matcher}
+    if not spec.cond and type(spec.processor) == "table" then
+      spec.cond = {_list = keys(spec.processor)} -- if no condition is specified, use the keys of the processor table as the condition
     end
 
-    for i, matcher in ipairs(spec.matcher) do
-      local match_func
-      if type(matcher) == "string" then
-        match_func = function(res)
-          return stringx.find(res, matcher)
-        end
+    if not isListOrEmptyTable(spec.cond) then
+      spec.cond = {spec.cond}
+    end
+
+    for i, cond in ipairs(spec.cond) do
+      local matches = find
     end
   end
   return res
@@ -163,33 +165,33 @@ function replace(str, type, ...)
   if type == "luaregex" then
     res = rawreplace(
       res, 
-      {matcher = matchers.lua_metacharacters, processor = "%", mode = "prepend"}
+      {cond = matchers.lua_metacharacters, processor = "%", mode = "prepend"}
     )
   elseif type == "regex" then
     res = rawreplace(
       res, 
       {
-        {matcher = matchers.regex_metacharacters, processor = "\\", mode = "prepend"},
-        {matcher = "processor_table_keys", processor = matchers.odd_whitespace, mode = "replace" }
+        {cond = matchers.regex_metacharacters, processor = "\\", mode = "prepend"},
+        {processor = matchers.odd_whitespace, mode = "replace" }
       }
     )
   elseif type == "modsymbols" then 
     res = rawreplace(
       res, 
       {
-        {matcher = "processor_table_keys", processor = processors.normalizing_modmap, mode = "replace" },
-        {matcher = "processor_table_keys", processor = processors.mod_symbolmap, mode = "replace" }
+        { processor = processors.normalizing_modmap, mode = "replace" },
+        { processor = processors.mod_symbolmap, mode = "replace" }
       }
     )
   elseif type == "doi" then 
     res = rawreplace(
       res, 
-      {matcher = matchers.doi_prefix_variants, processor = "https://doi.org/", mode = "replace" }
+      {cond = matchers.doi_prefix_variants, processor = "https://doi.org/", mode = "replace" }
     )
   elseif type == "urlencode" then
     res = rawreplace(
       res, 
-      {matcher = "[^\\w _%\\-\\.~]", processor = char_to_hex, mode = "replace" }
+      {cond = "[^\\w _%\\-\\.~]", processor = char_to_hex, mode = "replace" }
     )
   end
   return res

@@ -5,7 +5,15 @@ function isListOrEmptyTable(t)
   for k, v in pairs(t) do
     if type(k) ~= "number" then return false end
   end
+  if t.isassoc == "isassoc" then return false end -- signal value to indicate that this is an assoc table
   return next(t) == nil
+end
+
+--- temporary, not sure if this is better than the above
+--- @param t any
+--- @return boolean
+function isListOrEmptyTable(t)
+  return type(t) == "table" and pcall(function(t) return #t end, t) and not t.isassoc == "isassoc"
 end
 
 --- determines if a table is a sparse list, i.e. a list with holes, which in lua doesn't support many list ops

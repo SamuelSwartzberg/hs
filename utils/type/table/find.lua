@@ -1,10 +1,14 @@
+-- TODO multiple return? = find all option
 
 --- @class findOpts
 --- @field args kvmult
 --- @field ret kvmult here, kvmult can also include "boolean", to return a boolean instead of the value
 --- @field last boolean
+--- @field findall boolean
+--- @field start integer
+--- @field stop integer
 
---- @param tbl? table | nil
+--- @param tbl? indexable | nil
 --- @param cond? conditionSpec
 --- @param opts? kvmult | kvmult[] | findOpts
 function find(tbl, cond, opts)
@@ -22,6 +26,17 @@ function find(tbl, cond, opts)
     opts.ret = opts.ret or {"v"}
   end
 
+  local is_list = isListOrEmptyTable(tbl)
+  local is_string = type(tbl) == "string"
+
+  if opts.start or opts.stop then
+    if is_list or is_string then
+      tbl = slice(tbl, opts.start, opts.stop)
+    else
+      error("start and stop options don't work for non-list tables")
+    end
+  end
+
   if type(opts.args) == "string" then
     opts.args = chars(opts.args)
   end
@@ -33,24 +48,29 @@ function find(tbl, cond, opts)
     end
   end
 
-  local iterator
+  if not is_string then
+    local iterator
 
-  if isListOrEmptyTable(tbl) then
-    iterator = ipairs
-    if opts.last then tbl = rev(tbl) end
-  else
-    iterator = pairs
-    if opts.last then error("last option not yet implemented for non-list tables") end
-  end
+    if is_list then
+      iterator = ipairs
+      if opts.last then tbl = rev(tbl) end
+    else
+      iterator = pairs
+      if opts.last then error("last option not implemented for non-list tables") end
+    end
 
-  for k, v in wdefarg(iterator)(tbl) do
-    local retriever = {
-      k = k,
-      v = v
-    }
-    local res = true
-    for _, arg in ipairs(opts.args) do
-      res = res and test(retriever[arg], cond)
+    local finalres 
+    if opts.findall then finalres = {} end
+
+    for k, v in wdefarg(iterator)(tbl) do
+      local retriever = {
+        k = k,
+        v = v
+      }
+      local res = true
+      for _, arg in ipairs(opts.args) do
+        res = res and findsingle(retriever[arg], cond)
+      end
       if res then
         local ret = {}
         for _, retarg in ipairs(opts.ret) do
@@ -60,10 +80,26 @@ function find(tbl, cond, opts)
             table.insert(ret, retriever[retarg])
           end
         end
-        return table.unpack(ret)
+        if opts.findall then
+          table.insert(finalres, ret)
+        else
+          return table.unpack(ret)
+        end
       end
+
     end
+  else
+    -- TODO: I've thought about this a lot, and I think the best way to do this is to
+    --   have _contains and _r of the conditionSpec be implemented here as plain/regex string search, where we interpret the index returned as k, and the match as v
+    --   for any other condition, we just pass it on to test. given test returns true:
+    --     for _start and _stop, we can use 0 / #tbl - #_stop as k, and the value of _start / _stop as v 
+    --     for _exactly, we can use 0 as k, and the value of _exactly as v
+    --     for _empty, we can use 0 as k, and "" as v
+    --     for _type and _list, we can use 0 as k, and the entire string as v
+    --     we should probably disallow _invert, since it doesn't make sense in this context
+    -- maybe this logic should be in test instead of here? or maybe it should be in a separate function?
+
   end
 
-  return nil
+  return finalres
 end

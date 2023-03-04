@@ -108,6 +108,11 @@ function slice(thing, start_or_spec, stop, step)
   return new_thing
 end
 
+---@alias indexable string|any[]|table
+
+---@param thing indexable
+---@param ind any
+---@return any
 function elemAt(thing, ind)
   if type(thing) == "string" then
     return eutf8.sub(thing, ind, ind)
@@ -116,23 +121,40 @@ function elemAt(thing, ind)
   end
 end
 
+---@generic T : indexable
+---@param thing T
+---@return T
 function rev(thing)
   if type(thing) == "string" then
     return eutf8.reverse(thing)
-  else
-    local new_list = {}
-    for i = #thing, 1, -1 do
-      new_list[#new_list + 1] = thing[i]
+  elseif type(thing) == "table" then
+    if isListOrEmptyTable(thing) then
+      local new_list = {}
+      for i = #thing, 1, -1 do
+        new_list[#new_list + 1] = thing[i]
+      end
+      return new_list
+    else
+      return iterToTable(thing:revpairs())
     end
-    return new_list
+  else
+    error("rev only works on strings, lists, and tables. got " .. type(thing) .. " when processing:\n\n" .. json.encode(thing))
   end
 end
 
+---@param thing indexable
+---@return integer
 function len(thing)
   if type(thing) == "string" then
     return eutf8.len(thing)
+  elseif type(thing) == "table" then
+    if isListOrEmptyTable(thing) then
+      return #thing
+    else
+      return #values(thing)
+    end
   else
-    return #thing
+    error("len only works on strings, lists, and tables. got " .. type(thing) .. " when processing:\n\n" .. json.encode(thing))
   end
 end
 
@@ -146,29 +168,83 @@ function finder(thing, search, startsearch)
   end
 end
 
-function append(thing, addition)
-  if type(thing) == "string" then
-    return thing .. addition
+---@class appendOpts
+---@field nooverwrite? boolean
+
+---add a single element to an indexable
+---@generic T : indexable
+---@param base `T`
+---@param addition any
+---@param opts? appendOpts
+---@return T
+function append(base, addition, opts)
+  opts = opts or {}
+  if type(base) == "string" then
+    if not base then base = "" end
+    if not addition then return base end
+    return base .. addition
+  elseif type(base) == "table" then
+    local new_thing = tablex.deepcopy(base) 
+    if not addition then return new_thing end
+    if isListOrEmptyTable(base) then
+      new_thing[#new_thing + 1] = addition
+      return new_thing
+    else
+      if base.isassoc == "isassoc" then base.isassoc = nil end
+      if #values(addition) >= 2 then
+        if not opts.nooverwrite or not new_thing[addition[1]] then
+          new_thing[addition[1]] = addition[2]
+        end
+        return new_thing
+      else
+        error("can't append a non-pair to an assoc arr")
+      end
+    end
   else
-    local new_thing = tablex.deepcopy(thing)
-    new_thing[#new_thing + 1] = addition
-    return new_thing
+    error("append only works on strings, lists, and tables. got " .. type(base) .. " when processing:\n\n" .. json.encode(base))
   end
 end
 
-function glue(base, addition)
-  if type(base) == "string" then
-    return base .. addition
+---@class glueOpts : appendOpts
+---@field recurse? boolean | number
+---@field depth? number
+
+---add a single element to an indexable, but where that element may be mushed into the base in the process
+---@generic T : indexable
+---@param base `T`
+---@param addition any
+---@param opts? glueOpts
+---@return T
+function glue(base, addition, opts)
+  opts = opts or {}
+  if type(addition) ~= "table" then
+    return append(base, addition, opts)
   else
-    if not base then base = {} 
-    else base = tablex.deepcopy(base) end
-    if type(addition) == "nil" then
-      -- do nothing
-    elseif not isListOrEmptyTable(addition) then
-      base[#base + 1] = addition
+    if isListOrEmptyTable(addition) then
+      if isListOrEmptyTable(base) then
+        for _, v in ipairs(addition) do
+          base = append(base, v, opts)
+        end
+      else
+        base = append(base, addition, opts) -- if the base is an assoc arr, and we're gluing a list, we're just gonna treat it as a value to append
+      end
     else
-      for _, v in ipairs(addition) do
-        base[#base + 1] = v
+      if isListOrEmptyTable(base) then -- if the base is a list, and we're gluing an assoc arr, we're just gonna treat it as a value to append
+        base = append(base, addition, opts)
+      else
+        opts.depth = crementIfNumber(opts.depth, "in")
+        opts.recurse = defaultIfNil(opts.recurse, true)
+        for k, v in pairs(addition) do
+          if type(v) == "table" then
+            if not type(base[k]) == "table" or not opts.recurse or opts.recurse < opts.depth then
+              base = append(base, {k, v}, opts)
+            else
+              base[k] = glue(base[k], v, opts)
+            end
+          else
+            base = append(base, {k, v}, opts)
+          end
+        end
       end
     end
     return base
@@ -210,30 +286,32 @@ function longestCommonPrefix(list, opts)
   return res
 end
 
---- @class concatOpts
+--- @class concatOpts : glueOpts
 --- @field isopts "isopts"
 --- @field sep? any | any[]
 
---- @generic T, U
---- @param ... T[] | T | nil
---- @return (T | U)[]
-function concat(...)
-  local lists = {...}
+
+--- @generic T : indexable
+--- @param opts? concatOpts
+--- @param ... T
+--- @return T
+function concat(opts, ...)
+  local inputs = {...}
   if not opts then return {} end
   if type(opts) == "table" and opts.isopts == "isopts" then
     -- no-op
   else -- opts is actually the first list
-    table.insert(lists, 1, opts)
+    table.insert(inputs, 1, opts)
     opts = {}
   end
 
-  if #lists == 1 and isListOrEmptyTable(lists[1]) then
-    lists = lists[1]
+  if #inputs == 1 and isListOrEmptyTable(inputs[1]) then -- was called with a single list instead of varargs, but we can handle that
+    inputs = inputs[1]
   end
 
-  local new_list = {}
-  for i, list in ipairs(lists) do
-    glue(new_list, list)
+  local outputs = {}
+  for i, input in ipairs(inputs) do
+    glue(outputs, input)
     if opts.sep then
       local sep
       if type(opts.sep) == "table" then
@@ -241,20 +319,21 @@ function concat(...)
       else
         sep = opts.sep
       end
-      glue(new_list, sep)
+      glue(outputs, sep)
     end
   end
-  return new_list
+  return outputs
 end
 
---- @generic T : string|any[]
+--- @generic T : indexable
 --- @param thing T
 --- @param n integer
+--- @param opts? concatOpts
 --- @return T
-function multiply(thing, n)
+function multiply(thing, n, opts)
   local newthing = {}
   for i = 1, n do
-    newthing = concat(newthing, thing)
+    newthing = concat(newthing, thing, opts)
   end
   return newthing
 end

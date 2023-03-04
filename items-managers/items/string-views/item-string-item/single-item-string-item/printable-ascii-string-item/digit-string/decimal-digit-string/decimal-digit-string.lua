@@ -7,7 +7,7 @@ DecimalDigitStringItemSpecifier = {
         return tonumber(self:get("contents"), 10)
       end,
       ["is-decimal-id"] = function(self)
-        return asciiStringContainsOnly(self:get("contents"), "0-9")
+        return not onig.find(self:get("contents"), "[^0-9]")
       end,
       ["decimal-to-number-interface"] = function(self)
         return CreateNumber(self:get("decimal-numeric-equivalent"))

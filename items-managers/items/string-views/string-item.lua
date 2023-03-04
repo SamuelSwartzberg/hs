@@ -16,13 +16,12 @@ StringItemSpecifier = {
         return containsUppercase(self:get("contents"))
       end,
       ["is-might-be-json-item"] = function(self)
-        local stripped_contents = self:get("stripped-contents")
-        return 
-          startsEndsWith(stripped_contents,{starts = "{", ends = "}"}) or
-          startsEndsWith(stripped_contents,{starts = "[", ends = "]"})
+        return  self:get("starts-ends-with",{starts = "{", ends = "}"}) or
+        self:get("starts-ends-with",{starts = "[", ends = "]"})
       end,
       ["starts-ends-with"] = function(self, specifier)
-        return startsEndsWith(stringy.strip(self:get("contents")), specifier)
+        local str = stringy.strip(self:get("contents"))
+        return stringy.startswith(str, specifier.starts) and stringy.endswith(str, specifier.ends)
       end,
       ["is-might-be-xml-item"] = function(self) return self:get("starts-ends-with", {starts = "<", ends = ">"}) end,
       ["is-might-be-bib-item"] = function(self) return self:get("starts-ends-with", {starts = "@", ends = "}"}) end,

@@ -4,7 +4,7 @@
 --- @param gen fun(...: `V`): fun(state: `T`, control_var: `U`): (`W`, `X`), T, U
 --- @return table<W, X>
 function iterToTable(gen, ...)
-  local res = {}
+  local res = ovtable.new()
   for k, v in gen do
     res[k] = v
   end

@@ -113,3 +113,11 @@ function returnEmpty(thing)
     return {}
   end
 end
+
+function returnAnd(a, b)
+  return a and b
+end
+
+function returnOr(a, b)
+  return a or b
+end
