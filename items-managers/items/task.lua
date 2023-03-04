@@ -30,7 +30,7 @@ TaskItemSpecifier = {
       end,
       ["recreate"] = function(self)
         self:doThis("stop")
-        self:get("contents").hstask = runHsTask(self:get("args"))
+        self:get("contents").hstask = run(self:get("args"))
       end,
     }
   }
@@ -38,7 +38,7 @@ TaskItemSpecifier = {
 
 --- @type BoundRootInitializeInterface
 function CreateTaskItem(args)
-  local hstask = runHsTask(args)
+  local hstask = run(args)
   local task = {
     hstask = hstask,
     args = args,

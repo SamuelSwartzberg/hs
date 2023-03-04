@@ -10,10 +10,10 @@ IcsFileItemSpecifier = {
         local tmpdir_ics_path = env.TMPDIR .. "/" .. basename .. ".ics"
         local tmpdir_json_path = env.TMPDIR .. "/" .. basename .. ".json"
         srctgt("copy", self:get("contents"), tmpdir_ics_path)
-        getOutputArgs(
+        run({
           "ical2json",
           { value = tmpdir_ics_path, type = "quoted" }
-        )
+        })
         local res = json.decode(readFile(tmpdir_json_path))
         delete(tmpdir_ics_path)
         delete(tmpdir_json_path)
@@ -24,11 +24,11 @@ IcsFileItemSpecifier = {
         local tmpdir_ics_path = env.TMPDIR .. "/" .. basename .. ".ics"
         local tmpdir_json_path = env.TMPDIR .. "/" .. basename .. ".json"
         writeFile(tmpdir_json_path, json.encode(tbl))
-        getOutputArgs(
+        run({
           "ical2json",
           "-r",
           { value = tmpdir_ics_path, type = "quoted" }
-        )
+        })
         local res = readFile(tmpdir_ics_path)
         delete(tmpdir_ics_path)
         delete(tmpdir_json_path)

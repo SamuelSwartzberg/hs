@@ -4,7 +4,7 @@ UniCommandSpecifier = {
   properties = {
     getables = {
       ["uni-text"] = function(self, specifier)
-        local res = getOutputTask(merge({
+        local res = run(merge({
           "uni",
           specifier.subcommand,
           "-compact",

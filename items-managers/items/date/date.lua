@@ -1,14 +1,4 @@
-local format_map = {
-  ["rfc3339-date"] = "%Y-%m-%d",
-  ["rfc3339-time"] = "%H:%M:%S",
-  ["rfc3339-datetime"] = "%Y-%m-%dT%H:%M:%SZ",
-  ["american-date"] = "%m/%d/%Y",
-  ["american-time"] = "%I:%M:%S %p",
-  ["american-datetime"] = "%m/%d/%Y %I:%M:%S %p",
-  ["german-date"] = "%d.%m.%Y",
-  ["german-time"] = "%H:%M:%S",
-  ["german-datetime"] = "%d.%m.%Y %H:%M:%S",
-}
+local format_map = processors.date_format_map
 local formats = keys(format_map)
 local format_array = CreateArray(formats)
 

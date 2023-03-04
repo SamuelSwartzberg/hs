@@ -18,7 +18,7 @@ NewpipeItemSpecifier = {
     },
     doThisables = {
       ["pre-backup"] = function(self, do_after)
-        runHsTask({
+        run({
           "cd",
           { value = "$NEWPIPE_STATE_DIR", type = "quoted" },
           "&&",

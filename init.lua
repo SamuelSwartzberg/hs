@@ -376,7 +376,7 @@ System:get("manager", "watcher"):doThis("register-all", {
         local vol = CreateStringItem(information.path)
         if vol:get("is-time-machine-volume") then
           hs.alert.show("Starting backup...")
-          runHsTask({"tmutil", "startbackup"})
+          run({"tmutil", "startbackup"})
         end
       elseif event == hs.fs.volume.didUnmount then
         local vol = CreateStringItem(information.path)
@@ -394,14 +394,14 @@ System:get("manager", "watcher"):doThis("register-all", {
 
 
 System:get("manager", "timer"):doThis("register-all", {
-  bindArg(runHsTask, {"newsboat", "-x", "reload"}),
+  bindArg(run, {"newsboat", "-x", "reload"}),
   syncVdirSyncer,
   bind(syncHomeRelativePath, {"me/state/todo", "push"}),
   CreateStringItem(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
   { 
-    fn = bindArg(runHsTask, {
+    fn = bindArg(run, {
       "mbsync",
       "-c",
       { value = "$XDG_CONFIG_HOME/isync/mbsyncrc", type = "quoted"},

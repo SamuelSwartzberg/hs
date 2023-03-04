@@ -424,7 +424,7 @@ KhalCommandSpecifier = {
           )
         end
 
-        runHsTaskProcessOutput(command, function(std_out)
+        run(command, function(std_out)
           -- todo: build RRULE, add it to event
           if specifier.do_after then 
             specifier.do_after(std_out)

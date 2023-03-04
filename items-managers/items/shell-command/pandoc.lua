@@ -62,7 +62,7 @@ PandocCommandSpecifier = {
         table.insert(command_parts, "-o")
         table.insert(command_parts, {value = target, type ="quoted"})
         command_parts = concat(command_parts, specifier.extra_args)
-        runHsTaskProcessOutput(command_parts, function ()
+        run(command_parts, function ()
           -- deleteFile(temp_path)
           if specifier.do_after then
             specifier.do_after(target)

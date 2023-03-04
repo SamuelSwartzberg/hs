@@ -293,7 +293,7 @@ InterfaceDefaultTemplate = {
       ["paste-result-of-get"] = bind(getThenUse, { ["3"] = bind(pasteMultilineString, {["1"] = arg_ignore})}),
       ["open-result-of-get-in-browser"] = bind(getThenUse, { ["3"] = function(_, thing) open({url=thing}) end}),
       ["view-result-of-get"] = bind(getThenUse, { ["3"] = bind(hs.alert.show, {["1"] = arg_ignore})}),
-      ["open-result-of-get"] = bind(getThenUse, { ["3"] = bind(runOpenCommand, {["1"] = arg_ignore})}),
+      ["open-result-of-get"] = bind(getThenUse, { ["3"] = bind(open, {["1"] = arg_ignore})}),
       ["quick-look-result-of-get"] = bind(getThenUse, { ["3"] = bind(hs.alert.show, {["1"] = arg_ignore})}),
       ["code-quick-look-result-of-get"] = bind(getThenUse, { ["3"] = bind(alert, {["1"] = arg_ignore})}),
       ["choose-action-on-result-of-get"] = bind(getThenUse, { ["3"] = function(_, item)

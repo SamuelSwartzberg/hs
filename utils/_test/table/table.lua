@@ -119,15 +119,24 @@ assertMessage(
 )
 
 assertMessage(
-  #keys(chunk({ 
-    a = 1,
-    b = 2,
-    c = 3,
-    d = 4,
-    e = 5,
-    f = 6,
-    g = 7,
-  }, 3)[1]),
+  #keys(
+    split(
+      { 
+        a = 1,
+        b = 2,
+        c = 3,
+        d = 4,
+        e = 5,
+        f = 6,
+        g = 7,
+      }, 
+      function(k) return k % 3 == 0 end,
+      {
+        includesep = true,
+        findopts = {args = "k"}
+      }
+    )[1]
+  ),
   3
 )
 

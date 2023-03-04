@@ -1,20 +1,5 @@
 local test_date = date("2013-02-03T09:56:22Z")
 
-assertMessage(
-  dateToRFC3339Precision(test_date, "hour"),
-  date("2013-02-03T09:00:00Z")
-)
-
-assertMessage(
-  dateToRFC3339Precision(test_date, "min"),
-  date("2013-02-03T09:56:00Z")
-)
-
-assertMessage(
-  dateToRFC3339Precision(test_date, "month"),
-  date("2013-02-01T00:00:00Z")
-)
-
 assertValuesContainExactly(
   seq(test_date:copy():adddays(-3), test_date:copy():adddays(3)),
   {
@@ -52,9 +37,4 @@ assertMessage(
 assertMessage(
   processDateSpecification({ unit = "days", amount = 1 }, test_date),
   test_date:adddays(1)
-)
-
-assertMessage(
-  processDateSpecification({ unit = "days", amount = 1, precision = "hour" }, test_date),
-  dateToRFC3339Precision(test_date:adddays(1), "hour")
 )

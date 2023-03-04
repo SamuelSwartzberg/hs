@@ -8,9 +8,11 @@
 --- @field start integer
 --- @field stop integer
 
---- @param tbl? indexable | nil
+---@alias findOptsWShorthand kvmult | kvmult[] | findOpts
+
+--- @param tbl? indexable
 --- @param cond? conditionSpec
---- @param opts? kvmult | kvmult[] | findOpts
+--- @param opts? findOptsWShorthand
 function find(tbl, cond, opts)
   if not tbl or  #tbl == 0 then
     return nil -- default falsy value if table is empty, since there is nothing to find
@@ -30,11 +32,7 @@ function find(tbl, cond, opts)
   local is_string = type(tbl) == "string"
 
   if opts.start or opts.stop then
-    if is_list or is_string then
-      tbl = slice(tbl, opts.start, opts.stop)
-    else
-      error("start and stop options don't work for non-list tables")
-    end
+    tbl = slice(tbl, opts.start, opts.stop)
   end
 
   if type(opts.args) == "string" then

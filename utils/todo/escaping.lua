@@ -138,34 +138,49 @@ processors = {
   normalizing_dt_component_map = {
     S = "second",
     sec = "second",
+    secs = "second",
     second = "second",
     seconds = "second",
-    [1] = "second",
+    [1] = "second", -- 1 second
+    ["6."] = "second", -- sixth component of a rf3339 date
+    ["%S"] = "second",
     M = "minute",
     min = "minute",
+    mins = "minute",
     minute = "minute",
     minutes = "minute",
     [60] = "minute",
+    ["5."] = "minute", 
+    ["%M"] = "minute",
     H = "hour",
     hour = "hour",
     hours = "hour",
     [3600] = "hour",
+    ["4."] = "hour",
+    ["%H"] = "hour",
     d = "day",
     day = "day",
     days = "day",
     [86400] = "day",
+    ["3."] = "day",
+    ["%d"] = "day",
     w = "week",
     week = "week",
     weeks = "week",
     [604800] = "week",
+    ["%w"] = "week",
     m = "month",
     month = "month",
     months = "month",
     [2592000] = "month",
+    ["2."] = "month",
+    ["%m"] = "month",
     y = "year",
     year = "year",
     years = "year",
     [31536000] = "year",
+    ["1."] = "year",
+    ["%y"] = "year",
   },
   normalizers = {
     extension = {
@@ -188,7 +203,55 @@ processors = {
     month = 60 * 60 * 24 * 30,
     year = 60 * 60 * 24 * 365,
   },
+  dt_component_format_part_map = {
+    second = "%S",
+    minute = "%M",
+    hour = "%H",
+    day = "%d",
+    week = "%W",
+    month = "%m",
+    year = "%Y",
+  },
+  dt_component_RFC3339_separator_map = {
+    year = "-",
+    month = "-",
+    day = "T",
+    hour = ":",
+    minute = ":",
+    second = "Z",
+  },
+  rfc3339 = {
+    year = "%Y",
+    month = "%Y-%m",
+    day = "%Y-%m-%d",
+    hour = "%Y-%m-%dT%H",
+    minute = "%Y-%m-%dT%H:%M",
+    second = "%Y-%m-%dT%H:%M:%SZ",
+  },
+  date_format_map = {
+    ["rfc3339-date"] = "%Y-%m-%d",
+    ["rfc3339-time"] = "%H:%M:%S",
+    ["rfc3339-datetime"] = "%Y-%m-%dT%H:%M:%SZ",
+    ["american-date"] = "%m/%d/%Y",
+    ["american-time"] = "%I:%M:%S %p",
+    ["american-datetime"] = "%m/%d/%Y %I:%M:%S %p",
+    ["german-date"] = "%d.%m.%Y",
+    ["german-time"] = "%H:%M:%S",
+    ["german-datetime"] = "%d.%m.%Y %H:%M:%S",
+    ["email"] = "%a, %d %b %Y %H:%M:%S %z"
+  },
+  number_weekday_map = {
+    [1] = "Monday",
+    [2] = "Tuesday",
+    [3] = "Wednesday",
+    [4] = "Thursday",
+    [5] = "Friday",
+    [6] = "Saturday",
+    [7] = "Sunday"
+  }
 }
+
+processors.weekday_number_map = map(processors.number_weekday_map, returnAny, {"kv", "vk"})
 
 
 --- @alias matcher string | {r: string} | "processor_table_keys"
@@ -455,7 +518,7 @@ toUpperAlphanumMinus = bind(toPatternSeparator, {["2"] = {"%w%d", "-", "upper"}}
 --- @param str string
 --- @return string
 function romanize(str)
-  local raw_romanized = getOutputTask(
+  local raw_romanized = run(
     { "echo", "-n",  {value = str, type = "quoted"}, "|", "kakasi", "-iutf8", "-outf8", "-ka", "-Ea", "-Ka", "-Ha", "-Ja", "-s", "-ga" }
   )
   local is_ok, romanized = pcall(eutf8.gsub, raw_romanized, "(%w)%^", "%1%1")

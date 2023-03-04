@@ -4,20 +4,20 @@ MullvadCommandSpecifier = {
   properties = {
     getables = {
       ["status"] = function()
-        return stringy.strip(getOutputArgs(
+        return stringy.strip(run({
           "mullvad",
           "status"
-        ))
+        }))
       end,
       ["is-connected"] = function (self)
         return stringy.startswith(self:get("status"),"Connected")
       end,
       ["relay-list-raw-string"] = function(self)
-        return stringy.strip(memoize(getOutputArgs)(
+        return stringy.strip(memoize(run)({
           "mullvad",
           "relay",
           "list"
-        ))
+        }))
       end,
       ["relay-list-raw-table"] = function(self)
         return memoize(parseRelayTable)(self:get("relay-list-raw-string"))

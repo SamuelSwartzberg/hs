@@ -29,7 +29,7 @@ function bind(func, arg_spec)
       end
       inner_func = function(...)
         local args = {...}
-        local new_args = listSplice(args, arg_list, int_index)
+        local new_args = splice(args, arg_list, int_index)
         return inner_func(table.unpack(new_args))
       end
     end

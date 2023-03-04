@@ -183,7 +183,7 @@ OmegatProjectDirItemSpecifier = {
         local generation_tasks = self:get("target-files-extension", "odt"):get("map", function(odt)
           return CreateShellCommand("libreoffice"):get("to-txt-command", odt:get("contents"))
         end)
-        runHsTaskSequential(generation_tasks, do_after)
+        runHsTaskNThreads(generation_tasks, 1, do_after)
       end,
       ["generate-raw-rechnung"] = function(self, do_after)
         self:doThis("generate-target-txts", function()

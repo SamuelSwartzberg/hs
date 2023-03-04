@@ -13,7 +13,7 @@ PathWithLineAndorCharacterNumberItemSpecifier = {
     },
     doThisables = {
       ["vscode-open-and-go-to"] = function (self)
-        runHsTaskProcessOutput({
+        run({
           "open",
           "-a",
            { value = "Visual Studio Code", type = "quoted" },

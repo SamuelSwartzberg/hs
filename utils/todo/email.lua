@@ -24,11 +24,12 @@ function buildEmailHeaders(headers)
   return table.concat(header_lines, "\n")
 end
 
---- @param iso_time integer
---- @return string|osdate
-function formatDateEmail(iso_time)
-  return os.date("%a, %d %b %Y %H:%M:%S %z", iso_time)
-end
+function buildEmailHeaders2(headers)
+  return stringx.join("\n", listSort(map(headers, function(value, key)
+    return false, ("%s: %s"):format(firstCharToUpper(key), le(value))
+  end), function (a, b)
+    return find()
+  end))
 
 --- @param headers { [string]: string }
 --- @param body string
@@ -41,7 +42,7 @@ function buildEmailInteractive(headers, body, edit_func, do_after)
     local evaled_mail = le(mail)
     local temp_file = writeFile(nil, evaled_mail)
     local new_file = writeFile(nil, "")
-    runHsTaskProcessOutput({
+    run({
       "mmime",
       "<",
       { value = temp_file, type = "quoted" },
@@ -76,7 +77,7 @@ function sendEmail(email_file, do_after)
       { value = email_file, type = "quoted" },
       "|",
       "msed",
-      { value = "/Date/a/"..formatDateEmail(os.time()), type = "quoted" },
+      { value = "/Date/a/"..os.date(processors.date_format_map.email, os.time()), type = "quoted" },
       "|",
       "msed",
       { value = "/Status/a/S/", type = "quoted" },

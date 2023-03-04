@@ -86,7 +86,7 @@ ExtantPathItemSpecifier = {
     },
     doThisables = {
       ["cd-and-run-this-task"] = function(self, task)
-        runHsTask(self:get("cd-and-this-task", task))
+        run(self:get("cd-and-this-task", task))
       end,
       ["open-path"] = function (self, app)
         open({path = self:get("contents"), app = app})

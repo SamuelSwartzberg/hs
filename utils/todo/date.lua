@@ -1,23 +1,3 @@
---- @enum NumberWeekdayMap
-number_weekday_map = {
-  [1] = "Monday",
-  [2] = "Tuesday",
-  [3] = "Wednesday",
-  [4] = "Thursday",
-  [5] = "Friday",
-  [6] = "Saturday",
-  [7] = "Sunday"
-}
-
-weekday_number_map = map(number_weekday_map, returnAny, {"kv", "vk"})
-
---- @param dt dateObj
---- @param precision string | integer
---- @return dateObj
-function dateToRFC3339Precision(dt, precision)
-  return date(dt:fmt(getRFC3339FormatStringForPrecision(precision)))
-end
-
 --- @param specifier { dt?: dateObj, unit?: string, amount?: number, precision?: string }
 --- @param orig_date dateObj
 --- @return dateObj
@@ -35,7 +15,7 @@ function processDateSpecification(specifier, orig_date)
     dt = date_copy
   end
   if specifier.precision then
-    dt = dateToRFC3339Precision(dt, specifier.precision)
+    dt = dt:fmt(processors.rfc3339[processors.normalizing_dt_component_map[specifier.precision]])
   end
   return dt
 end
@@ -69,13 +49,35 @@ function timestampKeyTableToYMDTable(timestamp_key_table)
   return year_month_day_time_table
 end
 
---- @return number
-function getUnixTimeLastMidnight()
-  local now = os.time()
-  local midnight = os.date("*t", now)
-  midnight.hour = 0
-  midnight.min = 0
-  midnight.sec = 0
-  midnight.isdst = false
-  return os.time(midnight)
+
+--- @param precision number|string
+--- @return string
+function getRFC3339FormatStringForPrecision(precision)
+  local format_string = ""
+  if type(precision) == "string" then
+    precision = component_precision_map[precision]
+  end
+  if not precision then error("Invalid precision: " .. precision) end
+  for i = 1, precision do
+    local current_component = precision_component_map[i]
+    format_string = format_string .. precision_percent_specifier_map[current_component]
+    if i < precision then
+      format_string = format_string .. rfc_3339_format_separators[current_component]
+    end
+  end
+  return format_string
+end
+--- @param date_part_array number[]
+--- @return string|osdate
+function datePartArrayToRFC3339String(date_part_array)
+  local precision = #date_part_array
+  local format_string = getRFC3339FormatStringForPrecision(precision)
+  return os.date(format_string, os.time({
+    year = date_part_array[1],
+    month = date_part_array[2],
+    day = date_part_array[3],
+    hour = date_part_array[4],
+    min = date_part_array[5],
+    sec = date_part_array[6]
+  }))
 end

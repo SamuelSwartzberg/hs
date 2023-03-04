@@ -43,7 +43,7 @@ YoutubePlayableItemItemSpecifier = {
         return self:get("attrs-sync-inner", {attr})[attr]
       end,
       ["youtube-playable-item-unavailable"] = function(self)
-        local output, status = getOutputTask({"youtube-dl", "--get-title", self:get("contents")})
+        local output, status = run({"youtube-dl", "--get-title", self:get("contents")})
         if status ~= 0 then
           local lines = stringy.split(output, "\n")
           return find(lines, function(line)
@@ -103,7 +103,7 @@ YoutubePlayableItemItemSpecifier = {
   
     doThisables = {
       ["get-attrs-async-inner"] = function(self, specifier)
-        runHsTaskProcessOutput(
+        run(
           self:get("attrs-inner-task-args", specifier.attrs),
           function(output)
             local res = self:get("process-raw-attrs", {

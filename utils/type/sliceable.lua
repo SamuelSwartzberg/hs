@@ -1,4 +1,4 @@
----@alias indexable string|any[]|table
+---@alias indexable string|any[]|orderedtable
 
 --- @class sliceSpec
 --- @field start? conditionSpec
@@ -116,8 +116,12 @@ end
 function elemAt(thing, ind)
   if type(thing) == "string" then
     return eutf8.sub(thing, ind, ind)
-  else
-    return thing[ind]
+  elseif type(thing) == "table" then
+    if isListOrEmptyTable(thing) then
+      return thing[ind]
+    else
+      return thing:getindex(ind)
+    end
   end
 end
 
@@ -336,6 +340,8 @@ function multiply(thing, n, opts)
 end
 
 --- @class splitOpts
+--- @field includesep? boolean
+--- @field findopts? findOptsWShorthand
 
 --- @generic T : indexable
 --- @param thing T
@@ -343,6 +349,7 @@ end
 --- @param opts? splitOpts
 --- @return T[]
 function split(thing, sep, opts)
+  opts = tablex.deepcopy(opts) or {}
   local splintervals = find(
     thing,
     sep,
@@ -360,19 +367,61 @@ function split(thing, sep, opts)
   local lastend = 1
   for _, pair in ipairs(splintervals) do
     local start, match = table.unpack(pair)
-    local fragment = slice(thing, lastend, start - 1)
-    push(res, fragment)
-    local stop
-    if type(thing) == "string" then
-      stop = start + len(match) - 1
+    local matchlength 
+    if type(match) == "string" then
+      matchlength = len(match)
     else
-      stop = start
+      matchlength = 1
     end
-    lastend = start + 1
+    local sliceend = start - 1
+    if opts.includeSep then
+      sliceend = start
+    end
+    local fragment = slice(thing, lastend, sliceend)
+    push(res, fragment)
+    local stop = start + matchlength - 1
+    lastend = stop + 1
   end
 
   local lastfragment = slice(thing, lastend)
   push(res, lastfragment)
 
+  return res
+end
+
+--- @generic T : indexable
+--- @param thing T
+--- @param n integer
+--- @return T[]
+function chunk(thing, n)
+  return split(thing, function(k) return (k - 1) % n == 0 end, { includesep = true , findopts = { args = "k"} })
+end
+
+--- @class spliceOpts : appendOpts
+--- @field start? integer
+--- @field overwrite? boolean
+
+--- @generic T : indexable
+--- @param thing1 T
+--- @param thing2 T
+--- @param opts? spliceOpts | integer
+--- @return T
+function splice(thing1, thing2, opts)
+  if type(opts) == "number" then
+    opts = {start = opts}
+  else
+    opts = tablex.deepcopy(opts) or {}
+  end
+  opts.start = opts.start or 1
+  opts.overwrite = opts.overwrite or false
+  local res = {}
+  local before = slice(thing1, 1, opts.start - 1)
+  if opts.overwrite then
+    local after = slice(thing1, opts.start + len(thing2))
+    res = concat(before, thing2, after)
+  else
+    local after = slice(thing1, opts.start)
+    res = concat(before, thing2, after)
+  end
   return res
 end
