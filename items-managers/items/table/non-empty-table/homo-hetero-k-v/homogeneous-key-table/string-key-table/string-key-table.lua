@@ -161,22 +161,10 @@ StringKeyTableSpecifier = {
         return self:get("all-keys-are-in-list", {"pos", "children", "parent", "text", "tag", "attrs", "cdata"})
       end,
       ["is-env-var-key-table"] = function(self)
-        return self:get("all-keys-pass", function(key)
-          return potentialEnvVar(key)
-        end)
+        return not find(self:get("keys"), {_r = whole(matchers.case.upper_snake._r), _invert = true}, "boolean") == nil
       end,
       ["is-menu-item-key-table"] = function(self)
         return self:get("all-keys-are-in-list", {"path", "application", "AXTitle", "AXEnabled", "AXRole", "AXMenuItemMarkChar", "AXMenuItemCmdChar", "AXMenuItemCmdModifiers", "AXMenuItemCmdGlyph"})
-      end,
-      ["find-key-starting"] = function(self, prefix)
-        return self:get("find-key", function(key)
-          return stringy.startswith(key, prefix)
-        end)
-      end,
-      ["find-key-ending"] = function(self, suffix)
-        return self:get("find-key", function(key)
-          return stringy.endswith(key, suffix)
-        end)
       end,
     },
     doThisables = {

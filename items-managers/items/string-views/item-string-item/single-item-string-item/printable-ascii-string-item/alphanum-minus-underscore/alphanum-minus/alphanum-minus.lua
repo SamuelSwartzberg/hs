@@ -5,13 +5,18 @@ AlphanumMinusItemSpecifier = {
   type = "alphanum-minus-item",
   properties = {
     getables = {
-      ["is-isbn"] = function(self) return memoize(isIsbn)(self:get("contents")) end,
-      ["is-issn"] = function(self) return memoize(isIssn)(self:get("contents")) end,
+      ["is-isbn"] = function(self) return memoize(onig.find)(self:get("contents"), whole(matchers.id.isbn._r)) end,
+      ["is-issn"] = function(self) return memoize(onig.find)(self:get("contents"), whole(matchers.id.issn._r)) end,
       ["is-uuid"] = function(self)
-        return onig.find(self:get("contents"), "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", 1, "i")
+        return onig.find(self:get("contents"), whole(matchers.id.uuid._r), 1, "i")
       end,
       ["is-package-manager"] = function(self)
-        return memoize(isPackageManager)(self:get("contents"))
+        return find(lines(
+          memoize(run)({
+            "upkg",
+            "list-package-managers"
+          })
+        ), self:get("contents"))
       end,
       ["is-mullvad-relay-identifier"] = function(self)
         return 

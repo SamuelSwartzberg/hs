@@ -12,7 +12,7 @@ PrintableAsciiStringItemSpecifier = {
           and contents:find("^%w%w")
           and not contents:find("[^%w%-%_ ]")
       end,
-      ["is-doi"] = function(self) return isDoi(self:get("contents")) end,
+      ["is-doi"] = function(self) return memoize(onig.find)(self:get("contents"), whole(matchers.id.doi._r)) end,
       ["is-num"] = function(self) return tonumber(self:get("contents")) ~= nil end,
       ["is-email-address"] = function(self) -- trying to determine what string is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
         local contents = self:get("contents")
@@ -23,10 +23,10 @@ PrintableAsciiStringItemSpecifier = {
       end,
       ["is-digit-string"] = function(self) return onig.find(self:get("contents"), "^-?[0-9a-fA-F]*[\\.,]?[0-9a-fA-F]+$") end,
       ["is-date-related-item"] = function(self) 
-        return isRFC3339Datelike(self:get("contents"))
+        return memoize(onig.find)(self:get("contents"), whole(matchers.date.rfc3339._r))
       end,
       ["is-dice-notation-item"] = function(self)
-        return isDiceSyntaxString(self:get("contents"))
+        return onig.match(self:get("contents"), whole(matchers.syntax.dice._r))
       end,
       ["is-unicode-codepoint"] = function(self)
         return stringy.startswith(self:get("contents"), "U+") and string.match(self:get("contents"), "^U+%x+$")
@@ -35,16 +35,16 @@ PrintableAsciiStringItemSpecifier = {
         return stringy.startswith(self:get("contents"), "@")
       end,
       ["is-url-base64"] = function(self)
-        return isUrlBase64(self:get("contents"))
+        return onig.find(self:get("contents"), whole(matchers.b.b64.url._r))
       end,
       ["is-general-base64"] = function(self)
-        return isGeneralBase64(self:get("contents"))
+        return onig.find(self:get("contents"), whole(matchers.b.b64.gen._r))
       end,
       ["is-general-base32"] = function(self)
-        return isGeneralBase32(self:get("contents"))
+        return onig.find(self:get("contents"), whole(matchers.b.b32.gen._r))
       end,
       ["is-crockford-base32"] =  function(self)
-        return isCrockfordBase32(self:get("contents"))
+        return onig.find(self:get("contents"), whole(matchers.b.b32.crockford._r))
       end,
 
     },

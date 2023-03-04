@@ -114,10 +114,22 @@ function returnEmpty(thing)
   end
 end
 
+--- @param a any
+--- @param b any
+--- @return boolean
 function returnAnd(a, b)
   return a and b
 end
 
+--- @param a any
+--- @param b any
+--- @return boolean
 function returnOr(a, b)
   return a or b
+end
+
+--- @param regex string
+--- @return string
+function whole(regex)
+  return "^" .. regex .. "$"
 end

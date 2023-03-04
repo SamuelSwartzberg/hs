@@ -6,14 +6,14 @@ StringItemSpecifier = {
         return stringy.strip(self:get("contents"))
       end,
       ["is-single-item-string-item"] = function(self) 
-        return (not containsLargeWhitespace(self:get("contents"))) or (not (#self:get("contents") < 2000))
+        return (not (#self:get("contents") < 2000)) or (not onig.find(self:get("contents"), matchers.whitespace.large._r)) 
       end,
       ["is-multiline-string-item"] = function(self) return stringy.find(self:get("contents"), "\n") end,
       ["is-has-lowercase-string-item"] = function(self)
-        return containsLowercase(self:get("contents"))
+        return onig.find(self:get("contents"), matchers.case.lower._r)
       end,
       ["is-has-uppercase-string-item"] = function(self)
-        return containsUppercase(self:get("contents"))
+        return onig.find(self:get("contents"), matchers.case.upper._r)
       end,
       ["is-might-be-json-item"] = function(self)
         return  self:get("starts-ends-with",{starts = "{", ends = "}"}) or
