@@ -28,7 +28,7 @@ TelegramItemSpecifier = {
         return msg.text
       end,
       ["msg-raw-attachments"] = function(self, msg)
-        return {self:get("media-dir-for-chat", msg.chat_obj) .. "/" .. getLeafWithoutPath(msg.file)}
+        return {self:get("media-dir-for-chat", msg.chat_obj) .. "/" .. pathSlice(msg.file, "-1:-1")[1]}
       end,
       ["msg-raw-reactions"] = function(self, msg)
         local raw_reactions = {}

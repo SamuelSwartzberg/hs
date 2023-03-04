@@ -167,6 +167,18 @@ processors = {
     years = "year",
     [31536000] = "year",
   },
+  normalizers = {
+    extension = {
+      jpeg = "jpg",
+      jpg = "jpg",
+      htm = "html",
+      html = "html",
+      yml = "yaml",
+      yaml = "yaml",
+      markdown = "md",
+      md = "md",
+    }
+  },
   dt_component_seconds_map = {
     second = 1,
     minute = 60,

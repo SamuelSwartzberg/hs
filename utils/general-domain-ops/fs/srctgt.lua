@@ -72,7 +72,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
     if not testPath(target, "dir") then
       error("target must be a directory if into is true. Target: " .. target)
     end
-    target = target .. "/" .. getLeafWithoutPath(source)
+    target = target .. "/" .. pathSlice(source, "-1:-1")[1]
     createPath(target, "1:-2")
   end
 
@@ -91,7 +91,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
     -- if all_in, then change target to be the target directory + the leaf of the source
     -- this does mean that this doesn't play nice with the `into` option, but I don't think that's a problem
     if all_in then
-      final_target = target .. "/" .. getLeafWithoutPath(final_source)
+      final_target = target .. "/" .. pathSlice(final_source, "-1:-1")[1]
       createPath(final_target, "1:-2")
     end
     print(final_source .. " -> " .. final_target)

@@ -15,8 +15,8 @@ URLItemSpecifier = {
       ["url-tld"] = function(self)
         return string.match(self:get("url-host"), "%w+%.(%w+)$") end,
       ["url-path"] = function(self) return self:get("parsed-url").path end,
-      ["url-path-components"] = function(self)
-        return getPathComponents(self:get("url-path"))
+      ["url-path-slice"] = function(self, args)
+        return pathSlice(self:get("url-path"), table.unpack(args))
       end,
       ["url-query"] = function(self) return self:get("parsed-url").query end,
       ["url-fragment"] = function(self) return self:get("parsed-url").fragment end,

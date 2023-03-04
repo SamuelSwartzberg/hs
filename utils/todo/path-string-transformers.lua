@@ -1,80 +1,25 @@
---- @param str string
---- @return string | nil
-function getExtension(str)
-  return pathSlice(str, "-1:-1", { ext_sep = true })[1]
-end
-
---- @param str string
---- @return string | nil
-function getFilenameWithoutExtension(str)
-  return pathSlice(str, "-2:-2", { ext_sep = true })[1]
-end
-
---- @param path string
---- @return string
-function getPathWithoutExtension(path)
-  return pathSlice(path, ":-2", { ext_sep = true, rejoin_at_end = true }) --[[ @as string]]
-end
-
-
---- @param str string
---- @return string
-function getLeafWithoutPath(str)
-  return pathSlice(str, "-1:-1")[1]
-end
-
---- @param str string
---- @return string | nil
-function getLeafWithoutPathOrExtension(str)
-  return pathSlice(str, "-2:-2", { ext_sep = true })[1]
-end
-
-
-
---- @param path string
---- @return string
-function getParentPath(path)
-  return pathSlice(path, ":-2", { rejoin_at_end = true }) --[[ @as string ]]
-end
-
---- @param path string
---- @return string
-function getParentDirname(path)
-  return pathSlice(path, "-2:-2")[1]
-end
-
---- @param path string
---- @return string
-function getGrandparentPath(path)
-  return pathSlice(path, ":-3", { rejoin_at_end = true }) --[[ @as string ]]
-end
-
-local extension_map = {
-  ["jpeg"] = "jpg",
-  ["htm"] = "html",
-  ["yml"] = "yaml",
-  ["markdown"] = "md"
-}
-
---- will contain an empty string as the first element if path starts with a slash, which is what we want
---- @param path string
---- @return string[]
-function getPathComponents(path)
-  return pathSlice(path, ":") --[[ @as string[] ]]
-end
 
 --- @alias sliceOpts { ext_sep?: boolean, standartize_ext?: boolean, rejoin_at_end?: boolean, entire_path_for_each?: boolean }
 
 --- @param path string
---- @param spec sliceSpec | string
+--- @param spec? sliceSpec | string
 --- @param opts? sliceOpts
 --- @return string[] | string
 function pathSlice(path, spec, opts)
+
+  -- set defaults
+
+  spec = spec or { start = -1, stop = -1}
   opts = tablex.deepcopy(opts) or {}
+
+  -- prepare path components
+
   local raw_path_components = stringy.split(path, "/")
   if raw_path_components[#raw_path_components] == "" then
     pop(raw_path_components) -- if path ends with a slash, remove the empty string at the end
   end
+
+  -- handle special case of also slicing the extension
 
   if opts.ext_sep then
     local leaf = pop(raw_path_components)
@@ -93,14 +38,18 @@ function pathSlice(path, spec, opts)
     end
 
     if opts.standartize_ext then
-      extension = extension_map[extension] or extension
+      extension = processors.normalizers.extension[extension] or extension
     end
 
     push(raw_path_components, without_extension)
     push(raw_path_components, extension)
   end
 
+  -- slice
+
   local res =  slice(raw_path_components, spec)
+
+  -- handle postprocessing
 
   if opts.rejoin_at_end then 
     if opts.ext_sep then 

@@ -37,12 +37,12 @@ ParentDirItemSpecifier = {
       end, ]] -- currently disabled as converting to a string-item-array in an is-function of a string-item, which gets called during initialization, obviously will cause an infinite loop
       ["child-filename-only-array"] = function(self)
         return self:get("child-string-array"):get("map-to-new-array", function(item)
-          return getLeafWithoutPathOrExtension(item)
+          return pathSlice(item, "-2:-2", { ext_sep = true })[1]
         end)
       end,
       ["child-leaf-only-array"] = function(self)
         return self:get("child-string-array"):get("map-to-new-array", function(item)
-          return getLeafWithoutPath(item)
+          return pathSlice(item, "-1:-1")[1]
         end)
       end,
       ["child-ending-with"] = function(self, ending)

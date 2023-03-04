@@ -4,7 +4,7 @@
 function processSetupDirectivesInFiles(path)
   for _, child in ipairs(itemsInPath({path = path, include_dirs = false})) do
     logFile("processSetupDirectivesInFiles", child)
-    local basename = getLeafWithoutPath(child)
+    local basename = pathSlice(child, "-1:-1")[1]
     local command = changeCasePre(
       table.concat(
         map(

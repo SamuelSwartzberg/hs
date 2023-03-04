@@ -31,7 +31,7 @@ PathItemSpecifier = {
         return ensureAdfix(self:get("contents"), "/", true, false, "suf")
       end,
       ["path-without-extension"] = function(self)
-        return getPathWithoutExtension(self:get("contents"))
+        return pathSlice(self:get("contents"), ":-2", { ext_sep = true, reojoin_at_end = true })[1]
       end,
       ["full-audiovisual"] = function(self, fkey)
         local outstr = self:get("path-leaf-tags-audiovisual")

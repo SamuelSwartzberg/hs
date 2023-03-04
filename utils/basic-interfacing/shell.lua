@@ -1,9 +1,13 @@
-local rrq = bindArg(relative_require, "utils.task")
+--- @alias command_part string | {value: string | command_parts, type: "quoted"  | "interpolated" | nil}
+--- @alias command_parts command_part[]
 
---- @param command_parts command_part[] list of things to assemble into a command
+--- @param command_parts command_parts | string list of things to assemble into a command
 --- @return string
 function buildInnerCommand(command_parts)
   local command = ""
+  if type(command_parts) == "string" then
+    return " " .. command_parts
+  end
   command_parts = fixListWithNil(command_parts) -- this allows us to have optional args simply by having them be nil
   for _, command_part in ipairs(command_parts) do
     if type(command_part) == "string" then
@@ -24,7 +28,7 @@ function buildInnerCommand(command_parts)
   return command
 end
 
---- @param command_parts (string | {value: string, type: "quoted" | nil})[]
+--- @param command_parts command_parts | string list of things to assemble into a command
 --- @return string[]
 function buildTaskArgs(command_parts)
   local hs_task_args = {
@@ -36,7 +40,7 @@ function buildTaskArgs(command_parts)
 end
 
 --- @class run_options_object
---- @field args command_parts
+--- @field args command_parts | string
 --- @field catch? fun(exit_code: integer, std_err: string): any
 --- @field finally? fun(exit_code: integer, std_err_or_out: string): any currently, finally may run before and_then if and_then is async or has a delay
 --- @field force_sync? boolean if true, will run the task synchronously, even if and_then is provided
@@ -52,7 +56,7 @@ end
 --- @field run_immediately? boolean if true, will run the task immediately, otherwise, you need to call :start() manually on the returned task object
 --- @field and_then? fun(std_out: string): any this shouldn't be here, but rather the second argument of run, but if it's here, we'll still accept it
 
---- @alias run_first_arg run_options_object_async | command_parts
+--- @alias run_first_arg run_options_object_async | command_parts | string
 --- @alias run_and_then fun(std_out: string): (any) | true | run_first_arg
 
 --- @alias run fun(opts: run_first_arg, and_then?: run_and_then, ...?: run_and_then ): any

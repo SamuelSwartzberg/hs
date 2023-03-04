@@ -20,7 +20,7 @@ GitRootDirItemSpecifier = {
     },
     doThisables = {
       ["copy-as-hook"] = function(self, hook_path)
-        local newpath = self:get("hooks-dir") .. getLeafWithoutPath(hook_path)
+        local newpath = self:get("hooks-dir") .. pathSlice(hook_path, "-1:-1")[1]
         dir.copyfile(hook_path, newpath)
         local newpath_permissions = hs.fs.attributes(hook_path, "permissions")
         if stringx.at(newpath_permissions, 3) ~= "x" then

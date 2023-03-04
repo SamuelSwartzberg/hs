@@ -66,7 +66,7 @@ PlaintextFileItemSpecifier = {
         return stringy.endswith(self:get("contents"), ".log")
       end,
       ["is-email-file"] = function(self)
-        local parent_dir_name = getParentDirname(self:get("contents"))
+        local parent_dir_name = pathSlice(self:get("contents"), "-2:-2")[1]
         return 
           stringy.endswith(self:get("contents"), ".eml") or 
           parent_dir_name == "new" or

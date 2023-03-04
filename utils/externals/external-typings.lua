@@ -410,8 +410,6 @@
 
 --- @alias and_then fun(exit_code?: number, std_out?: string, std_err?: string): nil
 --- @alias stream_callback fun(task?: hs.task, std_out?: string, std_err?: string): boolean
---- @alias command_part string | {value: string | command_parts, type: "quoted"  | "interpolated" | nil}
---- @alias command_parts command_part[]
 
 --- @class hs.task
 --- @field new fun(launchPath: string, terminationCallbackFn: and_then, streamCallbackFn?: stream_callback, arguments?: string[]): hs.task

@@ -20,7 +20,7 @@ function fsTree(path, do_files, tree_files)
       elseif do_files == "append" then
         push(res, full_path)
       elseif do_files == "as-tree" then
-        local nodename = getFilenameWithoutExtension(file)
+        local nodename = pathSlice(file, "-2:-2", { ext_sep = true })[1]
         if stringy.endswith(file, ".yaml") and find(tree_files, "yaml") then
           res[nodename] = yamlLoad(readFile(full_path, "error"))
         elseif stringy.endswith(file, ".json") and find(tree_files, "json") then

@@ -6,13 +6,13 @@ LibreofficeCommandSpecifier = {
       ["to-txt-command"] = function (self, path)
         return {
           "cd",
-          {value = getParentPath(path), type= "quoted"},
+          {value = pathSlice(path, ":-2", {rejoin_at_end=true}), type= "quoted"},
           "&&",
           "soffice",
           "--headless",
           "--convert-to",
           "txt:Text",
-          {value = getLeafWithoutPath(path), type="quoted"},
+          {value = pathSlice(path, "-1:-1")[1], type="quoted"},
         }
       end
     },

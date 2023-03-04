@@ -15,7 +15,7 @@ ArrayOfExtantPathsSpecifier = {
       end,
       ["filter-to-array-of-non-dotfiles"] = function(self)
         return self:get("filter-to-new-array", function(item)
-          return not stringy.startswith(getLeafWithoutPath(item:get("contents")), ".")
+          return not stringy.startswith(pathSlice(item:get("contents", "-1:-1")[1]), ".")
         end)
       end,
       ["map-to-array-of-files"] = function(self)

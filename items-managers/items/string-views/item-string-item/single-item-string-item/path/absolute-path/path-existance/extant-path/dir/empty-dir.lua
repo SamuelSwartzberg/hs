@@ -11,7 +11,7 @@ local project_type_init_map = {
       "npm",
       "pkg",
       "set",
-      { value = "name=" .. getLeafWithoutPath(path), type = "quoted" },
+      { value = "name=" .. pathSlice(path, "-1:-1")[1], type = "quoted" },
     }, true)
   end,
   omegat = function(path)

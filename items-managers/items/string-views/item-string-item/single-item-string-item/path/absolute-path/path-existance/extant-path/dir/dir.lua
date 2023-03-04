@@ -49,7 +49,7 @@ DirItemSpecifier = {
       end,
       ["descendant-filename-only-array"] = function(self)
         return self:get("descendant-string-array"):get("map-to-new-array", function(item)
-          return getLeafWithoutPathOrExtension(item)
+          return pathSlice(item, "-2:-2", { ext_sep = true })[1]
         end)
       end,
       ["descendant-filename-only-string-item-array"] = function(self)

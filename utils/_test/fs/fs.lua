@@ -211,26 +211,6 @@ assertValuesContainExactly(
 
 
 
-assertMessage(
-  getParentPath("/foo/bar"),
-  "/foo"
-)
-
-assertMessage(
-  getParentPath("foo/bar"),
-  "foo"
-)
-
-assertMessage(
-  getGrandparentPath("/foo/bar/baz"),
-  "/foo"
-)
-
-assertMessage(
-  getGrandparentPath("foo/bar/baz"),
-  "foo"
-)
-
 assertValuesContain(
   getItemsForAllLevelsInSlice("/", { start = -2, stop = -2 }  ),
   {"/Applications"}
@@ -441,7 +421,7 @@ assertMessage(
 delete(temp_file_3_path_pong)
 
 local temp_subdir_1_path = env.TMPDIR .. "/temp_subdir_lua_test_" .. os.time() .. "/"
-local ping_in_subdir_1_path = temp_subdir_1_path .. getLeafWithoutPath(temp_file_3_path_ping)
+local ping_in_subdir_1_path = temp_subdir_1_path .. pathSlice(temp_file_3_path_ping, "-1:-1")[1]
 
 createPath(temp_subdir_1_path)
 

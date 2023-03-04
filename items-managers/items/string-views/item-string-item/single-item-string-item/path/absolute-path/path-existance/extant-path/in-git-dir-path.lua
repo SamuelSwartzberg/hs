@@ -14,7 +14,7 @@ InGitDirPathItemSpecifier = {
         if not dotgit then
           return nil
         end
-        return getParentPath(dotgit) or nil
+        return pathSlice(dotgit, ":-2", {rejoin_at_end = true})
       end,
       ["git-root-dir-relative-path"] = function(self)
         return self:get("relative-path-from", self:get("git-root-dir"))

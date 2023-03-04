@@ -6,7 +6,7 @@ PathLeafSpecifier = {
   properties = {
     getables = {
       ["path-leaf"] = function(self)
-        return getLeafWithoutPath(self:get("contents"))
+        return pathSlice(self:get("contents", "-1:-1")[1])
       end,
       ["to-path-leaf-parts"] = function(self)
         return CreatePathLeafParts({
@@ -32,7 +32,7 @@ PathLeafSpecifier = {
         return isUsableAsFiletype(self:get("path-leaf-extension"), filetype)
       end,
       ["leaf-without-extension"] = function (self)
-        return getFilenameWithoutExtension(self:get("path-leaf")) or ""
+        return pathSlice(self:get("contents"), "-2:-2", { ext_sep = true } )[1]
       end,
 
       ["path-leaf-starts-with"] = function(self, prefix)

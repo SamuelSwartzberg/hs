@@ -232,7 +232,7 @@ OmegatProjectDirItemSpecifier = {
             local path = CreatePathLeafParts({
               date = os.date(getRFC3339FormatStringForPrecision("day")),
               path = env.MDIARY .. "/i_made_this/translations/",
-              ["general-name"] = getLeafWithoutPathOrExtension(odt:get("contents")),
+              ["general-name"] = pathSlice(odt:get("contents"), "-2:-2", { ext_sep = true })[1],
               extension = "odt",
               tag = {
                 client = client,
