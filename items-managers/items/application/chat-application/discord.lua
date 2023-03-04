@@ -74,7 +74,7 @@ DiscordItemSpecifier = {
         return chat_obj
       end,
       ["backup-interval"] = function(self)
-        return toSeconds(60, "M")
+        return 60 * processors.dt_component_seconds_map["minute"]
       end,
     },
     doThisables = {

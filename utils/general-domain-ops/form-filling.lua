@@ -1,15 +1,6 @@
+--- @alias out_field  {value: string, alias?: string, explanation?: string}
 
-
-
-
---- @param string_opts string
-function dummyTxt(string_opts)
-  takeShellikeArgsAsOpts(generateDummyText)(string_opts, function(res)
-    CreateStringItem(res):doThis("choose-action")
-  end)
-end
-
---- @param opts { in_fields: {[string]: string}, out_fields: {value: string, alias?: string, explanation?: string}[] }
+--- @param opts { in_fields: {[string]: string}, out_fields: out_field[] }
 --- @param do_after fun(result: {[string]: string}): nil
 function fillTemplateFromFieldsWithAI(opts, do_after)
   local ai_request_str = "Fill the following template\n\n"
@@ -36,12 +27,5 @@ function fillTemplateFromFieldsWithAI(opts, do_after)
     end
     do_after(out_fields)
   end, { temperature = 0})
-end
-
---- @param string_opts string
-function genList(string_opts)
-  takeShellikeArgsAsOpts(generateList)(string_opts, function(res)
-    CreateArray(stringy.split(res, "\n")):doThis("choose-action")
-  end)
 end
 

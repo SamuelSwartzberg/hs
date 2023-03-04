@@ -35,6 +35,13 @@ local thing_formulation_map = {
   emoji = "emoji that could represent %s"
 }
 
+--- @param string_opts string
+function dummyTxt(string_opts)
+  takeShellikeArgsAsOpts(generateDummyText)(string_opts, function(res)
+    CreateStringItem(res):doThis("choose-action")
+  end)
+end
+
 --- @param opts { amount?: integer, thing?: string, forwhat?: string }
 --- @param do_after fun(result: string): nil
 function generateList(opts, do_after)
@@ -46,3 +53,11 @@ function generateList(opts, do_after)
   local ai_request_str = ("Generate a list of %d %s in the format <item>\\n<item>\\n..."):format(opts.amount, formulation)
   gpt3Request(ai_request_str, do_after)
 end
+
+--- @param string_opts string
+function genList(string_opts)
+  takeShellikeArgsAsOpts(generateList)(string_opts, function(res)
+    CreateArray(stringy.split(res, "\n")):doThis("choose-action")
+  end)
+end
+

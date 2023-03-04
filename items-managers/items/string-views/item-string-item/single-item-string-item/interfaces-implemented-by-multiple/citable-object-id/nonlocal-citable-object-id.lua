@@ -3,7 +3,22 @@ NonlocalCitableObjectIdItemSpecifier = {
   type = "nonlocal-citable-object-id-item",
   properties = {
     getables = {
-      ["bibtex-from-internet-as-table"] = function(self) return convertBibtexToTable(self:get("bibtex-from-internet")) end,
+      ["bibtex-from-internet-as-table"] = function(self) 
+        return runJSON({
+          "echo",
+          "-n",
+          {
+            value = self:get("bibtex-from-internet"),
+            type = "quoted"
+          },
+          "|",
+          "pandoc",
+          "-f",
+          "bibtex",
+          "-t",
+          "csljson"
+        })
+      end,
     },
     doThisables = {
       ["save-as-citation-file"] = function(self)

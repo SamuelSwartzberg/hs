@@ -1,18 +1,19 @@
+---@alias indexable string|any[]|table
+
 --- @class sliceSpec
 --- @field start? conditionSpec
 --- @field stop? conditionSpec
 --- @field step? integer
 --- @field sliced_indicator? any
 --- @field fill? any
+--- @field last_start? boolean
+--- @field last_stop? boolean
 
---- @alias sliceLArgOverload fun(thing: any[], start_or_spec?: conditionSpec, stop?: conditionSpec, step?: integer): any[]
---- @alias sliceLSpecOverload fun(thing: any[], start_or_spec: sliceSpec | string): any[]
---- @alias sliceSArgOverload fun(thing: string, start_or_spec?: conditionSpec, stop?: conditionSpec, step?: integer): string
---- @alias sliceSSpecOverload fun(thing: string, start_or_spec: sliceSpec | string): string
-
---- both start and stop are 1-indexed, for both positive and negative values
---- both start and stop are inclusive
---- @type sliceLArgOverload | sliceLSpecOverload | sliceSArgOverload | sliceSSpecOverload
+--- @generic T : indexable
+--- @param thing T
+--- @param start_or_spec conditionSpec|sliceSpec
+--- @param stop? conditionSpec
+--- @param step? integer
 function slice(thing, start_or_spec, stop, step)
 
   local spec = {}
@@ -38,11 +39,11 @@ function slice(thing, start_or_spec, stop, step)
   end
 
   if not type(spec.start) == "number" then
-    spec.start = finder(thing, spec.start)
+    spec.start = find(thing, spec.start, {ret = "k", last = spec.last_start})
   end
 
   if not type(spec.stop) == "number" then
-    spec.stop = finder(thing, spec.stop, spec.start)
+    spec.stop = find(thing, spec.stop, {ret = "k", start = spec.start, last = spec.last_stop})
   end
 
 
@@ -108,7 +109,6 @@ function slice(thing, start_or_spec, stop, step)
   return new_thing
 end
 
----@alias indexable string|any[]|table
 
 ---@param thing indexable
 ---@param ind any
@@ -155,16 +155,6 @@ function len(thing)
     end
   else
     error("len only works on strings, lists, and tables. got " .. type(thing) .. " when processing:\n\n" .. json.encode(thing))
-  end
-end
-
-function finder(thing, search, startsearch)
-  error("TODO: finder really should just be a polymorphic aspect of `find`")
-  startsearch = (startsearch + 1) or 1
-  if type(thing) == "string" then
-    return onig.find(thing, search, startsearch) 
-  else
-    return find(slice(thing, startsearch), search, {"v", "k"})
   end
 end
 
@@ -310,16 +300,23 @@ function concat(opts, ...)
   end
 
   local outputs = {}
+  local sep
   for i, input in ipairs(inputs) do
-    glue(outputs, input)
+    if sep then
+      outputs = glue(outputs, sep)
+    end
+    outputs = glue(outputs, input)
     if opts.sep then
-      local sep
-      if type(opts.sep) == "table" then
+      if isListOrEmptyTable(sep) then
         sep = opts.sep[i]
       else
-        sep = opts.sep
+        if opts.sep._contains then -- since we can split by a conditionSpec, we want to be able to use a conditionSpec as a separator to rejoin. However, _contains is the only value of a conditionSpec where we can be sure that using it as a separator will recreate the original list (all others are not reversible)
+          sep = opts.sep._contains
+        else
+          sep = opts.sep
+        end
       end
-      glue(outputs, sep)
+      
     end
   end
   return outputs
@@ -336,4 +333,46 @@ function multiply(thing, n, opts)
     newthing = concat(newthing, thing, opts)
   end
   return newthing
+end
+
+--- @class splitOpts
+
+--- @generic T : indexable
+--- @param thing T
+--- @param sep conditionSpec
+--- @param opts? splitOpts
+--- @return T[]
+function split(thing, sep, opts)
+  local splintervals = find(
+    thing,
+    sep,
+    {
+      ret = "kv",
+      findall = true
+    }
+  )
+
+  if len(splintervals) <= 1 then
+    return {thing}
+  end
+
+  local res = {}
+  local lastend = 1
+  for _, pair in ipairs(splintervals) do
+    local start, match = table.unpack(pair)
+    local fragment = slice(thing, lastend, start - 1)
+    push(res, fragment)
+    local stop
+    if type(thing) == "string" then
+      stop = start + len(match) - 1
+    else
+      stop = start
+    end
+    lastend = start + 1
+  end
+
+  local lastfragment = slice(thing, lastend)
+  push(res, lastfragment)
+
+  return res
 end

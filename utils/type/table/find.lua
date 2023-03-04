@@ -56,7 +56,11 @@ function find(tbl, cond, opts)
       if opts.last then tbl = rev(tbl) end
     else
       iterator = pairs
-      if opts.last then error("last option not implemented for non-list tables") end
+      if opts.last then 
+        iterator = function(t)
+          return t:revpairs()
+        end
+      end
     end
 
     local finalres 

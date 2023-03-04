@@ -30,7 +30,7 @@ JxaTabbableWindowItemSpecifier = {
         return res
       end,
       ["active-tab-index"] = function(self)
-        return getOrDoAppWindowField(self:get("application-name"), self:get("window-index-jxa"), "activeTabIndex") - 1
+        return getViaOSA("js", ("Application('%s').windows()[%d].%s()"):format(self:get("application-name"), self:get("window-index-jxa"), "activeTabIndex")) - 1
       end,
       ["active-tab"] = function(self)
         local window_index = self:get("window-index-jxa")

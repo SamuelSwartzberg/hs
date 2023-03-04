@@ -18,9 +18,21 @@ EmailFileItemSpecifier = {
         )
       end,
       ["email-body-quoted"] = function(self)
-        local body = self:get("email-body-rendered")
-        local body_quoted = quoteLines(body, ">")
-        return body_quoted
+        return stringx.join(
+          "\n",
+          map(
+            stringx.splitlines(
+              stringy.strip(self:get("email-body-rendered"))
+            ),
+            function(v)
+              if stringy.startswith(v, ">") then
+                return ">" .. v
+              else
+                return ">" .. " " .. v
+              end
+            end
+          )
+        )
       end,
       ["with-email-body-quoted"] = function(self, response)
         return response .. "\n\n" .. self:get("email-body-quoted")

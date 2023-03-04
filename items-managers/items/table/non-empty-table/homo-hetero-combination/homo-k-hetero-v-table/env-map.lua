@@ -54,7 +54,12 @@ EnvMapSpecifier = {
       ["to-env-file-string"] = function(self)
         local lines = self:get("env-lines-dependency-ordered")
         local line_string = stringx.join("\n", lines)
-        line_string = prependAllWith(line_string, "\n", "export ")
+        line_string = table.concat(
+          map(
+            stringy.split(line_string, "\n"),
+            {_f = "export %s"}
+          )
+        )
         return "#!/usr/bin/env bash\n\n" ..
           "set -u\n\n" .. 
           line_string .. 

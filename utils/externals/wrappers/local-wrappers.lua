@@ -17,3 +17,7 @@ end
 function pullAll(path)
   CreateStringItem(path):doThis("git-pull-all")
 end
+
+function resolveTilde(path)
+  return path:gsub("^~", env.HOME)
+end

@@ -12,7 +12,7 @@ JxaWindowItemSpecifier = {
         )
       end,
       ["simple-property"] = function(self, prop)
-        return getOrDoAppWindowField(self:get("application-name"), self:get("window-index-jxa"), prop)
+        return getViaOSA("js", ("Application('%s').windows()[%d].%s()"):format(self:get("application-name"), self:get("window-index-jxa"), prop))
       end,
     },
     doThisables = {
