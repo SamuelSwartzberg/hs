@@ -28,24 +28,20 @@ PathInMaudiovisualItemSpecifier = {
       end,
       ["do-unavailable-urls"] = function(self, do_after)
         local urls = self:get("media-urls-array"):get("contents")
-        runHsTaskNThreadsOnArray(urls, function(_, url)
+        runThreaded(map(urls, function(url)
           return url, {"youtube-dl", "--get-title", "--flat-playlist", { value = url, type = "quoted" }}
-        end, function (command_results)
+        end, {"k", "kv"}), 10, nil, function (command_results)
           for url, result in pairs(command_results) do
-            if type(result) == "table" then
-              print("result was table")
-              print(result.std_err)
-              local err_lines = stringy.split(result.std_err, "\n")
-              local is_unavailable = find(err_lines, function(line)
-                return stringy.startswith(line, "ERROR: Private video")
-              end)
-              print("is_unavailable: " .. tostring(is_unavailable))
-              if is_unavailable then
-                do_after(url)
-              end
-            end 
+            local err_lines = stringy.split(result.std_err, "\n")
+            local is_unavailable = find(err_lines, function(line)
+              return stringy.startswith(line, "ERROR: Private video")
+            end)
+            print("is_unavailable: " .. tostring(is_unavailable))
+            if is_unavailable then
+              do_after(url)
+            end
           end
-        end, 10)
+        end)
       end,
       ["qf-unavailable-urls"] = function (self)
         self:doThis("do-unavailable-urls", function(url)

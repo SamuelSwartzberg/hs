@@ -49,16 +49,16 @@ KhardCommandSpecifier = {
     },
     doThisables = {
       ["get-array-of-contact-tables"] = function(self, do_after)
-        runHsTaskNThreadsOnArray(self:get("all-contact-uids"), function(_, uid)
+        runThreaded(map(self:get("all-contact-uids"), function(uid)
           return uid, {"khard", "show", "--format=yaml", "uid:" .. uid }
-        end, function(raw_contact_table)
+        end, {"v", "kv"}), 10, function(raw_contact_table)
           local arr = map(raw_contact_table, function(uid, contact)
             contact = yamlLoad(contact)
             contact.uid = uid
             return false, CreateContactTableItem(contact)
           end, {"kv", "kv"})
           do_after(CreateArray(arr))
-        end, 10)
+        end)
       end,
     },
   },

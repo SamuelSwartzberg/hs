@@ -170,10 +170,6 @@ StringItemSpecifier = {
       ["write-to-file"] = function(self, path)
         writeFile(path, self:get("contents"))
       end,
-      ["quick-look-bash-eval"] = function(self)
-        local parts = stringy.split(self:get("contents"), " ")
-        runHsTaskQuickLookResult(parts)
-      end,
       ["search-with"] = function(self, search_engine)
         open(
           string.format(
@@ -252,10 +248,7 @@ StringItemSpecifier = {
       text = "🔍 ql.",
       key = "code-quick-look-result-of-get",
       args = {key = "contents"}
-    }, {
-      text = "🔍🐚🧬 qlbasheval.",
-      key = "quick-look-bash-eval"
-    }, {
+    },{
       text = "🧬 eval.",
       key = "get-as-do",
       args = "evaluated-as-lua"

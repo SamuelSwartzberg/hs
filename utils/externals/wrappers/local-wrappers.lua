@@ -21,3 +21,10 @@ end
 function resolveTilde(path)
   return path:gsub("^~", env.HOME)
 end
+
+--- @param namespace string
+--- @param key string
+--- @param value string
+function writeDefault(namespace, key, value)
+  return run({"defaults", "write", namespace, key, value})
+end
