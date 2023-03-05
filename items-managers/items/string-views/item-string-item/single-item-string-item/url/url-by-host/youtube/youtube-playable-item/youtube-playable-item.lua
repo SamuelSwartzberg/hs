@@ -58,20 +58,9 @@ YoutubePlayableItemItemSpecifier = {
       end,
       ["youtube-playable-item-title-cleaned"] = function(self)
         local title = stringy.strip(self:get("youtube-playable-item-title"))
-        title = transformString(title, {
-          { value = "-Official Music Video-", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "Official Music Video", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "Official Video", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "Official MV", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "Music Video", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "MV full", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "(Audio)", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "【MV】", presence = false, case_insensitive = true, adfix = "in" },
-          { value = " MV ", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "【OFFICIAL】", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "TVアニメ", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "Official", presence = false, case_insensitive = true, adfix = "suf" },
-          { value = "Video", presence = false, case_insensitive = true, adfix = "suf" },
+        title = rawreplace(title, {
+          { cond = {_r = mt._r.text_bloat.youtube.video, _ignore_case = true}, mode="remove" },
+          { cond = {_r = mt._r.text_bloat.youtube.misc, _ignore_case = true}, mode="remove" },
         })
         local channel_cleaned = self:get("youtube-playable-item-channel-cleaned")
         if channel_cleaned ~= "" then
@@ -84,18 +73,9 @@ YoutubePlayableItemItemSpecifier = {
       end,
       ["youtube-playable-item-channel-cleaned"] = function(self)
         local channel = stringy.strip(self:get("youtube-playable-item-channel"))
-        channel = transformString(channel, {
-          { value = "- Topic", presence = true, case_insensitive = false, adfix = "in" },
-          { value = "(SMEJ)", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "Official YouTube Channel", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "【YouTube Official Channel】", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "Official Channel", presence = false, case_insensitive = true, adfix = "in" },
-          { value = "Official", presence = false, case_insensitive = true, adfix = "suf" },
-          { value = "Channel", presence = false, case_insensitive = true, adfix = "suf" },
-          { value = "Music", presence = false, case_insensitive = true, adfix = "suf" },
-          { value = "VEVO", presence = false, case_insensitive = true, adfix = "in", regex = true},
-          { value = " */ *[^/]+$", presence = false, case_insensitive = true, adfix = "suf", regex = true},
-          { value =  "チャンネル", presence = false, case_insensitive = true, adfix = "in", regex = true},
+        channel = rawreplace(channel, {
+          { cond = {_r = mt._r.text_bloat.youtube.channel_topic_producer, _ignore_case = true}, mode="remove" },
+          { value = {_r = mt._r.text_bloat.youtube.slash_suffix, _ignore_case = true}, mode="remove" },
         })
         return channel
       end,

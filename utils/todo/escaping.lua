@@ -1,19 +1,34 @@
-matchers = {
-  lua_metacharacters = {{"%", "^", "$", "(", ")", ".", "[", "]", "*", "+", "-", "?"}},
-  regex_metacharacters =  {{"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"}},
-  doi_prefix_variants = { "doi:", {_r = "(?:https?://)(?:dx.)doi.org/?" } },
-  case = {
-    snake = { _r = "[a-zA-Z0-9_]+" },
-    upper_snake = { _r = "[A-Z0-9_]+" },
-    lower = { _r = "[a-z]+" },
-    upper = { _r = "[A-Z]+" },
+mt = {
+  _contains = {
+    lua_metacharacters = {"%", "^", "$", "(", ")", ".", "[", "]", "*", "+", "-", "?"},
+    regex_metacharacters =  {"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"},
+    small_words = {
+      "a", "an", "and", "as", "at", "but", "by", "en", "for", "if", "in", "of", "on", "or", "the", "to", "v", "v.", "via", "vs", "vs."
+    }
   },
-  syntax = {
-    dice = { _r = "\\d+d\\d+[/x]\\d+[+-]\\d+"}
+  _list = {
+    tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"}
   },
-  date = {
-    rfc3339 = {
-      _r = "\\d{4}(?:" ..
+  _r = {
+    text_bloat = {
+      youtube = {
+        video = "[\\-【 \\(]*(?:Official )?(?:Music Video|Video|MV)(?: full)?[\\-】 \\)]*",
+        misc = "[\\-【  \\(]*(?:Audio|TVアニメ|Official)[\\-】 \\)]*",
+        channel_topic_producer = "[\\-【 \\(]*(?:Official|YouTube|Music|Topic|SMEJ|VEVO|Channel|チャンネル ?){1, 3})[\\-】 \\)]*",
+        slash_suffix = " */ *[^/]+$"
+      }
+    },
+    case = {
+      snake = "[a-zA-Z0-9_]+",
+      upper_snake = "[A-Z0-9_]+",
+      lower = "[a-z]+",
+      upper = "[A-Z]+",
+    },
+    syntax = {
+      dice = "\\d+d\\d+[/x]\\d+[+-]\\d+"
+    },
+    date = {
+      rfc3339 = "\\d{4}(?:" ..
       "\\-\\d{2}(?:" ..
         "\\-\\d{2}(?:" ..
           "T\\d{2}(?:" ..
@@ -26,163 +41,88 @@ matchers = {
         ..")?"
       ..")?"
     ..")?"
-    }
-  },
-  b = {
-    b64 = {
-      gen = {
-        _r = "[A-Za-z0-9+/=]+"
+    },
+    b = {
+      b64 = {
+        gen = "[A-Za-z0-9+/=]+",
+        url = "[A-Za-z0-9_\\-=]+"
       },
-      url = {
-        _r = "[A-Za-z0-9_\\-=]+"
+      b32 = {
+        gen = "[A-Za-z2-7=]+",
+        crockford = "[0-9A-HJKMNP-TV-Z=]+"
       }
     },
-    b32 = {
-      gen = {
-        _r = "[A-Za-z2-7=]+"
-      },
-      crockford = {
-        _r = "[0-9A-HJKMNP-TV-Z=]+"
-      }
+    id = {
+      issn = "[0-9]{4}-?[0-9]{3}[0-9xX]",
+      isbn = "(?:[0-9]{9}[0-9xX])|(?:[0-9]{13})",
+      uuid = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      doi = "(?:10\\.\\d{4,9}/[-._;()/:A-Z0-9]+)",
+    },
+    whitespace = {
+      large = "[\t\r\n]"
     }
-  },
-  id = {
-    issn = {
-      _r = "[0-9]{4}-?[0-9]{3}[0-9xX]"
-    },
-    isbn = {
-      _r = "(?:[0-9]{9}[0-9xX])|(?:[0-9]{13})"
-    },
-    uuid = {
-      _r = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
-    },
-    doi = {
-      _r = "(?:10\\.\\d{4,9}/[-._;()/:A-Z0-9]+)"
-    },
-  },
-  whitespace = {
-    large = {
-      _r = "[\t\r\n]"
-    },
   }
 }
 
-processors = {
-  odd_whitespace = {
-    ["\n"] = "\\n",
-    ["\t"] = "\\t",
-    ["\f"] = "\\f",
-    ["\r"] = "\\r",
-    ["\0"] = "\\0"
+map = {
+  whitespace = {
+    escaped = {
+      ["\n"] = "\\n",
+      ["\t"] = "\\t",
+      ["\f"] = "\\f",
+      ["\r"] = "\\r",
+      ["\0"] = "\\0"
+    },
   },
-  single_char_readable_equivs = {
-    ["\t"] = "tab",
-    ["\n"] = "newline",
-    [","] = "comma",
-    [";"] = "semicolon",
-    ["."] = "period",
-    [":"] = "colon",
-    ["!"] = "exclamation mark",
-    ["?"] = "question mark",
-    ["("] = "left parenthesis",
-    [")"] = "right parenthesis",
-    ["["] = "left bracket",
-    ["]"] = "right bracket",
-    ["{"] = "left brace",
-    ["}"] = "right brace",
-    ["'"] = "single quote",
-    ['"'] = "double quote",
-    ["*"] = "asterisk",
-    ["-"] = "minus",
-    ["_"] = "underscore",
-    ["="] = "equals",
-    ["+"] = "plus",
-    ["<"] = "less than",
-    [">"] = "greater than",
-    ["/"] = "slash",
-    ["\\"] = "backslash",
-    ["|"] = "vertical bar",
-    ["~"] = "tilde",
-    ["`"] = "backtick",
-    ["@"] = "at sign",
-    ["#"] = "pound sign",
-    ["$"] = "dollar sign",
-    ["%"] = "percent sign",
-    ["^"] = "caret",
-    ["&"] = "ampersand",
-    [" "] = "space",
+  char = {
+    name = {
+      ["\t"] = "tab",
+      ["\n"] = "newline",
+      [","] = "comma",
+      [";"] = "semicolon",
+      ["."] = "period",
+      [":"] = "colon",
+      ["!"] = "exclamation mark",
+      ["?"] = "question mark",
+      ["("] = "left parenthesis",
+      [")"] = "right parenthesis",
+      ["["] = "left bracket",
+      ["]"] = "right bracket",
+      ["{"] = "left brace",
+      ["}"] = "right brace",
+      ["'"] = "single quote",
+      ['"'] = "double quote",
+      ["*"] = "asterisk",
+      ["-"] = "minus",
+      ["_"] = "underscore",
+      ["="] = "equals",
+      ["+"] = "plus",
+      ["<"] = "less than",
+      [">"] = "greater than",
+      ["/"] = "slash",
+      ["\\"] = "backslash",
+      ["|"] = "vertical bar",
+      ["~"] = "tilde",
+      ["`"] = "backtick",
+      ["@"] = "at sign",
+      ["#"] = "pound sign",
+      ["$"] = "dollar sign",
+      ["%"] = "percent sign",
+      ["^"] = "caret",
+      ["&"] = "ampersand",
+      [" "] = "space",
+    }
   },
-  normalizing_modmap = {
-    c = "cmd",
-    cmd = "cmd",
-    ["⌘"] = "cmd",
-    a = "alt",
-    alt = "alt",
-    ["⌥"] = "alt",
-    s = "shift",
-    shift = "shift",
-    ["⇧"] = "shift",
-    ct = "ctrl",
-    ctrl = "ctrl",
-    ["⌃"] = "ctrl",
-    f = "fn",
-    fn = "fn",
+  mod = {
+    symbol = {
+      cmd = "⌘",
+      alt = "⌥",
+      shift = "⇧",
+      ctrl = "⌃",
+      fn = "fn",
+    }
   },
-  mod_symbolmap = {
-    cmd = "⌘",
-    alt = "⌥",
-    shift = "⇧",
-    ctrl = "⌃",
-    fn = "fn",
-  },
-  normalizing_dt_component_map = {
-    S = "second",
-    sec = "second",
-    secs = "second",
-    second = "second",
-    seconds = "second",
-    [1] = "second", -- 1 second
-    ["6."] = "second", -- sixth component of a rf3339 date
-    ["%S"] = "second",
-    M = "minute",
-    min = "minute",
-    mins = "minute",
-    minute = "minute",
-    minutes = "minute",
-    [60] = "minute",
-    ["5."] = "minute", 
-    ["%M"] = "minute",
-    H = "hour",
-    hour = "hour",
-    hours = "hour",
-    [3600] = "hour",
-    ["4."] = "hour",
-    ["%H"] = "hour",
-    d = "day",
-    day = "day",
-    days = "day",
-    [86400] = "day",
-    ["3."] = "day",
-    ["%d"] = "day",
-    w = "week",
-    week = "week",
-    weeks = "week",
-    [604800] = "week",
-    ["%w"] = "week",
-    m = "month",
-    month = "month",
-    months = "month",
-    [2592000] = "month",
-    ["2."] = "month",
-    ["%m"] = "month",
-    y = "year",
-    year = "year",
-    years = "year",
-    [31536000] = "year",
-    ["1."] = "year",
-    ["%y"] = "year",
-  },
-  normalizers = {
+  normalize = {
     extension = {
       jpeg = "jpg",
       jpg = "jpg",
@@ -192,103 +132,274 @@ processors = {
       yaml = "yaml",
       markdown = "md",
       md = "md",
+    },
+    mod = {
+      c = "cmd",
+      cmd = "cmd",
+      ["⌘"] = "cmd",
+      a = "alt",
+      alt = "alt",
+      ["⌥"] = "alt",
+      s = "shift",
+      shift = "shift",
+      ["⇧"] = "shift",
+      ct = "ctrl",
+      ctrl = "ctrl",
+      ["⌃"] = "ctrl",
+      f = "fn",
+      fn = "fn",
+    },
+    dt_component = {
+      S = "second",
+      sec = "second",
+      secs = "second",
+      second = "second",
+      seconds = "second",
+      [1] = "second", -- 1 second
+      ["6."] = "second", -- sixth component of a rf3339 date
+      ["%S"] = "second",
+      M = "minute",
+      min = "minute",
+      mins = "minute",
+      minute = "minute",
+      minutes = "minute",
+      [60] = "minute",
+      ["5."] = "minute", 
+      ["%M"] = "minute",
+      H = "hour",
+      hour = "hour",
+      hours = "hour",
+      [3600] = "hour",
+      ["4."] = "hour",
+      ["%H"] = "hour",
+      d = "day",
+      day = "day",
+      days = "day",
+      [86400] = "day",
+      ["3."] = "day",
+      ["%d"] = "day",
+      w = "week",
+      week = "week",
+      weeks = "week",
+      [604800] = "week",
+      ["%w"] = "week",
+      m = "month",
+      month = "month",
+      months = "month",
+      [2592000] = "month",
+      ["2."] = "month",
+      ["%m"] = "month",
+      y = "year",
+      year = "year",
+      years = "year",
+      [31536000] = "year",
+      ["1."] = "year",
+      ["%y"] = "year",
+    },
+  },
+  dt_component = {
+    seconds = {
+      second = 1,
+      minute = 60,
+      hour = 60 * 60,
+      day = 60 * 60 * 24,
+      week = 60 * 60 * 24 * 7,
+      month = 60 * 60 * 24 * 30,
+      year = 60 * 60 * 24 * 365,
+    },
+    format_part = {
+      second = "%S",
+      minute = "%M",
+      hour = "%H",
+      day = "%d",
+      week = "%W",
+      month = "%m",
+      year = "%Y",
+    },
+    RFC3339_separator = {
+      year = "-",
+      month = "-",
+      day = "T",
+      hour = ":",
+      minute = ":",
+      second = "Z",
+    },
+    rfc3339 = {
+      year = "%Y",
+      month = "%Y-%m",
+      day = "%Y-%m-%d",
+      hour = "%Y-%m-%dT%H",
+      minute = "%Y-%m-%dT%H:%M",
+      second = "%Y-%m-%dT%H:%M:%SZ",
+    },
+  },
+  date_format_name = {
+    date_format = {
+      ["rfc3339-date"] = "%Y-%m-%d",
+      ["rfc3339-time"] = "%H:%M:%S",
+      ["rfc3339-datetime"] = "%Y-%m-%dT%H:%M:%SZ",
+      ["american-date"] = "%m/%d/%Y",
+      ["american-time"] = "%I:%M:%S %p",
+      ["american-datetime"] = "%m/%d/%Y %I:%M:%S %p",
+      ["german-date"] = "%d.%m.%Y",
+      ["german-time"] = "%H:%M:%S",
+      ["german-datetime"] = "%d.%m.%Y %H:%M:%S",
+      ["email"] = "%a, %d %b %Y %H:%M:%S %z"
+    },
+  },
+  mon1_int = {
+    weekday_en = {
+      [1] = "Monday",
+      [2] = "Tuesday",
+      [3] = "Wednesday",
+      [4] = "Thursday",
+      [5] = "Friday",
+      [6] = "Saturday",
+      [7] = "Sunday"
     }
+  } 
+}
+
+transf = {
+  hex = {
+    char = function(hex)
+      return string.char(tonumber(hex, 16))
+    end,
   },
-  dt_component_seconds_map = {
-    second = 1,
-    minute = 60,
-    hour = 60 * 60,
-    day = 60 * 60 * 24,
-    week = 60 * 60 * 24 * 7,
-    month = 60 * 60 * 24 * 30,
-    year = 60 * 60 * 24 * 365,
+  char = {
+    hex = function(char)
+      return string.format("%%%02X", string.byte(char))
+    end,
   },
-  dt_component_format_part_map = {
-    second = "%S",
-    minute = "%M",
-    hour = "%H",
-    day = "%d",
-    week = "%W",
-    month = "%m",
-    year = "%Y",
+  path = {
+    attachment = function(path)
+      local mimetype = mimetypes.guess(path) or "text/plain"
+      return "#" .. mimetype .. " " .. path
+    end,
   },
-  dt_component_RFC3339_separator_map = {
-    year = "-",
-    month = "-",
-    day = "T",
-    hour = ":",
-    minute = ":",
-    second = "Z",
-  },
-  rfc3339 = {
-    year = "%Y",
-    month = "%Y-%m",
-    day = "%Y-%m-%d",
-    hour = "%Y-%m-%dT%H",
-    minute = "%Y-%m-%dT%H:%M",
-    second = "%Y-%m-%dT%H:%M:%SZ",
-  },
-  date_format_map = {
-    ["rfc3339-date"] = "%Y-%m-%d",
-    ["rfc3339-time"] = "%H:%M:%S",
-    ["rfc3339-datetime"] = "%Y-%m-%dT%H:%M:%SZ",
-    ["american-date"] = "%m/%d/%Y",
-    ["american-time"] = "%I:%M:%S %p",
-    ["american-datetime"] = "%m/%d/%Y %I:%M:%S %p",
-    ["german-date"] = "%d.%m.%Y",
-    ["german-time"] = "%H:%M:%S",
-    ["german-datetime"] = "%d.%m.%Y %H:%M:%S",
-    ["email"] = "%a, %d %b %Y %H:%M:%S %z"
-  },
-  number_weekday_map = {
-    [1] = "Monday",
-    [2] = "Tuesday",
-    [3] = "Wednesday",
-    [4] = "Thursday",
-    [5] = "Friday",
-    [6] = "Saturday",
-    [7] = "Sunday"
+  string = {
+    escaped_csv_field = function(field)
+      return '"' .. rawreplace(field, {{'"', "\n"}, {'""', '\\n'}})  .. '"'
+    end
   }
 }
 
-processors.weekday_number_map = map(processors.number_weekday_map, returnAny, {"kv", "vk"})
 
+function resolveTilde(path)
+  return path:gsub("^~", env.HOME)
+end
 
---- @alias matcher string | {r: string} | "processor_table_keys"
+to = {
+  case = {
+    snake = {
+      cond = {
+        _r = "[^%w%d]",
+        _regex_engine = "eutf8",
+        _ignore_case = true,
+      },
+      mode = "replace",
+      proc = "_"
+    },
+    kebap = {
+      cond = {
+        _r = "[^%w%d]",
+        _regex_engine = "eutf8",
+        _ignore_case = true,
+      },
+      mode = "replace",
+      proc = "-"
+    }
+  }
+}
+
+map.weekday_en.mon1_int = map(map.mon1_int.weekday_en, returnAny, {"kv", "vk"})
+
 
 -- TODO replace custom matcher implementation here with `find`
 
---- @class replaceSpec
+--- @alias procSpec string | any[] | mapProcessor
+
+--- @class replaceOpts : splitOpts
+--- @field mode? "before" | "after" | "replace" | "remove"
+--- @field args kvmult
 --- @field cond? conditionSpec
---- @field matchall? boolean
---- @field processor? string | table | fun(str: string): string 
---- @field mode? "replace" | "prepend" | "append"
---- @field ignore_case? boolean
+--- @field proc? procSpec
 
---- @param str string | string[]
---- @param specs? replaceSpec | replaceSpec[]
---- @return string
-function rawreplace(str, specs)
-  if specs == nil then return str end
-  if type(specs) ~= "table" then specs = {specs} end
+--- @alias replaceSpec replaceOpts | (conditionSpec | procSpec)[]
+
+--- @generic T : indexable
+--- @param thing T
+--- @param opts? replaceOpts | replaceOpts[] | (conditionSpec[] | procSpec[])[]
+--- @param globalopts? replaceOpts
+--- @return T
+function rawreplace(thing, opts, globalopts)
+  if opts == nil then return thing end
+  opts = tablex.deepcopy(opts) or {}
+  if not isListOrEmptyTable(opts) then opts = {opts} end
+
+  --- allow for tr-like operation with two lists
+  if #opts == 2 and isListOrEmptyTable(opts[1]) and isListOrEmptyTable(opts[2]) then
+    local resolvedopts = {}
+    for i = 1, #opts[1] do
+      push(resolvedopts, {cond = opts[1][i], proc = opts[2][i]})
+    end
+  end
+
+  -- opts get set with the following precedence:
+  -- 1. opts on the current opt element
+  -- 2. opts on the globalopts
+  -- 3. opts of the previous opt element
+  -- 4. default opts
+  -- however, if the current opt has a proc of type table, then the cond will be overwritten unless it is explicitly set
+
+  globalopts = globalopts or {}
+  local mode, args, cond, proc, findopts = globalopts.mode, globalopts.args, globalopts.cond, globalopts.proc, globalopts.findopts
+  mode = defaultIfNil(mode, "before")
+  cond = defaultIfNil(cond, "\"")
+  proc = defaultIfNil(proc, "\\")
+
+  local res = thing
+  for _, opt in ipairs(opts) do
+    if isListOrEmptyTable(opt) and #opt == 2 then
+      opt = {cond = opt[1], proc = opt[2]}
+    end
+    matchall = defaultIfNil(opt.matchall, matchall)
+    mode = defaultIfNil(opt.mode, mode)
+    args = defaultIfNil(opt.args, args)
+    cond = defaultIfNil(opt.cond, cond)
+    proc = defaultIfNil(opt.proc, proc)
+
   
-  local res = str
-  for _, spec in ipairs(specs) do 
-    spec = tablex.deepcopy(spec) or {}
-    spec.processor = spec.processor or "\\"
-    spec.mode = spec.mode or "prepend"
-
-    if not spec.cond and type(spec.processor) == "table" then
-      spec.cond = {_list = keys(spec.processor)} -- if no condition is specified, use the keys of the processor table as the condition
+    if not opt.cond and type(proc) == "table" then
+      cond = {_list = keys(proc)} -- if no condition is specified, use the keys of the processor table as the condition
     end
-
-    if not isListOrEmptyTable(spec.cond) then
-      spec.cond = {spec.cond}
+  
+    local splitopts = {
+      mode = mode,
+      findopts = findopts
+    }
+    if splitopts.mode == "replace" then
+      splitopts.mode = "remove"
     end
-
-    for i, cond in ipairs(spec.cond) do
-      local matches = find
+    local parts, removed = split(res, cond, opts)
+    removed = map(removed, returnUnpack, {"v", "kv"})
+  
+    local sep
+    if mode == "replace" and not (type(proc) == "string" or isListOrEmptyTable(proc)) then -- we actually have to process the removed items to get the new items
+      sep = map(
+        removed,
+        proc,
+        {opts.args or "v", "v"}
+      )    
+    elseif mode == "remove" then
+      -- no-op
+    else
+      sep = opts.processor
     end
+    res = concat({
+      isopts = "isopts",
+      sep = sep,
+    }, parts)
   end
   return res
 end
@@ -303,28 +414,29 @@ function replace(str, type, ...)
   if type == "luaregex" then
     res = rawreplace(
       res, 
-      {cond = matchers.lua_metacharacters, processor = "%", mode = "prepend"}
+      {cond = mt._contains.lua_metacharacters, processor = "%", mode = "prepend"}
     )
   elseif type == "regex" then
     res = rawreplace(
       res, 
       {
-        {cond = matchers.regex_metacharacters, processor = "\\", mode = "prepend"},
-        {processor = matchers.odd_whitespace, mode = "replace" }
+        {cond = mt._contains.regex_metacharacters, processor = "\\", mode = "prepend"},
+        {processor = mt.whitespace.escaped, mode = "replace" }
       }
     )
   elseif type == "modsymbols" then 
     res = rawreplace(
       res, 
       {
-        { processor = processors.normalizing_modmap, mode = "replace" },
-        { processor = processors.mod_symbolmap, mode = "replace" }
+        { processor = map.normalize.mod, mode = "replace" },
+        { processor = map.mod_symbolmap, mode = "replace" }
       }
     )
   elseif type == "doi" then 
+    doi_prefix_variants = { "doi:", {_r = "(?:https?://)(?:dx.)doi.org/?" } },
     res = rawreplace(
       res, 
-      {cond = matchers.doi_prefix_variants, processor = "https://doi.org/", mode = "replace" }
+      {cond = mt.doi_prefix_variants, processor = "https://doi.org/", mode = "replace" }
     )
   elseif type == "urlencode" then
     res = rawreplace(
@@ -336,33 +448,6 @@ function replace(str, type, ...)
 end
 
 
----tr all chars in from to chars in to (1:1), similar to the cli tool `tr`
----@param s string
----@param from string
----@param to string
----@return string
-function stringTr(s, from, to)
-  for i = 1, #from do
-    s = eutf8.gsub(s, eutf8.sub(from, i, i), eutf8.sub(to, i, i))
-  end
-  return s
-end
-
----tr all chars in from to the same char(s) in to (n:1)
----@param s string
----@param from string
----@param to string
----@return string
-function stringTrAllToSame(s, from, to)
-  for i = 1, #from do
-    s = eutf8.gsub(s, eutf8.sub(from, i, i), to)
-  end
-  return s
-end
-
-local small_words = {
-  "a", "an", "and", "as", "at", "but", "by", "en", "for", "if", "in", "of", "on", "or", "the", "to", "v", "v.", "via", "vs", "vs."
-}
 
 ---@param word string
 ---@return string
@@ -427,11 +512,6 @@ function toBaseEncoding(str, base)
   return basexx["to_" .. base](str)
 end
 
---- @param c string character to encode
---- @return string
-char_to_hex = function(c)
-  return string.format("%%%02X", string.byte(c))
-end
 
 --- @param url string
 --- @param spaces_percent? boolean
@@ -441,7 +521,7 @@ function urlencode(url, spaces_percent)
     return ""
   end
   url = url:gsub("\n", "\r\n")
-  url = string.gsub(url, "([^%w _%%%-%.~])", char_to_hex)
+  url = string.gsub(url, "([^%w _%%%-%.~])", transf.char.hex)
   if spaces_percent then
     url = string.gsub(url, " ", "%%20")
   else
@@ -450,11 +530,7 @@ function urlencode(url, spaces_percent)
   return url
 end
 
---- @param x string
---- @return string
-hex_to_char = function(x)
-  return string.char(tonumber(x, 16))
-end
+
 
 --- @param url string
 --- @return string
@@ -463,7 +539,7 @@ urldecode = function(url)
     return ""
   end
   url = url:gsub("+", " ")
-  url = url:gsub("%%(%x%x)", hex_to_char)
+  url = url:gsub("%%(%x%x)", transf.hex.char)
   return url
 end
 
@@ -487,34 +563,6 @@ function extractDoi(str)
   return doi
 end
 
---- replace all chars not in pattern with sep, and remove consecutive, leading, trailing sep. Useful for converting strings to snake_case, kebab-case, etc.
---- @param str string
---- @param pattern string
---- @param sep string
---- @param mode "lower"|"upper"
-function toPatternSeparator(str, pattern, sep, mode)
-  local escaped_sep = escapeLuaMetacharacters(sep)
-  if mode == "lower" then
-    str = str:lower()
-  elseif mode == "upper" then
-    str = str:upper()
-  end
-  str = eutf8.gsub(str, "[^" .. pattern .. escaped_sep ..  "]", sep)
-  str = eutf8.gsub(str, escaped_sep .. "+", sep)
-  str = eutf8.gsub(str, "^" .. escaped_sep, "")
-  str = eutf8.gsub(str, escaped_sep .. "$", "")
-  return str
-end
-
---- @type fun(str: string): string
-toLowerAlphanumUnderscore = bind(toPatternSeparator, {["2"] = {"%w%d", "_", "lower"}})
---- @type fun(str: string): string
-toLowerAlphanumMinus = bind(toPatternSeparator, {["2"] = {"%w%d", "-", "lower"}})
---- @type fun(str: string): string
-toUpperAlphanumUnderscore = bind(toPatternSeparator, {["2"] = {"%w%d", "_", "upper"}})
---- @type fun(str: string): string
-toUpperAlphanumMinus = bind(toPatternSeparator, {["2"] = {"%w%d", "-", "upper"}})
-
 --- @param str string
 --- @return string
 function romanize(str)
@@ -535,23 +583,8 @@ end
 function romanizeToLowerAlphanumUnderscore(str)
   str = eutf8.gsub(str, "[%^']", "")
   str = romanize(str)
-  str = toLowerAlphanumUnderscore(str)
+  str = eutf8.lower(rawreplace(str, to.case.snake))
   return str
-end
-
---- @param path string
---- @return string
-function asAttach(path)
-  local mimetype = mimetypes.guess(path) or "text/plain"
-  return "#" .. mimetype .. " " .. path
-end
-
---- @param field string
---- @return string
-function escapeField(field)
-  local escaped_quotes = eutf8.gsub(field, '"', '""')
-  local escaped_newlines = eutf8.gsub(escaped_quotes, '\n', '\\n') -- not technically necessary for CSV, but so many implementations don't handle newlines properly that it's worth it
-  return '"' .. escaped_newlines  .. '"'
 end
 
 ---Ensure things related to adfixes
@@ -665,15 +698,11 @@ function changeCasePre(str, n, dir)
   return res
 end
 
-
---- @alias TransformSpecifier {value: string, presence: boolean, case_insensitive: boolean, adfix: "pre"|"suf"|"in"|nil, strip_after: boolean, regex: boolean}
-
---- @param str string
---- @param transform_specifiers TransformSpecifier[]
---- @return string
-function transformString(str, transform_specifiers)
-  for _, transform_specifier in ipairs(transform_specifiers) do
-    str = ensureAdfix(str, transform_specifier.value, transform_specifier.presence, transform_specifier.case_insensitive, transform_specifier.adfix, defaultIfNil(transform_specifier.strip_after, true), transform_specifier.regex)
-  end
-  return str
+--- try rewriting the above using rawreplace
+function changeCasePre(str, n, dir)
+  return rawreplace(str, {
+    mode = "replace",
+    cond = {_r = "^.{0," .. n .. "}"},
+    proc = dir == "up" and eutf8.upper or eutf8.lower
+  })
 end

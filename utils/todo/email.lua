@@ -77,7 +77,7 @@ function sendEmail(email_file, do_after)
       { value = email_file, type = "quoted" },
       "|",
       "msed",
-      { value = "/Date/a/"..os.date(processors.date_format_map.email, os.time()), type = "quoted" },
+      { value = "/Date/a/"..os.date(map.date_format_name.date_format.email, os.time()), type = "quoted" },
       "|",
       "msed",
       { value = "/Status/a/S/", type = "quoted" },

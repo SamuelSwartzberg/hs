@@ -15,7 +15,7 @@ function processDateSpecification(specifier, orig_date)
     dt = date_copy
   end
   if specifier.precision then
-    dt = dt:fmt(processors.rfc3339[processors.normalizing_dt_component_map[specifier.precision]])
+    dt = dt:fmt(map.dt_component.rfc3339[map.normalize.dt_component[specifier.precision]])
   end
   return dt
 end

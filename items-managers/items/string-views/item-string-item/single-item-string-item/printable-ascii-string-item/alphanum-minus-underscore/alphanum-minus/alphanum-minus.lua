@@ -5,10 +5,10 @@ AlphanumMinusItemSpecifier = {
   type = "alphanum-minus-item",
   properties = {
     getables = {
-      ["is-isbn"] = function(self) return memoize(onig.find)(self:get("contents"), whole(matchers.id.isbn._r)) end,
-      ["is-issn"] = function(self) return memoize(onig.find)(self:get("contents"), whole(matchers.id.issn._r)) end,
+      ["is-isbn"] = function(self) return memoize(onig.find)(self:get("contents"), whole(mt._r.id.isbn)) end,
+      ["is-issn"] = function(self) return memoize(onig.find)(self:get("contents"), whole(mt._r.id.issn)) end,
       ["is-uuid"] = function(self)
-        return onig.find(self:get("contents"), whole(matchers.id.uuid._r), 1, "i")
+        return onig.find(self:get("contents"), whole(mt._r.id.uuid), 1, "i")
       end,
       ["is-package-manager"] = function(self)
         return find(lines(

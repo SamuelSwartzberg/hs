@@ -1,12 +1,3 @@
-
-
-remote = function(path)
-  return select(2, resolve({s=path, t = {prefix = "hsftp:", root = ""}}))
-end
-fshttp = function(path)
-  return select(2, resolve({s=path, t = {prefix = env.FS_HTTP_SERVER, root = ""}}))
-end
-
 ---syncs files to and from the remote server using rclone
 ---@param path string
 ---@param push_or_pull "push"|"pull"
@@ -33,4 +24,3 @@ function syncHomeRelativePath(path, push_or_pull, action)
     { value = dest, type = "quoted" },
   }, true)
 end
-

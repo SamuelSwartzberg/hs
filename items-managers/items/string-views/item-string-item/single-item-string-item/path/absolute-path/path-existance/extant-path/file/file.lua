@@ -49,7 +49,7 @@ FileItemSpecifier = {
         writeFile(self:get("contents"), "", "exists")
       end,
       ["send-in-email"] = function(self, do_after)
-        sendEmailInteractive({}, asAttach(self:get("contents")), editorEditFunc, do_after)
+        sendEmailInteractive({}, transf.path.attachment(self:get("contents")), editorEditFunc, do_after)
       end,
       ["edit-file-interactive"] = function(self, do_after)
         run({

@@ -37,7 +37,7 @@ PlaintextTableFileItemSpecifier = {
       end,
       ["rows-to-lines"] = function(self, rows)
         return map(rows, function(row)
-          return table.concat(map(row, escapeField), self:get("field-separator"))
+          return table.concat(map(row, transf.string.escaped_csv_field), self:get("field-separator"))
         end)
       end,
     },
@@ -53,7 +53,7 @@ PlaintextTableFileItemSpecifier = {
         local rows = self:get("read-to-rows") or {}
         local field_sep = self:get("field-separator")
         for key, fields in pairs(assoc_arr) do 
-          local line = escapeField(key) .. field_sep .. table.concat(map(fields, escapeField), field_sep)
+          local line = transf.string.escaped_csv_field(key) .. field_sep .. table.concat(map(fields, transf.string.escaped_csv_field), field_sep)
           table.insert(rows, line)
         end
         table.sort(rows)

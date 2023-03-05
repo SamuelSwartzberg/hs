@@ -31,7 +31,7 @@ FirefoxItemSpecifier = {
         return state
       end,
       ["backup-interval"] = function(self)
-        return 5 * processors.dt_component_seconds_map["minute"]
+        return 5 * map.dt_component.seconds["minute"]
       end,
     },
     doThisables = {

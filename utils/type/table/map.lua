@@ -15,9 +15,11 @@
 --- @field treat_as_leaf "assoc" | "list" | false
 --- @field mapcondition conditionSpec TODO NOT USED YET
 
+--- @alias mapProcessor function | {_k: string | string[], _ret?: "orig" | nil} | {_f: string} | table | string
+
 --- @generic OT : string | number | boolean | nil
 --- @param tbl table | `OT`
---- @param f? function | {_k: string | string[], _ret?: "orig" | nil} | {_f: string} | table | string
+--- @param f? mapProcessor
 --- @param opts? kvmult | kvmult[] | mapOpts
 --- @return table | OT
 function map(tbl, f, opts)

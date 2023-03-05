@@ -158,10 +158,10 @@ StringKeyTableSpecifier = {
         return self:get("all-keys-are-in-list", {"type", "format", "quality", "resize", "result"})
       end,
       ["is-tree-node-key-table"] = function(self)
-        return self:get("all-keys-are-in-list", {"pos", "children", "parent", "text", "tag", "attrs", "cdata"})
+        return self:get("all-keys-are-in-list", mt._list.tree_node_keys)
       end,
       ["is-env-var-key-table"] = function(self)
-        return not find(self:get("keys"), {_r = whole(matchers.case.upper_snake._r), _invert = true}, "boolean") == nil
+        return not find(self:get("keys"), {_r = whole(mt._r.case.upper_snake), _invert = true}, "boolean") == nil
       end,
       ["is-menu-item-key-table"] = function(self)
         return self:get("all-keys-are-in-list", {"path", "application", "AXTitle", "AXEnabled", "AXRole", "AXMenuItemMarkChar", "AXMenuItemCmdChar", "AXMenuItemCmdModifiers", "AXMenuItemCmdGlyph"})

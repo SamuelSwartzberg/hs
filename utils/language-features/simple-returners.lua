@@ -133,3 +133,10 @@ end
 function whole(regex)
   return "^" .. regex .. "$"
 end
+
+--- @generic T
+--- @param arg T[]
+--- @return ...T
+function returnUnpack(arg)
+  return table.unpack(arg)
+end

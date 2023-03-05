@@ -8,6 +8,9 @@
 --- @field _exactly? string
 --- @field _invert? boolean
 --- @field _list? any[]
+--- @field _ignore_case? boolean
+--- @field _only_if_all? boolean
+--- @field _regex_engine? "onig" | "eutf8"
 
 
 --- @alias conditionThatCantBeConfusedForListOfConditions boolean | string | table | condition | function
@@ -77,18 +80,44 @@ function findsingle(item, conditions, opts)
 
       local found_other_use_for_table = false
 
+      -- nocase management
+
+      local item_maybe_nocase = item
+      if condition._ignore_case then
+        item_maybe_nocase = eutf8.lower(item)
+      end
+
+      function lowerIfNecessary(str)
+        if condition._ignore_case then
+          return eutf8.lower(str)
+        else
+          return str
+        end
+      end
+
       if condition._r or condition._start or condition._stop then
         if type(item) == "string" then
           if condition._r then -- regex
-            local start, stop, match = onig.find(item, condition._r)
-            push(results, getres(start, start, match))
+            condition._regex_engine = condition._regex_engine or "onig"
+            local start, stop, matched = _G[condition._regex_engine].find(item, condition._r, 1, condition._ignore_case and "i" or nil)
+            local match = start ~= nil
+            if condition._only_if_all then
+              match = match and #matched == #item
+            end
+            push(results, getres(start, start, matched))
           end
           if condition._start then -- starts with
-            local match = stringy.startswith(item, condition._start)
+            local match = stringy.startswith(item_maybe_nocase, lowerIfNecessary(condition._start))
+            if condition._only_if_all then
+              match = match and #condition._start == #item
+            end
             push(results, getres(match, 1, condition._start))
           end
           if condition._stop then -- ends with
-            local match = stringy.endswith(item, condition._stop)
+            local match = stringy.endswith(item_maybe_nocase, lowerIfNecessary(condition._stop))
+            if condition._only_if_all then
+              match = match and #condition._stop == #item
+            end
             push(results, getres(match, #item - #condition._stop + 1, condition._stop))
           end
           found_other_use_for_table = true
@@ -101,24 +130,30 @@ function findsingle(item, conditions, opts)
       end
       if condition._type then -- type
         local match = type(item) == condition._type
+        -- _only_if_all guaranteed to be true here if match is, so no check needed
         push(results, getres(match, 1, item))
         found_other_use_for_table = true
       end
       if condition._exactly then -- exactly
-        local match = item == condition._exactly
+        local match = item_maybe_nocase == lowerIfNecessary(condition._exactly)
+        -- _only_if_all guaranteed to be true here if match is, so no check needed
         push(results, getres(match, 1, item))
         found_other_use_for_table = true
       end
       if condition._contains then -- contains
-        local start = stringy.find(item, condition._contains)
-        push(results, getres(start, start, condition._contains))
+        local start = stringy.find(item_maybe_nocase, lowerIfNecessary(condition._contains))
+        local match = start ~= nil
+        if condition._only_if_all then
+          match = match and #item_maybe_nocase == #condition._contains
+        end
+        push(results, getres(match, start, condition._contains))
         found_other_use_for_table = true
       end
 
       if condition._list or not found_other_use_for_table then
         local list = condition._list or condition
         for _, listitem in ipairs(list) do
-          local match = item == listitem
+          local match = item_maybe_nocase == lowerIfNecessary(listitem)
           if match then
             push(results, getres(match, 1, item))
             break

@@ -100,7 +100,7 @@ OmegatProjectDirItemSpecifier = {
       ["rechnung-email"] = function(self)
         local d = self:get("data-object")
         local email = le(comp.documents.translation.rechnung_email_de, d)
-        email = email .. "\n\n" .. asAttach(self:get("rechnung-pdf-path"))
+        email = email .. "\n\n" .. transf.path.attachment(self:get("rechnung-pdf-path"))
         return email
       end,
       ["is-actually-project-dir"] = returnTrue,

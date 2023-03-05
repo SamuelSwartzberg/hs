@@ -38,7 +38,7 @@ function pathSlice(path, spec, opts)
     end
 
     if opts.standartize_ext then
-      extension = processors.normalizers.extension[extension] or extension
+      extension = map.normalize.extension[extension] or extension
     end
 
     push(raw_path_components, without_extension)

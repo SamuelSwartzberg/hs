@@ -281,7 +281,7 @@ doWithTempFile({contents = "foo"}, function(tmp_file)
 end)
 
 assertMessage(
-  asAttach(env.PROFILEFILE),
+  transf.path.attachment(env.PROFILEFILE),
   "#text/plain " .. env.PROFILEFILE
 )
 

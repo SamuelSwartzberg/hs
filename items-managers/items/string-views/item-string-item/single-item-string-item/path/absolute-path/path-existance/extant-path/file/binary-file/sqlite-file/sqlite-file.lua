@@ -4,7 +4,7 @@ SqliteFileItemSpecifier = {
   properties = {
     getables = {
       ["get-export-csv-filename"] = function(self, query)
-        return self:get("leaf-without-extension") .. "_" .. toLowerAlphanumUnderscore(query) .. ".csv"
+        return self:get("leaf-without-extension") .. "_" .. eutf8.lower(rawreplace(query, to.case.snake)) .. ".csv"
       end,
       ["get-export-csv-path"]  = function(self, query)
         return env.TMPDIR .. "/" .. self:get("get-export-csv-filename", query)

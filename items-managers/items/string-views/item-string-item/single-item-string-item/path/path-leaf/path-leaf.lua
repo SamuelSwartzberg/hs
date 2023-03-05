@@ -44,7 +44,7 @@ PathLeafSpecifier = {
         if not memoize(onig.match)(path_leaf,"^\\d") then return false end 
         local date_part = memoize(stringx.split)(path_leaf, "--")[1]
         local parts = memoize(stringx.split)(date_part, "_to_")
-        return memoize(onig.find)(parts[1],  whole(matchers.date.rfc3339._r)) and (not parts[2] or memoize(onig.find)(parts[2],  whole(matchers.date.rfc3339._r)))
+        return memoize(onig.find)(parts[1],  whole(mt._r.date.rfc3339._r)) and (not parts[2] or memoize(onig.find)(parts[2],  whole(mt.date.rfc3339)))
       end,
       ["is-path-leaf-general-name"] = function(self) 
         local path_leaf =  self:get("path-leaf")
