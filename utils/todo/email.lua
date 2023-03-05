@@ -2,7 +2,7 @@
 --- @param header_value string
 --- @return string
 function buildEmailHeader(header_name, header_value)
-  return string.format("%s: %s", firstCharToUpper(header_name), le(header_value))
+  return string.format("%s: %s", changeCasePre(header_name), le(header_value))
 end
 
 
@@ -26,7 +26,7 @@ end
 
 function buildEmailHeaders2(headers)
   return stringx.join("\n", listSort(map(headers, function(value, key)
-    return false, ("%s: %s"):format(firstCharToUpper(key), le(value))
+    return false, ("%s: %s"):format(changeCasePre(key), le(value))
   end), function (a, b)
     return find()
   end))
@@ -77,7 +77,7 @@ function sendEmail(email_file, do_after)
       { value = email_file, type = "quoted" },
       "|",
       "msed",
-      { value = "/Date/a/"..os.date(map.date_format_name.date_format.email, os.time()), type = "quoted" },
+      { value = "/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time()), type = "quoted" },
       "|",
       "msed",
       { value = "/Status/a/S/", type = "quoted" },

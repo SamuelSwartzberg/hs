@@ -5,7 +5,7 @@ GeneralBase64ItemSpecifier = {
     getables = {
       ["is-base-64"] = returnTrue,
       ["decode-general-base-64"] = function(self)
-        return fromBaseEncoding(self:get("contents"), "base64")
+        return transf.string.base64_gen(self:get("contents"))
       end,
       ["decode-base-64"] = function(self) return self:get("decode-general-base-64") end
     }

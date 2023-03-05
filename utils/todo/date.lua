@@ -15,7 +15,7 @@ function processDateSpecification(specifier, orig_date)
     dt = date_copy
   end
   if specifier.precision then
-    dt = dt:fmt(map.dt_component.rfc3339[map.normalize.dt_component[specifier.precision]])
+    dt = dt:fmt(tblmap.dt_component.rfc3339[tblmap.normalize.dt_component[specifier.precision]])
   end
   return dt
 end

@@ -64,7 +64,7 @@ mt = {
   }
 }
 
-map = {
+tblmap = {
   whitespace = {
     escaped = {
       ["\n"] = "\\n",
@@ -280,6 +280,47 @@ transf = {
   string = {
     escaped_csv_field = function(field)
       return '"' .. rawreplace(field, {{'"', "\n"}, {'""', '\\n'}})  .. '"'
+    end,
+    bits = basexx.to_bit,
+    hex = basexx.to_hex,
+    base64_gen = basexx.to_base64,
+    base64_url = basexx.to_url64,
+    base32_gen = basexx.to_base32,
+    base32_crock = basexx.to_crockford,
+    title_case = function(str)
+      local words, removed = split(str, {_r = "[ :–\\—\\-\\t\\n]", _regex_engine = "eutf8"})
+      local title_cased_words = map(words, transf.word.title_case_policy)
+      title_cased_words[1] = changeCasePre(title_cased_words[1])
+      title_cased_words[#title_cased_words] = changeCasePre(title_cased_words[#title_cased_words])
+      return concat({
+        isopts = "isopts",
+        sep = removed,
+      }, title_cased_words)
+    end,
+    romanized = function(str)
+      local raw_romanized = run(
+        { "echo", "-n",  {value = str, type = "quoted"}, "|", "kakasi", "-iutf8", "-outf8", "-ka", "-Ea", "-Ka", "-Ha", "-Ja", "-s", "-ga" }
+      )
+      local is_ok, romanized = pcall(eutf8.gsub, raw_romanized, "(%w)%^", "%1%1")
+      if not is_ok then
+        return str -- if there's an error, just return the original string
+      end
+      rawreplace(romanized, {{"(kigou)", "'"}, {}}, {
+        mode = "remove",
+      })
+      return romanized
+    end
+
+  },
+  word = {
+    title_case_policy = function(word)
+      if find(mt._contains.small_words, word) then
+        return word
+      elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
+        return word
+      else
+        return changeCasePre(word)
+      end
     end
   }
 }
@@ -308,11 +349,32 @@ to = {
       },
       mode = "replace",
       proc = "-"
+    },
+    capitalized = {
+      mode = "replace",
+      cond = {_r = "^."},
+      proc = eutf8.upper
     }
-  }
+  },
+  url = {
+    decoded = {
+      {
+        mode = "replace",
+        cond = {_r = "%%(%x%x)", _regex_engine = "eutf8"},
+        proc = transf.char.hex
+      },
+      {
+        mode = "replace",
+        cond = " ",
+        proc = "+"
+      }
+    }
+  },
 }
 
-map.weekday_en.mon1_int = map(map.mon1_int.weekday_en, returnAny, {"kv", "vk"})
+
+
+tblmap.weekday_en.mon1_int = map(tblmap.mon1_int.weekday_en, returnAny, {"kv", "vk"})
 
 
 -- TODO replace custom matcher implementation here with `find`
@@ -414,22 +476,22 @@ function replace(str, type, ...)
   if type == "luaregex" then
     res = rawreplace(
       res, 
-      {cond = mt._contains.lua_metacharacters, processor = "%", mode = "prepend"}
+      {{mt._contains.lua_metacharacters, "%"}}
     )
   elseif type == "regex" then
     res = rawreplace(
       res, 
       {
-        {cond = mt._contains.regex_metacharacters, processor = "\\", mode = "prepend"},
-        {processor = mt.whitespace.escaped, mode = "replace" }
+        {cond = { _contains = mt._contains.regex_metacharacters}, proc = "\\", mode = "before"},
+        {processor = mt._contains.whitespace.escaped, mode = "replace" }
       }
     )
   elseif type == "modsymbols" then 
     res = rawreplace(
       res, 
       {
-        { processor = map.normalize.mod, mode = "replace" },
-        { processor = map.mod_symbolmap, mode = "replace" }
+        { processor = tblmap.normalize.mod, mode = "replace" },
+        { processor = tblmap.mod_symbolmap, mode = "replace" }
       }
     )
   elseif type == "doi" then 
@@ -446,72 +508,6 @@ function replace(str, type, ...)
   end
   return res
 end
-
-
-
----@param word string
----@return string
-function firstCharToUpper(word)
-  local index_of_first_letter = eutf8.find(word, "%a")
-  if index_of_first_letter then
-    local first_letter = eutf8.sub(word, index_of_first_letter, index_of_first_letter)
-    local rest_of_word = eutf8.sub(word, index_of_first_letter + 1)
-    return eutf8.upper(first_letter) .. rest_of_word
-  else
-    return word
-  end
-end
-
----@param word string
----@return string
-function titleCaseWordNoContext(word)
-  if find(small_words, word) then
-    return word
-  elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
-    return word
-  else
-    return firstCharToUpper(word)
-  end
-end
-
----@param str string
----@return string
-function toTitleCase(str)
-  local words = split(str, {_r = "[ :\\–\\—\\-\\t\\n]"})
-  local title_cased_words = map(words, titleCaseWordNoContext)
-  title_cased_words[1] = firstCharToUpper(title_cased_words[1])
-  title_cased_words[#title_cased_words] = firstCharToUpper(title_cased_words[#title_cased_words])
-  -- it would be tempting to think that we could just join the words with a space, but that would normalize all word separators to spaces, which is not what we want, so we have to search for the correct occurrence of the non-capitalized word and replace it with the capitalized version
-  local current_position_in_str = 1
-  local original_str_lower = eutf8.lower(str)
-  for index, word in ipairs(words) do
-    local word_lower = eutf8.lower(word)
-    local word_position_in_str = eutf8.find(original_str_lower, word_lower, current_position_in_str, true)
-    if word_position_in_str then
-      str = eutf8.sub(str, 1, word_position_in_str - 1) .. title_cased_words[index] .. eutf8.sub(str, word_position_in_str + #word_lower)
-      current_position_in_str = word_position_in_str + #title_cased_words[index]
-    else 
-      error("Capitalized word is somehow not in the original string")
-    end
-    
-  end
-  return str
-end
-
----@param str string
----@param base string
----@return string
-function fromBaseEncoding(str, base)
-  return basexx["from_" .. base](str)
-end
-
----@param str string
----@param base string
----@return string
-function toBaseEncoding(str, base)
-  return basexx["to_" .. base](str)
-end
-
 
 --- @param url string
 --- @param spaces_percent? boolean
@@ -532,16 +528,6 @@ end
 
 
 
---- @param url string
---- @return string
-urldecode = function(url)
-  if url == nil then
-    return ""
-  end
-  url = url:gsub("+", " ")
-  url = url:gsub("%%(%x%x)", transf.hex.char)
-  return url
-end
 
 --- @param doi string
 --- @return string
@@ -557,32 +543,9 @@ end
 
 --- @param str string
 --- @return string
-function extractDoi(str)
-  local str_lower = eutf8.lower(str)
-  local doi = eutf8.match(str_lower, "10%d%d%d%d%d?%d?%d?%d?%d?/[-._;()/:A-Z0-9]+")
-  return doi
-end
-
---- @param str string
---- @return string
-function romanize(str)
-  local raw_romanized = run(
-    { "echo", "-n",  {value = str, type = "quoted"}, "|", "kakasi", "-iutf8", "-outf8", "-ka", "-Ea", "-Ka", "-Ha", "-Ja", "-s", "-ga" }
-  )
-  local is_ok, romanized = pcall(eutf8.gsub, raw_romanized, "(%w)%^", "%1%1")
-  if not is_ok then
-    return str -- if there's an error, just return the original string
-  end
-  romanized = eutf8.gsub(romanized, "(kigou)", "")
-  romanized = eutf8.gsub(romanized, "'", "")
-  return romanized
-end
-
---- @param str string
---- @return string
 function romanizeToLowerAlphanumUnderscore(str)
   str = eutf8.gsub(str, "[%^']", "")
-  str = romanize(str)
+  str = transf.string.romanized(str)
   str = eutf8.lower(rawreplace(str, to.case.snake))
   return str
 end
@@ -677,32 +640,4 @@ function ensureAdfix(in_str, in_adfix, presence, case_insensitive, adfix_type, s
     res = stringy.strip(res)
   end
   return res
-end
-
----@param str string
----@param n? integer
----@param dir? "up"| "down"
----@return string
-function changeCasePre(str, n, dir)
-  n = n or 1
-  dir = dir or "up"
-  local casefunc
-  if dir == "up" then
-    casefunc = eutf8.upper
-  elseif dir == "down" then
-    casefunc = eutf8.lower
-  else
-    error("Invalid direction: " .. tostring(dir))
-  end
-  local res = casefunc(eutf8.sub(str, 1, n)) .. eutf8.sub(str, n + 1)
-  return res
-end
-
---- try rewriting the above using rawreplace
-function changeCasePre(str, n, dir)
-  return rawreplace(str, {
-    mode = "replace",
-    cond = {_r = "^.{0," .. n .. "}"},
-    proc = dir == "up" and eutf8.upper or eutf8.lower
-  })
 end

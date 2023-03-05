@@ -1,4 +1,4 @@
-local format_map = map.date_format_name.date_format
+local format_map = tblmap.date_format_name.date_format
 local formats = keys(format_map)
 local format_array = CreateArray(formats)
 

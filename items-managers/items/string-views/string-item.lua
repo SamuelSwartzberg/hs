@@ -66,7 +66,7 @@ StringItemSpecifier = {
         return CreateShellCommand("uni"):get("identify", self:get("contents"))
       end,
       ["encoded-as"] = function(self, enc)
-        return toBaseEncoding(self:get("contents"), enc)
+        return transf.string[enc](self:get("contents"))
       end,
       ["escaped-general-regex"] = function(self)
         return replace(self:get("contents"), "regex")
@@ -97,7 +97,7 @@ StringItemSpecifier = {
       ["template-evaluated-contents"] = function (self)
         return le(self:get("contents"))
       end,
-      ["contents-romanized"] = function (self) return romanize(self:get("contents")) end,
+      ["contents-romanized"] = function (self) return transf.string.romanized(self:get("contents")) end,
       ["contents-as-romanized-snake-case-string"] = function(self)
         return romanizeToLowerAlphanumUnderscore(self:get("contents"))
       end,
@@ -133,7 +133,7 @@ StringItemSpecifier = {
         return res
       end,
       ["to-title-case"] = function(self)
-        return toTitleCase(self:get("contents"))
+        return transf.string.title_case(self:get("contents"))
       end,
       ["events-matching-search"] = function(self)
         return CreateShellCommand("khal"):get("search-events-items", {searchstr = self:get("fold")})
@@ -274,7 +274,7 @@ StringItemSpecifier = {
       description = "binec",
       emoji_icon = "🅱️2️⃣📦",
       key = "encoded-as",
-      args = "bit"
+      args = "bits"
     }, {
       description = "hexec",
       emoji_icon = "🅱️1️⃣6️⃣📦",
@@ -284,22 +284,22 @@ StringItemSpecifier = {
       description = "urlb64ec",
       emoji_icon = "🔗🅱️6️⃣4️⃣📦",
       key = "encoded-as",
-      args = "url_64"
+      args = "base64_url"
     }, {
       description = "genb64ec",
       emoji_icon = "🤝🅱️6️⃣4️⃣📦",
       key = "encoded-as",
-      args = "base_64"
+      args = "base64_gen"
     }, {
       description = "crc32ec",
       emoji_icon = "👴🏻🅱️3️⃣2️⃣📦",
       key = "encoded-as",
-      args = "crockford"
+      args = "base32_crock"
     }, {
       description = "gen32ec",
       emoji_icon = "🤝🅱️3️⃣2️⃣📦",
       key = "encoded-as",
-      args = "base_32"
+      args = "base32_gen"
     }, {
       description = "escrgx",
       emoji_icon = "🏃🏾‍♀️🧩",

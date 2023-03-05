@@ -162,7 +162,7 @@ function doInput(series_specifier, do_after)
       slice(parsed_series_specifier.keys, 1, -2),
       {
         matcher = "matcher_table_keys",
-        processor = map.modmap,
+        processor = tblmap.modmap,
         must_match_entire_string = true
       }
     )

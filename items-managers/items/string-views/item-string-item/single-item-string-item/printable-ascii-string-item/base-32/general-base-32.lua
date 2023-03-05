@@ -5,7 +5,7 @@ GeneralBase32ItemSpecifier = {
     getables = {
       ["is-base-32"] = returnTrue,
       ["decode-general-base-32"] = function(self)
-        return fromBaseEncoding(self:get("contents"), "base32")
+        return transf.string.base32_gen(self:get("contents"))
       end,
       ["decode-base-32"] = function(self) return self:get("decode-general-base-32") end
     }

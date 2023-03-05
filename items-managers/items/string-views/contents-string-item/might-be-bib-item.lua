@@ -7,7 +7,7 @@ MightBeBibItemSpecifier = {
         return slice(self:get("contents"), "url = \\{", "\\}")
       end,
       ["to-citable-object-id"] = function(self)
-        return CreateStringItem(toBaseEncoding(self:get("bib-url"), "url_64"))
+        return CreateStringItem(transf.string.base64_url(self:get("bib-url")))
       end,
     },
     doThisables = {

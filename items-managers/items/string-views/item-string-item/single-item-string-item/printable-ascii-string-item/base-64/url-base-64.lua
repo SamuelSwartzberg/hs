@@ -6,7 +6,7 @@ UrlBase64ItemSpecifier = {
       ["is-base-64"] = returnTrue,
       ["is-citable-object-id"] = returnTrue,
       ["decode-url-base-64"] = function(self)
-        return fromBaseEncoding(self:get("contents"), "url64")
+        return transf.string.base64_url(self:get("contents"))
       end,
       ["decode-base-64"] = function(self) return self:get("decode-url-base-64") end
     }

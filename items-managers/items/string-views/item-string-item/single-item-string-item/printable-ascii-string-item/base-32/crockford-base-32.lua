@@ -5,7 +5,7 @@ CrockfordBase32ItemSpecifier = {
     getables = {
       ["is-base-32"] = returnTrue,
       ["decode-crockford-base-32"] = function(self)
-        return fromBaseEncoding(self:get("contents"), "crockford")
+        return transf.string.base32_crock(self:get("contents"))
       end,
       ["decode-base-32"] = function(self) return self:get("decode-crockford-base-32") end
     }

@@ -31,7 +31,7 @@ FirefoxItemSpecifier = {
         return state
       end,
       ["backup-interval"] = function(self)
-        return 5 * map.dt_component.seconds["minute"]
+        return 5 * tblmap.dt_component.seconds["minute"]
       end,
     },
     doThisables = {

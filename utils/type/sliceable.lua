@@ -286,9 +286,10 @@ end
 
 
 --- @generic T : indexable
+--- @generic O : indexable
 --- @param opts? concatOpts
 --- @param ... T
---- @return T
+--- @return O -- concat return may have the same type as its input, but it may also change type, as in the case of concating a list of strings
 function concat(opts, ...)
   local inputs = {...}
   if not opts then return {} end
