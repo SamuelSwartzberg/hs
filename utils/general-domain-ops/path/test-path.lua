@@ -22,7 +22,7 @@ function testPath(path, opts)
     opts = tablex.deepcopy(opts)
   end
   path = path or env.HOME
-  path = resolveTilde(path)
+  path = transf.string.tilde_resolved(path)
   local remote = pathIsRemote(path)
 
   local results = {}

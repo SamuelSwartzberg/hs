@@ -23,7 +23,7 @@ SystemSpecifier = {
       ["all-devices-of-type-audiodevice-array"] = function(self, subtype)
         return CreateArray(map(
           values(
-            hs.audiodevice["all" .. changeCasePre(subtype, 1, "up") .. "Devices"]()
+            hs.audiodevice["all" .. replace(subtype, to.case.capitalized) .. "Devices"]()
           ),
           bind(CreateAudiodeviceItem, {["2"] = subtype })
         ))

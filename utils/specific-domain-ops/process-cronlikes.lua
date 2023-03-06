@@ -5,18 +5,17 @@ function processSetupDirectivesInFiles(path)
   for _, child in ipairs(itemsInPath({path = path, include_dirs = false})) do
     logFile("processSetupDirectivesInFiles", child)
     local basename = pathSlice(child, "-1:-1")[1]
-    local command = changeCasePre(
+    local command = replace(
       table.concat(
         map(
           stringy.split(basename, "-"),
           function (part)
-            return changeCasePre(part, 1, "up")
+            return replace(part, to.case.capitalized)
           end
         ), 
         ""
       ),
-      1,
-      "down"
+      to.case.notcapitalized
     )
     local contents = run({ "envsubst", "<", child })
     for line in stringx.lines(contents) do

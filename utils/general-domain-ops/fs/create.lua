@@ -1,7 +1,7 @@
 --- @param path string
 --- @param slice? sliceSpec | string
 function createPath(path, slice)
-  path = resolveTilde(path)
+  path = transf.string.tilde_resolved(path)
   slice = slice or { start = 1, stop = -1 } -- default to entire path
   local resolved_path = pathSlice(path, slice, {rejoin_at_end = true})
   local remote = pathIsRemote(resolved_path)
@@ -27,7 +27,7 @@ function writeFile(path, contents, condition, create_path, mode)
   condition = defaultIfNil(condition, "any")
   create_path = defaultIfNil(create_path, true)
   mode = defaultIfNil(mode, "w")
-  path = resolveTilde(path)
+  path = transf.string.tilde_resolved(path)
 
   local path_is_remote = pathIsRemote(path)
 

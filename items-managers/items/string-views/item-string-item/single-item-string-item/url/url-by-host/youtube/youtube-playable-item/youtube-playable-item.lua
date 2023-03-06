@@ -58,7 +58,7 @@ YoutubePlayableItemItemSpecifier = {
       end,
       ["youtube-playable-item-title-cleaned"] = function(self)
         local title = stringy.strip(self:get("youtube-playable-item-title"))
-        title = rawreplace(title, {
+        title = replace(title, {
           { cond = {_r = mt._r.text_bloat.youtube.video, _ignore_case = true}, mode="remove" },
           { cond = {_r = mt._r.text_bloat.youtube.misc, _ignore_case = true}, mode="remove" },
         })
@@ -73,7 +73,7 @@ YoutubePlayableItemItemSpecifier = {
       end,
       ["youtube-playable-item-channel-cleaned"] = function(self)
         local channel = stringy.strip(self:get("youtube-playable-item-channel"))
-        channel = rawreplace(channel, {
+        channel = replace(channel, {
           { cond = {_r = mt._r.text_bloat.youtube.channel_topic_producer, _ignore_case = true}, mode="remove" },
           { value = {_r = mt._r.text_bloat.youtube.slash_suffix, _ignore_case = true}, mode="remove" },
         })

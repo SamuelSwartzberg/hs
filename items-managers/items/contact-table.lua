@@ -76,7 +76,7 @@ ContactTableSpecifier = {
         end
       end,
       ["contact-addr-table"] = function(self, type)
-        return self:get("table-prop-policy", changeCasePre(type))
+        return self:get("table-prop-policy", replace(type, to.case.capitalized))
       end,
       ["contact-addr-table-item"] = function (self, type)
         return CreateTable(self:get("contact-addr-table", type))

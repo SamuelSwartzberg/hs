@@ -14,7 +14,7 @@ function delete(path, thing, action, onlyif)
 
   -- resolve tilde
 
-  path = resolveTilde(path)
+  path = transf.string.tilde_resolved(path)
 
   -- set local vars
 

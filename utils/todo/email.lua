@@ -2,7 +2,7 @@
 --- @param header_value string
 --- @return string
 function buildEmailHeader(header_name, header_value)
-  return string.format("%s: %s", changeCasePre(header_name), le(header_value))
+  return string.format("%s: %s", replace(header_name, to.case.capitalized), le(header_value))
 end
 
 
@@ -26,7 +26,7 @@ end
 
 function buildEmailHeaders2(headers)
   return stringx.join("\n", listSort(map(headers, function(value, key)
-    return false, ("%s: %s"):format(changeCasePre(key), le(value))
+    return false, ("%s: %s"):format(replace(key, to.case.capitalized), le(value))
   end), function (a, b)
     return find()
   end))

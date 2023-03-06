@@ -21,8 +21,8 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   -- resolve tilde
 
-  source = resolveTilde(source)
-  target = resolveTilde(target)
+  source = transf.string.tilde_resolved(source)
+  target = transf.string.tilde_resolved(target)
 
   -- check if path is remote, customize things accordingly
 

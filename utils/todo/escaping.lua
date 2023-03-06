@@ -57,6 +57,7 @@ mt = {
       isbn = "(?:[0-9]{9}[0-9xX])|(?:[0-9]{13})",
       uuid = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
       doi = "(?:10\\.\\d{4,9}/[-._;()/:A-Z0-9]+)",
+      doi_prefix = "^(?:https?://)?(?:dx.)?doi(?:.org/|:)?"
     },
     whitespace = {
       large = "[\t\r\n]"
@@ -279,7 +280,7 @@ transf = {
   },
   string = {
     escaped_csv_field = function(field)
-      return '"' .. rawreplace(field, {{'"', "\n"}, {'""', '\\n'}})  .. '"'
+      return '"' .. replace(field, {{'"', "\n"}, {'""', '\\n'}})  .. '"'
     end,
     bits = basexx.to_bit,
     hex = basexx.to_hex,
@@ -290,8 +291,8 @@ transf = {
     title_case = function(str)
       local words, removed = split(str, {_r = "[ :–\\—\\-\\t\\n]", _regex_engine = "eutf8"})
       local title_cased_words = map(words, transf.word.title_case_policy)
-      title_cased_words[1] = changeCasePre(title_cased_words[1])
-      title_cased_words[#title_cased_words] = changeCasePre(title_cased_words[#title_cased_words])
+      title_cased_words[1] = replace(title_cased_words[1], to.case.capitalized)
+      title_cased_words[#title_cased_words] = replace(title_cased_words[#title_cased_words], to.case.capitalized)
       return concat({
         isopts = "isopts",
         sep = removed,
@@ -305,10 +306,13 @@ transf = {
       if not is_ok then
         return str -- if there's an error, just return the original string
       end
-      rawreplace(romanized, {{"(kigou)", "'"}, {}}, {
+      replace(romanized, {{"(kigou)", "'"}, {}}, {
         mode = "remove",
       })
       return romanized
+    end,
+    tilde_resolved = function(path)
+      return path:gsub("^~", env.HOME)
     end
 
   },
@@ -319,16 +323,12 @@ transf = {
       elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
         return word
       else
-        return changeCasePre(word)
+        return replace(word, to.case.capitalized)
       end
     end
   }
 }
 
-
-function resolveTilde(path)
-  return path:gsub("^~", env.HOME)
-end
 
 to = {
   case = {
@@ -354,7 +354,12 @@ to = {
       mode = "replace",
       cond = {_r = "^."},
       proc = eutf8.upper
-    }
+    },
+    notcapitalized = {
+      mode = "replace",
+      cond = {_r = "^."},
+      proc = eutf8.lower
+    },
   },
   url = {
     decoded = {
@@ -370,6 +375,16 @@ to = {
       }
     }
   },
+  regex = {
+    lua_escaped = {{mt._contains.lua_metacharacters}, {"%"}},
+    general_escaped = {
+      map(mt._contains.regex_metacharacters, function(v) return {v, "\\" .. v} end),
+      {processor = tblmap.whitespace.escaped, mode = "replace" }
+    }
+  },
+  normalized = {
+    doi = {cond = {_r = mt._r.id.doi_prefix }, processor = "https://doi.org/", mode = "replace" }
+  }
 }
 
 
@@ -394,7 +409,7 @@ tblmap.weekday_en.mon1_int = map(tblmap.mon1_int.weekday_en, returnAny, {"kv", "
 --- @param opts? replaceOpts | replaceOpts[] | (conditionSpec[] | procSpec[])[]
 --- @param globalopts? replaceOpts
 --- @return T
-function rawreplace(thing, opts, globalopts)
+function replace(thing, opts, globalopts)
   if opts == nil then return thing end
   opts = tablex.deepcopy(opts) or {}
   if not isListOrEmptyTable(opts) then opts = {opts} end
@@ -432,7 +447,7 @@ function rawreplace(thing, opts, globalopts)
     proc = defaultIfNil(opt.proc, proc)
 
   
-    if not opt.cond and type(proc) == "table" then
+    if not opt.cond and type(proc) == "table" and not isListOrEmptyTable(proc) then
       cond = {_list = keys(proc)} -- if no condition is specified, use the keys of the processor table as the condition
     end
   
@@ -462,49 +477,6 @@ function rawreplace(thing, opts, globalopts)
       isopts = "isopts",
       sep = sep,
     }, parts)
-  end
-  return res
-end
-
---- @param str string
---- @param type? "luaregex" | "regex" | "modsymbols" | "doi"
---- @param ... any
---- @return string
-function replace(str, type, ...)
-  local res = str
-  type = type or "luaregex"
-  if type == "luaregex" then
-    res = rawreplace(
-      res, 
-      {{mt._contains.lua_metacharacters, "%"}}
-    )
-  elseif type == "regex" then
-    res = rawreplace(
-      res, 
-      {
-        {cond = { _contains = mt._contains.regex_metacharacters}, proc = "\\", mode = "before"},
-        {processor = mt._contains.whitespace.escaped, mode = "replace" }
-      }
-    )
-  elseif type == "modsymbols" then 
-    res = rawreplace(
-      res, 
-      {
-        { processor = tblmap.normalize.mod, mode = "replace" },
-        { processor = tblmap.mod_symbolmap, mode = "replace" }
-      }
-    )
-  elseif type == "doi" then 
-    doi_prefix_variants = { "doi:", {_r = "(?:https?://)(?:dx.)doi.org/?" } },
-    res = rawreplace(
-      res, 
-      {cond = mt.doi_prefix_variants, processor = "https://doi.org/", mode = "replace" }
-    )
-  elseif type == "urlencode" then
-    res = rawreplace(
-      res, 
-      {cond = "[^\\w _%\\-\\.~]", processor = char_to_hex, mode = "replace" }
-    )
   end
   return res
 end
@@ -546,7 +518,7 @@ end
 function romanizeToLowerAlphanumUnderscore(str)
   str = eutf8.gsub(str, "[%^']", "")
   str = transf.string.romanized(str)
-  str = eutf8.lower(rawreplace(str, to.case.snake))
+  str = eutf8.lower(replace(str, to.case.snake))
   return str
 end
 

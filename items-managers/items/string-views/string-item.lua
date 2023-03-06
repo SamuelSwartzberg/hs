@@ -69,10 +69,10 @@ StringItemSpecifier = {
         return transf.string[enc](self:get("contents"))
       end,
       ["escaped-general-regex"] = function(self)
-        return replace(self:get("contents"), "regex")
+        return replace(self:get("contents"), to.regex.general_escaped)
       end,
       ["escape-lua-regex"] = function(self)
-        return replace(self:get("contents"))
+        return replace(self:get("contents"), to.regex.lua_escaped)
       end,
       ["window-with-contents-as-title"] = function(self)
         local res = hs.window.find(self:get("contents"))

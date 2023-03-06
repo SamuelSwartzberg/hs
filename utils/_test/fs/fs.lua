@@ -3,17 +3,17 @@ if mode == "full-test" then
 delete(env.HSFTP_TMPDIR .. "/foo/")
 
 assertMessage(
-  resolveTilde("~"),
+  transf.string.tilde_resolved("~"),
   env.HOME
 )
 
 assertMessage(
-  resolveTilde("~/foo/bar"),
+  transf.string.tilde_resolved("~/foo/bar"),
   env.HOME .. "/foo/bar"
 )
 
 assertMessage(
-  resolveTilde("/~/foo/bar"),
+  transf.string.tilde_resolved("/~/foo/bar"),
   "/~/foo/bar"
 )
 
