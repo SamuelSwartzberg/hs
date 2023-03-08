@@ -19,40 +19,18 @@ function bindArg(func, arg)
   end
 end
 
-
-require("utils.functions")
 local rrq = bindArg(relative_require, "utils")
 
 
-rrq("fs")
-rrq("table")
-rrq("types")
-rrq("string")
-rrq("numbers")
-rrq("coding")
-rrq("applications")
-rrq("ui")
-rrq("dt")
-rrq("comparable")
-rrq("email")
-rrq("action-table")
-rrq("math")
-url = rrq("url")
-rrq("browser")
-rrq("api")
-rrq("dom")
-rrq("osascript")
-rrq("ipc-socket")
-rrq("task")
+rrq("language-features")
+rrq("externals")
+rrq("type")
+rrq("basic-interfacing")
+rrq("advanced-interfacing")
+rrq("general-domain-ops")
+rrq("specific-domain-ops")
 rrq("test")
-rrq("sync")
-rrq("benchmark")
-rrq("external-typings")
-rrq("document")
-rrq("user-io")
-rrq("wrappers")
-rrq("build-chooser")
-rrq("component-interface")
+
 env = getEnvAsTable()
 
 if mode ~= "prod" then 

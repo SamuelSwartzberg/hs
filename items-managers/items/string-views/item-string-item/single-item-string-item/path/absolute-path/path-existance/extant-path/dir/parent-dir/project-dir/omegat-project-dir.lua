@@ -89,7 +89,7 @@ OmegatProjectDirItemSpecifier = {
         return self:get("contents") .. "/tm"
       end,
       ["rechnung-noext-path"] = function (self)
-        return self:get("contents") .. "/" .. os.date(getRFC3339FormatStringForPrecision("day")) .. "--" .. self:get("client") .. "_" .. self:get("rechnung").nr
+        return self:get("contents") .. "/" .. os.date(tblmap.dt_component.rfc3339["day"]) .. "--" .. self:get("client") .. "_" .. self:get("rechnung").nr
       end,
       ["rechnung-raw-path"] = function (self)
         return self:get("rechnung-noext-path") .. ".md"
@@ -230,7 +230,7 @@ OmegatProjectDirItemSpecifier = {
           for j, odt in ipairs(odt_pair) do
             local client = self:get("local-data-object").client
             local path = CreatePathLeafParts({
-              date = os.date(getRFC3339FormatStringForPrecision("day")),
+              date = os.date(tblmap.dt_component.rfc3339["day"]),
               path = env.MDIARY .. "/i_made_this/translations/",
               ["general-name"] = pathSlice(odt:get("contents"), "-2:-2", { ext_sep = true })[1],
               extension = "odt",

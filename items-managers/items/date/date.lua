@@ -171,7 +171,7 @@ DateSpecifier = {
       end,
       
       ["to-precision"] = function(self, component) -- component is a string, either "year", "month", "day", "hour", "minute", "second"
-        return self:get("contents"):fmt(getRFC3339FormatStringForPrecision(component))
+        return self:get("contents"):fmt(tblmap.dt_component.rfc3339[component])
       end,
       ["date-to-precision"] = function (self, component)
         return date(self:get("to-precision", component))

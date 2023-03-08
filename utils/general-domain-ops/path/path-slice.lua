@@ -38,7 +38,7 @@ function pathSlice(path, spec, opts)
     end
 
     if opts.standartize_ext then
-      extension = tblmap.normalize.extension[extension] or extension
+      extension = normalize.extension[extension] or extension
     end
 
     push(raw_path_components, without_extension)

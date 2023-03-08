@@ -17,7 +17,16 @@ CslTableSpecifier = {
       ["csl-date-to-rfc3339"] = function(self, key)
         local value = self:get("value", key)
         if value then
-          return datePartArrayToRFC3339String(value)
+          return os.date(
+            tblmap.dt_component.rfc3339[#value], 
+            os.time(
+              map(
+                value, 
+                function(k) return mt.int.date_component[k] end, 
+                "k"
+              )
+            )
+          )
         end
       end,
       ["issued"] = function(self)

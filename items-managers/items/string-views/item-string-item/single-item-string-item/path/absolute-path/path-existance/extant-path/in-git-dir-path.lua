@@ -121,7 +121,7 @@ InGitDirPathItemSpecifier = {
           "commit",
           "-a",
           "-m",
-          { value = message or ("Programmatic commit at " .. os.date(getRFC3339FormatStringForPrecision("sec"))), type = "quoted" }
+          { value = message or ("Programmatic commit at " .. os.date(tblmap.dt_component.rfc3339["sec"])), type = "quoted" }
         })
       end,
       ["git-commit-all-and-push"] = function(self, message)

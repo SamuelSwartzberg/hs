@@ -113,8 +113,8 @@ YoutubePlayableItemItemSpecifier = {
           attrs = { "title", "uploader" },
           do_after = function(attrs)
             local tags = {
-              tcrea = romanizeToLowerAlphanumUnderscore(attrs.uploader),
-              title = romanizeToLowerAlphanumUnderscore(attrs.title)
+              tcrea = transf.string.romanized_snake(attrs.uploader),
+              title = transf.string.romanized_snake(attrs.title)
             }
             self:doThis("add-as-m3u", tags)
           end
@@ -143,7 +143,7 @@ YoutubePlayableItemItemSpecifier = {
           },
           do_after = function(tags)
             local cleaned = map(tags, function(v)
-              return romanizeToLowerAlphanumUnderscore(v)
+              return transf.string.romanized_snake(v)
             end)
             self:doThis("add-as-m3u", cleaned)
           end

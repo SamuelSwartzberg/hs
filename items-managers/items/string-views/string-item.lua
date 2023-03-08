@@ -99,7 +99,7 @@ StringItemSpecifier = {
       end,
       ["contents-romanized"] = function (self) return transf.string.romanized(self:get("contents")) end,
       ["contents-as-romanized-snake-case-string"] = function(self)
-        return romanizeToLowerAlphanumUnderscore(self:get("contents"))
+        return transf.string.romanized_snake(self:get("contents"))
       end,
       ["is-html-entity-encoded-string-item"] = function(self) 
         return stringy.find(self:get("contents"), "&") and stringy.find(self:get("contents"), ";")

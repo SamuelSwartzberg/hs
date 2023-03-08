@@ -24,13 +24,6 @@ function buildEmailHeaders(headers)
   return table.concat(header_lines, "\n")
 end
 
-function buildEmailHeaders2(headers)
-  return stringx.join("\n", listSort(map(headers, function(value, key)
-    return false, ("%s: %s"):format(replace(key, to.case.capitalized), le(value))
-  end), function (a, b)
-    return find()
-  end))
-
 --- @param headers { [string]: string }
 --- @param body string
 --- @param edit_func fun(mail: string, do_after: fun(mail: string))
@@ -106,9 +99,11 @@ function sendEmailInteractive(headers, body, edit_func, do_after)
 end
 
 function editorEditFunc(mail, do_after)
-  doWithTempFileEditedInEditor(mail, function(mail_file)
-    do_after(readFile(mail_file, "error"))
-  end)
+  doWithTempFile({
+    path = mail,
+    edit_before = true,
+    use_contents = true,
+  }, do_after)
 end
 
 --- @param path string

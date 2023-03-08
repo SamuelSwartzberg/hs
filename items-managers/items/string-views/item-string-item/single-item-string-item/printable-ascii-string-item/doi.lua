@@ -10,7 +10,7 @@ DoiItemSpecifier = {
           "-LH",
           "Accept: application/x-bibtex",
           {
-            value = toResolvedDoi(self:get("contents")),
+            value = replace(self:get("contents"), to.resolved.doi),
             type = "quoted"
           }
         })
