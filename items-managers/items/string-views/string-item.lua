@@ -162,7 +162,7 @@ StringItemSpecifier = {
         self:doThis("paste-result-of-get", {key = "contents"})
       end,
       ["say"] = function(self, lang)
-        say(self:get("fold"), lang)
+        speak:voice(tblmap.lang.voice[lang]):speak(self:get("fold"))
       end,
       ["add-to-log"] = function(self, path)
         CreateStringItem(path):doThis("log-now", self:get("contents"))

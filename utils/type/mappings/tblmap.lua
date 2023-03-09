@@ -126,7 +126,13 @@ tblmap = {
       [5] = "minute",
       [6] = "second",
     },
-  } 
+  },
+  lang = {
+    voice = {
+      en = "Alex",
+      ja = "Kyoko.premium"
+    }
+  }
 }
 
 -- make sure to automatically normalize any input to tblmap§

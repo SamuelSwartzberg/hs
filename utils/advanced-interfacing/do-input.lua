@@ -69,7 +69,7 @@ function doDelta(specifier, do_after)
     error("type must be 'scroll' or 'move'")
   end
 
-  local total_delta = pointdelta(specifier.target_point, current_point)
+  local total_delta = specifier.target_point - current_point
   local num_steps = math.ceil(specifier.duration / POLLING_INTERVAL)
   local deltas = {
     x = getStartingDelta(total_delta.x, specifier.factor_of_deceleration, num_steps),

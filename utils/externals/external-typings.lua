@@ -246,6 +246,14 @@
 --- @field keycodes hs.keycodes
 --- @field host hs.host
 --- @field mouse hs.mouse
+--- @field http hs.http
+--- @field fnutils hs.fnutils
+--- @field httpserver hs.httpserver
+--- @field settings hs.settings
+--- @field hash hs.hash
+--- @field math hs.math
+--- @field speech hs.speech
+
 
 --- @alias urltable { url: string }
 
@@ -261,8 +269,45 @@
 
 --- @class hs.audiodevice
 
+--- @class hs.http
+--- @field asyncGet fun(url: string, headers?: {[string]: any}, callback: fun(status: integer, body: string, headers: {[string]: any}): nil): nil
+--- @field asyncPost fun(url: string, body: string, headers?: {[string]: any}, callback: fun(status: integer, body: string, headers: {[string]: any}): nil): nil
+--- @field asyncPut fun(url: string, body: string, headers?: {[string]: any}, callback: fun(status: integer, body: string, headers: {[string]: any}): nil): nil
+--- @field get fun(url: string, headers?: {[string]: any}): integer, string, {[string]: any}
+--- @field post fun(url: string, body: string, headers?: {[string]: any}): integer, string, {[string]: any}
+--- @field put fun(url: string, body: string, headers?: {[string]: any}): integer, string, {[string]: any}
+
+--- @class hs.httpserver
+
+--- @class hs.fnutils
+
+--- @class hs.settings
 
 --- @class hs.sound
+
+--- @class hs.hash
+
+--- @class hs.math
+
+--- @class hs.speech
+--- @field new fun(voice?: string): hs.speech
+--- @field availableVoices fun(full?: boolean): string[]
+--- @field continue fun(self: hs.speech): hs.speech
+--- @field pause fun(self: hs.speech, where?: "immediate" | "word" | "sentence"): hs.speech
+--- @field stop fun(self: hs.speech, where?: "immediate" | "word" | "sentence"): hs.speech
+--- @field isSpeaking fun(self: hs.speech): boolean | nil
+--- @field isPuased fun(self: hs.speech): boolean | nil
+--- @field modulation fun(self: hs.speech, modulation: number): hs.speech
+--- @field phonemes fun(self: hs.speech, text: string): string
+--- @field rate fun(self: hs.speech, rate: number): hs.speech
+--- @field pitch fun(self: hs.speech, pitch: number): hs.speech
+--- @field reset fun(self: hs.speech): hs.speech
+--- @field speak fun(self: hs.speech, text: string): hs.speech
+--- @field speakToFile fun(self: hs.speech, text: string, path: string): hs.speech
+--- @field volume fun(self: hs.speech, volume: number): hs.speech
+--- @field voice (fun(self: hs.speech, voice: string): hs.speech) | (fun(self: hs.speech, full?: boolean): string)
+
+speak = hs.speech.new()
 
 --- @class hs.ipc
 --- @field cliInstall fun(path: string, silent?: boolean): boolean
