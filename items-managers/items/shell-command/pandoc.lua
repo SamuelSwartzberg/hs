@@ -70,7 +70,7 @@ PandocCommandSpecifier = {
         end)
       end,
       ["md-to-latexlike-pdf"] = function (self, specifier)
-        self:doThis("convert-md", merge({
+        self:doThis("convert-md", concat({
           format = "pdf",
           metadata = {
             geometry = "margin=3cm"
@@ -81,7 +81,7 @@ PandocCommandSpecifier = {
         }, specifier))
       end,
       ["md-to-latex-beamer-pdf"] = function(self, specifier)
-        self:doThis("convert-md", merge({
+        self:doThis("convert-md", concat({
           format = "beamer",
           preprocess = {
             enforce_space_blank_lines = true
@@ -89,7 +89,7 @@ PandocCommandSpecifier = {
         }, specifier))
       end,
       ["md-to-revealjs"] = function(self, specifier)
-        self:doThis("convert-md", merge({
+        self:doThis("convert-md", concat({
           format = "revealjs",
           target_ext = ".html",
           extra_args = {

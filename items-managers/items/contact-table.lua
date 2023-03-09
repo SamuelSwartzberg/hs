@@ -100,7 +100,7 @@ ContactTableSpecifier = {
       ["addresses-table"] = function(self)
         local raw = self:get("table-prop-policy", "Address")
         local processed = map(raw, function(v)
-          local raw_single = merge(
+          local raw_single = concat(
             v,
             {
               ["Formatted name"] = self:get("name"),

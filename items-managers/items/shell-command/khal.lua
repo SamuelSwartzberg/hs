@@ -340,7 +340,7 @@ KhalCommandSpecifier = {
       ["add-event-from-specifier"] = function(self, specifier)
         specifier = specifier or {}
         specifier = map(specifier, stringy.strip, {
-          mapcondition = "TOOD ONLY STRING"
+          mapcondition = { _type = "string"}
         })
         local command = {"khal", "new" }
         if specifier.calendar then
@@ -366,7 +366,7 @@ KhalCommandSpecifier = {
         if specifier.alarms then
           local alarms_str = table.concat(
             map(specifier.alarms, stringy.strip, {
-              mapcondition = "TOOD ONLY STRING"
+              mapcondition = { _type = "string"}
             }),
             ","
           )

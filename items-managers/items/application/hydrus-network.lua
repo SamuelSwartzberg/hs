@@ -28,7 +28,7 @@ HydrusNetworkItemSpecifier = {
           api_key = self:get("access-key"),
           api_key_header = "Hydrus-Client-API-Access-Key:"
         }
-        specifier = merge(local_specifier, specifier)
+        specifier = concat(local_specifier, specifier)
 ---@diagnostic disable-next-line: undefined-field
         makeSimpleRESTApiRequest(specifier, specifier.do_after)
       end,

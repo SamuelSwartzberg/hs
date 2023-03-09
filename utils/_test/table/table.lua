@@ -253,7 +253,7 @@ assertTable(
     c = "ro aaa r   ",
     d = 3
   }, stringy.strip, {
-    mapcondition = "TOOD ONLY STRING"
+    mapcondition = { _type = "string"}
   }),
   {
     a = "1",

@@ -26,7 +26,7 @@ assertTable(
 assertTable(
   map({ 1, 2 , 3}, function(item) return false, {item, item + 1} end, {
     args = "k",
-    useas = "kv",
+    ret = "kv",
     flatten = true
   }),
   {1, 2, 2, 3, 3, 4}

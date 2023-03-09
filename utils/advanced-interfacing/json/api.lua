@@ -18,7 +18,7 @@ function makeSimpleRESTApiRequest(specifier, do_after)
   elseif specifier.host or specifier.endpoint or specifier.params then
     url = ensureAdfix(specifier.host, "/", false, false, "suf")
     url = url .. (ensureAdfix(specifier.endpoint, "/") or "/")
-    url = url .. "?" .. concat({ sep = "&" }, map(specifier.params, {_f = "%s=%s"}, { args = "kv", useas = "v", tolist = true }) )
+    url = url .. "?" .. concat({ sep = "&" }, map(specifier.params, {_f = "%s=%s"}, { args = "kv", ret = "v", tolist = true }) )
   else
     url = "https://dummyjson.com/products?limit=10&skip=10"
   end

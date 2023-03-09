@@ -6,8 +6,8 @@
 --- @field _empty? boolean
 --- @field _type? "string" | "number" | "boolean" | "table" | "function" | "thread" | "userdata"
 --- @field _exactly? string
---- @field _invert? boolean
 --- @field _list? any[]
+--- @field _invert? boolean
 --- @field _ignore_case? boolean
 --- @field _only_if_all? boolean
 --- @field _regex_engine? "onig" | "eutf8"
@@ -20,6 +20,8 @@
 --- @class testOpts
 --- @field tostring boolean
 --- @field ret kvmult | "boolean"
+
+--- @alias matchspec {k: integer, v: indexable, match: boolean}
 
 --- @param item? string
 --- @param conditions? conditionSpec
@@ -61,6 +63,7 @@ function findsingle(item, conditions, opts)
         bool = returnBool
       end
 
+      --- @return matchspec
       local getres = function(match, k, v)
         match = bool(match)
         if match then 
@@ -71,7 +74,7 @@ function findsingle(item, conditions, opts)
           }
         else 
           return {
-            k = 1,
+            k = -1,
             v = "",
             match = false
           }
@@ -166,7 +169,33 @@ function findsingle(item, conditions, opts)
     end
   end
 
-  return reduce(results, returnAnd)
+  --- @param acc matchspec
+  ---@param val matchspec
+  local res = reduce(results, function(acc, val) 
+    -- we need to make a decision how we want to treat cases where we had multiple conditions, and thus the k and v are different
+    -- My current perspective is that since we require all conditions to be true, the k is the smallest k, and the v is the match from the first k to the largest k + #v 
+    -- This is a somewhat arbitrary decision, but its results are fairly predictable and intuitive
+
+    local accmatchindex = acc.k + #acc.v - 1
+    local valmatchindex = val.k + #val.v - 1
+    local largermatchindex = math.max(accmatchindex, valmatchindex)
+    local newv = slice(item, acc.k, largermatchindex)
+    return {
+      k = math.min(acc.k, val.k),
+      v = newv,
+      match = acc.match and val.match
+    }
+  end)
+
+  if opts.ret == "boolean" then
+    return res.match
+  else
+    for _, retarg in ipairs(opts.ret) do
+      push(results, res[retarg])
+    end
+    return table.unpack(results)
+  end
+  
 end
 
 

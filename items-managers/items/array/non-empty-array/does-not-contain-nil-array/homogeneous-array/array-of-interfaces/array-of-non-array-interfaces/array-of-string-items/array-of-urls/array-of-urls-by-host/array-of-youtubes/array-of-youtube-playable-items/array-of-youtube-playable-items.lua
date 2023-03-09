@@ -8,7 +8,7 @@ ArrayOfYoutubePlayableItemsSpecifier = {
     },
     doThisables = {
       ["to-stream"] = function(self, specifier)
-        local specified_contents = merge(
+        local specified_contents = concat(
           specifier,
           {
             initial_data = {

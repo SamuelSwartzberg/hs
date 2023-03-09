@@ -96,6 +96,7 @@ function returnSmaller(a, b)
   return a < b
 end
 
+
 --- @generic T
 --- @param list T[]
 --- @return T

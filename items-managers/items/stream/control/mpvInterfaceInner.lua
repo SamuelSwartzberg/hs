@@ -41,7 +41,7 @@ MPVInterfaceInnerSpecifier = {
 }
 
 function GetMPVInterfaceInner(super)
-  local interface =  merge(
+  local interface =  concat(
     MPVInterfaceInnerSpecifier,
     {contents = BuildIPCSocket()}
   )

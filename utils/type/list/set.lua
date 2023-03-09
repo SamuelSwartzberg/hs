@@ -2,7 +2,7 @@
 --- @param tbl T[]|nil
 --- @return T[]
 function toSet(tbl)
-  return keys(map(tbl, function(v) return v, true end, { args = "v", useas = "kv", nooverwrite = true }))
+  return keys(map(tbl, function(v) return v, true end, { args = "v", ret = "kv", nooverwrite = true }))
 end
 
 

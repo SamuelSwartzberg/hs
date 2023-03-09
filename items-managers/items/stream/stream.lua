@@ -200,7 +200,7 @@ function CreateStreamItem(specified_contents)
     
   }
 
-  local contents = merge(
+  local contents = concat(
     {
       initial_flags = {
         ["loop-playlist"] = false,
@@ -212,7 +212,8 @@ function CreateStreamItem(specified_contents)
         start = 0,
       },
       state = "booting",
-    },specified_contents
+    },
+    specified_contents
   )
 
   local interface = RootInitializeInterface(interface_specifier, contents)

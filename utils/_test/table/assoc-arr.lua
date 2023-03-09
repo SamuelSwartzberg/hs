@@ -166,7 +166,7 @@ assertTable(
 )
 
 assertTable(
-  merge(
+  concat(
     {
       {
         foo = "bar",
@@ -292,7 +292,7 @@ assertTable(
 )
 
 assertTable(
-  merge(
+  concat(
     {
       a = 1,
       b = 2

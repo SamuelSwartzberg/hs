@@ -50,19 +50,17 @@ function seq(start, stop, step, unit)
     mode = "string"
   end
 
-  local zero, addmethod
+  local addmethod
 
   if mode == "number" then
     stop = defaultIfNil(stop, 10)
     step = defaultIfNil(step, 1)
-    zero = 0
     addmethod = function(a, b) return a + b end
   elseif mode == "date" then
     if start then start = start:copy() else start = date() end
     if stop then stop = stop:copy() else stop = date():addays(10) end
     step = defaultIfNil(step, 1)
     unit = defaultIfNil(unit, "days")
-    zero = date(1) - date(1) 
     addmethod = function(a, b) 
       local a_copy = a:copy()
       return a_copy["add" .. unit](a_copy, b) 

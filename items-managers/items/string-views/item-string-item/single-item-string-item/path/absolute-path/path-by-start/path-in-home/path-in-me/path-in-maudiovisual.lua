@@ -21,7 +21,7 @@ PathInMaudiovisualItemSpecifier = {
     },
     doThisables = {
       ["to-stream"] = function(self, specifier)
-        specifier = merge(specifier, { initial_data = { path = self.root_super } })
+        specifier = concat(specifier, { initial_data = { path = self.root_super } })
         self
           :get("media-urls-string-item-array")
           :doThis("to-stream", specifier)

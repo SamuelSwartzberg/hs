@@ -164,7 +164,7 @@ YoutubePlayableItemItemSpecifier = {
             edited_tags[k] = new_v
           end
         end
-        specifier.tag = merge(edited_tags, promptUserToAddNKeyValuePairs("tag"))
+        specifier.tag = concat(edited_tags, promptUserToAddNKeyValuePairs("tag"))
 ---@diagnostic disable-next-line: param-type-mismatch
         specifier.path  = promptPipeline({
           {"dir", {prompt_args = {default = env.MAUDIOVISUAL}}},

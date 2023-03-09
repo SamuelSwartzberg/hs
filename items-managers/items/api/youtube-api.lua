@@ -55,13 +55,13 @@ YoutubeApiItemSpecifier = {
         local local_specifier = {
           host = "https://www.googleapis.com",
           endpoint = "youtube/v3/" .. specifier.endpoint,
-          params = merge({
+          params = concat({
             part = "snippet",
             key = env.GOOGLE_API_KEY,
           }, specifier.params or {}),
           api_key = env.YOUTUBE_SCOPE_ACCESS_TOKEN
         }
-        specifier = merge(local_specifier, specifier)
+        specifier = concat(local_specifier, specifier)
         makeSimpleRESTApiRequest(specifier, specifier.do_after)
       end,
       ["create-youtube-playlist"] = function(self, specifier)
