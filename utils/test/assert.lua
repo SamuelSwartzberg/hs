@@ -1,10 +1,3 @@
-
-function assertTable(a, b)
-  local string_table_a = hs.inspect(a, {depth = 5})
-  local string_table_b = hs.inspect(b, {depth = 5})
-  assert(string_table_a == string_table_b, ("Expected %s, but got %s"):format(string_table_b, string_table_a))
-end
-
 --- @generic K
 --- @generic V
 --- @param tbl { [`K`]: `V` } | nil
@@ -52,5 +45,8 @@ function assertValuesContainExactly(a, values)
 end
 
 function assertMessage(a, b)
+  if type (a) == "table" then a = hs.inspect(a, {depth = 5}) end
+  if type (b) == "table" then b = hs.inspect(b, {depth = 5}) end
+
   assert(a == b, ("Expected \n%s\n, but got \n%s"):format(b, a))
 end

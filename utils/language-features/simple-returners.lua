@@ -141,3 +141,32 @@ end
 function returnUnpack(arg)
   return table.unpack(arg)
 end
+
+--- @generic T
+--- @param ... T
+--- @return T[]
+function returnPack(...)
+  return {...}
+end
+
+--- @generic T 
+--- @param potential_tbl primitive | T[]
+--- @return primitive | ...<T>
+function returnUnpackIfTable(potential_tbl)
+  if type(potential_tbl) == "table" then
+    return table.unpack(potential_tbl)
+  else
+    return potential_tbl
+  end
+end
+
+function returnPoisonable()
+  local dirty = false
+  return function(...)
+    if dirty then
+      error("poisoned")
+    end
+    dirty = true
+    return {...}
+  end
+end

@@ -1,29 +1,29 @@
-assertTable(
+assertMessage(
   concat({1, 2}, nil),
   {1, 2}
 )
 
-assertTable(
+assertMessage(
   concat({1, 2}, false),
   {1, 2, false}
 )
 
-assertTable(
+assertMessage(
   concat({1, 2}, { a  = 1}),
   {1, 2, { a = 1}}
 )
 
-assertTable(
+assertMessage(
   concat({1, 2}, {3, 4}),
   {1, 2, 3, 4}
 )
 
-assertTable(
+assertMessage(
   concat({1, 2}, {{3, 4}}),
   {1, 2, {3, 4}}
 )
 
-assertTable(
+assertMessage(
   map({ 1, 2 , 3}, function(item) return false, {item, item + 1} end, {
     args = "k",
     ret = "kv",
@@ -32,126 +32,126 @@ assertTable(
   {1, 2, 2, 3, 3, 4}
 )
 
-assertTable(
+assertMessage(
   map({1,2,3}, function(x) return x end),
   {1,2,3}
 )
 
-assertTable(
+assertMessage(
   toSet({1,1,1,2,3,3}),
   {1,2,3}
 )
 
-assertTable(
+assertMessage(
   filter({1, "", 2, "", 3}, true),
   {1, 2, 3}
 )
 
-assertTable(
+assertMessage(
   filter({1, " ", 2, " ", 3}, true),
   {1, " ", 2, " ", 3}
 )
 
-assertTable(
+assertMessage(
   filter({1, 2, 3}, true),
   {1, 2, 3}
 )
-assertTable(
+assertMessage(
   slice({1,2,3}, 1),
   {1,2,3}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 2),
   {2,3}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 4),
   {}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 1, 1),
   {1}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 1, 2),
   {1,2}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 1, 4),
   {1,2,3}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 2, 1),
   {}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 1, -1),
   {1,2,3}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 1, -2),
   {1,2}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 2, -1),
   {2,3}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, nil, 3),
   {1,2,3}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 1, nil),
   {1,2,3}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}),
   {1,2,3}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 1, nil, 2),
   {1,3}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 2, nil, 2),
   {2}
 )
 
-assertTable(
+assertMessage(
   slice({1,2,3}, 1, nil, 3),
   {1}
 )
 
-assertTable(
+assertMessage(
   listSort(fixListWithNil({1, nil, 2, nil, 3})),
   {1, 2, 3}
 )
 
-assertTable(
+assertMessage(
   listSort(fixListWithNil({1, 2, 3})),
   {1, 2, 3}
 )
 
-assertTable(
+assertMessage(
   listSort(fixListWithNil({nil, 1, 2, nil})),
   {1, 2}
 )
 
-assertTable(
+assertMessage(
   fixListWithNil({nil, { "ja" }, { "nein" }, nil}),
   {{ "ja" }, { "nein" }}
 )
@@ -221,7 +221,7 @@ assertValuesContainExactly(
   }
 )
 
-assertTable(
+assertMessage(
   concat(
     {
       isopts = "isopts",

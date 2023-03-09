@@ -1,7 +1,7 @@
 arg_ignore = rand({len = 20})
 
 --- @param func function
---- @param arg_spec { [string]: any } | any
+--- @param arg_spec { [string]: any } | any each key is an index representing where to start binding the arguments, each value is a list of arguments to bind to the args starting at that index
 --- @return function
 function bind(func, arg_spec)
   if type(arg_spec) == "table" and not isListOrEmptyTable(arg_spec) then

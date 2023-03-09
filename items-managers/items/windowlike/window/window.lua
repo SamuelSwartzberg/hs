@@ -83,6 +83,9 @@ WindowItemSpecifier = {
       ["to-string"] = function(self)
         return ("%s (%s)"):format(self:get("title"), self:get("application-name"))
       end,
+      ["screen"] = function(self)
+        return self:get("contents"):screen()
+      end,
     },
     doThisables = {
       ["do-accessibility-element"] = function(self, specifier)
@@ -115,9 +118,11 @@ WindowItemSpecifier = {
       ["set-position"] = function(self, position)
         self:get("contents"):setTopLeft(position)
       end,
-      ["set-tile"] = function (self, tile_specifier)
-        local tile_rect = getTileRect(tile_specifier)
-        self:doThis("set-rect", tile_rect)
+      ["set-grid"] = function(self, grid)
+        hs.grid.set(grid, self:get("screen"))
+      end,
+      ["set-cell"] = function (self, cell)
+        hs.grid.set(self:get("contents"), cell, self:get("screen"))
       end,
       ["click-relative-to"] = function(self, specifier)
         local click_point = self:get("point-with-offset-from", specifier)

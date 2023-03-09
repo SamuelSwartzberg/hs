@@ -1,4 +1,4 @@
-assertTable(
+assertMessage(
   map(
     {
       x = 1,
@@ -22,7 +22,7 @@ assertTable(
   }
 )
 
-assertTable(
+assertMessage(
   listWithChildrenKeyToListIncludingPath({
     {
       title = "a",
@@ -60,7 +60,7 @@ assertTable(
   }
 )
 
-assertTable(
+assertMessage(
   listWithChildrenKeyToListIncludingPath({
     {
       title = "a",
@@ -108,7 +108,7 @@ assertTable(
 
 
 
-assertTable(
+assertMessage(
   listWithChildrenKeyToListIncludingPath({
     {
       addressation = "a",
@@ -139,7 +139,7 @@ assertTable(
   }
 )
 
-assertTable(
+assertMessage(
   listWithChildrenKeyToListIncludingPath({
     {
       title = "a",
@@ -165,7 +165,7 @@ assertTable(
   } -- note that the "c" is not included, because we skipped a level of nesting
 )
 
-assertTable(
+assertMessage(
   concat(
     {
       {
@@ -267,7 +267,7 @@ assertValuesContainExactly(
   }
 )
 
-assertTable(
+assertMessage(
   flatten({
     a = {
       b = {
@@ -291,7 +291,7 @@ assertTable(
   }
 )
 
-assertTable(
+assertMessage(
   concat(
     {
       a = 1,
@@ -310,7 +310,7 @@ assertTable(
   }
 )
 
-assertTable(
+assertMessage(
   flatten({
     l = {
       lll = "vvvvv",
@@ -334,7 +334,7 @@ assertTable(
 
 )
 
-assertTable(
+assertMessage(
   map(
     {
       a = { value = "foo" },
@@ -373,7 +373,7 @@ assertTable(
   
 )
 
-assertTable(
+assertMessage(
   map(
     {
       a = { value = "foo" },

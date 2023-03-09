@@ -4,7 +4,7 @@ assertValuesContainExactly(
   { "a", "b", "c" }
 )
 
-assertTable(
+assertMessage(
   iterToList(string.gmatch("abc", "d")),
   {}
 )
@@ -34,7 +34,7 @@ returnSameFsMemoized({
   b = "b"
 })
 
-assertTable(
+assertMessage(
   returnSameFsMemoized({
     a = "a",
     b = "b"
@@ -66,7 +66,7 @@ local testtbl = {
 }
 
 
-assertTable(
+assertMessage(
   statefulKeyIteratorToTable(spairs, testtbl),
   testtbl
 )

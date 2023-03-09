@@ -25,12 +25,12 @@ MPVInterfaceInnerSpecifier = {
     doThisables = {
       --- @param specifier { key: getsetable_key, args: any[] | any}
       ["set"] = function(self, specifier)
-        self.contents:getResponse({ command = { "set_property", specifier.key, tableUnpackIfTable(specifier.args) } })
+        self.contents:getResponse({ command = { "set_property", specifier.key, returnUnpackIfTable(specifier.args) } })
       end,
       --- @alias execable_key "playlist-shuffle" | "playlist-next" | "playlist-prev" | "quit" | "cycle"
       --- @param specifier { key: execable_key, args: any[] | any}
       ["exec"] = function(self, specifier)
-        self.contents:getResponse({ command = { specifier.key, tableUnpackIfTable(specifier.args) } })
+        self.contents:getResponse({ command = { specifier.key, returnUnpackIfTable(specifier.args) } })
       end,
       --- @param key getsetable_key
       ["cycle"] = function(self, key)

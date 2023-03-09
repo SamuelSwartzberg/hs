@@ -4,7 +4,7 @@ local current_alert
 local alert_hotkey
 alert_hotkey =  hs.hotkey.bind({"cmd", "alt", "shift"}, "/", function()
   local first_in = table.remove(do_queue, 1)
-  first_in.fn(tableUnpackIfTable(first_in.args))
+  first_in.fn(returnUnpackIfTable(first_in.args))
   if #do_queue == 0 then 
     alert_hotkey:disable()
     hs.alert.closeSpecific(current_alert)

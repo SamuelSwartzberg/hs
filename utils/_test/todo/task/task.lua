@@ -22,7 +22,7 @@ for i, v in ipairs(list_from_1_to_10) do
     cmds_from_1_to_10,
     i,
     function(results)
-      assertTable(
+      assertMessage(
         results,
         results_from_1_to_10
       )

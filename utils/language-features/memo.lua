@@ -78,7 +78,7 @@ local gen_cache_methods = {
 --- @generic I, O
 --- @param fn fun(...: I): O
 --- @param opts? memoOpts
---- @return fun(...: I): O
+--- @return fun(...: I): O, hs.timer?
 function memoize(fn, opts)
   local fnid = tostring(fn)
 
@@ -151,6 +151,6 @@ function memoize(fn, opts)
     end
   end
   memoized[fnid] = memoized_func
-  return memoized_func
+  return memoized_func, timer
 end
 

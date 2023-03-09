@@ -1,9 +1,11 @@
 
 --- @class filterOpts : tableProcOpts
 
---- @param tbl? table | nil
+--- @generic T : table 
+--- @param tbl? T | nil
 --- @param cond? conditionSpec
 --- @param opts? kvmult | filterOpts
+--- @return T
 function filter(tbl, cond, opts)
 
   -- defaults for all args

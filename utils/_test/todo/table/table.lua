@@ -36,30 +36,30 @@ assertMessage(
 )
 
 --- map list, map func returns primitive
-assertTable(
+assertMessage(
   map({ 1, 2, 3 }, function(value) return value + 1 end),
   { 2, 3, 4 }
 )
 
 --- map assoc arr, map func returns primitive
-assertTable(
+assertMessage(
   map({ a = 1, b = 2, c = 3 }, function(value) return value + 1 end),
   { a = 2, b = 3, c = 4 }
 )
 
 --- map list, map func returns table
-assertTable(
+assertMessage(
   map({ 1, 2, 3 }, function(value) return { value + 1 } end),
   { { 2 }, { 3 }, { 4 } }
 )
 
 --- map assoc arr, map func returns table
-assertTable(
+assertMessage(
   map({ a = 1, b = 2, c = 3 }, function(value) return { value + 1 } end),
   { a = { 2 }, b = { 3 }, c = { 4 } }
 )
 
-assertTable(
+assertMessage(
   listSort(
     flatten(
       {
@@ -80,7 +80,7 @@ assertTable(
   { 1, 2, 3, 4 }
 )
 
-assertTable(
+assertMessage(
   listSort(flatten(
     {
       1,
@@ -246,7 +246,7 @@ local nextKey = skeys(foobar_table)
 assertMessage(nextKey(), "bar")
 assertMessage(nextKey(), "foo")
 
-assertTable(
+assertMessage(
   map({
     a = " 1 ",
     b = "2",

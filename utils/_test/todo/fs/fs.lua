@@ -228,7 +228,7 @@ assertValuesContain(
 
 delete(env.HSFTP_TMPDIR .. "/foo", "empty")
 
-assertTable(
+assertMessage(
   itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", recursion = true}),
   {}
 )
