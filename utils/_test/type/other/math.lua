@@ -1,41 +1,29 @@
+assertMessage(
+  additionRingModuloN(1, 5, 4),
+  2
+)
 
----@param a integer
----@param b integer
----@param modulo integer
----@return integer
-function additionRingModuloN(a, b, modulo)
-    return (a + b) % modulo
-end
+assertMessage(
+  additionRingModuloN(1, 5, 3),
+  0
+)
 
----@param a integer
----@param b integer
----@param modulo integer
----@return integer
-function subtractionRingModuloN(a, b, modulo)
-  return (a - b) % modulo
-end
+assertMessage(
+  subtractionRingModuloN(1, 5, 4),
+  0
+)
 
----@param a? any
----@param crement? "in" | "de"
----@return any
-function crementIfNumber(a, crement)
-  a = a or 0
-  crement = crement or "in"
-  if type(a) == "number" then
-    if crement == "in" then
-      return a + 1
-    elseif crement == "de" then
-      return a - 1
-    else
-      error("Invalid crement: " .. crement)
-    end
-  else
-    return a
-  end
-end
+assertMessage(
+  crementIfNumber(1, "de"),
+  0
+)
 
----@param a any
----@return boolean
-function isEven(a)
-  return a % 2 == 0
-end
+assertMessage(
+  crementIfNumber("1", "de"),
+  "1"
+)
+
+assertMessage(
+  isEven(2),
+  true
+)

@@ -1,5 +1,0 @@
-local rrq = bindArg(relative_require, "utils._test.string")
-rrq("escaping")
-rrq("string-booleans")
-rrq("string-array")
-rrq("string-transformers")

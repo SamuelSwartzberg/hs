@@ -1,58 +1,64 @@
+assertMessage(
+  InfNo:get(true),
+  "inf"
+)
 
---- Binary type with two arbitrary values
---- @param vt any
---- @param vf any
-function Binary(vt, vf)
-  local binary = {
-    vt = vt,
-    vf = vf,
-  }
+assertMessage(
+  InfNo:get(false),
+  "no"
+)
 
-  --- @param state boolean
-  --- @return any
-  function binary:get(state)
-    if state then
-      return self.vt
-    else
-      return self.vf
-    end
-  end
+assertMessage(
+  InfNo:getBool("inf"),
+  true
+)
 
-  --- @param state any
-  --- @return boolean
-  function binary:getBool(state)
-    if state == self.vt then
-      return true
-    elseif state == self.vf then
-      return false
-    else
-      error("Invalid state")
-    end
-  end
+assertMessage(
+  InfNo:getBool("no"),
+  false
+)
 
-  --- @param state boolean
-  --- @return any
-  function binary:invBool(state)
-    return self:get(not state)
-  end
+assertMessage(
+  InfNo:getBool("nope"),
+  nil
+)
 
-  --- @param state any
-  --- @return any
-  function binary:invV(state)
-    return self:get(not self:getBool(state))
-  end
+assertMessage(
+  InfNo:invBool(true),
+  "no"
+)
 
-  --- @param state any
-  --- @return any
-  function binary:inv(state)
-    if type(state) == "boolean" or state == nil then
-      return self:invBool(state)
-    else
-      return self:invV(state)
-    end
-  end
+assertMessage(
+  InfNo:invBool(false),
+  "inf"
+)
 
-  return binary
-end
+assertMessage(
+  InfNo:invV("inf"),
+  "no"
+)
 
-InfNo = Binary("inf", "no")
+assertMessage(
+  InfNo:invV("no"),
+  "inf"
+)
+
+assertMessage(
+  InfNo:inv("inf"),
+  "no"
+)
+
+assertMessage(
+  InfNo:inv("no"),
+  "inf"
+)
+
+assertMessage(
+  InfNo:inv(true),
+  "no"
+)
+
+assertMessage(
+  InfNo:inv(false),
+  "inf"
+)

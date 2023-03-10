@@ -1,0 +1,13 @@
+local rrq = bindArg(relative_require, "utils.advanced-interfacing")
+
+rrq("alert")
+rrq("do-input")
+rrq("do-when-ready")
+rrq("do-with-activated")
+rrq("function-shell-args")
+rrq("gpt3")
+rrq("ipc-socket")
+rrq("json")
+rrq("prompt")
+rrq("query-page")
+rrq("run-threaded")

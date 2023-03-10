@@ -1,5 +1,0 @@
-local rrq = bindArg(relative_require, "utils._test.table")
-rrq("list")
-rrq("assoc-arr")
-rrq("table")
-rrq("ovtable")

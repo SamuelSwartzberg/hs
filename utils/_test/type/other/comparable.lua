@@ -1,85 +1,45 @@
---- @alias comparable_implementation {__eq: fun(self: any, other: any): (boolean), __lt: fun(self: any, other: any): (boolean), __le: fun(self: any, other: any): (boolean)}
---- @alias comparable comparable_implementation | number | string | hs_geometry_point_like -- presumably comparison is implemented via metamethods for numbers and strings as well, but my annotation system doesn't expose that
+local test_date = date("2013-02-03T09:56:22Z")
 
---- @generic T : comparable
---- @param val T
---- @param min T
---- @param max T
---- @return T
-function clamp(val, min, max)
-  if val < min then
-    return min
-  elseif val > max then
-    return max
-  else
-    return val
-  end
-end
+assertValuesContainExactly(
+  seq(test_date:copy():adddays(-3), test_date:copy():adddays(3)),
+  {
+    date("2013-01-31T09:56:22Z"),
+    date("2013-02-01T09:56:22Z"),
+    date("2013-02-02T09:56:22Z"),
+    date("2013-02-03T09:56:22Z"),
+    date("2013-02-04T09:56:22Z"),
+    date("2013-02-05T09:56:22Z"),
+    date("2013-02-06T09:56:22Z"),
+  }
+)
 
---- @generic T : comparable
----@param a T
----@param b T
----@param distance? T
----@return boolean
-function isClose(a, b, distance)
-  if not distance then distance = 1 end
-  if a > b then
-    return a - b < distance
-  else
-    return b - a < distance
-  end
-end
+assertValuesContainExactly(
+  seq(test_date:copy():addhours(-5), test_date:copy():addhours(4), 2, "hours"),
+  {
+    date("2013-02-03T04:56:22Z"),
+    date("2013-02-03T06:56:22Z"),
+    date("2013-02-03T08:56:22Z"),
+    date("2013-02-03T10:56:22Z"),
+    date("2013-02-03T12:56:22Z")
+  }
+)
 
---- @generic T : comparable
---- @param start? T
---- @param stop? T
---- @param step? T
---- @param unit? any only required for some types
---- @return T[]
-function seq(start, stop, step, unit)
-  start = defaultIfNil(start, 1)
+assertValuesContainExactly(
+  seq(1, 5),
+  {1, 2, 3, 4, 5}
+)
 
-  local mode
-  if type(start) == "number" then
-    mode = "number"
-  elseif type(start) == "table" then
-    if start.addays then
-      mode = "date"
-    end
-  elseif type(start) == "string" then
-    mode = "string"
-  end
+assertValuesContainExactly(
+  seq(1, 5, 2),
+  {1, 3, 5}
+)
 
-  local addmethod
+assertMessage(
+  isClose(1, 1.1, 0.2),
+  true
+)
 
-  if mode == "number" then
-    stop = defaultIfNil(stop, 10)
-    step = defaultIfNil(step, 1)
-    addmethod = function(a, b) return a + b end
-  elseif mode == "date" then
-    if start then start = start:copy() else start = date() end
-    if stop then stop = stop:copy() else stop = date():addays(10) end
-    step = defaultIfNil(step, 1)
-    unit = defaultIfNil(unit, "days")
-    addmethod = function(a, b) 
-      local a_copy = a:copy()
-      return a_copy["add" .. unit](a_copy, b) 
-    end
-  elseif mode == "string" then
-    start = defaultIfNil(start, "a")
-    stop = defaultIfNil(stop, "z")
-    step = defaultIfNil(step, 1)
-    addmethod = function(a, b)
-      return string.char(string.byte(a) + b)
-    end
-  end
-
-  local range = {}
-  local current = start
-  while current <= stop do
-    table.insert(range, current)
-    current = addmethod(current, step)
-  end
-
-  return range
-end
+assertMessage(
+  isClose(1, 2, 0.1),
+  false
+)

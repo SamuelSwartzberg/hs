@@ -11,7 +11,7 @@
 
 --- @generic T : indexable
 --- @param thing T
---- @param start_or_spec conditionSpec|sliceSpec
+--- @param start_or_spec? conditionSpec|sliceSpec
 --- @param stop? conditionSpec
 --- @param step? integer
 function slice(thing, start_or_spec, stop, step)
@@ -38,11 +38,11 @@ function slice(thing, start_or_spec, stop, step)
     spec.step = step
   end
 
-  if not type(spec.start) == "number" then
+  if spec.start and not type(spec.start) == "number" then
     spec.start = find(thing, spec.start, {ret = "k", last = spec.last_start})
   end
 
-  if not type(spec.stop) == "number" then
+  if spec.stop and not type(spec.stop) == "number" then
     spec.stop = find(thing, spec.stop, {ret = "k", start = spec.start, last = spec.last_stop})
   end
 
