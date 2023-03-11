@@ -21,6 +21,7 @@ mt = {
     case = {
       snake = "[a-zA-Z0-9_]+",
       upper_snake = "[A-Z0-9_]+",
+      lower_snake = "[a-z0-9_]+",
       lower = "[a-z]+",
       upper = "[A-Z]+",
     },
@@ -44,7 +45,7 @@ mt = {
     },
     b = {
       b64 = {
-        gen = "[A-Za-z0-9+/=]+",
+        gen = "[A-Za-z0-9\\+/=]+",
         url = "[A-Za-z0-9_\\-=]+"
       },
       b32 = {

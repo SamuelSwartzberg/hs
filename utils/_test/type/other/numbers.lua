@@ -1,39 +1,4 @@
 assertMessage(
-  toNumber(1.6, "int", "nil"),
-  2
-)
-
-assertMessage(
-  toNumber("1.6", "int", "nil"),
-  nil
-)
-
-assertMessage(
-  pcall(toNumber, "1.6", "int", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
-  false
-)
-
-assertMessage(
-  toNumber(1.6, "int", "nil"),
-  2
-)
-
-assertMessage(
-  toNumber("1.6", "pos-int", "nil"),
-  nil
-)
-
-assertMessage(
-  toNumber("1.6", "pos-int", "invalid-number"),
-  -math.huge
-)
-
-assertMessage(
-  pcall(toNumber, "1.6", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
-  false
-)
-
-assertMessage(
   isNumber(1.6, "int"),
   false
 )
@@ -73,13 +38,26 @@ assertMessage(
   true
 )
 
+
+
 assertMessage(
-  intOfLength(3),
+  lengthOfInt(rand({len=4})),
+  4
+)
+
+assertMessage(
+  lengthOfInt(rand({len=1})),
+  1
+)
+
+
+assertMessage(
+  intOfLength(3, "lower"),
   100
 )
 
 assertMessage(
-  intOfLength(1),
+  intOfLength(1, "lower"),
   1
 )
 
@@ -94,14 +72,10 @@ assertMessage(
 )
 
 assertMessage(
-  lengthOfInt(rand({len=4})),
-  4
+  intOfLength(2, "center"),
+  50
 )
 
-assertMessage(
-  lengthOfInt(rand({len=1})),
-  1
-)
 
 local lower = 22
 local upper = 179
@@ -118,3 +92,39 @@ assertMessage(
   true
 )
 
+
+
+assertMessage(
+  toNumber(1.6, "int", "nil"),
+  2
+)
+
+assertMessage(
+  toNumber("1.6", "int", "nil"),
+  nil
+)
+
+assertMessage(
+  pcall(toNumber, "1.6", "int", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
+  false
+)
+
+assertMessage(
+  toNumber(1.6, "int", "nil"),
+  2
+)
+
+assertMessage(
+  toNumber("1.6", "pos-int", "nil"),
+  nil
+)
+
+assertMessage(
+  toNumber("1.6", "pos-int", "invalid-number"),
+  -math.huge
+)
+
+assertMessage(
+  pcall(toNumber, "1.6", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
+  false
+)

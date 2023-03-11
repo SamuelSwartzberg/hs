@@ -24,6 +24,16 @@ assertMessage(
 )
 
 assertMessage(
+  crementIfNumber(1, "in"),
+  2
+)
+
+assertMessage(
+  crementIfNumber("1", "in"),
+  "1"
+)
+
+assertMessage(
   isEven(2),
   true
 )

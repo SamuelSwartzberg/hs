@@ -45,17 +45,18 @@ function seq(start, stop, step, unit)
   elseif type(start) == "table" then
     if start.addays then
       mode = "date"
+    elseif start.xy then
+      mode = "point"
     end
   elseif type(start) == "string" then
     mode = "string"
   end
 
-  local addmethod
+  local addmethod = function(a, b) return a + b end
 
   if mode == "number" then
     stop = defaultIfNil(stop, 10)
     step = defaultIfNil(step, 1)
-    addmethod = function(a, b) return a + b end
   elseif mode == "date" then
     if start then start = start:copy() else start = date() end
     if stop then stop = stop:copy() else stop = date():addays(10) end
@@ -65,6 +66,10 @@ function seq(start, stop, step, unit)
       local a_copy = a:copy()
       return a_copy["add" .. unit](a_copy, b) 
     end
+  elseif mode == "point" then
+    start = defaultIfNil(start, hs.geometry.point(0, 0))
+    stop = defaultIfNil(stop, hs.geometry.point(10, 10))
+    step = defaultIfNil(step, hs.geometry.point(1, 1))
   elseif mode == "string" then
     start = defaultIfNil(start, "a")
     stop = defaultIfNil(stop, "z")

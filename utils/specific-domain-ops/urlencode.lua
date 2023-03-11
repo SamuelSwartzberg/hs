@@ -7,7 +7,7 @@ function urlencode(url, spaces_percent)
     return ""
   end
   url = url:gsub("\n", "\r\n")
-  url = string.gsub(url, "([^%w _%%%-%.~])", transf.char.hex)
+  url = string.gsub(url, "([^%w _%%%-%.~])", transf.char.percent)
   if spaces_percent then
     url = string.gsub(url, " ", "%%20")
   else

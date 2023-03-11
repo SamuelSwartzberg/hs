@@ -1,54 +1,127 @@
---- saliastable: 
---- key f: matches key f, foo, ...
---- key fb: matches key fb, foo_bar, foo_baz, ...
---- laliastable
---- key foo: matches key foo, f, ...
---- key foo_bar: matches key foo_bar, fb
+local test_saliastable = newAliastable({
+  a = 1,
+  foo = 2,
+  ab = 3,
+  foo_bar = 4,
+}, "s")
 
+assertMessage(
+  test_saliastable.a,
+  1
+)
 
-function createAliasMetatable(get_longer_shorter_thing)
-  return {
-    __index = function(t, k)
-      local v = rawget(t, k)
-      if v then
-        return v
-      else
-        local key = find(t, function(testkey)
-          local longer_thing, shorter_thing = get_longer_shorter_thing(testkey, k)
-          local longer_parts = stringy.split(longer_thing, "_")
-          local shorter_parts = bytes(shorter_thing)
-          if not (#longer_parts == #shorter_parts) then
-            return false
-          end
-          for i, key_part in ipairs(shorter_parts) do
-            if not stringy.startswith(longer_parts[i], key_part) then
-              return false
-            end
-          end
-          return true
-        end, "k")
-        if key then
-          return t[key]
-        else
-          return nil
-        end
-      end
-    end
-  }
-end
+assertMessage(
+  test_saliastable.aaa,
+  nil
+)
 
-local aliasmetatable = {
-  l = createAliasMetatable(function(testkey, k)
-    return k, testkey
-  end),
-  s = createAliasMetatable(function(testkey, k)
-    return testkey, k
-  end)
-}
---- @param t? table
---- @param type? "l" | "s"
---- @return table
-function newAliastable(t, type)
-  type = type or "s"
-  return setmetatable(t or {}, aliasmetatable[type])
-end
+assertMessage(
+  test_saliastable.f,
+  2
+)
+
+assertMessage(
+  test_saliastable.foo,
+  2
+)
+
+assertMessage(
+  test_saliastable.c,
+  nil
+)
+
+assertMessage(
+  test_saliastable.ab,
+  3
+)
+
+assertMessage(
+  test_saliastable.aaa_bbb,
+  nil
+)
+
+assertMessage(
+  test_saliastable.fb,
+  4
+)
+
+assertMessage(
+  test_saliastable.foo_bar,
+  4
+)
+
+assertMessage(
+  test_saliastable.aaa_bbb_ccc,
+  nil
+)
+
+local test_laliastable = newAliastable({
+  a = 1,
+  foo = 2,
+  c = 5,
+  car = 6,
+  ab = 3,
+  foo_bar = 4,
+  ccc_bbb = 7,
+  cb = 8,
+}, "l")
+
+assertMessage(
+  test_laliastable.a,
+  1
+)
+
+assertMessage(
+  test_laliastable.aaa,
+  1
+)
+
+assertMessage(
+  test_laliastable.f,
+  nil
+)
+
+assertMessage(
+  test_laliastable.foo,
+  2
+)
+
+assertMessage(
+  test_laliastable.c,
+  5
+)
+
+assertMessage(
+  test_laliastable.car,
+  6
+)
+
+assertMessage(
+  test_laliastable.ab,
+  3
+)
+
+assertMessage(
+  test_laliastable.afu_boo,
+  3
+)
+
+assertMessage(
+  test_laliastable.fb,
+  nil
+)
+
+assertMessage(
+  test_laliastable.foo_bar,
+  4
+)
+
+assertMessage(
+  test_laliastable.ccc_bbb,
+  7
+)
+
+assertMessage(
+  test_laliastable.cb,
+  8
+)

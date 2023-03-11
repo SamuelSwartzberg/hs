@@ -1,4 +1,4 @@
---- @param t any
+--[[ --- @param t any
 --- @return boolean
 function isListOrEmptyTable(t)
   if type(t) ~= "table" then return false end
@@ -8,7 +8,7 @@ function isListOrEmptyTable(t)
   if t.isassoc == "isassoc" then return false end -- signal value to indicate that this is an assoc table
   return next(t) == nil
 end
-
+ ]]
 --- temporary, not sure if this is better than the above
 --- @param t any
 --- @return boolean

@@ -1,7 +1,7 @@
 --- @generic T
 --- @param list T[]
---- @param comp fun(a: T, b: T):boolean
---- @param if_even "lower" | "higher" | "both"
+--- @param comp? fun(a: T, b: T):boolean
+--- @param if_even? "lower" | "higher" | "average" | "both"
 --- @return T
 function listMedian(list, comp, if_even)
   if_even = if_even or "lower"
@@ -13,6 +13,8 @@ function listMedian(list, comp, if_even)
       return list[mid]
     elseif if_even == "higher" then
       return list[mid + 1]
+    elseif if_even == "average" then
+      return (list[mid] + list[mid + 1]) / 2
     else
       return {list[mid], list[mid + 1]}
     end

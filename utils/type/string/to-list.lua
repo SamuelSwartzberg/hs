@@ -1,6 +1,6 @@
 --- @param str string
 --- @return string[]
-function bytes(str)
+function bytechars(str)
   local t = {}
   for i = 1, #str do
     t[i] = str:sub(i, i)

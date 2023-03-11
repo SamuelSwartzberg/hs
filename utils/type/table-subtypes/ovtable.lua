@@ -170,7 +170,7 @@ end
 function pkg.init(all_elems)
   local t = pkg.new()
   for i, spec in ipairs(all_elems) do
-    t[spec.key] = spec.value
+    t[defaultIfNil(spec.k, spec.key)] = defaultIfNil(spec.v, spec.value)
   end
   return t
 end

@@ -6,7 +6,7 @@
 --- key foo_bar: matches key foo_bar, fb
 
 
-function createAliasMetatable(get_longer_shorter_thing)
+local function createAliasMetatable(get_longer_shorter_thing)
   return {
     __index = function(t, k)
       local v = rawget(t, k)
@@ -16,7 +16,7 @@ function createAliasMetatable(get_longer_shorter_thing)
         local key = find(t, function(testkey)
           local longer_thing, shorter_thing = get_longer_shorter_thing(testkey, k)
           local longer_parts = stringy.split(longer_thing, "_")
-          local shorter_parts = bytes(shorter_thing)
+          local shorter_parts = bytechars(shorter_thing)
           if not (#longer_parts == #shorter_parts) then
             return false
           end

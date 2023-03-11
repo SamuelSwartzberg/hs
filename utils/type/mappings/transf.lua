@@ -8,6 +8,9 @@ transf = {
   },
   char = {
     hex = function(char)
+      return string.format("%02X", string.byte(char))
+    end,
+    percent = function(char)
       return string.format("%%%02X", string.byte(char))
     end,
   },

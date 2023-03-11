@@ -47,7 +47,7 @@ function lengthOfInt(val)
 end
 
 --- @param length integer
---- @param target "upper" | "lower" | "center"
+--- @param target? "upper" | "lower" | "center"
 --- @return integer
 function intOfLength(length, target)
   target = target or "center"

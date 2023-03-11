@@ -1,22 +1,56 @@
 to = {
   case = {
     snake = {
-      cond = {
-        _r = "[^%w%d]",
-        _regex_engine = "eutf8",
-        _ignore_case = true,
-      },
-      mode = "replace",
-      proc = "_"
+      {
+        cond = {
+          _r = "[^%w%d]+",
+          _regex_engine = "eutf8",
+          _ignore_case = true,
+        },
+        mode = "replace",
+        proc = "_"
+      }, {
+        cond = {
+          _start = "_"
+        },
+        mode = "remove"
+      }, {
+        cond = {
+          _stop = "_"
+        },
+        mode = "remove"
+      }, {
+        cond = {
+          _r = "_{2,}",
+        },
+        mode = "replace",
+        proc = "_"
+      }
     },
-    kebap = {
+    kebap = {{
       cond = {
-        _r = "[^%w%d]",
+        _r = "[^%w%d]+",
         _regex_engine = "eutf8",
         _ignore_case = true,
       },
       mode = "replace",
-      proc = "-"
+      proc = "-"}, {
+        cond = {
+          _start = "-"
+        },
+        mode = "remove"
+      }, {
+        cond = {
+          _stop = "-"
+        },
+        mode = "remove"
+      }, {
+        cond = {
+          _r = "-{2,}",
+        },
+        mode = "replace",
+        proc = "-"
+      }
     },
     capitalized = {
       mode = "replace",
@@ -34,12 +68,12 @@ to = {
       {
         mode = "replace",
         cond = {_r = "%%(%x%x)", _regex_engine = "eutf8"},
-        proc = transf.char.hex
+        proc = transf.char.percent
       },
       {
         mode = "replace",
-        cond = " ",
-        proc = "+"
+        cond = "+",
+        proc = " "
       }
     }
   },

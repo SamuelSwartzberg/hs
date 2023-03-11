@@ -1,29 +1,59 @@
---- @param str string
---- @return string[]
-function bytes(str)
-  local t = {}
-  for i = 1, #str do
-    t[i] = str:sub(i, i)
-  end
-  return t
-end
+assertValuesContainExactly(
+  chars("hello"),
+  {"h", "e", "l", "l", "o"}
+)
 
+assertValuesContainExactly(
+  chars(""),
+  {}
+)
 
---- @param str string
---- @return string[]
-function chars(str)
-  local t = {}
-  for i = 1, eutf8.len(str) do
-    t[i] = eutf8.sub(str, i, i)
-  end
-  return t
-end
+assertValuesContainExactly(
+  chars("😁"),
+  {"😁"}
+)
 
---- @param str string
---- @return string[]
-function lines(str)
-  return stringy.split(
-    stringy.strip(str),
-    "\n"
-  )
-end
+assertValuesContainExactly(
+  chars("😁😁"),
+  {"😁", "😁"}
+)
+
+assertValuesContainExactly(
+  chars("😁~yaay~😁"),
+  {"😁", "~", "y", "a", "a", "y", "~", "😁"}
+)
+
+assertValuesContainExactly(
+  bytechars("hello"),
+  {"h", "e", "l", "l", "o"}
+)
+
+assertValuesContainExactly(
+  bytechars(""),
+  {}
+)
+
+assertMessage(
+  #bytechars("😁"),
+  4
+)
+
+assertMessage(
+  #bytechars("😁😁"),
+  8
+)
+
+assertMessage(
+  #bytechars("😁~yaay~😁"),
+  14
+)
+
+assertValuesContainExactly(
+  lines("hello\nworld"),
+  {"hello", "world"}
+)
+
+assertValuesContainExactly(
+  lines("yo"),
+  {"yo"}
+)
