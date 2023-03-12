@@ -1,31 +1,53 @@
+local temp_file_1 = env.TMPDIR .. "/do-when-ready/" .. os.time() .. "-1.txt"
+local temp_file_2 = env.TMPDIR .. "/do-when-ready/" .. os.time() .. "-2.txt"
+local temp_file_3 = env.TMPDIR .. "/do-when-ready/" .. os.time() .. "-3.txt"
 
-local do_queue = {}
-local current_alert
-local alert_hotkey
-alert_hotkey =  hs.hotkey.bind({"cmd", "alt", "shift"}, "/", function()
-  local first_in = table.remove(do_queue, 1)
-  first_in.fn(returnUnpackIfTable(first_in.args))
-  if #do_queue == 0 then 
-    alert_hotkey:disable()
-    hs.alert.closeSpecific(current_alert)
-  else
-    hs.alert.closeSpecific(current_alert)
-    current_alert = alert("Waiting to proceed (" .. #do_queue .. " waiting in queue) ... (Press chord / to continue.)", "indefinite")
-  end
-end)
-
---- @param fn function
---- @param args? any
-function doWhenReady(fn, args)
-  if current_alert then 
-    hs.alert.closeSpecific(current_alert)
-  end
-  
-  push(do_queue, {
-    fn = fn, 
-    args = args
-  })
-  current_alert = alert("Waiting to proceed (" .. #do_queue .. " waiting in queue) ... (Press chord / to continue.)", "indefinite")
-  ---@diagnostic disable-next-line: need-check-nil
-  alert_hotkey:enable()
+local function writeHelloWorld(path)
+  writeFile(path, "Hello World!", "any", true)
 end
+
+doWhenReady(writeHelloWorld, temp_file_1)
+doWhenReady(writeHelloWorld, temp_file_2)
+doWhenReady(writeHelloWorld, temp_file_3)
+
+-- check that files have not been written yet
+
+assertMessage(
+  readFile(temp_file_1, "nil"),
+  nil 
+)
+
+assertMessage(
+  readFile(temp_file_2, "nil"),
+  nil 
+)
+
+assertMessage(
+  readFile(temp_file_3, "nil"),
+  nil
+)
+
+hs.eventtap.keyStroke({"cmd", "alt", "shift"}, "/")
+
+assertMessage(
+  readFile(temp_file_1, "nil"),
+  "Hello World!"
+)
+
+assertMessage(
+  readFile(temp_file_3, "nil"),
+  nil
+)
+
+hs.eventtap.keyStroke({"cmd", "alt", "shift"}, "/")
+hs.eventtap.keyStroke({"cmd", "alt", "shift"}, "/")
+
+assertMessage(
+  readFile(temp_file_2, "nil"),
+  "Hello World!"
+)
+
+assertMessage(
+  readFile(temp_file_3, "nil"),
+  "Hello World!"
+)

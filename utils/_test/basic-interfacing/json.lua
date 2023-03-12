@@ -42,6 +42,25 @@ local succ, res = runJSON({
 
 assertMessage(succ, false)
 
+runJSON({
+  args = simulate_error_json_command,
+  accept_error_payload = false,
+  json_catch = function(error)
+    assertMessage(true, true)
+  end
+})
+
+local succ, res = runJSON({
+  args = simulate_error_json_command,
+  accept_error_payload = true,
+  json_catch = function(error)
+    assertMessage(true, true)
+    return true -- trigger default error handler additionally
+  end
+})
+
+assertMessage(succ, false)
+
 -- opt: error_that_is_success
 
 local succ, res = runJSON({
@@ -57,6 +76,14 @@ local succ, res = runJSON({
 })
 
 assertMessage(succ, false)
+
+runJSON({
+  args = simulate_error_json_command,
+  error_that_is_success = "some error",
+  json_catch = function(error)
+    assertMessage(true, true)
+  end
+})
 
 -- opt: key_that_contains_payload
 
@@ -79,5 +106,10 @@ local succ, res = runJSON({
 
 assertMessage(succ, false)
 
--- catching json errors
-
+runJSON({
+  args = without_payload_key_json_command,
+  key_that_contains_payload = "foo",
+  json_catch = function(error)
+    assertMessage(true, true)
+  end
+})

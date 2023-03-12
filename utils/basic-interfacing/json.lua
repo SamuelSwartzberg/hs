@@ -13,35 +13,51 @@ function runJSON(opts, and_then)
     opts.force_sync = true
   end
   opts.error_on_empty_output = defaultIfNil(opts.error_on_empty_output, true) -- a well-formed json api should return something like an empty object or array, not an empty string, even if there's no data
+
+  local function handleOutputfunction(std_out)
+    local status, res = pcall(json.decode, std_out)
+    if not status then
+      error(("When running command:\n\n%s\n\nGot output:\n\n%s\n\nBut failed to decode it as JSON with error:\n\n%s"):format(
+        buildInnerCommand(opts.args),
+        std_out,
+        res
+      ))
+    end
+    if res.error and not opts.accept_error_payload and (not opts.error_that_is_success or res.error ~= opts.error_that_is_success) then
+      error(("When running command:\n\n%s\n\nGot output:\n\n%s\n\nBut it was an error payload:\n\n%s"):format(
+        buildInnerCommand(opts.args),
+        json.encode(res),
+        res.error
+      ))
+    end
+    if opts.key_that_contains_payload and res[opts.key_that_contains_payload] then
+      res = res[opts.key_that_contains_payload]
+    else
+      error(("Opts say that the payload is in the key %s, but response contained no such key.\nResponse:\n\n%s"):format(
+        opts.key_that_contains_payload,
+        json.encode(res)
+      ))
+    end
+    if type(and_then) == "function" then
+      return and_then(res)
+    else 
+      return res
+    end
+  end
+
   return run(
     opts,
     function(std_out)
-      local status, res = pcall(json.decode, std_out)
-      if not status then
-        error(("When running command:\n\n%s\n\nGot output:\n\n%s\n\nBut failed to decode it as JSON with error:\n\n%s"):format(
-          buildInnerCommand(opts.args),
-          std_out,
-          res
-        ))
-      end
-      if res.error and not opts.accept_error_payload and (not opts.error_that_is_success or res.error ~= opts.error_that_is_success) then
-        error(("When running command:\n\n%s\n\nGot output:\n\n%s\n\nBut it was an error payload:\n\n%s"):format(
-          buildInnerCommand(opts.args),
-          json.encode(res),
-          res.error
-        ))
-      end
-      if opts.key_that_contains_payload and res[opts.key_that_contains_payload] then
-        res = res[opts.key_that_contains_payload]
+      local succ, res = pcall(handleOutputfunction, std_out)
+      if not succ then
+        local throw_default_error = true
+        if opts.json_catch then
+          throw_default_error = opts.json_catch(res)
+        end
+        if throw_default_error then
+          error(res)
+        end
       else
-        error(("Opts say that the payload is in the key %s, but response contained no such key.\nResponse:\n\n%s"):format(
-          opts.key_that_contains_payload,
-          json.encode(res)
-        ))
-      end
-      if type(and_then) == "function" then
-        return and_then(res)
-      else 
         return res
       end
     end

@@ -50,6 +50,7 @@ end
 --- @field accept_error_payload? boolean only relevant for JSON. If true, will accept a payload even it contains an error key.
 --- @field error_that_is_success? string only relevant for JSON, if the error message matches this, it will be treated as a success. For badly designed JSON APIs.
 --- @field key_that_contains_payload? string only relevant for JSON. If set, this key must be present for the request to be considered a success, and the value of that key will be returned / passed to and_then
+--- @field json_catch? fun(error_msg: string): any only relevant for JSON. If set, will be called if one of the JSON-specific errors occurs
 --- @field and_then? fun(std_out: string): any this shouldn't be here, but rather the second argument of run, but if it's here, we'll still accept it
 
 --- @class run_options_object_async : run_options_object

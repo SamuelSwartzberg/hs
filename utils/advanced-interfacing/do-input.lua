@@ -45,8 +45,8 @@ function doDelta(specifier, do_after)
   end
 
   if specifier.relative_to then
-    local front_app = CreateApplicationItem(hs.application.frontmostApplication())
-    specifier.target_point = front_app:get("point-with-offset-from", {
+    local front_window = CreateRunningApplicationItem(hs.application.frontmostApplication()):get("main-window-item")
+    specifier.target_point = front_window:get("point-with-offset-from", {
       from = specifier.relative_to,
       delta = specifier.target_point
     })
@@ -112,6 +112,9 @@ function doDelta(specifier, do_after)
   end, POLLING_INTERVAL)
   timer:start()
 end
+
+--- @alias series_specifier_inner { mode: "move"|"scroll"|"click"|"key", [string]: any }
+--- @alias series_specifier series_specifier_inner | string
 
 --- @param series_specifier series_specifier
 --- @param do_after? fun(): nil
@@ -180,9 +183,6 @@ function doInput(series_specifier, do_after)
   end
 
 end
-
---- @alias series_specifier_inner { mode: "move"|"scroll"|"click"|"key", [string]: any }
---- @alias series_specifier series_specifier_inner | string
 
 --- @param specifier { wait_time?: number, specifier_list: series_specifier[] } | series_specifier[] | string
 function doSeries(specifier)

@@ -18,10 +18,13 @@ function pullAll(path)
   CreateStringItem(path):doThis("git-pull-all")
 end
 
---- @param namespace string
---- @param key string
---- @param value string
-function writeDefault(namespace, key, value)
-  return run({"defaults", "write", namespace, key, value})
+--- @param ... string[]
+function writeDefault(...)
+  local args = {...}
+  local command = concat({
+    "defaults",
+    "write",
+  }, args)
+  run(command, true)
 end
 

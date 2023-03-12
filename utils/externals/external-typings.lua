@@ -577,6 +577,8 @@ speak = hs.speech.new()
 --- @field launchOrFocus fun(name: string): boolean
 --- @field getMenuItems fun(): {[string]: table}
 --- @field activate fun(allWindows?: boolean): boolean
+--- @field title fun(self: hs.application): string
+--- @field name fun(self: hs.application): string
 
 --- @class hs.eventtap
 --- @field keyStroke fun(modifiers: modifier[], character: string, delay?: integer, application?: hs.application): nil
