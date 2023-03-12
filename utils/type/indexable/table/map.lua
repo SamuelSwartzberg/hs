@@ -79,52 +79,28 @@ function map(tbl, f, opts)
 
   -- set some vars we will need later
 
-  local mapped_useas = {}
-  for index, ret in ipairs(opts.ret) do
-    mapped_useas[ret] = index
-  end
-
-  local itemres 
-
-
   local iterator = getIterator(tbl, opts)
   local res = getEmptyResult(tbl, opts)
-
-  local function addfunc()
-    local newkey = itemres[mapped_useas.k]
-    local newval = itemres[mapped_useas.v]
-    if newkey == false or opts.tolist then -- use false as a key to indicate to push to array instead
-      table.insert(res, newval)
-    else
-      if not (opts.nooverwrite and res[newkey]) then
-        res[newkey] = newval
-      end
-    end
-  end
 
 
   for k, v in wdefarg(iterator)(tbl) do
     if not opts.mapcondition or findsingle(v, opts.mapcondition) then
       if opts.recurse == true or opts.recurse > opts.depth and not isLeaf(v) then
-        itemres = {k, map(v, f, opts)}
-        addfunc()
+        addToRes({k, map(v, f, opts)}, res, opts, k, v)
       else
         local args = getArgs(opts.args, k, v)
         local tempres = {f(table.unpack(args))}
         if opts.flatten and type(tempres[1]) == "table" then -- flatten is enabled, and we've returned an element we want to flatten
           for resk, resv in pairs(tempres) do
-            itemres = {resk,resv}
-            addfunc()
+            addToRes({resk,resv}, res, opts, k, v)
           end
         else
-          itemres = tempres
-          addfunc()
+          addToRes(tempres, res, opts, k, v)
           
         end
       end
     else
-      itemres = {k, v}
-      addfunc()
+      addToRes({k, v}, res, opts, k, v)
     end
 
   

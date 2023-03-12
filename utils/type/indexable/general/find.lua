@@ -1,5 +1,3 @@
--- TODO multiple return? = find all option
-
 --- @class findOpts : tableProcOpts
 --- @field findall boolean
 

@@ -5,7 +5,7 @@
 --- @field _contains? string
 --- @field _empty? boolean
 --- @field _type? "string" | "number" | "boolean" | "table" | "function" | "thread" | "userdata"
---- @field _exactly? string
+--- @field _exactly? any
 --- @field _list? any[]
 --- @field _invert? boolean
 --- @field _ignore_case? boolean
@@ -30,9 +30,10 @@
 function findsingle(item, conditions, opts)
   item = item or ""
   conditions = conditions or true
-  opts = opts or {}
-  opts.tostring = defaultIfNil(opts.tostring, true)
-  opts.ret = opts.ret or "boolean"
+---@diagnostic disable-next-line: cast-local-type
+  opts = opts or "boolean" -- default to returning a boolean, this is different from the general default, which is why we have to do this before calling defaultOpts
+  opts = defaultOpts(opts)
+  
 
   if opts.tostring then item = tostring(item) end
 
@@ -75,7 +76,7 @@ function findsingle(item, conditions, opts)
         else 
           return {
             k = -1,
-            v = "",
+            v = false,
             match = false
           }
         end

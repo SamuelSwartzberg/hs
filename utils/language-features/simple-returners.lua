@@ -96,6 +96,11 @@ function returnSmaller(a, b)
   return a < b
 end
 
+--- @param a number
+--- @return number
+function returnAdd1(a)
+  return a + 1
+end
 
 --- @generic T
 --- @param list T[]
@@ -127,6 +132,14 @@ end
 --- @return boolean
 function returnOr(a, b)
   return a or b
+end
+
+--- @generic T
+--- @param a T
+--- @param b T
+--- @return T
+function returnSum(a, b)
+  return a + b
 end
 
 --- @param regex string

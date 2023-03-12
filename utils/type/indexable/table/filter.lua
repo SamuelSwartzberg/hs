@@ -31,11 +31,7 @@ function filter(tbl, cond, opts)
       end
     end
     if res then
-      if opts.tolist then
-        table.insert(res, v)
-      else
-        res[k] = v
-      end
+      addToRes({k, v}, res, opts)
     end
   end
 

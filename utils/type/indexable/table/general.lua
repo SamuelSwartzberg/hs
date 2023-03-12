@@ -1,8 +1,8 @@
 --- @class tableProcOpts
 --- @field args kvmult
---- @field ret kvmult
---- @field tolist boolean
---- @field noovtable boolean
+--- @field ret kvmult not: reduce()
+--- @field tolist boolean not: reduce()
+--- @field noovtable boolean not: reduce()
 --- @field last boolean
 --- @field start integer
 --- @field stop integer
@@ -90,5 +90,39 @@ function getDefaultInput(thing, opts)
     return slice(thing, opts.start, opts.stop)
   else
     return thing
+  end
+end
+
+function getIsLeaf(treat_as_leaf)
+  if treat_as_leaf == "assoc" then
+    return function(v) return not isListOrEmptyTable(v) end
+  elseif treat_as_leaf == "list" then
+    return isListOrEmptyTable
+  elseif treat_as_leaf == false then
+    return returnFalse
+  else
+    error("flatten: invalid value for treat_as_leaf: " .. tostring(treat_as_leaf))
+  end
+end
+
+function addToRes(itemres,res,opts,k,v)
+  local mapped_useas = {}
+  for index, ret in ipairs(opts.ret) do
+    mapped_useas[ret] = index
+  end
+
+  local newkey
+  if mapped_useas.k then newkey = itemres[mapped_useas.k] -- if I have specified an index of the output (itemres) to be the key, use that, even if the value retrieved is nil
+  else newkey = k end -- otherwise, use the original key
+  local newval
+  if mapped_useas.v then newval = itemres[mapped_useas.v] -- ditto for value
+  else newval = v end 
+  -- explanation: We want to be able to return nil in our processor (that feeds into itemres) and have that be the key/value in the result, so that we can delete things via map() and similar funcs. But we also want to be able to specify that we want to use the original key/value in the result.
+  if newkey == false or opts.tolist then -- use false as a key to indicate to push to array instead
+    table.insert(res, newval)
+  else
+    if not (opts.nooverwrite and res[newkey]) then
+      res[newkey] = newval
+    end
   end
 end

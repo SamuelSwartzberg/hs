@@ -1,10 +1,11 @@
 --- @class reduceOpts : tableProcOpts
 --- @field init any
 
---- @param tbl? table
---- @param reducer? function
+--- @generic K, V, O
+--- @param tbl? table<K, V>
+--- @param reducer? fun(acc: O, ...: K | V): O
 --- @param opts? any | reduceOpts
---- @return any
+--- @return O
 function reduce(tbl, reducer, opts)
 
   -- defaults for all args
@@ -15,13 +16,18 @@ function reduce(tbl, reducer, opts)
 
   local iterator = getIterator(tbl, opts)
 
-  opts.init = opts.init or ""
- 
+  local acc_needs_to_be_populated = opts.init == nil
+  -- if no init value is given, use the first value in the table as the acc, which removes the need for handling a nil acc in the reducer
 
   local acc = opts.init
   for k, v in iterator(tbl) do
     local args = getArgs(k, v, opts)
-    acc = reducer(acc, table.unpack(args))
+    if acc_needs_to_be_populated then
+      acc = args[1]
+      acc_needs_to_be_populated = false
+    else
+      acc = reducer(acc, table.unpack(args))
+    end
   end
   return acc
 end
