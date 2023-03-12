@@ -1,44 +1,85 @@
+-- test singleLe:
 
---- @param str string
---- @param d? table
---- @return any
-function singleLe(str, d)
-  if d then -- add d to global namespace so that it can be accessed in the string
-    _G.d = d
-  end
-  local luaExecutable = load("return " .. str, "chunk", "t", _G)
-  if luaExecutable ~= nil then -- expression
-    return luaExecutable()
-  else
-    local luaExecutable = load(str, "chunk", "t", _G)
-    if luaExecutable ~= nil then -- statement, must return within the statement itself
-      return luaExecutable()
-    else
-      error("Neither a valid expression nor a valid statement.")
-    end
-  end
-  _G.d = nil
+-- test simple expressions
 
-end
+assertMessage(
+  singleLe("1"),
+  1
+)
 
---- simple implementation of a template engine
---- Surround material to be templated from global namespace together local data model (addressable by `d`) by `{{[]}}`
---- to make parsing easier, nesting is not supported
---- @param template string
---- @param d? table | string either a table or a path to a yaml or json file containing the data model
---- @return string
-function le(template, d)
-  if type(d) == "string" then
-    if stringy.endswith(d, ".yaml") then
-      d = yaml.load(readFile(d, "error"))
-    elseif stringy.endswith(d, ".json") then
-      d = json.decode(readFile(d, "error"))
-    else
-      error("Unknown file type.")
-    end
-  end
-  local res = eutf8.gsub(template, "{{%[(.-)%]}}", function(item)
-    return singleLe(item, d)
-  end)
-  return res
-end
+assertMessage(
+  singleLe("2 * 3"),
+  6
+)
+
+-- test that _G injection works
+
+assertMessage(
+  singleLe("env.HOME"),
+  env.HOME
+)
+
+-- test statements
+
+assertMessage(
+  singleLe([[
+    local foo = 1
+    if (true) {
+      foo = foo + 1;
+    } else {
+      return 27;
+    }
+    return foo;
+  ]]),
+  2
+)
+
+
+-- test le:
+
+-- no interpolation
+
+assertMessage(
+  le("Foo bar baz"),
+  "Foo bar baz"
+)
+
+-- simple interpolation
+
+assertMessage(
+  le("I got {{[ 11 * 9 ]}} problems, but lack of {{[ 'interpolation' ]}} ain't one"),
+  "I got 99 problems, but lack of interpolation ain't one"
+)
+
+-- interpolation with statements
+
+assertMessage(
+  le([[
+    Lines: 
+
+    {{[
+      for i = 1, 10 do
+        print(i)
+      end
+      _G.injectionstore = 27
+    ]}}
+
+    Value in injectionstore: {{[ injectionstore ]}}
+  ]]),
+  [[
+    Lines: 
+
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+    9
+    10
+
+    Value in injectionstore: 27
+  ]]
+)

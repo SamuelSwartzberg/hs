@@ -47,14 +47,14 @@ end
 --- @field dont_clean_output? boolean
 --- @field run_raw_shell? boolean if true, will run the task in a raw shell, rather than first switching to bash and loading the envfile
 --- @field error_on_empty_output? boolean error also if the output is empty
---- @field error_that_is_success? string only relevant for JSON, if the error message matches this, it will be treated as a success. For badly designed JSON APIs.
 --- @field accept_error_payload? boolean only relevant for JSON. If true, will accept a payload even it contains an error key.
+--- @field error_that_is_success? string only relevant for JSON, if the error message matches this, it will be treated as a success. For badly designed JSON APIs.
 --- @field key_that_contains_payload? string only relevant for JSON. If set, this key must be present for the request to be considered a success, and the value of that key will be returned / passed to and_then
+--- @field and_then? fun(std_out: string): any this shouldn't be here, but rather the second argument of run, but if it's here, we'll still accept it
 
 --- @class run_options_object_async : run_options_object
 --- @field delay? number
 --- @field run_immediately? boolean if true, will run the task immediately, otherwise, you need to call :start() manually on the returned task object
---- @field and_then? fun(std_out: string): any this shouldn't be here, but rather the second argument of run, but if it's here, we'll still accept it
 
 --- @alias run_first_arg run_options_object_async | command_parts | string
 --- @alias run_and_then fun(std_out: string): (any) | true | run_first_arg
@@ -77,7 +77,7 @@ function run(opts, and_then, ...)
   opts.catch = function(exit_code, std_err)
     local should_run_default_catch = true
     if opts.catch then
-      should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch
+      should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch, otherwise, don't
     end
     if should_run_default_catch == true then
       local err_str = ("Error running command:\n\n%s\n\nExit code: %s\n\nStderr: %s"):format(buildInnerCommand(opts.args), exit_code, std_err)

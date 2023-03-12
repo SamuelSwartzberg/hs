@@ -19,6 +19,36 @@ assertMessage(
   { a = { 2 }, b = { 3 }, c = { 4 } }
 )
 
+assertMessage(
+  map({ 1, 2, 3, 4, 5 }, returnAdd1,  { start = 2, stop = 4 }),
+  { 3, 4, 5 }
+)
+
+local ov1_5 = ovtable.new()
+
+ovtable.a = 1
+ovtable.b = 2
+ovtable.c = 3
+ovtable.d = 4
+ovtable.e = 5
+
+assertMessage(
+  map(ov1_5, returnAdd1,  { start = 2, stop = 4 }),
+  { 
+    b = 3,
+    c = 4,
+    d = 5
+  }
+)
+
+assertMessage(
+  map(ov1_5, returnAdd1,  { start = 2, stop = 4, last = true }),
+  { 
+    d = 5,
+    c = 4,
+    b = 3
+  }
+)
 
 assertMessage(
   map(
