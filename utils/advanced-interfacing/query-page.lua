@@ -1,9 +1,7 @@
-local rrq = bindArg(relative_require, "utils.dom")
-
 --- @class querySelectorOpts
 --- @field url string
 --- @field selector string
---- @field only_text boolean
+--- @field only_text? boolean
 
 --- @param opts querySelectorOpts
 --- @return string

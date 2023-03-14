@@ -12,7 +12,7 @@ cmds_from_1_to_10 = map(
 results_from_1_to_10 = map(
   list_from_1_to_10,
   function (ind)
-    return tostring(ind), tostring(ind) .. "\n"
+    return tostring(ind), tostring(ind)
   end,
   {"k", "kv"}
 )

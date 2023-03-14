@@ -1,31 +1,36 @@
-function BuildIPCSocket(port)
-  local ipc_socket = { id = port or rand({len=10}) }
+local timestamp = os.time()
 
-  function ipc_socket:getResponse(tbl)
+local manual_socket = BuildIPCSocket("test-" .. timestamp)
 
-    local succ, res = pcall(runJSON, {
-      args = {
-        "echo",
-        { value = json.encode(tbl), type = "quoted" },
-        "|",
-        "/opt/homebrew/bin/socat",
-        "-",
-        self:getSocket()
-      },
-      key_that_contains_payload = "data"
-    })
+assertMessage(
+  manual_socket:getSocket(),
+  "/tmp/sockets/test-" .. timestamp
+)
 
-    if succ then
-      return res
-    else
-      return nil
-    end
-
+run(
+  "socat UNIX-LISTEN:/tmp/sockets/test-" .. timestamp .. " -",
+  function (stdout)
+    assertMessage(
+      stdout,
+      "Hello World!"
+    )
   end
+)
 
-  function ipc_socket:getSocket()
-    return "/tmp/sockets/" .. self.id
-  end
+assertMessage(
+  manual_socket:getResponse("Hello World!"),
+  nil
+)
 
-  return ipc_socket
-end
+local auto_socket = BuildIPCSocket()
+
+run(
+  "socat UNIX-LISTEN:" .. auto_socket:getSocket() .. ",fork SYSTEM 'socat - UNIX-CONNECT:" .. auto_socket:getSocket() .. "'",
+  true
+)
+
+assertMessage(
+  auto_socket:getResponse("Hello World!"),
+  "Hello World!"
+)
+

@@ -1,5 +1,5 @@
-function BuildIPCSocket(port)
-  local ipc_socket = { id = port or rand({len=10}) }
+function BuildIPCSocket(name)
+  local ipc_socket = { id = name or rand({len=10}) }
 
   function ipc_socket:getResponse(tbl)
 

@@ -46,7 +46,7 @@ YoutubeApiItemSpecifier = {
           },
           request_verb = "POST",
         }
-        makeSimpleRESTApiRequest(specifier, function(data)
+        rest(specifier, function(data)
           env.YOUTUBE_SCOPE_ACCESS_TOKEN = data.access_token
           env.YOUTUBE_SCOPE_REFRESH_TOKEN = data.refresh_token
         end)
@@ -62,7 +62,7 @@ YoutubeApiItemSpecifier = {
           api_key = env.YOUTUBE_SCOPE_ACCESS_TOKEN
         }
         specifier = concat(local_specifier, specifier)
-        makeSimpleRESTApiRequest(specifier, specifier.do_after)
+        rest(specifier, specifier.do_after)
       end,
       ["create-youtube-playlist"] = function(self, specifier)
         self:doThis("api-message", {

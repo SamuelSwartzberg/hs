@@ -4,7 +4,7 @@ YoutubeApiExtensionItemSpecifier = {
   properties = {
     getables = {
       ["result"] = function(self, specifier)
-        return makeSimpleRESTApiRequest({
+        return rest({
           host = self:get("contents"),
           endpoint = specifier.endpoint,
           params = specifier.params,

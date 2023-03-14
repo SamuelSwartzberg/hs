@@ -30,7 +30,7 @@ HydrusNetworkItemSpecifier = {
         }
         specifier = concat(local_specifier, specifier)
 ---@diagnostic disable-next-line: undefined-field
-        makeSimpleRESTApiRequest(specifier, specifier.do_after)
+        rest(specifier, specifier.do_after)
       end,
       ["add-url-to-hydrus"] = function(self, url)
         self:doThis("do-api-request", {

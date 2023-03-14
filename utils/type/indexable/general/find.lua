@@ -6,6 +6,7 @@
 --- @param indexable? indexable
 --- @param cond? conditionSpec
 --- @param opts? findOptsWShorthand
+--- @return any
 function find(indexable, cond, opts)
   cond = cond or false
   opts = defaultOpts(opts)

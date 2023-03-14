@@ -22,6 +22,8 @@ post 'lua is working':
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
   - jcw/jcwserve in string menu?
   - danbooru search links need their query to count as 'seen' for other queries
+  - wrapper for hs chords?
+  - hs grid chords?
   - fix timer bugs
   - https://www.hammerspoon.org/docs/hs.application.watcher.html: use to deactivate mullvad when geforce now? wrap application watchers to make it easier to create stuff?
     - maybe make watchers table with function, type, watcher keys such that we can subclass watchers based on type, this would also unlock additional functionality

@@ -5,7 +5,7 @@
 --- @field buttonA? string
 --- @field buttonB? string
 
---- @param prompt_args PromptStringArgs
+--- @param prompt_args? PromptStringArgs
 --- @return (string|nil), boolean
 function promptStringInner(prompt_args)
   prompt_args = prompt_args or {}
@@ -40,7 +40,7 @@ end
 --- @field allowed_file_types? string[]
 --- @field resolves_aliases? boolean
 
---- @param prompt_args PromptPathArgs
+--- @param prompt_args? PromptPathArgs
 --- @return (string|string[]|nil), boolean
 function promptPathInner(prompt_args)
   prompt_args = prompt_args or {}
@@ -150,32 +150,31 @@ end
 --- @alias promptIntMult fun(type: "int", prompt_spec?: PromptSpecifier, loop: "array"): integer[]|nil
 --- @alias promptNumber fun(type: "number", prompt_spec?: PromptSpecifier, loop: "pipeline" | nil): number|nil
 --- @alias promptNumberMult fun(type: "number", prompt_spec?: PromptSpecifier, loop: "array"): number[]|nil
---- @alias promptString fun(type: "string" | "string-path" | "string-filepath", prompt_spec?: PromptSpecifier | string, loop: "pipeline" | nil): string|nil
---- @alias promptStringMult fun(type: "string" | "string-path" | "string-filepath", prompt_spec?: PromptSpecifier | string, loop: "array"): string[]|nil
+--- @alias promptString fun(type?: "string" | "string-path" | "string-filepath", prompt_spec?: PromptSpecifier | string, loop: "pipeline" | nil): string|nil
+--- @alias promptStringMult fun(type?: "string" | "string-path" | "string-filepath", prompt_spec?: PromptSpecifier | string, loop: "array"): string[]|nil
 --- @alias promptPath fun(type: "path" | "dir", prompt_spec?: PromptSpecifier | string, loop: "pipeline" | nil): string|string[]|nil
 --- @alias promptPathMult fun(type: "path" | "dir", prompt_spec?: PromptSpecifier | string, loop: "array"): string[]|nil
 --- @alias promptPair fun(type: "pair", prompt_spec?: PromptSpecifier, loop: "pipeline" | nil): string[]|nil
 --- @alias promptPairMult fun(type: "pair", prompt_spec?: PromptSpecifier, loop: "array"): string[][]|nil
 
 
---- @type promptInt | promptNumber | promptString | promptPath
+--- @type promptInt | promptNumber | promptString | promptPath | promptPair | promptIntMult | promptNumberMult | promptStringMult | promptPathMult | promptPairMult
 function prompt(type, prompt_spec, loop)
   prompt_spec = tablex.deepcopy(prompt_spec) or {}
-  prompt_spec.prompt_args = tablex.deepcopy(prompt_spec.prompt_args) or {}
+  prompt_spec.prompt_args = prompt_spec.prompt_args or {}
+  type = type or "string"
   if type == "int" then
     prompt_spec = prompt_spec or {}
     prompt_spec.transformer = prompt_spec.transformer or bind(toNumber, {["2"] = "int"})
-    prompt_spec.transformed_validator = prompt_spec.transformed_validator or function(x) return x ~= nil end 
   elseif type == "number" then
     prompt_spec.transformer = prompt_spec.transformer or tonumber
-    prompt_spec.transformed_validator = prompt_spec.transformed_validator or function(x) return x ~= nil end -- tonumber returns nil on failure
   elseif type == "string" then
     if type(prompt_spec) == "string" then
-      prompt_spec = {prompt_args = {message = prompt_spec}}
+      prompt_spec = {prompt_args = {message = prompt_spec}} -- prompt_spec shorthand when type is string: prompt_spec is the message
     end
   elseif type == "string-path" or type == "string-filepath" or  type == "path" or type == "dir" then 
     if type(prompt_spec) == "string" then
-      prompt_spec = {prompt_args = {default = prompt_spec}}
+      prompt_spec = {prompt_args = {default = prompt_spec}} -- prompt_spec shorthand when type is string: prompt_spec is the default value
     end
 
     if type == "path" or type == "dir" then
@@ -212,8 +211,10 @@ function prompt(type, prompt_spec, loop)
     prompt_spec.transformer = function(x)
       local key, value = x:match("^(.-)-(.*)$")
       if key ~= nil and value ~= nil then
+---@diagnostic disable-next-line: return-type-mismatch -- not sure why, but lua-language-server seems to have cast prompt_spec.transformer to `tonumber` for some reason. Since lua-language-server is often a bit buggy, I'm just going to disable the warning for now.
         return {key, value}
       else
+---@diagnostic disable-next-line: return-type-mismatch
         return nil
       end
     end

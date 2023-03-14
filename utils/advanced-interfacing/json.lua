@@ -8,11 +8,12 @@
 --- @field api_key_header? string
 --- @field request_verb? string 
 
---- @param specifier RESTApiSpecifier
+--- @param specifier? RESTApiSpecifier
 --- @param do_after? fun(result: table): nil Using this function to decide whether to do sync or async, so for async requests that do nothing with their output (e.g. boring POST requests), you can just pass in any truthy value
 --- @return any
-function makeSimpleRESTApiRequest(specifier, do_after)
+function rest(specifier, do_after)
   local url
+  specifier = tablex.deepcopy(specifier) or {}
   if specifier.url then
     url = specifier.url
   elseif specifier.host or specifier.endpoint or specifier.params then

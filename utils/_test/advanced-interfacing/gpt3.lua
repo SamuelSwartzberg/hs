@@ -1,21 +1,20 @@
---- @param text_content string
---- @param do_after fun(result: string): nil
---- @param opts? { model?: string, max_tokens?: integer, temperature?: number, echo?: boolean }
-function gpt3Request(text_content, do_after, opts)
-  local request = concat({
-    model = "text-davinci-003",
-    max_tokens = 300,
-    temperature = 0.7,
-    echo = false,
-  }, opts or {})
-  request.prompt = text_content
-  makeSimpleRESTApiRequest({
-    url = "https://api.openai.com/v1/completions",
-    request_table = request,
-    api_key = env.OPENAI_API_KEY
-  },
-  function(result)
-    do_after(stringy.strip(result.choices[1].text))
-  end
+if mode == "full-test" then -- testing costs api requests and therefore money!
+
+  gpt3(
+    "Hey. I am testing if my api access is working. Please respond with 'Hello World!', if you would!",
+    function (response)
+      assertMessage(response, "Hello World!")
+    end
   )
+
+  gpt3(
+    "Hey. This is an unit test of the max_tokens option of my gpt access function. Please provide any output with no whitespace, but I will trim it to only two tokens.",
+    {
+      max_tokens = 2
+    },
+    function (response)
+      assertMessage(isClose(#response, 8, 3), true) -- 1 token ≈ 4 chars -> test if within 3 chars of that value
+    end
+  )
+
 end
