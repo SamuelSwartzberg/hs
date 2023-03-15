@@ -113,6 +113,157 @@ assertMessage(
 
 -- promptNopolicy
 
+local mockPrompterReturnsNil = function()
+  return nil
+end
+local getMockPrompterReturnsNilFirstTry = function()
+  local first_try = true
+  return function()
+    if first_try then
+      first_try = false
+      return nil
+    else
+      return "Hello World!"
+    end
+  end
+end
+local mockPrompterCancelled = function()
+  return nil, false
+end
+local getMockPrompterCancelledFirstTry = function()
+  local first_try = true
+  return function()
+    if first_try then
+      first_try = false
+      return nil, false
+    else
+      return "Hello World!"
+    end
+  end
+end
+
+local mockPrompterReturnsString = function()
+  return "Hello World!"
+end
+
+local mockPrompterInvalidWhenTransformed = function()
+  return "Invalid when transformed"
+end
+
+local getMockPrompterInvalidWhenTransformedFirstTry = function()
+  local first_try = true
+  return function()
+    if first_try then
+      first_try = false
+      return "Invalid when transformed"
+    else
+      return "Hello World!"
+    end
+  end
+end
+
+local mockTransformerRejectsInvalidWhenTransformed = function(x)
+  return x ~= "Invalid when transformed"
+end
+
+-- try permutations of on_raw_invalid, on_transformed_invalid, on_cancel and "return_nil", "error", "reprompt"
+
+assertMessage(
+  promptNopolicy({
+    prompter = mockPrompterReturnsNil,
+    on_raw_invalid = "return_nil",
+  }),
+  nil
+)
+
+local succ, res = pcall(promptNopolicy, {
+  prompter = mockPrompterReturnsNil,
+  on_raw_invalid = "error"
+})
+
+assertMessage(succ, false)
+assertMessage(res, "WARN: User input was invalid (before transformation).")
+
+assertMessage(
+  promptNopolicy({
+    prompter = getMockPrompterReturnsNilFirstTry(),
+    on_raw_invalid = "reprompt",
+  }),
+  "Hello World!"
+)
+
+assertMessage(
+  promptNopolicy({
+    prompter = mockPrompterCancelled,
+    on_cancel = "return_nil",
+  }),
+  nil
+)
+
+local succ, res = pcall(promptNopolicy, {
+  prompter = mockPrompterCancelled,
+  on_cancel = "error"
+})
+
+assertMessage(succ, false)
+assertMessage(res, "WARN: User cancelled modal.")
+
+assertMessage(
+  promptNopolicy({
+    prompter = getMockPrompterCancelledFirstTry(),
+    on_cancel = "reprompt",
+  }),
+  "Hello World!"
+)
+
+assertMessage(
+  promptNopolicy({
+    prompter = mockPrompterInvalidWhenTransformed,
+    transformer = mockTransformerRejectsInvalidWhenTransformed,
+    on_transformed_invalid = "return_nil",
+  }),
+  nil
+)
+
+local succ, res = pcall(promptNopolicy, {
+  prompter = mockPrompterInvalidWhenTransformed,
+  transformer = mockTransformerRejectsInvalidWhenTransformed,
+  on_transformed_invalid = "error"
+})
+
+assertMessage(succ, false)
+assertMessage(res, "WARN: User input was invalid (after transformation).")
+
+assertMessage(
+  promptNopolicy({
+    prompter = getMockPrompterInvalidWhenTransformedFirstTry(),
+    transformer = mockTransformerRejectsInvalidWhenTransformed,
+    on_transformed_invalid = "reprompt",
+  }),
+  "Hello World!"
+)
+
+-- success
+
+assertMessage(
+  promptNopolicy({
+    prompter = mockPrompterReturnsString,
+  }),
+  "Hello World!"
+)
+
+-- final_postprocessor
+
+assertMessage(
+  promptNopolicy({
+    prompter = mockPrompterReturnsString,
+    final_postprocessor = function(x)
+      return x .. "!"
+    end,
+  }),
+  "Hello World!!"
+)
+
 -- prompt
 
 -- test on_cancel behavior once
@@ -389,4 +540,15 @@ assertMessage(
     end
   ),
   tmppath
+)
+
+-- promptPipeline (like the "pipeline" arg, but allowing prompts of different types to be chained)
+
+assertMessage(
+  promptPipeline({
+    {"string", { prompter = function() return "41" end }},
+    {"integer", { prompter = function(prompt_args) return prompt_args.default end }},
+    {"number", { prompter = function(prompt_args) return prompt_args.default / 2 end }},
+  }),
+  20.5
 )

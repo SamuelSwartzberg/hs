@@ -64,6 +64,13 @@ transf = {
     end
 
   },
+  multiline_string = {
+    trimmed_lines = function(str)
+      local lines = split(str, "\n")
+      local trimmed_lines = map(lines, stringy.strip)
+      return concat(trimmed_lines, "\n")
+    end,
+  },
   word = {
     title_case_policy = function(word)
       if find(mt._contains.small_words, word) then

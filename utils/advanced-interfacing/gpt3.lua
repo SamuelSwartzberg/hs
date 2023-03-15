@@ -1,7 +1,7 @@
 --- @param text_content string
 --- @param opts { model?: string, max_tokens?: integer, temperature?: number, echo?: boolean, ai_role: "completion" | "chat" } | fun(result: string): nil
 --- @param do_after? fun(result: string): nil
-function gpt3(text_content, opts, do_after)
+function gpt(text_content, opts, do_after)
   if type(opts) == "function" then
     do_after = opts
     opts = {}

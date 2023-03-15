@@ -16,10 +16,11 @@ function promptStringInner(prompt_args)
   prompt_args.buttonB = prompt_args.buttonB or "Cancel"
   --- @type string, string|nil
   local button_pressed, rawReturn = doWithActivated("Hammerspoon", function()
-    return hs.dialog.textPrompt(prompt_args.message, prompt_args.informative_text, prompt_args.default, prompt_args.buttonA, prompt_args.buttonB)
+    return hs.dialog.textPrompt(prompt_args.message, prompt_args.informative_text, prompt_args.default,
+    prompt_args.buttonA, prompt_args.buttonB)
   end)
   local ok_button_pressed = button_pressed == prompt_args.buttonA
-  
+
   if stringy.startswith(rawReturn, " ") then -- space triggers lua eval mode
     rawReturn = singleLe(rawReturn)
   end
@@ -28,7 +29,6 @@ function promptStringInner(prompt_args)
   end
 
   return rawReturn, ok_button_pressed
-
 end
 
 --- @class PromptPathArgs
@@ -43,15 +43,17 @@ end
 --- @param prompt_args? PromptPathArgs
 --- @return (string|string[]|nil), boolean
 function promptPathInner(prompt_args)
-  prompt_args = prompt_args or {}
-  prompt_args.message = defaultIfNil(prompt_args.message, "Choose a file or folder.")
-  prompt_args.default = defaultIfNil(prompt_args.default, env.HOME)
-  prompt_args.can_choose_files = defaultIfNil(prompt_args.can_choose_files, true)
+  prompt_args                        = prompt_args or {}
+  prompt_args.message                = defaultIfNil(prompt_args.message, "Choose a file or folder.")
+  prompt_args.default                = defaultIfNil(prompt_args.default, env.HOME)
+  prompt_args.can_choose_files       = defaultIfNil(prompt_args.can_choose_files, true)
   prompt_args.can_choose_directories = defaultIfNil(prompt_args.can_choose_directories, true)
   prompt_args.allows_loop_selection  = defaultIfNil(prompt_args.allows_loop_selection, false)
-  prompt_args.allowed_file_types = defaultIfNil(prompt_args.allowed_file_types , {})
-  prompt_args.resolves_aliases = defaultIfNil(prompt_args.resolves_aliases, true)
-  local rawReturn = hs.dialog.chooseFileOrFolder(prompt_args.message, prompt_args.default, prompt_args.can_choose_files, prompt_args.can_choose_directories, prompt_args.allows_loop_selection, prompt_args.allowed_file_types, prompt_args.resolves_aliases)
+  prompt_args.allowed_file_types     = defaultIfNil(prompt_args.allowed_file_types, {})
+  prompt_args.resolves_aliases       = defaultIfNil(prompt_args.resolves_aliases, true)
+  local rawReturn                    = hs.dialog.chooseFileOrFolder(prompt_args.message, prompt_args.default,
+  prompt_args.can_choose_files, prompt_args.can_choose_directories, prompt_args.allows_loop_selection,
+  prompt_args.allowed_file_types, prompt_args.resolves_aliases)
   if rawReturn == nil then
     return nil, false
   end
@@ -93,8 +95,12 @@ function promptNopolicy(prompt_spec)
   prompt_spec.prompt_args = prompt_spec.prompt_args or {}
   local validation_extra = ""
   local original_informative_text = prompt_spec.prompt_args.informative_text
-  prompt_spec.prompt_args.informative_text = prompt_spec.prompt_args.informative_text .. "on_cancel: " .. prompt_spec.on_cancel .. ", on_raw_invalid: " .. prompt_spec.on_raw_invalid .. ", on_transformed_invalid: " .. prompt_spec.on_transformed_invalid .. "\n"
-    
+  prompt_spec.prompt_args.informative_text = prompt_spec.prompt_args.informative_text ..
+  "on_cancel: " ..
+  prompt_spec.on_cancel ..
+  ", on_raw_invalid: " ..
+  prompt_spec.on_raw_invalid .. ", on_transformed_invalid: " .. prompt_spec.on_transformed_invalid .. "\n"
+
   while true do
     if original_informative_text then
       prompt_spec.prompt_args.informative_text = original_informative_text .. "\n" .. validation_extra
@@ -120,10 +126,10 @@ function promptNopolicy(prompt_spec)
           elseif prompt_spec.on_transformed_invalid == "reprompt" then
             local has_string_eqviv, string_eqviv = pcall(tostring, raw_return)
             local transformed_has_string_eqviv, transformed_string_eqviv = pcall(tostring, transformed_return)
-            validation_extra = 
-              "Invalid input:\n" ..
-              "  Original: " .. (has_string_eqviv and string_eqviv or "<not tostringable>") .. "\n" ..
-              "  Transformed: " .. (transformed_has_string_eqviv and transformed_string_eqviv or "<not tostringable>")
+            validation_extra =
+                "Invalid input:\n" ..
+                "  Original: " .. (has_string_eqviv and string_eqviv or "<not tostringable>") .. "\n" ..
+                "  Transformed: " .. (transformed_has_string_eqviv and transformed_string_eqviv or "<not tostringable>")
           end
         end
       else
@@ -165,16 +171,16 @@ function prompt(type, prompt_spec, loop)
   type = type or "string"
   if type == "int" then
     prompt_spec = prompt_spec or {}
-    prompt_spec.transformer = prompt_spec.transformer or bind(toNumber, {["2"] = "int"})
+    prompt_spec.transformer = prompt_spec.transformer or bind(toNumber, { ["2"] = "int" })
   elseif type == "number" then
     prompt_spec.transformer = prompt_spec.transformer or tonumber
   elseif type == "string" then
     if type(prompt_spec) == "string" then
-      prompt_spec = {prompt_args = {message = prompt_spec}} -- prompt_spec shorthand when type is string: prompt_spec is the message
+      prompt_spec = { prompt_args = { message = prompt_spec } } -- prompt_spec shorthand when type is string: prompt_spec is the message
     end
-  elseif type == "string-path" or type == "string-filepath" or  type == "path" or type == "dir" then 
+  elseif type == "string-path" or type == "string-filepath" or type == "path" or type == "dir" then
     if type(prompt_spec) == "string" then
-      prompt_spec = {prompt_args = {default = prompt_spec}} -- prompt_spec shorthand when type is string: prompt_spec is the default value
+      prompt_spec = { prompt_args = { default = prompt_spec } } -- prompt_spec shorthand when type is string: prompt_spec is the default value
     end
 
     if type == "path" or type == "dir" then
@@ -187,17 +193,17 @@ function prompt(type, prompt_spec, loop)
 
       prompt_spec.prompter = promptPathInner
     elseif type == "string-path" then
-      prompt_spec.transformed_validator = function(x) 
+      prompt_spec.transformed_validator = function(x)
         local res = (x ~= nil)
-        if res then 
+        if res then
           res = pcall(createPath, x)
         end
         return res
       end
     elseif type == "string-filepath" then
-      prompt_spec.transformed_validator = function(x) 
+      prompt_spec.transformed_validator = function(x)
         local res = (x ~= nil)
-        if res then 
+        if res then
           res = pcall(writeFile, x)
         end
         return res
@@ -205,23 +211,23 @@ function prompt(type, prompt_spec, loop)
     end
   elseif type == "pair" then
     if type(prompt_spec) == "string" then
-      prompt_spec = {prompt_args = {message = prompt_spec}}
+      prompt_spec = { prompt_args = { message = prompt_spec } }
     end
     prompt_spec.prompt_args.message = "Add a new " .. prompt_spec.prompt_args.message .. " pair, separated by '-'"
     prompt_spec.transformer = function(x)
       local key, value = x:match("^(.-)-(.*)$")
       if key ~= nil and value ~= nil then
----@diagnostic disable-next-line: return-type-mismatch -- not sure why, but lua-language-server seems to have cast prompt_spec.transformer to `tonumber` for some reason. Since lua-language-server is often a bit buggy, I'm just going to disable the warning for now.
-        return {key, value}
+        ---@diagnostic disable-next-line: return-type-mismatch -- not sure why, but lua-language-server seems to have cast prompt_spec.transformer to `tonumber` for some reason. Since lua-language-server is often a bit buggy, I'm just going to disable the warning for now.
+        return { key, value }
       else
----@diagnostic disable-next-line: return-type-mismatch
+        ---@diagnostic disable-next-line: return-type-mismatch
         return nil
       end
     end
   end
-    
+
   prompt_spec.prompt_args.message = prompt_spec.prompt_args.message or ("Enter a " .. type .. ":")
-    
+
   if loop == "array" then
     prompt_spec.raw_validator = function(x) return x ~= nil end -- ensure that we can end the loop by a nil-equivalent prompt input
     local res = {}
