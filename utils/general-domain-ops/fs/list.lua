@@ -1,12 +1,12 @@
 --- @class itemsInPathOpts
 --- @field path string The path to the directory
---- @field recursion? boolean | integer Whether to recurse into subdirectories, and how much
---- @field include_dirs? boolean Whether to include directories in the returned table
---- @field include_files? boolean Whether to include files in the returned table
---- @field validator? fun(file_name: string): boolean A function that takes a file name and returns true if the file should be included in the returned table
---- @field slice_results? sliceSpec | string A slice spec to slice the results with
+--- @field recursion? boolean | integer Whether to recurse into subdirectories, and how much. Default false (no recursion)
+--- @field include_dirs? boolean Whether to include directories in the returned table. Default true
+--- @field include_files? boolean Whether to include files in the returned table. Default true
+--- @field validator? fun(file_name: string): boolean A function that takes a file name and returns true if the file should be included in the returned table. Default is a simple validator that excludes some files that are rarely useful (e.g. .git, node_modules, etc.)
+--- @field slice_results? sliceSpecLike A slice spec to slice each result with, e.g. "-1:-1" to get the file name. Default is no slicing
 --- @field slice_results_opts? table A table of options to pass to pathSlice
---- @field validator_result? fun(path: string): boolean A function that takes a path and returns true if the path should be included in the returned table
+--- @field validator_result? fun(path: string): boolean An additional validation function that runs as an additional filter on each result. default is no additional validation
 
 --- Returns a table of all things in a directory
 
@@ -105,6 +105,8 @@ function itemsInPath(opts)
 
   if opts.slice_results then
     files = map(files, function(path)
+      opts.slice_results_opts = opts.slice_results_opts or {}
+      opts.slice_results_opts.rejoin_at_end = defaultIfNil(opts.slice_results_opts.rejoin_at_end, true) -- default to rejoining the path, since more often than not we don't want to get a table of tables when listing paths
       return pathSlice(path, opts.slice_results, opts.slice_results_opts)
     end)
   end
@@ -113,7 +115,7 @@ function itemsInPath(opts)
 end
 
 --- @param path string
---- @param slice_spec? sliceSpec | string
+--- @param slice_spec? sliceSpecLike
 --- @param opts? itemsInPathOpts
 function getItemsForAllLevelsInSlice(path, slice_spec, opts)
   slice_spec = slice_spec or { start = 1, stop = -1 }

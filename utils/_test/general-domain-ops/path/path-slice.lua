@@ -1,86 +1,43 @@
+-- Test 1: Basic slicing
+local result1 = pathSlice("/a/b/c", ":")
+assertValuesContainExactly(result1, {"a", "b", "c"})
 
---- @alias sliceOpts { ext_sep?: boolean, standartize_ext?: boolean, rejoin_at_end?: boolean, entire_path_for_each?: boolean }
+-- Test 2: Slicing with start and stop
+local result2 = pathSlice("/a/b/c", "2:3")
+assertValuesContainExactly(result2, {"b", "c"})
 
---- @param path string
---- @param spec? sliceSpec | string
---- @param opts? sliceOpts
---- @return string[] | string
-function pathSlice(path, spec, opts)
+-- Test 3: Slicing with step
+local result3 = pathSlice("/a/b/c/d", "::2")
+assertValuesContainExactly(result3, {"a", "c"})
 
-  -- set defaults
+-- Test 4: Slicing with negative start
+local result4 = pathSlice("/a/b/c", "-2:")
+assertValuesContainExactly(result4, {"b", "c"})
 
-  spec = spec or { start = -1, stop = -1}
-  opts = tablex.deepcopy(opts) or {}
+-- Test 5: Slicing with negative stop
+local result5 = pathSlice("/a/b/c", ":2:-1")
+assertValuesContainExactly(result5, {"a", "b"})
 
-  -- prepare path components
+-- Test 6: Slicing with negative step
+local result6 = pathSlice("/a/b/c/d", "4:1:-1")
+assertValuesContainExactly(result6, {"d", "c", "b", "a"})
 
-  local raw_path_components = stringy.split(path, "/")
-  if raw_path_components[#raw_path_components] == "" then
-    pop(raw_path_components) -- if path ends with a slash, remove the empty string at the end
-  end
+-- Test 7: Slicing with extension separation
+local result7 = pathSlice("/a/b/file.txt", ":", {ext_sep = true})
+assertValuesContainExactly(result7, {"a", "b", "file", "txt"})
 
-  -- handle special case of also slicing the extension
+-- Test 8: Slicing with standardized extension
+local result8 = pathSlice("/a/b/file.yml", ":", {standartize_ext = true})
+assertValuesContainExactly(result8, {"a", "b", "file.yaml"})
 
-  if opts.ext_sep then
-    local leaf = pop(raw_path_components)
-    local without_extension = ""
-    local extension = ""
-    if leaf == "" then
-      -- already both empty, nothing to do
-    elseif stringy.startswith(leaf, ".") then -- dotfile
-      without_extension = leaf
-    elseif stringy.endswith(leaf, ".") then -- file that ends with a dot, does not count as having an extension
-      without_extension = leaf
-    elseif not stringy.find(leaf, ".") then
-      without_extension = leaf
-    else -- in case of multiple dots, everything after the last dot is considered the extension
-      without_extension, extension = leaf:match("^(.+)%.([^%.]+)$")
-    end
+-- Test 9: Slicing with rejoining at the end
+local result9 = pathSlice("/a/b/c", ":", {rejoin_at_end = true})
+assertMessage(result9, "/a/b/c")
 
-    if opts.standartize_ext then
-      extension = normalize.extension[extension] or extension
-    end
+-- Test 10: Slicing with entire path for each component
+local result10 = pathSlice("/a/b/c", ":", {entire_path_for_each = true})
+assertValuesContainExactly(result10, {"/a", "/a/b", "/a/b/c"})
 
-    push(raw_path_components, without_extension)
-    push(raw_path_components, extension)
-  end
-
-  -- slice
-
-  local res =  slice(raw_path_components, spec)
-
-  -- handle postprocessing
-
-  if opts.rejoin_at_end then 
-    if opts.ext_sep then 
-      local extension = pop(res)
-      if not extension then return "" end
-      local without_extension = pop(res)
-      if without_extension == nil then -- in this case, we sliced everything but the last element
-        return extension
-      else
-        local filename
-        if extension == "" then
-          filename = without_extension
-        else
-          filename = without_extension .. "." .. extension
-        end
-        if #res == 0 then
-          return filename
-        else
-          return table.concat(res, "/") .. "/" .. filename
-        end
-      end
-    else 
-      return table.concat(res, "/")
-    end
-  elseif opts.entire_path_for_each then
-    if opts.ext_sep then error("Getting entire path for each component when treating filename and extension as separate components is difficult and thus currently not supported") end
-    for i = #res, 1, -1 do
-      local relevant_path_components = slice(raw_path_components, { start = 1, stop = i })
-      res[i] = table.concat(relevant_path_components, "/")
-    end
-  else
-    return res
-  end
-end
+-- Test 11: Slicing with multiple options
+local result11 = pathSlice("/a/b/file.txt", "::2", {ext_sep = true, entire_path_for_each = true})
+assertValuesContainExactly(result11, {"/a", "/a/b/file"})

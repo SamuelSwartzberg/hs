@@ -1,7 +1,15 @@
---- @alias pathSpec { path?: string, root?: string, prefix?: string, suffix?: string }
+--- @class pathSpec 
+--- @field path? string
+--- @field root? string
+--- @field prefix? string
+--- @field suffix? string
 
---- @alias resolveOpts { s: pathSpec | string, t: pathSpec | string }
+--- @class resolveOpts
+--- @field s pathSpec|string
+--- @field t pathSpec|string
 
+--- resolves a path, where some elements are relative to others
+--- specifically, we recieve some parts of an s and t path, and we resolve them to a source and target path
 --- @param opts resolveOpts | string
 --- @return string, string
 function resolve(opts)

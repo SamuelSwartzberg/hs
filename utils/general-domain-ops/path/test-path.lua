@@ -1,7 +1,7 @@
 --- @class sliceTest
---- @field slice sliceSpec | string
+--- @field slice sliceSpecLike
 --- @field condition? anyCondition
---- @field sliceOpts? sliceOpts
+--- @field sliceOpts? pathSliceOpts
 
 --- @alias dirness "dir" | "not-dir"
 

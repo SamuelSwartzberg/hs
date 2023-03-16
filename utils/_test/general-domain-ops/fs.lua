@@ -213,7 +213,7 @@ assertValuesContain(
   {env.HSFTP_TMPDIR .. "/foo/test1.txt"}
 )
 
-delete(env.HSFTP_TMPDIR .. "/foo", "empty")
+delete(env.HSFTP_TMPDIR .. "/foo", "dir", "empty")
 
 assertMessage(
   itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", recursion = true}),
@@ -245,6 +245,7 @@ assertMessage(
     "/Applications"
   ),
   true
+)
 
 
 local unique_temp_file = writeFile(nil, "foo")
@@ -550,4 +551,182 @@ assertMessage(
 delete(env.HSFTP_TMPDIR .. "/natsume.txt")
 delete(env.HSFTP_TMPDIR .. "/keiko.txt")
 
+createPath(
+  env.TMPDIR .. "/" .. os.time() .. "/foo/bar/baz",
+  ":-4"
+)
+
+assertMessage(
+  testPath(env.TMPDIR .. "/" .. os.time()),
+  true
+)
+
+assertMessage(
+  testPath(env.TMPDIR .. "/" .. os.time() .. "/foo"),
+  false
+)
+
+
+writeFile(env.TMPDIR .. "/delete-if-notempty/" .. os.time() .. ".txt", "lorem ipsum", "any", true)
+
+
+delete(env.TMPDIR .. "/delete-if-notempty", "any", "delete", "empty")
+
+assertMessage(
+  testPath(env.TMPDIR .. "/delete-if-notempty"),
+  true
+)
+
+delete(env.TMPDIR .. "/delete-if-notempty", "any", "delete", "not-empty")
+
+assertMessage(
+  testPath(env.TMPDIR .. "/delete-if-notempty"),
+  false
+)
+
+local succ, res = pcall(
+  readFile,
+  "/this/path/does/not/exist",
+  "nil"
+)
+
+assertMessage(
+  succ,
+  true
+)
+
+assertMessage(
+  res,
+  nil
+)
+
+local succ, res = pcall(
+  readFile,
+  "/this/path/does/not/exist",
+  "error"
+)
+
+assertMessage(
+  succ,
+  false
+)
+
+assertValuesContain(
+  itemsInPath({
+    path = env.MAC_LIBRARY,
+    slice_results = "-1:-1"
+  }),
+  {
+    "Containers",
+    "Cache"
+  }
+)
+
+assertMessage(
+  itemsInPath({
+    path = env.MAC_LIBRARY,
+    slice_results = "-2:-1",
+    slice_results_opts = {
+      rejoin_at_end = false
+    }
+  }),
+  {
+    {"Library", "Containers"},
+    {"Library", "Cache"}
+  }
+)
+
+assertValuesContainExactly(
+  itemsInPath({
+    path = env.MAC_LIBRARY,
+    validator_result = function(res)
+      return res == env.MAC_LIBRARY .. "/Containers"
+    end
+  }),
+  {
+    env.MAC_LIBRARY .. "/Containers"
+  }
+)
+
+local fstree_test_dir = env.TMPDIR .. "/fstree-" .. os.time() .. "/"
+
+writeFile(fstree_test_dir .. "foo.txt", "gg ez", "any", true)
+writeFile(fstree_test_dir .. "abee.json", "{'a': 'b'}", "any", true)
+createPath(fstree_test_dir .. "bar/baz")
+writeFile(fstree_test_dir .. "bar/rei.yaml", "kore: ha\nchoco: desu\n", "any", true)
+writeFile(fstree_test_dir .. "bar/murloc.txt", "mrgl mrgl", "any", true)
+
+assertMessage(
+  fsTree(fstree_test_dir, "read"),
+  {
+    foo = "gg ez",
+    abee = "{'a': 'b'}",
+    bar = {
+      baz = {},
+      rei = "kore: ha\nchoco: desu\n",
+      murloc = "mrgl mrgl"
+    }
+  }
+)
+
+assertMessage(
+  fsTree(fstree_test_dir, "as-tree"),
+  {
+    abee = {
+      a = "b"
+    },
+    bar = {
+      baz = {},
+      rei = {
+        choco = "desu",
+        kore = "ha"
+      }
+    },
+  }
+)
+
+assertMessage(
+  fsTree(fstree_test_dir, "as-tree", {'yaml'}),
+  {
+    bar = {
+      rei = {
+        choco = "desu",
+        kore = "ha"
+      }
+    },
+  }
+)
+
+assertMessage(
+  fsTree(fstree_test_dir, "as-tree", {'json'}),
+  {
+    abee = {
+      a = "b"
+    },
+  }
+)
+
+delete(fstree_test_dir .. "bar/baz")
+srctgt("move", fstree_test_dir .. "foo.txt", fstree_test_dir .. "inner", nil, true, true)
+srctgt("move", fstree_test_dir .. "abee.json", fstree_test_dir .. "inner", nil, true, true)
+createPath(fstree_test_dir .. "sore/are")
+
+assertMessage(
+  fsTree(fstree_test_dir, "append"),
+  {
+    inner = {
+      fstree_test_dir .. "/inner/foo.txt",
+      fstree_test_dir .. "/inner/abee.json"
+    },
+    sore = {
+      are = {}
+    },
+    bar = {
+      fstree_test_dir .. "/bar/rei.yaml",
+      fstree_test_dir .. "/bar/murloc.txt"
+    }
+  }
+)
+
 end
+

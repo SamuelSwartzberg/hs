@@ -18,7 +18,20 @@ lemap = {
     ]}}
 
     If there seems to be no data for a field, just leave it blank.
-    
-    ]])
+
+    ]]),
+    code_coverage = [[I have a function with the signature:
+
+```lua
+{{[d.signature]}}
+```
+I would like to know if there any parameters that are not being tested, or for which possible types of values are not being tested? That is, is the test coverage for this function complete?
+
+The tests so far:
+  
+```lua
+{{[d.tests]}}
+```
+]]
   }
 }

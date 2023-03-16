@@ -1,9 +1,15 @@
 
---- @alias sliceOpts { ext_sep?: boolean, standartize_ext?: boolean, rejoin_at_end?: boolean, entire_path_for_each?: boolean }
+--- @class pathSliceOpts 
+--- @field ext_sep? boolean whether to treat the extension as a separate component. This is guaranteed to guarantee two elements, even when either the extension or the non-extension part of the leaf of the path is empty (Empty components will be ""), thus allowing predictable indexing of the result. Default nil (no extension separation)
+--- @field standartize_ext? boolean whether to standartize the extension (e.g. "yml" -> "yaml") Default nil (no standartization)
+--- @field rejoin_at_end? boolean whether to rejoin the path components at the end, thus returning a `string` instead of a `string[]`. Default nil (do not rejoin)
+--- @field entire_path_for_each? boolean whether to return the entire path up to that component for each component. Default nil (do not return the entire path for each component). Cannot be set if `rejoin_at_end` is set. Example: pathSlice("/a/b/c", "1:-1", { entire_path_for_each = true }) -> { "/a", "/a/b", "/a/b/c" }
 
+--- slices a path into components.
+--- pathSlice("/a/b/c", ":") -> { "a", "b", "c" }
 --- @param path string
---- @param spec? sliceSpec | string
---- @param opts? sliceOpts
+--- @param spec? sliceSpecLike
+--- @param opts? pathSliceOpts
 --- @return string[] | string
 function pathSlice(path, spec, opts)
 

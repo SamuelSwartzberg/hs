@@ -1,13 +1,15 @@
 ---@alias indexable string|any[]|orderedtable
 
 --- @class sliceSpec
---- @field start? conditionSpec
---- @field stop? conditionSpec
---- @field step? integer
---- @field sliced_indicator? any
---- @field fill? any
---- @field last_start? boolean
---- @field last_stop? boolean
+--- @field start? integer|conditionSpec inclusive (both when positive, negative and for any conditionSpec). Default 1
+--- @field stop? integer|conditionSpec inclusive (both when positive, negative and for any conditionSpec). Default -1 ≙ #thing 
+--- @field step? integer May also be negative. Default 1
+--- @field sliced_indicator? any Optional indicator to be added to the result when changed as a result of slicing, e.g. for adding ellipses. Default nil (no indicator)
+--- @field fill? any Optional value to fill any positions that were sliced away with, such that the result is the same length as the original. Default nil (no filling)
+--- @field last_start? boolean When using a conditionSpec for start, this indicates that the last matching element should be used instead of the first. Default false
+--- @field last_stop? boolean When using a conditionSpec for stop, this indicates that the last matching element should be used instead of the first. Default false
+
+--- @alias sliceSpecLike sliceSpec | string string here is a shorthand parsed as [<start>]:[<stop>][:[<step>]]
 
 --- @generic T : indexable
 --- @param thing T
@@ -26,7 +28,7 @@ function slice(thing, start_or_spec, stop, step)
     local stripped_str = stringy.strip(start_or_spec)
     local start_str, stop_str, step_str = onig.match(
       stripped_str, 
-      "^\\[?(\\d+)(?::(\\d+))?(?::(\\d+))?\\]?$"
+      "^\\[?([-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
     )
     spec.start = toNumber(start_str, "int", "nil")
     spec.stop = toNumber(stop_str, "int", "nil")

@@ -1,5 +1,5 @@
 --- @param path string
---- @param slice? sliceSpec | string
+--- @param slice? sliceSpecLike
 function createPath(path, slice)
   path = transf.string.tilde_resolved(path)
   slice = slice or { start = 1, stop = -1 } -- default to entire path
