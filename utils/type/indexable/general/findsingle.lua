@@ -1,27 +1,30 @@
 --- @class condition
---- @field _r? string
---- @field _start? string
---- @field _stop? string
---- @field _contains? string
---- @field _empty? boolean
---- @field _type? "string" | "number" | "boolean" | "table" | "function" | "thread" | "userdata"
---- @field _exactly? any
---- @field _list? any[]
---- @field _invert? boolean
---- @field _ignore_case? boolean
---- @field _only_if_all? boolean
---- @field _regex_engine? "onig" | "eutf8"
+--- @field _r? string a regex to match
+--- @field _start? string a plain string that the item must start with
+--- @field _stop? string a plain string that the item must end with
+--- @field _contains? string a plain string that the item must contain
+--- @field _empty? boolean whether the item must be empty (this rarely makes sense to combine with other conditions)
+--- @field _type? "string" | "number" | "boolean" | "table" | "function" | "thread" | "userdata" the type of the item (most often only makes sense when used with find() on tables, since if you are using find() on a string, you already know the type, lol)
+--- @field _exactly? any the item must be exactly this value
+--- @field _list? any[] the item must be contained in this list
+--- @field _invert? boolean whether to invert the result of the condition
+--- @field _ignore_case? boolean whether to ignore case when matching (only for strings)
+--- @field _only_if_all? boolean whether to only return true if the condition matches the entire string (only for strings)
+--- @field _regex_engine? "onig" | "eutf8" the regex engine to use for _r
 
 
---- @alias conditionThatCantBeConfusedForListOfConditions boolean | string | table | condition | function
---- @alias anyCondition conditionThatCantBeConfusedForListOfConditions | any[]
---- @alias conditionSpec conditionThatCantBeConfusedForListOfConditions | anyCondition[]
+--- @alias conditionThatCantBeConfusedForListOfConditions boolean | string | table | condition | function a condition that can't be confused for a list of conditions (see below)
+--- @alias anyCondition conditionThatCantBeConfusedForListOfConditions | any[] a condition (condition table or condition shorthand)
+--- @alias conditionSpec conditionThatCantBeConfusedForListOfConditions | anyCondition[] a condition or a list of conditions, excluding the list shorthand, since we have no way of knowing if the user meant a list of conditions or the list shorthand (i.e. it is unclear if {"a", "b"} is the list shorthand (and therefore we should find an element in this list) or it is a list of string shorthands (and therefore we should find a match for both "a" and "b")) This is all to say, use {{ "a", "b" }} if all you want to do is find an element in the list {"a", "b"}.
 
 --- @class testOpts
 --- @field tostring boolean
 --- @field ret kvmult | "boolean"
 
---- @alias matchspec {k: integer, v: indexable, match: boolean}
+--- @class matchspec 
+--- @field k integer
+--- @field v indexable
+--- @field match boolean
 
 --- @param item? string
 --- @param conditions? conditionSpec

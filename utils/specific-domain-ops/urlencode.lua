@@ -1,6 +1,7 @@
 
+--- URL-encodes a string.
 --- @param url string
---- @param spaces_percent? boolean
+--- @param spaces_percent? boolean whether to encode spaces as %20 (true) or + (false)
 --- @return string
 function urlencode(url, spaces_percent)
   if url == nil then

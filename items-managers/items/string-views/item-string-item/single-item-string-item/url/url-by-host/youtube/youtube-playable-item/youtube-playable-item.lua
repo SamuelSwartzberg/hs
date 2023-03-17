@@ -98,7 +98,7 @@ YoutubePlayableItemItemSpecifier = {
         self:doThis("get-attrs-async-inner", {
           attrs = { "title", "uploader" },
           do_after = function(attrs)
-            fillTemplateFromFieldsWithAI(
+            fillTemplateGPT(
               {
                 in_fields = attrs,
                 out_fields = specifier.out_fields,

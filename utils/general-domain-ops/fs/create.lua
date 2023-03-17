@@ -1,5 +1,5 @@
 --- @param path string
---- @param slice? sliceSpecLike
+--- @param slice? sliceSpecLike how to slice the path before creating it
 function createPath(path, slice)
   path = transf.string.tilde_resolved(path)
   slice = slice or { start = 1, stop = -1 } -- default to entire path
@@ -12,14 +12,11 @@ function createPath(path, slice)
   end
 end
 
-
--- todo: remote?
-
 --- @param path? string
---- @param contents? string
---- @param condition? "exists" | "not-exists" | "any"
---- @param create_path? boolean
---- @param mode? "w" | "a"
+--- @param contents? string what to write to the file, if anything
+--- @param condition? "exists" | "not-exists" | "any" under what conditions to write the file
+--- @param create_path? boolean whether to create the path to the file if it doesn't exist
+--- @param mode? "w" | "a" the mode to open the file in (write or append)
 --- @return string | nil 
 function writeFile(path, contents, condition, create_path, mode)
   path = path or env.TMPDIR .. "/" .. os.time() .. "-" .. rand({len = 8}) .. ".tmp"

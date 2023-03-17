@@ -1,8 +1,8 @@
 
 --- @param path string
---- @param thing? "notdir" | "dir" | "any"
---- @param action? "delete" | "empty"
---- @param onlyif? "empty" | "notempty" | "any"
+--- @param thing? "notdir" | "dir" | "any" what kind of thing the path must point to in order to be deleted
+--- @param action? "delete" | "empty" what to do with the path
+--- @param onlyif? "empty" | "notempty" | "any" only delete if the path is empty or not empty
 --- @return nil
 function delete(path, thing, action, onlyif)
 

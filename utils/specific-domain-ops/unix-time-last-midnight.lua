@@ -1,3 +1,4 @@
+--- Get the unix time of the last midnight.
 --- @return number
 function getUnixTimeLastMidnight()
   local now = os.time()

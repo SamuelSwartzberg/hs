@@ -1,16 +1,23 @@
 --- @class sliceTest
 --- @field slice sliceSpecLike
---- @field condition? anyCondition
+--- @field condition? anyCondition  a condition(s) (passed to find()) to run on the slice
 --- @field sliceOpts? pathSliceOpts
 
 --- @alias dirness "dir" | "not-dir"
 
---- @class testPathOpts
---- @field slice? sliceTest | (sliceTest | (string|table)[] )[]
---- @field existence? boolean | dirness | { exists?: boolean, dirness?: dirness, contents?: anyCondition}
+--- @class existenceTest
+--- @field exists? boolean whether the path should exist or not
+--- @field dirness? dirness whether the path should be a directory or not
+--- @field contents? anyCondition a condition(s) (passed to find()) to run on the contents 
 
---- @param path string
---- @param opts? testPathOpts | string | boolean
+
+--- @class testPathOpts
+--- @field slice? sliceTest | (sliceTest | (string|table)[] )[] specify one or more slices, its options, and the condition it must match. When specifying a list of slices, you may use the shorthand of \{<slice>[, <condition>[, <sliceOpts>]]\} 
+--- @field existence? boolean | dirness | existenceTest
+
+--- tests a path based on various conditions. returns true if the path passes all conditions, false otherwise
+--- @param path string the path to test
+--- @param opts? testPathOpts | string | boolean boolean is a shorthand for {existence = boolean}, string is a shorthand for {dirness = string}
 --- @return boolean
 function testPath(path, opts)
 
@@ -60,7 +67,7 @@ function testPath(path, opts)
       if results[#results] == false then -- return early if any slice test fails. This may be removed at some point if I allow for 'or'-logic at some point
         return false
       end
-        
+    end
   end
 
   -- test existence
@@ -144,8 +151,9 @@ function testPath(path, opts)
               end
             end
           end
+        end
+      end
     end
-
   end
 
 

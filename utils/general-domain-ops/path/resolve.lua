@@ -1,8 +1,8 @@
 --- @class pathSpec 
 --- @field path? string
 --- @field root? string
---- @field prefix? string
---- @field suffix? string
+--- @field prefix? string will be removed from the beginning of the path if it exists before resolving, and then added back at the very end after resolving
+--- @field suffix? string will be removed from the beginning of the path if it exists before resolving, and then added back at the very end after resolving
 
 --- @class resolveOpts
 --- @field s pathSpec|string
@@ -10,6 +10,11 @@
 
 --- resolves a path, where some elements are relative to others
 --- specifically, we recieve some parts of an s and t path, and we resolve them to a source and target path
+--- s.path is necessary, since we need to resolve relative to something
+--- we prefer to use as many options of t for target, but will use s to infer the rest
+--- prefix and suffix are most useful when paths have some extra info that is not itself a path
+---   such as a url or scheme as a prefix
+---   or query params or a file extension as a suffix
 --- @param opts resolveOpts | string
 --- @return string, string
 function resolve(opts)
