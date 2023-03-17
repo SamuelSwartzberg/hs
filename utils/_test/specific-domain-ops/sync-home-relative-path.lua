@@ -1,26 +1,55 @@
----syncs files to and from the remote server using rclone
----@param path string
----@param push_or_pull "push"|"pull"
----@param action? "copy" | "move"
----@return nil
-function syncHomeRelativePath(path, push_or_pull, action)
-  local local_path = resolve(path)
-  local remote_path = remote(path)
-  local source, dest 
-  if push_or_pull == "push" then
-    source = local_path
-    dest = remote_path
-  elseif push_or_pull == "pull" then
-    source = remote_path
-    dest = local_path
-  else
-    error("push_or_pull must be 'push' or 'pull'")
-  end
-  action = defaultIfNil(action, "copy")
-  run({
-    "rclone",
-    action,
-    { value = source, type = "quoted" },
-    { value = dest, type = "quoted" },
-  }, true)
+-- Test 1: Push local file to remote
+do
+  local timestamp = tostring(os.time())
+  local localPath = env.TMPDIR .. "/test_push_local_" .. timestamp
+  local remotePath = env.HSFTP_TMPDIR .. "/test_push_remote_" .. timestamp
+  createPath(localPath)
+  writeFile(localPath .. "/file1.txt", "This is a test file.")
+  syncHomeRelativePath(".tmp/test_push_local_" .. timestamp, "push")
+
+  local remoteFileContents = readFile(remote("/.tmp/test_push_remote_" .. timestamp .. "/file1.txt"))
+  assertMessage(remoteFileContents, "This is a test file.")
+
+  delete(localPath, "dir", "delete", "any")
+  delete(remotePath, "dir", "delete", "any")
+end
+
+-- Test 2: Pull remote file to local
+do
+  local timestamp = tostring(os.time())
+  local localPath = env.TMPDIR .. "/test_pull_local_" .. timestamp
+  local remotePath = env.HSFTP_TMPDIR .. "/test_pull_remote_" .. timestamp
+  createPath(remotePath)
+  writeFile(remotePath .. "/file2.txt", "This is another test file.")
+  syncHomeRelativePath(".tmp/test_pull_remote_" .. timestamp, "pull")
+
+  local localFileContents = readFile(resolve("/.tmp/test_pull_local_" .. timestamp .. "/file2.txt"))
+  assertMessage(localFileContents, "This is another test file.")
+
+  delete(localPath, "dir", "delete", "any")
+  delete(remotePath, "dir", "delete", "any")
+end
+
+-- Test 3: Push local directory to remote using "move" action
+do
+  local timestamp = tostring(os.time())
+  local localPath = env.TMPDIR .. "/test_move_push_local_" .. timestamp
+  local remotePath = env.HSFTP_TMPDIR .. "/test_move_push_remote_" .. timestamp
+  createPath(localPath)
+  writeFile(localPath .. "/file3.txt", "This is a test file for move action.")
+  syncHomeRelativePath(".tmp/test_move_push_local_" .. timestamp, "push", "move")
+
+  local remoteFileContents = readFile(remote("/.tmp/test_move_push_remote_" .. timestamp .. "/file3.txt"))
+  local localFileExists = readFile(localPath .. "/file3.txt", "nil")
+  assertMessage(remoteFileContents, "This is a test file for move action.")
+  assertMessage(localFileExists, nil)
+
+  delete(localPath, "dir", "delete", "any")
+  delete(remotePath, "dir", "delete", "any")
+end
+
+-- Test 4: Invalid push_or_pull parameter
+do
+  local success, errorMessage = pcall(syncHomeRelativePath, ".tmp/test_invalid_param", "invalid")
+  assertMessage(errorMessage, "push_or_pull must be 'push' or 'pull'")
 end

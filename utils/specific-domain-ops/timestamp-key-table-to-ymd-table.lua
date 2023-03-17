@@ -1,3 +1,4 @@
+--- transforms a timestamp-key orderedtable into a table of the structure [yyyy] = { [yyyy-mm] = { [yyyy-mm-dd] = { [hh:mm:ss, ...] } } }
 --- @param timestamp_key_table orderedtable
 --- @return { [string]: { [string]: { [string]: string[] } } }
 function timestampKeyTableToYMDTable(timestamp_key_table)

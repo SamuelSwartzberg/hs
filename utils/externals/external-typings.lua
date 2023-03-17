@@ -48,51 +48,51 @@
 --- @field setcenturyflip fun(var_century: number): nil
 --- @field __call fun(var_date: date_specifier): dateObj
 
---- @class dateObj
---- @field addays fun(days: integer): dateObj
---- @field addhours fun(hours: number): dateObj
---- @field addminutes fun(minutes: number): dateObj
---- @field addmonths fun(months: integer): dateObj
---- @field addseconds fun(seconds: number): dateObj
---- @field addticks fun(ticks: number): dateObj
---- @field addyears fun(years: integer): dateObj
---- @field copy fun(): dateObj
+--- @class dateObj besides the methods here, it has various operators defined on it via metamethods, e.g. +, -, ==, <, etc.
+--- @field addays fun(self: dateObj, days: integer): dateObj
+--- @field addhours fun(self: dateObj, hours: number): dateObj
+--- @field addminutes fun(self: dateObj, minutes: number): dateObj
+--- @field addmonths fun(self: dateObj, months: integer): dateObj
+--- @field addseconds fun(self: dateObj, seconds: number): dateObj
+--- @field addticks fun(self: dateObj, ticks: number): dateObj
+--- @field addyears fun(self: dateObj, years: integer): dateObj
+--- @field copy fun(self: dateObj): dateObj
 --- @field fmt fun(self: dateObj, format: string): string
---- @field getbias fun(): unknown
---- @field getclockhour fun(): integer the hour of the day, in 12-hour clock format
---- @field getdate fun(): integer, integer, integer the day, month, and year
---- @field getday fun(): integer the day of the month
---- @field getfracs fun(): number seconds as a fraction
---- @field gethours fun(): integer the hour of the day, in 24-hour clock format
---- @field getisoweekday fun(): integer the day of the week, mon = 1, sun = 7
---- @field getisoweeknum fun(): integer the ISO week number (01 to 53)
---- @field getisoyear fun(): integer the ISO year (relates to the ISO week number)
---- @field getminutes fun(): integer the minute of the hour
---- @field getmonth fun(): integer the month of the year
---- @field getseconds fun(): integer the second of the minute
---- @field getticks fun(): number ticks after seconds value
---- @field gettime fun(): integer, integer, integer, integer the hour, minute, second, and ticks
---- @field getweekday fun(): integer the day of the week, sun = 1, sat = 7
---- @field getweeknum fun(): integer the week number
---- @field getyear fun(): integer the year
---- @field getyearday fun(): integer the day of the year
---- @field setday fun(day: integer): dateObj
---- @field sethours fun(hours?: number, minutes?: number, seconds?: number, ticks?: number): dateObj
---- @field setisoweekday fun(day?: integer): dateObj
---- @field setisoweeknum fun(week?: integer, weekday?: integer): dateObj
---- @field setisoyear fun(year?: integer, week?: integer, weekday?: integer): dateObj
---- @field setminutes fun(minutes?: number, seconds?: number, ticks?: number): dateObj
---- @field setmonth fun(month?: integer, day?: integer): dateObj
---- @field setseconds fun(seconds?: number, ticks?: number): dateObj
---- @field setticks fun(ticks?: number): dateObj
---- @field setyear fun(year?: integer, month?: integer, day?: integer): dateObj
---- @field spandays fun(var_date: dateObj): integer
---- @field spanhours fun(var_date: dateObj): number
---- @field spanminutes fun(var_date: dateObj): number
---- @field spanseconds fun(var_date: dateObj): number
---- @field spanticks fun(var_date: dateObj): number
---- @field tolocaltime fun(): dateObj
---- @field toutc fun(): dateObj
+--- @field getbias fun(self: dateObj): unknown
+--- @field getclockhour fun(self: dateObj): integer the hour of the day, in 12-hour clock format
+--- @field getdate fun(self: dateObj): integer, integer, integer the day, month, and year
+--- @field getday fun(self: dateObj): integer the day of the month
+--- @field getfracs fun(self: dateObj): number seconds as a fraction
+--- @field gethours fun(self: dateObj): integer the hour of the day, in 24-hour clock format
+--- @field getisoweekday fun(self: dateObj): integer the day of the week, mon = 1, sun = 7
+--- @field getisoweeknum fun(self: dateObj): integer the ISO week number (01 to 53)
+--- @field getisoyear fun(self: dateObj): integer the ISO year (relates to the ISO week number)
+--- @field getminutes fun(self: dateObj): integer the minute of the hour
+--- @field getmonth fun(self: dateObj): integer the month of the year
+--- @field getseconds fun(self: dateObj): integer the second of the minute
+--- @field getticks fun(self: dateObj): number ticks after seconds value
+--- @field gettime fun(self: dateObj): integer, integer, integer, integer the hour, minute, second, and ticks
+--- @field getweekday fun(self: dateObj): integer the day of the week, sun = 1, sat = 7
+--- @field getweeknum fun(self: dateObj): integer the week number
+--- @field getyear fun(self: dateObj): integer the year
+--- @field getyearday fun(self: dateObj): integer the day of the year
+--- @field setday fun(self: dateObj, day: integer): dateObj
+--- @field sethours fun(self: dateObj, hours?: number, minutes?: number, seconds?: number, ticks?: number): dateObj
+--- @field setisoweekday fun(self: dateObj, day?: integer): dateObj
+--- @field setisoweeknum fun(self: dateObj, week?: integer, weekday?: integer): dateObj
+--- @field setisoyear fun(self: dateObj, year?: integer, week?: integer, weekday?: integer): dateObj
+--- @field setminutes fun(self: dateObj, minutes?: number, seconds?: number, ticks?: number): dateObj
+--- @field setmonth fun(self: dateObj, month?: integer, day?: integer): dateObj
+--- @field setseconds fun(self: dateObj, seconds?: number, ticks?: number): dateObj
+--- @field setticks fun(self: dateObj, ticks?: number): dateObj
+--- @field setyear fun(self: dateObj, year?: integer, month?: integer, day?: integer): dateObj
+--- @field spandays fun(self: dateObj, var_date: dateObj): integer
+--- @field spanhours fun(self: dateObj, var_date: dateObj): number
+--- @field spanminutes fun(self: dateObj, var_date: dateObj): number
+--- @field spanseconds fun(self: dateObj, var_date: dateObj): number
+--- @field spanticks fun(self: dateObj, var_date: dateObj): number
+--- @field tolocaltime fun(self: dateObj, ): dateObj
+--- @field toutc fun(self: dateObj, ): dateObj
 
 --- @class ftcsv_opts 
 --- @field loadFromString boolean If you want to load a csv from a string instead of a file, set loadFromString to true (default: false)

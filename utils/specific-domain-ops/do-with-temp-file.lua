@@ -1,10 +1,9 @@
 
 --- @class tempFileOpts
---- @field path? string please
+--- @field path? string the path to the file, if not given, a random one will be generated
 --- @field contents? string
---- @field edit_before? boolean
---- @field use_contents? boolean whether to pass the contents of the file to the callback instead of the path
-
+--- @field edit_before? boolean allow user to edit the file before the callback is called
+--- @field use_contents? boolean whether to pass the contents of the file to the function instead of the path
 --- do an action on a temporary file, optionally editing it before, and delete it afterwards
 --- @param opts tempFileOpts
 --- @param do_this fun(tmp_file: string): nil

@@ -1,5 +1,5 @@
 ---syncs files to and from the remote server using rclone
----@param path string
+---@param path string the path, relative to the home directory on local and to the root directory on remote
 ---@param push_or_pull "push"|"pull"
 ---@param action? "copy" | "move"
 ---@return nil

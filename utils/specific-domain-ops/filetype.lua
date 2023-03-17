@@ -14,11 +14,11 @@ local filetype_list = {
 }
 
 
---- @param str string
+--- @param path string
 --- @param filetype string
 --- @return boolean
-function isUsableAsFiletype(str, filetype)
-  local extension = pathSlice(str, "-1:-1", { ext_sep = true, standartize_ext = true })[1]
+function isUsableAsFiletype(path, filetype)
+  local extension = pathSlice(path, "-1:-1", { ext_sep = true, standartize_ext = true })[1]
   if find(filetype_list[filetype], extension) then
     return true
   else
