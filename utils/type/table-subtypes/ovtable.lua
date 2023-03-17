@@ -222,7 +222,7 @@ end
 
 --- @class orderedtable
 --- @field new fun(): orderedtable
---- @field init fun(all_elems: { key: string, value: any }[]): orderedtable
+--- @field init fun(all_elems: ({ k: string, v: any } | { key: string, value: any })[]): orderedtable
 --- @field getindex getindex_givekey | getindex_nogivekey
 --- @field keyindex fun(t: orderedtable, key: string): number | nil, string | nil
 --- @field revpairs fun(t: orderedtable): fun(): (string, any) | nil

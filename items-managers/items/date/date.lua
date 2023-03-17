@@ -134,7 +134,7 @@ DateSpecifier = {
         return self:get("contents"):getisoweekday() - 1
       end,
       ["weekday-str"] = function(self)
-        return mon1_int.weekday_en[self:get("weekday-number-start-1")]
+        return transf.mon1_int.weekday_en[self:get("weekday-number-start-1")] 
       end,
       ["weeknumber"] = function(self)
         return self:get("contents"):getweeknumber()
@@ -142,7 +142,7 @@ DateSpecifier = {
       ["weekday-offset"] = function(self, specifier) -- get the nth previous/next weekday
         -- specifier has keys "weekday" and "offset"
         if type(specifier.weekday) == "string" then
-          specifier.weekday = weekday_en.mon1_int[specifier.weekday]
+          specifier.weekday = transf.weekday_en.mon1_int[specifier.weekday]
         end
 
         local weekday_number = self:get("weekday-number-start-0")

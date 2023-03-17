@@ -1,4 +1,5 @@
---- @param cronspec string
+--- Get the next time a cron expression will run
+--- @param cronspec string a time specification in cron format
 --- @return number
 function getCronNextTime(cronspec)
   return tonumber(run({

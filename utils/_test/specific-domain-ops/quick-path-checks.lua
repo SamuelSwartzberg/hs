@@ -1,23 +1,42 @@
---- @param str string
---- @return boolean
-function looksLikePath(str)
-  return 
-    str:find("/") ~= nil
-    and str:find("[\n\t\r\f]") == nil
-    and str:find("^%s") == nil
-    and str:find("%s$") == nil
+-- Test looksLikePath
+assertMessage(looksLikePath("test/path"), true)
+assertMessage(looksLikePath("test/path/"), true)
+assertMessage(looksLikePath("/test/path"), true)
+assertMessage(looksLikePath("  test/path"), false)
+assertMessage(looksLikePath("test/path  "), false)
+assertMessage(looksLikePath("test\n/path"), false)
+assertMessage(looksLikePath("test\t/path"), false)
+assertMessage(looksLikePath("test\r/path"), false)
+assertMessage(looksLikePath("test\f/path"), false)
+
+-- Test pathIsRemote
+assertMessage(pathIsRemote("http://example.com/test.git"), true)
+assertMessage(pathIsRemote("https://example.com/test.git"), true)
+assertMessage(pathIsRemote("git@example.com:test.git"), true)
+assertMessage(pathIsRemote("ftp://example.com/test.git"), true)
+assertMessage(pathIsRemote("test.git"), false)
+assertMessage(pathIsRemote("example.com/test.git"), false)
+assertMessage(pathIsRemote("test/path/test.git"), false)
+
+-- Test isGitRootDir
+-- Prepare a simple helper function to mock itemsInPath
+function mockItemsInPath(nonGitPath)
+  return function(path)
+    if path == "gitRootDir" then
+      return {"file1", "file2", ".git"}
+    elseif path == "nonGitRootDir" then
+      return {"file1", "file2"}
+    else
+      return nonGitPath or {}
+    end
+  end
 end
 
---- @param path string
---- @return boolean
-function pathIsRemote(path)
-  return not not path:find("^[^/:]-:") 
-end
+local originalItemsInPath = itemsInPath
+itemsInPath = mockItemsInPath()
 
---- @param path string
---- @return boolean
-function isGitRootDir(path)
-  return not not find(itemsInPath(path), function (child)
-    return stringy.endswith(child, "/.git")
-  end)
-end
+assertMessage(isGitRootDir("gitRootDir"), true)
+assertMessage(isGitRootDir("nonGitRootDir"), false)
+
+-- Restore the original itemsInPath function
+itemsInPath = originalItemsInPath

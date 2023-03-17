@@ -36,14 +36,6 @@ function processSetupDirectivesInFiles(path)
             return arg
           end
         end)
-        print(
-          "Would execute"
-          .. " _G[\"" .. command .. "\"]"
-          .. "(" .. table.concat(map(args, tostring), ", ") .. ")"
-        )
-        print(
-          "with interval " .. interval
-        )
         if stringy.startswith(interval, "@") then -- is an event
           if interval == "@startup" then
             _G[command](table.unpack(args))

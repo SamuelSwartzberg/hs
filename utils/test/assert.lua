@@ -44,9 +44,12 @@ function assertValuesContainExactly(a, values)
   assertValuesContain(a, values)
 end
 
-function assertMessage(a, b)
+--- @param a any
+--- @param b any
+--- @param msg? string
+function assertMessage(a, b, msg)
   if type (a) == "table" then a = hs.inspect(a, {depth = 5}) end
   if type (b) == "table" then b = hs.inspect(b, {depth = 5}) end
 
-  assert(a == b, ("Expected \n%s\n, but got \n%s"):format(b, a))
+  assert(a == b, ("Expected \n%s\n, but got \n%s. %s"):format(b, a, msg or ""))
 end

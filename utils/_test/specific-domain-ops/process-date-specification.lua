@@ -14,5 +14,5 @@ assertMessage(
 
 assertMessage(
   processDateSpecification({ unit = "days", amount = 1 }, test_date),
-  test_date:adddays(1)
+  test_date:copy():adddays(1)
 )
