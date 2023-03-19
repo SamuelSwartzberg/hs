@@ -2,17 +2,20 @@
 --- @alias procSpec string | any[] | mapProcessor
 
 --- @class replaceOpts : splitOpts
---- @field mode? "before" | "after" | "replace" | "remove"
---- @field args kvmult
---- @field cond? conditionSpec
---- @field proc? procSpec
+--- @field mode? "before" | "after" | "replace" | "remove" what to do with the matched element. "before" and "after" will insert the (result of the) proc before or after the matched element, "replace" will replace the matched element with the proc, and "remove" will remove the matched element without using the proc
+--- @field args kvmult controls what arguments are passed to the proc
+--- @field cond? conditionSpec the condition to match
+--- @field proc? procSpec the proc to run on the matched element
 
---- @alias replaceSpec replaceOpts | (conditionSpec | procSpec)[]
+--- @alias conditonProcSpecPair (conditionSpec | procSpec)[] imagine the type annotation was actually [conditionSpec, procSpec] but lua doesn't support that
+--- @alias replaceSpec replaceOpts | conditonProcSpecPair
+--- @alias conditionProcSpecParallelList (conditionSpec[] | procSpec[])[] imagine the type annotation was actually [conditionSpec[], procSpec[]] but lua doesn't support that
 
+--- replace elements in an indexable
 --- @generic T : indexable
 --- @param thing T
---- @param opts? replaceOpts | replaceOpts[] | (conditionSpec[] | procSpec[])[]
---- @param globalopts? replaceOpts
+--- @param opts? replaceOpts | replaceSpec[] | conditionProcSpecParallelList thus you can all it as replace(<thing>, { cond = ..., ...}), replace(<thing>, { {cond = ..., ...}, {cond = ..., ...}, ...}), or replace(<thing>, { {cond1, proc1}, {cond2, proc2}, ...}), or replace(<thing>, { {cond1, cond2, ...}, {proc1, proc2, ...} })
+--- @param globalopts? replaceOpts global options that will be used if the options are not specified on the current opt element, which is especially useful when using non-assoc array syntax to specify the opts
 --- @return T
 function replace(thing, opts, globalopts)
   if opts == nil then return thing end

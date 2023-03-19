@@ -11,7 +11,15 @@
 --- @field treat_as_leaf "assoc" | "list" | false
 --- @field mapcondition conditionSpec TODO NOT USED YET
 
+--- mapProcessor will processed into a function as follows:
+---   - if it's a function, it's used as is
+---   - if it's a table with a _k field, the arg is treated as a table, and the value of _k is used as the key to get the value from the table
+---     - in that case, the _ret field determines the behavior if the arg is not a table. if _ret is "orig", the arg is returned, otherwise nil is returned
+---   - if it's a table with a _f field, the arg is treated as a format string, and the arg(s) is/are used as the arguments to string.format
+---  - if it's a generic table with none of the above, the arg is treated as a key, and the value of that key is returned
+---  - if it's a string, that same string is returned as both the key and the value, without caring about the arg at all (this seems odd, but allows some useful ops when combined with the `ret` option of mapOpts)
 --- @alias mapProcessor function | {_k: string | string[], _ret?: "orig" | nil} | {_f: string} | table | string
+
 
 --- @generic OT : string | number | boolean | nil
 --- @param tbl table | `OT`
@@ -40,7 +48,7 @@ function map(tbl, f, opts)
       if f._k then
         if type(f._k) == "string" then
           f = function(arg)
-            if type("arg") == table then
+            if type(arg) == table then
               return arg[f._k]
             else
               return f._ret == "orig" and arg or nil

@@ -1,5 +1,5 @@
 --- @class prefixOpts
---- @field rev boolean whether to reverse the list before finding the prefix
+--- @field rev boolean whether to search for the prefix in reverse (ergo will return the suffix, but in the original order)
 
 --- find the longest common prefix of a list of indexables
 --- @generic T : indexable
