@@ -1,7 +1,8 @@
 --- @class prefixOpts
---- @field rev boolean
+--- @field rev boolean whether to reverse the list before finding the prefix
 
---- @generic T : string|any[]
+--- find the longest common prefix of a list of indexables
+--- @generic T : indexable
 --- @param list `T`[]
 --- @param opts? prefixOpts
 --- @return T

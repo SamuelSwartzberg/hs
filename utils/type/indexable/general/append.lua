@@ -1,10 +1,10 @@
 ---@class appendOpts
----@field nooverwrite? boolean
+---@field nooverwrite? boolean only relevant for assoc arrs or lists treated as assoc arrs, if true, will not overwrite existing values
 
 ---add a single element to an indexable
 ---@generic T : indexable
----@param base `T`
----@param addition any
+---@param base `T` element to add to
+---@param addition any element to add
 ---@param opts? appendOpts
 ---@return T
 function append(base, addition, opts)

@@ -1,3 +1,4 @@
+--- Returns the element at the given index of the given indexable.
 ---@param thing indexable
 ---@param ind any
 ---@return any

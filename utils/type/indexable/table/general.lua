@@ -1,11 +1,11 @@
 --- @class tableProcOpts
---- @field args kvmult
---- @field ret kvmult not: reduce()
---- @field tolist boolean not: reduce()
---- @field noovtable boolean not: reduce()
---- @field last boolean
---- @field start integer
---- @field stop integer
+--- @field args kvmult if there's a callback (or equivalent thing), what of the element does it recieve in which order?
+--- @field ret kvmult what of the element does the callback (or equivalent thing) return in which order?
+--- @field tolist boolean instead of replacing the element, append result to a list
+--- @field noovtable boolean if the output would be an assoc array, don't make it an ovtable (just make it a normal table)
+--- @field last boolean iterate in reverse / use the last element, as the case may be
+--- @field start integer only consider elements with or after this index
+--- @field stop integer only consider elements with or before this index
 
 --- @param opts any 
 --- @return table

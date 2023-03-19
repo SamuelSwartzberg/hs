@@ -1,3 +1,4 @@
+--- concat an indexable to itself n times
 --- @generic T : indexable
 --- @param thing T
 --- @param n integer

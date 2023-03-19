@@ -1,3 +1,4 @@
+--- Returns the length of an indexable
 ---@param thing indexable
 ---@return integer
 function len(thing)

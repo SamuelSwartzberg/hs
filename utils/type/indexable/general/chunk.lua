@@ -1,3 +1,4 @@
+--- Split an indexable into chunks of a given size.
 --- @generic T : indexable
 --- @param thing T
 --- @param n integer

@@ -18,8 +18,8 @@
 --- @alias conditionSpec conditionThatCantBeConfusedForListOfConditions | anyCondition[] a condition or a list of conditions, excluding the list shorthand, since we have no way of knowing if the user meant a list of conditions or the list shorthand (i.e. it is unclear if {"a", "b"} is the list shorthand (and therefore we should find an element in this list) or it is a list of string shorthands (and therefore we should find a match for both "a" and "b")) This is all to say, use {{ "a", "b" }} if all you want to do is find an element in the list {"a", "b"}.
 
 --- @class testOpts
---- @field tostring boolean
---- @field ret kvmult | "boolean"
+--- @field tostring boolean whether to convert the item to a string before testing it
+--- @field ret kvmult | "boolean" what of the element does the callback (or equivalent thing) return in which order (or just return a boolean)
 
 --- @class matchspec 
 --- @field k integer

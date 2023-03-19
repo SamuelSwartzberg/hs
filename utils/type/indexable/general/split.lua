@@ -1,6 +1,6 @@
 --- @class splitOpts
---- @field mode? "remove" | "before" | "after"
---- @field findopts? findOptsWShorthand
+--- @field mode? "remove" | "before" | "after" whether to remove the separator, or split before or after it, keeping the separator
+--- @field findopts? findOptsWShorthand since the separator is a conditionSpec passed to find, you can pass options to find here
 
 --- @generic T : indexable
 --- @param thing T

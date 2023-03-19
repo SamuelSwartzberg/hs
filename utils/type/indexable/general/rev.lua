@@ -1,3 +1,4 @@
+---reverse an indexable
 ---@generic T : indexable
 ---@param thing T
 ---@return T

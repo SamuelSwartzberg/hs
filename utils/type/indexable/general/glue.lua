@@ -1,8 +1,9 @@
 ---@class glueOpts : appendOpts
----@field recurse? boolean | number
----@field depth? number
+---@field recurse? boolean | number if true, recurse into tables, if false, don't, if a number, recurse until that depth
+---@field depth? number the current depth of recursion
 
 ---add a single element to an indexable, but where that element may be mushed into the base in the process
+---may be recursive
 ---@generic T : indexable
 ---@param base `T`
 ---@param addition any

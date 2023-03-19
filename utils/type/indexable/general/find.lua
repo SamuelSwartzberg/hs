@@ -1,10 +1,10 @@
 --- @class findOpts : tableProcOpts
---- @field findall boolean
+--- @field findall boolean return all matches instead of just the first one
 
 ---@alias findOptsWShorthand kvmult | kvmult[] | findOpts
 
 --- @param indexable? indexable
---- @param cond? conditionSpec
+--- @param cond? conditionSpec the condition that is being searched for
 --- @param opts? findOptsWShorthand
 --- @return any
 function find(indexable, cond, opts)

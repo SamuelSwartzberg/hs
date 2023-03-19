@@ -1,11 +1,12 @@
 --- @class concatOpts : glueOpts
---- @field isopts "isopts"
---- @field sep? any | any[]
+--- @field isopts "isopts" this is just a flag to indicate that the first argument is actually an options table
+--- @field sep? any | any[] separator to use between each element
 
 
+--- joins together n indexables
 --- @generic T : indexable
 --- @generic O : indexable
---- @param opts? concatOpts
+--- @param opts? concatOpts | T opts may be opts, or actually be the first element
 --- @param ... T
 --- @return O -- concat return may have the same type as its input, but it may also change type, as in the case of concating a list of strings
 function concat(opts, ...)
