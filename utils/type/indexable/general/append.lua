@@ -1,7 +1,7 @@
 ---@class appendOpts
 ---@field nooverwrite? boolean only relevant for assoc arrs or lists treated as assoc arrs, if true, will not overwrite existing values
 
----add a single element to an indexable
+---add a single element to an indexable. If the is a string or list, the addition may be of any type and will simply be appended. If the base is an assoc arr, the addition must be a pair, and will be added to the base as a key-value pair.
 ---@generic T : indexable
 ---@param base `T` element to add to
 ---@param addition any element to add

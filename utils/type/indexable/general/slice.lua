@@ -13,7 +13,7 @@
 
 --- @generic T : indexable
 --- @param thing T
---- @param start_or_spec? conditionSpec|sliceSpec integer if we're specifying the start, stop and step as separate arguments, otherwise a sliceSpec or a string to be parsed as a sliceSpec
+--- @param start_or_spec? integer|string|sliceSpec if we're specifying the start, stop and step as separate arguments, otherwise a sliceSpec or a string to be parsed as a sliceSpec
 --- @param stop? conditionSpec integer if we're specifying the start, stop and step as separate arguments, otherwise nil
 --- @param step? integer see above
 function slice(thing, start_or_spec, stop, step)

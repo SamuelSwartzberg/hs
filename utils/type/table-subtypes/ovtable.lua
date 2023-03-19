@@ -220,7 +220,7 @@ end
 --- @alias getindex_givekey fun(t: orderedtable, idx: number, give_key_name: true): string, any 
 --- @alias getindex_nogivekey fun(t: orderedtable, idx: number, give_key_name: false | nil): any
 
---- @class orderedtable
+--- @class orderedtable may also be used a table would, since it has a metatable implementing the relevant metamethods properly. Typically imported as `ovtable`.
 --- @field new fun(): orderedtable
 --- @field init fun(all_elems: ({ k: string, v: any } | { key: string, value: any })[]): orderedtable
 --- @field getindex getindex_givekey | getindex_nogivekey
