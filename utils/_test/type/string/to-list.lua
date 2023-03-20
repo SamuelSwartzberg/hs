@@ -1,34 +1,34 @@
-assertValuesContainExactly(
+assertMessage(
   chars("hello"),
   {"h", "e", "l", "l", "o"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   chars(""),
   {}
 )
 
-assertValuesContainExactly(
+assertMessage(
   chars("😁"),
   {"😁"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   chars("😁😁"),
   {"😁", "😁"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   chars("😁~yaay~😁"),
   {"😁", "~", "y", "a", "a", "y", "~", "😁"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   bytechars("hello"),
   {"h", "e", "l", "l", "o"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   bytechars(""),
   {}
 )
@@ -48,12 +48,12 @@ assertMessage(
   14
 )
 
-assertValuesContainExactly(
+assertMessage(
   lines("hello\nworld"),
   {"hello", "world"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   lines("yo"),
   {"yo"}
 )

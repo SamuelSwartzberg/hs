@@ -11,7 +11,7 @@ assertMessage(
   testtbl
 )
 
-assertValuesContainExactly(
+assertMessage(
   statefulNokeyIteratorToTable(spairs, testtbl),
   {
     { "a", "恋" },

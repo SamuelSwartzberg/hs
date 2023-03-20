@@ -4,7 +4,7 @@ assertMessage(
   {1,2,3}
 )
 
-assertValuesContainExactly(
+assertMessage(
   combinations({1, 2, 3}, 2),
   {
     {2, 1},
@@ -13,14 +13,14 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   combinations({1, 2, 3}, 3),
   {
     {3, 2, 1}
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   combinations({1, 2, 3}, 1),
   {
     {1},
@@ -29,7 +29,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   permutations({1, 2, 3}),
   {
     {1, 2, 3},
@@ -41,7 +41,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   powerset({1, 2, 3}),
   {
     {},

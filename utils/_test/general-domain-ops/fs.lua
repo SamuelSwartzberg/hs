@@ -127,7 +127,7 @@ assertValuesContain(
 
 --- same but remote
 
-assertValuesContainExactly(
+assertMessage(
   itemsInPath(env.HSFTP_TMPDIR .. "/foo"),
   { 
     env.HSFTP_TMPDIR .. "/foo/test1.txt", 
@@ -143,7 +143,7 @@ assertValuesContain(
 )
 
 --- same but remote
-assertValuesContainExactly(
+assertMessage(
   itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", include_dirs = false}),
   { 
     env.HSFTP_TMPDIR .. "/foo/test1.txt", 
@@ -158,7 +158,7 @@ assertValuesContain(
 )
 
 --- same but remote
-assertValuesContainExactly(
+assertMessage(
   itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", include_files = false}),
   { 
     env.HSFTP_TMPDIR .. "/foo/bar"
@@ -186,7 +186,7 @@ delete(env.TMPDIR .. "/ff")
 writeFile(env.HSFTP_TMPDIR .. "/foo/bar/new.txt", "hello world", "any", true)
 
 
-assertValuesContainExactly(
+assertMessage(
   itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", recursion = true}),
   { 
     env.HSFTP_TMPDIR .. "/foo/test1.txt", 
@@ -636,7 +636,7 @@ assertMessage(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   itemsInPath({
     path = env.MAC_LIBRARY,
     validator_result = function(res)

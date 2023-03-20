@@ -22,13 +22,15 @@
 --- @field ret kvmult | "boolean" what of the element does the callback (or equivalent thing) return in which order (or just return a boolean)
 
 --- @class matchspec 
---- @field k integer
---- @field v indexable
---- @field match boolean
+--- @field k integer the start of the match
+--- @field v indexable the value of the match
+--- @field match boolean whether it counts as a match
 
---- @param item? string
---- @param conditions? conditionSpec
---- @param opts? testOpts
+--- find a single item that matches the conditions
+--- this is the logic guts of `find`, but can also be used on its own
+--- @param item? any most conditions only work if type is string, or the tostring option is set
+--- @param conditions? conditionSpec the conditions to test against
+--- @param opts? testOpts the options to use
 --- @return boolean
 function findsingle(item, conditions, opts)
   item = item or ""
@@ -44,7 +46,24 @@ function findsingle(item, conditions, opts)
     conditions = {conditions}
   end
 
-  local results
+  local results = {}
+
+  --- @return matchspec
+  local gen_getres = function(match, k, v)
+    if match then 
+      return {
+        k = k,
+        v = v,
+        match = match
+      }
+    else 
+      return {
+        k = -1,
+        v = false,
+        match = false
+      }
+    end
+  end
 
   for _, condition in wdefarg(ipairs)(conditions) do 
 
@@ -58,6 +77,7 @@ function findsingle(item, conditions, opts)
   
     -- process full conditions into results
 
+    -- condition is a table, so we need to do some complex processing
     if type(condition) == "table" then
 
       local bool 
@@ -67,34 +87,25 @@ function findsingle(item, conditions, opts)
         bool = returnBool
       end
 
-      --- @return matchspec
+      -- easier to wrap here than to keep passing in the bool function
+      -- can't be defined in gen_getres because it needs to be defined after bool is defined
       local getres = function(match, k, v)
         match = bool(match)
-        if match then 
-          return {
-            k = k,
-            v = v,
-            match = match
-          }
-        else 
-          return {
-            k = -1,
-            v = false,
-            match = false
-          }
-        end
+        return gen_getres(match, k, v)
       end
 
       local found_other_use_for_table = false
 
       -- nocase management
 
+      -- make the item itself lowercase if necessary
       local item_maybe_nocase = item
       if condition._ignore_case then
         item_maybe_nocase = eutf8.lower(item)
       end
 
-      function lowerIfNecessary(str)
+      -- helper function that implements _ignore_case for other things that may need to be compared to the item
+      function lowerIfNecessary(str) 
         if condition._ignore_case then
           return eutf8.lower(str)
         else
@@ -102,6 +113,7 @@ function findsingle(item, conditions, opts)
         end
       end
 
+      -- conditions that can only be used on strings
       if condition._r or condition._start or condition._stop then
         if type(item) == "string" then
           if condition._r then -- regex
@@ -130,6 +142,8 @@ function findsingle(item, conditions, opts)
           found_other_use_for_table = true
         end
       end
+
+      -- conditions that can be used on any type
       if condition._empty then -- empty
         local succ, rs = pcall(function() return #item == 0 end) -- pcall because # errors on failure
         push(results, getres(succ and rs, 1, item))
@@ -167,14 +181,15 @@ function findsingle(item, conditions, opts)
           end
         end
       end
+    -- condition is a function, so we only need to call it, and get the result
     elseif type(condition) == "function" then
       local k, v = condition(item)
-      push(results, getres(not not k, k, v))
+      push(results, gen_getres(not not k, k, v))
     end
   end
 
   --- @param acc matchspec
-  ---@param val matchspec
+  --- @param val matchspec
   local res = reduce(results, function(acc, val) 
     -- we need to make a decision how we want to treat cases where we had multiple conditions, and thus the k and v are different
     -- My current perspective is that since we require all conditions to be true, the k is the smallest k, and the v is the match from the first k to the largest k + #v 

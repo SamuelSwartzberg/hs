@@ -34,22 +34,19 @@ function assertValuesNotContain(a, values)
   end
 end
 
---- @param a table
---- @param values any[]
---- @return nil
-function assertValuesContainExactly(a, values)
-  if #a ~= #values then
-    error(("Expected %s to contain exactly %s, but it does not, because it has %s elements."):format(hs.inspect(a, {depth = 5}), hs.inspect(values, {depth = 5}), #a))
-  end
-  assertValuesContain(a, values)
-end
-
 --- @param a any
 --- @param b any
 --- @param msg? string
 function assertMessage(a, b, msg)
-  if type (a) == "table" then a = hs.inspect(a, {depth = 5}) end
-  if type (b) == "table" then b = hs.inspect(b, {depth = 5}) end
+  if isListOrEmptyTable(a) and isListOrEmptyTable(b) then 
+    if #a ~= #values then
+      error(("Expected %s to contain exactly %s, but it does not, because it has %s elements."):format(hs.inspect(a, {depth = 5}), hs.inspect(values, {depth = 5}), #a))
+    end
+    assertValuesContain(a, values)
+  else
+    if type (a) == "table" then a = hs.inspect(a, {depth = 5}) end
+    if type (b) == "table" then b = hs.inspect(b, {depth = 5}) end
 
-  assert(a == b, ("Expected \n%s\n, but got \n%s. %s"):format(b, a, msg or ""))
+    assert(a == b, ("Expected \n%s\nbut got \n%s. %s"):format(b, a, msg or ""))
+  end
 end

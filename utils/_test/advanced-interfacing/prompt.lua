@@ -311,7 +311,7 @@ local function string_multiple()
   end)
 end
 
-assertValuesContainExactly(
+assertMessage(
   doGui(
     string_multiple,
     function ()
@@ -432,14 +432,14 @@ assertMessage(
 
 -- type: pair
 
-assertValuesContainExactly(
+assertMessage(
   doGui("foo-bar\n", function ()
     return prompt("pair")
   end),
   {"foo", "bar"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   doGui(function()
     hs.eventtap.keyStrokes("foobar")
     hs.eventtap.keyStroke({}, "return")
@@ -465,14 +465,14 @@ local function pair_multiple()
   end)
 end
 
-assertValuesContainExactly(
+assertMessage(
   doGui(pair_multiple, function ()
     return prompt("pair", {}, "array")
   end),
   {{"foo", "bar"}, {"baz", "qux"}}
 )
 
-assertValuesContainExactly(
+assertMessage(
   doGui(pair_multiple, function ()
     return prompt("pair", {}, "pipeline")
   end),

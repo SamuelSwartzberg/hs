@@ -40,12 +40,12 @@ for i, v in ipairs(test_ovtable) do
   )
 end
 
-assertValuesContainExactly(
+assertMessage(
   keys(test_ovtable),
   keys(test_nonov_assoc_arr)
 )
 
-assertValuesContainExactly(
+assertMessage(
   values(test_ovtable),
   values(test_nonov_assoc_arr)
 )
@@ -64,14 +64,14 @@ local test_nonov_list_new = {
   "four",
 }
 
-assertValuesContainExactly(
+assertMessage(
   values(test_ovtable),
   test_nonov_list_new
 )
 
 test_ovtable["IV"] = nil 
 
-assertValuesContainExactly(
+assertMessage(
   values(test_ovtable),
   test_nonov_list
 )

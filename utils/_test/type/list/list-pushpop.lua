@@ -2,7 +2,7 @@ local abc  = { "a", "b", "c" }
 
 push(abc, "d")
 
-assertValuesContainExactly(
+assertMessage(
   abc,
   {"a", "b", "c", "d"}
 )
@@ -12,7 +12,7 @@ assertMessage(
   "d"
 )
 
-assertValuesContainExactly(
+assertMessage(
   abc,
   {"a", "b", "c"}
 )

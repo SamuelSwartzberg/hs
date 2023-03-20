@@ -4,12 +4,12 @@ local test_tbl = {
   c = "III",
 }
 
-assertValuesContainExactly(
+assertMessage(
   keys(test_tbl),
   {"a", "b", "c"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   values(test_tbl),
   {"I", "II", "III"}
 )
@@ -20,12 +20,12 @@ local test_arr = {
   "III",
 }
 
-assertValuesContainExactly(
+assertMessage(
   keys(test_arr),
   {1, 2, 3}
 )
 
-assertValuesContainExactly(
+assertMessage(
   values(test_arr),
   {"I", "II", "III"}
 )
@@ -36,12 +36,12 @@ local test_ovtable = ovtable.init({
   { k = "three", v = "III" },
 })
 
-assertValuesContainExactly(
+assertMessage(
   keys(test_ovtable),
   {"one", "two", "three"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   values(test_ovtable),
   {"I", "II", "III"}
 )

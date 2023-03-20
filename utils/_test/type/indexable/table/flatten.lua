@@ -101,7 +101,7 @@ assertMessage(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   flatten(
     {
       a = {
@@ -121,7 +121,7 @@ assertValuesContainExactly(
   { 1, "a", "b", "c", "d", "e", "f", 4 }
 )
 
-assertValuesContainExactly(
+assertMessage(
   flatten(
     {
       a = {
@@ -147,7 +147,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   flatten(
     {
       a = {
@@ -250,7 +250,7 @@ assertMessage(
 )
 
 
-assertValuesContainExactly(
+assertMessage(
   flatten(
     {
       a = {
@@ -287,7 +287,7 @@ assertValuesContainExactly(
     }
   }
 )
-assertValuesContainExactly(
+assertMessage(
   flatten(
     {
       a = {
@@ -329,7 +329,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   flatten(
     {
       a = {

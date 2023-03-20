@@ -95,27 +95,27 @@ assertMessage(
   true
 )
 
-assertValuesContainExactly(
+assertMessage(
   seq(1, 5),
   {1, 2, 3, 4, 5}
 )
 
-assertValuesContainExactly(
+assertMessage(
   seq(1, 5, 2),
   {1, 3, 5}
 )
 
-assertValuesContainExactly(
+assertMessage(
   seq("a", "e"),
   {"a", "b", "c", "d", "e"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   seq("a", "e", 2),
   {"a", "c", "e"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   seq(
     hs.geometry.point(1, 1),
     hs.geometry.point(5, 5)
@@ -129,7 +129,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   seq(
     hs.geometry.point(1, 1),
     hs.geometry.point(5, 5),
@@ -144,7 +144,7 @@ assertValuesContainExactly(
 
 local test_date = date("2013-02-03T09:56:22Z")
 
-assertValuesContainExactly(
+assertMessage(
   seq(test_date:copy():adddays(-3), test_date:copy():adddays(3)),
   {
     date("2013-01-31T09:56:22Z"),
@@ -157,7 +157,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   seq(test_date:copy():addhours(-5), test_date:copy():addhours(4), 2, "hours"),
   {
     date("2013-02-03T04:56:22Z"),

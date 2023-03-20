@@ -3,7 +3,7 @@
 local abc = { "a", "b", "c" }
 local a_to_t = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t" }
 
-assertValuesContainExactly(
+assertMessage(
   filter(abc, { _type = "string"}, "v"),
   { "a", "b", "c" }
 )
@@ -13,12 +13,12 @@ assertMessage(
   {}
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter(a_to_t, isEven, {"k", "v"}),
   { "b", "d", "f", "h", "j", "l", "n", "p", "r", "t" }
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter(a_to_t, isEven, {
     args = "k",
     ret = "k"
@@ -41,14 +41,14 @@ assertMessage(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter(sometable, isEven, {
     tolist = true
   }),
   { 2, 4 }
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter(sometable, isEven, {
     tolist = true,
     last = true
@@ -56,7 +56,7 @@ assertValuesContainExactly(
   { 4, 2 }
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter(sometable, isEven, {
     tolist = true,
     last = true,
@@ -65,7 +65,7 @@ assertValuesContainExactly(
   { 4 }
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter(sometable, isEven, {
     tolist = true,
     last = true,
@@ -92,7 +92,7 @@ assertMessage(
 )
 -- conditions
 
-assertValuesContainExactly(
+assertMessage(
   filter(
     list_with_various_strings,
     { _contains = "..."}
@@ -100,7 +100,7 @@ assertValuesContainExactly(
   {"Omae wa mou...", "...shindeiru"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter(
     list_with_various_strings,
     { _r = " \\w+ " }
@@ -112,7 +112,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter(
     list_with_various_strings,
     { _type = "number" }
@@ -122,17 +122,17 @@ assertValuesContainExactly(
 
 -- shorthands
 
-assertValuesContainExactly(
+assertMessage(
   filter({1, "", 2, "", 3}, true),
   {1, 2, 3}
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter({1, " ", 2, " ", 3}, true),
   {1, " ", 2, " ", 3}
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter({1, 2, 3}, true),
   {1, 2, 3}
 )
@@ -143,33 +143,33 @@ assertMessage(
 )
 
 
-assertValuesContainExactly(
+assertMessage(
   filter({1, "", 2, "", 3}, false),
   {"", "", ""}
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter({1, 2, 3}, 3),
   {3}
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter({1, 2, 3}, 4),
   {}
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter({1, 2, 3, 1 }, 1),
   {1, 1}
 )
 
-assertValuesContainExactly(
+assertMessage(
   filter({1, 2, 3, 4, 5}, { 2, 3, 4}),
   {2, 3, 4}
 )
 
 
-assertValuesContainExactly(
+assertMessage(
   filter({1, 2, 3, 4, 5}, { 6, 7, 8}),
   {}
 )

@@ -1,5 +1,5 @@
 
-assertValuesContainExactly(
+assertMessage(
   iterToList(string.gmatch("abc", ".")),
   { "a", "b", "c" }
 )
@@ -9,12 +9,12 @@ assertMessage(
   {}
 )
 
-assertValuesContainExactly(
+assertMessage(
   iterToTable(ipairs({"a", "b", "c"})),
   { "a", "b", "c" }
 )
 
-assertValuesContainExactly(
+assertMessage(
   iterToTable(pairs({a = "a", b = "b", c = "c"})),
   { a = "a", b = "b", c = "c" }
 )

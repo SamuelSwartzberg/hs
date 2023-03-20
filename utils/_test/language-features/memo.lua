@@ -4,26 +4,26 @@
 
 local poisonable1 = returnPoisonable()
 
-assertValuesContainExactly(
+assertMessage(
   memoize(poisonable1)(1, 2, 3),
   {1, 2, 3}
 )
 
-assertValuesContainExactly(
+assertMessage(
   memoize(poisonable1)(1, 2, 3),
   {1, 2, 3}
 )
 
 local poisonable2 = returnPoisonable()
 
-assertValuesContainExactly(
+assertMessage(
   memoize(poisonable2, {
     mode = "mem"
   })(1, 2, 3),
   {1, 2, 3}
 )
 
-assertValuesContainExactly(
+assertMessage(
   memoize(poisonable2, {
     mode = "mem"
   })(1, 2, 3),
@@ -32,14 +32,14 @@ assertValuesContainExactly(
 
 local poisonable3 = returnPoisonable()
 
-assertValuesContainExactly(
+assertMessage(
   memoize(poisonable3, {
     mode = "fs"
   })(1, 2, 3),
   {1, 2, 3}
 )
 
-assertValuesContainExactly(
+assertMessage(
   memoize(poisonable3, {
     mode = "fs"
   })(1, 2, 3),
@@ -69,7 +69,7 @@ end)
 
 local poisonable4 = returnPoisonable()
 
-assertValuesContainExactly(
+assertMessage(
   memoize(poisonable4, {
     mode = "mem",
     invalidation_mode = "invalidate",
@@ -100,14 +100,14 @@ local memoizedPoisonable5, timer = memoize(poisonable5, {
   interval = 1
 })
 
-assertValuesContainExactly(
+assertMessage(
   memoizedPoisonable5(1, 2, 3),
   {1, 2, 3}
 )
 
 hs.timer.usleep(500)
 
-assertValuesContainExactly(
+assertMessage(
   memoizedPoisonable5(1, 2, 3),
   {1, 2, 3}
 )

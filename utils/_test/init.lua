@@ -9,9 +9,9 @@ end
 relative_require = test_relative_require
   
 
-rrq("language-features")
-rrq("externals")
 rrq("type")
+rrq("externals")
+rrq("language-features")
 rrq("basic-interfacing")
 
 env = getEnvAsTable()

@@ -35,7 +35,7 @@ assertMessage(
   -8
 )
 
-assertValuesContainExactly(
+assertMessage(
   test_date_item_1:get("start-end", {
     start = { dt = test_date_1:copy():adddays(-1) },
     ["end"] = { dt = test_date_1:copy():adddays(1) }
@@ -46,7 +46,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   test_date_item_1:get("start-end", {
     ["end"] = { unit = "days", amount = 1 }
   }),
@@ -56,7 +56,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   test_date_item_1:get("start-end", {
     ["end"] = { unit = "hours", amount = 1,precision = "min" },
     
@@ -67,7 +67,7 @@ assertValuesContainExactly(
   }
 )
 
-assertValuesContainExactly(
+assertMessage(
   test_date_item_1:get("range", {
     start = { dt = test_date_1:copy():addhours(-4) },
     unit = "hours"
@@ -83,7 +83,7 @@ assertValuesContainExactly(
 
 local time_cleaned_test_date_1 = test_date_1:copy():sethours(0):setminutes(0):setseconds(0)
 
-assertValuesContainExactly(
+assertMessage(
   test_date_item_1:get("hours-in-day-range"),
   {
     time_cleaned_test_date_1:copy():addhours(0),

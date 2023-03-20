@@ -453,7 +453,7 @@ assertMessage(
   "lower_snake_case"
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[2],
     { _r  = mt._r.case.lower_snake },
@@ -480,7 +480,7 @@ assertMessage(
   "ha"
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[1],
     { _r  = mt._r.case.lower_snake },
@@ -489,7 +489,7 @@ assertValuesContainExactly(
   { 6, "ha" }
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[1],
     { _start = "Kore" },
@@ -498,7 +498,7 @@ assertValuesContainExactly(
   { 1, "Kore" }
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[1],
     { _start = "Kore", _invert = true },
@@ -516,7 +516,7 @@ assertMessage(
   "Kore"
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[6],
     { _stop = "iru" },
@@ -525,7 +525,7 @@ assertValuesContainExactly(
   { 10, "iru" }
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[6],
     { _contains = "shin" },
@@ -534,7 +534,7 @@ assertValuesContainExactly(
   { 4, "shin" }
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[8],
     { _empty = true },
@@ -543,7 +543,7 @@ assertValuesContainExactly(
   { 1, "" }
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[6],
     { _empty = false },
@@ -552,7 +552,7 @@ assertValuesContainExactly(
   { 1, "...shindeiru"}
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[3],
     { _exactly = 738 },
@@ -561,7 +561,7 @@ assertValuesContainExactly(
   { 1, 738 }
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[3],
     { _list = { 737, 738, 739 } },
@@ -570,7 +570,7 @@ assertValuesContainExactly(
   { 1, 738 }
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[7],
     { _r = "Nani%?", _regex_engine = "eutf8" },
@@ -579,7 +579,7 @@ assertValuesContainExactly(
   { 1, "Nani?" }
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[7],
     function(elem)
@@ -594,7 +594,7 @@ assertValuesContainExactly(
 
 -- boolean -> _empty
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[8],
     true,
@@ -603,7 +603,7 @@ assertValuesContainExactly(
   { 1, "" }
 )
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[6],
     false,
@@ -614,7 +614,7 @@ assertValuesContainExactly(
 
 -- string -> _exactly
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[2],
     "lower_snake_case",
@@ -625,7 +625,7 @@ assertValuesContainExactly(
 
 -- number -> _exactly
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[3],
     738,
@@ -636,7 +636,7 @@ assertValuesContainExactly(
 
 -- list -> _list
 
-assertValuesContainExactly(
+assertMessage(
   findsingle(
     list_with_various_strings[3],
     { 737, 738, 739 },

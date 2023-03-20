@@ -91,7 +91,7 @@ assertMessage(
 
 -- buildTaskArgs:
 
-assertValuesContainExactly(
+assertMessage(
   buildTaskArgs({
     "echo",
     {

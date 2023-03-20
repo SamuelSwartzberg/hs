@@ -3,12 +3,12 @@ assertMessage(
   2
 )
 
-assertValuesContainExactly(
+assertMessage(
   wdefarg(returnSame, 1)(),
   {1}
 )
 
-assertValuesContainExactly(
+assertMessage(
   wdefarg(returnSame, {2, 3})(),
   {2, 3}
 )

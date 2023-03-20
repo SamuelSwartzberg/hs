@@ -3,6 +3,7 @@
 ---@param ind any
 ---@return any
 function elemAt(thing, ind)
+  inspPrint(thing)
   if type(thing) == "string" then
     return eutf8.sub(thing, ind, ind)
   elseif type(thing) == "table" then
