@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.type.mappings")
+local rrq = bindArg(relative_require, "utils._test.type.mappings")
 
 rrq("mt")
 rrq("normalize")

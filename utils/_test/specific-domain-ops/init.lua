@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.specific-domain-ops")
+local rrq = bindArg(relative_require, "utils._test.specific-domain-ops")
 
 
 rrq("parse")

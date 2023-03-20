@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.type.list")
+local rrq = bindArg(relative_require, "utils._test.type.list")
 
 rrq("fix-list-with-nil")
 rrq("list-median")

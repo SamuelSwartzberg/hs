@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.advanced-interfacing")
+local rrq = bindArg(relative_require, "utils._test.advanced-interfacing")
 
 rrq("alert")
 rrq("do-input")

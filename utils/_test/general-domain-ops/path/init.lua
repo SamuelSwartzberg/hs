@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.general-domain-ops.path")
+local rrq = bindArg(relative_require, "utils._test.general-domain-ops.path")
 
 rrq("path-slice")
 rrq("prompt")

@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.type")
+local rrq = bindArg(relative_require, "utils._test.type")
 
 rrq("indexable")
 rrq("iterator")

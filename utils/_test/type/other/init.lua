@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.type.other")
+local rrq = bindArg(relative_require, "utils._test.type.other")
 
 rrq("binary")
 rrq("comparable")

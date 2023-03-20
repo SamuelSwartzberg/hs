@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.type.table-subtypes")
+local rrq = bindArg(relative_require, "utils._test.type.table-subtypes")
 
 rrq("aliastable")
 rrq("ovtable")

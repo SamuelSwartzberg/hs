@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.wrappers.hs-wrappes")
+local rrq = bindArg(relative_require, "utils._test.wrappers.hs-wrappes")
 rrq("hs-application")
 rrq("hs-pasteboard")
 rrq("hs-geometry")

@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.basic-interfacing")
+local rrq = bindArg(relative_require, "utils._test.basic-interfacing")
 
 rrq("eval")
 rrq("json")

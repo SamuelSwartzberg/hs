@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.general-domain-ops")
+local rrq = bindArg(relative_require, "utils._test.general-domain-ops")
 
 rrq("fs")
 rrq("path")

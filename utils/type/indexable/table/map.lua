@@ -1,15 +1,13 @@
--- new function map that generalizes over all map scenarios
-
 --- @alias kv "k"|"v"|string string here for stuff like "kv" or weirder stuff like "kkkkvkkvv"
 --- @alias kvmult kv | kv[]
 
 --- @class mapOpts : tableProcOpts
---- @field flatten boolean
---- @field nooverwrite boolean
---- @field recurse boolean | integer
---- @field depth integer
---- @field treat_as_leaf "assoc" | "list" | false
---- @field mapcondition conditionSpec TODO NOT USED YET
+--- @field flatten? boolean whether to flatten the result into the root tbl
+--- @field nooverwrite? boolean whether to overwrite existing keys
+--- @field recurse? boolean | integer whether/how to recurse into subtables
+--- @field depth? integer the current depth of recursion, if any. only used internally
+--- @field treat_as_leaf? "assoc" | "list" | false what to treat as a leaf node (i.e. what to not recurse into)
+--- @field mapcondition? conditionSpec TODO NOT IMPLEMENTED YET
 
 --- mapProcessor will processed into a function as follows:
 ---   - if it's a function, it's used as is
@@ -21,11 +19,10 @@
 --- @alias mapProcessor function | {_k: string | string[], _ret?: "orig" | nil} | {_f: string} | table | string
 
 
---- @generic OT : string | number | boolean | nil
---- @param tbl table | `OT`
+--- @param tbl table
 --- @param f? mapProcessor
 --- @param opts? kvmult | kvmult[] | mapOpts
---- @return table | OT
+--- @return table
 function map(tbl, f, opts)
 
   f = f or returnAny

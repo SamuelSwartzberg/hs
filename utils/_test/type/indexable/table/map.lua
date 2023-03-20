@@ -1,3 +1,35 @@
+assertMessage(
+  map({ "foo", "bar", "baz" }, { _f = "%s!"}),
+  { "foo!", "bar!", "baz!" }
+)
+
+assertMessage(
+  map({ "foo", "bar", "baz" }, "lol"),
+  { "lol", "lol", "lol" }
+)
+
+assertMessage(
+  map({ { foo = 1 }, {notfoo = 2} }, { foo = 3 }, { _k = "foo" }),
+  { 1, nil, 3 }
+)
+
+assertMessage(
+  map({ { foo = 1 }, {notfoo = 2} }, { foo = 3 }, { _k = "foo", _ret = "orig" }),
+  { 1, {notfoo = 2}, 3 }
+)
+
+assertMessage(
+  map(
+    {"foo", "bar", "baz"}, 
+    {
+      foo = "sore",
+      bar = "mo",
+      baz = "ii",
+      quux = "janai?"
+    }
+  ),
+  { "sore", "mo", "ii" }
+)
 
 assertMessage(
   map({ 1, 2, 3 }, returnAdd1),
@@ -189,4 +221,48 @@ assertMessage(
 assertMessage(
   map({1,2,3}, function(x) return x end),
   {1,2,3}
+)
+
+assertMessage(
+  map({ a = 1, b = 2, c = 3 }, returnSame, { tolist = true }),
+  { 1, 2, 3 }
+)
+
+local tmpovtable = ovtable.new()
+tmpovtable.a = 1
+tmpovtable.b = 2
+tmpovtable.c = 3
+
+local mappedtable = map(tmpovtable, returnSame, { noovtable = true })
+
+assertMessage(
+  mappedtable.revpairs,
+  nil
+)
+
+local mappedovtable = map(tmpovtable, returnSame, { noovtable = false })
+
+assertMessage(
+  mappedovtable.revpairs,
+  ovtable.revpairs
+)
+
+-- todo: if this test errors, maybe it only works with ovtables?
+local tblwithduplicatevalues = {
+  a = "a",
+  b = "b",
+  c = "c",
+  d = "a",
+  e = "b",
+  f = "c"
+}
+
+assertMessage(
+  map(tblwithduplicatevalues, returnSame, { arg = "k", ret = "v" }),
+  { d = "a", e = "b", f = "c" }
+)
+
+assertMessage(
+  map(tblwithduplicatevalues, returnSame, { arg = "k", ret = "v", nooverwrite = true }),
+  { a = "a", b = "b", c = "c" }
 )
