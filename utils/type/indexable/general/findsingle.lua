@@ -34,11 +34,11 @@
 --- @return boolean
 function findsingle(item, conditions, opts)
   item = item or ""
-  conditions = conditions or true
+  conditions = defaultIfNil(conditions, true)
 ---@diagnostic disable-next-line: cast-local-type
-  opts = opts or "boolean" -- default to returning a boolean, this is different from the general default, which is why we have to do this before calling defaultOpts
-  opts = defaultOpts(opts)
-  
+  if not opts then opts = {ret = "boolean"} 
+  elseif type(opts) == "table" and not opts.ret then opts.ret = "boolean" end -- default to returning a boolean, this is different from the general default, which is why we have to do this before calling defaultOpts
+  opts = defaultOpts(opts)  
 
   if opts.tostring then item = tostring(item) end
 
@@ -116,23 +116,25 @@ function findsingle(item, conditions, opts)
       -- conditions that can only be used on strings
       if condition._r or condition._start or condition._stop then
         if type(item) == "string" then
-          if condition._r then -- regex
+          if condition._r ~= nil then -- regex
             condition._regex_engine = condition._regex_engine or "onig"
-            local start, stop, matched = _G[condition._regex_engine].find(item, condition._r, 1, condition._ignore_case and "i" or nil)
+            local slice_lib = _G[condition._regex_engine] == "onig" and string or eutf8
+            local start, stop = _G[condition._regex_engine].find(item, condition._r, 1, condition._ignore_case and "i" or nil)
+            local matched = slice_lib.sub(item, start, stop)
             local match = start ~= nil
             if condition._only_if_all then
               match = match and #matched == #item
             end
-            push(results, getres(start, start, matched))
+            push(results, getres(match, start, matched))
           end
-          if condition._start then -- starts with
+          if condition._start ~= nil then -- starts with
             local match = stringy.startswith(item_maybe_nocase, lowerIfNecessary(condition._start))
             if condition._only_if_all then
               match = match and #condition._start == #item
             end
             push(results, getres(match, 1, condition._start))
           end
-          if condition._stop then -- ends with
+          if condition._stop ~= nil then -- ends with
             local match = stringy.endswith(item_maybe_nocase, lowerIfNecessary(condition._stop))
             if condition._only_if_all then
               match = match and #condition._stop == #item
@@ -144,25 +146,27 @@ function findsingle(item, conditions, opts)
       end
 
       -- conditions that can be used on any type
-      if condition._empty then -- empty
+      if condition._empty ~= nil then -- empty
+        
         local succ, rs = pcall(function() return #item == 0 end) -- pcall because # errors on failure
-        push(results, getres(succ and rs, 1, item))
+        local isempty = succ and rs
+        push(results, getres( isempty == condition._empty, 1, item))
         found_other_use_for_table = true
       end
-      if condition._type then -- type
+      if condition._type ~= nil then -- type
         local match = type(item) == condition._type
         -- _only_if_all guaranteed to be true here if match is, so no check needed
         push(results, getres(match, 1, item))
         found_other_use_for_table = true
       end
-      if condition._exactly then -- exactly
+      if condition._exactly ~= nil then -- exactly
         local match = item_maybe_nocase == lowerIfNecessary(condition._exactly)
         -- _only_if_all guaranteed to be true here if match is, so no check needed
         push(results, getres(match, 1, item))
         found_other_use_for_table = true
       end
-      if condition._contains then -- contains
-        local start = stringy.find(item_maybe_nocase, lowerIfNecessary(condition._contains))
+      if condition._contains ~= nil then -- contains
+        local start = toNumber(stringy.find(item_maybe_nocase, lowerIfNecessary(condition._contains)), "pos-int", "nil")
         local match = start ~= nil
         if condition._only_if_all then
           match = match and #item_maybe_nocase == #condition._contains
@@ -171,14 +175,19 @@ function findsingle(item, conditions, opts)
         found_other_use_for_table = true
       end
 
-      if condition._list or not found_other_use_for_table then
+      if condition._list ~= nil or not found_other_use_for_table then
         local list = condition._list or condition
+        local match = false
         for _, listitem in ipairs(list) do
-          local match = item_maybe_nocase == lowerIfNecessary(listitem)
+          print(listitem)
+          match = item_maybe_nocase == lowerIfNecessary(listitem)
           if match then
             push(results, getres(match, 1, item))
             break
           end
+        end
+        if not match then
+          push(results, getres(match, -1, false))
         end
       end
     -- condition is a function, so we only need to call it, and get the result
@@ -188,6 +197,7 @@ function findsingle(item, conditions, opts)
     end
   end
 
+
   --- @param acc matchspec
   --- @param val matchspec
   local res = reduce(results, function(acc, val) 
@@ -195,24 +205,33 @@ function findsingle(item, conditions, opts)
     -- My current perspective is that since we require all conditions to be true, the k is the smallest k, and the v is the match from the first k to the largest k + #v 
     -- This is a somewhat arbitrary decision, but its results are fairly predictable and intuitive
 
-    local accmatchindex = acc.k + #acc.v - 1
-    local valmatchindex = val.k + #val.v - 1
-    local largermatchindex = math.max(accmatchindex, valmatchindex)
-    local newv = slice(item, acc.k, largermatchindex)
-    return {
-      k = math.min(acc.k, val.k),
-      v = newv,
-      match = acc.match and val.match
-    }
+    if acc.match and val.match then 
+      local accmatchindex = acc.k + #acc.v - 1
+      local valmatchindex = val.k + #val.v - 1
+      local largermatchindex = math.max(accmatchindex, valmatchindex)
+      local newv = slice(item, acc.k, largermatchindex)
+      return {
+        k = math.min(acc.k, val.k),
+        v = newv,
+        match = true
+      }
+    else
+      return {
+        k = -1,
+        v = false,
+        match = false
+      }
+    end
   end)
 
   if opts.ret == "boolean" then
     return res.match
   else
+    local finalresults = {}
     for _, retarg in ipairs(opts.ret) do
-      push(results, res[retarg])
+      push(finalresults, res[retarg])
     end
-    return table.unpack(results)
+    return table.unpack(finalresults)
   end
   
 end

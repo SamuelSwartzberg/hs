@@ -25,7 +25,7 @@ function defaultOpts(opts)
   end
   if type(opts.ret) == "string" then
     if opts.ret == "boolean" then
-      opts.ret = {"boolean"}
+      -- no-op
     else
       opts.ret = chars(opts.ret)
     end
@@ -84,7 +84,7 @@ end
 --- @return T
 function getDefaultInput(thing, opts)
   if type(thing) ~= "table" and type(thing) ~= "string" and type(thing) ~= "nil" then
-    error("Expected table, string or, got " .. type(thing))
+    error("Expected table, string, or nil, got " .. type(thing))
   end
   if opts.start or opts.stop then
     return slice(thing, opts.start, opts.stop)
@@ -123,7 +123,10 @@ function addToRes(itemres,res,opts,k,v)
     table.insert(res, newval)
   else
     if not (opts.nooverwrite and res[newkey]) then
-      res[newkey] = newval
+      if newkey ~= nil then 
+        res[newkey] = newval
+      end -- else no-op, don't add nil keys
     end
   end
+  return res -- typically, this is not needed, but it's here if needed, mainly in tests
 end

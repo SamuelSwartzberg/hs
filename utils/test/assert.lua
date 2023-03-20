@@ -39,10 +39,10 @@ end
 --- @param msg? string
 function assertMessage(a, b, msg)
   if isListOrEmptyTable(a) and isListOrEmptyTable(b) then 
-    if #a ~= #values then
-      error(("Expected %s to contain exactly %s, but it does not, because it has %s elements."):format(hs.inspect(a, {depth = 5}), hs.inspect(values, {depth = 5}), #a))
+    if #a ~= #b then
+      error(("Expected %s to contain exactly %s, but it does not, because it has %s elements."):format(hs.inspect(a, {depth = 5}), hs.inspect(b, {depth = 5}), #a))
     end
-    assertValuesContain(a, values)
+    assertValuesContain(a, b)
   else
     if type (a) == "table" then a = hs.inspect(a, {depth = 5}) end
     if type (b) == "table" then b = hs.inspect(b, {depth = 5}) end

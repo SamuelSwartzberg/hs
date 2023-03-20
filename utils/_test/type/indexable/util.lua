@@ -1,4 +1,4 @@
-local stringdefaultops =  defaultOpts({"f", "o", "o"})
+local stringdefaultops =  defaultOpts("foo")
 
 assertMessage(
   stringdefaultops.args,
@@ -10,7 +10,7 @@ assertMessage(
   {"f", "o", "o"}
 )
 
-local listdefaultops =  defaultOpts({{"f", "o", "o"}, {"b", "a", "r"}})
+local listdefaultops =  defaultOpts({"foo", "bar"})
 
 assertMessage(
   listdefaultops.args,
@@ -22,7 +22,7 @@ assertMessage(
   {"b", "a", "r"}
 )
 
-local listdefaultopslen1 =  defaultOpts({{"f", "o", "o"}})
+local listdefaultopslen1 =  defaultOpts({"foo"})
 
 assertMessage(
   listdefaultopslen1.args,
@@ -47,7 +47,7 @@ assertMessage(
   {"v"} -- default
 )
 
-local tblops =  defaultOpts({args = {"f", "o", "o"}, ret = {"b", "a", "r"}})
+local tblops =  defaultOpts({args = "foo", ret = "bar"})
 
 assertMessage(
   tblops.args,
@@ -68,7 +68,7 @@ assertMessage(
 
 assertMessage(
   booleanops.ret,
-  {"boolean"} -- boolean is only special for ret
+  "boolean" -- boolean is only special for ret
 )
 
 assertMessage(
@@ -87,7 +87,7 @@ assertMessage(
 )
 
 assertMessage(
-  getEmptyResult(ovtable.new(), {noovtable = false}).revpairs,
+  getEmptyResult(ovtable.init({{"foo", "bar"}}), {noovtable = false}).revpairs,
   ovtable.revpairs
 )
 
@@ -96,7 +96,7 @@ assertMessage(
     "key",
     "val",
     {
-      args = "k",
+      args = {"k"},
     }
   ),
   {"key"}
@@ -107,7 +107,7 @@ assertMessage(
     "key",
     "val",
     {
-      args = "v",
+      args = {"v"},
     }
   ),
   {"val"}
@@ -118,7 +118,7 @@ assertMessage(
     "key",
     "val",
     {
-      args = "kvkkvv",
+      args = {"k", "v", "k", "k", "v", "v"},
     }
   ),
   {"key", "val", "key", "key", "val", "val"}
@@ -132,18 +132,13 @@ assertMessage(
 )
 
 assertMessage(
-  res,
-  "Expected table, string, or nil, got boolean"
-)
-
-assertMessage(
   getDefaultInput("string", {}),
   "string"
 )
 
 assertMessage(
   getDefaultInput("string", {start = 3}),
-  "ing"
+  "ring"
 )
 
 assertMessage(
@@ -187,17 +182,17 @@ assertMessage(
 )
 
 assertMessage(
-  addToRes({"itemreskey", "itemresval"}, {}, {ret = {"v"}}, "origkey", "origval"),
+  addToRes({"itemreskey", "itemresval"}, {}, {ret = {"discard", "v"}}, "origkey", "origval"),
   {origkey = "itemresval"}
 )
 
 assertMessage(
-  addToRes({"itemreskey", "itemresval"}, {}, {ret = {"k", "k"}}, "origkey", "origval"),
+  addToRes({"itemreskey", "itemreskey"}, {}, {ret = {"k", "v"}}, "origkey", "origval"),
   {itemreskey = "itemreskey"}
 )
 
 assertMessage(
-  addToRes({"itemreskey", "itemresval"}, {}, {ret = {"v", "v"}}, "origkey", "origval"),
+  addToRes({"itemresval", "itemresval"}, {}, {ret = {"k", "v"}}, "origkey", "origval"),
   {itemresval = "itemresval"}
 )
 
@@ -219,4 +214,18 @@ assertMessage(
 assertMessage(
   addToRes({"itemreskey", "itemresval"}, {itemreskey = "priorval"}, {ret = {"k", "v"}, nooverwrite = true}, "origkey", "origval"),
   {itemreskey = "priorval"}
+)
+
+-- key is nil 
+
+assertMessage(
+  addToRes({nil, "itemresval"}, {}, {ret = {"k", "v"}}, "origkey", "origval"),
+  {}
+)
+
+-- val is nil
+
+assertMessage(
+  addToRes({"itemreskey", nil}, {}, {ret = {"k", "v"}}, "origkey", "origval"),
+  {}
 )

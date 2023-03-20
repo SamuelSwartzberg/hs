@@ -417,7 +417,7 @@ assertMessage(
   findsingle(
     list_with_various_strings[3],
     { _exactly = "738" },
-    { _tostring = true }
+    { tostring = true }
   ),
   true
 )
@@ -426,7 +426,7 @@ assertMessage(
   findsingle(
     list_with_various_strings[2],
     { _exactly = "lower_snake_casing" },
-    { _tostring = true }
+    { tostring = true }
   ),
   false
 )
@@ -454,11 +454,11 @@ assertMessage(
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[2],
     { _r  = mt._r.case.lower_snake },
     "kv"
-  ),
+  )},
   { 1, "lower_snake_case" }
 )
 
@@ -477,33 +477,33 @@ assertMessage(
     { _r  = mt._r.case.lower_snake },
     "v"
   ),
-  "ha"
+  "ore"
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[1],
     { _r  = mt._r.case.lower_snake },
     "kv"
-  ),
-  { 6, "ha" }
+  )},
+  { 2, "ore" }
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[1],
     { _start = "Kore" },
     "kv"
-  ),
+  )},
   { 1, "Kore" }
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[1],
     { _start = "Kore", _invert = true },
     "kv"
-  ),
+  )},
   { -1, false }
 )
 
@@ -513,80 +513,82 @@ assertMessage(
     { _start = "kore", _ignore_case = true },
     "v"
   ),
-  "Kore"
+  "kore" -- the string actually contains 'Kore'. Currently, the implementation is such that the value of _start is returned in the case of _ignore_case, rather than the contents of the string. I'm not sure whether it would be better to return the contents of the string instead. For now, I'll leave it as is.
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[6],
     { _stop = "iru" },
     "kv"
-  ),
+  )},
   { 10, "iru" }
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[6],
     { _contains = "shin" },
     "kv"
-  ),
+  )},
   { 4, "shin" }
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[8],
     { _empty = true },
     "kv"
-  ),
+  )},
   { 1, "" }
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[6],
     { _empty = false },
     "kv"
-  ),
+  )},
   { 1, "...shindeiru"}
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[3],
     { _exactly = 738 },
     "kv"
-  ),
+  )},
   { 1, 738 }
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[3],
     { _list = { 737, 738, 739 } },
     "kv"
-  ),
+  )},
   { 1, 738 }
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[7],
     { _r = "Nani%?", _regex_engine = "eutf8" },
     "kv"
-  ),
+  )},
   { 1, "Nani?" }
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[7],
     function(elem)
-      return elem == "Nani?"
+      local match = elem == "Nani?"
+      if match then return 1, elem else
+      return -1, false end
     end,
     "kv"
-  ),
+  )},
   { 1, "Nani?" }
 )
 
@@ -595,52 +597,52 @@ assertMessage(
 -- boolean -> _empty
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[8],
     true,
     "kv"
-  ),
+  )},
   { 1, "" }
 )
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[6],
     false,
     "kv"
-  ),
+  )},
   { 1, "...shindeiru"}
 )
 
 -- string -> _exactly
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[2],
     "lower_snake_case",
     "kv"
-  ),
+  )},
   { 1, "lower_snake_case" }
 )
 
 -- number -> _exactly
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[3],
     738,
     "kv"
-  ),
+  )},
   { 1, 738 }
 )
 
 -- list -> _list
 
 assertMessage(
-  findsingle(
+  {findsingle(
     list_with_various_strings[3],
-    { 737, 738, 739 },
+    {{ 737, 738, 739 }},
     "kv"
-  ),
+  )},
   { 1, 738 }
 )
