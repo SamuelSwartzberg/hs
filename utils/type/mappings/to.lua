@@ -79,10 +79,7 @@ to = {
   },
   regex = {
     lua_escaped = {{mt._contains.lua_metacharacters}, {"%"}},
-    general_escaped = {
-      map(mt._contains.regex_metacharacters, function(v) return {v, "\\" .. v} end),
-      {processor = tblmap.whitespace.escaped, mode = "replace" }
-    }
+    
   },
   resolved = {
     doi = {cond = {_r = mt._r.id.doi_prefix }, processor = "https://doi.org/", mode = "replace" }

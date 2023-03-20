@@ -127,6 +127,17 @@ tblmap = {
       [6] = "second",
     },
   },
+  weekday_mon1_en = {
+    int = {
+      ["Monday"] = 1,
+      ["Tuesday"] = 2,
+      ["Wednesday"] = 3,
+      ["Thursday"] = 4,
+      ["Friday"] = 5,
+      ["Saturday"] = 6,
+      ["Sunday"] = 7
+    }
+  },
   lang = {
     voice = {
       en = "Alex",
@@ -151,5 +162,3 @@ for k, v in pairs(tblmap) do
     )
   end
 end
-
-tblmap.weekday_en.mon1_int = map(tblmap.int.weekday_mon1_en, returnAny, {"kv", "vk"})

@@ -1,5 +1,6 @@
 local types = { "string", "number", "boolean", "table", "function", "nil", "thread", "userdata" }
-local types_w_any = concat(types, {"any"})
+local types_w_any = tablex.copy(types)
+table.insert(types_w_any, "any")
 
 --- @alias shape_table { [string]: string|shape_table }
 

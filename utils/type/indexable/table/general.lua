@@ -105,6 +105,7 @@ function getIsLeaf(treat_as_leaf)
   end
 end
 
+--- @param itemres any[] really should be [any, any], but lua type annotations don't support that
 function addToRes(itemres,res,opts,k,v)
   local mapped_useas = {}
   for index, ret in ipairs(opts.ret) do

@@ -1,4 +1,4 @@
-arg_ignore = rand({len = 20})
+arg_ignore = math.random(20)
 
 --- @param func function
 --- @param arg_spec { [string]: any } | any each key is an index representing where to start binding the arguments, each value is a list of arguments to bind to the args starting at that index

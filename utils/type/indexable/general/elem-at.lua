@@ -9,7 +9,11 @@ function elemAt(thing, ind)
     if isListOrEmptyTable(thing) then
       return thing[ind]
     else
-      return thing:getindex(ind)
+      if thing.getindex then
+        return thing:getindex(ind)
+      else
+        error("can't get index of table without getindex method")
+      end
     end
   end
 end

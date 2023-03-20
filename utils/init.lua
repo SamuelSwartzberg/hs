@@ -31,8 +31,11 @@ rrq("general-domain-ops")
 rrq("specific-domain-ops")
 rrq("test")
 
-env = getEnvAsTable()
-
 if mode ~= "prod" then 
   rrq("_test")
 end
+
+to.regex.general_escaped = {
+  map(mt._contains.regex_metacharacters, function(v) return {v, "\\" .. v} end),
+  {processor = tblmap.whitespace.escaped, mode = "replace" }
+}
