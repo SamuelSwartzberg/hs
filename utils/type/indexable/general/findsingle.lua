@@ -37,7 +37,7 @@ function findsingle(item, conditions, opts)
   conditions = defaultIfNil(conditions, true)
 ---@diagnostic disable-next-line: cast-local-type
   if not opts then opts = {ret = "boolean"} 
-  elseif type(opts) == "table" and not opts.ret then opts.ret = "boolean" end -- default to returning a boolean, this is different from the general default, which is why we have to do this before calling defaultOpts
+  elseif type(opts) == "table" and not isListOrEmptyTable(opts) and not opts.ret then opts.ret = "boolean" end -- default to returning a boolean, this is different from the general default, which is why we have to do this before calling defaultOpts
   opts = defaultOpts(opts)  
 
   if opts.tostring then item = tostring(item) end
@@ -179,7 +179,6 @@ function findsingle(item, conditions, opts)
         local list = condition._list or condition
         local match = false
         for _, listitem in ipairs(list) do
-          print(listitem)
           match = item_maybe_nocase == lowerIfNecessary(listitem)
           if match then
             push(results, getres(match, 1, item))
@@ -193,10 +192,18 @@ function findsingle(item, conditions, opts)
     -- condition is a function, so we only need to call it, and get the result
     elseif type(condition) == "function" then
       local k, v = condition(item)
-      push(results, gen_getres(not not k, k, v))
+      if v == nil and type(k) == "boolean" then -- if the function returns a boolean, then we assume that the boolean is the match, and the item is the value
+        if k then
+          k = 1
+          v = item
+        else
+          k = -1
+          v = false
+        end
+      end
+      push(results, gen_getres(not not (k and k ~= -1), k, v))
     end
   end
-
 
   --- @param acc matchspec
   --- @param val matchspec

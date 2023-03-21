@@ -23,6 +23,8 @@ function append(base, addition, opts)
       if base.isassoc == "isassoc" then base.isassoc = nil end
       if #values(addition) >= 2 then
         if not opts.nooverwrite or not new_thing[addition[1]] then
+          inspPrint(addition)
+          inspPrint(new_thing)
           new_thing[addition[1]] = addition[2]
         end
         return new_thing
