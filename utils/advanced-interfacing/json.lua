@@ -13,7 +13,7 @@
 --- @return any
 function rest(specifier, do_after)
   local url
-  specifier = tablex.deepcopy(specifier) or {}
+  specifier = copy(specifier) or {}
   if specifier.url then
     url = specifier.url
   elseif specifier.host or specifier.endpoint or specifier.params then

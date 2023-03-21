@@ -84,7 +84,7 @@ end
 --- @param prompt_spec? PromptSpecifier
 --- @return any
 function promptNopolicy(prompt_spec)
-  prompt_spec = tablex.deepcopy(prompt_spec) or {}
+  prompt_spec = copy(prompt_spec) or {}
   prompt_spec.prompter = prompt_spec.prompter or promptStringInner
   prompt_spec.transformer = prompt_spec.transformer or function(x) return x end
   prompt_spec.raw_validator = prompt_spec.raw_validator or function(x) return x ~= nil end
@@ -166,7 +166,7 @@ end
 
 --- @type promptInt | promptNumber | promptString | promptPath | promptPair | promptIntMult | promptNumberMult | promptStringMult | promptPathMult | promptPairMult
 function prompt(type, prompt_spec, loop)
-  prompt_spec = tablex.deepcopy(prompt_spec) or {}
+  prompt_spec = copy(prompt_spec) or {}
   prompt_spec.prompt_args = prompt_spec.prompt_args or {}
   type = type or "string"
   if type == "int" then

@@ -11,7 +11,7 @@ function splice(thing1, thing2, opts)
   if type(opts) == "number" then
     opts = {start = opts}
   else
-    opts = tablex.deepcopy(opts) or {}
+    opts = copy(opts) or {}
   end
   opts.start = opts.start or 1
   opts.overwrite = opts.overwrite or false

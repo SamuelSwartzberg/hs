@@ -16,7 +16,7 @@ function pathSlice(path, spec, opts)
   -- set defaults
 
   spec = spec or { start = -1, stop = -1}
-  opts = tablex.deepcopy(opts) or {}
+  opts = copy(opts) or {}
 
   -- prepare path components
 

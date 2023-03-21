@@ -25,7 +25,7 @@
 function flatten(tbl, opts)
 
   if not opts then opts = {} 
-  else opts = tablex.deepcopy(opts) end
+  else opts = copy(opts) end
 
   -- set defaults
 
@@ -110,7 +110,7 @@ function flatten(tbl, opts)
       valAddfunc(res, v, k)
     else
       if opts.recurse == true or opts.recurse > opts.depth then
-        local newopts = tablex.deepcopy(opts)
+        local newopts = copy(opts)
         newopts.path = concat(opts.path, k)
         local subres = flatten(v, newopts)
         for k, v in pairs(subres) do

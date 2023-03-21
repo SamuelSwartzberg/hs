@@ -19,7 +19,7 @@
 --- @return T
 function replace(thing, opts, globalopts)
   if opts == nil then return thing end
-  opts = tablex.deepcopy(opts) or {}
+  opts = copy(opts) or {}
   if not isListOrEmptyTable(opts) then opts = {opts} end
 
   --- allow for tr-like operation with two lists

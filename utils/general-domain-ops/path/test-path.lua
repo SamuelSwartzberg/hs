@@ -26,7 +26,7 @@ function testPath(path, opts)
   elseif type(opts) == "string" then
     opts = {dirness = opts}
   else
-    opts = tablex.deepcopy(opts)
+    opts = copy(opts)
   end
   path = path or env.HOME
   path = transf.string.tilde_resolved(path)

@@ -5,7 +5,7 @@
 --- @return T
 function listMedian(list, comp, if_even)
   if_even = if_even or "lower"
-  list = tablex.copy(list) -- don't modify the original list
+  list = copy(list, false) -- don't modify the original list
   table.sort(list, comp)
   local mid = math.floor(#list / 2)
   if #list % 2 == 0 then

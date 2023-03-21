@@ -15,7 +15,7 @@ function defaultOpts(opts)
   elseif isListOrEmptyTable(opts) then
     opts = {args = opts[1] or {"v"}, ret = opts[2] or {"v"}}
   else
-    opts = tablex.deepcopy(opts) or {}
+    opts = copy(opts) or {}
     opts.args = opts.args or {"v"}
     opts.ret = opts.ret or {"v"}
   end

@@ -9,7 +9,7 @@
 --- @param opts? splitOpts
 --- @return T[], T[]?
 function split(thing, sep, opts)
-  opts = tablex.deepcopy(opts) or {}
+  opts = copy(opts) or {}
   local splintervals = find(
     thing,
     sep,

@@ -1,5 +1,5 @@
 local types = { "string", "number", "boolean", "table", "function", "nil", "thread", "userdata" }
-local types_w_any = tablex.copy(types)
+local types_w_any = copy(types, false)
 table.insert(types_w_any, "any")
 
 --- @alias shape_table { [string]: string|shape_table }
@@ -14,7 +14,7 @@ function resolveTypeMatchingToKeys(test_tbl, shape)
       for k, _ in pairs(test_tbl) do
         if type(k) == typ or typ == "any" then 
           if not shape[k] then
-            shape[k] = tablex.deepcopy(shape["[" .. typ .. "]"])
+            shape[k] = copy(shape["[" .. typ .. "]"])
           end
         end
       end

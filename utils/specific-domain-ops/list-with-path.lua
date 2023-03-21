@@ -13,7 +13,7 @@ function listWithChildrenKeyToListIncludingPath(list, path, specifier)
   if not specifier.levels_of_nesting_to_skip then specifier.levels_of_nesting_to_skip = 0 end
   local result = {}
   for i, item in ipairs(list) do
-    local cloned_path = tablex.copy(path)
+    local cloned_path = copy(path, false)
     push(cloned_path, item[specifier.title_key_name])
     local children = item[specifier.children_key_name]
     if specifier.levels_of_nesting_to_skip > 0 and children then
@@ -23,7 +23,7 @@ function listWithChildrenKeyToListIncludingPath(list, path, specifier)
     end
     if not isListOrEmptyTable(children) then children = nil end
     if specifier.include_inner_nodes or not children then -- if it doesn't have children (or we want to include inner nodes), add it to the result
-      item.path = tablex.copy(path) -- not cloned_path as we want the path to be the path up to and including the parent, not the path up to and including the item. 
+      item.path = copy(path, false) -- not cloned_path as we want the path to be the path up to and including the parent, not the path up to and including the item. 
       item[specifier.children_key_name] = nil
       push(result, item)
     end

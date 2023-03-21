@@ -86,7 +86,7 @@ function memoize(fn, opts)
     return memoized[fnid]
   end
 
-  opts = tablex.deepcopy(opts) or {}
+  opts = copy(opts) or {}
   opts.mode = opts.mode or "mem"
   opts.is_async = opts.is_async or false
   opts.invalidation_mode = opts.invalidation_mode or "none"

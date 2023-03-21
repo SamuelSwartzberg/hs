@@ -23,7 +23,7 @@ function slice(thing, start_or_spec, stop, step)
   -- parse the slice spec if it's a string or table
 
   if type(start_or_spec) == "table" then
-    spec = tablex.copy(start_or_spec)
+    spec = copy(start_or_spec, false)
   elseif type(start_or_spec) == "string" then
     local stripped_str = stringy.strip(start_or_spec)
     local start_str, stop_str, step_str = onig.match(

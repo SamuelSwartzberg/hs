@@ -6,7 +6,7 @@
 --- @param opts querySelectorOpts
 --- @return string
 function queryPage(opts)
-  opts = tablex.deepcopy(opts) or {}
+  opts = copy(opts) or {}
   opts.url = opts.url or "https://example.com"
   local webpage = memoized(hs.http.get, {mode = "fs", invalidation_mode = "invalidate", interval = tblmap.dt_component.seconds.day})(opts.url)
 

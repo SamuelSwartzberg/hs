@@ -30,7 +30,7 @@ NonEmptyArraySpecifier = {
         return CreateArray(self:get("map", callback))
       end,
       ["sorted"] = function(self, callback)
-        local res = tablex.copy(self:get("contents"))
+        local res = copy(self:get("contents"), false)
         table.sort(res, callback)
         return res
       end,
@@ -44,7 +44,7 @@ NonEmptyArraySpecifier = {
         return CreateArray(self:get("reverse"))
       end,
       ["revsorted"] = function(self, callback)
-        local res = tablex.copy(self:get("contents"))
+        local res = copy(self:get("contents"), false)
         table.sort(res, callback)
         return rev(res)
       end,

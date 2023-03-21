@@ -36,12 +36,12 @@ function resolve(opts)
 
   -- set defaults
 
-  opts.s = tablex.deepcopy(opts.s) or {}
+  opts.s = copy(opts.s) or {}
   opts.s.path = opts.s.path or env.ME -- this is just some reasonable default, may be changed if a more convenient default is needed
   opts.s.root = opts.s.root or env.HOME
   opts.s.prefix = opts.s.prefix or ""
   opts.s.suffx = opts.s.suffix or ""
-  opts.t = tablex.deepcopy(opts.t) or {}
+  opts.t = copy(opts.t) or {}
   opts.t.prefix = opts.t.prefix or ""
   opts.t.suffix = opts.t.suffix or ""
 

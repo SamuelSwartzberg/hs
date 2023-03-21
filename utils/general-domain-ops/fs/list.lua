@@ -16,7 +16,7 @@ function itemsInPath(opts)
   if type (opts) == "string" then
     opts = {path = opts}
   elseif type (opts) == "table" then
-    opts = tablex.deepcopy(opts)
+    opts = copy(opts)
   elseif opts == nil then
     opts = {}
   else
@@ -83,7 +83,7 @@ function itemsInPath(opts)
           if opts.recursion <= 0 then shouldRecurse = false end
         end
         if shouldRecurse then
-          local sub_opts = tablex.deepcopy(opts)
+          local sub_opts = copy(opts)
           sub_opts.path = file_path
           sub_opts.recursion = crementIfNumber(opts.recursion, "de")
           local sub_files = itemsInPath(sub_opts)

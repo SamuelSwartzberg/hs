@@ -14,7 +14,7 @@ function append(base, addition, opts)
     if not addition then return base end
     return base .. addition
   elseif type(base) == "table" then
-    local new_thing = tablex.deepcopy(base) 
+    local new_thing = copy(base) 
     if not addition then return new_thing end
     if isListOrEmptyTable(base) then
       new_thing[#new_thing + 1] = addition

@@ -7,7 +7,7 @@ function copy(t, deep)
     return t:copy(deep)
   else
     if deep then
-      return tablex.deepcopy(t)
+      return copy(t)
     else
       return tablex.copy(t)
     end

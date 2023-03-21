@@ -225,8 +225,8 @@ function pkg.copy(t, deep)
         -- If the value is an orderedtable, recursively copy it
         copy[k] = v:copy(true)
       else
-        -- If the value is a normal table, use tablex.deepcopy
-        copy[k] = tablex.deepcopy(v)
+        -- If the value is a normal table, use copy
+        copy[k] = copy(v)
       end
     else
       -- For non-table values or shallow copying, just assign the value
