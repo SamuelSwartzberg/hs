@@ -13,7 +13,7 @@ function rev(thing)
       end
       return new_list
     else
-      return iterToTable(thing:revpairs())
+      return iterToTbl(thing:revpairs())
     end
   else
     error("rev only works on strings, lists, and tables. got " .. type(thing) .. " when processing:\n\n" .. json.encode(thing))

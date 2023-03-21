@@ -1,10 +1,10 @@
 local rrq = bindArg(relative_require, "utils._test.type")
 
-rrq("indexable")
+rrq("table-simple")
+rrq("table-subtypes")
 rrq("iterator")
+rrq("indexable")
 rrq("list")
 rrq("mappings")
 rrq("other")
 rrq("string")
-rrq("table-simple")
-rrq("table-subtypes")

@@ -1,23 +1,21 @@
+--- @param opts? tableProcOpts | kvmult
+function iterToTbl(opts, ...)
+  local args = {...}
+  if type(opts) == "function" then -- actually no opts
+    table.insert(args, 1, opts)
+    opts = nil
+  end
+  if not opts then opts = {ret = "kv"} 
+  elseif type(opts) == "table" and not isListOrEmptyTable(opts) and not opts.ret then opts.ret = "kv" end 
+  opts = defaultOpts(opts)
 
---- makes a function that returns an iterator instead return a table
---- @generic T, U, V, W, X
---- @param gen fun(...: `V`): fun(state: `T`, control_var: `U`): (`W`, `X`), T, U
---- @return table<W, X>
-function iterToTable(gen, ...)
-  local res = ovtable.new()
-  for k, v in gen do
-    res[k] = v
-  end
-  return res
-end
+  local res = getEmptyResult(nil, opts)
 
-function iterToList(gen)
-  if gen == nil then
-    return {}
+  for a1, a2, a3, a4, a5, a6, a7, a8, a9 in table.unpack(args) do
+    local as = {a1, a2, a3, a4, a5, a6, a7, a8, a9}
+    inspPrint(as)
+    addToRes(as, res, opts, nil, nil)
   end
-  local res = {}
-  for v in gen do
-    table.insert(res, v)
-  end
+
   return res
 end

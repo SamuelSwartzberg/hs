@@ -87,9 +87,9 @@ assertMessage(
 )
 
 local reverse_test_ovtable = ovtable.init({
-  { k = "three", v = "III" },
-  { k = "two", v = "II" },
-  { k = "one", v = "I" },
+  { k = "III", v = "three" },
+  { k = "II", v = "two" },
+  { k = "I", v = "one" },
 })
 
 local indexer = 1

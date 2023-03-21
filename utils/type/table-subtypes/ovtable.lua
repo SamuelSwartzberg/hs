@@ -216,25 +216,19 @@ end
 
 function pkg.copy(t, deep)  
   -- Create a new ordered table for the copy
-  local copy = pkg.new()
+  local cpy = pkg.new()
   
   -- Iterate over the original orderedtable
   for k, v in pairs(t) do
     if deep and type(v) == "table" then
-      if getmetatable(v) == pkg.orderedmetatable then
-        -- If the value is an orderedtable, recursively copy it
-        copy[k] = v:copy(true)
-      else
-        -- If the value is a normal table, use copy
-        copy[k] = copy(v)
-      end
+      cpy[k] = copy(v, deep)
     else
       -- For non-table values or shallow copying, just assign the value
-      copy[k] = v
+      cpy[k] = v
     end
   end
   
-  return copy
+  return cpy
 end
 
 

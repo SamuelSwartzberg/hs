@@ -113,13 +113,13 @@ StringItemSpecifier = {
           or stringy.find(self:get("contents"), "&")
       end, -- 'decoded' = to be encoded
       ["extract-utf8"] = function(self, pattern)
-        return iterToList(eutf8.gmatch(self:get("contents"), pattern))
+        return iterToTbl({tolist=true, ret="v"},eutf8.gmatch(self:get("contents"), pattern))
       end,
       ["extract-utf8-array"] = function(self, pattern)
         return CreateArray(self:get("extract-utf8", pattern))
       end,
       ["extract-onig"] = function(self, pattern)
-        return iterToList(onig.gmatch(self:get("contents"), pattern))
+        return iterToTbl({tolist=true, ret="v"},onig.gmatch(self:get("contents"), pattern))
       end,
       ["extract-onig-array"] = function(self, pattern)
         return CreateArray(self:get("extract-onig", pattern))
