@@ -52,8 +52,11 @@ function find(indexable, cond, opts)
     inspPrint(finalres)
   else
     local matchkey, matchvalue
+    local rest = indexable
+    finalres = {}
     while true do
-      matchkey, matchvalue = findsingle(indexable, cond, {
+      preventInfiniteLoop(json.encode(indexable), 100)
+      matchkey, matchvalue = findsingle(rest, cond, {
         ret = "kv"
       })
       local res = {}
@@ -64,9 +67,11 @@ function find(indexable, cond, opts)
       for _, retarg in ipairs(opts.ret) do 
         push(res, retriever[retarg])
       end
+      print(matchkey, matchvalue)
       if opts.findall then
         if matchkey == -1 then break end
         table.insert(finalres, res)
+        rest = slice(rest, matchkey + 1)
       else
         return table.unpack(res)
       end

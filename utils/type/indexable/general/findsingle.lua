@@ -20,6 +20,7 @@
 --- @class testOpts
 --- @field tostring boolean whether to convert the item to a string before testing it
 --- @field ret kvmult | "boolean" what of the element does the callback (or equivalent thing) return in which order (or just return a boolean)
+--- @field start integer only consider elements with or after this index (if you specify this, you are responsible for ensuring that item is an indexable and thus can be sliced) 
 
 --- @class matchspec 
 --- @field k integer the start of the match
@@ -41,6 +42,10 @@ function findsingle(item, conditions, opts)
   opts = defaultOpts(opts)  
 
   if opts.tostring then item = tostring(item) end
+
+  local start = opts.start or 1
+  local potentially_sliced_item = item
+  if start > 1 then potentially_sliced_item = slice(item, start) end
 
   if not isListOrEmptyTable(conditions) then
     conditions = {conditions}
@@ -71,8 +76,10 @@ function findsingle(item, conditions, opts)
 
     if type(condition) == "boolean" then
       condition = {_empty = condition}
-    elseif type(condition) == "string" or type(condition) == "number" then
+    elseif type(condition) == "number" then
       condition = {_exactly = condition}
+    elseif type(condition) == "string" then
+      condition = {_contains = condition}
     end
   
     -- process full conditions into results
@@ -100,10 +107,13 @@ function findsingle(item, conditions, opts)
 
       -- make the item itself lowercase if necessary
       local item_maybe_nocase = item
+      local potentially_sliced_item_maybe_nocase = potentially_sliced_item
       if condition._ignore_case then
         item_maybe_nocase = eutf8.lower(item)
+        potentially_sliced_item_maybe_nocase = eutf8.lower(potentially_sliced_item)
       end
 
+      print(potentially_sliced_item_maybe_nocase)
       -- helper function that implements _ignore_case for other things that may need to be compared to the item
       function lowerIfNecessary(str) 
         if condition._ignore_case then
@@ -119,27 +129,27 @@ function findsingle(item, conditions, opts)
           if condition._r ~= nil then -- regex
             condition._regex_engine = condition._regex_engine or "onig"
             local slice_lib = _G[condition._regex_engine] == "onig" and string or eutf8
-            local start, stop = _G[condition._regex_engine].find(item, condition._r, 1, condition._ignore_case and "i" or nil)
-            local matched = slice_lib.sub(item, start, stop)
-            local match = start ~= nil
+            local mstart, mstop = _G[condition._regex_engine].find(item, condition._r, start, condition._ignore_case and "i" or nil)
+            local matched = slice_lib.sub(item, mstart, mstop)
+            local match = mstart ~= nil
             if condition._only_if_all then
-              match = match and #matched == #item
+              match = match and #matched == #potentially_sliced_item
             end
-            push(results, getres(match, start, matched))
+            push(results, getres(match, mstart, matched))
           end
           if condition._start ~= nil then -- starts with
-            local match = stringy.startswith(item_maybe_nocase, lowerIfNecessary(condition._start))
+            local match = stringy.startswith(potentially_sliced_item_maybe_nocase, lowerIfNecessary(condition._start))
             if condition._only_if_all then
-              match = match and #condition._start == #item
+              match = match and #condition._start == #potentially_sliced_item
             end
-            push(results, getres(match, 1, condition._start))
+            push(results, getres(match, start, condition._start))
           end
           if condition._stop ~= nil then -- ends with
-            local match = stringy.endswith(item_maybe_nocase, lowerIfNecessary(condition._stop))
+            local match = stringy.endswith(potentially_sliced_item_maybe_nocase, lowerIfNecessary(condition._stop))
             if condition._only_if_all then
-              match = match and #condition._stop == #item
+              match = match and #condition._stop == #potentially_sliced_item
             end
-            push(results, getres(match, #item - #condition._stop + 1, condition._stop))
+            push(results, getres(match, #potentially_sliced_item - #condition._stop + 1, condition._stop))
           end
           found_other_use_for_table = true
         end
@@ -148,30 +158,30 @@ function findsingle(item, conditions, opts)
       -- conditions that can be used on any type
       if condition._empty ~= nil then -- empty
         
-        local succ, rs = pcall(function() return #item == 0 end) -- pcall because # errors on failure
+        local succ, rs = pcall(function() return #potentially_sliced_item == 0 end) -- pcall because # errors on failure
         local isempty = succ and rs
-        push(results, getres( isempty == condition._empty, 1, item))
+        push(results, getres( isempty == condition._empty, start, potentially_sliced_item))
         found_other_use_for_table = true
       end
       if condition._type ~= nil then -- type
-        local match = type(item) == condition._type
+        local match = type(potentially_sliced_item) == condition._type
         -- _only_if_all guaranteed to be true here if match is, so no check needed
-        push(results, getres(match, 1, item))
+        push(results, getres(match, start, potentially_sliced_item))
         found_other_use_for_table = true
       end
       if condition._exactly ~= nil then -- exactly
-        local match = item_maybe_nocase == lowerIfNecessary(condition._exactly)
+        local match = potentially_sliced_item_maybe_nocase == lowerIfNecessary(condition._exactly)
         -- _only_if_all guaranteed to be true here if match is, so no check needed
-        push(results, getres(match, 1, item))
+        push(results, getres(match, start, potentially_sliced_item))
         found_other_use_for_table = true
       end
       if condition._contains ~= nil then -- contains
-        local start = toNumber(stringy.find(item_maybe_nocase, lowerIfNecessary(condition._contains)), "pos-int", "nil")
-        local match = start ~= nil
+        local mstart = toNumber(stringy.find(potentially_sliced_item_maybe_nocase, lowerIfNecessary(condition._contains)), "pos-int", "nil")
+        local match = mstart ~= nil
         if condition._only_if_all then
-          match = match and #item_maybe_nocase == #condition._contains
+          match = match and #potentially_sliced_item_maybe_nocase == #condition._contains
         end
-        push(results, getres(match, start, condition._contains))
+        push(results, getres(match, mstart, condition._contains))
         found_other_use_for_table = true
       end
 
@@ -179,9 +189,9 @@ function findsingle(item, conditions, opts)
         local list = condition._list or condition
         local match = false
         for _, listitem in ipairs(list) do
-          match = item_maybe_nocase == lowerIfNecessary(listitem)
+          match = potentially_sliced_item_maybe_nocase == lowerIfNecessary(listitem)
           if match then
-            push(results, getres(match, 1, item))
+            push(results, getres(match, start, potentially_sliced_item))
             break
           end
         end
@@ -191,11 +201,11 @@ function findsingle(item, conditions, opts)
       end
     -- condition is a function, so we only need to call it, and get the result
     elseif type(condition) == "function" then
-      local k, v = condition(item)
+      local k, v = condition(potentially_sliced_item)
       if v == nil and type(k) == "boolean" then -- if the function returns a boolean, then we assume that the boolean is the match, and the item is the value
         if k then
-          k = 1
-          v = item
+          k = start
+          v = potentially_sliced_item
         else
           k = -1
           v = false

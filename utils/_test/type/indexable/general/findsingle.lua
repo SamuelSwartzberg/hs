@@ -623,15 +623,15 @@ assertMessage(
   { 1, "...shindeiru"}
 )
 
--- string -> _exactly
+-- string -> _contains
 
 assertMessage(
   {findsingle(
     list_with_various_strings[2],
-    "lower_snake_case",
+    "snake",
     "kv"
   )},
-  { 1, "lower_snake_case" }
+  { 7, "snake" }
 )
 
 -- number -> _exactly
