@@ -12,7 +12,7 @@ function find(indexable, cond, opts)
   if not opts then opts = {ret = "boolean"} 
   elseif type(opts) == "table" and not isListOrEmptyTable(opts) and not opts.ret then opts.ret = "boolean" end -- default to returning a boolean, this is different from the general default, which is why we have to do this before calling defaultOpts
   opts = defaultOpts(opts)
-  indexable = getDefaultInput(indexable, opts)
+  indexable = getDefaultInput(indexable)
 
 
   local finalres
@@ -24,6 +24,7 @@ function find(indexable, cond, opts)
     if opts.findall then finalres = getEmptyResult(indexable, opts) end
 
     for k, v in wdefarg(iterator)(indexable) do
+      print(k, v)
       local retriever = {
         k = k,
         v = v

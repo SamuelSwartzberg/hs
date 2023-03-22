@@ -141,7 +141,7 @@ assertMessage(result16, "hello...")
 
 -- Test 17: Slice using sliced_indicator on a table
 local result17 = slice(test_tbl, {start = 2, stop = 4, sliced_indicator = "sliced"})
-assertMessage(result17, {"b", "c", "d", "sliced"})
+assertMessage(result17, {"sliced", "b", "c", "d", "sliced"})
 
 -- Test 18: Slice using fill on a string
 local result18 = slice(test_str, {start = 1, stop = 5, step = 2, fill = "_"})
@@ -156,13 +156,13 @@ local result20 = slice(test_str, {start = {_r = "l"}, last_start = true, stop = 
 assertMessage(result20, "llo")
 
 -- Test 21: Slice using last_start and last_stop on a table
-local result21 = slice(test_tbl, {start = {_exactly = "a", _invert = true, last_start = true}, stop = {_exactly = "d", last_stop = true}})
-assertMessage(result21, {"c", "d"})
+local result21 = slice({"b", "a", "b", "a", "d", "d", "c"}, {start = {_exactly = "a"}, last_start = true, stop = {_exactly = "d"}, last_stop = true})
+assertMessage(result21, {"a", "d", "d"})
 
 -- Test 22: Slice using sliced_indicator and fill on a string
 local result22 = slice(test_str, {start = 3, stop = 9, fill = "_", sliced_indicator = "..."})
-assertMessage(result22, "...__llo worl_...")
+assertMessage(result22, "...__llo wor__...")
 
 -- Test 23: Slice using sliced_indicator and fill on a table
-local result23 = slice(test_tbl, {start = 1, stop = 5, step = 2, fill = "x", sliced_indicator = "sliced"})
-assertMessage(result23, {"a", "x", "c", "x", "e", "sliced"})
+local result23 = slice(test_tbl, {start = 2, stop = 5, fill = "x", sliced_indicator = "sliced"})
+assertMessage(result23, {"sliced", "x", "b", "c", "d", "e"})

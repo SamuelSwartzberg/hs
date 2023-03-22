@@ -111,7 +111,7 @@ function slice(thing, start_or_spec, stop, step)
   if spec.sliced_indicator then
     if spec.start > 1 then
       if isListOrEmptyTable(new_thing) and not isListOrEmptyTable(spec.sliced_indicator) then
-        concat({spec.sliced_indicator}, new_thing)
+        new_thing = concat({spec.sliced_indicator}, new_thing)
       else
         new_thing = concat(spec.sliced_indicator, new_thing)
       end

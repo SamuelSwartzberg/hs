@@ -40,9 +40,13 @@ end
 function getIterator(thing, opts)
   local iter
   if isListOrEmptyTable(thing) then
-    if opts.last then iter = revipairs
-    else iter = ipairs end
+    if opts.last then 
+      iter = function(tbl) return revipairs(tbl, opts.start, opts.stop) end
+    else 
+      iter = function(tbl) return ipairs(tbl, opts.start, opts.stop) end 
+    end
   else
+    -- this would be the place to implement start/stop for non-lists, but that would be a lot of work, so for now, it's not supported
     if opts.last then  iter=  function(tbl) return tbl:revpairs() end 
     else iter = pairs end
   end
@@ -80,17 +84,12 @@ end
 
 --- @generic T : indexable
 --- @param thing `T`
---- @param opts table
 --- @return T
-function getDefaultInput(thing, opts)
+function getDefaultInput(thing)
   if type(thing) ~= "table" and type(thing) ~= "string" and type(thing) ~= "nil" then
     error("Expected table, string, or nil, got " .. type(thing))
   end
-  if opts.start or opts.stop then
-    return slice(thing, opts.start, opts.stop)
-  else
-    return thing
-  end
+  return thing
 end
 
 function getIsLeaf(treat_as_leaf)

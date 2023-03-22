@@ -27,7 +27,7 @@ function map(tbl, f, opts)
 
   f = f or returnAny
   opts = defaultOpts(opts)
-  tbl = getDefaultInput(tbl, opts)
+  tbl = getDefaultInput(tbl)
 
   -- set defaults
 

@@ -12,7 +12,7 @@ function reduce(tbl, reducer, opts)
 
   reducer = reducer or returnLarger
   opts = defaultOpts(opts)
-  tbl = getDefaultInput(tbl, opts)
+  tbl = getDefaultInput(tbl)
 
   local iterator = getIterator(tbl, opts)
 

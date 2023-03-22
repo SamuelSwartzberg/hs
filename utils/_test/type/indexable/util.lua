@@ -124,7 +124,7 @@ assertMessage(
   {"key", "val", "key", "key", "val", "val"}
 )
 
-local succ, res = pcall(getDefaultInput,false, {})
+local succ, res = pcall(getDefaultInput,false)
 
 assertMessage(
   succ,
@@ -132,13 +132,8 @@ assertMessage(
 )
 
 assertMessage(
-  getDefaultInput("string", {}),
+  getDefaultInput("string"),
   "string"
-)
-
-assertMessage(
-  getDefaultInput("string", {start = 3}),
-  "ring"
 )
 
 assertMessage(

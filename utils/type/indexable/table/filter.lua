@@ -12,7 +12,7 @@ function filter(tbl, cond, opts)
 
   cond = cond or false
   opts = defaultOpts(opts)
-  tbl = getDefaultInput(tbl, opts)
+  tbl = getDefaultInput(tbl)
 
   local iterator = getIterator(tbl, opts)
   

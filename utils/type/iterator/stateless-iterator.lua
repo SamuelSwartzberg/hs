@@ -1,3 +1,29 @@
+-- sliceable ipairs & revipairs
+
+function ipairs(tbl, start, stop)
+  start = start or 1
+  stop = stop or #tbl
+  local i = start - 1
+  return function()
+    i = i + 1
+    if i <= stop then
+      return i, tbl[i]
+    end
+  end, tbl, start
+end
+
+function revipairs(tbl, stop, start)
+  start = start or #tbl
+  stop = stop or 1
+  local i = start + 1
+  return function()
+    i = i - 1
+    if i >= stop then
+      return i, tbl[i]
+    end
+  end, tbl, start
+end
+
 --- @param opts? tableProcOpts | kvmult
 function iterToTbl(opts, ...)
   local args = {...}
@@ -20,13 +46,3 @@ function iterToTbl(opts, ...)
   return res
 end
 
-function revipairs_iter(tbl, index)
-  index = index - 1
-  if index >= 1 then
-      return index, tbl[index]
-  end
-end
-
-function revipairs(tbl)
-  return revipairs_iter, tbl, #tbl + 1
-end
