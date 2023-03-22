@@ -79,9 +79,6 @@ function slice(thing, start_or_spec, stop, step)
   -- currently: return empty thing
   -- consider: reverse the step
 
-  inspPrint(spec)
-
-
   if spec.start > spec.stop and spec.step > 0 then
     return new_thing
   elseif spec.start < spec.stop and spec.step < 0 then

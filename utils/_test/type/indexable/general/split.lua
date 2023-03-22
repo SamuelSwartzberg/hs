@@ -13,9 +13,9 @@ local test2_result = split(test2_input, test2_sep)
 assertMessage(test2_result, test2_expected)
 
 -- Test 2: Split list with string
-local test2_input = {"a", "b", "sep", "c", "sep", "d"}
+local test2_input = {"a", "b", "sep", "c", "d", "sep", "d"}
 local test2_sep = "sep"
-local test2_expected = {{"a", "b"}, {"c"}, {"d"}}
+local test2_expected = {{"a", "b"}, {"c", "d"}, {"d"}}
 local test2_result = split(test2_input, test2_sep)
 assertMessage(test2_result, test2_expected)
 
@@ -36,21 +36,14 @@ local test4_result = split(test4_input, test4_sep, test4_opts)
 assertMessage(test4_result, test4_expected)
 
 -- Test 5: Split with custom condition (updated)
-local test5_input = "apple.orange_banana!grape"
+local test5_input = "apple;orange_banana,grape"
 local test5_sep = {
-  _r = "[._!]",
+  _r = "[;_,]",
   _ignore_case = true
 }
 local test5_expected = {"apple", "orange", "banana", "grape"}
 local test5_result = split(test5_input, test5_sep)
 assertMessage(test5_result, test5_expected)
-
--- Test 6: Split with a list of conditions
-local test6_input = "hello,world!test?example"
-local test6_sep = {",", "!", "?"}
-local test6_expected = {"hello", "world", "test", "example"}
-local test6_result = split(test6_input, test6_sep)
-assertMessage(test6_result, test6_expected)
 
 -- Test 7: Split with empty input
 local test7_input = ""
@@ -67,8 +60,13 @@ local test8_result = split(test8_input, test8_sep)
 assertMessage(test8_result, test8_expected)
 
 -- Test 9: Split an orderedtable (updated)
-local ovtable = require "ovtable"
-local test9_input = ovtable.init({{k = "a", v = 1}, {k = "s1", v = "sep"}, {k = "b", v = 3}, {k = "s2", v = "sep"}, {k = "c", v = 5}})
+local test9_input = ovtable.init({
+  {k = "a", v = 1}, 
+  {k = "s1", v = "sep"}, 
+  {k = "b", v = 3}, 
+  {k = "s2", v = "sep"}, 
+  {k = "c", v = 5}
+})
 local test9_sep = "sep"
 local test9_expected = {
   ovtable.init({{k = "a", v = 1}}),

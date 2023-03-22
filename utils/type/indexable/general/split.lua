@@ -23,13 +23,15 @@ function split(thing, sep, opts)
     return {thing}
   end
 
+  inspPrint(splintervals)
+
   local res = {}
   local removed = {}
   local lastend = 1
   for _, pair in ipairs(splintervals) do
     local start, match = table.unpack(pair)
     local matchlength 
-    if type(match) == "string" then
+    if type(thing) == "string" then -- we're splitting a string, so splitter can have variable length in relation to the thing
       matchlength = len(match)
     else
       matchlength = 1
@@ -38,7 +40,10 @@ function split(thing, sep, opts)
     if opts.mode == "after" then
       sliceend = sliceend + matchlength
     end
+    inspPrint(thing)
+    print(lastend, sliceend)
     local fragment = slice(thing, lastend, sliceend)
+    inspPrint(fragment)
     push(res, fragment)
     local stop = start + matchlength - 1
     lastend = stop + 1

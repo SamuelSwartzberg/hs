@@ -37,8 +37,6 @@ function concat(opts, ...)
     inputs = inputs[1]
   end
 
-  inspPrint(inputs)
-
   -- determine the type of output, which will determine the behavior of glue and ultimately the return type
   local outputs = table.remove(inputs, 1)
   local sep, index

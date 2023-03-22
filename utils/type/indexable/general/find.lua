@@ -18,13 +18,14 @@ function find(indexable, cond, opts)
   local finalres
 
   if not (type(indexable) == "string") then
+    print("notstr")
     local iterator = getIterator(indexable, opts)
 
     
     if opts.findall then finalres = getEmptyResult(indexable, opts) end
 
     for k, v in wdefarg(iterator)(indexable) do
-      print(k, v)
+      
       local retriever = {
         k = k,
         v = v
@@ -49,10 +50,10 @@ function find(indexable, cond, opts)
       end
 
     end
-    inspPrint(finalres)
   else
     local matchkey, matchvalue
     local rest = indexable
+    local index_accum = 0
     finalres = {}
     while true do
       preventInfiniteLoop(json.encode(indexable), 100)
@@ -61,16 +62,18 @@ function find(indexable, cond, opts)
       })
       local res = {}
       local retriever = {
-        k = matchkey,
+        k = matchkey + index_accum,
         v = matchvalue
       }
       for _, retarg in ipairs(opts.ret) do 
         push(res, retriever[retarg])
       end
       print(matchkey, matchvalue)
+      inspPrint(res)
       if opts.findall then
         if matchkey == -1 then break end
         table.insert(finalres, res)
+        index_accum = index_accum + matchkey
         rest = slice(rest, matchkey + 1)
       else
         return table.unpack(res)

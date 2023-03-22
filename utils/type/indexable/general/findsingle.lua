@@ -130,10 +130,13 @@ function findsingle(item, conditions, opts)
             condition._regex_engine = condition._regex_engine or "onig"
             local slice_lib = _G[condition._regex_engine] == "onig" and string or eutf8
             local mstart, mstop = _G[condition._regex_engine].find(item, condition._r, start, condition._ignore_case and "i" or nil)
-            local matched = slice_lib.sub(item, mstart, mstop)
             local match = mstart ~= nil
-            if condition._only_if_all then
-              match = match and #matched == #potentially_sliced_item
+            local matched 
+            if match then
+              matched = slice_lib.sub(item, mstart, mstop)
+              if condition._only_if_all then
+                match = match and #matched == #potentially_sliced_item
+              end
             end
             push(results, getres(match, mstart, matched))
           end
@@ -214,6 +217,8 @@ function findsingle(item, conditions, opts)
       push(results, gen_getres(not not (k and k ~= -1), k, v))
     end
   end
+
+  inspPrint(results)
 
   --- @param acc matchspec
   --- @param val matchspec

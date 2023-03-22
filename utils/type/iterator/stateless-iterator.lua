@@ -39,7 +39,6 @@ function iterToTbl(opts, ...)
 
   for a1, a2, a3, a4, a5, a6, a7, a8, a9 in table.unpack(args) do
     local as = {a1, a2, a3, a4, a5, a6, a7, a8, a9}
-    inspPrint(as)
     addToRes(as, res, opts, nil, nil)
   end
 
