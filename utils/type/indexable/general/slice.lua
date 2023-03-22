@@ -28,7 +28,7 @@ function slice(thing, start_or_spec, stop, step)
     local stripped_str = stringy.strip(start_or_spec)
     local start_str, stop_str, step_str = onig.match(
       stripped_str, 
-      "^\\[?([-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
+      "^\\[?(-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
     )
     spec.start = toNumber(start_str, "int", "nil")
     spec.stop = toNumber(stop_str, "int", "nil")
@@ -40,13 +40,14 @@ function slice(thing, start_or_spec, stop, step)
     spec.step = step
   end
 
-  if spec.start and not type(spec.start) == "number" then
+  if spec.start and type(spec.start) ~= "number" then
     spec.start = find(thing, spec.start, {ret = "k", last = spec.last_start})
   end
 
-  if spec.stop and not type(spec.stop) == "number" then
+  if spec.stop and type(spec.stop) ~= "number" then
     spec.stop = find(thing, spec.stop, {ret = "k", start = spec.start, last = spec.last_stop})
   end
+
 
 
   -- implement various functions polymorphically depending on the type of thing
@@ -69,14 +70,17 @@ function slice(thing, start_or_spec, stop, step)
     spec.stop = len(thing) + spec.stop + 1
   end
 
-  -- clamp indices to ensure we don't go out of bounds
+  -- clamp indices to ensure we don't go out of bounds (+/-1 because we want over/underindexing to produce an empty thing, not the last element)
 
-  spec.start = clamp(spec.start, 1, len(thing))
-  spec.stop = clamp(spec.stop, 1, len(thing))
+  spec.start = clamp(spec.start, 1, len(thing) + 1)
+  spec.stop = clamp(spec.stop, 1-1, len(thing))
 
   -- handle cases where users have passed conditions that will result in an infinite loop
   -- currently: return empty thing
   -- consider: reverse the step
+
+  inspPrint(spec)
+
 
   if spec.start > spec.stop and spec.step > 0 then
     return new_thing
@@ -104,8 +108,17 @@ function slice(thing, start_or_spec, stop, step)
     new_thing = concat(prepend, new_thing, postpend)
   end
 
-  if spec.sliced_indicator and len(new_thing) < len(thing) then
-    new_thing = append(new_thing, spec.sliced_indicator)
+  if spec.sliced_indicator then
+    if spec.start > 1 then
+      if isListOrEmptyTable(new_thing) and not isListOrEmptyTable(spec.sliced_indicator) then
+        concat({spec.sliced_indicator}, new_thing)
+      else
+        new_thing = concat(spec.sliced_indicator, new_thing)
+      end
+    end
+    if spec.stop < len(thing) then
+      new_thing = concat(new_thing, spec.sliced_indicator)
+    end
   end
 
   return new_thing

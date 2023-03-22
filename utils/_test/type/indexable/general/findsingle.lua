@@ -16,6 +16,15 @@ list_with_various_strings = {
 
 assertMessage(
   findsingle(
+    list_with_various_strings[1],
+    { _contains = "kore" },
+    { last = true, ret = "k" }
+  ),
+  9
+)
+
+assertMessage(
+  findsingle(
     list_with_various_strings[2],
     { _r  = mt._r.case.lower_snake }
   ),

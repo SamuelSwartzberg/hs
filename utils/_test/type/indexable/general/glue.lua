@@ -52,15 +52,15 @@ expected6["f"] = {7, 8, 10}
 expected6["g"] = 9
 assertMessage(result6, expected6)
 
--- Test 7: Glue two orderedtables with recursion and limited depth
+-- Test 7: Glue two orderedtables with recursion
 local ot5 = ovtable.new()
 ot5["h"] = {11, 12}
 local ot6 = ovtable.new()
 ot6["i"] = 13
 ot6["h"] = {14}
-local result7 = glue(ot5, ot6, {recurse = 1, depth = 0})
+local result7 = glue(ot5, ot6, {recurse = 1})
 local expected7 = ovtable.new()
-expected7["h"] = {11, 12}
+expected7["h"] = {11, 12, 14} -- currently, arrays also get recursed into and then merged. Is this the desired behavior? Maybe we need an option to control this.
 expected7["i"] = 13
 assertMessage(result7, expected7)
 

@@ -19,3 +19,14 @@ function iterToTbl(opts, ...)
 
   return res
 end
+
+function revipairs_iter(tbl, index)
+  index = index - 1
+  if index >= 1 then
+      return index, tbl[index]
+  end
+end
+
+function revipairs(tbl)
+  return revipairs_iter, tbl, #tbl + 1
+end

@@ -40,7 +40,7 @@ end
 function getIterator(thing, opts)
   local iter
   if isListOrEmptyTable(thing) then
-    if opts.last then  iter=  function(tbl) return ipairs(rev(tbl)) end 
+    if opts.last then iter = revipairs
     else iter = ipairs end
   else
     if opts.last then  iter=  function(tbl) return tbl:revpairs() end 

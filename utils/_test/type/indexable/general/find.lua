@@ -30,6 +30,12 @@ assertMessage(
 )
 
 assertMessage(
+  find({"foo", "bar", "foo"}, "foo", { last = true, args = "v", ret = "k" }),
+  3
+)
+
+
+assertMessage(
   find(
     { 1, 2, 3 },
     function(value) return value == 2 end,
@@ -46,7 +52,7 @@ assertMessage(
   ),
   "b"
 )
---[[ temporarily disabled because I need to test concat separately first
+
 assertMessage(
   find(
     { 2, 7, 9, 1, 3, 2, 5, 1, 2, 9 },
@@ -91,7 +97,7 @@ assertMessage(
   ),
   { { 1, 2 }, { 6, 2 } }
 )
- ]]
+
 assertMessage(
   {find(
     "somestr",

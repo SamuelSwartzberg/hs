@@ -5,8 +5,8 @@
 --- @param opts? concatOpts
 --- @return T
 function multiply(thing, n, opts)
-  local newthing = {}
-  for i = 1, n do
+  local newthing = thing
+  for i = 1, n-1 do
     newthing = concat(newthing, thing, opts)
   end
   return newthing

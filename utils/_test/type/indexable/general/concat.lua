@@ -32,7 +32,7 @@ assertMessage(result8, {a = 1, b = 2, c = 3, d = 4})
 
 -- Test 9: Concat with list and associative array
 local result9 = concat({1, 2}, {a = 3, b = 4})
-assertMessage(result9, {{1, 2}, {a = 3, b = 4}})
+assertMessage(result9, {1, 2, {a = 3, b = 4}})
 
 -- Test 10: Concat with 3 lists
 

@@ -2,11 +2,11 @@
 --- @field isopts "isopts" this is just a flag to indicate that the first argument is actually an options table
 --- @field sep? any | any[] separator to use between each element
 
-function getSep(opts,i)
+function getSep(opts,i, isfinal)
   if opts.sep then
     if isListOrEmptyTable(opts.sep) then
       return opts.sep[i]
-    else
+    elseif not isfinal then -- separators that are the same for all elements don't get added to the final element (since there's no way to manually control them)
       if type(opts.sep) == "table" and opts.sep._contains then -- since we can split by a conditionSpec, we want to be able to use a conditionSpec as a separator to rejoin. However, _contains is the only value of a conditionSpec where we can be sure that using it as a separator will recreate the original list (all others are not reversible)
         return opts.sep._contains
       else
@@ -37,14 +37,28 @@ function concat(opts, ...)
     inputs = inputs[1]
   end
 
-  local outputs = {}
-  local sep = getSep(opts,1)
+  inspPrint(inputs)
+
+  -- determine the type of output, which will determine the behavior of glue and ultimately the return type
+  local outputs = table.remove(inputs, 1)
+  local sep, index
+
+  -- now do the rest of the loop
   for i, input in ipairs(inputs) do
+    index = i
+    sep = getSep(opts,i)
     if sep then
       outputs = glue(outputs, sep)
     end
     outputs = glue(outputs, input)
-    sep = getSep(opts,i)
   end
+
+  -- add the final separator if necessary
+  sep = getSep(opts, index + 1, true)
+  if sep then
+    outputs = glue(outputs, sep)
+  end
+  
+
   return outputs
 end
