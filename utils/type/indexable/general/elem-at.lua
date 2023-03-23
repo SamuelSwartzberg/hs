@@ -1,8 +1,9 @@
 --- Returns the element at the given index of the given indexable.
 ---@param thing indexable
----@param ind any
+---@param ind integer
+---@param ret? kv
 ---@return any
-function elemAt(thing, ind)
+function elemAt(thing, ind, ret)
   if type(thing) == "string" then
     return eutf8.sub(thing, ind, ind)
   elseif type(thing) == "table" then
@@ -10,7 +11,11 @@ function elemAt(thing, ind)
       return thing[ind]
     else
       if thing.getindex then
-        return thing:getindex(ind)
+        if ret == "kv" then
+          return {thing:getindex(ind, true)}
+        else
+          return thing:getindex(ind)
+        end
       else
         error("can't get index of table without getindex method")
       end

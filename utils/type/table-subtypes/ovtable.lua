@@ -99,8 +99,19 @@ local orderedmetatable = {
 
    end,
  
+   -- TODO no test coverage yet
    -- This metamethod is called when a key is accessed but does not exist in the ordered table.
-   __index = pkg
+   __index = function(t, k)
+    local v = pkg[k]
+    if v then
+      return v
+    elseif type(k) == "number" then
+      return pkg.keyfromindex(t, k)
+    else
+      return nil
+    end
+  end
+  
  }
 
 pkg.orderedmetatable = orderedmetatable
@@ -214,6 +225,27 @@ function pkg.keyindex(t, key)
   end
 end
 
+-- TODO no test coverage yet
+function pkg.keyfromindex(t, idx)
+  -- Ensure that `idx` is a int.
+  assert(type(idx) == "number", "idx must be a number.")
+
+  -- Extract the unique memory address of the subtable from the ordered table.
+  local addr = string.sub(tostring(t), 8)
+  
+  -- Get the list of keys in the insertion order.
+  local kstr = ins_order[addr]
+
+  -- If the list of keys does not exist, return an error message.
+  if not kstr then
+    return nil, "this table has no keys"
+  else
+    -- Get the key at the specified index.
+    return kstr[idx]
+  end
+end
+
+
 function pkg.copy(t, deep)  
   -- Create a new ordered table for the copy
   local cpy = pkg.new()
@@ -240,6 +272,7 @@ end
 --- @field init fun(all_elems: ({ k: string, v: any } | { key: string, value: any })[]): orderedtable
 --- @field getindex getindex_givekey | getindex_nogivekey
 --- @field keyindex fun(t: orderedtable, key: string): number | nil, string | nil
+--- @field keyfromindex fun(t: orderedtable, idx: integer): string | nil, string | nil
 --- @field revpairs fun(t: orderedtable): fun(): (string, any) | nil
 
 ovtable = pkg

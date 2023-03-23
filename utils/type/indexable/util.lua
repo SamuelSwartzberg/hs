@@ -61,6 +61,8 @@ function getEmptyResult(thing, opts)
     return {}
   elseif isListOrEmptyTable(thing) then
     return {}
+  elseif type(thing) == "string" then
+    return ""
   else
     return ovtable.new()
   end
@@ -128,4 +130,16 @@ function addToRes(itemres,res,opts,k,v)
     end
   end
   return res -- typically, this is not needed, but it's here if needed, mainly in tests
+end
+
+--- @param thing indexable
+--- @param k string|integer
+--- @return integer
+function getIndex(thing, k)
+  if type(thing) == "table" and thing.keyindex then
+---@diagnostic disable-next-line: return-type-mismatch
+    return thing:keyindex(k)
+  else
+    return k --[[ @as integer ]]
+  end
 end

@@ -1,4 +1,4 @@
---- @alias kv "k"|"v"|string string here for stuff like "kv" or weirder stuff like "kkkkvkkvv"
+--- @alias kv "k"|"v"|"i"|string string here for stuff like "kv" or weirder stuff like "kkkkvkkvv". "i" is for indices when they need to be distinguished from keys
 --- @alias kvmult kv | kv[]
 
 --- @class mapOpts : tableProcOpts

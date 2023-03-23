@@ -11,7 +11,7 @@ rrq("concat")
 rrq("multiply")
 rrq("slice")
 rrq("split")
-rrq("longestß-common-prefix")
+-- rrq("longest-common-prefix") // TODO: waiting until reduce is tested
 rrq("splice")
 rrq("replace")
 rrq("chunk")

@@ -28,7 +28,9 @@ function replace(thing, opts, globalopts)
     for i = 1, #opts[1] do
       push(resolvedopts, {cond = opts[1][i], proc = opts[2][i]})
     end
+    opts = resolvedopts
   end
+
 
   -- opts get set with the following precedence:
   -- 1. opts on the current opt element
@@ -66,21 +68,33 @@ function replace(thing, opts, globalopts)
     if splitopts.mode == "replace" then
       splitopts.mode = "remove"
     end
-    local parts, removed = split(res, cond, opts)
-    removed = map(removed, returnUnpack, {"v", "kv"})
+    local parts, removed = split(res, cond, splitopts)
+    inspPrint(parts)
+    inspPrint(removed)
+    -- removed = map(removed, returnUnpack, {"v", "kv"}) TODO: uncomment once we've reached the map tests without failing
   
     local sep
-    if mode == "replace" and not (type(proc) == "string" or isListOrEmptyTable(proc)) then -- we actually have to process the removed items to get the new items
-      sep = map(
-        removed,
-        proc,
-        {opts.args or "v", "v"}
-      )    
+    if mode == "replace" then -- we actually have to process the removed items to get the new items
+      if
+        not (isListOrEmptyTable(proc) or type(proc) == "string")  -- proc must be processed by map
+        or (type(thing) == "table" and not isListOrEmptyTable(thing))  -- thing must be processed by map
+      then
+        error("currently, using this is not supported since we need to test map first")
+        sep = map(
+          removed,
+          proc,
+          {args or "v", "v"}
+        )
+      else
+        sep = proc
+      end
     elseif mode == "remove" then
       -- no-op
     else
-      sep = opts.processor
+      sep = proc
     end
+    inspPrint(sep)
+    -- TODO: if every element in thing is replaced, parts will be an empty list. In that case, concat won't be able to infer what type of indexable to return, so we need some way to solve that. We could have sep be parts in that case? Or maybe there's a better way?
     res = concat({
       isopts = "isopts",
       sep = sep,

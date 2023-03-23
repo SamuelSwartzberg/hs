@@ -1,5 +1,3 @@
-local ovtable = require "orderedtable"
-
 -- Test 1: Simple splice on a list
 local list1 = {1, 2, 3, 4, 5}
 local list2 = {6, 7, 8}

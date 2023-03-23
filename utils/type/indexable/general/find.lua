@@ -21,14 +21,12 @@ function find(indexable, cond, opts)
     print("notstr")
     local iterator = getIterator(indexable, opts)
 
-    
-    if opts.findall then finalres = getEmptyResult(indexable, opts) end
-
     for k, v in wdefarg(iterator)(indexable) do
       
       local retriever = {
         k = k,
-        v = v
+        v = v,
+        i = getIndex(indexable, k)
       }
       local res = findsingle(retriever[opts.args[1]], cond, "boolean")
       if res == true then
@@ -43,11 +41,14 @@ function find(indexable, cond, opts)
         end
         if opts.findall then
           if #retres == 1 then retres = retres[1] end
+          if not finalres then finalres = {} end
           push(finalres, retres)
         else
           return returnUnpackIfTable(retres)
         end
       end
+      print("finalres")
+      inspPrint(finalres)
 
     end
   else
@@ -63,7 +64,8 @@ function find(indexable, cond, opts)
       local res = {}
       local retriever = {
         k = matchkey + index_accum,
-        v = matchvalue
+        v = matchvalue,
+        i = getIndex(indexable, matchkey + index_accum)
       }
       for _, retarg in ipairs(opts.ret) do 
         push(res, retriever[retarg])
@@ -84,5 +86,6 @@ function find(indexable, cond, opts)
     end
   end
   if opts.ret == "boolean" and not opts.findall and finalres == nil then finalres = false end
+  if opts.findall and finalres == nil then finalres = {} end
   return finalres
 end

@@ -75,3 +75,19 @@ local test9_expected = {
 }
 local test9_result = split(test9_input, test9_sep)
 assertMessage(test9_result, test9_expected)
+
+
+-- Test 10: Split list with string and "before" mode
+
+local test10_input = {"a", "b", "sep", "c", "d", "sep", "d"}
+local test10_sep = "sep"
+local test10_result = split(test10_input, test10_sep, {mode = "before"})
+local test10_expected = {{"a", "b"}, {"sep", "c", "d"}, {"sep", "d"}}
+assertMessage(test10_result, test10_expected)
+
+-- Test 11: Split list with string and "after" mode
+local test11_input = {"a", "b", "sep", "c", "d", "sep", "d"}
+local test11_sep = "sep"
+local test11_result = split(test11_input, test11_sep, {mode = "after"})
+local test11_expected = {{"a", "b", "sep"}, {"c", "d", "sep"}, {"d"}}
+assertMessage(test11_result, test11_expected)
