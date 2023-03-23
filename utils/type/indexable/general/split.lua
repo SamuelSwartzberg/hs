@@ -14,10 +14,10 @@ function split(thing, sep, opts)
   local splintervals = find(
     thing,
     sep,
-    {
+    concat({
       ret = "iv",
       findall = true
-    }
+    }, opts.findopts)
   )
 
   if len(splintervals) == 0 then

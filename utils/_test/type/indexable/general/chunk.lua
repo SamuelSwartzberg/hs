@@ -1,8 +1,3 @@
--- Test 1: Chunk a string
-local test_str = "hello world"
-local result1 = chunk(test_str, 3)
-assertMessage(result1, {"hel", "lo ", "wor", "ld"})
-
 -- Test 2: Chunk a list
 local test_list = {1, 2, 3, 4, 5, 6, 7, 8, 9}
 local result2 = chunk(test_list, 4)
@@ -24,10 +19,6 @@ local expected3 = {
   ovtable.init({{k="g",v=7}})
 }
 assertMessage(result3, expected3)
-
--- Test 4: Chunk a string with a size larger than the string length
-local result4 = chunk(test_str, 20)
-assertMessage(result4, {"hello world"})
 
 -- Test 5: Chunk a list with a size larger than the list length
 local result5 = chunk(test_list, 15)

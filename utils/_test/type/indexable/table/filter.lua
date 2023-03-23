@@ -4,12 +4,12 @@ local abc = { "a", "b", "c" }
 local a_to_t = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t" }
 
 assertMessage(
-  filter(abc, { _type = "string"}, "v"),
+  filter(abc, { _type = "string"}, {"v"}),
   { "a", "b", "c" }
 )
 
 assertMessage(
-  filter(abc, { _type = "string"}, "k"),
+  filter(abc, { _type = "string"}, {"k"}),
   {}
 )
 

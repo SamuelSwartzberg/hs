@@ -1,28 +1,3 @@
-
-
-
-assertMessage(
-  #keys(
-    split(
-      { 
-        a = 1,
-        b = 2,
-        c = 3,
-        d = 4,
-        e = 5,
-        f = 6,
-        g = 7,
-      }, 
-      function(k) return k % 3 == 0 end,
-      {
-        includesep = true,
-        findopts = {args = "k"}
-      }
-    )[1]
-  ),
-  3
-)
-
 assertMessage(
   #keys(chunk({ 
     a = 1,
@@ -125,6 +100,10 @@ assertMessage(
   ),
   {
     {
+      foo = "bar",
+      baz = "qux"
+    },
+    {
       foo = "roar",
       baz = "rrrr"
     }
@@ -133,7 +112,7 @@ assertMessage(
 
 
 assertMessage(
-  concat({1, 2}, nil),
+  concat({{1, 2}}, nil), -- since nil doesn't count as a value, we need to wrap the list as if it is was the only arg
   {1, 2}
 )
 

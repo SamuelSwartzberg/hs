@@ -8,16 +8,19 @@
 --- @field stop integer only consider elements with or before this index
 
 --- @param opts any 
+--- @param retdefault? kvmult
 --- @return table
-function defaultOpts(opts)
+function defaultOpts(opts, retdefault)
+  if not opts then opts = {ret = "boolean"} 
+  elseif type(opts) == "table" and not isListOrEmptyTable(opts) and not opts.ret then opts.ret = "boolean" end
   if type(opts) == "string" then
     opts = {args = opts, ret = opts}
   elseif isListOrEmptyTable(opts) then
-    opts = {args = opts[1] or {"v"}, ret = opts[2] or {"v"}}
+    opts = {args = opts[1] or {"v"}, ret = opts[2] or retdefault or {"v"}}
   else
     opts = copy(opts) or {}
     opts.args = opts.args or {"v"}
-    opts.ret = opts.ret or {"v"}
+    opts.ret = opts.ret or retdefault or {"v"}
   end
 
   if type(opts.args) == "string" then
@@ -52,6 +55,22 @@ function getIterator(thing, opts)
   end
   return wdefarg(iter)
 end
+
+--- TODO: no tests yet
+--- @param thing indexable
+--- @param k any
+--- @param v any
+--- @param manual_counter integer
+--- @return {k: any, v: any, i: integer}, integer
+function getRetriever(thing, k, v, manual_counter)
+  manual_counter = manual_counter + 1
+  return {
+    k = k,
+    v = v,
+    i = getIndex(thing, k, manual_counter)
+  }, manual_counter
+end
+
 
 --- @param thing indexable
 --- @param opts table
@@ -113,6 +132,8 @@ function addToRes(itemres,res,opts,k,v)
     mapped_useas[ret] = index
   end
 
+  inspPrint(mapped_useas)
+
   local newkey
   if mapped_useas.k then newkey = itemres[mapped_useas.k] -- if I have specified an index of the output (itemres) to be the key, use that, even if the value retrieved is nil
   else newkey = k end -- otherwise, use the original key
@@ -120,6 +141,8 @@ function addToRes(itemres,res,opts,k,v)
   if mapped_useas.v then newval = itemres[mapped_useas.v] -- ditto for value
   else newval = v end 
   -- explanation: We want to be able to return nil in our processor (that feeds into itemres) and have that be the key/value in the result, so that we can delete things via map() and similar funcs. But we also want to be able to specify that we want to use the original key/value in the result.
+  inspPrint(newkey)
+  inspPrint(newval)
   if newkey == false or opts.tolist then -- use false as a key to indicate to push to array instead
     table.insert(res, newval)
   else
@@ -134,11 +157,19 @@ end
 
 --- @param thing indexable
 --- @param k string|integer
+--- @param manual_counter? integer
 --- @return integer
-function getIndex(thing, k)
-  if type(thing) == "table" and thing.keyindex then
----@diagnostic disable-next-line: return-type-mismatch
-    return thing:keyindex(k)
+function getIndex(thing, k, manual_counter)
+  if type(thing) == "table" then
+    if thing.keyindex then
+      return thing:keyindex(k) --[[ @as integer ]]
+    else
+      if not isListOrEmptyTable(thing) and manual_counter then
+        return manual_counter
+      else
+        return k --[[ @as integer ]]
+      end
+    end
   else
     return k --[[ @as integer ]]
   end

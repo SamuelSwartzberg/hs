@@ -36,10 +36,7 @@
 function findsingle(item, conditions, opts)
   item = item or ""
   conditions = defaultIfNil(conditions, true)
----@diagnostic disable-next-line: cast-local-type
-  if not opts then opts = {ret = "boolean"} 
-  elseif type(opts) == "table" and not isListOrEmptyTable(opts) and not opts.ret then opts.ret = "boolean" end -- default to returning a boolean, this is different from the general default, which is why we have to do this before calling defaultOpts
-  opts = defaultOpts(opts)  
+  opts = defaultOpts(opts, "boolean")
 
   if opts.tostring then item = tostring(item) end
 

@@ -1,5 +1,6 @@
 
 --- @class filterOpts : tableProcOpts
+--- @field findopts? findOptsWShorthand since the cond is a conditionSpec passed to find, you can pass options to find here
 
 --- @generic T : table 
 --- @param tbl? T | nil
@@ -11,26 +12,26 @@ function filter(tbl, cond, opts)
   -- defaults for all args
 
   cond = cond or false
-  opts = defaultOpts(opts)
+  opts = defaultOpts(opts, {"k", "v"})
   tbl = getDefaultInput(tbl)
 
   local iterator = getIterator(tbl, opts)
   
   local res = getEmptyResult(tbl, opts)
 
+  local manual_counter = 0
   for k, v in iterator(tbl) do
-    local retriever = {
-      k = k,
-      v = v
-    }
-    local res = true
+    local retriever
+    retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)
+    local boolres = true
     for _, arg in ipairs(opts.args) do
-      res = res and findsingle(retriever[arg], cond)
-      if not res then
+      boolres = boolres and findsingle(retriever[arg], cond, opts.findopts)
+      if not boolres then
         break -- exit early
       end
     end
-    if res then
+    inspPrint(res)
+    if boolres then
       addToRes({k, v}, res, opts)
     end
   end

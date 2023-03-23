@@ -15,7 +15,7 @@ function append(base, addition, opts)
     return base .. addition
   elseif type(base) == "table" then
     local new_thing = copy(base) 
-    if not addition then return new_thing end
+    if addition == nil then return new_thing end
     if isListOrEmptyTable(base) then
       new_thing[#new_thing + 1] = addition
       return new_thing

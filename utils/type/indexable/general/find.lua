@@ -9,9 +9,7 @@
 --- @return any
 function find(indexable, cond, opts)
   cond = cond or false
-  if not opts then opts = {ret = "boolean"} 
-  elseif type(opts) == "table" and not isListOrEmptyTable(opts) and not opts.ret then opts.ret = "boolean" end -- default to returning a boolean, this is different from the general default, which is why we have to do this before calling defaultOpts
-  opts = defaultOpts(opts)
+  opts = defaultOpts(opts, "boolean")
   indexable = getDefaultInput(indexable)
 
 
@@ -20,14 +18,10 @@ function find(indexable, cond, opts)
   if not (type(indexable) == "string") then
     print("notstr")
     local iterator = getIterator(indexable, opts)
-
+    local manual_counter = 0
     for k, v in wdefarg(iterator)(indexable) do
-      
-      local retriever = {
-        k = k,
-        v = v,
-        i = getIndex(indexable, k)
-      }
+      local retriever
+      retriever, manual_counter = getRetriever(indexable, k, v, manual_counter)
       local res = findsingle(retriever[opts.args[1]], cond, "boolean")
       if res == true then
         --- @type table | boolean

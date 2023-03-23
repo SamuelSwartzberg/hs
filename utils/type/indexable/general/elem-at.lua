@@ -16,8 +16,16 @@ function elemAt(thing, ind, ret)
         else
           return thing:getindex(ind)
         end
-      else
-        error("can't get index of table without getindex method")
+      else -- TODO: this branch isn't tested yet
+        local keys = keys(thing) -- TODO: memoize once initial testing is done
+        table.sort(keys, returnStringEquivOrder)
+        local key = keys[ind]
+        local value = thing[key]
+        if ret == "kv" then
+          return {key, value}
+        else
+          return value
+        end
       end
     end
   end
