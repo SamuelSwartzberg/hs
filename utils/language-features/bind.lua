@@ -17,7 +17,7 @@ function bind(func, arg_spec)
   -- initialize inner_func to the original function
   local inner_func = func
 
-  for index, arg_list in pairs(arg_spec) do -- for all arg_lists to bind
+  for index, arg_list in prs(arg_spec) do -- for all arg_lists to bind
     local int_index = toNumber(index, "int", "fail")
     if arg_list == arg_ignore then -- ignore this argument
       inner_func = function(...)

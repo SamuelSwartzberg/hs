@@ -29,7 +29,7 @@ function split(thing, sep, opts)
   local res = {}
   local removed = {}
   local lastend = 1
-  for _, pair in ipairs(splintervals) do
+  for _, pair in iprs(splintervals) do
     local start, match = table.unpack(pair)
     local matchlength 
     if type(thing) == "string" then -- we're splitting a string, so splitter can have variable length in relation to the thing

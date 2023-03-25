@@ -77,7 +77,7 @@ assertMessage(
   simple_list_of_lists
 )
 
-for i, v in ipairs(simple_list_of_lists) do
+for i, v in iprs(simple_list_of_lists) do
   assertMessage(
     shallowcopy_list_of_lists[i] == v,
     true
@@ -109,7 +109,7 @@ assertMessage(
   simple_assoc_of_assocs
 )
 
-for k, v in pairs(simple_assoc_of_assocs) do
+for k, v in prs(simple_assoc_of_assocs) do
   assertMessage(
     shallowcopy_assoc_of_assocs[k] == v,
     true

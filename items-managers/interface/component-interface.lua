@@ -14,7 +14,7 @@ end
 
 --- @type recursiveGetFunction | recursiveDoFunction
 local function actionInterfacesRecursive(self, action, key, value, previous_lower_node_id)
-  for _, interface in pairs(self.interface) do
+  for _, interface in prs(self.interface) do
     if (not previous_lower_node_id) or (not (interface.id == previous_lower_node_id)) then -- prevent infinite loops by not going back down the tree where we've come from
       local interface_returned = interface[action](interface, key, value, false, true)
       if interface_returned ~= nil then
@@ -30,7 +30,7 @@ local function getOrDoAll(self, action, key, value, not_recursive_children, not_
   local result_for_self = self[action](self, key, value, true, true)
   output = concat(output, result_for_self)
   if self.interface and not not_recursive_children then
-    for _, interface in pairs(self.interface) do
+    for _, interface in prs(self.interface) do
       if (not previous_lower_node_id) or (not (interface.id == previous_lower_node_id)) then 
         local result_for_descendants = getOrDoAll(interface, action, key, value, false, true)
         output = concat(output, result_for_descendants)
@@ -84,7 +84,7 @@ local function interactiveFunc(self, specifier)
   elseif type(thing) == "table" and not thing.func then
     args_to_pass = {}
     --- @cast thing { [string]: string | function }
-    for key, val in pairs(thing) do
+    for key, val in prs(thing) do
       args_to_pass[key] = singleInteractiveFunc(self, val)
     end
   else
@@ -372,7 +372,7 @@ InterfaceDefaultTemplate = {
     if not self.super then self.contents = value end
     if self.potential_interfaces then
       self.interface = {}
-      for potential_interface, potential_interface_constructor  in pairs(self.potential_interfaces) do
+      for potential_interface, potential_interface_constructor  in prs(self.potential_interfaces) do
         if self:get("is-" .. potential_interface) then
           self.interface[potential_interface] = potential_interface_constructor(self)
         end

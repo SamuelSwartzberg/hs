@@ -16,7 +16,7 @@ local test_nonov_list = {
   "three",
 }
 
-for k, v in pairs(test_ovtable) do
+for k, v in prs(test_ovtable) do
   assertMessage(
     v == test_nonov_assoc_arr[k],
     true
@@ -28,7 +28,7 @@ for k, v in pairs(test_ovtable) do
   )
 end
 
-for i, v in ipairs(test_ovtable) do
+for i, v in iprs(test_ovtable) do
   assertMessage(
     v == test_nonov_list[i],
     true
@@ -94,7 +94,7 @@ local reverse_test_ovtable = ovtable.init({
 
 local indexer = 1
 
-for k, v in revpairs(ovtable) do
+for k, v in revprs(ovtable) do
   assertMessage(
     reverse_test_ovtable:keyindex(k),
     indexer

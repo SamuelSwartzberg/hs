@@ -55,7 +55,7 @@ function map(tbl, f, opts)
           f = function(arg)
             if type("arg") == table then
               local res = {}
-              for _, k in ipairs(f._k) do
+              for _, k in iprs(f._k) do
                 table.insert(res, arg[k])
               end
               return res
@@ -98,7 +98,7 @@ function map(tbl, f, opts)
         local args = getArgs(retriever, opts)
         local tempres = {f(table.unpack(args))}
         if opts.flatten and type(tempres[1]) == "table" then -- flatten is enabled, and we've returned an element we want to flatten
-          for resk, resv in pairs(tempres) do
+          for resk, resv in prs(tempres) do
             addToRes({resk,resv}, res, opts, k, v)
           end
         else

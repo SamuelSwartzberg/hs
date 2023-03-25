@@ -67,7 +67,7 @@ function findsingle(item, conditions, opts)
     end
   end
 
-  for _, condition in wdefarg(ipairs)(conditions) do 
+  for _, condition in wdefarg(iprs)(conditions) do 
 
     -- process shorthand conditions into full conditions
 
@@ -188,7 +188,7 @@ function findsingle(item, conditions, opts)
       if condition._list ~= nil or not found_other_use_for_table then
         local list = condition._list or condition
         local match = false
-        for _, listitem in ipairs(list) do
+        for _, listitem in iprs(list) do
           match = potentially_sliced_item_maybe_nocase == lowerIfNecessary(listitem)
           if match then
             push(results, getres(match, start, potentially_sliced_item))
@@ -247,7 +247,7 @@ function findsingle(item, conditions, opts)
     return res.match
   else
     local finalresults = {}
-    for _, retarg in ipairs(opts.ret) do
+    for _, retarg in iprs(opts.ret) do
       push(finalresults, res[retarg])
     end
     return table.unpack(finalresults)

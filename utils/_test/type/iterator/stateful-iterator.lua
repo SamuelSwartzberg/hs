@@ -7,12 +7,12 @@ local testtbl = {
 
 
 assertMessage(
-  statefulKeyIteratorToTable(spairs, testtbl),
+  statefulKeyIteratorToTable(sprs, testtbl),
   testtbl
 )
 
 assertMessage(
-  statefulNokeyIteratorToTable(spairs, testtbl),
+  statefulNokeyIteratorToTable(sprs, testtbl),
   {
     { "a", "恋" },
     { "b", "爱" },

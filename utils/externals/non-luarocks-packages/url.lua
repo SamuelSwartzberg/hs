@@ -163,7 +163,7 @@ function M.buildQuery(tab, sep, key)
 		sep = M.options.separator or '&'
 	end
 	local keys = {}
-	for k in pairs(tab) do
+	for k in prs(tab) do
 		keys[#keys+1] = k
 	end
 	table.sort(keys, function (a, b)
@@ -297,7 +297,7 @@ function M:setAuthority(authority)
 		-- ipv4
 		local chunks = { str:match("^(%d+)%.(%d+)%.(%d+)%.(%d+)$") }
 		if #chunks == 4 then
-			for _, v in pairs(chunks) do
+			for _, v in prs(chunks) do
 				if tonumber(v) > 255 then
 					return false
 				end
@@ -308,7 +308,7 @@ function M:setAuthority(authority)
 		local chunks = { str:match("^%["..(("([a-fA-F0-9]*):"):rep(8):gsub(":$","%%]$"))) }
 		if #chunks == 8 or #chunks < 8 and
 			str:match('::') and not str:gsub("::", "", 1):match('::') then
-			for _,v in pairs(chunks) do
+			for _,v in prs(chunks) do
 				if #v > 0 and tonumber(v, 16) > 65535 then
 					return false
 				end

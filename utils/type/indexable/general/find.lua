@@ -29,7 +29,7 @@ function find(indexable, cond, opts)
         if opts.ret == "boolean" then
           retres = true
         else
-          for _, retarg in ipairs(opts.ret) do 
+          for _, retarg in iprs(opts.ret) do 
             push(retres, retriever[retarg])
           end
         end
@@ -61,7 +61,7 @@ function find(indexable, cond, opts)
         v = matchvalue,
         i = getIndex(indexable, matchkey + index_accum)
       }
-      for _, retarg in ipairs(opts.ret) do 
+      for _, retarg in iprs(opts.ret) do 
         push(res, retriever[retarg])
       end
       print(matchkey, matchvalue)

@@ -11,7 +11,7 @@ ShrinkSpecifierTableSpecifier = {
       ["to-string"] = function(self)
         local outstr = ""
         local contents = self:get("contents")
-        for k, v in pairs(contents) do
+        for k, v in prs(contents) do
           outstr = outstr .. k .. ": " .. v .. "; "
         end
         return outstr

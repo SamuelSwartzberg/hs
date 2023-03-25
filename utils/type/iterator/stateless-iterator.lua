@@ -5,7 +5,7 @@
 --- @param stop? integer
 --- @param step? integer
 --- @return function, indexable, integer
-function ipairs(thing, start, stop, step)
+function iprs(thing, start, stop, step)
   start = start or 1
   stop = stop or len(thing)
   step = step or 1
@@ -26,8 +26,8 @@ end
 --- @param stop? integer
 --- @param step? integer
 --- @return function, indexable, integer
-function revipairs(thing, start, stop, step)
-  return ipairs(thing, start, stop, step and -math.abs(step) or -1)
+function reviprs(thing, start, stop, step)
+  return iprs(thing, start, stop, step and -math.abs(step) or -1)
 end
 
 --- pairs dropin replacement that is ordered by default, supports start/stop/step and works with any indexable
@@ -38,8 +38,8 @@ end
 --- @param stop? integer
 --- @param step? integer
 --- @return function, indexable, integer
-function pairs(thing, start, stop, step)
-  local iter, tbl, state = ipairs(thing, start, stop, step)
+function prs(thing, start, stop, step)
+  local iter, tbl, state = iprs(thing, start, stop, step)
   return function()
     local i, v = iter(tbl, state)
     if i then
@@ -53,8 +53,8 @@ end
 --- @param stop? integer
 --- @param step? integer
 --- @return function, indexable, integer
-function revpairs(thing, start, stop, step)
-  return pairs(thing, start, stop, step and -math.abs(step) or -1)
+function revprs(thing, start, stop, step)
+  return prs(thing, start, stop, step and -math.abs(step) or -1)
 end
 
 --- @param opts? tableProcOpts | kvmult

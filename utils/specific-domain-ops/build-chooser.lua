@@ -12,7 +12,7 @@ end
 --- @param style_object whole_chooser_style
 --- @return nil
 function styleWholeChooser(chooser, style_object)
-  for k, v in pairs(style_object) do
+  for k, v in prs(style_object) do
     chooser[k](chooser, v)
   end
 end

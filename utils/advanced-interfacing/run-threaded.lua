@@ -7,11 +7,11 @@ function runThreaded(command_specifier_list, threads, do_after, catch)
   local threads = threads or 10 -- sensible default
   local results = {}
   local chunked_table = chunk(command_specifier_list, threads)
-  local next_pair = sipairs(chunked_table)
+  local next_pair = siprs(chunked_table)
   local function runNextChunk()
     local _, chunk = next_pair()
     if chunk then
-      for command_id, command_parts in wdefarg(pairs)(command_specifier_list) do
+      for command_id, command_parts in wdefarg(prs)(command_specifier_list) do
       local task = run({
         args = command_parts,
         catch = function(exit_code, std_err)

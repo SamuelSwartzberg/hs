@@ -145,7 +145,7 @@ NonEmptyArraySpecifier = {
         end
       end,
       ["for-all-staggered"] = function(self, specifier) -- specifier = { interval = ..., fn = ... }
-        local next_pair = sipairs(self:get("contents"))
+        local next_pair = siprs(self:get("contents"))
         System:get("contents")["global-timer-manager"]:doThis("create", { 
           interval = specifier.interval,
           fn = function()

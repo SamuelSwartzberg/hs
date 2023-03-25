@@ -20,7 +20,7 @@ function glue(base, addition, opts)
   else
     if isListOrEmptyTable(addition) then
       if isListOrEmptyTable(base) then
-        for _, v in ipairs(addition) do
+        for _, v in iprs(addition) do
           base = append(base, v, opts)
         end
       else
@@ -32,7 +32,7 @@ function glue(base, addition, opts)
       else
         opts.depth = crementIfNumber(opts.depth, "in")
         opts.recurse = defaultIfNil(opts.recurse, true)
-        for k, v in pairs(addition) do
+        for k, v in prs(addition) do
           if type(v) == "table" then
             inspPrint(opts.recurse)
             if not type(base[k]) == "table" or not opts.recurse or (type(opts.recurse) == "number" and (opts.recurse < opts.depth)) then 

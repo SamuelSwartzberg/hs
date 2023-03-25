@@ -38,7 +38,7 @@ end
 --- @param opts table
 --- @return function
 function getIterator(opts)
-  return wdefarg(function(tbl) return pairs(tbl, opts.start, opts.stop, opts.last and -1 or 1) end)
+  return wdefarg(function(tbl) return prs(tbl, opts.start, opts.stop, opts.last and -1 or 1) end)
 end
 
 --- @alias retriever {k: any, v: any, i: integer}
@@ -79,7 +79,7 @@ end
 --- @return any
 function getArgs(retriever, opts)
   local args = {}
-  for _, arg in ipairs(opts.args) do
+  for _, arg in iprs(opts.args) do
     table.insert(args, retriever[arg])
   end
   return args
@@ -111,7 +111,7 @@ end
 function addToRes(itemres,res,opts,k,v)
   local mapped_useas = {}
   inspPrint(opts)
-  for index, ret in ipairs(opts.ret) do
+  for index, ret in iprs(opts.ret) do
     mapped_useas[ret] = index
   end
 

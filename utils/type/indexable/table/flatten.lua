@@ -105,7 +105,7 @@ function flatten(tbl, opts)
 
   local res
 
-  for k, v in pairs(tbl) do
+  for k, v in prs(tbl) do
     if isLeaf(v) then
       valAddfunc(res, v, k)
     else
@@ -113,7 +113,7 @@ function flatten(tbl, opts)
         local newopts = copy(opts)
         newopts.path = concat(opts.path, k)
         local subres = flatten(v, newopts)
-        for k, v in pairs(subres) do
+        for k, v in prs(subres) do
           valAddfunc(res, v, k)
         end
       else
@@ -123,14 +123,14 @@ function flatten(tbl, opts)
   end
 
   if opts.join_path and opts.depth == 0 then
-    for k, v in pairs(res) do
+    for k, v in prs(res) do
       v.path = table.concat(v.path, opts.join_path)
     end
   end
   
   if opts.mode == "path-assoc" and opts.depth == 0 then
     local newres = {}
-    for k, v in pairs(res) do
+    for k, v in prs(res) do
       local val
       if res_should_be_plain then
         val = v.value

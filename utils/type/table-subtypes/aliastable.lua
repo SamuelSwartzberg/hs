@@ -29,7 +29,7 @@ local function createAliasMetatable(get_longer_shorter_thing)
           end
           return true
         end
-        for tk, tv in pairs(t) do
+        for tk, tv in prs(t) do
           if matches(tk) then
             key = tk
             break

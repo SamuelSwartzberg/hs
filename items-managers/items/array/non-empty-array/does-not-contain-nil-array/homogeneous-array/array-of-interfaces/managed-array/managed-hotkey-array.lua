@@ -9,7 +9,7 @@ ManagedHotkeyArraySpecifier = {
       end,
       --- @param specifier { [string]: key_inner_specifier}
       ["register-all"] = function(self, specifier)
-        for key, inner_specifier in pairs(specifier) do
+        for key, inner_specifier in prs(specifier) do
           self:doThis("create", {key = key, fn = inner_specifier.fn, explanation = inner_specifier.explanation, mnemonic = inner_specifier.mnemonic})
         end
       end

@@ -98,7 +98,7 @@ function pkg.init(all_elems)
   local t = pkg.new()
   -- Add each key-value pair in the list
 
-  for i, spec in ipairs(all_elems) do
+  for i, spec in iprs(all_elems) do
     -- Check if the key-value pair is specified as `{key, value}` or `{k = key, v = value}` / `{key = key, value = value}`.
     if #spec == 2 then
       t[spec[1]] = spec[2]
@@ -182,7 +182,7 @@ function pkg.copy(t, deep)
   local cpy = pkg.new()
   
   -- Iterate over the original orderedtable
-  for k, v in pairs(t) do
+  for k, v in prs(t) do
     if deep and type(v) == "table" then
       cpy[k] = copy(v, deep)
     else

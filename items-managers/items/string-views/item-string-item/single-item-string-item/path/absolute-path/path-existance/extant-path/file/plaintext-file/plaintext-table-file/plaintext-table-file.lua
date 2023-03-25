@@ -52,7 +52,7 @@ PlaintextTableFileItemSpecifier = {
       ["append-assoc-arr-as-rows"] = function(self, assoc_arr)
         local rows = self:get("read-to-rows") or {}
         local field_sep = self:get("field-separator")
-        for key, fields in pairs(assoc_arr) do 
+        for key, fields in prs(assoc_arr) do 
           local line = transf.string.escaped_csv_field(key) .. field_sep .. table.concat(map(fields, transf.string.escaped_csv_field), field_sep)
           table.insert(rows, line)
         end

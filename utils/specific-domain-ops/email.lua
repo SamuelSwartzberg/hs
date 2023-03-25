@@ -18,7 +18,7 @@ function buildEmailHeaders(headers)
       headers[header_name] = nil
     end
   end
-  for key, value in pairs(headers) do
+  for key, value in prs(headers) do
     table.insert(header_lines, buildEmailHeader(key, value))
   end
   return table.concat(header_lines, "\n")

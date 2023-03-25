@@ -4,7 +4,7 @@
 --- @param value any
 --- @return boolean
 function valuesContainShape(tbl, value)
-  for _, v in wdefarg(pairs)(tbl) do
+  for _, v in wdefarg(prs)(tbl) do
     if hs.inspect(v, {depth = 5}) == hs.inspect(value, {depth = 5}) then return true end
   end
   return false

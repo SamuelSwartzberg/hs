@@ -141,7 +141,7 @@ DirItemSpecifier = {
       ["table-to-fs-children-dispatch"] = function(self, specifier) 
         -- assumes a table where all values are of the same type
         local child_filenames = self:get("child-leaf-only-array")
-        for k, v in pairs(specifier.payload) do
+        for k, v in prs(specifier.payload) do
           local desired_name = k
 
           -- allow for regex names 

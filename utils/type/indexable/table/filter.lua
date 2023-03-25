@@ -25,7 +25,7 @@ function filter(tbl, cond, opts)
     local retriever
     retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)
     local boolres = true
-    for _, arg in ipairs(opts.args) do
+    for _, arg in iprs(opts.args) do
       boolres = boolres and findsingle(retriever[arg], cond, opts.findopts)
       if not boolres then
         break -- exit early

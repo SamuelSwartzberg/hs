@@ -153,7 +153,7 @@ YoutubePlayableItemItemSpecifier = {
         --- @type path_leaf_parts
         local specifier = {}
         local edited_tags = {}
-        for k, v in pairs(deduced_tags) do
+        for k, v in prs(deduced_tags) do
           local new_v = prompt("string", {
             prompt_args = {
               prompt = "Confirm value for " .. k,

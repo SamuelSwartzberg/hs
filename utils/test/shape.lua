@@ -11,7 +11,7 @@ table.insert(types_w_any, "any")
 function resolveTypeMatchingToKeys(test_tbl, shape)
   for _, typ in ipairs(types_w_any) do
     if shape["[" .. typ .. "]"] then -- if shape has a key "[<type>|any]", then this is the type we want for any key (of type|any) not explicitly specified in the shape
-      for k, _ in pairs(test_tbl) do
+      for k, _ in prs(test_tbl) do
         if type(k) == typ or typ == "any" then 
           if not shape[k] then
             shape[k] = copy(shape["[" .. typ .. "]"])
@@ -44,7 +44,7 @@ function shapeMatchesInner(test_tbl, shape, path)
   if not shape then error("shape expected", 0) end
   resolveTypeMatchingToKeys(test_tbl, shape)
   local recollected_optional_keys = {}
-  for k, v in pairs(shape) do
+  for k, v in prs(shape) do
     local is_optional = stringy.endswith(k, "?")
     if is_optional then
       local old_k = k
@@ -73,10 +73,10 @@ function shapeMatchesInner(test_tbl, shape, path)
       error(("Unexpected value in shape: %s"):format(v), 0)
     end
   end
-  for k, v in pairs(recollected_optional_keys) do
+  for k, v in prs(recollected_optional_keys) do
     shape[k] = v
   end
-  for k, v in pairs(test_tbl) do
+  for k, v in prs(test_tbl) do
     if not shape[k] then 
       error(("Key %s is in %s but not in shape"):format(k, path), 0) 
     end

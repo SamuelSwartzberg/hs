@@ -4,7 +4,7 @@ function null2nil(input) -- in-place!
   -- cleanup keys with lyaml.null values
   -- in obj table produced by lyaml.load
   -- https://github.com/gvvaughan/lyaml/issues/31
-  for k, v in pairs(input) do
+  for k, v in prs(input) do
     if v == yaml.null then
       input[k] = nil
     elseif type(v) == "table" then
@@ -38,7 +38,7 @@ end
 ---@return string[]
 function yamlDumpAlignedInner(table, keystop, valuestop, depth)
   local lines = {}
-  for value_k, value_v in pairs(table) do
+  for value_k, value_v in prs(table) do
     local pre_padding_length = depth * 2
     local key_length = #value_k
     local key_padding_length = keystop - (key_length + pre_padding_length)

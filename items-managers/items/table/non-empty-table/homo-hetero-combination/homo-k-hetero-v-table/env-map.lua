@@ -20,7 +20,7 @@ EnvMapSpecifier = {
       ["env-lines"] = function(self, pkey)
         local  lines = {}
         local pkey_var = pkey and "$" .. pkey .. "/" or ""
-        for key, value in pairs(self:get("contents")) do
+        for key, value in prs(self:get("contents")) do
           if type(value) == "string" then
             push(lines, string.format("%s=\"%s%s\"", key, pkey_var, value))
           elseif value.type == "env-item" then
@@ -45,7 +45,7 @@ EnvMapSpecifier = {
           lines_with_dependencies[key] = { line = line, dependencies = dependencies }
         end
         local out_lines = {}
-        for _, line_with_dependencies in pairs(lines_with_dependencies) do
+        for _, line_with_dependencies in prs(lines_with_dependencies) do
           out_lines = concat(out_lines, getDependencyLines(line_with_dependencies, lines_with_dependencies))
         end
         return toSet(out_lines)

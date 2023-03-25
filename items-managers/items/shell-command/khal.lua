@@ -129,10 +129,10 @@ end
 
 function fillCalenderTemplate(specifier)
   local template = getCalendarTemplate()
-  for key, value in pairs(specifier) do
+  for key, value in prs(specifier) do
     if template[key] then
       if key == "repeat" then
-        for subkey, subvalue in pairs(value) do
+        for subkey, subvalue in prs(value) do
           template[key][subkey].value = subvalue
         end
       else

@@ -44,7 +44,7 @@ function parseDate(date)
 
   local date_parts
 
-  for _, date_regex in pairs(date_regexes) do
+  for _, date_regex in prs(date_regexes) do
     date_parts = {eutf8.match(date, date_regex)}
     if #date_parts > 0 then
       break

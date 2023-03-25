@@ -45,7 +45,7 @@ function concat(opts, ...)
   inspPrint(inputs)
   inspPrint(outputs)
   -- now do the rest of the loop
-  for i, input in ipairs(inputs) do
+  for i, input in iprs(inputs) do
     index = i
     sep = getSep(opts,i)
     if sep then

@@ -1,6 +1,6 @@
 
 local list_from_a_to_f = { "a", "b", "c", "d", "e", "f" }
-local next_ipair = sipairs(list_from_a_to_f)
+local next_ipair = siprs(list_from_a_to_f)
 
 local k, v = next_ipair()
 assertMessage(k, 1)
@@ -31,7 +31,7 @@ local foobar_table = ovtable.new()
 foobar_table.bar = "42"
 foobar_table.foo = "26"
 
-local next_foobar = spairs(foobar_table)
+local next_foobar = sprs(foobar_table)
 
 k, v = next_foobar()
 assertMessage(k, "bar")

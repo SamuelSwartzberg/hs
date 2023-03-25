@@ -17,7 +17,7 @@ StateWindowItemSpecifier = {
           self:get("application-item"):get("state-as-json").windows,
           function(json_window)
             -- inspPrint(json_window)
-            for k, v in pairs(geometry) do
+            for k, v in prs(geometry) do
               if not isClose(v, json_window[k]) then
                 return false
               end

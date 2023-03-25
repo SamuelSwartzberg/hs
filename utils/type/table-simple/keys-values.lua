@@ -4,7 +4,7 @@
 --- @return K[]
 function keys(tbl)
   local t = {}
-  for k, _ in wdefarg(pairs)(tbl) do
+  for k, _ in wdefarg(prs)(tbl) do
     t[#t + 1] = k
   end
   return t
@@ -17,7 +17,7 @@ end
 --- @return V[]
 function values(tbl)
   local t = {}
-  for _, v in wdefarg(pairs)(tbl) do
+  for _, v in wdefarg(prs)(tbl) do
     t[#t + 1] = v
   end
   return t
