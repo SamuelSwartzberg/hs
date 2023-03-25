@@ -82,12 +82,12 @@ assertMessage(
 )
 
 assertMessage(
-  getEmptyResult("whatever", {noovtable = true}),
+  getEmptyResult("whatever", {output = "table"}),
   {}
 )
 
 assertMessage(
-  getEmptyResult(ovtable.init({{"foo", "bar"}}), {noovtable = false}).isovtable,
+  getEmptyResult(ovtable.init({{"foo", "bar"}})).isovtable,
   true
 )
 

@@ -17,6 +17,7 @@ end
 function ks(tbl)
   local t = {}
   for k, _ in wdefarg(prs)(tbl) do
+    inspPrint(k)
     t[#t + 1] = k
   end
   return t

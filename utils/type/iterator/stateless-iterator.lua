@@ -6,22 +6,26 @@
 --- @param step? integer
 --- @return function, indexable, integer
 function iprs(thing, start, stop, step)
+  preventInfiniteLoop("iprs", 1000)
+  local len_thing = len(thing)
+  if len_thing == 0 then
+    return function() end, thing, 0
+  end
   start = start or 1
-  stop = stop or len(thing)
+  stop = stop or len_thing
   step = step or 1
   if (start - stop) * (step/math.abs(step)) > 0 then
     start, stop = stop, start -- swap if they're in the wrong order
   end
-  local i = start
-  return function()
+  return function(thing, i)
+    i = i + step
     if 
-      (step > 0 and i >= stop) or
-      (step < 0 and i <= stop)
+      (step > 0 and i <= stop) or
+      (step < 0 and i >= stop)
     then
       return i, elemAt(thing, i)
     end
-    i = i + step
-  end, thing, start
+  end, thing, start - step
 end
 
 --- @param thing indexable
@@ -42,13 +46,14 @@ end
 --- @param step? integer
 --- @return function, indexable, integer
 function prs(thing, start, stop, step)
-  local iter, tbl, state = iprs(thing, start, stop, step)
-  return function()
-    local i, v = iter(tbl, state)
+  local iter, tbl, idx = iprs(thing, start, stop, step)
+  return function(tbl)
+    local i, v = iter(tbl, idx)
     if i then
+      idx = i
       return table.unpack(elemAt(thing, i, "kv"))
     end
-  end, tbl, state
+  end, tbl, idx
 end
 
 --- @param thing indexable
@@ -67,11 +72,9 @@ function iterToTbl(opts, ...)
     table.insert(args, 1, opts)
     opts = nil
   end
-  if not opts then opts = {ret = "kv"} 
-  elseif type(opts) == "table" and not isListOrEmptyTable(opts) and not opts.ret then opts.ret = "kv" end 
-  opts = defaultOpts(opts)
+  opts = defaultOpts(opts, "kv")
 
-  local res = getEmptyResult(nil, opts)
+  local res = getEmptyResult({}, opts)
 
   for a1, a2, a3, a4, a5, a6, a7, a8, a9 in table.unpack(args) do
     local as = {a1, a2, a3, a4, a5, a6, a7, a8, a9}

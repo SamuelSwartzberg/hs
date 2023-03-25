@@ -148,9 +148,9 @@ tblmap = {
 
 -- make sure to automatically normalize any input to tblmap§
 
-for k, v in prs(tblmap) do
+for k, v in pairs(tblmap) do
   local thing_to_normalize = k 
-  for k2, v2 in prs(v) do
+  for k2, v2 in pairs(v) do
     setmetatable(
       v2,
       {

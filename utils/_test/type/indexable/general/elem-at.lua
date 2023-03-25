@@ -12,4 +12,4 @@ local test_assoc = {
   e = "five",
 }
 assertMessage(elemAt(test_assoc, 3), "three")
-assertMessage(elemAt(test_assoc, 3, "kv"), {3, "three"})
+assertMessage(elemAt(test_assoc, 3, "kv"), {"c", "three"})

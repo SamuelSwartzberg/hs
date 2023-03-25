@@ -7,13 +7,9 @@ function rev(thing)
     return eutf8.reverse(thing)
   elseif type(thing) == "table" then
     if not thing.isovtable then
-      return iterToTbl(revprs(thing)) -- this doesn't work for ovtables, because iterToTbl creates a vanilla lua table
+      return iterToTbl(revprs(thing))
     else
-      local new = ovtable.new()
-      for k, v in revprs(thing) do
-        new[k] = v
-      end
-      return new
+      return iterToTbl(revprs(thing), {toovtable = true});
     end
   else
     error("rev only works on strings, lists, and tables. got " .. type(thing) .. " when processing:\n\n" .. json.encode(thing))

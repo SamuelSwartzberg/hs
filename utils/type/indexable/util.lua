@@ -1,8 +1,8 @@
 --- @class tableProcOpts
 --- @field args kvmult if there's a callback (or equivalent thing), what of the element does it recieve in which order?
 --- @field ret kvmult what of the element does the callback (or equivalent thing) return in which order?
+--- @field output "table" | "ovtable" whether to use a normal table or an ovtable
 --- @field tolist boolean instead of replacing the element, append result to a list
---- @field noovtable boolean if the output would be an assoc array, don't make it an ovtable (just make it a normal table)
 --- @field last boolean iterate in reverse / use the last element, as the case may be
 --- @field start integer only consider elements with or after this index
 --- @field stop integer only consider elements with or before this index
@@ -60,16 +60,19 @@ end
 
 
 --- @param thing indexable
---- @param opts table
+--- @param opts? table
 --- @return indexable
 function getEmptyResult(thing, opts)
-  if opts.tolist or opts.noovtable then
+  opts = opts or {}
+  if opts.tolist or opts.output == "table" then -- manual case 1
     return {}
-  elseif isListOrEmptyTable(thing) then
+  elseif opts.output == "ovtable" then -- manual case 2
+    return ovtable.new()
+  elseif isListOrEmptyTable(thing) then -- inferred case 1
     return {}
-  elseif type(thing) == "string" then
+  elseif type(thing) == "string" then -- inferred case 2
     return ""
-  else
+  else -- default case
     return ovtable.new()
   end
 end

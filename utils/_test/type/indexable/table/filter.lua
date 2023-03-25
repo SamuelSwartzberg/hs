@@ -83,7 +83,7 @@ assertMessage(
 )
 
 local noov_filtered = filter(sometable, isEven, {
-  noovtable = true
+  output = "table"
 })
 
 assertMessage(

@@ -2,6 +2,8 @@
 ---@param thing indexable
 ---@return integer
 function len(thing)
+  preventInfiniteLoop("len", 1000)
+
   if type(thing) == "string" then
     return eutf8.len(thing)
   elseif type(thing) == "table" then
