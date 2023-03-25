@@ -26,7 +26,7 @@ function elemAt(thing, ind, ret)
         else
           return thing:getindex(ind)
         end
-      else -- TODO: this branch isn't tested yet
+      else
         local keys = keys(thing) -- TODO: memoize once initial testing is done
         table.sort(keys, returnStringEquivOrder)
         local key = keys[ind]

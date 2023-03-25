@@ -221,3 +221,37 @@ assertMessage(
   addToRes({"itemreskey", nil}, {}, {ret = {"k", "v"}}, "origkey", "origval"),
   {}
 )
+
+-- getIterator
+
+local test_assoc = {a = 1, b = 2, c = 3, d = 4}
+
+local manual_counter = 0
+for k, v in getIterator({ start = 2})(test_assoc) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, "b")
+    assertMessage(v, 2)
+  elseif manual_counter == 2 then
+    assertMessage(k, "c")
+    assertMessage(v, 3)
+  elseif manual_counter == 3 then
+    assertMessage(k, "d")
+    assertMessage(v, 4)
+  end
+end
+
+local manual_counter = 0
+for k, v in getIterator({ stop = 3, last = true})(test_assoc) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, "c")
+    assertMessage(v, 3)
+  elseif manual_counter == 2 then
+    assertMessage(k, "b")
+    assertMessage(v, 2)
+  elseif manual_counter == 3 then
+    assertMessage(k, "a")
+    assertMessage(v, 1)
+  end
+end

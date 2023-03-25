@@ -15,7 +15,7 @@ function filter(tbl, cond, opts)
   opts = defaultOpts(opts, {"k", "v"})
   tbl = getDefaultInput(tbl)
 
-  local iterator = getIterator(tbl, opts)
+  local iterator = getIterator(opts)
   
   local res = getEmptyResult(tbl, opts)
 

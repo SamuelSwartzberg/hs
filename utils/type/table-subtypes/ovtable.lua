@@ -66,7 +66,6 @@ local orderedmetatable = {
 
    end,
  
-   -- TODO no test coverage yet
    -- This metamethod is called when a key is accessed but does not exist in the ordered table.
    __index = function(t, k)
     local v = pkg[k]
@@ -158,7 +157,6 @@ function pkg.keyindex(t, key)
   end
 end
 
--- TODO no test coverage yet
 function pkg.keyfromindex(t, idx)
   -- Ensure that `idx` is a int.
   assert(type(idx) == "number", "idx must be a number.")

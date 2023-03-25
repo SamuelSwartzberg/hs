@@ -84,7 +84,7 @@ function map(tbl, f, opts)
 
   -- set some vars we will need later
 
-  local iterator = getIterator(tbl, opts)
+  local iterator = getIterator(opts)
   local res = getEmptyResult(tbl, opts)
 
   local manual_counter = 0

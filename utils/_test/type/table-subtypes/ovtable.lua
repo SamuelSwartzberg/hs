@@ -106,3 +106,35 @@ for k, v in revpairs(ovtable) do
 
   indexer = indexer + 1
 end
+
+assertMessage(
+  reverse_test_ovtable:keyfromindex(1),
+  "III"
+)
+
+assertMessage(
+  reverse_test_ovtable:keyfromindex(2),
+  "II"
+)
+
+assertMessage(
+  reverse_test_ovtable:keyfromindex(3),
+  "I"
+)
+
+-- test __index metamethod
+
+assertMessage(
+  reverse_test_ovtable[1],
+  "three"
+)
+
+assertMessage(
+  reverse_test_ovtable[2],
+  "two"
+)
+
+assertMessage(
+  reverse_test_ovtable[3],
+  "one"
+)

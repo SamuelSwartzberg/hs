@@ -1,5 +1,6 @@
 local rrq = bindArg(relative_require, "utils._test.type.indexable.general")
 
+rrq("get-index")
 rrq("elem-at")
 rrq("len")
 rrq("rev")

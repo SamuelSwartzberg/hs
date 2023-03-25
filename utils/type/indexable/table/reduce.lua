@@ -14,7 +14,7 @@ function reduce(tbl, reducer, opts)
   opts = defaultOpts(opts)
   tbl = getDefaultInput(tbl)
 
-  local iterator = getIterator(tbl, opts)
+  local iterator = getIterator(opts)
 
   local acc_needs_to_be_populated = opts.init == nil
   -- if no init value is given, use the first value in the table as the acc, which removes the need for handling a nil acc in the reducer

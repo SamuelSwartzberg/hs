@@ -17,7 +17,7 @@ function find(indexable, cond, opts)
 
   if not (type(indexable) == "string") then
     print("notstr")
-    local iterator = getIterator(indexable, opts)
+    local iterator = getIterator(opts)
     local manual_counter = 0
     for k, v in wdefarg(iterator)(indexable) do
       local retriever

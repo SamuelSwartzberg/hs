@@ -1,5 +1,6 @@
 local rrq = bindArg(relative_require, "utils.type.indexable.general")
 
+rrq("get-index")
 rrq("append")
 rrq("concat")
 rrq("elem-at")

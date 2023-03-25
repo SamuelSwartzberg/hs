@@ -35,27 +35,10 @@ function defaultOpts(opts, retdefault)
   return opts
 end
 
---- @param thing table
 --- @param opts table
 --- @return function
-function getIterator(thing, opts)
-  local iter
-  inspPrint(opts)
-  if isListOrEmptyTable(thing) then
-    if opts.last then 
-      iter = function(tbl) return revipairs(tbl, opts.start, opts.stop) end
-    else 
-      iter = function(tbl) return ipairs(tbl, opts.start, opts.stop) end 
-    end
-  else
-    -- todo: implement start/stop for non-lists. Maybe it would be easier just to implement ipairs/revipairs polymorphically?
-    if opts.start or opts.stop then
-      error("start/stop not implemented for non-lists")
-    end
-    if opts.last then  iter=  function(tbl) return tbl:revpairs() end 
-    else iter = pairs end
-  end
-  return wdefarg(iter)
+function getIterator(opts)
+  return wdefarg(function(tbl) return pairs(tbl, opts.start, opts.stop, opts.last and -1 or 1) end)
 end
 
 --- @alias retriever {k: any, v: any, i: integer}
@@ -155,24 +138,3 @@ function addToRes(itemres,res,opts,k,v)
   return res -- typically, this is not needed, but it's here if needed, mainly in tests
 end
 
---- TODO: no tests yet
---- TODO: move to different file
---- @param thing indexable
---- @param k string|integer
---- @param manual_counter? integer
---- @return integer
-function getIndex(thing, k, manual_counter)
-  if type(thing) == "table" then
-    if thing.keyindex then
-      return thing:keyindex(k) --[[ @as integer ]]
-    else
-      if not isListOrEmptyTable(thing) and manual_counter then
-        return manual_counter
-      else
-        return k --[[ @as integer ]]
-      end
-    end
-  else
-    return k --[[ @as integer ]]
-  end
-end

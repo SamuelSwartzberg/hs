@@ -1,8 +1,4 @@
 
--- sliceable ipairs & revipairs
-
--- TODO: not fully tested yet
--- TODO: move to different file
 --- ipairs dropin replacement that supports start/stop/step and works with any indexable
 --- @param thing indexable
 --- @param start? integer
@@ -13,6 +9,9 @@ function ipairs(thing, start, stop, step)
   start = start or 1
   stop = stop or len(thing)
   step = step or 1
+  if (start - stop) * (step/math.abs(step)) > 0 then
+    start, stop = stop, start -- swap if they're in the wrong order
+  end
   local i = start - 1
   return function()
     i = i + step
@@ -22,20 +21,15 @@ function ipairs(thing, start, stop, step)
   end, thing, start
 end
 
--- TODO: not fully tested yet
 --- @param thing indexable
 --- @param start? integer
 --- @param stop? integer
 --- @param step? integer
 --- @return function, indexable, integer
 function revipairs(thing, start, stop, step)
-  if step and step > 0 then
-    step = -step
-  end
-  return ipairs(thing, start or len(thing), stop or 1, step or -1)
+  return ipairs(thing, start, stop, step and -math.abs(step) or -1)
 end
 
--- TODO: not tested yet
 --- pairs dropin replacement that is ordered by default, supports start/stop/step and works with any indexable
 --- difference from ipairs is that it returns the key instead of the index
 --- in case of a list/string, the key is the index, so it's the same as ipairs
@@ -54,17 +48,13 @@ function pairs(thing, start, stop, step)
   end, tbl, state
 end
 
--- TODO: not tested yet
 --- @param thing indexable
 --- @param start? integer
 --- @param stop? integer
 --- @param step? integer
 --- @return function, indexable, integer
 function revpairs(thing, start, stop, step)
-  if step and step > 0 then
-    step = -step
-  end
-  return pairs(thing, start or len(thing), stop or 1, step or -1)
+  return pairs(thing, start, stop, step and -math.abs(step) or -1)
 end
 
 --- @param opts? tableProcOpts | kvmult
