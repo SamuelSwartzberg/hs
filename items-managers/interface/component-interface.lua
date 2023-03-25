@@ -78,7 +78,7 @@ local function interactiveFunc(self, specifier)
   if isListOrEmptyTable(specifier.thing) then
     --- @cast thing (string | function)[]
     args_to_pass = {}
-    for _, thing in ipairs(thing) do
+    for _, thing in iprs(thing) do
       push(args_to_pass, singleInteractiveFunc(self, thing))
     end
   elseif type(thing) == "table" and not thing.func then
@@ -194,7 +194,7 @@ InterfaceDefaultTemplate = {
       end,
       ["action-table"] = function(self)
         local chooser_table = {}
-        for action_index, action in ipairs(self:get("filtered-action-table")) do
+        for action_index, action in iprs(self:get("filtered-action-table")) do
           local chooser_string = ""
           if type(action.text) == "string" then
             chooser_string = action.text
@@ -327,7 +327,7 @@ InterfaceDefaultTemplate = {
         })
       end,
       ["do-multiple"] = function(self, actions)
-        for _, action in ipairs(actions) do
+        for _, action in iprs(actions) do
           self:doThis(action.key, action.args)
         end
       end,

@@ -14,7 +14,7 @@ ManagedInputMethodArraySpecifier = {
         self:doThis("add-to-end", CreateInputMethodItem(method_id))
       end,
       ["register-all"] = function(self, specifier)
-        for index, method_id in ipairs(specifier) do
+        for index, method_id in iprs(specifier) do
           self:doThis("create", method_id)
         end
       end,

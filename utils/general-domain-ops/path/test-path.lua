@@ -44,7 +44,7 @@ function testPath(path, opts)
 
   if opts.slice then
 
-    for _, slice_spec in ipairs(opts.slice) do
+    for _, slice_spec in iprs(opts.slice) do
 
       if isListOrEmptyTable(slice_spec) then
         slice_spec = {

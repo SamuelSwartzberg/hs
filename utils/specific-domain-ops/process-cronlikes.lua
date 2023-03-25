@@ -2,7 +2,7 @@
 
 --- @param path string
 function processSetupDirectivesInFiles(path)
-  for _, child in ipairs(itemsInPath({path = path, include_dirs = false})) do
+  for _, child in iprs(itemsInPath({path = path, include_dirs = false})) do
     logFile("processSetupDirectivesInFiles", child)
     local basename = pathSlice(child, "-1:-1")[1]
     local command = replace(

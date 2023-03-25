@@ -84,7 +84,7 @@ YoutubeApiItemSpecifier = {
           do_after = function(response)
             local playlist_id = response.id
 
-            for index, video_id in ipairs(specifier.videos) do
+            for index, video_id in iprs(specifier.videos) do
               self:doThis("async-post", {
                 endpoint = "playlistItems",
                 request_verb = "POST",

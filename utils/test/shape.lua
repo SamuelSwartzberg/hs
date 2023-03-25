@@ -9,7 +9,7 @@ table.insert(types_w_any, "any")
 --- @param shape shape_table
 --- @return nil
 function resolveTypeMatchingToKeys(test_tbl, shape)
-  for _, typ in ipairs(types_w_any) do
+  for _, typ in iprs(types_w_any) do
     if shape["[" .. typ .. "]"] then -- if shape has a key "[<type>|any]", then this is the type we want for any key (of type|any) not explicitly specified in the shape
       for k, _ in prs(test_tbl) do
         if type(k) == typ or typ == "any" then 

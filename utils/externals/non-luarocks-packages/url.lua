@@ -170,7 +170,7 @@ function M.buildQuery(tab, sep, key)
   		local function padnum(n, rest) return ("%03d"..rest):format(tonumber(n)) end
   		return tostring(a):gsub("(%d+)(%.)",padnum) < tostring(b):gsub("(%d+)(%.)",padnum)
 	end)
-	for _,name in ipairs(keys) do
+	for _,name in iprs(keys) do
 		local value = tab[name]
 		name = encode(tostring(name), {["-"] = true, ["_"] = true, ["."] = true})
 		if key then
@@ -238,7 +238,7 @@ function M.parseQuery(str, sep)
 		end
 
 		local t = values[key]
-		for i,k in ipairs(keys) do
+		for i,k in iprs(keys) do
 			if type(t) ~= 'table' then
 				t = {}
 			end
@@ -416,7 +416,7 @@ function M.removeDotSegments(path)
 	local new = {}
 	local j = 0
 
-	for i,c in ipairs(fields) do
+	for i,c in iprs(fields) do
 		if c == '..' then
 			if j > 0 then
 				j = j - 1

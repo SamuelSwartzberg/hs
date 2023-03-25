@@ -9,7 +9,7 @@ function buildInnerCommand(command_parts)
     return " " .. command_parts
   end
   command_parts = fixListWithNil(command_parts) -- this allows us to have optional args simply by having them be nil
-  for _, command_part in ipairs(command_parts) do
+  for _, command_part in iprs(command_parts) do
     if type(command_part) == "string" then
       command = command .. " " .. command_part
     elseif type(command_part) == "table" then

@@ -12,7 +12,7 @@ function listWithChildrenKeyToListIncludingPath(list, path, specifier)
   if not specifier.title_key_name then specifier.title_key_name = "title" end
   if not specifier.levels_of_nesting_to_skip then specifier.levels_of_nesting_to_skip = 0 end
   local result = {}
-  for i, item in ipairs(list) do
+  for i, item in iprs(list) do
     local cloned_path = copy(path, false)
     push(cloned_path, item[specifier.title_key_name])
     local children = item[specifier.children_key_name]

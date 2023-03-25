@@ -294,7 +294,7 @@ local item_creation_map = {
 
 
 for create_function, test_specifers in prs(item_creation_map) do
-  for _, test_specifier in ipairs(test_specifers) do
+  for _, test_specifier in iprs(test_specifers) do
     if test_specifier.pretest then
       test_specifier.pretest()
     end
@@ -303,7 +303,7 @@ for create_function, test_specifers in prs(item_creation_map) do
       value = value()
     end
     local item = create_function(value)
-    for _, must_be in wdefarg(ipairs)(test_specifier.must_be) do
+    for _, must_be in wdefarg(iprs)(test_specifier.must_be) do
       if not find(item:get_all("type"), must_be, "boolean") then
         error("Item created by " .. 
         tostring(create_function) .. 
@@ -313,7 +313,7 @@ for create_function, test_specifers in prs(item_creation_map) do
         
       end
     end
-    for _, must_not_be in wdefarg(ipairs)(test_specifier.must_not_be) do
+    for _, must_not_be in wdefarg(iprs)(test_specifier.must_not_be) do
       if find(item:get_all("type"), must_not_be, "boolean") then
         error("Item created by " .. tostring(create_function) .. " with value " .. tostring(test_specifier.value) .. " has type " .. tostring(must_not_be) .. " but should not")
       end

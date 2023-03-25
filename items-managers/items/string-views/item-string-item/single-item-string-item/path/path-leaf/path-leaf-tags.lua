@@ -13,7 +13,7 @@ PathLeafTagsSpecifier = {
       ["tag-raw-value-map"] = function (self)
         local tag_string_inner_list = self:get("tag-string-inner-list")
         local tag_raw_value_map = {}
-        for _, tag_string_inner in ipairs(tag_string_inner_list) do
+        for _, tag_string_inner in iprs(tag_string_inner_list) do
           local tag_name, tag_value_raw = tag_string_inner:match("^(.-)-(.+)$")
           tag_raw_value_map[tag_name] = tag_value_raw
         end
@@ -45,7 +45,7 @@ PathLeafTagsSpecifier = {
       end,
       ["has-tag-name"] = function (self, tag_name)
         local tag_name_list = self:get("tag-name-list")
-        for _, tag_name_in_list in ipairs(tag_name_list) do
+        for _, tag_name_in_list in iprs(tag_name_list) do
           if tag_name_in_list == tag_name then
             return true
           end

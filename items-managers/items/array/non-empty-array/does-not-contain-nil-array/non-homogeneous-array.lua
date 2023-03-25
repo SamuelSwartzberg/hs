@@ -4,8 +4,8 @@ NonHomogeneousArraySpecifier = {
     getables = {
       ["to-map-of-homogeneous-arrays"] = function(self)
         local homogeneous_array_map = {}
-        for _, item in ipairs(self:get("contents")) do
-          for _, type in ipairs(allTypesOfPrimitiveOrInterface(item)) do
+        for _, item in iprs(self:get("contents")) do
+          for _, type in iprs(allTypesOfPrimitiveOrInterface(item)) do
             if homogeneous_array_map[type] == nil then homogeneous_array_map[type] = {} end
             homogeneous_array_map[type][#homogeneous_array_map[type]+1] = item
           end

@@ -7,7 +7,7 @@ global_store = nil
 --- @param specifier BenchmarkSpecifier
 --- @return nil
 function benchmarkFunctions(specifier)
-  for _, func_specifier in ipairs(specifier.funcs) do
+  for _, func_specifier in iprs(specifier.funcs) do
     local start = os.clock()
     local func = func_specifier.func
     for i = 1, specifier.iterations do

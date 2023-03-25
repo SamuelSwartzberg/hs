@@ -47,7 +47,7 @@ function flatten(tbl, opts)
     }
   elseif isListOrEmptyTable(opts.val) then
     local newval = {}
-    for _, v in ipairs(opts.val) do
+    for _, v in iprs(opts.val) do
       newval[v] = true
     end
     opts.val = newval

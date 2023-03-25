@@ -87,7 +87,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   local final_target = target
   local tmptarget 
-  for _, final_source in ipairs(sources) do    
+  for _, final_source in iprs(sources) do    
     -- if all_in, then change target to be the target directory + the leaf of the source
     -- this does mean that this doesn't play nice with the `into` option, but I don't think that's a problem
     if all_in then

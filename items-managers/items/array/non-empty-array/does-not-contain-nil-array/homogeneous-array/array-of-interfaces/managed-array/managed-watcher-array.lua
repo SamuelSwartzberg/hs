@@ -8,7 +8,7 @@ ManagedWatcherArraySpecifier = {
         self:doThis("add-to-end", CreateWatcherItem(specifier))
       end,
       ["register-all"] = function(self, specifiers)
-        for _, specifier in ipairs(specifiers) do
+        for _, specifier in iprs(specifiers) do
           self:doThis("create", specifier)
         end
       end

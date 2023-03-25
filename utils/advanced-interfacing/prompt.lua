@@ -255,7 +255,7 @@ end
 
 function promptPipeline(prompt_pipeline)
   local res = prompt_pipeline[1].prompt_args.default
-  for _, args in ipairs(prompt_pipeline) do
+  for _, args in iprs(prompt_pipeline) do
     local prompt_spec = args[2] or {}
     prompt_spec.prompt_args = prompt_spec.prompt_args or {}
     prompt_spec.prompt_args.default = res

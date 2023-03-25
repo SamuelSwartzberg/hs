@@ -10,7 +10,7 @@
 function getChooseItemTable(specifiers)
   local action_table = {}
 
-  for _, specifier in ipairs(specifiers) do
+  for _, specifier in iprs(specifiers) do
     if specifier.check then 
       specifier.condition = function(item)
         return item:get(specifier.key, specifier.args) ~= nil
@@ -36,7 +36,7 @@ end
 --- @return action_table
 function getSearchEngineActionTable(search_engines)
   local res = {}
-  for _, search_engine in ipairs(search_engines) do
+  for _, search_engine in iprs(search_engines) do
     res[#res + 1] = {
       text = string.format("%s🔎 s%s.", search_engine.emoji_icon, search_engine.short),
       key = "search-with",

@@ -72,7 +72,7 @@ local orderedmetatable = {
     if v then
       return v
     elseif type(k) == "number" then
-      return pkg.keyfromindex(t, k)
+      return pkg.getindex(t, k)
     else
       return nil
     end
@@ -194,6 +194,23 @@ function pkg.copy(t, deep)
   return cpy
 end
 
+function pkg.len(t)
+  -- Extract the unique memory address of the subtable from the ordered table.
+  local addr = string.sub(tostring(t), 8)
+  
+  -- Get the list of keys in the insertion order.
+  local kstr = ins_order[addr]
+
+  -- If the list of keys does not exist, return 0.
+  if not kstr then
+    return 0
+  else
+    -- Return the number of keys in the list.
+    return #kstr
+  end
+end
+
+
 pkg.isovtable = true
 
 --- @alias getindex_givekey fun(t: orderedtable, idx: number, give_key_name: true): string, any 
@@ -205,6 +222,7 @@ pkg.isovtable = true
 --- @field getindex getindex_givekey | getindex_nogivekey
 --- @field keyindex fun(t: orderedtable, key: string): number | nil, string | nil
 --- @field keyfromindex fun(t: orderedtable, idx: integer): string | nil, string | nil
+--- @field len fun(t: orderedtable): integer
 --- @field isovtable true signal that this is an orderedtable
 
 ovtable = pkg

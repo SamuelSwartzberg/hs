@@ -1,5 +1,5 @@
 
---- ipairs dropin replacement that supports start/stop/step and works with any indexable
+--- iprs dropin replacement that supports start/stop/step and works with any indexable
 --- @param thing indexable
 --- @param start? integer
 --- @param stop? integer
@@ -12,12 +12,15 @@ function iprs(thing, start, stop, step)
   if (start - stop) * (step/math.abs(step)) > 0 then
     start, stop = stop, start -- swap if they're in the wrong order
   end
-  local i = start - 1
+  local i = start
   return function()
-    i = i + step
-    if i <= stop then
+    if 
+      (step > 0 and i >= stop) or
+      (step < 0 and i <= stop)
+    then
       return i, elemAt(thing, i)
     end
+    i = i + step
   end, thing, start
 end
 
@@ -31,8 +34,8 @@ function reviprs(thing, start, stop, step)
 end
 
 --- pairs dropin replacement that is ordered by default, supports start/stop/step and works with any indexable
---- difference from ipairs is that it returns the key instead of the index
---- in case of a list/string, the key is the index, so it's the same as ipairs
+--- difference from iprs is that it returns the key instead of the index
+--- in case of a list/string, the key is the index, so it's the same as iprs
 --- @param thing indexable
 --- @param start? integer
 --- @param stop? integer

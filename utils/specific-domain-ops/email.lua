@@ -11,7 +11,7 @@ end
 function buildEmailHeaders(headers)
   local header_lines = {}
   local initial_headers = {"from", "to", "cc", "bcc", "subject"}
-  for _, header_name in ipairs(initial_headers) do
+  for _, header_name in iprs(initial_headers) do
     local header_value = headers[header_name]
     if header_value then
       table.insert(header_lines, buildEmailHeader(header_name, header_value))

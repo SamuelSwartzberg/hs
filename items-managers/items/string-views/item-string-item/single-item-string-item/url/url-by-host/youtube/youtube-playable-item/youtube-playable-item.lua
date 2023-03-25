@@ -25,7 +25,7 @@ YoutubePlayableItemItemSpecifier = {
       ["process-raw-attrs"] = function(self, specifier)
         local fields = stringx.split(specifier.raw_attr_string, env.UNLIKELY_SEPARATOR)
         local res = {}
-        for i, field in ipairs(fields) do
+        for i, field in iprs(fields) do
           res[specifier.attrs[i]] = stringy.strip(field)
         end
         return res

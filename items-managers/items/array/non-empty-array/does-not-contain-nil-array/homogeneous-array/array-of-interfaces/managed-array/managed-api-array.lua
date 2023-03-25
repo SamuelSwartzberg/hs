@@ -8,7 +8,7 @@ ManagedApiArraySpecifier = {
         self:doThis("add-to-end", CreateApiItem(api_url))
       end,
       ["register-all"] = function(self, api_urls)
-        for _, api_url in ipairs(api_urls) do
+        for _, api_url in iprs(api_urls) do
           self:doThis("create", api_url)
         end
       end

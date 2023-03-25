@@ -2,7 +2,7 @@
 local tbl = {10, 20, 30, 40, 50}
 local emptyTbl = {}
 
--- Test ipairs
+-- Test iprs
 -- Test default
 local manual_counter = 0
 for i, v in iprs(tbl) do
@@ -80,7 +80,7 @@ for i, v in iprs(tbl, 5, 1, -2) do
   end
 end
 
--- Test ipairs on assoc arr (use key string equivalent order)
+-- Test iprs on assoc arr (use key string equivalent order)
 
 local assocArr = {a = 10, b = 20, c = 30, d = 40, e = 50}
 
@@ -105,7 +105,7 @@ for i, v in iprs(assocArr) do
   end
 end
 
--- Test ipairs on assoc arr with start, stop, and negative step
+-- Test iprs on assoc arr with start, stop, and negative step
 
 local manual_counter = 0
 
@@ -120,7 +120,7 @@ for i, v in iprs(assocArr, 1, 3, -2) do
   end
 end
 
--- Test ipairs on ovtable (uses insertion order)
+-- Test iprs on ovtable (uses insertion order)
 
 local test_ovtable = ovtable.init({
   {k = "e", v = 10},
@@ -151,7 +151,7 @@ for i, v in iprs(test_ovtable) do
   end
 end
 
--- Test ipairs on ovtable with start, stop, and negative step
+-- Test iprs on ovtable with start, stop, and negative step
 
 local manual_counter = 0
 for i, v in iprs(test_ovtable, 1, 3, -2) do
@@ -165,7 +165,7 @@ for i, v in iprs(test_ovtable, 1, 3, -2) do
   end
 end
 
--- test that revipairs is equivalent to ipairs with negative step
+-- test that reviprs is equivalent to iprs with negative step
 
 local manual_counter = 0
 for i, v in reviprs(tbl) do

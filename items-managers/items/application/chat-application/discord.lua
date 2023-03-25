@@ -30,7 +30,7 @@ DiscordItemSpecifier = {
       ["msg-raw-attachments"] = function(self, msg)
         local raw_attachments = {}
         
-        for _, attachment in ipairs(msg.attachments) do
+        for _, attachment in iprs(msg.attachments) do
           local attachment_leaf = pathSlice(attachment.uri, "-1:-1")[1]
           local attachment_path = self:get("media-dir-for-chat", msg.chat_obj) .. "/" .. attachment_leaf
           table.insert(raw_attachments, attachment_path)
@@ -40,7 +40,7 @@ DiscordItemSpecifier = {
       end,
       ["msg-raw-reactions"] = function(self, msg)
         local raw_reactions = {}
-        for _, reaction in ipairs(msg.reactions) do
+        for _, reaction in iprs(msg.reactions) do
           local reaction_str = ("%s (%s)"):format(reaction.emoji.name, reaction.count)
           table.insert(raw_reactions, reaction_str)
         end
