@@ -68,12 +68,16 @@ function getEmptyResult(thing, opts)
     return {}
   elseif opts.output == "ovtable" then -- manual case 2
     return ovtable.new()
-  elseif isListOrEmptyTable(thing) then -- inferred case 1
-    return {}
   elseif type(thing) == "string" then -- inferred case 2
     return ""
-  else -- default case
-    return ovtable.new()
+  elseif type(thing) == "table" then -- inferred case 3
+    if isListOrEmptyTable(thing) or not thing.isovtable then
+      return {}
+    else
+      return ovtable.new()
+    end
+  else 
+    return {}
   end
 end
 
@@ -141,3 +145,9 @@ function addToRes(itemres,res,opts,k,v)
   return res -- typically, this is not needed, but it's here if needed, mainly in tests
 end
 
+
+--- @param opts table
+--- @return boolean
+function shouldRecurse(opts)
+  return  (opts.recurse == true or (type(opts.recurse) == "number" and opts.recurse > opts.depth))
+end

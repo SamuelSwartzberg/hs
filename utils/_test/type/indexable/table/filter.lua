@@ -140,33 +140,33 @@ assertMessage(
 -- shorthands
 
 assertMessage(
-  filter({1, "", 2, "", 3}, true),
+  filter({1, "", 2, "", 3}, false, {tolist = true}),
   {1, 2, 3}
 )
 
 assertMessage(
-  filter({1, " ", 2, " ", 3}, true),
+  filter({1, " ", 2, " ", 3}, false),
   {1, " ", 2, " ", 3}
 )
 
 assertMessage(
-  filter({1, 2, 3}, true),
+  filter({1, 2, 3}, false),
   {1, 2, 3}
 )
 
 assertMessage(
-  filter({1, 2, 3}, false),
+  filter({1, 2, 3}, true),
   {}
 )
 
 
 assertMessage(
-  filter({1, "", 2, "", 3}, false),
-  {"", "", ""}
+  filter({1, "", 2, "", 3}, true, {tolist = true}),
+  {"", ""}
 )
 
 assertMessage(
-  filter({1, 2, 3}, 3),
+  filter({1, 2, 3}, 3, {tolist = true}),
   {3}
 )
 
@@ -176,17 +176,17 @@ assertMessage(
 )
 
 assertMessage(
-  filter({1, 2, 3, 1 }, 1),
+  filter({1, 2, 3, 1 }, 1, {tolist = true}),
   {1, 1}
 )
 
 assertMessage(
-  filter({1, 2, 3, 4, 5}, { 2, 3, 4}),
+  filter({1, 2, 3, 4, 5}, {{ 2, 3, 4}}, {tolist = true}),
   {2, 3, 4}
 )
 
 
 assertMessage(
-  filter({1, 2, 3, 4, 5}, { 6, 7, 8}),
+  filter({1, 2, 3, 4, 5}, {{ 6, 7, 8}}, {tolist = true}),
   {}
 )

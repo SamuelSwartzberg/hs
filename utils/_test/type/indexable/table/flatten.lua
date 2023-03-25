@@ -1,6 +1,6 @@
 
 assertMessage(
-  listSort(
+  
     flatten(
       {
         a = 1,
@@ -16,12 +16,12 @@ assertMessage(
         treat_as_leaf = false,
         mode = "list",
       }
-  )),
+  ),
   { 1, 2, 3, 4 }
 )
 
 assertMessage(
-  listSort(flatten(
+  flatten(
     {
       1,
       2,
@@ -37,12 +37,12 @@ assertMessage(
       treat_as_leaf = false,
       mode = "list",
     }
-  )),
+  ),
   { 1, 2, 3, 4, 5 }
 )
 
 assertMessage(
-  listSort(flatten(
+  flatten(
     {
       1,
       2,
@@ -60,7 +60,7 @@ assertMessage(
       treat_as_leaf = "assoc",
       mode = "list",
     }
-  )),
+  ),
   { 
     1,
     2,
@@ -73,7 +73,7 @@ assertMessage(
 )
 
 assertMessage(
-  listSort(flatten(
+  flatten(
     {
       1,
       2,
@@ -82,22 +82,21 @@ assertMessage(
           foo = "bar"
         },
         {
-          4
+          4 -- equivalent to { [1] = 4 }
         },
-        5
+        5 -- equivalent to [3] = 5
       }
     },
     {
       treat_as_leaf = false,
       mode = "assoc",
     }
-  )),
+  ),
   {
-    [1] = 1,
     [2] = 2,
     foo = "bar",
-    [4] = 4,
-    [5] = 5
+    [1] = 4,
+    [3] = 5
   }
 )
 
@@ -302,7 +301,7 @@ assertMessage(
     {
       treat_as_leaf = false,
       mode = "list",
-      val = { "path", "depth" },
+      val = { "path", "depth", "value" },
     }
   ),
   {
@@ -344,7 +343,7 @@ assertMessage(
     {
       treat_as_leaf = false,
       mode = "list",
-      val = { "path", "depth",},
+      val = { "path", "depth", "value"},
       join_path = ".",
     }
   ),

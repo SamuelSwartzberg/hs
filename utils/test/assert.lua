@@ -17,7 +17,7 @@ function assertValuesContain(a, values)
   for _, value in iprs(values) do
     assert(
     valuesContainShape(a, value),
-    ("Expected %s to contain %s"):format(hs.inspect(a, {depth = 5}), hs.inspect(value, {depth = 5}))
+    ("Expected \n%s\n to contain \n%s\n\nAll required values:\n%s"):format(hs.inspect(a, {depth = 5}), hs.inspect(value, {depth = 5}), hs.inspect(values, {depth = 5}))
   )
   end
 end

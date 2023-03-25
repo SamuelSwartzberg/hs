@@ -160,6 +160,8 @@ function findsingle(item, conditions, opts)
         
         local succ, rs = pcall(function() return #potentially_sliced_item == 0 end) -- pcall because # errors on failure
         local isempty = succ and rs
+        inspPrint(potentially_sliced_item)
+        inspPrint(isempty)
         push(results, getres( isempty == condition._empty, start, potentially_sliced_item))
         found_other_use_for_table = true
       end
@@ -186,6 +188,7 @@ function findsingle(item, conditions, opts)
       end
 
       if condition._list ~= nil or not found_other_use_for_table then
+        print("using list")
         local list = condition._list or condition
         local match = false
         for _, listitem in iprs(list) do

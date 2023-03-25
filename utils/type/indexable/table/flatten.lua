@@ -34,7 +34,8 @@ function flatten(tbl, opts)
   opts.val = defaultIfNil(opts.val, "plain")
   opts.recurse = defaultIfNil(opts.recurse, true)
   opts.path = defaultIfNil(opts.path, {})
-  opts.depth = crementIfNumber(opts.depth, "in")
+  if opts.depth == nil then opts.depth = 0 
+  else opts.depth = opts.depth + 1 end
   opts.indentation = defaultIfNil(opts.indentation, 2)
 
   -- process incl shorthand
@@ -70,6 +71,7 @@ function flatten(tbl, opts)
       opts.val = {} 
     end
     opts.val.path = true
+    opts.val.value = true
   end
 
   -- create leaf detector
@@ -103,19 +105,28 @@ function flatten(tbl, opts)
     end
   end
 
-  local res
+  local res = getEmptyResult(tbl, opts)
 
+  print("tbl")
+  inspPrint(tbl)
   for k, v in prs(tbl) do
-    if isLeaf(v) then
+    print(k, v)
+    if type(v) ~= "table" or isLeaf(v) then
+      print('leaf')
       valAddfunc(res, v, k)
     else
-      if opts.recurse == true or opts.recurse > opts.depth then
+      print('not leaf')
+      if shouldRecurse(opts) then
         local newopts = copy(opts)
         newopts.path = concat(opts.path, k)
         local subres = flatten(v, newopts)
+        print("subres")
+        inspPrint(subres, 3)
         for k, v in prs(subres) do
-          valAddfunc(res, v, k)
+          addfunc(res, v, k)
         end
+        print("res after adding subres")
+        inspPrint(res, 5)
       else
         valAddfunc(res, v, k)
       end
@@ -130,7 +141,8 @@ function flatten(tbl, opts)
   
   if opts.mode == "path-assoc" and opts.depth == 0 then
     local newres = {}
-    for k, v in prs(res) do
+    inspPrint(res, 5)
+    for k, v in iprs(res) do
       local val
       if res_should_be_plain then
         val = v.value

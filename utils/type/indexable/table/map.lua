@@ -65,7 +65,7 @@ function map(tbl, f, opts)
           end
         end
       elseif f._f then
-        local frmt
+        local frmt = f._f
         f = function(...)
           return string.format(frmt, ...)
         end
@@ -90,7 +90,7 @@ function map(tbl, f, opts)
   local manual_counter = 0
   for k, v in wdefarg(iterator)(tbl) do
     if not opts.mapcondition or findsingle(v, opts.mapcondition) then
-      if opts.recurse == true or opts.recurse > opts.depth and not isLeaf(v) then
+      if shouldRecurse(opts) and not isLeaf(v) then
         addToRes({k, map(v, f, opts)}, res, opts, k, v)
       else
         local retriever
