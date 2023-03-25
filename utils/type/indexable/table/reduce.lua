@@ -20,8 +20,11 @@ function reduce(tbl, reducer, opts)
   -- if no init value is given, use the first value in the table as the acc, which removes the need for handling a nil acc in the reducer
 
   local acc = opts.init
+  local manual_counter = 0
   for k, v in iterator(tbl) do
-    local args = getArgs(k, v, opts)
+    local retriever
+    retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)
+    local args = getArgs(retriever, opts)
     if acc_needs_to_be_populated then
       acc = args[1]
       acc_needs_to_be_populated = false

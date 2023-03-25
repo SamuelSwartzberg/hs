@@ -87,13 +87,15 @@ function map(tbl, f, opts)
   local iterator = getIterator(tbl, opts)
   local res = getEmptyResult(tbl, opts)
 
-
+  local manual_counter = 0
   for k, v in wdefarg(iterator)(tbl) do
     if not opts.mapcondition or findsingle(v, opts.mapcondition) then
       if opts.recurse == true or opts.recurse > opts.depth and not isLeaf(v) then
         addToRes({k, map(v, f, opts)}, res, opts, k, v)
       else
-        local args = getArgs(opts.args, k, v)
+        local retriever
+        retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)
+        local args = getArgs(retriever, opts)
         local tempres = {f(table.unpack(args))}
         if opts.flatten and type(tempres[1]) == "table" then -- flatten is enabled, and we've returned an element we want to flatten
           for resk, resv in pairs(tempres) do

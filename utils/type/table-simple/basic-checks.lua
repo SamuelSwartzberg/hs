@@ -3,7 +3,7 @@
 function isListOrEmptyTable(t)
   if type(t) ~= "table" then return false end -- not a table
   if t.isassoc == "isassoc" then return false end -- signal value to indicate that this is an assoc table
-  if t.revpairs then return false end -- only ordered tables have revpairs, and ordered tables are not lists and never count as empty tables
+  if t.isovtable then return false end
   local count = 0
   for k, v in pairs(t) do
     if type(k) ~= "number" then return false end

@@ -16,39 +16,6 @@ local key_ins_order = {} -- Mirror of `ins_order` to fetch the order of the key 
   Metatable used to implement ordered tables. Stored in a local for identification purposes.
 --]]
 local orderedmetatable = {
-  __pairs = function (t)
-    local idx = 1
-    -- The unique memory address of the current subtable is extracted from the ordered table.
-    local id = string.sub(tostring(t), 8)
-
-    -- The subtables that store the insertion order are looked up.
-    local L1 = ins_order[id]
-    local L2 = key_ins_order[id]
-
-    -- If either of the subtables doesn't exist, return an empty iterator function.
-    if not L1 or not L2 then
-      return function () return nil end
-    end
-
-    -- The iterator function returns a closure that advances the index into the internal table until it finds a key with a non-nil value.
-    return function ()
-      local k = L1[idx]
-      local v = t[k]
-
-      while v == nil and idx <= #L1 do
-        idx = idx + 1
-
-        k = L1[idx]
-        v = t[k]
-      end
-
-      -- The index is advanced once more before returning the current key-value pair.
-      idx = idx + 1
-
-      return k, v
-    end
-  end,
-
   -- This metamethod is called when the ordered table is about to be garbage collected.
   __gc = function (t)
     -- The unique memory address of the subtable is extracted from the ordered table.
@@ -115,40 +82,6 @@ local orderedmetatable = {
  }
 
 pkg.orderedmetatable = orderedmetatable
-
-function pkg.revpairs(t)
-  -- The unique memory address of the subtable is extracted from the ordered table.
-  local id = string.sub(tostring(t), 8)
-  -- The current index into the internal table is initialized to the last index.
-  local idx = #ins_order[id]
-
-  -- The subtables that store the insertion order are looked up.
-  local L1 = ins_order[id]
-  local L2 = key_ins_order[id]
-
-  -- If either of the subtables doesn't exist, return an empty iterator function.
-  if not L1 or not L2 then
-    return function () return nil end
-  end
-
-  -- The iterator function returns a closure that advances the index into the internal table until it finds a key with a non-nil value.
-  return function ()
-    local k = L1[idx]
-    local v = t[k]
-
-    while v == nil and idx > 0 do
-      idx = idx - 1
-
-      k = L1[idx]
-      v = t[k]
-    end
-
-    -- The index is decremented once more before returning the current key-value pair.
-    idx = idx - 1
-
-    return k, v
-  end
-end
 
 function pkg.new()
   -- Create a new ordered table with an empty metatable.
@@ -263,6 +196,7 @@ function pkg.copy(t, deep)
   return cpy
 end
 
+pkg.isovtable = true
 
 --- @alias getindex_givekey fun(t: orderedtable, idx: number, give_key_name: true): string, any 
 --- @alias getindex_nogivekey fun(t: orderedtable, idx: number, give_key_name: false | nil): any
@@ -273,6 +207,6 @@ end
 --- @field getindex getindex_givekey | getindex_nogivekey
 --- @field keyindex fun(t: orderedtable, key: string): number | nil, string | nil
 --- @field keyfromindex fun(t: orderedtable, idx: integer): string | nil, string | nil
---- @field revpairs fun(t: orderedtable): fun(): (string, any) | nil
+--- @field isovtable true signal that this is an orderedtable
 
 ovtable = pkg

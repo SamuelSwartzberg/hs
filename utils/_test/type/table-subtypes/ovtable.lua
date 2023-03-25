@@ -94,7 +94,7 @@ local reverse_test_ovtable = ovtable.init({
 
 local indexer = 1
 
-for k, v in test_ovtable:revpairs() do
+for k, v in revpairs(ovtable) do
   assertMessage(
     reverse_test_ovtable:keyindex(k),
     indexer

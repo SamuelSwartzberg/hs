@@ -72,7 +72,7 @@ assertMessage(
 )
 
 assertMessage(
-  getEmptyResult({1, 2, 3}, {}).revpairs,
+  getEmptyResult({1, 2, 3}, {}).isovtable,
   nil
 )
 
@@ -87,14 +87,13 @@ assertMessage(
 )
 
 assertMessage(
-  getEmptyResult(ovtable.init({{"foo", "bar"}}), {noovtable = false}).revpairs,
-  ovtable.revpairs
+  getEmptyResult(ovtable.init({{"foo", "bar"}}), {noovtable = false}).isovtable,
+  true
 )
 
 assertMessage(
   getArgs(
-    "key",
-    "val",
+    {k = "key", v = "val"},
     {
       args = {"k"},
     }
@@ -104,8 +103,7 @@ assertMessage(
 
 assertMessage(
   getArgs(
-    "key",
-    "val",
+    {k = "key", v = "val"},
     {
       args = {"v"},
     }
@@ -115,8 +113,7 @@ assertMessage(
 
 assertMessage(
   getArgs(
-    "key",
-    "val",
+    {k = "key", v = "val"},
     {
       args = {"k", "v", "k", "k", "v", "v"},
     }

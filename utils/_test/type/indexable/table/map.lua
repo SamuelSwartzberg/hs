@@ -236,15 +236,15 @@ tmpovtable.c = 3
 local mappedtable = map(tmpovtable, returnSame, { noovtable = true })
 
 assertMessage(
-  mappedtable.revpairs,
+  mappedtable.isovtable,
   nil
 )
 
 local mappedovtable = map(tmpovtable, returnSame, { noovtable = false })
 
 assertMessage(
-  mappedovtable.revpairs,
-  ovtable.revpairs
+  mappedovtable.isovtable,
+  true
 )
 
 -- todo: if this test errors, maybe it only works with ovtables?

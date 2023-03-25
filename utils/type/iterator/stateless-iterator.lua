@@ -1,27 +1,70 @@
+
 -- sliceable ipairs & revipairs
 
-function ipairs(tbl, start, stop)
+-- TODO: not fully tested yet
+-- TODO: move to different file
+--- ipairs dropin replacement that supports start/stop/step and works with any indexable
+--- @param thing indexable
+--- @param start? integer
+--- @param stop? integer
+--- @param step? integer
+--- @return function, indexable, integer
+function ipairs(thing, start, stop, step)
   start = start or 1
-  stop = stop or #tbl
+  stop = stop or len(thing)
+  step = step or 1
   local i = start - 1
   return function()
-    i = i + 1
+    i = i + step
     if i <= stop then
-      return i, tbl[i]
+      return i, elemAt(thing, i)
     end
-  end, tbl, start
+  end, thing, start
 end
 
-function revipairs(tbl, stop, start)
-  start = start or #tbl
-  stop = stop or 1
-  local i = start + 1
+-- TODO: not fully tested yet
+--- @param thing indexable
+--- @param start? integer
+--- @param stop? integer
+--- @param step? integer
+--- @return function, indexable, integer
+function revipairs(thing, start, stop, step)
+  if step and step > 0 then
+    step = -step
+  end
+  return ipairs(thing, start or len(thing), stop or 1, step or -1)
+end
+
+-- TODO: not tested yet
+--- pairs dropin replacement that is ordered by default, supports start/stop/step and works with any indexable
+--- difference from ipairs is that it returns the key instead of the index
+--- in case of a list/string, the key is the index, so it's the same as ipairs
+--- @param thing indexable
+--- @param start? integer
+--- @param stop? integer
+--- @param step? integer
+--- @return function, indexable, integer
+function pairs(thing, start, stop, step)
+  local iter, tbl, state = ipairs(thing, start, stop, step)
   return function()
-    i = i - 1
-    if i >= stop then
-      return i, tbl[i]
+    local i, v = iter(tbl, state)
+    if i then
+      return table.unpack(elemAt(thing, i, "kv"))
     end
-  end, tbl, start
+  end, tbl, state
+end
+
+-- TODO: not tested yet
+--- @param thing indexable
+--- @param start? integer
+--- @param stop? integer
+--- @param step? integer
+--- @return function, indexable, integer
+function revpairs(thing, start, stop, step)
+  if step and step > 0 then
+    step = -step
+  end
+  return pairs(thing, start or len(thing), stop or 1, step or -1)
 end
 
 --- @param opts? tableProcOpts | kvmult

@@ -5,10 +5,20 @@
 ---@return any
 function elemAt(thing, ind, ret)
   if type(thing) == "string" then
-    return eutf8.sub(thing, ind, ind)
+    local value = eutf8.sub(thing, ind, ind)
+    if ret == "kv" then
+      return {ind, value}
+    else
+      return value
+    end
   elseif type(thing) == "table" then
     if isListOrEmptyTable(thing) then
-      return thing[ind]
+      local value = thing[ind]
+      if ret == "kv" then
+        return {ind, value}
+      else
+        return value
+      end
     else
       if thing.getindex then
         if ret == "kv" then

@@ -11,8 +11,6 @@
 --- @param retdefault? kvmult
 --- @return table
 function defaultOpts(opts, retdefault)
-  if not opts then opts = {ret = "boolean"} 
-  elseif type(opts) == "table" and not isListOrEmptyTable(opts) and not opts.ret then opts.ret = "boolean" end
   if type(opts) == "string" then
     opts = {args = opts, ret = opts}
   elseif isListOrEmptyTable(opts) then
@@ -42,6 +40,7 @@ end
 --- @return function
 function getIterator(thing, opts)
   local iter
+  inspPrint(opts)
   if isListOrEmptyTable(thing) then
     if opts.last then 
       iter = function(tbl) return revipairs(tbl, opts.start, opts.stop) end
@@ -49,19 +48,24 @@ function getIterator(thing, opts)
       iter = function(tbl) return ipairs(tbl, opts.start, opts.stop) end 
     end
   else
-    -- this would be the place to implement start/stop for non-lists, but that would be a lot of work, so for now, it's not supported
+    -- todo: implement start/stop for non-lists. Maybe it would be easier just to implement ipairs/revipairs polymorphically?
+    if opts.start or opts.stop then
+      error("start/stop not implemented for non-lists")
+    end
     if opts.last then  iter=  function(tbl) return tbl:revpairs() end 
     else iter = pairs end
   end
   return wdefarg(iter)
 end
 
+--- @alias retriever {k: any, v: any, i: integer}
+
 --- TODO: no tests yet
 --- @param thing indexable
 --- @param k any
 --- @param v any
 --- @param manual_counter integer
---- @return {k: any, v: any, i: integer}, integer
+--- @return retriever, integer
 function getRetriever(thing, k, v, manual_counter)
   manual_counter = manual_counter + 1
   return {
@@ -87,15 +91,10 @@ function getEmptyResult(thing, opts)
   end
 end
 
---- @param k any
---- @param v any
+--- @param retriever retriever
 --- @param opts table
 --- @return any
-function getArgs(k, v, opts)
-  local retriever = {
-    k = k,
-    v = v
-  }
+function getArgs(retriever, opts)
   local args = {}
   for _, arg in ipairs(opts.args) do
     table.insert(args, retriever[arg])
@@ -128,6 +127,7 @@ end
 --- @param itemres any[] really should be [any, any], but lua type annotations don't support that
 function addToRes(itemres,res,opts,k,v)
   local mapped_useas = {}
+  inspPrint(opts)
   for index, ret in ipairs(opts.ret) do
     mapped_useas[ret] = index
   end
@@ -155,6 +155,8 @@ function addToRes(itemres,res,opts,k,v)
   return res -- typically, this is not needed, but it's here if needed, mainly in tests
 end
 
+--- TODO: no tests yet
+--- TODO: move to different file
 --- @param thing indexable
 --- @param k string|integer
 --- @param manual_counter? integer

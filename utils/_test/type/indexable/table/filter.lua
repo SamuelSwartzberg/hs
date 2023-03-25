@@ -14,16 +14,24 @@ assertMessage(
 )
 
 assertMessage(
-  filter(a_to_t, isEven, {"k", "v"}),
+  filter(a_to_t, isEven, {args = "k", tolist = true}),
   { "b", "d", "f", "h", "j", "l", "n", "p", "r", "t" }
 )
 
 assertMessage(
-  filter(a_to_t, isEven, {
-    args = "k",
-    ret = "k"
-  }),
-  { "b", "d", "f", "h", "j", "l", "n", "p", "r", "t" }
+  filter(a_to_t, isEven, {"k"}),
+  {
+    [2] = "b",
+    [4] = "d",
+    [6] = "f",
+    [8] = "h",
+    [10] = "j",
+    [12] = "l",
+    [14] = "n",
+    [16] = "p",
+    [18] = "r",
+    [20] = "t"
+  }
 )
 
 local sometable = ovtable.new()
@@ -87,7 +95,7 @@ assertMessage(
 )
 
 assertMessage(
-  noov_filtered.revpairs,
+  noov_filtered.isovtable,
   nil
 )
 -- conditions
