@@ -6,7 +6,6 @@
 --- @param step? integer
 --- @return function, indexable, integer
 function iprs(thing, start, stop, step)
-  preventInfiniteLoop("iprs", 1000)
   local len_thing = len(thing)
   if len_thing == 0 then
     return function() end, thing, 0

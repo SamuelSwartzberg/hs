@@ -1,4 +1,4 @@
----@alias indexable string|any[]|orderedtable
+---@alias indexable string|any[]|table|orderedtable
 
 --- @class sliceSpec
 --- @field start? integer|conditionSpec inclusive (both when positive, negative and for any conditionSpec). Default 1
@@ -48,12 +48,14 @@ function slice(thing, start_or_spec, stop, step)
     spec.stop = find(thing, spec.stop, {ret = "k", start = spec.start, last = spec.last_stop})
   end
 
+  local is_assoc = type(thing) == "table" and not isListOrEmptyTable(thing)
+
 
 
   -- implement various functions polymorphically depending on the type of thing
 
-  local new_thing = getEmptyResult(thing, {})
-  
+  local new_thing = getEmptyResult(thing)
+  inspPrint(new_thing.isovtable)
 
   -- set defaults
 
@@ -93,7 +95,8 @@ function slice(thing, start_or_spec, stop, step)
   -- build the slice
   
   for i = spec.start, spec.stop, spec.step do
-    new_thing = append(new_thing, elemAt(thing, i, "kv"))
+    inspPrint(new_thing)
+    new_thing = append(new_thing, elemAt(thing, i, is_assoc and "kv"))
   end
 
   if spec.fill then

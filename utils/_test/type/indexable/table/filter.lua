@@ -99,19 +99,27 @@ assertMessage(
   nil
 )
 -- conditions
-
 assertMessage(
   filter(
     list_with_various_strings,
-    { _contains = "..."}
-  )
+    { _contains = "..." },
+    {tolist = true}
+  ),
   {"Omae wa mou...", "...shindeiru"}
+)
+assertMessage(
+  filter(
+    list_with_various_strings,
+    { _contains = "..." }
+  ),
+  {[5] = "Omae wa mou...", [6] = "...shindeiru"}
 )
 
 assertMessage(
   filter(
     list_with_various_strings,
-    { _r = " \\w+ " }
+    { _r = " \\w+ " },
+    {tolist = true}
   ),
   {
     "Kore ha kore de oishii",
@@ -123,7 +131,8 @@ assertMessage(
 assertMessage(
   filter(
     list_with_various_strings,
-    { _type = "number" }
+    { _type = "number" },
+    {tolist = true}
   ),
   {738}
 )

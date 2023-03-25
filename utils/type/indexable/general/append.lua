@@ -1,5 +1,6 @@
 ---@class appendOpts
 ---@field nooverwrite? boolean only relevant for assoc arrs or lists treated as assoc arrs, if true, will not overwrite existing values
+---@field aspair? boolean add the addition as a pair to the base, even if the base is a list
 
 ---add a single element to an indexable. If the is a string or list, the addition may be of any type and will simply be appended. If the base is an assoc arr, the addition must be a pair, and will be added to the base as a key-value pair.
 ---@generic T : indexable
@@ -16,7 +17,8 @@ function append(base, addition, opts)
   elseif type(base) == "table" then
     local new_thing = copy(base) 
     if addition == nil then return new_thing end
-    if isListOrEmptyTable(base) then
+    if isListOrEmptyTable(base) and not opts.aspair then
+      print("islist")
       new_thing[#new_thing + 1] = addition
       return new_thing
     else
