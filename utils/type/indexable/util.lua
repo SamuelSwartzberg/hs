@@ -116,12 +116,13 @@ end
 
 --- @param itemres any[] really should be [any, any], but lua type annotations don't support that
 function addToRes(itemres,res,opts,k,v)
+  print("addtores")
   local mapped_useas = {}
   inspPrint(opts)
   for index, ret in iprs(opts.ret) do
     mapped_useas[ret] = index
   end
-
+  inspPrint(itemres)
   inspPrint(mapped_useas)
 
   local newkey
@@ -133,6 +134,8 @@ function addToRes(itemres,res,opts,k,v)
   -- explanation: We want to be able to return nil in our processor (that feeds into itemres) and have that be the key/value in the result, so that we can delete things via map() and similar funcs. But we also want to be able to specify that we want to use the original key/value in the result.
   inspPrint(newkey)
   inspPrint(newval)
+  print(k)
+  
   if newkey == false or opts.tolist then -- use false as a key to indicate to push to array instead
     table.insert(res, newval)
   else

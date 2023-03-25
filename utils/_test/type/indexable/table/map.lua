@@ -9,12 +9,26 @@ assertMessage(
 )
 
 assertMessage(
-  map({ { foo = 1 }, {notfoo = 2} }, { foo = 3 }, { _k = "foo" }),
-  { 1, nil, 3 }
+  map(
+    { 
+      { foo = 1 }, 
+      {notfoo = 2} , 
+      { foo = 3 } 
+    }, 
+    { _k = "foo" }
+  ),
+  { 1, [3] = 3 }
 )
 
 assertMessage(
-  map({ { foo = 1 }, {notfoo = 2} }, { foo = 3 }, { _k = "foo", _ret = "orig" }),
+  map(
+    { 
+      { foo = 1 }, 
+      {notfoo = 2} , 
+      { foo = 3 }
+    }, 
+    { _k = "foo", _ret = "orig" }
+  ),
   { 1, {notfoo = 2}, 3 }
 )
 
@@ -53,16 +67,16 @@ assertMessage(
 
 assertMessage(
   map({ 1, 2, 3, 4, 5 }, returnAdd1,  { start = 2, stop = 4 }),
-  { 3, 4, 5 }
+  { nil, 3, 4, 5 }
 )
 
 local ov1_5 = ovtable.new()
 
-ovtable.a = 1
-ovtable.b = 2
-ovtable.c = 3
-ovtable.d = 4
-ovtable.e = 5
+ov1_5.a = 1
+ov1_5.b = 2
+ov1_5.c = 3
+ov1_5.d = 4
+ov1_5.e = 5
 
 assertMessage(
   map(ov1_5, returnAdd1,  { start = 2, stop = 4 }),
