@@ -14,7 +14,7 @@ assertMessage(
 )
 
 assertMessage(
-  listMedian({-27, 5, 1, 8, 9, 22}, nil, "upper"),
+  listMedian({-27, 5, 1, 8, 9, 22}, nil, "higher"),
   8
 )
 

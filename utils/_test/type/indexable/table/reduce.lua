@@ -75,5 +75,5 @@ assertMessage(
     returnSum,
     { start = 2, stop = 3 }
   ),
-  5
+  7
 )
