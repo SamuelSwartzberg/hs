@@ -302,11 +302,11 @@ local tblwithduplicatevalues = {
 }
 
 assertMessage(
-  map(tblwithduplicatevalues, returnSame, { arg = "k", ret = "v" }),
-  { d = "a", e = "b", f = "c" }
+  map(tblwithduplicatevalues, returnAny, { args = "kv", ret = "vk" }),
+  { a = "d" , b = "e", c = "f" }
 )
 
 assertMessage(
-  map(tblwithduplicatevalues, returnSame, { arg = "k", ret = "v", nooverwrite = true }),
+  map(tblwithduplicatevalues, returnAny, { args = "kv", ret = "vk",  nooverwrite = true }),
   { a = "a", b = "b", c = "c" }
 )

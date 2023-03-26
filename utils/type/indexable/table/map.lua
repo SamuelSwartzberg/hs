@@ -110,7 +110,9 @@ function map(tbl, f, opts)
       else
         local retriever
         retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)
+        print('args')
         local args = getArgs(retriever, opts)
+        inspPrint(args)
         local tempres = {f(table.unpack(args))}
         print("tempres")
         inspPrint(tempres)
