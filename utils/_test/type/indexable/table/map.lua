@@ -162,6 +162,7 @@ assertMessage(
         i = "blue",
       }
     },
+    e = {} -- this happens because it recurses into the table, but then none of its pairs match the condition. It would be trivial to test for recursive calls returning an empty table and not adding it to the result, but I'm not sure if that's the right thing to do. Let's leave this for now, and keep an eye on it.
   }
 )
 
@@ -224,10 +225,46 @@ assertMessage(
 )
 
 assertMessage(
-  map({ 1, 2 , 3}, function(item) return false, {item, item + 1} end, {
-    args = "k",
+  map({ a = 1, b = 2 , c = 3}, function(item) return false, {item, item + 1} end, {
+    args = "v",
     ret = "kv",
+  }),
+  {{1, 2}, {2, 3}, {3, 4}}
+)
+
+print("START")
+
+assertMessage(
+  map({ {1}, {2}, {3}}, returnSame, {
+    flatten = true,
+    tolist = true
+  }),
+  {1, 2, 3}
+)
+
+assertMessage(
+  map({ {1}, {2}, {3}}, returnSame, {
+    flatten = true,
+  }),
+  {3} -- without tolist, this is the intended behavior, but it's not very intuitive. Consider changing this.
+)
+
+assertMessage(
+  map({ 2, 5 , 8}, function(item) return {item, item + 1} end, {
+    args = "k",
+    ret = "v",
     flatten = true
+  }),
+  {3, 4} -- see above tolist comment
+)
+
+
+assertMessage(
+  map({ 2, 5, 8}, function(item) return {item, item + 1} end, {
+    args = "k",
+    ret = "v",
+    flatten = true,
+    tolist = true
   }),
   {1, 2, 2, 3, 3, 4}
 )

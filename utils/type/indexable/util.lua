@@ -116,34 +116,45 @@ end
 
 --- @param itemres any[] really should be [any, any], but lua type annotations don't support that
 function addToRes(itemres,res,opts,k,v)
-  print("addtores")
   local mapped_useas = {}
-  inspPrint(opts)
   for index, ret in iprs(opts.ret) do
     mapped_useas[ret] = index
   end
+  print("itemres")
   inspPrint(itemres)
+  print("mapped_useas")
   inspPrint(mapped_useas)
 
   local newkey
-  if mapped_useas.k then newkey = itemres[mapped_useas.k] -- if I have specified an index of the output (itemres) to be the key, use that, even if the value retrieved is nil
+  if mapped_useas.k ~= nil then newkey = itemres[mapped_useas.k] -- if I have specified an index of the output (itemres) to be the key, use that, even if the value retrieved is nil
   else newkey = k end -- otherwise, use the original key
   local newval
-  if mapped_useas.v then newval = itemres[mapped_useas.v] -- ditto for value
+  if mapped_useas.v ~= nil then newval = itemres[mapped_useas.v] -- ditto for value
   else newval = v end 
   -- explanation: We want to be able to return nil in our processor (that feeds into itemres) and have that be the key/value in the result, so that we can delete things via map() and similar funcs. But we also want to be able to specify that we want to use the original key/value in the result.
-  inspPrint(newkey)
-  inspPrint(newval)
-  print(k)
-  
-  if newkey == false or opts.tolist then -- use false as a key to indicate to push to array instead
-    table.insert(res, newval)
-  else
-    if not (opts.nooverwrite and res[newkey]) then
-      if newkey ~= nil then 
-        res[newkey] = newval
-      end -- else no-op, don't add nil keys
+
+  if opts.flatten and type(newval) == "table" then
+    for resk, resv in prs(newval) do
+      local optcopy = copy(opts)
+      optcopy.ret = {"k", "v"}
+      addToRes({resk, resv}, res, optcopy)
+      
     end
+  else
+    print("addToRes, newkey:")
+    inspPrint(newkey)
+    print("addToRes, newval:")
+    inspPrint(newval)
+    if newkey == false or opts.tolist then -- use false as a key to indicate to push to array instead
+      table.insert(res, newval)
+    else
+      if not (opts.nooverwrite and res[newkey]) then
+        if newkey ~= nil then 
+          res[newkey] = newval
+        end -- else no-op, don't add nil keys
+      end
+    end
+   
   end
   return res -- typically, this is not needed, but it's here if needed, mainly in tests
 end

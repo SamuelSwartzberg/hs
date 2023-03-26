@@ -25,7 +25,6 @@
 --- @return table
 function map(tbl, f, opts)
 
-  inspPrint(tbl)
   f = f or returnAny
   opts = defaultOpts(opts)
   tbl = getDefaultInput(tbl)
@@ -40,19 +39,17 @@ function map(tbl, f, opts)
   local isLeaf = getIsLeaf(opts.treat_as_leaf)
 
   -- process non-function f into function f
+  local proc = f -- proc will contain the mapProcessor, while f will be changed to a function based on the mapProcessor
 
   if type(f) == "table" then
-    local tblproc = f
     if f._k or f._f then 
       if f._k then
         if type(f._k) == "string" then
           f = function(arg)
-            print("hello")
-            if type(arg) == "table" and arg[tblproc._k] ~=nil then
-              return arg[tblproc._k]
+            if type(arg) == "table" and arg[proc._k] ~=nil then
+              return arg[proc._k]
             else
-              if tblproc._ret == "orig" then
-                print("reting arg")
+              if proc._ret == "orig" then
                 return arg
               else
                 return nil
@@ -63,12 +60,12 @@ function map(tbl, f, opts)
           f = function(arg)
             if type(arg) == "table" then
               local res = {}
-              for _, k in iprs(tblproc._k) do
+              for _, k in iprs(proc._k) do
                 table.insert(res, arg[k])
               end
               return res
             else
-              return tblproc._ret == "orig" and arg or nil
+              return proc._ret == "orig" and arg or nil
             end
           end
         end
@@ -80,7 +77,7 @@ function map(tbl, f, opts)
       end
     else
       f = function(arg)
-        return tblproc[arg]
+        return proc[arg]
       end
     end
   elseif type(f) == "string" then
@@ -95,46 +92,40 @@ function map(tbl, f, opts)
   local iterator = getIterator(opts)
   local res = getEmptyResult(tbl, opts)
 
+  print("tbl")
   inspPrint(tbl)
 
   local manual_counter = 0
   for k, v in wdefarg(iterator)(tbl) do
-    print("k")
-    inspPrint(k)
-    inspPrint(res)
     if not opts.mapcondition or findsingle(v, opts.mapcondition) then
-      print("depth: " .. opts.depth)
-      print("recurse: " .. tostring(opts.recurse))
-      if opts.depth > 100 then
-        error("map: depth exceeded 100")
-      end
-      if shouldRecurse(opts) and not (type(v) ~= "table" or isLeaf(v)) then
-        addToRes({k, map(v, f, opts)}, res, opts, k, v)
+      if 
+        shouldRecurse(opts) and 
+        not (type(v) ~= "table" or isLeaf(v)) and
+        (not proc._k or not v[proc._k]) -- if we're using a _k mapProcessor, we don't want to recurse into the table if it has the key we're looking for
+      then
+        print("recursing...")
+        local optcopy = copy(opts)
+        optcopy.ret = {"v"} -- when recursing, the recursive call is going to return a single value, which represents the new value of our current key, so we have to overwrite .ret here. Maybe there's a cleaner option that allows for more flexibility, but I can't think of one right now, let's see how this works out
+        addToRes({map(v, proc, opts)}, res, optcopy, k, v)
       else
         local retriever
         retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)
         local args = getArgs(retriever, opts)
-        inspPrint(args)
         local tempres = {f(table.unpack(args))}
         print("tempres")
         inspPrint(tempres)
-        print("v")
-        inspPrint(v)
-        if opts.flatten and type(tempres[1]) == "table" then -- flatten is enabled, and we've returned an element we want to flatten
-          for resk, resv in prs(tempres) do
-            addToRes({resk,resv}, res, opts, k, v)
-          end
-        else
-          addToRes(tempres, res, opts, k, v)
-          
-        end
+        addToRes(tempres, res, opts, k, v)
       end
     else
-      addToRes({k, v}, res, opts, k, v)
+      local optcopy = copy(opts)
+      optcopy.ret = {} -- if we're not mapping the value, there's are no returned values to use. this way, addToRes will default to k, v.
+      addToRes({}, res, optcopy, k, v)
     end
 
-  
+    print("res after iteration")
+    inspPrint(res)
   end
 
+  
   return res
 end
