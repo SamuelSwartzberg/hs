@@ -232,7 +232,6 @@ assertMessage(
   {{1, 2}, {2, 3}, {3, 4}}
 )
 
-print("START")
 
 assertMessage(
   map({ {1}, {2}, {3}}, returnSame, {

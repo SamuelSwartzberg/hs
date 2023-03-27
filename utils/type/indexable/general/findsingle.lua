@@ -68,7 +68,6 @@ function findsingle(item, conditions, opts)
   end
 
   for _, condition in wdefarg(iprs)(conditions) do 
-
     -- process shorthand conditions into full conditions
 
     if type(condition) == "boolean" then
@@ -123,9 +122,14 @@ function findsingle(item, conditions, opts)
       if condition._r or condition._start or condition._stop then
         if type(item) == "string" then
           if condition._r ~= nil then -- regex
+            print(condition._regex_engine)
             condition._regex_engine = condition._regex_engine or "onig"
             local slice_lib = _G[condition._regex_engine] == "onig" and string or eutf8
+            inspPrint(_G[condition._regex_engine])
+            print(start)
             local mstart, mstop = _G[condition._regex_engine].find(item, condition._r, start, condition._ignore_case and "i" or nil)
+            print(mstart)
+            print(mstop)
             local match = mstart ~= nil
             local matched 
             if match then

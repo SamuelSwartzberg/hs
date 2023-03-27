@@ -35,7 +35,6 @@ assertMessage(t6_result, {"contains_a", "contains_a", "contains_a", "dog", "cont
 -- Test 7: Replace with a function processor
 local t7 = {"apple", "banana", "carrot", "dog", "elephant"}
 local t7_result = replace(t7, {cond = "banana", mode = "replace", proc = function(v) 
-    inspPrint(v);
     return v:upper() end})
 assertMessage(t7_result, {"apple", "BANANA", "carrot", "dog", "elephant"}) 
 

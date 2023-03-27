@@ -49,6 +49,7 @@ function find(indexable, cond, opts)
     local iters = 0
     finalres = {}
     while true do
+      
       iters = iters + 1
       if opts.limit and iters > opts.limit then break end
       preventInfiniteLoop(json.encode(indexable), 100)
@@ -61,6 +62,7 @@ function find(indexable, cond, opts)
         v = matchvalue,
         i = getIndex(indexable, matchkey + index_accum)
       }
+      inspPrint(retriever)
       for _, retarg in iprs(opts.ret) do 
         push(res, retriever[retarg])
       end

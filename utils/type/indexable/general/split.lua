@@ -11,6 +11,8 @@
 --- @return T[], T[]?
 function split(thing, sep, opts)
   opts = copy(opts) or {}
+  inspPrint(thing)
+  inspPrint(sep)
   local splintervals = find(
     thing,
     sep,
@@ -20,6 +22,7 @@ function split(thing, sep, opts)
       limit = opts.limit
     }, opts.findopts)
   )
+
 
   if len(splintervals) == 0 then
     return {thing}
