@@ -122,7 +122,7 @@ assertMessage(
 assertMessage(
   find(
     "foo",
-    {_r = "^."},
+    {_r = "."},
     {
       ret = "iv",
       findall = true,

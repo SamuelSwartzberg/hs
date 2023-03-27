@@ -49,8 +49,11 @@ function find(indexable, cond, opts)
     local matchkey, matchvalue
     local rest = indexable
     local index_accum = 0
+    local iters = 0
     finalres = {}
     while true do
+      iters = iters + 1
+      if opts.limit and iters > opts.limit then break end
       preventInfiniteLoop(json.encode(indexable), 100)
       matchkey, matchvalue = findsingle(rest, cond, {
         ret = "kv"

@@ -69,7 +69,7 @@ end
 --- @param limit? integer
 --- @return function, indexable, integer
 function revprs(thing, start, stop, step, limit)
-  return prs(thing, start, stop, step and -math.abs(step) or -1)
+  return prs(thing, start, stop, step and -math.abs(step) or -1, limit)
 end
 
 --- @param opts? tableProcOpts | kvmult
