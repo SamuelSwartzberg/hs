@@ -82,7 +82,7 @@ function yamlDumpAligned(tbl)
     mode = "assoc",
     val = {"valuestop", "keystop"},
   })
-  local valuestop = reduce(map(values(stops), {_k = "valuestop"}))
-  local keystop = reduce(map(values(stops), {_k = "keystop"}))
+  local valuestop = reduce(map(stops, {_k = "valuestop"}, {tolist = true}))
+  local keystop = reduce(map(stops, {_k = "keystop"}, {tolist = true}))
   return table.concat(yamlDumpAlignedInner(tbl, keystop, valuestop, 0), "\n")
 end

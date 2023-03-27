@@ -158,3 +158,5 @@ assertMessage(
   select(2, returnUnpackIfTable({ "foo", "bar" })),
   "bar"
 )
+
+error("stop")

@@ -10,7 +10,7 @@ function reduce(tbl, reducer, opts)
 
   -- defaults for all args
 
-  reducer = reducer or returnLarger
+  reducer = reducer or returnLargerItem
   opts = defaultOpts(opts)
   tbl = getDefaultInput(tbl)
 
@@ -22,6 +22,7 @@ function reduce(tbl, reducer, opts)
   local acc = opts.init
   local manual_counter = 0
   for k, v in iterator(tbl) do
+    inspPrint(acc)
     local retriever
     retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)
     local args = getArgs(retriever, opts)

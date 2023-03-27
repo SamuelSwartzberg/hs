@@ -22,3 +22,4 @@ assertMessage(
   defaultIfNil(false, 2),
   false
 )
+

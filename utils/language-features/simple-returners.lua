@@ -89,6 +89,18 @@ function returnLarger(a, b)
   return a > b
 end
 
+--- @generic T, U
+--- @param a T
+--- @param b U
+--- @return T | U
+function returnLargerItem(a, b)
+  if a > b then
+    return a
+  else
+    return b
+  end
+end
+
 --- @param a any
 --- @param b any
 --- @return boolean
