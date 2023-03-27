@@ -3,7 +3,7 @@ ArrayOfPathLeafsSpecifier = {
   type = "array-of-path-leafs",
   properties = {
     getables = {
-      ["is-array-of-path-leaf-dates"] = bind(isArrayOfInterfacesOfType, { ["2"] = "path-leaf-date" }),
+      ["is-array-of-path-leaf-dates"] = bind(isArrayOfInterfacesOfType, {a_use, "path-leaf-date" }),
     
     },
     doThisables = {

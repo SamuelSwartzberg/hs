@@ -1,43 +1,41 @@
-arg_ignore = math.random(20)
+a_ig = math.random(20)
+a_use = math.random(20)
 
 --- binds arguments to a function
---- may also bind arguments to arg_ignore, which will cause the function to ignore that argument
 --- @param func function
---- @param arg_spec { [string]: any } | any each key is an index representing where to start binding the arguments, each value is a list of arguments to bind to the args starting at that index (or the shorthand of a single argument). There is also a shorthand available, where if arg_spec is not an assoc arr, it will be treated as if it were { ["1"] = arg_spec }.
+--- @param arg_spec any | any[]
+--- @param ignore_spec? any | any[]
 --- @return function
-function bind(func, arg_spec)
+function bind(func, arg_spec, ignore_spec)
 
   -- handle shorthand
-  if type(arg_spec) == "table" and not isListOrEmptyTable(arg_spec) then
-    -- no-op
-  else 
-    arg_spec = { ["1"] = arg_spec }
+  if not isListOrEmptyTable(arg_spec) then
+    arg_spec = { arg_spec }
   end
-
+  if not isListOrEmptyTable(ignore_spec) then
+    ignore_spec = { ignore_spec }
+  end
+  
   -- initialize inner_func to the original function
-  local inner_func = func
-
-  for index, arg_list in prs(arg_spec) do -- for all arg_lists to bind
-    local int_index = toNumber(index, "int", "fail")
-    if arg_list == arg_ignore then -- ignore this argument
-      inner_func = function(...)
-        local args = {...}
-        local new_args = concat( -- create new list of args without the ignored arg
-          slice(args, 1, int_index - 1), -- all args before the index
-          slice(args, int_index + 1, #args) -- all args after the index
-        )
-        return func(table.unpack(new_args)) -- call the original function with the new args
-      end
-    else -- bind this argument
-      if not isListOrEmptyTable(arg_list) then -- handle shorthand
-        arg_list = { arg_list }
-      end
-      inner_func = function(...)
-        local args = {...}
-        local new_args = splice(args, arg_list, int_index) -- splice the arg_list into the args at the index
-        return inner_func(table.unpack(new_args))
+  local inner_func = function(...)
+    local args = {...}
+    for index, arg in iprs(ignore_spec) do
+      if arg == a_ig then
+        table.remove(args, 1)
       end
     end
+    local new_args = {}
+    for index, arg in iprs(arg_spec) do -- for all arg_lists to bind
+      if arg == a_use then
+        new_args[index] = table.remove(args, 1)
+      else
+        new_args[index] = arg
+      end
+    end
+    for _, arg in iprs(args) do -- for all remaining args
+      table.insert(new_args, arg)
+    end
+    return func(table.unpack(new_args))
   end
 
   return inner_func

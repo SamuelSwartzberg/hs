@@ -43,7 +43,7 @@ ArrayOfInterfacesSpecifier = {
         end)
       end,
       ["sorted-to-new-array-default"] = function(self) return self:get("sorted-to-string-to-new-array") end,
-      ["is-array-of-arrays"] = bind(isArrayOfInterfacesOfType, { ["2"] = "array" }),
+      ["is-array-of-arrays"] = bind(isArrayOfInterfacesOfType, {a_use, "array" }),
       ["is-array-of-non-array-interfaces"] = function(self)
         return not self:get("is-array-of-arrays")
       end,

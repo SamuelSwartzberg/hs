@@ -3,7 +3,7 @@ ArrayOfFilesSpecifier = {
   type = "array-of-files",
   properties = {
     getables = {
-      ["is-array-of-plaintext-files"] = bind(isArrayOfInterfacesOfType, { ["2"] = "plaintext-file" }),
+      ["is-array-of-plaintext-files"] = bind(isArrayOfInterfacesOfType, {a_use, "plaintext-file" }),
       ["map-to-array-of-contents"] = function(self)
         return self:get("map-to-new-array", function(item)
           return item:get("file-contents")

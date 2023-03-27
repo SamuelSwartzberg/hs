@@ -6,7 +6,7 @@ ArrayOfNonEmptyTablesSpecifier = {
       ["flatten-to-single-table"] = function(self)
         return CreateTable(concat(table.unpack(self:get("map-to-table-of-contents"))))
       end,
-      ["is-array-of-shrink-specifier-tables"] = bind(isArrayOfInterfacesOfType, { ["2"] = "shrink-specifier-table" }),
+      ["is-array-of-shrink-specifier-tables"] = bind(isArrayOfInterfacesOfType, {a_use, "shrink-specifier-table" }),
     },
     doThisables = { },
   },

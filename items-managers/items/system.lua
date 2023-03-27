@@ -25,7 +25,7 @@ SystemSpecifier = {
           values(
             hs.audiodevice["all" .. replace(subtype, to.case.capitalized) .. "Devices"]()
           ),
-          bind(CreateAudiodeviceItem, {["2"] = subtype })
+          bind(CreateAudiodeviceItem, {{a_use,  = subtype })
         ))
       end,
       ["all-output-devices-audiodevice-array"] = function(self)

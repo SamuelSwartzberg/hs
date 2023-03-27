@@ -228,17 +228,17 @@ InterfaceDefaultTemplate = {
         end)
       end,
       ["str-item"] = bind(
-        getThenUse, {["3"] = function (_, contents)
+        getThenUse, {a_use, a_use, function (_, contents)
           return CreateStringItem(contents)
         end}
       ),
       ["array"] = bind(
-        getThenUse, {["3"] = function (_, contents)
+        getThenUse, {a_use, a_use, function (_, contents)
           return CreateArray(contents)
         end}
       ),
       ["new-array-from-result-of-get"] = bind(
-        getThenUse, {["3"] = function (_, contents)
+        getThenUse, {a_use, a_use, function (_, contents)
           return CreateArray(contents)
         end}
       ),
@@ -289,23 +289,23 @@ InterfaceDefaultTemplate = {
       ["get-as-do"] = function(self, key)
         self:get(key)
       end,
-      ["copy-result-of-get"] = bind(getThenUse, { ["3"] = bind(hs.pasteboard.setContents, {["1"] = arg_ignore})}),
-      ["paste-result-of-get"] = bind(getThenUse, { ["3"] = bind(pasteMultilineString, {["1"] = arg_ignore})}),
-      ["open-result-of-get-in-browser"] = bind(getThenUse, { ["3"] = function(_, thing) open({url=thing}) end}),
-      ["view-result-of-get"] = bind(getThenUse, { ["3"] = bind(hs.alert.show, {["1"] = arg_ignore})}),
-      ["open-result-of-get"] = bind(getThenUse, { ["3"] = bind(open, {["1"] = arg_ignore})}),
-      ["quick-look-result-of-get"] = bind(getThenUse, { ["3"] = bind(hs.alert.show, {["1"] = arg_ignore})}),
-      ["code-quick-look-result-of-get"] = bind(getThenUse, { ["3"] = bind(alert, {["1"] = arg_ignore})}),
-      ["choose-action-on-result-of-get"] = bind(getThenUse, { ["3"] = function(_, item)
+      ["copy-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.pasteboard.setContents, {}, {a_ig})}),
+      ["paste-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(pasteMultilineString, {}, {a_ig})}),
+      ["open-result-of-get-in-browser"] = bind(getThenUse, { a_use, a_use, function(_, thing) open({url=thing}) end}),
+      ["view-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.alert.show, {}, {a_ig})}),
+      ["open-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(open, {}, {a_ig})}),
+      ["quick-look-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.alert.show, {}, {a_ig})}),
+      ["code-quick-look-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(alert, {}, {a_ig})}),
+      ["choose-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
         item:doThis("choose-action")
       end}),
-      ["choose-action-on-str-item-result-of-get"] = bind(getThenUse, { ["3"] = function(_, item)
+      ["choose-action-on-str-item-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
         CreateStringItem(item):doThis("choose-action")
       end}),
-      ["choose-item-and-then-action-on-result-of-get"] = bind(getThenUse, { ["3"] = function(_, item)
+      ["choose-item-and-then-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
         item:doThis("choose-item-and-then-action")
       end}),
-      ["choose-item-or-action-on-result-of-get"] = bind(getThenUse, { ["3"] = function(_, item)
+      ["choose-item-or-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
         item:doThis("choose-item-or-action")
       end}),
       ["repeat-action"] = function(self, specifier)
@@ -350,7 +350,7 @@ InterfaceDefaultTemplate = {
     end
     return nil
   end,
-  get_all = bind(getOrDoAll, {["2"] = "get"}),
+  get_all = bind(getOrDoAll, {{a_use,  = "get"}),
   doThis = function(self, key, value, not_recursive_children, not_recursive_super, previous_lower_node_id)
     if self.properties.doThisables[key] then
       self.properties.doThisables[key](self, value)
@@ -367,7 +367,7 @@ InterfaceDefaultTemplate = {
     end
     return nil
   end,
-  doThis_all = bind(getOrDoAll, {["2"] = "doThis"}),
+  doThis_all = bind(getOrDoAll, {{a_use,  = "doThis"}),
   setContents = function(self, value)
     if not self.super then self.contents = value end
     if self.potential_interfaces then

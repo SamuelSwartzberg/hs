@@ -3,8 +3,8 @@ ArrayOfPrintableAsciiStringItemsSpecifier = {
   type = "array-of-printable-ascii-string-items",
   properties = {
     getables = {
-      ["is-array-of-pass-name-items"] = bind(isArrayOfInterfacesOfType, { ["2"] = "pass-name" }),
-      ["is-array-of-date-related-items"] = bind(isArrayOfInterfacesOfType, { ["2"] = "date-related-item" }),
+      ["is-array-of-pass-name-items"] = bind(isArrayOfInterfacesOfType, {a_use, "pass-name" }),
+      ["is-array-of-date-related-items"] = bind(isArrayOfInterfacesOfType, {a_use, "date-related-item" }),
     },
     doThisables = {
     

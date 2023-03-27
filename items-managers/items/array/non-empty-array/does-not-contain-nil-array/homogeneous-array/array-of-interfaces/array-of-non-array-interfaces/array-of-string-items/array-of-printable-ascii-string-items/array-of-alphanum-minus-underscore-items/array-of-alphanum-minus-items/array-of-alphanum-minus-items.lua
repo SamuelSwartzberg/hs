@@ -3,7 +3,7 @@ ArrayOfAlphanumMinusItemsSpecifier = {
   type = "array-of-alphanum-minus-items",
   properties = {
     getables = {
-      ["is-array-of-uuids"] = bind(isArrayOfInterfacesOfType, { ["2"] = "uuid-item" }),
+      ["is-array-of-uuids"] = bind(isArrayOfInterfacesOfType, {a_use, "uuid-item" }),
       
     },
     doThisables = {

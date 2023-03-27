@@ -171,7 +171,7 @@ function prompt(type, prompt_spec, loop)
   type = type or "string"
   if type == "int" then
     prompt_spec = prompt_spec or {}
-    prompt_spec.transformer = prompt_spec.transformer or bind(toNumber, { ["2"] = "int" })
+    prompt_spec.transformer = prompt_spec.transformer or bind(toNumber, {a_use, "int" })
   elseif type == "number" then
     prompt_spec.transformer = prompt_spec.transformer or tonumber
   elseif type == "string" then

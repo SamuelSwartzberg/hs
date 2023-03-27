@@ -3,7 +3,7 @@ ArrayOfUuidsSpecifier = {
   type = "array-of-uuids",
   properties = {
     getables = {
-      ["is-array-of-contacts"] = bind(isArrayOfInterfacesOfType, { ["2"] = "contact-item" }),
+      ["is-array-of-contacts"] = bind(isArrayOfInterfacesOfType, {a_use, "contact-item" }),
       
     },
     doThisables = {
