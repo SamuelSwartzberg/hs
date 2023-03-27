@@ -67,7 +67,7 @@ local keymap = {
       ):doThis("choose-menu-action")
     end,
   },
-  {a_use,  = {
+  a_use, {
     explanation = "Choose contact and action on that contact (from local vcf files)",
     fn = function()
       CreateShellCommand("khard")

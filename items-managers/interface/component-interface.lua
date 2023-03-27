@@ -350,7 +350,7 @@ InterfaceDefaultTemplate = {
     end
     return nil
   end,
-  get_all = bind(getOrDoAll, {{a_use,  = "get"}),
+  get_all = bind(getOrDoAll, {a_use, "get"}),
   doThis = function(self, key, value, not_recursive_children, not_recursive_super, previous_lower_node_id)
     if self.properties.doThisables[key] then
       self.properties.doThisables[key](self, value)
@@ -367,7 +367,7 @@ InterfaceDefaultTemplate = {
     end
     return nil
   end,
-  doThis_all = bind(getOrDoAll, {{a_use,  = "doThis"}),
+  doThis_all = bind(getOrDoAll, {a_use, "doThis"}),
   setContents = function(self, value)
     if not self.super then self.contents = value end
     if self.potential_interfaces then
