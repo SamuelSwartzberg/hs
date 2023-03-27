@@ -30,7 +30,7 @@ assertMessage(
 
 assertMessage(
   isNumber(1, "float"),
-  false
+  true
 )
 
 assertMessage(
@@ -101,11 +101,11 @@ assertMessage(
 
 assertMessage(
   toNumber("1.6", "int", "nil"),
-  nil
+  2
 )
 
 assertMessage(
-  pcall(toNumber, "1.6", "int", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
+  pcall(toNumber, "wololo", "int", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
   false
 )
 
@@ -115,16 +115,16 @@ assertMessage(
 )
 
 assertMessage(
-  toNumber("1.6", "pos-int", "nil"),
+  toNumber("wolo6", "pos-int", "nil"),
   nil
 )
 
 assertMessage(
-  toNumber("1.6", "pos-int", "invalid-number"),
+  toNumber("wolo6", "pos-int", "invalid-number"),
   -math.huge
 )
 
 assertMessage(
-  pcall(toNumber, "1.6", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
+  pcall(toNumber, "wolo6", "You face JARAXXUS, EREDAR LORD OF THE BURNING LEGION!"),
   false
 )

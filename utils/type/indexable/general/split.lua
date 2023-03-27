@@ -11,8 +11,6 @@
 --- @return T[], T[]?
 function split(thing, sep, opts)
   opts = copy(opts) or {}
-  inspPrint(thing)
-  inspPrint(sep)
   local splintervals = find(
     thing,
     sep,
@@ -23,11 +21,14 @@ function split(thing, sep, opts)
     }, opts.findopts)
   )
 
+  opts.mode = opts.mode or "remove"
 
   if len(splintervals) == 0 then
     return {thing}
   end
 
+  inspPrint(splintervals)
+  print(opts.mode)
 
   local res = {}
   local removed = {}
@@ -52,8 +53,9 @@ function split(thing, sep, opts)
       lastend = lastend - matchlength
     end
     if opts.mode == "remove" then
-      push(removed, {start, slice(thing, start, stop)})
+      push(removed,  slice(thing, start, stop))
     end
+    inspPrint(removed)
   end
 
   local lastfragment = slice(thing, lastend)

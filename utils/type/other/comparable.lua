@@ -43,7 +43,7 @@ function seq(start, stop, step, unit)
   if type(start) == "number" then
     mode = "number"
   elseif type(start) == "table" then
-    if start.addays then
+    if start.adddays then
       mode = "date"
     elseif start.xy then
       mode = "point"
@@ -52,7 +52,9 @@ function seq(start, stop, step, unit)
     mode = "string"
   end
 
-  local addmethod = function(a, b) return a + b end
+  local addmethod = function(a, b) 
+    return a + b 
+  end
 
   if mode == "number" then
     stop = defaultIfNil(stop, 10)

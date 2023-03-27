@@ -79,7 +79,7 @@ function rand(spec, type)
   end
   local randnr = low + math.random()  * (high - low);
   if type == "number" then
-    return randnr
+    return toNumber(randnr, "int", "fail")
   elseif type == "b64" then
     local len = lengthOfInt(randnr)
     return run({

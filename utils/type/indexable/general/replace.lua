@@ -75,8 +75,7 @@ function replace(thing, opts, globalopts)
       splitopts.mode = "remove"
     end
     local parts, removed = split(res, cond, splitopts)
-    removed = map(removed, function(v)
-      local mapk, mapv = table.unpack(v)
+    removed = map(removed, function(mapv)
       if isListOrEmptyTable(mapv) and #mapv == 1 then
         mapv = mapv[1]
       end

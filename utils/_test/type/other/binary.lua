@@ -19,8 +19,8 @@ assertMessage(
 )
 
 assertMessage(
-  InfNo:getBool("nope"),
-  nil
+  pcall(InfNo.getBool, InfNo, "foo"),
+  false
 )
 
 assertMessage(
