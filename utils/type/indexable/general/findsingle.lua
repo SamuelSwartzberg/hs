@@ -42,7 +42,10 @@ function findsingle(item, conditions, opts)
 
   local start = opts.start or 1
   local potentially_sliced_item = item
-  if start > 1 then potentially_sliced_item = slice(item, start) end
+  if start > 1 then 
+    start = math.min(start, len(item) + 1)
+    potentially_sliced_item = slice(item, start) 
+  end
 
   if not isListOrEmptyTable(conditions) then
     conditions = {conditions}
@@ -122,14 +125,14 @@ function findsingle(item, conditions, opts)
       if condition._r or condition._start or condition._stop then
         if type(item) == "string" then
           if condition._r ~= nil then -- regex
-            print(condition._regex_engine)
             condition._regex_engine = condition._regex_engine or "onig"
             local slice_lib = _G[condition._regex_engine] == "onig" and string or eutf8
-            inspPrint(_G[condition._regex_engine])
-            print(start)
-            local mstart, mstop = _G[condition._regex_engine].find(item, condition._r, start, condition._ignore_case and "i" or nil)
-            print(mstart)
-            print(mstop)
+            local mstart, mstop
+            if condition._regex_engine == "onig" then -- extra case because onig allows case-insensitive directly via a flag
+              mstart, mstop = onig.find(item, condition._r, start, condition._ignore_case and "i" or nil)
+            elseif condition._regex_engine == "eutf8" then -- here we have to do it manually. However, our condition needs to be lowercase already, since I can't run lowerIfNecessary on the regex, since that breaks some character class shorthands (%W != %w, etc)
+              mstart, mstop = eutf8.find(item_maybe_nocase, condition._r, start)
+            end
             local match = mstart ~= nil
             local matched 
             if match then
@@ -180,6 +183,9 @@ function findsingle(item, conditions, opts)
       end
       if condition._contains ~= nil then -- contains
         local mstart = toNumber(stringy.find(potentially_sliced_item_maybe_nocase, lowerIfNecessary(condition._contains)), "pos-int", "nil")
+        if start ~= nil and mstart ~= nil then
+          mstart = mstart + start - 1
+        end
         local match = mstart ~= nil
         if condition._only_if_all then
           match = match and #potentially_sliced_item_maybe_nocase == #condition._contains
@@ -192,7 +198,7 @@ function findsingle(item, conditions, opts)
         local list = condition._list or condition
         local match = false
         for _, listitem in iprs(list) do
-          match = potentially_sliced_item_maybe_nocase == lowerIfNecessary(listitem)
+          match = potentially_sliced_item_maybe_nocase == lowerIfNecessary(listitem) -- counts as a match if any of the list items is equal to the item
           if match then
             push(results, getres(match, start, potentially_sliced_item))
             break

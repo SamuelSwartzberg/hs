@@ -44,33 +44,30 @@ function find(indexable, cond, opts)
     end
   else
     local matchkey, matchvalue
-    local rest = indexable
-    local index_accum = 0
+    local start = 1
     local iters = 0
     finalres = {}
     while true do
-      
       iters = iters + 1
       if opts.limit and iters > opts.limit then break end
       preventInfiniteLoop(json.encode(indexable), 100)
-      matchkey, matchvalue = findsingle(rest, cond, {
-        ret = "kv"
+      matchkey, matchvalue = findsingle(indexable, cond, {
+        ret = "kv",
+        start = start
       })
       local res = {}
       local retriever = {
-        k = matchkey + index_accum,
+        k = matchkey,
         v = matchvalue,
-        i = getIndex(indexable, matchkey + index_accum)
+        i = getIndex(indexable, matchkey)
       }
-      inspPrint(retriever)
       for _, retarg in iprs(opts.ret) do 
         push(res, retriever[retarg])
       end
       if opts.findall then
         if matchkey == -1 then break end
         table.insert(finalres, res)
-        index_accum = index_accum + matchkey
-        rest = slice(rest, matchkey + 1)
+        start = matchkey + #matchvalue 
       else
         return table.unpack(res)
       end

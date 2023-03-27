@@ -26,8 +26,10 @@ function replace(thing, opts, globalopts)
   --- allow for tr-like operation with two lists
   if #opts == 2 and isListOrEmptyTable(opts[1]) and isListOrEmptyTable(opts[2]) then
     local resolvedopts = {}
-    for i = 1, #opts[1] do
-      push(resolvedopts, {cond = opts[1][i], proc = opts[2][i]})
+    local lastproc
+    for i = 1, #opts[1], 1 do
+      lastproc = opts[2][i] or lastproc
+      push(resolvedopts, {cond = opts[1][i], proc = lastproc})
     end
     opts = resolvedopts
   end
@@ -42,7 +44,7 @@ function replace(thing, opts, globalopts)
 
   globalopts = globalopts or {}
   local mode, args, ret, cond, proc, findopts, limit = globalopts.mode, globalopts.args, globalopts.ret, globalopts.cond, globalopts.proc, globalopts.findopts, globalopts.limit
-  mode = defaultIfNil(mode, "before")
+  mode = defaultIfNil(mode, "replace")
   cond = defaultIfNil(cond, "\"")
   proc = defaultIfNil(proc, "\\")
 

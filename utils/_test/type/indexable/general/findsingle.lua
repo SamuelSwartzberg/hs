@@ -25,10 +25,47 @@ assertMessage(
 
 assertMessage(
   findsingle(
+    list_with_various_strings[1],
+    { _contains = "kore" },
+    { last = true, ret = "k", start = 3}
+  ),
+  9
+)
+
+assertMessage(
+  findsingle(
+    list_with_various_strings[1],
+    { _contains = "kore" },
+    { last = true, ret = "k", start = 12}
+  ),
+  -1
+)
+
+
+assertMessage(
+  findsingle(
+    list_with_various_strings[1],
+    { _contains = "i" },
+    { last = true, ret = "k", start = 999}
+  ),
+  -1
+)
+
+assertMessage(
+  findsingle(
     list_with_various_strings[2],
     { _r  = mt._r.case.lower_snake }
   ),
   true
+)
+
+assertMessage(
+  {findsingle(
+    list_with_various_strings[2],
+    { _r  = mt._r.case.lower_snake },
+    {start = 4, ret ="kv"}
+  )},
+  {4, "er_snake_case"}
 )
 
 assertMessage(
@@ -98,6 +135,33 @@ assertMessage(
 assertMessage(
   findsingle(
     list_with_various_strings[1],
+    { _start = "Kore" },
+    {start = 2}
+  ),
+  false
+)
+
+assertMessage(
+  findsingle(
+    list_with_various_strings[1],
+    { _start = "ha"},
+    { start = 6}
+  ),
+  true
+)
+
+assertMessage(
+  {findsingle(
+    list_with_various_strings[1],
+    { _start = "ha"},
+    { start = 6, ret = "kv"}
+  )},
+  {6, "ha"}
+)
+
+assertMessage(
+  findsingle(
+    list_with_various_strings[1],
     { _start = "Kore", _invert = true }
   ),
   false
@@ -141,6 +205,24 @@ assertMessage(
     { _stop = "...shindeiru" }
   ),
   true
+)
+assertMessage(
+  findsingle(
+    list_with_various_strings[6],
+    { _stop = "...shindeiru" },
+    { start = 1}
+  ),
+  true
+)
+
+
+assertMessage(
+  findsingle(
+    list_with_various_strings[6],
+    { _stop = "...shindeiru"},
+    {start = 4 }
+  ),
+  false
 )
 
 assertMessage(
@@ -240,6 +322,15 @@ assertMessage(
 )
 
 assertMessage(
+  {findsingle(
+    list_with_various_strings[6],
+    { _empty = true },
+    { start = 999, ret = "kv" }
+  )},
+  {13, ""}
+)
+
+assertMessage(
   findsingle(
     list_with_various_strings[6],
     { _empty = true, _ignore_case = true }
@@ -329,6 +420,15 @@ assertMessage(
 )
 
 assertMessage(
+  {findsingle(
+    list_with_various_strings[2],
+    { _exactly = "snake_case" },
+    { start = 7, ret = "kv" }
+  )},
+  { 7, "snake_case" }
+)
+
+assertMessage(
   findsingle(
     list_with_various_strings[2],
     { _exactly = "lower_snake_case", _invert = true }
@@ -401,6 +501,15 @@ assertMessage(
 )
 
 assertMessage(
+  {findsingle(
+    list_with_various_strings[7],
+    { _list = { "ani?", "ani!?", "ani!?!?", "ani!?!?!?" }, _ignore_case = true },
+    { start = 2, ret = "kv" }
+  )},
+  { 2, "ani?" }
+)
+
+assertMessage(
   findsingle(
     list_with_various_strings[7],
     { _r = "Nani%?", _regex_engine = "eutf8" }
@@ -416,6 +525,17 @@ assertMessage(
     end
   ),
   true
+)
+
+assertMessage(
+  {findsingle(
+    list_with_various_strings[7],
+    function(elem)
+      return elem == "ani?"
+    end,
+    { start = 2, ret = "kv" }
+  )},
+  { 2, "ani?" }
 )
 
 -- test the options (tostring, ret)
@@ -634,6 +754,30 @@ assertMessage(
   { 7, "snake" }
 )
 
+assertMessage(
+  {findsingle(
+    list_with_various_strings[2],
+    "snake",
+    {
+      ret = "kv",
+      start = 4
+    }
+  )},
+  { 7, "snake" }
+)
+
+assertMessage(
+  {findsingle(
+    list_with_various_strings[2],
+    "snake",
+    {
+      ret = "kv",
+      start = 8
+    }
+  )},
+  { -1, false }
+)
+
 -- number -> _exactly
 
 assertMessage(
@@ -655,3 +799,4 @@ assertMessage(
   )},
   { 1, 738 }
 )
+

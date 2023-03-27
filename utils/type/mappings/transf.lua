@@ -6,6 +6,12 @@ transf = {
       return string.char(tonumber(hex, 16))
     end,
   },
+  percent = {
+    char = function(percent)
+      local num = percent:sub(2, 3)
+      return string.char(tonumber(num, 16))
+    end,
+  },
   char = {
     hex = function(char)
       return string.format("%02X", string.byte(char))
@@ -31,10 +37,14 @@ transf = {
     base32_gen = basexx.to_base32,
     base32_crock = basexx.to_crockford,
     title_case = function(str)
-      local words, removed = split(str, {_r = "[ :–\\—\\-\\t\\n]", _regex_engine = "eutf8"})
+      local words, removed = split(str, {_r = "[ :–%—%-%t%n]", _regex_engine = "eutf8"})
+      print("titlecase")
+      inspPrint(words)
+      inspPrint(removed)
       local title_cased_words = map(words, transf.word.title_case_policy)
       title_cased_words[1] = replace(title_cased_words[1], to.case.capitalized)
       title_cased_words[#title_cased_words] = replace(title_cased_words[#title_cased_words], to.case.capitalized)
+      inspPrint(title_cased_words)
       return concat({
         isopts = "isopts",
         sep = removed,

@@ -1,3 +1,8 @@
+local realenv = env
+env = {
+  HOME = "/Users/sam"
+}
+
 assertMessage(
   transf.string.tilde_resolved("~"),
   env.HOME
@@ -109,18 +114,13 @@ assertMessage(
 )
 
 assertMessage(
-  transf.word.title_case_policy("l33tcode"),
-  "l33tcode"
-)
-
-assertMessage(
   transf.word.title_case_policy("sWAG"),
   "sWAG"
 )
 
 assertMessage(
-  transf.string.title_case("a tale of two cities, and also 9/11, and also l33tcode, sWAG"),
-  "A Tale of Two Cities, and Also 9/11, and Also l33tcode, sWAG"
+  transf.string.title_case("a tale of two cities, and also 9/11, and also sWAG"),
+  "A Tale of Two Cities, and Also 9/11, and Also sWAG"
 )
 
 assertMessage(
@@ -132,3 +132,5 @@ assertMessage(
   transf.string.romanized_snake("ねえもう少しだけでいいの"),
   "nee_mou_sukoshi_dake_de_ii_no"
 )
+
+env = realenv

@@ -35,12 +35,12 @@ assertMessage(
 local unescaped_regex = "(for some reason I want to match %this% as a [literal]+)"
 
 assertMessage(
-  replace(unescaped_regex, to.regex.lua_escaped),
+  replace(unescaped_regex, to.regex.lua_escaped, {mode = "before"}),
   "%(for some reason I want to match %%this%% as a %[literal%]%+%)"
 )
 
 assertMessage(
-  replace(unescaped_regex, to.regex.general_escaped),
+  replace(unescaped_regex, to.regex.general_escaped, {mode = "before"}),
   "\\(for some reason I want to match %this% as a \\[literal\\]\\+\\)"
 )
 

@@ -69,8 +69,8 @@ to = {
     decoded = {
       {
         mode = "replace",
-        cond = {_r = "%%(%x%x)", _regex_engine = "eutf8"},
-        proc = transf.char.percent
+        cond = {_r = "%%%x%x", _regex_engine = "eutf8"},
+        proc = transf.percent.char
       },
       {
         mode = "replace",
@@ -80,11 +80,11 @@ to = {
     }
   },
   regex = {
-    lua_escaped = {{mt._contains.lua_metacharacters}, {"%"}},
-    
+    lua_escaped = {mt._contains.lua_metacharacters, {"%"}},
+    general_escaped = {mt._contains.regex_metacharacters, {"\\"}},
   },
   resolved = {
-    doi = {cond = {_r = mt._r.id.doi_prefix }, processor = "https://doi.org/", mode = "replace" }
+    doi = {cond = {_r = mt._r.id.doi_prefix }, proc = "https://doi.org/", mode = "replace" }
   }
 }
 
