@@ -6,6 +6,7 @@
 --- @field last boolean iterate in reverse / use the last element, as the case may be
 --- @field start integer only consider elements with or after this index
 --- @field stop integer only consider elements with or before this index
+--- @field limit integer limit the number of iterations
 
 --- @param opts any 
 --- @param retdefault? kvmult
@@ -38,7 +39,7 @@ end
 --- @param opts table
 --- @return function
 function getIterator(opts)
-  return wdefarg(function(tbl) return prs(tbl, opts.start, opts.stop, opts.last and -1 or 1) end)
+  return wdefarg(function(tbl) return prs(tbl, opts.start, opts.stop, opts.last and -1 or 1) end, opts.limit)
 end
 
 --- @alias retriever {k: any, v: any, i: integer}

@@ -54,12 +54,14 @@ to = {
     },
     capitalized = {
       mode = "replace",
-      cond = {_r = "^."},
+      cond = {_r = "."},
+      limit = 1,
       proc = eutf8.upper
     },
     notcapitalized = {
       mode = "replace",
-      cond = {_r = "^."},
+      cond = {_r = "."},
+      limit = 1,
       proc = eutf8.lower
     },
   },

@@ -4,8 +4,9 @@
 --- @param start? integer
 --- @param stop? integer
 --- @param step? integer
+--- @param limit? integer limit the number of iterations, regardless of the index
 --- @return function, indexable, integer
-function iprs(thing, start, stop, step)
+function iprs(thing, start, stop, step, limit)
   local len_thing = len(thing)
   if len_thing == 0 then
     return function() end, thing, 0
@@ -13,14 +14,18 @@ function iprs(thing, start, stop, step)
   start = start or 1
   stop = stop or len_thing
   step = step or 1
+  limit = limit or math.huge
+  local iters = 0
   if (start - stop) * (step/math.abs(step)) > 0 then
     start, stop = stop, start -- swap if they're in the wrong order
   end
   return function(thing, i)
     i = i + step
+    iters = iters + 1
     if 
-      (step > 0 and i <= stop) or
-      (step < 0 and i >= stop)
+      ((step > 0 and i <= stop) or
+      (step < 0 and i >= stop)) and
+      iters <= limit
     then
       return i, elemAt(thing, i)
     end
@@ -31,9 +36,10 @@ end
 --- @param start? integer
 --- @param stop? integer
 --- @param step? integer
+--- @param limit? integer
 --- @return function, indexable, integer
-function reviprs(thing, start, stop, step)
-  return iprs(thing, start, stop, step and -math.abs(step) or -1)
+function reviprs(thing, start, stop, step, limit)
+  return iprs(thing, start, stop, step and -math.abs(step) or -1, limit)
 end
 
 --- pairs dropin replacement that is ordered by default, supports start/stop/step and works with any indexable
@@ -43,9 +49,10 @@ end
 --- @param start? integer
 --- @param stop? integer
 --- @param step? integer
+--- @param limit? integer
 --- @return function, indexable, integer
-function prs(thing, start, stop, step)
-  local iter, tbl, idx = iprs(thing, start, stop, step)
+function prs(thing, start, stop, step, limit)
+  local iter, tbl, idx = iprs(thing, start, stop, step, limit)
   return function(tbl)
     local i, v = iter(tbl, idx)
     if i then
@@ -59,8 +66,9 @@ end
 --- @param start? integer
 --- @param stop? integer
 --- @param step? integer
+--- @param limit? integer
 --- @return function, indexable, integer
-function revprs(thing, start, stop, step)
+function revprs(thing, start, stop, step, limit)
   return prs(thing, start, stop, step and -math.abs(step) or -1)
 end
 

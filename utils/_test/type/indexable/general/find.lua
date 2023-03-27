@@ -106,3 +106,28 @@ assertMessage(
   )},
   { 5, "str" }
 )
+
+assertMessage(
+  find(
+    "sostrmestr",
+    {_contains = "str"},
+    { findall = true, ret = "kv", args = "k" }
+  ),
+  {
+    {3, "str"},
+    { 8, "str" }
+  }
+)
+
+assertMessage(
+  find(
+    "foo",
+    {_r = "^."},
+    {
+      ret = "iv",
+      findall = true,
+      limit = 1
+    }
+  ),
+  {{1, "f"}}
+)

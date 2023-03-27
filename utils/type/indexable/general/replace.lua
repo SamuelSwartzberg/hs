@@ -4,6 +4,7 @@
 --- @class replaceOpts : splitOpts
 --- @field mode? "before" | "after" | "replace" | "remove" what to do with the matched element. "before" and "after" will insert the (result of the) proc before or after the matched element, "replace" will replace the matched element with the proc, and "remove" will remove the matched element without using the proc
 --- @field args kvmult controls what arguments are passed to the proc
+--- @field ret kvmult
 --- @field cond? conditionSpec the condition to match
 --- @field proc? procSpec the proc to run on the matched element
 
@@ -40,7 +41,7 @@ function replace(thing, opts, globalopts)
   -- however, if the current opt has a proc of type table, then the cond will be overwritten unless it is explicitly set
 
   globalopts = globalopts or {}
-  local mode, args, cond, proc, findopts = globalopts.mode, globalopts.args, globalopts.cond, globalopts.proc, globalopts.findopts
+  local mode, args, ret, cond, proc, findopts, limit = globalopts.mode, globalopts.args, globalopts.ret, globalopts.cond, globalopts.proc, globalopts.findopts, globalopts.limit
   mode = defaultIfNil(mode, "before")
   cond = defaultIfNil(cond, "\"")
   proc = defaultIfNil(proc, "\\")
@@ -53,8 +54,10 @@ function replace(thing, opts, globalopts)
     matchall = defaultIfNil(opt.matchall, matchall)
     mode = defaultIfNil(opt.mode, mode)
     args = defaultIfNil(opt.args, args)
+    ret = defaultIfNil(opt.ret, ret)
     cond = defaultIfNil(opt.cond, cond)
     proc = defaultIfNil(opt.proc, proc)
+    limit = defaultIfNil(opt.limit, limit)
 
   
     if not opt.cond and type(proc) == "table" and not isListOrEmptyTable(proc) then
@@ -63,28 +66,42 @@ function replace(thing, opts, globalopts)
   
     local splitopts = {
       mode = mode,
-      findopts = findopts
+      findopts = findopts,
+      limit = limit
     }
     if splitopts.mode == "replace" then
       splitopts.mode = "remove"
     end
     local parts, removed = split(res, cond, splitopts)
-    inspPrint(parts)
-    inspPrint(removed)
-    -- removed = map(removed, returnUnpack, {"v", "kv"}) TODO: uncomment once we've reached the map tests without failing
-  
+    print("bef map")
+    inspPrint(parts, 4)
+    inspPrint(removed, 4)
+    removed = map(removed, function(v)
+      local mapk, mapv = table.unpack(v)
+      if isListOrEmptyTable(mapv) and #mapv == 1 then
+        mapv = mapv[1]
+      end
+      return false, mapv
+    end, {"v", "kv"}) 
     local sep
     if mode == "replace" then -- we actually have to process the removed items to get the new items
       if
         not (isListOrEmptyTable(proc) or type(proc) == "string")  -- proc must be processed by map
         or (type(thing) == "table" and not isListOrEmptyTable(thing))  -- thing must be processed by map
       then
-        error("currently, using this is not supported since we need to test map first")
+        print("removed")
+        inspPrint(removed)
         sep = map(
           removed,
           proc,
-          {args or "v", "v"}
+          {
+            args = args, 
+            ret = ret,
+            recurse = 2,
+          }
         )
+        print("mapped")
+        inspPrint(sep)
       else
         sep = proc
       end
@@ -94,7 +111,24 @@ function replace(thing, opts, globalopts)
       sep = proc
     end
     inspPrint(sep)
-    -- TODO: if every element in thing is replaced, parts will be an empty list. In that case, concat won't be able to infer what type of indexable to return, so we need some way to solve that. We could have sep be parts in that case? Or maybe there's a better way?
+
+
+    local needs_type_added = #parts == 0 or (isListOrEmptyTable(parts[1]) and #parts[1] == 0)
+
+    -- if there is no first element, or the first element is an empty list, then we need to add a type to the first element, since concat infers how it should concat based on the first element
+    if needs_type_added then
+      if type(thing) == "table" then
+        if not isListOrEmptyTable(thing) then
+          if thing.isovtable then
+            parts[1] = ovtable.new() -- due to the check above, we know that we're not overwriting any information. Same for below
+          else
+            parts[1] = assoc({})
+          end
+        else
+          parts[1] = list({})
+        end
+      end
+    end
     res = concat({
       isopts = "isopts",
       sep = sep,

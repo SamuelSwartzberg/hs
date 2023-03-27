@@ -7,7 +7,7 @@
 --- @field recurse? boolean | integer whether/how to recurse into subtables
 --- @field depth? integer the current depth of recursion, if any. only used internally
 --- @field treat_as_leaf? "assoc" | "list" | false what to treat as a leaf node (i.e. what to not recurse into)
---- @field mapcondition? conditionSpec TODO NOT IMPLEMENTED YET
+--- @field mapcondition? conditionSpec 
 
 --- mapProcessor will processed into a function as follows:
 ---   - if it's a function, it's used as is
@@ -100,8 +100,8 @@ function map(tbl, f, opts)
     if not opts.mapcondition or findsingle(v, opts.mapcondition) then
       if 
         shouldRecurse(opts) and 
-        not (type(v) ~= "table" or isLeaf(v)) and
-        (not proc._k or not v[proc._k]) -- if we're using a _k mapProcessor, we don't want to recurse into the table if it has the key we're looking for
+        (type(v) == "table" and not isLeaf(v)) and
+        (type(proc) ~= "table" or (not proc._k or not v[proc._k])) -- if we're using a _k mapProcessor, we don't want to recurse into the table if it has the key we're looking for
       then
         print("recursing...")
         local optcopy = copy(opts)

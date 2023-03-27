@@ -91,3 +91,14 @@ local test11_sep = "sep"
 local test11_result = split(test11_input, test11_sep, {mode = "after"})
 local test11_expected = {{"a", "b", "sep"}, {"c", "d", "sep"}, {"d"}}
 assertMessage(test11_result, test11_expected)
+
+-- Test 12: Split string with condition which would match each element if it was matching chars individually
+
+assertMessage(
+  split(
+    "foo",
+    {_r = "."},
+    {mode = "after", limit = 1}
+  ),
+  {"f", "oo"} -- definitely not {"f", "o", "o"}
+)

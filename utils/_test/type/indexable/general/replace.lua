@@ -33,13 +33,15 @@ assertMessage(t6_result, {"contains_a", "contains_a", "contains_a", "dog", "cont
 
 
 -- Test 7: Replace with a function processor
---[[ local t7 = {"apple", "banana", "carrot", "dog", "elephant"}
-local t7_result = replace(t7, {cond = "banana", mode = "replace", proc = function(v) return v:upper() end})
+local t7 = {"apple", "banana", "carrot", "dog", "elephant"}
+local t7_result = replace(t7, {cond = "banana", mode = "replace", proc = function(v) 
+    inspPrint(v);
+    return v:upper() end})
 assertMessage(t7_result, {"apple", "BANANA", "carrot", "dog", "elephant"}) 
 
 -- Test 8: Replace with a table processor
 local t8 = {"apple", "banana", "carrot", "dog", "elephant"}
-local t8_result = replace(t8, {proc = {apple = "fruit", dog = "animal"}})
+local t8_result = replace(t8, {proc = {apple = "fruit", dog = "animal"}, mode ="replace"})
 assertMessage(t8_result, {"fruit", "banana", "carrot", "animal", "elephant"})
 
 -- Test 9: Replace with a string processor and custom arguments
@@ -47,10 +49,17 @@ local t9 = {"apple", "banana", "carrot", "dog", "elephant"}
 local t9_result = replace(t9, {cond = "banana", mode = "replace", proc = {_f = "%s_ed"}, args = "v"})
 assertMessage(t9_result, {"apple", "banana_ed", "carrot", "dog", "elephant"})
 
--- Test 11: Replace with a list processor and custom return arguments
+-- Test 11: Replace with a list processor
 local t11 = {"apple", "banana", "carrot", "dog", "elephant"}
-local t11_result = replace(t11, {cond = "banana", mode = "replace", proc = {"fruit", "modified"}, ret = "v"})
-error("wait a sec")]] -- TODO: uncomment once we've reached the map tests without failing
+local t11_result = replace(
+  t11, 
+  {
+    cond = "banana", 
+    mode = "replace", 
+    proc = {"fruit", "modified"}, 
+  }
+)
+assertMessage(t11_result, {"apple", "fruit", "modified", "carrot", "dog", "elephant"})
 
 -- Test 12: Replace using conditionProcSpecParallelList
 local t12 = {"apple", "banana", "carrot", "dog", "elephant"}
@@ -73,9 +82,27 @@ local t15_result = replace(t15, { {"apple", "fruit"}, {"carrot", "vegetable"}, {
 assertMessage(t15_result, {"fruit", "banana", "vegetable", "animal", "elephant"})
 
 -- Test 16: Replace with args set to 'k'
---[[ local ot16 = ovtable.init({ {key = "apple", value = 1}, {key = "banana", value = 2} })
-local ot16_result = replace(ot16, {cond = {_type = "number"}, mode = "replace", proc = rev, args = "k"})
-assertMessage(ot16_result, ovtable.init({ {key = "elppa", value = 1}, {key = "ananab", value = 2} })) ]] -- TODO: uncomment once we've reached the map tests without failing
+local ot16 = ovtable.init({
+  {key = "apple", value = 1},
+  {key = "banana", value = 2} 
+})
+local ot16_result = replace(
+  ot16, 
+  {
+    cond = {_type = "number"}, 
+    mode = "replace", 
+    proc = rev, 
+    args = "k",
+    ret = "k"
+  }
+)
+assertMessage(
+  ot16_result, 
+  ovtable.init({ 
+    {key = "elppa", value = 1}, 
+    {key = "ananab", value = 2} 
+  })
+)
 
 -- Tests for strings
 -- Test 17: Replace with a string
@@ -88,7 +115,7 @@ local s18 = "apple,ban"
 local s18_result = replace(s18, {cond = {_contains = "a"}, mode = "replace", proc = "contains_a"})
 assertMessage(s18_result, "contains_apple,bcontains_an")
 
---[[ -- Tests for orderedtables
+-- Tests for orderedtables
 -- Test 19: Replace with an orderedtable
 local ot19 = ovtable.init({ {key = "apple", value = 1}, {key = "banana", value = 2} })
 local ot19_result = replace(ot19, {cond = {_type = "number"}, mode = "replace", proc = "3"})
@@ -104,4 +131,4 @@ assertMessage(ot20_result, ovtable.init({
     {k="apple", v="tasty_fruit"},
     {k="banana", v="tasty_fruit"},
     {k="carrot", v="vegetable"}
-})) ]] -- TODO: uncomment once we've reached the map tests without failing
+}))

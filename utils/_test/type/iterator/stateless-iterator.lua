@@ -22,6 +22,8 @@ for i, v in iprs(tbl) do
   elseif manual_counter == 5 then
     assertMessage(i, 5)
     assertMessage(v, 50)
+  elseif manual_counter == 6 then
+    error("Should not iterate")
   end
 end
 
@@ -43,6 +45,8 @@ for i, v in iprs(tbl, 2, 4) do
   elseif manual_counter == 3 then
     assertMessage(i, 4)
     assertMessage(v, 40)
+  elseif manual_counter == 4 then
+    error("Should not iterate")
   end
 end
 
@@ -60,6 +64,8 @@ for i, v in iprs(tbl, 1, 5, 2) do
   elseif manual_counter == 3 then
     assertMessage(i, 5)
     assertMessage(v, 50)
+  elseif manual_counter == 4 then
+    error("Should not iterate")
   end
 end
 
@@ -77,6 +83,8 @@ for i, v in iprs(tbl, 5, 1, -2) do
   elseif manual_counter == 3 then
     assertMessage(i, 1)
     assertMessage(v, 10)
+  elseif manual_counter == 4 then
+    error("Should not iterate")
   end
 end
 
@@ -102,6 +110,8 @@ for i, v in iprs(assocArr) do
   elseif manual_counter == 5 then
     assertMessage(i, 5)
     assertMessage(v, 50)
+  elseif manual_counter == 6 then
+    error("Should not iterate")
   end
 end
 
@@ -117,6 +127,8 @@ for i, v in iprs(assocArr, 1, 3, -2) do
   elseif manual_counter == 2 then
     assertMessage(i, 1)
     assertMessage(v, 10)
+  elseif manual_counter == 3 then
+    error("Should not iterate")
   end
 end
 
@@ -148,6 +160,8 @@ for i, v in iprs(test_ovtable) do
   elseif manual_counter == 5 then
     assertMessage(i, 5)
     assertMessage(v, 50)
+  elseif manual_counter == 6 then
+    error("Should not iterate")
   end
 end
 
@@ -162,6 +176,8 @@ for i, v in iprs(test_ovtable, 1, 3, -2) do
   elseif manual_counter == 2 then
     assertMessage(i, 1)
     assertMessage(v, 10)
+  elseif manual_counter == 3 then
+    error("Should not iterate")
   end
 end
 
@@ -185,6 +201,8 @@ for i, v in reviprs(tbl) do
   elseif manual_counter == 5 then
     assertMessage(i, 1)
     assertMessage(v, 10)
+  elseif manual_counter == 6 then
+    error("Should not iterate")
   end
 end
 
@@ -209,6 +227,8 @@ for k, v in prs(tbl) do
   elseif manual_counter == 5 then
     assertMessage(k, 5)
     assertMessage(v, 50)
+  elseif manual_counter == 6 then
+    error("Should not iterate")
   end
 end
 
@@ -232,6 +252,8 @@ for k, v in prs(assocArr) do
   elseif manual_counter == 5 then
     assertMessage(k, "e")
     assertMessage(v, 50)
+  elseif manual_counter == 6 then
+    error("Should not iterate")
   end
 end
 
@@ -255,6 +277,8 @@ for k, v in prs(test_ovtable) do
   elseif manual_counter == 5 then
     assertMessage(k, "a")
     assertMessage(v, 50)
+  elseif manual_counter == 6 then
+    error("Should not iterate")
   end
 end
 
@@ -269,6 +293,8 @@ for k, v in prs(assocArr, 1, 3, -2) do
   elseif manual_counter == 2 then
     assertMessage(k, "a")
     assertMessage(v, 10)
+  elseif manual_counter == 3 then
+    error("Should not iterate")
   end
 end
 
@@ -286,6 +312,8 @@ for k, v in prs(test_ovtable, 1, 5, -2) do
   elseif manual_counter == 3 then
     assertMessage(k, "e")
     assertMessage(v, 10)
+  elseif manual_counter == 4 then
+    error("Should not iterate")
   end
 end
 
@@ -303,6 +331,23 @@ for k, v in revprs(test_ovtable, 1, 5, 2) do
   elseif manual_counter == 3 then
     assertMessage(k, "e")
     assertMessage(v, 10)
+  elseif manual_counter == 4 then
+    error("Should not iterate")
+  end
+end
+
+-- test that limit works 
+local manual_counter = 0
+for  k, v in revprs(test_ovtable, 1, 5, 2, 2) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, "a")
+    assertMessage(v, 50)
+  elseif manual_counter == 2 then
+    assertMessage(k, "c")
+    assertMessage(v, 30)
+  elseif manual_counter == 3 then
+    error("Should not iterate")
   end
 end
 

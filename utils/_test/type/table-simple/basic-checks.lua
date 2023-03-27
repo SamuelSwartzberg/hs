@@ -14,6 +14,26 @@ assertMessage(
 )
 
 assertMessage(
+  isListOrEmptyTable(ovtable.new()),
+  false
+)
+
+assertMessage(
+  isListOrEmptyTable("not a table"),
+  false
+)
+
+assertMessage(
+  isListOrEmptyTable(assoc({})),
+  false
+)
+
+assertMessage(
+  isListOrEmptyTable(list({})),
+  true
+)
+
+assertMessage(
   isSparseList({ 1, 2, 3 }),
   false
 )

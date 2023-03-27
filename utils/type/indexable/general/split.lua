@@ -1,6 +1,7 @@
 --- @class splitOpts
 --- @field mode? "remove" | "before" | "after" whether to remove the separator, or split before or after it, keeping the separator
 --- @field findopts? findOptsWShorthand since the separator is a conditionSpec passed to find, you can pass options to find here
+--- @field limit? integer the `limit` option of findopts, directly accessible for convenience
 
 --- split an indexable into a list of indexables, using a conditionSpec as a separator
 --- @generic T : indexable
@@ -16,7 +17,8 @@ function split(thing, sep, opts)
     sep,
     concat({
       ret = "iv",
-      findall = true
+      findall = true,
+      limit = opts.limit
     }, opts.findopts)
   )
 

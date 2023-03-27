@@ -2,6 +2,7 @@
 --- @return boolean
 function isListOrEmptyTable(t)
   if type(t) ~= "table" then return false end -- not a table
+  if t.islist then return true end -- signal value to indicate that this is a list
   if t.isassoc == "isassoc" then return false end -- signal value to indicate that this is an assoc table
   if t.isovtable then return false end
   local count = 0
