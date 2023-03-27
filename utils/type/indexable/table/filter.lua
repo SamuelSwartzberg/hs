@@ -21,7 +21,6 @@ function filter(tbl, cond, opts)
 
   local manual_counter = 0
   for k, v in iterator(tbl) do
-    print(k, v)
     local retriever
     retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)
     local boolres = true
@@ -31,7 +30,6 @@ function filter(tbl, cond, opts)
         break -- exit early
       end
     end
-    inspPrint(res)
     if boolres then
       addToRes({k, v}, res, opts)
     end

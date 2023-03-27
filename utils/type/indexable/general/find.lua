@@ -16,7 +16,6 @@ function find(indexable, cond, opts)
   local finalres
 
   if not (type(indexable) == "string") then
-    print("notstr")
     local iterator = getIterator(opts)
     local manual_counter = 0
     for k, v in wdefarg(iterator)(indexable) do
@@ -41,8 +40,6 @@ function find(indexable, cond, opts)
           return returnUnpackIfTable(retres)
         end
       end
-      print("finalres")
-      inspPrint(finalres)
 
     end
   else
@@ -67,8 +64,6 @@ function find(indexable, cond, opts)
       for _, retarg in iprs(opts.ret) do 
         push(res, retriever[retarg])
       end
-      print(matchkey, matchvalue)
-      inspPrint(res)
       if opts.findall then
         if matchkey == -1 then break end
         table.insert(finalres, res)

@@ -121,10 +121,6 @@ function addToRes(itemres,res,opts,k,v)
   for index, ret in iprs(opts.ret) do
     mapped_useas[ret] = index
   end
-  print("itemres")
-  inspPrint(itemres)
-  print("mapped_useas")
-  inspPrint(mapped_useas)
 
   local newkey
   if mapped_useas.k ~= nil then newkey = itemres[mapped_useas.k] -- if I have specified an index of the output (itemres) to be the key, use that, even if the value retrieved is nil
@@ -142,10 +138,6 @@ function addToRes(itemres,res,opts,k,v)
       
     end
   else
-    print("addToRes, newkey:")
-    inspPrint(newkey)
-    print("addToRes, newval:")
-    inspPrint(newval)
     if newkey == false or opts.tolist then -- use false as a key to indicate to push to array instead
       table.insert(res, newval)
     else

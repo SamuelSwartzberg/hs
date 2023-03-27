@@ -73,9 +73,6 @@ function replace(thing, opts, globalopts)
       splitopts.mode = "remove"
     end
     local parts, removed = split(res, cond, splitopts)
-    print("bef map")
-    inspPrint(parts, 4)
-    inspPrint(removed, 4)
     removed = map(removed, function(v)
       local mapk, mapv = table.unpack(v)
       if isListOrEmptyTable(mapv) and #mapv == 1 then
@@ -89,8 +86,6 @@ function replace(thing, opts, globalopts)
         not (isListOrEmptyTable(proc) or type(proc) == "string")  -- proc must be processed by map
         or (type(thing) == "table" and not isListOrEmptyTable(thing))  -- thing must be processed by map
       then
-        print("removed")
-        inspPrint(removed)
         sep = map(
           removed,
           proc,
@@ -100,8 +95,6 @@ function replace(thing, opts, globalopts)
             recurse = 2,
           }
         )
-        print("mapped")
-        inspPrint(sep)
       else
         sep = proc
       end
@@ -110,7 +103,6 @@ function replace(thing, opts, globalopts)
     else
       sep = proc
     end
-    inspPrint(sep)
 
 
     local needs_type_added = #parts == 0 or (isListOrEmptyTable(parts[1]) and #parts[1] == 0)

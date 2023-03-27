@@ -55,17 +55,12 @@ function slice(thing, start_or_spec, stop, step)
   -- implement various functions polymorphically depending on the type of thing
 
   local new_thing = getEmptyResult(thing)
-  inspPrint(new_thing.isovtable)
 
   -- set defaults
 
   if not spec.step then spec.step = 1 end
   if not spec.start then spec.start = 1 end
   if not spec.stop then spec.stop = len(thing) end
-
-  inspPrint(thing)
-  inspPrint(spec)
-
 
   -- resolve negative indices
 
@@ -91,11 +86,9 @@ function slice(thing, start_or_spec, stop, step)
     return new_thing
   end
 
-  inspPrint(spec)
   -- build the slice
   
   for i = spec.start, spec.stop, spec.step do
-    inspPrint(new_thing)
     new_thing = append(new_thing, elemAt(thing, i, is_assoc and "kv"))
   end
 

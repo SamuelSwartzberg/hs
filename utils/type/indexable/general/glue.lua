@@ -34,7 +34,6 @@ function glue(base, addition, opts)
         opts.recurse = defaultIfNil(opts.recurse, true)
         for k, v in prs(addition) do
           if type(v) == "table" then
-            inspPrint(opts.recurse)
             if not type(base[k]) == "table" or not opts.recurse or (type(opts.recurse) == "number" and (opts.recurse < opts.depth)) then 
               base = append(base, {k, v}, opts)
             else

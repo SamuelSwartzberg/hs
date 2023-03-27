@@ -18,7 +18,6 @@ function append(base, addition, opts)
     local new_thing = copy(base) 
     if addition == nil then return new_thing end
     if isListOrEmptyTable(base) and not opts.aspair then
-      print("islist")
       new_thing[#new_thing + 1] = addition
       return new_thing
     else

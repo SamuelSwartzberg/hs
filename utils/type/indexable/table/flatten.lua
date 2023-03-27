@@ -107,26 +107,17 @@ function flatten(tbl, opts)
 
   local res = getEmptyResult(tbl, opts)
 
-  print("tbl")
-  inspPrint(tbl)
   for k, v in prs(tbl) do
-    print(k, v)
     if type(v) ~= "table" or isLeaf(v) then
-      print('leaf')
       valAddfunc(res, v, k)
     else
-      print('not leaf')
       if shouldRecurse(opts) then
         local newopts = copy(opts)
         newopts.path = concat(opts.path, k)
         local subres = flatten(v, newopts)
-        print("subres")
-        inspPrint(subres, 3)
         for k, v in prs(subres) do
           addfunc(res, v, k)
         end
-        print("res after adding subres")
-        inspPrint(res, 5)
       else
         valAddfunc(res, v, k)
       end
@@ -141,7 +132,6 @@ function flatten(tbl, opts)
   
   if opts.mode == "path-assoc" and opts.depth == 0 then
     local newres = {}
-    inspPrint(res, 5)
     for k, v in iprs(res) do
       local val
       if res_should_be_plain then

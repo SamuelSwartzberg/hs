@@ -36,14 +36,11 @@ function concat(opts, ...)
   if #inputs == 1 and isListOrEmptyTable(inputs[1]) then -- was called with a single list instead of varargs, but we can handle that
     inputs = inputs[1]
   end
-  inspPrint(inputs)
 
   -- determine the type of output, which will determine the behavior of glue and ultimately the return type
   local outputs = table.remove(inputs, 1)
   local sep, index
 
-  inspPrint(inputs)
-  inspPrint(outputs)
   -- now do the rest of the loop
   for i, input in iprs(inputs) do
     index = i

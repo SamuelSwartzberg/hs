@@ -10,7 +10,6 @@
 --- @param opts? splitOpts
 --- @return T[], T[]?
 function split(thing, sep, opts)
-  print("---split---")
   opts = copy(opts) or {}
   local splintervals = find(
     thing,
@@ -26,7 +25,6 @@ function split(thing, sep, opts)
     return {thing}
   end
 
-  inspPrint(splintervals)
 
   local res = {}
   local removed = {}
@@ -43,10 +41,7 @@ function split(thing, sep, opts)
     if opts.mode == "after" then
       sliceend = sliceend + matchlength
     end
-    inspPrint(thing)
-    print(lastend, sliceend)
     local fragment = slice(thing, lastend, sliceend)
-    inspPrint(fragment)
     push(res, fragment)
     local stop = start + matchlength - 1
     lastend = stop + 1
@@ -59,9 +54,6 @@ function split(thing, sep, opts)
   end
 
   local lastfragment = slice(thing, lastend)
-  inspPrint(lastend)
-  print("lastfrag")
-  inspPrint(lastfragment)
   push(res, lastfragment) -- TODO: not checking if lastfragment is empty might cause problems, but checking definitely causees problems. If problems occur, more complex logic is needed here
 
   return res, removed
