@@ -1,3 +1,9 @@
+local realenv = env
+env = {
+  HOME = "/Users/sam"
+}
+
+
 -- test singleLe:
 
 -- test simple expressions
@@ -24,11 +30,11 @@ assertMessage(
 assertMessage(
   singleLe([[
     local foo = 1
-    if (true) {
+    if (true) then
       foo = foo + 1;
-    } else {
+    else
       return 27;
-    }
+    end
     return foo;
   ]]),
   2
@@ -54,32 +60,36 @@ assertMessage(
 -- interpolation with statements
 
 assertMessage(
-  le([[
-    Lines: 
+le([[
+Lines: 
 
-    {{[
-      for i = 1, 10 do
-        print(i)
-      end
-      _G.injectionstore = 27
-    ]}}
+{{[
+  local vals = {}
+  for i = 1, 10 do
+    push(vals, i)
+  end
+  _G.injectionstore = 27
+  return table.concat(vals, "\n")
+]}}
 
-    Value in injectionstore: {{[ injectionstore ]}}
-  ]]),
-  [[
-    Lines: 
+Value in injectionstore: {{[ injectionstore ]}}
+]]),
+[[
+Lines: 
 
-    1
-    2
-    3
-    4
-    5
-    6
-    7
-    8
-    9
-    10
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
 
-    Value in injectionstore: 27
-  ]]
+Value in injectionstore: 27
+]]
 )
+
+env = realenv

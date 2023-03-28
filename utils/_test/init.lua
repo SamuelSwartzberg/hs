@@ -12,9 +12,9 @@ relative_require = test_relative_require
 rrq("type")
 rrq("externals")
 rrq("language-features")
+env = getEnvAsTable()
 rrq("basic-interfacing")
 
-env = getEnvAsTable()
 
 rrq("advanced-interfacing")
 rrq("general-domain-ops")

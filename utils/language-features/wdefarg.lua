@@ -8,7 +8,7 @@ function wdefarg(fn, default)
   return function(...)
     local args = {...}
     if #args == 0 then
-      args = default
+      args = {default}
     end
     return fn(table.unpack(args))
   end

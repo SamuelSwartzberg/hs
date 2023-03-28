@@ -6,17 +6,18 @@
 function buildInnerCommand(command_parts)
   local command = ""
   if type(command_parts) == "string" then
-    return " " .. command_parts
+    return command_parts
   end
   command_parts = fixListWithNil(command_parts) -- this allows us to have optional args simply by having them be nil
   for _, command_part in iprs(command_parts) do
-    if type(command_part) == "string" then
+    if type(command_part) == "string" then -- simply concat the command_part
       command = command .. " " .. command_part
-    elseif type(command_part) == "table" then
-      if command_part.type == "quoted" then
+    elseif type(command_part) == "table" then -- command_part needs to be calculated
+      command_part.type = command_part.type or "quoted"
+      if command_part.type == "quoted" then -- wrap the command_part in quotes
         command = command .. ' "' .. replace(command_part.value, {matcher = '"'}) .. '"'
-      elseif command_part.type == "interpolated" then
-        command = command .. '"$('  .. buildInnerCommand(command_part.value) .. ')"'
+      elseif command_part.type == "interpolated" then -- recursively build the command_part and wrap it in $()
+        command = command .. ' "$('  .. buildInnerCommand(command_part.value) .. ')"'
       else
         error("Unknown command_part type: " .. command_part.type)
       end
@@ -25,18 +26,7 @@ function buildInnerCommand(command_parts)
     end
   end
 
-  return command
-end
-
---- @param command_parts command_parts | string list of things to assemble into a command
---- @return string[]
-function buildTaskArgs(command_parts)
-  local hs_task_args = {
-    "-c",
-    "cd && source \"$HOME/.target/envfile\" &&" .. buildInnerCommand(command_parts)
-  }
-  return hs_task_args
-
+  return string.sub(command, 2) -- remove the first space
 end
 
 --- @class run_options_object
@@ -51,7 +41,7 @@ end
 --- @field error_that_is_success? string only relevant for JSON, if the error message matches this, it will be treated as a success. For badly designed JSON APIs.
 --- @field key_that_contains_payload? string only relevant for JSON. If set, this key must be present for the request to be considered a success, and the value of that key will be returned / passed to and_then
 --- @field json_catch? fun(error_msg: string): any only relevant for JSON. If set, will be called if one of the JSON-specific errors occurs
---- @field and_then? fun(std_out: string): any this shouldn't be here, but rather the second argument of run, but if it's here, we'll still accept it
+--- @field and_then? run_and_then more typically, you would use the shorthand syntax, which is to pass the and_then function as the second argument to run
 
 --- @class run_options_object_async : run_options_object
 --- @field delay? number
@@ -65,36 +55,36 @@ end
 --- @type run
 function run(opts, and_then, ...)
   local varargs = {...}
-  local args 
-  if not opts.args then
+  if not opts then
     error("No args provided")
   else
-    if isListOrEmptyTable(opts) then -- handle providing command_parts directly
-      opts = {args = args}
+    if (type(opts) ~= "table") or isListOrEmptyTable(opts) then -- handle shorthand
+      opts = {args = opts}
     end
-    args = buildTaskArgs(opts.args)
   end
+  local cmd = "cd && source \"$HOME/.target/envfile\" && " .. buildInnerCommand(opts.args)
   opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
-  opts.catch = function(exit_code, std_err)
+  inspPrint(cmd)
+  
+  catch = function(exit_code, std_err)
     local should_run_default_catch = true
     if opts.catch then
       should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch, otherwise, don't
     end
     if should_run_default_catch == true then
       local err_str = ("Error running command:\n\n%s\n\nExit code: %s\n\nStderr: %s"):format(buildInnerCommand(opts.args), exit_code, std_err)
-      error(err_str)
+      error(err_str, 0)
     end
   end
 
-  if opts.and_then then and_then = opts.and_then end
   opts.run_immediately = defaultIfNil(opts.run_immediately, true)
-
-  if and_then and not opts.force_sync then
-    if and_then == true then -- in this case, we're only using and_then to indicate that we want to run the task asyncly
+  opts.and_then = opts.and_then or and_then
+  if opts.and_then and not opts.force_sync then
+    if opts.and_then == true then -- in this case, we're only using and_then to indicate that we want to run the task asyncly
       and_then = function() end
-    elseif type(and_then) == "table" then -- shorthand for and_then being another call to `run`, with and_then being opts of the second call, and the varargs being the and_then of the second call, and potentially further
+    elseif type(opts.and_then) == "table" then -- shorthand for and_then being another call to `run`, with and_then being opts of the second call, and the varargs being the and_then of the second call, and potentially further
       and_then = function()
-        run(and_then, table.unpack(varargs))
+        run(opts.and_then, table.unpack(varargs))
       end
     end
     local task =  hs.task.new(
@@ -102,7 +92,7 @@ function run(opts, and_then, ...)
       function(exit_code, std_out, std_err)
         local error_to_rethrow
         if exit_code ~= 0 then
-          local status, res = pcall(opts.catch, exit_code, std_err) -- temporarily catch the error so we can run the finally block
+          local status, res = pcall(catch, exit_code, std_err) -- temporarily catch the error so we can run the finally block
           if not status then
             error_to_rethrow = res
           end
@@ -111,7 +101,7 @@ function run(opts, and_then, ...)
             std_out = stringy.strip(std_out)
           end
           if opts.error_on_empty_output and std_out == "" then
-            opts.catch(-1, "Output was empty and error_on_empty_output was true.")
+            catch(-1, "Output was empty and error_on_empty_output was true.")
           end
           if opts.delay then
             hs.timer.doAfter(opts.delay, function()
@@ -128,7 +118,7 @@ function run(opts, and_then, ...)
           end
         end
       end,
-      args
+      { "-c", cmd }
     )
     if opts.run_immediately then
       task:start()
@@ -139,12 +129,13 @@ function run(opts, and_then, ...)
     if opts.run_raw_shell then
       command = "LC_ALL=en_US.UTF-8 && LANG=en_US.UTF-8 && LANGUAGE=en_US.UTF-8 && " .. buildInnerCommand(opts.args)
     else 
+      -- encode command in base64 so we can pass it to bash without worrying about escaping
       command = string.format(
-        "/opt/homebrew/bin/bash %s '%s'",
-        args[1],
-        args[2]
+        "base64 -d <<< '%s' | /opt/homebrew/bin/bash -s",
+        transf.string.base64_gen(cmd)
       )
     end
+    inspPrint(command)
     local output, status, reason, code = hs.execute(command)
     local error_to_rethrow
     if status then
@@ -152,15 +143,15 @@ function run(opts, and_then, ...)
         output = stringy.strip(output)
       end
       if opts.error_on_empty_output and output == "" then
-        opts.catch(-1, "Output was empty and error_on_empty_output was true.")
+        catch(-1, "Output was empty and error_on_empty_output was true.")
       end
-      if and_then then
-        return and_then(output)
+      if opts.and_then then
+        return opts.and_then(output)
       else
         return output
       end
     else
-      local status, res = pcall(opts.catch, code, output)
+      local status, res = pcall(catch, code, output)
       if not status then
         error_to_rethrow = res
       end
@@ -171,7 +162,7 @@ function run(opts, and_then, ...)
     end
 
     if error_to_rethrow then
-      error(error_to_rethrow)
+      error(error_to_rethrow, 0)
     end
 
     return nil

@@ -1,11 +1,13 @@
 ---@diagnostic disable: duplicate-set-field
 
+--- gets the cache path for a namespace and within that given function and args
 --- @param name string
 --- @param func_id string
 --- @param args? any[]
 function getFsCachePath(name, func_id, args)
   local path = env.XDG_CACHE_HOME .. "/" .. name .. "/" .. func_id .. "/"
   if args then 
+    -- encode args to json and hash it, to use as the key for the cache
     local jsonified_args = json.encode(args)
     local md5 = hashings("md5")
     md5:update(jsonified_args)
@@ -19,7 +21,7 @@ end
 local memstore = {}
 memoized = {}
 
-
+-- Define a table with methods for cache storage in memory and filesystem
 local gen_cache_methods = {
   mem = {
     put = function(fnid, params, result)
@@ -54,7 +56,9 @@ local gen_cache_methods = {
     end,
     get = function(fnid, params)
       local cache_path = getFsCachePath("fsmemoize", fnid, params)
-      return json.decode(readFile(cache_path))
+      local raw_cnt = readFile(cache_path)
+      if not raw_cnt then return nil end
+      return json.decode(raw_cnt)
     end,
     reset = function(fnid)
       local cache_path = getFsCachePath("fsmemoize", fnid)
@@ -70,22 +74,25 @@ local gen_cache_methods = {
 
 
 --- @class memoOpts
---- @field mode? "mem" | "fs"
---- @field is_async? boolean
---- @field invalidation_mode? "invalidate" | "reset" | "none"
---- @field interval? number
+--- @field mode? "mem" | "fs" whether to use memory or filesystem to store the cache. Fs cache is more persistent, but slower. Defaults to "mem"
+--- @field is_async? boolean whether we are memoizing an async function. Defaults to false
+--- @field invalidation_mode? "invalidate" | "reset" | "none" whether and in what way to invalidate the cache. Defaults to "none"
+--- @field interval? number how often to invalidate the cache. Defaults to 0
 
+--- memoize a function if it's not already memoized, or return the memoized version if it is
 --- @generic I, O
 --- @param fn fun(...: I): O
 --- @param opts? memoOpts
 --- @return fun(...: I): O, hs.timer?
 function memoize(fn, opts)
-  local fnid = tostring(fn)
+  local fnid = tostring(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
 
   if memoized[fnid] then -- if the function is already memoized, return the memoized version. This allows us to use memoized functions immediately as `memoize(fn)(...)` without having to assign it to a variable first
+    print("already memoized")
     return memoized[fnid]
   end
 
+  --- set default options
   opts = copy(opts) or {}
   opts.mode = opts.mode or "mem"
   opts.is_async = opts.is_async or false
@@ -93,23 +100,27 @@ function memoize(fn, opts)
   opts.interval = opts.interval or 0
 
 
-  
+  -- initialize the cache if using memory
   if opts.mode == "mem" then
     memstore[fnid] = {}
   end
   
+  -- create some variables that will be used later
+
   local cache_methods = gen_cache_methods[opts.mode]
   local timer
   
   local created_at = cache_methods.get_created_time(fnid)
 
+  -- create a timer to invalidate the cache if needed
   if opts.invalidation_mode == "reset" then
     timer = hs.timer.doEvery(opts.interval, function()
+      print("resetting")
       cache_methods.reset(fnid)
     end)
   end
 
-
+  -- create the memoized function
   local memoized_func = function(...)
     local params = {...}
     local callback = nil
@@ -123,25 +134,28 @@ function memoize(fn, opts)
     local result 
 
     if opts.invalidation_mode == "invalidate" then
-      if created_at + opts.interval < os.time() then
+      print("invalidated")
+      if created_at + opts.interval < os.time() then -- cache is invalid, so we need to recalculate
         cache_methods.reset(fnid)
         created_at = os.time()
       end
 
     else
+
+      -- get the result from the cache
       result = cache_methods.get(fnid, params)
     end
 
     if not opts.is_async then
-      if not result then 
+      if not result then  -- no result yet, so we need to call the original function and store the result in the cache
         result = { fn(...) }
         cache_methods.put(fnid, params, result)
       end
-      return table.unpack(result)
+      return table.unpack(result) -- we're sure to have a result now, so we can return it
     else
-      if result then
+      if result then -- if we have a result, we can call the callback immediately
         callback(table.unpack(result))
-      else
+      else -- else we need to call the original function and wrap the callback to store the result in the cache before calling it
         fn(table.unpack(params), function(...)
           local result = {...}
           cache_methods.put(fnid, params, result)

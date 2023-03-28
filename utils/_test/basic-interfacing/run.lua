@@ -3,8 +3,8 @@
 -- mere string passthrough
 
 assertMessage(
-  buildInnerCommand("cat ~/.profile | tr -d '\n'"),
-  " cat ~/.profile | tr -d '\n'"
+  buildInnerCommand("cat ~/.profile | tr -d '\\n'"),
+  "cat ~/.profile | tr -d '\\n'"
 )
 
 -- command building with only string parts
@@ -16,9 +16,9 @@ assertMessage(
     "|",
     "tr",
     "-d",
-    "'\n'"
+    "'\\n'"
   }),
-  " cat ~/.profile | tr -d '\n'"
+  "cat ~/.profile | tr -d '\\n'"
 )
 
 -- command building with string and quoted parts
@@ -30,9 +30,9 @@ assertMessage(
     "|",
     "tr",
     "-d",
-    { value = "'\n'", type = "quoted" }
+    { value = "\\n", type = "quoted" }
   }),
-  " cat \"~/.profile\" | tr -d '\n'"
+  "cat \"~/.profile\" | tr -d \"\\n\""
 )
 
 -- command building with only string and interpolated parts
@@ -45,7 +45,7 @@ assertMessage(
       type = "interpolated"
     }
   }),
-  ' echo "$(seq 1 10)"'
+  'echo "$(seq 1 10)"'
 )
 
 -- quoted parts in interpolated parts
@@ -60,10 +60,11 @@ assertMessage(
           value = "~/fake file with spaces",
           type = "quoted"
         }
-      }
+      },
+      type = "interpolated"
     }
   }),
-  ' echo "$(cat "~/fake file with spaces")"'
+  'echo "$(cat "~/fake file with spaces")"'
 )
 
 -- nested interpolated parts
@@ -81,33 +82,14 @@ assertMessage(
               value = "~/fake file with spaces",
               type = "quoted"
             }
-          }
+          },
+          type = "interpolated"
         }
-      }
+      },
+      type = "interpolated"
     }
   }),
-  ' echo "$(echo "$(cat "~/fake file with spaces")")"'
-)
-
--- buildTaskArgs:
-
-assertMessage(
-  buildTaskArgs({
-    "echo",
-    {
-      value = {
-        "cat",
-        {
-          value = "~/fake file with spaces",
-          type = "quoted"
-        }
-      }
-    }
-  }),
-  {
-    '-c',
-    'cd && source "$HOME/.target/envfile && echo "$(cat "~/fake file with spaces")"'
-  }
+  'echo "$(echo "$(cat "~/fake file with spaces")")"'
 )
 
 -- run:
@@ -126,7 +108,7 @@ assertMessage(
 local succ, res = pcall(run, "false")
 
 assertMessage(succ, false)
-assertMessage(res, "Error running command:\n\n false\n\nExit code: 1\n\nStderr: ")
+assertMessage(res, "Error running command:\n\nfalse\n\nExit code: 1\n\nStderr: ")
 
 -- custom error handling
 
@@ -150,7 +132,7 @@ local succ, res = pcall(run, {
 })
 
 assertMessage(succ, false)
-assertMessage(res, "Error running command:\n\n false\n\nExit code: 1\n\nStderr: ")
+assertMessage(res, "Error running command:\n\nfalse\n\nExit code: 1\n\nStderr: ")
 
 -- finally with no callback and no error
 
@@ -217,7 +199,7 @@ assertMessage(
 
 assertMessage(
   run({
-    args = "echo '   hello world   '",
+    args = "echo -n '   hello world   '",
     dont_clean_output = true
   }),
   "   hello world   "
@@ -246,7 +228,7 @@ assertMessage(
   run({
     args = 'echo "$ME/foo"'
   }),
-  env.ME
+  env.ME .. "/foo"
 )
 
 assertMessage(
