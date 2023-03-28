@@ -245,10 +245,11 @@ assertMessage(
 
 local file = env.TMPDIR .. "/async_test/" .. os.time()
 
-local runres = run("echo 'hello world' > " .. file, true)
+local runres = run("echo -n 'hello world' > " .. file, true)
 
-assertMessage(runres, nil)
-assertMessage(readFile(file), "hello world")
+hs.timer.doAfter(1, function()
+  assertMessage(readFile(file, "error"), "hello world")
+end)
 
 -- async with callback
 

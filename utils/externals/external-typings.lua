@@ -119,6 +119,7 @@
 --- @class cjson
 --- @field encode fun(t: any): string
 --- @field decode fun(s: string): any
+--- @field null userdata
 
 --- @class tomlopts
 --- @field quoteDatesAndTimes boolean Dates and times will be emitted as quoted strings.

@@ -2,11 +2,12 @@ local simple_json_command = 'echo "foo bar" | wc | jc --wc'
 
 assertMessage(
   runJSON(simple_json_command),
-  {
-    lines = 1,
-    words = 2,
-    characters = 8
-  }
+  {{
+    lines = 1.0,
+    words = 2.0,
+    filename = json.null,
+    characters = 8.0
+  }}
 )
 
 -- opt: accept_error_payload
@@ -16,11 +17,12 @@ assertMessage(
     args = simple_json_command,
     accept_error_payload = true
   }),
-  {
-    lines = 1,
-    words = 2,
-    characters = 8
-  }
+  {{
+    lines = 1.0,
+    words = 2.0,
+    filename = json.null,
+    characters = 8.0
+  }}
 )
 
 local simulate_error_json_command = 'echo "{ \\"error\\": \\"some error\\" }"'
@@ -35,7 +37,7 @@ assertMessage(
   }
 )
 
-local succ, res = runJSON({
+local succ, res = pcall(runJSON,{
   args = simulate_error_json_command,
   accept_error_payload = false
 })
@@ -50,7 +52,7 @@ runJSON({
   end
 })
 
-local succ, res = runJSON({
+local succ, res = pcall(runJSON,{
   args = simulate_error_json_command,
   accept_error_payload = true,
   json_catch = function(error)
