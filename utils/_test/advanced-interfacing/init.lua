@@ -2,8 +2,6 @@ local rrq = bindArg(relative_require, "utils._test.advanced-interfacing")
 
 rrq("alert")
 rrq("do-when-ready")
-rrq("do-with-activated")
-rrq("function-shell-args")
 rrq("gpt3")
 rrq("ipc-socket")
 rrq("json")

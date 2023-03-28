@@ -261,14 +261,16 @@ end)
 
 local timestamp = os.time()
 
-run({
+local tsk1 = run({
   args = "echo 'hello world'",
-  delay = 5
+  delay = 2
 }, function (std_out)
   assertMessage(std_out, "hello world")
-  assertMessage(os.time() - timestamp >= 4, true) -- allow for some variability in execution time
-  assertMessage(os.time() - timestamp <= 6, true)
+  assertMessage(os.time() - timestamp >= 1, true) -- allow for some variability in execution time
+  assertMessage(os.time() - timestamp <= 3, true)
 end)
+
+tsk1:waitUntilExit()
 
 -- async with error 
 

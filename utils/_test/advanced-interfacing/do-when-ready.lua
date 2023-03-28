@@ -29,6 +29,7 @@ assertMessage(
 
 hs.eventtap.keyStroke({"cmd", "alt", "shift"}, "/")
 
+
 hs.timer.doAfter(1, function ()
   assertMessage(
     readFile(temp_file_1, "error"),
@@ -52,9 +53,7 @@ hs.timer.doAfter(1, function ()
     assertMessage(
       readFile(temp_file_3, "error"),
       "Hello World!"
-  )
+    )
+
   end)
 end)
-
-
-hs.timer.usleep(2000 * 1000)

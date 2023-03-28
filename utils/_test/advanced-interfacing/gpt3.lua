@@ -16,5 +16,6 @@ if mode == "full-test" then -- testing costs api requests and therefore money!
       assertMessage(isClose(#response, 8, 3), true) -- 1 token ≈ 4 chars -> test if within 3 chars of that value
     end
   )
-
+else
+  print("skipping...")
 end

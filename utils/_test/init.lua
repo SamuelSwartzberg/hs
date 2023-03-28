@@ -7,7 +7,6 @@ function test_relative_require(currmod, modname)
   orig_relative_require(currmod, modname)
 end
 relative_require = test_relative_require
-  
 
 rrq("type")
 rrq("externals")
