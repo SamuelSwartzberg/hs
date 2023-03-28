@@ -25,7 +25,7 @@ function doWhenReady(fn, args)
     fn = fn, 
     args = args
   })
-  current_alert = alert("Waiting to proceed (" .. #do_queue .. " waiting in queue) ... (Press chord / to continue.)", "indefinite")
+  current_alert = alert("Waiting to proceed (" .. #do_queue .. " waiting in queue) ... (Press chord / to continue.)", {duration = "indefinite"})
   ---@diagnostic disable-next-line: need-check-nil
   alert_hotkey:enable()
 end

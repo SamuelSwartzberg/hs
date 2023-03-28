@@ -88,7 +88,6 @@ function memoize(fn, opts)
   local fnid = tostring(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
 
   if memoized[fnid] then -- if the function is already memoized, return the memoized version. This allows us to use memoized functions immediately as `memoize(fn)(...)` without having to assign it to a variable first
-    print("already memoized")
     return memoized[fnid]
   end
 
@@ -115,7 +114,6 @@ function memoize(fn, opts)
   -- create a timer to invalidate the cache if needed
   if opts.invalidation_mode == "reset" then
     timer = hs.timer.doEvery(opts.interval, function()
-      print("resetting")
       cache_methods.reset(fnid)
     end)
   end
@@ -134,7 +132,6 @@ function memoize(fn, opts)
     local result 
 
     if opts.invalidation_mode == "invalidate" then
-      print("invalidated")
       if created_at + opts.interval < os.time() then -- cache is invalid, so we need to recalculate
         cache_methods.reset(fnid)
         created_at = os.time()

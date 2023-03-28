@@ -43,17 +43,17 @@ local succ, res = pcall(runJSON,{
 })
 
 assertMessage(succ, false)
-local catch_ran = false
+local catch_ran_1 = false
 
 runJSON({
   args = simulate_error_json_command,
   accept_error_payload = false,
   json_catch = function(error)
-    catch_ran = true
+    catch_ran_1 = true
   end
 })
 
-assertMessage(catch_ran, true)
+assertMessage(catch_ran_1, true)
 
 local succ, res = pcall(runJSON,{
   args = simulate_error_json_command,
@@ -64,18 +64,18 @@ local succ, res = pcall(runJSON,{
 })
 
 assertMessage(succ, true)
-local catch_ran = false
+local catch_ran_2 = false
 
 local succ, res = pcall(runJSON,{
   args = simulate_error_json_command,
   accept_error_payload = false,
   json_catch = function(error)
-    catch_ran = true
+    catch_ran_2 = true
     return true
   end
 })
 
-assertMessage(catch_ran, true)
+assertMessage(catch_ran_2, true)
 
 assertMessage(succ, false)
 
@@ -95,17 +95,17 @@ local succ, res = pcall(runJSON, {
 
 assertMessage(succ, false)
 
-local catch_ran = false
+local catch_ran_3 = false
 
 runJSON({
   args = simulate_error_json_command,
-  error_that_is_success = "some error",
+  error_that_is_success = "some other error",
   json_catch = function(error)
-    catch_ran = true
+    catch_ran_3 = true
   end
 })
 
-assertMessage(catch_ran, true)
+assertMessage(catch_ran_3, true)
 
 -- opt: key_that_contains_payload
 

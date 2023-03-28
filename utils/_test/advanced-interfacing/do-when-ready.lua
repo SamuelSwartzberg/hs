@@ -29,25 +29,32 @@ assertMessage(
 
 hs.eventtap.keyStroke({"cmd", "alt", "shift"}, "/")
 
-assertMessage(
-  readFile(temp_file_1, "nil"),
-  "Hello World!"
-)
+hs.timer.doAfter(1, function ()
+  assertMessage(
+    readFile(temp_file_1, "error"),
+    "Hello World!"
+  )
 
-assertMessage(
-  readFile(temp_file_3, "nil"),
-  nil
-)
+  assertMessage(
+    readFile(temp_file_3, "nil"),
+    nil
+  )
 
-hs.eventtap.keyStroke({"cmd", "alt", "shift"}, "/")
-hs.eventtap.keyStroke({"cmd", "alt", "shift"}, "/")
+  hs.eventtap.keyStroke({"cmd", "alt", "shift"}, "/")
+  hs.eventtap.keyStroke({"cmd", "alt", "shift"}, "/")
+  hs.timer.doAfter(1, function ()
+    
+    assertMessage(
+      readFile(temp_file_2, "error"),
+      "Hello World!"
+    )
 
-assertMessage(
-  readFile(temp_file_2, "nil"),
-  "Hello World!"
-)
+    assertMessage(
+      readFile(temp_file_3, "error"),
+      "Hello World!"
+  )
+  end)
+end)
 
-assertMessage(
-  readFile(temp_file_3, "nil"),
-  "Hello World!"
-)
+
+hs.timer.usleep(2000 * 1000)
