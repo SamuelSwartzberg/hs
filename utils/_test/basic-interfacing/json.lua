@@ -43,56 +43,76 @@ local succ, res = pcall(runJSON,{
 })
 
 assertMessage(succ, false)
+local catch_ran = false
 
 runJSON({
   args = simulate_error_json_command,
   accept_error_payload = false,
   json_catch = function(error)
-    assertMessage(true, true)
+    catch_ran = true
   end
 })
+
+assertMessage(catch_ran, true)
 
 local succ, res = pcall(runJSON,{
   args = simulate_error_json_command,
   accept_error_payload = true,
   json_catch = function(error)
-    assertMessage(true, true)
-    return true -- trigger default error handler additionally
+    assertMessage(true, false)
   end
 })
+
+assertMessage(succ, true)
+local catch_ran = false
+
+local succ, res = pcall(runJSON,{
+  args = simulate_error_json_command,
+  accept_error_payload = false,
+  json_catch = function(error)
+    catch_ran = true
+    return true
+  end
+})
+
+assertMessage(catch_ran, true)
 
 assertMessage(succ, false)
 
 -- opt: error_that_is_success
 
-local succ, res = runJSON({
+local succ, res = pcall(runJSON, {
   args = simulate_error_json_command,
   error_that_is_success = "some error"
 })
 
 assertMessage(succ, true)
 
-local succ, res = runJSON({
+local succ, res = pcall(runJSON, {
   args = simulate_error_json_command,
   error_that_is_success = "some other error"
 })
 
 assertMessage(succ, false)
 
+local catch_ran = false
+
 runJSON({
   args = simulate_error_json_command,
   error_that_is_success = "some error",
   json_catch = function(error)
-    assertMessage(true, true)
+    catch_ran = true
   end
 })
+
+assertMessage(catch_ran, true)
 
 -- opt: key_that_contains_payload
 
 local with_payload_key_json_command = 'echo "{ \\"foo\\": \\"bar\\" }"'
 local without_payload_key_json_command = 'echo "{ \\"notfoo\\": \\"bar\\" }"'
 
-local succ, res = runJSON({
+local succ, res = pcall(runJSON,{
   args = with_payload_key_json_command,
   key_that_contains_payload = "foo"
 })
@@ -101,7 +121,7 @@ assertMessage(succ, true)
 
 assertMessage(res, "bar")
 
-local succ, res = runJSON({
+local succ, res =pcall(runJSON,{
   args = without_payload_key_json_command,
   key_that_contains_payload = "foo"
 })
@@ -114,4 +134,4 @@ runJSON({
   json_catch = function(error)
     assertMessage(true, true)
   end
-})
+}) 

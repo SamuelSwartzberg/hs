@@ -58,6 +58,7 @@ function runJSON(opts, and_then)
     opts,
     function(std_out)
       local succ, res = pcall(handleOutputfunction, std_out)
+      inspPrint(succ)
       if not succ then
         local throw_default_error = true
         if opts.json_catch then

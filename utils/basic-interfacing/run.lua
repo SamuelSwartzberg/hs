@@ -65,10 +65,13 @@ function run(opts, and_then, ...)
   local cmd = "cd && source \"$HOME/.target/envfile\" && " .. buildInnerCommand(opts.args)
   opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
   inspPrint(cmd)
+
+  inspPrint(opts)
   
-  catch = function(exit_code, std_err)
+  local catch = function(exit_code, std_err)
     local should_run_default_catch = true
     if opts.catch then
+      print("catching")
       should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch, otherwise, don't
     end
     if should_run_default_catch == true then
@@ -112,6 +115,7 @@ function run(opts, and_then, ...)
           end
         end
         if opts.finally then
+          print("finally")
           opts.finally(exit_code, std_out or std_err)
           if error_to_rethrow then -- rethrow the error if it was caught
             error(error_to_rethrow)

@@ -263,10 +263,11 @@ local timestamp = os.time()
 
 run({
   args = "echo 'hello world'",
-  delay = 1
+  delay = 5
 }, function (std_out)
   assertMessage(std_out, "hello world")
-  assertMessage(os.time() - timestamp, 1)
+  assertMessage(os.time() - timestamp >= 4, true) -- allow for some variability in execution time
+  assertMessage(os.time() - timestamp <= 6, true)
 end)
 
 -- async with error 
@@ -286,7 +287,7 @@ end)
 
 local callback_called = false
 
-run({
+local tsk = run({
   args = "echo 'hello world'",
   finally = function()
     assertMessage(callback_called, true)
@@ -296,19 +297,22 @@ run({
   callback_called = true
 end)
 
+tsk:waitUntilExit()
+
 -- async with catch and finally
 
-local catch_called = false
+local catch_called_n = false
 
-run({
-  args = "false",
+rrrrrr = run({
+  args = "false  ",
   catch = function()
-    catch_called = true
+    catch_called_n = true
   end,
   finally = function()
-    assertMessage(catch_called, true)
+    assertMessage(catch_called_n, true)
   end
 }, function ()
   assertMessage(true, false) -- should not be called
 end)
 
+tsk:waitUntilExit()
