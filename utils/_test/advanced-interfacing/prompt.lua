@@ -7,7 +7,7 @@ assertMessage(
 
 assertMessage(
   doGui("\n", function ()
-    promptStringInner({
+    return promptStringInner({
       default = "Hello World!",
     })
   end),
@@ -21,7 +21,7 @@ assertMessage(
 
 assertMessage(
   doGui(" 2 + 2\n", promptStringInner),
-  "4"
+  4
 )
 
 local rawreturn, ok_button_pressed = doGui("Hello World!\n", promptStringInner)
@@ -42,11 +42,11 @@ assertMessage(
 
 assertMessage(
   doGui("\n", function ()
-    promptPathInner({
-      default = env.PROFILEFILE,
+    return promptPathInner({
+      default = env.DESKTOP,
     })
   end),
-  env.PROFILEFILE
+  env.DESKTOP
 )
 
 local rawres, succ = doGui(
@@ -61,7 +61,7 @@ assertMessage(rawres, nil)
 
 assertMessage(
   doGui("sudoer\n", function ()
-    promptPathInner({
+    return promptPathInner({
       default = "/private/etc",
       can_choose_directories = false,
       can_choose_files = true,
@@ -72,7 +72,7 @@ assertMessage(
 
 assertMessage(
   doGui("sudoer\n", function ()
-    promptPathInner({
+    return promptPathInner({
       default = "/private/etc",
       can_choose_directories = true,
       can_choose_files = false,
@@ -81,9 +81,15 @@ assertMessage(
   "/private/etc/sudoers.d"
 )
 
+local choosetc = function()
+  hs.eventtap.keyStroke({ "cmd", "shift"}, ".") -- show hidden files
+  hs.eventtap.keyStrokes("etc")
+  hs.eventtap.keyStroke({}, "return")
+end
+
 assertMessage(
-  doGui("etc\n", function ()
-    promptPathInner({
+  doGui(choosetc, function ()
+    return promptPathInner({
       default = "/",
       resolves_aliases = true,
     })
@@ -92,8 +98,8 @@ assertMessage(
 )
 
 assertMessage(
-  doGui("etc\n", function ()
-    promptPathInner({
+  doGui(choosetc, function ()
+    return promptPathInner({
       default = "/",
       resolves_aliases = false,
     })
@@ -103,7 +109,7 @@ assertMessage(
 
 assertMessage(
   doGui("\n", function ()
-    promptPathInner({
+    return promptPathInner({
       default = env.HOME,
       allows_loop_selection = true,
     })

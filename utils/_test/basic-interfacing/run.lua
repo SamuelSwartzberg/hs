@@ -267,18 +267,20 @@ end)
 
 -- async with callback and delay
 
-local timestamp = os.time()
+manual_tests.run_callback_delay = function()
+  local timestamp = os.time()
 
-local tsk1 = run({
-  args = "echo 'hello world'",
-  delay = 2
-}, function (std_out)
-  assertMessage(std_out, "hello world")
-  assertMessage(os.time() - timestamp >= 1, true) -- allow for some variability in execution time
-  assertMessage(os.time() - timestamp <= 3, true)
-end)
+  local tsk1 = run({
+    args = "echo 'hello world'",
+    delay = 2
+  }, function (std_out)
+    assertMessage(std_out, "hello world")
+    assertMessage(os.time() - timestamp >= 1, true) -- allow for some variability in execution time
+    assertMessage(os.time() - timestamp <= 3, true)
+  end)
 
-tsk1:waitUntilExit()
+  tsk1:waitUntilExit()
+end
 
 -- async with error 
 
