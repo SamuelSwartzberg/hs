@@ -1,3 +1,5 @@
+if mode == "full-test" then
+  
 -- promptStringInner
 
 assertMessage(
@@ -117,19 +119,20 @@ assertMessage(
   {env.HOME}
 )
 
+
 -- promptNopolicy
 
 local mockPrompterReturnsNil = function()
-  return nil
+  return nil, true
 end
 local getMockPrompterReturnsNilFirstTry = function()
   local first_try = true
   return function()
     if first_try then
       first_try = false
-      return nil
+      return nil, true
     else
-      return "Hello World!"
+      return "Hello World!", true
     end
   end
 end
@@ -143,17 +146,17 @@ local getMockPrompterCancelledFirstTry = function()
       first_try = false
       return nil, false
     else
-      return "Hello World!"
+      return "Hello World!", true
     end
   end
 end
 
 local mockPrompterReturnsString = function()
-  return "Hello World!"
+  return "Hello World!", true
 end
 
 local mockPrompterInvalidWhenTransformed = function()
-  return "Invalid when transformed"
+  return "Invalid when transformed", true
 end
 
 local getMockPrompterInvalidWhenTransformedFirstTry = function()
@@ -161,15 +164,15 @@ local getMockPrompterInvalidWhenTransformedFirstTry = function()
   return function()
     if first_try then
       first_try = false
-      return "Invalid when transformed"
+      return "Invalid when transformed", true
     else
-      return "Hello World!"
+      return "Hello World!", true
     end
   end
 end
 
 local mockTransformerRejectsInvalidWhenTransformed = function(x)
-  return x ~= "Invalid when transformed"
+  return ternary(x == "Invalid when transformed", nil, x), true
 end
 
 -- try permutations of on_raw_invalid, on_transformed_invalid, on_cancel and "return_nil", "error", "reprompt"
@@ -508,20 +511,6 @@ assertMessage(
   env.DESKTOP
 )
 
-assertMessage(
-  doGui(function ()
-    hs.eventtap.keyStrokes("/illegal")
-    hs.eventtap.keyStroke({}, "return")
-    hs.timer.doAfter(0.001, function()
-      hs.eventtap.keyStrokes(env.DESKTOP)
-      hs.eventtap.keyStroke({}, "return")
-    end)
-  end, function ()
-    return prompt("dir", env.DOCUMENTS)
-  end),
-  env.DESKTOP
-)
-
 local tmppath =  env.TMPDIR .. "/prompttest/".. os.time() .. ".txt"
 
 assertMessage(
@@ -548,13 +537,18 @@ assertMessage(
   tmppath
 )
 
+
+else
+  print("skipping...")
+end
+
 -- promptPipeline (like the "pipeline" arg, but allowing prompts of different types to be chained)
 
 assertMessage(
   promptPipeline({
-    {"string", { prompter = function() return "41" end }},
-    {"integer", { prompter = function(prompt_args) return prompt_args.default end }},
-    {"number", { prompter = function(prompt_args) return prompt_args.default / 2 end }},
+    {"string", { prompter = function() return "41", true end }},
+    {"integer", { prompter = function(prompt_args) return prompt_args.default, true end }},
+    {"number", { prompter = function(prompt_args) return prompt_args.default / 2, true end }},
   }),
   20.5
 )

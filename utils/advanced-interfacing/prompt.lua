@@ -1,19 +1,19 @@
 --- @class PromptStringArgs
---- @field message string
---- @field informative_text? string
---- @field default? string
---- @field buttonA? string
---- @field buttonB? string
+--- @field message any
+--- @field informative_text? any
+--- @field default? any
+--- @field buttonA? any
+--- @field buttonB? any
 
 --- @param prompt_args? PromptStringArgs
 --- @return (string|nil), boolean
 function promptStringInner(prompt_args)
   prompt_args = prompt_args or {}
-  prompt_args.message = prompt_args.message or "Enter a string."
-  prompt_args.informative_text = prompt_args.informative_text or ""
-  prompt_args.default = prompt_args.default or ""
-  prompt_args.buttonA = prompt_args.buttonA or "OK"
-  prompt_args.buttonB = prompt_args.buttonB or "Cancel"
+  prompt_args.message = transf.not_nil.string(prompt_args.message) or "Enter a string."
+  prompt_args.informative_text = transf.not_nil.string(prompt_args.informative_text) or ""
+  prompt_args.default = transf.not_nil.string(prompt_args.default) or ""
+  prompt_args.buttonA = transf.not_nil.string(prompt_args.buttonA) or "OK"
+  prompt_args.buttonB = transf.not_nil.string(prompt_args.buttonB) or "Cancel"
   --- @type string, string|nil
   local button_pressed, rawReturn = doWithActivated("Hammerspoon", function()
     return hs.dialog.textPrompt(prompt_args.message, prompt_args.informative_text, prompt_args.default,
@@ -84,6 +84,8 @@ end
 --- @param prompt_spec? PromptSpecifier
 --- @return any
 function promptNopolicy(prompt_spec)
+
+  -- set defaults for all prompt_spec fields
   prompt_spec = copy(prompt_spec) or {}
   prompt_spec.prompter = prompt_spec.prompter or promptStringInner
   prompt_spec.transformer = prompt_spec.transformer or function(x) return x end
@@ -93,34 +95,50 @@ function promptNopolicy(prompt_spec)
   prompt_spec.on_raw_invalid = prompt_spec.on_raw_invalid or "return_nil"
   prompt_spec.on_transformed_invalid = prompt_spec.on_transformed_invalid or "reprompt"
   prompt_spec.prompt_args = prompt_spec.prompt_args or {}
-  local validation_extra = ""
-  local original_informative_text = prompt_spec.prompt_args.informative_text
-  prompt_spec.prompt_args.informative_text = prompt_spec.prompt_args.informative_text ..
-  "on_cancel: " ..
-  prompt_spec.on_cancel ..
-  ", on_raw_invalid: " ..
-  prompt_spec.on_raw_invalid .. ", on_transformed_invalid: " .. prompt_spec.on_transformed_invalid .. "\n"
 
+  -- generate some informative text mainly used when prompter is promptStringInner, though other prompters can consume this too
+  local validation_extra
+  local original_informative_text = prompt_spec.prompt_args.informative_text
+  local info_on_reactions = "c: " ..
+    prompt_spec.on_cancel ..
+    ", r_i: " ..
+    prompt_spec.on_raw_invalid .. 
+    ", t_i: " .. 
+    prompt_spec.on_transformed_invalid
+  local static_informative_text 
+  if original_informative_text then
+    static_informative_text = original_informative_text .. "\n" .. info_on_reactions
+  else
+    static_informative_text = info_on_reactions
+  end
+
+  -- main loop to allow reprompting when prompt_spec conditions for reprompting are met
   while true do
-    if original_informative_text then
-      prompt_spec.prompt_args.informative_text = original_informative_text .. "\n" .. validation_extra
+
+    -- add information on why the prompter is being called to the informative text, if it exists
+    if validation_extra then
+      prompt_spec.prompt_args.informative_text = static_informative_text .. "\n" .. validation_extra
     else
-      prompt_spec.prompt_args.informative_text = validation_extra
+      prompt_spec.prompt_args.informative_text = static_informative_text
     end
+
+    -- call the prompter
     local raw_return, ok_button_pressed = prompt_spec.prompter(prompt_spec.prompt_args)
-    prompt_spec.prompt_args.informative_text = original_informative_text
-    if ok_button_pressed then
-      if prompt_spec.raw_validator(raw_return) then
+
+    if ok_button_pressed then -- not cancelled
+      if prompt_spec.raw_validator(raw_return) then -- raw input was valid
         local transformed_return = prompt_spec.transformer(raw_return)
-        if prompt_spec.transformed_validator(transformed_return) then
+        if prompt_spec.transformed_validator(transformed_return) then -- transformed input was valid
+
+          -- if the prompt_spec has a final_postprocessor, call it. No matter what, return the result
           if prompt_spec.final_postprocessor then
             return prompt_spec.final_postprocessor(transformed_return)
           else
             return transformed_return
           end
-        else
+        else -- transformed input was invalid, handle according to prompt_spec.on_transformed_invalid
           if prompt_spec.on_transformed_invalid == "error" then
-            error("WARN: User input was invalid (after transformation).")
+            error("WARN: User input was invalid (after transformation).", 0)
           elseif prompt_spec.on_transformed_invalid == "return_nil" then
             return nil
           elseif prompt_spec.on_transformed_invalid == "reprompt" then
@@ -132,9 +150,9 @@ function promptNopolicy(prompt_spec)
                 "  Transformed: " .. (transformed_has_string_eqviv and transformed_string_eqviv or "<not tostringable>")
           end
         end
-      else
+      else -- raw input was invalid, handle according to prompt_spec.on_raw_invalid
         if prompt_spec.on_raw_invalid == "error" then
-          error("WARN: User input was invalid (before transformation).")
+          error("WARN: User input was invalid (before transformation).", 0)
         elseif prompt_spec.on_raw_invalid == "return_nil" then
           return nil
         elseif prompt_spec.on_raw_invalid == "reprompt" then
@@ -142,9 +160,9 @@ function promptNopolicy(prompt_spec)
           validation_extra = "Invalid input: " .. (has_string_eqviv and string_eqviv or "<not tostringable>")
         end
       end
-    else
+    else -- cancelled, handle according to prompt_spec.on_cancel
       if prompt_spec.on_cancel == "error" then
-        error("WARN: User cancelled modal.")
+        error("WARN: User cancelled modal.", 0)
       elseif prompt_spec.on_cancel == "return_nil" then
         return nil
       end
@@ -165,34 +183,43 @@ end
 
 
 --- @type promptInt | promptNumber | promptString | promptPath | promptPair | promptIntMult | promptNumberMult | promptStringMult | promptPathMult | promptPairMult
-function prompt(type, prompt_spec, loop)
-  prompt_spec = copy(prompt_spec) or {}
+function prompt(ptype, prompt_spec, loop)
+  local non_table_prompt_spec
+  if type(prompt_spec) == "table" then
+    prompt_spec = copy(prompt_spec)
+  elseif prompt_spec ~= nil then
+    non_table_prompt_spec = prompt_spec
+    prompt_spec = {}
+  else
+    prompt_spec = {}
+  end
   prompt_spec.prompt_args = prompt_spec.prompt_args or {}
-  type = type or "string"
-  if type == "int" then
+  ptype = ptype or "string"
+  local untransformer
+  if ptype == "int" then
     prompt_spec = prompt_spec or {}
     prompt_spec.transformer = prompt_spec.transformer or bind(toNumber, {a_use, "int" })
-  elseif type == "number" then
+  elseif ptype == "number" then
     prompt_spec.transformer = prompt_spec.transformer or tonumber
-  elseif type == "string" then
-    if type(prompt_spec) == "string" then
-      prompt_spec = { prompt_args = { message = prompt_spec } } -- prompt_spec shorthand when type is string: prompt_spec is the message
+  elseif ptype == "string" then
+    if type(non_table_prompt_spec) == "string" then
+      prompt_spec = { prompt_args = { message = non_table_prompt_spec } } -- prompt_spec shorthand when type is string: prompt_spec is the message
     end
-  elseif type == "string-path" or type == "string-filepath" or type == "path" or type == "dir" then
-    if type(prompt_spec) == "string" then
-      prompt_spec = { prompt_args = { default = prompt_spec } } -- prompt_spec shorthand when type is string: prompt_spec is the default value
+  elseif ptype == "string-path" or ptype == "string-filepath" or ptype == "path" or ptype == "dir" then
+    if type(non_table_prompt_spec) == "string" then
+      prompt_spec = { prompt_args = { default = non_table_prompt_spec } } -- prompt_spec shorthand when type is string: prompt_spec is the default value
     end
 
-    if type == "path" or type == "dir" then
+    if ptype == "path" or ptype == "dir" then
       prompt_spec.prompt_args.default = prompt_spec.prompt_args.default or ""
 
-      if type == "dir" then
+      if ptype == "dir" then
         prompt_spec.prompt_args.can_choose_files = false
         prompt_spec.prompt_args.message = prompt_spec.prompt_args.message or "Choose a directory"
       end
 
       prompt_spec.prompter = promptPathInner
-    elseif type == "string-path" then
+    elseif ptype == "string-path" then
       prompt_spec.transformed_validator = function(x)
         local res = (x ~= nil)
         if res then
@@ -200,7 +227,7 @@ function prompt(type, prompt_spec, loop)
         end
         return res
       end
-    elseif type == "string-filepath" then
+    elseif ptype == "string-filepath" then
       prompt_spec.transformed_validator = function(x)
         local res = (x ~= nil)
         if res then
@@ -209,11 +236,15 @@ function prompt(type, prompt_spec, loop)
         return res
       end
     end
-  elseif type == "pair" then
-    if type(prompt_spec) == "string" then
-      prompt_spec = { prompt_args = { message = prompt_spec } }
+  elseif ptype == "pair" then
+    if type(non_table_prompt_spec) == "string" then
+      prompt_spec = { prompt_args = { message = non_table_prompt_spec } }
     end
-    prompt_spec.prompt_args.message = "Add a new " .. prompt_spec.prompt_args.message .. " pair, separated by '-'"
+    if prompt_spec.prompt_args.message then
+      prompt_spec.prompt_args.message = "Add a new " .. prompt_spec.prompt_args.message .. " pair, separated by '-'"
+    else
+      prompt_spec.prompt_args.message = "Add a new pair, separated by '-'"
+    end
     prompt_spec.transformer = function(x)
       local key, value = x:match("^(.-)-(.*)$")
       if key ~= nil and value ~= nil then
@@ -224,9 +255,12 @@ function prompt(type, prompt_spec, loop)
         return nil
       end
     end
+    untransformer = function(x)
+      return x[1] .. "-" .. x[2]
+    end
   end
 
-  prompt_spec.prompt_args.message = prompt_spec.prompt_args.message or ("Enter a " .. type .. ":")
+  prompt_spec.prompt_args.message = prompt_spec.prompt_args.message or ("Enter a " .. ptype .. ":")
 
   if loop == "array" then
     prompt_spec.raw_validator = function(x) return x ~= nil end -- ensure that we can end the loop by a nil-equivalent prompt input
@@ -242,10 +276,14 @@ function prompt(type, prompt_spec, loop)
   elseif loop == "pipeline" then
     while true do
       local x = promptNopolicy(prompt_spec)
-      if x == prompt_spec.prompt_args.default then
-        return prompt_spec.prompt_args.default
+      local untransformed_if_necessary = x
+      if untransformer then -- untransform the output if necessary, so that it can be used as the default for the next prompt, and so it can be compared to the previous input
+        untransformed_if_necessary = untransformer(x)
+      end
+      if untransformed_if_necessary == prompt_spec.prompt_args.default then -- same as previous input, so we're done (default is a bit of a misnomer here, but it's the best I could come up with)
+        return x -- return the transformed output
       else
-        prompt_spec.prompt_args.default = x
+        prompt_spec.prompt_args.default = untransformed_if_necessary
       end
     end
   else
@@ -254,12 +292,24 @@ function prompt(type, prompt_spec, loop)
 end
 
 function promptPipeline(prompt_pipeline)
-  local res = prompt_pipeline[1].prompt_args.default
+  local res
+  local first_prompt_spec = prompt_pipeline[1][2]
+  if type(first_prompt_spec) == "table" and first_prompt_spec.prompt_args then 
+    res = first_prompt_spec.prompt_args.default
+  else
+    res = first_prompt_spec
+  end
   for _, args in iprs(prompt_pipeline) do
-    local prompt_spec = args[2] or {}
-    prompt_spec.prompt_args = prompt_spec.prompt_args or {}
-    prompt_spec.prompt_args.default = res
-    res = prompt(args[1], prompt_spec, args[3])
+    local prompt_spec = args[2]
+    local new_prompt_spec
+    if type(prompt_spec) == "table" then
+      new_prompt_spec = prompt_spec
+    else
+      new_prompt_spec = {}
+    end
+    new_prompt_spec.prompt_args = new_prompt_spec.prompt_args or {}
+    new_prompt_spec.prompt_args.default = res
+    res = prompt(args[1], new_prompt_spec, args[3])
   end
   return res
 end

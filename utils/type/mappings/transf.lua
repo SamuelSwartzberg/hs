@@ -12,6 +12,15 @@ transf = {
       return string.char(tonumber(num, 16))
     end,
   },
+  not_nil = {
+    string = function(arg)
+      if arg == nil then
+        return nil
+      else
+        return tostring(arg)
+      end
+    end,
+  },
   char = {
     hex = function(char)
       return string.format("%02X", string.byte(char))
