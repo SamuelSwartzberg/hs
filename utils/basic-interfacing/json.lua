@@ -13,8 +13,10 @@ function runJSON(opts, and_then)
     opts.force_sync = true
   end
   opts.error_on_empty_output = defaultIfNil(opts.error_on_empty_output, true) -- a well-formed json api should return something like an empty object or array, not an empty string, even if there's no data
+  inspPrint(opts.args)
 
   local function handleOutputfunction(std_out)
+    print(std_out)
     local status, res = pcall(json.decode, std_out)
     if not status then
       error(("When running command:\n\n%s\n\nGot output:\n\n%s\n\nBut failed to decode it as JSON with error:\n\n%s"):format(
@@ -23,6 +25,7 @@ function runJSON(opts, and_then)
         res
       ))
     end
+    inspPrint(res)
     if 
       res.error 
       and not opts.accept_error_payload 

@@ -35,6 +35,14 @@ assertMessage(
   "cat \"~/.profile\" | tr -d \"\\n\""
 )
 
+assertMessage(
+  buildInnerCommand({
+    "echo",
+    { value = '"foo"  "bar"', type = "quoted" }
+  }),
+  'echo "\\"foo\\"  \\"bar\\""'
+)
+
 -- command building with only string and interpolated parts
 
 assertMessage(

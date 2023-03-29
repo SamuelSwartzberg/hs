@@ -15,7 +15,9 @@ function buildInnerCommand(command_parts)
     elseif type(command_part) == "table" then -- command_part needs to be calculated
       command_part.type = command_part.type or "quoted"
       if command_part.type == "quoted" then -- wrap the command_part in quotes
-        command = command .. ' "' .. replace(command_part.value, {matcher = '"'}) .. '"'
+        command = command .. ' "' .. replace(command_part.value, {{"\"", "\\\""}}) .. '"'
+      elseif command_part.type == "sq" then
+        command = command .. " '" .. replace(command_part.value, {{"'", "\\'"}}) .. "'"
       elseif command_part.type == "interpolated" then -- recursively build the command_part and wrap it in $()
         command = command .. ' "$('  .. buildInnerCommand(command_part.value) .. ')"'
       else
@@ -90,6 +92,7 @@ function run(opts, and_then, ...)
     local task =  hs.task.new(
       "/opt/homebrew/bin/bash",
       function(exit_code, std_out, std_err)
+        print("in callback")
         local error_to_rethrow
         if exit_code ~= 0 then
           local status, res = pcall(catch, exit_code, std_err) -- temporarily catch the error so we can run the finally block

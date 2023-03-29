@@ -4,16 +4,13 @@ function BuildIPCSocket(name)
   function ipc_socket:getResponse(tbl)
 
     local succ, res = pcall(runJSON, {
-      args = {
-        "echo",
-        { value = json.encode(tbl), type = "quoted" },
-        "|",
-        "/opt/homebrew/bin/socat",
-        "-",
-        self:getSocket()
-      },
+      args = 
+        "echo '" .. json.encode(tbl) .. "' | /opt/homebrew/bin/socat UNIX-CONNECT:" .. self:getSocket() .. " STDIO"
+      ,
       key_that_contains_payload = "data"
     })
+
+    inspPrint(res)
 
     if succ then
       return res

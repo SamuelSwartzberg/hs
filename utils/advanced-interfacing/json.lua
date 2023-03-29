@@ -18,8 +18,13 @@ function rest(specifier, do_after)
     url = specifier.url
   elseif specifier.host or specifier.endpoint or specifier.params then
     url = ensureAdfix(specifier.host, "/", false, false, "suf")
-    url = url .. (ensureAdfix(specifier.endpoint, "/") or "/")
-    url = url .. "?" .. concat({ sep = "&" }, map(specifier.params, {_f = "%s=%s"}, { args = "kv", ret = "v", tolist = true }) )
+    if specifier.endpoint then
+      url = url .. (ensureAdfix(specifier.endpoint, "/") or "/")
+    inspPrint(map(specifier.params, {_f = "%s=%s"}, { args = "kv", ret = "v", tolist = true }))
+    end
+    if specifier.params then
+      url = url .. "?" .. concat({ sep = "&", isopts="isopts" }, map(specifier.params, {_f = "%s=%s"}, { args = "kv", ret = "v", tolist = true }) )
+    end
   else
     url = "https://dummyjson.com/products?limit=10&skip=10"
   end
@@ -52,6 +57,7 @@ function rest(specifier, do_after)
   end
   if specifier.request_table then
     local request_json = json.encode(specifier.request_table)
+    inspPrint(request_json)
     curl_args = concat(curl_args, {
       "-d",
       { value = request_json, type = "quoted"}

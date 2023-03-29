@@ -8,29 +8,24 @@ assertMessage(
 )
 
 run(
-  "socat UNIX-LISTEN:/tmp/sockets/test-" .. timestamp .. " -",
-  function (stdout)
-    assertMessage(
-      stdout,
-      "Hello World!"
-    )
-  end
+  "socat UNIX-LISTEN:/tmp/sockets/test-" .. timestamp .. ",fork EXEC:'/bin/cat'",
+  true
 )
 
 assertMessage(
-  manual_socket:getResponse("Hello World!"),
-  nil
+  manual_socket:getResponse({data = "Hello World!"}),
+  "Hello World!"
 )
 
 local auto_socket = BuildIPCSocket()
 
 run(
-  "socat UNIX-LISTEN:" .. auto_socket:getSocket() .. ",fork SYSTEM 'socat - UNIX-CONNECT:" .. auto_socket:getSocket() .. "'",
+  "socat UNIX-LISTEN:" .. auto_socket:getSocket() .. ",fork EXEC:'/bin/cat'",
   true
 )
 
 assertMessage(
-  auto_socket:getResponse("Hello World!"),
+  auto_socket:getResponse({data = "Hello World!"}),
   "Hello World!"
 )
 

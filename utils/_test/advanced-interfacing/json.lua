@@ -2,8 +2,10 @@
 
 local default_query_res = rest() -- without args, it queries a default api endpoint (dummyjson.com)
 
+inspPrint(default_query_res)
+
 assertMessage(
-  #default_query_res, 
+  #default_query_res.products, 
   10
 )
 
@@ -12,7 +14,7 @@ local url_query_res = rest({
 })
 
 assertMessage(
-  #url_query_res,
+  #url_query_res.products,
   10
 )
 
@@ -26,7 +28,7 @@ local assembled_query_res = rest({
 })
 
 assertMessage(
-  #assembled_query_res,
+  #assembled_query_res.products,
   10
 )
 
@@ -51,7 +53,7 @@ assertMessage(
 
 local post_res = rest({
   host = "https://dummyjson.com",
-  endpoint = "products",
+  endpoint = "products/add",
   params = {
     limit = 10,
     skip = 10
@@ -70,7 +72,7 @@ assertMessage(
 
 local post_res = rest({
   host = "https://dummyjson.com",
-  endpoint = "products",
+  endpoint = "products/add",
   params = {
     limit = 10,
     skip = 10
@@ -81,7 +83,7 @@ local post_res = rest({
 assertMessage(
   post_res,
   {
-    id = 101
+    id = 101.0
   }
 )
 
@@ -89,7 +91,7 @@ assertMessage(
 
 local post_res = rest({
   host = "https://dummyjson.com",
-  endpoint = "products",
+  endpoint = "products/add",
   params = {
     limit = 10,
     skip = 10
@@ -103,7 +105,7 @@ local post_res = rest({
 assertMessage(
   post_res,
   {
-    id = 101,
+    id = 101.0,
     title = "test"
   }
 )
@@ -113,9 +115,9 @@ assertMessage(
 local auth_response = rest({
   host = "https://dummyjson.com",
   endpoint = "auth/login",
-  request_table = {
-    username = "foo",
-    password = "bar"
+  request_table = { -- data of some user from https://dummyjson.com/docs/users
+    username = "atuny0",
+    password = "9uQFF1Lh"
   },
   request_verb = "POST"
 })
@@ -141,7 +143,8 @@ local problem_token_res = rest({
 assertMessage(
   problem_token_res,
   {
-    message = "Authentication Problem"
+    message = "Invalid/Expired Token!",
+    name = "JsonWebTokenError"
   }
 )
 
@@ -172,7 +175,7 @@ local wrong_header_res = rest({
     skip = 10
   },
   api_key = auth_token,
-  api_key_header_name = "Authorization: IAmABear"
+  api_key_header = "Authorization: IAmABear"
 })
 
 assertMessage(
