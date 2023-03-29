@@ -7,27 +7,30 @@ function runThreaded(command_specifier_list, threads, do_after, catch)
   local threads = threads or 10 -- sensible default
   local results = {}
   local chunked_table = chunk(command_specifier_list, threads)
+  inspPrint(chunked_table)
   local next_pair = siprs(chunked_table)
   local function runNextChunk()
+    print("next chunk")
     local _, chunk = next_pair()
+    preventInfiniteLoop("chunk", 2)
     if chunk then
       for command_id, command_parts in wdefarg(prs)(command_specifier_list) do
-      local task = run({
-        args = command_parts,
-        catch = function(exit_code, std_err)
-          results[command_id] = {
-            exit_code = exit_code,
-            std_err = std_err
-          }
-        end,
-        finally = function()
-          if #values(results) == #values(command_specifier_list) then
-            runNextChunk()
+        local task = run({
+          args = command_parts,
+          catch = function(exit_code, std_err)
+            results[command_id] = {
+              exit_code = exit_code,
+              std_err = std_err
+            }
+          end,
+          finally = function()
+            if #values(results) == #values(command_specifier_list) then
+              runNextChunk()
+            end
           end
-        end
-        }, function (std_out)
-          results[command_id] = std_out
-        end)
+          }, function (std_out)
+            results[command_id] = std_out
+          end)
       end
     else
       local failures = filter(results, {_type = "table"})

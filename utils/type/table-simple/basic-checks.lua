@@ -1,6 +1,8 @@
 --- @param t any
+--- @param also_allow_sparse? boolean
 --- @return boolean
-function isListOrEmptyTable(t)
+function isListOrEmptyTable(t, also_allow_sparse)
+  also_allow_sparse = defaultIfNil(also_allow_sparse, false)
   if type(t) ~= "table" then return false end -- not a table
   if t.islist then return true end -- signal value to indicate that this is a list
   if t.isassoc then return false end -- signal value to indicate that this is an assoc table
@@ -9,7 +11,7 @@ function isListOrEmptyTable(t)
   for k, v in pairs(t) do
     if type(k) ~= "number" then return false end
     count = count + 1
-    if k ~= count then return false end
+    if k ~= count and not also_allow_sparse then return false end
   end
   return true
 end

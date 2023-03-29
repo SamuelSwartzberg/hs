@@ -47,7 +47,9 @@ function toStatefulGenerator(gen, start_res_at, end_res_at)
     local stateless_next, state, initial_val = gen(...)
     local control_var = initial_val
     return function()
+      inspPrint(control_var)
       local res = {stateless_next(state, control_var)}
+      inspPrint(res)
       control_var = res[1]
       if control_var == nil then
         return nil

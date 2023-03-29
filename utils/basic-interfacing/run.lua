@@ -60,10 +60,11 @@ function run(opts, and_then, ...)
   if not opts then
     error("No args provided")
   else
-    if (type(opts) ~= "table") or isListOrEmptyTable(opts) then -- handle shorthand
+    if (type(opts) ~= "table") or isListOrEmptyTable(opts, true) then -- handle shorthand
       opts = {args = opts}
     end
   end
+  inspPrint(opts)
   local cmd = "cd && source \"$HOME/.target/envfile\" && " .. buildInnerCommand(opts.args)
   opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
 

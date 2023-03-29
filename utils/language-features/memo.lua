@@ -66,7 +66,10 @@ local gen_cache_methods = {
     end,
     get_created_time = function(fnid)
       local cache_path = getFsCachePath("fsmemoize", fnid, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
-      return tonumber(readFile(cache_path))
+      return tonumber(readFile(cache_path)) or os.time() -- if the file doesn't exist, return the current time
+    end,
+    set_created_time = function(fnid, created_time)
+      writeFile(getFsCachePath("fsmemoize", fnid, "~~~created~~~"), tostring(created_time), "any", true)
     end
 
   }
@@ -132,8 +135,12 @@ function memoize(fn, opts)
     local result 
 
     if opts.invalidation_mode == "invalidate" then
+      inspPrint(created_at)
       if created_at + opts.interval < os.time() then -- cache is invalid, so we need to recalculate
         cache_methods.reset(fnid)
+        if opts.mode == "fs" then
+          cache_methods.set_created_time(fnid, os.time())
+        end
         created_at = os.time()
       end
 
@@ -145,6 +152,7 @@ function memoize(fn, opts)
 
     if not opts.is_async then
       if not result then  -- no result yet, so we need to call the original function and store the result in the cache
+        inspPrint({...})
         result = { fn(...) }
         cache_methods.put(fnid, params, result)
       end

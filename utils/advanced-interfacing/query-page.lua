@@ -8,14 +8,17 @@
 function queryPage(opts)
   opts = copy(opts) or {}
   opts.url = opts.url or "https://example.com"
-  local webpage = memoize(hs.http.get, {mode = "fs", invalidation_mode = "invalidate", interval = tblmap.dt_component.seconds.day})(opts.url)
+  local _, webpage = memoize(hs.http.get, {mode = "fs", invalidation_mode = "invalidate", interval = tblmap.dt_component.seconds.day})(opts.url)
 
   if not webpage then
     error("Could not fetch webpage at: " .. url)
   end
   local res
   if opts.selector then
-    res = memoized(run)({"|",
+    res = memoize(run)({
+      "echo",
+      { value = webpage, type = "quoted"},
+      "|",
       "htmlq",
       opts.only_text and "--text" or nil,
       { value = opts.selector, type = "quoted" }
