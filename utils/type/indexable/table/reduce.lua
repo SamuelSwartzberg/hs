@@ -22,7 +22,6 @@ function reduce(tbl, reducer, opts)
   local acc = opts.init
   local manual_counter = 0
   for k, v in iterator(tbl) do
-    inspPrint(acc)
     local retriever
     retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)
     local args = getArgs(retriever, opts)

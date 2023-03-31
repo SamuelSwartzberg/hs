@@ -19,8 +19,6 @@ runThreaded(
   end
 )
 
-error("stop")
-
 print("t2")
 
 runThreaded(

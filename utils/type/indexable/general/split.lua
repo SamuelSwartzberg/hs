@@ -44,11 +44,7 @@ function split(thing, sep, opts)
     if opts.mode == "after" then
       sliceend = sliceend + matchlength
     end
-    print("thing")
-    inspPrint(thing)
     local fragment = slice(thing, lastend, sliceend)
-    print("fragment")
-    inspPrint(fragment)
     push(res, fragment)
     local stop = start + matchlength - 1
     lastend = stop + 1
@@ -61,7 +57,7 @@ function split(thing, sep, opts)
   end
 
   local lastfragment = slice(thing, lastend)
-  push(res, lastfragment) -- TODO: not checking if lastfragment is empty might cause problems, but checking definitely causees problems. If problems occur, more complex logic is needed here
+  push(res, lastfragment) 
 
   return res, removed
 end

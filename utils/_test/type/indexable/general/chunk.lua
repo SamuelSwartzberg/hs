@@ -40,3 +40,18 @@ assertMessage(result5, {{1, 2, 3, 4, 5, 6, 7, 8, 9}})
 -- Test 6: Chunk an orderedtable with a size larger than the orderedtable length
 local result6 = chunk(ot, 10)
 assertMessage(result6, {ot})
+
+assertMessage(
+  chunk({1,2,3}, 1),
+  {{1}, {2}, {3}}
+)
+
+assertMessage(
+  chunk({1,2,3}, 2),
+  {{1,2}, {3}}
+)
+
+assertMessage(
+  chunk({1,2,3}, 3),
+  {{1,2,3}}
+)

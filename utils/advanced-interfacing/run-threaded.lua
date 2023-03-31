@@ -6,7 +6,10 @@
 function runThreaded(command_specifier_list, threads, do_after, catch)
   local threads = threads or 10 -- sensible default
   local results = {}
+  print("unchunked")
+  inspPrint(command_specifier_list)
   local chunked_table = chunk(command_specifier_list, threads)
+  print("chunked table")
   inspPrint(chunked_table)
   local next_pair = siprs(chunked_table)
   local function runNextChunk()
