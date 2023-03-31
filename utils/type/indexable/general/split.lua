@@ -44,7 +44,10 @@ function split(thing, sep, opts)
     if opts.mode == "after" then
       sliceend = sliceend + matchlength
     end
+    print("thing")
+    inspPrint(thing)
     local fragment = slice(thing, lastend, sliceend)
+    print("fragment")
     inspPrint(fragment)
     push(res, fragment)
     local stop = start + matchlength - 1

@@ -105,8 +105,14 @@ function flatten(tbl, opts)
     end
   end
 
+  if opts.mode ~= "list" then -- force output to be an assoc arr if we need to
+    opts.output = "table"
+  end
+
   local res = getEmptyResult(tbl, opts)
 
+  print("tbl")
+  inspPrint(tbl)
   for k, v in prs(tbl) do
     if type(v) ~= "table" or isLeaf(v) then
       valAddfunc(res, v, k)
@@ -115,8 +121,14 @@ function flatten(tbl, opts)
         local newopts = copy(opts)
         newopts.path = concat(opts.path, k)
         local subres = flatten(v, newopts)
-        for k, v in prs(subres) do
-          addfunc(res, v, k)
+        print("subres")
+        print(subres.islist)
+        inspPrint(subres)
+        for subk, subv in prs(subres) do
+          print("adding")
+          print(subk)
+          inspPrint(subv)
+          addfunc(res, subv, subk)
         end
       else
         valAddfunc(res, v, k)

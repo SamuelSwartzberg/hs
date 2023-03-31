@@ -76,6 +76,10 @@ function getEmptyResult(thing, opts)
   elseif type(thing) == "table" then -- inferred case 3
     if thing.isovtable then
       return ovtable.new()
+    elseif thing.islist then
+      return list({})
+    elseif thing.isassoc then
+      return assoc({})
     elseif isListOrEmptyTable(thing) then
       return list({})
     else

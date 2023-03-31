@@ -5,10 +5,10 @@ function len(thing)
   if type(thing) == "string" then
     return eutf8.len(thing)
   elseif type(thing) == "table" then
-    if isListOrEmptyTable(thing) then
-      return #thing
-    elseif thing.isovtable then
+    if thing.isovtable then
       return thing:len()
+    elseif isListOrEmptyTable(thing) then
+      return #thing
     else
       local len = 0
       for k, v in pairs(thing) do

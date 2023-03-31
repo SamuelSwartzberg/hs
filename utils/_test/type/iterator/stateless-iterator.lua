@@ -351,6 +351,65 @@ for  k, v in revprs(test_ovtable, 1, 5, 2, 2) do
   end
 end
 
+-- test iprs on mixed table
+
+local mixed_table = { 1, 2, 3, a = 4, b = 5, c = 6 }
+local manual_counter = 0
+
+for k, v in iprs(mixed_table) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, 1)
+    assertMessage(v, 1)
+  elseif manual_counter == 2 then
+    assertMessage(k, 2)
+    assertMessage(v, 2)
+  elseif manual_counter == 3 then
+    assertMessage(k, 3)
+    assertMessage(v, 3)
+  elseif manual_counter == 4 then
+    assertMessage(k, 4)
+    assertMessage(v, 4)
+  elseif manual_counter == 5 then
+    assertMessage(k, 5)
+    assertMessage(v, 5)
+  elseif manual_counter == 6 then
+    assertMessage(k, 6)
+    assertMessage(v, 6)
+  elseif manual_counter == 7 then
+    error("Should not iterate")
+  end
+end
+
+-- test prs on mixed table
+
+local manual_counter = 0
+
+for k, v in prs(mixed_table) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, 1)
+    assertMessage(v, 1)
+  elseif manual_counter == 2 then
+    assertMessage(k, 2)
+    assertMessage(v, 2)
+  elseif manual_counter == 3 then
+    assertMessage(k, 3)
+    assertMessage(v, 3)
+  elseif manual_counter == 4 then
+    assertMessage(k, "a")
+    assertMessage(v, 4)
+  elseif manual_counter == 5 then
+    assertMessage(k, "b")
+    assertMessage(v, 5)
+  elseif manual_counter == 6 then
+    assertMessage(k, "c")
+    assertMessage(v, 6)
+  elseif manual_counter == 7 then
+    error("Should not iterate")
+  end
+end
+
 -- test iterToTbl
 
 

@@ -79,6 +79,64 @@ assertMessage(
       2,
       {
         {
+          27, -- equivalent to { [1] = 27 }
+          4 -- equivalent to { [2] = 4 }
+        },
+        {
+          foo = "bar"
+        }, -- equivalent to { [2] = { foo = "bar" } }
+        5 -- equivalent to [3] = 5
+      }
+    },
+    {
+      treat_as_leaf = "assoc",
+      mode = "assoc",
+    }
+  ),
+  {
+    [1] = 27,
+    [2] = { foo = "bar" },
+    [3] = 5
+  }
+)
+
+  assertMessage(
+  flatten(
+    {
+      1,
+      2,
+      {
+        {
+          27, -- equivalent to { [1] = 27 }
+          4 -- equivalent to { [2] = 4 }
+        },
+        {
+          foo = "bar"
+        }, -- equivalent to foo = "bar"
+        5 -- equivalent to [3] = 5
+      }
+    },
+    {
+      treat_as_leaf = false,
+      mode = "assoc",
+    }
+  ),
+  {
+    [1] = 27,
+    [2] = 4,
+    foo = "bar",
+    [3] = 5
+  }
+)
+
+
+assertMessage(
+  flatten(
+    {
+      1,
+      2,
+      {
+        {
           foo = "bar"
         },
         {
