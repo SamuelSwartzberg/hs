@@ -7,9 +7,7 @@ ExecutableCodeFileItemSpecifier = {
     getables = {
       ["is-shellscript-file"] = function(self)
         return testPath(self:get("contents"), {
-          existence = {
-            contents = { r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" }
-          }
+          contents = { r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" }
         }) or isUsableAsFiletype(self:get("contents"), "shell-script")
       end,
       ["has-errors"] = function(self)

@@ -88,7 +88,7 @@ local gen_cache_methods = {
 --- @param opts? memoOpts
 --- @return fun(...: I): O, hs.timer?
 function memoize(fn, opts)
-  local fnid = tostring(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
+  local fnid = stringy.split(tostring(fn), " ")[2] -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
 
   if memoized[fnid] then -- if the function is already memoized, return the memoized version. This allows us to use memoized functions immediately as `memoize(fn)(...)` without having to assign it to a variable first
     return memoized[fnid]

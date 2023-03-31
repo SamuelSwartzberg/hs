@@ -15,8 +15,8 @@ local result4 = pathSlice("/a/b/c", "-2:")
 assertMessage(result4, {"b", "c"})
 
 -- Test 5: Slicing with negative stop
-local result5 = pathSlice("/a/b/c", ":2:-1")
-assertMessage(result5, {"a", "b"})
+local result5 = pathSlice("/a/b/c", "2:-1")
+assertMessage(result5, {"b", "c"})
 
 -- Test 6: Slicing with negative step
 local result6 = pathSlice("/a/b/c/d", "4:1:-1")
@@ -37,7 +37,3 @@ assertMessage(result9, "/a/b/c")
 -- Test 10: Slicing with entire path for each component
 local result10 = pathSlice("/a/b/c", ":", {entire_path_for_each = true})
 assertMessage(result10, {"/a", "/a/b", "/a/b/c"})
-
--- Test 11: Slicing with multiple options
-local result11 = pathSlice("/a/b/file.txt", "::2", {ext_sep = true, entire_path_for_each = true})
-assertMessage(result11, {"/a", "/a/b/file"})

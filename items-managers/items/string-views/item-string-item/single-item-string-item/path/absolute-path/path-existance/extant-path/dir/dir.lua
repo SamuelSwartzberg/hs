@@ -6,18 +6,14 @@ DirItemSpecifier = {
     getables = {
       ["is-parent-dir"] = function(self)
         return testPath(self:get("contents"), {
-          existence = {
-            dirness = "dir",
-            contents = true
-          }
+          dirness = "dir",
+          contents = true
         })
       end, 
       ["is-empty-dir"] = function(self)
         return testPath(self:get("contents"), {
-          existence = {
-            dirness = "dir",
-            contents = false
-          }
+          dirness = "dir",
+          contents = false
         })
       end,
       ["is-dir-by-path"] = function()

@@ -25,9 +25,19 @@ function pathSlice(path, spec, opts)
     pop(raw_path_components) -- if path ends with a slash, remove the empty string at the end
   end
 
-  -- handle special case of also slicing the extension
+  local started_with_slash = false
+  if raw_path_components[1] == "" then
+    started_with_slash = true
+    if #raw_path_components == 1 then
+      raw_path_components[1] = "/" -- if path is just a slash, keep it
+    else
+      table.remove(raw_path_components, 1) -- remove the empty string at the beginning
+    end
+  end
 
-  if opts.ext_sep then
+  -- handle special case of also slicing the extension
+  -- both relevant if we want to actually separate the extension or if we want to standartize it
+  if opts.ext_sep or opts.standartize_ext then
     local leaf = pop(raw_path_components)
     local without_extension = ""
     local extension = ""
@@ -47,8 +57,12 @@ function pathSlice(path, spec, opts)
       extension = normalize.extension[extension] or extension
     end
 
-    push(raw_path_components, without_extension)
-    push(raw_path_components, extension)
+    if opts.ext_sep then
+      push(raw_path_components, without_extension)
+      push(raw_path_components, extension)
+    else
+      push(raw_path_components, without_extension .. "." .. extension)
+    end
   end
 
   -- slice
@@ -58,7 +72,10 @@ function pathSlice(path, spec, opts)
   -- handle postprocessing
 
   if opts.rejoin_at_end then 
-    if opts.ext_sep then 
+    if started_with_slash then
+      table.insert(res, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
+    end
+    if opts.ext_sep then -- if we separated the path into filename and extension, we need to rejoin them
       local extension = pop(res)
       if not extension then return "" end
       local without_extension = pop(res)
@@ -84,8 +101,12 @@ function pathSlice(path, spec, opts)
     if opts.ext_sep then error("Getting entire path for each component when treating filename and extension as separate components is difficult and thus currently not supported") end
     for i = #res, 1, -1 do
       local relevant_path_components = slice(raw_path_components, { start = 1, stop = i })
+      if started_with_slash then
+        table.insert(relevant_path_components, 1, "") -- same as above
+      end
       res[i] = table.concat(relevant_path_components, "/")
     end
+    return res
   else
     return res
   end

@@ -76,20 +76,16 @@ assertMessage(
 
 assertMessage(
   testPath("/Applications", {
-    existence = {
-      dirness = "dir",
-      contents = true
-    }
+    dirness = "dir",
+    contents = true
   }),
   true
 )
 
 assertMessage(
   testPath(remote_file_path, {
-    existence = {
-      dirness = "not-dir",
-      contents = "hello world"
-    }
+    dirness = "not-dir",
+    contents = "hello world"
   })
 )
 
@@ -98,19 +94,15 @@ delete(remote_file_path)
 
 assertMessage(
   testPath(remote_dir_path, {
-    existence = {
-      dirness = "dir",
-      contents = false
-    }
+    dirness = "dir",
+    contents = false
   })
 )
 
 assertMessage(
   testPath("/Library/User Pictures/sam",{
-    existence = {
-      dirness = "dir",
-      contents = false
-    }
+    dirness = "dir",
+    contents = false
   }),
   true
 )

@@ -20,7 +20,7 @@ function delete(path, thing, action, onlyif)
 
   local path_is_remote = pathIsRemote(path)
   local is_dir = testPath(path, "dir")
-  local is_empty = testPath(path, {existence = { contents = false}})
+  local is_empty = testPath(path, { contents = false})
 
   -- return early if dirness of path doesn't match thing
 
