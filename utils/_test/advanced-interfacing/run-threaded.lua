@@ -40,8 +40,6 @@ runThreaded(
   end
 )
 
-error("stop")
-
 print("t3")
 
 
