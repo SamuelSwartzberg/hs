@@ -135,7 +135,6 @@ function memoize(fn, opts)
     local result 
 
     if opts.invalidation_mode == "invalidate" then
-      inspPrint(created_at)
       if created_at + opts.interval < os.time() then -- cache is invalid, so we need to recalculate
         cache_methods.reset(fnid)
         if opts.mode == "fs" then
@@ -152,7 +151,6 @@ function memoize(fn, opts)
 
     if not opts.is_async then
       if not result then  -- no result yet, so we need to call the original function and store the result in the cache
-        inspPrint({...})
         result = { fn(...) }
         cache_methods.put(fnid, params, result)
       end

@@ -20,7 +20,6 @@ function rest(specifier, do_after)
     url = ensureAdfix(specifier.host, "/", false, false, "suf")
     if specifier.endpoint then
       url = url .. (ensureAdfix(specifier.endpoint, "/") or "/")
-    inspPrint(map(specifier.params, {_f = "%s=%s"}, { args = "kv", ret = "v", tolist = true }))
     end
     if specifier.params then
       url = url .. "?" .. concat({ sep = "&", isopts="isopts" }, map(specifier.params, {_f = "%s=%s"}, { args = "kv", ret = "v", tolist = true }) )
@@ -57,7 +56,6 @@ function rest(specifier, do_after)
   end
   if specifier.request_table then
     local request_json = json.encode(specifier.request_table)
-    inspPrint(request_json)
     curl_args = concat(curl_args, {
       "-d",
       { value = request_json, type = "quoted"}

@@ -21,8 +21,6 @@ function split(thing, sep, opts)
     }, opts.findopts)
   )
 
-  inspPrint(splintervals)
-
   opts.mode = opts.mode or "remove"
 
   if len(splintervals) == 0 then

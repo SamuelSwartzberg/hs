@@ -64,11 +64,8 @@ function run(opts, and_then, ...)
       opts = {args = opts}
     end
   end
-  inspPrint(opts)
   local cmd = "cd && source \"$HOME/.target/envfile\" && " .. buildInnerCommand(opts.args)
   opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
-
-  print(cmd)
 
   
   local catch = function(exit_code, std_err)
@@ -95,7 +92,6 @@ function run(opts, and_then, ...)
     local task =  hs.task.new(
       "/opt/homebrew/bin/bash",
       function(exit_code, std_out, std_err)
-        print("in callback")
         local error_to_rethrow
         if exit_code ~= 0 then
           local status, res = pcall(catch, exit_code, std_err) -- temporarily catch the error so we can run the finally block

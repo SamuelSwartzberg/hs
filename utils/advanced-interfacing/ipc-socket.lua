@@ -10,8 +10,6 @@ function BuildIPCSocket(name)
       key_that_contains_payload = "data"
     })
 
-    inspPrint(res)
-
     if succ then
       return res
     else

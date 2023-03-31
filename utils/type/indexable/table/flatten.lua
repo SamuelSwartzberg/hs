@@ -111,8 +111,6 @@ function flatten(tbl, opts)
 
   local res = getEmptyResult(tbl, opts)
 
-  print("tbl")
-  inspPrint(tbl)
   for k, v in prs(tbl) do
     if type(v) ~= "table" or isLeaf(v) then
       valAddfunc(res, v, k)
@@ -121,13 +119,7 @@ function flatten(tbl, opts)
         local newopts = copy(opts)
         newopts.path = concat(opts.path, k)
         local subres = flatten(v, newopts)
-        print("subres")
-        print(subres.islist)
-        inspPrint(subres)
         for subk, subv in prs(subres) do
-          print("adding")
-          print(subk)
-          inspPrint(subv)
           addfunc(res, subv, subk)
         end
       else

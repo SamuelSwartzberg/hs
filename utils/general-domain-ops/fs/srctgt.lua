@@ -94,7 +94,6 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
       final_target = target .. "/" .. pathSlice(final_source, "-1:-1")[1]
       createPath(final_target, "1:-2")
     end
-    print(final_source .. " -> " .. final_target)
 
     if not has_remote_path then 
       if action == "copy" then

@@ -118,7 +118,6 @@ assertMessage(
   "sWAG"
 )
 
-print("start a tale")
 assertMessage(
   transf.string.title_case("A tale of two cities, and also 9/11, and also sWAG"),
   "A Tale of Two Cities, and Also 9/11, and Also SWAG"
