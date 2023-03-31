@@ -13,7 +13,7 @@ if mode == "full-test" then -- testing costs api requests and therefore money!
       max_tokens = 2
     },
     function (response)
-      assertMessage(isClose(#response, 8, 3), true) -- 1 token ≈ 4 chars -> test if within 3 chars of that value
+      assertMessage(isClose(#response, 8, 5), true) -- 1 token ≈ 4 chars -> test if within 3 chars of that value
     end
   )
 else

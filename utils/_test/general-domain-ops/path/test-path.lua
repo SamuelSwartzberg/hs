@@ -2,7 +2,6 @@
 local tempDir = env.TMPDIR
 local testPath1 = tempDir .. "/testPath1_" .. tostring(os.time())
 createPath(testPath1)
-inspPrint(testPath1)
 assertMessage(testPath(testPath1, {exists = true}), true)
 delete(testPath1, "any", "delete", "any")
 
@@ -26,7 +25,6 @@ delete(testPath3, "any", "delete", "any")
 local testPath4 = tempDir .. "/testPath4_" .. tostring(os.time())
 createPath(testPath4)
 writeFile(testPath4 .. "/file.txt", "sample content", "any", true, "w")
-print(readFile(testPath4 .. "/file.txt"))
 assertMessage(testPath(testPath4 .. "/file.txt", {exists = true, contents = {_contains = "sample content"}}), true)
 delete(testPath4, "any", "delete", "any")
 

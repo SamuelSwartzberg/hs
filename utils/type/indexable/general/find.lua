@@ -50,7 +50,7 @@ function find(indexable, cond, opts)
     while true do
       iters = iters + 1
       if opts.limit and iters > opts.limit then break end
-      preventInfiniteLoop(json.encode(indexable), 100)
+      preventInfiniteLoop(json.encode(indexable), 1000)
       matchkey, matchvalue = findsingle(indexable, cond, {
         ret = "kv",
         start = start

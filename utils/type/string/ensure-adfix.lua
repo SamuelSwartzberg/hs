@@ -1,5 +1,4 @@
 
-
 ---Ensure things related to adfixes
 ---@param in_str string the string to check and potentially modify
 ---@param in_adfix string the adfix to check for and potentially add
@@ -24,7 +23,7 @@ function ensureAdfix(in_str, in_adfix, presence, case_insensitive, adfix_type, s
     adfix = in_adfix
   end
   local flag = ternary(case_insensitive, "i", "")
-  local check_ad = ternary(regex, in_adfix, replace(in_adfix, "regex")) -- which adfix to check for in regex
+  local check_ad = ternary(regex, in_adfix, replace(in_adfix, to.regex.general_escaped)) -- which adfix to check for in regex
   local position_check_func
   if adfix_type == "pre" then
     if regex then 

@@ -12,10 +12,12 @@ run(
   true
 )
 
-assertMessage(
-  manual_socket:getResponse({data = "Hello World!"}),
-  "Hello World!"
-)
+hs.timer.doAfter(0.1, function()
+  assertMessage(
+    manual_socket:getResponse({data = "Hello World!"}),
+    "Hello World!"
+  )
+end)
 
 local auto_socket = BuildIPCSocket()
 
@@ -24,8 +26,9 @@ run(
   true
 )
 
-assertMessage(
-  auto_socket:getResponse({data = "Hello World!"}),
-  "Hello World!"
-)
-
+hs.timer.doAfter(0.1, function()
+  assertMessage(
+    auto_socket:getResponse({data = "Hello World!"}),
+    "Hello World!"
+  )
+end)

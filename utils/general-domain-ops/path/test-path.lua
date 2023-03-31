@@ -38,7 +38,6 @@ function testPath(path, opts)
 
   local exists
 
-  inspPrint(remote)
   if not remote then
     local file = io.open(path, "r")
     pcall(io.close, file)
@@ -47,7 +46,6 @@ function testPath(path, opts)
     exists = pcall(run,{"rclone", "ls", {value = path, type = "quoted"}})
   end
 
-  inspPrint(exists)
   push(results, exists == opts.exists)
 
   if exists and opts.exists then -- if the path exists and we want it to exist, test the dirness and contents
@@ -75,8 +73,6 @@ function testPath(path, opts)
 
     if opts.contents ~= nil then
       local contents
-      print("cont")
-      print(dirness)
       -- get contents depending on whether the path is a directory or not
       if dirness then 
         contents = itemsInPath(path)
@@ -84,11 +80,9 @@ function testPath(path, opts)
           contents = nil
         end
       else
-        print("readin file")
         contents = readFile(path, "nil")
       end
 
-      inspPrint(contents)
 
       -- test contents
       if contents == nil then -- boolean case: test whether the contents are nil or not
@@ -97,15 +91,11 @@ function testPath(path, opts)
         if dirness then
           error("not implemented yet")
         else
-          print("here")
           push(results, find(contents, opts.contents))
         end
       end
     end
   end
-
-
-  inspPrint(results)
 
   return reduce(results, returnAnd)
 end

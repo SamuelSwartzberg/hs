@@ -1,3 +1,5 @@
+if mode == "full-test" then -- testing costs api requests and therefore money!
+
 -- Test 1: Basic functionality
 local test1Opts = {
   in_fields = {
@@ -33,3 +35,6 @@ fillTemplateGPT(test2Opts, function(result)
   assertMessage(result.piece, "Moonlight Sonata")
   assertMessage(result.movement, "1st Movement")
 end)
+else
+  print("skipping...")
+end

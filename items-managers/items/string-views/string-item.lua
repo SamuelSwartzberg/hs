@@ -48,8 +48,8 @@ StringItemSpecifier = {
       ["ends-with"] = function(self, str)
         return stringy.endswith(self:get("contents"), str)
       end,
-      ["difference-from-prefix-or-self"] = function(self, prefix) return 
-        ensureAdfix(self:get("contents"), prefix, false)
+      ["difference-from-prefix-or-self"] = function(self, prefix) 
+        return ensureAdfix(self:get("contents"), prefix, false)
       end,
       ["difference-from-prefix-or-nil"] = function(self, prefix)
         if not self:get("starts-with", prefix) then return nil end

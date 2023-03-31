@@ -40,7 +40,7 @@ function resolve(opts)
   opts.s.path = opts.s.path or env.ME -- this is just some reasonable default, may be changed if a more convenient default is needed
   opts.s.root = opts.s.root or env.HOME
   opts.s.prefix = opts.s.prefix or ""
-  opts.s.suffx = opts.s.suffix or ""
+  opts.s.suffix = opts.s.suffix or ""
   opts.t = copy(opts.t) or {}
   opts.t.prefix = opts.t.prefix or ""
   opts.t.suffix = opts.t.suffix or ""
@@ -52,13 +52,13 @@ function resolve(opts)
   -- clean paths
 
   if opts.s.path then
-    ensureAdfix(opts.s.path, opts.s.prefix, true, false, "pre")
-    ensureAdfix(opts.s.path, opts.s.suffix, true, false, "suf")
+    opts.s.path = ensureAdfix(opts.s.path, opts.s.prefix, false, false, "pre")
+    opts.s.path = ensureAdfix(opts.s.path, opts.s.suffix, false, false, "suf")
   end
 
   if opts.t.path then
-    ensureAdfix(opts.t.path, opts.t.prefix, true, false, "pre")
-    ensureAdfix(opts.t.path, opts.t.suffix, true, false, "suf")
+    opts.t.path = ensureAdfix(opts.t.path, opts.t.prefix, false, false, "pre")
+    opts.t.path = ensureAdfix(opts.t.path, opts.t.suffix, false, false, "suf")
   end
 
   -- clean roots
@@ -79,12 +79,12 @@ function resolve(opts)
 
   if not opts.t.path then -- use at least relative path from source 
     if not opts.t.root then -- use relative path from source and root from source
-      target = source_relative_path
+      target = source
     else -- use relative path from source and root from target
       target = opts.t.root .. source_relative_path
     end
   else -- use at least relative path from target 
-    local target_relative_path = ensureAdfix(opts.t.path, opts.t.root, false, false, "pre")
+    local target_relative_path = ensureAdfix(opts.t.path, opts.t.root or "", false, false, "pre")
     target_relative_path = ensureAdfix(target_relative_path, "/", false, false, "pre")
     if opts.t.root then -- use relative path and root from target
       target = opts.t.root .. target_relative_path
