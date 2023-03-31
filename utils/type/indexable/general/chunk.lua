@@ -7,6 +7,7 @@ function chunk(thing, n)
   return split(
     thing, 
     function(k) 
+      print(k)
       return k % n == 0 
     end, 
     { mode = "after" , findopts = { args = "i"} }

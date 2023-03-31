@@ -6,6 +6,5 @@ function getUnixTimeLastMidnight()
   midnight.hour = 0
   midnight.min = 0
   midnight.sec = 0
-  midnight.isdst = false
   return os.time(midnight)
 end

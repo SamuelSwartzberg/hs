@@ -102,3 +102,112 @@ assertMessage(
   ),
   {"f", "oo"} -- definitely not {"f", "o", "o"}
 )
+
+-- Test 13: Split assoc arr 
+
+assertMessage(
+  split(
+    {
+      a = "foo",
+      b = "bar",
+      c = "baz",
+      d = "foo",
+      e = "bar",
+    },
+    {_exactly = "baz"},
+    {mode = "remove"}
+  ),
+  {
+    {
+      a = "foo",
+      b = "bar",
+    },
+    {
+      d = "foo",
+      e = "bar",
+    }
+  }
+)
+
+-- Test 14: Split assoc arr with with "before" mode
+
+assertMessage(
+  split(
+    {
+      a = "foo",
+      b = "bar",
+      c = "baz",
+      d = "foo",
+      e = "bar",
+    },
+    {_exactly = "baz"},
+    {mode = "before"}
+  ),
+  {
+    {
+      a = "foo",
+      b = "bar",
+    },
+    {
+      c = "baz",
+      d = "foo",
+      e = "bar",
+    }
+  }
+)
+
+-- Test 15: Split assoc arr with with "after" mode
+
+assertMessage(
+  split(
+    {
+      a = "foo",
+      b = "bar",
+      c = "baz",
+      d = "foo",
+      e = "bar",
+    },
+    {_exactly = "baz"},
+    {mode = "after"}
+  ),
+  {
+    {
+      a = "foo",
+      b = "bar",
+      c = "baz",
+    },
+    {
+      d = "foo",
+      e = "bar",
+    }
+  }
+)
+
+-- Test 16: Split assoc arr on index
+
+assertMessage(
+  split(
+    {
+      a = "foo",
+      b = "bar",
+      c = "baz",
+      d = "foo",
+      e = "bar",
+    },
+    function(i)
+      return i % 2 == 0
+    end,
+    {mode = "remove", findopts = {args = "i"}}
+  ),
+  {
+    {
+      a = "foo",
+    },
+    {
+      c = "baz",
+    },
+    {
+      e = "bar",
+    }
+  }
+)

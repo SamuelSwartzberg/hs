@@ -41,11 +41,11 @@ function slice(thing, start_or_spec, stop, step)
   end
 
   if spec.start and type(spec.start) ~= "number" then
-    spec.start = find(thing, spec.start, {ret = "k", last = spec.last_start})
+    spec.start = find(thing, spec.start, {ret = "i", last = spec.last_start})
   end
 
   if spec.stop and type(spec.stop) ~= "number" then
-    spec.stop = find(thing, spec.stop, {ret = "k", start = spec.start, last = spec.last_stop})
+    spec.stop = find(thing, spec.stop, {ret = "i", start = spec.start, last = spec.last_stop})
   end
 
   local is_assoc = type(thing) == "table" and not isListOrEmptyTable(thing)

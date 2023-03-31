@@ -21,14 +21,13 @@ function split(thing, sep, opts)
     }, opts.findopts)
   )
 
+  inspPrint(splintervals)
+
   opts.mode = opts.mode or "remove"
 
   if len(splintervals) == 0 then
     return {thing}
   end
-
-  inspPrint(splintervals)
-  print(opts.mode)
 
   local res = {}
   local removed = {}
@@ -46,6 +45,7 @@ function split(thing, sep, opts)
       sliceend = sliceend + matchlength
     end
     local fragment = slice(thing, lastend, sliceend)
+    inspPrint(fragment)
     push(res, fragment)
     local stop = start + matchlength - 1
     lastend = stop + 1
@@ -55,7 +55,6 @@ function split(thing, sep, opts)
     if opts.mode == "remove" then
       push(removed,  slice(thing, start, stop))
     end
-    inspPrint(removed)
   end
 
   local lastfragment = slice(thing, lastend)

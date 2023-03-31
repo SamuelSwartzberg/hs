@@ -65,17 +65,21 @@ end
 --- @return indexable
 function getEmptyResult(thing, opts)
   opts = opts or {}
-  if opts.tolist or opts.output == "table" then -- manual case 1
-    return {}
+  if opts.tolist  then -- manual case 1
+    return list({})
+  elseif opts.output == "table" then -- manual case 2
+    return assoc({})
   elseif opts.output == "ovtable" then -- manual case 2
     return ovtable.new()
   elseif type(thing) == "string" then -- inferred case 2
     return ""
   elseif type(thing) == "table" then -- inferred case 3
-    if isListOrEmptyTable(thing) or not thing.isovtable then
-      return {}
-    else
+    if thing.isovtable then
       return ovtable.new()
+    elseif isListOrEmptyTable(thing) then
+      return list({})
+    else
+      return assoc({})
     end
   else 
     return {}

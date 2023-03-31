@@ -155,7 +155,7 @@ local correct_token_res = rest({
   endpoint = "auth/products",
   params = {
     limit = 10,
-    skip = 11
+    skip = 10
   },
   api_key = auth_token
 })

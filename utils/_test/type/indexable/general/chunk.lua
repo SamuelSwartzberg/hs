@@ -1,3 +1,16 @@
+-- Test 1: Chunk an assoc arr
+
+local test_assoc = assoc({a = 1, b = 2, c = 3, d = 4, e = 5, f = 6, g = 7})
+local result1 = chunk(test_assoc, 3)
+assertMessage(
+  result1,
+  {
+    assoc({a = 1, b = 2, c = 3}),
+    assoc({d = 4, e = 5, f = 6}),
+    assoc({g = 7})
+  }
+)
+
 -- Test 2: Chunk a list
 local test_list = {1, 2, 3, 4, 5, 6, 7, 8, 9}
 local result2 = chunk(test_list, 4)

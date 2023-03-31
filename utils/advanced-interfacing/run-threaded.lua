@@ -12,7 +12,7 @@ function runThreaded(command_specifier_list, threads, do_after, catch)
   local function runNextChunk()
     print("next chunk")
     local _, chunk = next_pair()
-    preventInfiniteLoop("chunk", 2)
+    inspPrint(chunk)
     if chunk then
       for command_id, command_parts in wdefarg(prs)(command_specifier_list) do
         local task = run({
