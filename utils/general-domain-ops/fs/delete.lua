@@ -19,6 +19,14 @@ function delete(path, thing, action, onlyif)
   -- set local vars
 
   local path_is_remote = pathIsRemote(path)
+  local exists = testPath(path)
+
+  -- return early if path doesn't exist
+
+  if not exists then
+    return nil
+  end
+
   local is_dir = testPath(path, "dir")
   local is_empty = testPath(path, { contents = false})
 
@@ -46,7 +54,7 @@ function delete(path, thing, action, onlyif)
     return nil
   end
 
-  -- delete
+  -- check actions
 
   if action ~= "delete" and action ~= "empty" then
     error("action must be 'delete' or 'empty'")

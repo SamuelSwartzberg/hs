@@ -117,9 +117,12 @@ function itemsInPath(opts)
   return files
 end
 
+--- @class getItemsForAllLevelsInSliceOpts : itemsInPathOpts
+
+--- Gets all dirs and files in all levels of a path selected by a slice spec
 --- @param path string
 --- @param slice_spec? sliceSpecLike
---- @param opts? itemsInPathOpts
+--- @param opts? getItemsForAllLevelsInSliceOpts
 function getItemsForAllLevelsInSlice(path, slice_spec, opts)
   slice_spec = slice_spec or { start = 1, stop = -1 }
   opts = opts or {}

@@ -190,13 +190,25 @@ assertMessage(
   }
 )
 
+assertValuesContain(
+  getItemsForAllLevelsInSlice("/usr/bin/", { start = -1, stop = -1 } ),
+  {"/usr/bin/awk"}
+  
+)
 
 
 assertValuesContain(
-  getItemsForAllLevelsInSlice("/", { start = -2, stop = -2 }  ),
-  {"/Applications"}
+  getItemsForAllLevelsInSlice("/usr/bin/awk", { start = -2, stop = -2 } ),
+  {"/usr/bin/awk"}
   
 )
+
+assertValuesContain(
+  getItemsForAllLevelsInSlice("/usr/bin/awk", { start = 1, stop = -1 } ),
+  {"/usr/bin/awk", "/usr/bin"}
+  
+)
+
 
 -- same but remote
 
@@ -214,19 +226,11 @@ assertMessage(
   {}
 )
 
-assertMessage(
-  find(
-    getItemsForAllLevelsInSlice("/", { start = -2, stop = -2 }  )
-    "/nonextant"
-  ),
-  false
-)
-
 --- exclude dirs
 assertMessage(
   find(
-    getItemsForAllLevelsInSlice('/', { start = -2, stop = -2 }, {include_dirs = false}  ),
-    "/Applications"
+    getItemsForAllLevelsInSlice('/usr/bin', { start = -2, stop = -2 }, {include_dirs = false}  ),
+    "/usr/bin"
   ),
   false
 )
@@ -235,10 +239,10 @@ assertMessage(
 --- exclude files
 assertMessage(
   find(
-    getItemsForAllLevelsInSlice('/', { start = -2, stop = -2 }, {include_files = false}  ),
-    "/Applications"
+    getItemsForAllLevelsInSlice('/usr/bin', { start = -1, stop = -1}, {include_files = false}  ),
+    "/usr/bin/awk"
   ),
-  true
+  false
 )
 
 

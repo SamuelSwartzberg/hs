@@ -99,12 +99,17 @@ function pathSlice(path, spec, opts)
     end
   elseif opts.entire_path_for_each then
     if opts.ext_sep then error("Getting entire path for each component when treating filename and extension as separate components is difficult and thus currently not supported") end
-    for i = #res, 1, -1 do
-      local relevant_path_components = slice(raw_path_components, { start = 1, stop = i })
-      if started_with_slash then
-        table.insert(relevant_path_components, 1, "") -- same as above
+    for i, v in ipairs(res) do
+      for rawi, rawv in ipairs(raw_path_components) do
+        if rawv == v then
+          local relevant_path_components = slice(raw_path_components, { start = 1, stop = rawi })
+          if started_with_slash then
+            table.insert(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
+          end
+          res[i] = table.concat(relevant_path_components, "/")
+          break
+        end
       end
-      res[i] = table.concat(relevant_path_components, "/")
     end
     return res
   else

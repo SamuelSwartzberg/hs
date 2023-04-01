@@ -37,3 +37,31 @@ assertMessage(result9, "/a/b/c")
 -- Test 10: Slicing with entire path for each component
 local result10 = pathSlice("/a/b/c", ":", {entire_path_for_each = true})
 assertMessage(result10, {"/a", "/a/b", "/a/b/c"})
+
+assertMessage(
+  pathSlice("/a/b/c/d", "::2", {
+    entire_path_for_each = true
+  }),
+  {"/a", "/a/b/c"}
+)
+
+assertMessage(
+  pathSlice("/a/b/c/d", "-1:-1", {
+    entire_path_for_each = true
+  }),
+  {"/a/b/c/d"}
+)
+
+assertMessage(
+  pathSlice("/a/b/c/d", "-2:-2", {
+    entire_path_for_each = true
+  }),
+  {"/a/b/c"}
+)
+
+assertMessage(
+  pathSlice("/a/b/c/d", "-3:-2", {
+    entire_path_for_each = true
+  }),
+  {"/a/b", "/a/b/c"}
+)
