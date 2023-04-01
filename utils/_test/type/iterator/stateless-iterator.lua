@@ -298,6 +298,23 @@ for k, v in prs(assocArr, 1, 3, -2) do
   end
 end
 
+local manual_counter = 0
+for k, v in prs(assocArr, 1, -3) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, "a")
+    assertMessage(v, 10)
+  elseif manual_counter == 2 then
+    assertMessage(k, "b")
+    assertMessage(v, 20)
+  elseif manual_counter == 3 then
+    assertMessage(k, "c")
+    assertMessage(v, 30)
+  elseif manual_counter == 4 then
+    error("Should not iterate")
+  end
+end
+
 -- test pairs with negative step on ovtable
 
 local manual_counter = 0
@@ -313,6 +330,53 @@ for k, v in prs(test_ovtable, 1, 5, -2) do
     assertMessage(k, "e")
     assertMessage(v, 10)
   elseif manual_counter == 4 then
+    error("Should not iterate")
+  end
+end
+
+
+local manual_counter = 0
+for k, v in prs(test_ovtable, 1, 5, -1) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, "a")
+    assertMessage(v, 50)
+  elseif manual_counter == 2 then
+    assertMessage(k, "b")
+    assertMessage(v, 40)
+  elseif manual_counter == 3 then
+    assertMessage(k, "c")
+    assertMessage(v, 30)
+  elseif manual_counter == 4 then
+    assertMessage(k, "d")
+    assertMessage(v, 20)
+  elseif manual_counter == 5 then
+    assertMessage(k, "e")
+    assertMessage(v, 10)
+  elseif manual_counter == 6 then
+    error("Should not iterate")
+  end
+end
+
+local manual_counter = 0
+for k, v in prs(test_ovtable, 1, -1, -1) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, "a")
+    assertMessage(v, 50)
+  elseif manual_counter == 2 then
+    assertMessage(k, "b")
+    assertMessage(v, 40)
+  elseif manual_counter == 3 then
+    assertMessage(k, "c")
+    assertMessage(v, 30)
+  elseif manual_counter == 4 then
+    assertMessage(k, "d")
+    assertMessage(v, 20)
+  elseif manual_counter == 5 then
+    assertMessage(k, "e")
+    assertMessage(v, 10)
+  elseif manual_counter == 6 then
     error("Should not iterate")
   end
 end

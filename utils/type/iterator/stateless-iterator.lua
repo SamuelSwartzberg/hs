@@ -12,7 +12,13 @@ function iprs(thing, start, stop, step, limit)
     return function() end, thing, 0
   end
   start = start or 1
+  if start < 0 then
+    start = len_thing + start + 1 -- e.g. 8 + -1 + 1 = 8 -> last elem
+  end
   stop = stop or len_thing
+  if stop < 0 then
+    stop = len_thing + stop + 1
+  end
   step = step or 1
   limit = limit or math.huge
   local iters = 0
