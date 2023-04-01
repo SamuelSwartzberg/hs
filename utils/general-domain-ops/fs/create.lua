@@ -17,7 +17,7 @@ end
 --- @param condition? "exists" | "not-exists" | "any" under what conditions to write the file
 --- @param create_path? boolean whether to create the path to the file if it doesn't exist
 --- @param mode? "w" | "a" the mode to open the file in (write or append)
---- @param fail? "fail" | "nil" what to do if an error occurs
+--- @param fail? "error" | "nil" what to do if an error occurs
 --- @return string | nil 
 function writeFile(path, contents, condition, create_path, mode, fail)
   path = path or env.TMPDIR .. "/" .. os.time() .. "-" .. rand({len = 8}) .. ".tmp"
@@ -36,7 +36,7 @@ function writeFile(path, contents, condition, create_path, mode, fail)
     if create_path then -- if we're allowed to create the parent path, do so
       createPath(parent_path)
     else -- otherwise, fail by returning nil
-      if fail == "fail" then
+      if fail == "error" then
         error(("Failed to write file %s: parent path %s does not exist"):format(path, parent_path))
       else
         return nil
@@ -51,7 +51,7 @@ function writeFile(path, contents, condition, create_path, mode, fail)
   local path_exists = testPath(path)
   if path_exists then
     if condition == "not-exists" then
-      if fail == "fail" then
+      if fail == "error" then
         error(("Failed to write file %s: file already exists"):format(path))
       else
         return nil
@@ -59,7 +59,7 @@ function writeFile(path, contents, condition, create_path, mode, fail)
     end
   else
     if condition == "exists" then
-      if fail == "fail" then
+      if fail == "error" then
         error(("Failed to write file %s: file does not exist"):format(path))
       else
         return nil
@@ -72,7 +72,7 @@ function writeFile(path, contents, condition, create_path, mode, fail)
       file:write(contents or "")
       io.close(file)
     else
-      if fail == "fail" then
+      if fail == "error" then
         error(("Failed to write file %s: could not open file"):format(path))
       else
         return nil

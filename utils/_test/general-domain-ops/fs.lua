@@ -432,25 +432,22 @@ assertMessage(
   "lorem ipsum"
 )
 
-local delres = delete(temp_subdir_1_path, "any", "delete", "empty")
+inspPrint(temp_subdir_1_path)
+inspPrint(itemsInPath(temp_subdir_1_path))
+local succ, res  = pcall(delete, temp_subdir_1_path, "any", "delete", "empty", "error")
 
 assertMessage(
-  delres,
+  succ,
   false
 )
 
-local emptyres = delete(temp_subdir_1_path, "any", "empty")
+delete(temp_subdir_1_path, "any", "empty")
 
 assertMessage(
-  emptyres,
+  testPath(temp_file_1_path, { exists = true, contents = false }),
   true
 )
-delres = delete(temp_subdir_1_path, "any", "delete", "empty")
-
-assertMessage(
-  delres,
-  true
-)
+delete(temp_subdir_1_path, "any", "delete", "empty", "error")
 
 assertMessage(
   testPath(temp_subdir_1_path),

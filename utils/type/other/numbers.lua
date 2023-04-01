@@ -79,7 +79,7 @@ function rand(spec, type)
   end
   local randnr = low + math.random()  * (high - low);
   if type == "number" then
-    return toNumber(randnr, "int", "fail")
+    return toNumber(randnr, "int", "error")
   elseif type == "b64" then
     local len = lengthOfInt(randnr)
     return run({
@@ -95,7 +95,7 @@ end
 
 --- @param thing any
 --- @param target? "number" | "int" | "pos-int"
---- @param mode? "fail" | "nil" | "invalid-number"
+--- @param mode? "error" | "nil" | "invalid-number"
 --- @return number | nil
 function toNumber(thing, target, mode)
   target = target or "number"
@@ -122,7 +122,7 @@ function toNumber(thing, target, mode)
   local res = conv_func(thing)
 
   if res == nil then
-    if mode == "fail" then
+    if mode == "error" then
       error("Value cannot be converted to a " .. target)
     elseif mode == "nil" then
       return nil

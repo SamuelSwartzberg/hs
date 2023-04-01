@@ -1,12 +1,12 @@
 
 ---Ensure things related to adfixes
 ---@param in_str string the string to check and potentially modify
----@param in_adfix string the adfix to check for and potentially add
----@param presence? boolean whether the adfix should be present or not
----@param case_insensitive? boolean whether to ignore case when checking for the adfix
----@param adfix_type? "pre"|"suf"|"in"|nil where the adfix should be
----@param strip_after? boolean whether to strip whitespace before returning
----@param regex? boolean whether the adfix is a regex
+---@param in_adfix string the adfix to check for and potentially add.
+---@param presence? boolean whether the adfix should be present or not. Default true
+---@param case_insensitive? boolean whether to ignore case when checking for the adfix. Default false
+---@param adfix_type? "pre"|"suf"|"in"|nil where the adfix should be. Default "pre"
+---@param strip_after? boolean whether to strip whitespace before returning. Default false
+---@param regex? boolean whether the adfix is a regex. Default false
 ---@return string
 function ensureAdfix(in_str, in_adfix, presence, case_insensitive, adfix_type, strip_after, regex)
   if case_insensitive == nil then case_insensitive = false end

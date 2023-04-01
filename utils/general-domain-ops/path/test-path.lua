@@ -54,22 +54,22 @@ function testPath(path, opts)
 
     local dirness
 
+    if not remote then
+      dirness = not not hs.fs.chdir(path)
+    else 
+      dirness = pcall(runJSON,{
+        args = {"rclone", "lsjson", "--stat", {value = path, type = "quoted"}},
+        key_that_contains_payload = "IsDir"
+      })
+
+    end
+
     if opts.dirness ~= nil then
-      if not remote then
-        dirness = not not hs.fs.chdir(path)
-      else 
-        dirness = pcall(runJSON,{
-          args = {"rclone", "lsjson", "--stat", {value = path, type = "quoted"}},
-          key_that_contains_payload = "IsDir"
-        })
-
-      end
       push(results, dirness == (opts.dirness == "dir"))
-
       if results[#results] == false then -- return early if the dirness test fails. This may be removed at some point if I allow for 'or'-logic at some point
         return false
       end
-    end
+    end    
 
     if opts.contents ~= nil then
       local contents
@@ -83,12 +83,15 @@ function testPath(path, opts)
 
       -- test contents
       if type(opts.contents) == "boolean" then -- boolean case: test whether the contents are nil or not
+        print('dirness')
         print(dirness)
         if dirness then
+          print('contents')
           inspPrint(contents)
           push(results, opts.contents == (#contents > 0))
         else
-          push(results, opts.contents == (contents ~= nil))
+          local isempty = contents == nil or contents == ""
+          push(results, opts.contents == (not isempty))
         end
       else
         push(results, find(contents, opts.contents))

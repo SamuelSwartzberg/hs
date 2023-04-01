@@ -41,7 +41,7 @@ function doDelta(specifier, do_after)
   if type(specifier.target_point) == "string" then
     local x, y = specifier.target_point:match("^([\\-%d]+)..-([\\-%d]+)$")
 ---@diagnostic disable-next-line: assign-type-mismatch
-    specifier.target_point = { x = toNumber(x, "number", "fail"), y = toNumber(y, "number", "fail") }
+    specifier.target_point = { x = toNumber(x, "number", "error"), y = toNumber(y, "number", "error") }
   end
 
   if specifier.relative_to then
