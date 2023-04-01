@@ -52,21 +52,25 @@ function itemsInPath(opts)
         args = {"rclone", "lsf", {value = listerpath, type = "quoted"}},
         catch = function() return nil end,
       }) 
+      inspPrint(output)
       if output then
         items = lines(output)
-        items = filter(items, true)
+        items = filter(items, false)
+        inspPrint(items)
         items = map(
           items,
           function(item)
             item = stringy.strip(item)
             item = ensureAdfix(item, "/", false, false, "pre")
             item = ensureAdfix(item, "/", false, false, "suf")
+            print(item)
             return item
           end
         )
       else
         items = {}
       end
+      inspPrint(items)
       return svalues(items)
     end
   end

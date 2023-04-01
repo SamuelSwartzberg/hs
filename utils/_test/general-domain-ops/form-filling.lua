@@ -31,8 +31,8 @@ local test2Opts = {
 }
 
 fillTemplateGPT(test2Opts, function(result)
-  assertMessage(result.composer, "Beethoven")
-  assertMessage(result.piece, "Moonlight Sonata")
+  assertMessage(result.artist, "Beethoven")
+  assertMessage(result.song_title, "Moonlight Sonata")
   assertMessage(result.movement, "1st Movement")
 end)
 else

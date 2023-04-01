@@ -1,3 +1,4 @@
+if mode == "full-test" then -- running this every time takes forever
 -- buildInnerCommand:
 
 -- mere string passthrough
@@ -328,3 +329,6 @@ rrrrrr = run({
 end)
 
 tsk:waitUntilExit()
+else
+  print("skipping...")
+end

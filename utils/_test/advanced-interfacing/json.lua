@@ -1,3 +1,5 @@
+if mode == "full-test" then -- making a bunch of json requests non-async takes time
+
 -- ensure that the stuff gotten for various ways of assembling the url seems right
 
 local default_query_res = rest() -- without args, it queries a default api endpoint (dummyjson.com)
@@ -204,3 +206,6 @@ rest({
   )
 end)
 
+else
+  print("skipping...")
+end

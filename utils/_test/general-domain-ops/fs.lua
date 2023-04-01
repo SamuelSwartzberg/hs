@@ -1,4 +1,4 @@
-if mode == "full-test" then
+if true --[[mode == "full-test"]] then
 
 delete(env.HSFTP_TMPDIR .. "/foo/")
 
@@ -86,7 +86,8 @@ assertMessage(
   testPath(remote_file_path, {
     dirness = "not-dir",
     contents = "hello world"
-  })
+  }),
+  true
 )
 
 delete(remote_file_path)
@@ -96,7 +97,8 @@ assertMessage(
   testPath(remote_dir_path, {
     dirness = "dir",
     contents = false
-  })
+  }),
+  true
 )
 
 assertMessage(

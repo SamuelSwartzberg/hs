@@ -22,7 +22,7 @@ lemap = {
     by extracting data from the following fields
 
     {{[
-      table.concat(map(d.in_fields, "%s: %s", { args = "kv", ret = "v", tolist = true }), "\n")
+      table.concat(map(d.in_fields, {_f= "%s: %s"}, { args = "kv", ret = "v", tolist = true }), "\n")
     ]}}
 
     If there seems to be no data for a field, just leave it blank.

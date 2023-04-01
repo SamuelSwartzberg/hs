@@ -25,7 +25,10 @@
 --- @param opts fillTemplateGPTOpts
 --- @param do_after fun(result: {[string]: string}): nil
 function fillTemplateGPT(opts, do_after)
-  gpt(le(lemap.gpt.fill_template, opts), function (result)
+  local query = le(lemap.gpt.fill_template, opts)
+  print(query)
+  gpt(query, function (result)
+    inspPrint(result)
     local out_fields = map(
       opts.out_fields,
       function (field, value)

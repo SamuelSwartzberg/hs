@@ -85,14 +85,10 @@ function testPath(path, opts)
 
 
       -- test contents
-      if contents == nil then -- boolean case: test whether the contents are nil or not
+      if type(opts.contents) == "boolean" then -- boolean case: test whether the contents are nil or not
         push(results, opts.contents == (contents ~= nil))
       else
-        if dirness then
-          error("not implemented yet")
-        else
-          push(results, find(contents, opts.contents))
-        end
+        push(results, find(contents, opts.contents))
       end
     end
   end
