@@ -52,7 +52,6 @@ function itemsInPath(opts)
         args = {"rclone", "lsf", {value = listerpath, type = "quoted"}},
         catch = function() return nil end,
       }) 
-      inspPrint(output)
       if output then
         items = lines(output)
         items = filter(items, false)

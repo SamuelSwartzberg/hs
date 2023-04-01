@@ -107,38 +107,38 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
       elseif action == "link" then
         _, err_msg =  hs.fs.link(final_source, final_target, true)
       elseif action == "zip" then
-        run(
+        run({
           "zip",
           "-r",
           { value = final_target, type = "quoted"},
           { value = final_source, type = "quoted"}
-        )
+        })
       end
     else
       if action == "copy" then
-        run(
+        run({
           "rclone",
           "copyto",
           { value = final_source, type = "quoted"},
           { value = final_target, type = "quoted"}
-        )
+        })
       elseif action == "move" then
-        run(
+        run({
           "rclone",
           "moveto",
           { value = final_source, type = "quoted"},
           { value = final_target, type = "quoted"}
-        )
+        })
       elseif action == "link" then
         error("linking remote files is not supported (not supported by rclone and also not really sensible)")
       elseif action == "zip" then
         tmptarget = env.TMPDIR .. "/" .. os.time() .. "-" .. rand({len = 8}) .. ".zip"
-        run(
+        run({
           "zip",
           "-r",
           { value = tmptarget, type = "quoted"},
           { value = final_source, type = "quoted"}
-        )
+        })
       end
 
     end

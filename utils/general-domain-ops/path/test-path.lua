@@ -76,9 +76,6 @@ function testPath(path, opts)
       -- get contents depending on whether the path is a directory or not
       if dirness then 
         contents = itemsInPath(path)
-        if #contents == 0 then
-          contents = nil
-        end
       else
         contents = readFile(path, "nil")
       end
@@ -86,7 +83,13 @@ function testPath(path, opts)
 
       -- test contents
       if type(opts.contents) == "boolean" then -- boolean case: test whether the contents are nil or not
-        push(results, opts.contents == (contents ~= nil))
+        print(dirness)
+        if dirness then
+          inspPrint(contents)
+          push(results, opts.contents == (#contents > 0))
+        else
+          push(results, opts.contents == (contents ~= nil))
+        end
       else
         push(results, find(contents, opts.contents))
       end

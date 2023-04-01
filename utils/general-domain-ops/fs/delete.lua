@@ -55,32 +55,32 @@ function delete(path, thing, action, onlyif)
   if is_dir then
     if not path_is_remote then
       if action == "empty" then
-        run(
+        run({
           "rm",
           "-rf",
           { value = path .. "/*", type = "quoted"}
-        )
+        })
       elseif action == "delete" then
-        run(
+        run({
           "rm",
           "-rf",
           { value = path, type = "quoted"}
-        )
+        })
       end
     else
-      run(
+      run({
         "rclone",
         "purge",
         { value = path, type = "quoted"}
-      )
+      })
 
       -- purge deletes the directory itself, so we need to recreate it if we want to empty it (there seems to be no rclone empty command, or equivalent)
       if action == "empty" then
-        run(
+        run({
           "rclone",
           "mkdir",
           { value = path, type = "quoted"}
-        )
+        })
       end
     end
   else
@@ -93,11 +93,14 @@ function delete(path, thing, action, onlyif)
           error(err_msg)
         end
       else
-        run(
+        inspPrint({ "rclone",
+        "deletefile",
+        { value = path, type = "quoted"}})
+        run({
           "rclone",
           "deletefile",
           { value = path, type = "quoted"}
-        )
+        })
       end
     end
   end
