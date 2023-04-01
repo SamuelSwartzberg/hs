@@ -19,24 +19,5 @@ assertMessage(pathIsRemote("example.com/test.git"), false)
 assertMessage(pathIsRemote("test/path/test.git"), false)
 
 -- Test isGitRootDir
--- Prepare a simple helper function to mock itemsInPath
-function mockItemsInPath(nonGitPath)
-  return function(path)
-    if path == "gitRootDir" then
-      return {"file1", "file2", ".git"}
-    elseif path == "nonGitRootDir" then
-      return {"file1", "file2"}
-    else
-      return nonGitPath or {}
-    end
-  end
-end
-
-local originalItemsInPath = itemsInPath
-itemsInPath = mockItemsInPath()
-
-assertMessage(isGitRootDir("gitRootDir"), true)
-assertMessage(isGitRootDir("nonGitRootDir"), false)
-
--- Restore the original itemsInPath function
-itemsInPath = originalItemsInPath
+assertMessage(isGitRootDir(env.MENV), true)
+assertMessage(isGitRootDir(env.DESKTOP), false)

@@ -3,5 +3,10 @@
 --- @param key string
 --- @return string | nil
 function shortcutToString(mods, key)
-  return stringx.join(" ", {stringx.join("", map(mods, tblmap.mod.symbol)), key})
+  local modstr = stringx.join("", map(mods, tblmap.mod.symbol))
+  if modstr == "" then
+    return key
+  else
+    return modstr .. " " .. key
+  end
 end

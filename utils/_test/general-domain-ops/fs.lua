@@ -1,4 +1,4 @@
-if true --[[mode == "full-test"]] then
+if mode == "full-test" then
 
 delete(env.HSFTP_TMPDIR .. "/foo/")
 
@@ -714,15 +714,15 @@ assertMessage(
   fsTree(fstree_test_dir, "append"),
   {
     inner = {
-      fstree_test_dir .. "/inner/foo.txt",
-      fstree_test_dir .. "/inner/abee.json"
+      fstree_test_dir .. "inner/abee.json",
+      fstree_test_dir .. "inner/foo.txt",
     },
     sore = {
       are = {}
     },
     bar = {
-      fstree_test_dir .. "/bar/rei.yaml",
-      fstree_test_dir .. "/bar/murloc.txt"
+      fstree_test_dir .. "bar/rei.yaml",
+      fstree_test_dir .. "bar/murloc.txt"
     }
   }
 )

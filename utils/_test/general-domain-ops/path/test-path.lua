@@ -49,7 +49,7 @@ delete(testPath3Remote, "any", "delete", "any")
 local testPath4Remote = tempDirRemote .. "/testPath4_" .. tostring(os.time())
 createPath(testPath4Remote)
 writeFile(testPath4Remote .. "/file.txt", "sample content", "any", true, "w")
-assertMessage(testPath(testPath4Remote, {exists = true, contents = {_contains = "sample content"}}), true)
+assertMessage(testPath(testPath4Remote .. "/file.txt", {exists = true, contents = {_contains = "sample content"}}), true)
 delete(testPath4Remote, "any", "delete", "any")
 
 
