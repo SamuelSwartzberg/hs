@@ -1,13 +1,17 @@
--- Test 1: Push local file to remote
+if mode == "full-test" then 
+  -- Test 1: Push local file to remote
 do
   local timestamp = tostring(os.time())
-  local localPath = env.TMPDIR .. "/test_push_local_" .. timestamp
-  local remotePath = env.HSFTP_TMPDIR .. "/test_push_remote_" .. timestamp
-  createPath(localPath)
-  writeFile(localPath .. "/file1.txt", "This is a test file.")
-  syncHomeRelativePath(".tmp/test_push_local_" .. timestamp, "push")
+  local dirname = "/test_push_local_" .. timestamp
+  local localPath = env.TMPDIR .. dirname
+  local localFile = localPath .. "/file1.txt"
+  local remotePath = remote(localPath)
+  local remoteFile = remote(localFile)
+  writeFile(localFile, "This is a test file.", true)
 
-  local remoteFileContents = readFile(remote("/.tmp/test_push_remote_" .. timestamp .. "/file1.txt"))
+  syncHomeRelativePath(".tmp" .. dirname, "push", nil, true) -- 3rd param should default to "copy"
+
+  local remoteFileContents = readFile(remoteFile, "error")
   assertMessage(remoteFileContents, "This is a test file.")
 
   delete(localPath, "dir", "delete", "any")
@@ -17,13 +21,15 @@ end
 -- Test 2: Pull remote file to local
 do
   local timestamp = tostring(os.time())
-  local localPath = env.TMPDIR .. "/test_pull_local_" .. timestamp
-  local remotePath = env.HSFTP_TMPDIR .. "/test_pull_remote_" .. timestamp
-  createPath(remotePath)
-  writeFile(remotePath .. "/file2.txt", "This is another test file.")
-  syncHomeRelativePath(".tmp/test_pull_remote_" .. timestamp, "pull")
+  local dirname = "/test_push_local_" .. timestamp
+  local localPath = env.TMPDIR .. dirname
+  local localFile = localPath .. "/file2.txt"
+  local remotePath = remote(localPath)
+  local remoteFile = remote(localFile)
+  writeFile(remoteFile, "This is another test file.", true)
+  syncHomeRelativePath(".tmp" .. dirname, "pull", "copy", true)
 
-  local localFileContents = readFile(resolve("/.tmp/test_pull_local_" .. timestamp .. "/file2.txt"))
+  local localFileContents = readFile(localFile, "error")
   assertMessage(localFileContents, "This is another test file.")
 
   delete(localPath, "dir", "delete", "any")
@@ -33,16 +39,17 @@ end
 -- Test 3: Push local directory to remote using "move" action
 do
   local timestamp = tostring(os.time())
-  local localPath = env.TMPDIR .. "/test_move_push_local_" .. timestamp
-  local remotePath = env.HSFTP_TMPDIR .. "/test_move_push_remote_" .. timestamp
-  createPath(localPath)
-  writeFile(localPath .. "/file3.txt", "This is a test file for move action.")
-  syncHomeRelativePath(".tmp/test_move_push_local_" .. timestamp, "push", "move")
+  local dirname = "/test_push_local_" .. timestamp
+  local localPath = env.TMPDIR .. dirname
+  local localFile = localPath .. "/file3.txt"
+  local remotePath = remote(localPath)
+  local remoteFile = remote(localFile)
+  writeFile(localFile, "This is a test file for move action.", true)
+  syncHomeRelativePath(".tmp" .. dirname, "push", "move", true)
 
-  local remoteFileContents = readFile(remote("/.tmp/test_move_push_remote_" .. timestamp .. "/file3.txt"))
-  local localFileExists = readFile(localPath .. "/file3.txt", "nil")
+  local remoteFileContents = readFile(remoteFile, "error")
   assertMessage(remoteFileContents, "This is a test file for move action.")
-  assertMessage(localFileExists, nil)
+  assertMessage(testPath(localFile), false)
 
   delete(localPath, "dir", "delete", "any")
   delete(remotePath, "dir", "delete", "any")
@@ -52,4 +59,7 @@ end
 do
   local success, errorMessage = pcall(syncHomeRelativePath, ".tmp/test_invalid_param", "invalid")
   assertMessage(errorMessage, "push_or_pull must be 'push' or 'pull'")
+end
+else
+  print("skipping...")
 end
