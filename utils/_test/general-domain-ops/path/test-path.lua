@@ -51,3 +51,14 @@ createPath(testPath4Remote)
 writeFile(testPath4Remote .. "/file.txt", "sample content", "any", true, "w")
 assertMessage(testPath(testPath4Remote, {exists = true, contents = {_contains = "sample content"}}), true)
 delete(testPath4Remote, "any", "delete", "any")
+
+
+assertMessage(
+  pathSlice("/a/b/c", "-1:-1", {rejoin_at_end=true}),
+  "c" -- this is to expose a bug that would cause this to return "/c", falsely readding the leading slash even though c was not the first element of the path
+)
+
+assertMessage(
+  pathSlice("/a/b/a", "-1:-1", {rejoin_at_end=true}),
+  "a" -- aggravated case of the above bug
+)

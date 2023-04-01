@@ -444,7 +444,7 @@ assertMessage(
 delete(temp_subdir_1_path, "any", "empty")
 
 assertMessage(
-  testPath(temp_file_1_path, { exists = true, contents = false }),
+  testPath(temp_subdir_1_path, { exists = true, contents = false }),
   true
 )
 delete(temp_subdir_1_path, "any", "delete", "empty", "error")
@@ -613,11 +613,11 @@ assertValuesContain(
   }),
   {
     "Containers",
-    "Cache"
+    "Caches"
   }
 )
 
-assertMessage(
+assertValuesContain(
   itemsInPath({
     path = env.MAC_LIBRARY,
     slice_results = "-2:-1",
@@ -627,7 +627,7 @@ assertMessage(
   }),
   {
     {"Library", "Containers"},
-    {"Library", "Cache"}
+    {"Library", "Caches"}
   }
 )
 
@@ -646,7 +646,7 @@ assertMessage(
 local fstree_test_dir = env.TMPDIR .. "/fstree-" .. os.time() .. "/"
 
 writeFile(fstree_test_dir .. "foo.txt", "gg ez", "any", true)
-writeFile(fstree_test_dir .. "abee.json", "{'a': 'b'}", "any", true)
+writeFile(fstree_test_dir .. "abee.json", "{\"a\": \"b\"}", "any", true)
 createPath(fstree_test_dir .. "bar/baz")
 writeFile(fstree_test_dir .. "bar/rei.yaml", "kore: ha\nchoco: desu\n", "any", true)
 writeFile(fstree_test_dir .. "bar/murloc.txt", "mrgl mrgl", "any", true)
@@ -654,12 +654,12 @@ writeFile(fstree_test_dir .. "bar/murloc.txt", "mrgl mrgl", "any", true)
 assertMessage(
   fsTree(fstree_test_dir, "read"),
   {
-    foo = "gg ez",
-    abee = "{'a': 'b'}",
+    ["foo.txt"] = "gg ez",
+    ["abee.json"] = "{\"a\": \"b\"}",
     bar = {
       baz = {},
-      rei = "kore: ha\nchoco: desu\n",
-      murloc = "mrgl mrgl"
+      ["rei.yaml"] = "kore: ha\nchoco: desu\n",
+      ["murloc.txt"] = "mrgl mrgl"
     }
   }
 )
@@ -684,6 +684,7 @@ assertMessage(
   fsTree(fstree_test_dir, "as-tree", {'yaml'}),
   {
     bar = {
+      baz = {}, -- currently empty dirs are included in the tree when using as-tree. this may change in the future
       rei = {
         choco = "desu",
         kore = "ha"
@@ -698,6 +699,9 @@ assertMessage(
     abee = {
       a = "b"
     },
+    bar = { -- same as above (transitively, if the child dir wouldn't be included, bar itself would be empty and thus not included)
+      baz = {} -- same as above
+    }
   }
 )
 

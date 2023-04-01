@@ -103,9 +103,10 @@ function itemsInPath(opts)
   end
 
   if opts.validator_result then
-    files = filter(files, opts.validator_result)
+    files = filter(files, opts.validator_result, {tolist=true})
   end
 
+  inspPrint(files)
   if opts.slice_results then
     files = map(files, function(path)
       opts.slice_results_opts = opts.slice_results_opts or {}

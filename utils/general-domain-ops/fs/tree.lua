@@ -10,8 +10,8 @@ function fsTree(path, do_files, tree_files)
   tree_files = tree_files or {"json", "yaml"}
   local res = {}
   path = ensureAdfix(path, "/", true, false, "suf")
-  for _,full_path in itemsInPath(path) do
-    local file = pathSlice(path, "-1:-1")
+  for _,full_path in iprs(itemsInPath(path)) do
+    local file = pathSlice(full_path, "-1:-1")[1]
     if testPath(full_path, "dir") then 
       res[file] = fsTree(full_path, do_files, tree_files)
     else
@@ -24,6 +24,7 @@ function fsTree(path, do_files, tree_files)
         if stringy.endswith(file, ".yaml") and find(tree_files, "yaml") then
           res[nodename] = yamlLoad(readFile(full_path, "error"))
         elseif stringy.endswith(file, ".json") and find(tree_files, "json") then
+          print("decoding " .. nodename)
           res[nodename] = json.decode(readFile(full_path, "error"))
         end
       end

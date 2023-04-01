@@ -67,12 +67,16 @@ function pathSlice(path, spec, opts)
 
   -- slice
 
-  local res =  slice(raw_path_components, spec)
+  local res, eff_slice_spec =  slice(raw_path_components, spec)
+  local same_start_elem = res[1] == raw_path_components[1]
+  local starts_at_beginning = eff_slice_spec.start == 1
+    
+  local still_starts_at_root = started_with_slash and same_start_elem and starts_at_beginning
 
   -- handle postprocessing
 
   if opts.rejoin_at_end then 
-    if started_with_slash then
+    if still_starts_at_root then
       table.insert(res, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
     end
     if opts.ext_sep then -- if we separated the path into filename and extension, we need to rejoin them

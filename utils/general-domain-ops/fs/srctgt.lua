@@ -47,7 +47,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
   -- create (parent) path if necessary
 
   if create_path then
-    if testPath(target, "dir") then
+    if testPath(target, "dir") or into then
       createPath(target)
     else
       createPath(target, "1:-2")
