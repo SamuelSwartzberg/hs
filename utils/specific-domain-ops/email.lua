@@ -26,11 +26,22 @@ end
 
 --- @param headers { [string]: string }
 --- @param body string
---- @param edit_func fun(mail: string, do_after: fun(mail: string))
---- @param do_after fun(mail: string)
-function buildEmailInteractive(headers, body, edit_func, do_after)
+--- @return string
+function buildEmail(headers, body)
   local header = buildEmailHeaders(headers)
   local mail = string.format("%s\n\n%s", header, body)
+  return mail
+end
+
+--- @param headers { [string]: string }
+--- @param body string
+--- @param edit_func? fun(mail: string, do_after: fun(mail: string))
+--- @param do_after fun(mail: string)
+function buildEmailInteractive(headers, body, edit_func, do_after)
+  local mail = buildEmail(headers, body)
+  edit_func = edit_func  or function(mail, do_after)
+    do_after(mail)
+  end
   edit_func(mail, function(mail)
     local evaled_mail = le(mail)
     local temp_file = writeFile(nil, evaled_mail)
@@ -46,6 +57,10 @@ function buildEmailInteractive(headers, body, edit_func, do_after)
       do_after(new_file)
     end)
   end)
+end
+
+function getLocalEmailAddr()
+  return string.format("%s@%s", env.USER, env.HOSTNAME)
 end
 
 --- @param email_file string
@@ -90,9 +105,6 @@ end
 --- @param edit_func? fun(mail: string, do_after: fun(mail: string))
 --- @param do_after? fun()
 function sendEmailInteractive(headers, body, edit_func, do_after)
-  edit_func = edit_func or function(mail, do_after)
-    do_after(mail)
-  end
   buildEmailInteractive(headers, body, edit_func, function(mail_file)
     sendEmail(mail_file, do_after)
   end)

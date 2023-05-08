@@ -10,9 +10,12 @@ post 'lua is working':
     - shrinking, moving other documents
     - consider how to integrate email into history
     - is self-renaming of dated dirs implemented?
+    - import/sync strava
   - window switcher is limited to spaces, can't deal with minimized items
   - process bookmarks to sessions, urls
   - old contact importing
+    - contact em 
+    - contact freiland aktzeichen host (ask first if still hosting)
   - newsboat formatting, interface
   - test:
     - calendar interfacing
