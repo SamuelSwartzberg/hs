@@ -80,19 +80,39 @@ assertMessage(
 local lower = 22
 local upper = 179
 
-local rand = rand({low = lower, high = upper})
+local randnr1 = rand({low = lower, high = upper})
 
 assertMessage(
-  rand >= lower,
+  randnr1 >= lower,
   true
 )
 
 assertMessage(
-  rand <= upper,
+  randnr1 <= upper,
   true
 )
 
+local randMustBeInt = rand({low = lower, high = upper})
 
+assertMessage(
+  isNumber(randMustBeInt, "int"),
+  true
+)
+
+local randMustBeFloat = rand({low = 12.34, high = 12.34})
+
+
+assertMessage(
+  randMustBeFloat,
+  12.34
+)
+
+local randMustBeInt2 = rand({low = 12.34, high = 12.34}, "int")
+
+assertMessage(
+  randMustBeInt2,
+  12
+)
 
 assertMessage(
   toNumber(1.6, "int", "nil"),

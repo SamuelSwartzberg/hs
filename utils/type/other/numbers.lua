@@ -67,19 +67,44 @@ function intOfLength(length, target)
 end
 
 --- @param spec { low?: number, high?: number, len?: number }
---- @param type? "number" | "b64"
+--- @param type? "int" | "number" | "b64"
 --- @return number | string
 function rand(spec, type)
   spec = spec or {}
-  type = type or "number"
+
+  -- simple default logic: if we pass len or if both high or low (if set) are ints, then we return an int, otherwise a number (float). This should allow for intuitive usage.
+  if 
+    spec.len or
+    (
+      (not spec.low or isNumber(spec.low, "int")) and
+      (not spec.high or isNumber(spec.high, "int"))
+    )
+  then
+    type = type or "int"
+  else
+    type = type or "number"
+  end
+
   local low, high = spec.low, spec.high
+
+  -- handle len case
   if spec.len then
     low = intOfLength(spec.len, "lower")
     high = intOfLength(spec.len, "upper")
   end
+
+  -- set defaults for low and high
+  if not low then
+    low = 0
+  end
+  if not high then
+    high = 1
+  end
   local randnr = low + math.random()  * (high - low);
-  if type == "number" then
+  if type == "int" then
     return toNumber(randnr, "int", "error")
+  elseif type == "number" then
+    return randnr
   elseif type == "b64" then
     local len = lengthOfInt(randnr)
     return run({
@@ -123,7 +148,7 @@ function toNumber(thing, target, mode)
 
   if res == nil then
     if mode == "error" then
-      error("Value cannot be converted to a " .. target)
+      error("Value cannot be converted to a " .. target .. ": " .. tostring(thing))
     elseif mode == "nil" then
       return nil
     elseif mode == "invalid-number" then

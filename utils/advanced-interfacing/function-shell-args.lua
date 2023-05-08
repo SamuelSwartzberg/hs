@@ -14,10 +14,12 @@ end
 function shellLikeArgsToOpts(opts)
   local opts_tbl = {}
   local opts_list = stringy.split(opts, " ")
-  opts_list = filter(opts_list, true)
+  inspPrint(opts_list)
+  opts_list = filter(opts_list, false)
   local prev_opt_was_key = false
   local prev_opt_key = nil
   for _, opt_part in iprs(opts_list) do
+    inspPrint(opt_part)
     if stringy.startswith(opt_part, "-") then
       if prev_opt_was_key then
         opts_tbl[prev_opt_key] = true

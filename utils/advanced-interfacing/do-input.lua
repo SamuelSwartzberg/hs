@@ -39,9 +39,10 @@ function doDelta(specifier, do_after)
   specifier.jitter_factor = specifier.jitter_factor or 0.1
 
   if type(specifier.target_point) == "string" then
-    local x, y = specifier.target_point:match("^([\\-%d]+)..-([\\-%d]+)$")
----@diagnostic disable-next-line: assign-type-mismatch
-    specifier.target_point = { x = toNumber(x, "number", "error"), y = toNumber(y, "number", "error") }
+    local x, y = specifier.target_point:match("^([%-%d]+)..-([%-%d]+)$")
+    specifier.target_point = hs.geometry.point(toNumber(x, "number", "error"), toNumber(y, "number", "error"))
+  elseif type(specifier.target_point) == "table" and not specifier.target_point.type then 
+    specifier.target_point = hs.geometry.new(specifier.target_point)
   end
 
   if specifier.relative_to then
@@ -71,6 +72,8 @@ function doDelta(specifier, do_after)
 
   local total_delta = specifier.target_point - current_point
   local num_steps = math.ceil(specifier.duration / POLLING_INTERVAL)
+  inspPrint(total_delta)
+  inspPrint(num_steps)
   local deltas = {
     x = getStartingDelta(total_delta.x, specifier.factor_of_deceleration, num_steps),
     y = getStartingDelta(total_delta.y, specifier.factor_of_deceleration, num_steps)
@@ -80,23 +83,27 @@ function doDelta(specifier, do_after)
     y = current_point.y
   }
 
+  inspPrint(specifier)
+  inspPrint(deltas)
+
   local steps_left = num_steps
   local timer = hs.timer.doWhile(function() 
-      local continue = (
-        math.abs(deltas.x) > 0.1 or
-        math.abs(deltas.y) > 0.1 
-      ) and steps_left > 0
-      if not continue then 
-        if do_after then 
-          local after_timer = hs.timer.doAfter(
-            DELAY, -- wait a bit for everything to settle
-            do_after
-          )
-          after_timer:start()
-        end
+    local continue = (
+      math.abs(deltas.x) > 0.1 or
+      math.abs(deltas.y) > 0.1 
+    ) and steps_left > 0
+    if not continue then 
+      specifier.set_pos_func(specifier.target_point, deltas) -- make sure we end up at the right place, and not a little off
+      if do_after then 
+        local after_timer = hs.timer.doAfter(
+          DELAY, -- wait a bit for everything to settle
+          do_after
+        )
+        after_timer:start()
       end
-      return continue
-    end, function()
+    end
+    return continue
+  end, function()
     steps_left = steps_left - 1
     if steps_left > 0 then
       past_ideal_points.x = past_ideal_points.x + deltas.x
@@ -104,10 +111,10 @@ function doDelta(specifier, do_after)
       current_point.x = past_ideal_points.x + deltas.x * specifier.jitter_factor
       current_point.y = past_ideal_points.y + deltas.y * specifier.jitter_factor
       specifier.set_pos_func(current_point, deltas)
+      inspPrint(current_point)
+      inspPrint(deltas)
       deltas.x = deltas.x * specifier.factor_of_deceleration
       deltas.y = deltas.y * specifier.factor_of_deceleration
-    else
-      specifier.set_pos_func(specifier.target_point, deltas)
     end
   end, POLLING_INTERVAL)
   timer:start()
@@ -116,40 +123,48 @@ end
 --- @alias series_specifier_inner { mode: "move"|"scroll"|"click"|"key", [string]: any }
 --- @alias series_specifier series_specifier_inner | string
 
+--- @param series_specifier string
+--- @return series_specifier_inner
+function parseSeriesSpecifier(series_specifier)
+  local parsed_series_specifier = {}
+  if stringy.startswith(series_specifier, ".") then
+    parsed_series_specifier.mode = "click"
+    if #series_specifier == 1 then
+      parsed_series_specifier.button = "l"
+    else
+      parsed_series_specifier.button = string.sub(series_specifier, 2, 2)
+    end
+  elseif stringy.startswith(series_specifier, ":") then
+    parsed_series_specifier.mode = "key"
+    parsed_series_specifier.keys = fixListWithNil(stringy.split(string.sub(series_specifier, 2), "+"))
+  else
+    local mode_char, x, y, optional_relative_specifier = string.match(series_specifier, "^(.)([\\-%d]+)..-([\\-%d]+)( %%%a+)?$")
+    if not mode_char or not x or not y then
+      error("Tried to parse string series_specifier, but it didn't match any known format:\n\n" .. series_specifier)
+    end
+    if mode_char == "m" then
+      parsed_series_specifier.mode = "move"
+    elseif mode_char == "s" then
+      parsed_series_specifier.mode = "scroll"
+    else
+      error("doInput: invalid mode character `" .. mode_char .. "` in series specifier:\n\n" .. series_specifier)
+    end
+    parsed_series_specifier.x = tonumber(x)
+    parsed_series_specifier.y = tonumber(y)
+    if optional_relative_specifier and #optional_relative_specifier > 0 then
+      parsed_series_specifier.relative_to = string.sub(optional_relative_specifier, 3)
+    end
+  end
+  return parsed_series_specifier
+end
+
 --- @param series_specifier series_specifier
 --- @param do_after? fun(): nil
 --- @return nil
 function doInput(series_specifier, do_after)
   local parsed_series_specifier = {}
   if type(series_specifier) == "string" then
-    if stringy.startswith(series_specifier, ".") then
-      parsed_series_specifier.mode = "click"
-      if #series_specifier == 1 then
-        parsed_series_specifier.button = "l"
-      else
-        parsed_series_specifier.button = string.sub(series_specifier, 2, 2)
-      end
-    elseif stringy.startswith(series_specifier, ":") then
-      parsed_series_specifier.mode = "key"
-      parsed_series_specifier.keys = fixListWithNil(stringy.split(string.sub(series_specifier, 2), "+"))
-    else
-      local mode_char, x, y, optional_relative_specifier = string.match(series_specifier, "^(.)([\\-%d]+)..-([\\-%d]+)( %%%a+)?$")
-      if not mode_char or not x or not y then
-        error("Tried to parse string series_specifier, but it didn't match any known format:\n\n" .. series_specifier)
-      end
-      if mode_char == "m" then
-        parsed_series_specifier.mode = "move"
-      elseif mode_char == "s" then
-        parsed_series_specifier.mode = "scroll"
-      else
-        error("doInput: invalid mode character `" .. mode_char .. "` in series specifier:\n\n" .. series_specifier)
-      end
-      parsed_series_specifier.x = tonumber(x)
-      parsed_series_specifier.y = tonumber(y)
-      if optional_relative_specifier and #optional_relative_specifier > 0 then
-        parsed_series_specifier.relative_to = string.sub(optional_relative_specifier, 3)
-      end
-    end
+    parsed_series_specifier = parseSeriesSpecifier(series_specifier)
   elseif type(series_specifier) == "table" then
     parsed_series_specifier = series_specifier
   else

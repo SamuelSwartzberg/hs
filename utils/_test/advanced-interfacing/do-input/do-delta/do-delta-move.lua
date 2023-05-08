@@ -1,4 +1,4 @@
-if mode=="full-test" then
+if mode == "full-test" then
   assertMessage(
     getStartingDelta(500, 1, 5),
     100
@@ -8,42 +8,42 @@ if mode=="full-test" then
   hs.mouse.absolutePosition({x = 0, y = 0})
 
   doDelta({target_point = {x = 500, y = 500}}, function()
-    assertMessage(
-      hs.mouse.absolutePosition(),
-      {x = 500, y = 500}
+    assert(
+      hs.geometry.new(hs.mouse.absolutePosition()) == hs.geometry.new({x = 500, y = 500})
     )
     hs.mouse.absolutePosition({x = 0, y = 0})
 
     doDelta({target_point = "500x500"}, function()
-      assertMessage(
-        hs.mouse.absolutePosition(),
-        {x = 500, y = 500}
+      assert(
+        hs.geometry.new(hs.mouse.absolutePosition()) ==
+        hs.geometry.new({x = 500, y = 500})
       )
       hs.mouse.absolutePosition({x = 0, y = 0})
 
       doDelta({target_point = "500..this should work even with arbitrary text between the numbers#@#$@500"}, function()
-        assertMessage(
-          hs.mouse.absolutePosition(),
-          {x = 500, y = 500}
+        assert(
+          hs.geometry.new(hs.mouse.absolutePosition()) ==
+          hs.geometry.new({x = 500, y = 500})
         )
         hs.mouse.absolutePosition({x = 0, y = 0})
 
 
         hs.application.launchOrFocus("TextEdit")
 
+        -- TODO: test beyond here - can't be done until we've arrived at items again
         local textedit_window_item = CreateRunningApplicationItem(hs.application.find("TextEdit")):get("main-window-item")
 
         textedit_window_item:doThis("set-position", {x = 300, y = 300})
 
-        assertMessage(
-          textedit_window_item:get("point-tl"),
-          {x = 300, y = 300}
+        assert(
+          textedit_window_item:get("point-tl") ==
+          hs.geometry.new({x = 300, y = 300})
         )
 
         doDelta({target_point = "500x500", relative_to = "tl"}, function()
-          assertMessage(
-            hs.mouse.absolutePosition(),
-            {x = 800, y = 800}
+          assert(
+            hs.geometry.new(hs.mouse.absolutePosition()) ==
+            hs.geometry.new({x = 800, y = 800})
           )
           hs.mouse.absolutePosition({x = 0, y = 0})
 
@@ -55,16 +55,16 @@ if mode=="full-test" then
           )
 
           doDelta({target_point = { x = 200, y = 200 }, relative_to = "c" }, function()
-            assertMessage(
-              hs.mouse.absolutePosition(),
-              {x = 300 + 250 + 200, y = 300 + 250 + 200}
+            assert(
+              hs.geometry.new(hs.mouse.absolutePosition()) ==
+              hs.geometry.new({x = 300 + 250 + 200, y = 300 + 250 + 200})
             )
             hs.mouse.absolutePosition({x = 0, y = 0})
 
             doDelta({target_point = { x = -200, y = -200 }, relative_to = "br"}, function()
-              assertMessage(
-                hs.mouse.absolutePosition(),
-                {x = 300 + 500 - 200, y = 300 + 500 - 200}
+              assert(
+                hs.geometry.new(hs.mouse.absolutePosition()) ==
+                hs.geometry.new({x = 300 + 500 - 200, y = 300 + 500 - 200})
               )
               hs.mouse.absolutePosition({x = 0, y = 0})
 

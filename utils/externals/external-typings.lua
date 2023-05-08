@@ -581,10 +581,63 @@ speak = hs.speech.new()
 --- @field title fun(self: hs.application): string
 --- @field name fun(self: hs.application): string
 
+--- @class hs.eventtap.eventtap
+--- @field isEnabled fun(self: hs.eventtap.eventtap): boolean
+--- @field start fun(self: hs.eventtap.eventtap): hs.eventtap.eventtap
+--- @field stop fun(self: hs.eventtap.eventtap): hs.eventtap.eventtap
+
 --- @class hs.eventtap
+--- @field event hs.eventtap.event
+--- @field checkKeyboardModifiers fun(raw?: boolean): table
+--- @field checkMouseButtons fun(): table
+--- @field doubleClickInterval fun(): number
+--- @field isSecureInputEnabled fun(): boolean
+--- @field keyRepeatDelay fun(): number
+--- @field keyRepeatInterval fun(): number
 --- @field keyStroke fun(modifiers: modifier[], character: string, delay?: integer, application?: hs.application): nil
 --- @field keyStrokes fun(text: string, application?: hs.application): nil
+--- @field leftClick fun(point: hs_geometry_point_like, delay?: number): nil
+--- @field middleClick fun(point: hs_geometry_point_like, delay?: number): nil
+--- @field rightClick fun(point: hs_geometry_point_like, delay?: number): nil
+--- @field otherClick fun(point: hs_geometry_point_like, delay?: number, button?: integer): nil
 --- @field scrollWheel fun(offsets: integer[], modifiers?: modifier[], unit?: "line" | "pixel"): nil
+--- @field new fun(types: hs.eventtap.event.types[], callback: function, filter?: function): hs.eventtap.eventtap
+
+--- @class hs.eventtap.event
+--- @field types hs.eventtap.event.types
+--- @field properties table
+--- @field rawFlagMasks table
+--- @field newKeyEventSequence fun(modifiers: string[], character): table
+--- @field newEvent fun(): hs.eventtap.event.event
+--- @field newEventFromData fun(data: string): hs.eventtap.event.event
+--- @field newGesture fun(gestureType: string, gestureValue?: number): hs.eventtap.event.event
+--- @field newKeyEvent fun(mods: string[], key: string, isdown: boolean): hs.eventtap.event.event
+
+--- @class hs.eventtap.event.event
+--- @field copy fun(self: hs.eventtap.event.event): hs.eventtap.event.event
+--- @field asData fun(self: hs.eventtap.event.event): string
+--- @field getButtonState fun(self: hs.eventtap.event.event, button:integer): boolean
+--- @field getCharacters fun(self: hs.eventtap.event.event, clean?: boolean): string
+--- @field getFlags fun(self: hs.eventtap.event.event): table
+--- @field getKeyCode fun(self: hs.eventtap.event.event): integer
+--- @field getProperty fun(self: hs.eventtap.event.event, prop: string): number
+--- @field getRawEventData fun(self: hs.eventtap.event.event): table
+--- @field getTouchDetails fun(self: hs.eventtap.event.event): table|nil
+--- @field getTouches fun(self: hs.eventtap.event.event): table|nil
+--- @field getType fun(self: hs.eventtap.event.event, nsSpecificType?: boolean): integer
+--- @field getUnicodeString fun(self: hs.eventtap.event.event): string
+--- @field location fun(self: hs.eventtap.event.event, pointTable: hs_geometry_point_like): (hs.eventtap.event.event) | fun(self: hs.eventtap.event.event): hs_geometry_point_table
+--- @field post fun(self: hs.eventtap.event.event, app?: hs.application): hs.eventtap.event.event
+--- @field rawFlags fun(self: hs.eventtap.event.event, flags: integer): (hs.eventtap.event.event) | fun(self: hs.eventtap.event.event): integer
+--- @field setFlags fun(self: hs.eventtap.event.event, table: table) : hs.eventtap.event.event
+--- @field setKeyCode fun(self: hs.eventtap.event.event, keyCode: integer): hs.eventtap.event.event
+--- @field setProperty fun(self: hs.eventtap.event.event, prop: string, value: number): hs.eventtap.event.event
+--- @field setType fun(self: hs.eventtap.event.event, type: integer): hs.eventtap.event.event
+--- @field setUnicodeString fun(self: hs.eventtap.event.event, string: string): hs.eventtap.event.event
+--- @field systemKey fun(self: hs.eventtap.event.event): table
+--- @field timestamp fun(self: hs.eventtap.event.event, absolutetime: integer): (hs.eventtap.event.event) | fun(self: hs.eventtap.event.event): integer
+
+--- @alias hs.eventtap.event.types table
 
 --- @class hs.keycodes
 --- @field currentSourceID fun(sourceID: string): (boolean) | fun(): string
@@ -593,4 +646,4 @@ speak = hs.speech.new()
 --- @field localizedName fun(): string
 
 --- @class hs.mouse
---- @field absolutePosition fun(): (hs.geometry.point) | fun(point: hs_geometry_point_like): hs.geometry.point 
+--- @field absolutePosition fun(): (hs_geometry_point_table) | fun(point: hs_geometry_point_like): hs_geometry_point_table 
