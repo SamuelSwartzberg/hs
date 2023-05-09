@@ -29,16 +29,21 @@ assertMessage(
 )
 
 assertMessage(
-  bind(returnPack, {}, {a_ig})("foo", "bar"),
+  bind(string.sub, {a_use, 1, 1})("foo"),
+  "f"
+)
+
+assertMessage(
+  bind(returnPack, {}, 1)("foo", "bar"),
   {"bar"}
 )
 
 assertMessage(
-  bind(returnPack, {}, {a_ig, a_ig})("foo", "bar"),
+  bind(returnPack, {}, {1, 2})("foo", "bar"),
   {}
 )
 
 assertMessage(
-  bind(returnPack, {"baz"}, {a_ig, a_ig})("foo", "bar", "moo"),
+  bind(returnPack, {"baz"}, {1, 2})("foo", "bar", "moo"),
   {"baz", "moo"}
 )

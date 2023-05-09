@@ -289,13 +289,13 @@ InterfaceDefaultTemplate = {
       ["get-as-do"] = function(self, key)
         self:get(key)
       end,
-      ["copy-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.pasteboard.setContents, {}, {a_ig})}),
-      ["paste-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(pasteMultilineString, {}, {a_ig})}),
+      ["copy-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.pasteboard.setContents, {}, 1)}),
+      ["paste-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(pasteMultilineString, {}, 1)}),
       ["open-result-of-get-in-browser"] = bind(getThenUse, { a_use, a_use, function(_, thing) open({url=thing}) end}),
-      ["view-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.alert.show, {}, {a_ig})}),
-      ["open-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(open, {}, {a_ig})}),
-      ["quick-look-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.alert.show, {}, {a_ig})}),
-      ["code-quick-look-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(alert, {}, {a_ig})}),
+      ["view-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.alert.show, {}, 1)}),
+      ["open-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(open, {}, 1)}),
+      ["quick-look-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.alert.show, {}, 1)}),
+      ["code-quick-look-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(alert, {}, 1)}),
       ["choose-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
         item:doThis("choose-action")
       end}),
@@ -430,9 +430,14 @@ function RootInitializeInterface(interface_specifier, contents)
   if contents == nil then 
     error("Contents for a component interface may not be nil.", 0)
   end
+  print("InterfaceDefaultTemplate")
+  inspPrint(InterfaceDefaultTemplate)
+  print("interface_specifier")
+  inspPrint(interface_specifier)
   --- @type RootComponentInterface
   local interface =  concat(InterfaceDefaultTemplate, interface_specifier)
-  interface.id = rand({len=10})
+---@diagnostic disable-next-line: assign-type-mismatch
+  interface.id = rand({len=10}, "int")
   interface.properties.getables["is-" .. interface.type] = function() return true end -- in the root, we can be sure that the is-<type> is true
   interface.root_super = interface
   interface:setContents(contents)

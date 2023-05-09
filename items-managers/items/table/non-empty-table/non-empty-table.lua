@@ -104,7 +104,7 @@ NonEmptyTableSpecifier = {
         return find(self:get("contents"), predicate)
       end,
       ["find-pair"] = function (self, predicate)
-        return find(self:get("contents"), predicate, 
+        return find(self:get("contents"), predicate, "kv") 
       end,
       ["map-table"] = function(self, callback)
         return map(self:get("contents"), callback, {"kv", "kv"})

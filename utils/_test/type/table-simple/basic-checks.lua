@@ -9,6 +9,21 @@ assertMessage(
 )
 
 assertMessage(
+  isEmptyTable({ a = 1 }),
+  false
+)
+
+assertMessage(
+  isEmptyTable({ 1, 2, 3 }),
+  false
+)
+
+assertMessage(
+  isEmptyTable({}),
+  true
+)
+
+assertMessage(
   isListOrEmptyTable({ 1, 2, 3 }),
   true
 )

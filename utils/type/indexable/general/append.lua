@@ -31,6 +31,6 @@ function append(base, addition, opts)
       end
     end
   else
-    error("append only works on strings, lists, and tables. got " .. type(base) .. " when processing:\n\n" .. json.encode(base))
+    error("append only works on bases that are strings, lists, and tables. got " .. type(base) .. " when processing:\n\n" .. json.encode(base))
   end
 end

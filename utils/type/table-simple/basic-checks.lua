@@ -16,6 +16,15 @@ function isListOrEmptyTable(t, also_allow_sparse)
   return true
 end
 
+--- @param t any
+--- @return boolean
+function isEmptyTable(t)
+  for k, v in pairs(t) do
+    return false
+  end
+  return true
+end
+
 
 --- determines if a table is a sparse list, i.e. a list with holes, which in lua doesn't support many list ops
 --- @param t table

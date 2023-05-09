@@ -191,11 +191,8 @@ KhalCommandSpecifier = {
       ["writable-calendars"] = function(self)
         return filter(
           self:get("calendars"),
-          { _start =  "r-:" }
-          function (_, cal)
-            return not stringy.startswith(cal,) -- inspired by rwx access rights
-          end
-        ))
+          { _start =  "r-:", _invert = true }
+        )
       end,
       ["writable-calendar-string"] = function(self)
         return table.concat(self:get("writable-calendars"), ",")

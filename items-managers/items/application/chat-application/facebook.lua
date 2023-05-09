@@ -108,7 +108,7 @@ FacebookItemSpecifier = {
       ["preprocess-backup-files"] = function()
         for _, subdir in itemsInPath({path = env.TMP_FACEBOOK_EXPORT_PARENT, include_files = false}) do
           if not find({"photos", "stickers_used"}, pathSlice(subdir, "-1:-1")[1]) then
-            srctgt("move", subdir, env.MCHATS_GLOBAL_FACEBOOK_MEDIA,, "any", true, false, true) delete(subdir, "dir")
+            srctgt("move", subdir, env.MCHATS_GLOBAL_FACEBOOK_MEDIA, "any", true, false, true) delete(subdir, "dir")
           end
         end
       end,

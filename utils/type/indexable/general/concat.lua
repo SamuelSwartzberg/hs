@@ -48,6 +48,8 @@ function concat(opts, ...)
     if sep then
       outputs = glue(outputs, sep)
     end
+    print("outputs")
+    inspPrint(outputs)
     outputs = glue(outputs, input)
   end
 

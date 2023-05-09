@@ -1,10 +1,9 @@
-a_ig = math.random(20)
 a_use = math.random(20)
 
 --- binds arguments to a function
 --- @param func function
---- @param arg_spec any | any[]
---- @param ignore_spec? any | any[]
+--- @param arg_spec any | any[] List of arguments to bind. Use a_use to consume an argument.
+--- @param ignore_spec? integer | integer[] List of arguments to ignore (by index).
 --- @return function
 function bind(func, arg_spec, ignore_spec)
 
@@ -19,10 +18,9 @@ function bind(func, arg_spec, ignore_spec)
   -- initialize inner_func to the original function
   local inner_func = function(...)
     local args = {...}
-    for index, arg in iprs(ignore_spec) do
-      if arg == a_ig then
-        table.remove(args, 1)
-      end
+    table.sort(ignore_spec, function(a, b) return a > b end)
+    for _, index in iprs(ignore_spec) do
+      table.remove(args, index)
     end
     local new_args = {}
     for index, arg in iprs(arg_spec) do -- for all arg_lists to bind

@@ -48,7 +48,7 @@ ot4["g"] = 9
 ot4["f"] = {10}
 local result6 = glue(ot3, ot4)
 local expected6 = ovtable.new()
-expected6["f"] = {7, 8, 10}
+expected6["f"] = {10}
 expected6["g"] = 9
 assertMessage(result6, expected6)
 
@@ -60,7 +60,7 @@ ot6["i"] = 13
 ot6["h"] = {14}
 local result7 = glue(ot5, ot6, {recurse = 1})
 local expected7 = ovtable.new()
-expected7["h"] = {11, 12, 14} -- currently, arrays also get recursed into and then merged. Is this the desired behavior? Maybe we need an option to control this.
+expected7["h"] = {14}
 expected7["i"] = 13
 assertMessage(result7, expected7)
 
@@ -96,3 +96,15 @@ expected10["a"] = 1
 expected10["b"] = 2
 expected10["c"] = ot8a["c"]
 assertMessage(result10, expected10)
+
+-- exposes a bug where if both args were assoc arrs, and the second one had a key containing an assoc arr, an error would occur
+assertMessage(
+  glue({a="b"}, {c={}}),
+  {a="b", c={}}
+)
+
+-- exposes an aggravated case of the above bug, where if both args were assoc arrs, and the first one had a key containing an assoc arr, for which key the second one had a list, it would try to treat that list as a pair to add, and misbehavior or an error would occur, depending if the list had 2 elements or not
+assertMessage(
+  glue({a={foo="bar"}}, {a={1}}),
+  {a={1}}
+)

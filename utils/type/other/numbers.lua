@@ -66,9 +66,9 @@ function intOfLength(length, target)
   end
 end
 
---- @param spec { low?: number, high?: number, len?: number }
---- @param type? "int" | "number" | "b64"
---- @return number | string
+--- @alias randSpec { low?: number, high?: number, len?: number }
+
+--- @type fun(spec?: randSpec, type?: "int"): (integer) | fun(spec?: randSpec, type?: "number"): (number) | fun(spec?: randSpec, type?: "b64"): (string)
 function rand(spec, type)
   spec = spec or {}
 
