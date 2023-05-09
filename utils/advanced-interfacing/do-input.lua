@@ -228,7 +228,7 @@ function doSeries(specifier, do_after)
     function()
       local subspecifier = table.remove(specifier.specifier_list, 1)
       function do_after_inner()
-        doSeries(specifier)
+        doSeries(specifier, do_after)
       end
       doInput(subspecifier, do_after_inner)
     end

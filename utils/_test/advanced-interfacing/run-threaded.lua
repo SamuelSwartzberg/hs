@@ -1,4 +1,3 @@
-print("t1")
 
 runThreaded(
   {
@@ -19,8 +18,6 @@ runThreaded(
   end
 )
 
-print("t2")
-
 runThreaded(
   {
     a = "echo 1",
@@ -40,9 +37,6 @@ runThreaded(
   end
 )
 
-print("t3")
-
-
 runThreaded(
   {
     a = "echo 1",
@@ -62,8 +56,6 @@ runThreaded(
   end
 )
 
-print("t4")
-
 runThreaded(
   {
     a = "echo 1",
@@ -82,8 +74,6 @@ runThreaded(
     )
   end
 )
-
-print("t5")
 
 runThreaded(
   {

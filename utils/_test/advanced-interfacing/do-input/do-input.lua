@@ -121,4 +121,6 @@ if mode == "full-test" then
 
     end
   )
+else
+  print("skipping...")
 end

@@ -81,4 +81,6 @@ if mode == "full-test" then
     end)
 
   end)
+else
+  print("skipping...")
 end
