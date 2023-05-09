@@ -71,24 +71,24 @@ TelegramItemSpecifier = {
             window:doThis("focus")
             window:doThis("set-size", {w = 800, h = 1500})
             window:doThis("set-position", {x = 0, y = 0})
-            window:doThis("click-series", {
-              { mode = "moveandclick", tl = {x = 30, y = 65} },
-              { mode = "moveandclick", tl = {x = 40, y = 395} },
-              { mode = "moveandclick", c = { x = 0, y = -300} },
-              { mode = "moveandclick", c = { x = 0, y = 295} },
-              { mode = "moveandclick", c = { x = -150, y = -155} },
-              { mode = "moveandclick", c = { x = -150, y = -65} },
-              { mode = "scroll", target_point = { x = 0, y = -200} },
-              { mode = "moveandclick", c = { x = 0, y = 0} },
-              { mode = "scroll", target_point = { x = 0, y = -200} },
-              { mode = "scroll", target_point = { x = 0, y = -200} },
-              { mode = "scroll", target_point = { x = 0, y = -70} },
-              { mode = "click", c = { x = 0, y = 0} },
-              { mode = "move", c = { x = 0, y = -100} },
-              { mode = "scroll", target_point = {x = 0, y = -300}},
-              { mode = "scroll", target_point = {x = 0, y = -300}},
-              { mode = "moveandclick", c = { x = 0, y = 170} },
-              { mode = "moveandclick", c = { x = 130, y = 215} },
+            window:doThis("do-series", {
+              "m30 65 %tl", ".",
+              "m40 395 %tl", ".",
+              "m0 -300 %c", ".",
+              "m0 295 %c", ".",
+              "m-150 -155 %c", ".",
+              "m-150 -65 %c", ".",
+              "s0 -200",
+              "m0 0 %c", ".",
+              "s0 -200",
+              "s0 -200",
+              "s0 -70",
+              "m0 0 %c", ".",
+              "m0 -100 %c",
+              "s0 -300",
+              "s0 -300",
+              "m0 170 %c", ".",
+              "m130 215 %c", ".",
             })
             hs.timer.doAfter(300, do_after)
           end

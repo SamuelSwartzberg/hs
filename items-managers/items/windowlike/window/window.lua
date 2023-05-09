@@ -128,7 +128,7 @@ WindowItemSpecifier = {
         local click_point = self:get("point-with-offset-from", specifier)
         hs.eventtap.leftClick(click_point)
       end,
-      ["click-series"] = function (self, specifier_list)
+      ["do-series"] = function (self, specifier_list)
         doSeries(specifier_list)
       end,
       ["scroll-relative-to"] = function (self, specifier)

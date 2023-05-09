@@ -19,7 +19,7 @@ end
 --- @field factor_of_deceleration? number 0 will teleport, 1 will move linearly
 --- @field duration? number
 --- @field jitter_factor? number
---- @field relative_to? "tl"| "tr"| "bl"| "br"| "c"
+--- @field relative_to? "tl"| "tr"| "bl"| "br"| "c"|"curpos"
 
 --- naive implementations of moving a thing such that applications that expect human-like movement will not notice / get confused
 --- not sure if this is necessary, but it's a good idea to be careful
@@ -39,18 +39,22 @@ function doDelta(specifier, do_after)
   specifier.jitter_factor = specifier.jitter_factor or 0.1
 
   if type(specifier.target_point) == "string" then
-    local x, y = specifier.target_point:match("^([%-%d]+)..-([%-%d]+)$")
+    local x, y = onig.match(specifier.target_point, whole(mt._r.syntax.point))
     specifier.target_point = hs.geometry.point(toNumber(x, "number", "error"), toNumber(y, "number", "error"))
   elseif type(specifier.target_point) == "table" and not specifier.target_point.type then 
     specifier.target_point = hs.geometry.new(specifier.target_point)
   end
 
   if specifier.relative_to then
-    local front_window = CreateRunningApplicationItem(hs.application.frontmostApplication()):get("main-window-item")
-    specifier.target_point = front_window:get("point-with-offset-from", {
-      from = specifier.relative_to,
-      delta = specifier.target_point
-    })
+    if specifier.relative_to ~= "curpos" then
+      local front_window = CreateRunningApplicationItem(hs.application.frontmostApplication()):get("main-window-item")
+      specifier.target_point = front_window:get("point-with-offset-from", {
+        from = specifier.relative_to,
+        delta = specifier.target_point
+      })
+    else
+      specifier.target_point =  specifier.target_point + hs.mouse.absolutePosition()
+    end
   end
 
   -- set type-specific defaults
@@ -72,8 +76,6 @@ function doDelta(specifier, do_after)
 
   local total_delta = specifier.target_point - current_point
   local num_steps = math.ceil(specifier.duration / POLLING_INTERVAL)
-  inspPrint(total_delta)
-  inspPrint(num_steps)
   local deltas = {
     x = getStartingDelta(total_delta.x, specifier.factor_of_deceleration, num_steps),
     y = getStartingDelta(total_delta.y, specifier.factor_of_deceleration, num_steps)
@@ -83,8 +85,6 @@ function doDelta(specifier, do_after)
     y = current_point.y
   }
 
-  inspPrint(specifier)
-  inspPrint(deltas)
 
   local steps_left = num_steps
   local timer = hs.timer.doWhile(function() 
@@ -111,8 +111,6 @@ function doDelta(specifier, do_after)
       current_point.x = past_ideal_points.x + deltas.x * specifier.jitter_factor
       current_point.y = past_ideal_points.y + deltas.y * specifier.jitter_factor
       specifier.set_pos_func(current_point, deltas)
-      inspPrint(current_point)
-      inspPrint(deltas)
       deltas.x = deltas.x * specifier.factor_of_deceleration
       deltas.y = deltas.y * specifier.factor_of_deceleration
     end
@@ -136,9 +134,9 @@ function parseSeriesSpecifier(series_specifier)
     end
   elseif stringy.startswith(series_specifier, ":") then
     parsed_series_specifier.mode = "key"
-    parsed_series_specifier.keys = fixListWithNil(stringy.split(string.sub(series_specifier, 2), "+"))
+    parsed_series_specifier.keys = fixListWithNil(stringy.split(string.sub(series_specifier, 2), "+")) -- separating modifier keys with `+`
   else
-    local mode_char, x, y, optional_relative_specifier = string.match(series_specifier, "^(.)([\\-%d]+)..-([\\-%d]+)( %%%a+)?$")
+    local mode_char, x, y, optional_relative_specifier = onig.match(series_specifier, "^(.)"..mt._r.syntax.point.."( %[a-zA-Z]+)?$")
     if not mode_char or not x or not y then
       error("Tried to parse string series_specifier, but it didn't match any known format:\n\n" .. series_specifier)
     end
@@ -149,8 +147,10 @@ function parseSeriesSpecifier(series_specifier)
     else
       error("doInput: invalid mode character `" .. mode_char .. "` in series specifier:\n\n" .. series_specifier)
     end
-    parsed_series_specifier.x = tonumber(x)
-    parsed_series_specifier.y = tonumber(y)
+    parsed_series_specifier.target_point = {
+      x = tonumber(x),
+      y = tonumber(y)
+    }
     if optional_relative_specifier and #optional_relative_specifier > 0 then
       parsed_series_specifier.relative_to = string.sub(optional_relative_specifier, 3)
     end
@@ -163,6 +163,7 @@ end
 --- @return nil
 function doInput(series_specifier, do_after)
   local parsed_series_specifier = {}
+  do_after = do_after  or returnNil -- dummy function b/c the timer functions require a function
   if type(series_specifier) == "string" then
     parsed_series_specifier = parseSeriesSpecifier(series_specifier)
   elseif type(series_specifier) == "table" then
@@ -173,7 +174,7 @@ function doInput(series_specifier, do_after)
 
   if parsed_series_specifier.mode == "click" then 
     local clickmap = { l = "leftClick", r = "rightClick", m = "middleClick" }
-    hs.eventtap[clickmap[parsed_series_specifier.button]]()
+    hs.eventtap[clickmap[parsed_series_specifier.button]](hs.mouse.absolutePosition())
     hs.timer.doAfter(0.2 + DELAY, do_after) -- default click delay + a bit of extra time
   elseif parsed_series_specifier.mode == "key" then
     local mods = replace(
@@ -187,6 +188,8 @@ function doInput(series_specifier, do_after)
     local key = slice(parsed_series_specifier.keys, -1, -1)[1]
     if mods and #mods > 0 then
       hs.eventtap.keyStroke(mods, key)
+    elseif #key == 1 then
+      hs.eventtap.keyStroke({}, key)
     else
       hs.eventtap.keyStrokes(key)
     end
@@ -200,7 +203,8 @@ function doInput(series_specifier, do_after)
 end
 
 --- @param specifier { wait_time?: number, specifier_list: series_specifier[] } | series_specifier[] | string
-function doSeries(specifier)
+--- @param do_after? fun(): nil
+function doSeries(specifier, do_after)
   if type(specifier) == "string" then
     specifier = {specifier_list = stringy.split(specifier, ",")}
   elseif isListOrEmptyTable(specifier) then
@@ -214,16 +218,19 @@ function doSeries(specifier)
   specifier.wait_time = specifier.wait_time or rand({low=0.10, high=0.12}) --[[ @as number ]]
 
   if #specifier.specifier_list == 0 then
+    if do_after then
+      do_after()
+    end
     return
   end
   hs.timer.doAfter(
     specifier.wait_time, 
     function()
       local subspecifier = table.remove(specifier.specifier_list, 1)
-      function do_after()
+      function do_after_inner()
         doSeries(specifier)
       end
-      doInput(subspecifier, do_after)
+      doInput(subspecifier, do_after_inner)
     end
   )
   

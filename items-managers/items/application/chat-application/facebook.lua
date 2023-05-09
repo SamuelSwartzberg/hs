@@ -82,7 +82,7 @@ FacebookItemSpecifier = {
               local ff_window = CreateRunningApplicationItem(hs.application.get("Firefox")):get("focused-window-item")
               ff_window:doThis("set-grid", {x = 2, y = 1})
               ff_window:doThis("set-cell", {x = 1, y = 1, h = 1, w = 1})
-              ff_window:doThis("click-series", { 
+              ff_window:doThis("do-series", { 
                 "-100x-410 %c", -- format open
                 ".",
                 "-100x-310 %c", -- format select
