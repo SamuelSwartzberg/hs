@@ -1,5 +1,6 @@
 
 --- iprs dropin replacement that supports start/stop/step and works with any indexable
+--- guarantees the same order every time, and typically also the same order as ipairs (though this is not guaranteed)
 --- @param thing indexable
 --- @param start? integer
 --- @param stop? integer
@@ -11,12 +12,12 @@ function iprs(thing, start, stop, step, limit)
   if len_thing == 0 then
     return function() end, thing, 0
   end
-  start = start or 1
-  if start < 0 then
+  start = start or 1 -- default to first elem
+  if start < 0 then -- if negative, count from the end
     start = len_thing + start + 1 -- e.g. 8 + -1 + 1 = 8 -> last elem
   end
-  stop = stop or len_thing
-  if stop < 0 then
+  stop = stop or len_thing -- default to last elem
+  if stop < 0 then -- if negative, count from the end
     stop = len_thing + stop + 1
   end
   step = step or 1
@@ -51,6 +52,7 @@ end
 --- pairs dropin replacement that is ordered by default, supports start/stop/step and works with any indexable
 --- difference from iprs is that it returns the key instead of the index
 --- in case of a list/string, the key is the index, so it's the same as iprs
+--- guarantees the same order every time, thus may have a different order than pairs
 --- @param thing indexable
 --- @param start? integer
 --- @param stop? integer

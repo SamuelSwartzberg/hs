@@ -19,7 +19,7 @@ assertMessage(
     foo = "bar",
     baz = "qux",
   }),
-  "Foo: bar\nBaz: qux"
+  "Baz: qux\nFoo: bar"
 )
 
 -- real headers (are auto-sorted)
@@ -43,7 +43,7 @@ assertMessage(
     from = "test@example.com",
     to = "test2@example.com"
   }),
-  "From: test@example.com\nTo: test2@example.com\nSubject: test\nFoo: bar\nBaz: qux"
+  "From: test@example.com\nTo: test2@example.com\nSubject: test\nBaz: qux\nFoo: bar"
 )
 
 -- build email
@@ -57,7 +57,7 @@ assertMessage(
     to = "test2@example.com"
   }, "hello world"),
 
-  "From: test@example.com\nTo: test2@example.com\nSubject: test\nFoo: bar\nBaz: qux\n\nhello world"
+  "From: test@example.com\nTo: test2@example.com\nSubject: test\nBaz: qux\nFoo: bar\n\nhello world"
 )
 
 -- build email interactive
@@ -71,22 +71,22 @@ buildEmailInteractive({
   }, [[Hello,
 
 This is a test email. It will never be sent.
-Find attached the file you didn't ask for. {{[transf.path.attachment("/Library/User Pictures/Flowers/Dahlia.tif")]}}
+Find attached the file you didn't ask for.
+{{[transf.path.attachment("/Library/User Pictures/Flowers/Dahlia.tif")]}}
 
 Cheers!]],  nil, function(mail)
   local contents = readFile(mail)
-  assertMessage(contents, 
-[[From: test@example.com
+  assert(
+    stringy.startswith(
+      contents, 
+      [[From: test@example.com
 To: test2@example.com
 Subject: test
-Foo: bar
 Baz: qux
-
-Hello,
-
-This is a test email. It will never be sent.
-Find attached the file you didn't ask for. /Library/User Pictures/Flowers/Dahlia.tif
-
-Cheers!]])
+Foo: bar
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=]]
+    )
+  )
 end)
 

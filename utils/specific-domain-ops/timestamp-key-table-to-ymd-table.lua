@@ -4,8 +4,6 @@
 function timestampKeyTableToYMDTable(timestamp_key_table)
   local year_month_day_time_table = {}
   for timestamp_str, fields in prs(timestamp_key_table,-1,1,-1) do 
-    print("timestamp_str: " .. timestamp_str)
-    inspPrint(fields)
     local timestamp = tonumber(timestamp_str)
     local year = os.date("%Y", timestamp)
     local year_month = os.date("%Y-%m", timestamp)

@@ -1,4 +1,4 @@
---- @alias command_part string | {value: string | command_parts, type: "quoted"  | "interpolated" | nil}
+--- @alias command_part string | {value: string | command_parts, type: "quoted"  | "interpolated" | "sq" | nil}
 --- @alias command_parts command_part[]
 
 --- @param command_parts command_parts | string list of things to assemble into a command

@@ -30,3 +30,5 @@ if mode == "full-test" then
     print(k)
   end
 end
+
+print("--- Automatic tests completed ---")

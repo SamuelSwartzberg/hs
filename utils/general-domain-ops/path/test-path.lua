@@ -83,11 +83,7 @@ function testPath(path, opts)
 
       -- test contents
       if type(opts.contents) == "boolean" then -- boolean case: test whether the contents are nil or not
-        print('dirness')
-        print(dirness)
         if dirness then
-          print('contents')
-          inspPrint(contents)
           push(results, opts.contents == (#contents > 0))
         else
           local isempty = contents == nil or contents == ""
