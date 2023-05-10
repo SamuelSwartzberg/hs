@@ -12,8 +12,15 @@
 --- @param retdefault? kvmult
 --- @return table
 function defaultOpts(opts, retdefault)
+
+  -- process shorthand
+
   if type(opts) == "string" then
-    opts = {args = opts, ret = opts}
+    if opts == "boolean" then
+      opts = {args = {"v"}, ret = "boolean"} -- if our shorthand is boolean, we don't want args to be "boolean" - that wouldn't make any sense. so we'll default to the general arg value of "v"
+    else
+      opts = {args = opts, ret = opts}
+    end
   elseif isListOrEmptyTable(opts) then
     opts = {args = opts[1] or {"v"}, ret = opts[2] or retdefault or {"v"}}
   else
@@ -21,6 +28,8 @@ function defaultOpts(opts, retdefault)
     opts.args = opts.args or {"v"}
     opts.ret = opts.ret or retdefault or {"v"}
   end
+
+  -- process raw form of table
 
   if type(opts.args) == "string" then
     opts.args = chars(opts.args)

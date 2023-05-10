@@ -424,6 +424,126 @@ assert(
   )
 )
 
+-- Must succeed: two optional keys, object value, child key: is not present
+
+assert(
+  shapeMatchesInner(
+    {
+      child = {
+      }
+    },
+    {
+      child = {
+        ["name?"] = "string",
+        ["age?"] = "number"
+      }
+    },
+    "User1"
+  )
+)
+
+-- Must succeed: type key, object value, child key: is present, also an object value
+
+assert(
+  shapeMatchesInner(
+    {
+      child = {
+        name = {
+          first = "Lucy",
+          last = "Cryofreeze"
+        }
+      }
+    },
+    {
+      child = {
+        ["name?"] = {
+          first = "string",
+          last = "string"
+        }
+      }
+    },
+    "User1"
+))
+
+assert(
+  shapeMatchesInner(
+    {
+      name = "foo",
+      zebra = "bar"
+    },
+    {
+      ["name?"] = "string",
+      ["zebra?"] = "string"
+    },
+    "User1"
+  )
+)
+
+assert(
+  shapeMatchesInner(
+    {
+      name = {},
+      zebra = {}
+    },
+    {
+      ["name?"] = {
+        ["[string]"] = "string"
+      },
+      ["zebra?"] = {
+        ["[string]"] = "string"
+      }
+    },
+    "User1"
+  )
+)
+
+assert(
+  shapeMatchesInner(
+    {
+      child = {
+        name = {
+          first = "Lucy",
+          last = "Cryofreeze"
+        },
+        zebras = {
+          
+        }
+      }
+    },
+    {
+      child = {
+        ["name?"] = {
+          first = "string",
+          last = "string"
+        },
+        ["zebras?"] = {
+          ["[string]"] = "string"
+        }
+      }
+    },
+    "User1"
+))
+
+assert(
+  shapeMatchesInner(
+    {
+      child = {
+        name = {
+          first = "Lucy",
+          last = "Cryofreeze"
+        }
+      }
+    },
+    {
+      child = {
+        ["name?"] = {
+          ['[string]'] = "string",
+        }
+      }
+    },
+    "User1"
+))
+
 -- Must fail: type key, object value, child key: is present, incorrect type
 
 local succ, res = pcall(

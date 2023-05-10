@@ -104,6 +104,7 @@ for key, item in prs(_G) do
     end
     if item.potential_interfaces then
       for k, v in prs(item.potential_interfaces) do 
+        print(k)
         if not find(potential_interfaces_ignore_map[key], k, "boolean") then
           if not item.properties.getables["is-" .. k] then
             passes = false

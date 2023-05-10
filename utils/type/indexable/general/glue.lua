@@ -15,9 +15,6 @@
 ---@return T
 function glue(base, addition, opts)
   opts = opts or {}
-  print("glue")
-  inspPrint(base)
-  inspPrint(addition)
   if type(addition) ~= "table" then
     return append(base, addition, opts) -- glue(string, string2)
   elseif isEmptyTable(addition) then
@@ -50,8 +47,6 @@ function glue(base, addition, opts)
             then -- we shouldn't recurse, just simply add as a k-v pair
               base = append(base, {k, v}, opts)
             else
-              print("k")
-              inspPrint(k)
               base[k] = glue(base[k], v, opts)
             end
           else -- we can't recurse, just simply add as a k-v pair

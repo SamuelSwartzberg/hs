@@ -1,7 +1,7 @@
 --- @class findOpts : tableProcOpts
 --- @field findall boolean return all matches instead of just the first one
 
----@alias findOptsWShorthand kvmult | kvmult[] | findOpts
+---@alias findOptsWShorthand kvmult | kvmult[] | findOpts may be string, array, array of arrays, or table
 
 --- @param indexable? indexable
 --- @param cond? conditionSpec the condition that is being searched for
