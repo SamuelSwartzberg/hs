@@ -20,6 +20,7 @@ rrq("basic-interfacing")
 rrq("advanced-interfacing")
 rrq("general-domain-ops")
 rrq("specific-domain-ops")
+rrq("test")
 relative_require = orig_relative_require
 
 -- alert manual tests if mode == "full-test"

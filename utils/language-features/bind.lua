@@ -1,4 +1,4 @@
-a_use = math.random(20)
+a_use = math.random(999999999)
 
 --- binds arguments to a function
 --- @param func function

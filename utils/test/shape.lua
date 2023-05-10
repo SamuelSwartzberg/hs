@@ -9,12 +9,12 @@ table.insert(types_w_any, "any")
 --- @param shape shape_table
 --- @return nil
 function resolveTypeMatchingToKeys(test_tbl, shape)
-  for _, typ in iprs(types_w_any) do
+  for _, typ in iprs(types_w_any) do -- for any possible type
     if shape["[" .. typ .. "]"] then -- if shape has a key "[<type>|any]", then this is the type we want for any key (of type|any) not explicitly specified in the shape
-      for k, _ in prs(test_tbl) do
-        if type(k) == typ or typ == "any" then 
-          if not shape[k] then
-            shape[k] = copy(shape["[" .. typ .. "]"])
+      for k, _ in prs(test_tbl) do -- for each key in test_tbl
+        if type(k) == typ or typ == "any" then -- if the test_tbl key is of the type we want
+          if not shape[k] then -- and if the test_tbl key is not explicitly specified in the shape already
+            shape[k] = copy(shape["[" .. typ .. "]"])  -- then add a copy of the type we want to the shape
           end
         end
       end
@@ -38,7 +38,7 @@ end
 --- @param test_tbl table 
 --- @param shape shape_table
 --- @param path string the table name if root, or the path to the subtable if within recursive 
---- @return nil
+--- @return true|nil
 function shapeMatchesInner(test_tbl, shape, path)
   if not test_tbl then error("test_tbl expected", 0) end
   if not shape then error("shape expected", 0) end
@@ -67,7 +67,10 @@ function shapeMatchesInner(test_tbl, shape, path)
       if type(test_tbl[k]) ~= "table" then 
         error(("Key %s in %s is not of type table, but instead of type %s"):format(k, path, type(test_tbl[k])), 0) 
       else
-        shapeMatches(test_tbl[k], v, path .. "." .. k)
+        local succ, res = pcall(shapeMatchesInner,test_tbl[k], v, path .. "." .. k)
+        if not succ then
+          error(res, 0)
+        end
       end
     else
       error(("Unexpected value in shape: %s"):format(v), 0)
@@ -81,4 +84,5 @@ function shapeMatchesInner(test_tbl, shape, path)
       error(("Key %s is in %s but not in shape"):format(k, path), 0) 
     end
   end
+  return true
 end
