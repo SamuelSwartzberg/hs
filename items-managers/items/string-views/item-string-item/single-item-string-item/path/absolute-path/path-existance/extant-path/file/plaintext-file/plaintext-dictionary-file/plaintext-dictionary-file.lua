@@ -53,14 +53,14 @@ PlaintextDictionaryFileItemSpecifier = {
     { key = "ini-file", value = CreateIniFileItem },
     { key = "ics-file", value = CreateIcsFileItem },
   }),
-  action_table = concat({
+  action_table = concat({{
     {
       text = "👉#️⃣💎 ctbl.",
       key = "choose-action-on-result-of-get",
       args = "parse-to-table-item"
 
     }
-  })
+  }})
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

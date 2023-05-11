@@ -2,16 +2,10 @@ ManagedApiArraySpecifier = {
   type = "managed-api-array",
   properties = {
     getables = {
+      ["creator"] = function(self) return CreateApiItem end,
     },
     doThisables = {
-      ["create"] = function(self, api_url)
-        self:doThis("add-to-end", CreateApiItem(api_url))
-      end,
-      ["register-all"] = function(self, api_urls)
-        for _, api_url in iprs(api_urls) do
-          self:doThis("create", api_url)
-        end
-      end
+      
     },
   },
   

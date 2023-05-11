@@ -21,21 +21,6 @@ ManagedTimerArraySpecifier = {
           end
         end
       end,
-
-      ["create"] = function(self, specifier)
-        local timer
-        if type(specifier) == "function" then 
-          timer = CreateTimerItem({fn = specifier})
-        else
-          timer = CreateTimerItem(specifier)
-        end
-        self:doThis("add-to-end", timer)
-      end,
-      ["register-all"] = function(self, specifiers)
-        for _, specifier in iprs(specifiers) do
-          self:doThis("create", specifier)
-        end
-      end
     },
   },
   

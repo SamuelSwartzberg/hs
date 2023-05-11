@@ -7,10 +7,11 @@ ManagedClipboardArraySpecifier = {
           stop = 250,
           sliced_indicator = "..."
         })
-      end
+      end,
+      ["has-custom-create-logic"] = returnTrue
     },
     doThisables = {
-      ["create"] = function(self, args)
+      ["use-custom-create-logic"] = function(self, args)
         local item = CreateStringItem(args)
         local contents = item:get("contents")
         local element_with_same_contents = self:get(

@@ -4,12 +4,10 @@ ManagedStreamArraySpecifier = {
     getables = {
       ["first-playing-stream"] = function(self)
         return self:get("find", function(stream) return not stream:get("key", "pause") end)
-      end
+      end,
+      ["creator"] = function() return CreateStreamItem end,
     },
     doThisables = {
-      ["create"] = function(self, specified_contents)
-        self:doThis("add-to-end", CreateStreamItem(specified_contents))
-      end,
       ["create-background-stream"] = function(self, relative_path)
         CreateStringItem(env.MAUDIOVISUAL .. "/" .. relative_path):doThis("to-stream", {
           initial_flags = {

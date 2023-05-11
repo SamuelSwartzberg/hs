@@ -53,7 +53,10 @@ ManagedArraySpecifier = {
         end  
       end,
       ["create-all"] = function(self, specifiers)
-        for i, specifier in iprs(specifiers) do
+        for key, specifier in prs(specifiers) do
+          if not specifier.speckey then
+            specifier.speckey = key
+          end
           self:doThis("create", specifier)
         end
       end,
@@ -80,6 +83,13 @@ ManagedArraySpecifier = {
       ["shuffle"] = function(self)
         self:doThis("sort", function(a, b) return math.random() > 0.5 end)
       end,
+      ["create"] = function(self, specifier)
+        if self:get("has-custom-create-logic") then
+          self:doThis("use-custom-create-logic", specifier)
+        else
+          self:doThis("add-to-end", self:get("creator")(specifier))
+        end
+      end,
     },
   },
   potential_interfaces = ovtable.init({
@@ -87,8 +97,7 @@ ManagedArraySpecifier = {
     { key = "managed-hotkey-array", value = CreateManagedHotkeyArray },
     { key = "managed-stream-array", value = CreateManagedStreamArray },
     { key = "managed-timer-array", value = CreateManagedTimerArray },
-    { key = "managed-watcher-array", value = CreateManagedWatcherArray },
-    { key = "managed-task-array", value = CreateManagedTaskArray },
+    { key = "managed-creatable-array", value = CreateManagedCreatableArray },
     { key = "managed-api-array", value = CreateManagedApiArray },
     { key = "managed-input-method-array", value = CreateManagedInputMethodArray },
   }),

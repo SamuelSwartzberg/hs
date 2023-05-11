@@ -63,7 +63,7 @@ local booleanops = defaultOpts("boolean")
 
 assertMessage(
   booleanops.args,
-  {"b", "o", "o", "l", "e", "a", "n"}
+  {"v"}
 )
 
 assertMessage(

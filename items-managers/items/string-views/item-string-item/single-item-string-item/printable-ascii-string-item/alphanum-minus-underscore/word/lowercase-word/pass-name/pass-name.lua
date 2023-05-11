@@ -60,7 +60,7 @@ PassNameItemSpecifier = {
       end,
     }
   },
-  action_table = concat({
+  action_table = concat({{
     {
       text = "✍️🔑 fllpss",
       key = "fill-pass"
@@ -68,7 +68,7 @@ PassNameItemSpecifier = {
       text = "📋🔑 cpypss",
       key = "copy-pass"
     },
-  }),
+  }}),
   potential_interfaces = ovtable.init({
     { key = "pass-passw", value = CreatePassPasswItem },
     { key = "pass-otp", value = CreatePassOtpItem },

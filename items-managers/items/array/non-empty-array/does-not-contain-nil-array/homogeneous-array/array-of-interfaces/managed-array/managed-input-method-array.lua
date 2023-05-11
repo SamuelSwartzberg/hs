@@ -8,16 +8,9 @@ ManagedInputMethodArraySpecifier = {
         end)
         return self:get("next-wrapping", current_active_index)
       end,
+      ["creator"] = function() return CreateInputMethodItem end,
     },
     doThisables = {
-      ["create"] = function(self, method_id)
-        self:doThis("add-to-end", CreateInputMethodItem(method_id))
-      end,
-      ["register-all"] = function(self, specifier)
-        for index, method_id in iprs(specifier) do
-          self:doThis("create", method_id)
-        end
-      end,
       ["activate-next"] = function(self)
         self:get("next-to-be-activated"):doThis("activate")
       end,

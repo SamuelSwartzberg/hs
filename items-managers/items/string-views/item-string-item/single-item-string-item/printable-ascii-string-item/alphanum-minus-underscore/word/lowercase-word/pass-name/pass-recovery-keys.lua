@@ -8,7 +8,7 @@ PassRecoveryKeysItemSpecifier = {
       end,
     }
   },
-  action_table = concat(getChooseItemTable({
+  action_table = concat({getChooseItemTable({
     {
       description = "rcvry",
       emoji_icon = "🔧🔑",
@@ -18,7 +18,7 @@ PassRecoveryKeysItemSpecifier = {
       description = "rcvrypth",
       key = "pass-recovery-path"
     }
-  })),
+  })}),
   potential_interfaces = ovtable.init({})
 }
 

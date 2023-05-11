@@ -23,7 +23,7 @@ function serve(type, tcp_port, path)
   else
     error("type must be 'http' or 'json'")
   end
-  local preexisting_server_with_same_args = taskmanager:get("find-by-args", args)
+  local preexisting_server_with_same_args = taskmanager:get("find-by-specifier", args)
   if preexisting_server_with_same_args then
     preexisting_server_with_same_args:doThis("recreate")
   else

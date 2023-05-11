@@ -15,7 +15,7 @@ PassOtpItemSpecifier = {
       end,
     },
   },
-  action_table = concat(getChooseItemTable({
+  action_table = concat({getChooseItemTable({
     {
       description = "otp",
       emoji_icon = "⌚️🗝",
@@ -25,7 +25,7 @@ PassOtpItemSpecifier = {
       description = "otppth",
       key = "pass-otp-path"
     },
-  }))
+  })})
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

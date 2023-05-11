@@ -88,6 +88,9 @@ TimerItemSpecifier = {
 
 --- @type BoundRootInitializeInterface
 function CreateTimerItem(specifier)
+  if type(specifier) == "function" then 
+    specifier = {fn = specifier}
+  end
   specifier.interval = specifier.interval or "*/10 * * * *"
   local timer_item = RootInitializeInterface(TimerItemSpecifier, specifier)
   timer_item:doThis("calculate-and-prime")

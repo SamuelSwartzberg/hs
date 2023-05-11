@@ -332,14 +332,7 @@ local keymap = {
   },
   [","] = nil, -- unassigned
   ["."] = nil, -- unassigned
-  ["/"] = nil -- unassigned
-}
-
-System:get("manager", "hotkey"):doThis("register-all", keymap)
-
-
-System:get("manager", "hotkey"):doThis(
-  "create", 
+  ["/"] = nil, -- unassigned
   {
     key = "`", 
     modifiers = {"cmd", "alt"}, 
@@ -348,29 +341,34 @@ System:get("manager", "hotkey"):doThis(
         :doThis("activate-next") 
     end
   }
-)
 
-System:get("manager", "input-method"):doThis("register-all", {
+}
+
+System:get("manager", "creatable"):doThis("create-all", keymap)
+
+System:get("manager", "input-method"):doThis("create-all", {
   "com.apple.keylayout.US",
   "com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
 })
 
-System:get("manager", "api"):doThis("register-all", {
+System:get("manager", "api"):doThis("create-all", {
   "https://www.googleapis.com/youtube",
   "https://yt.lemnoslife.com/"
 })
 
 -- structure below is not final, more OO way will emerge in the course of working on this I think
 
-System:get("manager", "watcher"):doThis("register-all", {
+System:get("manager", "creatable"):doThis("create-all", {
   { 
-    type = hs.pasteboard.watcher, 
+    type = "watcher",
+    watchertype = hs.pasteboard.watcher, 
     fn = function(item)
       System:get("manager", "clipboard"):doThis("create", item)
     end 
   },
   {
-    type = hs.fs.volume,
+    type = "watcher",
+    watchertype = hs.fs.volume,
     fn = function(event, information)
       if event == hs.fs.volume.didMount then
         local vol = CreateStringItem(information.path)
@@ -388,12 +386,13 @@ System:get("manager", "watcher"):doThis("register-all", {
         end
       end
     end
-  }
+  },
+  { type = "task", args = {"jcwserve", env.JSON_SHELL_API_LAYER_SERVER_PORT} }
 })
 
 
 
-System:get("manager", "timer"):doThis("register-all", {
+System:get("manager", "timer"):doThis("create-all", {
   bindArg(run, {"newsboat", "-x", "reload"}),
   syncVdirSyncer,
   bind(syncHomeRelativePath, {"me/state/todo", "push"}),
@@ -414,11 +413,6 @@ System:get("manager", "timer"):doThis("register-all", {
   CreateApplicationItem("Signal"):get("backup-timer"),
   CreateApplicationItem("Discord"):get("backup-timer"),]]
 }) 
-
-System:get("manager", "task"):doThis("register-all", {
-  { "jcwserve", env.JSON_SHELL_API_LAYER_SERVER_PORT }
-})
-
 processSetupDirectivesInFiles(env.MACTABLE_PATHS)
 
 hs.alert.show("Config loaded")

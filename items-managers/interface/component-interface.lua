@@ -249,7 +249,7 @@ InterfaceDefaultTemplate = {
       ["timer-that-does"] = function(self, specifier)
         return {
           interval = specifier.interval,
-          fn = function() self:doThis(specifier.key, specifier.args) end
+          fn = function() self:doThis(specifier.key, specifier.args) end,
         }
       end,
       id = function(self) return self.id end,
