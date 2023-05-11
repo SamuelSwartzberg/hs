@@ -196,7 +196,6 @@ function returnPoisonable()
   end
 end
 
--- TODO: not tested yet
 function returnStringEquivOrder(a, b)
   return tostring(a) < tostring(b)
 end

@@ -10,20 +10,26 @@ CreatableItemSpecifier = {
         return self:get("contents").hscreatable
       end,
       ["specid"] = function(self)
-        return json.encode(self:get("specifier"))
+        local spec = self:get("specifier")
+        local filteredSpec = {}
+        for k,v in pairs(spec) do
+          if type(v) ~= "userdata" and type(v) ~= "function" then
+            filteredSpec[k] = v
+          end
+        end
+        return json.encode(filteredSpec)
       end,
       ["type"] = function(self)
         return self:get("specifier").type
       end,
-      ["is-hotkey"] = function(self)
-        return self:get("type") == "hotkey"
-      end,
+      
       ["is-task"] = function(self)
         return self:get("type") == "task"
       end,
-      ["is-watcher"] = function(self)
-        return self:get("type") == "watcher"
+      ["is-fireable"] = function(self)
+        return self:get("specifier").fn ~= nil
       end,
+      
     },
     doThisables = {
       ["recreate"] = function (self)
@@ -40,9 +46,9 @@ CreatableItemSpecifier = {
     }
   },
   potential_interfaces = ovtable.init({
-    { key = "hotkey", value = CreateHotkeyItem },
+    
     { key = "task", value = CreateTaskItem },
-    { key = "watcher", value = CreateWatcherItem },
+    { key = "fireable", value = CreateFireableItem },
   }),
 }
 

@@ -42,7 +42,6 @@ assertMessage(
   })(1, 2, 3),
   {1, 2, 3}
 )
---[[ 
 local poisonable3 = returnPoisonable()
 
 assertMessage(
@@ -57,7 +56,7 @@ assertMessage(
     mode = "fs"
   })(1, 2, 3),
   {1, 2, 3}
-) ]] -- TODO: re-enable this test once `run` (which is a hidden dependency of `memoize` mode = "fs") is implemented
+)
 
 local async_poisoned = false
 local function asyncPoisonable(arg, callback)

@@ -128,7 +128,7 @@ assertMessage(
   "A Tale of Two Cities, and Also 9/11, and sWAG Also"
 )
 
---[[ assertMessage(
+assertMessage(
   transf.string.romanized("ねえもう少しだけでいいの"),
   "nee mou sukoshi dake de ii no"
 )
@@ -137,5 +137,5 @@ assertMessage(
   transf.string.romanized_snake("ねえもう少しだけでいいの"),
   "nee_mou_sukoshi_dake_de_ii_no"
 )
- ]] -- todo: reactivate once I've debugged `run`
+
 env = realenv

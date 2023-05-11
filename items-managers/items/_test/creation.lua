@@ -64,7 +64,64 @@ local item_creation_map = {
     }
   },
 
-  [CreateArray] = {}, -- todo
+  [CreateArray] = {
+    {
+      value = {},
+      must_be = { "array", "empty-array" },
+      must_not_be = { "non-empty-array" }
+    },
+    {
+      value = { 1, 2 },
+      must_be = { "array", "non-empty-array", "pair",  "does-not-contain-nil-array", "homogeneous-array", "array-of-noninterfaces" },
+      must_not_be = { "empty-array", "contains-nil-array", "non-homogeneous-array", "array-of-interfaces" }
+    },
+    {
+      value = { 1, 2, 3 },
+      must_not_be = { "pair" }
+    },
+    {
+      value = { 1, 2, nil, 4 },
+      must_be = { "array", "non-empty-array", "contains-nil-array"},
+      must_not_be = { "empty-array", "does-not-contain-nil-array" }
+    },
+    {
+      value = { 1, 2, "3" },
+      must_be = { "array", "non-empty-array", "non-homogeneous-array"},
+      must_not_be = { "empty-array", "homogeneous-array" }
+    },
+    {
+      value = { "1", "2", "3" },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-noninterfaces", "array-of-strings" },
+    },
+    {
+      value = { CreateStringItem("1"), CreateStringItem("2") },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items" },
+      must_not_be = { "empty-array", "non-homogeneous-array", "array-of-noninterfaces" }
+    },
+    {
+      value = { CreateArray({1, 2}), CreateArray({3, 4}) },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-arrays" },
+      must_not_be = { "empty-array", "non-homogeneous-array", "array-of-non-array-interfaces" }
+    },
+    {
+      value = { CreateAudiodeviceItem("Test Device 1")},
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-audiodevices" },
+    },
+    {
+      value = { CreateDate(date())},
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-dates" },
+    },
+    {
+      value = { CreateTable({foo = "bar"}), CreateTable({bar = "foo"}) },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-tables", "array-of-non-empty-tables" },
+      must_not_be = { "array-of-empty-tables" }
+    },
+    {
+      value = { CreateTable({}), CreateTable({}) },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-tables", "array-of-empty-tables" },
+      must_not_be = { "array-of-non-empty-tables" }
+    }
+  }, -- todo
   [CreateEnvItem] = {}, -- todo
  [CreateNumber] = {
     {
@@ -161,10 +218,10 @@ local item_creation_map = {
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "grandparent-dir"},
     }
   }, -- todo
-  [CreateWatcherItem] = {
+  [CreateCreatableItem] = {
     {
       value = {
-        type = hs.pasteboard
+        
       }
     }
   }
