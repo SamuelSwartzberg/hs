@@ -4,7 +4,7 @@ URLByHostItemSpecifier = {
   properties = {
     getables = {
       ["is-youtube"] = function(self) return stringy.find(self:get("url-host"), "youtube") end, 
-      ["is-booru-url"] = function(self) return stringy.find(self:get("url-host"), "gelbooru") or stringy.find(self:get("url-host"), "danbooru") end,
+      ["is-booru-url"] = function(self) return stringy.find(self:get("url-host"), "gelbooru") or stringy.find(self:get("url-host"), "danbooru") or stringy.find(self:get("url-host"), "yande.re") end,
     }
   },
   potential_interfaces = ovtable.init({

@@ -6,6 +6,9 @@ EnvItemSpecifier = {
       ["is-value-env-item"] = function(self)
         return self:get("contents").value
       end,
+      ["is-no-value-env-item"] = function(self)
+        return self:get("contents").value == nil
+      end,
       ["is-dependents-env-item"] = function(self)
         return self:get("contents").dependents
       end,
@@ -29,6 +32,7 @@ EnvItemSpecifier = {
   },
   potential_interfaces = ovtable.init({
     { key = "value-env-item", value = CreateValueEnvItem },
+    { key = "no-value-env-item", value = CreateNoValueEnvItem },
     { key = "dependents-env-item", value = CreateDependentsEnvItem },
     { key = "nodependents-env-item", value = CreateNodependentsEnvItem },
     { key = "aliases-env-item", value = CreateAliasesEnvItem },

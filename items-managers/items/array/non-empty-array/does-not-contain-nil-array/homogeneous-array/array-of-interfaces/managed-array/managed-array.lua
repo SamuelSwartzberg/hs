@@ -94,7 +94,6 @@ ManagedArraySpecifier = {
   },
   potential_interfaces = ovtable.init({
     { key = "managed-clipboard-array", value = CreateManagedClipboardArray },
-    { key = "managed-hotkey-array", value = CreateManagedHotkeyArray },
     { key = "managed-stream-array", value = CreateManagedStreamArray },
     { key = "managed-timer-array", value = CreateManagedTimerArray },
     { key = "managed-creatable-array", value = CreateManagedCreatableArray },

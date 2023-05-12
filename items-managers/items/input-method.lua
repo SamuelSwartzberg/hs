@@ -20,7 +20,7 @@ InputMethodItemSpecifier = {
 }
 
 --- @type BoundRootInitializeInterface
-function CreateInputMethodItem(hs_application)
-  return RootInitializeInterface(InputMethodItemSpecifier, hs_application)
+function CreateInputMethodItem(method)
+  return RootInitializeInterface(InputMethodItemSpecifier, method)
 end
 

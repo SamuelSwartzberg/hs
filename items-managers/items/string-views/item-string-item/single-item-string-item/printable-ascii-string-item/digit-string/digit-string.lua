@@ -1,7 +1,7 @@
 
 --- @type ItemSpecifier
 DigitStringItemSpecifier = {
-  type = "alphanum-item",
+  type = "digit-string-item",
   properties = {
     getables = {
       ["is-decimal-digit-string"] = function (self)

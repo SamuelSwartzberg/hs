@@ -33,10 +33,10 @@ PlaintextFileItemSpecifier = {
         return self:get("lines-of-file-contents")[n]
       end,
       ["range-lines-of-file-contents"] = function(self, specifier)
-        return slice(self:get("lines-of-file-contents"), specifier)
+        return select(1, slice(self:get("lines-of-file-contents"), specifier))
       end,
       ["range-chars-of-file-contents"] = function(self, specifier)
-        return slice(self:get("file-contents"), specifier)
+        return select(1, slice(self:get("file-contents"), specifier))
       end,
       ["file-contents-to-string"] = function(self) return self:get("file-contents") end,
       ["file-contents-to-tsv-dict"] = function(self)

@@ -7,6 +7,8 @@
 --- @field splitlines fun(s: string, keep_ends?: boolean): string[]
 --- @field replace fun(s: string, old: string, new: string, n?: integer): string
 --- @field shorten fun(s: string, n: integer, tail?: boolean): string
+--- @field startswith fun(s: string, prefix: string | string[]): boolean
+--- @field endswith fun(s: string, suffix: string | string[]): boolean 
 
 --- @class pl.file 
 --- @field copy fun(src: string, dest: string, flag?: boolean): boolean flag is for overwrite

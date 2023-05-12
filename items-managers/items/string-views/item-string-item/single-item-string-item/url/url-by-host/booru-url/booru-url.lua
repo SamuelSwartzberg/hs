@@ -8,7 +8,11 @@ BooruURLItemSpecifier = {
       end,
       ["is-gelbooru-url"] = function(self)
         return stringy.find(self:get("url-host"), "gelbooru")
-      end
+      end,
+      ["is-yandere-url"] = function(self)
+        return stringy.find(self:get("url-host"), "yande.re")
+      end,
+
     }, 
     doThisables = {
       ["add-to-local"] = function(self)
@@ -22,6 +26,7 @@ BooruURLItemSpecifier = {
   potential_interfaces = ovtable.init({
     { key = "danbooru-url", value = CreateDanbooruURLItem },
     { key = "gelbooru-url", value = CreateGelbooruURLItem },
+    { key = "yandere-url", value = CreateYandereURLItem },
   }),
 
   action_table = {
