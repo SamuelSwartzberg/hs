@@ -8,9 +8,7 @@ PathInterfaceItemSpecifier = {
       ["is-tilde-absolute-path"] = function(self) return self:get("contents"):find("^~") end,
       ["is-true-absolute-path"] = function(self) return self:get("contents"):find("^/") end,
       ["is-volume"] = function(self) return stringy.startswith(self:get("contents"), "/Volumes/") end,
-      ["is-path-by-start"] = function(self)
-        return true
-      end,
+      ["is-path-by-start"] = returnTrue,
       ["relative-path-from"] = function(self, starting_point)
         starting_point = starting_point or env.HOME
         return self:get("difference-from-prefix-or-nil", ensureAdfix(starting_point, "/", true, false, "suf"))
@@ -20,7 +18,7 @@ PathInterfaceItemSpecifier = {
       end,
       ["file-url"] = function (self)
         return "file://" .. self:get("contents")
-      end
+      end,
     },
     doThisables = {
       ["create-file"] = function(self, contents) writeFile(self:get("contents"), contents, "not-exists") end,

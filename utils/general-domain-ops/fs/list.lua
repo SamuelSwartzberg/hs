@@ -31,7 +31,7 @@ function itemsInPath(opts)
     end
   end
   local files = {}
-  opts.path = transf.string.tilde_resolved(opts.path)
+  opts.path = transf.string.path_resolved(opts.path)
   opts.path = ensureAdfix(opts.path, "/", true, false, "suf")
   if opts.path == "" then opts.path = "/" end
   opts.validator = opts.validator or function(file_name)

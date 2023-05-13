@@ -75,9 +75,44 @@ transf = {
       return str
     end,
     tilde_resolved = function(path)
-      return path:gsub("^~", env.HOME)
-    end
-
+      if stringy.startswith(path, "~") then
+        return env.HOME .. eutf8.sub(path, 2)
+      else
+        return path
+      end
+    end,
+    path_resolved = function(path)
+      path = transf.string.tilde_resolved(path)
+      local components = pathSlice(path, ":")
+      local reduced_components = {}
+      local started_with_slash = stringy.startswith(path, "/")
+      for _, component in ipairs(components) do
+        if component == ".." then
+          if #reduced_components > 0 then
+            table.remove(reduced_components)
+          else -- we can't go higher up
+            if started_with_slash then
+              -- no-op: we're already at the root, so we treat this similarly to '.', which is a no-op. This is consistent with the behavior of cd/ls in bash
+            else
+              table.insert(reduced_components, "..") -- the path was a relative path, and we've arrived at the root of the relative path. We have no further information about what is above the root of the relative path, so we have no choice but to leave this component unresolved
+            end
+             
+          end
+        elseif component ~= "." then
+          table.insert(reduced_components, component)
+        end
+      end
+      local new_path = table.concat(reduced_components, "/")
+      if started_with_slash then
+        return "/" .. new_path
+      else
+        if #new_path == 0 then
+          return "."
+        else
+          return new_path
+        end
+      end
+    end,
   },
   multiline_string = {
     trimmed_lines = function(str)

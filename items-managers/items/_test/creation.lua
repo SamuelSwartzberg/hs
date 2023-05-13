@@ -2,7 +2,8 @@
 
 -- try creating various items to make sure they work
 
-local TMPDIR_NOW = env.TMPDIR .. '/' .. os.time() .. '/'
+local testtime = os.time()
+local TMPDIR_NOW = env.TMPDIR .. '/' .. testtime .. '/'
 
 --- @class TestSpecifier
 --- @field value any
@@ -447,6 +448,18 @@ local item_creation_map = {
       must_not_be = { "relative-path", "true-absolute-path", "extant-path" }
     }, 
     {
+      value = "/Volumes/foobar",
+      must_be = { "volume", "non-root-volume"}
+    },
+    {
+      value = env.TMBACKUPVOL,
+      must_be = { "volume", "non-root-volume", "time-machine-volume" }
+    },
+    {
+      value = "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. hs.host.localizedName() .. "/" .. os.date("%Y-%m-%d-%H"),
+      must_be = { "volume", "non-root-volume", "dynamic-time-machine-volume" }
+    },
+    {
       pretest = function()
         writeFile(TMPDIR_NOW .. "foo.txt")
       end,
@@ -455,10 +468,42 @@ local item_creation_map = {
       posttest = function()
         delete(TMPDIR_NOW .. "foo.txt")
       end
-    },  
+    },
     {
       value = env.HOME,
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "grandparent-dir"},
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "grandparent-dir", "path-by-start-item", "path-in-home-item" },
+    },
+    {
+      value = env.HOMEBREW_SHARE,
+      must_be = { "path-by-start-item", "path-not-in-home-item"}
+    },
+    {
+      pretest = function()
+        writeFile(env.SCREENSHOTS .. "/" .. testtime .. ".png")
+      end,
+      value = env.SCREENSHOTS .. "/" .. testtime .. ".png",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "path-in-home-item", "path-in-screenshots-item" },
+      posttest = function()
+        delete(env.SCREENSHOTS .. "/" .. testtime .. ".png")
+      end
+    },
+    {
+      value = env.MENV,
+      must_be = { "path-in-home-item", "path-in-me-item", "path-in-mspec-item" }
+    },
+    {
+      value = env.MPASSPASSW,
+      must_be = { "path-in-home-item", "path-in-me-item", "path-in-mspec-item", "path-in-mpass-item", "path-in-mpassw-item" },
+      must_not_be = { "path-in-mpassotp-item" }
+    },
+    {
+      value = env.MPASSOTP,
+      must_be = { "path-in-home-item", "path-in-me-item", "path-in-mspec-item", "path-in-mpass-item", "path-in-mpassw-item", "path-in-mpassotp-item" },
+      must_not_be = { "path-in-mpassw-item" }
+    },
+    {
+      value = env.MAUDIOVISUAL,
+      must_be = { "path-in-home-item", "path-in-me-item", "path-in-maudiovisual-item" }
     },
     {
       value = "foo\nbar",

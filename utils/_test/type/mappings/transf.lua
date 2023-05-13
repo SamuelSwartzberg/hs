@@ -19,6 +19,122 @@ assertMessage(
 )
 
 assertMessage(
+  transf.string.path_resolved("~/foo/bar"),
+  env.HOME .. "/foo/bar"
+)
+
+assertMessage(
+  transf.string.path_resolved("/usr/./bin"),
+  "/usr/bin"
+)
+
+assertMessage(
+  transf.string.path_resolved("/usr/././bin"),
+  "/usr/bin"
+)
+
+assertMessage(
+  transf.string.path_resolved("/usr/../bin"),
+  "/bin"
+)
+
+assertMessage(
+  transf.string.path_resolved("/usr/../../bin"),
+  "/bin"
+)
+
+assertMessage(
+  transf.string.path_resolved("/usr/bin/../.."),
+  "/"
+)
+
+assertMessage(
+  transf.string.path_resolved("/usr/bin/././"),
+  "/usr/bin"
+)
+
+assertMessage(
+  transf.string.path_resolved("/./foo"),
+  "/foo"
+)
+
+assertMessage(
+  transf.string.path_resolved("/././usr/bin"),
+  "/usr/bin"
+)
+
+assertMessage(
+  transf.string.path_resolved("/../bar"),
+  "/bar"
+)
+
+assertMessage(
+  transf.string.path_resolved("/../../bar"),
+  "/bar"
+)
+
+assertMessage(
+  transf.string.path_resolved("./foo"),
+  "foo"
+)
+
+assertMessage(
+  transf.string.path_resolved("././foo"),
+  "foo"
+)
+
+assertMessage(
+  transf.string.path_resolved("../bar"),
+  "../bar"
+)
+
+assertMessage(
+  transf.string.path_resolved("../../bar"),
+  "../../bar"
+)
+
+assertMessage(
+  transf.string.path_resolved("foo/."),
+  "foo"
+)
+
+assertMessage(
+  transf.string.path_resolved("foo/./."),
+  "foo"
+)
+
+assertMessage(
+  transf.string.path_resolved("foo/.."),
+  "."
+)
+
+assertMessage(
+  transf.string.path_resolved("foo/../.."),
+  ".."
+)
+
+assertMessage(
+  transf.string.path_resolved("foo/./bar"),
+  "foo/bar"
+)
+
+assertMessage(
+  transf.string.path_resolved("foo/../foo"),
+  "foo"
+)
+
+assertMessage(
+  transf.string.path_resolved("foo/./../bar"),
+  "bar"
+)
+
+assertMessage(
+  transf.string.path_resolved("foo/.././bar"),
+  "bar"
+)
+
+
+assertMessage(
   transf.hex.char("6d"),
   "m"
 )

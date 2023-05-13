@@ -4,7 +4,7 @@
 
 --- @type readFileResult | readFileOrError
 function readFile(path, mode)
-  path = transf.string.tilde_resolved(path)
+  path = transf.string.path_resolved(path)
   mode = mode or "nil"
   local path_is_remote = pathIsRemote(path)
   if not path_is_remote then 

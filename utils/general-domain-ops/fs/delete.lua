@@ -14,9 +14,9 @@ function delete(path, thing, action, onlyif, fail)
   onlyif = defaultIfNil(onlyif, "any")
   fail = defaultIfNil(fail, "nil")
 
-  -- resolve tilde
+  -- resolve path
 
-  path = transf.string.tilde_resolved(path)
+  path = transf.string.path_resolved(path)
 
   -- set local vars
 

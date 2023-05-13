@@ -3,29 +3,20 @@ PathItemSpecifier = {
   type = "path",
   properties = {
     getables = {
-      ["is-absolute-path"] = function(self) return self:get("contents"):find("^/") or self:get("contents"):find("^~") end,
+      ["is-absolute-path"] = function(self) 
+        return stringy.startswith(self:get("contents"), "/") or stringy.startswith(self:get("contents"), "~")
+      end,
       ["is-relative-path"] = function(self) return not self:get("is-absolute-path") end,
-      ["is-path-leaf"] = function(self) return #self:get("path-components") > 0 end,
+      ["is-path-leaf"] = returnTrue,
       ["is-in-path"] = function(self, path) return stringy.startswith(self:get("contents"), path) end,
-      ["path"] = function(self)
-        return self:get("contents")
-      end,
-      ["path-components"] = function (self)
-        return filter(
-          stringy.split(self:get("path"), "/"),
-          true
-        )
-      end,
-      ["parent-path-components"] = function(self)
-        local path_components = self:get("path-components")
-        pop(path_components)
-        return path_components
+      ["resolved-path"] = function(self)
+        return transf.string.path_resolved(self:get("contents"))
       end,
       ["parent-dir-name"] = function(self)
-        return self:get("parent-path-components")[#self:get("parent-path-components")]
+        return pathSlice(self:get("resolved-path"), "-2:-2")[1]
       end,
       ["parent-dir-path"] = function(self)
-        return "/" .. table.concat(self:get("parent-path-components"), "/")
+        return pathSlice(self:get("resolved-path"), ":-2", {rejoin_at_end=true})
       end,
       ["path-ensure-final-slash"] = function(self)
         return ensureAdfix(self:get("contents"), "/", true, false, "suf")
