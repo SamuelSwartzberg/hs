@@ -522,66 +522,97 @@ local item_creation_map = {
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dated-extant-path-item"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/json/basic.json",
+      value = env.MSPEC .. "/mock/files/plaintext/json/basic.json",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-dictionary-file", "json-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/md/basic.md",
+      value = env.MSPEC .. "/mock/files/plaintext/md/basic.md",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "md-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/m3u/basic.m3u",
+      value = env.MSPEC .. "/mock/files/plaintext/m3u/basic.m3u",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "m3u-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/gitignore/basic.gitignore",
+      value = env.MSPEC .. "/mock/files/plaintext/gitignore/basic.gitignore",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "gitignore-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/email/basic.eml",
+      value = env.MSPEC .. "/mock/files/plaintext/email/basic.eml",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "email-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/xml/basic.xml",
+      value = env.MSPEC .. "/mock/files/plaintext/xml/basic.xml",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-tree-file", "xml-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/yaml/basic.yaml",
+      value = env.MSPEC .. "/mock/files/plaintext/yaml/basic.yaml",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-dictionary-file", "yaml-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/csv/basic.csv",
+      value = env.MSPEC .. "/mock/files/plaintext/csv/basic.csv",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-table-file", "csv-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/tsv/basic.tsv",
+      value = env.MSPEC .. "/mock/files/plaintext/tsv/basic.tsv",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path",  "file", "plaintext-file", "plaintext-table-file", "tsv-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/csv/timestamp.csv",
+      value = env.MSPEC .. "/mock/files/plaintext/csv/timestamp.csv",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-table-file", "csv-file", "timestamp-first-column-plaintext-table-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/toml/basic.toml",
+      value = env.MSPEC .. "/mock/files/plaintext/toml/basic.toml",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "toml-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/ini/basic.ini",
+      value = env.MSPEC .. "/mock/files/plaintext/ini/basic.ini",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "ini-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/bib/basic.bib",
+      value = env.MSPEC .. "/mock/files/plaintext/bib/basic.bib",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "bib-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/ics/basic.ics",
+      value = env.MSPEC .. "/mock/files/plaintext/ics/basic.ics",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "ics-file"}
     },
     {
-      value = env.MSPEC .. "/mock/plaintext/files/log/basic.log",
+      value = env.MSPEC .. "/mock/files/plaintext/log/basic.log",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "log-file"}
     },
-    -- todo shellscript-file (=also executable-code-file), tachiyomi-json-file, khal-config-file, vdirsyncer-config-file, all of may-be-either-file, binary-file, and all of dir
+    {
+      value = env.MSPEC .. "/mock/files/plaintext/sh/basic.sh",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "executable-code-file", "shellscript-file"}
+    },
+    {
+      value = env.MSPEC .. "/mock/files/plaintext/json/tachiyomi.json",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "json-file", "tachiyomi-json-file"}
+    },
+    {
+      value = env.MSPEC .. "/mock/dir_structure/khal/config.ini",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "plaintext-dictionary-file", "ini-file", "khal-config-file"}
+    },
+    {
+      value = env.MSPEC .. "/mock/dir_structure/vdirsyncer/config.ini",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "plaintext-dictionary-file", "ini-file", "vdirsyncer-config-file"}
+    },
+    {
+      value = env.MSPEC .. "/mock/dir_structure/newsboat/urls",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "newsboat-urls-file"}
+    },
+    {
+      value = env.MSPEC .. "/mock/files/binary/image/png/basic.png",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "image-file", "binary-file"}
+    },
+    {
+      value = env.MSPEC .. "/mock/files/binary/db/sql/sqlite/places.sqlite",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "binary-file", "db-file", "sql-file", "sqlite-file", "firefox-places-sqlite-file"}
+    },
+    {
+      value = env.MSPEC .. "/mock/files/binary/db/sql/sqlite/newpipe.db",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "binary-file", "db-file", "sql-file", "sqlite-file", "newpipe-sqlite-file"}
+    },
     {
       value = "foo\nbar",
       must_be = {
