@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 LocalCitableObjectIdItemSpecifier = {
-  type = "local-citable-object-id-item",
+  type = "local-citable-object-id",
   properties = {
     getables = {
       ["bibtex-from-citation-file"] = function(self)

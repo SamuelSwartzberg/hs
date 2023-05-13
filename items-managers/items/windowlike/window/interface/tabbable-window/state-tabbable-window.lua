@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 StateTabbableWindowItemSpecifier = {
-  type = "state-tabbable-window-item",
+  type = "state-tabbable-window",
   properties = {
     getables = {
       ["list-of-tabs"] = function(self)

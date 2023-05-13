@@ -1,6 +1,6 @@
 
 ArrayOfDateRelatedItemsSpecifier = {
-  type = "array-of-date-related-items",
+  type = "array-of-date-relateds",
   properties = {
     getables = {
       ["smallest-date"] = function(self)

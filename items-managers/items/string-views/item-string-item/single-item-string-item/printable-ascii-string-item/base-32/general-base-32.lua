@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 GeneralBase32ItemSpecifier = {
-  type = "general-base32-item",
+  type = "general-base32",
   properties = {
     getables = {
       ["is-base-32"] = returnTrue,

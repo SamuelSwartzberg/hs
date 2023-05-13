@@ -1,6 +1,6 @@
 
 ArrayOfStringItemsSpecifier = {
-  type = "array-of-string-items",
+  type = "array-of-strings",
   properties = {
     getables = {
       ["to-string-array"] = function(self) return self:get("map-to-new-array", function(item) return item:get("contents") end) end,

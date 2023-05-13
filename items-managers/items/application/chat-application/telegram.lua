@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 TelegramItemSpecifier = {
-  type = "telegram-item",
+  type = "telegram",
   properties = {
     getables = {
       ["convo-id"] = function(self, chat_obj)

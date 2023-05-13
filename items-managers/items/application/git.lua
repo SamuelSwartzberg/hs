@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 GitItemSpecifier = {
-  type = "git-item",
+  type = "git",
   properties = {
     getables = {
      

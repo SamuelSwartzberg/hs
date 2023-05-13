@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 FireableItemSpecifier = {
-  type = "fireable-item",
+  type = "fireable",
   properties = {
     getables = {
       ["is-watcher"] = function(self)

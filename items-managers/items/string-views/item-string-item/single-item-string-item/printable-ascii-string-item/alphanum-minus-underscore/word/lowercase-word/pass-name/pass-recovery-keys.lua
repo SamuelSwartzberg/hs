@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PassRecoveryKeysItemSpecifier = {
-  type = "pass-recovery-keys-item",
+  type = "pass-recovery-keys",
   properties = {
     getables = {
       ["pass-recovery-key"] = function(self)

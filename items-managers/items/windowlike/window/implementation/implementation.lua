@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 WindowImplementationItemSpecifier = {
-  type = "window-implementation-item",
+  type = "window-implementation",
   properties = {
     getables = {
       ["is-jxa-window"] = function(self) 

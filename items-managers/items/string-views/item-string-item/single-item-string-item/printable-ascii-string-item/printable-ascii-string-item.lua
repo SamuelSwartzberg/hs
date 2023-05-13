@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PrintableAsciiStringItemSpecifier = {
-  type = "printable-ascii-string-item",
+  type = "printable-ascii-string",
   properties = {
     getables = {
       ["is-alphanum-minus-underscore"] = function(self) 

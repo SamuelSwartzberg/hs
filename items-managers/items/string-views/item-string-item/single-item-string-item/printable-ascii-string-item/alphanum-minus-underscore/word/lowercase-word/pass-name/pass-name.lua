@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PassNameItemSpecifier = {
-  type = "pass-name-item",
+  type = "pass-name",
   properties = {
     getables = {
       ["pass-value"] = function(self, type)

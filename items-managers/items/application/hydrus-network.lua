@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 HydrusNetworkItemSpecifier = {
-  type = "hydrus-network-item",
+  type = "hydrus-network",
   properties = {
     getables = {
       ["to-hs-application"] = function(self)

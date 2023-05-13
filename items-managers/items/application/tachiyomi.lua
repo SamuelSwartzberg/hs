@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 TachiyomiItemSpecifier = {
-  type = "tachiyomi-item",
+  type = "tachiyomi",
   properties = {
     getables = {
      

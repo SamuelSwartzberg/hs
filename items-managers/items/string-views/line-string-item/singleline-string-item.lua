@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 SinglelineStringItemSpecifier = {
-  type = "singleline-string-item",
+  type = "singleline-string",
   properties = {
     getables = {
       

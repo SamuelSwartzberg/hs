@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 YoutubePlayableItemItemSpecifier = {
-  type = "youtube-playable-item",
+  type = "youtube-playable",
   properties = {
     getables = {
       ["is-youtube-playlist"] = function(self)

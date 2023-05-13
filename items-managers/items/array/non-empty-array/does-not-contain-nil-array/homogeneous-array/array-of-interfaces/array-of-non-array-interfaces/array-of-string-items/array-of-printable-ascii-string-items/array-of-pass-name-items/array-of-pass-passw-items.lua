@@ -1,6 +1,6 @@
 
 ArrayOfPassPasswItemsSpecifier = {
-  type = "array-of-pass-passw-items",
+  type = "array-of-pass-passws",
   properties = {
     getables = {
       

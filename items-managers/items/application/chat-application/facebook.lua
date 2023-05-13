@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 FacebookItemSpecifier = {
-  type = "facebook-item",
+  type = "facebook",
   properties = {
     getables = {
       ["convo-id"] = function(self, chat_obj)

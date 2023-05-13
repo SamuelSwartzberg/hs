@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 MullvadRelayIdentifierItemSpecifier = {
-  type = "mullvad-relay-identifier-item",
+  type = "mullvad-relay-identifier",
   properties = {
     getables = {
 

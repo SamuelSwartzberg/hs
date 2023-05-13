@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 JxaTabItemSpecifier = {
-  type = "jxa-tab-item",
+  type = "jxa-tab",
   properties = {
     getables = {
       ["simple-property"] = function(self, prop)

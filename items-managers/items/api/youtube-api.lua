@@ -7,7 +7,7 @@ local youtube_auth_params_env_var_map = {
 
 --- @type ItemSpecifier
 YoutubeApiItemSpecifier = {
-  type = "youtube-api-item",
+  type = "youtube-api",
   properties = {
     getables = {
       ["access-token"] = function() return nil end, -- todo

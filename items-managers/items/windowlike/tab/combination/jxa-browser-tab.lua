@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 JxaBrowserTabItemSpecifier = {
-  type = "jxa-browser-tab-item",
+  type = "jxa-browser-tab",
   properties = {
     getables = {
       ["url"] = function (self)

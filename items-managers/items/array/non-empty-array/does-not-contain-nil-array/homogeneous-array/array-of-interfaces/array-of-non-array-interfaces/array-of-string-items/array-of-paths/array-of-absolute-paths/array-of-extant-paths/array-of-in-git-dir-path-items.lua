@@ -1,6 +1,6 @@
 
 ArrayOfInGitDirPathItemsSpecifier = {
-  type = "array-of-in-git-dir-path-items",
+  type = "array-of-in-git-dir-paths",
   properties = {
     getables = {
       ["filter-to-uncommitted-git-root-dirs"] = function(self)

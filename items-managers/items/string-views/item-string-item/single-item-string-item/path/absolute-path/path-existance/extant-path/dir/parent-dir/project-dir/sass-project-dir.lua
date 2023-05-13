@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 SassProjectDirItemSpecifier = {
-  type = "sass-project-dir-item",
+  type = "sass-project-dir",
   properties = {
     getables = {
       ["local-build-task"] = function()

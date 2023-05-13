@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 DatedExtantPathItemSpecifier = {
-  type = "dated-extant-path-item",
+  type = "dated-extant-path",
   properties = {
     getables = {
       

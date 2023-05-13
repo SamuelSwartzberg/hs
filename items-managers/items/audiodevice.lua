@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 AudiodeviceItemSpecifier = {
-  type = "audiodevice-item",
+  type = "audiodevice",
   properties = {
     getables = {
       ["name"] = function (self)

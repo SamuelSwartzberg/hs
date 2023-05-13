@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 LowercaseWordItemSpecifier = {
-  type = "lowercase-word-item",
+  type = "lowercase-word",
   properties = {
     getables = {
       ["is-pass-name"] = function(self)

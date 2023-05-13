@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 StateWindowItemSpecifier = {
-  type = "state-window-item",
+  type = "state-window",
   properties = {
     getables = {
       ["state-json-matched-geometry-table"] = function(self)

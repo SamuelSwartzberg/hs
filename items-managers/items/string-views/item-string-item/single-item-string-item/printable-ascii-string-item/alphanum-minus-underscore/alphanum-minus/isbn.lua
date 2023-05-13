@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 IsbnItemSpecifier = {
-  type = "isbn-item",
+  type = "isbn",
   properties = {
     getables = {
       ["bibtex-from-internet"] = function(self)

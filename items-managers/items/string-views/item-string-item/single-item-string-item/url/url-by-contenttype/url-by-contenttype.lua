@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 URLByContenttypeItemSpecifier = {
-  type = "url-by-contenttype-item",
+  type = "url-by-contenttype",
   properties = {
     getables = {
       ["is-image-url"] = function(self)

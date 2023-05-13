@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 YoutubeApiExtensionItemSpecifier = {
-  type = "youtube-api-extension-item",
+  type = "youtube-api-extension",
   properties = {
     getables = {
       ["result"] = function(self, specifier)

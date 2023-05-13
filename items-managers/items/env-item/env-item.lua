@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 EnvItemSpecifier = {
-  type = "env-item",
+  type = "env",
   properties = {
     getables = {
       ["is-value-env-item"] = function(self)

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 EmailAddressItemSpecifier = {
-  type = "email-address-item",
+  type = "email-address",
   properties = {
     getables = {
     },

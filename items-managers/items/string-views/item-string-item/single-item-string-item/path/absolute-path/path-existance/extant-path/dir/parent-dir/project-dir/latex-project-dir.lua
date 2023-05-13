@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 LatexProjectDirItemSpecifier = {
-  type = "latex-project-dir-item",
+  type = "latex-project-dir",
   properties = {
     getables = {
       

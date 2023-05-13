@@ -1,6 +1,6 @@
 
 ArrayOfYoutubePlayableItemsSpecifier = {
-  type = "array-of-youtube-playable-items",
+  type = "array-of-youtube-playables",
   properties = {
     getables = {
       ["is-array-of-youtube-videos"] = bind(isArrayOfInterfacesOfType, {a_use, "youtube-video" }),

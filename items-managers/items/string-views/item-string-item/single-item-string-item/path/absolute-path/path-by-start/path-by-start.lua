@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PathByStartItemSpecifier = {
-  type = "path-by-start-item",
+  type = "path-by-start",
   properties = {
     getables = {
       ["is-path-in-home"] = function(self)

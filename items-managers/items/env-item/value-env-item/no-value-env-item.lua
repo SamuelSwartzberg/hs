@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 NoValueEnvItemSpecifier = {
-  type = "no-value-env-item",
+  type = "no-value-env",
   properties = {
     getables = {
       ["value-to-env-line-value"] = function(self)

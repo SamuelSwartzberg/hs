@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 URLByHostItemSpecifier = {
-  type = "url-by-host-item",
+  type = "url-by-host",
   properties = {
     getables = {
       ["is-youtube"] = function(self) return stringy.find(self:get("url-host"), "youtube") end, 

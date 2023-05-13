@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 IssnItemSpecifier = {
-  type = "issn-item",
+  type = "issn",
   properties = {
     getables = {
 

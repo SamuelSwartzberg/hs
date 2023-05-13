@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PassSecurityQuestionItemSpecifier = {
-  type = "pass-security-question-item",
+  type = "pass-security-question",
   properties = {
     getables = {
       ["pass-security-question"] = function(self)

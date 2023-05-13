@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 OmegatApplicationSpecifier = {
-  type = "omegat-item",
+  type = "omegat",
   properties = {
     getables = {
       ["open-recent-menu-command"] = function(self)

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 NewpipeItemSpecifier = {
-  type = "newpipe-item",
+  type = "newpipe",
   properties = {
     getables = {
       ["backup-sqlite"] = function(self)

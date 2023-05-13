@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 BrowserTabItemSpecifier = {
-  type = "browser-tab-item",
+  type = "browser-tab",
   properties = {
     getables = {
       ["extra-tab-info"] = function(self)

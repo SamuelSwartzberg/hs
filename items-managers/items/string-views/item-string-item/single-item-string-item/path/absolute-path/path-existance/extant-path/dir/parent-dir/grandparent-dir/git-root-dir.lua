@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 GitRootDirItemSpecifier = {
-  type = "git-root-dir-item",
+  type = "git-root-dir",
   properties = {
     getables = {
       ["dotgit-dir"] = function(self)

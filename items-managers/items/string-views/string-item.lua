@@ -1,5 +1,5 @@
 StringItemSpecifier = {
-  type = "string-item",
+  type = "string",
   properties = {
     getables = {
       ["stripped-contents"] = function(self)

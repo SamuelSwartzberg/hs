@@ -1,6 +1,6 @@
 
 ArrayOfPassOtpItemsSpecifier = {
-  type = "array-of-pass-otp-items",
+  type = "array-of-pass-otps",
   properties = {
     getables = {
       

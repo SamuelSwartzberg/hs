@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 TabbableWindowItemSpecifier = {
-  type = "tabbable-window-item",
+  type = "tabbable-window",
   properties = {
     getables = {
       ["is-jxa-tabbable-window"] = function(self) 

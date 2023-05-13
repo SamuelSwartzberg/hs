@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 YoutubeChannelIdItemSpecifier = {
-  type = "youtube-channel-id-item",
+  type = "youtube-channel-id",
   properties = {
     getables = {
       ["youtube-feed-url"] = function(self)

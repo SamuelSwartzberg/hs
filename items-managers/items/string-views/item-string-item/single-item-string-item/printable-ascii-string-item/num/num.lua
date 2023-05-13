@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 NumItemSpecifier = {
-  type = "num-item",
+  type = "num",
   properties = {
     getables = {
       ["numeric-equivalent"] = function(self)

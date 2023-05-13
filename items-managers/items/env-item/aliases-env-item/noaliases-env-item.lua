@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 NoaliasesEnvItemSpecifier = {
-  type = "noaliases-env-item",
+  type = "noaliases-env",
   properties = {
     getables = {
       ["self-to-env-lines"] = function(self, specifier)

@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 PackageManagerItemSpecifier = {
-  type = "package-manager-item",
+  type = "package-manager",
   properties = {
     getables = {
       

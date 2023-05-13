@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 NodependentsEnvItemSpecifier = {
-  type = "nodependents-env-item",
+  type = "nodependents-env",
   properties = {
     getables = {
       ["dependents-to-env-lines"] = function()

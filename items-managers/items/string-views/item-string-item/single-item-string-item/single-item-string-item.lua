@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 SingleItemStringItemSpecifier = {
-  type = "single-item-string-item",
+  type = "single-item-string",
   properties = {
     doThisables = {
       ["choose-synonym-th"] = function(self)

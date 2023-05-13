@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 HasUppercaseStringItemSpecifier = {
-  type = "has-uppercase-string-item",
+  type = "has-uppercase-string",
   properties = {
     getables = {
       ["contents-as-all-lowercase"] = function(self) return self:get("contents"):lower() end,
@@ -35,7 +35,7 @@ CreateHasUppercaseStringItem = bindArg(NewDynamicContentsComponentInterface, Has
 
 --- @type ItemSpecifier
 HasLowercaseStringItemSpecifier = {
-  type = "has-lowercase-string-item",
+  type = "has-lowercase-string",
   properties = {
     getables = {
       ["contents-as-all-uppercase"] = function(self) return self:get("contents"):upper() end,

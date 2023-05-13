@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 MightBeXmlItemSpecifier = {
-  type = "might-be-xml-item",
+  type = "might-be-xml",
   properties = {
     getables = {
       ["parse-as-xml"] = function(self)

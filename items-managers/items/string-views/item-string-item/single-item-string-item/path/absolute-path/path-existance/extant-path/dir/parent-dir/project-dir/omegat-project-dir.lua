@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 OmegatProjectDirItemSpecifier = {
-  type = "omegat-project-dir-item",
+  type = "omegat-project-dir",
   properties = {
     getables = {
       ["corresponding-application-name"] = function(self)

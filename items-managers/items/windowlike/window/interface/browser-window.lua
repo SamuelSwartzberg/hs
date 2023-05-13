@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 BrowserWindowItemSpecifier = {
-  type = "browser-window-item",
+  type = "browser-window",
   properties = {
     getables = {
       

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 UnicodeCodepointItemSpecifier = {
-  type = "unicode-codepoint-item",
+  type = "unicode-codepoint",
   properties = {
     getables = {
       ["numeric-equivalent"] = function(self)

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PathInMspecItemSpecifier = {
-  type = "path-in-mspec-item",
+  type = "path-in-mspec",
   properties = {
     getables = {
       ["is-path-in-mpass"] = function(self)

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 WatcherItemSpecifier = {
-  type = "watcher-item",
+  type = "watcher",
   properties = {
     getables = {
       ["fn"] = function(self)

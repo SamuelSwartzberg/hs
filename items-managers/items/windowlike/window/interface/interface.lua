@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 WindowInterfaceItemSpecifier = {
-  type = "window-interface-item",
+  type = "window-interface",
   properties = {
     getables = {
       ["is-browser-window"] = function(self) 

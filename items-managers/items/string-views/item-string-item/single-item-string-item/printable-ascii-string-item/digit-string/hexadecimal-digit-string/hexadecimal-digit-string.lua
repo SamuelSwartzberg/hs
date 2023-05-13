@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 HexadecimalDigitStringItemSpecifier = {
-  type = "hexadecimal-digit-string-item",
+  type = "hexadecimal-digit-string",
   properties = {
     getables = {
       ["hexadecimal-numeric-value"] = function(self)

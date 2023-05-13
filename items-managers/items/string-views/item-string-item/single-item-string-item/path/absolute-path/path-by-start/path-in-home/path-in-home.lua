@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PathInHomeItemSpecifier = {
-  type = "path-in-home-item",
+  type = "path-in-home",
   properties = {
     getables = {
       ["is-path-in-me"] = function (self)

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 ApplicationItemSpecifier = {
-  type = "application-item",
+  type = "application",
   properties = {
     getables = {
       ["application-support-dir"] = function(self) -- generally true, but may need to be overwritten in subclasses for some applications

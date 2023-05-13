@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 OctalDigitStringItemSpecifier = {
-  type = "octal-digit-string-item",
+  type = "octal-digit-string",
   properties = {
     getables = {
       ["octal-numeric-value"] = function(self)

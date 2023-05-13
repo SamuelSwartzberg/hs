@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 TabInterfaceItemSpecifier = {
-  type = "tab-interface-item",
+  type = "tab-interface",
   properties = {
     getables = {
       ["is-browser-tab"] = function(self) 

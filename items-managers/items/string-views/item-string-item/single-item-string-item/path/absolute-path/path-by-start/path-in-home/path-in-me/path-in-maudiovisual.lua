@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PathInMaudiovisualItemSpecifier = {
-  type = "path-in-maudivisual-item",
+  type = "path-in-maudivisual",
   properties = {
     getables = {
       ["base-path"] = function()

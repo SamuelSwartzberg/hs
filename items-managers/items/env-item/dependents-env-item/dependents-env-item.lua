@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 DependentsEnvItemSpecifier = {
-  type = "dependents-env-item",
+  type = "dependents-env",
   properties = {
     getables = {
       ["dependents"] = function(self)

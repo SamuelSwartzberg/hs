@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PhoneNumberItemSpecifier = {
-  type = "phone-number-item",
+  type = "phone-number",
   properties = {
     getables = {
      

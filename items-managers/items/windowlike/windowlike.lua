@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 WindowlikeItemSpecifier = {
-  type = "windowlike-item",
+  type = "windowlike",
   properties = {
     getables = {
       ["running-application-item"] = function(self)

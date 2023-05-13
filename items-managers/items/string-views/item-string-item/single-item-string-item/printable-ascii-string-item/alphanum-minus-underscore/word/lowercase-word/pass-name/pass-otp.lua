@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PassOtpItemSpecifier = {
-  type = "pass-otp-item",
+  type = "pass-otp",
   properties = {
     getables = {
       ["pass-otp"] = function(self)

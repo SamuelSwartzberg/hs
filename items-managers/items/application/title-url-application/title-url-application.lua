@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 TitleUrlApplicationItemSpecifier = {
-  type = "title-url-application-item",
+  type = "title-url-application",
   properties = {
     getables = {
       ["is-firefox"] = function(self)

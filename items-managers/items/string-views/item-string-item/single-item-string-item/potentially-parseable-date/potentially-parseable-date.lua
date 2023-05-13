@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PotentiallyParseableDateItemSpecifier = {
-  type = "potentially-parseable-date-item",
+  type = "potentially-parseable-date",
   properties = {
     getables = {
       ["to-timestamp"] = function(self)

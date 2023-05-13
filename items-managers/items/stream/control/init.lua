@@ -3,7 +3,7 @@ rrq("mpvInterfaceInner")
 
 --- @type ItemSpecifier
 StreamControlItemSpecifier = {
-  type = "stream-control-item",
+  type = "stream-control",
   properties = {
     getables = {
       ["is-mpv-inner"] = returnTrue,

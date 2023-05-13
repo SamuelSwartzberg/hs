@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PathInMeItemSpecifier = {
-  type = "path-in-me-item",
+  type = "path-in-me",
   properties = {
     getables = {
       ["is-path-in-maudiovisual"] = function (self)

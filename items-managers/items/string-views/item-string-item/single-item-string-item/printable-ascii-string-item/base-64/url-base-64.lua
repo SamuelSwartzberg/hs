@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 UrlBase64ItemSpecifier = {
-  type = "url-base64-item",
+  type = "url-base64",
   properties = {
     getables = {
       ["is-base-64"] = returnTrue,

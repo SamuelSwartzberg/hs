@@ -1,7 +1,7 @@
 --- @type ItemSpecifier
 --- @type ItemSpecifier
 InGitDirPathItemSpecifier = {
-  type = "in-git-dir-path-item",
+  type = "in-git-dir-path",
   properties = {
     getables = {
       ["git-root-dir"] = function(self)

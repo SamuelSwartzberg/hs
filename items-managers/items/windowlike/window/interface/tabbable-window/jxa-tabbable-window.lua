@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 JxaTabbableWindowItemSpecifier = {
-  type = "jxa-tabbable-window-item",
+  type = "jxa-tabbable-window",
   properties = {
     getables = {
       ["amount-of-tabs"] = function(self)

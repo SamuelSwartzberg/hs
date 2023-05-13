@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 TabCombinationItemSpecifier = {
-  type = "tab-combination-item",
+  type = "tab-combination",
   properties = {
     getables = {
       ["is-jxa-browser-tab"] = function(self) 

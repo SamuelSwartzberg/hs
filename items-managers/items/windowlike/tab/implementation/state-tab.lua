@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 StateTabItemSpecifier = {
-  type = "state-tab-item",
+  type = "state-tab",
   properties = {
     getables = {
       ["current-hist-attrs"] = function(self)

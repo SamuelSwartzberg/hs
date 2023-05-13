@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 MightBeJsonItemSpecifier = {
-  type = "might-be-json-item",
+  type = "might-be-json",
   properties = {
     getables = {
       ["parse-as-json"] = function(self)

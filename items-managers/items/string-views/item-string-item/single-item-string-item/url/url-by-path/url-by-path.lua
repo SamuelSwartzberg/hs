@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 URLByPathItemSpecifier = {
-  type = "url-by-path-item",
+  type = "url-by-path",
   properties = {
     getables = {
       ["is-owner-item-url"] = function(self) 

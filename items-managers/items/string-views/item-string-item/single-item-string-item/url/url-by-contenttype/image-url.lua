@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 ImageURLItemSpecifier = {
-  type = "image-url-item",
+  type = "image-url",
   properties = {
     getables = {
       ["booru-url"] = function(self)

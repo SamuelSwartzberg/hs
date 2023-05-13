@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 InputMethodItemSpecifier = {
-  type = "input-method-item",
+  type = "input-method",
   properties = {
     getables = {
       ["to-string"] = function(self)

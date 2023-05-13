@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PassUsernameItemSpecifier = {
-  type = "pass-username-item",
+  type = "pass-username",
   properties = {
     getables = {
       ["pass-username-as-filename"] = function(self)

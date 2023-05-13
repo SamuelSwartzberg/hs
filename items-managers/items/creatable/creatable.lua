@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 CreatableItemSpecifier = {
-  type = "creatable-item",
+  type = "creatable",
   properties = {
     getables = {
       ["specifier"] = function(self)

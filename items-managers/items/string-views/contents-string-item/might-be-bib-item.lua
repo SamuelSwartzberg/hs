@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 MightBeBibItemSpecifier = {
-  type = "might-be-bib-item",
+  type = "might-be-bib",
   properties = {
     getables = {
       ["bib-url"] = function(self)

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 DateRelatedItemSpecifier = {
-  type = "date-related-item",
+  type = "date-related",
   properties = {
     getables = {
       ["to-date-obj"] = function(self)

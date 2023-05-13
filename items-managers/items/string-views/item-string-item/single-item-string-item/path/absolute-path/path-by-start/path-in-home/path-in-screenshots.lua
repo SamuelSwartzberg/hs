@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PathInScreenshotsItemSpecifier = {
-  type = "path-in-screenshots-item",
+  type = "path-in-screenshots",
   properties = {
     getables = {
       ["base-path"] = function(self)

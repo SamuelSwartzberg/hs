@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 ChatApplicationItemSpecifier = {
-  type = "chat-application-item",
+  type = "chat-application",
   properties = {
     getables = {
       ["is-discord"] = function(self) return self:get("contents") == "Discord" end,

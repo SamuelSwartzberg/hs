@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 WordItemSpecifier = {
-  type = "word-item",
+  type = "word",
   properties = {
     doThisables = {},
     getables = {

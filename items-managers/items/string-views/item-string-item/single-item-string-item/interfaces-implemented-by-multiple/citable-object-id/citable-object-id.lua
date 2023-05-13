@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 CitableObjectIdItemSpecifier = {
-  type = "citable-object-id-item",
+  type = "citable-object-id",
   properties = {
     getables = {
       ["to-bib-filename"] = function(self)

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 ProjectDirItemSpecifier = {
-  type = "project-dir-item",
+  type = "project-dir",
   properties = {
     getables = {
       ["is-latex-project-dir"] = function(self)

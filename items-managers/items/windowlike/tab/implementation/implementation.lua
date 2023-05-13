@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 TabImplementationItemSpecifier = {
-  type = "tab-implementation-item",
+  type = "tab-implementation",
   properties = {
     getables = {
       ["is-jxa-tab"] = function(self) 

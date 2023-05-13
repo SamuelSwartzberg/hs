@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 Base64ItemSpecifier = {
-  type = "base64-item",
+  type = "base64",
   properties = {
     getables = {
       

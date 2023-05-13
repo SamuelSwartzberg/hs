@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 TabItemSpecifier = {
-  type = "tab-item",
+  type = "tab",
   properties = {
     getables = {
       ["is-implementation-tab"] = returnTrue,

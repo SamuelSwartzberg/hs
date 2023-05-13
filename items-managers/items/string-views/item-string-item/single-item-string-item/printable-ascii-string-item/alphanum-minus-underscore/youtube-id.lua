@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 YoutubeIdItemSpecifier = {
-  type = "youtube-id-item",
+  type = "youtube-id",
   properties = {
     getables = {
       ["to-youtube-video"] = function(self)

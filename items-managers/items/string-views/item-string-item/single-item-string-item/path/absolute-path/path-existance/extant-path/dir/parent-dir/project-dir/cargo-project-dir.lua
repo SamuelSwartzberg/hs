@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 CargoProjectDirItemSpecifier = {
-  type = "cargo-project-dir-item",
+  type = "cargo-project-dir",
   properties = {
     getables = {
       ["local-build-task"] = function()

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 DecimalDigitStringItemSpecifier = {
-  type = "decimal-digit-string-item",
+  type = "decimal-digit-string",
   properties = {
     getables = {
       ["decimal-numeric-value"] = function(self)

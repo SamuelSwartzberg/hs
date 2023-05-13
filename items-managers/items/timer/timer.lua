@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 TimerItemSpecifier = {
-  type = "timer-item",
+  type = "timer",
   properties = {
     getables = {
       ["interval"] = function (self)

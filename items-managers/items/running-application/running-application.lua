@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 RunningApplicationItemSpecifier = {
-  type = "running-application-item",
+  type = "running-application",
   properties = {
     getables = {
       ["is-omegat"] = function(self) return self:get("contents"):title() == "OmegaT" end,

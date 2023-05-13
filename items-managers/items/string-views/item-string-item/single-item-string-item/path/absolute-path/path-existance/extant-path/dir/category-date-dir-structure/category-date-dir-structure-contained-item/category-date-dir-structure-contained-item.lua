@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 CategoryDateDirStructureContainedItemSpecifier = {
-  type = "category-date-dir-structure-contained-item",
+  type = "category-date-dir-structure-contained",
   properties = {
     getables = {
       ["is-category-date-dir-structure-dir"] = function(self)

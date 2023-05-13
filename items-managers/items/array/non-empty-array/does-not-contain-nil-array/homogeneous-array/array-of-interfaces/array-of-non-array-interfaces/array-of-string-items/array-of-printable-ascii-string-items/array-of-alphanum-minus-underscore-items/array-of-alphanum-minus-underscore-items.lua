@@ -1,6 +1,6 @@
 
 ArrayOfAlphanumMinusUnderscoreItemsSpecifier = {
-  type = "array-of-alphanum-minus-underscore-items",
+  type = "array-of-alphanum-minus-underscores",
   properties = {
     getables = {
       ["is-array-of-youtube-ids"] = bind(isArrayOfInterfacesOfType, {a_use, "youtube-id-item" }),

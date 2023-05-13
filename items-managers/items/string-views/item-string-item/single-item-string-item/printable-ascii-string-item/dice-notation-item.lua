@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 DiceNotationItemSpecifier = {
-  type = "dicenotation-item",
+  type = "dicenotation",
   properties = {
     getables = {
       ["roll-result"] = function(self)

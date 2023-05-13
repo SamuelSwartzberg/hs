@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 AliasesEnvItemSpecifier = {
-  type = "aliases-env-item",
+  type = "aliases-env",
   properties = {
     getables = {
       ["self-to-env-lines"] = function(self, specifier)

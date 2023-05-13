@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 FirefoxItemSpecifier = {
-  type = "firefox-item",
+  type = "firefox",
   properties = {
     getables = {
       ["default-profile-dir"] = function(self)

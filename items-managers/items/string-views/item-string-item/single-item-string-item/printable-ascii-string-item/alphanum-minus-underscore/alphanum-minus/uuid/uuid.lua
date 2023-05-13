@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 UuidItemSpecifier = {
-  type = "uuid-item",
+  type = "uuid",
   properties = {
     getables = {
       ["is-contact"] = function(self)

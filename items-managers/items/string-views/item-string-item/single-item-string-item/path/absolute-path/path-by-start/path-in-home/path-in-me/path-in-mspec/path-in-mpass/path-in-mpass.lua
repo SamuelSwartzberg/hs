@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PathInMpassItemSpecifier = {
-  type = "path-in-mpass-item",
+  type = "path-in-mpass",
   properties = {
     getables = {
       ["is-path-in-mpassotp"] = function(self)

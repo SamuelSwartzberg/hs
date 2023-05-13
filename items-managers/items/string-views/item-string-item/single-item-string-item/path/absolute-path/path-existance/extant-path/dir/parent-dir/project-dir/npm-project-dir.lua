@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 NpmProjectDirItemSpecifier = {
-  type = "npm-project-dir-item",
+  type = "npm-project-dir",
   properties = {
     getables = {
       ["local-build-task"] = function()

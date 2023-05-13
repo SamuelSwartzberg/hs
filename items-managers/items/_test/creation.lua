@@ -17,51 +17,51 @@ local item_creation_map = {
   [CreateApiItem] = {
     {
       value = "https://www.googleapis.com/youtube",
-      must_be = { "api-item", "youtube-api-item" },
-      must_not_be = { "youtube-api-extension-item" }
+      must_be = { "api", "youtube-api" },
+      must_not_be = { "youtube-api-extension" }
     },
     {
       value = "https://yt.lemnoslife.com/",
-      must_be = { "api-item", "youtube-api-extension-item" },
-      must_not_be = { "youtube-api-item" }
+      must_be = { "api", "youtube-api-extension" },
+      must_not_be = { "youtube-api" }
     }
   },
   [CreateApplicationItem] = {
     {
       value = "Facebook",
-      must_be = { "application-item", "chat-application-item", "facebook-item" }
+      must_be = { "application", "chat-application", "facebook" }
     },
     {
       value = "Discord",
-      must_be = { "application-item", "chat-application-item", "discord-item" }
+      must_be = { "application", "chat-application", "discord" }
     },
     {
       value = "Signal",
-      must_be = { "application-item", "chat-application-item", "signal-item" }
+      must_be = { "application", "chat-application", "signal" }
     },
     {
       value = "Telegram Lite",
-      must_be = { "application-item", "chat-application-item", "telegram-item" }
+      must_be = { "application", "chat-application", "telegram" }
     },
     {
       value = "Firefox",
-      must_be = { "application-item", "title-url-application-item", "firefox-item" }
+      must_be = { "application", "title-url-application", "firefox" }
     },
     {
       value = "Newpipe",
-      must_be = { "application-item", "title-url-application-item", "newpipe-item" }
+      must_be = { "application", "title-url-application", "newpipe" }
     },
     {
       value = "Git",
-      must_be = { "application-item", "git-item" }
+      must_be = { "application", "git" }
     },
     {
       value = "Hydrus Network",
-      must_be = { "application-item", "hydrus-network-item" }
+      must_be = { "application", "hydrus-network" }
     },
     {
       value = "Tachiyomi",
-      must_be = { "application-item", "tachiyomi-item" }
+      must_be = { "application", "tachiyomi" }
     }
   },
 
@@ -96,19 +96,19 @@ local item_creation_map = {
     },
     {
       value = { CreateStringItem("1"), CreateStringItem("2") },
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items" },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings" },
       must_not_be = { "empty-array", "non-homogeneous-array", "array-of-noninterfaces" }
     },
     {
       value = { 
         CreateStringItem("/foo"), CreateStringItem("bar/baz")
       },
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-paths", "array-of-path-leafs", "array-of-printable-ascii-items" },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis" },
       must_not_be = { "array-of-absolute-paths", "array-of-urls" }
     },
     {
       value = { CreateStringItem("/foo"), CreateStringItem("/home/user/bar/baz")},
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-absolute-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-ascii-items" },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-absolute-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis" },
       must_not_be = { "array-of-extant-paths" }
     },
     {
@@ -116,7 +116,7 @@ local item_creation_map = {
         CreateStringItem(env.DESKTOP),
         CreateStringItem(env.DOWNLOADS),
       },
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-ascii-items", "array-of-dirs"},
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis", "array-of-dirs"},
       must_not_be = { "array-of-files" }
     },
     {
@@ -128,7 +128,7 @@ local item_creation_map = {
         CreateStringItem(TMPDIR_NOW .. "test-array-of-files-1"),
         CreateStringItem(TMPDIR_NOW .. "test-array-of-files-2"),
       },
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-ascii-items", "array-of-files"},
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis", "array-of-files"},
       must_not_be = { "array-of-dirs" }
 
     },
@@ -137,7 +137,7 @@ local item_creation_map = {
         CreateStringItem(env.MENV),
         CreateStringItem(env.MDOTCONFIG)
       },
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-ascii-items", "array-of-dirs", "array-of-git-root-dirs", "array-of-in-git-dir-path-items"},
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis", "array-of-dirs", "array-of-git-root-dirs", "array-of-in-git-dir-paths"},
     },
     {
       value = {
@@ -154,7 +154,7 @@ local item_creation_map = {
           })[1]
         )
       },
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-ascii-items", "array-of-in-git-dir-path-items"},
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis", "array-of-in-git-dir-paths"},
       must_not_be = { "array-of-dirs", "array-of-git-root-dirs" }
     },
     {
@@ -166,7 +166,7 @@ local item_creation_map = {
         CreateStringItem(TMPDIR_NOW .. "test-array-of-plaintext-dictionary-files.yaml"),
         CreateStringItem(TMPDIR_NOW .. "test-array-of-plaintext-dictionary-files.json"),
       },
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-ascii-items", "array-of-files", "array-of-plaintext-files", "array-of-plaintext-dictionary-files"},
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis", "array-of-files", "array-of-plaintext-files", "array-of-plaintext-dictionary-files"},
     },
     {
       value = {CreateStringItem("/Volumes/foo"), CreateStringItem("/Volumes/bar")},
@@ -174,17 +174,17 @@ local item_creation_map = {
     },
     {
       value = {CreateStringItem("foo"), CreateStringItem("bar\0baz")},
-      must_not_be = { "array-of-printable-ascii-items" }
+      must_not_be = { "array-of-printable-asciis" }
     },
     {
       value = {CreateStringItem("a_b-c"), CreateStringItem("def")},
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-printable-ascii-items", "array-of-alphanum-minus-underscore-items" },
-      must_not_be = { "array-of-alphanum-minus-items" }
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-printable-asciis", "array-of-alphanum-minus-underscores" },
+      must_not_be = { "array-of-alphanum-minuss" }
     },
     {
       value = {CreateStringItem("b-c"), CreateStringItem("2022-02")},
-      must_be = { "array-of-alphanum-minus-items" },
-      must_not_be = { "array-of-date-related-items" }
+      must_be = { "array-of-alphanum-minuss" },
+      must_not_be = { "array-of-date-relateds" }
     },
     {
       value = {
@@ -192,8 +192,8 @@ local item_creation_map = {
         CreateStringItem("2c05471a-2970-45c4-81f2-44f79566b432"),
         CreateStringItem("123e4567-e89b-12d3-a456-426614174000"),
       },
-      must_be = { "array", "non-empty-array", "homogeneous-array",  "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-printable-ascii-items", "array-of-alphanum-minus-underscore-items","array-of-alphanum-minus-items",
-      "array-of-uuid-items"
+      must_be = { "array", "non-empty-array", "homogeneous-array",  "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-printable-asciis", "array-of-alphanum-minus-underscores","array-of-alphanum-minuss",
+      "array-of-uuids"
       },
       must_not_be = { "array-of-contacts" }
     },
@@ -202,42 +202,42 @@ local item_creation_map = {
         CreateStringItem("15af8992-7b9b-094d-a363-1cdb45a90f5f"),
         CreateStringItem("2c05471a-2970-45c4-81f2-44f79566b432"),
       },
-      must_be = { "array", "non-empty-array", "homogeneous-array",  "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-printable-ascii-items", "array-of-alphanum-minus-underscore-items","array-of-alphanum-minus-items",
-      "array-of-uuid-items",
+      must_be = { "array", "non-empty-array", "homogeneous-array",  "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-printable-asciis", "array-of-alphanum-minus-underscores","array-of-alphanum-minuss",
+      "array-of-uuids",
       "array-of-contacts"
       },
     },
     {
       value = {CreateStringItem("2022-02-01"), CreateStringItem("2022-02-02T08:00")},
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-printable-ascii-items", "array-of-date-related-items" },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-printable-asciis", "array-of-date-relateds" },
     },
     {
       value = {CreateStringItem("dsc"), CreateStringItem("ma"), CreateStringItem("uniqlo")},
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-printable-ascii-items", "array-of-pass-name-items", "array-of-pass-passw-items" },
-      must_not_be = { "array-of-pass-otp-items" }
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-printable-asciis", "array-of-pass-names", "array-of-pass-passws" },
+      must_not_be = { "array-of-pass-otps" }
     },
     {
       value = {CreateStringItem("dsc"), CreateStringItem("ma")},
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-printable-ascii-items", "array-of-pass-name-items", "array-of-pass-passw-items" , "array-of-pass-otp-items" }
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-printable-asciis", "array-of-pass-names", "array-of-pass-passws" , "array-of-pass-otps" }
     },
     {
       value = {CreateStringItem("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), CreateStringItem("https://www.google.com")},
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-urls", "array-of-urls-by-host" },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-urls", "array-of-urls-by-host" },
       must_not_be = { "array-of-youtubes" }
     },
     {
       value = {CreateStringItem("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), CreateStringItem("https://www.youtube.com/playlist?list=PLYlndC1jl8s3_Sy4zCIU77wQv1zQs38qX"), CreateStringItem("https://www.youtube.com")},
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-urls", "array-of-urls-by-host", "array-of-youtubes" },
-      must_not_be = { "array-of-youtube-playable-items" }
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-urls", "array-of-urls-by-host", "array-of-youtubes" },
+      must_not_be = { "array-of-youtube-playables" }
     },
     {
       value = {CreateStringItem("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), CreateStringItem("https://www.youtube.com/playlist?list=PLYlndC1jl8s3_Sy4zCIU77wQv1zQs38qX"),},
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-urls", "array-of-urls-by-host", "array-of-youtubes", "array-of-youtube-playable-items" },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-urls", "array-of-urls-by-host", "array-of-youtubes", "array-of-youtube-playables" },
       must_not_be = {  "array-of-youtube-videos" }
     },
     {
       value = {CreateStringItem("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), CreateStringItem("https://www.youtube.com/watch?v=QH2-TGUlwu4")},
-      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-string-items", "array-of-urls", "array-of-urls-by-host", "array-of-youtubes", "array-of-youtube-playable-items", "array-of-youtube-videos" },
+      must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings", "array-of-urls", "array-of-urls-by-host", "array-of-youtubes", "array-of-youtube-playables", "array-of-youtube-videos" },
       must_not_be = { "array-of-youtube-playlists" }
     },
     {
@@ -278,9 +278,9 @@ local item_creation_map = {
         type = "hotkey"
       },
       must_be = {
-        "creatable-item",
-        "fireable-item",
-        "hotkey-item",
+        "creatable",
+        "fireable",
+        "hotkey",
       }
     },
     {
@@ -288,9 +288,9 @@ local item_creation_map = {
         type = "watcher"
       },
       must_be = {
-        "creatable-item",
-        "fireable-item",
-        "watcher-item",
+        "creatable",
+        "fireable",
+        "watcher",
       }
     },
     {
@@ -298,13 +298,13 @@ local item_creation_map = {
         type = "task"
       },
       must_be = {
-        "creatable-item",
-        "task-item",
+        "creatable",
+        "task",
       },
       must_not_be = {
-        "fireable-item",
-        "hotkey-item",
-        "watcher-item",
+        "fireable",
+        "hotkey",
+        "watcher",
       }
     }
   },
@@ -319,15 +319,15 @@ local item_creation_map = {
       value = {
         value = {}
       },
-      must_be = { "env-item", "value-env-item", "list-value-env-item", "nodependents-env-item", "noaliases-env-item" },
-      must_not_be = { "no-value-env-item", "dependents-env-item", "string-value-env-item", "aliases-env-item" }
+      must_be = { "env", "value-env", "list-value-env", "nodependents-env", "noaliases-env" },
+      must_not_be = { "no-value-env", "dependents-env", "string-value-env", "aliases-env" }
     },
     {
       value = {
         value = "foo"
       },
-      must_be = { "env-item", "value-env-item", "string-value-env-item",  "nodependents-env-item", "noaliases-env-item"  },
-      must_not_be = { "no-value-env-item" , "dependents-env-item", "list-value-env-item", "aliases-env-item" }
+      must_be = { "env", "value-env", "string-value-env",  "nodependents-env", "noaliases-env"  },
+      must_not_be = { "no-value-env" , "dependents-env", "list-value-env", "aliases-env" }
     },
     {
       value = {
@@ -335,14 +335,14 @@ local item_creation_map = {
           FOO = "bar"
         }
       },
-      must_be = { "env-item", "no-value-env-item", "dependents-env-item", "noaliases-env-item" },
-      must_not_be = { "value-env-item", "nodependents-env-item" , "string-value-env-item", "list-value-env-item", "aliases-env-item" }
+      must_be = { "env", "no-value-env", "dependents-env", "noaliases-env" },
+      must_not_be = { "value-env", "nodependents-env" , "string-value-env", "list-value-env", "aliases-env" }
     },
     {
       value = {
         aliases = { "FOO "}
       },
-      must_be = { "env-item", "no-value-env-item", "aliases-env-item", "nodependents-env-item" },
+      must_be = { "env", "no-value-env", "aliases-env", "nodependents-env" },
     }
   }, -- todo
   [CreateNumber] = {
@@ -366,19 +366,19 @@ local item_creation_map = {
   --[[ [CreateRunningApplicationItem] = {
     {
       value = function() return hs.application.open("Google Chrome") end,
-      must_be = { "running-application-item", "browser-application", "chrome-application" }
+      must_be = { "running-application", "browser-application", "chrome-application" }
     },
     {
       value = function() return hs.application.open("Firefox") end,
-      must_be = { "running-application-item", "browser-application", "firefox-application" }
+      must_be = { "running-application", "browser-application", "firefox-application" }
     },
     {
       value = function() return hs.application.open("LibreOffice") end,
-      must_be = { "running-application-item", "libreoffice-item" }
+      must_be = { "running-application", "libreoffice" }
     },
     {
       value = function() return hs.application.open("OmegaT") end,
-      must_be = { "running-application-item", "omegat-item" }
+      must_be = { "running-application", "omegat" }
     }
   }, ]] -- stays commented out most of the time since having applications open is annoying while I'm constantly rerunning this while debugging
   [CreateShellCommand] = {
@@ -420,12 +420,12 @@ local item_creation_map = {
   [CreateStringItem] = {
     {
       value = "foo/bar",
-      must_be = { "string-item", "single-item-string-item", "path", "relative-path" },
+      must_be = { "string", "single-item-string", "path", "relative-path" },
       must_not_be = { "absolute-path" }
     },
     {
       value = "/foo/bar",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-leaf", "path-leaf-general-name" },
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-leaf", "path-leaf-general-name" },
       must_not_be = { "relative-path", "tilde-absolute-path", "extant-path", "path-leaf-extension", "path-leaf-date", "path-leaf-tags"}
     },
     {
@@ -444,7 +444,7 @@ local item_creation_map = {
     },
     {
       value = "~/foo/bar",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "tilde-absolute-path", "non-extant-path" },
+      must_be = { "string", "single-item-string", "path", "absolute-path", "tilde-absolute-path", "non-extant-path" },
       must_not_be = { "relative-path", "true-absolute-path", "extant-path" }
     }, 
     {
@@ -464,451 +464,451 @@ local item_creation_map = {
         writeFile(TMPDIR_NOW .. "foo.txt")
       end,
       value = TMPDIR_NOW .. "foo.txt",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file" },
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file" },
       posttest = function()
         delete(TMPDIR_NOW .. "foo.txt")
       end
     },
     {
       value = env.HOME,
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "grandparent-dir", "path-by-start-item", "path-in-home-item" },
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "grandparent-dir", "path-by-start", "path-in-home" },
     },
     {
       value = env.HOMEBREW_SHARE,
-      must_be = { "path-by-start-item", "path-not-in-home-item"}
+      must_be = { "path-by-start", "path-not-in-home"}
     },
     {
       pretest = function()
         writeFile(env.SCREENSHOTS .. "/" .. testtime .. ".png")
       end,
       value = env.SCREENSHOTS .. "/" .. testtime .. ".png",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "path-in-home-item", "path-in-screenshots-item" },
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "path-in-home", "path-in-screenshots" },
       posttest = function()
         delete(env.SCREENSHOTS .. "/" .. testtime .. ".png")
       end
     },
     {
       value = env.MENV,
-      must_be = { "path-in-home-item", "path-in-me-item", "path-in-mspec-item" }
+      must_be = { "path-in-home", "path-in-me", "path-in-mspec" }
     },
     {
       value = env.MPASSPASSW,
-      must_be = { "path-in-home-item", "path-in-me-item", "path-in-mspec-item", "path-in-mpass-item", "path-in-mpassw-item" },
-      must_not_be = { "path-in-mpassotp-item" }
+      must_be = { "path-in-home", "path-in-me", "path-in-mspec", "path-in-mpass", "path-in-mpassw" },
+      must_not_be = { "path-in-mpassotp" }
     },
     {
       value = env.MPASSOTP,
-      must_be = { "path-in-home-item", "path-in-me-item", "path-in-mspec-item", "path-in-mpass-item", "path-in-mpassw-item", "path-in-mpassotp-item" },
-      must_not_be = { "path-in-mpassw-item" }
+      must_be = { "path-in-home", "path-in-me", "path-in-mspec", "path-in-mpass", "path-in-mpassw", "path-in-mpassotp" },
+      must_not_be = { "path-in-mpassw" }
     },
     {
       value = env.MAUDIOVISUAL,
-      must_be = { "path-in-home-item", "path-in-me-item", "path-in-maudiovisual-item" }
+      must_be = { "path-in-home", "path-in-me", "path-in-maudiovisual" }
     },
     {
       value = "/foo/bar:289",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-with-line-andor-character-number" },
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-with-line-andor-character-number" },
     },
     {
       value = "/foo/bar:289:12",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-with-line-andor-character-number" },
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-with-line-andor-character-number" },
     },
     {
       value = itemsInPath(env.MENV)[1],
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "in-git-dir-path-item" }
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "in-git-dir-path" }
     },
     {
       value = itemsInPath(env.MDIARY .. "/i_made_this/film")[1],
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dated-extant-path-item"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dated-extant-path"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/json/basic.json",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-dictionary-file", "json-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-dictionary-file", "json-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/md/basic.md",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "md-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "md-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/m3u/basic.m3u",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "m3u-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "m3u-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/gitignore/basic.gitignore",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "gitignore-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "gitignore-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/email/basic.eml",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "email-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "email-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/xml/basic.xml",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-tree-file", "xml-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-tree-file", "xml-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/yaml/basic.yaml",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-dictionary-file", "yaml-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-dictionary-file", "yaml-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/csv/basic.csv",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-table-file", "csv-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "plaintext-file", "plaintext-table-file", "csv-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/tsv/basic.tsv",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path",  "file", "plaintext-file", "plaintext-table-file", "tsv-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path",  "file", "plaintext-file", "plaintext-table-file", "tsv-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/csv/timestamp.csv",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-table-file", "csv-file", "timestamp-first-column-plaintext-table-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-table-file", "csv-file", "timestamp-first-column-plaintext-table-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/toml/basic.toml",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "toml-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "toml-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/ini/basic.ini",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "ini-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "ini-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/bib/basic.bib",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "bib-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "bib-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/ics/basic.ics",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "ics-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "ics-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/log/basic.log",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "log-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "log-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/sh/basic.sh",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "executable-code-file", "shellscript-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "executable-code-file", "shellscript-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/plaintext/json/tachiyomi.json",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "json-file", "tachiyomi-json-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "json-file", "tachiyomi-json-file"}
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/config_dir/khal/config.ini",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "plaintext-dictionary-file", "ini-file", "khal-config-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "plaintext-dictionary-file", "ini-file", "khal-config-file"}
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/config_dir/vdirsyncer/config.ini",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "plaintext-dictionary-file", "ini-file", "vdirsyncer-config-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "plaintext-dictionary-file", "ini-file", "vdirsyncer-config-file"}
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/config_dir/newsboat/urls",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "newsboat-urls-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "newsboat-urls-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/binary/image/png/basic.png",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "image-file", "binary-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "image-file", "binary-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/binary/db/sql/sqlite/places.sqlite",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "binary-file", "db-file", "sql-file", "sqlite-file", "firefox-places-sqlite-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "binary-file", "db-file", "sql-file", "sqlite-file", "firefox-places-sqlite-file"}
     },
     {
       value = env.MSPEC .. "/mock/files/binary/db/sql/sqlite/newpipe.db",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "binary-file", "db-file", "sql-file", "sqlite-file", "newpipe-sqlite-file"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "binary-file", "db-file", "sql-file", "sqlite-file", "newpipe-sqlite-file"}
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_tree/empty_dir",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "empty-dir"},
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "empty-dir"},
       must_not_be = { "parent-dir", "grandparent-dir"}
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_tree/parent_only_dir",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "parent-but-not-grandparent-dir"},
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "parent-but-not-grandparent-dir"},
       must_not_be = { "empty-dir", "grandparent-dir"}
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_tree/grandparent_dir",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "grandparent-dir", "parent-dir"},
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "grandparent-dir", "parent-dir"},
       must_not_be = { "empty-dir", "parent-but-not-grandparent-dir"}
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/cargo/basic_cargo",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "cargo-project-dir"},
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "cargo-project-dir"},
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/latex/basic_latex",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "latex-project-dir"},
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "latex-project-dir"},
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/npm/basic_npm",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "npm-project-dir"},
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "npm-project-dir"},
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/omegat/basic_omegat",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "omegat-project-dir"},
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "omegat-project-dir"},
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/sass/basic_sass",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "sass-project-dir"},
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "sass-project-dir"},
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/git_dir/empty_git_root",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "git-root-dir"},
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "git-root-dir"},
     },
     {
       value = env.MSPEC .. "/mock/dir/dir_by_structure/logging_dir/empty_logs",
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "logging-dir"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "logging-dir"}
     },
     {
       value = env.MAC_APPLICATIONS,
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "applications-dir"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "applications-dir"}
     },
     {
       value = env.MCUR_PROJ,
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "mcur-proj-dir"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "mcur-proj-dir"}
     },
     {
       value = env.MENV,
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "menv-dir"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "menv-dir"}
     },
     {
       value = env.MDIARY,
-      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "mdiary-dir"}
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "mdiary-dir"}
     },
     {
       value = "foo\nbar",
       must_be = {
-        "multiline-string-item"
+        "multiline-string"
       },
       must_not_be = {
-        "singleline-string-item"
+        "singleline-string"
       }
     },
     {
       value = "foobar",
       must_be = {
-        "singleline-string-item"
+        "singleline-string"
       },
     },
     {
       value = multiply("10 charact", 201),
-      must_not_be = {"single-item-string-item"}
+      must_not_be = {"single-item-string"}
     },
     {
       value = "foo\tbar",
-      must_not_be = {"single-item-string-item"}
+      must_not_be = {"single-item-string"}
     },
     {
       value = "oFo",
-      must_be = {"has-lowercase-string-item", "has-uppercase-string-item"}
+      must_be = {"has-lowercase-string", "has-uppercase-string"}
     },
     {
       value = "ofo",
-      must_be = {"has-lowercase-string-item"},
-      must_not_be = {"has-uppercase-string-item"}
+      must_be = {"has-lowercase-string"},
+      must_not_be = {"has-uppercase-string"}
     },
     {
       value = "OFO",
-      must_be = {"has-uppercase-string-item"},
-      must_not_be = {"has-lowercase-string-item", "might-be-json-item", "might-be-xml-item", "might-be-bib-item"}
+      must_be = {"has-uppercase-string"},
+      must_not_be = {"has-lowercase-string", "might-be-json", "might-be-xml", "might-be-bib"}
     },
     {
       value = "{foo}",
-      must_be = {"might-be-json-item"}
+      must_be = {"might-be-json"}
     },
     {
       value = "[foo]",
-      must_be = {"might-be-json-item"}
+      must_be = {"might-be-json"}
     },
     {
       value = "<foo>",
-      must_be = {"might-be-xml-item"}
+      must_be = {"might-be-xml"}
     },
     {
       value = "@foo }",
-      must_be = {"might-be-bib-item"}
+      must_be = {"might-be-bib"}
     },
     {
       value = "This is this &amp; that is that",
-      must_be = {"html-entity-encoded-string-item"}
+      must_be = {"html-entity-encoded-string"}
     },
     {
       value = "This <b>text</b> needs to be encoded if it's going to be used in HTML",
-      must_be = {"html-entity-decoded-string-item"}
+      must_be = {"html-entity-decoded-string"}
     },
     {
       value = "https://www.google.com",
-      must_be = {"string-item", "single-item-string-item", "url", "url-by-host-item"},
-      must_not_be = {"url-by-path-item", "url-by-contenttype"}
+      must_be = {"string", "single-item-string", "url", "url-by-host"},
+      must_not_be = {"url-by-path", "url-by-contenttype"}
     },
     {
       value = "https://www.google.com/foo/bar",
-      must_be = {"string-item", "single-item-string-item", "url", "url-by-host-item", "url-by-path-item", "owner-item-url"},
+      must_be = {"string", "single-item-string", "url", "url-by-host", "url-by-path", "owner-item-url"},
       must_not_be = {"url-by-contenttype"}
     },
     {
       value = "https://www.google.com/foo/bar.png",
-      must_be = {"string-item", "single-item-string-item", "url", "url-by-host-item", "url-by-path-item", "url-by-contenttype-item", "image-url-item"},
+      must_be = {"string", "single-item-string", "url", "url-by-host", "url-by-path", "url-by-contenttype", "image-url"},
     },
     {
       value = "https://youtube.com/",
-      must_be = {"url", "url-by-host-item", "youtube-item"},
+      must_be = {"url", "url-by-host", "youtube"},
     },
     {
       value = "https://youtube.com/watch?v=foo",
-      must_be = {"url", "url-by-host-item", "youtube-item", "youtube-playable-item", "youtube-video"},
+      must_be = {"url", "url-by-host", "youtube", "youtube-playable", "youtube-video"},
     },
     {
       value = "https://youtube.com/playlist?list=foo",
-      must_be = {"url", "url-by-host-item", "youtube-item", "youtube-playable-item", "youtube-playlist"},
+      must_be = {"url", "url-by-host", "youtube", "youtube-playable", "youtube-playlist"},
     },
     {
       value = "https://gelbooru.com/index.php?page=post&s=view&id=foo",
-      must_be = {"url", "url-by-host-item", "booru-url", "gelbooru-url"}
+      must_be = {"url", "url-by-host", "booru-url", "gelbooru-url"}
     },
     {
       value = "https://yande.re/post/show/123456",
-      must_be = {"url", "url-by-host-item", "booru-url", "yandere-url"}
+      must_be = {"url", "url-by-host", "booru-url", "yandere-url"}
     },
     {
       value = "foo392q@#",
-      must_be = {"printable-ascii-string-item"}
+      must_be = {"printable-ascii-string"}
     },
     {
       value = "foo32--_bar",
-      must_be = {"printable-ascii-string-item", "alphanum-minus-underscore-item" }
+      must_be = {"printable-ascii-string", "alphanum-minus-underscore" }
     },
     {
       value = "DE" .. multiply("0", 32),
-      must_be = {"printable-ascii-string-item", "alphanum-minus-underscore-item", "iban-item"}
+      must_be = {"printable-ascii-string", "alphanum-minus-underscore", "iban"}
     },
     {
       value = "10.1000/182",
-      must_be = {"printable-ascii-string-item", "doi-item", "citeable-object-id-item", "nonlocal-citeable-object-id-item"},
-      must_not_be = {"local-citeable-object-id-item"}
+      must_be = {"printable-ascii-string", "doi", "citeable-object-id", "nonlocal-citeable-object-id"},
+      must_not_be = {"local-citeable-object-id"}
     },
     {
       value = "100",
-      must_be = {"printable-ascii-string-item", "num-item"}
+      must_be = {"printable-ascii-string", "num"}
     },
     {
       value = "test@example.com",
-      must_be = {"printable-ascii-string-item", "email-address-item"}
+      must_be = {"printable-ascii-string", "email-address"}
     },
     {
       value = "01321 1314 134 33",
-      must_be = {"printable-ascii-string-item", "phone-number-item"}
+      must_be = {"printable-ascii-string", "phone-number"}
     },
     {
       value = "-2d.fb",
-      must_be = {"printable-ascii-string-item", "digit-string-item", "hexadecimal-digit-string"},
+      must_be = {"printable-ascii-string", "digit-string", "hexadecimal-digit-string"},
       must_not_be = {"binary-digit-string", "octal-digit-string", "decimal-digit-string"}
     },
     {
       value = "901",
-      must_be = {"printable-ascii-string-item", "digit-string-item", "decimal-digit-string", "hexadecimal-digit-string", "decimal-id"},
+      must_be = {"printable-ascii-string", "digit-string", "decimal-digit-string", "hexadecimal-digit-string", "decimal-id"},
       must_not_be = {"binary-digit-string", "octal-digit-string"}
     },
     {
       value = "201,5",
-      must_be = {"printable-ascii-string-item", "digit-string-item", "decimal-digit-string", "octal-digit-string", "hexadecimal-digit-string"},
+      must_be = {"printable-ascii-string", "digit-string", "decimal-digit-string", "octal-digit-string", "hexadecimal-digit-string"},
       must_not_be = { "binary-digit-string"}
     },
     {
       value = "-101010111",
-      must_be = {"printable-ascii-string-item", "digit-string-item", "binary-digit-string", "decimal-digit-string", "octal-digit-string", "hexadecimal-digit-string"},
+      must_be = {"printable-ascii-string", "digit-string", "binary-digit-string", "decimal-digit-string", "octal-digit-string", "hexadecimal-digit-string"},
     },
     {
       value = "2021-02",
-      must_be = {"printable-ascii-string-item", "date-related-item"}
+      must_be = {"printable-ascii-string", "date-related"}
     },
     {
       value = "4d20*2+6",
-      must_be = {"printable-ascii-string-item", "dice-notation-item"}
+      must_be = {"printable-ascii-string", "dice-notation"}
     },
     {
       value = "U+2021",
-      must_be = {"printable-ascii-string-item", "unicode-codepoint-item", "potentially-parseable-date-item"}
+      must_be = {"printable-ascii-string", "unicode-codepoint", "potentially-parseable-date"}
     },
     {
       value = "@choco",
-      must_be = {"printable-ascii-string-item", "handle-item"}
+      must_be = {"printable-ascii-string", "handle"}
     },
     {
       value = "JBSWY3DPEBLW64TMMQQQ====",
-      must_be = {"printable-ascii-string-item", "general-base32-item", "base32-item"},
-      must_not_be = {"crockford-base32-item"}
+      must_be = {"printable-ascii-string", "general-base32", "base32"},
+      must_not_be = {"crockford-base32"}
     },
     {
       value = "91JPRV3F5GG7EVVJDHJ22",
-      must_be = {"printable-ascii-string-item", "base32-item", "crockford-base32-item"},
-      must_not_be = {"general-base32-item"}
+      must_be = {"printable-ascii-string", "base32", "crockford-base32"},
+      must_not_be = {"general-base32"}
     },
     {
       value = "SGVsbG8gd29ybGQ=",
-      must_be = {"printable-ascii-string-item", "base64-item", "general-base64-item"},
-      must_not_be = {"url-base64-item"}
+      must_be = {"printable-ascii-string", "base64", "general-base64"},
+      must_not_be = {"url-base64"}
     },
     {
       value = "SGVsbG8gd29ybGQ_",
-      must_be = {"printable-ascii-string-item", "base64-item", "url-base64-item"},
-      must_not_be = {"general-base64-item"}
+      must_be = {"printable-ascii-string", "base64", "url-base64"},
+      must_not_be = {"general-base64"}
     },
     {
       value = "AEBAGBAF",
-      must_be = {"printable-ascii-string-item", "base32-item", "crockford-base32-item", "general-base32-item"},
+      must_be = {"printable-ascii-string", "base32", "crockford-base32", "general-base32"},
     },
     {
       value = "SGVsbG8gd29ybGQ",
-      must_be = {"printable-ascii-string-item", "base64-item", "url-base64-item", "general-base64-item"},
+      must_be = {"printable-ascii-string", "base64", "url-base64", "general-base64"},
     },
     {
       value = "foo-bar",
-      must_be = {"alphanum-minus-underscore-item", "alphanum-minus-item"}
+      must_be = {"alphanum-minus-underscore", "alphanum-minus"}
     },
     {
       value = "foo_bar",
-      must_be = {"alphanum-minus-underscore-item", "word-item", "lowercase-word-item"}
+      must_be = {"alphanum-minus-underscore", "word", "lowercase-word"}
     },
     {
       value = "FOO_BAR",
-      must_be = {"alphanum-minus-underscore-item", "word-item"},
-      must_not_be = {"lowercase-word-item"}
+      must_be = {"alphanum-minus-underscore", "word"},
+      must_not_be = {"lowercase-word"}
     },
     {
       value = "dsc",
-      must_be = {"alphanum-minus-underscore-item", "word-item", "lowercase-word-item", "pass-name-item", "pass-otp-item", "pass-passw-item"},
+      must_be = {"alphanum-minus-underscore", "word", "lowercase-word", "pass-name", "pass-otp", "pass-passw"},
       must_not_be = {
-        "pass-recovery-keys-item", "pass-security-question-item", "pass-username-item"
+        "pass-recovery-keys", "pass-security-question", "pass-username"
       }
     },
     {
       value = "signal",
-      must_be = {"pass-recovery-keys-item"}
+      must_be = {"pass-recovery-keys"}
     },
     {
       value = "elster",
-      must_be = {"pass-security-question-item"}
+      must_be = {"pass-security-question"}
     },
     {
       value = "barmer",
-      must_be = {"pass-username-item"}
+      must_be = {"pass-username"}
     },
     {
-      must_be = {"alphanum-minus-item", "isbn-item", "citeable-object-id-item"},
+      must_be = {"alphanum-minus", "isbn", "citeable-object-id"},
       value = "978-3-16-148410-0"
     },
     {
-      must_be = {"alphanum-minus-item", "issn-item"},
+      must_be = {"alphanum-minus", "issn"},
       value = "0378-5955"
     },
     {
-      must_be = {"alphanum-minus-item", "uuid-item"},
+      must_be = {"alphanum-minus", "uuid"},
       value = "f81d4fae-7dec-11d0-a765-00a0c91e6bf6"
     },
     {
-      must_be = {"alphanum-minus-item", "package-manager-item"},
+      must_be = {"alphanum-minus", "package-manager"},
       value = "npm"
     },
     {
-      must_be = {"alphanum-minus-item", "mullvad-relay-identifier-item"},
+      must_be = {"alphanum-minus", "mullvad-relay-identifier"},
       value = "us-sea-wg-203"
     }
 

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PathInMpasspasswItemSpecifier = {
-  type = "path-in-mpasspassw-item",
+  type = "path-in-mpasspassw",
   properties = {
     getables = {
 

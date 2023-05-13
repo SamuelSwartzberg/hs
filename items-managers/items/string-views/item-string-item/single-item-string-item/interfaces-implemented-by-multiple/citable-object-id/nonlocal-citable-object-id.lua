@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 NonlocalCitableObjectIdItemSpecifier = {
-  type = "nonlocal-citable-object-id-item",
+  type = "nonlocal-citable-object-id",
   properties = {
     getables = {
       ["bibtex-from-internet-as-table"] = function(self) 

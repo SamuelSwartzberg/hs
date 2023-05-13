@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 HotkeyItemSpecifier = {
-  type = "hotkey-item",
+  type = "hotkey",
   properties = {
     getables = {
       ["hotkey"] = function(self)

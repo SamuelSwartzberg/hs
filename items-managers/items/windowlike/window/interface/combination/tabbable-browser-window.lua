@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 TabbableBrowserWindowItemSpecifier = {
-  type = "tabbable-browser-window-item",
+  type = "tabbable-browser-window",
   properties = {
     getables = {
       ["url"] = function (self)

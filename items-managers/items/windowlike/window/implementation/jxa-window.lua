@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 JxaWindowItemSpecifier = {
-  type = "jxa-window-item",
+  type = "jxa-window",
   properties = {
     getables = {
       ["window-index-jxa"] = function(self)

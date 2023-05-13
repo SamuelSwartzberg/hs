@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 WindowCombinationItemSpecifier = {
-  type = "window-combination-item",
+  type = "window-combination",
   properties = {
     getables = {
       ["is-tabbable-browser-window"] = function (self)

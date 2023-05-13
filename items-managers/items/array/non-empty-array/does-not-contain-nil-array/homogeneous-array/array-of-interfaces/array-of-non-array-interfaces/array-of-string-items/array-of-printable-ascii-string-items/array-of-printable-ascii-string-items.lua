@@ -1,6 +1,6 @@
 
 ArrayOfPrintableAsciiStringItemsSpecifier = {
-  type = "array-of-printable-ascii-string-items",
+  type = "array-of-printable-ascii-strings",
   properties = {
     getables = {
       ["is-array-of-pass-name-items"] = bind(isArrayOfInterfacesOfType, {a_use, "pass-name" }),

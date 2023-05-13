@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 IbanItemSpecifier = {
-  type = "iban-item",
+  type = "iban",
   properties = {
     getables = {
       ["cleaned-iban"] = function(self)

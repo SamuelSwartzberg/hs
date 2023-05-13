@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 HandleItemSpecifier = {
-  type = "handle-item",
+  type = "handle",
   properties = {
     getables = {
       ["raw-handle"] = function(self)

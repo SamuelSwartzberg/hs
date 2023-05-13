@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 ApiItemSpecifier = {
-  type = "api-item",
+  type = "api",
   properties = {
     getables = {
       ["is-youtube-api"] = function(self)

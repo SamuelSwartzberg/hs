@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 HTMLEntityEncodedStringItemSpecifier = {
-  type = "html-entity-encoded-string-item",
+  type = "html-entity-encoded-string",
   properties = {
     getables = {
       ["html-entities-decoded"] = function(self)
@@ -22,7 +22,7 @@ CreateHTMLEntityEncodedStringItem = bindArg(NewDynamicContentsComponentInterface
 
 --- @type ItemSpecifier
 HTMLEntityDecodedStringItemSpecifier = {
-  type = "html-entity-decoded-string-item",
+  type = "html-entity-decoded-string",
   properties = {
     getables = {
       ["html-entities-encoded"] = function(self)

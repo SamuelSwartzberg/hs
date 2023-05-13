@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 WindowItemSpecifier = {
-  type = "window-item",
+  type = "window",
   properties = {
     getables = {
       ["is-implementation"] = returnTrue,

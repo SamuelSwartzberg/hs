@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 DiscordItemSpecifier = {
-  type = "discord-item",
+  type = "discord",
   properties = {
     getables = {
       ["convo-id"] = function(self, chat_obj)

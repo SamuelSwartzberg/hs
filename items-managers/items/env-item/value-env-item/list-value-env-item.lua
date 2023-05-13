@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 ListValueEnvItemSpecifier = {
-  type = "list-value-env-item",
+  type = "list-value-env",
   properties = {
     getables = {
       ["value-to-env-line-value"] = function(self, pkey_var)

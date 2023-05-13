@@ -3,7 +3,7 @@
 
 --- @type ItemSpecifier
 MultilineStringItemSpecifier = {
-  type = "multiline-string-item",
+  type = "multiline-string",
   properties = {
     getables = {
       ["parsed-as-yaml"] = function(self) -- not guaranteed to work, as the string may not be yaml. ensure this yourself

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 DecimalIdItemSpecifier = {
-  type = "decimal-id-item",
+  type = "decimal-id",
   properties = {
     getables = {
       ["get-gelbooru-url"] = function(self)

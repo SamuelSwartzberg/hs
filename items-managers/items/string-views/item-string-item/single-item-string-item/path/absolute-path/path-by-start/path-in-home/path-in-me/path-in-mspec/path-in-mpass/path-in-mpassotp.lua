@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 PathInMpassotpItemSpecifier = {
-  type = "path-in-mpassotp-item",
+  type = "path-in-mpassotp",
   properties = {
     getables = {
 

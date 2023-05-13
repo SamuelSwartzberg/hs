@@ -1,6 +1,6 @@
 
 ArrayOfPassNameItemsSpecifier = {
-  type = "array-of-pass-name-items",
+  type = "array-of-pass-names",
   properties = {
     getables = {
       ["is-array-of-pass-otp-items"] = bind(isArrayOfInterfacesOfType, {a_use, "pass-otp" }),

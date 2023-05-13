@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 ManagedDateProjectDirItemSpecifier = {
-  type = "managed-date-project-dir-item",
+  type = "managed-date-project-dir",
   properties = {
     getables = {
 

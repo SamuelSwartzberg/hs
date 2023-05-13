@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 CrockfordBase32ItemSpecifier = {
-  type = "crockford-base32-item",
+  type = "crockford-base32",
   properties = {
     getables = {
       ["is-base-32"] = returnTrue,

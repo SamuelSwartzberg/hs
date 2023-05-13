@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 OwnerItemUrlItemSpecifier = {
-  type = "owner-item-url-item",
+  type = "owner-item-url",
   properties = {
     getables = {
       ["owner-item-part"] = function(self)

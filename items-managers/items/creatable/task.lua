@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 TaskItemSpecifier = {
-  type = "task-item",
+  type = "task",
   properties = {
     getables = {
       ["created"] = function(self)

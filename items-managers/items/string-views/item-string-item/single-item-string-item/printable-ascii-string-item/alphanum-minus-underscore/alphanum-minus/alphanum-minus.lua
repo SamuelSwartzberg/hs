@@ -2,7 +2,7 @@
 
 --- @type ItemSpecifier
 AlphanumMinusItemSpecifier = {
-  type = "alphanum-minus-item",
+  type = "alphanum-minus",
   properties = {
     getables = {
       ["alphanum"] = function(self)

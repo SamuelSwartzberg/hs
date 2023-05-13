@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 Base32ItemSpecifier = {
-  type = "base32-item",
+  type = "base32",
   properties = {
     getables = {
       

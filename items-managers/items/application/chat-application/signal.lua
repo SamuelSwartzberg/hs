@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 SignalItemSpecifier = {
-  type = "signal-item",
+  type = "signal",
   properties = {
     getables = {
       ["convo-id"] = function(self, chat_obj)

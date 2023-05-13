@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 ContactItemSpecifier = {
-  type = "contact-item",
+  type = "contact",
   properties = {
     getables = {
       ["to-contact-table"] = function(self)

@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 BinaryDigitStringItemSpecifier = {
-  type = "binary-digit-string-item",
+  type = "binary-digit-string",
   properties = {
     getables = {
       ["binary-numeric-value"] = function(self)

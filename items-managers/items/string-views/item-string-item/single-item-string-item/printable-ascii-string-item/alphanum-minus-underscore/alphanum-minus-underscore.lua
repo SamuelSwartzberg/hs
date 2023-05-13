@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 AlphanumMinusUnderscoreItemSpecifier = {
-  type = "alphanum-minus-underscore-item",
+  type = "alphanum-minus-underscore",
   properties = {
     getables = {
       ["is-word"] = function(self) 

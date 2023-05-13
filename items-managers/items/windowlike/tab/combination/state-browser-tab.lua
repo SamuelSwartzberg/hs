@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 StateBrowserTabItemSpecifier = {
-  type = "state-browser-tab-item",
+  type = "state-browser-tab",
   properties = {
     getables = {
       ["url"] = function (self)

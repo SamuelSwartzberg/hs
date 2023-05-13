@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
 LibreofficeApplicationSpecifier = {
-  type = "libreoffice-item",
+  type = "libreoffice",
   properties = {
     getables = {
       ["reload-menu-command"] = function(self)
