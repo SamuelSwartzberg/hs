@@ -10,7 +10,7 @@ BibFileItemSpecifier = {
           "citation-js",
           "--input",
           {
-            value = self:get("contents"),
+            value = self:get("completely-resolved-path"),
             type = "quoted"
           },
           "--output-language", "json"
@@ -43,7 +43,7 @@ BibFileItemSpecifier = {
           "--csl",
           { value = "styles/" .. format, type = "quoted" },
           {
-            value = self:get("contents"),
+            value = self:get("completely-resolved-path"),
             type = "quoted"
           }
         })

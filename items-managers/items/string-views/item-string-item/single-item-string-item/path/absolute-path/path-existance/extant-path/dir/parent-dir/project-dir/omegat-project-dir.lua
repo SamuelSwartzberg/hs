@@ -7,7 +7,7 @@ OmegatProjectDirItemSpecifier = {
         return "OmegaT"
       end,
       ["local-data-object-path"] = function(self)
-        return self:get("contents") .. "/data.yaml"
+        return self:get("completely-resolved-path") .. "/data.yaml"
       end,
       ["local-data-object"] = function(self)
         return yamlLoad(
@@ -24,10 +24,10 @@ OmegatProjectDirItemSpecifier = {
         return self:get("local-data-object").rechnung
       end,
       ["dictionary-dir"] = function(self)
-        return self:get("contents") .. "/dictionary"
+        return self:get("completely-resolved-path") .. "/dictionary"
       end,
       ["glossary-dir"] = function(self)
-        return self:get("contents") .. "/glossary"
+        return self:get("completely-resolved-path") .. "/glossary"
       end,
       ["local-client-glossary"] = function(self)
         return self:get("glossary-dir") .. "/" .. self:get("client") .. ".txt"
@@ -42,7 +42,7 @@ OmegatProjectDirItemSpecifier = {
         return env.MGLOSSARIES .. "/universal.txt"
       end,
       ["local-resultant-tm"] = function(self)
-        return self:get("contents") .. "/" .. self:get("path-leaf") .. "-omegat.tmx"
+        return self:get("completely-resolved-path") .. "/" .. self:get("path-leaf") .. "-omegat.tmx"
       end,
       ["global-client-tm"] = function(self) -- is a dir
         return env.MTM_MEMORY .. "/" .. self:get("client") 
@@ -51,10 +51,10 @@ OmegatProjectDirItemSpecifier = {
         return env.MTM_MEMORY .. "/universal"
       end,
       ["omegat-dir"] = function(self)
-        return self:get("contents") .. "/omegat"
+        return self:get("completely-resolved-path") .. "/omegat"
       end,
       ["source-dir"] = function(self)
-        return self:get("contents") .. "/source"
+        return self:get("completely-resolved-path") .. "/source"
       end,
       ["source-files"] = function(self)
         return self:get("str-item", { key = "source-dir" }):get("child-string-item-array")
@@ -63,7 +63,7 @@ OmegatProjectDirItemSpecifier = {
         return self:get("str-item", { key = "source-dir" }):get("child-string-item-array"):get("filter-to-extension", ext)
       end,
       ["target-dir"] = function(self)
-        return self:get("contents") .. "/target"
+        return self:get("completely-resolved-path") .. "/target"
       end,
       ["target-files"] = function(self)
         return self:get("str-item", { key = "target-dir" }):get("child-string-item-array")
@@ -86,10 +86,10 @@ OmegatProjectDirItemSpecifier = {
         return d
       end,
       ["tm-dir"] = function(self)
-        return self:get("contents") .. "/tm"
+        return self:get("completely-resolved-path") .. "/tm"
       end,
       ["rechnung-noext-path"] = function (self)
-        return self:get("contents") .. "/" .. os.date(tblmap.dt_component.rfc3339["day"]) .. "--" .. self:get("client") .. "_" .. self:get("rechnung").nr
+        return self:get("completely-resolved-path") .. "/" .. os.date(tblmap.dt_component.rfc3339["day"]) .. "--" .. self:get("client") .. "_" .. self:get("rechnung").nr
       end,
       ["rechnung-raw-path"] = function (self)
         return self:get("rechnung-noext-path") .. ".md"
@@ -126,7 +126,7 @@ OmegatProjectDirItemSpecifier = {
       end,
       ["open-project"] = function(self)
         self:doThis("do-running-application-ensure", function(application)
-          application:doThis("open-recent", self:get("contents"))
+          application:doThis("open-recent", self:get("completely-resolved-path"))
           application:doThis("focus-main-window")
         end)
       end,
@@ -232,7 +232,7 @@ OmegatProjectDirItemSpecifier = {
             local path = CreatePathLeafParts({
               date = os.date(tblmap.dt_component.rfc3339["day"]),
               path = env.MDIARY .. "/i_made_this/translations/",
-              ["general-name"] = pathSlice(odt:get("contents"), "-2:-2", { ext_sep = true })[1],
+              ["general-name"] = pathSlice(odt:get("completely-resolved-path"), "-2:-2", { ext_sep = true })[1],
               extension = "odt",
               tag = {
                 client = client,

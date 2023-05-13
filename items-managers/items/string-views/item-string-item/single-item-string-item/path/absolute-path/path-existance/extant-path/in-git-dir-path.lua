@@ -5,7 +5,7 @@ InGitDirPathItemSpecifier = {
   properties = {
     getables = {
       ["git-root-dir"] = function(self)
-        if self:get("is-git-root-dir") then return self:get("contents") end
+        if self:get("is-git-root-dir") then return self:get("completely-resolved-path") end
         local dotgit = memoize(getItemsForAllLevelsInSlice)(self:get("contents"), "1:-2", {
           include_files = false,
           validator_result = bind(stringy.endswith, {a_use, "/.git"})
@@ -88,7 +88,7 @@ InGitDirPathItemSpecifier = {
         self:doThis("cd-and-run-this-task", {
           "git",
           "add",
-          { value = self:get("contents"), type = "quoted"}
+          { value = self:get("completely-resolved-path"), type = "quoted"}
         })
       end,
       ["git-add-all"] = function(self)
@@ -104,7 +104,7 @@ InGitDirPathItemSpecifier = {
           "commit",
           "-m",
           { value = message or ("changed " .. self:get("relative-path-from", self:get("git-root-dir"))), type = "quoted"},
-          { value = self:get("contents"), type = "quoted"}
+          { value = self:get("completely-resolved-path"), type = "quoted"}
         })
       end,
       ["git-commit-staged"] = function(self, message)

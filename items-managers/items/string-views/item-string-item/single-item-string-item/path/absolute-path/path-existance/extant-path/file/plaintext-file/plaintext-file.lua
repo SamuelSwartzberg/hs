@@ -47,7 +47,7 @@ PlaintextFileItemSpecifier = {
       end,
       ["descendants-to-line-array"] = function(self) return self:get("to-line-array") end, -- polymorphic implementation
       ["is-m3u-file"] = function(self)
-        return stringy.endswith(self:get("contents"), "m3u")
+        return stringy.endswith(self:get("resolved-path"), "m3u")
       end,
       ["is-plaintext-table-file"] = function(self)
         return isUsableAsFiletype(self:get("contents"), "plaintext-table")
@@ -60,23 +60,23 @@ PlaintextFileItemSpecifier = {
       end,
       ["is-executable-code-file"] = returnTrue, -- determining whether a file is executable code is difficult, as there are so many programming languages and extensions, so I'm just gonna assert it's true and not implement any polymorphic behavior in executable-code-file
       ["is-gitignore-file"] = function(self)
-        return stringy.endswith(self:get("contents"), ".gitignore")
+        return stringy.endswith(self:get("resolved-path"), ".gitignore")
       end,
       ["is-log-file"] = function(self)
-        return stringy.endswith(self:get("contents"), ".log")
+        return stringy.endswith(self:get("resolved-path"), ".log")
       end,
       ["is-email-file"] = function(self)
-        local parent_dir_name = pathSlice(self:get("contents"), "-2:-2")[1]
+        local parent_dir_name = self:get("parent-dir-name")
         return 
-          stringy.endswith(self:get("contents"), ".eml") or 
+          stringy.endswith(self:get("resolved-path"), ".eml") or 
           parent_dir_name == "new" or
           parent_dir_name == "cur"
       end,
       ["is-newsboat-urls-file"] = function(self)
-        return stringy.endswith(self:get("contents"), "/urls")
+        return stringy.endswith(self:get("resolved-path"), "/urls")
       end,
       ["is-md-file"] = function(self)
-        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "md"
+        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "md"
       end,
       ["file-contents-utf8-chars"] = function(self)
         return eutf8.len(self:get("file-contents"))

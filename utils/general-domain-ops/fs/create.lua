@@ -1,7 +1,7 @@
 --- @param path string
 --- @param slice? sliceSpecLike how to slice the path before creating it
 function createPath(path, slice)
-  path = transf.string.path_resolved(path)
+  path = transf.string.path_resolved(path, true)
   slice = slice or { start = 1, stop = -1 } -- default to entire path
   local resolved_path = pathSlice(path, slice, {rejoin_at_end = true})
   local remote = pathIsRemote(resolved_path)
@@ -25,7 +25,7 @@ function writeFile(path, contents, condition, create_path, mode, fail)
   condition = defaultIfNil(condition, "any")
   create_path = defaultIfNil(create_path, true)
   mode = defaultIfNil(mode, "w")
-  path = transf.string.path_resolved(path)
+  path = transf.string.path_resolved(path, true)
   fail = defaultIfNil(fail, "nil")
 
   local path_is_remote = pathIsRemote(path)

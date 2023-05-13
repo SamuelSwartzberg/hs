@@ -4,10 +4,10 @@ PathInHomeItemSpecifier = {
   properties = {
     getables = {
       ["is-path-in-me"] = function (self)
-        return stringy.startswith(self:get("contents"), env.ME)
+        return stringy.startswith(self:get("completely-resolved-path"), env.ME)
       end,
       ["is-path-in-screenshots"] = function (self)
-        return stringy.startswith(self:get("contents"), env.SCREENSHOTS)
+        return stringy.startswith(self:get("completely-resolved-path"), env.SCREENSHOTS)
       end,
     },
     doThisables = {

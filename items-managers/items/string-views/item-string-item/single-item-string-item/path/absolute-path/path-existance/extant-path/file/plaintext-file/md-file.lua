@@ -10,7 +10,7 @@ MdFileItemSpecifier = {
       ["to-pandoc-export"] = function(self, specifier)
         inspPrint(specifier)
         CreateShellCommand("pandoc"):doThis("md-to-" .. specifier.format , {
-          source = self:get("contents"),
+          source = self:get("resolved-path"),
           target = specifier.target_path,
           do_after = specifier.do_after
         })

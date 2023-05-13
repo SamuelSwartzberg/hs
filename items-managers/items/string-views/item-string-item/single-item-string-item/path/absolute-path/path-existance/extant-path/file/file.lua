@@ -49,12 +49,12 @@ FileItemSpecifier = {
         writeFile(self:get("contents"), "", "exists")
       end,
       ["send-in-email"] = function(self, do_after)
-        sendEmailInteractive({}, transf.path.attachment(self:get("contents")), editorEditFunc, do_after)
+        sendEmailInteractive({}, transf.path.attachment(self:get("completely-resolved-path")), editorEditFunc, do_after)
       end,
       ["edit-file-interactive"] = function(self, do_after)
         run({
           "$VISUAL",
-          { value = self:get("contents"), type = "quoted" },
+          { value = self:get("completely-resolved-path"), type = "quoted" },
         }, do_after)
       end,
     }

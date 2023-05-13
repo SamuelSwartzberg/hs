@@ -15,7 +15,7 @@ SqliteFileItemSpecifier = {
           "-header",
           "-csv",
           {
-            value = self:get("contents"),
+            value = self:get("resolved-path"),
             type = "quoted"
           },
           {
@@ -30,10 +30,10 @@ SqliteFileItemSpecifier = {
         }
       end,
       ["is-firefox-places-sqlite-file"] = function(self)
-        return stringy.endswith(self:get("contents"), "places.sqlite")
+        return stringy.endswith(self:get("completely-resolved-path"), "places.sqlite")
       end,
       ["is-newpipe-sqlite-file"] = function(self)
-        return stringy.endswith(self:get("contents"), "newpipe.db")
+        return stringy.endswith(self:get("completely-resolved-path"), "newpipe.db")
       end,
     },
     doThisables = {

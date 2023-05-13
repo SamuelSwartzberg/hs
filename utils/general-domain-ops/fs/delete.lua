@@ -16,7 +16,7 @@ function delete(path, thing, action, onlyif, fail)
 
   -- resolve path
 
-  path = transf.string.path_resolved(path)
+  path = transf.string.path_resolved(path, true)
 
   -- set local vars
 

@@ -6,7 +6,7 @@ PathLeafSpecifier = {
   properties = {
     getables = {
       ["path-leaf"] = function(self)
-        return pathSlice(self:get("contents", "-1:-1")[1])
+        return pathSlice(self:get("resolved-path", "-1:-1")[1])
       end,
       ["to-path-leaf-parts"] = function(self)
         return CreatePathLeafParts({
@@ -32,7 +32,7 @@ PathLeafSpecifier = {
         return isUsableAsFiletype(self:get("path-leaf-extension"), filetype)
       end,
       ["leaf-without-extension"] = function (self)
-        return pathSlice(self:get("contents"), "-2:-2", { ext_sep = true } )[1]
+        return pathSlice(self:get("resolved-path"), "-2:-2", { ext_sep = true } )[1]
       end,
 
       ["path-leaf-starts-with"] = function(self, prefix)
@@ -53,9 +53,9 @@ PathLeafSpecifier = {
           or 
           path_leaf:match("%-%-") -- string contains --
        end,
-      ["is-path-leaf-tags"] = function(self) return stringy.find(self:get("contents"), "%") end,
+      ["is-path-leaf-tags"] = function(self) return stringy.find(self:get("path-leaf"), "%") end,
       ["is-path-leaf-extension"] = function(self)
-        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true } ) ~= ""
+        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true } ) ~= ""
       end,
 
       ["windows-with-path-leaf-as-title"] = function(self)

@@ -31,7 +31,7 @@ function itemsInPath(opts)
     end
   end
   local files = {}
-  opts.path = transf.string.path_resolved(opts.path)
+  opts.path = transf.string.path_resolved(opts.path, true)
   opts.path = ensureAdfix(opts.path, "/", true, false, "suf")
   if opts.path == "" then opts.path = "/" end
   opts.validator = opts.validator or function(file_name)
@@ -128,6 +128,7 @@ function getItemsForAllLevelsInSlice(path, slice_spec, opts)
   slice_spec = slice_spec or { start = 1, stop = -1 }
   opts = opts or {}
   opts.recursion = false
+  local path = transf.string.path_resolved(path, true)
   local levels = pathSlice(path, slice_spec, { entire_path_for_each = true })
   local res = {}
   for _, level in iprs(levels) do

@@ -4,13 +4,13 @@ PathByStartItemSpecifier = {
   properties = {
     getables = {
       ["is-path-in-home"] = function(self)
-        return stringy.startswith(self:get("contents"), env.HOME)
+        return stringy.startswith(self:get("completely-resolved-path"), env.HOME)
       end,
       ["is-path-not-in-home"] = function(self)
         return not self:get("is-path-in-home")
       end,
       ["relative-path"] = function(self)
-        return ensureAdfix(self:get("contents"), self:get("base-path"), false)
+        return ensureAdfix(self:get("completely-resolved-path"), self:get("base-path"), false)
       end,
     },
     doThisables = {

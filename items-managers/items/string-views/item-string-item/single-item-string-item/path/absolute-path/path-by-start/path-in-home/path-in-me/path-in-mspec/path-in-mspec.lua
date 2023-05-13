@@ -4,7 +4,7 @@ PathInMspecItemSpecifier = {
   properties = {
     getables = {
       ["is-path-in-mpass"] = function(self)
-        return stringy.startswith(self:get("contents"), env.MPASS)
+        return stringy.startswith(self:get("completely-resolved-path"), env.MPASS)
       end
     },
     doThisables = {

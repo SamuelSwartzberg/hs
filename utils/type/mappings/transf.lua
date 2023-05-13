@@ -81,8 +81,10 @@ transf = {
         return path
       end
     end,
-    path_resolved = function(path)
-      path = transf.string.tilde_resolved(path)
+    path_resolved = function(path, resolve_tilde)
+      if resolve_tilde then
+        path = transf.string.tilde_resolved(path)
+      end
       local components = pathSlice(path, ":")
       local reduced_components = {}
       local started_with_slash = stringy.startswith(path, "/")

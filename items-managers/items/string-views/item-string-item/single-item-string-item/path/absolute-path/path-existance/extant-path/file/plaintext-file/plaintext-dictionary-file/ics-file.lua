@@ -41,7 +41,7 @@ IcsFileItemSpecifier = {
         local khal = CreateShellCommand("khal")
         khal:doThis("choose-writable-calendar", function(calendar)
           khal:doThis("add-event-from-file", {
-            path = self:get("contents"),
+            path = self:get("completely-resolved-path"),
             calendar = calendar
           })
         end)

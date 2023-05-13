@@ -10,7 +10,7 @@ ShellscriptFileItemSpecifier = {
           "shellcheck",
           "--format=json",
           "--severity=" .. severity,
-          { value = self:get("contents"), type = "quoted" },
+          { value = self:get("completely-resolved-path"), type = "quoted" },
         })
         return res
       end,
@@ -19,7 +19,7 @@ ShellscriptFileItemSpecifier = {
           "shellcheck",
           "--format=gcc",
           "--severity=" .. severity,
-          { value = self:get("contents"), type = "quoted" },
+          { value = self:get("completely-resolved-path"), type = "quoted" },
         })
         return res
       end,

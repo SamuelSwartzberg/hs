@@ -14,10 +14,10 @@ PathInterfaceItemSpecifier = {
         return self:get("difference-from-prefix-or-nil", ensureAdfix(starting_point, "/", true, false, "suf"))
       end,
       ["local-http-server-url"] = function(self)
-        return env.FS_HTTP_SERVER .. self:get("contents")
+        return env.FS_HTTP_SERVER .. self:get("completely-resolved-path")
       end,
       ["file-url"] = function (self)
-        return "file://" .. self:get("contents")
+        return "file://" .. self:get("completely-resolved-path")
       end,
     },
     doThisables = {
@@ -42,7 +42,7 @@ PathInterfaceItemSpecifier = {
             srctgt("move", IfDoesntExist(self:get("contents"), specifier.payload)
           else ]]if specifier.mode == "write" then
             if self:get("is-non-extant-path") or specifier.overwrite then 
-              local filename = self:get("contents")
+              local filename = self:get("completely-resolved-path")
               if specifier.extension then 
                 filename = filename .. "." .. specifier.extension 
               end

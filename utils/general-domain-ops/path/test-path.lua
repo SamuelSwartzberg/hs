@@ -21,7 +21,7 @@ function testPath(path, opts)
     opts = copy(opts)
   end
   path = path or env.HOME
-  path = transf.string.path_resolved(path)
+  path = transf.string.path_resolved(path, true)
   local remote = pathIsRemote(path)
 
   local results = {}

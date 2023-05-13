@@ -9,7 +9,7 @@ LoggingDirSpecifier = {
           dt:fmt("%Y-%m"),
           dt:fmt("%Y-%m-%d"),
         }
-        local path = self:get("contents") .. "/" .. table.concat(y_ym_ymd, "/") .. ".csv"
+        local path = self:get("completely-resolved-path") .. "/" .. table.concat(y_ym_ymd, "/") .. ".csv"
         return path
       end
     },

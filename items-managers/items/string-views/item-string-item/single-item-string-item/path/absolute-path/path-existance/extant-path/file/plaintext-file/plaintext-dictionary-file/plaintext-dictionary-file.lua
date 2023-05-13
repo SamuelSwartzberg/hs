@@ -7,22 +7,22 @@ PlaintextDictionaryFileItemSpecifier = {
   properties = {
     getables = {
       ["is-yaml-file"] = function(self)
-        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "yaml"
+        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "yaml"
       end,
       ["is-json-file"] = function(self)
-        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "json"
+        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "json"
       end,
       ["is-bib-file"] = function(self)
-        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "bib"
+        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "bib"
       end,
       ["is-toml-file"] = function(self)
-        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "toml" 
+        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "toml" 
       end,
       ["is-ini-file"] = function(self)
-        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "ini"
+        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "ini"
       end,
       ["is-ics-file"] = function(self)
-        return pathSlice(self:get("contents"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "ics"
+        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "ics"
       end,
       ["to-env-map"] = function(self)
         local table = self:get("parse-to-lua-table")

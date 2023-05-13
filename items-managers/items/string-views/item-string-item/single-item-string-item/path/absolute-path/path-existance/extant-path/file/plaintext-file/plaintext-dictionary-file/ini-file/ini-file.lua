@@ -8,7 +8,7 @@ IniFileItemSpecifier = {
       ["parse-to-lua-table"] = function(self)
         return runJSON({
           "cat",
-          { value = self:get("contents"), type = "quoted" },
+          { value = self:get("completely-resolved-path"), type = "quoted" },
           "|",
           "jc",
           "--ini"

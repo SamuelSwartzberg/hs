@@ -9,7 +9,7 @@ EmailFileItemSpecifier = {
         return {
           "mshow",
           "-R",
-          { value = self:get("contents"), type = "quoted"}
+          { value = self:get("completely-resolved-path"), type = "quoted"}
         }
       end,
       ["email-body-rendered"] = function(self)
@@ -41,14 +41,14 @@ EmailFileItemSpecifier = {
         return run({
           "mshow",
           "-q",
-          { value = self:get("contents"), type = "quoted"}
+          { value = self:get("completely-resolved-path"), type = "quoted"}
         })
       end,
       ["email-all-decoded-headers"] = function(self)
         return run({
           "mshow",
           "-L",
-          { value = self:get("contents"), type = "quoted"}
+          { value = self:get("completely-resolved-path"), type = "quoted"}
         })
       end,
       ["email-header"] = function(self, type)
@@ -57,7 +57,7 @@ EmailFileItemSpecifier = {
           "-h",
           { value = type, type = "quoted" },
           "-d",
-          { value = self:get("contents"), type = "quoted"}
+          { value = self:get("completely-resolved-path"), type = "quoted"}
         })
         return raw_res
       end,
@@ -66,7 +66,7 @@ EmailFileItemSpecifier = {
         return run({
           "mshow",
           "-t",
-          { value = self:get("contents"), type = "quoted"}
+          { value = self:get("completely-resolved-path"), type = "quoted"}
         })
       end,
       ["attachments"] = function(self)
@@ -88,12 +88,12 @@ EmailFileItemSpecifier = {
             "maddr",
             "-h",
             { value = type, type = "quoted" },
-            { value = self:get("contents"), type = "quoted"}  
+            { value = self:get("completely-resolved-path"), type = "quoted"}  
           })
         else
           raw_res = run({
             "maddr",
-            { value = self:get("contents"), type = "quoted"}  
+            { value = self:get("completely-resolved-path"), type = "quoted"}  
           })
         end
         local all_addr = stringy.split(raw_res, "\n")
@@ -106,7 +106,7 @@ EmailFileItemSpecifier = {
           "mscan",
           "-f",
           { value = format_specifier, type = "quoted" },
-          { value = self:get("contents"), type = "quoted" }
+          { value = self:get("completely-resolved-path"), type = "quoted" }
         }
       end,
       ["email-summary"] = function(self, format_specifier)
@@ -122,7 +122,7 @@ EmailFileItemSpecifier = {
           "&&",
           "mshow",
           "-x",
-          { value = self:get("contents"), type = "quoted" },
+          { value = self:get("completely-resolved-path"), type = "quoted" },
           { value = name, type = "quoted" },
         }, true)
       end,
@@ -170,13 +170,13 @@ EmailFileItemSpecifier = {
           "mdeliver",
           { value = path, type = "quoted" },
           "<",
-          { value = self:get("contents"), type = "quoted" }
+          { value = self:get("completely-resolved-path"), type = "quoted" }
         }, {
           "minc", -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
           { value = path, type = "quoted" }
         }, {
           "rm",
-          { value = self:get("contents"), type = "quoted" }
+          { value = self:get("completely-resolved-path"), type = "quoted" }
         }, true)
       end,
     }

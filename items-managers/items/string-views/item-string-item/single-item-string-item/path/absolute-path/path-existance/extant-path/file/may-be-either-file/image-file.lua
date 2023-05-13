@@ -6,7 +6,7 @@ ImageFileItemSpecifier = {
   properties = {
     getables = {
       ["as-hs-image"] = function(self)
-        return memoize(hs.image.imageFromPath)(self:get("contents"))
+        return memoize(hs.image.imageFromPath)(self:get("completely-resolved-path"))
       end,
       ["chooser-image"] = function(self)
         return self:get("as-hs-image")
@@ -16,7 +16,7 @@ ImageFileItemSpecifier = {
           "saucenao",
           "--file",
           {
-            value = self:get("contents"),
+            value = self:get("completely-resolved-path"),
             type = "quoted"
           },
           "--output-properties",
@@ -42,7 +42,7 @@ ImageFileItemSpecifier = {
           { type = "image", format = "png", resize = true },
           { type = "image", format = "jpg", resize = true },
         },CreateTable ))
-        shrink_specifier_array:doThis("create-shrunken-versions", self:get("contents"))
+        shrink_specifier_array:doThis("create-shrunken-versions", self:get("completely-resolved-path"))
         self:doThis("move-replace-self", shrink_specifier_array:get("best-version"))
         shrink_specifier_array:doThis("delete-non-best-versions")
       end,

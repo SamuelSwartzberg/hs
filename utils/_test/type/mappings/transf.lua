@@ -19,8 +19,13 @@ assertMessage(
 )
 
 assertMessage(
-  transf.string.path_resolved("~/foo/bar"),
+  transf.string.path_resolved("~/foo/bar", true),
   env.HOME .. "/foo/bar"
+)
+
+assertMessage(
+  transf.string.path_resolved("~/foo/bar", false),
+  "~/foo/bar"
 )
 
 assertMessage(

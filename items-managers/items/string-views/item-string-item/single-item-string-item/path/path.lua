@@ -8,7 +8,7 @@ PathItemSpecifier = {
       end,
       ["is-relative-path"] = function(self) return not self:get("is-absolute-path") end,
       ["is-path-leaf"] = returnTrue,
-      ["is-in-path"] = function(self, path) return stringy.startswith(self:get("contents"), path) end,
+      ["is-in-path"] = function(self, path) return stringy.startswith(self:get("resolved-path"), path) end,
       ["resolved-path"] = function(self)
         return transf.string.path_resolved(self:get("contents"))
       end,
@@ -19,10 +19,10 @@ PathItemSpecifier = {
         return pathSlice(self:get("resolved-path"), ":-2", {rejoin_at_end=true})
       end,
       ["path-ensure-final-slash"] = function(self)
-        return ensureAdfix(self:get("contents"), "/", true, false, "suf")
+        return ensureAdfix(self:get("resolved-path"), "/", true, false, "suf")
       end,
       ["path-without-extension"] = function(self)
-        return pathSlice(self:get("contents"), ":-2", { ext_sep = true, reojoin_at_end = true })[1]
+        return pathSlice(self:get("resolved-path"), ":-2", { ext_sep = true, reojoin_at_end = true })[1]
       end,
       ["full-audiovisual"] = function(self, fkey)
         local outstr = self:get("path-leaf-tags-audiovisual")

@@ -4,10 +4,10 @@ PathWithLineAndorCharacterNumberItemSpecifier = {
   properties = {
     getables = {
       ["path-part"] = function (self)
-        return stringy.split(self:get("contents"), ":")[1]
+        return stringy.split(self:get("resolved-path"), ":")[1]
       end,
       ["number-part"] = function(self)
-        local number_parts = slice(stringy.split(self:get("contents"), ":"), 2)
+        local number_parts = slice(stringy.split(self:get("resolved-path"), ":"), 2)
         return stringx.join(":", number_parts)
       end,
     },

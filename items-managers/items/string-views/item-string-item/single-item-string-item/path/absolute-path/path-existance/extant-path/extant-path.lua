@@ -4,18 +4,18 @@ ExtantPathItemSpecifier = {
   properties = {
     getables = {
     --[[   ["is-category-date-dir-structure-contained-item"] = function(self)
-        return stringy.startswith(self:get("contents"), env.MDIARY) -- currently the only category-date-dir-structure-root is env.MDIARY, and this check is far cheaper then the alternative, so we'll use it for now
+        return stringy.startswith(self:get("completely-resolved-path"), env.MDIARY) -- currently the only category-date-dir-structure-root is env.MDIARY, and this check is far cheaper then the alternative, so we'll use it for now
       end, ]]
       ["is-dir"] = function(self) return testPath(self:get("contents"), "dir") end,
       ["is-file"] = function(self) return not self:get("is-dir") end, 
       ["is-dated-extant-path"] = function(self) 
-        local path_leaf = pathSlice(self:get("contents", "-1:-1")[1])
+        local path_leaf = pathSlice(self:get("completely-resolved-path", "-1:-1")[1])
         return 
           path_leaf:match("^(.-)%-%-") 
           or path_leaf:match("^(%d[^%%]+)") 
       end, 
       ["get-ancestor-string-array"] = function(self)
-        return CreateArray(pathSlice(self:get("contents"), "1:-2", { entire_path_for_each = true }))
+        return CreateArray(pathSlice(self:get("completely-resolved-path"), "1:-2", { entire_path_for_each = true }))
       end,
       ["is-in-git-dir-path"] = function(self) 
         return find(
@@ -52,27 +52,27 @@ ExtantPathItemSpecifier = {
       end,
       ["find-sibling"] = function(self, func)
         return self:get("sibling-string-array"):get("find", function(sibling)
-          if sibling == self:get("contents") then return false end -- don't return self
+          if sibling == self:get("completely-resolved-path") then return false end -- don't return self
           return func(sibling)
         end)
       end,
       ["find-sibling-with-same-filename"] = function(self)
         return self:get("find-sibling", function(sibling)
-          return pathSlice(sibling, "-2:-2", { ext_sep = true })[1] == pathSlice(self:get("contents", "-2:-2", { ext_sep = true })[1])
+          return pathSlice(sibling, "-2:-2", { ext_sep = true })[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true })[1])
         end)
       end,
       ["find-sibling-with-different-extension"] = function(self, ext)
         return self:get("find-sibling", function(sibling)
-          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("contents", "-2:-2", { ext_sep = true })[1]) .. "." .. ext
+          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true })[1]) .. "." .. ext
         end)
       end,
       ["find-sibling-dir-with-same-filename"] = function(self)
         return self:get("find-sibling", function(sibling)
-          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("contents", "-2:-2", { ext_sep = true })[1])
+          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true })[1])
         end)
       end,
       ["path-attr"] = function(self, attr)
-        return hs.fs.attributes(self:get("contents"), attr)
+        return hs.fs.attributes(self:get("completely-resolved-path"), attr)
       end,
       ["path-size"] = function(self)
         return self:get("path-attr", "size")
@@ -89,29 +89,29 @@ ExtantPathItemSpecifier = {
         run(self:get("cd-and-this-task", task))
       end,
       ["open-path"] = function (self, app)
-        open({path = self:get("contents"), app = app})
+        open({path = self:get("completely-resolved-path"), app = app})
       end,
       ["open-parent"] = function (self, app)
         open({path = self:get("parent-dir-path"), app = app})
       end,
       ["open-path-in-finder"] = function(self)
-        hs.execute("open -R '" .. self:get("contents") .. "'")
+        hs.execute("open -R '" .. self:get("completely-resolved-path") .. "'")
       end,
       ["open-with-application"] = function(self, application)
         run({
           "open",
           "-a",
           application,
-          { value = self:get("contents"), type = "quoted" }
+          { value = self:get("completely-resolved-path"), type = "quoted" }
         }, true)
       end,
       ["open-contents-in-new-vscode-window"] = function(self)
         -- this should ideally use the `code` command, but it is currently broken
-        open(self:get("contents"))
+        open(self:get("completely-resolved-path"))
       end,
       ["open-contents-in-current-vscode-window"] = function(self)
         -- this should ideally use the `code` command, but it is currently broken
-        open(self:get("contents"))
+        open(self:get("completely-resolved-path"))
       end,
       ["move-safe"] = function(self, target)
         srctgt("move", self:get("contents"), target, "not-exists")

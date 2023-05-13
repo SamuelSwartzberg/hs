@@ -18,6 +18,7 @@ local filetype_list = {
 --- @param filetype string
 --- @return boolean
 function isUsableAsFiletype(path, filetype)
+  path = transf.string.path_resolved(path)
   local extension = pathSlice(path, "-1:-1", { ext_sep = true, standartize_ext = true })[1]
   if find(filetype_list[filetype], extension) then
     return true

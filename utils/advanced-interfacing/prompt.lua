@@ -51,6 +51,9 @@ function promptPathInner(prompt_args)
   prompt_args.allows_loop_selection  = defaultIfNil(prompt_args.allows_loop_selection, false)
   prompt_args.allowed_file_types     = defaultIfNil(prompt_args.allowed_file_types, {})
   prompt_args.resolves_aliases       = defaultIfNil(prompt_args.resolves_aliases, true)
+
+  prompt_args.default = transf.string.path_resolved(prompt_args.default, true) -- resolve the path ourself, to be sure & remain in control
+
   local rawReturn                    = hs.dialog.chooseFileOrFolder(prompt_args.message, prompt_args.default,
   prompt_args.can_choose_files, prompt_args.can_choose_directories, prompt_args.allows_loop_selection,
   prompt_args.allowed_file_types, prompt_args.resolves_aliases)

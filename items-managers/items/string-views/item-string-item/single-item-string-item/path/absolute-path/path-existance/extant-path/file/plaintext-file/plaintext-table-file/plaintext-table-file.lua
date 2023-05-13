@@ -6,18 +6,18 @@ PlaintextTableFileItemSpecifier = {
   properties = {
     getables = {
       ["read-to-list-rows"] = function(self)
-        return ftcsv.parse(self:get("contents"), self:get("field-separator"), {headers = false})
+        return ftcsv.parse(self:get("completely-resolved-path"), self:get("field-separator"), {headers = false})
       end,
       ["read-to-list-row-iter"] = function (self)
-        local iter = ftcsv.parseLine(self:get("contents"), self:get("field-separator"), {headers = false})
+        local iter = ftcsv.parseLine(self:get("completely-resolved-path"), self:get("field-separator"), {headers = false})
         iter() -- skip the header
         return iter
       end,
       ["read-to-assoc-rows"] = function(self)
-        return ftcsv.parse(self:get("contents"), self:get("field-separator"))
+        return ftcsv.parse(self:get("completely-resolved-path"), self:get("field-separator"))
       end,
       ["read-to-assoc-row-iter"] = function (self)
-        return ftcsv.parseLine(self:get("contents"), self:get("field-separator"))
+        return ftcsv.parseLine(self:get("completely-resolved-path"), self:get("field-separator"))
       end,
       ["is-timestamp-first-column-plaintext-table-file"] = function(self) -- this only checks the first line with content for performance reasons.
         local line = self:get("nth-line-of-file-contents", 2)
@@ -30,10 +30,10 @@ PlaintextTableFileItemSpecifier = {
         end
       end,
       ["is-csv-table-file"] = function(self)
-        return stringy.endswith(self:get("contents"), ".csv")
+        return stringy.endswith(self:get("resolved-path"), ".csv")
       end,
       ["is-tsv-table-file"] = function(self)
-        return stringy.endswith(self:get("contents"), ".tsv")
+        return stringy.endswith(self:get("resolved-path"), ".tsv")
       end,
       ["rows-to-lines"] = function(self, rows)
         return map(rows, function(row)

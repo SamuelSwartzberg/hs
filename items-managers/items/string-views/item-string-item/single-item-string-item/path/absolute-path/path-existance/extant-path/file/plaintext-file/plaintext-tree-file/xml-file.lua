@@ -6,7 +6,7 @@ XmlFileItemSpecifier = {
   properties = {
     getables = {
       ["parse-to-lua-table"] = function(self)
-        return xml.parseFile(self:get("contents"))
+        return xml.parseFile(self:get("completely-resolved-path"))
       end,
       ["lua-table-to-string"] = function(_, tbl)
         -- not implemented

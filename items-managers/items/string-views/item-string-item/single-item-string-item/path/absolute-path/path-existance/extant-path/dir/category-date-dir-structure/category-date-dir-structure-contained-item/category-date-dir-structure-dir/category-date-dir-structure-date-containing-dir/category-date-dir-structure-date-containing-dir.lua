@@ -4,7 +4,7 @@ CategoryDateDirStructureDateContainingDirSpecifier = {
   properties = {
     getables = {
       ["is-category-date-dir-structure-managed-date-dir"] = function(self)
-        return self:get("is-path-leaf-date") and not stringy.endswith(self:get("contents"), "_nm")
+        return self:get("is-path-leaf-date") and not stringy.endswith(self:get("resolved-path"), "_nm")
       end,
       ["child-smallest-largest-date-array"] = function(self)
         return self:get("child-string-item-array"):get("largest-and-smallest-thing", "to-date")
