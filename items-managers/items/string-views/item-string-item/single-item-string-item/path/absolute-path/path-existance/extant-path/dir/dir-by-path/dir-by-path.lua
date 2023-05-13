@@ -4,7 +4,7 @@ DirByPathItemSpecifier = {
   properties = {
     getables = {
       ["is-applications-dir"] = function(self)
-        return self:get("path-ensure-final-slash") == "/Applications/"
+        return self:get("path-ensure-final-slash") == env.MAC_APPLICATIONS
       end,
       ["is-diary-dir"] = function(self)
         return self:get("path-ensure-final-slash") == env.MDIARY .. "/"

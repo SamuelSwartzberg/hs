@@ -590,15 +590,15 @@ local item_creation_map = {
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path","file", "plaintext-file", "plaintext-dictionary-file", "json-file", "tachiyomi-json-file"}
     },
     {
-      value = env.MSPEC .. "/mock/dir_structure/khal/config.ini",
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/config_dir/khal/config.ini",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "plaintext-dictionary-file", "ini-file", "khal-config-file"}
     },
     {
-      value = env.MSPEC .. "/mock/dir_structure/vdirsyncer/config.ini",
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/config_dir/vdirsyncer/config.ini",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "plaintext-dictionary-file", "ini-file", "vdirsyncer-config-file"}
     },
     {
-      value = env.MSPEC .. "/mock/dir_structure/newsboat/urls",
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/config_dir/newsboat/urls",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "plaintext-file", "newsboat-urls-file"}
     },
     {
@@ -612,6 +612,65 @@ local item_creation_map = {
     {
       value = env.MSPEC .. "/mock/files/binary/db/sql/sqlite/newpipe.db",
       must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "binary-file", "db-file", "sql-file", "sqlite-file", "newpipe-sqlite-file"}
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_tree/empty_dir",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "empty-dir"},
+      must_not_be = { "parent-dir", "grandparent-dir"}
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_tree/parent_only_dir",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "parent-but-not-grandparent-dir"},
+      must_not_be = { "empty-dir", "grandparent-dir"}
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_tree/grandparent_dir",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "grandparent-dir", "parent-dir"},
+      must_not_be = { "empty-dir", "parent-but-not-grandparent-dir"}
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/cargo/basic_cargo",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "cargo-project-dir"},
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/latex/basic_latex",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "latex-project-dir"},
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/npm/basic_npm",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "npm-project-dir"},
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/omegat/basic_omegat",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "omegat-project-dir"},
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/project_dir/sass/basic_sass",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "project-dir", "sass-project-dir"},
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/git_dir/empty_git_root",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "parent-dir", "git-root-dir"},
+    },
+    {
+      value = env.MSPEC .. "/mock/dir/dir_by_structure/logging_dir/empty_logs",
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "logging-dir"}
+    },
+    {
+      value = env.MAC_APPLICATIONS,
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "applications-dir"}
+    },
+    {
+      value = env.MCUR_PROJ,
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "mcur-proj-dir"}
+    },
+    {
+      value = env.MENV,
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "menv-dir"}
+    },
+    {
+      value = env.MDIARY,
+      must_be = { "string-item", "single-item-string-item", "path", "absolute-path", "true-absolute-path", "extant-path", "dir", "dir-by-path", "mdiary-dir"}
     },
     {
       value = "foo\nbar",
