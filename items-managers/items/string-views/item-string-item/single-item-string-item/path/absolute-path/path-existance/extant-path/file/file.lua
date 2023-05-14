@@ -63,7 +63,7 @@ FileItemSpecifier = {
     { key = "image-file", value = CreateImageFileItem },
     { key = "plaintext-file", value = CreatePlaintextFileItem },
     { key = "binary-file", value = CreateBinaryFileItem },
-  }, true),
+  }),
   action_table = {
     {
       text = "🗑 rmfl.",

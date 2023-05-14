@@ -2,5 +2,5 @@ local rrq = bindArg(relative_require, "items-managers.items.array.non-empty-arra
 
 rrq("array-of-urls")
 rrq("array-of-paths")
-rrq("array-of-printable-ascii-string-items")
-rrq("array-of-string-items")
+rrq("array-of-printable-ascii-strings")
+rrq("array-of-strings")

@@ -2,4 +2,4 @@ local rrq = bindArg(relative_require, "items-managers.items.string-views.item-st
 
 rrq("youtube-playlist")
 rrq("youtube-video")
-rrq("youtube-playable-item")
+rrq("youtube-playable")

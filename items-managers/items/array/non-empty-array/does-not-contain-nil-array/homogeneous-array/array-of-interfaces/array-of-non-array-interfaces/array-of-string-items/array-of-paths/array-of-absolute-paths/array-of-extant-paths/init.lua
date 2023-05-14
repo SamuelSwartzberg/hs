@@ -3,5 +3,5 @@ local rrq = bindArg(relative_require, "items-managers.items.array.non-empty-arra
 rrq("array-of-dirs")
 rrq("array-of-files")
 rrq("array-of-dated-extant-paths")
-rrq("array-of-in-git-dir-path-items")
+rrq("array-of-in-git-dir-paths")
 rrq("array-of-extant-paths")

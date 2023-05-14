@@ -1,5 +1,4 @@
 --- @type ItemSpecifier
---- @type ItemSpecifier
 InGitDirPathItemSpecifier = {
   type = "in-git-dir-path",
   properties = {
