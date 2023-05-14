@@ -246,7 +246,7 @@ local item_creation_map = {
       must_not_be = { "empty-array", "non-homogeneous-array", "array-of-non-array-interfaces" }
     },
     {
-      value = { CreateAudiodeviceItem("Test Device 1")},
+      value = { CreateAudiodeviceItem("Test Device 1", "output")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-audiodevices" },
     },
     {
@@ -415,7 +415,87 @@ local item_creation_map = {
       must_be = { "shell-command", "uni-command" }
     } 
   },
-  [CreateTable] = {}, -- todo
+  [CreateTable] = {
+    {
+      value = {},
+      must_be = { "table", "empty-table" },
+      must_not_be = { "non-empty-table" }
+    },
+    {
+      value = { foo = "bar" },
+      must_be = { "table", "non-empty-table", "homogeneous-key-table", "homogeneous-value-table", "homo-k-homo-v-table" },
+      must_not_be = { "empty-table", "heterogeneous-value-table"}
+    },
+    {
+      value = { foo = "bar", quuz = "meep" },
+      must_be = { "table", "non-empty-table", "homogeneous-key-table", "homogeneous-value-table", "homo-k-homo-v-table", "string-key-table", "str-key-noninterface-value-table", "str-key-str-value-table" },
+      must_not_be = { "empty-table", "heterogeneous-value-table", "heterogeneous-key-table",  "homo-k-hetero-v-table", "hetero-k-homo-v-table", "hetero-k-hetero-v-table"}
+    },
+    {
+      value = { foo = {foo = 1}, quuz = { cu = "te"} },
+      must_be = { "table", "non-empty-table", "homogeneous-key-table", "homogeneous-value-table", "homo-k-homo-v-table", "string-key-table", "str-key-noninterface-value-table", "str-key-plain-table-value-table" },
+      must_not_be = { "empty-table", "heterogeneous-value-table", "heterogeneous-key-table",  "homo-k-hetero-v-table", "hetero-k-homo-v-table", "hetero-k-hetero-v-table"}
+    },
+    {
+      value = { [4] = "bar", [8] = "meep" },
+      must_be = { "table", "non-empty-table", "homogeneous-key-table", "homogeneous-value-table", "homo-k-homo-v-table", "number-key-table" },
+      must_not_be = { "empty-table", "heterogeneous-value-table", "heterogeneous-key-table",  "homo-k-hetero-v-table", "hetero-k-homo-v-table", "hetero-k-hetero-v-table"}
+    },
+    {
+      value = { [1234567890] = "bar", [1234567898] = "meep" },
+      must_be = { "table", "non-empty-table", "homogeneous-key-table", "homogeneous-value-table", "homo-k-homo-v-table", "number-key-table", "timestamp-key-table", "noninterface-value-table", "string-value-table" },
+      must_not_be = { "empty-table", "heterogeneous-value-table", "heterogeneous-key-table",  "homo-k-hetero-v-table", "hetero-k-homo-v-table", "hetero-k-hetero-v-table"}
+    },
+    {
+      value = { foo = "bar", quuz = 1 },
+      must_be = { "table", "non-empty-table", "homogeneous-key-table", "heterogeneous-value-table", "homo-k-hetero-v-table" },
+      must_not_be = { "empty-table", "homogeneous-value-table", "heterogeneous-key-table",  "homo-k-homo-v-table", "hetero-k-homo-v-table", "hetero-k-hetero-v-table"}
+    },
+    {
+      value = { foo = "bar", [false] = "meep" },
+      must_be = { "table", "non-empty-table", "heterogeneous-key-table", "homogeneous-value-table", "hetero-k-homo-v-table" },
+      must_not_be = { "empty-table", "heterogeneous-value-table", "homogeneous-key-table",  "homo-k-hetero-v-table", "homo-k-homo-v-table", "hetero-k-hetero-v-table"}
+    },
+    {
+      value = { [false] = CreateStringItem("haiiro") },
+      must_be = { "table", "non-empty-table", "homogeneous-key-table", "homogeneous-value-table", "homo-k-homo-v-table", "interface-value-table" },
+      must_not_be = { "empty-table", "heterogeneous-value-table"}
+    },
+    {
+      value = { [false] = "bar", quuz = 1 },
+      must_be = { "table", "non-empty-table", "heterogeneous-key-table", "heterogeneous-value-table", "hetero-k-hetero-v-table" },
+      must_not_be = { "empty-table", "homogeneous-value-table", "homogeneous-key-table",  "homo-k-homo-v-table", "hetero-k-homo-v-table", "homo-k-hetero-v-table"}
+    },
+    {
+      value = { foo = CreateStringItem("foo"), quuz = CreateStringItem("cute") },
+      must_be = { "table", "non-empty-table", "homogeneous-key-table", "homogeneous-value-table", "homo-k-homo-v-table", "string-key-table", "str-key-interface-value-table" },
+      must_not_be = { "empty-table", "heterogeneous-value-table", "heterogeneous-key-table",  "homo-k-hetero-v-table", "hetero-k-homo-v-table", "hetero-k-hetero-v-table"}
+    },
+    {
+      value = { cldr = "foo", emoji = "bar", name = "smile"},
+      must_be = {"emoji-prop-table"}
+    },
+    {
+      value = {home = "foo@example.com", pref = "bar@foo.us"},
+      must_be = {"vcard-email-table"}
+    },
+    {
+      value = { work = "121 11023 20"},
+      must_be = {"vcard-phone-table"}
+    },
+    {
+      value = { Street = "Somestr", Code="12345"},
+      must_be = {"single-address-table"}
+    },
+    {
+      value = { plane = "8", name ="somename"},
+      must_be = {"unicoode-prop-table"}
+    },
+    {
+      value = { FOO = "bar" },
+      must_be = {"env-var-table"}
+    }
+  }, -- todo
   [CreateWindowlikeItem] = {}, -- todo
   [CreateStringItem] = {
     {
@@ -918,22 +998,51 @@ local item_creation_map = {
 
   },
   [CreateTimerItem] = {
-
+    {
+      value = {
+        fn = returnNil,
+      },
+      must_be = {"timer"}
+    }
   },
   [CreateAudiodeviceItem] = {
-
+    {
+      value = {"foo", "input"},
+      unpack = true,
+      must_be = {"audiodevice"}
+    }
   },
   [CreateContactTableItem] = {
-
+    {
+      value = {
+        ["First name"] = "foo",
+        ["Last name"] = "bar"
+      },
+      must_be = {"contact-table"}
+    }
   },
   [CreateEventTableItem] = {
-
+    {
+      value = {
+        location = "Kyoto",
+        start = "2021-02-01T00:00:00Z",
+      },
+      must_be = {"event-table"}
+    }
   },
   [CreateInputMethodItem] = {
-
+    {
+      value = "foo",
+      must_be = {"input-method"}
+    }
   },
   [CreatePathLeafParts] = {
-
+    {
+      value = {
+        ["general-name"] = "foo"
+      },
+      must_be = {"path-leaf-parts"}
+    }
   },
 }
 
@@ -951,7 +1060,11 @@ for create_function, test_specifers in prs(item_creation_map) do
       if type(value) == "function" then
         value = value()
       end
-      item = create_function(value)
+      if test_specifier.unpack then
+        item = create_function(table.unpack(value))
+      else
+        item = create_function(value)
+      end
     else
       item = test_specifier.local_create_function()
     end
