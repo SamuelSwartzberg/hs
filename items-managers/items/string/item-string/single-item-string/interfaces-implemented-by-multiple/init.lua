@@ -1,3 +1,3 @@
-local rrq = bindArg(relative_require, "items-managers.items.string.item-string-item.single-item-string-item.interfaces-implemented-by-multiple")
+local rrq = bindArg(relative_require, "items-managers.items.string.item-string.single-item-string.interfaces-implemented-by-multiple")
 
 rrq("citable-object-id")
