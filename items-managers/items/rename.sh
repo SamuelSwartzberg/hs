@@ -1,19 +1,19 @@
 #!/bin/bash
 
-# Find files with -item.lua or -items.lua
-files=$(find . -type f \( -name "*-item.lua" -o -name "*-items.lua" \))
+# Find directories with -item or -items
+dirs=$(find . -type d \( -name "*-item" -o -name "*-items" \))
 
-# If no such files found, exit the script
-if [[ -z "$files" ]]; then
-  echo "No files found with -item.lua or -items.lua"
+# If no such directories found, exit the script
+if [[ -z "$dirs" ]]; then
+  echo "No directories found with -item or -items"
   exit 0
 fi
 
-# Show the files and ask for confirmation
-echo "Files to be renamed:"
-echo "$files"
+# Show the directories and ask for confirmation
+echo "Directories to be renamed:"
+echo "$dirs"
 
-read -p "Are you sure you want to rename these files? [y/N] " response
+read -p "Are you sure you want to rename these directories? [y/N] " response
 case "$response" in
 [yY][eE][sS] | [yY]) ;;
 *)
@@ -22,12 +22,12 @@ case "$response" in
   ;;
 esac
 
-# Rename the files
-echo "Renaming files..."
-while IFS= read -r file; do
-  # Create new filename by removing -item and preserving the s if present
-  newfile=$(echo "$file" | sed 's/-item\(\(s\)\?\)\.lua/\1.lua/')
-  mv -- "$file" "$newfile"
-done <<<"$files"
+# Rename the directories
+echo "Renaming directories..."
+while IFS= read -r dir; do
+  # Create new directory name by removing -item and preserving the s if present
+  newdir=$(echo "$dir" | sed 's/-item\(\(s\)\?\)$/\1/')
+  mv -- "$dir" "$newdir"
+done <<<"$dirs"
 
 echo "Operation completed."
