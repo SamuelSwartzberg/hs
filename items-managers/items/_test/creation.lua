@@ -495,13 +495,24 @@ local item_creation_map = {
       value = { FOO = "bar" },
       must_be = {"env-var-table"}
     }
+    ,
+    {
+      value = { FOO = CreateTable({ Street = "Somestr", Code="12345"}) },
+      must_be = {"address-table"}
+    }
   }, -- todo
   [CreateWindowlikeItem] = {}, -- todo
   [CreateStringItem] = {
     {
       value = "foo/bar",
       must_be = { "string", "single-item-string", "path", "relative-path" },
-      must_not_be = { "absolute-path" }
+      must_not_be = { "absolute-path" },
+    },
+    {
+      value = "  foo ",
+      get_asserts = {
+        { "stripped-contents", "foo"}
+      }
     },
     {
       value = "/foo/bar",
@@ -1081,6 +1092,14 @@ for create_function, test_specifers in prs(item_creation_map) do
     for _, must_not_be in wdefarg(iprs)(test_specifier.must_not_be) do
       if find(item:get_all("type"), must_not_be, "boolean") then
         error("Item created by " .. tostring(create_function) .. " with value " .. tostring(test_specifier.value) .. " has type " .. tostring(must_not_be) .. " but should not")
+      end
+    end
+    if test_specifier.use_test then
+      test_specifier.use_test(item)
+    end
+    if test_specifier.get_asserts then
+      for _, assert in iprs(test_specifier.get_asserts) do
+        assertMessage(item:get(assert[1], assert[3]), assert[2])
       end
     end
     if test_specifier.posttest then
