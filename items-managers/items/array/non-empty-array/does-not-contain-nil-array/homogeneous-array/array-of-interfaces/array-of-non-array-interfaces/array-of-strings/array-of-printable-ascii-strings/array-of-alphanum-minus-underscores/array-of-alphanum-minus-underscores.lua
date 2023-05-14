@@ -3,8 +3,8 @@ ArrayOfAlphanumMinusUnderscoreItemsSpecifier = {
   type = "array-of-alphanum-minus-underscores",
   properties = {
     getables = {
-      ["is-array-of-youtube-ids"] = bind(isArrayOfInterfacesOfType, {a_use, "youtube-id-item" }),
-      ["is-array-of-alphanum-minus-items"] = bind(isArrayOfInterfacesOfType, {a_use, "alphanum-minus-item" }),
+      ["is-array-of-youtube-ids"] = bind(isArrayOfInterfacesOfType, {a_use, "youtube-id" }),
+      ["is-array-of-alphanum-minus-items"] = bind(isArrayOfInterfacesOfType, {a_use, "alphanum-minus" }),
     },
     doThisables = {
 

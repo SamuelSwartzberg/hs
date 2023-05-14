@@ -6,7 +6,7 @@ ArrayOfExtantPathsSpecifier = {
       ["is-array-of-dirs"] = bind(isArrayOfInterfacesOfType, {a_use, "dir" }),
       ["is-array-of-files"] = bind(isArrayOfInterfacesOfType, {a_use, "file" }),
       ["is-array-of-dated-extant-paths"] = bind(isArrayOfInterfacesOfType, {a_use, "dated-extant-path" }),
-      ["is-array-of-in-git-dir-path-items"] = bind(isArrayOfInterfacesOfType, {a_use, "in-git-dir-path-item" }),
+      ["is-array-of-in-git-dir-path-items"] = bind(isArrayOfInterfacesOfType, {a_use, "in-git-dir-path" }),
       ["filter-to-array-of-dirs"] = function(self)
         return self:get("filter-to-array-of-type", "dir")
       end,

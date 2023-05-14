@@ -1,6 +1,6 @@
 
 ArrayOfStringItemsSpecifier = {
-  type = "array-of-strings",
+  type = "array-of-strings-item",
   properties = {
     getables = {
       ["to-string-array"] = function(self) return self:get("map-to-new-array", function(item) return item:get("contents") end) end,
@@ -33,7 +33,7 @@ ArrayOfStringItemsSpecifier = {
       end,
       ["is-array-of-urls"] = bind(isArrayOfInterfacesOfType, {a_use, "url" }),
       ["is-array-of-paths"] = bind(isArrayOfInterfacesOfType, {a_use, "path" }),
-      ["is-array-of-printable-ascii-string-items"] = bind(isArrayOfInterfacesOfType, {a_use, "printable-ascii-string-item" }),
+      ["is-array-of-printable-ascii-string-items"] = bind(isArrayOfInterfacesOfType, {a_use, "printable-ascii-string" }),
     },
     doThisables = {
       ["tab-fill-with"] = function(self)
