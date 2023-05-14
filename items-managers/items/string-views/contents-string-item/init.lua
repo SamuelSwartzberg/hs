@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.string-views.contents-string-item")
+local rrq = bindArg(relative_require, "items-managers.items.string-views.contents-string")
 
 rrq("html-entity-string")
 rrq("has-case-string")

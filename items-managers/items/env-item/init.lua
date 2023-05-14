@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.env-item")
+local rrq = bindArg(relative_require, "items-managers.items.env")
 
 rrq("aliases-env")
 rrq("dependents-env")

@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.env-item.value-env-item")
+local rrq = bindArg(relative_require, "items-managers.items.env-item.value-env")
 
 rrq("list-value-env")
 rrq("string-value-env")
