@@ -61,11 +61,9 @@ local is_method_ignore_map = { -- contains keys of specifiers and values of arra
 local potential_interfaces_ignore_map = {
   ManagedArraySpecifier = {
     "managed-clipboard-array",
-    "managed-hotkey-array",
+    "managed-creatable-array",
     "managed-stream-array",
     "managed-timer-array",
-    "managed-watcher-array",
-    "managed-task-array",
     "managed-api-array",
     "managed-input-method-array",
   },

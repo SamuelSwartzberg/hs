@@ -138,3 +138,73 @@ assertMessage(
   reverse_test_ovtable[3],
   "one"
 )
+
+local ovtable_manual = ovtable.new()
+
+ovtable_manual["foo"] = returnAdd1
+ovtable_manual["bar"] = returnEmptyString
+
+assertMessage(
+  ovtable.init({
+    { "foo", returnAdd1 },
+    { "bar", returnEmptyString }
+  }),
+  ovtable_manual
+)
+
+assertMessage(
+  ovtable.init({
+    { key = "foo", value = returnAdd1 },
+    { key = "bar", value = returnEmptyString },
+  }),
+  ovtable_manual
+)
+
+
+local succ, res = pcall(ovtable.init, {
+  { "key", "value", "what's this? three elements? oh no!" }
+})
+
+assertMessage(succ, false)
+
+local succ, res = pcall(ovtable.init, {
+  { "key" }
+})
+
+assertMessage(succ, false)
+
+local succ, res = pcall(ovtable.init, {
+  { 
+    key = "key",
+    -- notice the lack of value
+  }
+})
+
+assertMessage(succ, false)
+
+local succ, res = pcall(ovtable.init, {
+  { 
+    -- notice the lack of key
+    value = "value",
+  }
+})
+
+assertMessage(succ, false)
+
+local succ, res = pcall(ovtable.init, {
+  { 
+    -- notice the lack of k
+    v = "value",
+  }
+})
+
+assertMessage(succ, false)
+
+local succ, res = pcall(ovtable.init,{
+  {
+    k = "key",
+    -- notice the lack of v
+  }
+})
+
+assertMessage(succ, false)

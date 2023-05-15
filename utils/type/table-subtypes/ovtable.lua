@@ -100,11 +100,20 @@ function pkg.init(all_elems)
 
   for i, spec in iprs(all_elems) do
     -- Check if the key-value pair is specified as `{key, value}` or `{k = key, v = value}` / `{key = key, value = value}`.
-    if #spec == 2 then
-      t[spec[1]] = spec[2]
+    if isList(spec) then
+      if #spec == 2 then
+        t[spec[1]] = spec[2]
+      else
+        error("invalid key-value pair, doesn't have len 2 " .. hs.inspect(spec))
+      end
     else
       -- Use the `defaultIfNil` function to retrieve the key-value pair from the `spec` assoc arr.
       t[defaultIfNil(spec.k, spec.key)] = defaultIfNil(spec.v, spec.value)
+      if spec.k == nil and spec.key == nil then
+        error("invalid key-value pair, doesn't have key " .. hs.inspect(spec))
+      elseif spec.v == nil and spec.value == nil then
+        error("invalid key-value pair, doesn't have value " .. hs.inspect(spec))
+      end
     end
   end
   -- Return the ordered table.

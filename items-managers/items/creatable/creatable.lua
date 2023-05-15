@@ -46,9 +46,8 @@ CreatableItemSpecifier = {
     }
   },
   potential_interfaces = ovtable.init({
-    
-    { key = "task", value = CreateTaskItem },
-    { key = "fireable", value = CreateFireableItem },
+    {"task", CreateTaskItem },
+    {"fireable", CreateFireableItem },
   }),
 }
 

@@ -33,7 +33,6 @@ ArrayOfArraysSpecifier = {
     },
   },
   potential_interfaces = ovtable.init({
-    { key = "dict", value = CreateDict },
   }),
   action_table = {}
   
