@@ -34,6 +34,41 @@ assertMessage(
 )
 
 assertMessage(
+  isEmptyTable(list({})),
+  true
+)
+
+assertMessage(
+  isEmptyTable(assoc({})),
+  true
+)
+
+assertMessage(
+  isUndeterminableTable({ a = 1 }),
+  false
+)
+
+assertMessage(
+  isUndeterminableTable({ 1, 2, 3 }),
+  false
+)
+
+assertMessage(
+  isUndeterminableTable({}),
+  true
+)
+
+assertMessage(
+  isUndeterminableTable(list({})),
+  false
+)
+
+assertMessage(
+  isUndeterminableTable(assoc({})),
+  false
+)
+
+assertMessage(
   isListOrEmptyTable({ 1, 2, 3 }),
   true
 )

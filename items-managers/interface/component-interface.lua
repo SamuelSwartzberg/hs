@@ -26,7 +26,7 @@ end
 
 
 local function getOrDoAll(self, action, key, value, not_recursive_children, not_recursive_super,  previous_lower_node_id)
-  local output = {}
+  local output = list({})
   local result_for_self = self[action](self, key, value, true, true)
   output = concat(output, result_for_self)
   if self.interface and not not_recursive_children then

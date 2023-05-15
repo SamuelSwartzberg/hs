@@ -17,7 +17,9 @@ function getSep(opts,i, isfinal)
   end
 end
 
---- joins together n indexables. Accepts input in a variety of ways: The first argument may be opts, or not, and the non-opts elements may be provided as a list or as varargs. The only requirement is that if we want to call concat with exactly one list considered as a single arg (not sure why we would want to, but anyway), it must be wrapped in another list, to distinguish it from a list of args.
+--- joins together n indexables. 
+--- the type of the first argument determines the type of the output.
+--- Accepts input in a variety of ways: The first argument may be opts, or not, and the non-opts elements may be provided as a list or as varargs. The only requirement is that if we want to call concat with exactly one list considered as a single arg (not sure why we would want to, but anyway), it must be wrapped in another list, to distinguish it from a list of args.
 --- @generic T : indexable
 --- @generic O : indexable
 --- @param opts? concatOpts | T opts may be opts, or actually be the first element

@@ -32,6 +32,16 @@ function preventInfiniteLoop(identifier, tries)
 end
 
 
+--- @param value any
+--- @param depth? integer
+--- @return nil
+function inspPrint(value, depth)
+  print(hs.inspect(value, {
+    depth = depth or 2
+  }))
+end
+
+
 local rrq = bindArg(relative_require, "utils")
 
 

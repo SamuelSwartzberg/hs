@@ -121,6 +121,8 @@ function findsingle(item, conditions, opts)
         end
       end
 
+      inspPrint(condition)
+
       -- conditions that can only be used on strings
       if condition._r or condition._start or condition._stop then
         if type(item) == "string" then
@@ -224,6 +226,8 @@ function findsingle(item, conditions, opts)
     end
   end
 
+  inspPrint(results)
+
   --- @param acc matchspec
   --- @param val matchspec
   local res = reduce(results, function(acc, val) 
@@ -249,6 +253,8 @@ function findsingle(item, conditions, opts)
       }
     end
   end)
+
+  inspPrint(res)
 
   if opts.ret == "boolean" then
     return res.match

@@ -15,11 +15,3 @@ function hsInspectCleaned(value, depth)
   })
 
 end
-
---- @param value any
---- @param depth? integer
---- @return nil
-function inspPrint(value, depth)
-  depth = depth or 2
-  print(hsInspectCleaned(value, depth))
-end

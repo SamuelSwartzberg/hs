@@ -66,3 +66,18 @@ local result13 = concat(
 )
 
 assertMessage(result13, {a = 1, b = 2, i = "-", c = 3, d = 4, ii = "-", e = 5, f = 6, iii = "-"})
+
+assertMessage(
+  concat(list({}), {a = 1, b = 2}, {c = 3, d = 4}, {e = 5, f = 6}),
+  { {a = 1, b = 2}, {c = 3, d = 4}, {e = 5, f = 6} }
+)
+
+assertMessage(
+  concat(assoc({}), {a = 1, b = 2}, {c = 3, d = 4}, {e = 5, f = 6}),
+  {a = 1, b = 2, c = 3, d = 4, e = 5, f = 6}
+)
+
+assertMessage(
+  concat({1, 2}, {a = 1, b = 2}, {c = 3, d = 4}, {e = 5, f = 6}),
+  {1, 2, {a = 1, b = 2}, {c = 3, d = 4}, {e = 5, f = 6}}
+)

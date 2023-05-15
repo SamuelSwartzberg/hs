@@ -33,10 +33,22 @@ end
 --- @param t any
 --- @return boolean
 function isEmptyTable(t)
+  if type(t) ~= "table" then error("isEmptyTable only works on tables. got " .. type(t)) end
   for k, v in pairs(t) do
     return false
   end
   return true
+end
+
+--- A table is undeterminable if it's not manually declared to be a list, assoc, or ovtable, and it's empty. That is to say, an empty table is undeterminable if we have no way of knowing if it's a list, an assoc, or an ovtable.
+--- @param t table
+--- @return boolean
+function isUndeterminableTable(t)
+  if type(t) ~= "table" then error("isUndeterminableTable only works on tables. got " .. type(t)) end
+  if t.isovtable then return false end
+  if t.islist then return false end
+  if t.isassoc then return false end
+  return isEmptyTable(t)
 end
 
 

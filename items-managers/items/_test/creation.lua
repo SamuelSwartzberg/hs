@@ -1080,18 +1080,23 @@ for create_function, test_specifers in prs(item_creation_map) do
       item = test_specifier.local_create_function()
     end
     for _, must_be in wdefarg(iprs)(test_specifier.must_be) do
-      if not find(item:get_all("type"), must_be, "boolean") then
-        error("Item created by " .. 
-        tostring(create_function) .. 
-        " with value " .. tostring(test_specifier.value) .. 
-        " does not have type " .. tostring(must_be) .. ". It has the types " .. 
-        item:get("types-of-all-valid-interfaces"))
-        
+      if not find(item:get_all("type"), {_exactly = must_be}, "boolean") then
+        local errstr = 
+          "Item did not have all required types.\n" ..
+          "Type missing: " .. tostring(must_be) .. "\n" ..
+          "Types present: " .. tostring(item:get("types-of-all-valid-interfaces")) .. "\n" ..
+          "Item: " .. hs.inspect(item)
+        error(errstr)
       end
     end
     for _, must_not_be in wdefarg(iprs)(test_specifier.must_not_be) do
-      if find(item:get_all("type"), must_not_be, "boolean") then
-        error("Item created by " .. tostring(create_function) .. " with value " .. tostring(test_specifier.value) .. " has type " .. tostring(must_not_be) .. " but should not")
+      if find(item:get_all("type"),  {_exactly = must_not_be}, "boolean") then
+        local errstr = 
+          "Item had a type it shouldn't.\n" ..
+          "Type missing: " .. tostring(must_not_be) .. "\n" ..
+          "Types present: " .. tostring(item:get("types-of-all-valid-interfaces")) .. "\n" ..
+          "Item: " .. hs.inspect(item)
+        error(errstr)
       end
     end
     if test_specifier.use_test then
