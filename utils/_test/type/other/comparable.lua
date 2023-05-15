@@ -60,10 +60,14 @@ local two_days_from_now = date():adddays(2)
 
 local now = date()
 
+clamp(now, two_days_ago, two_days_from_now)
+
 assertMessage(
   clamp(now, two_days_ago, two_days_from_now),
   now
 )
+
+
 
 assertMessage(
   clamp(three_days_ago, two_days_ago, two_days_from_now),

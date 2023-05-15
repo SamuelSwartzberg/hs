@@ -250,12 +250,12 @@ assertMessage(
 )
 
 assertMessage(
-  transf.string.romanized("ねえもう少しだけでいいの"),
+  transf.string.romanized("ねえ もう少しだけ で いい の"),
   "nee mou sukoshi dake de ii no"
 )
 
 assertMessage(
-  transf.string.romanized_snake("ねえもう少しだけでいいの"),
+  transf.string.romanized_snake("ねえ もう少しだけ で いい の"),
   "nee_mou_sukoshi_dake_de_ii_no"
 )
 

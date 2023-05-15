@@ -21,6 +21,12 @@ post 'lua is working':
     - calendar interfacing
     - ics files
     - ics urls
+  - health data downsync
+    - strava
+    - other devices: general heartrate? Blood pressure? steps
+    - dna test?
+    - regular blood test?
+    - family health data
   - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
   - jcw/jcwserve in string menu?

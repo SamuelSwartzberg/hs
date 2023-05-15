@@ -7,8 +7,16 @@ function len(thing)
   elseif type(thing) == "table" then
     if thing.isovtable then
       return thing:len()
-    elseif isListOrEmptyTable(thing) then
-      return #thing
+    elseif isEmptyTable(thing) then
+      return 0
+    elseif isList(thing) then
+      local largestkey = 0
+      for k, v in pairs(thing) do
+        if type(k) == "number" and k > largestkey then
+          largestkey = k
+        end
+      end
+      return largestkey
     else
       local len = 0
       for k, v in pairs(thing) do

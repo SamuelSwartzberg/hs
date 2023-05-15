@@ -493,6 +493,17 @@ assertMessage(
 )
 
 assertMessage(
+  iterToTbl(prs({a = "a", b = "b", c = "c"})).islist,
+  nil
+)
+
+assertMessage(
+  iterToTbl(prs({"a", "b", "c"})).isassoc,
+  nil
+)
+
+assertMessage(
   iterToTbl(prs({a = "a", b = "b", c = "c"})),
   { a = "a", b = "b", c = "c" }
 )
+

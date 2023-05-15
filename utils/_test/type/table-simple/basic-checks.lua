@@ -4,8 +4,18 @@ assertMessage(
 )
 
 assertMessage(
+  isList({ a = 1 }),
+  false
+)
+
+assertMessage(
   isListOrEmptyTable({}),
   true
+)
+
+assertMessage(
+  isList({}),
+  false
 )
 
 assertMessage(
@@ -29,7 +39,17 @@ assertMessage(
 )
 
 assertMessage(
+  isList({ 1, 2, 3 }),
+  true
+)
+
+assertMessage(
   isListOrEmptyTable(ovtable.new()),
+  false
+)
+
+assertMessage(
+  isList(ovtable.new()),
   false
 )
 
@@ -39,12 +59,27 @@ assertMessage(
 )
 
 assertMessage(
+  isList("not a table"),
+  false
+)
+
+assertMessage(
   isListOrEmptyTable(assoc({})),
   false
 )
 
 assertMessage(
+  isList(assoc({})),
+  false
+)
+
+assertMessage(
   isListOrEmptyTable(list({})),
+  true
+)
+
+assertMessage(
+  isList(list({})),
   true
 )
 

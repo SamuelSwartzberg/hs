@@ -1,7 +1,13 @@
+--- according to this function, a table is a list if:
+--- 1. it is a table
+--- 2. it is not manually declared to be an assoc or ovtable
+--- 3. either:
+---     1. it is manually declared to be a list
+---     2. it has no keys that are not numbers and at least one key
 --- @param t any
 --- @param also_allow_sparse? boolean
---- @return boolean
-function isListOrEmptyTable(t, also_allow_sparse)
+--- @return boolean, boolean?
+function isList(t, also_allow_sparse)
   also_allow_sparse = defaultIfNil(also_allow_sparse, false)
   if type(t) ~= "table" then return false end -- not a table
   if t.islist then return true end -- signal value to indicate that this is a list
@@ -13,7 +19,15 @@ function isListOrEmptyTable(t, also_allow_sparse)
     count = count + 1
     if k ~= count and not also_allow_sparse then return false end
   end
-  return true
+  return count > 0, count == 0
+end
+
+--- @param t any
+--- @param also_allow_sparse? boolean
+--- @return boolean
+function isListOrEmptyTable(t, also_allow_sparse)
+  local is_def_list, is_empty = isList(t, also_allow_sparse)
+  return is_empty or is_def_list
 end
 
 --- @param t any
