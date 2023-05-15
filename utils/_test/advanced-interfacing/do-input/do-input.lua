@@ -19,7 +19,6 @@ if mode == "full-test" then
         end
 
         if button == correctButton then
-          print("Handled mouse " .. type)
           eventTap:stop()
           doAfter()
           return true
@@ -31,7 +30,6 @@ if mode == "full-test" then
         local correctKeyCode = hs.keycodes.map[type]
 
         if keyCode == correctKeyCode then
-          print("Handled key " .. type)
           eventTap:stop()
           doAfter()
           return true

@@ -4,8 +4,6 @@ if mode == "full-test" then -- making a bunch of json requests non-async takes t
 
 local default_query_res = rest() -- without args, it queries a default api endpoint (dummyjson.com)
 
-inspPrint(default_query_res)
-
 assertMessage(
   #default_query_res.products, 
   10

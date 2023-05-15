@@ -9,8 +9,6 @@ local example_table = ovtable.init({
   {key="1634366318", value={"event8"}},
 })
 
-inspPrint(example_table)
-
 -- example output table
 local example_output = {
   ["2021"] = {

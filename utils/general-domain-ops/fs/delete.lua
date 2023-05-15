@@ -35,7 +35,6 @@ function delete(path, thing, action, onlyif, fail)
 
   local is_dir = testPath(path, "dir")
   local is_empty = testPath(path, { contents = false})
-  print(is_empty)
 
   -- return early if dirness of path doesn't match thing
 
@@ -84,7 +83,6 @@ function delete(path, thing, action, onlyif, fail)
   if is_dir then
     if not path_is_remote then
       if action == "empty" then
-        print("emptying")
         path = ensureAdfix(path, "/", true, false, "suf")
         run("rm -rf \"" .. replace(path, {{"\"", "\\\""}}) .. "\"*") -- need to make sure that the glob is not quoted
       elseif action == "delete" then
@@ -120,9 +118,6 @@ function delete(path, thing, action, onlyif, fail)
           error(err_msg)
         end
       else
-        inspPrint({ "rclone",
-        "deletefile",
-        { value = path, type = "quoted"}})
         run({
           "rclone",
           "deletefile",

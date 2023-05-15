@@ -430,10 +430,6 @@ function RootInitializeInterface(interface_specifier, contents)
   if contents == nil then 
     error("Contents for a component interface may not be nil.", 0)
   end
-  print("InterfaceDefaultTemplate")
-  inspPrint(InterfaceDefaultTemplate)
-  print("interface_specifier")
-  inspPrint(interface_specifier)
   --- @type RootComponentInterface
   local interface =  concat(InterfaceDefaultTemplate, interface_specifier)
 ---@diagnostic disable-next-line: assign-type-mismatch

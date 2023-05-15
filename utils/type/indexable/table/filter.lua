@@ -18,7 +18,6 @@ function filter(tbl, cond, opts)
   local iterator = getIterator(opts)
   
   local res = getEmptyResult(tbl, opts)
-  print(res.islist)
 
   local manual_counter = 0
   for k, v in iterator(tbl) do
@@ -32,8 +31,6 @@ function filter(tbl, cond, opts)
       end
     end
     if boolres then
-      print(k)
-      print(hs.inspect(res))
       addToRes({k, v}, res, opts)
     end
   end

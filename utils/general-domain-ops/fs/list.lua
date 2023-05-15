@@ -55,21 +55,18 @@ function itemsInPath(opts)
       if output then
         items = lines(output)
         items = filter(items, false)
-        inspPrint(items)
         items = map(
           items,
           function(item)
             item = stringy.strip(item)
             item = ensureAdfix(item, "/", false, false, "pre")
             item = ensureAdfix(item, "/", false, false, "suf")
-            print(item)
             return item
           end
         )
       else
         items = {}
       end
-      inspPrint(items)
       return svalues(items)
     end
   end
@@ -106,7 +103,6 @@ function itemsInPath(opts)
     files = filter(files, opts.validator_result, {tolist=true})
   end
 
-  inspPrint(files)
   if opts.slice_results then
     files = map(files, function(path)
       opts.slice_results_opts = opts.slice_results_opts or {}

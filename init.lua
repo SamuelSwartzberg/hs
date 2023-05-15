@@ -254,7 +254,6 @@ local keymap = {
     explanation = "Choose a composite item, eval and choose an action on it.",
     fn = function()
       compTable:doThis("choose-item", function (item)
-        inspPrint(item)
         CreateStringItem(le(item)):doThis("choose-action")
       end)
     end,

@@ -78,7 +78,6 @@ RunningApplicationItemSpecifier = {
       end,
       ["open-recent"] = function(self, recent_item)
         local command = concat(self:get("open-recent-menu-command"), recent_item)
-        inspPrint(command)
         self:get("contents"):selectMenuItem(command)
       end,
       ["reload"] = function(self)

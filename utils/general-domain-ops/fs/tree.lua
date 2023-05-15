@@ -24,7 +24,6 @@ function fsTree(path, do_files, tree_files)
         if stringy.endswith(file, ".yaml") and find(tree_files, "yaml") then
           res[nodename] = yamlLoad(readFile(full_path, "error"))
         elseif stringy.endswith(file, ".json") and find(tree_files, "json") then
-          print("decoding " .. nodename)
           res[nodename] = json.decode(readFile(full_path, "error"))
         end
       end

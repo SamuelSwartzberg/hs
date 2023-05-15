@@ -36,7 +36,6 @@ PathInMaudiovisualItemSpecifier = {
             local is_unavailable = find(err_lines, function(line)
               return stringy.startswith(line, "ERROR: Private video")
             end)
-            print("is_unavailable: " .. tostring(is_unavailable))
             if is_unavailable then
               do_after(url)
             end

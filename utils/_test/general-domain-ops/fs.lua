@@ -432,8 +432,6 @@ assertMessage(
   "lorem ipsum"
 )
 
-inspPrint(temp_subdir_1_path)
-inspPrint(itemsInPath(temp_subdir_1_path))
 local succ, res  = pcall(delete, temp_subdir_1_path, "any", "delete", "empty", "error")
 
 assertMessage(

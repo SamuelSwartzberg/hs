@@ -9,7 +9,6 @@ InGitDirPathItemSpecifier = {
           include_files = false,
           validator_result = bind(stringy.endswith, {a_use, "/.git"})
         })[1]
-        print(dotgit)
         if not dotgit then
           return nil
         end

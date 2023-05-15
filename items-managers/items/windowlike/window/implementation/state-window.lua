@@ -7,7 +7,6 @@ StateWindowItemSpecifier = {
     getables = {
       ["state-json-matched-geometry-table"] = function(self)
         local geometry = self:get("rect").table
-        inspPrint(geometry)
         geometry = map(geometry, {x = "screenX", y = "screenY", w = "width", h = "height"}, {"k", "k"})
         return geometry
       end,
@@ -16,7 +15,6 @@ StateWindowItemSpecifier = {
         return find(
           self:get("application-item"):get("state-as-json").windows,
           function(json_window)
-            -- inspPrint(json_window)
             for k, v in prs(geometry) do
               if not isClose(v, json_window[k]) then
                 return false
