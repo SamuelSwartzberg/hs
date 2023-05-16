@@ -108,3 +108,121 @@ assertMessage(
   glue({a={foo="bar"}}, {a={1}}),
   {a={1}}
 )
+
+-- exposes a bug where something something ovtable as nested value (unclear atm)
+
+local nested_ovtable_glue_result = glue(
+  {
+    a = ovtable.init({
+      {k = "b", v = 1},
+    })
+  },
+  {
+    a = {
+      c = 2,
+    }
+  }
+)
+
+assertMessage(
+  nested_ovtable_glue_result,
+  {
+    a = ovtable.init({
+      {k = "b", v = 1},
+      {k = "c", v = 2},
+    })
+  }
+)
+
+assertMessage(
+  nested_ovtable_glue_result.a.isovtable,
+  true
+)
+
+local nested_ovtable_glue_result_rev = glue(
+  {
+    a = {
+      c = 2,
+    }
+  },
+  {
+    a = ovtable.init({
+      {k = "b", v = 1},
+    })
+  }
+)
+
+assertMessage(
+  nested_ovtable_glue_result_rev,
+  {
+    a = {
+      c = 2,
+      b = 1,
+    }
+  }
+)
+
+assertMessage(
+  nested_ovtable_glue_result_rev.a.isovtable,
+  nil
+)
+
+local glue_ovtable_to_nil = glue(
+  {
+    a = nil,
+    b = "foo",
+    c = {
+      d = returnTrue
+    }
+  },
+  {
+    e = "bar",
+    a = ovtable.init({
+      {k = "f", v = 1},
+      {k = "g", v = returnAdd1},
+    }),
+    c = {
+      a = returnFalse
+    }
+  }
+)
+
+inspPrint(glue_ovtable_to_nil)
+
+
+hsInspectCleaned(glue_ovtable_to_nil)
+
+assertMessage(glue_ovtable_to_nil, glue_ovtable_to_nil)
+
+error("stop")
+
+ovtable.init({
+  {k = "f", v = 1},
+  {k = "g", v = returnAdd1},
+})
+
+assertMessage(
+  glue_ovtable_to_nil,
+  {
+    a = ovtable.init({
+      {k = "f", v = 1},
+      {k = "g", v = returnAdd1},
+    }),
+    b = "foo",
+    c = {
+      a = returnFalse,
+      d = returnTrue,
+    },
+    e = "bar",
+  }
+)
+
+assertMessage(
+  glue_ovtable_to_nil.a.isovtable,
+  true
+)
+
+assertMessage(
+  glue_ovtable_to_nil.a:len(),
+  2
+)

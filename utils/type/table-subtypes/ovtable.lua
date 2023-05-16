@@ -212,6 +212,7 @@ function pkg.len(t)
 
   -- If the list of keys does not exist, return 0.
   if not kstr then
+    print("this table has no keys")
     return 0
   else
     -- Return the number of keys in the list.

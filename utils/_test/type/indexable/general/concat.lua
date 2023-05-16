@@ -81,3 +81,108 @@ assertMessage(
   concat({1, 2}, {a = 1, b = 2}, {c = 3, d = 4}, {e = 5, f = 6}),
   {1, 2, {a = 1, b = 2}, {c = 3, d = 4}, {e = 5, f = 6}}
 )
+
+
+-- some tests that were written for glue but which concat must also pass
+
+local concat_ovtable_glue_result = concat(
+  {
+    a = ovtable.init({
+      {k = "b", v = 1},
+    })
+  },
+  {
+    a = {
+      c = 2,
+    }
+  }
+)
+
+assertMessage(
+  concat_ovtable_glue_result,
+  {
+    a = ovtable.init({
+      {k = "b", v = 1},
+      {k = "c", v = 2},
+    })
+  }
+)
+
+assertMessage(
+  concat_ovtable_glue_result.a.isovtable,
+  true
+)
+
+local concat_ovtable_glue_result_rev = concat(
+  {
+    a = {
+      c = 2,
+    }
+  },
+  {
+    a = ovtable.init({
+      {k = "b", v = 1},
+    })
+  }
+)
+
+assertMessage(
+  concat_ovtable_glue_result_rev,
+  {
+    a = {
+      c = 2,
+      b = 1,
+    }
+  }
+)
+
+assertMessage(
+  concat_ovtable_glue_result_rev.a.isovtable,
+  nil
+)
+
+local concat_ovtable_to_nil = concat(
+  {
+    a = nil,
+    b = "foo",
+    c = {
+      d = returnTrue
+    }
+  },
+  {
+    e = "bar",
+    a = ovtable.init({
+      {k = "f", v = 1},
+      {k = "g", v = returnAdd1},
+    }),
+    c = {
+      a = returnFalse
+    }
+  }
+)
+
+assertMessage(
+  concat_ovtable_to_nil,
+  {
+    a = ovtable.init({
+      {k = "f", v = 1},
+      {k = "g", v = returnAdd1},
+    }),
+    b = "foo",
+    c = {
+      a = returnFalse,
+      d = returnTrue,
+    },
+    e = "bar",
+  }
+)
+
+assertMessage(
+  concat_ovtable_to_nil.a.isovtable,
+  true
+)
+
+assertMessage(
+  concat_ovtable_to_nil.a:len(),
+  2
+)

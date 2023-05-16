@@ -7,10 +7,13 @@ function copy(t, deep)
   if t.isovtable then -- orderedtable
     return t:copy(deep)
   else
-    if deep then
-      return tablex.deepcopy(t)
-    else
-      return tablex.copy(t)
+    for k, v in prs(t) do
+      if type(v) == "table" and deep then
+        t[k] = copy(v, deep)
+      else
+        t[k] = v
+      end
     end
   end
+  return t
 end

@@ -56,6 +56,70 @@ assertMessage(
   simple_ovtable
 )
 
+assertMessage(
+  copy(simple_ovtable, false).isovtable,
+  true
+)
+
+assertMessage(
+  copy(simple_ovtable, true).isovtable,
+  true
+)
+
+local minimal_ovtable = ovtable.init({
+  {"a", 1},
+})
+
+local minimal_ovtable_copy = copy(minimal_ovtable)
+
+assertMessage(
+  minimal_ovtable,
+  minimal_ovtable_copy
+)
+
+assertMessage(
+  minimal_ovtable:len(),
+  1
+)
+
+assertMessage(
+  minimal_ovtable_copy:len(),
+  1
+)
+
+local tbl_w_ovtable = {
+  a = ovtable.init({
+    {"b", 2}
+  }),
+}
+
+local tbl_w_ovtable_copy = copy(tbl_w_ovtable)
+
+assertMessage(
+  tbl_w_ovtable,
+  tbl_w_ovtable_copy
+)
+
+assertMessage(
+  tbl_w_ovtable.a.isovtable,
+  true
+)
+
+assertMessage(
+  tbl_w_ovtable_copy.a.isovtable,
+  true
+)
+
+assertMessage(
+  tbl_w_ovtable.a:len(),
+  1
+)
+
+assertMessage(
+  tbl_w_ovtable_copy.a:len(),
+  1
+)
+
 local simple_list_of_lists = { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} }
 
 local shallowcopy_list_of_lists = copy(simple_list_of_lists, false)

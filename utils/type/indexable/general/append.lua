@@ -10,20 +10,27 @@
 ---@return T
 function append(base, addition, opts)
   opts = opts or {}
+  print("appending")
+  inspPrint(addition)
+  print("to")
+  inspPrint(base)
   if type(base) == "string" then
     if not base then base = "" end
     if not addition then return base end
     return base .. addition
   elseif type(base) == "table" then
+    print("base is a table")
     local new_thing = copy(base) 
     if addition == nil then return new_thing end
     if isListOrEmptyTable(base) and not opts.aspair then
       new_thing[#new_thing + 1] = addition
       return new_thing
     else
+      print("base is not list")
       if #values(addition) >= 2 then
         if not opts.nooverwrite or not new_thing[addition[1]] then
           new_thing[addition[1]] = addition[2]
+          inspPrint(new_thing)
         end
         return new_thing
       else

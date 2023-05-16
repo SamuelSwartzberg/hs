@@ -31,6 +31,7 @@ local function getOrDoAll(self, action, key, value, not_recursive_children, not_
   output = concat(output, result_for_self)
   if self.interface and not not_recursive_children then
     for _, interface in prs(self.interface) do
+      print(interface)
       if (not previous_lower_node_id) or (not (interface.id == previous_lower_node_id)) then 
         local result_for_descendants = getOrDoAll(interface, action, key, value, false, true)
         output = concat(output, result_for_descendants)
@@ -370,9 +371,11 @@ InterfaceDefaultTemplate = {
   doThis_all = bind(getOrDoAll, {a_use, "doThis"}),
   setContents = function(self, value)
     if not self.super then self.contents = value end
+    print(self.potential_interfaces:len())
     if self.potential_interfaces then
       self.interface = {}
       for potential_interface, potential_interface_constructor  in prs(self.potential_interfaces) do
+        print("checking if " .. potential_interface .. " is a potential interface, constructor: " .. hs.inspect(potential_interface_constructor))
         if self:get("is-" .. potential_interface) then
           self.interface[potential_interface] = potential_interface_constructor(self)
         end
@@ -431,7 +434,12 @@ function RootInitializeInterface(interface_specifier, contents)
     error("Contents for a component interface may not be nil.", 0)
   end
   --- @type RootComponentInterface
-  local interface =  concat(InterfaceDefaultTemplate, interface_specifier)
+  print(interface_specifier.potential_interfaces:len())
+  inspPrint(InterfaceDefaultTemplate.potential_interfaces)
+  inspPrint(interface_specifier.potential_interfaces)
+  print("concat")
+  local interface =  glue(InterfaceDefaultTemplate, interface_specifier)
+  print(interface.potential_interfaces:len())
 ---@diagnostic disable-next-line: assign-type-mismatch
   interface.id = rand({len=10}, "int")
   interface.properties.getables["is-" .. interface.type] = function() return true end -- in the root, we can be sure that the is-<type> is true

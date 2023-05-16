@@ -26,6 +26,10 @@ for i, v in iprs(tbl) do
     error("Should not iterate")
   end
 end
+assertMessage(
+  manual_counter,
+  5
+)
 
 -- Test empty table
 for i, v in iprs(emptyTbl) do
@@ -50,6 +54,11 @@ for i, v in iprs(tbl, 2, 4) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  3
+)
+
 -- Test step
 
 local manual_counter = 0
@@ -69,6 +78,11 @@ for i, v in iprs(tbl, 1, 5, 2) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  3
+)
+
 -- Test negative step
 
 local manual_counter = 0
@@ -87,6 +101,11 @@ for i, v in iprs(tbl, 5, 1, -2) do
     error("Should not iterate")
   end
 end
+
+assertMessage(
+  manual_counter,
+  3
+)
 
 -- Test iprs on assoc arr (use key string equivalent order)
 
@@ -115,6 +134,11 @@ for i, v in iprs(assocArr) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  5
+)
+
 -- Test iprs on assoc arr with start, stop, and negative step
 
 local manual_counter = 0
@@ -131,6 +155,11 @@ for i, v in iprs(assocArr, 1, 3, -2) do
     error("Should not iterate")
   end
 end
+
+assertMessage(
+  manual_counter,
+  2
+)
 
 -- Test iprs on ovtable (uses insertion order)
 
@@ -165,6 +194,11 @@ for i, v in iprs(test_ovtable) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  5
+)
+
 -- Test iprs on ovtable with start, stop, and negative step
 
 local manual_counter = 0
@@ -180,6 +214,11 @@ for i, v in iprs(test_ovtable, 1, 3, -2) do
     error("Should not iterate")
   end
 end
+
+assertMessage(
+  manual_counter,
+  2
+)
 
 -- test that reviprs is equivalent to iprs with negative step
 
@@ -205,6 +244,11 @@ for i, v in reviprs(tbl) do
     error("Should not iterate")
   end
 end
+
+assertMessage(
+  manual_counter,
+  5
+)
 
 -- test pairs
 -- test default on list
@@ -232,6 +276,11 @@ for k, v in prs(tbl) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  5
+)
+
 -- test default on assoc arr
 
 local manual_counter = 0
@@ -256,6 +305,11 @@ for k, v in prs(assocArr) do
     error("Should not iterate")
   end
 end
+
+assertMessage(
+  manual_counter,
+  5
+)
 
 -- test default on ovtable
 
@@ -282,6 +336,11 @@ for k, v in prs(test_ovtable) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  5
+)
+
 -- test pairs with start, stop, and negative step on assoc arr
 
 local manual_counter = 0
@@ -297,6 +356,11 @@ for k, v in prs(assocArr, 1, 3, -2) do
     error("Should not iterate")
   end
 end
+
+assertMessage(
+  manual_counter,
+  2
+)
 
 local manual_counter = 0
 for k, v in prs(assocArr, 1, -3) do
@@ -314,6 +378,11 @@ for k, v in prs(assocArr, 1, -3) do
     error("Should not iterate")
   end
 end
+
+assertMessage(
+  manual_counter,
+  3
+)
 
 -- test pairs with negative step on ovtable
 
@@ -334,6 +403,10 @@ for k, v in prs(test_ovtable, 1, 5, -2) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  3
+)
 
 local manual_counter = 0
 for k, v in prs(test_ovtable, 1, 5, -1) do
@@ -358,6 +431,11 @@ for k, v in prs(test_ovtable, 1, 5, -1) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  5
+)
+
 local manual_counter = 0
 for k, v in prs(test_ovtable, 1, -1, -1) do
   manual_counter = manual_counter + 1
@@ -381,6 +459,11 @@ for k, v in prs(test_ovtable, 1, -1, -1) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  5
+)
+
 -- test that revpairs with positive step is equivalent to pairs with negative step
 
 local manual_counter = 0
@@ -400,6 +483,11 @@ for k, v in revprs(test_ovtable, 1, 5, 2) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  3
+)
+
 -- test that limit works 
 local manual_counter = 0
 for  k, v in revprs(test_ovtable, 1, 5, 2, 2) do
@@ -414,6 +502,11 @@ for  k, v in revprs(test_ovtable, 1, 5, 2, 2) do
     error("Should not iterate")
   end
 end
+
+assertMessage(
+  manual_counter,
+  2
+)
 
 -- test iprs on mixed table
 
@@ -445,6 +538,11 @@ for k, v in iprs(mixed_table) do
   end
 end
 
+assertMessage(
+  manual_counter,
+  6
+)
+
 -- test prs on mixed table
 
 local manual_counter = 0
@@ -473,6 +571,69 @@ for k, v in prs(mixed_table) do
     error("Should not iterate")
   end
 end
+
+assertMessage(
+  manual_counter,
+  6
+)
+
+local ovtable_w_pairs = ovtable.init({
+  { "a", "1"},
+  { "b", "1"},
+  { "c", "1"},
+})
+
+local manual_counter = 0
+
+for k, v in prs(ovtable_w_pairs) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, "a")
+    assertMessage(v, "1")
+  elseif manual_counter == 2 then
+    assertMessage(k, "b")
+    assertMessage(v, "1")
+  elseif manual_counter == 3 then
+    assertMessage(k, "c")
+    assertMessage(v, "1")
+  elseif manual_counter == 4 then
+    error("Should not iterate")
+  end
+end
+
+assertMessage(
+  manual_counter,
+  3
+)
+
+local ovtable_w_function_values = ovtable.init({
+  { key = "a", value = function() return 1 end },
+  { key = "b", value = function() return 2 end },
+  { key = "c", value = function() return 3 end },
+})
+
+local manual_counter = 0
+for k, v in prs(ovtable_w_function_values) do 
+  local val = v()
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, "a")
+    assertMessage(val, 1)
+  elseif manual_counter == 2 then
+    assertMessage(k, "b")
+    assertMessage(val, 2)
+  elseif manual_counter == 3 then
+    assertMessage(k, "c")
+    assertMessage(val, 3)
+  elseif manual_counter == 4 then
+    error("Should not iterate")
+  end
+end
+
+assertMessage(
+  manual_counter,
+  3
+)
 
 -- test iterToTbl
 

@@ -309,3 +309,240 @@ assertMessage(
   map(tblwithduplicatevalues, returnAny, { args = "kv", ret = "vk",  nooverwrite = true }),
   { a = "a", b = "b", c = "c" }
 )
+
+assertMessage(
+  map({
+    a = 1,
+    b = {
+      c = 2,
+    }
+  }, returnAdd1, { recurse = true }),
+  {
+    a = 2,
+    b = {
+      c = 3
+    }
+  }
+)
+
+local succ, res = pcall(map, {
+  a = 1,
+  b = {
+    c = 2,
+  }
+}, returnAdd1, { recurse = false }) -- this should error, because it's trying to add 1 to a table
+
+assertMessage(succ, false)
+
+local succ, res =  pcall(map, {
+  a = 1,
+  b = {
+    c = 2,
+  }
+}, returnAdd1) -- this should error, because it's trying to add 1 to a table (recurse is false by default)
+
+assertMessage(succ, false)
+
+-- trying to expose a bug where I think map is mutating the original table accidentally
+
+local simple_tbl = {
+  a = 1,
+  b = 2,
+  c = 3
+}
+
+local simple_tbl_copy = copy(simple_tbl)
+
+assertMessage(simple_tbl, simple_tbl_copy)
+
+assertMessage(
+  map(simple_tbl, returnSame),
+  simple_tbl
+)
+
+assertMessage(
+  simple_tbl,
+  simple_tbl_copy
+)
+
+local nested_tbl = {
+  a = 1,
+  b = 2,
+  c = {
+    d = 3,
+    e = 4,
+    f = {
+      g = 5,
+      h = 6
+    }
+  }
+}
+
+local nested_tbl_copy = copy(nested_tbl, true)
+
+assertMessage(nested_tbl, nested_tbl_copy)
+
+assertMessage(
+  map(nested_tbl, returnSame, { recurse = true }),
+  nested_tbl
+)
+
+assertMessage(
+  nested_tbl,
+  nested_tbl_copy
+)
+
+-- should succeed when recursing
+
+local tbl_w_nested_ovtable_simple = {
+  d = ovtable.init({
+    { "a", "moo" },
+  })
+}
+
+local tbl_w_nested_ovtable_simple_copy = copy(tbl_w_nested_ovtable_simple)
+
+assertMessage(tbl_w_nested_ovtable_simple, tbl_w_nested_ovtable_simple_copy)
+
+assertMessage(
+  map(tbl_w_nested_ovtable_simple, returnSame, { recurse = true }),
+  tbl_w_nested_ovtable_simple
+)
+
+assertMessage(
+  map(tbl_w_nested_ovtable_simple_copy, returnSame, { recurse = true }),
+  tbl_w_nested_ovtable_simple_copy
+)
+
+assertMessage(
+  tbl_w_nested_ovtable_simple,
+  tbl_w_nested_ovtable_simple_copy
+)
+
+-- and also when not recursing
+
+local tbl_w_nested_ovtable_simple_2 = {
+  d = ovtable.init({
+    { "a", "moo" },
+  })
+}
+
+local tbl_w_nested_ovtable_simple_copy_2 = copy(tbl_w_nested_ovtable_simple_2)
+
+assertMessage(tbl_w_nested_ovtable_simple_2, tbl_w_nested_ovtable_simple_copy_2)
+
+assertMessage(
+  map(tbl_w_nested_ovtable_simple_2, returnSame, { recurse = false }),
+  tbl_w_nested_ovtable_simple_2
+)
+
+assertMessage(
+  tbl_w_nested_ovtable_simple_2,
+  tbl_w_nested_ovtable_simple_copy_2
+)
+
+local tbl_w_nested_ovtable_simple_2_again = {
+  d = ovtable.init({
+    { "a", "moo" },
+  })
+}
+
+local tbl_w_nested_ovtable_simple_copy_2_again = copy(tbl_w_nested_ovtable_simple_2_again)
+
+assertMessage(tbl_w_nested_ovtable_simple_2_again, tbl_w_nested_ovtable_simple_copy_2_again)
+
+assertMessage(
+  map(tbl_w_nested_ovtable_simple_2_again, function (v)
+    if type(v) == "number" and v % 1 == 0 then
+      return math.floor(v)
+    else
+      return v
+    end
+  end, {recurse = true}),
+  tbl_w_nested_ovtable_simple_2_again
+)
+
+assertMessage(
+  tbl_w_nested_ovtable_simple_2_again,
+  tbl_w_nested_ovtable_simple_copy_2_again
+)
+
+local tbl_w_nested_ovtable_simple_2_again_2 = {
+  d = ovtable.init({
+    { "a", "moo" },
+  })
+}
+
+local tbl_w_nested_ovtable_simple_copy_2_again_2 = copy(tbl_w_nested_ovtable_simple_2_again_2)
+
+assertMessage(tbl_w_nested_ovtable_simple_2_again_2, tbl_w_nested_ovtable_simple_copy_2_again_2)
+
+assertMessage(
+  map(tbl_w_nested_ovtable_simple_2_again_2, function (v)
+    if type(v) == "number" and v % 1 == 0 then
+      return math.floor(v)
+    else
+      return v
+    end
+  end, {recurse = true, args = "v", ret = "v"}),
+  tbl_w_nested_ovtable_simple_2_again_2
+)
+
+assertMessage(
+  tbl_w_nested_ovtable_simple_2_again_2,
+  tbl_w_nested_ovtable_simple_copy_2_again_2
+)
+
+
+local tbl_w_nested_ovtable_simple_3 = {
+  d = ovtable.init({
+    { "a", returnAdd1 },
+  })
+}
+
+local tbl_w_nested_ovtable_simple_3_copy = copy(tbl_w_nested_ovtable_simple_3)
+
+assertMessage(tbl_w_nested_ovtable_simple_3, tbl_w_nested_ovtable_simple_3_copy)
+
+assertMessage(
+  map(tbl_w_nested_ovtable_simple_3, returnSame),
+  tbl_w_nested_ovtable_simple_3
+)
+
+assertMessage(
+  tbl_w_nested_ovtable_simple_3,
+  tbl_w_nested_ovtable_simple_3_copy
+)
+
+local tbl_w_nested_ovtable = {
+  a = 1,
+  b = 2,
+  c = {
+    d = 3,
+    e = 4,
+    f = {
+      g = 5,
+      h = 6
+    }
+  },
+  d = ovtable.init({
+    { "a", returnAdd1 },
+    { "b", false }
+  })
+}
+
+local tbl_w_nested_ovtable_copy = copy(tbl_w_nested_ovtable)
+
+
+assertMessage(tbl_w_nested_ovtable, tbl_w_nested_ovtable_copy)
+
+assertMessage(
+  map(tbl_w_nested_ovtable, returnSame),
+  tbl_w_nested_ovtable
+)
+
+assertMessage(
+  tbl_w_nested_ovtable,
+  tbl_w_nested_ovtable_copy
+)
+
