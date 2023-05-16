@@ -21,11 +21,13 @@
 
 --- @param tbl table
 --- @param opts? flattenOpts
+--- @param visited? table
 --- @return table
-function flatten(tbl, opts)
+function flatten(tbl, opts, visited)
 
   if not opts then opts = {} 
   else opts = copy(opts) end
+  visited = defaultIfNil(visited, {})
 
   -- set defaults
 
@@ -110,6 +112,7 @@ function flatten(tbl, opts)
   end
 
   local res = getEmptyResult(tbl, opts)
+  visited[tostring(tbl)] = res
 
   for k, v in prs(tbl) do
     if type(v) ~= "table" or isLeaf(v) then
@@ -118,7 +121,12 @@ function flatten(tbl, opts)
       if shouldRecurse(opts) then
         local newopts = copy(opts)
         newopts.path = concat(opts.path, k)
-        local subres = flatten(v, newopts)
+        local subres
+        if visited[tostring(v)] then
+          subres = visited[tostring(v)]
+        else
+          subres = flatten(v, newopts, visited)
+        end
         for subk, subv in prs(subres) do
           addfunc(res, subv, subk)
         end

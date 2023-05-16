@@ -546,3 +546,82 @@ assertMessage(
   tbl_w_nested_ovtable_copy
 )
 
+local table_will_self_ref = {}
+
+table_will_self_ref.self = table_will_self_ref
+
+local recmap_of_table_will_self_ref = map(table_will_self_ref, returnSame, { recurse = true })
+
+assertMessage(
+  recmap_of_table_will_self_ref.self,
+  recmap_of_table_will_self_ref
+)
+
+assertMessage(
+  recmap_of_table_will_self_ref.self ==   table_will_self_ref.self,
+  false
+)
+
+local mult_self_ref = {}
+
+mult_self_ref.a = mult_self_ref
+mult_self_ref.b = mult_self_ref
+
+local recmap_of_mult_self_ref = map(mult_self_ref, returnSame, { recurse = true })
+
+assertMessage(
+  recmap_of_mult_self_ref.a,
+  recmap_of_mult_self_ref
+)
+
+assertMessage(
+  recmap_of_mult_self_ref.b,
+  recmap_of_mult_self_ref
+)
+
+assertMessage(
+  recmap_of_mult_self_ref.a == mult_self_ref.a,
+  false
+)
+
+assertMessage(
+  recmap_of_mult_self_ref.b == mult_self_ref.b,
+  false
+)
+
+local deep_self_ref = {}
+
+deep_self_ref.a = {}
+deep_self_ref.a.b = {}
+
+deep_self_ref.a.b.c = deep_self_ref
+
+local recmap_of_deep_self_ref = map(deep_self_ref, returnSame, { recurse = true })
+
+assertMessage(
+  recmap_of_deep_self_ref.a.b.c,
+  recmap_of_deep_self_ref
+)
+
+assertMessage(
+  recmap_of_deep_self_ref.a.b.c == deep_self_ref.a.b.c,
+  false
+)
+
+local deep_child_ref = {}
+
+deep_child_ref.a = {}
+deep_child_ref.a.b = {}
+deep_child_ref.a.b.c = deep_child_ref.a
+
+local deep_copy_of_deep_child_ref = copy(deep_child_ref, true)
+
+assertMessage(
+  deep_copy_of_deep_child_ref.a.b.c,
+  deep_copy_of_deep_child_ref.a
+)
+
+assertMessage(
+  deep_copy_of_deep_child_ref.a.b.c == deep_child_ref.a,
+  false
+)

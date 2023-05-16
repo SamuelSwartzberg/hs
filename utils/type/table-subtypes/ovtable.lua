@@ -185,24 +185,6 @@ function pkg.keyfromindex(t, idx)
   end
 end
 
-
-function pkg.copy(t, deep)  
-  -- Create a new ordered table for the copy
-  local cpy = pkg.new()
-  
-  -- Iterate over the original orderedtable
-  for k, v in prs(t) do
-    if deep and type(v) == "table" then
-      cpy[k] = copy(v, deep)
-    else
-      -- For non-table values or shallow copying, just assign the value
-      cpy[k] = v
-    end
-  end
-  
-  return cpy
-end
-
 function pkg.len(t)
   -- Extract the unique memory address of the subtable from the ordered table.
   local addr = string.sub(tostring(t), 8)

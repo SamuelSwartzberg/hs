@@ -74,6 +74,9 @@ transf = {
       str = eutf8.lower(replace(str, to.case.snake))
       return str
     end,
+    romanized_gpt = function(str)
+      return gpt("I'm using you as a romanization API, so only output the result. Please romanize this with wapuro-like romanization, where っ -> duplicated letter, long vowel mark -> duplicated letter (e.g. ローマ -> roomaji), づ -> du, んま -> nma, じ -> ji, を-> wo, and particles are separated by spaces (e.g. これに-> kore ni): " .. str)
+    end,
     tilde_resolved = function(path)
       if stringy.startswith(path, "~") then
         return env.HOME .. eutf8.sub(path, 2)

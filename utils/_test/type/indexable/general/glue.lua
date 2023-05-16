@@ -187,14 +187,8 @@ local glue_ovtable_to_nil = glue(
   }
 )
 
-inspPrint(glue_ovtable_to_nil)
-
-
-hsInspectCleaned(glue_ovtable_to_nil)
 
 assertMessage(glue_ovtable_to_nil, glue_ovtable_to_nil)
-
-error("stop")
 
 ovtable.init({
   {k = "f", v = 1},

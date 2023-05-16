@@ -46,7 +46,6 @@ end
 ---@param opts? glueOpts
 ---@return T
 function glue(base, addition, opts)
-  print("---glue---")
   opts = opts or {}
   if type(addition) ~= "table" then
     return append(base, addition, opts) -- glue(string, string2)

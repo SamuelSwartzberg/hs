@@ -22,18 +22,17 @@
 --- @param tbl table
 --- @param f? mapProcessor
 --- @param opts? kvmult | kvmult[] | mapOpts
+--- @param visited? table
 --- @return table
-function map(tbl, f, opts)
-
-  print("start map")
-  inspPrint(opts)
+function map(tbl, f, opts, visited)
   f = f or returnAny
   opts = defaultOpts(opts)
   tbl = getDefaultInput(tbl)
+  visited = defaultIfNil(visited, {})
+  preventInfiniteLoop(hs.inspect({tbl, opts}, {depth = 3}), 100)
 
   -- set defaults
 
-  inspPrint(opts)
   opts.recurse = defaultIfNil(opts.recurse, false)
   if opts.depth == nil then opts.depth = 0 
   else opts.depth = opts.depth + 1 end 
@@ -95,21 +94,26 @@ function map(tbl, f, opts)
   local iterator = getIterator(opts)
   local res = getEmptyResult(tbl, opts)
 
+  visited[tostring(tbl)] = res
 
-  inspPrint(opts)
+
   local manual_counter = 0
   for k, v in wdefarg(iterator)(tbl) do
-    print(k)
     if not opts.mapcondition or findsingle(v, opts.mapcondition) then
       if 
         shouldRecurse(opts) and 
         (type(v) == "table" and not isLeaf(v)) and
         (type(proc) ~= "table" or (not proc._k or not v[proc._k])) -- if we're using a _k mapProcessor, we don't want to recurse into the table if it has the key we're looking for
       then
-        print("recursing...")
         local optcopy = copy(opts)
         optcopy.ret = {"v"} -- when recursing, the recursive call is going to return a single value, which represents the new value of our current key, so we have to overwrite .ret here. Maybe there's a cleaner option that allows for more flexibility, but I can't think of one right now, let's see how this works out
-        addToRes({map(v, proc, opts)}, res, optcopy, k, v)
+        local itemres
+        if visited[tostring(v)] then
+          itemres = visited[tostring(v)]
+        else
+          itemres = map(v, proc, opts, visited)
+        end
+        addToRes({itemres}, res, optcopy, k, v)
       else
         local retriever
         retriever, manual_counter = getRetriever(tbl, k, v, manual_counter)

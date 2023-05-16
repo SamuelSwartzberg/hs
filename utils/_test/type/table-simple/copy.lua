@@ -246,3 +246,83 @@ assertMessage(
   deepcopy_ovtable_of_mixed_ovtable_assoc_arrs.c == ovtable_of_mixed_ovtable_assoc_arrs.c,
   false
 )
+
+local table_will_self_ref = {}
+
+table_will_self_ref.self = table_will_self_ref
+
+local deep_copy_of_table_will_self_ref = copy(table_will_self_ref, true)
+
+assertMessage(
+  deep_copy_of_table_will_self_ref.self,
+  deep_copy_of_table_will_self_ref
+)
+
+assertMessage(
+  deep_copy_of_table_will_self_ref.self ==   table_will_self_ref.self,
+  false
+)
+
+local mult_self_ref = {}
+
+mult_self_ref.a = mult_self_ref
+mult_self_ref.b = mult_self_ref
+
+local deep_copy_of_mult_self_ref = copy(mult_self_ref, true)
+
+assertMessage(
+  deep_copy_of_mult_self_ref.a,
+  deep_copy_of_mult_self_ref
+)
+
+assertMessage(
+  deep_copy_of_mult_self_ref.b,
+  deep_copy_of_mult_self_ref
+)
+
+assertMessage(
+  deep_copy_of_mult_self_ref.a == mult_self_ref.a,
+  false
+)
+
+assertMessage(
+  deep_copy_of_mult_self_ref.b == mult_self_ref.b,
+  false
+)
+
+local deep_self_ref = {}
+
+deep_self_ref.a = {}
+deep_self_ref.a.b = {}
+
+deep_self_ref.a.b.c = deep_self_ref
+
+local deep_copy_of_deep_self_ref = copy(deep_self_ref, true)
+
+assertMessage(
+  deep_copy_of_deep_self_ref.a.b.c,
+  deep_copy_of_deep_self_ref
+)
+
+assertMessage(
+  deep_copy_of_deep_self_ref.a.b.c == deep_self_ref.a.b.c,
+  false
+)
+
+local deep_child_ref = {}
+
+deep_child_ref.a = {}
+deep_child_ref.a.b = {}
+deep_child_ref.a.b.c = deep_child_ref.a
+
+local deep_copy_of_deep_child_ref = copy(deep_child_ref, true)
+
+assertMessage(
+  deep_copy_of_deep_child_ref.a.b.c,
+  deep_copy_of_deep_child_ref.a
+)
+
+assertMessage(
+  deep_copy_of_deep_child_ref.a.b.c == deep_child_ref.a,
+  false
+)
