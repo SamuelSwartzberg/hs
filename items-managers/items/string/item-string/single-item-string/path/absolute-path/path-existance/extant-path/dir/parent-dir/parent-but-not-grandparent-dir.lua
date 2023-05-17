@@ -4,7 +4,7 @@ ParentButNotGrandparentDirItemSpecifier = {
   properties = {
 
     getables = {
-      ["descendant-string-array"] = function(self) return self:get("child-string-array") end,
+      ["descendants"] = function(self) return self:get("children") end,
     },
   
     doThisables = {

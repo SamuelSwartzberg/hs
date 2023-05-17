@@ -6,7 +6,7 @@ PathLeafSpecifier = {
   properties = {
     getables = {
       ["path-leaf"] = function(self)
-        return pathSlice(self:get("resolved-path", "-1:-1")[1])
+        return pathSlice(self:get("resolved-path", "-1:-1"))[1]
       end,
       ["to-path-leaf-parts"] = function(self)
         return CreatePathLeafParts({

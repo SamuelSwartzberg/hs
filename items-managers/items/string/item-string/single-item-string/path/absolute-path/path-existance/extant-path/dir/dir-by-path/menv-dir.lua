@@ -26,7 +26,7 @@ MenvDirItemSpecifier = {
         end
       end,
       ["update-env-source-file"] = function(self, specifier)
-        self:get("descendant-ending-with-to-string-item", specifier.name .. ".yaml"):doThis("merge-file-contents-with-lua-table", specifier.payload)
+        self:get("str-item", {args = specifier.name .. ".yaml", key = "descendant-ending-with"}):doThis("merge-file-contents-with-lua-table", specifier.payload)
       end,
       ["update-env-source-file-and-write-env-file"] = function(self, specifier)
         self:doThis("update-env-source-file", specifier)

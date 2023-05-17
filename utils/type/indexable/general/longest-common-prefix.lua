@@ -24,7 +24,7 @@ function longestCommonPrefix(list, opts)
     end
 
     return slice(acc, 1, last_matching_index) or ( isstring and "" or {} )
-  end, list[1])
+  end)
 
   if opts.rev then
     res = rev(res)

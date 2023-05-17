@@ -4,8 +4,11 @@ ParentDirItemSpecifier = {
   properties = {
 
     getables = {
+      ["children"] = function(self)
+        return itemsInPath(self:get("contents"))
+      end,
       ["child-string-array"] = function(self) 
-        return CreateArray(itemsInPath(self:get("contents"))) 
+        return CreateArray(self:get("children")) 
       end,
       ["find-child"] = function(self, func)
         return self:get("child-string-array"):get("find", func)

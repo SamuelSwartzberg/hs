@@ -9,7 +9,7 @@ ExtantPathItemSpecifier = {
       ["is-dir"] = function(self) return testPath(self:get("contents"), "dir") end,
       ["is-file"] = function(self) return not self:get("is-dir") end, 
       ["is-dated-extant-path"] = function(self) 
-        local path_leaf = pathSlice(self:get("completely-resolved-path", "-1:-1")[1])
+        local path_leaf = pathSlice(self:get("completely-resolved-path", "-1:-1"))[1]
         return 
           path_leaf:match("^(.-)%-%-") 
           or path_leaf:match("^(%d[^%%]+)") 
@@ -58,17 +58,17 @@ ExtantPathItemSpecifier = {
       end,
       ["find-sibling-with-same-filename"] = function(self)
         return self:get("find-sibling", function(sibling)
-          return pathSlice(sibling, "-2:-2", { ext_sep = true })[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true })[1])
+          return pathSlice(sibling, "-2:-2", { ext_sep = true })[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true }))[1]
         end)
       end,
       ["find-sibling-with-different-extension"] = function(self, ext)
         return self:get("find-sibling", function(sibling)
-          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true })[1]) .. "." .. ext
+          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true }))[1] .. "." .. ext
         end)
       end,
       ["find-sibling-dir-with-same-filename"] = function(self)
         return self:get("find-sibling", function(sibling)
-          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true })[1])
+          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true }))[1]
         end)
       end,
       ["path-attr"] = function(self, attr)

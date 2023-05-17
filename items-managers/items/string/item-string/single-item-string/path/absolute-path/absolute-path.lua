@@ -3,10 +3,10 @@ PathInterfaceItemSpecifier = {
   type = "absolute-path",
   properties = {
     getables = {
-      ["is-extant-path"] = function(self) return testPath(self:get("contents")) end,
-      ["is-non-extant-path"] = function(self) return not self:get("is-extant-path") end,
       ["is-tilde-absolute-path"] = function(self) return self:get("contents"):find("^~") end,
       ["is-true-absolute-path"] = function(self) return self:get("contents"):find("^/") end,
+      ["is-extant-path"] = function(self) return testPath(self:get("contents")) end,
+      ["is-non-extant-path"] = function(self) return not self:get("is-extant-path") end,
       ["is-volume"] = function(self) return stringy.startswith(self:get("contents"), "/Volumes/") end,
       ["is-path-by-start"] = returnTrue,
       ["relative-path-from"] = function(self, starting_point)
@@ -61,10 +61,12 @@ PathInterfaceItemSpecifier = {
     }
   },
   potential_interfaces = ovtable.init({
-    { key = "extant-path", value = CreateExtantPathItem },
-    { key = "non-extant-path", value = CreateNonExtantPathItem },
+    -- these two must come first, since checking later potential_interfaces depends on them
     { key = "tilde-absolute-path", value = CreateTildeAbsolutePathItem },
     { key = "true-absolute-path", value = CreateTrueAbsolutePathItem },
+    -- other potential_interfaces
+    { key = "extant-path", value = CreateExtantPathItem },
+    { key = "non-extant-path", value = CreateNonExtantPathItem },
     { key = "volume", value = CreateVolumeItem },
     { key = "path-by-start", value = CreatePathByStartItem },
   }),

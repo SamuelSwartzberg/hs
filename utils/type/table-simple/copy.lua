@@ -9,8 +9,6 @@ function copy(t, deep, copied_tables)
   if type(t) ~= "table" then return t end -- non-tables don't need to be copied
   deep = defaultIfNil(deep, true)
   copied_tables = defaultIfNil(copied_tables, {})
-  preventInfiniteLoop(hs.inspect(t), 10000)
-
   if not t then return t end
   local new
   if t.isovtable then -- orderedtable

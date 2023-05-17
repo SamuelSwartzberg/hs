@@ -16,7 +16,7 @@ function pathSlice(path, spec, opts)
   -- check path type
 
   if type(path) ~= "string" then
-    error("pathSlice: path must be a string")
+    error("pathSlice: path must be a string. Was " .. type(path))
   end
 
   -- set defaults
@@ -54,11 +54,9 @@ function pathSlice(path, spec, opts)
     end
   end
 
-  inspPrint(raw_path_components)
-
   -- handle special case of also slicing the extension
   -- both relevant if we want to actually separate the extension or if we want to standartize it
-  if opts.ext_sep or opts.standartize_ext then
+  if (opts.ext_sep or opts.standartize_ext) and not path_is_empty then
     local leaf = pop(raw_path_components)
     local without_extension = ""
     local extension = ""

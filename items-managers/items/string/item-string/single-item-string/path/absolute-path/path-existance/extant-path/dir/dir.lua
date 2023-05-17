@@ -28,7 +28,8 @@ DirItemSpecifier = {
       end,
       
       -- the following methods can be implemented here, even though we don't know yet if we have descendants or only children, since we implement self:get("descendant-string-array") polymorphically, and as such getting 'descendants' actually gets children if there are no descendants
-
+      ["descendant-string-array"] = function(self) 
+        return CreateArray(self:get("descendants")) end,
       ["descendant-string-item-array"] = function(self) 
         return self:get("descendant-string-array"):get("to-string-item-array") 
       end,
@@ -52,7 +53,7 @@ DirItemSpecifier = {
         return self:get("descendant-filename-only-array"):get("to-string-item-array")
       end,
       ["find-descendant"] = function(self, func)
-        return find(self:get("descendants-string-array"), func)
+        return find(self:get("descendants"), func)
       end,
       ["descendant-ending-with"] = function(self, ending)
         return self:get("find-descendant", function(item)
