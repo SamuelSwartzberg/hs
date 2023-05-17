@@ -371,8 +371,8 @@ InterfaceDefaultTemplate = {
   doThis_all = bind(getOrDoAll, {a_use, "doThis"}),
   setContents = function(self, value)
     if not self.super then self.contents = value end
-    print(self.potential_interfaces:len())
     if self.potential_interfaces then
+      print(self.potential_interfaces:len())
       self.interface = {}
       for potential_interface, potential_interface_constructor  in prs(self.potential_interfaces) do
         print("checking if " .. potential_interface .. " is a potential interface, constructor: " .. hs.inspect(potential_interface_constructor))

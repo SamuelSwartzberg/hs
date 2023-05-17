@@ -188,3 +188,59 @@ assertMessage(result22, "...__llo wor__...")
 -- Test 23: Slice using sliced_indicator and fill on a table
 local result23 = slice(test_tbl, {start = 2, stop = 5, fill = "x", sliced_indicator = "sliced"})
 assertMessage(result23, {"sliced", "x", "b", "c", "d", "e"})
+
+-- start > stop with positive step
+
+assertMessage(
+  slice("somestr", 5, 2),
+  ""
+)
+
+-- stop > start with negative step
+
+assertMessage(
+  slice("somestr", 2, 5, -1),
+  ""
+)
+
+-- indices that are out of bounds for tables, strings, and assoc arrs, empty inputs
+
+assertMessage(
+  slice(list({}), 500, 1),
+  list({})
+)
+
+assertMessage(
+  slice("", 500, 1),
+  ""
+)
+
+assertMessage(
+  slice(assoc({}), 500, 1),
+  assoc({})
+)
+
+assertMessage(
+  slice(list({}), 1, 500),
+  list({})
+)
+
+assertMessage(
+  slice(list({}), 1, 500, 8),
+  list({})
+)
+
+assertMessage(
+  slice("foobar", 8),
+  ""
+)
+
+assertMessage(
+  slice({1, 2}, nil, 0),
+  {}
+)
+
+assertMessage(
+  slice({1, 2}, 83, 102, 3),
+  {}
+)

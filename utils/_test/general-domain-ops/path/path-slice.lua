@@ -65,3 +65,89 @@ assertMessage(
   }),
   {"/a/b", "/a/b/c"}
 )
+
+-- todo: tests for empty strings, strings ending in a slash, strings not starting with a slash, and indices out of bounds, strings with slash at beginning and end
+
+-- empty
+
+assertMessage(
+  pathSlice("", ":"),
+  {""}
+)
+
+-- empty with ext_sep
+
+assertMessage(
+  pathSlice("", ":", {ext_sep = true}),
+  {"", ""}
+)
+
+-- out of bounds
+
+assertMessage(
+  pathSlice("/a/b/c", "4:5"),
+  {}
+)
+
+-- out of bounds (neg)
+
+assertMessage(
+  pathSlice("/a/b/c", "-5:-4"),
+  {}
+)
+
+-- out of bounds with ext_sep
+
+assertMessage(
+  pathSlice("/a/b/c", "5:", {ext_sep = true}),
+  {}
+)
+
+-- empty out of bounds
+
+assertMessage(
+  pathSlice("", "-2:-2"),
+  {}
+)
+
+-- empty out of bounds with ext_sep
+
+assertMessage(
+  pathSlice("", "-7:-5", {ext_sep = true}),
+  {}
+)
+
+-- root path
+
+assertMessage(
+  pathSlice("/", ":"),
+  {"/"}
+)
+
+-- root path out of bounds
+
+assertMessage(
+  pathSlice("/", "2:2"),
+  {}
+)
+
+-- relative path (no slash)
+
+assertMessage(
+  pathSlice("a/b/c", ":"),
+  {"a", "b", "c"}
+)
+
+-- slash at end
+
+assertMessage(
+  pathSlice("/a/b/c/", ":"),
+  {"a", "b", "c"}
+)
+
+-- slash at beginning and end
+
+assertMessage(
+  pathSlice("/a/b/c/", ":"),
+  {"a", "b", "c"}
+)

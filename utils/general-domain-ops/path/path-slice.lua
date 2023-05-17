@@ -13,27 +13,48 @@
 --- @return string[] | string
 function pathSlice(path, spec, opts)
 
+  -- check path type
+
+  if type(path) ~= "string" then
+    error("pathSlice: path must be a string")
+  end
+
   -- set defaults
 
   spec = spec or { start = -1, stop = -1}
   opts = copy(opts) or {}
 
+  -- set special state booleans
+
+  local started_with_slash = stringy.startswith(path, "/")
+  local ended_with_slash = stringy.endswith(path, "/")
+  local path_is_just_a_slash = path == "/"
+  local path_is_empty = path == ""
+
   -- prepare path components
 
   local raw_path_components = stringy.split(path, "/")
-  if raw_path_components[#raw_path_components] == "" then
-    pop(raw_path_components) -- if path ends with a slash, remove the empty string at the end
-  end
 
-  local started_with_slash = false
-  if raw_path_components[1] == "" then
-    started_with_slash = true
-    if #raw_path_components == 1 then
-      raw_path_components[1] = "/" -- if path is just a slash, keep it
+  -- handle various path edge cases
+
+  if path_is_just_a_slash then
+    raw_path_components = {"/"}
+  elseif path_is_empty then
+    if opts.ext_sep then
+      raw_path_components = {"", ""}
     else
+      raw_path_components = {""}
+    end
+  else 
+    if started_with_slash then
       table.remove(raw_path_components, 1) -- remove the empty string at the beginning
     end
+    if ended_with_slash then
+      pop(raw_path_components) -- remove the empty string at the end
+    end
   end
+
+  inspPrint(raw_path_components)
 
   -- handle special case of also slicing the extension
   -- both relevant if we want to actually separate the extension or if we want to standartize it

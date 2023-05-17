@@ -11,6 +11,11 @@
 
 --- @alias sliceSpecLike sliceSpec | string string here is a shorthand parsed as [<start>]:[<stop>][:[<step>]]
 
+--- slices an indexable
+--- - start and stop are inclusive, (positive and negative)
+--- - negative step to reverse
+--- - start < first index or stop > last index will be clamped to the first and last index respectively, thus preventing errors when out of bounds
+--- - start > stop (if pos step) or start < stop (if neg step) will return an empty table
 --- @generic T : indexable
 --- @param thing T
 --- @param start_or_spec? integer|string|sliceSpec if we're specifying the start, stop and step as separate arguments, otherwise a sliceSpec or a string to be parsed as a sliceSpec
@@ -82,9 +87,9 @@ function slice(thing, start_or_spec, stop, step)
   -- consider: reverse the step
 
   if spec.start > spec.stop and spec.step > 0 then
-    return new_thing
+    return new_thing, spec
   elseif spec.start < spec.stop and spec.step < 0 then
-    return new_thing
+    return new_thing, spec
   end
 
   -- build the slice
