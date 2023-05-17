@@ -29,7 +29,7 @@ function map(tbl, f, opts, visited)
   opts = defaultOpts(opts)
   tbl = getDefaultInput(tbl)
   visited = defaultIfNil(visited, {})
-  preventInfiniteLoop(hs.inspect({tbl, opts}, {depth = 3}), 100)
+  preventInfiniteLoop(hs.inspect({tbl, opts}, {depth = 3}), 10000)
 
   -- set defaults
 

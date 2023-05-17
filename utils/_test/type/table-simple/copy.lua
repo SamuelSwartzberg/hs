@@ -326,3 +326,22 @@ assertMessage(
   deep_copy_of_deep_child_ref.a.b.c == deep_child_ref.a,
   false
 )
+
+assertMessage(
+  copy({
+    foo = "bar"
+  }, true),
+  {
+    foo = "bar"
+  }
+)
+
+
+assertMessage(
+  copy({
+    foo = "bar"
+  }),
+  {
+    foo = "bar"
+  }
+)

@@ -8,8 +8,6 @@
 function recursiveMerge(base, addition, opts)
   opts.depth = crementIfNumber(opts.depth, "in")
   opts.recurse = defaultIfNil(opts.recurse, true)
-  inspPrint(base)
-  inspPrint(addition)
   local no_recurse = not opts.recurse 
     or (
       type(opts.recurse) == "number" and 
@@ -21,15 +19,11 @@ function recursiveMerge(base, addition, opts)
       type(v) == "table" and not isList(v) and
       type(base[k]) == "table" and not isList(base[k])
     then --recurse
-      print("recursing into "..k)
       base[k] = recursiveMerge(base[k], v, opts)
     else -- we can't recurse, just simply add as a k-v pair
-      print("adding ".. k )
       base = append(base, {k, v}, opts)
     end
   end
-  print("returning")
-  inspPrint(base)
   return base
 end
 
@@ -69,8 +63,6 @@ function glue(base, addition, opts)
         base = recursiveMerge(base, addition, opts)
       end
     end
-    print("finally returning")
-    inspPrint(base)
     return base
   end
 end
