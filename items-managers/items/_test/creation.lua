@@ -12,6 +12,9 @@ local TMPDIR_NOW = env.TMPDIR .. '/' .. testtime .. '/'
 --- @field pretest? fun(): nil
 --- @field posttest? fun(): nil
 
+error("Temp stop foo")
+
+
 --- @type { [function]: TestSpecifier[] }
 local item_creation_map = {
   [CreateStringItem] = {
@@ -1165,11 +1168,14 @@ local item_creation_map = {
   },
 }
 
-
-
+local iters = 0
 
 for create_function, test_specifers in prs(item_creation_map) do
+  print("Testing create function: " .. tostring(create_function))
   for _, test_specifier in iprs(test_specifers) do
+    iters = iters + 1
+    if iters > 5 then error("Temp stop" ) end
+    print("Testing test specifier: " .. hs.inspect(test_specifier, {depth=3}))
     if test_specifier.pretest then
       test_specifier.pretest()
     end

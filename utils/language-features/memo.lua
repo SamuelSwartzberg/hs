@@ -3,9 +3,14 @@
 --- gets the cache path for a namespace and within that given function and args
 --- @param name string
 --- @param func_id string
+--- @param opts_as_str? string
 --- @param args? any[]
-function getFsCachePath(name, func_id, args)
+function getFsCachePath(name, func_id, opts_as_str, args)
   local path = env.XDG_CACHE_HOME .. "/" .. name .. "/" .. func_id .. "/"
+
+  if opts_as_str then
+    path = path .. opts_as_str .. "/"
+  end
   if args then 
     -- encode args to json and hash it, to use as the key for the cache
     local jsonified_args = json.encode(args)
@@ -18,14 +23,17 @@ function getFsCachePath(name, func_id, args)
 end
 
 
-local memstore = {}
+memstore = {}
 memoized = {}
+memoized_w_opts = {}
 
 -- Define a table with methods for cache storage in memory and filesystem
 local gen_cache_methods = {
   mem = {
-    put = function(fnid, params, result)
-      local node = memstore[fnid]
+    put = function(fnid, opts_as_str, params, result)
+      memstore[fnid] = memstore[fnid] or {}
+      memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
+      local node = memstore[fnid][opts_as_str]
       for i=1, #params do
         local param = params[i]
         node.children = node.children or {}
@@ -34,46 +42,52 @@ local gen_cache_methods = {
       end
       node.results = result
     end,
-    get = function(fnid, params)
-      local node = memstore[fnid]
+    get = function(fnid, opts_as_str, params)
+      memstore[fnid] = memstore[fnid] or {}
+      memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
+      local node = memstore[fnid][opts_as_str]
       for i=1, #params do
         node = node.children and node.children[params[i]]
         if not node then return nil end
       end
       return node.results
     end,
-    reset = function(fnid)
-      memstore[fnid] = {}
+    reset = function(fnid, opts_as_str)
+      memstore[fnid] = memstore[fnid] or {}
+      memstore[fnid][opts_as_str] = {}
     end,
     get_created_time = function() -- no special functionality here, just needs to exist for polymorphic implementation with fscache
       return os.time()
     end
   },
   fs = {
-    put = function(fnid, params, result)
-      local cache_path = getFsCachePath("fsmemoize", fnid, params)
+    put = function(fnid, opts_as_str, params, result)
+      local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, params)
       writeFile(cache_path, json.encode(result), "any", true)
     end,
-    get = function(fnid, params)
-      local cache_path = getFsCachePath("fsmemoize", fnid, params)
+    get = function(fnid, opts_as_str, params)
+      local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, params)
       local raw_cnt = readFile(cache_path)
       if not raw_cnt then return nil end
       return json.decode(raw_cnt)
     end,
-    reset = function(fnid)
-      local cache_path = getFsCachePath("fsmemoize", fnid)
+    reset = function(fnid, opts_as_str)
+      local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str)
       delete(cache_path)
     end,
-    get_created_time = function(fnid)
-      local cache_path = getFsCachePath("fsmemoize", fnid, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
+    get_created_time = function(fnid, opts_as_str)
+      local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
       return tonumber(readFile(cache_path)) or os.time() -- if the file doesn't exist, return the current time
     end,
-    set_created_time = function(fnid, created_time)
-      writeFile(getFsCachePath("fsmemoize", fnid, "~~~created~~~"), tostring(created_time), "any", true)
+    set_created_time = function(fnid, opts_as_str, created_time)
+      writeFile(getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~"), tostring(created_time), "any", true)
     end
-
   }
 }
+
+function optsTostring(opts)
+  return hs.inspect(opts, { newline = "", indent = "" })
+end
 
 
 --- @class memoOpts
@@ -90,9 +104,23 @@ local gen_cache_methods = {
 function memoize(fn, opts)
   local fnid = stringy.split(tostring(fn), " ")[2] -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
 
-  if memoized[fnid] then -- if the function is already memoized, return the memoized version. This allows us to use memoized functions immediately as `memoize(fn)(...)` without having to assign it to a variable first
+  local opts_as_str_or_nil
+  if memoized[fnid] then 
     return memoized[fnid]
+  elseif opts == nil then
+    -- no-op: we only need to make the else block isn't executed if opts is nil, since that will result in an infinite loop
+  else
+    opts_as_str_or_nil = memoize(optsTostring)(opts)
+    if memoized_w_opts[fnid] then
+      if memoized_w_opts[fnid][opts_as_str_or_nil] then -- if the function is already memoized with the same options, return the memoized version.  This allows us to use memoized functions immediately as `memoize(fn)(...)` without having to assign it to a variable first
+        return memoized_w_opts[fnid][opts_as_str_or_nil]
+      end
+    else
+      memoized_w_opts[fnid] = {}
+    end
   end
+
+  local opts_as_str = opts_as_str_or_nil or "nil"
 
   --- set default options
   opts = copy(opts) or {}
@@ -104,7 +132,7 @@ function memoize(fn, opts)
 
   -- initialize the cache if using memory
   if opts.mode == "mem" then
-    memstore[fnid] = {}
+    memstore[fnid] = memstore[fnid] or {}
   end
   
   -- create some variables that will be used later
@@ -112,12 +140,12 @@ function memoize(fn, opts)
   local cache_methods = gen_cache_methods[opts.mode]
   local timer
   
-  local created_at = cache_methods.get_created_time(fnid)
+  local created_at = cache_methods.get_created_time(fnid, opts_as_str)
 
   -- create a timer to invalidate the cache if needed
   if opts.invalidation_mode == "reset" then
     timer = hs.timer.doEvery(opts.interval, function()
-      cache_methods.reset(fnid)
+      cache_methods.reset(fnid, opts_as_str)
     end)
   end
 
@@ -138,7 +166,7 @@ function memoize(fn, opts)
       if created_at + opts.interval < os.time() then -- cache is invalid, so we need to recalculate
         cache_methods.reset(fnid)
         if opts.mode == "fs" then
-          cache_methods.set_created_time(fnid, os.time())
+          cache_methods.set_created_time(fnid, opts_as_str, os.time())
         end
         created_at = os.time()
       end
@@ -146,13 +174,13 @@ function memoize(fn, opts)
     else
 
       -- get the result from the cache
-      result = cache_methods.get(fnid, params)
+      result = cache_methods.get(fnid, opts_as_str, params)
     end
 
     if not opts.is_async then
       if not result then  -- no result yet, so we need to call the original function and store the result in the cache
         result = { fn(...) }
-        cache_methods.put(fnid, params, result)
+        cache_methods.put(fnid, opts_as_str, params, result)
       end
       return table.unpack(result) -- we're sure to have a result now, so we can return it
     else
@@ -161,13 +189,17 @@ function memoize(fn, opts)
       else -- else we need to call the original function and wrap the callback to store the result in the cache before calling it
         fn(table.unpack(params), function(...)
           local result = {...}
-          cache_methods.put(fnid, params, result)
+          cache_methods.put(fnid, opts_as_str, params, result)
           callback(table.unpack(result))
         end)
       end
     end
   end
-  memoized[fnid] = memoized_func
+  if opts_as_str_or_nil == nil then
+    memoized[fnid] = memoized_func
+  else
+    memoized_w_opts[fnid][opts_as_str] = memoized_func
+  end
   return memoized_func, timer
 end
 

@@ -19,19 +19,28 @@ function benchmarkFunctions(specifier)
       "Benchmarked %s at %s iterations, took %s seconds",
       func_specifier.name, specifier.iterations, elapsed
     )
+    print(res)
   end
 end
 
 --- @param func function
 --- @param args any[]
 --- @param iterations number
-function benchmarkMemoization(func, args, iterations)
-  local memoized = memoize(func)
+--- @param inline boolean
+function benchmarkMemoization(func, args, iterations, inline)
+  local mmzd
+  if not inline then
+    mmzd = memoize(func)
+  else
+    mmzd = function (...)
+      return memoize(func)(...)
+    end
+  end
   benchmarkFunctions({
     funcs = {
       {
         name = "memoized",
-        func = memoized,
+        func = mmzd,
         args = args,
       },
       {

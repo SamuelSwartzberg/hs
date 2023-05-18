@@ -7,7 +7,7 @@ NonRootVolumeItemSpecifier = {
         return self:get("path-ensure-final-slash") == env.TMBACKUPVOL .. "/"
       end,
       ["is-dynamic-time-machine-volume"] = function(self)
-        return stringy.startswith(self:get("resolved-path"), "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. hs.host.localizedName() .. "/" .. os.date("%Y-%m-%d-%H"))
+        return stringy.startswith(self:get("resolved-path"), "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. memoize(hs.host.localizedName)() .. "/" .. os.date("%Y-%m-%d-%H"))
       end
     },
     doThisables = {

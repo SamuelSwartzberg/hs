@@ -5,11 +5,6 @@ GrandparentDirItemSpecifier = {
 
     getables = {
       ["descendants"] = function(self)
-        print("descendants")
-        inspPrint(itemsInPath({
-          path = self:get("contents"),
-          recursion = true
-        }))
         return itemsInPath({
           path = self:get("contents"),
           recursion = true

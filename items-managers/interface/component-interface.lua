@@ -432,10 +432,6 @@ function RootInitializeInterface(interface_specifier, contents)
     error("Contents for a component interface may not be nil.", 0)
   end
   --- @type RootComponentInterface
-  print(interface_specifier.potential_interfaces:len())
-  inspPrint(InterfaceDefaultTemplate.potential_interfaces)
-  inspPrint(interface_specifier.potential_interfaces)
-  print("concat")
   local interface =  glue(InterfaceDefaultTemplate, interface_specifier)
   print(interface.potential_interfaces:len())
 ---@diagnostic disable-next-line: assign-type-mismatch

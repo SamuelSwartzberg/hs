@@ -2,6 +2,8 @@
 -- test code to make sure all the items are correct
 local passes = true
 
+print("testing item shape...")
+
 local is_method_ignore_map = { -- contains keys of specifiers and values of arrays of 'is' methods where it is not an error if there is not a corresponding potential_interface
   AudiodeviceItemSpecifier = { "is-default-device" },
   PathItemSpecifier = { "is-in-path" },
