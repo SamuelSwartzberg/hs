@@ -33,7 +33,7 @@ end
 
 --- @class run_options_object
 --- @field args command_parts | string
---- @field catch? fun(exit_code: integer, std_err: string): any
+--- @field catch? boolean | fun(exit_code: integer, std_err: string): (any) if the catch returns true or there is no custom catch, run the default catch, which will print the error and exit. if true is provided as a catch value, a catch will be used that ignores the error and does nothing
 --- @field finally? fun(exit_code: integer, std_err_or_out: string): any currently, finally may run before and_then if and_then is async or has a delay
 --- @field force_sync? boolean if true, will run the task synchronously, even if and_then is provided
 --- @field dont_clean_output? boolean
@@ -71,7 +71,11 @@ function run(opts, and_then, ...)
   local catch = function(exit_code, std_err)
     local should_run_default_catch = true
     if opts.catch then
-      should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch, otherwise, don't
+      if opts.catch == true then
+        should_run_default_catch = false
+      else
+        should_run_default_catch = opts.catch(exit_code, std_err) -- if the user-provided catch returns true, run the default catch, otherwise, don't
+      end
     end
     if should_run_default_catch == true then
       local err_str = ("Error running command:\n\n%s\n\nExit code: %s\n\nStderr: %s"):format(buildInnerCommand(opts.args), exit_code, std_err)

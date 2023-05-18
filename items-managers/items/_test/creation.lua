@@ -507,6 +507,13 @@ local item_creation_map = {
       value = "f81d4fae-7dec-11d0-a765-00a0c91e6bf6"
     },
     {
+      must_be = {"alphanum-minus", "uuid", "contact"},
+      value = "2c05471a-2970-45c4-81f2-44f79566b432",
+      use_test = function(item)
+
+      end
+    },
+    {
       must_be = {"alphanum-minus", "package-manager"},
       value = "npm"
     },
@@ -891,7 +898,107 @@ local item_creation_map = {
     },
     {
       value = "khard",
-      must_be = { "shell-command", "khard-command" }
+      must_be = { "shell-command", "khard-command" },
+      use_test = function(command)
+        local khard_list = command:get("khard-list")
+        assertMessage(
+          type(khard_list),
+          "string"
+        )
+        local khard_list_first_field = stringy.split(khard_list, "\t")[1]
+        assertMessage(
+          onig.match(khard_list_first_field, whole(mt._r.id.uuid)),
+          true
+        )
+        local all_contact_uuids = command:get("all-contact-uuids")
+        assertMessage(
+          type(all_contact_uuids),
+          "table"
+        )
+        for _, uuid in ipairs(all_contact_uuids) do
+          assertMessage(
+            onig.match(uuid, whole(mt._r.id.uuid)),
+            true
+          )
+        end
+        local all_contact_uuids_string_items = command:get("all-contact-uuids-to-string-items")
+        assertMessage(
+          type(all_contact_uuids_string_items),
+          "table"
+        )
+        for _, item in ipairs(all_contact_uuids_string_items) do
+          assert(
+            find(item:get_all("type"), {_exactly = "contact"})
+          )
+        end
+        local contact_by_uuid = command:get("show-contact", "a615b162-a203-4a24-a392-87ba3a7ca80c")
+        assertMessage(
+          type(contact_by_uuid),
+          "string"
+        )
+        local contact_by_find = command:get("find-contact", "Test Contact Germany English 001")
+        assertMessage(
+          type(contact_by_find),
+          "string"
+        )
+        local yaml_contact_by_uuid = command:get("show-contact-yaml", "a615b162-a203-4a24-a392-87ba3a7ca80c")
+        assertMessage(
+          type(yaml_contact_by_uuid),
+          "table"
+        )
+        assertMessage(
+          yaml_contact_by_uuid.uid,
+          "a615b162-a203-4a24-a392-87ba3a7ca80c"
+        )
+        assertMessage(
+          yaml_contact_by_uuid.Address.home,
+          "Teststr. 27, 00000 Testhausen, Deutschland"
+        )
+        local yaml_contact_by_find = command:get("find-contact-yaml", "Test Contact Germany English 001")
+        assertMessage(
+          type(yaml_contact_by_find),
+          "table"
+        )
+        assertMessage(
+          yaml_contact_by_find.uid,
+          "a615b162-a203-4a24-a392-87ba3a7ca80c"
+        )
+        assertMessage(
+          yaml_contact_by_find.Address.home,
+          "Teststr. 27, 00000 Testhausen, Deutschland"
+        )
+        local contact_by_uuid_to_contact_table = command:get("show-contact-to-contact-table", "a615b162-a203-4a24-a392-87ba3a7ca80c")
+        assert(
+          find(contact_by_uuid_to_contact_table:get_all("type"), {_exactly = "contact"})
+        )
+        assertMessage(
+          contact_by_uuid_to_contact_table:get("uid"),
+          "a615b162-a203-4a24-a392-87ba3a7ca80c"
+        )
+        local contact_by_find_to_contact_table = command:get("find-contact-to-contact-table", "Test Contact Germany English 001")
+        assert(
+          find(contact_by_find_to_contact_table:get_all("type"), {_exactly = "contact"})
+        )
+        assertMessage(
+          contact_by_find_to_contact_table:get("uid"),
+          "a615b162-a203-4a24-a392-87ba3a7ca80c"
+        )
+        command:doThis("get-array-of-contact-tables", function(arr_cont_tbls)
+          assertMessage(
+            type(arr_cont_tbls),
+            "table"
+          )
+          assertMessage(
+            arr_cont_tbls.type,
+            "array"
+          )
+          assert(
+            arr_cont_tbls:get("all-pass", function(cont_tbl)
+              return find(cont_tbl:get_all("type"), {_exactly = "contact-table"})
+            end)
+          )
+        end)
+      end
     },
     {
       value = "libreoffice",

@@ -17,7 +17,7 @@ KhardCommandSpecifier = {
         )
         return res
       end,
-      ["all-contacts-to-string-items"] = function(self)
+      ["all-contact-uuids-to-string-items"] = function(self)
         return map(
           self:get("all-contact-uids"),
           function (contact)
@@ -27,24 +27,30 @@ KhardCommandSpecifier = {
       end,
       
       ["show-contact"] = function(self, uid)
-        return memoize(run)( "khard show --format=yaml uid:" .. uid )
+        return memoize(run)( "khard show --format=yaml uid:" .. uid, {catch = true} )
       end,
       ["find-contact"] = function(self, searchstr)
-        return memoize(run)("khard show --format=yaml " .. searchstr )
+        return memoize(run)("khard show --format=yaml " .. searchstr, {catch = true} )
+      end,
+      ["show-contact-yaml"] = function(self, uid)
+        local cntct = yamlLoad(self:get("show-contact", uid))
+        cntct.uid = uid
+        return cntct
+      end,
+      ["find-contact-yaml"] = function(self, searchstr)
+        local cntct = yamlLoad(self:get("find-contact", searchstr))
+        cntct.uid = searchstr
+        return cntct
       end,
       ["is-contact"] = function(self, uuid)
         local _, status = self:get("show-contact", uuid)
         return status
       end,
       ["show-contact-to-contact-table"] = function(self, uid)
-        local contact_raw =  yamlLoad(self:get("show-contact", uid))
-        contact_raw.uid = uid
-        return CreateContactTableItem(contact_raw)
+        return CreateContactTableItem(yamlLoad(self:get("show-contact-yaml", uid)))
       end,
       ["find-contact-to-contact-table"] = function(self, searchstr)
-        local contact_raw =  yamlLoad(self:get("find-contact", searchstr))
-        contact_raw.uid = searchstr
-        return CreateContactTableItem(contact_raw)
+        return CreateContactTableItem(yamlLoad(self:get("find-contact-yaml", searchstr)))
       end
     },
     doThisables = {
