@@ -11,7 +11,7 @@ function filter(tbl, cond, opts)
 
   -- defaults for all args
 
-  cond = cond or false
+  cond = defaultIfNil(cond, false)
   opts = defaultOpts(opts, {"k", "v"})
   tbl = getDefaultInput(tbl)
 

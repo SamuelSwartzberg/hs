@@ -191,6 +191,11 @@
 --- @alias reject fun(reason: any): nil
 --- @alias promisefn fun(resolve: resolve, reject: reject): nil
 
+--- @class shelve
+--- @field open fun(file_name: string, access_mode?: string): table
+--- @field marshal fun(value: any): string
+--- @field unmarshal fun(value: string): any
+
 
 --- @class PromiseObj
 --- @field thenCall fun(self: PromiseObj, onFulfilled: fun(value: any): (any), onRejected?: fun(reason: any): any): PromiseObj thenCall instead of then since then is a reserved word in lua

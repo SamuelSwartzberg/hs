@@ -25,7 +25,7 @@ function gpt(text_content, opts, do_after)
   end
 
   if opts.ai_role == "completion" then
-    request.echo = opts.echo or false -- only supported for completions
+    request.echo = defaultIfNil(opts.echo, false) -- only supported for completions
     request.prompt = text_content
   elseif opts.ai_role == "chat" then
     request.messages = {}

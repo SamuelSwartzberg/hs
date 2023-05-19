@@ -187,13 +187,15 @@ end
 
 function returnPoisonable()
   local dirty = false
-  return function(...)
+  local returnfn
+  returnfn = function(...)
     if dirty then
-      error("poisoned")
+      error("poisoned " .. tostring(returnfn))
     end
     dirty = true
     return {...}
   end
+  return returnfn
 end
 
 function returnStringEquivOrder(a, b)

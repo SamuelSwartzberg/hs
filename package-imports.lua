@@ -34,6 +34,8 @@ p_memoize = require 'memoize'
 --- @type mimetypes
 mimetypes = require "mimetypes"
 combine = require "combine"
+--- @type shelve
+shelve = require "shelve"
 
 --- @type hashings 
 hashings = require("hashings")

@@ -135,6 +135,101 @@ hs.timer.doAfter(1, function()
 end)
 
 
+local poisonable6 = returnPoisonable()
 
+local memoizedPoisonable6 = memoize(poisonable6, {stringify_table_params = true})
 
+assertMessage(
+  memoizedPoisonable6({"foo", "bar"}),
+  {{"foo", "bar"}}
+)
 
+assertMessage(
+  memoizedPoisonable6({"foo", "bar"}),
+  {{"foo", "bar"}}
+)
+
+local succ, res = pcall(
+  poisonable6,
+  {"foo", "bar"}
+)
+
+assertMessage(succ, false)
+
+local poisonable7 = returnPoisonable()
+
+local memoizedPoisonable7 = memoize(poisonable7,  {stringify_table_params = true})
+
+assertMessage(
+  memoizedPoisonable7({"foo", "bar"}, {"baz"}),
+  { {"foo", "bar"}, {"baz"} }
+)
+
+assertMessage(
+  memoizedPoisonable7({"foo", "bar"}, {"baz"}),
+  { {"foo", "bar"}, {"baz"} }
+)
+
+local succ, res = pcall(
+  poisonable7,
+  {"foo", "bar"}, {"baz"}
+)
+
+assertMessage(succ, false)
+
+local poisonable8 = returnPoisonable()
+
+local memoizedPoisonable8 = memoize(poisonable8, {stringify_table_params = true, table_param_subset = "no-fn-userdata-loops"})
+
+local bigtbl = {
+  baz = "qux",
+  love = {
+    "is",
+    "all",
+    "you",
+  },
+  need   = {
+    [true] = "!"
+  }
+}
+
+assertMessage(
+  memoizedPoisonable8(
+    {
+      foo = "bar"
+    },
+    bigtbl
+  ),
+  {
+    {
+      foo = "bar"
+    },
+    bigtbl
+  }
+)
+
+assertMessage(
+  memoizedPoisonable8(
+    {
+      foo = "bar"
+    },
+    bigtbl
+  ),
+  {
+    {
+      foo = "bar"
+    },
+    bigtbl
+  }
+)
+
+local succ, res = pcall(
+  poisonable8,
+  {
+    foo = "bar"
+  },
+  bigtbl
+)
+
+assertMessage(succ, false)
+  

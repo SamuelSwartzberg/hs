@@ -8,7 +8,7 @@
 --- @param opts? findOptsWShorthand default {ret = "boolean"}
 --- @return any
 function find(indexable, cond, opts)
-  cond = cond or false
+  cond = defaultIfNil(cond, false)
   opts = defaultOpts(opts, "boolean")
   indexable = getDefaultInput(indexable)
 

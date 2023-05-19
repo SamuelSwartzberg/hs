@@ -14,7 +14,7 @@ function splice(thing1, thing2, opts)
     opts = copy(opts) or {}
   end
   opts.start = opts.start or 1
-  opts.overwrite = opts.overwrite or false
+  opts.overwrite = defaultIfNil(opts.overwrite, false)
   local res = {}
   local before = slice(thing1, 1, opts.start - 1)
   if opts.overwrite then

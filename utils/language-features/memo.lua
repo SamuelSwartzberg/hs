@@ -30,24 +30,43 @@ memoized_w_opts = {}
 -- Define a table with methods for cache storage in memory and filesystem
 local gen_cache_methods = {
   mem = {
-    put = function(fnid, opts_as_str, params, result)
+    put = function(fnid, opts_as_str, params, result, opts)
       memstore[fnid] = memstore[fnid] or {}
       memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
       local node = memstore[fnid][opts_as_str]
       for i=1, #params do
         local param = params[i]
+        if opts.stringify_table_params and type(param) == "table" then
+          if opts.table_param_subset == "json" then
+            param = json.encode(param)
+          elseif opts.table_param_subset == "no-fn-userdata-loops" then
+            param = shelve.marshal(param)
+          elseif opts.table_param_subset == "any" then
+            param = hs.inspect(param, { depth = 4 })
+          end
+        end
         node.children = node.children or {}
         node.children[param] = node.children[param] or {}
         node = node.children[param]
       end
       node.results = result
     end,
-    get = function(fnid, opts_as_str, params)
+    get = function(fnid, opts_as_str, params, opts)
       memstore[fnid] = memstore[fnid] or {}
       memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
       local node = memstore[fnid][opts_as_str]
       for i=1, #params do
-        node = node.children and node.children[params[i]]
+        local param = params[i]
+        if opts.stringify_table_params and type(param) == "table" then
+          if opts.table_param_subset == "json" then
+            param = json.encode(param)
+          elseif opts.table_param_subset == "no-fn-userdata-loops" then
+            param = shelve.marshal(param)
+          elseif opts.table_param_subset == "any" then
+            param = hs.inspect(param, { depth = 4 })
+          end
+        end
+        node = node.children and node.children[param]
         if not node then return nil end
       end
       return node.results
@@ -61,11 +80,11 @@ local gen_cache_methods = {
     end
   },
   fs = {
-    put = function(fnid, opts_as_str, params, result)
+    put = function(fnid, opts_as_str, params, result, opts)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, params)
       writeFile(cache_path, json.encode(result), "any", true)
     end,
-    get = function(fnid, opts_as_str, params)
+    get = function(fnid, opts_as_str, params, opts)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, params)
       local raw_cnt = readFile(cache_path)
       if not raw_cnt then return nil end
@@ -86,7 +105,7 @@ local gen_cache_methods = {
 }
 
 function optsTostring(opts)
-  return hs.inspect(opts, { newline = "", indent = "" })
+  return json.encode(opts)
 end
 
 
@@ -95,6 +114,8 @@ end
 --- @field is_async? boolean whether we are memoizing an async function. Defaults to false
 --- @field invalidation_mode? "invalidate" | "reset" | "none" whether and in what way to invalidate the cache. Defaults to "none"
 --- @field interval? number how often to invalidate the cache. Defaults to 0
+--- @field stringify_table_params? boolean whether to stringify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to stringify the params to use them as a path
+--- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be stringified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
 
 --- memoize a function if it's not already memoized, or return the memoized version if it is
 --- @generic I, O
@@ -120,14 +141,16 @@ function memoize(fn, opts)
     end
   end
 
-  local opts_as_str = opts_as_str_or_nil or "nil"
+  local opts_as_str = opts_as_str_or_nil or "noopts"
 
   --- set default options
   opts = copy(opts) or {}
   opts.mode = opts.mode or "mem"
-  opts.is_async = opts.is_async or false
+  opts.is_async = defaultIfNil(opts.is_async, false)
   opts.invalidation_mode = opts.invalidation_mode or "none"
   opts.interval = opts.interval or 0
+  opts.stringify_table_params = defaultIfNil(opts.stringify_table_params, false)
+  opts.table_param_subset = opts.table_param_subset or "json"
 
 
   -- initialize the cache if using memory
@@ -174,13 +197,13 @@ function memoize(fn, opts)
     else
 
       -- get the result from the cache
-      result = cache_methods.get(fnid, opts_as_str, params)
+      result = cache_methods.get(fnid, opts_as_str, params, opts)
     end
 
     if not opts.is_async then
       if not result then  -- no result yet, so we need to call the original function and store the result in the cache
         result = { fn(...) }
-        cache_methods.put(fnid, opts_as_str, params, result)
+        cache_methods.put(fnid, opts_as_str, params, result, opts)
       end
       return table.unpack(result) -- we're sure to have a result now, so we can return it
     else
@@ -189,7 +212,7 @@ function memoize(fn, opts)
       else -- else we need to call the original function and wrap the callback to store the result in the cache before calling it
         fn(table.unpack(params), function(...)
           local result = {...}
-          cache_methods.put(fnid, opts_as_str, params, result)
+          cache_methods.put(fnid, opts_as_str, params, result, opts)
           callback(table.unpack(result))
         end)
       end
