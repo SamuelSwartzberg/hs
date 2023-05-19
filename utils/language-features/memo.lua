@@ -27,6 +27,8 @@ memstore = {}
 memoized = {}
 memoized_w_opts = {}
 
+local nil_singleton = {}
+
 -- Define a table with methods for cache storage in memory and filesystem
 local gen_cache_methods = {
   mem = {
@@ -36,7 +38,8 @@ local gen_cache_methods = {
       local node = memstore[fnid][opts_as_str]
       for i=1, #params do
         local param = params[i]
-        if opts.stringify_table_params and type(param) == "table" then
+        if param == nil then param = nil_singleton 
+        elseif opts.stringify_table_params and type(param) == "table" then
           if opts.table_param_subset == "json" then
             param = json.encode(param)
           elseif opts.table_param_subset == "no-fn-userdata-loops" then
@@ -57,7 +60,8 @@ local gen_cache_methods = {
       local node = memstore[fnid][opts_as_str]
       for i=1, #params do
         local param = params[i]
-        if opts.stringify_table_params and type(param) == "table" then
+        if param == nil then param = nil_singleton 
+        elseif opts.stringify_table_params and type(param) == "table" then
           if opts.table_param_subset == "json" then
             param = json.encode(param)
           elseif opts.table_param_subset == "no-fn-userdata-loops" then
@@ -117,13 +121,15 @@ end
 --- @field stringify_table_params? boolean whether to stringify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to stringify the params to use them as a path
 --- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be stringified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
 
+local identifier = createIdentifier()
+
 --- memoize a function if it's not already memoized, or return the memoized version if it is
 --- @generic I, O
 --- @param fn fun(...: I): O
 --- @param opts? memoOpts
 --- @return fun(...: I): O, hs.timer?
 function memoize(fn, opts)
-  local fnid = stringy.split(tostring(fn), " ")[2] -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
+  local fnid = identifier(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
 
   local opts_as_str_or_nil
   if memoized[fnid] then 
@@ -202,8 +208,11 @@ function memoize(fn, opts)
 
     if not opts.is_async then
       if not result then  -- no result yet, so we need to call the original function and store the result in the cache
+        -- print("cache miss")
         result = { fn(...) }
         cache_methods.put(fnid, opts_as_str, params, result, opts)
+      else
+        -- print("cache hit")
       end
       return table.unpack(result) -- we're sure to have a result now, so we can return it
     else

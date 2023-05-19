@@ -33,7 +33,7 @@ end
 --- @param t any
 --- @return boolean
 function isEmptyTable(t)
-  if type(t) ~= "table" then error("isEmptyTable only works on tables. got " .. type(t)) end
+  if type(t) ~= "table" then return false end
   for k, v in pairs(t) do
     return false
   end
@@ -44,7 +44,7 @@ end
 --- @param t table
 --- @return boolean
 function isUndeterminableTable(t)
-  if type(t) ~= "table" then error("isUndeterminableTable only works on tables. got " .. type(t)) end
+  if type(t) ~= "table" then return false end
   if t.isovtable then return false end
   if t.islist then return false end
   if t.isassoc then return false end

@@ -232,4 +232,200 @@ local succ, res = pcall(
 )
 
 assertMessage(succ, false)
+
+--- test that memoizing tables as args always works.
+
+--- shallow table
   
+local poisonable9_1 = returnPoisonable()
+local poisonable9_2 = returnPoisonable()
+local poisonable9_3 = returnPoisonable()
+
+local tbl_w_keys = {
+  a = "a",
+  b = "b",
+  c = "c",
+  d = "d",
+  e = "e",
+}
+
+local memoizedPoisonable9_1 = memoize(poisonable9_1, {stringify_table_params = true, table_param_subset = "json"})
+
+local memoizedPoisonable9_2 = memoize(poisonable9_2, {stringify_table_params = true, table_param_subset = "no-fn-userdata-loops"})
+
+local memoizedPoisonable9_3 = memoize(poisonable9_3, {stringify_table_params = true, table_param_subset = "any"})
+
+--- 100 iters to make sure that the order of the keys is not just a fluke
+
+for i = 1, 100 do
+  assertMessage(
+    memoizedPoisonable9_1(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+  
+  assertMessage(
+    memoizedPoisonable9_2(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+  
+  assertMessage(
+    memoizedPoisonable9_3(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+end
+
+--- nested table
+
+local poisonable10_1 = returnPoisonable()
+local poisonable10_2 = returnPoisonable()
+local poisonable10_3 = returnPoisonable()
+
+local tbl_w_keys = {
+  a = "a",
+  b = "b",
+  c = "c",
+  d = "d",
+  e = "e",
+  f = {
+    a = "a",
+    b = "b",
+    c = "c",
+    d = "d",
+    e = "e",
+  }
+}
+
+local memoizedPoisonable10_1 = memoize(poisonable10_1, {stringify_table_params = true, table_param_subset = "json"})
+local memoizedPoisonable10_2 = memoize(poisonable10_2, {stringify_table_params = true, table_param_subset = "no-fn-userdata-loops"})
+local memoizedPoisonable10_3 = memoize(poisonable10_3, {stringify_table_params = true, table_param_subset = "any"})
+
+--- 100 iters to make sure that the order of the keys is not just a fluke
+
+for i = 1, 100 do
+  assertMessage(
+    memoizedPoisonable10_1(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+  
+  assertMessage(
+    memoizedPoisonable10_2(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+  
+  assertMessage(
+    memoizedPoisonable10_3(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+end
+
+--- numerical values
+
+local poisonable11_1 = returnPoisonable()
+local poisonable11_2 = returnPoisonable()
+local poisonable11_3 = returnPoisonable()
+
+local tbl_w_keys = {
+  a = 1,
+  b = 2,
+  c = 3,
+  d = 4,
+  e = 5,
+}
+
+local memoizedPoisonable11_1 = memoize(poisonable11_1, {stringify_table_params = true, table_param_subset = "json"})
+local memoizedPoisonable11_2 = memoize(poisonable11_2, {stringify_table_params = true, table_param_subset = "no-fn-userdata-loops"})
+local memoizedPoisonable11_3 = memoize(poisonable11_3, {stringify_table_params = true, table_param_subset = "any"})
+
+--- 100 iters to make sure that the order of the keys is not just a fluke
+
+for i = 1, 100 do
+  assertMessage(
+    memoizedPoisonable11_1(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+  
+  assertMessage(
+    memoizedPoisonable11_2(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+  
+  assertMessage(
+    memoizedPoisonable11_3(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+end
+
+--- function values ("any" only)
+
+local poisonable12_1 = returnPoisonable()
+
+local tbl_w_keys = {
+  a = function() end,
+  b = function() end,
+  c = function() end,
+  d = function() end,
+  e = function() end,
+}
+
+local memoizedPoisonable12_1 = memoize(poisonable12_1, {stringify_table_params = true, table_param_subset = "any"})
+
+--- 100 iters to make sure that the order of the keys is not just a fluke
+
+for i = 1, 100 do
+  assertMessage(
+    memoizedPoisonable12_1(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+end
+
+--- nested function values ("any" only)
+
+local poisonable13_1 = returnPoisonable()
+
+local tbl_w_keys = {
+  a = function() end,
+  b = function() end,
+  c = function() end,
+  d = function() end,
+  e = function() end,
+  f = {
+    a = function() end,
+    b = function() end,
+    c = function() end,
+    d = function() end,
+    e = function() end,
+  }
+}
+
+local memoizedPoisonable13_1 = memoize(poisonable13_1, {stringify_table_params = true, table_param_subset = "any"})
+
+--- 100 iters to make sure that the order of the keys is not just a fluke
+
+for i = 1, 100 do
+  assertMessage(
+    memoizedPoisonable13_1(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+end

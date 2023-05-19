@@ -41,29 +41,36 @@ end
 ---@return T
 function glue(base, addition, opts)
   opts = opts or {}
-  if type(addition) ~= "table" then
-    return append(base, addition, opts) -- glue(string, string2)
-  elseif isEmptyTable(addition) then
-    return base -- appending an empty table to anything is a no-op
-  elseif isUndeterminableTable(base) then
-    return addition
-  else
-    if isList(addition) then
-      if isList(base) then -- glue(list, list2)
-        for _, v in iprs(addition) do
-          base = append(base, v, opts)
-        end
-      else -- glue(assocarr, list)
-        base = append(base, addition, opts) 
-      end
-    else
-      if isList(base) then -- glue(list, assocarr) if the base is a list, and we're gluing an assoc arr, we're just gonna treat it as a value to append
-        base = append(base, addition, opts)
-      else -- glue(assocarr, assocarr2)
-        base = recursiveMerge(base, addition, opts)
-      end
-    end
+  if addition == nil then
     return base
+  elseif base == nil then
+    return addition
+  elseif type(addition) == "table" then
+      
+    if isEmptyTable(addition) then
+      return base -- appending an empty table to anything is a no-op
+    elseif isUndeterminableTable(base) then
+      return addition
+    else
+      if isList(addition) then
+        if isList(base) then -- glue(list, list2)
+          for _, v in iprs(addition) do
+            base = append(base, v, opts)
+          end
+        else -- glue(assocarr, list)
+          base = append(base, addition, opts) 
+        end
+      else
+        if isList(base) then -- glue(list, assocarr) if the base is a list, and we're gluing an assoc arr, we're just gonna treat it as a value to append
+          base = append(base, addition, opts)
+        else -- glue(assocarr, assocarr2)
+          base = recursiveMerge(base, addition, opts)
+        end
+      end
+      return base
+    end
+  else
+    return append(base, addition, opts) -- glue(string, string2)
   end
 end
 

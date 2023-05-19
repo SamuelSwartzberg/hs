@@ -393,16 +393,19 @@ NonHeritableInterfacePropsTemplate = {
   }
 }
 
+local identifier = 0
+
+
 BasicInterfaceDefaultTemplate = concat(InterfaceDefaultTemplate, {properties = NonHeritableInterfacePropsTemplate})
 
 --- @param interface_specifier ItemSpecifier
 --- @param super ComponentInterface
 --- @return NonRootComponentInterface
 function NewDynamicContentsComponentInterface(interface_specifier, super)
-  -- print("creating a " .. interface_specifier.type .. " interface")
   --- @type NonRootComponentInterface
-  local interface = concat(InterfaceDefaultTemplate, interface_specifier)
-  interface.id = rand({len=10})
+  local interface = memoize(glue)(InterfaceDefaultTemplate, interface_specifier)
+  interface.id = identifier
+  identifier = identifier + 1
   if super then 
     interface.super = super
     interface.root_super = super.root_super
@@ -423,23 +426,22 @@ local root_action_table = {
 
 --- @alias BoundNewDynamicContentsComponentInterface fun(super: ComponentInterface): NonRootComponentInterface
 
+
 --- @param interface_specifier ItemSpecifier
 --- @param contents any
 --- @return RootComponentInterface
 function RootInitializeInterface(interface_specifier, contents)
-  -- print("creating a " .. interface_specifier.type .. " interface")
   if contents == nil then 
     error("Contents for a component interface may not be nil.", 0)
   end
   --- @type RootComponentInterface
-  local interface =  glue(InterfaceDefaultTemplate, interface_specifier)
-  print(interface.potential_interfaces:len())
----@diagnostic disable-next-line: assign-type-mismatch
-  interface.id = rand({len=10}, "int")
+  local interface =  memoize(glue)(InterfaceDefaultTemplate, interface_specifier)
+  interface.id = identifier
+  identifier = identifier + 1
   interface.properties.getables["is-" .. interface.type] = function() return true end -- in the root, we can be sure that the is-<type> is true
   interface.root_super = interface
   interface:setContents(contents)
-  interface.action_table = concat(interface.action_table, root_action_table)
+  interface.action_table = memoize(concat)(InterfaceDefaultTemplate.action_table, interface_specifier.action_table, root_action_table)
   return interface
 end
 

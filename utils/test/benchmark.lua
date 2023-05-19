@@ -1,23 +1,33 @@
 global_store = nil
 
 --- @class BenchmarkSpecifier
---- @field funcs { name: string, func: function, args: any[] }[]
+--- @field funcs benchspec[]
 --- @field iterations number
 
---- @param specifier BenchmarkSpecifier
+--- @alias benchspec { name?: string, func: function, args?: any[] }
+
+--- @param specifier BenchmarkSpecifier | benchspec
 --- @return nil
 function benchmarkFunctions(specifier)
+  if not specifier.funcs then
+    specifier = { funcs = { specifier } }
+  end
+  specifier.iterations = specifier.iterations or 100
   for _, func_specifier in iprs(specifier.funcs) do
     local start = os.clock()
     local func = func_specifier.func
     for i = 1, specifier.iterations do
-      global_store = func(table.unpack(func_specifier.args))
+      local args
+      if func_specifier.args then
+        args = table.unpack(func_specifier.args)
+      end
+      global_store = func(args)
     end
     local stop = os.clock()
     local elapsed = stop - start
     local res = string.format(
       "Benchmarked %s at %s iterations, took %s seconds",
-      func_specifier.name, specifier.iterations, elapsed
+      (func_specifier.name or "unnamed"), specifier.iterations, elapsed
     )
     print(res)
   end
@@ -26,14 +36,15 @@ end
 --- @param func function
 --- @param args any[]
 --- @param iterations number
---- @param inline boolean
-function benchmarkMemoization(func, args, iterations, inline)
+--- @param acc "inline" | "var"
+--- @param memoopts memoOpts
+function benchmarkMemoization(func, args, iterations, acc, memoopts)
   local mmzd
-  if not inline then
-    mmzd = memoize(func)
+  if acc == "var" then
+    mmzd = memoize(func, memoopts)
   else
     mmzd = function (...)
-      return memoize(func)(...)
+      return memoize(func, memoopts)(...)
     end
   end
   benchmarkFunctions({
