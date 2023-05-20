@@ -65,7 +65,7 @@ function prs(thing, start, stop, step, limit)
     local i, v = iter(tbl, idx)
     if i then
       idx = i
-      return table.unpack(elemAt(thing, i, "kv"))
+      return elemAt(thing, i, "kv")
     end
   end, tbl, idx
 end

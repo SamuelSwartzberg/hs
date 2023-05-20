@@ -18,16 +18,14 @@ local key_ins_order = {} -- Mirror of `ins_order` to fetch the order of the key 
 local orderedmetatable = {
   -- This metamethod is called when the ordered table is about to be garbage collected.
   __gc = function (t)
-    -- The unique memory address of the subtable is extracted from the ordered table.
-    local id = string.sub(tostring(t), 8)
 
     -- If either of the subtables exists, remove the subtable from the table of insertion orders.
-    if ins_order[id] then
-      ins_order[id] = nil
+    if ins_order[t] then
+      ins_order[t] = nil
     end
 
-    if key_ins_order[id] then
-      key_ins_order[id] = nil
+    if key_ins_order[t] then
+      key_ins_order[t] = nil
     end
   end,
 
@@ -36,12 +34,9 @@ local orderedmetatable = {
     -- Ensure that the key is a string.
     assert(type(key) == "string", "key must be a string.")
 
-    -- The unique memory address of the subtable is extracted from the ordered table.
-    local id = string.sub(tostring(t), 8)
-
     if value == nil then -- deletion handling
        -- If the value is `nil`, remove the key-value pair from the table.
-       local idx = key_ins_order[id][key]
+       local idx = key_ins_order[t][key]
 
        -- If the key does not exist in the mirror table, return.
        if not idx then -- key doesn't exist
@@ -49,18 +44,18 @@ local orderedmetatable = {
        end
  
        -- Remove the key from the list of keys.
-       table.remove(ins_order[id], idx)
+       table.remove(ins_order[t], idx)
  
        -- Remove the key from the mirror table.
-       key_ins_order[id][key] = nil
+       key_ins_order[t][key] = nil
  
        -- Remove the key-value pair from the ordered table.
        rawset(t, key, nil)
     else 
       -- Add the new key-value pair to the ordered table.
-      local idx = #ins_order[id] + 1
-      ins_order[id][idx] = key
-      key_ins_order[id][key] = idx
+      local idx = #ins_order[t] + 1
+      ins_order[t][idx] = key
+      key_ins_order[t][key] = idx
       rawset(t, key, value)
     end
 
@@ -84,13 +79,12 @@ pkg.orderedmetatable = orderedmetatable
 
 function pkg.new()
   -- Create a new ordered table with an empty metatable.
-  local tbl = setmetatable({}, orderedmetatable)
+  local t = setmetatable({}, orderedmetatable)
   -- Generate a unique memory address for the new subtable.
-  local id = string.sub(tostring(tbl), 8)
   -- Create a new subtable to track the insertion order.
-  ins_order[id] = {}
-  key_ins_order[id] = {}
-  return tbl
+  ins_order[t] = {}
+  key_ins_order[t] = {}
+  return t
 end
 
 function pkg.init(all_elems)
@@ -125,11 +119,9 @@ end
 function pkg.getindex(t, idx, give_key_name)
   -- Ensure that `idx` is a number.
   assert(type(idx) == "number", "idx must be a number.")
-
-  -- Extract the unique memory address of the subtable from the ordered table.
-  local id = string.sub(tostring(t), 8)
+  
   -- Get the list of keys in the insertion order.
-  local kstr = ins_order[id]
+  local kstr = ins_order[t]
 
   -- If the list of keys does not exist, return an error message.
   if not kstr then
@@ -152,10 +144,8 @@ function pkg.keyindex(t, key)
   -- Ensure that `key` is a string.
   assert(type(key) == "string", "key must be a string.")
 
-  -- Extract the unique memory address of the subtable from the ordered table.
-  local id = string.sub(tostring(t), 8)
   -- Get the mirror table that maps keys to insertion order indices.
-  local kstr = key_ins_order[id]
+  local kstr = key_ins_order[t]
 
   -- If the mirror table does not exist, return an error message.
   if not kstr then
@@ -169,12 +159,9 @@ end
 function pkg.keyfromindex(t, idx)
   -- Ensure that `idx` is a int.
   assert(type(idx) == "number", "idx must be a number.")
-
-  -- Extract the unique memory address of the subtable from the ordered table.
-  local id = string.sub(tostring(t), 8)
   
   -- Get the list of keys in the insertion order.
-  local kstr = ins_order[id]
+  local kstr = ins_order[t]
 
   -- If the list of keys does not exist, return an error message.
   if not kstr then
@@ -186,11 +173,9 @@ function pkg.keyfromindex(t, idx)
 end
 
 function pkg.len(t)
-  -- Extract the unique memory address of the subtable from the ordered table.
-  local id = string.sub(tostring(t), 8)
   
   -- Get the list of keys in the insertion order.
-  local kstr = ins_order[id]
+  local kstr = ins_order[t]
 
   -- If the list of keys does not exist, return 0.
   if not kstr then
@@ -201,6 +186,21 @@ function pkg.len(t)
     return #kstr
   end
 end
+
+--- Pairs implementation for ordered tables
+function pkg.pairs(t)
+  local i = 0
+  local n = pkg.len(t)
+  return function()
+      i = i + 1
+      if i <= n then
+          local k = key_ins_order[t][i]
+          return k, t[k]
+      end
+  end
+end
+
+
 
 
 pkg.isovtable = true
@@ -215,6 +215,7 @@ pkg.isovtable = true
 --- @field keyindex fun(t: orderedtable, key: string): number | nil, string | nil
 --- @field keyfromindex fun(t: orderedtable, idx: integer): string | nil, string | nil
 --- @field len fun(t: orderedtable): integer
+--- @field pairs fun(t: orderedtable): (fun(): string, any)
 --- @field isovtable true signal that this is an orderedtable
 
 ovtable = pkg

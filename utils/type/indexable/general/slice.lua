@@ -95,7 +95,11 @@ function slice(thing, start_or_spec, stop, step)
   -- build the slice
   
   for i = spec.start, spec.stop, spec.step do
-    new_thing = append(new_thing, elemAt(thing, i, is_assoc and "kv"))
+    if is_assoc then
+      new_thing = append(new_thing, {elemAt(thing, i, "kv")})
+    else
+      new_thing = append(new_thing, elemAt(thing, i))
+    end
   end
 
   if spec.fill then

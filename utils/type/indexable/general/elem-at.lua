@@ -2,12 +2,12 @@
 ---@param thing indexable
 ---@param ind integer
 ---@param ret? kv
----@return any
+---@return any, any?
 function elemAt(thing, ind, ret)
   if type(thing) == "string" then
     local value = eutf8.sub(thing, ind, ind)
     if ret == "kv" then
-      return {ind, value}
+      return ind, value
     else
       return value
     end
@@ -15,14 +15,14 @@ function elemAt(thing, ind, ret)
     if isListOrEmptyTable(thing) then
       local value = thing[ind]
       if ret == "kv" then
-        return {ind, value}
+        return ind, value
       else
         return value
       end
     else
-      if thing.getindex then
+      if thing.isovtable then
         if ret == "kv" then
-          return {thing:getindex(ind, true)}
+          return thing:getindex(ind, true)
         else
           return thing:getindex(ind)
         end
@@ -32,7 +32,7 @@ function elemAt(thing, ind, ret)
         local key = keys[ind]
         local value = thing[key]
         if ret == "kv" then
-          return {key, value}
+          return key, value
         else
           return value
         end

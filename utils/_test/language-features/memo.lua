@@ -429,3 +429,37 @@ for i = 1, 100 do
     {tbl_w_keys}
   )
 end
+
+--- self-referential table ("any" only)
+
+local poisonable14_1 = returnPoisonable()
+
+local tbl_w_keys = {
+  a = "a",
+  b = "b",
+  c = "c",
+  d = "d",
+  e = "e",
+  nested = {
+    a = "a",
+    b = "b",
+    c = "c",
+    d = "d",
+    e = "e",
+  }
+}
+
+tbl_w_keys.nested.self = tbl_w_keys
+
+local memoizedPoisonable14_1 = memoize(poisonable14_1, {stringify_table_params = true, table_param_subset = "any"})
+
+--- 100 iters to make sure that the order of the keys is not just a fluke
+
+for i = 1, 100 do
+  assertMessage(
+    memoizedPoisonable14_1(
+      tbl_w_keys
+    ),
+    {tbl_w_keys}
+  )
+end

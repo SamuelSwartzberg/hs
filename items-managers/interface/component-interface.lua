@@ -373,7 +373,7 @@ InterfaceDefaultTemplate = {
     if not self.super then self.contents = value end
     if self.potential_interfaces then
       self.interface = {}
-      for potential_interface, potential_interface_constructor  in prs(self.potential_interfaces) do
+      for potential_interface, potential_interface_constructor  in self.potential_interfaces:pairs() do
         if self:get("is-" .. potential_interface) then
           self.interface[potential_interface] = potential_interface_constructor(self)
         end

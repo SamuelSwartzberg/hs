@@ -17,11 +17,11 @@ function benchmarkFunctions(specifier)
     local start = os.clock()
     local func = func_specifier.func
     for i = 1, specifier.iterations do
-      local args
       if func_specifier.args then
-        args = table.unpack(func_specifier.args)
+        global_store = func(table.unpack(func_specifier.args))
+      else
+        global_store = func()
       end
-      global_store = func(args)
     end
     local stop = os.clock()
     local elapsed = stop - start

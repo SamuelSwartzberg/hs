@@ -40,6 +40,18 @@ for i, v in iprs(test_ovtable) do
   )
 end
 
+for k, v in test_ovtable:pairs() do
+  assertMessage(
+    v == test_nonov_assoc_arr[k],
+    true
+  )
+  local key_for_value = find(test_nonov_assoc_arr, v, {"v", "k"})
+  assertMessage(
+    k == key_for_value,
+    true
+  )
+end
+
 assertMessage(
   keys(test_ovtable),
   keys(test_nonov_assoc_arr)
