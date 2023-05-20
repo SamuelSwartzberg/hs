@@ -190,13 +190,13 @@ end
 --- Pairs implementation for ordered tables
 function pkg.pairs(t)
   local i = 0
-  local n = pkg.len(t)
+  local n = t:len()
   return function()
-      i = i + 1
-      if i <= n then
-          local k = key_ins_order[t][i]
-          return k, t[k]
-      end
+    i = i + 1
+    if i <= n then
+        local k = ins_order[t][i]
+        return k, t[k]
+    end
   end
 end
 

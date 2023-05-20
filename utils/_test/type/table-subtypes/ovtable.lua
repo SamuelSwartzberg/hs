@@ -16,7 +16,10 @@ local test_nonov_list = {
   "three",
 }
 
+local iters = 0
+
 for k, v in prs(test_ovtable) do
+  iters = iters + 1
   assertMessage(
     v == test_nonov_assoc_arr[k],
     true
@@ -28,7 +31,16 @@ for k, v in prs(test_ovtable) do
   )
 end
 
+assertMessage(
+  iters,
+  3
+)
+
+local iters = 0
+
 for i, v in iprs(test_ovtable) do
+
+  iters = iters + 1
   assertMessage(
     v == test_nonov_list[i],
     true
@@ -40,7 +52,15 @@ for i, v in iprs(test_ovtable) do
   )
 end
 
+assertMessage(
+  iters,
+  3
+)
+
+local iters = 0
+
 for k, v in test_ovtable:pairs() do
+  iters = iters + 1
   assertMessage(
     v == test_nonov_assoc_arr[k],
     true
@@ -51,6 +71,11 @@ for k, v in test_ovtable:pairs() do
     true
   )
 end
+
+assertMessage(
+  iters,
+  3
+)
 
 assertMessage(
   keys(test_ovtable),

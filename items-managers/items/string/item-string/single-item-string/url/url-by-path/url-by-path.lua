@@ -4,8 +4,7 @@ URLByPathItemSpecifier = {
   properties = {
     getables = {
       ["is-owner-item-url"] = function(self) 
-        local url_path_components = self:get("url-path-slice", {":"})
-        return #url_path_components >= 2
+        return #memoize(pathSlice)(self:get("url-path"), ":") >= 2
       end
     }
   },

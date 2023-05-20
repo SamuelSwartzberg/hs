@@ -13,16 +13,10 @@ SingleItemStringItemSpecifier = {
       end,
     },
     getables = {
-      ["is-url"] = function(self) return isUrl(self:get("contents")) end,
-      ["is-path"] = function(self) return looksLikePath(self:get("contents")) end,
+      ["is-url"] = function(self) return memoize(isUrl)(self:get("contents")) end,
+      ["is-path"] = function(self) return memoize(looksLikePath)(self:get("contents")) end,
       ["is-printable-ascii-string-item"] = function(self) 
-        return not eutf8.find(self:get("contents"), "[^%w%p%s]")
-      end,
-      ["is-application"] = function(self) 
-        return find(
-          itemsInPath({ path = "/Applications/"}),
-          self:get("contents") .. ".app"
-        )
+        return memoize(onig.find)(self:get("contents"), mt._r.charset.printable_ascii)
       end,
       ["is-potentially-parsable-date"] = function(self)
         local res = eutf8.find(self:get("contents"), "%d%d") -- this doesn't guarantee that this is a date, we'll check that within the potentiallyParsableDateItem subclass. This is just a quick check to see if it's worth trying to parse it
@@ -46,7 +40,6 @@ SingleItemStringItemSpecifier = {
     { key = "url", value = CreateURLItem },
     { key = "path", value = CreatePathItem },
     { key = "printable-ascii-string-item", value = CreatePrintableAsciiStringItem },
-    { key = "application", value = CreateApplicationItem },
     { key = "potentially-parsable-date", value = CreatePotentiallyParseableDateItem },
   }),
   action_table = {

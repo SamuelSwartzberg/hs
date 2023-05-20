@@ -117,7 +117,7 @@ end
 --- @field mode? "mem" | "fs" whether to use memory or filesystem to store the cache. Fs cache is more persistent, but slower. Defaults to "mem"
 --- @field is_async? boolean whether we are memoizing an async function. Defaults to false
 --- @field invalidation_mode? "invalidate" | "reset" | "none" whether and in what way to invalidate the cache. Defaults to "none"
---- @field interval? number how often to invalidate the cache. Defaults to 0
+--- @field interval? number how often to invalidate the cache, in seconds. Defaults to 0
 --- @field stringify_table_params? boolean whether to stringify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to stringify the params to use them as a path
 --- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be stringified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
 

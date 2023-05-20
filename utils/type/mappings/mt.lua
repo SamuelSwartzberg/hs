@@ -7,7 +7,11 @@ mt = {
     }
   },
   _list = {
-    tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"}
+    tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"},
+    html_entity_indicator = {
+      encoded = {"&", ";"},
+      decoded = {"\"", "'", "<", ">", "&"}
+    }
   },
   _r = {
     text_bloat = {
@@ -28,6 +32,10 @@ mt = {
     syntax = {
       dice = "(?:\\d+)?d\\d+(?:[/x\\*]\\d+)?(?:[+-]\\d+)?",
       point = "([\\-\\d]+)..*?([\\-\\d]+)"
+    },
+    charset = {
+      printable_ascii = "[\\x20-\\x7E]+",
+      ascii = "[\\x00-\\x7F]+",
     },
     date = {
       rfc3339 = "\\d{4}(?:" ..
@@ -63,6 +71,18 @@ mt = {
     },
     whitespace = {
       large = "[\t\r\n]"
+    },
+    url = {
+      host = {
+        subpart = {
+          domain_and_tld = "(\\w+\\.\\w+)$",
+          domain = "(\\w+)\\.\\w+$",
+          tld = "\\w+\\.(\\w+)$"
+        }
+      }
     }
+  },
+  _r_lua = {
+    without_extension_and_extension = "(.+)%.([^%.]+)"
   }
 }

@@ -15,16 +15,13 @@ URLItemSpecifier = {
       ["url-tld"] = function(self)
         return string.match(self:get("url-host"), "%w+%.(%w+)$") end,
       ["url-path"] = function(self) return self:get("parsed-url").path end,
-      ["url-path-slice"] = function(self, args)
-        return pathSlice(self:get("url-path"), table.unpack(args))
-      end,
       ["url-query"] = function(self) return self:get("parsed-url").query end,
       ["url-fragment"] = function(self) return self:get("parsed-url").fragment end,
       ["url-port"] = function(self) return self:get("parsed-url").port end,
       ["url-user"] = function(self) return self:get("parsed-url").user end,
       ["url-password"] = function(self) return self:get("parsed-url").password end,
       ["is-url-by-contenttype"] = function(self)
-        return self:get("url-path") and pathSlice(self:get("url-path"), "-1:-1", { ext_sep = true } )[1] ~= ""
+        return self:get("url-path") and pathSlice(self:get("url-path"), "-1:-1", refstore.params.path_slice.opts.ext_sep)[1] ~= ""
       end,
       ["is-url-by-host"] = function(self)
         return self:get("url-host")
@@ -48,7 +45,7 @@ URLItemSpecifier = {
         return self:get("text-by-selector", "meta[name=description]")
       end,
       ["default-negotation-url-contents"] = function(self)
-        return run({
+        return memoize(run, { invalidation_mode ="invalidate", interval = 600 })({
           "curl",
           "-L",
           { value = self:get("contents"), type = "quoted"},

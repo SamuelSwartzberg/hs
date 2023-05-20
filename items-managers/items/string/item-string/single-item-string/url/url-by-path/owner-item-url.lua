@@ -6,8 +6,7 @@ OwnerItemUrlItemSpecifier = {
   properties = {
     getables = {
       ["owner-item-part"] = function(self)
-        local url_path_components = self:get("url-path-slice", {":"})
-        return url_path_components[1] .. "/" .. url_path_components[2]
+        return memoize(pathSlice)(self:get("url-path"), "1:2", refstore.params.path_slice.opts.rejoin_at_end)
       end,
     }
   },

@@ -69,7 +69,7 @@ function pathSlice(path, spec, opts)
     elseif not stringy.find(leaf, ".") then
       without_extension = leaf
     else -- in case of multiple dots, everything after the last dot is considered the extension
-      without_extension, extension = leaf:match("^(.+)%.([^%.]+)$")
+      without_extension, extension = eutf8.match(leaf, whole(mt._r_lua.without_extension_and_extension))
     end
 
     if opts.standartize_ext then
@@ -86,7 +86,7 @@ function pathSlice(path, spec, opts)
 
   -- slice
 
-  local res, eff_slice_spec =  slice(raw_path_components, spec)
+  local res, eff_slice_spec =  memoize(slice, {stringify_table_params = true, table_param_subset = "json"})(raw_path_components, spec)
   local same_start_elem = res[1] == raw_path_components[1]
   local starts_at_beginning = eff_slice_spec.start == 1
     

@@ -6,25 +6,20 @@ StringItemSpecifier = {
         return stringy.strip(self:get("contents"))
       end,
       ["is-single-item-string-item"] = function(self) 
-        return (not (#self:get("contents") < 2000)) or (not onig.find(self:get("contents"), mt._r.whitespace.large)) 
+        return (not (#self:get("contents") < 2000)) or (not memoize(onig.find)(self:get("contents"), mt._r.whitespace.large)) 
       end,
       ["is-multiline-string-item"] = function(self) return stringy.find(self:get("contents"), "\n") end,
       ["is-has-lowercase-string-item"] = function(self)
-        return onig.find(self:get("contents"), mt._r.case.lower)
+        return memoize(onig.find)(self:get("contents"), mt._r.case.lower)
       end,
       ["is-has-uppercase-string-item"] = function(self)
-        return onig.find(self:get("contents"), mt._r.case.upper)
+        return memoize(onig.find)(self:get("contents"), mt._r.case.upper)
       end,
       ["is-might-be-json-item"] = function(self)
-        return  self:get("starts-ends-with",{starts = "{", ends = "}"}) or
-        self:get("starts-ends-with",{starts = "[", ends = "]"})
+        return  startsEndsWithFast(self:get("contents"), "{", "}") or startsEndsWithFast(self:get("contents"), "[", "]")
       end,
-      ["starts-ends-with"] = function(self, specifier)
-        local str = stringy.strip(self:get("contents"))
-        return stringy.startswith(str, specifier.starts) and stringy.endswith(str, specifier.ends)
-      end,
-      ["is-might-be-xml-item"] = function(self) return self:get("starts-ends-with", {starts = "<", ends = ">"}) end,
-      ["is-might-be-bib-item"] = function(self) return self:get("starts-ends-with", {starts = "@", ends = "}"}) end,
+      ["is-might-be-xml-item"] = function(self) return startsEndsWithFast(self:get("contents"), "<", ">") end,
+      ["is-might-be-bib-item"] =function(self) return startsEndsWithFast(self:get("contents"), "@", "}") end,
       ["to-string-array"] = function(self, sep) 
         return CreateArray(stringy.split(self:get("contents"), sep)) 
       end,
@@ -102,15 +97,10 @@ StringItemSpecifier = {
         return transf.string.romanized_snake(self:get("contents"))
       end,
       ["is-html-entity-encoded-string-item"] = function(self) 
-        return stringy.find(self:get("contents"), "&") and stringy.find(self:get("contents"), ";")
+        return allOfFast(self:get("contents"), mt._list.html_entity_indicator.encoded)
       end,
       ["is-html-entity-decoded-string-item"] = function(self)
-         return 
-          stringy.find(self:get("contents"), "\"")
-          or stringy.find(self:get("contents"), "'")
-          or stringy.find(self:get("contents"), "<")
-          or stringy.find(self:get("contents"), ">")
-          or stringy.find(self:get("contents"), "&")
+         return anyOfFast(self:get("contents"), mt._list.html_entity_indicator.decoded)
       end, -- 'decoded' = to be encoded
       ["extract-utf8"] = function(self, pattern)
         return iterToTbl({tolist=true, ret="v"},eutf8.gmatch(self:get("contents"), pattern))

@@ -125,3 +125,23 @@ assertMessage(
   onig.match(doi_prefix, whole(mt._r.id.doi_prefix)),
   doi_prefix
 )
+
+assertMessage(
+  onig.match("\0\0asdfa%Q@8)I#\0", mt._r.charset.printable_ascii),
+  "asdfa%Q@8)I#"
+)
+
+assertMessage(
+  onig.match("\0\0asdfa%Q@8)I#\0", whole(mt._r.charset.printable_ascii)),
+  nil
+)
+
+assertMessage(
+  onig.match("\0\0asdfa%Q@8)I#\0", mt._r.charset.ascii),
+  "\0\0asdfa%Q@8)I#\0"
+)
+
+assertMessage(
+  onig.match("\0\0asdfa%Q@8)I#\0", whole(mt._r.charset.ascii)),
+  "\0\0asdfa%Q@8)I#\0"
+)
