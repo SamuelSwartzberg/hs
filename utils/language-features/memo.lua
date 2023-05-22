@@ -52,7 +52,7 @@ local gen_cache_methods = {
         node.children[param] = node.children[param] or {}
         node = node.children[param]
       end
-      node.results = result
+      node.results = copy(result, true)
     end,
     get = function(fnid, opts_as_str, params, opts)
       memstore[fnid] = memstore[fnid] or {}
@@ -73,7 +73,7 @@ local gen_cache_methods = {
         node = node.children and node.children[param]
         if not node then return nil end
       end
-      return node.results
+      return copy(node.results, true)
     end,
     reset = function(fnid, opts_as_str)
       memstore[fnid] = memstore[fnid] or {}
@@ -208,11 +208,12 @@ function memoize(fn, opts)
 
     if not opts.is_async then
       if not result then  -- no result yet, so we need to call the original function and store the result in the cache
-        -- print("cache miss")
+        print("cache miss for", fnid)
         result = { fn(...) }
         cache_methods.put(fnid, opts_as_str, params, result, opts)
       else
-        -- print("cache hit")
+        print("cache hit for", fnid)
+        inspPrint(result)
       end
       return table.unpack(result) -- we're sure to have a result now, so we can return it
     else

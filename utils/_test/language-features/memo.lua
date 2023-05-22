@@ -463,3 +463,58 @@ for i = 1, 100 do
     {tbl_w_keys}
   )
 end
+
+-- mutate result of memoized function, make sure that it doesn't affect the cache
+
+local example_table = {
+  a = "a",
+  b = "b",
+}
+
+local test_table_1 = copy(example_table)
+local test_table_2 = copy(example_table)
+local test_table_3 = copy(example_table)
+
+local res1 = memoize(
+  returnSame,
+  {stringify_table_params = true, table_param_subset = "json"}
+)(
+  test_table_1
+)
+
+assertMessage(
+  res1,
+  example_table
+)
+
+-- try and mutate the result from the uncached result table
+
+res1.c = "c"
+
+local res2 = memoize(
+  returnSame,
+  {stringify_table_params = true, table_param_subset = "json"}
+)(
+  test_table_2
+)
+
+assertMessage(
+  res2,
+  example_table
+)
+
+-- mutate the result from the cached result table
+
+res2.c = "c"
+
+local res3 = memoize(
+  returnSame,
+  {stringify_table_params = true, table_param_subset = "json"}
+)(
+  test_table_3
+)
+
+assertMessage(
+  res3,
+  example_table
+)

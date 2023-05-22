@@ -668,3 +668,88 @@ assertMessage(
   { a = "a", b = "b", c = "c" }
 )
 
+-- test fastpairs, a pairs dropin that also works on ovtables
+
+local tbl_w_var_values = {
+  a = true,
+  b = returnNil,
+  c = 1,
+  d = "string",
+}
+
+local manual_counter = 0
+
+for k, v in fastpairs(tbl_w_var_values) do
+  manual_counter = manual_counter + 1
+  -- fastpairs does not guarantee order
+  if manual_counter == 5 then
+    error("Should not iterate")
+  end
+end
+
+assertMessage(
+  manual_counter,
+  4
+)
+
+local ovtable_w_var_values = ovtable.init({
+  { key = "a", value = true },
+  { key = "b", value = returnNil },
+  { key = "c", value = 1 },
+  { key = "d", value = "string" },
+})
+
+local manual_counter = 0
+
+for k, v in fastpairs(ovtable_w_var_values) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, "a")
+    assertMessage(v, true)
+  elseif manual_counter == 2 then
+    assertMessage(k, "b")
+    assertMessage(v, returnNil)
+  elseif manual_counter == 3 then
+    assertMessage(k, "c")
+    assertMessage(v, 1)
+  elseif manual_counter == 4 then
+    assertMessage(k, "d")
+    assertMessage(v, "string")
+  elseif manual_counter == 5 then
+    error("Should not iterate")
+  end
+end
+
+assertMessage(
+  manual_counter,
+  4
+)
+
+local list_w_var_values = {
+  true,
+  returnNil,
+  1,
+  "string",
+}
+
+
+local manual_counter = 0
+
+for k, v in fastpairs(list_w_var_values) do
+  manual_counter = manual_counter + 1
+  if manual_counter == 1 then
+    assertMessage(k, 1)
+    assertMessage(v, true)
+  elseif manual_counter == 2 then
+    assertMessage(k, 2)
+    assertMessage(v, returnNil)
+  elseif manual_counter == 3 then
+    assertMessage(k, 3)
+    assertMessage(v, 1)
+  elseif manual_counter == 4 then
+    assertMessage(k, 4)
+    assertMessage(v, "string")
+  elseif manual_counter == 5 then
+    error("Should not iterate")
+  end
+end

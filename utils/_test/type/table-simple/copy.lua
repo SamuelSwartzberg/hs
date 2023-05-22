@@ -345,3 +345,66 @@ assertMessage(
     foo = "bar"
   }
 )
+
+-- mutation test
+
+local mutation_test_tbl_1 = {
+  foo = "bar"
+}
+
+local mutation_test_tbl_2 = copy(mutation_test_tbl_1, false)
+
+mutation_test_tbl_1.foo = "changed"
+
+assertMessage(
+  mutation_test_tbl_1.foo,
+  "changed"
+)
+
+assertMessage(
+  mutation_test_tbl_2.foo,
+  "bar"
+)
+
+local mutation_test_tbl_3 = {
+  foo = "bar",
+  deep = {
+    pink = "floyd"
+  }
+}
+
+local mutation_test_tbl_4 = copy(mutation_test_tbl_3, false)
+
+
+mutation_test_tbl_3.deep.pink = "floyd changed"
+
+assertMessage(
+  mutation_test_tbl_3.deep.pink,
+  "floyd changed"
+)
+
+assertMessage(
+  mutation_test_tbl_4.deep.pink,
+  "floyd changed"
+)
+
+local mutation_test_tbl_5 = {
+  foo = "bar",
+  deep = {
+    pink = "floyd"
+  }
+}
+
+local mutation_test_tbl_6 = copy(mutation_test_tbl_5, true)
+
+mutation_test_tbl_5.deep.pink = "floyd changed"
+
+assertMessage(
+  mutation_test_tbl_5.deep.pink,
+  "floyd changed"
+)
+
+assertMessage(
+  mutation_test_tbl_6.deep.pink,
+  "floyd"
+)

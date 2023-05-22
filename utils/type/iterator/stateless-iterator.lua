@@ -99,3 +99,13 @@ function iterToTbl(opts, ...)
   return res
 end
 
+--- the prs function is functional but slow. This is a version that doesn't support start/stop/step or guarantee order, but works with any table, including ordered tables, and is much faster
+--- @param t table
+--- @return function, table?, any?
+function fastpairs(t)
+  if t.isovtable then
+    return t:pairs()
+  else
+    return pairs(t)
+  end
+end

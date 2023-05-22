@@ -28,5 +28,6 @@ function copy(t, deep, copied_tables)
       new[k] = v
     end
   end
+  setmetatable(new, getmetatable(t)) -- I don't I currently have any metatables where data is stored and thus copy(getmetatable(t)) would be necessary, but this comment is here so that I remember to add it if I ever do
   return new
 end

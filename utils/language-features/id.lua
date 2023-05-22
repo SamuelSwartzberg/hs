@@ -8,7 +8,7 @@ function createIdentifier()
     local id = fn_id_map[thing]
     if id == nil then
       next_id = next_id + 1
-      id = next_id
+      id = "thing " .. next_id
       fn_id_map[thing] = id
     end
     return id
