@@ -6,14 +6,14 @@ StringItemSpecifier = {
         return stringy.strip(self:get("contents"))
       end,
       ["is-single-item-string-item"] = function(self) 
-        return (not (#self:get("contents") < 2000)) or (not memoize(onig.find)(self:get("contents"), mt._r.whitespace.large)) 
+        return (not (#self:get("contents") < 2000)) or (not onig.find(self:get("contents"), mt._r.whitespace.large)) 
       end,
       ["is-multiline-string-item"] = function(self) return stringy.find(self:get("contents"), "\n") end,
       ["is-has-lowercase-string-item"] = function(self)
-        return memoize(onig.find)(self:get("contents"), mt._r.case.lower)
+        return onig.find(self:get("contents"), mt._r.case.lower)
       end,
       ["is-has-uppercase-string-item"] = function(self)
-        return memoize(onig.find)(self:get("contents"), mt._r.case.upper)
+        return onig.find(self:get("contents"), mt._r.case.upper)
       end,
       ["is-might-be-json-item"] = function(self)
         return  startsEndsWithFast(self:get("contents"), "{", "}") or startsEndsWithFast(self:get("contents"), "[", "]")

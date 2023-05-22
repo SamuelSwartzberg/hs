@@ -70,7 +70,7 @@ function findsingle(item, conditions, opts)
     end
   end
 
-  for _, condition in wdefarg(iprs)(conditions) do 
+  for _, condition in iprs(conditions) do 
     -- process shorthand conditions into full conditions
 
     if type(condition) == "boolean" then

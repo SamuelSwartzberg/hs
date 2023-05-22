@@ -52,7 +52,7 @@ function CreateStreamItem(specified_contents)
         end,
         ["to-initial-args"] = function(self)
           local args = {}
-          for key, value in prs(self:get("contents").initial_flags) do
+          for key, value in fastpairs(self:get("contents").initial_flags) do
             if value then
               table.insert(args, "--" .. key)
             end

@@ -20,8 +20,8 @@ ArrayOfInterfacesSpecifier = {
       ["chooser-list-of-all-queriable-properties"] = function(self)
         local chooser_list = {}
         local all_queriable_properties = self:get("all-querable-properties")
-        for action, keys in prs(all_queriable_properties) do
-          for key, _ in prs(keys) do
+        for action, keys in pairs(all_queriable_properties) do
+          for key, _ in pairs(keys) do
             chooser_list[#chooser_list + 1] = {
               text = string.format("%s: %s", action, key),
               ["action"] = action,

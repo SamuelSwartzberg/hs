@@ -53,7 +53,7 @@ ManagedArraySpecifier = {
         end  
       end,
       ["create-all"] = function(self, specifiers)
-        for key, specifier in prs(specifiers) do
+        for key, specifier in fastpairs(specifiers) do
           if not specifier.speckey then
             specifier.speckey = key
           end

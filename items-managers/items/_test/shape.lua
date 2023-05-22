@@ -74,7 +74,7 @@ local potential_interfaces_ignore_map = {
   }
 }
 
-for key, item in prs(_G) do
+for key, item in pairs(_G) do
   if stringy.endswith(key, "Specifier") and type(item) == "table" then
     --- @cast item ItemSpecifier
     local res = shapeMatches(item, {
@@ -103,7 +103,7 @@ for key, item in prs(_G) do
       passes = false
     end
     if item.potential_interfaces then
-      for k, v in prs(item.potential_interfaces) do 
+      for k, v in item.potential_interfaces:pairs() do 
         if not find(potential_interfaces_ignore_map[key], {_exactly = k}, "boolean") then
           if not item.properties.getables["is-" .. k] then
             passes = false
@@ -114,7 +114,7 @@ for key, item in prs(_G) do
       end
     end
     if item.properties.getables then 
-      for k, v in prs(item.properties.getables) do
+      for k, v in pairs(item.properties.getables) do
         if stringy.startswith(k, "is-") then
           if not find(is_method_ignore_map[key], {_exactly = k}, "boolean") then 
             local interface_name = k:sub(4)

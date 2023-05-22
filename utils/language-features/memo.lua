@@ -208,12 +208,12 @@ function memoize(fn, opts)
 
     if not opts.is_async then
       if not result then  -- no result yet, so we need to call the original function and store the result in the cache
-        print("cache miss for", fnid)
+        -- print("cache miss for", fnid)
         result = { fn(...) }
         cache_methods.put(fnid, opts_as_str, params, result, opts)
       else
-        print("cache hit for", fnid)
-        inspPrint(result)
+        -- print("cache hit for", fnid)
+        -- inspPrint(result)
       end
       return table.unpack(result) -- we're sure to have a result now, so we can return it
     else

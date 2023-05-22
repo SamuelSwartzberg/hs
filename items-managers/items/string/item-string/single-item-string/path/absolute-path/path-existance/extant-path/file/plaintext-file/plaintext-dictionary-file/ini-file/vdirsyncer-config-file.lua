@@ -8,7 +8,7 @@ VdirsyncerConfigFileItemSpecifier = {
       ["vdirsyncer-config-sections"] = function(self, type)
         local res = {}
         local config_table = self:get("parse-to-lua-table")
-        for k, v in prs(config_table) do
+        for k, v in fastpairs(config_table) do
           local key_parts = stringy.split(k, " ")
           if key_parts[1] == type then
             res[key_parts[2]] = v

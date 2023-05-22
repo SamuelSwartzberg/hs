@@ -6,8 +6,9 @@
 --- @param stop? integer
 --- @param step? integer
 --- @param limit? integer limit the number of iterations, regardless of the index
+--- @param precalc_keys? any[] precalculated keys 
 --- @return function, indexable, integer
-function iprs(thing, start, stop, step, limit)
+function iprs(thing, start, stop, step, limit, precalc_keys)
   local len_thing = len(thing)
   if len_thing == 0 then
     return function() end, thing, 0
@@ -26,6 +27,7 @@ function iprs(thing, start, stop, step, limit)
   if (start - stop) * (step/math.abs(step)) > 0 then
     start, stop = stop, start -- swap if they're in the wrong order
   end
+  local tblkeys = precalc_keys or keys(thing)
   return function(thing, i)
     i = i + step
     iters = iters + 1
@@ -34,7 +36,7 @@ function iprs(thing, start, stop, step, limit)
       (step < 0 and i >= stop)) and
       iters <= limit
     then
-      return i, elemAt(thing, i)
+      return i, elemAt(thing, i, nil, tblkeys)
     end
   end, thing, start - step
 end
@@ -60,12 +62,13 @@ end
 --- @param limit? integer
 --- @return function, indexable, integer
 function prs(thing, start, stop, step, limit)
-  local iter, tbl, idx = iprs(thing, start, stop, step, limit)
+  local tblkeys = keys(thing)
+  local iter, tbl, idx = iprs(thing, start, stop, step, limit, tblkeys)
   return function(tbl)
     local i, v = iter(tbl, idx)
     if i then
       idx = i
-      return elemAt(thing, i, "kv")
+      return elemAt(thing, i, "kv", tblkeys)
     end
   end, tbl, idx
 end

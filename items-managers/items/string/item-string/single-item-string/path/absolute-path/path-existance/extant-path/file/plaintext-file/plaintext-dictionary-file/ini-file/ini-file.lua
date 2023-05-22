@@ -19,7 +19,7 @@ IniFileItemSpecifier = {
       end,
       ["table-to-ini-section"] = function(_, specifier)
         local out_lines = { "[" .. specifier.header .. "]" }
-        for k, v in prs(specifier.body) do
+        for k, v in fastpairs(specifier.body) do
           local val
           if stringy.startswith(v, "noquote:") then
             val = v:match("noquote:(.+)")

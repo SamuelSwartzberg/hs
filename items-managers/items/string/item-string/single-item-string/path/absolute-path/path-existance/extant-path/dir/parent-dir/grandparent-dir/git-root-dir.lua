@@ -35,7 +35,7 @@ GitRootDirItemSpecifier = {
         self:doThis("copy-as-hook", env.GITCONFIGHOOKS  .. "/"  .. hook_name)
       end,
       ["sync-hooks"] = function(self)
-        for _, hook_path in prs(itemsInPath({path = env.GITCONFIGHOOKS, include_dirs = false})) do
+        for _, hook_path in fastpairs(itemsInPath({path = env.GITCONFIGHOOKS, include_dirs = false})) do
           self:doThis("copy-as-hook", hook_path)
         end
       end,

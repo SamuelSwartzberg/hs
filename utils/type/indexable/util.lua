@@ -150,7 +150,7 @@ function addToRes(itemres,res,opts,k,v)
   -- explanation: We want to be able to return nil in our processor (that feeds into itemres) and have that be the key/value in the result, so that we can delete things via map() and similar funcs. But we also want to be able to specify that we want to use the original key/value in the result.
 
   if opts.flatten and type(newval) == "table" then
-    for resk, resv in prs(newval) do
+    for resk, resv in fastpairs(newval) do
       local optcopy = copy(opts)
       optcopy.ret = {"k", "v"}
       addToRes({resk, resv}, res, optcopy)

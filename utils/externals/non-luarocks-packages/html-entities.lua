@@ -2300,7 +2300,7 @@ function htmlEntities.filter(input, table)
     return false
   end
   local output = input
-  for s, v in prs(table) do
+  for s, v in pairs(table) do
     output = output:gsub(s, v)
   end
   return output

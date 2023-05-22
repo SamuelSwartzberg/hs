@@ -43,7 +43,7 @@ FacebookItemSpecifier = {
           for _, reaction in iprs(msg["reactions"]) do
             reaction_tally[reaction.reaction] = (reaction_tally[reaction.reaction] or 0) + 1
           end
-          for reaction, count in prs(reaction_tally) do
+          for reaction, count in pairs(reaction_tally) do
             table.insert(raw_reactions, ("%s (%d)"):format(reaction, count))
           end
         end

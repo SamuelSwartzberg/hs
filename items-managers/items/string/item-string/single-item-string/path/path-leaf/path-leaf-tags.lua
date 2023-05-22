@@ -22,7 +22,7 @@ PathLeafTagsSpecifier = {
       ["tag-value-map"] = function (self)
         local tag_raw_value_map = self:get("tag-raw-value-map")
         local tag_value_map = {}
-        for tag_name, tag_value_raw in prs(tag_raw_value_map) do
+        for tag_name, tag_value_raw in fastpairs(tag_raw_value_map) do
           tag_value_map[tag_name] = stringy.split(tag_value_raw, ",")
         end
         return tag_value_map
@@ -38,7 +38,7 @@ PathLeafTagsSpecifier = {
       ["tag-name-list"] = function (self)
         local tag_raw_value_map = self:get("tag-raw-value-map")
         local tag_name_list = {}
-        for tag_name, _ in prs(tag_raw_value_map) do
+        for tag_name, _ in fastpairs(tag_raw_value_map) do
           table.insert(tag_name_list, tag_name)
         end
         return tag_name_list

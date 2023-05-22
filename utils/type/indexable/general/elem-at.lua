@@ -2,8 +2,9 @@
 ---@param thing indexable
 ---@param ind integer
 ---@param ret? kv
+---@param precalc_keys? any[] if provided, will be used instead of keys(thing) - useful for performance
 ---@return any, any?
-function elemAt(thing, ind, ret)
+function elemAt(thing, ind, ret, precalc_keys)
   if type(thing) == "string" then
     local value = eutf8.sub(thing, ind, ind)
     if ret == "kv" then
@@ -27,9 +28,9 @@ function elemAt(thing, ind, ret)
           return thing:getindex(ind)
         end
       else
-        local keys = keys(thing) -- TODO: memoize once initial testing is done
-        table.sort(keys, returnStringEquivOrder)
-        local key = keys[ind]
+        local tblkeys = precalc_keys or keys(thing)
+        table.sort(tblkeys, returnStringEquivOrder)
+        local key = tblkeys[ind]
         local value = thing[key]
         if ret == "kv" then
           return key, value

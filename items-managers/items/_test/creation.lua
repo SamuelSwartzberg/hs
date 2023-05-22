@@ -1170,7 +1170,7 @@ local item_creation_map = {
 
 local iters = 0
 
-for create_function, test_specifers in prs(item_creation_map) do
+for create_function, test_specifers in fastpairs(item_creation_map) do
   print("Testing create function: " .. tostring(create_function))
   for _, test_specifier in iprs(test_specifers) do
     iters = iters + 1

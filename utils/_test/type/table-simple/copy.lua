@@ -173,7 +173,7 @@ assertMessage(
   simple_assoc_of_assocs
 )
 
-for k, v in prs(simple_assoc_of_assocs) do
+for k, v in fastpairs(simple_assoc_of_assocs) do
   assertMessage(
     shallowcopy_assoc_of_assocs[k] == v,
     true

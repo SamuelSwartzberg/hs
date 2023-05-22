@@ -13,7 +13,7 @@ function recursiveMerge(base, addition, opts)
       type(opts.recurse) == "number" and 
       (opts.recurse < opts.depth)
     )
-  for k, v in prs(addition) do
+  for k, v in fastpairs(addition) do
     if 
       not no_recurse and
       type(v) == "table" and not isList(v) and

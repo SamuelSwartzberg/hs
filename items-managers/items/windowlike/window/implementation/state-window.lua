@@ -15,7 +15,7 @@ StateWindowItemSpecifier = {
         return find(
           self:get("application-item"):get("state-as-json").windows,
           function(json_window)
-            for k, v in prs(geometry) do
+            for k, v in fastpairs(geometry) do
               if not isClose(v, json_window[k]) then
                 return false
               end

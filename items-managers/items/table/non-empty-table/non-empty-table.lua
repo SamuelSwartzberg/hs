@@ -178,7 +178,7 @@ NonEmptyTableSpecifier = {
       end,
       ["chooser-list-of-pairs"] = function(self)
         local list = {}
-        for k, v in wdefarg(prs)(self:get("map-pairs-to-string")) do
+        for k, v in wdefarg(fastpairs)(self:get("map-pairs-to-string")) do
           list[#list + 1] = {
             text = v,
             value = k

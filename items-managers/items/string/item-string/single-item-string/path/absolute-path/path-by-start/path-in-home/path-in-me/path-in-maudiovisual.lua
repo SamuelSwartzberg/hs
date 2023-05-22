@@ -31,7 +31,7 @@ PathInMaudiovisualItemSpecifier = {
         runThreaded(map(urls, function(url)
           return url, {"youtube-dl", "--get-title", "--flat-playlist", { value = url, type = "quoted" }}
         end, {"k", "kv"}), 10, nil, function (command_results)
-          for url, result in prs(command_results) do
+          for url, result in fastpairs(command_results) do
             local err_lines = stringy.split(result.std_err, "\n")
             local is_unavailable = find(err_lines, function(line)
               return stringy.startswith(line, "ERROR: Private video")

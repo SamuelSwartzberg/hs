@@ -65,7 +65,7 @@ ContactTableSpecifier = {
           return nil
         else
           local transformed_table = {}
-          for k, v in prs(potential_prop_table) do
+          for k, v in pairs(potential_prop_table) do
             local new_ks = stringy.split(k, ",")
             for _, raw_new_k in iprs(new_ks) do
               local new_k = stringy.strip(raw_new_k)
@@ -126,7 +126,7 @@ ContactTableSpecifier = {
 
       ["to-string"] = function(self)
         local str = self:get("full-name")
-        for _, name_addition in prs({"nickname", "title", "organization", "role"}) do
+        for _, name_addition in ipairs({"nickname", "title", "organization", "role"}) do
           local name_addition_res = self:get(name_addition)
           if name_addition_res then
             str = str .. ", " .. name_addition_res
@@ -134,7 +134,7 @@ ContactTableSpecifier = {
         end
         local first_colon_val = true
         print(self:get("email", "pref"))
-        for _, contact_method in prs({"email", "phone"}) do
+        for _, contact_method in ipairs({"email", "phone"}) do
           local contact_method_res = stringx.join(", ", self:get("all-contact-addr", contact_method))
           if contact_method_res ~= "" then
             if first_colon_val then
