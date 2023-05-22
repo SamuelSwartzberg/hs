@@ -259,4 +259,12 @@ assertMessage(
   "nee_mou_sukoshi_dake_de_ii_no"
 )
 
+assertMessageAny(
+  transf.table.url_params({foo = "bar", baz = "quux"}),
+  {
+    "baz=quux&foo=bar",
+    "foo=bar&baz=quux"
+  }
+)
+
 env = realenv

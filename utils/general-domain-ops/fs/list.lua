@@ -7,75 +7,95 @@
 --- @field slice_results? sliceSpecLike A slice spec to slice each result with, e.g. "-1:-1" to get the file name. Default is no slicing
 --- @field slice_results_opts? table A table of options to pass to pathSlice
 --- @field validator_result? fun(path: string): boolean An additional validation function that runs as an additional filter on each result. default is no additional validation
+--- @field follow_links? boolean Whether to follow symlinks. Default false
+
+local function listRemoteDir(listerpath)
+  local output = run({
+    args = {"rclone", "lsf", {value = listerpath, type = "quoted"}},
+    catch = function() return nil end,
+  }) 
+  if output then
+    items = lines(output)
+    items = memoize(filter, refstore.params.memoize.opts.stringify_json)(items, false)
+    items = memoize(map, refstore.params.memoize.opts.stringify_json)(
+      items,
+      transf.path.no_leading_following_slash_or_whitespace
+    )
+  else
+    items = {}
+  end
+  return svalues(items)
+end
 
 --- Returns a table of all things in a directory
-
 --- @param opts itemsInPathOpts | string
 --- @param is_recursive_call? boolean Whether this is a recursive call. Allows us to avoid some duplicate work
---- @param path string Internal use only. The path to the directory during recursion
---- @param depth? integer The current depth of recursion. 
+--- @param path? string Internal use only. The path to the directory during recursion
+--- @param depth? integer Internal use only. The current depth of recursion. 
+--- @param seen_paths? string[] Internal use only. A table of paths we have already seen. Used to avoid infinite recursion
 --- @return string[] #A table of all things in the directory
-function itemsInPath(opts, is_recursive_call, path, depth)
+function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
   if not is_recursive_call then
     if type (opts) == "string" then
-      opts = {path = opts}
+      path = opts
+      opts = {}
     elseif type (opts) == "table" then
       opts = copy(opts)
+      path = opts.path
     elseif opts == nil then
       opts = {}
+      path = ""
     else
       error("itemsInPath: opts must be a string or a table")
     end
   end
   
-  if not testPath(opts.path, "dir") then 
+  if not testPath(path, "dir") then 
     if opts.include_files then
-      return {opts.path}
+      return {path}
     else
       return {}
     end
   end
+
   local files = {}
   if not is_recursive_call then 
-    opts.path = transf.string.path_resolved(opts.path, true)
-    opts.path = mustEnd(opts.path, "/")
-    if opts.path == "" then opts.path = "/" end
+    path = transf.string.path_resolved(path, true)
+    path = mustEnd(path, "/")
+    if path == "" then path = "/" end
     opts.validator = opts.validator or function(file_name)
-      return not findsingle(file_name,{".git", "node_modules", ".vscode"})
+      return not listContains(mt._list.useless_files, file_name)
     end
     opts.recursion = defaultIfNil(opts.recursion, false)
     opts.include_dirs = defaultIfNil(opts.include_dirs, true)
     opts.include_files = defaultIfNil(opts.include_files, true)
+    opts.follow_links = defaultIfNil(opts.follow_links, false)
   end
 
-  local remote = pathIsRemote(opts.path)
+
+
+  if opts.follow_links then
+    seen_paths = seen_paths or {}
+    local links_resolved_path = hs.fs.pathToAbsolute(path)
+    if listContains(seen_paths, links_resolved_path) then
+      return {}
+    else
+      push(seen_paths, links_resolved_path)
+    end
+  end
+
+  local remote = pathIsRemote(path)
 
   local lister
   if not remote then
     lister = hs.fs.dir
   else
-    lister = function(listerpath)
-      local output = run({
-        args = {"rclone", "lsf", {value = listerpath, type = "quoted"}},
-        catch = function() return nil end,
-      }) 
-      if output then
-        items = lines(output)
-        items = memoize(filter, refstore.params.memoize.opts.stringify_json)(items, false)
-        items = memoize(map, refstore.params.memoize.opts.stringify_json)(
-          items,
-          transf.path.no_leading_following_slash_or_whitespace
-        )
-      else
-        items = {}
-      end
-      return svalues(items)
-    end
+    lister = listRemoteDir
   end
 
-  for file_name in lister(opts.path) do
+  for file_name in lister(path) do
     if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" and opts.validator(file_name) then
-      local file_path = opts.path .. file_name
+      local file_path = path .. file_name
       if testPath(file_path, "dir") then 
         if opts.include_dirs then
           files[#files + 1] = file_path
@@ -86,9 +106,16 @@ function itemsInPath(opts, is_recursive_call, path, depth)
             shouldRecurse = false
           end
         end
+        if 
+          not opts.follow_links
+          and hs.fs.attributes(file_path, "mode") == "link" 
+        then
+          shouldRecurse = false
+        end
+          
         if shouldRecurse then
           depth = depth or 0
-          local sub_files = itemsInPath(opts, true, file_path, depth + 1)
+          local sub_files = itemsInPath(opts, true, file_path, depth + 1, seen_paths)
           for _, sub_file in ipairs(sub_files) do
             files[#files + 1] = sub_file
           end

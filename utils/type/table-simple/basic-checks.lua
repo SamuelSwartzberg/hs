@@ -70,3 +70,13 @@ end
 function hasKey(entity, key)
   return type(entity) == "table" and entity[key] ~= nil
 end
+
+--- @param t any[]
+--- @param v any
+--- @return boolean
+function listContains(t, v)
+  for _, v2 in ipairs(t) do
+    if v2 == v then return true end
+  end
+  return false
+end

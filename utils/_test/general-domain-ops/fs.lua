@@ -728,3 +728,112 @@ else
   print("skipping...")
 end
 
+-- test symlinks for itemsInPath
+
+
+local symlink_test_dir1 = env.TMPDIR .. "/symlink-test-1-" .. os.time() .. "/"
+local symlink_test_dir2 = env.TMPDIR .. "/symlink-test-2-" .. os.time() .. "/"
+
+writeFile(symlink_test_dir1 .. "foo.txt", "I got a fire in me", "any", true)
+writeFile(symlink_test_dir1 .. "nested1/foon.txt", "Night city", "any", true)
+writeFile(symlink_test_dir2 .. "bar.txt", "A fire like pain", "any", true)
+writeFile(symlink_test_dir2 .. "nested2/barn.txt", "This fire is outta control", "any", true)
+
+srctgt("link", symlink_test_dir2 .. "test-1-link", symlink_test_dir1)
+
+-- don't follow symlinks by default
+
+assertMessage(
+  itemsInPath({
+    path = symlink_test_dir2,
+    recursion = true
+  }),
+  {
+    symlink_test_dir2 .. "bar.txt",
+    symlink_test_dir2 .. "nested2",
+    symlink_test_dir2 .. "nested2/barn.txt",
+    symlink_test_dir2 .. "test-1-link",
+  }
+)
+
+-- don't follow symlinks if follow_links is false
+
+assertMessage(
+  itemsInPath({
+    path = symlink_test_dir2,
+    recursion = true,
+    follow_links = false
+  }),
+  {
+    symlink_test_dir2 .. "bar.txt",
+    symlink_test_dir2 .. "nested2",
+    symlink_test_dir2 .. "nested2/barn.txt",
+    symlink_test_dir2 .. "test-1-link",
+  }
+)
+
+-- follow symlinks if follow_links is true
+
+assertMessage(
+  itemsInPath({
+    path = symlink_test_dir2,
+    recursion = true,
+    follow_links = true
+  }),
+  {
+    symlink_test_dir2 .. "bar.txt",
+    symlink_test_dir2 .. "nested2",
+    symlink_test_dir2 .. "nested2/barn.txt",
+    symlink_test_dir2 .. "test-1-link",
+    symlink_test_dir2 .. "test-1-link/foo.txt",
+    symlink_test_dir2 .. "test-1-link/nested1",
+    symlink_test_dir2 .. "test-1-link/nested1/foon.txt",
+  }
+)
+
+-- deal with cycles
+
+-- deal with direct cycles
+
+srctgt("link", symlink_test_dir2 .. "test-2-link", symlink_test_dir2)
+
+assertMessage(
+  itemsInPath({
+    path = symlink_test_dir2,
+    recursion = true,
+    follow_links = true
+  }),
+  {
+    symlink_test_dir2 .. "bar.txt",
+    symlink_test_dir2 .. "nested2",
+    symlink_test_dir2 .. "nested2/barn.txt",
+    symlink_test_dir2 .. "test-1-link",
+    symlink_test_dir2 .. "test-1-link/foo.txt",
+    symlink_test_dir2 .. "test-1-link/nested1",
+    symlink_test_dir2 .. "test-1-link/nested1/foon.txt",
+    symlink_test_dir2 .. "test-2-link"
+  }
+)
+
+-- deal with indirect cycles
+
+srctgt("link", symlink_test_dir1 .. "test-2-link", symlink_test_dir2)
+
+assertMessage(
+  itemsInPath({
+    path = symlink_test_dir2,
+    recursion = true,
+    follow_links = true
+  }),
+  {
+    symlink_test_dir2 .. "bar.txt",
+    symlink_test_dir2 .. "nested2",
+    symlink_test_dir2 .. "nested2/barn.txt",
+    symlink_test_dir2 .. "test-1-link",
+    symlink_test_dir2 .. "test-1-link/foo.txt",
+    symlink_test_dir2 .. "test-1-link/nested1",
+    symlink_test_dir2 .. "test-1-link/nested1/foon.txt",
+    symlink_test_dir2 .. "test-1-link/test-2-link",
+    symlink_test_dir2 .. "test-2-link"
+  }
+)

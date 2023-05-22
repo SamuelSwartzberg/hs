@@ -27,6 +27,23 @@
 --- @field v indexable the value of the match
 --- @field match boolean whether it counts as a match
 
+--- @return matchspec
+local function gen_getres(match, k, v)
+  if match then 
+    return {
+      k = k,
+      v = v,
+      match = match
+    }
+  else 
+    return {
+      k = -1,
+      v = false,
+      match = false
+    }
+  end
+end
+
 --- find a single item that matches the conditions
 --- this is the logic guts of `find`, but can also be used on its own
 --- @param item? any most conditions only work if type is string, or the tostring option is set
@@ -52,23 +69,6 @@ function findsingle(item, conditions, opts)
   end
 
   local results = {}
-
-  --- @return matchspec
-  local gen_getres = function(match, k, v)
-    if match then 
-      return {
-        k = k,
-        v = v,
-        match = match
-      }
-    else 
-      return {
-        k = -1,
-        v = false,
-        match = false
-      }
-    end
-  end
 
   for _, condition in ipairs(conditions) do 
     -- process shorthand conditions into full conditions

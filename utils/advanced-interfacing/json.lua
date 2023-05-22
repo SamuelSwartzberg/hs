@@ -22,44 +22,41 @@ function rest(specifier, do_after)
       url = url .. (mustStart(specifier.endpoint, "/") or "/")
     end
     if specifier.params then
-      url = url .. "?" .. concat({ sep = "&", isopts="isopts" }, map(specifier.params, {_f = "%s=%s"}, { args = "kv", ret = "v", tolist = true }) )
+      url = url .. "?" .. transf.table.url_params(specifier.params)
     end
   else
     url = "https://dummyjson.com/products?limit=10&skip=10"
   end
   
-  local curl_args = {"curl"}
-
-  curl_args = concat(curl_args, { {
-    value = url,
-    type = "quoted"
-  } })
-
-  curl_args = concat(curl_args, {
+  local curl_args = {
+    "curl", {
+      value = url,
+      type = "quoted"
+    },
     "-H", 
     { value = "Content-Type: application/json", type = "quoted"},
     "-H",
     { value = "Accept: application/json", type = "quoted"},
-  })
+  }
   if specifier.api_key then 
     specifier.api_key_header = specifier.api_key_header or "Authorization: Bearer"
-    curl_args = concat(curl_args, {
-      "-H",
+    push(curl_args, "-H")
+    push(curl_args, 
       { value =  specifier.api_key_header .. " " .. specifier.api_key, type = "quoted"}
-    })
+    )
   end
   if specifier.request_verb then
-    curl_args = concat(curl_args, {
-      "--request",
+    push(curl_args, "--request")
+    push(curl_args, 
       { value = specifier.request_verb, type = "quoted"}
-    })
+    )
   end
   if specifier.request_table then
     local request_json = json.encode(specifier.request_table)
-    curl_args = concat(curl_args, {
-      "-d",
+    push(curl_args, "-d")
+    push(curl_args, 
       { value = request_json, type = "quoted"}
-    })
+    )
   end
   
   return runJSON(curl_args, do_after)

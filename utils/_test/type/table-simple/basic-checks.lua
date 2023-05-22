@@ -147,3 +147,33 @@ assertMessage(
   hasKey("not a table", "a"),
   false
 )
+
+assertMessage(
+  listContains({ 1, 2, 3 }, 1),
+  true
+)
+
+assertMessage(
+  listContains({ 1, 2, 3 }, 4),
+  false
+)
+
+assertMessage(
+  listContains("not a table", 1),
+  false
+)
+
+assertMessage(
+  listContains({ 1, 2, 3 }, "1"),
+  false
+)
+
+assertMessage(
+  listContains({ 1, 2, 3 }, nil),
+  false
+)
+
+assertMessage(
+  listContains({ 1, {}, 3 }, {}),
+  false
+)

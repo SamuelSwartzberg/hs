@@ -52,3 +52,15 @@ function assertMessage(a, b, msg)
     assert(a == b, ("Expected \n%s\nbut got \n%s. %s"):format(b, a, msg or ""))
   end
 end
+
+--- @param a any
+--- @param b any[]
+--- @param msg? string
+function assertMessageAny(a, b, msg)
+  local succ, res
+  for _, possibility in ipairs(b) do
+    succ, res = pcall(assertMessage, a, possibility, msg)
+    if succ then return end
+  end
+  error(res)
+end

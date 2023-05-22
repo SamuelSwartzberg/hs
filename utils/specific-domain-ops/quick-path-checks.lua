@@ -17,5 +17,9 @@ end
 --- @param path string
 --- @return boolean
 function isGitRootDir(path)
-  return find(itemsInPath(path), {_stop = ".git"})
+  return find(itemsInPath({
+    path = path,
+    recursion = false,
+    validator = returnTrue
+  }), {_stop = ".git"})
 end

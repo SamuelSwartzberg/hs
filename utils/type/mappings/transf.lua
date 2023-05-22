@@ -145,5 +145,14 @@ transf = {
         return replace(word, to.case.capitalized)
       end
     end
+  },
+  table = {
+    url_params = function(t)
+      local params = {}
+      for k, v in pairs(t) do
+        table.insert(params, k .. "=" .. v)
+      end
+      return table.concat(params, "&")
+    end,
   }
 }
