@@ -11,6 +11,20 @@ refstore = {
           rejoin_at_end = true
         },
       }
+    },
+    memoize = {
+      opts = {
+        stringify_table_params = {
+          stringify_table_params = true
+        },
+        table_param_subset = {
+          table_param_subset = "json"
+        },
+        stringify_json = {
+          stringify_table_params = true,
+          table_param_subset = "json"
+        }
+      }
     }
   }
 }

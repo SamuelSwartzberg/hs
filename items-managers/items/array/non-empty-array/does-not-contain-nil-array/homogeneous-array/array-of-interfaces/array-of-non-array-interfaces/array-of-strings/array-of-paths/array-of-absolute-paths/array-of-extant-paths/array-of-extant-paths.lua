@@ -70,7 +70,7 @@ ArrayOfExtantPathsSpecifier = {
         self:doThis("for-all", function(extant_path)
           createPath(target_dir) -- ensures path exists
           local path_leaf = extant_path:get("path_leaf")
-          local target_path = ensureAdfix(target_dir, "/", true, false, "suf") .. path_leaf
+          local target_path = mustEnd(target_dir, "/") .. path_leaf
           extant_path:doThis("move-safe", target_path)
         end)
       end,
@@ -78,7 +78,7 @@ ArrayOfExtantPathsSpecifier = {
         local common_ancestor = self:get("common-ancestor")
         self:doThis("for-all", function(extant_path)
           local relpath = extant_path:get("relative-path-from", common_ancestor)
-          local target_path = ensureAdfix(target, "/", true, false, "suf") .. relpath
+          local target_path = mustEnd(target, "/") .. relpath
           extant_path:doThis("move-safe", target_path)
         end)
       end,

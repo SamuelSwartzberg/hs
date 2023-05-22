@@ -129,7 +129,7 @@ EmailFileItemSpecifier = {
       ["choose-save-act-on-attachment"] = function(self)
         CreateArray(self:get("attachments")):doThis("choose-item", function(attachment)
           self:doThis("download-attachment", attachment)
-          local path = ensureAdfix(env.TMPDIR, "/", true, false, "suf") .. attachment
+          local path = mustEnd(env.TMPDIR, "/") .. attachment
           local file = CreateStringItem(path)
           file:doThis("choose-action")
         end)

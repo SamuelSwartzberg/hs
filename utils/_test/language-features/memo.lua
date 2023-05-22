@@ -249,7 +249,7 @@ local tbl_w_keys = {
   e = "e",
 }
 
-local memoizedPoisonable9_1 = memoize(poisonable9_1, {stringify_table_params = true, table_param_subset = "json"})
+local memoizedPoisonable9_1 = memoize(poisonable9_1, refstore.params.memoize.opts.stringify_json)
 
 local memoizedPoisonable9_2 = memoize(poisonable9_2, {stringify_table_params = true, table_param_subset = "no-fn-userdata-loops"})
 
@@ -301,7 +301,7 @@ local tbl_w_keys = {
   }
 }
 
-local memoizedPoisonable10_1 = memoize(poisonable10_1, {stringify_table_params = true, table_param_subset = "json"})
+local memoizedPoisonable10_1 = memoize(poisonable10_1, refstore.params.memoize.opts.stringify_json)
 local memoizedPoisonable10_2 = memoize(poisonable10_2, {stringify_table_params = true, table_param_subset = "no-fn-userdata-loops"})
 local memoizedPoisonable10_3 = memoize(poisonable10_3, {stringify_table_params = true, table_param_subset = "any"})
 
@@ -344,7 +344,7 @@ local tbl_w_keys = {
   e = 5,
 }
 
-local memoizedPoisonable11_1 = memoize(poisonable11_1, {stringify_table_params = true, table_param_subset = "json"})
+local memoizedPoisonable11_1 = memoize(poisonable11_1, refstore.params.memoize.opts.stringify_json)
 local memoizedPoisonable11_2 = memoize(poisonable11_2, {stringify_table_params = true, table_param_subset = "no-fn-userdata-loops"})
 local memoizedPoisonable11_3 = memoize(poisonable11_3, {stringify_table_params = true, table_param_subset = "any"})
 
@@ -477,7 +477,7 @@ local test_table_3 = copy(example_table)
 
 local res1 = memoize(
   returnSame,
-  {stringify_table_params = true, table_param_subset = "json"}
+  refstore.params.memoize.opts.stringify_json
 )(
   test_table_1
 )
@@ -493,7 +493,7 @@ res1.c = "c"
 
 local res2 = memoize(
   returnSame,
-  {stringify_table_params = true, table_param_subset = "json"}
+  refstore.params.memoize.opts.stringify_json
 )(
   test_table_2
 )
@@ -509,7 +509,7 @@ res2.c = "c"
 
 local res3 = memoize(
   returnSame,
-  {stringify_table_params = true, table_param_subset = "json"}
+  refstore.params.memoize.opts.stringify_json
 )(
   test_table_3
 )

@@ -90,3 +90,27 @@ function ensureAdfix(in_str, in_adfix, presence, case_insensitive, adfix_type, s
   end
   return res
 end
+
+--- Ensure a suffix, fast version
+--- @param in_str string
+--- @param suffix string
+--- @return string
+function mustEnd(in_str, suffix)
+  if stringy.endswith(in_str, suffix) then
+    return in_str
+  else
+    return in_str .. suffix
+  end
+end
+
+--- Ensure a prefix, fast version
+--- @param in_str string
+--- @param prefix string
+--- @return string
+function mustStart(in_str, prefix)
+  if stringy.startswith(in_str, prefix) then
+    return in_str
+  else
+    return prefix .. in_str
+  end
+end

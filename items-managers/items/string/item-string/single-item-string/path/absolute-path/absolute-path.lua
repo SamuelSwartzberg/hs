@@ -11,7 +11,7 @@ PathInterfaceItemSpecifier = {
       ["is-path-by-start"] = returnTrue,
       ["relative-path-from"] = function(self, starting_point)
         starting_point = starting_point or env.HOME
-        return self:get("difference-from-prefix-or-nil", ensureAdfix(starting_point, "/", true, false, "suf"))
+        return self:get("difference-from-prefix-or-nil", mustEnd(starting_point, "/"))
       end,
       ["local-http-server-url"] = function(self)
         return env.FS_HTTP_SERVER .. self:get("completely-resolved-path")

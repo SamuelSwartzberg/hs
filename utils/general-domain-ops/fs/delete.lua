@@ -83,7 +83,7 @@ function delete(path, thing, action, onlyif, fail)
   if is_dir then
     if not path_is_remote then
       if action == "empty" then
-        path = ensureAdfix(path, "/", true, false, "suf")
+        path = mustEnd(path, "/")
         run("rm -rf \"" .. replace(path, {{"\"", "\\\""}}) .. "\"*") -- need to make sure that the glob is not quoted
       elseif action == "delete" then
         run({

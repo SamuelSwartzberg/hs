@@ -88,7 +88,7 @@ function pathSlice(path, spec, opts)
 
   local res, eff_slice_spec =  memoize(
     slice, 
-    {stringify_table_params = true, table_param_subset = "json"}
+    refstore.params.memoize.opts.stringify_json
   )(raw_path_components, spec)
   local same_start_elem = res[1] == raw_path_components[1]
   local starts_at_beginning = eff_slice_spec.start == 1

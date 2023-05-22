@@ -64,11 +64,11 @@ function resolve(opts)
   -- clean roots
 
   if opts.s.root and opts.s.root ~= "" then
-    opts.s.root = ensureAdfix(opts.s.root, "/", true, false, "suf")
+    opts.s.root = mustEnd(opts.s.root, "/")
   end
 
   if opts.t.root and opts.t.root ~= "" then
-    opts.t.root = ensureAdfix(opts.t.root, "/", true, false, "suf")
+    opts.t.root = mustEnd(opts.t.root, "/")
   end
 
   -- init source vars
@@ -95,10 +95,10 @@ function resolve(opts)
 
   -- readd prefixes and suffixes to results
 
-  source = ensureAdfix(source, opts.s.prefix, true, false, "pre")
-  source = ensureAdfix(source, opts.s.suffix, true, false, "suf")
-  target = ensureAdfix(target, opts.t.prefix, true, false, "pre")
-  target = ensureAdfix(target, opts.t.suffix, true, false, "suf")
+  source = mustStart(source, opts.s.prefix)
+  source = mustEnd(source, opts.s.suffix)
+  target = mustStart(target, opts.t.prefix)
+  target = mustEnd(target, opts.t.suffix)
 
   return source, target
 end

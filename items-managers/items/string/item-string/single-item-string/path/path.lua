@@ -19,7 +19,7 @@ PathItemSpecifier = {
         return pathSlice(self:get("resolved-path"), ":-2", {rejoin_at_end=true})
       end,
       ["path-ensure-final-slash"] = function(self)
-        return ensureAdfix(self:get("resolved-path"), "/", true, false, "suf")
+        return mustEnd(self:get("resolved-path"), "/")
       end,
       ["path-without-extension"] = function(self)
         return pathSlice(self:get("resolved-path"), ":-2", { ext_sep = true, reojoin_at_end = true })[1]

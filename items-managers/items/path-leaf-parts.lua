@@ -31,7 +31,7 @@ PathLeafPartsSpecifier = {
         return self:get("contents").extension and "." .. self:get("contents").extension or ""
       end,
       ["path-as-string"] = function(self)
-        return ensureAdfix(self:get("contents").path or "", "/", true, false, "suf") 
+        return mustEnd(self:get("contents").path or "", "/")
       end,
       ["date"] = function(self)
         return self:get("contents").date or ""

@@ -5,14 +5,14 @@ LowercaseWordItemSpecifier = {
     getables = {
       ["is-pass-name"] = function(self)
         return find(
-          memoize(itemsInPath)({
+          memoize(itemsInPath, refstore.params.memoize.opts.stringify_json)({
             path = env.MPASS,
             recursion = true,
             include_dirs = false,
             slice_results = "-2:-2",
             slice_results_opts = { ext_sep = true },
           }),
-          self:get("contents")
+          {_exactly = self:get("contents")}
         )
       end,
     },

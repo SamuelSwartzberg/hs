@@ -87,3 +87,23 @@ assertMessage(
   ensureAdfix("AfoobAr", "oba", false, true, "in"),
   "Afor"
 )
+
+assertMessage(
+  mustEnd("foo/bar", "/"),
+  "foo/bar/"
+)
+
+assertMessage(
+  mustEnd("foo/bar/", "/"),
+  "foo/bar/"
+)
+
+assertMessage(
+  mustStart("foo/bar", "/"),
+  "/foo/bar"
+)
+
+assertMessage(
+  mustStart("/foo/bar", "/"),
+  "/foo/bar"
+)

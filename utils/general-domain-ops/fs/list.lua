@@ -11,16 +11,19 @@
 --- Returns a table of all things in a directory
 
 --- @param opts itemsInPathOpts | string
+--- @param is_recursive_call? boolean Whether this is a recursive call. Allows us to avoid some duplicate work
 --- @return string[] #A table of all things in the directory
-function itemsInPath(opts)
-  if type (opts) == "string" then
-    opts = {path = opts}
-  elseif type (opts) == "table" then
-    opts = copy(opts)
-  elseif opts == nil then
-    opts = {}
-  else
-    error("itemsInPath: opts must be a string or a table")
+function itemsInPath(opts, is_recursive_call)
+  if not is_recursive_call then
+    if type (opts) == "string" then
+      opts = {path = opts}
+    elseif type (opts) == "table" then
+      opts = copy(opts)
+    elseif opts == nil then
+      opts = {}
+    else
+      error("itemsInPath: opts must be a string or a table")
+    end
   end
   
   if not testPath(opts.path, "dir") then 
@@ -31,15 +34,17 @@ function itemsInPath(opts)
     end
   end
   local files = {}
-  opts.path = transf.string.path_resolved(opts.path, true)
-  opts.path = ensureAdfix(opts.path, "/", true, false, "suf")
-  if opts.path == "" then opts.path = "/" end
-  opts.validator = opts.validator or function(file_name)
-    return not findsingle(file_name,{".git", "node_modules", ".vscode"})
+  if not is_recursive_call then 
+    opts.path = transf.string.path_resolved(opts.path, true)
+    opts.path = mustEnd(opts.path, "/")
+    if opts.path == "" then opts.path = "/" end
+    opts.validator = opts.validator or function(file_name)
+      return not findsingle(file_name,{".git", "node_modules", ".vscode"})
+    end
+    opts.recursion = defaultIfNil(opts.recursion, false)
+    opts.include_dirs = defaultIfNil(opts.include_dirs, true)
+    opts.include_files = defaultIfNil(opts.include_files, true)
   end
-  opts.recursion = defaultIfNil(opts.recursion, false)
-  opts.include_dirs = defaultIfNil(opts.include_dirs, true)
-  opts.include_files = defaultIfNil(opts.include_files, true)
 
   local remote = pathIsRemote(opts.path)
 
@@ -54,7 +59,7 @@ function itemsInPath(opts)
       }) 
       if output then
         items = lines(output)
-        items = filter(items, false)
+        items = memoize(filter, refstore.params.memoize.opts.stringify_json)(items, false)
         items = map(
           items,
           function(item)
