@@ -39,9 +39,9 @@ function getStyledChooserItems(style_specifier, choices)
   --- @type item_style
   local item_style = concat(DefaultStylesForChooser, style_specifier)
   local new_choices = {}
-  for i, choice in iprs(choices) do
+  for i, choice in ipairs(choices) do
     choice.image = choice.image or item_style.image
-    for _, text in iprs({"text", "subText"}) do
+    for _, text in ipairs({"text", "subText"}) do
       if choice[text] then
         local text_string_or_styledtext = choice[text]
         local styled_text
@@ -52,7 +52,7 @@ function getStyledChooserItems(style_specifier, choices)
           local text_string = slice(existing_style, 1, 1)[1]
           local style = slice(existing_style, 2, #existing_style)
           styled_text = hs.styledtext.new(text_string, item_style.styledtext[text])
-          for _, v in iprs(style) do
+          for _, v in ipairs(style) do
             styled_text = styled_text:setStyle(v.attributes, v.starts, v.ends)
           end
         end

@@ -8,17 +8,28 @@ global_store = nil
 
 --- @param specifier BenchmarkSpecifier | benchspec
 --- @return nil
-function benchmarkFunctions(specifier)
+function benchmarkFunctions(specifier, args, iters)
   if not specifier.funcs then
-    specifier = { funcs = { specifier } }
+    specifier = { funcs = specifier }
   end
-  specifier.iterations = specifier.iterations or 100
-  for _, func_specifier in iprs(specifier.funcs) do
+  specifier.iterations = specifier.iterations or iters or 100
+  for _, func_specifier in ipairs(specifier.funcs) do
     local start = os.clock()
+    if type(func_specifier) == "function" then
+      func_specifier = { func = func_specifier }
+    elseif isList(func_specifier) then
+      func_specifier = {
+        func = func_specifier[1],
+        name = func_specifier[2],
+        args = func_specifier[3],
+      }
+    end
     local func = func_specifier.func
     for i = 1, specifier.iterations do
       if func_specifier.args then
-        global_store = func(table.unpack(func_specifier.args))
+        global_store = func(returnUnpackIfTable(func_specifier.args))
+      elseif args then
+        global_store = func(returnUnpackIfTable(args))
       else
         global_store = func()
       end

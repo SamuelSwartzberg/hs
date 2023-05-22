@@ -121,7 +121,7 @@ results_from_1_to_10 = map(
   {"k", "kv"}
 )
 
-for i, v in iprs(list_from_1_to_10) do
+for i, v in ipairs(list_from_1_to_10) do
   runThreaded(
     cmds_from_1_to_10,
     i,

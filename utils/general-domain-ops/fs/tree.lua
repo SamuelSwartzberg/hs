@@ -10,7 +10,7 @@ function fsTree(path, do_files, tree_files)
   tree_files = tree_files or {"json", "yaml"}
   local res = {}
   path = ensureAdfix(path, "/", true, false, "suf")
-  for _,full_path in iprs(itemsInPath(path)) do
+  for _,full_path in ipairs(itemsInPath(path)) do
     local file = pathSlice(full_path, "-1:-1")[1]
     if testPath(full_path, "dir") then 
       res[file] = fsTree(full_path, do_files, tree_files)

@@ -87,7 +87,7 @@ function itemsInPath(opts)
           sub_opts.path = file_path
           sub_opts.recursion = crementIfNumber(opts.recursion, "de")
           local sub_files = itemsInPath(sub_opts)
-          for _, sub_file in iprs(sub_files) do
+          for _, sub_file in ipairs(sub_files) do
             files[#files + 1] = sub_file
           end
         end
@@ -127,7 +127,7 @@ function getItemsForAllLevelsInSlice(path, slice_spec, opts)
   local path = transf.string.path_resolved(path, true)
   local levels = pathSlice(path, slice_spec, { entire_path_for_each = true })
   local res = {}
-  for _, level in iprs(levels) do
+  for _, level in ipairs(levels) do
     opts.path = level -- this modifies the opts table, but that's fine, since it gets copied in itemsInPath
     local items = itemsInPath(opts)
     res = concat(res, items)

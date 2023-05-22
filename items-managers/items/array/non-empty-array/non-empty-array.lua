@@ -108,7 +108,7 @@ NonEmptyArraySpecifier = {
       end,
       ["flatten"] = function(self, recursive)
         local new_arr = {}
-        for i, item in iprs(self:get("contents")) do
+        for i, item in ipairs(self:get("contents")) do
           if type(item) == "table" and item.get and item:get("is-array") then
             if recursive then
               new_arr = concat(new_arr, item:get("flatten", recursive))
@@ -140,7 +140,7 @@ NonEmptyArraySpecifier = {
     },
     doThisables = {
       ["for-all"] = function(self, callback)
-        for i, item in iprs(self:get("contents")) do
+        for i, item in ipairs(self:get("contents")) do
           callback(item)
         end
       end,

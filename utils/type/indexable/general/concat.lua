@@ -44,7 +44,7 @@ function concat(opts, ...)
   local sep, index
 
   -- now do the rest of the loop
-  for i, input in iprs(inputs) do
+  for i, input in ipairs(inputs) do
     index = i
     sep = getSep(opts,i)
     if sep then

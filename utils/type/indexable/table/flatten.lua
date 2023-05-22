@@ -50,7 +50,7 @@ function flatten(tbl, opts, visited)
     }
   elseif isListOrEmptyTable(opts.val) then
     local newval = {}
-    for _, v in iprs(opts.val) do
+    for _, v in ipairs(opts.val) do
       newval[v] = true
     end
     opts.val = newval
@@ -144,7 +144,7 @@ function flatten(tbl, opts, visited)
   
   if opts.mode == "path-assoc" and opts.depth == 0 then
     local newres = {}
-    for k, v in iprs(res) do
+    for k, v in ipairs(res) do
       local val
       if res_should_be_plain then
         val = v.value

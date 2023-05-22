@@ -452,13 +452,13 @@ assertMessage(
   false
 )
 
-for _, n in iprs(seq(1, 4)) do
+for _, n in ipairs(seq(1, 4)) do
   writeFile( temp_subdir_1_path .. "file_" .. n .. ".txt", "lorem ipsum " .. n, "not-exists", true, "w" )
 end
 
 srctgt("link", temp_subdir_1_path, temp_subdir_1_path .. "subdir", "not-exists", false, false, true)
 
-for _, n in iprs(seq(1, 4)) do
+for _, n in ipairs(seq(1, 4)) do
   assertMessage(
     readFile( temp_subdir_1_path .. "subdir/file_" .. n .. ".txt" ),
     "lorem ipsum " .. n

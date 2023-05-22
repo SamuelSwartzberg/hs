@@ -16,7 +16,7 @@ NonEmptyTableSpecifier = {
       end,
       ["first-match-in-list-of-keys"] = function (self, list_of_keys)
         local contents = self:get("contents")
-        for _, key in iprs(list_of_keys) do
+        for _, key in ipairs(list_of_keys) do
           if contents[key] then
             return contents[key]
           end

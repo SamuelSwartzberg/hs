@@ -86,15 +86,10 @@ function pathSlice(path, spec, opts)
 
   -- slice
 
-  inspPrint(raw_path_components)
-  inspPrint(spec)
-  inspPrint({slice(raw_path_components, spec)})
   local res, eff_slice_spec =  memoize(
     slice, 
     {stringify_table_params = true, table_param_subset = "json"}
   )(raw_path_components, spec)
-  inspPrint(res)
-  inspPrint(eff_slice_spec)
   local same_start_elem = res[1] == raw_path_components[1]
   local starts_at_beginning = eff_slice_spec.start == 1
     

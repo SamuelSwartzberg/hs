@@ -7,7 +7,7 @@ function parseRelayTable(raw)
   local raw_countries = stringx.split(raw, "\n\n") -- stringy does not support splitting by multiple characters
   raw_countries = filter(raw_countries, true)
   local countries = {}
-  for _, raw_country in iprs(raw_countries) do
+  for _, raw_country in ipairs(raw_countries) do
     local raw_country_lines = stringy.split(raw_country, "\n")
     raw_country_lines = filter(raw_country_lines, true)
     local country_header = raw_country_lines[1]
@@ -16,7 +16,7 @@ function parseRelayTable(raw)
     local payload_lines = slice(raw_country_lines, 2, -1)
     countries[country_code] = {}
     local city_code
-    for _, payload_line in iprs(payload_lines) do
+    for _, payload_line in ipairs(payload_lines) do
       if stringy.startswith(payload_line, "\t\t") then -- line specifying a single relay
         local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
         push(countries[country_code][city_code], relay_code)

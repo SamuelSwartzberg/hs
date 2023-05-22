@@ -34,7 +34,7 @@ TelegramItemSpecifier = {
         local raw_reactions = {}
         if msg["reactions"] then
           local reaction_tally = {}
-          for _, reaction in iprs(msg["reactions"]) do
+          for _, reaction in ipairs(msg["reactions"]) do
             reaction_tally[reaction.reaction] = (reaction_tally[reaction.reaction] or 0) + 1
           end
           for reaction, count in pairs(reaction_tally) do
@@ -99,7 +99,7 @@ TelegramItemSpecifier = {
         local export_json = CreateStringItem(export_dir:get("child-ending-with", "result.json")):get("parse-to-lua-table")
         local chats = export_json.chats.list
 
-        for chat_index, chat in iprs(chats) do
+        for chat_index, chat in ipairs(chats) do
           chat.chat_index = chat_index
           func(chat, chat_index)
         end

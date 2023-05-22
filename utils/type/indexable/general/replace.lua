@@ -49,7 +49,7 @@ function replace(thing, opts, globalopts)
   proc = defaultIfNil(proc, "\\")
 
   local res = thing
-  for _, opt in iprs(opts) do
+  for _, opt in ipairs(opts) do
     if isListOrEmptyTable(opt) and #opt == 2 then
       opt = {cond = opt[1], proc = opt[2]}
     end

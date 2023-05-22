@@ -64,7 +64,7 @@ end
 --- @return (T|U)[]
 function setIntersection(set1, set2)
   local new_list = {}
-  for _, v in iprs(set1) do
+  for _, v in ipairs(set1) do
     if find(set2, v) then
       new_list[#new_list + 1] = v
     end
@@ -78,7 +78,7 @@ end
 --- @return boolean
 function setEquals(set1, set2)
   if #set1 ~= #set2 then return false end
-  for _, v in iprs(set1) do
+  for _, v in ipairs(set1) do
     if not find(set2, v) then
       return false
     end
@@ -91,7 +91,7 @@ end
 --- @param set2 U[]
 --- @return boolean
 function setIsSubset(set1, set2)
-  for _, v in iprs(set1) do
+  for _, v in ipairs(set1) do
     if not find(set2, v) then
       return false
     end
@@ -113,7 +113,7 @@ end
 --- @return (T|U)[]
 function setDifference(set1, set2)
   local new_list = {}
-  for _, v in iprs(set1) do
+  for _, v in ipairs(set1) do
     if not find(set2, v) then
       new_list[#new_list + 1] = v
     end
@@ -127,12 +127,12 @@ end
 --- @return (T|U)[]
 function setSymmetricDifference(set1, set2)
   local new_list = {}
-  for _, v in iprs(set1) do
+  for _, v in ipairs(set1) do
     if not find(set2, v) then
       new_list[#new_list + 1] = v
     end
   end
-  for _, v in iprs(set2) do
+  for _, v in ipairs(set2) do
     if not find(set1, v) then
       new_list[#new_list + 1] = v
     end

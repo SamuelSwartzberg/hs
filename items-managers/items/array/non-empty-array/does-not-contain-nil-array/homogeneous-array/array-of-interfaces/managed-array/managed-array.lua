@@ -33,7 +33,7 @@ ManagedArraySpecifier = {
         return self:get("remove-by-index", index)
       end,
       ["filter-in-place-valid"] = function(self)
-        for i, item in iprs(self:get("contents")) do
+        for i, item in ipairs(self:get("contents")) do
           if not item:get("is-valid") then
             self:get("remove-by-index", i)
           end

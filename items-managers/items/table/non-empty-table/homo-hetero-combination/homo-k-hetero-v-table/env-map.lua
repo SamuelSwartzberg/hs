@@ -2,7 +2,7 @@
 
 local function getDependencyLines(line_with_dependencies, lines_with_dependencies)
   local lines = {}
-  for _, dependency in iprs(line_with_dependencies.dependencies) do
+  for _, dependency in ipairs(line_with_dependencies.dependencies) do
     local dependency_line_with_dependencies = lines_with_dependencies[dependency]
     if dependency_line_with_dependencies then
       lines = concat(lines, getDependencyLines(dependency_line_with_dependencies, lines_with_dependencies))
@@ -33,7 +33,7 @@ EnvMapSpecifier = {
         -- order the env lines so that the dependencies are defined before the dependents
         local lines = self:get("env-lines")
         local lines_with_dependencies = {}
-        for _, line in iprs(lines) do
+        for _, line in ipairs(lines) do
           local key, value = string.match(line, "^([A-Z0-9_]-)=\"(.*)\"$")
           local dependencies
           if value then

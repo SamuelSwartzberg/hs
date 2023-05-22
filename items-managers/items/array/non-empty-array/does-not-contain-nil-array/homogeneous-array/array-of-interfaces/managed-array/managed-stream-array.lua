@@ -19,7 +19,7 @@ ManagedStreamArraySpecifier = {
         })
       end,
       ["create-background-streams"] = function(self, relative_paths)
-        for _, relative_path in iprs(relative_paths) do
+        for _, relative_path in ipairs(relative_paths) do
           self:doThis("create-background-stream", relative_path)
         end
       end,

@@ -66,7 +66,7 @@ LatexProjectDirItemSpecifier = {
         self:doThis("open-in-new-vscode-window")
       end,
       ["build-bibfile"] = function(self)
-        for _, bib_item in iprs(self:get("imported-bib-items")) do
+        for _, bib_item in ipairs(self:get("imported-bib-items")) do
           writeFile(self:get("latex-bibfile"), bib_item, "any", true, "a")
         end
       end,

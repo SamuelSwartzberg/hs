@@ -4,7 +4,7 @@
 function pasteMultilineString(str)
   local lines = stringy.split(str, "\n")
   local is_first_line = true
-  for _, line in iprs(lines) do
+  for _, line in ipairs(lines) do
     if is_first_line then
       is_first_line = false
     else

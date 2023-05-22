@@ -106,7 +106,7 @@ end
 --- @return any
 function getArgs(retriever, opts)
   local args = {}
-  for _, arg in iprs(opts.args) do
+  for _, arg in ipairs(opts.args) do
     table.insert(args, retriever[arg])
   end
   return args
@@ -137,7 +137,7 @@ end
 --- @param itemres any[] really should be [any, any], but lua type annotations don't support that
 function addToRes(itemres,res,opts,k,v)
   local mapped_useas = {}
-  for index, ret in iprs(opts.ret) do
+  for index, ret in ipairs(opts.ret) do
     mapped_useas[ret] = index
   end
 

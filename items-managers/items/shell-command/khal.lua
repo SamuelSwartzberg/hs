@@ -44,13 +44,13 @@ end
 
 function addInclExclToCommand(command, specifier)
   if specifier.include_calendar then
-    for _, cal in iprs(specifier.include_calendar) do
+    for _, cal in ipairs(specifier.include_calendar) do
       table.insert(command, "--include-calendar")
       table.insert(command, { value = cal, type = "quoted" })
     end
   end
   if specifier.exclude_calendar then
-    for _, cal in iprs(specifier.exclude_calendar) do
+    for _, cal in ipairs(specifier.exclude_calendar) do
       table.insert(command, "--exclude-calendar")
       table.insert(command, { value = cal, type = "quoted" })
     end
@@ -60,7 +60,7 @@ end
 function parseParseableKhalToSpecification(event)
   local components = stringx.split(event, FIELD_SEPARATOR)
   local parsed = ovtable.new()
-  for i, component in iprs(components) do
+  for i, component in ipairs(components) do
     local key = PARSEABLE_FORMAT_COMPONENTS[i]
     if key == "alarms" then
       parsed[key] = stringy.split(component, ",")

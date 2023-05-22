@@ -54,7 +54,7 @@ function glue(base, addition, opts)
     else
       if isList(addition) then
         if isList(base) then -- glue(list, list2)
-          for _, v in iprs(addition) do
+          for _, v in ipairs(addition) do
             base = append(base, v, opts)
           end
         else -- glue(assocarr, list)

@@ -67,7 +67,7 @@ ContactTableSpecifier = {
           local transformed_table = {}
           for k, v in pairs(potential_prop_table) do
             local new_ks = stringy.split(k, ",")
-            for _, raw_new_k in iprs(new_ks) do
+            for _, raw_new_k in ipairs(new_ks) do
               local new_k = stringy.strip(raw_new_k)
               transformed_table[new_k] = v
             end

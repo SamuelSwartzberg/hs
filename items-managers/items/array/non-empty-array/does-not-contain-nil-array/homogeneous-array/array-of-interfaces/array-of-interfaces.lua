@@ -64,7 +64,7 @@ ArrayOfInterfacesSpecifier = {
       end,
       ["min-contents-item"] = function(self)
         local target
-        for i, item in iprs(self:get("contents")) do
+        for i, item in ipairs(self:get("contents")) do
           if not target or item:get("contents") < target:get("contents") then
             target = item
           end
@@ -76,7 +76,7 @@ ArrayOfInterfacesSpecifier = {
       end,
       ["max-contents-item"] = function(self)
         local target
-        for i, item in iprs(self:get("contents")) do
+        for i, item in ipairs(self:get("contents")) do
           if not target or item:get("contents") > target:get("contents") then
             target = item
           end
@@ -112,12 +112,12 @@ ArrayOfInterfacesSpecifier = {
         end)
       end,
       ["set-all"] = function(self, do_specifier)
-        for i, item in iprs(self:get("contents")) do
+        for i, item in ipairs(self:get("contents")) do
           item:set(item, do_specifier.key, do_specifier.value)
         end
       end,
       ["do-all"] = function(self, do_specifier)
-        for i, item in iprs(self:get("contents")) do
+        for i, item in ipairs(self:get("contents")) do
           item:doThis(do_specifier.key, do_specifier.args)
         end
       end,

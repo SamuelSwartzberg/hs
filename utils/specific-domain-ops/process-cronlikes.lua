@@ -76,10 +76,10 @@ end
 
 --- @param path string
 function processSetupDirectivesInFiles(path)
-  for _, child in iprs(itemsInPath({path = path, include_dirs = false})) do
+  for _, child in ipairs(itemsInPath({path = path, include_dirs = false})) do
     local cronlikeSpecs = processCronlikeFile(child)
     
-    for _, spec in iprs(cronlikeSpecs) do
+    for _, spec in ipairs(cronlikeSpecs) do
       if spec.conditionType == "startup" then
         _G[spec.fn](table.unpack(spec.args))
       elseif spec.conditionType == "timer" then

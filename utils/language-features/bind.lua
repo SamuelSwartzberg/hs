@@ -19,18 +19,18 @@ function bind(func, arg_spec, ignore_spec)
   local inner_func = function(...)
     local args = {...}
     table.sort(ignore_spec, function(a, b) return a > b end)
-    for _, index in iprs(ignore_spec) do
+    for _, index in ipairs(ignore_spec) do
       table.remove(args, index)
     end
     local new_args = {}
-    for index, arg in iprs(arg_spec) do -- for all arg_lists to bind
+    for index, arg in ipairs(arg_spec) do -- for all arg_lists to bind
       if arg == a_use then
         new_args[index] = table.remove(args, 1)
       else
         new_args[index] = arg
       end
     end
-    for _, arg in iprs(args) do -- for all remaining args
+    for _, arg in ipairs(args) do -- for all remaining args
       table.insert(new_args, arg)
     end
     return func(table.unpack(new_args))

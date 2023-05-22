@@ -38,7 +38,7 @@ function parseDate(date)
 
   -- we have to parse the date
 
-  for _, sep in iprs(long_dt_seps) do
+  for _, sep in ipairs(long_dt_seps) do
     eutf8.gsub(date, sep, " ")
   end
 

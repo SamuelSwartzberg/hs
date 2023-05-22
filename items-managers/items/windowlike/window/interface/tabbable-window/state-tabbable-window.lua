@@ -7,7 +7,7 @@ StateTabbableWindowItemSpecifier = {
     getables = {
       ["list-of-tabs"] = function(self)
         local res = {}
-        for i, tab in iprs(self:get("window-in-state-json").tabs) do
+        for i, tab in ipairs(self:get("window-in-state-json").tabs) do
           tab.window = self:get("contents")
           tab.type = "state"
           tab.app = self:get("running-application")
@@ -19,7 +19,7 @@ StateTabbableWindowItemSpecifier = {
       ["active-tab"] = function(self)
         local list_of_tabs = self:get("list-of-tabs")
         local window_title = self:get("raw-title")
-        for i, tab in iprs(list_of_tabs) do
+        for i, tab in ipairs(list_of_tabs) do
           if tab:get("raw-title") == window_title then
             return tab
           end

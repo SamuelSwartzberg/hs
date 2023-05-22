@@ -16,7 +16,7 @@ end
 --- @param values any[]
 --- @return nil
 function assertValuesContain(a, values)
-  for _, value in iprs(values) do
+  for _, value in ipairs(values) do
     assert(
     valuesContainShape(a, value),
     ("Expected \n%s\n to contain \n%s\n\nAll required values:\n%s"):format(hsInspectCleaned(a, 5), hsInspectCleaned(value, 5), hsInspectCleaned(values, 5))
@@ -28,7 +28,7 @@ end
 --- @param values any[]
 --- @return nil
 function assertValuesNotContain(a, values)
-  for _, value in iprs(values) do
+  for _, value in ipairs(values) do
     assert(
     not valuesContainShape(a, value),
     ("Expected %s to not contain %s, but it does."):format(hsInspectCleaned(a, 5), hsInspectCleaned(value, 5))

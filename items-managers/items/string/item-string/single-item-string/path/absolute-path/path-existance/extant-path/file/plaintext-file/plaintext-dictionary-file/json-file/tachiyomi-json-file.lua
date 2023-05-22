@@ -18,14 +18,14 @@ TachiyomiJsonFileItemSpecifier = {
         local manga = raw_backup.backupManga
         local manga_url, manga_title = manga.url, manga.title
         local chapter_map = {}
-        for _, chapter in iprs(manga.chapters) do
+        for _, chapter in ipairs(manga.chapters) do
           chapter_map[chapter.url] = {
             chapterNumber = chapter.chapterNumber,
             name = chapter.name
           }
         end
         local history_list = {}
-        for _, hist_item in iprs(manga.history) do
+        for _, hist_item in ipairs(manga.history) do
           local chapter = chapter_map[hist_item.url]
           history_list[hist_item.lastRead / 1000] = {
             manga_url,

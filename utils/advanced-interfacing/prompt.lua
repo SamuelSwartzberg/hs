@@ -302,7 +302,7 @@ function promptPipeline(prompt_pipeline)
   else
     res = first_prompt_spec
   end
-  for _, args in iprs(prompt_pipeline) do
+  for _, args in ipairs(prompt_pipeline) do
     local prompt_spec = args[2]
     local new_prompt_spec
     if type(prompt_spec) == "table" then
