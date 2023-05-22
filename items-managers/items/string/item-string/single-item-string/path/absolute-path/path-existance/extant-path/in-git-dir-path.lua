@@ -24,8 +24,8 @@ InGitDirPathItemSpecifier = {
           "--get",
           "remote.origin.url",
         })
-        remote = ensureAdfix(remote, ".git", false, false, "suf")
-        remote = ensureAdfix(remote, "/", false, false, "suf")
+        remote = mustNotEnd(remote, ".git")
+        remote = mustNotEnd(remote, "/")
         return remote
       end,
       ["git-remote-owner-item"] = function(self)

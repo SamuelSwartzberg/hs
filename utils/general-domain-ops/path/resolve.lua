@@ -52,13 +52,13 @@ function resolve(opts)
   -- clean paths
 
   if opts.s.path then
-    opts.s.path = ensureAdfix(opts.s.path, opts.s.prefix, false, false, "pre")
-    opts.s.path = ensureAdfix(opts.s.path, opts.s.suffix, false, false, "suf")
+    opts.s.path = mustNotStart(opts.s.path, opts.s.prefix)
+    opts.s.path = mustNotEnd(opts.s.path, opts.s.suffix)
   end
 
   if opts.t.path then
-    opts.t.path = ensureAdfix(opts.t.path, opts.t.prefix, false, false, "pre")
-    opts.t.path = ensureAdfix(opts.t.path, opts.t.suffix, false, false, "suf")
+    opts.t.path = mustNotStart(opts.t.path, opts.t.prefix)
+    opts.t.path = mustNotEnd(opts.t.path, opts.t.suffix)
   end
 
   -- clean roots
@@ -73,8 +73,8 @@ function resolve(opts)
 
   -- init source vars
 
-  local source_relative_path = ensureAdfix(opts.s.path, opts.s.root, false, false, "pre")
-  source_relative_path = ensureAdfix(source_relative_path, "/", false, false, "pre")
+  local source_relative_path = mustNotStart(opts.s.path, opts.s.root)
+  source_relative_path = mustNotStart(source_relative_path, "/")
   source = opts.s.root .. source_relative_path
 
   if not opts.t.path then -- use at least relative path from source 
@@ -84,8 +84,8 @@ function resolve(opts)
       target = opts.t.root .. source_relative_path
     end
   else -- use at least relative path from target 
-    local target_relative_path = ensureAdfix(opts.t.path, opts.t.root or "", false, false, "pre")
-    target_relative_path = ensureAdfix(target_relative_path, "/", false, false, "pre")
+    local target_relative_path = mustNotStart(opts.t.path, opts.t.root or "")
+    target_relative_path = mustNotStart(target_relative_path, "/")
     if opts.t.root then -- use relative path and root from target
       target = opts.t.root .. target_relative_path
     else -- use relative path from target and root from source

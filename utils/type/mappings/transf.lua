@@ -34,6 +34,10 @@ transf = {
       local mimetype = mimetypes.guess(path) or "text/plain"
       return "#" .. mimetype .. " " .. path
     end,
+    no_leading_following_slash_or_whitespace = function(item)
+      item = stringy.strip(item)
+      return item
+    end
   },
   string = {
     escaped_csv_field = function(field)

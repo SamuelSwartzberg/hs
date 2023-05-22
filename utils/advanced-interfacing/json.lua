@@ -17,9 +17,9 @@ function rest(specifier, do_after)
   if specifier.url then
     url = specifier.url
   elseif specifier.host or specifier.endpoint or specifier.params then
-    url = ensureAdfix(specifier.host, "/", false, false, "suf")
+    url = mustNotEnd(specifier.host, "/")
     if specifier.endpoint then
-      url = url .. (ensureAdfix(specifier.endpoint, "/") or "/")
+      url = url .. (mustStart(specifier.endpoint, "/") or "/")
     end
     if specifier.params then
       url = url .. "?" .. concat({ sep = "&", isopts="isopts" }, map(specifier.params, {_f = "%s=%s"}, { args = "kv", ret = "v", tolist = true }) )

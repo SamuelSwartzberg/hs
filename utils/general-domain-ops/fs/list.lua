@@ -12,8 +12,10 @@
 
 --- @param opts itemsInPathOpts | string
 --- @param is_recursive_call? boolean Whether this is a recursive call. Allows us to avoid some duplicate work
+--- @param path string Internal use only. The path to the directory during recursion
+--- @param depth? integer The current depth of recursion. 
 --- @return string[] #A table of all things in the directory
-function itemsInPath(opts, is_recursive_call)
+function itemsInPath(opts, is_recursive_call, path, depth)
   if not is_recursive_call then
     if type (opts) == "string" then
       opts = {path = opts}
@@ -60,14 +62,9 @@ function itemsInPath(opts, is_recursive_call)
       if output then
         items = lines(output)
         items = memoize(filter, refstore.params.memoize.opts.stringify_json)(items, false)
-        items = map(
+        items = memoize(map, refstore.params.memoize.opts.stringify_json)(
           items,
-          function(item)
-            item = stringy.strip(item)
-            item = ensureAdfix(item, "/", false, false, "pre")
-            item = ensureAdfix(item, "/", false, false, "suf")
-            return item
-          end
+          transf.path.no_leading_following_slash_or_whitespace
         )
       else
         items = {}
@@ -85,13 +82,13 @@ function itemsInPath(opts, is_recursive_call)
         end
         local shouldRecurse = opts.recursion
         if type(opts.recursion) == "number" then
-          if opts.recursion <= 0 then shouldRecurse = false end
+          if depth and depth >= opts.recursion then
+            shouldRecurse = false
+          end
         end
         if shouldRecurse then
-          local sub_opts = copy(opts)
-          sub_opts.path = file_path
-          sub_opts.recursion = crementIfNumber(opts.recursion, "de")
-          local sub_files = itemsInPath(sub_opts)
+          depth = depth or 0
+          local sub_files = itemsInPath(opts, true, file_path, depth + 1)
           for _, sub_file in ipairs(sub_files) do
             files[#files + 1] = sub_file
           end
@@ -105,7 +102,7 @@ function itemsInPath(opts, is_recursive_call)
   end
 
   if opts.validator_result then
-    files = filter(files, opts.validator_result, {tolist=true})
+    files = memoize(filter, refstore.params.memoize.opts.stringify_json)(files, opts.validator_result, refstore.params.table_proc_fn.opts.tolist)
   end
 
   if opts.slice_results then

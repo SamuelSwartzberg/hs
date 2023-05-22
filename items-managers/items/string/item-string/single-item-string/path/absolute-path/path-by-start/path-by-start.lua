@@ -10,7 +10,7 @@ PathByStartItemSpecifier = {
         return not self:get("is-path-in-home")
       end,
       ["relative-path"] = function(self)
-        return ensureAdfix(self:get("completely-resolved-path"), self:get("base-path"), false)
+        return mustNotStart(self:get("completely-resolved-path"), self:get("base-path"))
       end,
     },
     doThisables = {

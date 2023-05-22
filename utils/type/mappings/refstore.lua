@@ -25,6 +25,13 @@ refstore = {
           table_param_subset = "json"
         }
       }
+    },
+    table_proc_fn = {
+      opts = {
+        tolist = {
+          tolist = true
+        }
+      }
     }
   }
 }

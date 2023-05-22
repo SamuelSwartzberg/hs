@@ -107,3 +107,23 @@ assertMessage(
   mustStart("/foo/bar", "/"),
   "/foo/bar"
 )
+
+assertMessage(
+  mustNotStart("foo/bar", "/"),
+  "foo/bar"
+)
+
+assertMessage(
+  mustNotStart("/foo/bar", "/"),
+  "foo/bar"
+)
+
+assertMessage(
+  mustNotEnd("foo/bar", "/"),
+  "foo/bar"
+)
+
+assertMessage(
+  mustNotEnd("foo/bar/", "/"),
+  "foo/bar"
+)

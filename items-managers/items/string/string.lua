@@ -44,14 +44,14 @@ StringItemSpecifier = {
         return stringy.endswith(self:get("contents"), str)
       end,
       ["difference-from-prefix-or-self"] = function(self, prefix) 
-        return ensureAdfix(self:get("contents"), prefix, false)
+        return mustNotStart(self:get("contents"), prefix)
       end,
       ["difference-from-prefix-or-nil"] = function(self, prefix)
         if not self:get("starts-with", prefix) then return nil end
         return eutf8.sub(self:get("contents"), eutf8.len(prefix) + 1)
       end,
       ["difference-from-suffix-or-self"] = function(self, suffix) return 
-          ensureAdfix(self:get("contents"), suffix, false, "suf")
+          mustNotEnd(self:get("contents"), suffix)
       end,
       ["difference-from-suffix-or-nil"] = function(self, suffix)
         if not self:get("ends-with", suffix) then return nil end

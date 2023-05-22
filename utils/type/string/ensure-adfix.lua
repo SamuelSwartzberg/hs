@@ -1,4 +1,3 @@
-
 ---Ensure things related to adfixes
 ---@param in_str string the string to check and potentially modify
 ---@param in_adfix string the adfix to check for and potentially add.
@@ -112,5 +111,31 @@ function mustStart(in_str, prefix)
     return in_str
   else
     return prefix .. in_str
+  end
+end
+
+--- Ensure not prefix
+--- @param in_str string
+--- @param prefix string
+--- @return string
+function mustNotStart(in_str, prefix)
+  if stringy.startswith(in_str, prefix) then
+    local pref_len = eutf8.len(prefix)
+    return eutf8.sub(in_str, pref_len + 1)
+  else
+    return in_str
+  end
+end
+
+--- Ensure not suffix
+--- @param in_str string
+--- @param suffix string
+--- @return string
+function mustNotEnd(in_str, suffix)
+  if stringy.endswith(in_str, suffix) then
+    local suff_len = eutf8.len(suffix)
+    return eutf8.sub(in_str, 1, eutf8.len(in_str) - suff_len)
+  else
+    return in_str
   end
 end
