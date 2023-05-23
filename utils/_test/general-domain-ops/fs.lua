@@ -739,7 +739,7 @@ writeFile(symlink_test_dir1 .. "nested1/foon.txt", "Night city", "any", true)
 writeFile(symlink_test_dir2 .. "bar.txt", "A fire like pain", "any", true)
 writeFile(symlink_test_dir2 .. "nested2/barn.txt", "This fire is outta control", "any", true)
 
-srctgt("link", symlink_test_dir2 .. "test-1-link", symlink_test_dir1)
+srctgt("link", symlink_test_dir1, symlink_test_dir2 .. "test-1-link")
 
 -- don't follow symlinks by default
 
@@ -795,7 +795,7 @@ assertMessage(
 
 -- deal with direct cycles
 
-srctgt("link", symlink_test_dir2 .. "test-2-link", symlink_test_dir2)
+srctgt("link", symlink_test_dir2, symlink_test_dir2 .. "test-2-link")
 
 assertMessage(
   itemsInPath({
@@ -817,7 +817,7 @@ assertMessage(
 
 -- deal with indirect cycles
 
-srctgt("link", symlink_test_dir1 .. "test-2-link", symlink_test_dir2)
+srctgt("link", symlink_test_dir2, symlink_test_dir1 .. "test-2-link")
 
 assertMessage(
   itemsInPath({

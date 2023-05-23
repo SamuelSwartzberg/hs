@@ -63,6 +63,49 @@ if mode=="full-test" then
     pathSlice("/a/b/a", "-1:-1", {rejoin_at_end=true}),
     "a" -- aggravated case of the above bug
   )
+
+  -- test empty dir
+
+  -- success case
+
+  local emptyDir = tempDir .. "/emptyDir_" .. tostring(os.time())
+  createPath(emptyDir)
+  assert(
+    testPath(emptyDir, {dirness = "dir", contents = false})
+  )
+
+  -- fail case: does not exist
+
+  local nonExtantDir = tempDir .. "/nonExtantDir_" .. tostring(os.time())
+  assertMessage(
+    testPath(nonExtantDir, {dirness = "dir", contents = false}),
+    false
+  )
+
+  -- fail case: not a dir
+
+  local nonDir = tempDir .. "/nonDir_" .. tostring(os.time())
+
+  writeFile(nonDir, "sample content", "any", true, "w")
+
+  assertMessage(
+    testPath(nonDir, {dirness = "dir", contents = false}),
+    false
+  )
+
+  delete(nonDir, "any", "delete", "error")
+
+  -- fail case: not empty
+
+  local nonEmptyDir = tempDir .. "/nonEmptyDir_" .. tostring(os.time())
+
+  createPath(nonEmptyDir)
+  writeFile(nonEmptyDir .. "/file.txt", "sample content", "any", true, "w")
+
+  assertMessage(
+    testPath(nonEmptyDir, {dirness = "dir", contents = false}),
+    false
+  )
 else
   print("skipping...")
 end

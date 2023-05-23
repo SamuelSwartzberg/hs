@@ -47,14 +47,14 @@ local poisonable3 = returnPoisonable()
 assertMessage(
   memoize(poisonable3, {
     mode = "fs"
-  })(1, 2, 3),
+  }, "poisonable3")(1, 2, 3),
   {1, 2, 3}
 )
 
 assertMessage(
   memoize(poisonable3, {
     mode = "fs"
-  })(1, 2, 3),
+  }, "poisonable3")(1, 2, 3),
   {1, 2, 3}
 )
 
@@ -518,3 +518,68 @@ assertMessage(
   res3,
   example_table
 )
+
+
+-- purge cache for single function (mem)
+
+local poisonable15 = returnPoisonable()
+
+assertMessage(
+  memoize(poisonable15)(1, 2, 3),
+  {1, 2, 3}
+)
+
+assertMessage(
+  memoize(poisonable15)(1, 2, 3),
+  {1, 2, 3}
+)
+
+purgeCache(poisonable15, "mem")
+
+-- since the cache was purged, it should be empty, forcing us to recompute the result, thus poisoning it
+
+local succ, res = pcall(memoize(poisonable15), 1, 2, 3)
+
+assert(not succ)
+
+-- purge cache for single function (fs)
+
+local poisonable16 = returnPoisonable()
+
+assertMessage(
+  memoize(poisonable16, {mode = "fs"}, "poisonable16")(1, 2, 3),
+  {1, 2, 3}
+)
+
+assertMessage(
+  memoize(poisonable16, {mode = "fs"},  "poisonable16")(1, 2, 3),
+  {1, 2, 3}
+)
+
+purgeCache("poisonable16", "fs")
+
+-- since the cache was purged, it should be empty, forcing us to recompute the result, thus poisoning it
+
+local succ, res = pcall(memoize(poisonable16, {mode = "fs"}, "poisonable16"), 1, 2, 3)
+
+assert(not succ)
+
+-- purge cache for all functions (mem)
+
+purgeCache(nil, "mem")
+
+local succ, res = pcall(memoize(poisonable2, {
+  mode = "mem"
+}), 1, 2, 3)
+
+assert(not succ)
+
+-- purge cache for all functions (fs)
+
+purgeCache(nil, "fs")
+
+local succ, res = pcall(memoize(poisonable3, {
+  mode = "fs"
+}, "poisonable3"), 1, 2, 3)
+
+assert(not succ)

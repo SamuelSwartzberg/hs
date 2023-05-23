@@ -127,9 +127,10 @@ local identifier = createIdentifier()
 --- @generic I, O
 --- @param fn fun(...: I): O
 --- @param opts? memoOpts
+--- @param funcname? string the name of the function. Optional, but required if mode = "fs", since we need to use the function name to create a unique cache path. We can't rely on an automatically generated identifier, since this may change between sessions
 --- @return fun(...: I): O, hs.timer?
-function memoize(fn, opts)
-  local fnid = identifier(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
+function memoize(fn, opts, funcname)
+  local fnid = funcname or identifier(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
 
   local opts_as_str_or_nil
   if memoized[fnid] then 
@@ -157,6 +158,10 @@ function memoize(fn, opts)
   opts.interval = opts.interval or 0
   opts.stringify_table_params = defaultIfNil(opts.stringify_table_params, false)
   opts.table_param_subset = opts.table_param_subset or "json"
+
+  if opts.mode == "fs" and not funcname then
+    error("If mode = 'fs', you must provide a function name to ensure persistence between sessions")
+  end
 
 
   -- initialize the cache if using memory
@@ -236,3 +241,23 @@ function memoize(fn, opts)
   return memoized_func, timer
 end
 
+--- purge the cache for a function, or the entire cache if no function is specified
+--- @param fn_or_fnid? function | string
+--- @param mode? "mem" | "fs" 
+function purgeCache(fn_or_fnid, mode)
+  mode = mode or "fs"
+  if fn_or_fnid then
+    if mode == "fs" then
+      delete(env.XDG_CACHE_HOME .. "/fsmemoize/" .. fn_or_fnid)
+    else
+      local fnid = identifier(fn_or_fnid)
+      memstore[fnid] = nil
+    end
+  else
+    if mode == "fs" then
+      delete(env.XDG_CACHE_HOME .. "/fsmemoize", "dir", "empty")
+    else
+      memstore = {}
+    end
+  end
+end

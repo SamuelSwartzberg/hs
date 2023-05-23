@@ -4,13 +4,9 @@ PassNameItemSpecifier = {
   properties = {
     getables = {
       ["pass-value"] = function(self, type)
-        return run({
-          "pass",
-          {
-            value = type .. "/" .. self:get("contents"),
-            type = "quoted"
-          }
-        })
+        return memoize(run, refstore.params.memoize.opts.invalidate_5_min)(
+          "pass \"" .. type .. "/" .. self:get("contents") .. "\""
+        )
       end,
       ["as-gpg-file"] = function(self)
         return self:get("contents") .. ".gpg"

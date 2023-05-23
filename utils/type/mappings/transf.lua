@@ -154,5 +154,12 @@ transf = {
       end
       return table.concat(params, "&")
     end,
+  },
+  gpt_response_table = {
+    response_text = function(result)
+      local first_choice = result.choices[1]
+      local response = first_choice.text or first_choice.message.content
+      return stringy.strip(response)
+    end
   }
 }

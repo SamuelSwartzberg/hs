@@ -26,7 +26,7 @@ EmptyDirItemSpecifier = {
   properties = {
     getables = {
       ["descendants"] = function(self)
-        return {self.root_super} -- while self is not technically a descendant, in most cases where I want a descendant, but the dir is empty, I actually probably want the dir itself, so this is a good default
+        return {self:get("contents")} -- while self is not technically a descendant, in most cases where I want a descendant, but the dir is empty, I actually probably want the dir itself, so this is a good default
       end,
     },
     doThisables = {

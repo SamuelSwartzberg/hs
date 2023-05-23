@@ -29,8 +29,8 @@ end
 
 --- Returns a table of all things in a directory
 --- @param opts itemsInPathOpts | string
---- @param is_recursive_call? boolean Whether this is a recursive call. Allows us to avoid some duplicate work
 --- @param path? string Internal use only. The path to the directory during recursion
+--- @param is_recursive_call? boolean Whether this is a recursive call. Allows us to avoid some duplicate work
 --- @param depth? integer Internal use only. The current depth of recursion. 
 --- @param seen_paths? string[] Internal use only. A table of paths we have already seen. Used to avoid infinite recursion
 --- @return string[] #A table of all things in the directory
@@ -61,7 +61,6 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
   local files = {}
   if not is_recursive_call then 
     path = transf.string.path_resolved(path, true)
-    path = mustEnd(path, "/")
     if path == "" then path = "/" end
     opts.validator = opts.validator or function(file_name)
       return not listContains(mt._list.useless_files, file_name)
@@ -72,7 +71,7 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
     opts.follow_links = defaultIfNil(opts.follow_links, false)
   end
 
-
+  path = mustEnd(path, "/")
 
   if opts.follow_links then
     seen_paths = seen_paths or {}
@@ -95,7 +94,7 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
 
   for file_name in lister(path) do
     if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" and opts.validator(file_name) then
-      local file_path = path .. file_name
+      local file_path = path .. mustNotEnd(file_name, "/")
       if testPath(file_path, "dir") then 
         if opts.include_dirs then
           files[#files + 1] = file_path
@@ -108,14 +107,14 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
         end
         if 
           not opts.follow_links
-          and hs.fs.attributes(file_path, "mode") == "link" 
+          and hs.fs.symlinkAttributes(file_path, "mode") == "link" 
         then
           shouldRecurse = false
         end
           
         if shouldRecurse then
           depth = depth or 0
-          local sub_files = itemsInPath(opts, true, file_path, depth + 1, seen_paths)
+          local sub_files = itemsInPath(opts, file_path, true, depth + 1, seen_paths)
           for _, sub_file in ipairs(sub_files) do
             files[#files + 1] = sub_file
           end
@@ -154,12 +153,12 @@ function getItemsForAllLevelsInSlice(path, slice_spec, opts)
   opts = opts or {}
   opts.recursion = false
   local path = transf.string.path_resolved(path, true)
-  local levels = pathSlice(path, slice_spec, { entire_path_for_each = true })
-  local res = {}
+  local levels = memoize(pathSlice, refstore.params.memoize.opts.stringify_json)(path, slice_spec, { entire_path_for_each = true })
+  local reslist = {}
   for _, level in ipairs(levels) do
     opts.path = level -- this modifies the opts table, but that's fine, since it gets copied in itemsInPath
     local items = itemsInPath(opts)
-    res = concat(res, items)
+    push(reslist, items)
   end
-  return res
+  return memoize(concat, refstore.params.memoize.opts.stringify_json)(reslist)
 end

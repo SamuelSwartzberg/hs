@@ -1,5 +1,5 @@
 --- @param text_content string
---- @param opts { model?: string, max_tokens?: integer, temperature?: number, echo?: boolean, ai_role: "completion" | "chat", system_msg?: string } | fun(result: string): nil
+--- @param opts? { model?: string, max_tokens?: integer, temperature?: number, echo?: boolean, ai_role: "completion" | "chat", system_msg?: string } | fun(result: string): nil
 --- @param do_after? fun(result: string): nil
 function gpt(text_content, opts, do_after)
   if type(opts) == "function" then
@@ -43,19 +43,18 @@ function gpt(text_content, opts, do_after)
 
   local url = base_url .. endpoint
 
-  rest({
+  local request_opts = {
     url = url,
     request_table = request,
     api_key = env.OPENAI_API_KEY
-  },
-  function(result)
-    local response
-    if opts.ai_role == "completion" then
-      response = result.choices[1].text
-    elseif opts.ai_role == "chat" then
-      response = result.choices[1].message.content
-    end
-    if do_after then do_after(stringy.strip(response)) end
+  }
+
+  if do_after then
+    rest(request_opts, function(result)
+      do_after(transf.gpt_response_table.response_text(result))
+    end)
+  else
+    local result = rest(request_opts)
+    return transf.gpt_response_table.response_text(result)
   end
-  )
 end
