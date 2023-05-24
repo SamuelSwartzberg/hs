@@ -24,7 +24,6 @@ function youtube(spec, do_after)
   spec.params = spec.params or {}
   spec.params.part = spec.params.part or "snippet"
   spec.endpoint = spec.endpoint or "channels"
-  spec.target = spec.target or "id"
 
 
   local is_nokey_endpoint = listContains(mt._list.nokey_endpoints, spec.endpoint)
@@ -44,28 +43,88 @@ function youtube(spec, do_after)
   end
 
 
-  local getresobj = function(result)
+  local getres = function(result)
     local resobj = result.items[1] -- default case
-    if spec.endpoint == "channels" and spec.target == "title" then
+    if -- case where relevant results are in snippet
+      (
+        spec.endpoint == "channels" or
+        spec.endpoint == "playlists"
+      )
+      and 
+      (
+        spec.target == "title"
+      )
+    then
       resobj = resobj.snippet
+    elseif -- case where there are more than one item
+      (
+        spec.endpoint == "playlistItems"
+      )
+    then
+      resobj = result.items
     end
-    return resobj
-  end
+
+    if spec.target then
+      return resobj[spec.target]
+    else
+      return resobj
+    end
+  end  
 
   if do_after then
     rest(spec, function(result)
-      do_after(getresobj(result)[spec.target])
+      do_after(getres(result))
     end)
   else
     local result = rest(spec)
-    return getresobj(result)[spec.target]
+    return getres(result)
   end
+end
+
+--- @param id string
+--- @param video_id string
+--- @param index? number
+--- @param do_after? fun(): nil
+function addVidToPlaylist(id, video_id, index, do_after)
+  youtube({
+    endpoint = "playlistItems",
+    request_verb = "POST",
+    request_table = {
+      snippet = {
+        playlistId = id,
+        position = index,
+        resourceId = {
+          kind = "youtube#video",
+          videoId = video_id
+        }
+      }
+    },
+  }, do_after)
+end
+
+--- @param id string
+--- @param video_ids string[]
+--- @param do_after? fun(): nil
+function addVidsToPlaylist(id, video_ids, do_after)
+  local next_vid = sipairs(video_ids)
+  local add_next_vid
+  add_next_vid = function ()
+    local index, video_id = next_vid()
+    if index then
+      addVidToPlaylist(id, video_id, index - 1, add_next_vid)
+    else
+      if do_after then
+        do_after()
+      end
+    end
+  end
+  add_next_vid()
 end
 
 --- @param spec {name?: string, description?: string, privacyStatus?: string, videos?: string[]}
 --- @param do_after? fun(result: string): nil
 function createYoutubePlaylist(spec, do_after)
-  youtube({
+  local id = youtube({
     endpoint = "playlists",
     params = { part = "snippet,status" },
     request_verb = "POST",
@@ -76,32 +135,28 @@ function createYoutubePlaylist(spec, do_after)
       }
     },
     target = "id",
-  }, function(id)
+  }, do_after and function(id)
     if spec.videos then
-      for index, video_id in ipairs(spec.videos) do
-        youtube({
-          endpoint = "playlistItems",
-          request_verb = "POST",
-          request_table = {
-            snippet = {
-              playlistId = id,
-              position = index - 1,
-              resourceId = {
-                kind = "youtube#video",
-                videoId = video_id,
-              }
-            }
-          },
-          do_after = function(response)
-            inspPrint(response)
-            -- todo: return url or something
-          end
-        })
-      end
+      addVidsToPlaylist(id, spec.videos, do_after)
     else
-      if do_after then
-        do_after(id)
-      end
+      do_after(id)
     end
   end)
+  if not do_after then
+    if spec.videos then
+      addVidsToPlaylist(id, spec.videos)
+    end
+    return id
+  end
+end
+
+--- @param id string
+--- @param do_after? fun(result: string): nil
+function deleteYoutubePlaylist(id, do_after)
+  youtube({
+    endpoint = "playlists",
+    params = { id = id },
+    request_verb = "DELETE",
+    target = "id",
+  }, do_after)
 end

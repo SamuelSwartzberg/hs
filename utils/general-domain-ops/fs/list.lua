@@ -24,7 +24,7 @@ local function listRemoteDir(listerpath)
   else
     items = {}
   end
-  return svalues(items)
+  return svls(items)
 end
 
 --- Returns a table of all things in a directory

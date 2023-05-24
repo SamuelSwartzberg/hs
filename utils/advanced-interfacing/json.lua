@@ -1,36 +1,27 @@
 --- @class RESTApiSpecifier
---- @field url? string 
+--- @field url? string the url to send the request to, if not using host, endpoint, and params
 --- @field host? string
 --- @field endpoint? string
 --- @field params? table
---- @field request_table? { [string]: any } | nil
---- @field api_key? string 
---- @field api_name? string
---- @field oauth2_subname? string
---- @field api_key_header? string
+--- @field request_table? { [string]: any } | nil the body of the request, if any
+--- @field request_verb? string the HTTP verb to use for the request, defaults to GET
+--- @field api_key? string manually specify the api key. Typically, prefer automatic retrieval of api key
+--- @field api_name? string the name of the api, used for retrieving api keys
+--- @field oauth2_subname? string the name of the oauth2 scope, used for retrieving api keys. will default to api_name if not specified
+--- @field api_key_header? string allows for different HTTP header to be used for api key, for apis that don't use the "Authoirzation: Bearer" header
+--- @field api_key_param? string allows for api_key to be passed as a param instead of a header, for apis that don't accept the key in a HTTP header
 --- @field api_key_type? "simple" | "access_norefresh" | "oauth2" | "telegram"
---- @field oauth2_url? string
---- @field request_verb? string 
+--- @field oauth2_url? string the url to send the oauth2 request to
 
 --- @param specifier? RESTApiSpecifier
 --- @param do_after? fun(result: table): nil Using this function to decide whether to do sync or async, so for async requests that do nothing with their output (e.g. boring POST requests), you can just pass in any truthy value
 --- @param have_tried_access_refresh? boolean
 --- @return any
 function rest(specifier, do_after, have_tried_access_refresh)
-  local url
   specifier = copy(specifier) or {}
-  if specifier.url then
-    url = specifier.url
-  elseif specifier.host or specifier.endpoint or specifier.params then
-    url = mustNotEnd(specifier.host, "/")
-    if specifier.endpoint then
-      url = url .. (mustStart(specifier.endpoint, "/") or "/")
-    end
-    if specifier.params then
-      url = url .. "?" .. transf.table.url_params(specifier.params)
-    end
-  else
-    url = "https://dummyjson.com/products?limit=10&skip=10"
+
+  if specifier.api_key_type == "oauth2" and  not specifier.oauth2_subname then
+    specifier.oauth2_subname = specifier.api_name
   end
 
   local api_keys_location = env.MAPI .. "/" .. specifier.api_name .. "/" 
@@ -41,6 +32,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     specifier.api_key_type = specifier.api_key_type or "simple"
   end
   if specifier.oauth2_subname then specifier.api_key_type = "oauth2" end
+  
 
   if not specifier.api_key then
     local keyloc
@@ -90,6 +82,25 @@ function rest(specifier, do_after, have_tried_access_refresh)
       else return true -- throw default error
       end
     end
+  end
+
+  local url
+  if specifier.url then
+    url = specifier.url
+  elseif specifier.host or specifier.endpoint or specifier.params then
+    url = mustNotEnd(specifier.host, "/")
+    if specifier.endpoint then
+      url = url .. (mustStart(specifier.endpoint, "/") or "/")
+    end
+    if specifier.api_key_param then
+      specifier.params = specifier.params or {}
+      specifier.params[specifier.api_key_param] = specifier.api_key
+    end
+    if specifier.params then
+      url = url .. "?" .. transf.table.url_params(specifier.params)
+    end
+  else
+    url = "https://dummyjson.com/products?limit=10&skip=10"
   end
   
   local curl_command = {

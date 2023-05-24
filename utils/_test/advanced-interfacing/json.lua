@@ -128,82 +128,88 @@ assertMessage(auth_token ~= nil, true)
 
 -- get request with auth token
 
--- wrong token first
+-- missing token
 
---[[ local problem_token_res = rest({
-  host = "https://dummyjson.com",
-  endpoint = "auth/products",
+local problem_token_res = rest({
+  host = "https://danbooru.donmai.us",
+  endpoint = "profile.json",
   params = {
-    limit = 10,
-    skip = 10
-  },
-  api_key = "wrong token"
-})
-
-assertMessage(
-  problem_token_res,
-  {
-    message = "Invalid/Expired Token!",
-    name = "JsonWebTokenError"
+    login = "reirui"
   }
-) ]] -- todo once server actually errors on wrong token: https://github.com/Ovi/DummyJSON/issues/22
+})
 
--- correct token
 
-local correct_token_res = rest({
-  host = "https://dummyjson.com",
-  endpoint = "auth/products",
+assertMessage(
+  problem_token_res.error,
+  "SessionLoader::AuthenticationFailure"
+) 
+
+-- wrong token manually
+
+problem_token_res = rest({
+  host = "https://danbooru.donmai.us",
+  endpoint = "profile.json",
   params = {
-    limit = 10,
-    skip = 10
+    login = "reirui"
   },
-  api_key = auth_token
+  api_key_param = "api_key",
+  api_key = "wrong"
 })
 
 assertMessage(
-  correct_token_res,
-  assembled_query_res
+  problem_token_res.error,
+  "SessionLoader::AuthenticationFailure"
 )
 
--- wrong header name
+-- wrong token automatically
 
---[[ 
-local wrong_header_res = rest({
-  host = "https://dummyjson.com",
-  endpoint = "auth/products",
+problem_token_res = rest({
+  host = "https://danbooru.donmai.us",
+  endpoint = "profile.json",
   params = {
-    limit = 10,
-    skip = 10
+    login = "reirui"
   },
-  api_key = auth_token,
-  api_key_header = "Authorization: IAmABear"
+  api_name = "wronglol",
 })
 
 assertMessage(
-  wrong_header_res,
-  {
-    message = "Authentication Problem"
-  }
-) ]] -- todo once server actually errors on wrong token: https://github.com/Ovi/DummyJSON/issues/22
+  problem_token_res.error,
+  "SessionLoader::AuthenticationFailure"
+)
 
--- correct header name, manually set, as well as callback
+-- correct token manually
 
-rest({
-  host = "https://dummyjson.com",
-  endpoint = "auth/products",
+local correct_token_res = rest({
+  host = "https://danbooru.donmai.us",
+  endpoint = "profile.json",
   params = {
-    limit = 10,
-    skip = 10
+    login = "reirui"
   },
-  api_key = auth_token,
-  api_key_header_name = "Authorization: Bearer",
-}, function(res)
-  assertMessage(
-    res,
-    assembled_query_res
-  )
-end)
+  api_key_param = "api_key",
+  api_key = readFile(env.MAPI .. "/danbooru/key") .. "wrong"
+})
 
+assertMessage(
+  correct_token_res.name,
+  "reirui"
+)
+
+-- correct token automatically
+
+ correct_token_res = rest({
+  host = "https://danbooru.donmai.us",
+  endpoint = "profile.json",
+  params = {
+    login = "reirui"
+  },
+  api_key_param = "api_key",
+  api_name = "danbooru",
+})
+
+assertMessage(
+  correct_token_res.name,
+  "reirui"
+)
 else
   print("skipping...")
 end

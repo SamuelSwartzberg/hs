@@ -14,7 +14,7 @@ function gpt(text_content, opts, do_after)
   request.max_tokens = opts.max_tokens or 300
   request.temperature = opts.temperature or 0.7
 
-  local base_url = "https://api.openai.com/v1/"
+
   local endpoint
   if opts.ai_role == "completion" then
     endpoint = "completions"
@@ -41,12 +41,11 @@ function gpt(text_content, opts, do_after)
     })
   end
 
-  local url = base_url .. endpoint
-
   local request_opts = {
-    url = url,
+    host = "https://api.openai.com/v1/",
+    endpoint = endpoint,
     request_table = request,
-    api_key = env.OPENAI_API_KEY
+    api_name = "openai",
   }
 
   if do_after then
