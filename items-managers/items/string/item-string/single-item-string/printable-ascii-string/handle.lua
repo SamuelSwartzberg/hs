@@ -7,7 +7,7 @@ HandleItemSpecifier = {
         return self:get("contents"):sub(2) -- remove the leading @
       end,
       ["youtube-channel-id"] = function(self)
-        return CreateApiItem("https://yt.lemnoslife.com/"):get("channel-handle-to-channel-id", self:get("contents"))
+        return memoize(youtube, refstore.params.memoize.opts.invalidate_1_month_fs)({"channels", "id", {handle = self:get("contents")}})
       end,
       ["youtube-feed-url"] = function(self)
         return self:get("str-item", "youtube-channel-id"):get("youtube-feed-url")

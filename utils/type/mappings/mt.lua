@@ -8,6 +8,7 @@ mt = {
   },
   _list = {
     tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"},
+    nokey_endpoints = {"channels"},
     useless_files = {".git", "node_modules", ".vscode"},
     html_entity_indicator = {
       encoded = {"&", ";"},

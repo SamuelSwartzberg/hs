@@ -351,11 +351,6 @@ System:get("manager", "input-method"):doThis("create-all", {
   "com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
 })
 
-System:get("manager", "api"):doThis("create-all", {
-  "https://www.googleapis.com/youtube",
-  "https://yt.lemnoslife.com/"
-})
-
 -- structure below is not final, more OO way will emerge in the course of working on this I think
 
 System:get("manager", "creatable"):doThis("create-all", {

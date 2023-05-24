@@ -527,18 +527,6 @@ local item_creation_map = {
 
 
   },
-  [CreateApiItem] = {
-    {
-      value = "https://www.googleapis.com/youtube",
-      must_be = { "api", "youtube-api" },
-      must_not_be = { "youtube-api-extension" }
-    },
-    {
-      value = "https://yt.lemnoslife.com/",
-      must_be = { "api", "youtube-api-extension" },
-      must_not_be = { "youtube-api" }
-    }
-  },
   [CreateApplicationItem] = {
     {
       value = "Facebook",

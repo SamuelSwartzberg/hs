@@ -1,4 +1,4 @@
-if mode == "full-test" then -- running this every time takes forever
+if true then -- running this every time takes forever
 -- buildInnerCommand:
 
 -- mere string passthrough

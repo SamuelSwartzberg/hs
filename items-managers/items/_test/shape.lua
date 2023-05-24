@@ -66,7 +66,6 @@ local potential_interfaces_ignore_map = {
     "managed-creatable-array",
     "managed-stream-array",
     "managed-timer-array",
-    "managed-api-array",
     "managed-input-method-array",
   },
   ArraySpecifier = {

@@ -12,16 +12,9 @@ ImageFileItemSpecifier = {
         return self:get("as-hs-image")
       end,
       ["booru-url"] = function(self)
-        return run({
-          "saucenao",
-          "--file",
-          {
-            value = self:get("completely-resolved-path"),
-            type = "quoted"
-          },
-          "--output-properties",
-          "booru-url"
-        })
+        return memoize(run, refstore.params.memoize.opts.invalidate_1_month_fs)(
+          "saucenao --file \"" .. self:get("completely-resolved-path") .. "\" --output-properties booru-url"
+        )
       end,
     },
     doThisables = {
