@@ -150,9 +150,27 @@ transf = {
     url_params = function(t)
       local params = {}
       for k, v in pairs(t) do
-        table.insert(params, k .. "=" .. v)
+        local encoded_v = urlencode(v, true)
+        table.insert(params, k .. "=" .. encoded_v)
       end
       return table.concat(params, "&")
+    end,
+  },
+  url_components = {
+    url = function(comps)
+      local url
+      if comps.url then
+        url = comps.url
+      elseif comps.host or comps.endpoint then
+        url = mustEnd(comps.host, "/")
+        if comps.endpoint then
+          url = url .. (mustNotStart(comps.endpoint, "/") or "/")
+        end   
+      end     
+      if comps.params then
+        url = url .. "?" .. transf.table.url_params(comps.params)
+      end
+      return url
     end,
   },
   gpt_response_table = {

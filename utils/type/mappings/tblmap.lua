@@ -143,6 +143,16 @@ tblmap = {
       en = "Alex",
       ja = "Kyoko.premium"
     }
+  },
+  api_name = {
+    url = {
+
+    }
+  },
+  oauth2_subname = {
+    url = {
+      
+    }
   }
 }
 

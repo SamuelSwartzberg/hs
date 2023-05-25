@@ -9,6 +9,7 @@ mt = {
   _list = {
     tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"},
     nokey_endpoints = {"channels"},
+    apis_that_dont_support_authorization_code_fetch = {"google"},
     useless_files = {".git", "node_modules", ".vscode"},
     html_entity_indicator = {
       encoded = {"&", ";"},
