@@ -210,6 +210,72 @@ assertMessage(
   correct_token_res.name,
   "reirui"
 )
+
+-- oauth requests
+
+-- initial: neither refresh nor access token exists
+
+delete(env.MAPI .. "/dropbox/access_token")
+delete(env.MAPI .. "/dropbox/refresh_token")
+delete(env.MAPI .. "/dropbox/authorization_code")
+
+local dropbox_request = {
+  api_name = "dropbox",
+  endpoint = "/2/users/get_current_account",
+  request_table = {},
+  token_type = "oauth2",
+  oauth2_url = "https://api.dropboxapi.com/oauth2/token",
+  oauth2_authorization_url = "https://www.dropbox.com/oauth2/authorize"
+}
+
+local task = run({
+  args = "oauth2callback",
+  catch = true
+})
+hs.timer.doAfter(1, function()
+
+  rest(dropbox_request, function(response)
+    
+    assertMessage(
+      response.email,
+      "korehabetsumei@mailbox.org"
+    )
+
+    -- refresh token exists, but no access token
+
+    delete(env.MAPI .. "/dropbox/access_token")
+    delete(env.MAPI .. "/dropbox/authorization_code")
+    assert(#readFile(env.MAPI .. "/dropbox/refresh_token") > 0)
+
+    rest(dropbox_request, function (response)
+    
+      assertMessage(
+        response.email,
+        "korehabetsumei@mailbox.org"
+      )
+
+      -- both refresh and access token exist
+
+      assert(#readFile(env.MAPI .. "/dropbox/access_token") > 0)
+      assert(#readFile(env.MAPI .. "/dropbox/refresh_token") > 0)
+
+      rest(dropbox_request, function (response)
+    
+        assertMessage(
+          response.email,
+          "korehabetsumei@mailbox.org"
+        )
+
+        task:kill()
+
+    
+      end)
+      
+    end)
+
+  end)
+end)
+
 else
   print("skipping...")
 end

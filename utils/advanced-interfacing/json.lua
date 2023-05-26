@@ -7,13 +7,13 @@
 --- @field params? table
 --- @field request_table? { [string]: any } | nil the body of the request, if any
 --- @field request_table_type? "json" | "form-urlencoded"
---- @field request_verb? string the HTTP verb to use for the request, defaults to GET
+--- @field request_verb? string the HTTP verb to use for the request, defaults to GET, or POST if request_table is specified
 --- @field token? string manually specify the token. Typically, prefer automatic retrieval of token
 --- @field api_name? string the name of the api, used for retrieving api keys
 --- @field oauth2_subname? string the name of the oauth2 scope, used for retrieving api keys. will default to api_name if not specified
 --- @field token_header? string allows for different HTTP header to be used for token, for apis that don't use the "Authoirzation: Bearer" header
 --- @field token_param? string allows for token to be passed as a param instead of a header, for apis that don't accept the key in a HTTP header
---- @field token_type? "simple" | "access_norefresh" | "oauth2" | "telegram"
+--- @field token_type? "simple" | "oauth2" | "telegram"
 --- @field oauth2_url? string the url to send the oauth2 request to
 --- @field oauth2_authorization_url? string the url to send the oauth2 authorization request to, if different from oauth2_url. Is frequently different as it is shown to the user, but will default to oauth2_url if not specified
 
@@ -38,20 +38,28 @@ function rest(specifier, do_after, have_tried_access_refresh)
   if specifier.oauth2_subname then specifier.token_type = "oauth2" end
   
 
+  local token
   if not specifier.token then
     local keyloc
     if specifier.token_type == "simple" then
       keyloc = api_keys_location .. "key"
-    elseif specifier.token_type == "access_norefresh" or specifier.token_type == "oauth2" then
+    elseif specifier.token_type == "oauth2" then
       keyloc = oauth_keys_location .. "access_token"
     elseif specifier.token_type == "telegram" then
       -- todo
     end
-    specifier.token = readFile(keyloc)
+    token = readFile(keyloc)
+  else
+    token = specifier.token
   end
 
   local catch_auth_error
-  if specifier.token_type == "oauth2" or specifier.token_type == "access_norefresh" then
+  if specifier.token_type == "oauth2"  then
+
+    if not do_after then
+      error("Oauth2 requests must be async. Please pass in a do_after function. (This is because some of the steps required cannot be done in a blocking manner, as they require user input and hammerspoon is single-threaded)")
+    end
+
     local function process_tokenres(tokenres)
       if tokenres.access_token then
         writeFile(oauth_keys_location .. "access_token", tokenres.access_token)
@@ -63,17 +71,22 @@ function rest(specifier, do_after, have_tried_access_refresh)
         error("Failed to refresh access token. Result was:\n" .. json.encode(tokenres))
       end
     end
-    if specifier.token == nil then -- initial token request
+
+    local clientid = readFile(api_keys_location .. "clientid")
+    local clientsecret = readFile(api_keys_location .. "clientsecret")
+    if not clientid or not clientsecret then
+      error("Failed to get clientid or clientsecret from " .. api_keys_location ". Oauth2 apis must have these. Are you sure you've already set up the api?")
+    end
+    local refresh_token = readFile(oauth_keys_location .. "refresh_token")
+
+    local function initial_authorize()
       if listContains(mt._list.apis_that_dont_support_authorization_code_fetch, specifier.api_name) then
         error("Cannot fetch access token for " .. specifier.api_name .. " because it doesn't support authorization code flow")
       end
       specifier.oauth2_authorization_url = specifier.oauth2_authorization_url or specifier.oauth2_url
       -- authorize the app by opening a browser window
-      local clientid = readFile(api_keys_location .. "clientid")
-      local clientsecret = readFile(api_keys_location .. "clientsecret")
-      if not clientid or not clientsecret then
-        error("Failed to get clientid or clientsecret from " .. api_keys_location ". Are you sure you've already set up the api?")
-      end
+      
+      
       open({ 
         url = specifier.oauth2_authorization_url,
         params = {
@@ -83,6 +96,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
         }
       }, function() -- our server listening on the above port will save the authorization code to the proper location
         local authorization_code = readFile(oauth_keys_location .. "authorization_code")
+        delete( oauth_keys_location .. "authorization_code")
         if not authorization_code then
           error("Failed to get authorization code from server")
         end
@@ -95,47 +109,49 @@ function rest(specifier, do_after, have_tried_access_refresh)
         }
         rest({
           url = specifier.oauth2_url,
-          request_verb = "POST",
           request_table = token_request_body
-        }, process_tokenres) -- typically, I would separate sync and async cases here, but there's no way to use open sync while waiting, since that'd block hammerspoon potentially for minutes, which is unacceptable. Therefore, only an async version is provided
+        }, process_tokenres)
         
       end)
     end
-    catch_auth_error = function(res)
-      if res.error and res.error.errors and res.error.errors[1] and res.error.errors[1].reason == "authError" then -- try to refresh token
-        if specifier.token_type == "access_norefresh" then
-          error("Access token expired, but token_type is access_norefresh, so cannot refresh token. Response was:\n" .. json.encode(res))
-        end
-        if have_tried_access_refresh then
-          error("Access token expired, and already tried to refresh token, but failed. Response was:\n" .. json.encode(res))
-        end
-        local token_request_body = {
-          client_id = readFile(api_keys_location .. "clientid"),
-          client_secret = readFile(api_keys_location .. "clientsecret"),
-          refresh_token = readFile(oauth_keys_location .. "refresh_token"),
-          grant_type = "refresh_token"
-        }
-        local request = {
-          url = specifier.oauth2_url,
-          request_verb = "POST",
-          request_table = token_request_body
-        }
 
-        if do_after then
-          rest(request, process_tokenres)
-        else
-          local tokenres = rest(request)
-          return process_tokenres(tokenres)
-        end
-        
-      else return true -- throw default error
+    local function do_refresh_token()
+      local token_request_body = {
+        client_id = clientid,
+        client_secret = clientsecret,
+        refresh_token = refresh_token,
+        grant_type = "refresh_token"
+      }
+      local request = {
+        url = specifier.oauth2_url,
+        request_table = token_request_body
+      }
+      rest(request, process_tokenres, true)
+    end
+
+    if token == nil then -- initial token request
+      if refresh_token then
+        do_refresh_token()
+      else
+        initial_authorize()
+      end
+    end
+
+    catch_auth_error = function(res)
+      if have_tried_access_refresh then
+        error("Access token expired, and already tried to refresh token, but failed. Response was:\n" .. json.encode(res))
+      end
+      if refresh_token then
+        do_refresh_token()
+      else
+        initial_authorize()
       end
     end
   end
 
   if specifier.token_param then
     specifier.params = specifier.params or {}
-    specifier.params[specifier.token_param] = specifier.token
+    specifier.params[specifier.token_param] = token
   end
 
   local url = transf.url_components.url(specifier) or "https://dummyjson.com/products?limit=10&skip=10"
@@ -149,7 +165,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     "-H",
     { value = "Accept: application/json", type = "quoted"},
   }
-  if specifier.token then 
+  if specifier.token and not specifier.token_param then
     specifier.token_header = specifier.token_header or "Authorization: Bearer"
     push(curl_command, "-H")
     push(curl_command, 
@@ -163,6 +179,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     )
   end
   if specifier.request_table then
+    specifier.request_verb = specifier.request_verb or "POST"
     local request_string, content_type
 
     specifier.request_table_type = specifier.request_table_type or "json"
