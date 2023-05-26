@@ -152,8 +152,8 @@ problem_token_res = rest({
   params = {
     login = "reirui"
   },
-  api_key_param = "api_key",
-  api_key = "wrong"
+  token_param = "api_key",
+  token = "wrong"
 })
 
 assertMessage(
@@ -185,8 +185,8 @@ local correct_token_res = rest({
   params = {
     login = "reirui"
   },
-  api_key_param = "api_key",
-  api_key = readFile(env.MAPI .. "/danbooru/key") .. "wrong"
+  token_param = "api_key",
+  token = readFile(env.MAPI .. "/danbooru/key")
 })
 
 assertMessage(
@@ -202,7 +202,7 @@ assertMessage(
   params = {
     login = "reirui"
   },
-  api_key_param = "api_key",
+  token_param = "api_key",
   api_name = "danbooru",
 })
 

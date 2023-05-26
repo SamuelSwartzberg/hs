@@ -8,12 +8,12 @@
 --- @field request_table? { [string]: any } | nil the body of the request, if any
 --- @field request_table_type? "json" | "form-urlencoded"
 --- @field request_verb? string the HTTP verb to use for the request, defaults to GET
---- @field api_key? string manually specify the api key. Typically, prefer automatic retrieval of api key
+--- @field token? string manually specify the token. Typically, prefer automatic retrieval of token
 --- @field api_name? string the name of the api, used for retrieving api keys
 --- @field oauth2_subname? string the name of the oauth2 scope, used for retrieving api keys. will default to api_name if not specified
---- @field api_key_header? string allows for different HTTP header to be used for api key, for apis that don't use the "Authoirzation: Bearer" header
---- @field api_key_param? string allows for api_key to be passed as a param instead of a header, for apis that don't accept the key in a HTTP header
---- @field api_key_type? "simple" | "access_norefresh" | "oauth2" | "telegram"
+--- @field token_header? string allows for different HTTP header to be used for token, for apis that don't use the "Authoirzation: Bearer" header
+--- @field token_param? string allows for token to be passed as a param instead of a header, for apis that don't accept the key in a HTTP header
+--- @field token_type? "simple" | "access_norefresh" | "oauth2" | "telegram"
 --- @field oauth2_url? string the url to send the oauth2 request to
 --- @field oauth2_authorization_url? string the url to send the oauth2 authorization request to, if different from oauth2_url. Is frequently different as it is shown to the user, but will default to oauth2_url if not specified
 
@@ -24,34 +24,34 @@
 function rest(specifier, do_after, have_tried_access_refresh)
   specifier = copy(specifier) or {}
 
-  if specifier.api_key_type == "oauth2" and  not specifier.oauth2_subname then
+  if specifier.token_type == "oauth2" and  not specifier.oauth2_subname then
     specifier.oauth2_subname = specifier.api_name
   end
 
   local api_keys_location = env.MAPI .. "/" .. specifier.api_name .. "/" 
   local oauth_keys_location = env.MAPI .. "/" .. specifier.oauth2_subname .. "/" 
 
-  -- if we have an api_name, used for fetching api keys, we can be pretty sure we need an api key
+  -- if we have an api_name, used for fetching api keys, we can be pretty sure we need an token
   if specifier.api_name then
-    specifier.api_key_type = specifier.api_key_type or "simple"
+    specifier.token_type = specifier.token_type or "simple"
   end
-  if specifier.oauth2_subname then specifier.api_key_type = "oauth2" end
+  if specifier.oauth2_subname then specifier.token_type = "oauth2" end
   
 
-  if not specifier.api_key then
+  if not specifier.token then
     local keyloc
-    if specifier.api_key_type == "simple" then
+    if specifier.token_type == "simple" then
       keyloc = api_keys_location .. "key"
-    elseif specifier.api_key_type == "access_norefresh" or specifier.api_key_type == "oauth2" then
+    elseif specifier.token_type == "access_norefresh" or specifier.token_type == "oauth2" then
       keyloc = oauth_keys_location .. "access_token"
-    elseif specifier.api_key_type == "telegram" then
+    elseif specifier.token_type == "telegram" then
       -- todo
     end
-    specifier.api_key = readFile(keyloc)
+    specifier.token = readFile(keyloc)
   end
 
   local catch_auth_error
-  if specifier.api_key_type == "oauth2" or specifier.api_key_type == "access_norefresh" then
+  if specifier.token_type == "oauth2" or specifier.token_type == "access_norefresh" then
     local function process_tokenres(tokenres)
       if tokenres.access_token then
         writeFile(oauth_keys_location .. "access_token", tokenres.access_token)
@@ -63,24 +63,32 @@ function rest(specifier, do_after, have_tried_access_refresh)
         error("Failed to refresh access token. Result was:\n" .. json.encode(tokenres))
       end
     end
-    if specifier.api_key == nil then -- initial token request
+    if specifier.token == nil then -- initial token request
       if listContains(mt._list.apis_that_dont_support_authorization_code_fetch, specifier.api_name) then
         error("Cannot fetch access token for " .. specifier.api_name .. " because it doesn't support authorization code flow")
       end
       specifier.oauth2_authorization_url = specifier.oauth2_authorization_url or specifier.oauth2_url
       -- authorize the app by opening a browser window
+      local clientid = readFile(api_keys_location .. "clientid")
+      local clientsecret = readFile(api_keys_location .. "clientsecret")
+      if not clientid or not clientsecret then
+        error("Failed to get clientid or clientsecret from " .. api_keys_location ". Are you sure you've already set up the api?")
+      end
       open({ 
         url = specifier.oauth2_authorization_url,
         params = {
           response_type = "code",
-          client_id = readFile(api_keys_location .. "clientid"),
+          client_id = clientid,
           redirect_uri = "http://127.0.0.1:8412/?api_name=" .. specifier.oauth2_subname
         }
       }, function() -- our server listening on the above port will save the authorization code to the proper location
         local authorization_code = readFile(oauth_keys_location .. "authorization_code")
+        if not authorization_code then
+          error("Failed to get authorization code from server")
+        end
         local token_request_body = {
-          client_id = readFile(api_keys_location .. "clientid"),
-          client_secret = readFile(api_keys_location .. "clientsecret"),
+          client_id = clientid,
+          client_secret = clientsecret,
           code = authorization_code,
           grant_type = "authorization_code",
           redirect_uri = "http://127.0.0.1:8412/?api_name=" .. specifier.oauth2_subname
@@ -95,8 +103,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
     end
     catch_auth_error = function(res)
       if res.error and res.error.errors and res.error.errors[1] and res.error.errors[1].reason == "authError" then -- try to refresh token
-        if specifier.api_key_type == "access_norefresh" then
-          error("Access token expired, but api_key_type is access_norefresh, so cannot refresh token. Response was:\n" .. json.encode(res))
+        if specifier.token_type == "access_norefresh" then
+          error("Access token expired, but token_type is access_norefresh, so cannot refresh token. Response was:\n" .. json.encode(res))
         end
         if have_tried_access_refresh then
           error("Access token expired, and already tried to refresh token, but failed. Response was:\n" .. json.encode(res))
@@ -125,9 +133,9 @@ function rest(specifier, do_after, have_tried_access_refresh)
     end
   end
 
-  if specifier.api_key_param then
+  if specifier.token_param then
     specifier.params = specifier.params or {}
-    specifier.params[specifier.api_key_param] = specifier.api_key
+    specifier.params[specifier.token_param] = specifier.token
   end
 
   local url = transf.url_components.url(specifier) or "https://dummyjson.com/products?limit=10&skip=10"
@@ -141,11 +149,11 @@ function rest(specifier, do_after, have_tried_access_refresh)
     "-H",
     { value = "Accept: application/json", type = "quoted"},
   }
-  if specifier.api_key then 
-    specifier.api_key_header = specifier.api_key_header or "Authorization: Bearer"
+  if specifier.token then 
+    specifier.token_header = specifier.token_header or "Authorization: Bearer"
     push(curl_command, "-H")
     push(curl_command, 
-      { value =  specifier.api_key_header .. " " .. specifier.api_key, type = "quoted"}
+      { value =  specifier.token_header .. " " .. specifier.token, type = "quoted"}
     )
   end
   if specifier.request_verb then

@@ -5,7 +5,7 @@
 function hydrus(spec, do_after)
   spec.api_name = "hydrus"
   spec.host = "http://127.0.0.1:45869/"
-  spec.api_key_header = "Hydrus-Client-API-Access-Key:"
+  spec.token_header = "Hydrus-Client-API-Access-Key:"
   if do_after then
     rest(spec, do_after)
   else
