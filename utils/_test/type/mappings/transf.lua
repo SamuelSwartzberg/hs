@@ -267,4 +267,68 @@ assertMessageAny(
   }
 )
 
+assertMessageAny(
+  transf.table.url_params({
+    foo="I am a cat", 
+    bar="吾輩は猫である"
+  }),
+  {
+    "foo=I%20am%20a%20cat&bar=%E5%90%BE%E8%BC%A9%E3%81%AF%E7%8C%AB%E3%81%A7%E3%81%82%E3%82%8B",
+    "bar=%E5%90%BE%E8%BC%A9%E3%81%AF%E7%8C%AB%E3%81%A7%E3%81%82%E3%82%8B&foo=I%20am%20a%20cat"
+  }
+)
+
+assertMessage(
+  transf.url_components.url({
+    url = "https://example.com/foo/bar"
+  }),
+  "https://example.com/foo/bar"
+)
+
+assertMessage(
+  transf.url_components.url({
+    host = "https://example.com",
+    endpoint = "foo/bar"
+  }),
+  "https://example.com/foo/bar"
+)
+
+assertMessage(
+  transf.url_components.url({
+    host = "https://example.com",
+    endpoint = "/foo/bar"
+  }),
+  "https://example.com/foo/bar"
+)
+
+assertMessageAny(
+  transf.url_components.url({
+    url = "https://example.com/foo/bar",
+    params = {
+      foo = "bar",
+      baz = "a space"
+    }
+  }),
+  {
+    "https://example.com/foo/bar?foo=bar&baz=a%20space",
+    "https://example.com/foo/bar?baz=a%20space&foo=bar",
+  }
+)
+
+assertMessageAny(
+  transf.url_components.url({
+    url = "https://example.com/foo/bar",
+    params = {
+      foo = "bar",
+      baz = "a space"
+    },
+    host = "https://example.com",
+    endpoint = "foo/bar"
+  }),
+  {
+    "https://example.com/foo/bar?foo=bar&baz=a%20space",
+    "https://example.com/foo/bar?baz=a%20space&foo=bar",
+  }
+)
+
 env = realenv

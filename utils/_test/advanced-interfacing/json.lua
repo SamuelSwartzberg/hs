@@ -96,7 +96,6 @@ local post_res = rest({
     limit = 10,
     skip = 10
   },
-  request_verb = "POST",
   request_table = {
     title = "test"
   }
@@ -109,6 +108,45 @@ assertMessage(
     title = "test"
   }
 )
+
+-- request_table_type "form-urlencoded"
+
+local rest_res = rest({
+  host = "https://httpbin.org",
+  endpoint = "post",
+  request_table = {
+    foo = "bar"
+  },
+  request_table_type = "form-urlencoded"
+})
+
+assertMessage(
+  rest_res.form,
+  {
+    foo = "bar"
+  }
+)
+
+local rest_res = rest({
+  host = "https://httpbin.org",
+  endpoint = "post",
+  request_table = {
+    foo = "bar",
+    lol = "what is a space",
+    kore = "は日本語の例。"
+  },
+  request_table_type = "form-urlencoded"
+})
+
+assertMessage(
+  rest_res.form,
+  {
+    foo = "bar",
+    lol = "what is a space",
+    kore = "は日本語の例。"
+  }
+)
+
 
 -- get auth token for the next test
 
@@ -275,6 +313,8 @@ hs.timer.doAfter(1, function()
 
   end)
 end)
+
+error("TODO set up oauth2callback permanently")
 
 else
   print("skipping...")

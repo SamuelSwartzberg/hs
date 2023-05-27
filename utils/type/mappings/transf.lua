@@ -168,7 +168,11 @@ transf = {
         end   
       end     
       if comps.params then
-        url = url .. "?" .. transf.table.url_params(comps.params)
+        if type(comps.params) == "table" then
+          url = url .. "?" .. transf.table.url_params(comps.params)
+        else
+          url = url .. mustStart(comps.params, "?")
+        end
       end
       return url
     end,

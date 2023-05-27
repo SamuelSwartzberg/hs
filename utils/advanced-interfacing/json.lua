@@ -8,10 +8,13 @@
 --- @field request_table? { [string]: any } | nil the body of the request, if any
 --- @field request_table_type? "json" | "form-urlencoded"
 --- @field request_verb? string the HTTP verb to use for the request, defaults to GET, or POST if request_table is specified
---- @field token? string manually specify the token. Typically, prefer automatic retrieval of token
---- @field api_name? string the name of the api, used for retrieving api keys
---- @field oauth2_subname? string the name of the oauth2 scope, used for retrieving api keys. will default to api_name if not specified
---- @field token_header? string allows for different HTTP header to be used for token, for apis that don't use the "Authoirzation: Bearer" header
+--- @field auth_process? "bearer" | "basic" | "manual" | "none" Which authentication process to use. Defaults to "none" if nothing related to tokens is specified, or to token otherwise.
+--- @field token? string manually specify the token. Typically, prefer automatic retrieval of token. Usage of token in any way precludes the usage of username/password
+--- @field username? string necessary when auth_process "basic", but we will try and fetch it from disk for api_name if not manually provided, or default to env.MAIN_EMAIL
+--- @field password? string necessary when auth_process "basic", but we will try and fetch it from disk for api_name if not manually provided
+--- @field token_header? string allows for different HTTP header to be used for token, for apis that don't use the "Authorization: " header
+--- @field api_name? string the name of the api, used for retrieving tokens and usernames/passwords
+--- @field oauth2_subname? string the name of the oauth2 scope, used for retrieving tokens. will default to api_name if not specified
 --- @field token_param? string allows for token to be passed as a param instead of a header, for apis that don't accept the key in a HTTP header
 --- @field token_type? "simple" | "oauth2" | "telegram"
 --- @field oauth2_url? string the url to send the oauth2 request to
@@ -31,7 +34,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
   local api_keys_location = env.MAPI .. "/" .. specifier.api_name .. "/" 
   local oauth_keys_location = env.MAPI .. "/" .. specifier.oauth2_subname .. "/" 
 
-  -- if we have an api_name, used for fetching api keys, we can be pretty sure we need an token
+  -- if we have an api_name, used for fetching tokens, we can be pretty sure we need an token
   if specifier.api_name then
     specifier.token_type = specifier.token_type or "simple"
   end
@@ -155,6 +158,15 @@ function rest(specifier, do_after, have_tried_access_refresh)
   end
 
   local url = transf.url_components.url(specifier) or "https://dummyjson.com/products?limit=10&skip=10"
+
+  if (specifier.token and not specifier.token_param) then
+    specifier.auth_process = specifier.auth_process or "bearer"
+  end
+
+  if specifier.auth_process == "basic" then
+    specifier.username = specifier.username or readFile(env.MPASSUSERNAME .. "/" .. specifier.api_name .. ".txt")
+    specifier.password = specifier.password or run("pass passw/" .. specifier.api_name )
+  end
   
   
   local curl_command = {
@@ -165,8 +177,18 @@ function rest(specifier, do_after, have_tried_access_refresh)
     "-H",
     { value = "Accept: application/json", type = "quoted"},
   }
-  if specifier.token and not specifier.token_param then
-    specifier.token_header = specifier.token_header or "Authorization: Bearer"
+  
+  if listContains(mt._list.auth_processes, specifier.auth_process) then
+    local auth_header = specifier.token_header or "Authorization: "
+    auth_header = mustEnd(auth_header, ": ")
+    if specifier.auth_process == "bearer" then
+      auth_header = auth_header .. "Bearer " .. specifier.token
+    elseif specifier.auth_process == "basic" then
+      auth_header = auth_header .. "Basic " .. transf.string.base64_url(specifier.username .. ":" .. specifier.password)
+    else
+      auth_header = auth_header .. specifier.token
+    end
+
     push(curl_command, "-H")
     push(curl_command, 
       { value =  specifier.token_header .. " " .. specifier.token, type = "quoted"}

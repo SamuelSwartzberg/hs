@@ -11,6 +11,9 @@ mt = {
     nokey_endpoints = {"channels"},
     apis_that_dont_support_authorization_code_fetch = {"google"},
     useless_files = {".git", "node_modules", ".vscode"},
+    auth_processes = {
+      "bearer", "basic", "manual"
+    },
     html_entity_indicator = {
       encoded = {"&", ";"},
       decoded = {"\"", "'", "<", ">", "&"}

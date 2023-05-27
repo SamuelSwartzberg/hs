@@ -35,7 +35,7 @@ PassNameItemSpecifier = {
       ["is-pass-security-question"] = function(self) return testPath(self:get("pass-security-question-path")) end,
       ["is-pass-username"] = function(self) return testPath(self:get("pass-username-path")) end,
       ["pass-username"] = function(self)
-        return self:get("pass-username") or "me@samswartzberg.com"
+        return self:get("pass-username") or env.MAIN_EMAIL
       end,
       ["username-and-password-as-string-array"] = function(self)
         return CreateArray({
