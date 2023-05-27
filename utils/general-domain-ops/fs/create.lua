@@ -13,11 +13,11 @@ function createPath(path, slice)
 end
 
 --- @param path? string
---- @param contents? string what to write to the file, if anything
---- @param condition? "exists" | "not-exists" | "any" under what conditions to write the file
---- @param create_path? boolean whether to create the path to the file if it doesn't exist
---- @param mode? "w" | "a" the mode to open the file in (write or append)
---- @param fail? "error" | "nil" what to do if an error occurs
+--- @param contents? string what to write to the file, if anything. Defaults to an empty string.
+--- @param condition? "exists" | "not-exists" | "any" under what conditions to write the file. Defaults to "any"
+--- @param create_path? boolean whether to create the path to the file if it doesn't exist. defaults to true
+--- @param mode? "w" | "a" the mode to open the file in (write or append). Defaults to "w"
+--- @param fail? "error" | "nil" what to do if an error occurs. Defaults to "nil"
 --- @return string | nil 
 function writeFile(path, contents, condition, create_path, mode, fail)
   path = path or env.TMPDIR .. "/" .. os.time() .. "-" .. rand({len = 8}) .. ".tmp"

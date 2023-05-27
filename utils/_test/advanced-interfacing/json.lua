@@ -10,7 +10,7 @@ assertMessage(
 )
 
 local url_query_res = rest({
-  url = "https://dummyjson.com/products?limit=10&skip=10"
+  url = "dummyjson.com/products?limit=10&skip=10"
 })
 
 assertMessage(
@@ -19,7 +19,7 @@ assertMessage(
 )
 
 local assembled_query_res = rest({
-  host = "https://dummyjson.com",
+  host = "dummyjson.com",
   endpoint = "products",
   params = {
     limit = 10,
@@ -52,7 +52,7 @@ assertMessage(
 -- local post with wrong request verb
 
 local post_res = rest({
-  host = "https://dummyjson.com",
+  host = "dummyjson.com",
   endpoint = "products/add",
   params = {
     limit = 10,
@@ -71,7 +71,7 @@ assertMessage(
 -- local post with correct request verb, but no data
 
 local post_res = rest({
-  host = "https://dummyjson.com",
+  host = "dummyjson.com",
   endpoint = "products/add",
   params = {
     limit = 10,
@@ -90,7 +90,7 @@ assertMessage(
 -- local post with correct request verb, and title data
 
 local post_res = rest({
-  host = "https://dummyjson.com",
+  host = "dummyjson.com",
   endpoint = "products/add",
   params = {
     limit = 10,
@@ -112,7 +112,7 @@ assertMessage(
 -- request_table_type "form-urlencoded"
 
 local rest_res = rest({
-  host = "https://httpbin.org",
+  host = "httpbin.org",
   endpoint = "post",
   request_table = {
     foo = "bar"
@@ -128,7 +128,7 @@ assertMessage(
 )
 
 local rest_res = rest({
-  host = "https://httpbin.org",
+  host = "httpbin.org",
   endpoint = "post",
   request_table = {
     foo = "bar",
@@ -147,11 +147,10 @@ assertMessage(
   }
 )
 
-
--- get auth token for the next test
+-- get auth token
 
 local auth_response = rest({
-  host = "https://dummyjson.com",
+  host = "dummyjson.com",
   endpoint = "auth/login",
   request_table = { -- data of some user from https://dummyjson.com/docs/users
     username = "atuny0",
@@ -164,12 +163,125 @@ local auth_token = auth_response.token
 
 assertMessage(auth_token ~= nil, true)
 
+
+-- authentication
+
+-- auth_process: basic
+
+-- auto username/pw
+
+local basic_auth_response = rest({
+  host = "httpbin.org",
+  endpoint = "basic-auth/me%40samswartzberg.com/testpw",
+  auth_process = "basic",
+  api_name = "httpbin"
+})
+
+assert(basic_auth_response.authenticated, true)
+
+-- manual username/pw
+
+local basic_auth_response = rest({
+  host = "httpbin.org",
+  endpoint = "basic-auth/me%40samswartzberg.com/testpw",
+  auth_process = "basic",
+  api_name = "httpbin",
+  username = "me@samswartzberg.com",
+  password = "testpw"
+})
+
+assert(basic_auth_response.authenticated, true)
+
+-- only username
+
+local basic_auth_response = rest({
+  host = "httpbin.org",
+  endpoint = "basic-auth/me%40samswartzberg.com/testpw",
+  auth_process = "basic",
+  api_name = "httpbin",
+  username = "me@samswartzberg.com",
+})
+
+assert(basic_auth_response.authenticated, true)
+
+-- only password
+
+local basic_auth_response = rest({
+  host = "httpbin.org",
+  endpoint = "basic-auth/me%40samswartzberg.com/testpw",
+  auth_process = "basic",
+  api_name = "httpbin",
+  password = "testpw"
+})
+
+assert(basic_auth_response.authenticated, true)
+
+-- auth_process = "manual" to avoid the "Basic " prefix
+
+local manual_basic_auth_response = rest({
+  host = "httpbin.org",
+  endpoint = "headers",
+  auth_process = "bearer",
+  api_name = "httpbin",
+  token = "foobar"
+})
+
+assertMessage(
+  manual_basic_auth_response.headers.Authorization,
+  "Bearer: foobar"
+)
+
+local manual_basic_auth_response = rest({
+  host = "httpbin.org",
+  endpoint = "headers",
+  auth_process = "manual",
+  api_name = "httpbin",
+  token = "foobar"
+})
+
+assertMessage(
+  manual_basic_auth_response.headers.Authorization,
+  "foobar"
+)
+
+-- different token_header
+
+local diff_token_header_response = rest({
+  host = "httpbin.org",
+  endpoint = "headers",
+  auth_process = "basic",
+  api_name = "httpbin",
+  token_header = "X-Test-Token-Header"
+})
+
+assertMessage(
+  diff_token_header_response.headers["X-Test-Token-Header"],
+  "Basic " .. transf.string.base64_url("me@samswartzberg.com:testpw")
+)
+
+-- different token_header w/ bearer
+
+writeFile(env.MAPI .. "/httpbin/key", "123456")
+
+local diff_token_header_response = rest({
+  host = "httpbin.org",
+  endpoint = "headers",
+  auth_process = "bearer",
+  api_name = "httpbin",
+  token_header = "X-Test-Token-Header"
+})
+
+assertMessage(
+  diff_token_header_response.headers["X-Test-Token-Header"],
+  "Bearer 123456"
+)
+
 -- get request with auth token
 
 -- missing token
 
 local problem_token_res = rest({
-  host = "https://danbooru.donmai.us",
+  host = "danbooru.donmai.us",
   endpoint = "profile.json",
   params = {
     login = "reirui"
@@ -185,7 +297,7 @@ assertMessage(
 -- wrong token manually
 
 problem_token_res = rest({
-  host = "https://danbooru.donmai.us",
+  host = "danbooru.donmai.us",
   endpoint = "profile.json",
   params = {
     login = "reirui"
@@ -202,7 +314,7 @@ assertMessage(
 -- wrong token automatically
 
 problem_token_res = rest({
-  host = "https://danbooru.donmai.us",
+  host = "danbooru.donmai.us",
   endpoint = "profile.json",
   params = {
     login = "reirui"
@@ -218,7 +330,7 @@ assertMessage(
 -- correct token manually
 
 local correct_token_res = rest({
-  host = "https://danbooru.donmai.us",
+  host = "danbooru.donmai.us",
   endpoint = "profile.json",
   params = {
     login = "reirui"
@@ -235,7 +347,7 @@ assertMessage(
 -- correct token automatically
 
  correct_token_res = rest({
-  host = "https://danbooru.donmai.us",
+  host = "danbooru.donmai.us",
   endpoint = "profile.json",
   params = {
     login = "reirui"

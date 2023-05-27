@@ -2,6 +2,7 @@
 
 --- @class RESTApiSpecifier
 --- @field url? string the url to send the request to, if not using host, endpoint, and params
+--- @field scheme? string the scheme to use for the request, defaults to https://
 --- @field host? string
 --- @field endpoint? string
 --- @field params? table
@@ -16,7 +17,7 @@
 --- @field api_name? string the name of the api, used for retrieving tokens and usernames/passwords
 --- @field oauth2_subname? string the name of the oauth2 scope, used for retrieving tokens. will default to api_name if not specified
 --- @field token_param? string allows for token to be passed as a param instead of a header, for apis that don't accept the key in a HTTP header
---- @field token_type? "simple" | "oauth2" | "telegram"
+--- @field token_type? "simple" | "oauth2" | "telegram" defaults to "simple"
 --- @field oauth2_url? string the url to send the oauth2 request to
 --- @field oauth2_authorization_url? string the url to send the oauth2 authorization request to, if different from oauth2_url. Is frequently different as it is shown to the user, but will default to oauth2_url if not specified
 

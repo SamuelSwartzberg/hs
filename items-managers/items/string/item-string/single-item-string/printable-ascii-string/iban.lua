@@ -11,7 +11,7 @@ IbanItemSpecifier = {
     doThisables = {
       ["get-iban-api-data"] = function(self, do_after)
         memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
-          host = "https://openiban.com/",
+          host = "openiban.com/",
           endpoint = "validate/" .. self:get("cleaned-iban"),
           params = { getBIC = "true" },
         }, function(res)

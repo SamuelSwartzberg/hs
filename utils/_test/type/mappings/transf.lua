@@ -287,7 +287,7 @@ assertMessage(
 
 assertMessage(
   transf.url_components.url({
-    host = "https://example.com",
+    host = "example.com",
     endpoint = "foo/bar"
   }),
   "https://example.com/foo/bar"
@@ -295,7 +295,7 @@ assertMessage(
 
 assertMessage(
   transf.url_components.url({
-    host = "https://example.com",
+    host = "example.com",
     endpoint = "/foo/bar"
   }),
   "https://example.com/foo/bar"
@@ -322,7 +322,7 @@ assertMessageAny(
       foo = "bar",
       baz = "a space"
     },
-    host = "https://example.com",
+    host = "example.com",
     endpoint = "foo/bar"
   }),
   {

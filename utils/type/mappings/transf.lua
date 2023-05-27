@@ -162,7 +162,12 @@ transf = {
       if comps.url then
         url = comps.url
       elseif comps.host or comps.endpoint then
-        url = mustEnd(comps.host, "/")
+        if comps.scheme then
+          url = comps.scheme
+        else
+          url = "https://"
+        end
+        url = url .. mustEnd(comps.host, "/")
         if comps.endpoint then
           url = url .. (mustNotStart(comps.endpoint, "/") or "/")
         end   

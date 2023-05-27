@@ -4,7 +4,7 @@
 --- @param do_after? fun(result: string): nil
 function hydrus(spec, do_after)
   spec.api_name = "hydrus"
-  spec.host = "http://127.0.0.1:45869/"
+  spec.host = "127.0.0.1:45869/"
   spec.token_header = "Hydrus-Client-API-Access-Key:"
   spec.auth_process = "manual"
   if do_after then

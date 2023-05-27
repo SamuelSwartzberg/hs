@@ -42,7 +42,7 @@ function gpt(text_content, opts, do_after)
   end
 
   local request_opts = {
-    host = "https://api.openai.com/v1/",
+    host = "api.openai.com/v1/",
     endpoint = endpoint,
     request_table = request,
     api_name = "openai",
