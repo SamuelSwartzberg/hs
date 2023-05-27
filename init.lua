@@ -382,7 +382,8 @@ System:get("manager", "creatable"):doThis("create-all", {
       end
     end
   },
-  { type = "task", args = {"jcwserve", env.JSON_SHELL_API_LAYER_SERVER_PORT} }
+  { type = "task", args = {"jcwserve", env.JSON_SHELL_API_LAYER_SERVER_PORT} },
+  { type = "task", args = "oauth2callback"}
 })
 
 

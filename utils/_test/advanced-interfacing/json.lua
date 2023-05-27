@@ -426,8 +426,6 @@ hs.timer.doAfter(1, function()
   end)
 end)
 
-error("TODO set up oauth2callback permanently")
-
 else
   print("skipping...")
 end
