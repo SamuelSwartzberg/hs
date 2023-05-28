@@ -581,12 +581,13 @@ speak = hs.speech.new()
 --- @field frontmostApplication fun(): hs.application
 --- @field find fun(hint: string | number): hs.application
 --- @field get fun(name: string | number): hs.application
---- @field open fun(app: string | number): hs.application
+--- @field open fun(app: string | number, wait?: number, waitForFirstWindow?: boolean): hs.application
 --- @field launchOrFocus fun(name: string): boolean
 --- @field getMenuItems fun(): {[string]: table}
 --- @field activate fun(allWindows?: boolean): boolean
 --- @field title fun(self: hs.application): string
 --- @field name fun(self: hs.application): string
+--- @field hide fun(self: hs.application): boolean
 
 --- @class hs.eventtap.eventtap
 --- @field isEnabled fun(self: hs.eventtap.eventtap): boolean

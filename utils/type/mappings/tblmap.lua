@@ -192,7 +192,10 @@ for k, v in pairs(tblmap) do
       v2,
       {
         __index = function(t, k)
-          local key = normalize[thing_to_normalize][k] or k
+          local key = k
+          if normalize[thing_to_normalize] then
+            key = normalize[thing_to_normalize][k]
+          end
           return rawget(t, key)
         end
       }

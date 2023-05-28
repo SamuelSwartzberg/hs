@@ -331,4 +331,28 @@ assertMessageAny(
   }
 )
 
+assertMessageAny(
+  transf.table.curl_form_field_list({ foo = "bar", lol = "what"}),
+  {
+    { "-F", {value = "foo=bar", type = "quoted"}, "-F",{ value = "lol=what", type = "quoted"}},
+    { "-F", {value = "lol=what", type = "quoted"}, "-F",{ value = "foo=bar", type = "quoted"}}
+  }
+)
+
+assertMessageAny(
+  transf.table.curl_form_field_list({ foo = "bar", lol = "1"}),
+  {
+    { "-F", {value = "foo=bar", type = "quoted"}, "-F",{ value = "lol=1", type = "quoted"}},
+    { "-F", {value = "lol=1", type = "quoted"}, "-F",{ value = "foo=bar", type = "quoted"}}
+  }
+)
+
+assertMessageAny(
+  transf.table.curl_form_field_list({ foo = "bar", lol = "@~/foo.txt"}),
+  {
+    { "-F", {value = "foo=bar", type = "quoted"}, "-F",{ value = "lol=@" .. env.HOME .. "/foo.txt", type = "quoted"}},
+    { "-F", {value = "lol=@" .. env.HOME .. "/foo.txt", type = "quoted"}, "-F",{ value = "foo=bar", type = "quoted"}}
+  }
+)
+
 env = realenv

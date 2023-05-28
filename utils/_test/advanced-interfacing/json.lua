@@ -5,7 +5,7 @@ if true then -- making a bunch of json requests non-async takes time
 -- ensure that the stuff gotten for various ways of assembling the url seems right
 
 local url_query_res = rest({
-  url = "dummyjson.com/products?limit=10&skip=10"
+  url = "https://dummyjson.com/products?limit=10&skip=10"
 })
 
 assertMessage(
@@ -173,7 +173,7 @@ assertMessage(
 -- with files (uses curl notation for files)
 
 local timestamp = os.time()
-local filepath = env.TEMP_DIR .. "/rest-form-file-" .. timestamp .. ".txt"
+local filepath = env.TMPDIR .. "/rest-form-file-" .. timestamp .. ".txt"
 
 writeFile(filepath, "test")
 
@@ -201,7 +201,7 @@ assertMessage(
 assertMessage(
   rest_res.files,
   {
-    afile = "data:text/plain;base64,dGVzdA=="
+    afile = "test"
   }
 )
 
@@ -213,8 +213,12 @@ local uuid_response = rest({
   non_json_response = true
 })
 
+-- since the response is actually json, but we've told rest to not parse it, we have to parse it ourselves
+
+local actual_uuid = json.decode(uuid_response).uuid
+
 assert(
-  onig.match(uuid_response, whole(mt._r.id.uuid))
+  onig.match(actual_uuid, whole(mt._r.id.uuid))
 )
 
 -- get auth token
@@ -332,7 +336,7 @@ local manual_basic_auth_response = rest({
 
 assertMessage(
   manual_basic_auth_response.headers.Authorization,
-  "Bearer: foobar"
+  "Bearer foobar"
 )
 
 local manual_basic_auth_response = rest({
@@ -385,7 +389,7 @@ assertMessage(
 
 -- missing token (no api_name for auto retrieval)
 
-local problem_token_res = rest({
+local succ, res = pcall(rest,{
   host = "danbooru.donmai.us",
   endpoint = "profile.json",
   token_where = "param",
@@ -394,39 +398,25 @@ local problem_token_res = rest({
   }
 })
 
-
+assert(not succ)
 assertMessage(
-  problem_token_res.error,
-  "SessionLoader::AuthenticationFailure"
-) 
+  res,
+  "Cannot fetch token without api_name"
+)
 
 -- wrong token manually
 
-problem_token_res = rest({
+local problem_token_res = rest({
   host = "danbooru.donmai.us",
   endpoint = "profile.json",
   params = {
     login = "reirui"
   },
   token_where = "param",
-  token = "wrong"
-})
-
-assertMessage(
-  problem_token_res.error,
-  "SessionLoader::AuthenticationFailure"
-)
-
--- wrong token automatically
-
-problem_token_res = rest({
-  host = "danbooru.donmai.us",
-  endpoint = "profile.json",
-  params = {
-    login = "reirui"
-  },
-  api_name = "wronglol",
-  token_where = "header"
+  token = "wrong",
+  run_json_opts = {
+    accept_error_payload = true
+  }
 })
 
 assertMessage(
@@ -462,6 +452,24 @@ correct_token_res = rest({
   token_where = "param",
   api_name = "danbooru",
 })
+
+-- prefer manual token over auto
+
+correct_token_res = rest({
+  host = "danbooru.donmai.us",
+  endpoint = "profile.json",
+  params = {
+    login = "reirui"
+  },
+  api_name = "wronglol",
+  token_where = "param",
+  token = readFile(env.MAPI .. "/danbooru/key"),
+})
+
+assertMessage( 
+  correct_token_res.name,
+  "reirui"
+)
 
 -- correct token automatically with automatic retrieval of host, token_where
 
@@ -507,7 +515,7 @@ local token_res = rest({
 
 assertMessage(
   token_res.headers.Authorization,
-  "Bearer: " .. readFile(env.MAPI .. "/httpbin/key")
+  "Bearer " .. readFile(env.MAPI .. "/httpbin/key")
 )
 
 assertMessage(
@@ -525,7 +533,7 @@ local token_res = rest({
 
 assertMessage(
   token_res.headers.Authorization,
-  "Bearer: " .. readFile(env.MAPI .. "/httpbin/key")
+  "Bearer " .. readFile(env.MAPI .. "/httpbin/key")
 )
 
 assertMessage(
@@ -546,7 +554,7 @@ local token_res = rest({
 
 assertMessage(
   token_res.headers.Authorization,
-  "Bearer: " .. readFile(env.MAPI .. "/httpbin/key")
+  "Bearer " .. readFile(env.MAPI .. "/httpbin/key")
 )
 
 assertMessage(
@@ -565,7 +573,7 @@ local user_pass_res = rest({
 
 assertMessage(
   user_pass_res.headers.Authorization,
-  "Basic " .. transf.string.base64_url(env.MAIN_EMAIL .. ":" .. env.MAIN_PASSWORD)
+  "Basic " .. transf.string.base64_url(env.MAIN_EMAIL .. ":" .. "testpw")
 )
 
 assertMessage(
@@ -579,6 +587,8 @@ assertMessage(
 )
 
 -- test various apis
+
+hs.application.open("Hydrus Network")
 
 local hydrus_response = rest({
   api_name = "hydrus",

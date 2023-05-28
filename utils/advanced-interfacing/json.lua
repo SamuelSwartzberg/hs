@@ -24,6 +24,7 @@
 --- @field oauth2_url? string The URL to send the OAuth2 request to. If nil but required, tries to fetch it from a stored default for the api.
 --- @field oauth2_authorization_url? string The URL to send the OAuth2 authorization request to. If not specified, it will default to oauth2_url. If nil but required, tries to fetch it from a stored default for the api.
 --- @field non_json_response? boolean Indicates whether the response is not JSON. Some REST apis may return non-JSON responses in certain cases, this is used to handle those cases. Defaults to false. If using this, oauth2 token refresh with a refresh token will not work.
+--- @field run_json_opts run_first_arg args to pass through to runJSON. Mainly used for testing.
 
 --- @param specifier? RESTApiSpecifier
 --- @param do_after? fun(result: table): nil Function to execute after the request is completed. This is used to make the request synchronous or asynchronous.
@@ -32,7 +33,7 @@
 function rest(specifier, do_after, have_tried_access_refresh)
   specifier = copy(specifier) or {}
 
-  local api_keys_location, oauth_keys_location, catch_auth_error
+  local api_keys_location, catch_auth_error
 
   if specifier.api_name then
     specifier.token_where = specifier.token_where or tblmap.api_name.token_where[specifier.api_name]
@@ -43,24 +44,25 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if specifier.token_where then
 
-    api_keys_location = env.MAPI .. "/" .. specifier.api_name .. "/" 
-    oauth_keys_location = env.MAPI .. "/" .. specifier.api_name .. "/" 
+    if specifier.api_name then
+      api_keys_location = env.MAPI .. "/" .. specifier.api_name .. "/" 
+    end
 
     specifier.token_type = specifier.token_type or "simple"
 
-    local token
     if not specifier.token then
+      if not specifier.api_name then
+        error("Cannot fetch token without api_name", 0)
+      end
       local keyloc
       if specifier.token_type == "simple" then
         keyloc = api_keys_location .. "key"
       elseif specifier.token_type == "oauth2" then
-        keyloc = oauth_keys_location .. "access_token"
+        keyloc = api_keys_location .. "access_token"
       elseif specifier.token_type == "telegram" then
         -- todo
       end
-      token = readFile(keyloc)
-    else
-      token = specifier.token
+      specifier.token = readFile(keyloc)
     end
 
     if specifier.token_type == "oauth2"  then
@@ -71,9 +73,9 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
       local function process_tokenres(tokenres)
         if tokenres.access_token then
-          writeFile(oauth_keys_location .. "access_token", tokenres.access_token)
+          writeFile(api_keys_location .. "access_token", tokenres.access_token)
           if tokenres.refresh_token then
-            writeFile(oauth_keys_location .. "refresh_token", tokenres.refresh_token)
+            writeFile(api_keys_location .. "refresh_token", tokenres.refresh_token)
           end
           return rest(specifier, do_after) -- try again
         else
@@ -86,7 +88,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
       if not clientid or not clientsecret then
         error("Failed to get clientid or clientsecret from " .. api_keys_location ". Oauth2 apis must have these. Are you sure you've already set up the api?")
       end
-      local refresh_token = readFile(oauth_keys_location .. "refresh_token")
+      local refresh_token = readFile(api_keys_location .. "refresh_token")
 
       local function initial_authorize()
         if listContains(mt._list.apis_that_dont_support_authorization_code_fetch, specifier.api_name) then
@@ -111,8 +113,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
         end
         
         open(open_spec, function() -- our server listening on the above port will save the authorization code to the proper location
-          local authorization_code = readFile(oauth_keys_location .. "authorization_code")
-          delete( oauth_keys_location .. "authorization_code")
+          local authorization_code = readFile(api_keys_location .. "authorization_code")
+          delete( api_keys_location .. "authorization_code")
           if not authorization_code then
             error("Failed to get authorization code from server")
           end
@@ -145,7 +147,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
         rest(request, process_tokenres, true)
       end
 
-      if token == nil then -- initial token request
+      if specifier.token == nil then -- initial token request
         if refresh_token then
           do_refresh_token()
         else
@@ -195,8 +197,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if specifier.username_pw_where == "param" or specifier.username_pw_where == "both" then
     specifier.params = specifier.params or {}
-    specifier.params.username_param = specifier.username_param or "username"
-    specifier.params.password_param = specifier.password_param or "password"
+    specifier.username_param = specifier.username_param or "username"
+    specifier.password_param = specifier.password_param or "password"
     specifier.params[specifier.username_param] = specifier.username
     specifier.params[specifier.password_param] = specifier.password
   end
@@ -217,11 +219,11 @@ function rest(specifier, do_after, have_tried_access_refresh)
     "curl", {
       value = url,
       type = "quoted"
-    },
-    "-H",
+    }
   }
 
   if not specifier.non_json_response then
+    push(curl_command, "-H")
     push(curl_command, { value = "Accept: application/json", type = "quoted"})
   end
 
@@ -293,13 +295,16 @@ function rest(specifier, do_after, have_tried_access_refresh)
     )
   
   end
-  
+  local args = {
+    args = curl_command,
+  }
+  if specifier.run_json_opts then
+    args = glue(args, specifier.run_json_opts)
+  end
   if not specifier.non_json_response then
-    return runJSON({
-      args = curl_command,
-      json_catch = catch_auth_error,
-    }, do_after)
+    args.json_catch = catch_auth_error
+    return runJSON(args, do_after)
   else 
-    return run(curl_command, do_after)
+    return run(args, do_after)
   end
 end

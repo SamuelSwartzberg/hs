@@ -150,7 +150,7 @@ transf = {
     url_params = function(t)
       local params = {}
       for k, v in pairs(t) do
-        local encoded_v = urlencode(v, true)
+        local encoded_v = urlencode(tostring(v), true)
         table.insert(params, k .. "=" .. encoded_v)
       end
       return table.concat(params, "&")
@@ -165,7 +165,10 @@ transf = {
           valpath = transf.string.path_resolved(valpath, true)
           val = "@" .. valpath
         end
-        push(fields, ("%s=%s"):format(k, val))
+        push(fields, {
+          value = ("%s=%s"):format(k, val),
+          type = "quoted",
+        })
       end
       return fields
     end,
