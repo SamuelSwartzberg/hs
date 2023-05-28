@@ -19,7 +19,8 @@ BooruURLItemSpecifier = {
         CreateStringItem(env.MBOORU_FAVORITE_LOGS):doThis("log-timestamp-table", {
           [os.time] = "add," .. self:get("contents")
         })
-        hydrus({
+        rest({
+          api_name = "hydrus",
           endpoint = "add_urls/add_url",
           request_table = { url = url },
           request_verb = "POST",

@@ -155,6 +155,20 @@ transf = {
       end
       return table.concat(params, "&")
     end,
+    curl_form_field_list = function(t)
+      local fields = {}
+      for k, v in pairs(t) do
+        push(fields, "-F")
+        local val = v
+        if stringy.startswith(v, "@") then
+          local valpath = eutf8.sub(v, 2)
+          valpath = transf.string.path_resolved(valpath, true)
+          val = "@" .. valpath
+        end
+        push(fields, ("%s=%s"):format(k, val))
+      end
+      return fields
+    end,
   },
   url_components = {
     url = function(comps)

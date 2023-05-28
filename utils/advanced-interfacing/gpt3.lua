@@ -29,12 +29,11 @@ function gpt(text_content, opts, do_after)
     request.prompt = text_content
   elseif opts.ai_role == "chat" then
     request.messages = {}
-    if opts.system_msg ~= nil then
-      table.insert(request.messages, {
-        role = "system",
-        content = opts.system_msg or "You are a helpful assistant being queried through an API. Your output will be parsed, so adhere to any instructions given as to the format or content of the output."
-      })
-    end
+    table.insert(request.messages, {
+      role = "system",
+      content = opts.system_msg or "You are a helpful assistant being queried through an API. Your output will be parsed, so adhere to any instructions given as to the format or content of the output."
+    })
+  
     table.insert(request.messages, {
       role = "user",
       content = text_content
@@ -42,7 +41,6 @@ function gpt(text_content, opts, do_after)
   end
 
   local request_opts = {
-    host = "api.openai.com/v1/",
     endpoint = endpoint,
     request_table = request,
     api_name = "openai",

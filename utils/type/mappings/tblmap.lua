@@ -145,18 +145,45 @@ tblmap = {
     }
   },
   api_name = {
-    url = {
+    host = {
+      dropbox = "api.dropboxapi.com/2",
+      danbooru = "danbooru.donmai.us",
+      openai = "api.openai.com/v1",
+      hydrus = "127.0.0.1:45869",
+      httpbin = "httpbin.org"
+    },
+    auth_header = {
+      hydrus = "Hydrus-Client-API-Access-Key"
+    },
+    token_where = {
+      hydrus = "header",
+      danbooru = "param",
+      dropbox = "header",
+      openai = "header"
+    },
+    username_pw_where = {
 
+    },
+    auth_process = {
+      hydrus = "" -- "" means no auth process. Even though it's using keys for auth, it doesn't use the Bearer indicator
+    },
+    oauth2_url = {
+      dropbox = "api.dropboxapi.com/oauth2/token",
+      google = "https://accounts.google.com/o/oauth2/token"
+    },
+    oauth2_authorization_url = {
+      dropbox = "https://www.dropbox.com/oauth2/authorize",
+    },
+    needs_scopes = {
+      google = true
+    },
+    scopes = {
+      google = "https://www.googleapis.com/auth/youtube"
     }
   },
-  oauth2_subname = {
-    url = {
-      
-    }
-  }
 }
 
--- make sure to automatically normalize any input to tblmap§
+-- make sure to automatically normalize any input to tblmap
 
 for k, v in pairs(tblmap) do
   local thing_to_normalize = k 

@@ -34,12 +34,10 @@ function youtube(spec, do_after)
   end
 
   if is_extension_endpoint then
-    spec.host = "yt.lemnoslife.com/"
+    spec.host = "yt.lemnoslife.com"
   else
-    spec.host = "www.googleapis.com/youtube/v3/"
+    spec.host = "www.googleapis.com/youtube/v3"
     spec.api_name = "google"
-    spec.oauth2_subname = "google_youtube_scope"  
-    spec.oauth2_url = "https://accounts.google.com/o/oauth2/token"
   end
 
 
