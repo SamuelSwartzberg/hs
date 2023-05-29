@@ -37,13 +37,13 @@ function rest(specifier, do_after, have_tried_access_refresh)
   local api_keys_location, catch_auth_error, secondary_api_name
 
   if specifier.api_name then
-    specifier.token_where = specifier.token_where or tblmap.api_name.token_where[specifier.api_name]
-    specifier.username_pw_where = specifier.username_pw_where or tblmap.api_name.username_pw_where[specifier.api_name]
-
     if tblmap.secondary_api_name.api_name[specifier.api_name] then
       secondary_api_name = specifier.api_name
       specifier.api_name = tblmap.secondary_api_name.api_name[specifier.api_name]
     end
+
+    specifier.token_where = specifier.token_where or tblmap.api_name.token_where[specifier.api_name]
+    specifier.username_pw_where = specifier.username_pw_where or tblmap.api_name.username_pw_where[specifier.api_name]
   end
 
   -- fetch tokens
@@ -74,11 +74,12 @@ function rest(specifier, do_after, have_tried_access_refresh)
     if specifier.token_type == "oauth2"  then
 
       local function process_tokenres(tokenres)
+        inspPrint(tokenres)
+        if tokenres.refresh_token then
+          writeFile(api_keys_location .. "refresh_token", tokenres.refresh_token)
+        end
         if tokenres.access_token then
           writeFile(api_keys_location .. "access_token", tokenres.access_token)
-          if tokenres.refresh_token then
-            writeFile(api_keys_location .. "refresh_token", tokenres.refresh_token)
-          end
           return rest(original_specifier, do_after) -- try again
         else
           error("Failed to refresh access token. Result was:\n" .. json.encode(tokenres))
@@ -92,10 +93,10 @@ function rest(specifier, do_after, have_tried_access_refresh)
       end
       local refresh_token = readFile(api_keys_location .. "refresh_token")
 
-      local function initial_authorize()
-        specifier.oauth2_url = specifier.oauth2_url or tblmap.api_name.oauth2_url[specifier.api_name]
-        specifier.oauth2_authorization_url = specifier.oauth2_authorization_url or tblmap.api_name.oauth2_authorization_url[specifier.api_name] or specifier.oauth2_url
+      specifier.oauth2_url = specifier.oauth2_url or tblmap.api_name.oauth2_url[specifier.api_name]
+      specifier.oauth2_authorization_url = specifier.oauth2_authorization_url or tblmap.api_name.oauth2_authorization_url[specifier.api_name] or specifier.oauth2_url
 
+      local function authorize_app()
 
         -- authorize the app by opening a browser window
         
@@ -109,6 +110,9 @@ function rest(specifier, do_after, have_tried_access_refresh)
         }
         if tblmap.api_name.needs_scopes[specifier.api_name] then
           open_spec.params.scope = tblmap.api_name.scopes[specifier.api_name]
+        end
+        if tblmap.api_name.additional_auth_params[specifier.api_name] then
+          open_spec.params = glue(open_spec.params, tblmap.api_name.additional_auth_params[specifier.api_name])
         end
         
         open(open_spec, function() -- our server listening on the above port will save the authorization code to the proper location
@@ -128,7 +132,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
             url = specifier.oauth2_url,
             request_table = token_request_body,
             request_table_type = "form-urlencoded"
-          }, process_tokenres)
+          }, process_tokenres, true)
           
         end)
       end
@@ -156,7 +160,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
         if refresh_token then
           do_refresh_token()
         else
-          initial_authorize()
+          authorize_app()
         end
         if not do_after then
           print("Needed to (re)fetch access token, which must be done asynchronously. Returning nil for now, must be called again after token is fetched. This behavior is not ideal, but at least it doesn't permanently brick the program.")
@@ -165,15 +169,13 @@ function rest(specifier, do_after, have_tried_access_refresh)
       end
 
       catch_auth_error = function(res)
-        print("caught potential auth error")
-        inspPrint(res)
         if have_tried_access_refresh then
-          error("Access token expired, and already tried to refresh token, but failed. Response was:\n" .. json.encode(res))
+          error("Access token expired, and already tried to refresh token, but failed. Response was:\n" .. res)
         end
         if refresh_token then
           do_refresh_token()
         else
-          initial_authorize()
+          authorize_app()
         end
       end
     end

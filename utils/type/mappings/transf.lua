@@ -178,7 +178,7 @@ transf = {
       local url
       if comps.url then
         url = comps.url
-      elseif comps.host or comps.endpoint then
+      elseif comps.host then
         if comps.scheme then
           url = comps.scheme
         else

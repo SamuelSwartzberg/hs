@@ -613,7 +613,7 @@ local dropbox_request = {
   oauth2_authorization_url = "https://www.dropbox.com/oauth2/authorize"
 }
 
-local task = run({
+local oauth2callbacktask = run({
   args = "oauth2callback",
   catch = true
 }, true)
@@ -678,8 +678,8 @@ hs.timer.doAfter(1, function()
         )
 
         local youtube_request = {
-          api_name = "google",
-          endpoint = "youtube/v3/channels",
+          api_name = "youtube",
+          endpoint = "channels",
           params = { forUsername = "GoogleDevelopers" }
         }
 
@@ -690,9 +690,7 @@ hs.timer.doAfter(1, function()
             "UC_x5XG1OV2P6uZZ5FSM9Ttw"
           )
 
-          if task and task.kill then -- kill the task if it's still running. It will be if we spawned it here successfully, but more likely it was already running in the background (since the server is meant to be running all the time), so it's likely our task won't have spawned it, thus not be running, and thus we don't need to (and can't) kill it.
-            task:kill()
-          end
+          
         end)
       end)
 

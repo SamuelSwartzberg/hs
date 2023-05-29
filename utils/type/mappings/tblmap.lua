@@ -163,7 +163,8 @@ tblmap = {
       danbooru = "danbooru.donmai.us",
       openai = "api.openai.com/v1",
       hydrus = "127.0.0.1:45869",
-      httpbin = "httpbin.org"
+      httpbin = "httpbin.org",
+      google = "www.googleapis.com",
     },
     scheme = {
       hydrus = "http://",
@@ -207,6 +208,12 @@ tblmap = {
     },
     empty_post_body_content_type = {
       dropbox = "application/json"
+    },
+    additional_auth_params = {
+      google = {
+        access_type = "offline", 
+        prompt = "consent"
+      }
     },
   },
 }
