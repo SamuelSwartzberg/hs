@@ -118,9 +118,9 @@ function rand(spec, type)
   end
 end
 
---- @param thing any
---- @param target? "number" | "int" | "pos-int"
---- @param mode? "error" | "nil" | "invalid-number"
+--- @param thing any The thing to convert.
+--- @param target? "number" | "int" | "pos-int" What to convert to. Defaults to "number".
+--- @param mode? "error" | "nil" | "invalid-number" What to do if the value cannot be converted to the target type. Defaults to "nil".
 --- @return number | nil
 function toNumber(thing, target, mode)
   target = target or "number"

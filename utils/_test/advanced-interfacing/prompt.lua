@@ -526,15 +526,15 @@ assertMessage(
       hs.eventtap.keyStrokes("/illegal")
       hs.eventtap.keyStroke({}, "return")
       hs.timer.doAfter(0.001, function()
-        hs.eventtap.keyStrokes(tmppath)
+        hs.eventtap.keyStrokes(tmppath .. "2")
         hs.eventtap.keyStroke({}, "return")
       end)
     end,
     function ()
-      return prompt("string-filepath", tmppath .. "2")
+      return prompt("string-filepath", tmppath .. "1")
     end
   ),
-  tmppath
+  tmppath .. "2"
 )
 
 

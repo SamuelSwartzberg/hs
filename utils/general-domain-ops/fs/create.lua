@@ -1,14 +1,28 @@
 --- @param path string
 --- @param slice? sliceSpecLike how to slice the path before creating it
-function createPath(path, slice)
+--- @param fail? "error" | "nil" what to do if an error occurs. Defaults to "nil"
+function createPath(path, slice, fail)
   path = transf.string.path_resolved(path, true)
-  slice = slice or { start = 1, stop = -1 } -- default to entire path
-  local resolved_path = pathSlice(path, slice, {rejoin_at_end = true})
+  local resolved_path = path
+  if slice then
+    local sliced =  pathSlice(path, slice, {rejoin_at_end = true})
+    --- @cast sliced string
+    resolved_path = sliced
+  end
   local remote = pathIsRemote(resolved_path)
-  if not remote then
-    run({"mkdir -p '" .. resolved_path .. "'"})
-  else
-    run({"rclone", "mkdir", {value = resolved_path, type = "quoted"}})
+  local succ, res = pcall(function()
+    if not remote then
+      run({"mkdir -p '" .. resolved_path .. "'"})
+    else
+      run({"rclone", "mkdir", {value = resolved_path, type = "quoted"}})
+    end
+  end)
+  if not succ then
+    if fail == "error" then
+      error(res)
+    else
+      return nil
+    end
   end
 end
 

@@ -837,3 +837,13 @@ assertMessage(
     symlink_test_dir2 .. "test-2-link"
   }
 )
+
+-- test new fail parameter of createPath
+
+local create_res = createPath("/foo", nil, "nil")
+
+assert(create_res == nil)
+
+local succ, res = pcall(createPath, "/foo", nil, "error")
+
+assert(not succ)

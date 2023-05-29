@@ -1,24 +1,35 @@
---- @class PromptStringArgs
---- @field message any
---- @field informative_text? any
---- @field default? any
---- @field buttonA? any
---- @field buttonB? any
+--- @class PrompterArgs
+--- @field message? any Message to display in the prompt.
+--- @field default? any Default value for the prompt.
+
+--- @class PromptStringArgs : PrompterArgs
+--- @field informative_text? any Additional text to display in the prompt.
+--- @field buttonA? any Label for the first button.
+--- @field buttonB? any Label for the second button.
 
 --- @param prompt_args? PromptStringArgs
 --- @return (string|nil), boolean
 function promptStringInner(prompt_args)
+
+  -- set up default values, make sure provided values are strings
+
   prompt_args = prompt_args or {}
   prompt_args.message = transf.not_nil.string(prompt_args.message) or "Enter a string."
   prompt_args.informative_text = transf.not_nil.string(prompt_args.informative_text) or ""
   prompt_args.default = transf.not_nil.string(prompt_args.default) or ""
   prompt_args.buttonA = transf.not_nil.string(prompt_args.buttonA) or "OK"
   prompt_args.buttonB = transf.not_nil.string(prompt_args.buttonB) or "Cancel"
+
+  -- show prompt
+
   --- @type string, string|nil
   local button_pressed, rawReturn = doWithActivated("Hammerspoon", function()
     return hs.dialog.textPrompt(prompt_args.message, prompt_args.informative_text, prompt_args.default,
     prompt_args.buttonA, prompt_args.buttonB)
   end)
+
+  -- process result
+
   local ok_button_pressed = button_pressed == prompt_args.buttonA
 
   if stringy.startswith(rawReturn, " ") then -- space triggers lua eval mode
@@ -28,13 +39,13 @@ function promptStringInner(prompt_args)
     rawReturn = nil
   end
 
+  -- return result
+
   return rawReturn, ok_button_pressed
 end
 
 --- @class PromptPathArgs
---- @field message? string
---- @field default? string
---- @field can_choose_files? boolean
+--- @field can_choose_files? boolean 
 --- @field can_choose_directories? boolean
 --- @field allows_loop_selection? boolean
 --- @field allowed_file_types? string[]
@@ -43,9 +54,12 @@ end
 --- @param prompt_args? PromptPathArgs
 --- @return (string|string[]|nil), boolean
 function promptPathInner(prompt_args)
+
+    -- set up default values, make sure message and default are strings
+
   prompt_args                        = prompt_args or {}
-  prompt_args.message                = defaultIfNil(prompt_args.message, "Choose a file or folder.")
-  prompt_args.default                = defaultIfNil(prompt_args.default, env.HOME)
+  prompt_args.message                = defaultIfNil(transf.not_nil.string(prompt_args.message), "Choose a file or folder.")
+  prompt_args.default                = defaultIfNil(transf.not_nil.string(prompt_args.default), env.HOME)
   prompt_args.can_choose_files       = defaultIfNil(prompt_args.can_choose_files, true)
   prompt_args.can_choose_directories = defaultIfNil(prompt_args.can_choose_directories, true)
   prompt_args.allows_loop_selection  = defaultIfNil(prompt_args.allows_loop_selection, false)
@@ -54,9 +68,12 @@ function promptPathInner(prompt_args)
 
   prompt_args.default = transf.string.path_resolved(prompt_args.default, true) -- resolve the path ourself, to be sure & remain in control
 
-  local rawReturn                    = hs.dialog.chooseFileOrFolder(prompt_args.message, prompt_args.default,
-  prompt_args.can_choose_files, prompt_args.can_choose_directories, prompt_args.allows_loop_selection,
-  prompt_args.allowed_file_types, prompt_args.resolves_aliases)
+  -- show prompt
+
+  local rawReturn                    = hs.dialog.chooseFileOrFolder(prompt_args.message, prompt_args.default, prompt_args.can_choose_files, prompt_args.can_choose_directories, prompt_args.allows_loop_selection, prompt_args.allowed_file_types, prompt_args.resolves_aliases)
+
+  -- process result
+
   if rawReturn == nil then
     return nil, false
   end
@@ -64,6 +81,9 @@ function promptPathInner(prompt_args)
   if #listReturn == 0 then
     return nil, true
   end
+
+  -- return result
+
   if prompt_args.allows_loop_selection then
     return listReturn, true
   else
@@ -74,16 +94,17 @@ end
 --- @alias failure_action "error" | "return_nil" | "reprompt"
 
 --- @class PromptSpecifier
---- @field prompter? fun(prompt_args: table): any, boolean must return nil on the equivalent of an empty value
---- @field prompt_args? table
---- @field transformer? fun(rawReturn: any): any
---- @field raw_validator? fun(rawReturn: any): boolean
---- @field transformed_validator? fun(transformedReturn: any): boolean
---- @field on_cancel? failure_action
---- @field on_raw_invalid? failure_action
---- @field on_transformed_invalid? failure_action
---- @field final_postprocessor? fun(transformedReturn: any): any
+--- @field prompter? fun(prompt_args: table): any, boolean The function that implements prompting. Must return nil on the equivalent of an empty value.
+--- @field prompt_args? table Arguments to pass to `prompter`.
+--- @field transformer? fun(rawReturn: any): any transforms the raw return value into the transformed return value. Default is the identity function.
+--- @field raw_validator? fun(rawReturn: any): boolean validates before application of `transformer`. Default is ensuring the return value is not nil.
+--- @field transformed_validator? fun(transformedReturn: any): boolean validates after application of `transformer`. Default is ensuring the return value is not nil.
+--- @field on_cancel? failure_action What to do if the user cancels the prompt. May error, return nil, or reprompt. Default is "error".
+--- @field on_raw_invalid? failure_action What to do if the raw return value is invalid. May error, return nil, or reprompt. Default is "return_nil".
+--- @field on_transformed_invalid? failure_action What to do if the transformed return value is invalid. May error, return nil, or reprompt. Default is "reprompt".
+--- @field final_postprocessor? fun(transformedReturn: any): any A function to run on the final transformed return value, after validation. Default is the identity function.
 
+--- With the default prompt_spec, we will error if cancelled, return nil if the raw return value is the equivalent of an empty value, and never reprompt.
 --- @param prompt_spec? PromptSpecifier
 --- @return any
 function promptNopolicy(prompt_spec)
@@ -173,11 +194,11 @@ function promptNopolicy(prompt_spec)
   end
 end
 
---- @alias promptInt fun(type: "int", prompt_spec?: PromptSpecifier, loop: "pipeline" | nil): integer|nil
+--- @alias promptInt fun(type: "int", prompt_spec?: PromptSpecifier, loop: "pipeline" | nil): integer|nil prompts for a string, transforms it to an integer.
 --- @alias promptIntMult fun(type: "int", prompt_spec?: PromptSpecifier, loop: "array"): integer[]|nil
---- @alias promptNumber fun(type: "number", prompt_spec?: PromptSpecifier, loop: "pipeline" | nil): number|nil
+--- @alias promptNumber fun(type: "number", prompt_spec?: PromptSpecifier, loop: "pipeline" | nil): number|nil prompts for a string, transforms it to a number.
 --- @alias promptNumberMult fun(type: "number", prompt_spec?: PromptSpecifier, loop: "array"): number[]|nil
---- @alias promptString fun(type?: "string" | "string-path" | "string-filepath", prompt_spec?: PromptSpecifier | string, loop: "pipeline" | nil): string|nil
+--- @alias promptString fun(type?: "string" | "string-path" | "string-filepath", prompt_spec?: PromptSpecifier | string, loop: "pipeline" | nil): string|nil prompts for a string, optionally validates it as a path or filepath. If prompt_spec is a string, it is used as the message for "string", and as the default value for "string-path" and "string-filepath".
 --- @alias promptStringMult fun(type?: "string" | "string-path" | "string-filepath", prompt_spec?: PromptSpecifier | string, loop: "array"): string[]|nil
 --- @alias promptPath fun(type: "path" | "dir", prompt_spec?: PromptSpecifier | string, loop: "pipeline" | nil): string|string[]|nil
 --- @alias promptPathMult fun(type: "path" | "dir", prompt_spec?: PromptSpecifier | string, loop: "array"): string[]|nil
@@ -226,7 +247,7 @@ function prompt(ptype, prompt_spec, loop)
       prompt_spec.transformed_validator = function(x)
         local res = (x ~= nil)
         if res then
-          res = pcall(createPath, x)
+          res = pcall(createPath, x, nil, "error")
         end
         return res
       end
@@ -234,7 +255,7 @@ function prompt(ptype, prompt_spec, loop)
       prompt_spec.transformed_validator = function(x)
         local res = (x ~= nil)
         if res then
-          res = pcall(writeFile, x)
+          res = pcall(writeFile, x, "", "not-exists", true, "w", "error")
         end
         return res
       end
