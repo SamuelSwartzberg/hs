@@ -10,7 +10,11 @@ YoutubeChannelIdItemSpecifier = {
         return "https://www.youtube.com/channel/" .. self:get("contents")
       end,
       ["youtube-pretty-name"] = function(self)
-        return memoize(youtube, refstore.params.memoize.opts.invalidate_1_month_fs)({"channels", "title", {id = self:get("contents")}})
+        return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
+          api_name = "youtube",
+          endpoint = "channels",
+          params = { id = self:get("contents")}
+        }).items[1].snippet.title
       end,
     },
     doThisables = {

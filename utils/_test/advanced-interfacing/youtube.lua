@@ -1,15 +1,15 @@
-local google_dev_id = youtube({
-  endpoint = "channels",
-  target = "id",
-  params = { forUsername = "GoogleDevelopers" }
-})
+-- access and refresh tokens should already exist here, since we ran the oauth2 flow in the previous test, and don't want to test it here
 
-assertMessage(
-  google_dev_id,
-  "UC_x5XG1OV2P6uZZ5FSM9Ttw"
+assert(
+  readFile(env.MAPI .. "/google/access_token") ~= ""
 )
 
-local playlistItems = youtube({
+assert(
+  readFile(env.MAPI .. "/google/refresh_token") ~= ""
+)
+
+local playlistItems = rest({
+  api_name = "youtube",
   endpoint = "playlistItems",
   params = { playlistId = "PLIivdWyY5sqJ0oXcnZYqOnuNRxc0cqUzG" },
 })
@@ -29,11 +29,11 @@ local createdPlaylistId = createYoutubePlaylist({
   description = "This is a test playlist.",
 })
 
-local createdPlaylist = youtube({
+local createdPlaylist = rest({
+  api_name = "youtube",
   endpoint = "playlists",
   params = { id = createdPlaylistId },
-  target = "title",
-})
+}).items[1]
 
 assertMessage(
   createdPlaylist,
@@ -46,10 +46,11 @@ addVidToPlaylist(
   0
 )
 
-local playlistItems = youtube({
+local playlistItems = rest({
+  api_name = "youtube",
   endpoint = "playlistItems",
   params = { playlistId = createdPlaylistId },
-})
+}).items
 
 assertMessage(
   playlistItems[1].snippet.title,
@@ -70,10 +71,11 @@ addVidsToPlaylist(
   },
   function()
 
-    local playlistItems = youtube({
+    local playlistItems = rest({
+      api_name = "youtube",
       endpoint = "playlistItems",
       params = { playlistId = createdPlaylistId },
-    })
+    }).items
 
     assertMessage(
       playlistItems[1].snippet.title,
@@ -102,10 +104,11 @@ addVidsToPlaylist(
 
     deleteYoutubePlaylist(createdPlaylistId)
 
-    local playlistItems = youtube({
+    local playlistItems = rest({
+      api_name = "youtube",
       endpoint = "playlistItems",
       params = { playlistId = createdPlaylistId },
-    })
+    }).items
 
     assertMessage(
       playlistItems,
@@ -123,10 +126,11 @@ addVidsToPlaylist(
       }
     }, function (id)
       
-      local playlistItems = youtube({
+      local playlistItems = rest({
+        api_name = "youtube",
         endpoint = "playlistItems",
         params = { playlistId = id },
-      })
+      }).items
 
       assertMessage(
         playlistItems[1].snippet.title,

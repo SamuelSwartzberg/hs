@@ -144,6 +144,19 @@ tblmap = {
       ja = "Kyoko.premium"
     }
   },
+  secondary_api_name = {
+    api_name = {
+      youtube = "google"
+    },
+    endpoint_prefix = {
+      youtube = "youtube/v3"
+    },
+    default_params = {
+      youtube = {
+        part = "snippet",
+      }
+    }
+  },
   api_name = {
     host = {
       dropbox = "api.dropboxapi.com/2",
@@ -162,7 +175,12 @@ tblmap = {
       hydrus = "header",
       danbooru = "param",
       dropbox = "header",
-      openai = "header"
+      openai = "header",
+      google = "header",
+    },
+    token_type = {
+      google = "oauth2",
+      dropbox = "oauth2",
     },
     username_pw_where = {
 
@@ -176,6 +194,7 @@ tblmap = {
     },
     oauth2_authorization_url = {
       dropbox = "https://www.dropbox.com/oauth2/authorize",
+      google = "https://accounts.google.com/o/oauth2/auth"
     },
     needs_scopes = {
       google = true

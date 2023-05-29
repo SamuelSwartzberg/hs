@@ -20,7 +20,7 @@
 --- @field username_param? string The parameter name for the username when it's passed as a parameter.
 --- @field password_param? string The parameter name for the password when it's passed as a parameter.
 --- @field username_pw_where? header_or_param | boolean Where to specify the username/password, if at all. If nil, it will  be fetched from a stored default for the api, or default to false/nil.
---- @field token_type? "simple" | "oauth2" | "telegram" The type of token to use. Defaults to "simple".
+--- @field token_type? "simple" | "oauth2" | "telegram" The type of token to use. If nil, it will be fetched from a stored default for the api, or default to "simple".
 --- @field oauth2_url? string The URL to send the OAuth2 request to. If nil but required, tries to fetch it from a stored default for the api.
 --- @field oauth2_authorization_url? string The URL to send the OAuth2 authorization request to. If not specified, it will default to oauth2_url. If nil but required, tries to fetch it from a stored default for the api.
 --- @field non_json_response? boolean Indicates whether the response is not JSON. Some REST apis may return non-JSON responses in certain cases, this is used to handle those cases. Defaults to false. If using this, oauth2 token refresh with a refresh token will not work.
@@ -34,11 +34,16 @@ function rest(specifier, do_after, have_tried_access_refresh)
   local original_specifier = specifier
   specifier = copy(specifier) or {}
 
-  local api_keys_location, catch_auth_error
+  local api_keys_location, catch_auth_error, secondary_api_name
 
   if specifier.api_name then
     specifier.token_where = specifier.token_where or tblmap.api_name.token_where[specifier.api_name]
     specifier.username_pw_where = specifier.username_pw_where or tblmap.api_name.username_pw_where[specifier.api_name]
+
+    if tblmap.secondary_api_name.api_name[specifier.api_name] then
+      secondary_api_name = specifier.api_name
+      specifier.api_name = tblmap.secondary_api_name.api_name[specifier.api_name]
+    end
   end
 
   -- fetch tokens
@@ -49,7 +54,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
       api_keys_location = env.MAPI .. "/" .. specifier.api_name .. "/" 
     end
 
-    specifier.token_type = specifier.token_type or "simple"
+    specifier.token_type = specifier.token_type or tblmap.api_name.token_type[specifier.api_name] or "simple"
 
     if not specifier.token then
       if not specifier.api_name then
@@ -67,10 +72,6 @@ function rest(specifier, do_after, have_tried_access_refresh)
     end
 
     if specifier.token_type == "oauth2"  then
-
-      if not do_after then
-        error("Oauth2 requests must be async. Please pass in a do_after function. (This is because some of the steps required cannot be done in a blocking manner, as they require user input and hammerspoon is single-threaded)")
-      end
 
       local function process_tokenres(tokenres)
         if tokenres.access_token then
@@ -92,9 +93,6 @@ function rest(specifier, do_after, have_tried_access_refresh)
       local refresh_token = readFile(api_keys_location .. "refresh_token")
 
       local function initial_authorize()
-        if listContains(mt._list.apis_that_dont_support_authorization_code_fetch, specifier.api_name) then
-          error("Cannot fetch access token for " .. specifier.api_name .. " because it doesn't support authorization code flow")
-        end
         specifier.oauth2_url = specifier.oauth2_url or tblmap.api_name.oauth2_url[specifier.api_name]
         specifier.oauth2_authorization_url = specifier.oauth2_authorization_url or tblmap.api_name.oauth2_authorization_url[specifier.api_name] or specifier.oauth2_url
 
@@ -151,10 +149,17 @@ function rest(specifier, do_after, have_tried_access_refresh)
       end
 
       if specifier.token == nil then -- initial token request
+        local original_do_after = do_after
+        if not original_do_after then
+          do_after = returnNil
+        end
         if refresh_token then
           do_refresh_token()
         else
           initial_authorize()
+        end
+        if not do_after then
+          print("Needed to (re)fetch access token, which must be done asynchronously. Returning nil for now, must be called again after token is fetched. This behavior is not ideal, but at least it doesn't permanently brick the program.")
         end
         return -- we're done here, we'll retry after we get the token
       end
@@ -209,8 +214,19 @@ function rest(specifier, do_after, have_tried_access_refresh)
     specifier.params[specifier.password_param] = specifier.password
   end
 
+  -- adjust url
+
   if not specifier.host and not specifier.url then
     specifier.host = tblmap.api_name.host[specifier.api_name]
+  end
+
+  if secondary_api_name and tblmap.secondary_api_name.endpoint_prefix[secondary_api_name] and specifier.endpoint then
+    specifier.endpoint = mustEnd(tblmap.secondary_api_name.endpoint_prefix[secondary_api_name], "/") .. mustNotStart(specifier.endpoint, "/")
+  end
+
+  if secondary_api_name and tblmap.secondary_api_name.default_params[secondary_api_name] then
+    specifier.params = specifier.params or {}
+    specifier.params = glue(copy(tblmap.secondary_api_name.default_params[secondary_api_name], true), specifier.params)
   end
 
   specifier.scheme = specifier.scheme or tblmap.api_name.scheme[specifier.api_name]

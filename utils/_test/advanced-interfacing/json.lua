@@ -599,7 +599,6 @@ assert(
   type(hydrus_response.version) == "number"
 )
 
-error("stop")
 -- oauth requests
 
 -- prepare
@@ -663,13 +662,12 @@ hs.timer.doAfter(1, function()
         "korehabetsumei@mailbox.org"
       )
 
-      -- automatically retrieve token_where, oauth2_url and oauth2_authorization_url
+      -- automatically retrieve token_where, token_type, oauth2_url and oauth2_authorization_url
 
       dropbox_request = {
         api_name = "dropbox",
         endpoint = "users/get_current_account",
-        request_table = {},
-        token_type = "oauth2",
+        request_verb = "POST",
       }
 
       rest(dropbox_request, function (response)
@@ -678,12 +676,26 @@ hs.timer.doAfter(1, function()
           response.email,
           "korehabetsumei@mailbox.org"
         )
-        
+
+        local youtube_request = {
+          api_name = "google",
+          endpoint = "youtube/v3/channels",
+          params = { forUsername = "GoogleDevelopers" }
+        }
+
+        rest(youtube_request, function(response)
+
+          assertMessage(
+            response.items[1].id,
+            "UC_x5XG1OV2P6uZZ5FSM9Ttw"
+          )
+
+          if task and task.kill then -- kill the task if it's still running. It will be if we spawned it here successfully, but more likely it was already running in the background (since the server is meant to be running all the time), so it's likely our task won't have spawned it, thus not be running, and thus we don't need to (and can't) kill it.
+            task:kill()
+          end
+        end)
       end)
 
-      task:kill()
-
-  
     end)
 
   end)
