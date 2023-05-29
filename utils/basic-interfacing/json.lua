@@ -47,11 +47,7 @@ function runJSON(opts, and_then)
         ))
       end
     end
-    if type(and_then) == "function" then
-      return and_then(res)
-    else 
-      return res
-    end
+    return res
   end
 
   return run(
@@ -67,7 +63,11 @@ function runJSON(opts, and_then)
           error(res)
         end
       else
-        return res
+        if type(and_then) == "function" then
+          return and_then(res)
+        else 
+          return res
+        end
       end
     end
   )

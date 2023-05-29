@@ -16,8 +16,9 @@ function open(opts, do_after)
   opts = opts or {}
   local app_args
   if opts.url then 
-    if do_after then -- if we're opening an url, typically, we would exit immediately, negating the need for a callback. Therefore, we want to wait. The only easy way to do this is to use a completely different browser.
+    if do_after then -- if we're opening an url, typically, we would exit immediately, negating the need for a callback. Therefore, we want to wait. The only easy way to do this is to use a completely different browser. 
       app_args = { "-a", opts.app or "Safari", "-W" }
+      -- Annoyingly, due to a 15 (!) year old bug, Firefox will open the url as well, even if we specify a different browser. I've tried various fixes, but for now we'll just have to live with it and click the tab away manually.
     else
       app_args = { "-a", opts.app or "Firefox"}
     end
@@ -57,12 +58,10 @@ function open(opts, do_after)
     error("Something went wrong when determining the path to open. Opts that caused this:\n\n" .. json.encode(opts))
   end
 
-  local args = concat(
-    "open",
-    app_args,
-    { value = path, type = "quoted" }
-  )
+  table.insert(app_args, 1, "open")
+  push(app_args, { value = path, type = "quoted" })
 
-  run(args, do_after or true)
+  inspPrint(app_args)
+  run(app_args, do_after or true)
 end
       

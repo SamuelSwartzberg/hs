@@ -2,7 +2,7 @@
 
 --- @class RESTApiSpecifier
 --- @field url? string The URL to send the request to. This is used if not making use of the scheme, host and endpoint params fields.
---- @field scheme? string The scheme to use for the request. Defaults to "https://".
+--- @field scheme? string The scheme to use for the request. If nil, it will be fetched from a stored default for the api, or default to "https://".
 --- @field host? string The host of the API server. If nil, tries to fetch it from a stored default for the api.
 --- @field endpoint? string The API endpoint to call.
 --- @field params? table Any URL parameters to include in the request.
@@ -31,6 +31,7 @@
 --- @param have_tried_access_refresh? boolean Indicates whether an attempt to refresh the access token has been made.
 --- @return any
 function rest(specifier, do_after, have_tried_access_refresh)
+  local original_specifier = specifier
   specifier = copy(specifier) or {}
 
   local api_keys_location, catch_auth_error
@@ -77,7 +78,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
           if tokenres.refresh_token then
             writeFile(api_keys_location .. "refresh_token", tokenres.refresh_token)
           end
-          return rest(specifier, do_after) -- try again
+          return rest(original_specifier, do_after) -- try again
         else
           error("Failed to refresh access token. Result was:\n" .. json.encode(tokenres))
         end
@@ -127,7 +128,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
           }
           rest({
             url = specifier.oauth2_url,
-            request_table = token_request_body
+            request_table = token_request_body,
+            request_table_type = "form-urlencoded"
           }, process_tokenres)
           
         end)
@@ -142,7 +144,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
         }
         local request = {
           url = specifier.oauth2_url,
-          request_table = token_request_body
+          request_table = token_request_body,
+          request_table_type = "form-urlencoded"
         }
         rest(request, process_tokenres, true)
       end
@@ -153,9 +156,12 @@ function rest(specifier, do_after, have_tried_access_refresh)
         else
           initial_authorize()
         end
+        return -- we're done here, we'll retry after we get the token
       end
 
       catch_auth_error = function(res)
+        print("caught potential auth error")
+        inspPrint(res)
         if have_tried_access_refresh then
           error("Access token expired, and already tried to refresh token, but failed. Response was:\n" .. json.encode(res))
         end
@@ -207,6 +213,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
     specifier.host = tblmap.api_name.host[specifier.api_name]
   end
 
+  specifier.scheme = specifier.scheme or tblmap.api_name.scheme[specifier.api_name]
+
   local url = transf.url_components.url(specifier)
 
   if not url then
@@ -256,12 +264,32 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   -- assembole other parts of curl commmand
 
+  -- request_verb handling
+
   if specifier.request_verb then
+    specifier.request_verb = specifier.request_verb:upper()
     push(curl_command, "--request")
     push(curl_command, 
       { value = specifier.request_verb, type = "quoted"}
     )
   end
+
+  -- some APIs require a specific kind of body for empty POST requests, e.g. "null" or "{}", which we handle here
+  if 
+    specifier.request_verb == "POST"
+    and not specifier.request_table
+    and tblmap.api_name.empty_post_body[specifier.api_name]
+  then
+    push(curl_command, "-d")
+    push(curl_command, 
+      { value = tblmap.api_name.empty_post_body[specifier.api_name], type = "quoted"}
+    )
+    push(curl_command, "-H")
+    push(curl_command, 
+    { value = "Content-Type: " .. tblmap.api_name.empty_post_body_content_type[specifier.api_name], type = "quoted"}
+  )
+  end
+
   if specifier.request_table then
     specifier.request_verb = specifier.request_verb or "POST"
     local request_string, content_type

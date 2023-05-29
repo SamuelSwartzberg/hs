@@ -152,6 +152,9 @@ tblmap = {
       hydrus = "127.0.0.1:45869",
       httpbin = "httpbin.org"
     },
+    scheme = {
+      hydrus = "http://",
+    },
     auth_header = {
       hydrus = "Hydrus-Client-API-Access-Key"
     },
@@ -179,7 +182,13 @@ tblmap = {
     },
     scopes = {
       google = "https://www.googleapis.com/auth/youtube"
-    }
+    },
+    empty_post_body = {
+      dropbox = "null"
+    },
+    empty_post_body_content_type = {
+      dropbox = "application/json"
+    },
   },
 }
 

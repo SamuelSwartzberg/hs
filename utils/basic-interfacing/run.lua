@@ -67,6 +67,7 @@ function run(opts, and_then, ...)
   local cmd = "cd && source \"$HOME/.target/envfile\" && " .. buildInnerCommand(opts.args)
   opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
 
+  print("Running command: " .. cmd)
   
   local catch = function(exit_code, std_err)
     local should_run_default_catch = true

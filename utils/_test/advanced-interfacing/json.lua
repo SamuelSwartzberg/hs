@@ -599,18 +599,15 @@ assert(
   type(hydrus_response.version) == "number"
 )
 
+error("stop")
 -- oauth requests
 
--- initial: neither refresh nor access token exists
-
-delete(env.MAPI .. "/dropbox/access_token")
-delete(env.MAPI .. "/dropbox/refresh_token")
-delete(env.MAPI .. "/dropbox/authorization_code")
+-- prepare
 
 local dropbox_request = {
   api_name = "dropbox",
   endpoint = "users/get_current_account",
-  request_table = {},
+  request_verb = "POST",
   token_type = "oauth2",
   token_where = "header",
   oauth2_url = "https://api.dropboxapi.com/oauth2/token",
@@ -620,64 +617,73 @@ local dropbox_request = {
 local task = run({
   args = "oauth2callback",
   catch = true
-})
+}, true)
 hs.timer.doAfter(1, function()
 
+  -- test that the local server run by the oauth2callback script is running
+
+  delete(env.MAPI .. "/oauth2callbacktest/authorization_code")
+
+  run("curl \"http://127.0.0.1:8412/?api_name=oauth2callbacktest&code=1234\"")
+
+  assertMessage(
+    readFile(env.MAPI .. "/oauth2callbacktest/authorization_code"),
+    "1234"
+  )
+
+  -- initial: neither refresh nor access token exists
+
+  delete(env.MAPI .. "/dropbox/access_token")
+  delete(env.MAPI .. "/dropbox/refresh_token")
+  delete(env.MAPI .. "/dropbox/authorization_code")
+
+  local time_pre_auth = os.time()
+
   rest(dropbox_request, function(response)
+
+    local now = os.time()
+
+    assert(
+      now - time_pre_auth > 2, "there's no way we manually authorized in 2 seconds or less, so we failed to wait for the authorization, or something else went wrong!"
+    )
     
     assertMessage(
       response.email,
       "korehabetsumei@mailbox.org"
     )
 
-    -- refresh token exists, but no access token
+    -- access token exists
 
-    delete(env.MAPI .. "/dropbox/access_token")
-    delete(env.MAPI .. "/dropbox/authorization_code")
-    assert(#readFile(env.MAPI .. "/dropbox/refresh_token") > 0)
+    assert(#readFile(env.MAPI .. "/dropbox/access_token") > 0)
 
     rest(dropbox_request, function (response)
-    
+  
       assertMessage(
         response.email,
         "korehabetsumei@mailbox.org"
       )
 
-      -- both refresh and access token exist
+      -- automatically retrieve token_where, oauth2_url and oauth2_authorization_url
 
-      assert(#readFile(env.MAPI .. "/dropbox/access_token") > 0)
-      assert(#readFile(env.MAPI .. "/dropbox/refresh_token") > 0)
+      dropbox_request = {
+        api_name = "dropbox",
+        endpoint = "users/get_current_account",
+        request_table = {},
+        token_type = "oauth2",
+      }
 
       rest(dropbox_request, function (response)
-    
+  
         assertMessage(
           response.email,
           "korehabetsumei@mailbox.org"
         )
-
-        -- automatically retrieve token_where, oauth2_url and oauth2_authorization_url
-
-        dropbox_request = {
-          api_name = "dropbox",
-          endpoint = "users/get_current_account",
-          request_table = {},
-          token_type = "oauth2",
-        }
-
-        rest(dropbox_request, function (response)
-    
-          assertMessage(
-            response.email,
-            "korehabetsumei@mailbox.org"
-          )
-          
-        end)
-
-        task:kill()
-
-    
+        
       end)
-      
+
+      task:kill()
+
+  
     end)
 
   end)
