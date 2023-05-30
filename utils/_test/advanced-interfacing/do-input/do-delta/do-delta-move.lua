@@ -30,7 +30,6 @@ if mode == "full-test" then
 
         hs.application.launchOrFocus("TextEdit")
 
-        -- TODO: test beyond here - can't be done until we've arrived at items again
         local textedit_window_item = CreateRunningApplicationItem(hs.application.find("TextEdit")):get("main-window-item")
 
         textedit_window_item:doThis("set-position", {x = 300, y = 300})
@@ -51,7 +50,7 @@ if mode == "full-test" then
 
           assertMessage(
             textedit_window_item:get("size"),
-            {w = 500, h = 500}
+            hs.geometry.new({w = 500, h = 500})
           )
 
           doDelta({target_point = { x = 200, y = 200 }, relative_to = "c" }, function()
@@ -69,6 +68,7 @@ if mode == "full-test" then
               hs.mouse.absolutePosition({x = 0, y = 0})
 
               hs.mouse.absolutePosition(original_mouse_position)
+              print("Finished testing doDelta")
 
             end)
 

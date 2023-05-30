@@ -61,7 +61,6 @@ function open(opts, do_after)
   table.insert(app_args, 1, "open")
   push(app_args, { value = path, type = "quoted" })
 
-  inspPrint(app_args)
   run(app_args, do_after or true)
 end
       

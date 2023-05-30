@@ -1,6 +1,6 @@
-if true then -- making a bunch of json requests non-async takes time
+if mode == "full-test" then -- making a bunch of json requests non-async takes time
 
---  mode == "full-test"
+
 
 -- ensure that the stuff gotten for various ways of assembling the url seems right
 

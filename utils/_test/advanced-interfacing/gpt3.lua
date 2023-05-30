@@ -3,7 +3,6 @@ if mode == "full-test" then -- testing costs api requests and therefore money!
   gpt(
     "Hey. I am testing if my api access is working. Please respond with 'Hello World!', if you would!",
     function (response)
-      print(response)
       assertMessage(response, "Hello World!")
     end
   )
@@ -14,7 +13,6 @@ if mode == "full-test" then -- testing costs api requests and therefore money!
       max_tokens = 2
     },
     function (response)
-      print(response)
       assertMessage(isClose(#response, 8, 7), true) -- 1 token ≈ 4 chars -> test if within 7 chars of that value
     end
   )

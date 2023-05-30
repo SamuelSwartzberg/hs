@@ -30,20 +30,20 @@ WindowItemSpecifier = {
         return self:get("contents"):frame()
       end,
       ["point-tl"] = function (self)
-        return self:get("contents"):topLeft()
+        return self:get("rect").topleft
       end,
       ["point-tr"] = function(self)
         local rect = self:get("rect")
-        rect.x = rect.x + rect.w
-        return rect
+        rect.x = rect.x + rect.w -- move by width
+        return rect.topleft -- new top left is old top right
       end,
       ["point-bl"] = function(self)
         local rect = self:get("rect")
-        rect.y = rect.y + rect.h
-        return rect
+        rect.y = rect.y + rect.h -- move by height
+        return rect.topleft -- new top left is old bottom left
       end,
       ["point-br"] = function(self)
-        return self:get("contents"):bottomRight()
+        return self:get("rect").bottomright
       end,
       ["size"] = function(self)
         return self:get("contents"):size()

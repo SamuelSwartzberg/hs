@@ -74,7 +74,6 @@ function rest(specifier, do_after, have_tried_access_refresh)
     if specifier.token_type == "oauth2"  then
 
       local function process_tokenres(tokenres)
-        inspPrint(tokenres)
         if tokenres.refresh_token then
           writeFile(api_keys_location .. "refresh_token", tokenres.refresh_token)
         end

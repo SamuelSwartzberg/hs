@@ -26,7 +26,7 @@
 --- @param do_after fun(result: {[string]: string}): nil
 function fillTemplateGPT(opts, do_after)
   local query = le(lemap.gpt.fill_template, opts)
-  gpt(query, function (result)
+  gpt(query,  { temperature = 0}, function (result)
     local out_fields = map(
       opts.out_fields,
       function (field, value)
@@ -37,6 +37,6 @@ function fillTemplateGPT(opts, do_after)
       "kv"
     )
     do_after(out_fields)
-  end, { temperature = 0})
+  end)
 end
 

@@ -15,6 +15,7 @@ local test1Opts = {
 fillTemplateGPT(test1Opts, function(result)
   assertMessage(result.artist, "Aimer")
   assertMessage(result.song_title, "Last Stardust")
+  print("ok")
 end)
 
 -- Test 2: Alias and explanation
@@ -34,6 +35,7 @@ fillTemplateGPT(test2Opts, function(result)
   assertMessage(result.artist, "Beethoven")
   assertMessage(result.song_title, "Moonlight Sonata")
   assertMessage(result.movement, "1st Movement")
+  print("ok")
 end)
 else
   print("skipping...")
