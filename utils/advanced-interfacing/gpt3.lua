@@ -19,7 +19,7 @@ function gpt(text_content, opts, do_after)
   request.messages = {}
   table.insert(request.messages, {
     role = "system",
-    content = opts.system_msg or "You are a helpful assistant being queried through an API. Your output will be parsed, so adhere to any instructions given as to the format or content of the output."
+    content = opts.system_msg or "You are a helpful assistant being queried through an API. Your output will be parsed, so adhere to any instructions given as to the format or content of the output. Only output the result."
   })
 
   table.insert(request.messages, {

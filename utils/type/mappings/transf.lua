@@ -79,7 +79,7 @@ transf = {
       return str
     end,
     romanized_gpt = function(str)
-      return gpt("I'm using you as a romanization API, so only output the result. Please romanize this with wapuro-like romanization, where っ -> duplicated letter, long vowel mark -> duplicated letter (e.g. ローマ -> roomaji), づ -> du, んま -> nma, じ -> ji, を-> wo, and particles are separated by spaces (e.g. これに-> kore ni): " .. str)
+      return gpt("Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)\n\nDictionary:\n\nこっち -> kocchi\n\nText:\n\n" .. str, {temperature = 0})
     end,
     tilde_resolved = function(path)
       if stringy.startswith(path, "~") then

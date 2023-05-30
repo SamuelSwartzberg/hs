@@ -15,9 +15,9 @@ function buildInnerCommand(command_parts)
     elseif type(command_part) == "table" then -- command_part needs to be calculated
       command_part.type = command_part.type or "quoted"
       if command_part.type == "quoted" then -- wrap the command_part in quotes
-        command = command .. ' "' .. memoize(replace, refstore.params.memoize.opts.stringify_json)(command_part.value, {{"\"", "\\\""}}) .. '"'
+        command = command .. ' "' .. memoize(replace, refstore.params.memoize.opts.stringify_json)(command_part.value, to.string.escaped_double_quote_safe) .. '"'
       elseif command_part.type == "sq" then
-        command = command .. " '" .. memoize(replace, refstore.params.memoize.opts.stringify_json)(command_part.value, {{"'", "\\'"}}) .. "'"
+        command = command .. " '" .. memoize(replace, refstore.params.memoize.opts.stringify_json)(command_part.value, to.string.escaped_single_quote_safe) .. "'"
       elseif command_part.type == "interpolated" then -- recursively build the command_part and wrap it in $()
         command = command .. ' "$('  .. buildInnerCommand(command_part.value) .. ')"'
       else
@@ -65,6 +65,8 @@ function run(opts, and_then, ...)
     end
   end
   local cmd = "cd && source \"$HOME/.target/envfile\" && " .. buildInnerCommand(opts.args)
+
+  print("Running command: " .. cmd)
   opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
   
   local catch = function(exit_code, std_err)

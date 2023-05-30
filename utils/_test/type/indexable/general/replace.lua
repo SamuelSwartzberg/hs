@@ -131,3 +131,25 @@ assertMessage(ot20_result, ovtable.init({
     {k="banana", v="tasty_fruit"},
     {k="carrot", v="vegetable"}
 }))
+
+
+-- japanese
+
+-- baseline
+
+assertMessage(
+  replace('{ "foo" : "bar" }', {{"\"", "\\\""}}),
+  '{ \\\"foo\\\" : \\\"bar\\\" }'
+)
+
+assertMessage(
+  replace('{ "foo" : "barっbar" }', {
+    cond = {
+      _r = "\"",
+      _regex_engine = "eutf8"
+    }, 
+    mode = "replace",
+    proc = "\\\""
+  }),
+  '{ \\\"foo\\\" : \\\"barっbar\\\" }'
+)

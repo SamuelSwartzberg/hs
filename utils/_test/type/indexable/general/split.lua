@@ -211,3 +211,19 @@ assertMessage(
     }
   }
 )
+
+assertMessage(
+  split(
+    "barっbarっbar",
+    {_r = "っ", _regex_engine = "eutf8"}
+  ),
+  {"bar", "bar", "bar"}
+)
+
+assertMessage(
+  split(
+    '{ "foo" : "barっbar" }',
+    {_r = "\"", _regex_engine = "eutf8"}
+  ),
+  {"{ ", "foo", " : ", "barっbar", " }"}
+)

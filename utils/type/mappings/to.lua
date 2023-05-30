@@ -85,6 +85,28 @@ to = {
   },
   resolved = {
     doi = {cond = {_r = mt._r.id.doi_prefix }, proc = "https://doi.org/", mode = "replace" }
+  },
+  string = {
+    escaped_single_quote_safe = {
+      {
+        cond = {
+          _r = "'",
+          _regex_engine = "eutf8"
+        },
+        proc = "\\'",
+        mode = "replace"
+      }
+    },
+    escaped_double_quote_safe = {
+      {
+        cond = {
+          _r = '"',
+          _regex_engine = "eutf8"
+        },
+        proc = '\\"',
+        mode = "replace"
+      }
+    },
   }
 }
 

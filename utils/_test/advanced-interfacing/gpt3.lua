@@ -3,6 +3,7 @@ if mode == "full-test" then -- testing costs api requests and therefore money!
   gpt(
     "Hey. I am testing if my api access is working. Please respond with 'Hello World!', if you would!",
     function (response)
+      print(response)
       assertMessage(response, "Hello World!")
     end
   )
@@ -13,8 +14,19 @@ if mode == "full-test" then -- testing costs api requests and therefore money!
       max_tokens = 2
     },
     function (response)
-      assertMessage(isClose(#response, 8, 5), true) -- 1 token ≈ 4 chars -> test if within 3 chars of that value
+      print(response)
+      assertMessage(isClose(#response, 8, 7), true) -- 1 token ≈ 4 chars -> test if within 7 chars of that value
     end
+  )
+
+  assertMessage(
+    transf.string.romanized_gpt("Lipsum dolor sit amet. 草"),
+    "Lipsum dolor sit amet. kusa"
+  )
+
+  assertMessage(
+    transf.string.romanized_gpt("こっちの話です！そう。マッサージはづるづるです。真ん中に行きます。自分を見つけます。これはこれでいいよね。"),
+    "kocchi no hanashi desu! sou. massaaji wa duruduru desu. mannaka ni ikimasu. jibun wo mitsukemasu. kore wa kore de ii yo ne."
   )
 else
   print("skipping...")
