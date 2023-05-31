@@ -116,10 +116,7 @@ URLItemSpecifier = {
       ["add-events-to-calendar"] = function(self)
         local khal = CreateShellCommand("khal")
         khal:doThis("choose-writable-calendar", function(calendar)
-          khal:doThis("add-event-from-url", {
-            url = self:get("contents"),
-            calendar = calendar
-          })
+          dothis.khal.add_event_from_url(calendar, self:get("contents"))
         end)
       end,
 

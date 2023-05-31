@@ -487,7 +487,7 @@ local array_of_tables = {
   { baz = "quuz" }
 }
 
-local item_array_of_item_tables = transf.raw_array_of_tables.item_array_of_item_tables(array_of_tables)
+local item_array_of_item_tables = transf.array_of_tables.item_array_of_item_tables(array_of_tables)
 
 assertMessage(
   item_array_of_item_tables.type,

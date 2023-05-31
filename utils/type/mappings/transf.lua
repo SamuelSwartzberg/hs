@@ -268,6 +268,42 @@ transf = {
       local contact = yamlLoad(raw_contact)
       return contact
     end,
+    event_table = function(str)
+      local components = stringx.split(str, mt._contains.unique_field_separator)
+      local parsed = ovtable.new()
+      for i, component in ipairs(components) do
+        local key = mt._list.khal.parseable_format_components[i]
+        if key == "alarms" then
+          parsed[key] = stringy.split(component, ",")
+        elseif key == "description" then
+          parsed[key] = component
+        else
+          parsed[key] = stringx.replace(component, "\n", "")
+        end
+      end
+      return parsed
+    end
+  },
+  event_table = {
+    calendar_template = function(event_table)
+      local template = get.khal.calendar_template_empty()
+      for key, value in fastpairs(event_table) do
+        if template[key] then
+          if key == "repeat" then
+            for subkey, subvalue in fastpairs(value) do
+              template[key][subkey].value = subvalue
+            end
+          else
+            template[key].value = value
+          end
+        end
+      end
+      if template.alarms.value then 
+        template.alarms.value = table.concat(template.alarms.value, ",")
+      end
+      return yamlDumpAligned(template)
+
+    end
   },
   multiline_string = {
     trimmed_lines = function(str)
@@ -301,7 +337,14 @@ transf = {
       end
     
       return countries
-    end
+    end,
+    array_of_event_tables = function(str)
+      local res = filter(stringx.split(str, mt._contains.unique_record_separator))
+      return hs.fnutils.imap(
+        res,
+        transf.string.event_table
+      )
+    end,
   },
   word = {
     title_case_policy = function(word)
@@ -358,7 +401,7 @@ transf = {
       end,
     }
   },
-  raw_array_of_tables = {
+  array_of_tables = {
     item_array_of_item_tables = function(arr)
       return CreateArray(map(
         arr,
@@ -368,15 +411,31 @@ transf = {
       ))
     end
   },
-  raw_array_of_strings = {
+  array_of_strings = {
     item_array_of_string_items = function(arr)
-      return CreateArray(map(
+      return CreateArray(hs.fnutils.imap(
         arr,
-        function (itm)
-          return CreateStringItem(itm)
-        end
+        CreateStringItem
       ))
-    end
+    end,
+    repeated_option_string = function(arr, opt)
+      return table.concat(
+        hs.fnutils.imap(
+          arr,
+          function (itm)
+            return " " .. opt .. " " .. itm
+          end
+        )
+      )
+    end,
+  },
+  array_of_event_tables = {
+    item_array_of_event_table_items = function(arr)
+      return CreateArray(hs.fnutils.imap(
+        arr,
+        CreateEventTableItem
+      ))
+    end,
   },
   package_manager = {
     array = {

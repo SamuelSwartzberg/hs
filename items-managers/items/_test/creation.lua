@@ -882,16 +882,6 @@ local item_creation_map = {
   --     must_be = { "running-application", "omegat" }
   --   }
   -- }, -- stays commented out most of the time since having applications open is annoying while I'm constantly rerunning this while debugging
-  [CreateShellCommand] = {
-    {
-      value = "khal",
-      must_be = { "shell-command", "khal-command" }
-    },
-    {
-      value = "libreoffice",
-      must_be = { "shell-command", "libreoffice-command" }
-    },
-  },
   [CreateTable] = {
     {
       value = {},

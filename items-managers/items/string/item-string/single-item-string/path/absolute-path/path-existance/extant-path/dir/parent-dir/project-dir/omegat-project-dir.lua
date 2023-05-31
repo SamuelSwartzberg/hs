@@ -181,7 +181,10 @@ OmegatProjectDirItemSpecifier = {
       end,
       ["generate-target-txts"] = function(self, do_after)
         local generation_tasks = self:get("target-files-extension", "odt"):get("map", function(odt)
-          return CreateShellCommand("libreoffice"):get("to-txt-command", odt:get("contents"))
+          return"cd" ..
+          transf.string.single_quoted_escaped(pathSlice(odt:get("contents"), ":-2", {rejoin_at_end=true})) ..
+          "&& soffice --headless --convert-to txt:Text" ..
+          transf.string.single_quoted_escaped(pathSlice(odt:get("contents"), "-1:-1")[1])
         end)
         runThreaded(generation_tasks, 1, do_after)
       end,

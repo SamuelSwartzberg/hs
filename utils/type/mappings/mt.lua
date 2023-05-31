@@ -20,7 +20,9 @@ mt = {
     regex_metacharacters =  {"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"},
     small_words = {
       "a", "an", "and", "as", "at", "but", "by", "en", "for", "if", "in", "of", "on", "or", "the", "to", "v", "v.", "via", "vs", "vs."
-    }
+    },
+    unique_record_separator  = "__ENDOFRECORD5579__",
+    unique_field_separator = "Y:z:Y",
   },
   _list = {
     tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"},
@@ -28,6 +30,18 @@ mt = {
     useless_files = {".git", "node_modules", ".vscode"},
     auth_processes = {
       "bearer", "basic", "manual"
+    },
+    khal = {
+      parseable_format_components = {
+        "uid",
+        "calendar",
+        "start",
+        "title",
+        "description",
+        "location",
+        "end",
+        "url",
+      }
     },
     html_entity_indicator = {
       encoded = {"&", ";"},
