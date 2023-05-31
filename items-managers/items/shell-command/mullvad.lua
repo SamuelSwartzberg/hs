@@ -4,20 +4,13 @@ MullvadCommandSpecifier = {
   properties = {
     getables = {
       ["status"] = function()
-        return stringy.strip(run({
-          "mullvad",
-          "status"
-        }))
+        return stringy.strip(run("mullvad status"))
       end,
       ["is-connected"] = function (self)
         return stringy.startswith(self:get("status"),"Connected")
       end,
       ["relay-list-raw-string"] = function(self)
-        return stringy.strip(memoize(run)({
-          "mullvad",
-          "relay",
-          "list"
-        }))
+        return stringy.strip(memoize(run)("mullvad relay list"))
       end,
       ["relay-list-raw-table"] = function(self)
         return memoize(parseRelayTable)(self:get("relay-list-raw-string"))
@@ -29,16 +22,10 @@ MullvadCommandSpecifier = {
     },
     doThisables = {
       ["connect"] = function()
-        run({
-          "mullvad",
-          "connect",
-        }, true)
+        run("mullvad connect", true)
       end,
       ["disconnect"] = function()
-        run({
-          "mullvad",
-          "disconnect",
-        }, true)
+        run("mullvad disconnect", true)
       end,
       ["toggle"] = function(self)
         if self:get("is-connected") then
@@ -48,13 +35,7 @@ MullvadCommandSpecifier = {
         end
       end,
       ["relay-set"] = function(self, relay)
-        run({
-          "mullvad",
-          "relay",
-          "set",
-          "hostname",
-          relay,
-        }, true)
+        run("mullvad relay set hostname" .. relay, true)
       end,
       
     }

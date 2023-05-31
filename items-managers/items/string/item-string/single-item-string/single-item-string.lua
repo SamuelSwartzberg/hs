@@ -7,7 +7,7 @@ SingleItemStringItemSpecifier = {
         self:get("synonyms-th-to-array")
           :doThis("choose-item", function(item)
             item:doThis("choose-synonym", function(synonym)
-              pasteMultilineString(synonym)
+              CreateStringItem(synonym):doThis("choose-action")
             end)
           end)
       end,
@@ -22,17 +22,13 @@ SingleItemStringItemSpecifier = {
         local res = eutf8.find(self:get("contents"), "%d%d") -- this doesn't guarantee that this is a date, we'll check that within the potentiallyParsableDateItem subclass. This is just a quick check to see if it's worth trying to parse it
         return res
       end,
-      ["synonyms-av"] = function(self) -- uses thesaurus.altavista
-        return CreateShellCommand("synonyms"):get("synonyms-raw", self:get("contents"))
-      end,
       ["synonyms-av-to-array"] = function(self)
-        return CreateArray(stringy.split(self:get("synonyms-av"), "\t")):get("to-does-not-contain-nil-array")
-      end,
-      ["synonyms-th"] = function(self) -- uses thesaurus.com
-        return CreateShellCommand("syn"):get("synonyms", self:get("contents"))
+        return CreateArray(transf.word.synonyms.array_av(self:get("contents")))
       end,
       ["synonyms-th-to-array"] = function(self)
-        return CreateShellCommand("syn"):get("synonyms-to-array-of-synonyms-tables", self:get("contents"))
+        return transf.raw_array_of_tables.item_array_of_item_tables(
+          transf.word.synonyms.array_syn_tbls(self:get("contents"))
+        )
       end,
     }
   },

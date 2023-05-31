@@ -6,21 +6,7 @@ UpkgCommandSpecifier = {
       ["package-managers"] = function(self)
         return lines(run({"list-package-managers"}))
       end,
-      ["list"] = function(self, mgr) return lines(run({mgr, "list"})) end,
-      ["list-version"] = function(self, mgr) return lines(run({mgr, "list-version"})) end,
-      ["with-version"] = function(self, specifier) return lines(run({specifier.mgr, "with-version", specifier.arg})) end,
-      ["version"] = function(self, specifier) return lines(run({specifier.mgr, "version", specifier.arg})) end,
-      ["count"] = function(self, mgr) return lines(run({mgr, "count"})) end,
-      ["which"] = function(self, specifier) return lines(run({specifier.mgr, "which", specifier.arg}))
-      end,
-      ["is-installed"] = function(self, specifier)
-        return find(
-          lines(run({
-            specifier.mgr, 
-            "list"
-          })), specifier.arg
-        )
-      end,
+      
       ["package-managers-installed"] = function(self, specifier)
         return lines(run({
           specifier.mgr, 
@@ -28,48 +14,7 @@ UpkgCommandSpecifier = {
           specifier.arg
         }))
       end,
-      ["backed-up-packages"] = function(self, mgr)
-        return lines(run({
-          mgr, 
-          "read-backup"
-        }))
-      end,
-      ["missing-packages"] = function(self, mgr)
-        return lines(run({
-          mgr, 
-          "missing"
-        }))
-      end,
-      ["added-packages"] = function(self, mgr)
-        return lines(run({
-          mgr, 
-          "added"
-        }))
-      end,
-      ["difference-packages"] = function(self, mgr)
-        return lines(run({
-          mgr, 
-          "difference"
-        }))
-      end,
-      ["package-manager-version"] = function(self, mgr)
-        return lines(run({
-          mgr, 
-          "package-manager-version"
-        }))
-      end,
-      ["which-package-manager"] = function(self, mgr)
-        return lines(run({
-          mgr, 
-          "which-package-manager"
-        }))
-      end,
-      ["package-managers-with-missing-packages"] = function(self, mgr)
-        return lines(run({
-          mgr, 
-          "missing-package-managers"
-        }))
-      end,
+      
       ["package-manager-res-map"] = function(self, specifier) -- upkg theoretically already has the ability to iterate over all package managers, but it's easier for us to do the iterating, knowing which mgr we used, here, rather than parsing out the mgr from the upkg result
         local res = {}
         for _, mgr in self:get("package-managers") do

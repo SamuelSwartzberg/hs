@@ -14,9 +14,7 @@ AlphanumMinusItemSpecifier = {
         return onig.find(self:get("contents"), whole(mt._r.id.uuid), 1, "i")
       end,
       ["is-package-manager"] = function(self)
-        return find(lines(
-          memoize(run)("upkg list-package-managers")
-        ), self:get("contents"))
+        return is.string.package_manager(self:get("contents"))
       end,
       ["is-mullvad-relay-identifier"] = function(self)
         return 

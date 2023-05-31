@@ -2,7 +2,7 @@ a_use = math.random(999999999)
 
 --- binds arguments to a function
 --- @param func function
---- @param arg_spec any | any[] List of arguments to bind. Use a_use to consume an argument.
+--- @param arg_spec any | any[] List of arguments to bind. Use a_use to consume an argument passed at runtime.
 --- @param ignore_spec? integer | integer[] List of arguments to ignore (by index).
 --- @return function
 function bind(func, arg_spec, ignore_spec)

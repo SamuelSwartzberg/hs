@@ -1,7 +1,3 @@
-local realenv = env
-env = {
-  HOME = "/Users/sam"
-}
 
 assertMessage(
   transf.string.tilde_resolved("~"),
@@ -355,4 +351,150 @@ assertMessageAny(
   }
 )
 
-env = realenv
+assert(
+  findsingle(
+    transf.word.synonyms.raw_syn("love"),
+    "affection"
+  )
+)
+
+assertValuesContain(
+  transf.word.synonyms.array_syn_tbls("love")[1].synonyms,
+  { "affection" }
+)
+
+assertValuesContain(
+  transf.word.synonyms.array_syn_tbls("love")[1].antonym,
+  { "hate" }
+)
+
+assert(
+  findsingle(
+    transf.word.synonyms.raw_av("love"),
+    "screw"
+  )
+)
+
+assertValuesContain(
+  transf.word.synonyms.array_av("love"),
+  { "screw" }
+)
+
+assertValuesContain(
+  transf.package_manager.array.backed_up_packages("os"),
+  {"mpv"}
+)
+
+assert(
+  type(transf.package_manager.array.missing_packages("os")) == "table"
+)
+assert(
+  type(transf.package_manager.array.added_packages("os")) == "table"
+)
+assert(
+  type(transf.package_manager.array.difference_packages("os")) == "table"
+)
+
+local semver_components = transf.semver.components("1.2.3")
+
+assertMessage(
+  semver_components,
+  {
+    major = 1,
+    minor = 2,
+    patch = 3
+  }
+)
+
+local semver_components = transf.semver.components("1.2.3-alpha.1")
+
+assertMessage(
+  semver_components,
+  {
+    major = 1,
+    minor = 2,
+    patch = 3,
+    pre_release = "alpha.1"
+  }
+)
+
+local semver_components = transf.semver.components("1.2.3+build.1")
+
+assertMessage(
+  semver_components,
+  {
+    major = 1,
+    minor = 2,
+    patch = 3,
+    build = "build.1"
+  }
+)
+
+local semver_components = transf.semver.components("1.2.3-alpha.1+build.1")
+
+assertMessage(
+  semver_components,
+  {
+    major = 1,
+    minor = 2,
+    patch = 3,
+    pre_release = "alpha.1",
+    build = "build.1"
+  }
+)
+
+local os_pkg_manager_semver = transf.package_manager.array.package_manager_version("os")
+local os_pkg_manager_semver_components = transf.semver.components(os_pkg_manager_semver)
+
+assert(os_pkg_manager_semver_components.major >= 0)
+assert(os_pkg_manager_semver_components.minor >= 0)
+assert(os_pkg_manager_semver_components.patch >= 0)
+
+assertValuesContain(
+  transf.package_manager.array.list("os"),
+  {"mpv"}
+)
+
+assert(
+  find(
+    transf.package_manager.array.version("os"),
+    { _start = "1." } -- there will always be some package with a version starting with 1., so this is a safe test
+  )
+)
+
+assert(
+  tonumber(transf.package_manager.array.count("os")) > 50  -- 50 is a safe number to assume there are more than (at time of writing, 388)
+)
+
+assert(
+  find(
+    transf.package_manager.array.with_version("os", "mpv"),
+    { _start = "mpv@" }
+  )
+)
+
+assertValuesContain(
+  transf.package_manager.array.which("os", "mpv"),
+  {"/opt/homebrew/opt/mpv"}
+)
+
+assert(
+  transf.package_manager.array.is_installed("os", "mpv")
+)
+
+local array_of_tables = {
+  { foo = "bar" },
+  { baz = "quuz" }
+}
+
+local item_array_of_item_tables = transf.raw_array_of_tables.item_array_of_item_tables(array_of_tables)
+
+assertMessage(
+  item_array_of_item_tables.type,
+  "array"
+)
+
+assertMessage(
+  item_array_of_item_tables:get("contents")[1].type,
+  "table"
+)

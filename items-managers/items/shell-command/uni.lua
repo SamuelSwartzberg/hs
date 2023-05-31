@@ -3,8 +3,8 @@ UniCommandSpecifier = {
   type = "uni-command",
   properties = {
     getables = {
-      ["uni-text"] = function(self, specifier)
-        local res = run(concat({
+      ["uni-raw-json"] = function(self, specifier)
+        local res = runJSON(concat({
           "uni",
           specifier.subcommand,
           "-compact",
@@ -16,9 +16,6 @@ UniCommandSpecifier = {
           "-as=json"
         }, specifier.extra_options))
         return res
-      end,
-      ["uni-raw-json"] = function(self, specifier)
-        return json.decode(self:get("uni", specifier))
       end,
       ["uni-to-parsed-table"] = function (self, specifier)
         return map(

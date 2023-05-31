@@ -1,3 +1,4 @@
+--- @alias relay_table { [string]: { [string]: string[] } }
 
 
 transf = {
@@ -38,6 +39,18 @@ transf = {
       item = stringy.strip(item)
       return item
     end
+  },
+  semver = {
+    components = function(str)
+      local major, minor, patch, prerelease, build = onig.match(str, mt._r.version.semver)
+      return {
+        major = tonumber(major),
+        minor = tonumber(minor),
+        patch = tonumber(patch),
+        prerelease = prerelease,
+        build = build
+      }
+    end,
   },
   string = {
     escaped_csv_field = function(field)
@@ -127,6 +140,45 @@ transf = {
         end
       end
     end,
+    timestamp_or_nil = function(str)
+      if eutf8.match(str, "^%d") then
+        str = slice(str, {start = {_r = "%d"}})
+      end
+      -- date is already a timestamp
+    
+      if #str == 13 then
+        return tonumber(eutf8.sub(str, 1, 10))
+      elseif #str == 10 then
+        return tonumber(str)
+      end
+    
+      -- we have to parse the date
+    
+      for _, sep in ipairs(long_dt_seps) do
+        eutf8.gsub(str, _r_comp.lua.data.sep, " ")
+      end
+    
+      local date_parts
+    
+      for _, date_regex in fastpairs(date_regexes) do
+        date_parts = {eutf8.match(str, date_regex)}
+        if #date_parts > 0 then
+          break
+        end
+      end
+    
+      if #date_parts == 0 then
+        return nil
+      end
+    
+      local date_table = map(mt._list.date.dt_component_few_chars, function(k,v) return v, date_parts[k] end, "kv")
+      local res, timestamp = pcall(os.time, date_table)
+      if res then
+        return timestamp
+      else
+        return nil
+      end
+    end
   },
   multiline_string = {
     trimmed_lines = function(str)
@@ -134,6 +186,33 @@ transf = {
       local trimmed_lines = map(lines, stringy.strip)
       return table.concat(trimmed_lines, "\n")
     end,
+    relay_table = function(raw)
+      local raw_countries = stringx.split(raw, "\n\n") -- stringy does not support splitting by multiple characters
+      raw_countries = filter(raw_countries, true)
+      local countries = {}
+      for _, raw_country in ipairs(raw_countries) do
+        local raw_country_lines = stringy.split(raw_country, "\n")
+        raw_country_lines = filter(raw_country_lines, true)
+        local country_header = raw_country_lines[1]
+        local country_code = slice(country_header, "(", ")")
+        if country_code == nil then error("could not find country code in header. header was " .. country_header) end
+        local payload_lines = slice(raw_country_lines, 2, -1)
+        countries[country_code] = {}
+        local city_code
+        for _, payload_line in ipairs(payload_lines) do
+          if stringy.startswith(payload_line, "\t\t") then -- line specifying a single relay
+            local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
+            push(countries[country_code][city_code], relay_code)
+          elseif stringy.startswith(payload_line, "\t") then -- line specifying an entire city
+            city_code = slice(payload_line, "(", ")") -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
+            countries[country_code][city_code] = {}
+          end
+        end
+
+      end
+    
+      return countries
+    end
   },
   word = {
     title_case_policy = function(word)
@@ -144,7 +223,94 @@ transf = {
       else
         return replace(word, to.case.capitalized)
       end
+    end,
+    synonyms = {
+
+      raw_syn = function(str)
+        return memoize(run)(
+          "syn -p \'" .. memoize(replace)(str, to.string.escaped_single_quote_safe) .. "\'"
+        )
+      end,
+      array_syn_tbls = function(str)
+        local synonym_parts = stringx.split(transf.word.synonyms.raw_syn(str), "\n\n")
+        local synonym_tables = map(
+          synonym_parts,
+          function (synonym_part)
+            local synonym_part_lines = stringy.split(synonym_part, "\n")
+            local synonym_term = eutf8.sub(synonym_part_lines[1], 2) -- syntax: ❯<term>
+            local synonyms_raw = eutf8.sub(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
+            local antonyms_raw = eutf8.sub(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
+            local synonyms = map(stringy.split(synonyms_raw, ", "), stringy.strip)
+            local antonyms = map(stringy.split(antonyms_raw, ", "), stringy.strip)
+            return {
+              term = synonym_term,
+              synonyms = synonyms,
+              antonyms = antonyms,
+            }
+          end
+        )
+        return synonym_tables
+      end,
+      raw_av = function (str)
+        memoize(run)(
+          "synonym \'" .. memoize(replace)(str, to.string.escaped_single_quote_safe) .. "\'"
+        )
+      end,
+      array_av = function(str)
+        local items = stringy.split(transf.word.synonyms.raw_av(str), "\t")
+        items = filter(items, function(itm)
+          if itm == nil then
+            return false
+          end
+          itm = stringy.strip(itm)
+          return #itm > 0
+        end)
+        return items
+      end,
+    }
+  },
+  raw_array_of_tables = {
+    item_array_of_item_tables = function(arr)
+      return CreateArray(map(
+        arr,
+        function (arr)
+          return CreateTable(arr)
+        end
+      ))
     end
+  },
+  package_manager = {
+    array = {
+      backed_up_packages = function(mgr)
+        return lines(run("upkg " .. mgr .. " read-backup"))
+      end,
+      missing_packages = function(mgr)
+        return lines(run("upkg " .. mgr .. " missing"))
+      end,
+      added_packages = function(mgr)
+        return lines(run("upkg " .. mgr .. " added"))
+      end,
+      difference_packages = function(mgr)
+        return lines(run("upkg " .. mgr .. " difference"))
+      end,
+      package_manager_version = function(mgr)
+        return lines(run("upkg " .. mgr .. " package-manager-version"))
+      end,
+      which_package_manager = function(mgr)
+        return lines(run("upkg " .. mgr .. " which-package-manager"))
+      end,
+      package_managers_with_missing_packages = function(mgr)
+        return lines(run("upkg " .. mgr .. " missing-package-managers"))
+      end,
+      list = function(mgr) return lines(run("upkg" .. mgr .. "list")) end,
+      count = function(mgr) return lines(run("upkg" .. mgr .. " count")) end,
+      with_version = function(mgr, arg) return lines(run("upkg" .. mgr .. " with-version " .. (arg or ""))) end,
+      version = function(mgr, arg) return lines(run("upkg" .. mgr .. " version " .. (arg or ""))) end,
+      which = function(mgr, arg) return lines(run("upkg" .. mgr ..  " which" .. (arg or "")))
+      end,
+      is_installed = function(mgr, arg) return pcall(run, mgr .. "is-installed" .. (arg or "")) end,
+    },
+
   },
   table = {
     url_params = function(t)

@@ -864,24 +864,24 @@ local item_creation_map = {
       must_be = { "number" , "number-by-sign", "pos", "number-by-number-set", "float"}
     }
   },
-  --[[ [CreateRunningApplicationItem] = {
-    {
-      value = function() return hs.application.open("Google Chrome") end,
-      must_be = { "running-application", "browser-application", "chrome-application" }
-    },
-    {
-      value = function() return hs.application.open("Firefox") end,
-      must_be = { "running-application", "browser-application", "firefox-application" }
-    },
-    {
-      value = function() return hs.application.open("LibreOffice") end,
-      must_be = { "running-application", "libreoffice" }
-    },
-    {
-      value = function() return hs.application.open("OmegaT") end,
-      must_be = { "running-application", "omegat" }
-    }
-  }, ]] -- stays commented out most of the time since having applications open is annoying while I'm constantly rerunning this while debugging
+  -- --[CreateRunningApplicationItem] = {
+  --   {
+  --     value = function() return hs.application.open("Google Chrome") end,
+  --     must_be = { "running-application", "browser-application", "chrome-application" }
+  --   },
+  --   {
+  --     value = function() return hs.application.open("Firefox") end,
+  --     must_be = { "running-application", "browser-application", "firefox-application" }
+  --   },
+  --   {
+  --     value = function() return hs.application.open("LibreOffice") end,
+  --     must_be = { "running-application", "libreoffice" }
+  --   },
+  --   {
+  --     value = function() return hs.application.open("OmegaT") end,
+  --     must_be = { "running-application", "omegat" }
+  --   }
+  -- }, -- stays commented out most of the time since having applications open is annoying while I'm constantly rerunning this while debugging
   [CreateShellCommand] = {
     {
       value = "khal",
