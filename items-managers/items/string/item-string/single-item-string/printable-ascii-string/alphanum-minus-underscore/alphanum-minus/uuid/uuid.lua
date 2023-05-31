@@ -4,7 +4,7 @@ UuidItemSpecifier = {
   properties = {
     getables = {
       ["is-contact"] = function(self)
-        return CreateShellCommand("khard"):get("is-contact", self:get("contents"))
+        return is.uuid.contact(self:get("contents"))
       end
     }
   },

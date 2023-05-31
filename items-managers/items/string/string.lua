@@ -58,7 +58,9 @@ StringItemSpecifier = {
         return eutf8.sub(self:get("contents"), 1, eutf8.len(self:get("contents")) - eutf8.len(suffix))
       end,
       ["contained-unicode-prop-tables"] = function(self)
-        return CreateShellCommand("uni"):get("identify", self:get("contents"))
+        return transf.raw_array_of_tables.item_array_of_item_tables(
+          transf.string.unicode_prop_table_array(self:get("contents"))
+        )
       end,
       ["encoded-as"] = function(self, enc)
         return transf.string[enc](self:get("contents"))

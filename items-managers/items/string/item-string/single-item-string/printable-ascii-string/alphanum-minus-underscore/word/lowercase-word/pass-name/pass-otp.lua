@@ -4,14 +4,7 @@ PassOtpItemSpecifier = {
   properties = {
     getables = {
       ["pass-otp"] = function(self)
-        return run({
-          "pass",
-          "otp",
-          {
-            value = "otp/" .. self:get("contents"),
-            type = "quoted"
-          }
-        })
+        return run("pass otp otp/" .. self:get("contents"))
       end,
     },
   },

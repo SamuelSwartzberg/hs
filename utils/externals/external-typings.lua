@@ -288,6 +288,28 @@
 --- @class hs.httpserver
 
 --- @class hs.fnutils
+--- @field concat fun(table1: table, table2: table): table
+--- @field contains fun(table: table, value: any): boolean
+--- @field copy fun(table: table): table
+--- @field each fun(table: table, fn: fun(elem: any): nil): nil
+--- @field every fun(table: table, fn: fun(elem: any): boolean): boolean
+--- @field filter fun(table: table, fn: fun(elem: any): boolean): table
+--- @field find fun(table: table, fn: fun(elem: any): boolean): any
+--- @field ieach fun(table: any[], fn: fun(elem: any): nil): nil
+--- @field ifilter fun(table: any[], fn: fun(elem: any): boolean): table
+--- @field imap fun(table: any[], fn: fun(elem: any): any): table
+--- @field indexOf fun(table: any[], element: any): integer
+--- @field map fun(table: table, fn: fun(elem: any): any): table
+--- @field mapCat fun(table: table, fn: fun(elem: any): table): table
+--- @field reduce fun(table: table, fn: fun(acc: any, elem: any): (any), initial?: any): any
+--- @field some fun(table: table, fn: fun(elem: any): boolean): boolean
+--- @field split fun(string: string, separator: string, nMax?: integer, bPlain?: boolean): string[]
+--- @field cycle fun(table: table): (fun(): any)
+--- @field partial fun(fn: fun(...): any, ...): (fun(...): any) essentially a `bind` function
+--- @field sequence fun(...): (fun(...): table)
+--- @field sortByKeys fun(table: table, fn?: fun(a: any, b: any): boolean): table
+--- @field sortByKeyValues fun(table: table, fn?: fun(a: any, b: any): boolean): table
+
 
 --- @class hs.settings
 

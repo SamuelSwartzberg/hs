@@ -7,7 +7,7 @@ MullvadRelayIdentifierItemSpecifier = {
     },
     doThisables = {
       ["relay-set"] = function(self)
-        CreateShellCommand("mullvad"):doThis("relay-set", self:get("contents"))
+        dothis.mullvad.relay_set(self:get("contents"))
       end,
     }
   },

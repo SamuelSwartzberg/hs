@@ -50,16 +50,15 @@ PrintableAsciiStringItemSpecifier = {
     },
     doThisables = {
       ["add-as-password"] = function(self, name)
-        CreateShellCommand("pass"):doThis("add-password", {name = name, password = self:get("contents")})
+        run("yes" .. transf.string.single_quoted_escaped(self:get("contents")) .. "| pass insert passw/" .. name, true)
       end,
       ["add-as-username"] = function(self, name)
-        CreateShellCommand("pass"):doThis("add-username", {name = name, username = self:get("contents")})
+        writeFile(env.MPASSUSERNAME .. "/" .. name .. ".txt", self:get("contents"))
       end,
       ["add-as-password-with-prompt-username"] = function(self, name)
         local username = prompt("string", "Username")
-        local pass = CreateShellCommand("pass")
-        pass:doThis("add-password", {name = name, password = self:get("contents")})
-        pass:doThis("add-username", {name = name, username = username})
+        self:doThis("add-as-password", name)
+        CreateStringItem(username):doThis("add-as-username", name)
       end,
 
     }

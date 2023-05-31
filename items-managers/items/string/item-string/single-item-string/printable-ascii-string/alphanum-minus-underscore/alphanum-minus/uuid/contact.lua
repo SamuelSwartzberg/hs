@@ -4,7 +4,7 @@ ContactItemSpecifier = {
   properties = {
     getables = {
       ["to-contact-table"] = function(self)
-        return CreateShellCommand("khard"):get("show-contact-to-contact-table", self:get("contents"))
+        return transf.uuid.contact_table(self:get("contents"))
       end,
 
     }

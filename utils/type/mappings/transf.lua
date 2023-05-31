@@ -2,15 +2,67 @@
 
 
 transf = {
-  hex = {
+  hex = { -- a hex string
     char = function(hex)
       return string.char(tonumber(hex, 16))
+    end,
+    indicated_hex_string = function(hex)
+      return "0x" .. hex
+    end,
+    utf8_unicode_prop_table = function(hex)
+      return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped("utf8:" .. tostring(hex)))[1]
+    end,
+    unicode_codepoint = function(hex)
+      return "U+" .. hex
     end,
   },
   percent = {
     char = function(percent)
       local num = percent:sub(2, 3)
       return string.char(tonumber(num, 16))
+    end,
+  },
+  unicode_codepoint = { -- U+X...
+    number = function(codepoint)
+      return tonumber(codepoint:sub(3), 16)
+    end,
+    unicode_prop_table = function(codepoint)
+      return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped(codepoint))[1]
+    end
+  },
+  number = {
+    decimal_string = function(num)
+      return tostring(num)
+    end,
+    indicated_decimal_string = function(num)
+      return "0d" .. transf.number.decimal_string(num)
+    end,
+    hex_string = function(num)
+      return string.format("%X", num)
+    end,
+    indicated_hex_string = function(num)
+      return "0x" .. transf.number.hex_string(num)
+    end,
+    unicode_codepoint = function(num)
+      return "U+" .. transf.number.hex_string(num)
+    end,
+    octal_string = function(num)
+      return string.format("%o", num)
+    end,
+    indicated_octal_string = function(num)
+      return "0o" .. transf.number.octal_string(num)
+    end,
+    binary_string = function(num)
+      return string.format("%b", num)
+    end,
+    indicated_binary_string = function(num)
+      return "0b" .. transf.number.binary_string(num)
+    end,
+    unicode_prop_table = function(num)
+      return transf.unicode_codepoint.unicode_prop_table(transf.number.unicode_codepoint(num))
+    end,
+    utf8_unicode_prop_table = function(num)
+      return transf.hex.utf8_unicode_prop_table(transf.number.hex_string(num))
     end,
   },
   not_nil = {
@@ -29,6 +81,9 @@ transf = {
     percent = function(char)
       return string.format("%%%02X", string.byte(char))
     end,
+    unicode_prop_table = function(char)
+      return memoize(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(char))[1]
+    end
   },
   path = {
     attachment = function(path)
@@ -38,6 +93,11 @@ transf = {
     no_leading_following_slash_or_whitespace = function(item)
       item = stringy.strip(item)
       return item
+    end
+  },
+  real_image_path = {
+    qr_data = function(path)
+      return run("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
     end
   },
   semver = {
@@ -52,9 +112,30 @@ transf = {
       }
     end,
   },
+  uuid = {
+    raw_contact = function(uuid)
+      return memoize(run)( "khard show --format=yaml uid:" .. uuid, {catch = true} )
+    end,
+    contact_table = function(uuid)
+      local raw_contact = transf.uuid.raw_contact(uuid)
+      local contact_table = yamlLoad(raw_contact)
+      contact_table.uid = uuid
+      return contact_table
+    end,
+  },
   string = {
     escaped_csv_field = function(field)
+      error("current implementation will break on nonascii")
       return '"' .. replace(field, {{'"', "\n"}, {'""', '\\n'}})  .. '"'
+    end,
+    unicode_prop_table_array = function(str)
+      return memoize(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(str))
+    end,
+    single_quoted_escaped = function(str)
+      return " '" .. memoize(replace)(str, to.string.escaped_single_quote_safe) .. "'"
+    end,
+    double_quoted_escaped = function(str)
+      return ' "' .. memoize(replace)(str, to.string.escaped_double_quote_safe) .. '"'
     end,
     bits = basexx.to_bit,
     hex = basexx.to_hex,
@@ -178,7 +259,15 @@ transf = {
       else
         return nil
       end
-    end
+    end,
+    raw_contact = function(searchstr)
+      return memoize(run)("khard show --format=yaml " .. searchstr, {catch = true} )
+    end,
+    contact_table = function(searchstr)
+      local raw_contact = transf.string.raw_contact(searchstr)
+      local contact = yamlLoad(raw_contact)
+      return contact
+    end,
   },
   multiline_string = {
     trimmed_lines = function(str)
@@ -228,7 +317,7 @@ transf = {
 
       raw_syn = function(str)
         return memoize(run)(
-          "syn -p \'" .. memoize(replace)(str, to.string.escaped_single_quote_safe) .. "\'"
+          "syn -p" .. transf.string.single_quoted_escaped(str),
         )
       end,
       array_syn_tbls = function(str)
@@ -253,7 +342,7 @@ transf = {
       end,
       raw_av = function (str)
         memoize(run)(
-          "synonym \'" .. memoize(replace)(str, to.string.escaped_single_quote_safe) .. "\'"
+          "synonym" .. transf.string.single_quoted_escaped(str),
         )
       end,
       array_av = function(str)
@@ -275,6 +364,16 @@ transf = {
         arr,
         function (arr)
           return CreateTable(arr)
+        end
+      ))
+    end
+  },
+  raw_array_of_strings = {
+    item_array_of_string_items = function(arr)
+      return CreateArray(map(
+        arr,
+        function (itm)
+          return CreateStringItem(itm)
         end
       ))
     end
@@ -337,6 +436,9 @@ transf = {
         })
       end
       return fields
+    end,
+    single_quoted_escaped_json = function(t)
+      return transf.string.single_quoted_escaped(json.encode(t))
     end,
   },
   url_components = {

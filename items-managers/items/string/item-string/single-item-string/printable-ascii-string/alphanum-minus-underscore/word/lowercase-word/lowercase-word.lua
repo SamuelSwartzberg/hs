@@ -18,7 +18,7 @@ LowercaseWordItemSpecifier = {
     },
     doThisables = {
       ["add-as-pass-name"] = function(self, password)
-        CreateShellCommand("pass"):doThis("add-password", {name = self:get("contents"), password = password})
+        run("yes " .. transf.string.single_quoted_escaped(password) .. " | pass add passw/" .. self:get("contents"), true)
       end,
     }
   },

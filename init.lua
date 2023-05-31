@@ -71,11 +71,10 @@ local keymap = {
   a_use, {
     explanation = "Choose contact and action on that contact (from local vcf files)",
     fn = function()
-      CreateShellCommand("khard")
-        :doThis("get-array-of-contact-tables", function(arr)
-          arr:doThis("choose-item-and-then-action") 
-        end)
-      end,
+      CreateArray(
+        memoize(get.khard.all_contact_tables)
+      ):doThis("choose-item-and-then-action") 
+    end,
     mnemonic = "2 by association with @"
   },
   ["3"] = {
@@ -96,22 +95,13 @@ local keymap = {
   },
   ["6"] = {
     explanation = "Enable and disable mullvad",
-    fn = function() 
-      CreateShellCommand("mullvad")
-        :doThis("toggle")
-      end,
+    fn = dothis.mullvad.toggle
   },
   ["7"] = {
     explanation = "Switch ·to a different mullvad server",
     fn = function ()
-      local mullvad = CreateShellCommand("mullvad")
-      mullvad
-        :get("flat-relay-array")
-        :doThis("choose-item", 
-          function(relay_code) 
-            mullvad:doThis("relay-set", relay_code)
-          end
-        )
+      CreateArray(get.mullvad.flat_relay_array)
+        :doThis("choose-item", dothis.mullvad.relay_set)
     end
   },
   ["8"] = {

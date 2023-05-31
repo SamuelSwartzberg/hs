@@ -16,6 +16,9 @@ ImageFileItemSpecifier = {
           "saucenao --file \"" .. self:get("completely-resolved-path") .. "\" --output-properties booru-url"
         )
       end,
+      ["qr-data"] = function(self)
+        return transf.real_image_path.qr_data(self:get("completely-resolved-path"))
+      end,
     },
     doThisables = {
       ["add-to-local-booru"] = function(self)
