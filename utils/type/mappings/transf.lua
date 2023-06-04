@@ -499,6 +499,10 @@ transf = {
     single_quoted_escaped_json = function(t)
       return transf.string.single_quoted_escaped(json.encode(t))
     end,
+    yaml_metadata = function(t)
+      local string_contents = yamlDump(t)
+      return "---\n" .. string_contents .. "\n---\n"
+    end,
   },
   url_components = {
     url = function(comps)

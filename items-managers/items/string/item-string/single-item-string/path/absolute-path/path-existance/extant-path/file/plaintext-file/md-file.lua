@@ -8,17 +8,12 @@ MdFileItemSpecifier = {
     },
     doThisables = {
       ["to-pandoc-export"] = function(self, specifier)
-        CreateShellCommand("pandoc"):doThis("md-to-" .. specifier.format , {
-          source = self:get("resolved-path"),
-          target = specifier.target_path,
-          do_after = specifier.do_after
-        })
+        dothis.pandoc.markdown_to(self:get("resolved-path"), specifier.format, nil, specifier.do_after)
       end,
-      ["to-pandoc-export-and-then-choose-action"] = function(self, specifier)
-        specifier.do_after = function(target)
+      ["to-pandoc-export-and-then-choose-action"] = function(self, format)
+        dothis.pandoc.markdown_to(self:get("resolved-path"), format, nil, function(target)
           CreateStringItem(target):doThis("choose-action")
-        end
-        self:doThis("to-pandoc-export", specifier)
+        end)
       end,
 
     }
@@ -27,23 +22,17 @@ MdFileItemSpecifier = {
     {
       text = "👉📑📄🎓 cexltxpdf.",
       key = "to-pandoc-export-and-then-choose-action",
-      args = {
-        format = "latexlike-pdf"
-      }
+      args = "pdf"
     },
     {
       text = "👉📑💻🎓 cexltxbmr.",
       key = "to-pandoc-export-and-then-choose-action",
-      args = {
-        format = "latex-beamer-pdf"
-      }
+      args = "beamer"
     },
     {
       text = "👉📑💻🟨 cexrvjs.",
       key = "to-pandoc-export-and-then-choose-action",
-      args = {
-        format = "revealjs"
-      }
+      args = "revealjs"
     },
   }
 }

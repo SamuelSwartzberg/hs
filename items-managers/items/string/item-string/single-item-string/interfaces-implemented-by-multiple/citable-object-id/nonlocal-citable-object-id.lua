@@ -5,18 +5,12 @@ NonlocalCitableObjectIdItemSpecifier = {
     getables = {
       ["bibtex-from-internet-as-table"] = function(self) 
         return runJSON({
-          "echo",
-          "-n",
+          "echo -n",
           {
             value = self:get("bibtex-from-internet"),
             type = "quoted"
           },
-          "|",
-          "pandoc",
-          "-f",
-          "bibtex",
-          "-t",
-          "csljson"
+          " | pandoc -f bibtex -t csljson"
         })
       end,
     },

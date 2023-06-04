@@ -195,5 +195,33 @@ dothis = {
         "echo $'D\ny\n' | khal edit " .. get.khal.basic_command_parts(include, exclude) .. transf.string.single_quoted_escaped(searchstr)
       run(command, true)
     end,
+  },
+  pandoc = {
+    markdown_to = function(source, format, metadata, do_after)
+      local source, target = resolve({s = {path = source}, t = {suffix = "." .. tblmap.pandoc_format.extension[format]}}
+      local rawsource = readFile(source)
+      local processedsource = join.string.table.with_yaml_metadata(rawsource, metadata)
+      rawsource = eutf8.gsub(rawsource, "\n +\n", "\n&nbsp;\n")
+      local temp_path = source .. ".tmp"
+      writeFile(temp_path, processedsource) 
+      local command_parts = {
+        "pandoc",
+      }
+      table.insert(command_parts, "--wrap=preserve")
+      table.insert(command_parts, "-f")
+      table.insert(command_parts, "--standalone")
+      table.insert(command_parts, "-t")
+      table.insert(command_parts, format)
+      table.insert(command_parts, "-i")
+      table.insert(command_parts, {value = temp_path, type ="quoted"})
+      table.insert(command_parts, "-o")
+      table.insert(command_parts, {value = target, type ="quoted"})
+      run(command_parts, function ()
+        delete(temp_path)
+        if do_after then
+          do_after(target)
+        end
+      end)
+    end,
   }
 }

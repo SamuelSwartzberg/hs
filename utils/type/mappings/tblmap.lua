@@ -216,6 +216,13 @@ tblmap = {
       }
     },
   },
+  pandoc_format = {
+    extension = {
+      pdf = "pdf",
+      beamer = "pdf",
+      revealjs = "html",
+    }
+  }
 }
 
 -- make sure to automatically normalize any input to tblmap

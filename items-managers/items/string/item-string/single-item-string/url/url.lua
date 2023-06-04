@@ -114,8 +114,7 @@ URLItemSpecifier = {
         khal_config:doThis("git-push")
       end,
       ["add-events-to-calendar"] = function(self)
-        local khal = CreateShellCommand("khal")
-        khal:doThis("choose-writable-calendar", function(calendar)
+        CreateArray(get.khal.writeable_calendars()):doThis("choose-item", function(calendar)
           dothis.khal.add_event_from_url(calendar, self:get("contents"))
         end)
       end,

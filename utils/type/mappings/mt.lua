@@ -31,6 +31,55 @@ mt = {
     auth_processes = {
       "bearer", "basic", "manual"
     },
+    datelib = {
+      gettable_units  = { "date", "year", "isoyear", "month", "yearday", "weekday", "isoweekday", "weeknum", "isoweeknum", "day", "time", "hours", "minutes", "seconds", "fracs", "ticks" },
+      addable_units = { "years", "months", "days", "hours", "minutes", "seconds", "ticks" }
+    },
+    markdown_extensions = {
+      basic = {
+        "yaml_metadata_block"
+      },
+      featureful = {
+        "escaped_line_breaks",
+        "fenced_code_blocks",
+        "backtick_code_blocks",
+        "fenced_code_attributes",
+        "line_blocks",
+        "fancy_lists",
+        "startnum",
+        "definition_lists",
+        "example_lists",
+        "table_captions",
+        "pipe_tables",
+        "all_symbols_escapable",
+        "strikeout",
+        "superscript",
+        "subscript",
+        "tex_math_dollars",
+        "raw_html",
+        "footnotes",
+        "inline_notes",
+        "implicit_figures",
+        "mark",
+        "angle_brackets_escapable",
+        "hard_line_breaks",
+        "emoji",
+        "autolink_bare_uris",
+      },
+      navigable = {
+        "implicit_header_references"
+      },
+      citing = {
+        "citations",
+      },
+      styleable = {
+        "header_attributes",
+        "auto_identifiers",
+        "gfm_auto_identifiers",
+        "link_attributes",
+        "fenced_divs"
+      }
+    },
     khal = {
       parseable_format_components = {
         "uid",

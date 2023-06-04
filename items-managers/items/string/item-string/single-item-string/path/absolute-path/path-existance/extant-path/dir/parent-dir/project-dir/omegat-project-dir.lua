@@ -198,9 +198,7 @@ OmegatProjectDirItemSpecifier = {
       end,
       ["generate-rechnung"] = function(self)
         self:doThis("generate-raw-rechnung", function()
-          CreateShellCommand("pandoc"):doThis("md-to-latexlike-pdf", {
-            source = self:get("rechnung-raw-path"),
-          })
+          dothis.pandoc.markdown_to(self:get("rechnung-raw-path"), "pdf")
         end)
         
       end,

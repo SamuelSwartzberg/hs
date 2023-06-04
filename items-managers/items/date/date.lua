@@ -21,15 +21,9 @@ DateSpecifier = {
           amount = -specifier["amount"]
         })
       end,
-      ["addable-units"] = function(self)
-        return { "years", "months", "days", "hours", "minutes", "seconds", "ticks" }
-      end,
       ["val"] = function(self, unit)
         local dt = self:get("contents")
         return dt["get" .. unit](dt)
-      end,
-      ["gettable-units"] = function(self)
-        return { "date", "year", "isoyear", "month", "yearday", "weekday", "isoweekday", "weeknum", "isoweeknum", "day", "time", "hours", "minutes", "seconds", "fracs", "ticks" }
       end,
       ["span"] = function(self, unit)
         local dt = self:get("contents")
@@ -231,10 +225,8 @@ DateSpecifier = {
         )):doThis("choose-item-and-then-action")
       end,
       ["create-event-with-start"] = function(self)
-        CreateShellCommand("khal"):doThis("add-event-interactive", {
-          specifier = {
-            start = self:get("to-precision", "min")
-          }
+        dothis.khal.add_event_interactive({
+          start = self:get("to-precision", "min")
         })
       end,
     }

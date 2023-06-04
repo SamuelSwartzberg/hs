@@ -34,6 +34,9 @@ post 'lua is working':
   - wrapper for hs chords?
   - adding an otp: https://github.com/tadfisher/pass-otp
   - hs grid chords?
+  - record audio, write to temp file, chooser on file
+  - elevenlabs api
+  - openai whisper api
   - fix timer bugs
   - https://www.hammerspoon.org/docs/hs.application.watcher.html: use to deactivate mullvad when geforce now? wrap application watchers to make it easier to create stuff?
     - maybe make watchers table with function, type, watcher keys such that we can subclass watchers based on type, this would also unlock additional functionality

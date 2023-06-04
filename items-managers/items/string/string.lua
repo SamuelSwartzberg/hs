@@ -36,7 +36,6 @@ StringItemSpecifier = {
       ["new-string-item-from-contents"] = function(self)
         return self:doThis("str-item", {key = "contents"})
       end,
-     
       ["starts-with"] = function(self, str)
         return stringy.startswith(self:get("contents"), str)
       end,
@@ -50,8 +49,8 @@ StringItemSpecifier = {
         if not self:get("starts-with", prefix) then return nil end
         return eutf8.sub(self:get("contents"), eutf8.len(prefix) + 1)
       end,
-      ["difference-from-suffix-or-self"] = function(self, suffix) return 
-          mustNotEnd(self:get("contents"), suffix)
+      ["difference-from-suffix-or-self"] = function(self, suffix) 
+        return mustNotEnd(self:get("contents"), suffix)
       end,
       ["difference-from-suffix-or-nil"] = function(self, suffix)
         if not self:get("ends-with", suffix) then return nil end
@@ -128,7 +127,7 @@ StringItemSpecifier = {
         return transf.string.title_case(self:get("contents"))
       end,
       ["events-matching-search"] = function(self)
-        return CreateShellCommand("khal"):get("search-events-items", {searchstr = self:get("fold")})
+        return get.khal.search_event_tables(self:get("fold"))
       end,
       ["envsubst"] = function(self)
         return run({

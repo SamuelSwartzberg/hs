@@ -36,15 +36,13 @@ EventTableSpecifier = {
     },
     doThisables = {
       ["delete-event"] = function(self)
-        CreateShellCommand("khal"):doThis("delete-event", self:get("contents").uid)
+        dothis.khal.delete_event(self:get("contents").uid)
       end,
       ["edit-event"] = function(self)
-        CreateShellCommand("khal"):doThis("edit-event", self:get("contents").uid)
+        dothis.khal.edit_event(self:get("contents").uid)
       end,
       ["create-similar"] = function(self)
-        CreateShellCommand("khal"):doThis("add-event-interactive", {
-          specifier = self:get("contents")
-        })
+        dothis.khal.add_event_interactive(self:get("contents"))
       end,
 
     }

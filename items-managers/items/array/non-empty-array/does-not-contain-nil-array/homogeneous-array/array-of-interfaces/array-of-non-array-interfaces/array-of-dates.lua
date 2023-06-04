@@ -33,17 +33,15 @@ ArrayOfDatesSpecifier = {
         specifier = specifier or {}
         specifier.start = self:get("min-content-item"):get("to-precision", "min")
         specifier["end"] = self:get("max-content-item"):get("to-precision", "min")
-        return CreateShellCommand("khal"):get("list-events-items", specifier)
+        return transf.array_of_event_tables.item_array_of_event_table_items(get.khal.list_event_tables(specifier))
       end,
 
     },
     doThisables = {
       ["create-event-for-range"] = function(self)
-        CreateShellCommand("khal"):doThis("add-event-interactive", {
-          specifier = {
-            start = self:get("min-contents-item"):get("to-precision", "min"),
-            ["end"] = self:get("max-contents-item"):get("to-precision", "min"),
-          }
+        dothis.khal.add_event_interactive({
+          start = self:get("min-contents-item"):get("to-precision", "min"),
+          ["end"] = self:get("max-contents-item"):get("to-precision", "min"),
         })
       end,
     },
