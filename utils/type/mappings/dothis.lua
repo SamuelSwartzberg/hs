@@ -198,7 +198,7 @@ dothis = {
   },
   pandoc = {
     markdown_to = function(source, format, metadata, do_after)
-      local source, target = resolve({s = {path = source}, t = {suffix = "." .. tblmap.pandoc_format.extension[format]}}
+      local source, target = resolve({s = {path = source}, t = {suffix = "." .. tblmap.pandoc_format.extension[format]}})
       local rawsource = readFile(source)
       local processedsource = join.string.table.with_yaml_metadata(rawsource, metadata)
       rawsource = eutf8.gsub(rawsource, "\n +\n", "\n&nbsp;\n")

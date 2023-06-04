@@ -1,7 +1,6 @@
 _r_comp = {
   lua = {
     date = {
-      long_dt_seps = {" at "},
       sep = "[_%-%.:;%s/T]",
       sep_opt = "[_%-%.:;%s/T]?",
       y = "(%d%d%d%d)",
@@ -97,7 +96,8 @@ mt = {
       decoded = {"\"", "'", "<", ">", "&"}
     },
     date = {
-      dt_component_few_chars = {"year", "month", "day", "hour", "min", "sec"}
+      dt_component_few_chars = {"year", "month", "day", "hour", "min", "sec"},
+      long_dt_seps = {" at "}
     },
     addr_key = {"Formatted name", "First name", "Last name", "Street", "Code", "City", "Region", "Country", "Box", "Extended"},
     vcard = {
@@ -319,13 +319,13 @@ mt = {
       sep = "[_%-%.:;%s/T]",
     },
     date = {
-      full_datetime = _r_comp.lua.data.y .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.m .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.d .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.h .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.min .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.s .. "Z?",
-      noseconds_datetime = _r_comp.lua.data.y .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.m .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.d .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.h .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.min .. "Z?",
-      nominutes_noseconds = _r_comp.lua.data.y .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.m .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.d .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.h .. "Z?",
-      full_date = _r_comp.lua.data.y .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.m .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.d,
-      sep_month = _r_comp.lua.data.y .. _r_comp.lua.data.sep .. _r_comp.lua.data.m,
-      short_date = _r_comp.lua.data.y_s .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.m .. _r_comp.lua.data.sep_opt .. _r_comp.lua.data.d,
-      onlyear = _r_comp.lua.data.y
+      full_datetime = _r_comp.lua.date.y .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.m .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.d .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.h .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.min .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.s .. "Z?",
+      noseconds_datetime = _r_comp.lua.date.y .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.m .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.d .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.h .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.min .. "Z?",
+      nominutes_noseconds = _r_comp.lua.date.y .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.m .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.d .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.h .. "Z?",
+      full_date = _r_comp.lua.date.y .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.m .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.d,
+      sep_month = _r_comp.lua.date.y .. _r_comp.lua.date.sep .. _r_comp.lua.date.m,
+      short_date = _r_comp.lua.date.y_s .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.m .. _r_comp.lua.date.sep_opt .. _r_comp.lua.date.d,
+      onlyear = _r_comp.lua.date.y
     }
   }
 }

@@ -235,13 +235,13 @@ transf = {
     
       -- we have to parse the date
     
-      for _, sep in ipairs(long_dt_seps) do
+      for _, sep in ipairs(mt._list.date.long_dt_seps) do
         eutf8.gsub(str, _r_comp.lua.data.sep, " ")
       end
     
       local date_parts
     
-      for _, date_regex in fastpairs(date_regexes) do
+      for _, date_regex in fastpairs(mt._r_lua.date) do
         date_parts = {eutf8.match(str, date_regex)}
         if #date_parts > 0 then
           break
@@ -359,9 +359,7 @@ transf = {
     synonyms = {
 
       raw_syn = function(str)
-        return memoize(run)(
-          "syn -p" .. transf.string.single_quoted_escaped(str),
-        )
+        return memoize(run)( "syn -p" .. transf.string.single_quoted_escaped(str) )
       end,
       array_syn_tbls = function(str)
         local synonym_parts = stringx.split(transf.word.synonyms.raw_syn(str), "\n\n")
@@ -385,7 +383,7 @@ transf = {
       end,
       raw_av = function (str)
         memoize(run)(
-          "synonym" .. transf.string.single_quoted_escaped(str),
+          "synonym" .. transf.string.single_quoted_escaped(str)
         )
       end,
       array_av = function(str)
