@@ -13,6 +13,7 @@ URLByContenttypeItemSpecifier = {
   },
   potential_interfaces = ovtable.init({
     { key = "image-url", value = CreateImageURLItem },
+    { key = "playable-url", value = CreatePlayableURLItem },
   })
 }
 

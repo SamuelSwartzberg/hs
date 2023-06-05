@@ -45,29 +45,16 @@ URLItemSpecifier = {
         return self:get("text-by-selector", "meta[name=description]")
       end,
       ["default-negotation-url-contents"] = function(self)
-        return memoize(run, { invalidation_mode ="invalidate", interval = 600 })({
-          "curl",
-          "-L",
-          { value = self:get("contents"), type = "quoted"},
-        })
+        return transf.url.default_negotation_url_contents(self:get("contents"))
       end,
       ["url-in-wayback-machine"] = function (self)
-        return "https://web.archive.org/web/*/" .. self:get("contents")
+        return transf.url.in_wayback_machine(self:get("contents"))
       end
       
     },
     doThisables = {
       ["download-url"] = function(self, path)
-        local url = self:get("contents")
-        run({
-          "cd",
-          { value = path, type = "quoted" },
-          "&&",
-          "curl",
-          "--location", -- Follow redirects
-          { value = url, type = "quoted" },
-          "-O"
-        }, true)
+        dothis.url.download_to(self:get("contents"), path, true)
       end,
       ["download-url-to-downloads"] = function(self)
         self:doThis("download-url", { value = "$HOME/Downloads", type = "quoted" })

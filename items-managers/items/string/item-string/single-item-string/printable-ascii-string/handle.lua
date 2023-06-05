@@ -7,13 +7,13 @@ HandleItemSpecifier = {
         return transf.handle.raw_handle(self:get("contents"))
       end,
       ["youtube-channel-id"] = function(self)
-        return transf.youtube.channel_id(self:get("contents"))
+        return transf.handle.youtube_channel_id(self:get("contents"))
       end,
       ["youtube-feed-url"] = function(self)
-        return self:get("str-item", "youtube-channel-id"):get("youtube-feed-url")
+        return transf.handle.feed_url(self:get("contents"))
       end,
-      ["youtube-pretty-name"] = function(self)
-        return self:get("str-item", "youtube-channel-id"):get("youtube-pretty-name")
+      ["youtube-channel-title"] = function(self)
+        return transf.handle.channel_title(self:get("contents"))
       end,
     },
     doThisables = {

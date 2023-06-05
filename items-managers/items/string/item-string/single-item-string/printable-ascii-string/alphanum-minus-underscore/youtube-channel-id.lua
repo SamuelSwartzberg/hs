@@ -4,24 +4,20 @@ YoutubeChannelIdItemSpecifier = {
   properties = {
     getables = {
       ["youtube-feed-url"] = function(self)
-        return "https://www.youtube.com/feeds/videos.xml?channel_id=" .. self:get("contents")
+        return transf.youtube_channel_id.feed_url(self:get("contents"))
       end,
       ["youtube-channel-url"] = function(self)
-        return "https://www.youtube.com/channel/" .. self:get("contents")
+        return transf.youtube_channel_id.channel_url(self:get("contents"))
       end,
-      ["youtube-pretty-name"] = function(self)
-        return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
-          api_name = "youtube",
-          endpoint = "channels",
-          params = { id = self:get("contents")}
-        }).items[1].snippet.title
+      ["youtube-channeltitle"] = function(self)
+        return transf.youtube_channel_id.channel_title(self:get("contents"))
       end,
     },
     doThisables = {
       ["add-to-newsboat-urls"] = function(self, category)
         CreateStringItem(env.NEWSBOAT_URLS):doThis("append-newsboat-url", {
           url = self:get("youtube-feed-url"),
-          title = self:get("youtube-pretty-name"),
+          title = self:get("youtube-title"),
           category = category
         })
       end,

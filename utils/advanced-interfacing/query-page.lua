@@ -8,7 +8,7 @@
 function queryPage(opts)
   opts = copy(opts) or {}
   opts.url = opts.url or "https://example.com"
-  local _, webpage = memoize(hs.http.get, {mode = "fs", invalidation_mode = "invalidate", interval = tblmap.dt_component.seconds.day}, "hs.http.get")(opts.url)
+  local _, webpage = memoize(hs.http.get, refstore.params.memoize.opts.invalidate_1_day_fs, "hs.http.get")(opts.url)
 
   if not webpage then
     error("Could not fetch webpage at: " .. url)

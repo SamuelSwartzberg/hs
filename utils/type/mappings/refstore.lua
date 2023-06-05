@@ -44,6 +44,11 @@ refstore = {
           invalidation_mode = "invalidate",
           interval = 24 * 60 * 60
         },
+        invalidate_1_day_fs = {
+          mode = "fs",
+          invalidation_mode = "invalidate",
+          interval = 24 * 60 * 60
+        },
         invalidate_1_week_fs = {
           mode = "fs",
           invalidation_mode = "invalidate",

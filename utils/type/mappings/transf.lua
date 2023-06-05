@@ -100,7 +100,7 @@ transf = {
   },
   real_audio_path = {
     transcribed = function(path)
-      return memoize(rest, refstore.params.memoize.opts.invalidate_1_year_fs)({
+      return memoize(rest, refstore.params.memoize.opts.invalidate_1_year_fs, "rest")({
         api_name = "openai",
         endpoint = "audio/transcriptions",
         request_table_type = "form",
@@ -114,7 +114,10 @@ transf = {
   real_image_path = {
     qr_data = function(path)
       return run("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
-    end
+    end,
+    hs_image = function(path)
+      return memoize(hs.image.imageFromPath)(path)
+    end,
   },
   semver = {
     components = function(str)
@@ -126,6 +129,28 @@ transf = {
         prerelease = prerelease,
         build = build
       }
+    end,
+  },
+  iban = {
+    cleaned_iban = function(iban)
+      return select(1, string.gsub(iban, "[ %-_]", ""))
+    end
+  },
+  cleaned_iban = {
+    data = function(iban)
+      local res = memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
+        host = "openiban.com/",
+        endpoint = "validate/" .. iban,
+        params = { getBIC = "true" },
+      })
+      local data = res.bankData
+      data.valid = res.valid
+    end,
+    bic = function(iban)
+      return transf.cleaned_iban.data(iban).bic
+    end,
+    bank_name = function(iban)
+      return transf.cleaned_iban.data(iban).bankName
     end,
   },
   uuid = {
@@ -188,7 +213,25 @@ transf = {
     end,
   },
   youtube_channel_id = {
-    
+    feed_url = function(id)
+      return "https://www.youtube.com/feeds/videos.xml?channel_id=" .. id
+    end,
+    channel_url = function(id)
+      return "https://www.youtube.com/channel/" .. id
+    end,
+    youtube_channel_item = function(id)
+      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
+        api_name = "youtube",
+        endpoint = "channels",
+        params = {
+          id = id,
+          part = "snippet,status",
+        }
+      }).items[1]
+    end,
+    channel_title = function(id)
+      return transf.youtube_channel_id.youtube_channel_item(id).snippet.title
+    end,
   },
   youtube_video_title = {
     cleaned = function(title)
@@ -200,7 +243,7 @@ transf = {
     end,
   },
   youtube_channel_title = {
-    cleaned = function(title)
+    cleaned = function(channel)
       channel = replace(channel, {
         { cond = {_r = mt._r.text_bloat.youtube.channel_topic_producer, _ignore_case = true}, mode="remove" },
         { value = {_r = mt._r.text_bloat.youtube.slash_suffix, _ignore_case = true}, mode="remove" },
@@ -210,7 +253,7 @@ transf = {
   },
   handle = {
     youtube_channel_item = function(handle)
-      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
+      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
         api_name = "youtube",
         endpoint = "channels",
         params = { handle = handle}
@@ -218,6 +261,12 @@ transf = {
     end,
     youtube_channel_id = function(handle)
       return transf.handle.youtube_channel_item(handle).id
+    end,
+    channel_title = function(handle)
+      return transf.handle.youtube_channel_item(handle).snippet.title
+    end,
+    feed_url = function(handle)
+      return transf.youtube_channel_id.feed_url(transf.handle.youtube_channel_id(handle))
     end,
     raw_handle = function(handle)
       return eutf8.sub(handle, 2)
@@ -282,6 +331,7 @@ transf = {
         return path
       end
     end,
+    
     path_resolved = function(path, resolve_tilde)
       if resolve_tilde then
         path = transf.string.tilde_resolved(path)
@@ -595,13 +645,33 @@ transf = {
       return url
     end,
   },
+  url = {
+    in_wayback_machine = function(url)
+      return "https://web.archive.org/web/*/" .. url
+    end,
+    default_negotiation_url_contents = function(url)
+      return memoize(run, refstore.params.memoize.opts.invalidate_1_day_fs, "run")
+          "curl -L" .. transf.string.single_quoted_escaped(url)
+    end,
+    in_tmp_dir = function(url)
+      return env.TMPDIR .. "/urls/" .. transf.not_userdata_or_function.md5(url) .. ".url"
+    end
+  },
+  whisper_url = {
+    transcribed = function(url)
+      local path = transf.url.in_tmp_dir(url)
+      dothis.url.download(url, path)
+      return transf.real_audio_path.transcribed(path)
+
+    end
+  },
   image_url = {
     booru_url = function(url)
-      return run({
+      return run(
         "saucenao --url" ..
         transf.string.single_quoted_escaped(url)
         .. "--output-properties booru-url"
-      })
+      )
     end
   },
   gpt_response_table = {
@@ -610,5 +680,15 @@ transf = {
       local response = first_choice.text or first_choice.message.content
       return stringy.strip(response)
     end
+  },
+  not_userdata_or_function = {
+    md5 = function(thing)
+      if type(thing) ~= "string" then 
+        thing = json.encode(thing)
+      end
+      local md5 = hashings("md5")
+      md5:update(thing)
+      return md5:hexdigest()
+    end,
   }
 }

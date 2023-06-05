@@ -1,13 +1,13 @@
 
 
 --- @param action "copy" | "move" | "link" | "zip" what to do with the source
---- @param source string the source file or directory
---- @param target string  the target file or directory
+--- @param source string the source file or directory. May be local, rclone remote, or a URL
+--- @param target string  the target file or directory. May be local or rclone remote
 --- @param condition? "exists" | "not-exists" | "any" when, related to the existence of the target, to action the source
 --- @param create_path? boolean whether to create the path of the target if it doesn't exist
 --- @param into? boolean whether to action the source into the target directory, rather than action the source to the target
 --- @param all_in? boolean whether to action all the files in the source directory, rather than the source directory itself
---- @param relative_to? string allow specifying
+--- @param relative_to? string allow specifying a root directory to resolve relative paths from 
 --- @return nil
 function srctgt(action, source, target, condition, create_path, into, all_in, relative_to)
 
@@ -18,6 +18,14 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
   into = defaultIfNil(into, false)
   all_in = defaultIfNil(all_in, false)
   target = defaultIfNil(target, source .. "." .. action)
+
+  local source_is_url = isUrl(source)
+
+  if source_is_url then
+    local url = source
+    source = transf.url.in_tmp_dir(url)
+    run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(source))
+  end
 
   -- resolve tilde
 

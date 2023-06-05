@@ -132,7 +132,7 @@ mt = {
         ".yuv"
     },
     
-      whisper_audio = {
+      ["whisper-audio"] = {
         "mp3",
         "mp4",
         "mpeg",

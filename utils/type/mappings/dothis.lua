@@ -264,5 +264,10 @@ dothis = {
       },do_after)
     end,
 
-  }
+  },
+ url = {
+  download = function(url, target)
+    run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
+  end
+ }
 }

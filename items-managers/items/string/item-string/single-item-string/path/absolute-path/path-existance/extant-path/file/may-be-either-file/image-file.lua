@@ -6,15 +6,13 @@ ImageFileItemSpecifier = {
   properties = {
     getables = {
       ["as-hs-image"] = function(self)
-        return memoize(hs.image.imageFromPath)(self:get("completely-resolved-path"))
+        return transf.image_url.hs_image(self:get("completely-resolved-path"))
       end,
       ["chooser-image"] = function(self)
         return self:get("as-hs-image")
       end,
       ["booru-url"] = function(self)
-        return memoize(run, refstore.params.memoize.opts.invalidate_1_month_fs)(
-          "saucenao --file \"" .. self:get("completely-resolved-path") .. "\" --output-properties booru-url"
-        )
+        return transf.image_url.booru_url(self:get("completely-resolved-path"))
       end,
       ["qr-data"] = function(self)
         return transf.real_image_path.qr_data(self:get("completely-resolved-path"))
