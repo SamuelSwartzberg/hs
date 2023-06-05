@@ -14,6 +14,9 @@ _r_comp = {
   }
 }
 mt = {
+  _exactly = {
+    null_uuid = "00000000-0000-0000-0000-000000000000",
+  },
   _contains = {
     lua_metacharacters = {"%", "^", "$", "(", ")", ".", "[", "]", "*", "+", "-", "?"},
     regex_metacharacters =  {"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"},
@@ -29,6 +32,9 @@ mt = {
     useless_files = {".git", "node_modules", ".vscode"},
     auth_processes = {
       "bearer", "basic", "manual"
+    },
+    mullvad_states ={
+      "Connected", "Disconnected"
     },
     datelib = {
       gettable_units  = { "date", "year", "isoyear", "month", "yearday", "weekday", "isoweekday", "weeknum", "isoweeknum", "day", "time", "hours", "minutes", "seconds", "fracs", "ticks" },
@@ -295,7 +301,8 @@ mt = {
       isbn = "(?:(?:[0-9]{13}|[0-9]{9}[0-9xX]))",
       uuid = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
       doi = "(?:10\\.\\d{4,9}/[-._;()/:A-Z0-9]+)",
-      doi_prefix = "^(?:https?://)?(?:dx.)?doi(?:.org/|:)?"
+      doi_prefix = "^(?:https?://)?(?:dx.)?doi(?:.org/|:)?",
+      relay_identifier = "[a-z]{2}-[a-z]{3}-(?:wg|ovpn)-\\d{3}"
     },
     whitespace = {
       large = "[\t\r\n]"

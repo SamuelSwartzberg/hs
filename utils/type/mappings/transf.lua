@@ -435,39 +435,6 @@ transf = {
       ))
     end,
   },
-  package_manager = {
-    array = {
-      backed_up_packages = function(mgr)
-        return lines(run("upkg " .. mgr .. " read-backup"))
-      end,
-      missing_packages = function(mgr)
-        return lines(run("upkg " .. mgr .. " missing"))
-      end,
-      added_packages = function(mgr)
-        return lines(run("upkg " .. mgr .. " added"))
-      end,
-      difference_packages = function(mgr)
-        return lines(run("upkg " .. mgr .. " difference"))
-      end,
-      package_manager_version = function(mgr)
-        return lines(run("upkg " .. mgr .. " package-manager-version"))
-      end,
-      which_package_manager = function(mgr)
-        return lines(run("upkg " .. mgr .. " which-package-manager"))
-      end,
-      package_managers_with_missing_packages = function(mgr)
-        return lines(run("upkg " .. mgr .. " missing-package-managers"))
-      end,
-      list = function(mgr) return lines(run("upkg" .. mgr .. "list")) end,
-      count = function(mgr) return lines(run("upkg" .. mgr .. " count")) end,
-      with_version = function(mgr, arg) return lines(run("upkg" .. mgr .. " with-version " .. (arg or ""))) end,
-      version = function(mgr, arg) return lines(run("upkg" .. mgr .. " version " .. (arg or ""))) end,
-      which = function(mgr, arg) return lines(run("upkg" .. mgr ..  " which" .. (arg or "")))
-      end,
-      is_installed = function(mgr, arg) return pcall(run, mgr .. "is-installed" .. (arg or "")) end,
-    },
-
-  },
   table = {
     url_params = function(t)
       local params = {}

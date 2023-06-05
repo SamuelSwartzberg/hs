@@ -3,9 +3,9 @@ ExtantPathItemSpecifier = {
   type = "extant-path",
   properties = {
     getables = {
-    --[[   ["is-category-date-dir-structure-contained-item"] = function(self)
-        return stringy.startswith(self:get("completely-resolved-path"), env.MDIARY) -- currently the only category-date-dir-structure-root is env.MDIARY, and this check is far cheaper then the alternative, so we'll use it for now
-      end, ]]
+      -- ["is-category-date-dir-structure-contained-item"] = function(self)
+      --   return stringy.startswith(self:get("completely-resolved-path"), env.MDIARY) -- currently the only category-date-dir-structure-root is env.MDIARY, and this check is far cheaper then the alternative, so we'll use it for now
+      -- end, 
       ["is-dir"] = function(self) return testPath(self:get("contents"), "dir") end,
       ["is-file"] = function(self) return not self:get("is-dir") end, 
       ["is-dated-extant-path"] = function(self) 

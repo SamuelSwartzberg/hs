@@ -19,31 +19,31 @@ dothis = {
   },
   upkg = {
     install = function(mgr, pkg)
-      run("upkg install " .. mgr .. transf.string.single_quoted_escaped(pkg), true)
+      run("upkg " .. mgr .. " install " .. transf.string.single_quoted_escaped(pkg), true)
     end,
     install_self = function(mgr)
-      run("upkg install-self " .. mgr, true)
+      run("upkg " .. mgr .. " install-self", true)
     end,
     install_missing = function(mgr)
-      run("upkg install-missing " .. mgr, true)
+      run("upkg " .. mgr .. " install-missing", true)
     end,
     remove = function(mgr, pkg)
-      run("upkg remove " .. mgr .. transf.string.single_quoted_escaped(pkg), true)
+      run("upkg " .. mgr .. " remove " .. transf.string.single_quoted_escaped(pkg), true)
     end,
     upgrade = function(mgr, pkg)
       local target
       if pkg then target = transf.string.single_quoted_escaped(pkg)
       else target = "" end
-      run("upkg upgrade " .. mgr .. target, true)
+      run("upkg " .. mgr .. " upgrade " .. target, true)
     end,
     link = function(mgr, pkg)
-      run("upkg link " .. mgr .. transf.string.single_quoted_escaped(pkg), true)
+      run("upkg " .. mgr .. " link " .. transf.string.single_quoted_escaped(pkg), true)
     end,
     upgrade_all = function(mgr)
-      run("upkg upgrade-all " .. mgr, true)
+      run("upkg " .. mgr .. " upgrade-all", true)
     end,
-    do_backup_and_commit = function(mgr, action,msg)
-      run("upkg " .. action .. " " .. mgr, function()
+    do_backup_and_commit = function(mgr, action, msg)
+      run("upkg " .. mgr .. " " .. action, function()
         local message = msg or action
         
         if mgr then
