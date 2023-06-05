@@ -595,6 +595,15 @@ transf = {
       return url
     end,
   },
+  image_url = {
+    booru_url = function(url)
+      return run({
+        "saucenao --url" ..
+        transf.string.single_quoted_escaped(url)
+        .. "--output-properties booru-url"
+      })
+    end
+  },
   gpt_response_table = {
     response_text = function(result)
       local first_choice = result.choices[1]

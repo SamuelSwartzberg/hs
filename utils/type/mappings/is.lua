@@ -34,6 +34,9 @@ is = {
       else
         return false
       end
+    end,
+    playable_file = function (path)
+      return is.path.usable_as_filetype(path, "audio") or is.path.usable_as_filetype(path, "video")
     end
     
   }

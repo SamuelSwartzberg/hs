@@ -6,6 +6,9 @@ URLByContenttypeItemSpecifier = {
       ["is-image-url"] = function(self)
         return is.path.usable_as_filetype(self:get("url-path"), "image")
       end,
+      ["is-playable-url"] = function(self)
+        return is.path.usable_as_filetype(self:get("url-path"), "playable")
+      end,
     }
   },
   potential_interfaces = ovtable.init({

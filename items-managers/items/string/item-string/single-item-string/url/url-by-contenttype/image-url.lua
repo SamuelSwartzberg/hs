@@ -3,18 +3,9 @@ ImageURLItemSpecifier = {
   type = "image-url",
   properties = {
     getables = {
-      ["booru-url"] = function(self)
-        return run({
-          "saucenao",
-          "--url",
-          {
-            value = self:get("contents"),
-            type = "quoted"
-          },
-          "--output-properties",
-          "booru-url"
-        })
-      end,
+      ["booru-url"] = function (self)
+        return transf.image_url.booru_url(self:get("contents"))
+      end
     },
     doThisables = {
       ["add-to-local-booru"] = function(self)

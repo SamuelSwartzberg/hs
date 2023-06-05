@@ -2,3 +2,4 @@ local rrq = bindArg(relative_require, "items-managers.items.string.item-string.s
 
 rrq("db-file")
 rrq("binary-file")
+rrq("playable-file")
