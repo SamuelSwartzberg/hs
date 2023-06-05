@@ -10,6 +10,7 @@
 --- fills a template using GPT
 --- example use-case: Imagine trying to get the metadata of some song from a youtube video, where the artist name may be in the title, or the channel name, or not present at all, where the title may contain a bunch of other stuff besides the song title
 --- in this case you could call this function as
+--- ```
 --- fillTemplateGPT(
 ---   {
 ---     in_fields = {
@@ -22,6 +23,7 @@
 ---     }
 ---   }, ...
 --- )
+--- ```
 --- @param opts fillTemplateGPTOpts
 --- @param do_after fun(result: {[string]: string}): nil
 function fillTemplateGPT(opts, do_after)

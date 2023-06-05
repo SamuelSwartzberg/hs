@@ -209,6 +209,7 @@ dothis = {
       }
       table.insert(command_parts, "--wrap=preserve")
       table.insert(command_parts, "-f")
+      table.insert(command_parts, "markdown+" .. table.concat(get.pandoc.extensions(), "+"))
       table.insert(command_parts, "--standalone")
       table.insert(command_parts, "-t")
       table.insert(command_parts, format)
@@ -223,5 +224,45 @@ dothis = {
         end
       end)
     end,
+  },
+  pass = {
+    add_otp_url = function(url, name)
+      run({
+        "echo",
+        {value = url, type = "quoted"},
+        "|",
+        "pass otp insert otp/" .. name
+      })
+    end,
+  },
+  youtube = {
+    do_extracted_attrs_via_ai = function(video_id, do_after)
+      fillTemplateGPT({
+        in_fields = {
+          title = transf.youtube_video_id.title(video_id),
+          channel_title = transf.youtube_video_id.channel_title(video_id),
+        },
+        out_fields = {
+          {
+            alias = "tcrea",
+            value = "Artist"
+          },
+          {
+            alias = "title",
+            value = "Title"
+          },
+          {
+            alias = "srs",
+            value = "Series"
+          },
+          {
+            alias = "srsrel",
+            value = "Relation to series",
+            explanation = "op, ed, ost, insert song, etc."
+          }
+        },
+      },do_after)
+    end,
+
   }
 }

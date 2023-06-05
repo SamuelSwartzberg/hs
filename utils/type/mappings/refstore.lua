@@ -54,6 +54,11 @@ refstore = {
           invalidation_mode = "invalidate",
           interval = 30 * 24 * 60 * 60
         },
+        invalidate_1_year_fs = {
+          mode = "fs",
+          invalidation_mode = "invalidate",
+          interval = 365 * 24 * 60 * 60
+        },
       }
     },
     table_proc_fn = {

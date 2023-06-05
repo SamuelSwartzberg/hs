@@ -31,6 +31,9 @@ ImageFileItemSpecifier = {
         hs.pasteboard.writeObjects(self:get("as-hs-image"))
         hs.eventtap.keyStroke({"cmd"}, "v")
       end,
+      ["add-as-otp"] = function(self, name)
+        dothis.pass.add_otp_url(transf.real_image_path.qr_data(self:get("completely-resolved-path")), name)
+      end,
       ["shrink"] = function(self)
         local shrink_specifier_array = CreateArray(map( {
           { type = "image", format = "png" },

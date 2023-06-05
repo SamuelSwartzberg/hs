@@ -17,10 +17,6 @@ post 'lua is working':
     - contact em 
     - contact freiland aktzeichen host (ask first if still hosting)
   - newsboat formatting, interface
-  - test:
-    - calendar interfacing
-    - ics files
-    - ics urls
   - health data downsync
     - strava
     - other devices: general heartrate? Blood pressure? steps
@@ -32,7 +28,6 @@ post 'lua is working':
   - jcw/jcwserve in string menu?
   - danbooru search links need their query to count as 'seen' for other queries
   - wrapper for hs chords?
-  - adding an otp: https://github.com/tadfisher/pass-otp
   - hs grid chords?
   - record audio, write to temp file, chooser on file
   - elevenlabs api

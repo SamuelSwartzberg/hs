@@ -93,6 +93,22 @@ transf = {
     no_leading_following_slash_or_whitespace = function(item)
       item = stringy.strip(item)
       return item
+    end,
+    form_path = function(path)
+      return "@" .. path
+    end,
+  },
+  real_audio_path = {
+    transcribed = function(path)
+      return memoize(rest, refstore.params.memoize.opts.invalidate_1_year_fs)({
+        api_name = "openai",
+        endpoint = "audio/transcriptions",
+        request_table_type = "form",
+        request_table = {
+          model = "whisper-1",
+          file = transf.path.form_path(path),
+        }
+      }).text
     end
   },
   real_image_path = {
@@ -121,6 +137,90 @@ transf = {
       local contact_table = yamlLoad(raw_contact)
       contact_table.uid = uuid
       return contact_table
+    end,
+  },
+  youtube_video_id = {
+    youtube_video_item = function(id)
+      return rest({
+        api_name = "youtube",
+        endpoint = "videos",
+        params = {
+          id = id,
+          part = "snippet,status",
+        }
+      }).items[1]
+    end,
+    title = function(id)
+      return transf.youtube_video_id.youtube_video_item(id).snippet.title
+    end,
+    channel_title = function(id)
+      return transf.youtube_video_id.youtube_video_item(id).snippet.channelTitle
+    end,
+    youtube_channel_id = function(id)
+      return transf.youtube_video_id.youtube_video_item(id).snippet.channelId
+    end,
+    description = function(id)
+      return transf.youtube_video_id.youtube_video_item(id).snippet.description
+    end,
+    upload_status = function(id)
+      return transf.youtube_video_id.youtube_video_item(id).status.uploadStatus
+    end,
+    privacy_status = function(id)
+      return transf.youtube_video_id.youtube_video_item(id).status.privacyStatus
+    end,
+  },
+  youtube_playlist_id = {
+    youtube_playlist_item = function(id)
+      return rest({
+        api_name = "youtube",
+        endpoint = "playlists",
+        params = {
+          id = id,
+          part = "snippet,status",
+        }
+      }).items[1]
+    end,
+    title = function(id)
+      return transf.youtube_playlist_id.youtube_playlist_item(id).snippet.title
+    end,
+    uploader = function(id)
+      return transf.youtube_playlist_id.youtube_playlist_item(id).snippet.channelTitle
+    end,
+  },
+  youtube_channel_id = {
+    
+  },
+  youtube_video_title = {
+    cleaned = function(title)
+      title = replace(title, {
+        { cond = {_r = mt._r.text_bloat.youtube.video, _ignore_case = true}, mode="remove" },
+        { cond = {_r = mt._r.text_bloat.youtube.misc, _ignore_case = true}, mode="remove" },
+      })
+      return title
+    end,
+  },
+  youtube_channel_title = {
+    cleaned = function(title)
+      channel = replace(channel, {
+        { cond = {_r = mt._r.text_bloat.youtube.channel_topic_producer, _ignore_case = true}, mode="remove" },
+        { value = {_r = mt._r.text_bloat.youtube.slash_suffix, _ignore_case = true}, mode="remove" },
+      })
+      return channel
+    end,
+  },
+  handle = {
+    youtube_channel_item = function(handle)
+      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
+        api_name = "youtube",
+        endpoint = "channels",
+        params = { handle = handle}
+      }).items[1]
+    end,
+    youtube_channel_id = function(handle)
+      return transf.handle.youtube_channel_item(handle).id
+    end,
+    raw_handle = function(handle)
+      return eutf8.sub(handle, 2)
     end,
   },
   string = {

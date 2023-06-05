@@ -4,14 +4,10 @@ HandleItemSpecifier = {
   properties = {
     getables = {
       ["raw-handle"] = function(self)
-        return self:get("contents"):sub(2) -- remove the leading @
+        return transf.handle.raw_handle(self:get("contents"))
       end,
       ["youtube-channel-id"] = function(self)
-        return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
-          api_name = "youtube",
-          endpoint = "channels",
-          params = { handle = self:get("contents")}
-        }).items[1].id
+        return transf.youtube.channel_id(self:get("contents"))
       end,
       ["youtube-feed-url"] = function(self)
         return self:get("str-item", "youtube-channel-id"):get("youtube-feed-url")

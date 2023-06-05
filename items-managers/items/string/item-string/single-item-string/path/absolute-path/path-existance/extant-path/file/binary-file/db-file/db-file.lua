@@ -10,7 +10,7 @@ DbFileItemSpecifier = {
         return env.TMPDIR .. "/" .. self:get("get-export-csv-filename", query)
       end,
       ["is-sql-file"] = function(self)
-        return isUsableAsFiletype(self:get("contents"), "possibly-sql")
+        return is.path.usable_as_filetype(self:get("contents"), "possibly-sql")
       end,
     },
     doThisables = {

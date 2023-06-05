@@ -6,7 +6,7 @@ PlaintextTreeFileItemSpecifier = {
   properties = {
     getables = {
       ["is-xml-file"] = function(self)
-        return isUsableAsFiletype(self:get("contents"), "xml")
+        return is.path.usable_as_filetype(self:get("contents"), "xml")
       end,
     },
     doThisables = {

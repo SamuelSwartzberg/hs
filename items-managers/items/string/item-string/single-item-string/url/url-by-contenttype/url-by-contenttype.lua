@@ -4,7 +4,7 @@ URLByContenttypeItemSpecifier = {
   properties = {
     getables = {
       ["is-image-url"] = function(self)
-        return isUsableAsFiletype(self:get("url-path"), "image")
+        return is.path.usable_as_filetype(self:get("url-path"), "image")
       end,
     }
   },

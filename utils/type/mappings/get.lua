@@ -186,6 +186,14 @@ get = {
       }
       return CALENDAR_TEMPLATE_SPECIFIER
     end
+  },
+  pandoc = {
+    full_md_extension_set = function()
+      return flatten(
+        mt._list.markdown_extensions,
+        { mode="list"}
+      )
+    end
   }
   
 }

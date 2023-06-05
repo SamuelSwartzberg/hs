@@ -14,9 +14,10 @@
 ---   - if it's a table with a _k field, the arg is treated as a table, and the value of _k is used as the key to get the value from the table
 ---     - in that case, the _ret field determines the behavior if the arg is not a table. if _ret is "orig", the arg is returned, otherwise nil is returned
 ---   - if it's a table with a _f field, the arg is treated as a format string, and the arg(s) is/are used as the arguments to string.format
+---   - if it's a table with a _p field, the arg is treated as a default to prompt with, the contents of the _p field are used as the prompt type, and the result of the prompt is used as the value unless nil. This relies on args being {"k", "v"} and will set that if it's not already set
 ---  - if it's a generic table with none of the above, the arg is treated as a key, and the value of that key is returned
 ---  - if it's a string, that same string is returned as both the key and the value, without caring about the arg at all (this seems odd, but allows some useful ops when combined with the `ret` option of mapOpts)
---- @alias mapProcessor function | {_k: string | string[], _ret?: "orig" | nil} | {_f: string} | table | string
+--- @alias mapProcessor function | {_k: string | string[], _ret?: "orig" | nil} | {_f: string} | {_p: string} table | string
 
 
 --- @param tbl table
@@ -43,7 +44,7 @@ function map(tbl, f, opts, visited)
   local proc = f -- proc will contain the mapProcessor, while f will be changed to a function based on the mapProcessor
 
   if type(f) == "table" then
-    if f._k or f._f then 
+    if f._k or f._f or f._p then
       if f._k then
         if type(f._k) == "string" then
           f = function(arg)
@@ -74,6 +75,18 @@ function map(tbl, f, opts, visited)
         local frmt = f._f
         f = function(...)
           return string.format(frmt, ...)
+        end
+      elseif f._p then
+        local prompt_type = f._p
+        opts.args = {"k", "v"}
+        f = function(k, v)
+          local new_v = prompt(prompt_type, {
+            prompt_args = {
+              prompt = "Confirm value for " .. k,
+              default = v
+            },
+          })
+          return new_v or v
         end
       end
     else

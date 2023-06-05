@@ -4,7 +4,7 @@ BinaryFileItemSpecifier = {
   properties = {
     getables = {
       ["is-db-file"] = function(self)
-        return isUsableAsFiletype(self:get("contents"), "db")
+        return is.path.usable_as_filetype(self:get("contents"), "db")
       end,
     },
     doThisables = {

@@ -50,13 +50,13 @@ PlaintextFileItemSpecifier = {
         return stringy.endswith(self:get("resolved-path"), "m3u")
       end,
       ["is-plaintext-table-file"] = function(self)
-        return isUsableAsFiletype(self:get("contents"), "plaintext-table")
+        return is.path.usable_as_filetype(self:get("contents"), "plaintext-table")
       end,
       ["is-plaintext-dictionary-file"] = function(self)
-        return isUsableAsFiletype(self:get("contents"), "plaintext-dictionary")
+        return is.path.usable_as_filetype(self:get("contents"), "plaintext-dictionary")
       end,
       ["is-plaintext-tree-file"] = function(self)
-        return isUsableAsFiletype(self:get("contents"), "plaintext-tree")
+        return is.path.usable_as_filetype(self:get("contents"), "plaintext-tree")
       end,
       ["is-executable-code-file"] = returnTrue, -- determining whether a file is executable code is difficult, as there are so many programming languages and extensions, so I'm just gonna assert it's true and not implement any polymorphic behavior in executable-code-file
       ["is-gitignore-file"] = function(self)

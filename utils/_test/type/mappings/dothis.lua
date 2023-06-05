@@ -93,3 +93,47 @@ hs.timer.doAfter(1, function()
 end)
 
 -- test khal
+
+-- make sure event doesn't exist yet
+
+local baking_class_event = get.khal.search_event_tables("Baking class test event")
+
+assert(#baking_class_event == 0)
+
+-- create event
+
+dothis.khal.add_event_from_file(env.MMOCK .. "/files/plaintext/ics/single_event.ics")
+
+hs.timer.doAfter(1, function ()
+  local baking_class_event = get.khal.search_event_tables("Baking class test event")
+  assert(#baking_class_event == 1)
+  assertMessage(baking_class_event[1].title, "Baking class test event")
+  dothis.khal.delete_event("Baking class test event")
+  hs.timer.doAfter(1, function ()
+    local baking_class_event = get.khal.search_event_tables("Baking class test event")
+    assert(#baking_class_event == 0)
+    dothis.khal.add_event_from_url("file://" .. env.MMOCK .. "/files/plaintext/ics/single_event.ics")
+    hs.timer.doAfter(1, function()
+      local baking_class_event = get.khal.search_event_tables("Baking class test event")
+      assert(#baking_class_event == 1)
+      assertMessage(baking_class_event[1].title, "Baking class test event")
+      dothis.khal.edit_event("Baking class test event") -- user will be prompted to edit the event
+      alert("Edit the title of the event to 'Baking class test event edited'")
+      hs.timer.doAfter(60, function()
+        local baking_class_event = get.khal.search_event_tables("Baking class test event edited")
+        assert(#baking_class_event == 1)
+        assertMessage(baking_class_event[1].title, "Baking class test event edited")
+        dothis.khal.delete_event("Baking class test event edited")
+        hs.timer.doAfter(1, function ()
+          local baking_class_event = get.khal.search_event_tables("Baking class test event edited")
+          assert(#baking_class_event == 0)
+          error("TODO add_event_from_specifier, add_event_interactive")
+        end)
+      end)
+    end)
+  end)
+
+end)
+
+error("TODO pandoc.markdown_to")
+

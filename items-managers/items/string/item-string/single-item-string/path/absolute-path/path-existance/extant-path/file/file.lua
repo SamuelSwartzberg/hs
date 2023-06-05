@@ -6,13 +6,13 @@ FileItemSpecifier = {
   properties = {
     getables = {
       ["is-image-file"] = function(self) 
-        return isUsableAsFiletype(self:get("contents"), "image") 
+        return is.path.usable_as_filetype(self:get("contents"), "image") 
       end,
       ["is-plaintext-file"] = function(self) 
-        return not isUsableAsFiletype(self:get("contents"), "binary")
+        return not is.path.usable_as_filetype(self:get("contents"), "binary")
       end,
       ["is-binary-file"] = function(self) 
-        return isUsableAsFiletype(self:get("contents"), "binary")
+        return is.path.usable_as_filetype(self:get("contents"), "binary")
       end,
       ["dir-or-file-any-pass"] = function(self, query) return query(self) end,
       ["file-contents"] = function(self)
