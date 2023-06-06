@@ -51,33 +51,35 @@ get = {
       return lines(run("upkg list-package-managers"))
     end,
     backed_up_packages = function(mgr)
-      return lines(run("upkg " .. mgr .. " read-backup"))
+      return lines(run("upkg " .. (mgr or "") .. " read-backup"))
     end,
     missing_packages = function(mgr)
-      return lines(run("upkg " .. mgr .. " missing"))
+      return lines(run("upkg " .. (mgr or "") .. " missing"))
     end,
     added_packages = function(mgr)
-      return lines(run("upkg " .. mgr .. " added"))
+      return lines(run("upkg " .. (mgr or "") .. " added"))
     end,
     difference_packages = function(mgr)
-      return lines(run("upkg " .. mgr .. " difference"))
+      return lines(run("upkg " .. (mgr or "") .. " difference"))
     end,
     package_manager_version = function(mgr)
-      return lines(run("upkg " .. mgr .. " package-manager-version"))
+      return lines(run("upkg " .. (mgr or "") .. " package-manager-version"))
     end,
     which_package_manager = function(mgr)
-      return lines(run("upkg " .. mgr .. " which-package-manager"))
+      return lines(run("upkg " .. (mgr or "") .. " which-package-manager"))
     end,
     package_managers_with_missing_packages = function(mgr)
-      return lines(run("upkg " .. mgr .. " missing-package-managers"))
+      return lines(run("upkg " .. (mgr or "") .. " missing-package-managers"))
     end,
-    list = function(mgr) return lines(run("upkg" .. mgr .. "list")) end,
-    count = function(mgr) return lines(run("upkg" .. mgr .. " count")) end,
-    with_version = function(mgr, arg) return lines(run("upkg" .. mgr .. " with-version " .. (arg or ""))) end,
-    version = function(mgr, arg) return lines(run("upkg" .. mgr .. " version " .. (arg or ""))) end,
-    which = function(mgr, arg) return lines(run("upkg" .. mgr ..  " which" .. (arg or "")))
+    list = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list ")) end,
+    count = function(mgr) return lines(run("upkg " .. (mgr or "") .. " count ")) end,
+    with_version = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
+    with_version_package_manager = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
+    version = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
+    which = function(mgr, arg) return lines(run("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
-    is_installed = function(mgr, arg) return pcall(run, mgr .. "is-installed" .. (arg or "")) end,
+    is_installed = function(mgr, arg) return pcall(run, "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
+    installed_package_manager = function(arg) return lines(run("upkg " .. (arg or "") .. " is-installed-package-manager")) end,
   
   },
   khal = {

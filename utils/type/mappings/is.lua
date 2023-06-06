@@ -39,5 +39,19 @@ is = {
       return is.path.usable_as_filetype(path, "audio") or is.path.usable_as_filetype(path, "video")
     end
     
+  },
+  alphanum_minus_underscore = {
+    word =  function(str) 
+      return not string.find(str, "-")
+    end,
+    alphanum_minus = function(str)
+      return not string.find(str, "_")
+    end,
+    youtube_id = function(str)
+      return #str == 11 -- not officially specified, but b/c 64^11 > 2^64 > 64^10 and 64 chars in base64, allowing for billions of ids per living person, unlikely to change
+    end,
+    youtube_channel_id = function(str)
+      return #str == 24 -- standartized length
+    end,
   }
 }

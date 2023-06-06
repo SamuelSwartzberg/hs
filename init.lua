@@ -53,12 +53,8 @@ end
 --- @type { [string]: key_inner_specifier | nil}
 local keymap = {
   ["tab"] = {
-    explanation = "Window & tab cycling",
-    fn = function() 
-      System:get("all-windows-array"):get("flat-map", function(window)
-        return window:get("corresponding-tabs-or-self")
-      end):doThis("choose-item-and-do", "focus")
-    end
+    explanation = "Grid cell mapper",
+    fn = bindArg(dothis.grid.show_certain, {y = 2, x = 4})
   },
   ["1"] = {
     explanation = "Command palette for frontmost app",
@@ -379,7 +375,7 @@ System:get("manager", "creatable"):doThis("create-all", {
 
 
 System:get("manager", "timer"):doThis("create-all", {
-  bindArg(run, {"newsboat", "-x", "reload"}),
+  bindArg(run, {"newsboat -x reload"}),
   syncVdirSyncer,
   bind(syncHomeRelativePath, {"me/state/todo", "push"}),
   CreateStringItem(env.MEDIA_QUEUE):get("timer-that-does", { 
@@ -387,14 +383,17 @@ System:get("manager", "timer"):doThis("create-all", {
     key = "lines-as-stream-queue" }),
   { 
     fn = bindArg(run, {
-      "mbsync",
-      "-c",
+      "mbsync -c",
       { value = "$XDG_CONFIG_HOME/isync/mbsyncrc", type = "quoted"},
       "mb-channel"
     }), 
     interval = "* * * * *"
   },
   CreateStringItem(env.MENV):get("refresh-env-task"),
+  {
+    fn = dothis.upkg.upgrade_all,
+    interval = "0 0 * * *"
+  }
   --[[CreateApplicationItem("Firefox"):get("backup-timer"),
   CreateApplicationItem("Signal"):get("backup-timer"),
   CreateApplicationItem("Discord"):get("backup-timer"),]]

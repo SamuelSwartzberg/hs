@@ -4,16 +4,19 @@ AlphanumMinusUnderscoreItemSpecifier = {
   properties = {
     getables = {
       ["is-word"] = function(self) 
-        return not string.find(self:get("contents"), "-")
+        return is.alphanum_minus_underscore.word(self:get("contents"))
       end,
       ["is-alphanum-minus"] = function(self)
-        return not string.find(self:get("contents"), "_")
+        return is.alphanum_minus_underscore.alphanum_minus(self:get("contents"))
       end,
       ["is-youtube-id"] = function(self)
-        return #self:get("contents") == 11 -- not officially specified, but b/c 64^11 > 2^64 > 64^10 and 64 chars in base64, allowing for billions of ids per living person, unlikely to change
+        return is.alphanum_minus_underscore.youtube_id(self:get("contents"))
       end,
       ["is-youtube-channel-id"] = function(self)
-        return #self:get("contents") == 24 -- standartized length
+        return is.alphanum_minus_underscore.youtube_channel_id(self:get("contents"))
+      end,
+      ["is-package-manager"] = function(self)
+        return is.alphanum_minus_underscore.package_manager(self:get("contents"))
       end,
     }
   },
@@ -22,6 +25,7 @@ AlphanumMinusUnderscoreItemSpecifier = {
     { key = "alphanum-minus", value = CreateAlphanumMinusItem },
     { key = "youtube-id", value = CreateYoutubeIdItem },
     { key = "youtube-channel-id", value = CreateYoutubeChannelIdItem },
+    { key = "package-manager", value = CreatePackageManagerItem },
   })
 }
 

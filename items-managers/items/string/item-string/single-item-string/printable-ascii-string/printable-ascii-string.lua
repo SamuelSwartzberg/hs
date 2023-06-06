@@ -46,6 +46,12 @@ PrintableAsciiStringItemSpecifier = {
       ["is-crockford-base32"] =  function(self)
         return onig.find(self:get("contents"), whole(mt._r.b.b32.crockford))
       end,
+      ["is-installed-package"] = function(self, mgr)
+        return get.upkg.is_installed(mgr, self:get("contents"))
+      end,
+      ["with-version-package-manager-array"] = function(self, mgr)
+        return CreateArray(get.upkg.with_version_package_manager(mgr, self:get("contents")))
+      end,
 
     },
     doThisables = {
@@ -59,6 +65,12 @@ PrintableAsciiStringItemSpecifier = {
         local username = prompt("string", "Username")
         self:doThis("add-as-password", name)
         CreateStringItem(username):doThis("add-as-username", name)
+      end,
+      ["upkg-install"] = function(self, mgr)
+        dothis.upkg.install(mgr, self:get("contents"))
+      end,
+      ["upkg-remove"] = function(self, mgr)
+        dothis.upkg.remove(mgr, self:get("contents"))
       end,
 
     }
@@ -81,7 +93,7 @@ PrintableAsciiStringItemSpecifier = {
     { key = "crockford-base32", value = CreateCrockfordBase32Item },
   }),
   action_table = concat(getChooseItemTable({
-    
+   
   }),{
     {
       text = "📌🔑 addpsspw.",
@@ -104,7 +116,17 @@ PrintableAsciiStringItemSpecifier = {
         key = "add-as-password-with-prompt-username",
         thing = "pass entry name"
       }
-    },
+    }, {
+      text = "📦➡️💻 inspkg.",
+      key = "upkg-install",
+      
+    }, {
+      key = "choose-item-and-then-action-on-result-of-get",
+      args = {
+        key = "with-version-package-manager-array",
+      },
+      text = "📦💽🔢👨‍💻📦 wvrspkgmgr."
+    }
   })
 }
 

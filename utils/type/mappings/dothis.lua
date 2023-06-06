@@ -225,6 +225,12 @@ dothis = {
       end)
     end,
   },
+  grid = {
+    show_certain = function(grid)
+      hs.grid.setGrid(grid)
+      hs.grid.show()
+    end,
+  },
   pass = {
     add_otp_url = function(url, name)
       run({
@@ -269,5 +275,6 @@ dothis = {
   download = function(url, target)
     run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
   end
- }
+ },
+
 }
