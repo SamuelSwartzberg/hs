@@ -32,7 +32,7 @@ function open(opts, do_after)
     if isUrl(opts.url) then 
       path = transf.url_components.url(opts)
     else
-      path = "https://www.google.com/search?q=" .. urlencode(opts.url)
+      path = "https://www.google.com/search?q=" .. transf.string.urlencoded(opts.url)
     end
   elseif opts.host then 
     path = mustEnd(opts.host, "/")

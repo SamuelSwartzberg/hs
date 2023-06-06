@@ -141,8 +141,109 @@ assertMessage(
 )
 
 assertMessage(
+  transf.hex.indicated_hex_string("6d"),
+  "0x6d"
+)
+
+assertMessage(
+  transf.hex.utf8_unicode_prop_table("6d").name,
+  "LATIN SMALL LETTER M"
+)
+
+-- Test for hex -> unicode_codepoint
+assertMessage(
+  transf.hex.unicode_codepoint("6d"),
+  "U+6d"
+)
+
+-- Test for unicode_codepoint -> number
+assertMessage(
+  transf.unicode_codepoint.number("U+6D"),
+  109 -- This is the decimal equivalent of 6D in hexadecimal
+)
+
+-- Test for unicode_codepoint -> unicode_prop_table
+assertMessage(
+  transf.unicode_codepoint.unicode_prop_table("U+6D").name,
+  "LATIN SMALL LETTER M"
+)
+
+-- Test for number -> decimal_string
+assertMessage(
+  transf.number.decimal_string(109),
+  "109"
+)
+
+-- Test for number -> indicated_decimal_string
+assertMessage(
+  transf.number.indicated_decimal_string(109),
+  "0d109"
+)
+
+-- Test for number -> hex_string
+assertMessage(
+  transf.number.hex_string(109),
+  "6D"
+)
+
+-- Test for number -> indicated_hex_string
+assertMessage(
+  transf.number.indicated_hex_string(109),
+  "0x6D"
+)
+
+-- Test for number -> unicode_codepoint
+assertMessage(
+  transf.number.unicode_codepoint(109),
+  "U+6D"
+)
+
+-- Test for number -> octal_string
+assertMessage(
+  transf.number.octal_string(109),
+  "155"
+)
+
+-- Test for number -> indicated_octal_string
+assertMessage(
+  transf.number.indicated_octal_string(109),
+  "0o155"
+)
+
+-- Test for number -> binary_string
+assertMessage(
+  transf.number.binary_string(109),
+  "1101101"
+)
+
+-- Test for number -> indicated_binary_string
+assertMessage(
+  transf.number.indicated_binary_string(109),
+  "0b1101101"
+)
+
+-- Test for number -> unicode_prop_table
+assertMessage(
+  transf.number.unicode_prop_table(109).name,
+  "LATIN SMALL LETTER M"
+)
+
+-- Test for number -> utf8_unicode_prop_table
+assertMessage(
+  transf.number.utf8_unicode_prop_table(109).name,
+  "LATIN SMALL LETTER M"
+)
+
+assertMessage(
   transf.char.hex("m"),
   "6D"
+)
+
+
+-- Test for percent -> char
+assertMessage(
+  transf.percent.char("%6d"),
+  "m"
 )
 
 assertMessage(
@@ -576,4 +677,77 @@ assertMessage(
 assertMessage(
   yaml_contact_by_find.Address.home,
   "Teststr. 27, 00000 Testhausen, Deutschland"
+)
+
+local qr_code_test_contents = "This is a test string って、このstringの中に日本語があるよ！"
+
+local qr_code_utf8_bow = transf.string.qr_utf8_image_bow(qr_code_test_contents)
+local qr_code_utf8_wob = transf.string.qr_utf8_image_wob(qr_code_test_contents)
+local qr_code_png_path = transf.string.qr_png_in_cache(qr_code_test_contents)
+
+assertMessage(
+  type(qr_code_utf8_bow),
+  "string"
+)
+assertMessage(
+  type(qr_code_utf8_wob),
+  "string"
+)
+assertMessage(
+  type(qr_code_png_path),
+  "string"
+)
+assertMessage(
+  qr_code_utf8_bow,
+[[█████████████████████████████████████████
+██ ▄▄▄▄▄ ██▄▀███ ▀█▀ █▀▄█ ▀▀██▄█ ▄▄▄▄▄ ██
+██ █   █ █  ▀  ▀▀▄▀ ██▀█ ▄ ▀ ▄ █ █   █ ██
+██ █▄▄▄█ █ ▀▀█ ▀ ▀█ ▄▀▀▄█ ▄▄▄▀▄█ █▄▄▄█ ██
+██▄▄▄▄▄▄▄█ █▄▀ ▀▄█ ▀ █▄█ █ ▀▄▀▄█▄▄▄▄▄▄▄██
+██▄▀▄ ▄ ▄█▀▄ ██ █▀▄█▀██ ██ ▄█▄██▄▄  ▄████
+██▀▀▀▀ ▀▄█▄▀  ▄▄▄ ▄ ▄▄▀█▀▄▀█▄▀▀▀ ▄█▀▀▄ ██
+███▀▀▀█▄▄▄▀▀▀▄▄▀ ▄▀█ ▄█ ██   ███▄▀▄  █▀██
+██▄ ▀▄█ ▄▀ █▀ ▀ █ ▄█▄ ▄██ ▀ █ ▀▀█████▀███
+██▀▀ ██▀▄  ▀▄█▀ ▄▀▀█▄▀▄ ██ █▀ ▄▄██▀█ █▄██
+██▀▄▄▄▀█▄██ ▀█ █ █▀▀▄  ▄▀ ▀▄██▀█ ▄▄▄ ▄ ██
+██ ▀ ▄▄█▄▄▀██▀█▀ █▀   ▀██▀▄ ▄▄  ▄█▄ ▄▄▄██
+██▄ █ ▄▀▄▄  █▄▀ ▀▄█ ▀▄▄█▀▄  ▄▄▄▄▄▄▄▀▄ ███
+██▀▄ ▄█ ▄█▀▀  ▀▄▀ ▄▀▀▀▀▀▄▀▄ ▄▄▀▀▀▀ ▄▄  ██
+██ █▄▀▀ ▄ ▄▀ ▄▄ ▀ ▄▄▀▄██▄▄▄█▀▀ ▄  ▀ ▀▄ ██
+██▄█▄▄█▄▄▄   █ ▀ ▄ ▄█▄█▀▄  ▄▄▄ ▄▄▄ ▀▄▄███
+██ ▄▄▄▄▄ █▀  ▄█▄▄ ▀█▄▄██▀▀█ ▀█ █▄█ ▄█▄▄██
+██ █   █ █ ▀  ▄█▄ ▀█▄██ ██ ▀█▄▄      ▄▀██
+██ █▄▄▄█ █▄██▄▄█ █▀▄▄ ██▀▄▀▄▄▀▀▀▀ █ ▀▄ ██
+██▄▄▄▄▄▄▄█▄██▄██▄█▄▄███▄██▄▄▄▄▄▄██▄▄▄▄▄██
+█████████████████████████████████████████  ]]
+)
+
+assertMessage(
+  qr_code_utf8_wob,
+[[                                         
+█▀▀▀▀▀█  ▀▄   █▄ ▄█ ▄▀ █▄▄  ▀ █▀▀▀▀▀█  
+█ ███ █ ██▄██▄▄▀▄█  ▄ █▀█▄█▀█ █ ███ █  
+█ ▀▀▀ █ █▄▄ █▄█▄ █▀▄▄▀ █▀▀▀▄▀ █ ▀▀▀ █  
+▀▀▀▀▀▀▀ █ ▀▄█▄▀ █▄█ ▀ █ █▄▀▄▀ ▀▀▀▀▀▀▀  
+▀▄▀█▀█▀ ▄▀█  █ ▄▀ ▄  █  █▀ ▀  ▀▀██▀    
+▄▄▄▄█▄▀ ▀▄██▀▀▀█▀█▀▀▄ ▄▀▄ ▀▄▄▄█▀ ▄▄▀█  
+ ▄▄▄ ▀▀▀▄▄▄▀▀▄█▀▄ █▀ █  ███   ▀▄▀██ ▄  
+▀█▄▀ █▀▄█ ▄█▄█ █▀ ▀█▀  █▄█ █▄▄     ▄   
+▄▄█  ▄▀██▄▀ ▄█▀▄▄ ▀▄▀█  █ ▄█▀▀  ▄ █ ▀  
+▄▀▀▀▄ ▀  █▄ █ █ ▄▄▀██▀▄█▄▀  ▄ █▀▀▀█▀█  
+█▄█▀▀ ▀▀▄  ▄ ▄█ ▄███▄  ▄▀█▀▀██▀ ▀█▀▀▀  
+▀█ █▀▄▀▀██ ▀▄█▄▀ █▄▀▀ ▄▀██▀▀▀▀▀▀▀▄▀█   
+▄▀█▀ █▀ ▄▄██▄▀▄█▀▄▄▄▄▄▀▄▀█▀▀▄▄▄▄█▀▀██  
+█ ▀▄▄█▀█▀▄█▀▀█▄█▀▀▄▀  ▀▀▀ ▄▄█▀██▄█▄▀█  
+▀ ▀▀ ▀▀▀███ █▄█▀█▀ ▀ ▄▀██▀▀▀█▀▀▀█▄▀▀   
+█▀▀▀▀▀█ ▄██▀ ▀▀█▄ ▀▀  ▄▄ █▄ █ ▀ █▀ ▀▀  
+█ ███ █ █▄██▀ ▀█▄ ▀  █  █▄ ▀▀██████▀▄  
+█ ▀▀▀ █ ▀  ▀▀ █ ▄▀▀█  ▄▀▄▀▀▄▄▄▄█ █▄▀█  
+▀▀▀▀▀▀▀ ▀  ▀  ▀ ▀▀   ▀  ▀▀▀▀▀▀  ▀▀▀▀▀  
+                                       ]]
+)
+
+assertMessage(
+  transf.real_image_path.qr_data(qr_code_png_path),
+  qr_code_test_contents
 )

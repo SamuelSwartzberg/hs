@@ -6,7 +6,7 @@
 --- @param opts_as_str? string
 --- @param args? any[]
 function getFsCachePath(name, func_id, opts_as_str, args)
-  local path = env.XDG_CACHE_HOME .. "/" .. name .. "/" .. func_id .. "/"
+  local path = env.XDG_CACHE_HOME .. "/hs/" .. name .. "/" .. func_id .. "/"
 
   if opts_as_str then
     path = path .. opts_as_str .. "/"

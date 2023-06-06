@@ -145,3 +145,51 @@ assertMessage(
   onig.match("\0\0asdfa%Q@8)I#\0", whole(mt._r.charset.ascii)),
   "\0\0asdfa%Q@8)I#\0"
 )
+
+local major = onig.match("1", mt._r.version.semver)
+
+assertMessage(major, "1")
+
+local major, minor = onig.match("1.2", mt._r.version.semver)
+
+assertMessage(major, "1")
+assertMessage(minor, "2")
+
+local major, minor, patch = onig.match("1.2.3", mt._r.version.semver)
+
+assertMessage(major, "1")
+assertMessage(minor, "2")
+assertMessage(patch, "3")
+
+local major, minor, patch, pre = onig.match("1.2.3-alpha", mt._r.version.semver)
+
+assertMessage(major, "1")
+assertMessage(minor, "2")
+assertMessage(patch, "3")
+assertMessage(pre, "alpha")
+
+local major, minor, patch, pre, build = onig.match("1.2.3-alpha+build", mt._r.version.semver)
+
+assertMessage(major, "1")
+assertMessage(minor, "2")
+assertMessage(patch, "3")
+assertMessage(pre, "alpha")
+assertMessage(build, "build")
+
+local major, minor, patch, pre, build = onig.match("1.2.3+build", mt._r.version.semver)
+
+assertMessage(major, "1")
+assertMessage(minor, "2")
+assertMessage(patch, "3")
+assertMessage(pre, nil)
+assertMessage(build, "build")
+
+local major, minor, patch, pre, build = onig.match("1.2.3-alpha.1+build.11.e0f985a", mt._r.version.semver)
+
+assertMessage(major, "1")
+assertMessage(minor, "2")
+assertMessage(patch, "3")
+assertMessage(pre, "alpha.1")
+assertMessage(build, "build.11.e0f985a")
+
+

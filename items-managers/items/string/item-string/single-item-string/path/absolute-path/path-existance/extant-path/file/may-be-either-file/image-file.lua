@@ -51,6 +51,11 @@ ImageFileItemSpecifier = {
         emoji_icon = "🍡",
         description = "bruurl",
         key = "booru-url"
+      },
+      {
+        emoji_icon = "🔳🎒",
+        description = "qrcnt",
+        key = "qr-data"
       }
     }),{
       {
@@ -70,6 +75,11 @@ ImageFileItemSpecifier = {
         key = "do-multiple",
         args = { { key = "paste-as-image" }, { key = "rm-file" } }
       },
+      {
+        text = "📌⌚️🗝 addotp.",
+        key = "do-interactive",
+        args = { key = "add-as-otp", thing = "name" }
+      }
     }
   )
 }

@@ -29,6 +29,9 @@ URLItemSpecifier = {
       ["is-url-by-path"] = function(self)
         return self:get("url-path")
       end,
+      ["is-url-by-scheme"] = function(self)
+        return self:get("url-scheme")
+      end,
       ["by-selector"] = function(self, specifier)
         return memoize(queryPage)(self:get("contents"), specifier.selector, specifier.only_text)
       end,
@@ -49,6 +52,9 @@ URLItemSpecifier = {
       end,
       ["url-in-wayback-machine"] = function (self)
         return transf.url.in_wayback_machine(self:get("contents"))
+      end,
+      ["param-table"] = function(self)
+        return transf.url.param_table(self:get("contents"))
       end
       
     },
@@ -112,6 +118,7 @@ URLItemSpecifier = {
     { key = "url-by-contenttype", value = CreateURLByContenttypeItem },
     { key = "url-by-host", value = CreateURLByHostItem },
     { key = "url-by-path", value = CreateURLByPathItem },
+    { key = "url-by-scheme", value = CreateURLBySchemeItem }
   }),
   action_table = concat(getChooseItemTable({
     {

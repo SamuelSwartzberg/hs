@@ -53,5 +53,16 @@ is = {
     youtube_channel_id = function(str)
       return #str == 24 -- standartized length
     end,
+  },
+  url = {
+    mailto_url = function(url)
+      return stringy.startswith(url, "mailto:")
+    end,
+    tel_url = function(url)
+      return stringy.startswith(url, "tel:")
+    end,
+    otpauth_url = function(url)
+      return stringy.startswith(url, "otpauth:")
+    end,
   }
 }

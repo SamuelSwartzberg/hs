@@ -23,7 +23,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   if source_is_url then
     local url = source
-    source = transf.url.in_tmp_dir(url)
+    source = transf.url.in_cache_dir(url)
     run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(source))
   end
 

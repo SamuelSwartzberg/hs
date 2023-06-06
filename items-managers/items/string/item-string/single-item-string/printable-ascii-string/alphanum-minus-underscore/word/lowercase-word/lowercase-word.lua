@@ -18,7 +18,7 @@ LowercaseWordItemSpecifier = {
     },
     doThisables = {
       ["add-as-pass-name"] = function(self, password)
-        run("yes " .. transf.string.single_quoted_escaped(password) .. " | pass add passw/" .. self:get("contents"), true)
+        dothis.pass.add_password(password, self:get("contents"))
       end,
     }
   },

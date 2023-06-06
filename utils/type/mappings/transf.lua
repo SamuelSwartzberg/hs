@@ -273,6 +273,40 @@ transf = {
     end,
   },
   string = {
+    in_cache_dir = function(data, type)
+      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.not_userdata_or_function.md5(data) 
+    end,
+    qr_utf8_image_bow = function(data)
+      return memoize(run)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
+    end,
+    qr_utf8_image_wob = function(data)
+      return memoize(run)("qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data))
+    end,
+    qr_png_in_cache = function(data)
+      local path = transf.string.in_cache_dir(data, "qr")
+      dothis.string.generate_qr_png(data, path)
+      return path
+    end,
+    --- URL-encodes a string.
+    --- @param url string
+    --- @param spaces_percent? boolean whether to encode spaces as %20 (true) or + (false)
+    --- @return string
+    urlencoded = function(url, spaces_percent)
+      if url == nil then
+        return ""
+      end
+      url = url:gsub("\n", "\r\n")
+      url = string.gsub(url, "([^%w _%%%-%.~])", transf.char.percent)
+      if spaces_percent then
+        url = string.gsub(url, " ", "%%20")
+      else
+        url = string.gsub(url, " ", "+")
+      end
+      return url
+    end,
+    urldecoded = function(url)
+      return replace(url, to.url.decoded)
+    end,
     escaped_csv_field = function(field)
       error("current implementation will break on nonascii")
       return '"' .. replace(field, {{'"', "\n"}, {'""', '\\n'}})  .. '"'
@@ -434,6 +468,9 @@ transf = {
       return parsed
     end
   },
+  qr_utf8_image = {
+    data = 
+  },
   event_table = {
     calendar_template = function(event_table)
       local template = get.khal.calendar_template_empty()
@@ -589,7 +626,7 @@ transf = {
     url_params = function(t)
       local params = {}
       for k, v in pairs(t) do
-        local encoded_v = urlencode(tostring(v), true)
+        local encoded_v = transf.string.urlencoded(tostring(v), true)
         table.insert(params, k .. "=" .. encoded_v)
       end
       return table.concat(params, "&")
@@ -653,13 +690,34 @@ transf = {
       return memoize(run, refstore.params.memoize.opts.invalidate_1_day_fs, "run")
           "curl -L" .. transf.string.single_quoted_escaped(url)
     end,
-    in_tmp_dir = function(url)
-      return env.TMPDIR .. "/urls/" .. transf.not_userdata_or_function.md5(url) .. ".url"
-    end
+    in_cache_dir = function(url)
+      return transf.string.in_cache_dir(url, "url")
+    end,
+    param_table = function(url)
+      local params = {}
+      local url_parts = stringy.split(url, "?")
+      if #url_parts > 1 then
+        local param_parts = stringy.split(url_parts[2], "&")
+        for _, param_part in ipairs(param_parts) do
+          local param_parts = stringy.split(param_part, "=")
+          local key = param_parts[1]
+          local value = param_parts[2]
+          params[key] = transf.string.urldecoded(value)
+        end
+      end
+      return params
+    end,
+    no_scheme = function(url)
+      local parts = stringy.split(url, ":")
+      table.remove(parts, 1)
+      local rejoined = table.concat(parts, ":")
+      return mustNotStart(rejoined, "//")
+    end,
+
   },
   whisper_url = {
     transcribed = function(url)
-      local path = transf.url.in_tmp_dir(url)
+      local path = transf.url.in_cache_dir(url)
       dothis.url.download(url, path)
       return transf.real_audio_path.transcribed(path)
 
@@ -690,5 +748,43 @@ transf = {
       md5:update(thing)
       return md5:hexdigest()
     end,
+  },
+  mailto_url = {
+   
+    emails = function(mailto_url)
+      local no_scheme = transf.url.no_scheme(mailto_url)
+      local emails_part = stringy.split(no_scheme, "?")[1]
+      local emails = stringy.split(emails_part, ",")
+      return hs.fnutils.imap(emails, stringy.strip)
+    end,
+    first_email = function(mailto_url)
+      return transf.mailto_url.emails(mailto_url)[1]
+    end,
+    subject = function(tel_url)
+      return transf.url.param_table(tel_url).subject 
+    end,
+    body = function(tel_url)
+      return transf.url.param_table(tel_url).body 
+    end,
+    cc = function(tel_url)
+      return transf.url.param_table(tel_url).cc 
+    end,
+
+  },
+  tel_url = {
+    phone_number = function(tel_url)
+      return transf.url.no_scheme(tel_url)
+    end,
+    
+  },
+  otpauth_url = {
+    type = function(otpauth_url)
+      return stringy.split(transf.url.no_scheme(otpauth_url), "/")[1]
+    end,
+    label = function(otpauth_url)
+      local part = stringy.split(transf.url.no_scheme(otpauth_url), "/")[2]
+      return stringy.split(part, "?")[1]
+    end,
+    
   }
 }

@@ -7,7 +7,7 @@ ContactTableSpecifier = {
         return self:get("contents")[prop]
       end,
       ["encrypted-data"] = function(self, type)
-        return runJSON("pass show contacts/" .. type .. "/" .. self:get("uid"))
+        return get.pass.contact_json(type, self:get("uid"))
       end,
 
       ["iban"] = function(self)
@@ -150,12 +150,10 @@ ContactTableSpecifier = {
     },
     doThisables = {
       ["edit"] = function (self)
-        run(
-          "khard edit " .. self:get("uid")
-        , true)
+        dothis.khard.edit(self:get("uid"))
       end,
-      ["add-encrypted-data"] = function(self, specifier)
-        run("yes " .. transf.table.single_quoted_escaped_json(specifier.data) .. " | pass add contacts/" .. specifier.type .. "/" .. self:get("uid"), true)
+      ["add-iban"] = function(self, iban)
+        dothis.pass.add_contact_data(iban, "iban", self:get("uid"))
       end,
       ["do-bank-deets-array"] = function(self, do_after)
         local iban = self:get("iban")

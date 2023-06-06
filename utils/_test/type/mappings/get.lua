@@ -40,7 +40,7 @@ assert(
 
 assert(
   not find(
-    get.khard.list(),
+    get.khard.all_contact_uids(),
     { _r = whole(mt._r.id.contact_uid), _invert = true }
   )
 )

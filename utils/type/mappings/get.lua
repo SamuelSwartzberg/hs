@@ -196,6 +196,17 @@ get = {
         { mode="list"}
       )
     end
+  }, 
+  pass = {
+    json = function(type, item)
+      return runJSON("pass show " .. type .. "/" .. item)
+    end,
+    contact_json = function(type, item)
+      return get.pass.json("contacts/" .. type, item)
+    end,
+    otp = function(item)
+      return run("pass otp otp/" .. item)
+    end,
   }
   
 }

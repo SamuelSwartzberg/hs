@@ -137,6 +137,15 @@ StringItemSpecifier = {
           "envsubst"
         })
       end,
+      ["qr-utf8-image-bow"] = function(self)
+        return transf.string.qr_utf8_image_bow(self:get("contents"))
+      end,
+      ["qr-utf8-image-wob"] = function(self)
+        return transf.string.qr_utf8_image_wob(self:get("contents"))
+      end,
+      ["qr-png-path"] = function(self)
+        return transf.string.qr_png_in_cache(self:get("contents"))
+      end,
     },
     doThisables = {
       ["tab-fill-with-items"] = function(self, sep)
@@ -165,7 +174,7 @@ StringItemSpecifier = {
         open(
           string.format(
             self:get('fold'), 
-            urlencode(
+            transf.string.urlencoded(
               g_search_engines[search_engine].url, g_search_engines[search_engine].spaces_percent
             )
           )
@@ -334,6 +343,18 @@ StringItemSpecifier = {
       emoji_icon = "📰",
       description = "ttlcs",
       key = "to-title-case"
+    },{
+      emoji_icon = "🔳🏞🛣",
+      description = "qrimgpth",
+      key = "qr-image-path"
+    },{
+      emoji_icon = "🔳🔡⬜️",
+      description = "qrstrbow",
+      key = "qr-utf8-image-bow"
+    },{
+      emoji_icon = "🔳🔡⬛️", 
+      description = "qrstrwob",
+      key = "qr-utf8-image-wob"
     }
   }),
   getSearchEngineActionTable(g_search_engines))

@@ -68,6 +68,11 @@ dothis = {
       dothis.upkg.do_backup_and_commit(mgr, "replace-backup", "replace backup of packages")
     end,
   },
+  khard = {
+    edit = function(uid)
+      run("khard edit " .. uid, true)
+    end,
+  },
   khal = {
     add_event_from_file = function(calendar, path)
       run("khal import --include-calendar " .. calendar .. " " .. transf.string.single_quoted_escaped(path), true)
@@ -240,6 +245,19 @@ dothis = {
         "pass otp insert otp/" .. name
       })
     end,
+    add_item = function(data, type, name)
+      run("yes " .. transf.table.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name, true)
+    end,
+    add_json = function(data, type, name)
+      dothis.pass.add_item(json.encode(data), type, name)
+    end,
+    add_contact_data = function(data, type, uid)
+      type = "contacts/" .. type
+      dothis.pass.add_json(data, type, uid)
+    end,
+    add_password = function(password, name)
+      dothis.pass.add_item(password, "passw", name)
+    end,
   },
   youtube = {
     do_extracted_attrs_via_ai = function(video_id, do_after)
@@ -271,10 +289,17 @@ dothis = {
     end,
 
   },
- url = {
-  download = function(url, target)
-    run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
-  end
- },
+  url = {
+    download = function(url, target)
+      run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
+    end
+  },
+  string = {
+    generate_qr_png = function(data, path)
+      if not testPath(path) then
+        run("qrencode -l M -m 2 -t PNG -o" .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(data))
+      end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
+    end,
+  }
 
 }
