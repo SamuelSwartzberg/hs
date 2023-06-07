@@ -261,6 +261,7 @@
 --- @field hash hs.hash
 --- @field math hs.math
 --- @field speech hs.speech
+--- @field grid hs.grid
 
 
 --- @alias urltable { url: string }
@@ -312,8 +313,39 @@
 
 
 --- @class hs.settings
+--- @field bundleID string
+--- @field dateFormat string
+--- @field clear fun(key: string): boolean
+--- @field get fun(key: string): string | boolean | number | nil | table | userdata
+--- @field getKeys fun(): table
+--- @field set fun(key: string, val?: string | number | boolean | nil | table)
+--- @field setData fun(key: string, val: userdata)
+--- @field setDate fun(key: string, val: number | string)
+--- @field watchKey fun(identifier: string, key: string): (function) | fun(identifier: string, key: string, fn: function): string
+
+
 
 --- @class hs.sound
+--- @field getAudioEffectNames fun(): table
+--- @field soundFileTypes fun(): table
+--- @field soundTypes fun(): table
+--- @field systemSounds fun(): table
+--- @field getByFile fun(path: string): hs.sound | nil
+--- @field getByName fun(name: string): hs.sound | nil
+--- @field currentTime fun(self: hs.sound): (number) | fun(self: hs.sound, seekTime: number): hs.sound
+--- @field device fun(self: hs.sound): string | fun(self: hs.sound, deviceUID: string): hs.sound
+--- @field duration fun(self: hs.sound): number
+--- @field isPlaying fun(self: hs.sound): boolean
+--- @field loopSound fun(self: hs.sound): (boolean) | fun(self: hs.sound, loop: boolean): hs.sound
+--- @field name fun(self: hs.sound): (string) | fun(self: hs.sound, soundName: string | nil): hs.sound
+--- @field pause fun(self: hs.sound): hs.sound | boolean
+--- @field play fun(self: hs.sound): hs.sound | boolean
+--- @field resume fun(self: hs.sound): hs.sound | boolean
+--- @field setCallback fun(self: hs.sound, function: fun(state: boolean, sound: hs.sound)): hs.sound
+--- @field stop fun(self: hs.sound): hs.sound | boolean
+--- @field stopOnReload fun(self: hs.sound): (boolean) | fun(self: hs.sound, stopOnReload: boolean): hs.sound
+--- @field volume fun(self: hs.sound): (number) | fun(self: hs.sound, level: number): hs.sound
+
 
 --- @class hs.hash
 
@@ -677,3 +709,7 @@ speak = hs.speech.new()
 
 --- @class hs.mouse
 --- @field absolutePosition fun(): (hs_geometry_point_table) | fun(point: hs_geometry_point_like): hs_geometry_point_table 
+
+--- @class hs.grid
+--- @field setGrid fun(grid: hs_geometry_size_like, screen?: hs.screen, frame?: hs_geometry_rect_like): hs.grid
+--- @field show fun(exitedCallback?: fun(): (nil), multipleWindows?: boolean): hs.grid

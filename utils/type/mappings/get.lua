@@ -207,6 +207,11 @@ get = {
     otp = function(item)
       return run("pass otp otp/" .. item)
     end,
+  },
+  sox = {
+    is_recording = function()
+      local succ, res = pcall(run, "pgrep -x rec")
+      return succ
+    end,
   }
-  
 }

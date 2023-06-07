@@ -135,5 +135,8 @@ hs.timer.doAfter(1, function ()
 
 end)
 
-error("TODO pandoc.markdown_to")
+local test_md_file = env.MMOCK .. "/files/plaintext/md/full_pandoc.md"
 
+dothis.pandoc.markdown_to(test_md_file, "html", nil, function(res)
+  assert(stringy.find(res, '<h1 id="sec1" class="section">Heading 1</h1>'))
+end)

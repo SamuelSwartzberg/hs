@@ -6,14 +6,7 @@ IsbnItemSpecifier = {
   properties = {
     getables = {
       ["bibtex-from-internet"] = function(self)
-        return run({
-          "isbn_meta",
-          {
-            value = self:get("contents"),
-            type = "quoted"
-          },
-          "bibtex"
-        })
+        return transf.isbn.bibtex(self:get("contents"))
       end,
       ["is-citable-object-id"] = function() return true end,
     }

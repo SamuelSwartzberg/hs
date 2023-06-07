@@ -274,7 +274,7 @@ transf = {
   },
   string = {
     in_cache_dir = function(data, type)
-      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.not_userdata_or_function.md5(data) 
+      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. data
     end,
     qr_utf8_image_bow = function(data)
       return memoize(run)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
@@ -308,8 +308,7 @@ transf = {
       return replace(url, to.url.decoded)
     end,
     escaped_csv_field = function(field)
-      error("current implementation will break on nonascii")
-      return '"' .. replace(field, {{'"', "\n"}, {'""', '\\n'}})  .. '"'
+      return '"' .. replace(field, to.string.escaped_csv_field_contents)  .. '"'
     end,
     unicode_prop_table_array = function(str)
       return memoize(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(str))
@@ -467,9 +466,6 @@ transf = {
       end
       return parsed
     end
-  },
-  qr_utf8_image = {
-    data = 
   },
   event_table = {
     calendar_template = function(event_table)
@@ -682,6 +678,30 @@ transf = {
       return url
     end,
   },
+  doi = {
+    doi_url = function(doi)
+      return replace(doi, to.resolved.doi)
+    end,
+    bibtex = function(doi)
+      return run(
+        "curl -LH Accept: application/x-bibtex" .. transf.string.single_quoted_escaped(
+          transf.doi.doi_url(doi)
+        )
+      )
+    end,
+  },
+  isbn = {
+    bibtex = function(isbn)
+      return run(
+        "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " bibtex"
+      )
+    end,
+  },
+  bibtex_string = {
+    csl_table = function(str)
+      return runJSON(" pandoc -f bibtex -t csljson <<EOF " .. str .. "\nEOF")
+    end,
+  },
   url = {
     in_wayback_machine = function(url)
       return "https://web.archive.org/web/*/" .. url
@@ -691,7 +711,7 @@ transf = {
           "curl -L" .. transf.string.single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
-      return transf.string.in_cache_dir(url, "url")
+      return transf.not_userdata_or_function.in_cache_dir(url, "url")
     end,
     param_table = function(url)
       local params = {}
@@ -747,6 +767,12 @@ transf = {
       local md5 = hashings("md5")
       md5:update(thing)
       return md5:hexdigest()
+    end,
+    in_cache_dir = function(data, type)
+      return transf.string.in_cache_dir(
+        transf.not_userdata_or_function.md5(data),
+        type
+      )
     end,
   },
   mailto_url = {

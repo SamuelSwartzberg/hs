@@ -158,7 +158,6 @@ mt = {
         "yaml_metadata_block"
       },
       featureful = {
-        "escaped_line_breaks",
         "fenced_code_blocks",
         "backtick_code_blocks",
         "fenced_code_attributes",
@@ -166,6 +165,7 @@ mt = {
         "fancy_lists",
         "startnum",
         "definition_lists",
+        "task_lists",
         "example_lists",
         "table_captions",
         "pipe_tables",

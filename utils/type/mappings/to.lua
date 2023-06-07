@@ -107,6 +107,17 @@ to = {
         mode = "replace"
       }
     },
+    escaped_csv_field_contents = {
+      {
+        cond = {_r = '"', _regex_engine = "eutf8"},
+        proc = "\n",
+        mode = "replace"
+      }, {
+        cond = {_r = '""', _regex_engine = "eutf8"},
+        proc = '\\n',
+        mode = "replace"
+      }
+    }
   }
 }
 

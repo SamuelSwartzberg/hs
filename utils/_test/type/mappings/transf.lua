@@ -751,3 +751,40 @@ assertMessage(
   transf.real_image_path.qr_data(qr_code_png_path),
   qr_code_test_contents
 )
+
+assertMessage(
+  transf.string.single_quoted_escaped("foo"),
+  "'foo'"
+)
+
+assertMessage(
+  transf.string.double_quoted_escaped("foo"),
+  '"foo"'
+)
+
+assertMessage(
+  transf.string.single_quoted_escaped("foon't"),
+  "'foon\\'t'"
+)
+
+assertMessage(
+  transf.string.double_quoted_escaped('foon"t'),
+  '"foon\\"t"'
+)
+
+local unicode_table =  transf.string.unicode_prop_table_array("a🏞鯉")
+
+assertMessage(
+  unicode_table[1].name,
+  "LATIN SMALL LETTER A"
+)
+
+assertMessage(
+  unicode_table[2].cpoint,
+  "U+1F3DE"
+)
+
+assertMessage(
+  unicode_table[3].char,
+  "鯉"
+)

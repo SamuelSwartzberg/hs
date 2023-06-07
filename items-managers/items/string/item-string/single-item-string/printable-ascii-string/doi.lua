@@ -5,15 +5,7 @@ DoiItemSpecifier = {
     getables = {
       ["is-citable-object-id"] = function() return true end,
       ["bibtex-from-internet"] = function(self)
-        return run({
-          "curl",
-          "-LH",
-          "Accept: application/x-bibtex",
-          {
-            value = replace(self:get("contents"), to.resolved.doi),
-            type = "quoted"
-          }
-        })
+        return transf.doi.bibtex(self:get("contents"))
       end,
     }
   },

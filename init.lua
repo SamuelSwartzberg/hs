@@ -166,7 +166,14 @@ local keymap = {
       envTable:doThis("choose-item-and-then-action")
     end,
   },
-  r = nil, -- assigned above
+  r = {
+    explanation = "Record some audio, then choose an action on it",
+    fn = function() 
+      dothis.sox.rec_toggle_cache(function(file)
+        CreateStringItem(file):doThis("choose-action")
+      end)
+    end,
+  },
   t = {
     explanation = "Choose an action on the current date.",
     fn = function() 
@@ -179,7 +186,7 @@ local keymap = {
     fn = function() 
       CreateStringItem(env.MAUDIOVISUAL)
         :get("descendant-string-item-array")
-        :doThis("choose-tag-name-value-and-then-action")
+        :doThis("choose-tag-name-value-and-thenx-action")
     end,
   },
   u = {

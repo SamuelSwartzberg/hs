@@ -64,5 +64,5 @@ is = {
     otpauth_url = function(url)
       return stringy.startswith(url, "otpauth:")
     end,
-  }
+  },
 }

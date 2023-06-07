@@ -28,8 +28,6 @@ post 'lua is working':
   - jcw/jcwserve in string menu?
   - danbooru search links need their query to count as 'seen' for other queries
   - wrapper for hs chords?
-  - record audio, write to temp file, chooser on file
-  - elevenlabs api
   - https://www.hammerspoon.org/docs/hs.application.watcher.html: use to deactivate mullvad when geforce now? wrap application watchers to make it easier to create stuff?
     - maybe make watchers table with function, type, watcher keys such that we can subclass watchers based on type, this would also unlock additional functionality
   - citations

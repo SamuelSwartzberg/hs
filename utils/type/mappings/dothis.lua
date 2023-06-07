@@ -289,6 +289,28 @@ dothis = {
     end,
 
   },
+  sox = {
+    rec_start = function(path, do_after)
+      run("rec " .. transf.string.single_quoted_escaped(path), function()
+        if do_after then
+          do_after(path)
+        end
+      end)
+    end,
+    rec_start_cache = function(do_after)
+      dothis.sox.rec_start(transf.string.in_cache_dir(os.time(), "recording"), do_after)
+    end,
+    rec_stop = function()
+      run("killall rec")
+    end,
+    rec_toggle_cache = function(do_after)
+      if get.sox.is_recording() then
+        dothis.sox.rec_stop()
+      else
+        dothis.sox.rec_start_cache(do_after)
+      end
+    end,
+  },
   url = {
     download = function(url, target)
       run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
