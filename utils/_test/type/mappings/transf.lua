@@ -788,3 +788,114 @@ assertMessage(
   unicode_table[3].char,
   "鯉"
 )
+
+assertMessage(
+  transf.not_userdata_or_function.single_quoted_escaped_json("foo"),
+  "'\"foo\"'"
+)
+assertMessage(
+  transf.not_userdata_or_function.double_quoted_escaped_json({1, true, "bar"}),
+  '{1,true,"bar"}'
+)
+
+assertMessage(
+  transf.not_userdata_or_function.single_quoted_escaped_json({
+    foo = "foon't",
+    bar = false
+  }),
+  '{"foo":"foon\\\'t","bar":false}'
+)
+
+local stritmarr = transf.array_of_strings.item_array_of_string_items({
+    "foo",
+    "bar",
+    "baz"
+  })
+
+assertMessage(
+  stritmarr:get("contents")[1].type,
+  "string"
+)
+
+assertMessage(
+  stritmarr:get("contents")[2]:get("contents"),
+  "bar"
+)
+
+assertMessage(
+  stritmarr:get("contents")[3]:get("contents"),
+  "baz"
+)
+
+local str = "1234" .. mt._contains.unique_field_separator .. "somecalendar" .. mt._contains.unique_field_separator .. "2021-02-08T00:00:00Z"
+
+local event_tbl = transf.string.event_table(str)
+
+assertMessage(
+  event_tbl.uid,
+  "1234"
+)
+
+assertMessage(
+  event_tbl.calendar,
+  "somecalendar"
+)
+
+assertMessage(
+  event_tbl.start,
+  "2021-02-08T00:00:00Z"
+)
+
+local calendar_tmplt = transf.string.calendar_template(event_tbl)
+
+assertMessage(
+  calendar_tmplt,
+[[calendar: somecalendar         # one of: default,testcalendar,r-:birthdays,reminders,r-:wuerfelpech,r-:schulferien
+start:    2021-02-08T00:00:00Z]]
+)
+
+local compound_str = str .. mt._contains.unique_record_separator .. str
+
+local compound_tbl = transf.string.compound_table(compound_str)
+
+assertMessage(
+  compound_tbl[1].uid,
+  "1234"
+)
+
+assertMessage(
+  compound_tbl[1].calendar,
+  "somecalendar"
+)
+
+assertMessage(
+  compound_tbl[1].start,
+  "2021-02-08T00:00:00Z"
+)
+
+assertMessage(
+  compound_tbl[2].uid,
+  "1234"
+)
+
+assertMessage(
+  compound_tbl[2].calendar,
+  "somecalendar"
+)
+
+assertMessage(
+  compound_tbl[2].start,
+  "2021-02-08T00:00:00Z"
+)
+
+assertMessage(
+  transf.array_of_strings.repeated_option_string({"a", "b"}, "--include"),
+  "--include a --include b"
+)
+
+local event_tbl_item_arr = transf.array_of_event_tables.item_array_of_event_table_items(compound_tbl)
+
+assertMessage(
+  event_tbl_item_arr:get("contents")[1].uid,
+  "1234"
+)

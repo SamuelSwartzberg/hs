@@ -171,7 +171,7 @@ dothis = {
       run(command, function(std_out)
         -- todo: build RRULE, add it to event
         if specifier.do_after then 
-          specifier.do_after(std_out)
+          specifier.do_after(stringy.strip(std_out))
         end
       end)
     end,
@@ -246,7 +246,7 @@ dothis = {
       })
     end,
     add_item = function(data, type, name)
-      run("yes " .. transf.table.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name, true)
+      run("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name, true)
     end,
     add_json = function(data, type, name)
       dothis.pass.add_item(json.encode(data), type, name)

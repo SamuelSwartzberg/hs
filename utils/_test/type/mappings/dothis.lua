@@ -127,7 +127,50 @@ hs.timer.doAfter(1, function ()
         hs.timer.doAfter(1, function ()
           local baking_class_event = get.khal.search_event_tables("Baking class test event edited")
           assert(#baking_class_event == 0)
-          error("TODO add_event_from_specifier, add_event_interactive")
+          local tme = os.time()
+          dothis.khal.add_event_from_specifier({
+            calendar = "testcalendar",
+            location = "testlocation",
+            url = "https://example.com/testcalendar/testevent",
+            start = "2020-01-01T00:00:00",
+            ["end"] = "2020-01-01T01:00:00",
+            title = "testevent"  .. tme,
+            description = "testdescription",
+            do_after = function ()
+              local event_table = get.khal.search_event_tables("testevent" .. tme)[1]
+              assertMessage(event_table.title, "testevent" .. tme)
+              assertMessage(event_table.description, "testdescription")
+              assertMessage(event_table.location, "testlocation")
+              assertMessage(event_table.url, "https://example.com/testcalendar/testevent")
+              assertMessage(event_table.start, "2020-01-01T00:00:00")
+              assertMessage(event_table["end"], "2020-01-01T01:00:00")
+              dothis.khal.delete_event("testevent" .. tme)
+              hs.timer.doAfter(1, function ()
+                error("TODO add_event_interactive")
+                alert("Just save the event and close the window")
+                dothis.khal.add_event_interactive({
+                  calendar = "testcalendar",
+                  location = "testlocation",
+                  url = "https://example.com/testcalendar/testevent",
+                  start = "2021-01-01T00:00:00",
+                  ["end"] = "2021-01-01T01:00:00",
+                  title = "interactive "  .. tme,
+                  description = "testdescription",
+                  do_after = function()
+                    local event_table = get.khal.search_event_tables("interactive " .. tme)[1]
+                    assertMessage(event_table.title, "interactive " .. tme)
+                    assertMessage(event_table.description, "testdescription")
+                    assertMessage(event_table.location, "testlocation")
+                    assertMessage(event_table.url, "https://example.com/testcalendar/testevent")
+                    assertMessage(event_table.start, "2021-01-01T00:00:00")
+                    assertMessage(event_table["end"], "2021-01-01T01:00:00")
+                    dothis.khal.delete_event("interactive " .. tme)
+
+                  end
+                })
+              end)
+            end
+          })
         end)
       end)
     end)
@@ -138,5 +181,120 @@ end)
 local test_md_file = env.MMOCK .. "/files/plaintext/md/full_pandoc.md"
 
 dothis.pandoc.markdown_to(test_md_file, "html", nil, function(res)
+  -- Check if Heading 1 is correctly converted
   assert(stringy.find(res, '<h1 id="sec1" class="section">Heading 1</h1>'))
+
+  -- Check if Heading 2 is correctly converted
+  assert(stringy.find(res, '<h2 class="subsection">Heading 2</h2>'))
+
+  -- Check if italic is correctly converted
+  assert(stringy.find(res, '<em>markdown</em>'))
+
+  -- Check if bold is correctly converted
+  assert(stringy.find(res, '<strong>extensions</strong>'))
+
+  -- Check if strikeout is correctly converted
+  assert(stringy.find(res, '<s>text like this</s>'))
+
+  -- Check if subscript is correctly converted
+  assert(stringy.find(res, 'H<sub>2</sub>O'))
+
+  -- Check if superscript is correctly converted
+  assert(stringy.find(res, 'E=mc<sup>2</sup>'))
+
+  -- Check if highlight is correctly converted
+  assert(stringy.find(res, '<mark>important text</mark>'))
+
+  -- Check if emoji is correctly converted
+  assert(stringy.find(res, 'emojis &#x1F604;')) -- Unicode for :smile:
+
+  -- Check if link is correctly converted
+  assert(stringy.find(res, '<a href="https://google.com">Regular link</a>'))
+
+  -- Check if autolink bare URIs is correctly converted
+  assert(stringy.find(res, '<a href="https://google.com">https://google.com</a>'))
+
+  -- Check if inline code is correctly converted
+  assert(stringy.find(res, '<code>print("hello world")</code>'))
+
+  -- Check if escaped characters are correctly converted
+  assert(stringy.find(res, '&lt;literal spans&gt;'))
+  assert(stringy.find(res, '*literal asterisks*'))
+
+  -- Check if raw code block is correctly converted
+  assert(stringy.find(res, '<pre><code>function hello(name)'))
+
+  -- Check if highlighted code block is correctly converted
+  assert(stringy.find(res, '<pre class="lua"><code>function hello(name)'))
+  assert(stringy.find(res, '<pre><code>def hello(name)'))
+  assert(stringy.find(res, '<pre class="python"><code>def hello(name)'))
+  assert(stringy.find(res, '<pre class="python example"><code>def hello(name)'))
+  assert(stringy.find(res, '<pre class="python"><code>def hello(name)'))
+
+  -- Check if hard line breaks are correctly converted
+  assert(stringy.find(res, 'Lorem ipsum dolor sit amet,<br/>'))
+
+  -- Check if ordered list is correctly converted
+  assert(stringy.find(res, '<ol><li>First item</li>'))
+
+  -- Check if example list is correctly converted
+
+  assert(stringy.find(res, '<p id="example-1">(1) Proposition: With example_lists we can do that.'))
+  assert(stringy.find(res, '<p id="example-2">(2) Proof: By example.'))
+  assert(stringy.find(res, '<p id="example-3">(3) Q.E.D.</p>'))
+  assert(stringy.find(res, '<p id="example-4">(4) SO FUN!</p>'))
+  assert(stringy.find(res, 'Via (1), (2) we have shown that example_lists are awesome.'))
+
+  -- Check if task list is correctly converted
+  assert(stringy.find(res, '<li><input disabled="" type="checkbox">Unchecked</li>'))
+  assert(stringy.find(res, '<li><input checked="" disabled="" type="checkbox">Checked</li>'))
+  assert(stringy.find(res, '<li><input checked="" disabled="" type="checkbox">yay!</li>'))
+
+  -- Check if definition list is correctly converted
+  assert(stringy.find(res, '<dl><dt>Term 1</dt><dd>Definition 1</dd>'))
+
+  -- Check if line block is correctly converted
+  assert(stringy.find(res, '<div class="line-block"><div class="line">This is a line block.'))
+
+  -- Check if fenced division is correctly converted
+  assert(stringy.find(res, '<div class="fenced div">This is a fenced division.</div>'))
+
+  -- Check if table with caption above is correctly converted
+  assert(stringy.find(res, '<table><caption>Sample Table Caption above</caption><thead><tr><th>Header 1</th><th>Header 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Cell 3</td><td>Cell 4</td></tr></tbody></table>'))
+
+  -- Check if table with caption below is correctly converted
+  assert(stringy.find(res, '<table><thead><tr><th>Header 1</th><th>Header 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Cell 3</td><td>Cell 4</td></tr></tbody><caption>Sample Table Caption below</caption></table>'))
+  
+
+  -- Check if implicit header references are correctly converted
+  assert(stringy.find(res, '<a href="#line_blocks">line_blocks</a>'))
+
+  -- Check if auto identifiers are correctly converted
+  assert(stringy.find(res, '<a href="#sec1">Heading 1</a>'))
+
+  assert(stringy.find(res, '<h3 id="fancy_lists">fancy_lists</h3>'))
+  assert(stringy.find(res, '<h3 id="hard-line-breaks">Hard Line Breaks</h3>'))
+  
+  -- Check if footnotes are correctly converted
+  assert(stringy.find(res, '<a href="#fn1" class="footnote-ref" id="fnref1">'))
+
+  -- Check if citations are correctly converted
+  assert(stringy.find(res, '<span class="citation" data-cites="example2021">'))
+
+  -- Check if raw HTML is correctly converted
+  assert(stringy.find(res, '<span style="color: red">Red text</span>'))
+
+  -- Check if LaTeX Math is correctly converted
+  assert(stringy.find(res, '<span class="math inline">E=mc<sup>2</sup></span>'))
+
+  -- Check if inline notes are correctly converted
+  assert(stringy.find(res, '<a href="#fn2" class="footnote-ref" id="fnref2">'))
+
+  -- Check if implicit figures are correctly converted TODO this is not yet correct
+  assert(stringy.find(res, '<img src="path/to/image.jpg" alt="A description of the image"/>'))
+
+  -- Check if link attributes are correctly converted
+  assert(stringy.find(res, '<a href="https://google.com/" title="Google" class="linkclass">Link with title attribute</a>'))
+
+  delete(env.MMOCK .. "/files/plaintext/md/full_pandoc.html")
 end)

@@ -465,7 +465,31 @@ transf = {
         end
       end
       return parsed
-    end
+    end,
+    hiragana_only = function(str)
+      return run("kana --vowel-shortener x" .. transf.string.single_quoted_escaped(str))
+    end,
+    katakana_only = function(str)
+      return run("kana --vowel-shortener x --katakana --extended" .. transf.string.single_quoted_escaped(str))
+    end,
+    hiragana_punct = function(str)
+      return run("kana --vowel-shortener x --punctuation" .. transf.string.single_quoted_escaped(str))
+    end,
+    katakana_punct = function(str)
+      return run("kana --vowel-shortener x --katakana --extended --punctuation" .. transf.string.single_quoted_escaped(str))
+    end,
+    kana_mixed = function(str)
+      return run("kana --vowel-shortener x --extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.string.single_quoted_escaped(str))
+    end,
+    japanese_writing = function(str)
+      return gpt("You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:\n\n" .. str, {temperature = 0})
+    end,
+    kana_readings = function(str)
+      return gpt("Provide kana readings for: " .. str, {temperature = 0})
+    end,
+    ruby_annotated_kana = function(str)
+      return gpt("Add kana readings to this text as <ruby> annotations, including <rp> fallback: " .. str, {temperature = 0})
+    end,
   },
   event_table = {
     calendar_template = function(event_table)
@@ -644,9 +668,6 @@ transf = {
       end
       return fields
     end,
-    single_quoted_escaped_json = function(t)
-      return transf.string.single_quoted_escaped(json.encode(t))
-    end,
     yaml_metadata = function(t)
       local string_contents = yamlDump(t)
       return "---\n" .. string_contents .. "\n---\n"
@@ -773,6 +794,9 @@ transf = {
         transf.not_userdata_or_function.md5(data),
         type
       )
+    end,
+    single_quoted_escaped_json = function(t)
+      return transf.string.single_quoted_escaped(json.encode(t))
     end,
   },
   mailto_url = {
