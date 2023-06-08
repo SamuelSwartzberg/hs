@@ -166,7 +166,7 @@ transf = {
   },
   youtube_video_id = {
     youtube_video_item = function(id)
-      return rest({
+      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
         api_name = "youtube",
         endpoint = "videos",
         params = {

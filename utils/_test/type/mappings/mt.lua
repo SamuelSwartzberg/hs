@@ -193,3 +193,4 @@ assertMessage(pre, "alpha.1")
 assertMessage(build, "build.11.e0f985a")
 
 
+assert(onig.match("de-bln-wg-101", mt._r.id.relay_identifier))

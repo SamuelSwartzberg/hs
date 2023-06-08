@@ -198,6 +198,9 @@ get = {
     end
   }, 
   pass = {
+    value = function(type, item)
+      return memoize(run, refstore.params.memoize.opts.invalidate_1_day)("pass show " .. type .. "/" .. item)
+    end,
     json = function(type, item)
       return runJSON("pass show " .. type .. "/" .. item)
     end,

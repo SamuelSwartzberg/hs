@@ -195,3 +195,8 @@ assertMessage(
   templ.alarms.comment,
   "array of alarms as deltas"
 )
+
+assertValuesContain(
+  get.pandoc.full_md_extension_set(),
+  {"citations", "definition_lists", "fenced_code_blocks", "footnotes"} -- sample of extensions that should be present
+)

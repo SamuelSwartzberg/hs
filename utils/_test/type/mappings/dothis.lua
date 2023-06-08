@@ -298,3 +298,36 @@ dothis.pandoc.markdown_to(test_md_file, "html", nil, function(res)
 
   delete(env.MMOCK .. "/files/plaintext/md/full_pandoc.html")
 end)
+
+if get.pass.value("passw", "testotp") then
+  dothis.pass.delete_otp("testotp")
+end
+dothis.pass.add_otp_url(readFile(env.MMOCK .. "/strings/urls/otpauth/basic"), "testotp")
+hs.timer.doAfter(1, function()
+  assert(
+    toNumber(get.pass.otp("testotp"), "int") > 0
+  )
+  dothis.pass.delete_otp("testotp")
+end)
+
+dothis.youtube.do_extracted_attrs_via_ai("EBNl8bwdVcA", function(res_tbl)
+  assertMessage(
+    res_tbl.tcrea,
+    "nobodyknows+"
+  )
+  assert(
+    onig.match(res_tbl.titl, "Hero's Come Back!?") -- both with and without the question mark is correct
+  )
+  assertMessage(
+    res_tbl.srs,
+    "Naruto Shippuden"
+  )
+  assertMessage(
+    res_tbl.srsrel,
+    "op"
+  )
+  assertMessage(
+    res_tbl.srsrelindex,
+    "1"
+  )
+end)

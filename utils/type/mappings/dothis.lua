@@ -258,6 +258,17 @@ dothis = {
     add_password = function(password, name)
       dothis.pass.add_item(password, "passw", name)
     end,
+    delete = function(type, name)
+      run("pass rm " .. type .. "/" .. name, true)
+    end,
+    rename = function(type, old_name, new_name)
+      run("pass mv " .. type .. "/" .. old_name .. " " .. type .. "/" .. new_name, true)
+    end,
+    edit = function(data, type, name)
+      run("pass rm " .. type .. "/" .. name, function()
+        dothis.pass.add_item(data, type, name)
+      end)
+    end,
   },
   youtube = {
     do_extracted_attrs_via_ai = function(video_id, do_after)
@@ -265,6 +276,7 @@ dothis = {
         in_fields = {
           title = transf.youtube_video_id.title(video_id),
           channel_title = transf.youtube_video_id.channel_title(video_id),
+          description = slice(transf.youtube_video_id.description(video_id), { stop = 400, sliced_indicator = "... (truncated)" }),
         },
         out_fields = {
           {
@@ -283,6 +295,11 @@ dothis = {
             alias = "srsrel",
             value = "Relation to series",
             explanation = "op, ed, ost, insert song, etc."
+          },
+          {
+            alias = "srsrelindex",
+            value = "Index in the relation to series",
+            explanation = "positive integer"
           }
         },
       },do_after)

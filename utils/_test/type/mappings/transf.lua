@@ -899,3 +899,25 @@ assertMessage(
   event_tbl_item_arr:get("contents")[1].uid,
   "1234"
 )
+
+assertMessage(
+  transf.table.yaml_metadata({
+    title = "foo",
+    author = "bar"
+  }),
+[[---
+title: foo
+author: bar
+---
+]]
+)
+
+assertMessage(
+  transf.path.form_path("/foo/bar"),
+  "@/foo/bar"
+)
+
+assertMessage(
+  transf.real_audio_path.transcribed(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3"),
+  "This is a testfile containing my voice."
+)

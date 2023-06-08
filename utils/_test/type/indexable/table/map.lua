@@ -625,3 +625,31 @@ assertMessage(
   deep_copy_of_deep_child_ref.a.b.c == deep_child_ref.a,
   false
 )
+
+--- new {_p: string} processor
+
+assertMessage(
+  doGui(
+    "bar\n",
+    function() 
+      return map(
+        {"foo"},
+        {_p = "string"}
+      )
+    end
+  ),
+  {"bar"}
+)
+
+assertMessage(
+  doGui(
+    "\n",
+    function()
+      return map(
+        {1},
+        {_p = "number"}
+      )
+    end
+  ),
+  {"bar"}
+)
