@@ -172,7 +172,7 @@ transf = {
         params = {
           id = id,
           part = "snippet,status",
-        }
+        },
       }).items[1]
     end,
     title = function(id)
@@ -193,6 +193,9 @@ transf = {
     privacy_status = function(id)
       return transf.youtube_video_id.youtube_video_item(id).status.privacyStatus
     end,
+    youtube_video_url = function(id)
+      return "https://www.youtube.com/watch?v=" .. id
+    end,
   },
   youtube_playlist_id = {
     youtube_playlist_item = function(id)
@@ -210,6 +213,19 @@ transf = {
     end,
     uploader = function(id)
       return transf.youtube_playlist_id.youtube_playlist_item(id).snippet.channelTitle
+    end,
+    youtube_playlist_url = function(id)
+      return "https://www.youtube.com/playlist?list=" .. id
+    end,
+  },
+  youtube_playlist_url = {
+    youtube_playlist_id = function(url)
+      return transf.url.param_table(url).list
+    end,
+  },
+  youtube_video_url = {
+    youtube_video_id = function(url)
+      return transf.url.param_table(url).v
     end,
   },
   youtube_channel_id = {

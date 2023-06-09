@@ -82,3 +82,19 @@ assert(
 assert(
   is.youtube_video_id.unavailable(deleted_video_id)
 )
+
+assert(
+  is.path.playable_file("/foo/example.mp3")
+)
+
+assert(
+  is.path.playable_file("/foo/example.wav")
+)
+
+assert(
+  is.path.playable_file("example.mov")
+)
+
+assert(
+  not is.path.playable_file("example")
+)
