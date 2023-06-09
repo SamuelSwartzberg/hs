@@ -1060,3 +1060,55 @@ assertMessage(
   "DEUTSCHE KREDITBANK BERLIN"
 )
 
+assertMessage(
+  transf.not_userdata_or_function.md5("foo"),
+  "acbd18db4cc2f85cedef654fccc4a4d8"
+)
+
+assertMessage(
+  transf.not_userdata_or_function.md5(1),
+  "c4ca4238a0b923820dcc509a6f75849b"
+)
+
+assertMessage(
+  transf.not_userdata_or_function.md5(true),
+  "b326b5062b2f0e69046810717534cb09"
+)
+
+assertMessage(
+  transf.not_userdata_or_function.md5({"foo", "bar"}),
+  "1ea13cb52ddd7c90e9f428d1df115d8f"
+)
+
+assertMessage(
+  transf.not_userdata_or_function.md5({foo = "bar"}),
+  "9bb58f26192e4ba00f01e2e7b136bbd8"
+)
+
+assertMessage(
+  transf.url.in_wayback_machine("https://www.google.com/"),
+  "https://web.archive.org/web/*/https://www.google.com/"
+)
+
+assert(
+  stringy.startswith(transf.url.default_negotiation_url_contents("example.com"), [[<!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>]]
+)
+)
+
+assertMessage(
+  transf.url.in_cache_dir("https://www.google.com/"),
+  env.XDG_CACHE_HOME .. "/hs/url/https:__www.google.com_"
+)
+
+assertMessage(
+  transf.whisper_url.transcribed(transf.path.file_url(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3")),
+  "This is a testfile containing my voice."
+)
+
+assert(
+  transf.real_image_path.hs_image(env.MMOCK .. "/files/binary/image/png/basic.png").toASCII
+)
+

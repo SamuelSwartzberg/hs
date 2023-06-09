@@ -97,6 +97,12 @@ transf = {
     form_path = function(path)
       return "@" .. path
     end,
+    file_url = function(path)
+      return "file://" .. path
+    end,
+    extension = function(path)
+      return pathSlice(path, "-1:-1", refstore.params.path_slice.opts.ext_sep)[1]
+    end,
   },
   real_audio_path = {
     transcribed = function(path)
@@ -116,7 +122,18 @@ transf = {
       return run("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
     end,
     hs_image = function(path)
-      return memoize(hs.image.imageFromPath)(path)
+      return memoize(hs.image.imageFromPath, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromPath")(path)
+    end,
+    booru_url = function(url)
+      return run(
+        "saucenao --file" ..
+        transf.string.single_quoted_escaped(url)
+        .. "--output-properties booru-url"
+      )
+    end,
+    data_url = function(path)
+      local ext = transf.path.extension(path)
+      return memoize(hs.image.encodeAsURLString)(transf.real_image_path.hs_image(path), ext)
     end,
   },
   semver = {
@@ -196,6 +213,16 @@ transf = {
     youtube_video_url = function(id)
       return "https://www.youtube.com/watch?v=" .. id
     end,
+    captions_list = function(id)
+      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
+        api_name = "youtube",
+        endpoint = "captions",
+        params = {
+          videoId = id,
+          part = "snippet",
+        },
+      }).items
+    end,
   },
   youtube_playlist_id = {
     youtube_playlist_item = function(id)
@@ -252,7 +279,7 @@ transf = {
   youtube_video_title = {
     cleaned = function(title)
       title = replace(title, {
-        { cond = {_r = mt._r.text_bloat.youtube.video, _ignore_case = true}, mode="remove" },
+        { cond = {_r = mt._r.text_bloat.youtube.vieo, _ignore_case = true}, mode="remove" },
         { cond = {_r = mt._r.text_bloat.youtube.misc, _ignore_case = true}, mode="remove" },
       })
       return title
@@ -290,7 +317,7 @@ transf = {
   },
   string = {
     in_cache_dir = function(data, type)
-      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. data
+      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.string.safe_filename(data)
     end,
     qr_utf8_image_bow = function(data)
       return memoize(run)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
@@ -303,6 +330,35 @@ transf = {
       dothis.string.generate_qr_png(data, path)
       return path
     end,
+    --- does the minimum to make a string safe for use as a filename, but doesn't impose any policy
+    safe_filename = function(filename)
+      -- Replace forward slash ("/") with underscore
+      filename = eutf8.gsub(filename, "/", "_")
+
+      -- Replace control characters (ASCII values 0 - 31 and 127)
+      for i = 0, 31 do
+        filename = eutf8.gsub(filename, string.char(i), "_")
+      end
+      filename = eutf8.gsub(filename, string.char(127), "_")
+
+      -- Replace sequences of whitespace characters with a single underscore
+      filename = eutf8.gsub(filename, "%s+", "_")
+
+      if filename == "." then
+        filename = "_"
+      elseif filename == ".." then
+        filename = "__"
+      end
+
+      if #filename > 255 then
+        filename = eutf8.sub(filename, 1, 255)
+      elseif #filename == 0 then
+        filename = "_"
+      end
+      
+      return filename
+    end,
+
     --- URL-encodes a string.
     --- @param url string
     --- @param spaces_percent? boolean whether to encode spaces as %20 (true) or + (false)
@@ -311,12 +367,12 @@ transf = {
       if url == nil then
         return ""
       end
-      url = url:gsub("\n", "\r\n")
-      url = string.gsub(url, "([^%w _%%%-%.~])", transf.char.percent)
+      url = eutf8.gsub(url, "\n", "\r\n")
+      url = eutf8.gsub(url, "([^%w _%%%-%.~])", transf.char.percent)
       if spaces_percent then
-        url = string.gsub(url, " ", "%%20")
+        url = eutf8.gsub(url, " ", "%%20")
       else
-        url = string.gsub(url, " ", "+")
+        url = eutf8.gsub(url, " ", "+")
       end
       return url
     end,
@@ -787,7 +843,19 @@ transf = {
         transf.string.single_quoted_escaped(url)
         .. "--output-properties booru-url"
       )
-    end
+    end,
+    hs_image = function(url)
+      return memoize(hs.image.imageFromURL, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromURL")(url)
+    end,
+    qr_data = function(url)
+      local path = transf.url.in_cache_dir(url)
+      dothis.url.download(url, path)
+      return transf.real_image_path.qr_data(path)
+    end,
+    data_url = function(url)
+      local ext = transf.path.extension(url)
+      return memoize(hs.image.encodeAsURLString)(transf.image_url.hs_image(url), ext)
+    end,
   },
   gpt_response_table = {
     response_text = function(result)
@@ -852,5 +920,36 @@ transf = {
       return stringy.split(part, "?")[1]
     end,
     
+  },
+  data_url = {
+    content_type = function(data_url)
+      return stringy.split(transf.url.no_scheme(data_url), ";")[1]
+    end,
+    header_part = function(data_url) -- the non-data part will either be separated from the rest of the url by `;,` or `;base64,`, so we need to split on `,`, then find the first part that ends `;` or `base64;`, and then join and return all parts before that part
+      local parts = stringy.split(transf.url.no_scheme(data_url), ",")
+      local non_data_part = ""
+      for _, part in ipairs(parts) do
+        non_data_part = non_data_part .. part
+        if stringy.endswith(part, ";") or stringy.endswith(part, "base64;") then
+          break
+        else
+          non_data_part = non_data_part .. ","
+        end
+      end
+      return non_data_part
+    end,
+    payload_part = function(data_url)
+      return mustNotStart(transf.url.no_scheme(data_url), transf.data_url.header_part(data_url))
+    end,
+      
+    content_type_param_table = function(data_url)
+      local parts = stringy.split(transf.data_url.header_part(data_url), ";")
+      table.remove(parts, 1) -- this is the content type
+      table.remove(parts, #parts) -- this is the base64, or ""
+      return memoize(map)(parts, function(part)
+        local kv = stringy.split(part, "=")
+        return kv[1], kv[2]
+      end, {"v", "kv"})
+    end
   }
 }

@@ -7,11 +7,11 @@ post 'lua is working':
       - js to rewrite filenames on e.g. g.e-hentai to whatever I choose for hydrus
       - need to think on how to handle other file transmission & parsing (e.g. downloads, images from phone)
       - parse manga panels -> add to hydrus
+      - needs auto tagging capabilities based on ai
     - shrinking, moving other documents
     - consider how to integrate email into history
     - is self-renaming of dated dirs implemented?
     - import/sync strava
-  - window switcher is limited to spaces, can't deal with minimized items
   - process bookmarks to sessions, urls
   - old contact importing
     - contact em 

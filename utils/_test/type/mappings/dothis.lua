@@ -331,3 +331,10 @@ dothis.youtube.do_extracted_attrs_via_ai("EBNl8bwdVcA", function(res_tbl)
     "1"
   )
 end)
+
+local tgt = env.TMPDIR .. "/helloworld-" .. os.time() .. ".txt"
+dothis.url.download(transf.path.file_url(env.MMOCK .. "/files/plaintext/txt/helloworld.txt"), tgt)
+
+assert(
+  readFile(tgt) == "Hello World!"
+)

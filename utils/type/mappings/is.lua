@@ -37,6 +37,9 @@ is = {
     end,
     playable_file = function (path)
       return is.path.usable_as_filetype(path, "audio") or is.path.usable_as_filetype(path, "video")
+    end,
+    has_extension = function(path)
+      return transf.path.extension(path) ~= ""
     end
     
   },
@@ -64,5 +67,18 @@ is = {
     otpauth_url = function(url)
       return stringy.startswith(url, "otpauth:")
     end,
+    data_url = function(url)
+      return stringy.startswith(url, "data:")
+    end,
   },
+  data_url = {
+    base64 = function(url)
+      return stringy.endswith(transf.data_url.header_part(url), ";base64")
+    end,
+  },
+  media_type = {
+    image = function(media_type)
+      return stringy.startswith(media_type, "image/")
+    end,
+  }
 }

@@ -12,12 +12,15 @@ URLBySchemeItemSpecifier = {
       ["is-otpauth-url"] = function (self)
         return is.url.otpauth_url(self:get("contents"))
       end,
+      ["is-data-url"] = function(self)
+        return is.url.data_url(self:get("contents"))
+      end,
     }
   },
   potential_interfaces = ovtable.init({
-    { key = "mailto-url", value = CreateMailtoUrlItem },
-    { key = "tel-url", value = CreateTelUrlItem },
-    { key = "otpauth-url", value = CreateOtpauthUrlItem },
+    { key = "mailto-url", value = CreateMailtoURLItem },
+    { key = "tel-url", value = CreateTelURLItem },
+    { key = "otpauth-url", value = CreateOtpauthURLItem },
   })
 }
 

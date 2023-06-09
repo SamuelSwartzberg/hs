@@ -523,9 +523,28 @@ speak = hs.speech.new()
 --- @field start fun(self: hs.task): nil
 
 --- @class hs.image
---- @field imageFromPath fun(path: string): hs.image
---- @field imageFromASCII fun(ascii: string, context?: table): hs.image
---- @field imageFromAppBundle fun(appBundlePath: string): hs.image
+--- @field additionalImageNames string[]
+--- @field systemImageNames string[]
+--- @field getExifFromPath fun(path: string): table | nil
+--- @field iconForFile fun(file: string | string[]): hs.image | nil
+--- @field iconForFileType fun(fileType: string): hs.image | nil
+--- @field imageFromAppBundle fun(bundleID: string): hs.image | nil
+--- @field imageFromASCII fun(ascii: string, context?: table): hs.image | nil
+--- @field imageFromMediaFile fun(file: string): hs.image | nil
+--- @field imageFromName fun(string: string): hs.image | nil
+--- @field imageFromPath fun(path: string): hs.image | nil
+--- @field imageFromURL fun(url: string, callbackFn?: function): hs.image | nil
+--- @field bitmapRepresentation fun(size?: table, gray?: boolean): hs.image
+--- @field colorAt fun(point: table): table
+--- @field copy fun(): hs.image
+--- @field croppedCopy fun(rectangle: table): hs.image
+--- @field encodeAsURLString fun(scale?: boolean, type?: string): string
+--- @field name fun(name?: string): hs.image | string
+--- @field saveToFile fun(filename: string, scale?: boolean, filetype?: string): boolean
+--- @field setName fun(name: string): boolean
+--- @field setSize fun(size: table, absolute?: boolean): hs.image
+--- @field size fun(size?: table, absolute?: boolean): hs.image | table
+
 
 --- @alias fs_attributes { dev: number, ino: number, mode:string, nlink: number, uid: number, gid: number, rdev: number, access: number, change: number, modification: number, permissions: string, creation: number, size: number, blocks: number, blksize: number }
 

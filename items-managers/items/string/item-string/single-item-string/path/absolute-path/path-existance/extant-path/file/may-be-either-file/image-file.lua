@@ -6,13 +6,13 @@ ImageFileItemSpecifier = {
   properties = {
     getables = {
       ["as-hs-image"] = function(self)
-        return transf.image_url.hs_image(self:get("completely-resolved-path"))
+        return transf.real_image_path.hs_image(self:get("completely-resolved-path"))
       end,
       ["chooser-image"] = function(self)
         return self:get("as-hs-image")
       end,
       ["booru-url"] = function(self)
-        return transf.image_url.booru_url(self:get("completely-resolved-path"))
+        return transf.real_image_path.booru_url(self:get("completely-resolved-path"))
       end,
       ["qr-data"] = function(self)
         return transf.real_image_path.qr_data(self:get("completely-resolved-path"))

@@ -5,7 +5,16 @@ ImageURLItemSpecifier = {
     getables = {
       ["booru-url"] = function (self)
         return transf.image_url.booru_url(self:get("contents"))
-      end
+      end,
+      ["as-hs-image"] = function(self)
+        return transf.image_url.hs_image(self:get("contents"))
+      end,
+      ["chooser-image"] = function(self)
+        return self:get("as-hs-image")
+      end,
+      ["qr-data"] = function(self)
+        return transf.image_url.qr_data(self:get("completely-resolved-path"))
+      end,
     },
     doThisables = {
       ["add-to-local-booru"] = function(self)
