@@ -124,10 +124,10 @@ transf = {
     hs_image = function(path)
       return memoize(hs.image.imageFromPath, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromPath")(path)
     end,
-    booru_url = function(url)
+    booru_url = function(path)
       return run(
         "saucenao --file" ..
-        transf.string.single_quoted_escaped(url)
+        transf.string.single_quoted_escaped(path)
         .. "--output-properties booru-url"
       )
     end,

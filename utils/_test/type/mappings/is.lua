@@ -162,3 +162,35 @@ assert(
 assert(
   not is.url.otpauth_url("https://example.com")
 )
+
+assert(
+  is.url.data_url("data:text/plain;charset=utf-8;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
+)
+
+assert(
+  not is.url.data_url("https://example.com")
+)
+
+assert(
+  is.path.has_extension("example.txt")
+)
+
+assert(
+  not is.path.has_extension("example")
+)
+
+assert(
+  is.data_url.base64("data:text/plain;charset=utf-8;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
+)
+
+assert(
+  not is.data_url.base64("data:text/plain;charset=utf-8;,SGVsbG8sIFdvcmxkIQ%3D%3D%3D")
+)
+
+assert(
+  is.media_type.image("image/png")
+)
+
+assert(
+  not is.media_type.image("text/plain")
+)

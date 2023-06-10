@@ -1051,8 +1051,8 @@ assertMessage(
 )
 
 assertMessage(
-  transf.image_url.booru_url("https://i.pximg.net/img-master/img/2022/06/13/08/08/53/99021734_p0_master1200.jpg"),
-  "https://danbooru.donmai.us/posts/5435025"
+  transf.image_url.booru_url("https://cdn.donmai.us/original/82/cf/__kia_and_ati_steampunk_and_1_more_drawn_by_ooishi_ryuuko__82cf8ce1f00c40754920eb87f296f2c8.png"),
+  "https://danbooru.donmai.us/posts/199016"
 )
 
 assertMessage(
@@ -1418,4 +1418,31 @@ assertMessage(
 assertMessage(
   transf.string.japanese_writing(jp_sent),
   "いい性別だね。それ、お袋が選んだの？"
+)
+
+assertMessage(
+  transf.path.file_url("/home/user/test.txt"),
+  "file:///home/user/test.txt"
+)
+
+assertMessage(
+  transf.path.extension("/home/user/test.txt"),
+  "txt"
+)
+
+assertMessage(
+  transf.path.extension("/home/user/test"),
+  ""
+)
+
+assertMessage(
+  transf.real_image_path.booru_url(transf.url.in_cache_dir("https://cdn.donmai.us/original/82/cf/__kia_and_ati_steampunk_and_1_more_drawn_by_ooishi_ryuuko__82cf8ce1f00c40754920eb87f296f2c8.png")),
+  "https://danbooru.donmai.us/posts/199016"
+)
+
+assert(
+  stringy.startswith(
+    transf.real_image_path.data_url(env.MMOCK .. "files/binary/image/png/tiny_blank.png"),
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKEAYAAADdohP"
+  )
 )

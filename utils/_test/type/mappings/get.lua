@@ -324,3 +324,17 @@ dothis.pass.delete("test_password_name2")
 dothis.pass.delete("test", "basic_test")
 dothis.pass.delete("test", "json_test")
 dothis.pass.delete("contacts/contact_test_type", "contact_test")
+
+local current_default_audio_output = get.audiodevice_system.default("output")
+local built_in_output = hs.audiodevice.findDeviceByName("Built-in Output")
+
+dothis.audiodevice.set_default("Built-in Output", "output")
+
+local now_default_audio_output = get.audiodevice_system.default("output")
+
+assertMessage(
+  get.audiodevice.name(now_default_audio_output),
+  "Built-in Output"
+)
+
+assert(get.audiodevice.is_default(built_in_output, "output"))
