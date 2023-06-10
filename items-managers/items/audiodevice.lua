@@ -4,13 +4,10 @@ AudiodeviceItemSpecifier = {
   properties = {
     getables = {
       ["name"] = function (self)
-        return self:get("contents").device:name()
-      end,
-      ["default-device-subtype"] = function(self) 
-        return "default" .. replace(self:get("contents").subtype, to.case.capitalized) .. "Device"
+        return get.audiodevice.name(self:get("device"))
       end,
       ["is-default-device"] = function (self) 
-        return self:get("device") == hs.audiodevice[self:get("default-device-subtype")]()
+        return get.audiodevice.is_default(self:get("device"), self:get("subtype"))
       end,
       ["to-string"] = function(self)
         return self:get("name")
@@ -27,7 +24,7 @@ AudiodeviceItemSpecifier = {
     },
     doThisables = {
       ["set-default"] = function(self)
-        self:get("device")["set" .. replace(self:get("default-device-subtype"), to.case.capitalized)](self:get("device"))
+        dothis.audiodevice.set_default(self:get("device"), self:get("subtype"))
       end,
     }
   }

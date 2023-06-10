@@ -9,8 +9,8 @@ AlphanumMinusUnderscoreItemSpecifier = {
       ["is-alphanum-minus"] = function(self)
         return is.alphanum_minus_underscore.alphanum_minus(self:get("contents"))
       end,
-      ["is-youtube-id"] = function(self)
-        return is.alphanum_minus_underscore.youtube_id(self:get("contents"))
+      ["is-youtube-video-id"] = function(self)
+        return is.alphanum_minus_underscore.youtube_video_id(self:get("contents"))
       end,
       ["is-youtube-channel-id"] = function(self)
         return is.alphanum_minus_underscore.youtube_channel_id(self:get("contents"))
@@ -23,7 +23,8 @@ AlphanumMinusUnderscoreItemSpecifier = {
   potential_interfaces = ovtable.init({
     { key = "word", value = CreateWordItem },
     { key = "alphanum-minus", value = CreateAlphanumMinusItem },
-    { key = "youtube-id", value = CreateYoutubeIdItem },
+    { key = "youtube-id", value = CreateYoutubeVideoIdItem },
+    { key = "youtube-playlist-id", value = CreateYoutubePlaylistIdItem},
     { key = "youtube-channel-id", value = CreateYoutubeChannelIdItem },
     { key = "package-manager", value = CreatePackageManagerItem },
   })

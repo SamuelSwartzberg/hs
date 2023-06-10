@@ -69,8 +69,8 @@ dothis = {
     end,
   },
   khard = {
-    edit = function(uid)
-      run("khard edit " .. uid, true)
+    edit = function(uid, do_after)
+      run("khard edit " .. uid, do_after)
     end,
   },
   khal = {
@@ -317,8 +317,8 @@ dothis = {
     rec_start_cache = function(do_after)
       dothis.sox.rec_start(transf.string.in_cache_dir(os.time(), "recording"), do_after)
     end,
-    rec_stop = function()
-      run("killall rec")
+    rec_stop = function(do_after)
+      run("killall rec", do_after)
     end,
     rec_toggle_cache = function(do_after)
       if get.sox.is_recording() then
@@ -338,6 +338,27 @@ dothis = {
       if not testPath(path) then
         run("qrencode -l M -m 2 -t PNG -o" .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(data))
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
+    end,
+  },
+  real_audio_path = {
+    play = function(path, do_after)
+      run("play " .. transf.string.single_quoted_escaped(path), do_after)
+    end
+  },
+  audiodevice = {
+    set_default = function(device, type)
+      device["setDefault" .. transf.word.capitalized(type) .. "Device"](device)
+    end,
+    ensure_sound_will_be_played = function(device)
+      device:setOutputMuted(false)
+      device:setOutputVolume(100)
+    end,
+  },
+  audiodevice_system = {
+    ensure_sound_played_on_speakers = function()
+      local device = hs.audiodevice.findOutputByName("Built-in Output")
+      dothis.audiodevice.ensure_sound_will_be_played(device)
+      dothis.audiodevice.set_default(device, "output")
     end,
   }
 

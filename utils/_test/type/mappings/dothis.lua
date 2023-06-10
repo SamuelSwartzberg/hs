@@ -338,3 +338,40 @@ dothis.url.download(transf.path.file_url(env.MMOCK .. "/files/plaintext/txt/hell
 assert(
   readFile(tgt) == "Hello World!"
 )
+
+local yaml_contact_by_uuid = transf.uuid.contact_table("a615b162-a203-4a24-a392-87ba3a7ca80c")
+
+assertMessage(
+  yaml_contact_by_uuid.name,
+  "Test Contact Germany English 001"
+)
+
+dothis.khard.edit("a615b162-a203-4a24-a392-87ba3a7ca80c", function()
+  assertMessage(
+    transf.uuid.contact_table("a615b162-a203-4a24-a392-87ba3a7ca80c").name,
+    "Test Contact Germany English 001"
+  )
+end)
+
+dothis.sox.rec_start_cache(function(path)
+  dothis.audiodevice_system.ensure_sound_played_on_speakers()
+  dothis.real_audio_path.play(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3", function()
+    dothis.sox.rec_stop(function()
+      assertMessage(
+        transf.real_audio_path.transcribed(path),
+        "This is a testfile containing my voice."
+      )
+      dothis.sox.rec_toggle_cache()
+      dothis.real_audio_path.play(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3", function()
+        dothis.sox.rec_toggle_cache(function(recpath)
+          assertMessage(
+            transf.real_audio_path.transcribed(recpath),
+            "This is a testfile containing my voice."
+          )
+        end)
+      end)
+    end)
+  end)
+end)
+
+

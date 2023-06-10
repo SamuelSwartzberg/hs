@@ -35,8 +35,8 @@ end
 --- @field args command_parts | string
 --- @field catch? boolean | fun(exit_code: integer, std_err: string): (any) if the catch returns true or there is no custom catch, run the default catch, which will print the error and exit. if true is provided as a catch value, a catch will be used that ignores the error and does nothing
 --- @field finally? fun(exit_code: integer, std_err_or_out: string): any currently, finally may run before and_then if and_then is async or has a delay
---- @field force_sync? boolean if true, will run the task synchronously, even if and_then is provided
---- @field dont_clean_output? boolean
+--- @field force_sync? boolean if true, will run the task synchronously, even if and_then is provided. Default: false
+--- @field dont_clean_output? boolean if true, will not strip leading and trailing whitespace from the output. Default: false
 --- @field run_raw_shell? boolean if true, will run the task in a raw shell, rather than first switching to bash and loading the envfile
 --- @field error_on_empty_output? boolean error also if the output is empty
 --- @field accept_error_payload? boolean only relevant for JSON. If true, will accept a payload even it contains an error key.

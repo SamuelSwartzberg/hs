@@ -50,11 +50,14 @@ is = {
     alphanum_minus = function(str)
       return not string.find(str, "_")
     end,
-    youtube_id = function(str)
+    youtube_video_id = function(str)
       return #str == 11 -- not officially specified, but b/c 64^11 > 2^64 > 64^10 and 64 chars in base64, allowing for billions of ids per living person, unlikely to change
     end,
+    youtube_playlist_id = function(str)
+      return stringy.startswith(str, "PL") and #str == 34
+    end,
     youtube_channel_id = function(str)
-      return #str == 24 -- standartized length
+      return stringy.startswith(str, "UC") and #str == 24
     end,
   },
   url = {
@@ -80,5 +83,6 @@ is = {
     image = function(media_type)
       return stringy.startswith(media_type, "image/")
     end,
-  }
+  },
+  
 }

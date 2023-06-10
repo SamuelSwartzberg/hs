@@ -3,6 +3,7 @@ local rrq = bindArg(relative_require, "items-managers.items.string.item-string.s
 rrq("word")
 rrq("alphanum-minus")
 rrq("youtube-channel-id")
+rrq("youtube-video-id")
+rrq("youtube-playlist-id")
 rrq("package-manager")
-rrq("youtube-id")
 rrq("alphanum-minus-underscore")

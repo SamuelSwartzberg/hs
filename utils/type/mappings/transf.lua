@@ -323,7 +323,10 @@ transf = {
       return memoize(run)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
     end,
     qr_utf8_image_wob = function(data)
-      return memoize(run)("qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data))
+      return memoize(run, refstore.params.memoize.opts.stringify_json)({
+        args = "qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data),
+        dont_clean_output = true,
+      })
     end,
     qr_png_in_cache = function(data)
       local path = transf.string.in_cache_dir(data, "qr")
@@ -538,20 +541,26 @@ transf = {
       end
       return parsed
     end,
+    kana_inner = function(argstr)
+      return run("kana --vowel-shortener x " .. argstr )
+    end,
+    kana_inner_nospaces = function(argstr)
+      return run("kana --vowel-shortener x " .. argstr .. "| tr -d ' '")
+    end,
     hiragana_only = function(str)
-      return run("kana --vowel-shortener x" .. transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner(transf.string.single_quoted_escaped(str))
     end,
     katakana_only = function(str)
-      return run("kana --vowel-shortener x --katakana --extended" .. transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner("--katakana --extended" .. transf.string.single_quoted_escaped(str))
     end,
     hiragana_punct = function(str)
-      return run("kana --vowel-shortener x --punctuation" .. transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner_nospaces("--punctuation" .. transf.string.single_quoted_escaped(str))
     end,
     katakana_punct = function(str)
-      return run("kana --vowel-shortener x --katakana --extended --punctuation" .. transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner_nospaces("--katakana --extended --punctuation" .. transf.string.single_quoted_escaped(str))
     end,
     kana_mixed = function(str)
-      return run("kana --vowel-shortener x --extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner("--extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.string.single_quoted_escaped(str))
     end,
     japanese_writing = function(str)
       return gpt("You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:\n\n" .. str, {temperature = 0})
@@ -634,6 +643,9 @@ transf = {
       else
         return replace(word, to.case.capitalized)
       end
+    end,
+    capitalized = function(word)
+      return replace(word, to.case.capitalized)
     end,
     synonyms = {
 
@@ -787,6 +799,20 @@ transf = {
     bibtex = function(isbn)
       return run(
         "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " bibtex"
+      )
+    end,
+  },
+  isbn10 = {
+    isbn13 = function(isbn10)
+      return run(
+        "to_isbn13" .. transf.string.single_quoted_escaped(isbn10)
+      )
+    end,
+  },
+  isbn13 = {
+    isbn10 = function(isbn13)
+      return run(
+        "to_isbn10" .. transf.string.single_quoted_escaped(isbn13)
       )
     end,
   },

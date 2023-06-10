@@ -1001,6 +1001,16 @@ assertMessage(
   "NASA"
 )
 
+assertMessage(
+  transf.youtube_playlist_url.youtube_playlist_id("https://www.youtube.com/playlist?list=PL1D946ACB21752C0E"),
+  "PL1D946ACB21752C0E"
+)
+
+assertMessage(
+  transf.youtube_video_url.youtube_video_id("https://www.youtube.com/watch?v=doN4t5NKW-k"),
+  "doN4t5NKW-k"
+)
+
 -- cleaning
 
 assertMessage(
@@ -1112,3 +1122,300 @@ assert(
   transf.real_image_path.hs_image(env.MMOCK .. "/files/binary/image/png/basic.png").toASCII
 )
 
+assertMessage(
+  transf.string.in_cache_dir("foo"),
+  env.XDG_CACHE_HOME .. "/hs/default/foo"
+)
+
+assertMessage(
+  transf.string.in_cache_dir("foo", "bar"),
+  env.XDG_CACHE_HOME .. "/hs/bar/foo"
+)
+
+assertMessage(
+  transf.string.safe_filename("foo"),
+  "foo"
+)
+
+assertMessage(
+  transf.string.safe_filename("foo\abar"),
+  "foo_bar"
+)
+
+assertMessage(
+  transf.string.safe_filename("foo/bar"),
+  "foo_bar"
+)
+
+assertMessage(
+  transf.string.safe_filename("foo \t bar"),
+  "foo_bar"
+)
+
+assertMessage(
+  transf.string.safe_filename("."),
+  "_"
+)
+
+assertMessage(
+  transf.string.safe_filename(multiply("a", 400)),
+  multiply("a", 255)
+)
+
+assertMessage(
+  transf.string.safe_filename(""),
+  "_"
+)
+
+assertMessage(
+  transf.string.in_cache_dir("foo/bar/baz"),
+  env.XDG_CACHE_HOME .. "/hs/default/foo_bar_baz"
+)
+
+assertMessage(
+  transf.string.qr_utf8_image_bow("1"),
+[[█████████████████████████
+██ ▄▄▄▄▄ █▀██▀██ ▄▄▄▄▄ ██
+██ █   █ ██▀▄ ██ █   █ ██
+██ █▄▄▄█ █▄▄▄█ █ █▄▄▄█ ██
+██▄▄▄▄▄▄▄█▄█▄▀ █▄▄▄▄▄▄▄██
+██▄▀▄▀ █▄█▀█▄▄██▀█▄█▀ ███
+██▀▀▄▄▀▄▄▀▄█▄█▄█▀█▄█▀▀▄██
+██████▄█▄▄▀█ ▀▄▀▄▀▄▀▄ ▄██
+██ ▄▄▄▄▄ ██▀█ ▀ ▄ ▀ ▄ ▄██
+██ █   █ █▄▀▀▄█▄ ▄█▄ ▀▄██
+██ █▄▄▄█ █▄▀▀█▄█▀█▄█▀█▄██
+██▄▄▄▄▄▄▄█▄███▄█▄█▄█▄█▄██
+█████████████████████████]]
+)
+
+assertMessage(
+  transf.string.qr_utf8_image_wob("1"),
+[[                         
+  █▀▀▀▀▀█ ▄  ▄  █▀▀▀▀▀█  
+  █ ███ █  ▄▀█  █ ███ █  
+  █ ▀▀▀ █ ▀▀▀ █ █ ▀▀▀ █  
+  ▀▀▀▀▀▀▀ ▀ ▀▄█ ▀▀▀▀▀▀▀  
+  ▀▄▀▄█ ▀ ▄ ▀▀  ▄ ▀ ▄█   
+  ▄▄▀▀▄▀▀▄▀ ▀ ▀ ▄ ▀ ▄▄▀  
+      ▀ ▀▀▄ █▄▀▄▀▄▀▄▀█▀  
+  █▀▀▀▀▀█  ▄ █▄█▀█▄█▀█▀  
+  █ ███ █ ▀▄▄▀ ▀█▀ ▀█▄▀  
+  █ ▀▀▀ █ ▀▄▄ ▀ ▄ ▀ ▄ ▀  
+  ▀▀▀▀▀▀▀ ▀   ▀ ▀ ▀ ▀ ▀  
+                         ]]
+)
+
+assertMessage(
+  transf.string.qr_png_in_cache("This string has emoji 👍 and cool japanese slang like いいね！"),
+  env.XDG_CACHE_HOME .. "/hs/qr/This_string_has_emoji_👍_and_cool_japanese_slang_like_いいね！.png"
+)
+
+-- Test 1: Basic URL encoding
+local test1 = transf.string.urlencoded("https://www.example.com/test url")
+assertMessage(test1, "https%3A%2F%2Fwww.example.com%2Ftest+url")
+
+-- Test 2: Spaces encoded as %20
+local test2 = transf.string.urlencoded("https://www.example.com/test url", true)
+assertMessage(test2, "https%3A%2F%2Fwww.example.com%2Ftest%20url")
+
+-- Test 3: Spaces encoded as + (default behavior)
+local test3 = transf.string.urlencoded("https://www.example.com/test url", false)
+assertMessage(test3, "https%3A%2F%2Fwww.example.com%2Ftest+url")
+
+-- Test 4: Special characters encoding
+local test4 = transf.string.urlencoded("https://www.example.com/test?query=parameter&value=10")
+assertMessage(test4, "https%3A%2F%2Fwww.example.com%2Ftest%3Fquery%3Dparameter%26value%3D10")
+
+assertMessage(
+  transf.string.urldecode("https%3A%2F%2Fwww.example.com%2Ftest%20url"),
+  "https://www.example.com/test url"
+)
+
+assertMessage(
+  transf.url.param_table("https://www.example.com/test"),
+  {}
+)
+
+assertMessage(
+  transf.url.param_table("https://www.example.com/test?foo=bar"),
+  { foo = "bar" }
+)
+
+assertMessage(
+  transf.url.param_table("https://www.example.com/test?foo=bar&baz=qux"),
+  { foo = "bar", baz = "qux" }
+)
+
+assertMessage(
+  transf.url.param_table("https://www.example.com/test?foo=bar%20baz&baz=qux"),
+  { foo = "bar baz", baz = "qux" }
+)
+
+assertMessage(
+  transf.url.param_table("https://www.example.com/test?foo=bar baz&baz=qux"),
+  { foo = "bar baz", baz = "qux" }
+)
+
+assertMessage(
+  transf.url.no_scheme("https://www.example.com/test"),
+  "www.example.com/test"
+)
+
+assertMessage(
+  transf.url.no_scheme("www.example.com/test"),
+  "www.example.com/test"
+)
+
+assertMessage(
+  transf.url.no_scheme("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ=="),
+  "text/plain;base64,SGVsbG8sIFdvcmxkIQ=="
+)
+
+assertMessage(
+  transf.url.in_cache_dir("https://www.example.com/test"),
+  env.XDG_CACHE_HOME .. "/hs/url/https:__www.example.com_test"
+)
+
+assertMessage(
+  transf.mailto_url.emails("mailto:someone@example.com?subject=This%20is%20the%20subject&cc=someone_else@example.com&body=This%20is%20the%20body"),
+  { "someone@example.com" }
+)
+
+assertMessage(
+  transf.mailto_url.emails("mailto:someone@example.com,someoneelse@example.com"),
+  {"someone@example.com","someoneelse@example.com"}
+)
+
+assertMessage(
+  transf.mailto_url.first_email("mailto:someone@example.com,someoneelse@example.com"),
+  "someone@example.com"
+)
+
+assertMessage(
+  transf.mailto_url.subject("mailto:someone@example.com?subject=This%20is%20the%20subject&cc=someone_else@example.com&body=This%20is%20the%20body"),
+  "This is the subject"
+)
+
+assertMessage(
+  transf.mailto_url.cc("mailto:someone@example.com?subject=This%20is%20the%20subject&cc=someone_else@example.com&body=This%20is%20the%20body"),
+  "someone_else@example.com"
+)
+
+assertMessage(
+  transf.tel_url.phone_number("tel:+1-202-555-0101"),
+  "+1-202-555-0101"
+)
+
+assertMessage(
+  transf.otpauth_url.type("otpauth://totp/Test%20Issuer%3ATest%20Account?secret=12345678901234567890&issuer=Test%20Issuer"),
+  "totp"
+)
+
+assertMessage(
+  transf.otpauth_url.label("otpauth://totp/Test%20Issuer%3ATest%20Account?secret=12345678901234567890&issuer=Test%20Issuer"),
+  "Test Issuer:Test Account"
+)
+
+assertMessage(
+  transf.doi.doi_url("https://doi.org/10.1000/182"),
+  "https://doi.org/10.1000/182"
+)
+
+assertMessage(
+  transf.doi.doi_url("10.1000/182"),
+  "https://doi.org/10.1000/182"
+)
+
+assert(
+  stringy.startswith(
+    transf.doi.bibtex("10.1038/nature14539"),
+    "@article{LeCun_2015,"
+  )
+)
+
+assert(
+  stringy.startswith(
+    transf.isbn.bibtex("978-0-262-13472-9"),
+    "@book{9780262134729,"
+  )
+)
+
+assertMessage(
+  transf.not_userdata_or_function.in_cache_dir(false, "test"),
+  env.XDG_CACHE_HOME .. "/hs/test/" .. transf.not_userdata_or_function.md5(false)
+)
+
+assertMessage(
+  transf.bibtex_string.csl_table(transf.doi.bibtex("10.1038/nature14539")),
+  json.decode([[
+    [
+      {
+        "DOI": "10.1038/nature14539",
+        "URL": "https://doi.org/10.1038%2Fnature14539",
+        "author": [
+          {
+            "family": "LeCun",
+            "given": "Yann"
+          },
+          {
+            "family": "Bengio",
+            "given": "Yoshua"
+          },
+          {
+            "family": "Hinton",
+            "given": "Geoffrey"
+          }
+        ],
+        "container-title": "Nature",
+        "id": "LeCun_2015",
+        "issue": "7553",
+        "issued": {
+          "date-parts": [
+            [
+              2015,
+              5
+            ]
+          ]
+        },
+        "page": "436-444",
+        "publisher": "Springer Science and Business Media LLC",
+        "title": "Deep learning",
+        "type": "article-journal",
+        "volume": "521"
+      }
+    ]
+  ]])
+)
+
+local jp_sent = "Ii seibetsu da ne. Sore, ofuku ga eranda no?"
+
+assertMessage(
+  transf.string.hiragana_only(jp_sent),
+  "いい せいべつ だ ね. それ, おふく が えらんだ の?"
+)
+
+assertMessage(
+  transf.string.hiragana_punct(jp_sent),
+  "いいせいべつだね。それ、おふくがえらんだの？"
+)
+
+assertMessage(
+  transf.string.katakana_only(jp_sent),
+  "イイ セイベツ ダ ネ. ソレ, オフク ガ エランダ ノ?"
+)
+
+assertMessage(
+  transf.string.katakana_punct(jp_sent),
+  "イイセイベツダネ。ソレ、オフクガエランダノ？"
+)
+
+assertMessage(
+  transf.string.kana_mixed("kore,hiraganade.†Kore, romaji de.ΔKore, katakanade."),
+  "これ、ひらがなで。Kore, romaji de. コレ、カタカナデ。"
+)
+
+assertMessage(
+  transf.string.japanese_writing(jp_sent),
+  "いい性別だね。それ、お袋が選んだの？"
+)

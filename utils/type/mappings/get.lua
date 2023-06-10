@@ -63,23 +63,28 @@ get = {
       return lines(run("upkg " .. (mgr or "") .. " difference"))
     end,
     package_manager_version = function(mgr)
-      return lines(run("upkg " .. (mgr or "") .. " package-manager-version"))
+      return run("upkg " .. (mgr or "") .. " package-manager-version")
     end,
     which_package_manager = function(mgr)
-      return lines(run("upkg " .. (mgr or "") .. " which-package-manager"))
+      return run("upkg " .. (mgr or "") .. " which-package-manager")
     end,
-    package_managers_with_missing_packages = function(mgr)
-      return lines(run("upkg " .. (mgr or "") .. " missing-package-managers"))
+    package_managers_with_missing_packages = function()
+      return lines(run("upkg missing-package-manager"))
     end,
     list = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list ")) end,
+    list_version = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list-version ")) end,
+    list_no_version = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list-no-version ")) end,
+    list_version_package_manager = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
+    list_with_package_manager = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
     count = function(mgr) return lines(run("upkg " .. (mgr or "") .. " count ")) end,
     with_version = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
     with_version_package_manager = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
+    with_package_manager = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
     version = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
     which = function(mgr, arg) return lines(run("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
     is_installed = function(mgr, arg) return pcall(run, "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
-    installed_package_manager = function(arg) return lines(run("upkg " .. (arg or "") .. " is-installed-package-manager")) end,
+    installed_package_manager = function(arg) return lines(run("upkg " .. (arg or "") .. " installed-package-manager")) end,
   
   },
   khal = {
@@ -215,6 +220,19 @@ get = {
     is_recording = function()
       local succ, res = pcall(run, "pgrep -x rec")
       return succ
+    end,
+  },
+  audiodevice_system = {
+    default = function(type)
+      return hs.audiodevice["default" .. transf.word.capitalized(type) .. "Device"]()
+    end,
+  },
+  audiodevice = {
+    is_default = function (device, type)
+      return device == get.audiodevice_system.default(type)
+    end,
+    name = function(device)
+      return device:name()
     end,
   }
 }

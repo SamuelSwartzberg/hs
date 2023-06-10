@@ -847,3 +847,22 @@ assert(create_res == nil)
 local succ, res = pcall(createPath, "/foo", nil, "error")
 
 assert(not succ)
+
+-- test urls as source of srctgt when action "copy"
+
+local url_tgt_path = env.TMPDIR .. "/helloworld-" .. os.time() .. ".txt"
+local url_tgt_dir = env.TMPDIR .. "/helloworld-" .. os.time() .. "/"
+
+srctgt("copy", env.MMOCK .. "/files/plaintext/txt/helloworld.txt", url_tgt_path)
+
+assertMessage(
+  readFile(url_tgt_path),
+  "Hello World!"
+)
+
+srctgt("copy", env.MMOCK .. "/files/plaintext/txt/helloworld.txt", url_tgt_dir, true, true)
+
+assertMessage(
+  readFile(url_tgt_dir .. "helloworld.txt"),
+  "Hello World!"
+)

@@ -22,6 +22,12 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
   local source_is_url = isUrl(source)
 
   if source_is_url then
+    if action == "move" or action == "link" then
+      error("cannot " .. action .. " a URL")
+    end
+    if all_in then
+      error("cannot action all_in a URL, as listing the contents of a URL cannot reliably be done")
+    end
     local url = source
     source = transf.url.in_cache_dir(url)
     run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(source))

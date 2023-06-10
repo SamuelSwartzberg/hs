@@ -98,3 +98,67 @@ assert(
 assert(
   not is.path.playable_file("example")
 )
+
+assert(
+  is.alphanum_minus_underscore.word("foo_bar")
+)
+
+assert(
+  not is.alphanum_minus_underscore.word("foo-bar")
+)
+
+assert(
+  is.alphanum_minus_underscore.alphanum_minus("foo-bar")
+)
+
+assert(
+  not is.alphanum_minus_underscore.alphanum_minus("foo_bar")
+)
+
+assert(
+  is.alphanum_minus_underscore.youtube_video_id("Y7dpJ0oseIA")
+)
+
+assert(
+  not is.alphanum_minus_underscore.youtube_video_id("PLJicmE8fK0EgWJTaILL9k6D9B9FEo5EiP")
+)
+
+assert(
+  is.alphanum_minus_underscore.youtube_playlist_id("PLJicmE8fK0EgWJTaILL9k6D9B9FEo5EiP")
+)
+
+assert(
+  not is.alphanum_minus_underscore.youtube_playlist_id("Y7dpJ0oseIA")
+)
+
+assert(
+  is.alphanum_minus_underscore.youtube_channel_id("UCJicmE8fK0EgWJTaILL9k6D9B9FEo5EiP")
+)
+
+assert(
+  not is.alphanum_minus_underscore.youtube_channel_id("Y7dpJ0oseIA")
+)
+
+assert(
+  is.url.mailto_url("mailto:someone@example.com?subject=This%20is%20the%20subject&cc=someone_else@example.com&body=This%20is%20the%20body")
+)
+
+assert(
+  not is.url.mailto_url("https://example.com")
+)
+
+assert(
+  is.url.tel_url("tel:+1-555-555-5555")
+)
+
+assert(
+  not is.url.tel_url("https://example.com")
+)
+
+assert(
+  is.url.otpauth_url("otpauth://totp/Test%20Issuer%3ATest%20Account?secret=12345678901234567890&issuer=Test%20Issuer")
+)
+
+assert(
+  not is.url.otpauth_url("https://example.com")
+)
