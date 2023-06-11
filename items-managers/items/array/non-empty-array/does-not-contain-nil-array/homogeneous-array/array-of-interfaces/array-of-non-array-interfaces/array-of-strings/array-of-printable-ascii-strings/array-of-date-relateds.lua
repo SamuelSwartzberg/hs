@@ -28,7 +28,7 @@ ArrayOfDateRelatedItemsSpecifier = {
       end,
       ["is-in-range"] = function(self, date) -- date must be a date-related-item, or a raw rfc3339 date
         if date.get and date:get("is-date-related-item") then
-          date = date:get("contents")
+          date = date:get("c")
         end
         return self:get("smallest-date") <= date and date <= self:get("largest-date")
       end,

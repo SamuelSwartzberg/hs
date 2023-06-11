@@ -4,10 +4,10 @@ BinaryFileItemSpecifier = {
   properties = {
     getables = {
       ["is-db-file"] = function(self)
-        return is.path.usable_as_filetype(self:get("contents"), "db")
+        return is.path.usable_as_filetype(self:get("c"), "db")
       end,
       ["is-playable-file"] = function (self)
-        return is.path.playable_file(self:get("contents"))
+        return is.path.playable_file(self:get("c"))
       end
     },
     doThisables = {

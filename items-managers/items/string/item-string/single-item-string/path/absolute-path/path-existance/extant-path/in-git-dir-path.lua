@@ -5,7 +5,7 @@ InGitDirPathItemSpecifier = {
     getables = {
       ["git-root-dir"] = function(self)
         if self:get("is-git-root-dir") then return self:get("completely-resolved-path") end
-        local dotgit = memoize(getItemsForAllLevelsInSlice)(self:get("contents"), "1:-2", {
+        local dotgit = memoize(getItemsForAllLevelsInSlice)(self:get("c"), "1:-2", {
           include_files = false,
           validator_result = bind(stringy.endswith, {a_use, "/.git"})
         })[1]

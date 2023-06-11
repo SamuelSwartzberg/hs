@@ -549,7 +549,7 @@ assertMessage(
 )
 
 assertMessage(
-  item_array_of_item_tables:get("contents")[1].type,
+  item_array_of_item_tables:get("c")[1].type,
   "table"
 )
 
@@ -813,17 +813,17 @@ local stritmarr = transf.array_of_strings.item_array_of_string_items({
   })
 
 assertMessage(
-  stritmarr:get("contents")[1].type,
+  stritmarr:get("c")[1].type,
   "string"
 )
 
 assertMessage(
-  stritmarr:get("contents")[2]:get("contents"),
+  stritmarr:get("c")[2]:get("c"),
   "bar"
 )
 
 assertMessage(
-  stritmarr:get("contents")[3]:get("contents"),
+  stritmarr:get("c")[3]:get("c"),
   "baz"
 )
 
@@ -896,7 +896,7 @@ assertMessage(
 local event_tbl_item_arr = transf.array_of_event_tables.item_array_of_event_table_items(compound_tbl)
 
 assertMessage(
-  event_tbl_item_arr:get("contents")[1].uid,
+  event_tbl_item_arr:get("c")[1].uid,
   "1234"
 )
 

@@ -4,13 +4,13 @@ HexadecimalDigitStringItemSpecifier = {
   properties = {
     getables = {
       ["hexadecimal-numeric-value"] = function(self)
-        return tonumber(self:get("contents"), 16)
+        return tonumber(self:get("c"), 16)
       end,
       ["hexadecimal-to-number-interface"] = function(self)
         return CreateNumber(self:get("hexadecimal-numeric-equivalent"))
       end,
       ["hexadecimal-to-corresponding-string"] = function(self)
-        return basexx.from_hex(self:get("contents"))
+        return basexx.from_hex(self:get("c"))
       end,
     }
   },

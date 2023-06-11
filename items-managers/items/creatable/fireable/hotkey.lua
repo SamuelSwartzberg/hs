@@ -4,7 +4,7 @@ HotkeyItemSpecifier = {
   properties = {
     getables = {
       ["hotkey"] = function(self)
-        return self:get("contents").hotkey
+        return self:get("c").hotkey
       end,
       ["explanation"] = function(self)
         return self:get("specifier").explanation

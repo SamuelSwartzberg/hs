@@ -4,13 +4,13 @@ BinaryDigitStringItemSpecifier = {
   properties = {
     getables = {
       ["binary-numeric-value"] = function(self)
-        return tonumber(self:get("contents"), 2)
+        return tonumber(self:get("c"), 2)
       end,
       ["binary-to-number-interface"] = function(self)
         return CreateNumber(self:get("binary-numeric-equivalent"))
       end,
       ["binary-to-corresponding-string"] = function(self)
-        return basexx.from_bit(self:get("contents"))
+        return basexx.from_bit(self:get("c"))
       end,
 
     },

@@ -3,9 +3,9 @@ ArrayOfStringItemsSpecifier = {
   type = "array-of-strings-item",
   properties = {
     getables = {
-      ["to-string-array"] = function(self) return self:get("map-to-new-array", function(item) return item:get("contents") end) end,
+      ["to-string-array"] = function(self) return self:get("map-to-new-array", function(item) return item:get("c") end) end,
       ["filter-empty-strings-to-new-array"] = function(self)
-        return self:get("filter-to-new-array", function(item) return item:get("contents") ~= "" end)
+        return self:get("filter-to-new-array", function(item) return item:get("c") ~= "" end)
       end,
       ["joined-string-contents"] = function(self, joiner) return self:get("to-string-array"):get("joined-string-contents", joiner) end,
       ["to-joined-string-item"] = function(self, joiner) return CreateStringItem(self:get("to-string-array"):get("joined-string-contents", joiner)) end,
@@ -14,7 +14,7 @@ ArrayOfStringItemsSpecifier = {
       ["to-resplit-string-item-array-assume-sep"] = function(self, sep)
         return CreateArray(
           map(
-            self:get("contents"),
+            self:get("c"),
             function (strItem) 
               return strItem:get("to-string-item-array", sep) 
             end,

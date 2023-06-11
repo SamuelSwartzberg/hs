@@ -20,7 +20,7 @@ EnvMapSpecifier = {
       ["env-lines"] = function(self, pkey)
         local  lines = {}
         local pkey_var = pkey and "$" .. pkey .. "/" or ""
-        for key, value in fastpairs(self:get("contents")) do
+        for key, value in fastpairs(self:get("c")) do
           if type(value) == "string" then
             push(lines, string.format("%s=\"%s%s\"", key, pkey_var, value))
           elseif value.type == "env-item" then

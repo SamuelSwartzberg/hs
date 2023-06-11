@@ -4,7 +4,7 @@ ImageDataURLItemSpecifier = {
   properties = {
     getables = {
       ["as-hs-image"] = function (self)
-        return transf.image_url.hs_image(self:get("contents"))
+        return transf.image_url.hs_image(self:get("c"))
       end,
       ["chooser-image"] = function(self)
         return self:get("as-hs-image")

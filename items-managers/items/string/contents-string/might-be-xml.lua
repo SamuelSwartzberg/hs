@@ -4,7 +4,7 @@ MightBeXmlItemSpecifier = {
   properties = {
     getables = {
       ["parse-as-xml"] = function(self)
-        return xml.parse(self:get("contents"))
+        return xml.parse(self:get("c"))
       end,
       ["parse-as-rooted-xml-to-table"] = function(self)
         return CreateTable(self:get("parse-as-xml").children[1])

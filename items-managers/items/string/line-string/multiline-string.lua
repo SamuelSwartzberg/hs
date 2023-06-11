@@ -7,10 +7,10 @@ MultilineStringItemSpecifier = {
   properties = {
     getables = {
       ["parsed-as-yaml"] = function(self) -- not guaranteed to work, as the string may not be yaml. ensure this yourself
-        return yaml.load(self:get("contents"))
+        return yaml.load(self:get("c"))
       end,
       ["lines"] = function(self)
-        return stringy.split(self:get("contents"), "\n")
+        return stringy.split(self:get("c"), "\n")
       end,
       ["tail"] = function(self, n)
         n = n or 10

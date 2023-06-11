@@ -4,10 +4,10 @@ CreatableItemSpecifier = {
   properties = {
     getables = {
       ["specifier"] = function(self)
-        return self:get("contents").specifier
+        return self:get("c").specifier
       end,
       ["hscreatable"] = function (self)
-        return self:get("contents").hscreatable
+        return self:get("c").hscreatable
       end,
       ["specid"] = function(self)
         local spec = self:get("specifier")
@@ -41,7 +41,7 @@ CreatableItemSpecifier = {
         self:doThis("start")
       end,
       ["create"] = function(self)
-        self:get("contents").hscreatable = self:get("created")
+        self:get("c").hscreatable = self:get("created")
       end,
     }
   },

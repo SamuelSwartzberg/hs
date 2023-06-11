@@ -8,7 +8,7 @@ StateTabbableWindowItemSpecifier = {
       ["list-of-tabs"] = function(self)
         local res = {}
         for i, tab in ipairs(self:get("window-in-state-json").tabs) do
-          tab.window = self:get("contents")
+          tab.window = self:get("c")
           tab.type = "state"
           tab.app = self:get("running-application")
           tab.index = i

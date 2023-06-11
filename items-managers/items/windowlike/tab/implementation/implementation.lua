@@ -4,10 +4,10 @@ TabImplementationItemSpecifier = {
   properties = {
     getables = {
       ["is-jxa-tab"] = function(self) 
-        return self:get("contents").type == "jxa"
+        return self:get("c").type == "jxa"
       end,
       ["is-state-tab"] = function(self) 
-        return self:get("contents").type == "state"
+        return self:get("c").type == "state"
       end,
     },
     doThisables = {

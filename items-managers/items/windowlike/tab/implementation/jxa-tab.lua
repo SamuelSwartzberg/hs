@@ -4,7 +4,7 @@ JxaTabItemSpecifier = {
   properties = {
     getables = {
       ["simple-property"] = function(self, prop)
-        local contents = self:get("contents")
+        local contents = self:get("c")
         return getViaOSA("js", ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(self:get("application-name"), contents.window_index, contents.tab_index, prop))
       end,
       ["raw-title"] = function(self)
@@ -14,10 +14,10 @@ JxaTabItemSpecifier = {
         return self:get("simple-property", "url")
       end,
       ["running-application"] = function(self)
-        return self:get("contents").app
+        return self:get("c").app
       end,
       ["window-title"] = function(self)
-        return getViaOSA("js", ("Application('%s').windows()[%d].%s()"):format(self:get("application-name"), self:get("contents").window_index, "title"))
+        return getViaOSA("js", ("Application('%s').windows()[%d].%s()"):format(self:get("application-name"), self:get("c").window_index, "title"))
       end,
       ["window"] = function(self)
         return self:get("running-application-item"):get("get-window", self:get("window-title") .. " - " .. self:get("application-name"))
@@ -25,11 +25,11 @@ JxaTabItemSpecifier = {
     },
     doThisables = {
        ["make-main"] = function(self)
-        local contents = self:get("contents")
+        local contents = self:get("c")
         getViaOSA("JS", ("Application('%s').windows()[%d].activeTabIndex = %d"):format(self:get("application-name"), contents.window_index, contents.tab_index + 1))
       end,
       ["close"] = function(self)
-        local contents = self:get("contents")
+        local contents = self:get("c")
         getViaOSA("js", ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(self:get("application-name"), contents.window_index, contents.tab_index, "close"))
       end,
 

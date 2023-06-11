@@ -17,11 +17,11 @@ ManagedArraySpecifier = {
     },
     doThisables = {
       ["add-to-end"] = function(self, item)
-        push(self:get("contents"), item)
+        push(self:get("c"), item)
         self:doThis("update-interface-if-necessary", item)
       end,
       ["add-to-front"] = function(self, item)
-        table.insert(self:get("contents"), 1, item)
+        table.insert(self:get("c"), 1, item)
         self:doThis("update-interface-if-necessary", item)
       end,
       ["remove-by-id"] = function (self, id)
@@ -33,7 +33,7 @@ ManagedArraySpecifier = {
         return self:get("remove-by-index", index)
       end,
       ["filter-in-place-valid"] = function(self)
-        for i, item in ipairs(self:get("contents")) do
+        for i, item in ipairs(self:get("c")) do
           if not item:get("is-valid") then
             self:get("remove-by-index", i)
           end
@@ -44,7 +44,7 @@ ManagedArraySpecifier = {
         self:doThis("filter-in-place-valid")
       end,
       ["update-interface"] = function(self)
-        self.root_super:setContents(self:get("contents")) -- this seems like it would be useless, but in fact setting the contents forces the interface to check which potential interfaces apply now
+        self.root_super:setContents(self:get("c")) -- this seems like it would be useless, but in fact setting the contents forces the interface to check which potential interfaces apply now
       end,
       ["update-interface-if-necessary"] = function(self, item) 
       -- since we only check the interfaces of the array on generation, we need to check whether the interfaces of the array are incorrect whenever we add a new item
@@ -66,7 +66,7 @@ ManagedArraySpecifier = {
       ["move-to-index"] = function(self, args)
         local index_of_item = self:get("find-index", function(item) return item == args.item end)
         self:get("remove-by-index", index_of_item)
-        table.insert(self:get("contents"), args.index, args.item)
+        table.insert(self:get("c"), args.index, args.item)
       end,
       ["move-to-front"] = function(self, item)
         self:doThis("move-to-index", {item = item, index = 1})
@@ -75,10 +75,10 @@ ManagedArraySpecifier = {
         self:doThis("move-to-index", item, self:get("length"))
       end,
       ["clear"] = function(self)
-        self:get("contents")
+        self:get("c")
       end,
       ["sort"] = function(self, callback)
-        table.sort(self:get("contents"), callback)
+        table.sort(self:get("c"), callback)
       end,
       ["shuffle"] = function(self)
         self:doThis("sort", function(a, b) return math.random() > 0.5 end)

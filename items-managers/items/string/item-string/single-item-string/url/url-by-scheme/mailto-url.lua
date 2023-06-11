@@ -4,16 +4,16 @@ MailtoURLItemSpecifier = {
   properties = {
     getables = {
       ["first-email"] = function (self)
-        return get.mailto_url.first_email(self:get("contents"))
+        return get.mailto_url.first_email(self:get("c"))
       end,
       ["emails-array"] = function (self)
-        return CreateArray(transf.mailto_url.emails(self:get("contents")))
+        return CreateArray(transf.mailto_url.emails(self:get("c")))
       end,
       ["mailto-subject"] = function (self)
-        return get.mailto_url.subject(self:get("contents"))
+        return get.mailto_url.subject(self:get("c"))
       end,
       ["mailto-body"] = function (self)
-        return get.mailto_url.body(self:get("contents"))
+        return get.mailto_url.body(self:get("c"))
       end,
     }, 
     doThisables = {

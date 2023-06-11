@@ -3,10 +3,10 @@ HasUppercaseStringItemSpecifier = {
   type = "has-uppercase-string",
   properties = {
     getables = {
-      ["contents-as-all-lowercase"] = function(self) return self:get("contents"):lower() end,
-      ["contents-as-lower-snake-case"] = function(self) return eutf8.lower(replace(self:get("contents"), to.case.snake)) end,
+      ["contents-as-all-lowercase"] = function(self) return self:get("c"):lower() end,
+      ["contents-as-lower-snake-case"] = function(self) return eutf8.lower(replace(self:get("c"), to.case.snake)) end,
       ["contents-as-lower-kebap-case"] = function (self)
-        return eutf8.lower(replace(self:get("contents"), to.case.kebap))
+        return eutf8.lower(replace(self:get("c"), to.case.kebap))
       end
     }
   },
@@ -38,10 +38,10 @@ HasLowercaseStringItemSpecifier = {
   type = "has-lowercase-string",
   properties = {
     getables = {
-      ["contents-as-all-uppercase"] = function(self) return self:get("contents"):upper() end,
-      ["contents-as-upper-snake-case"] = function(self) return eutf8.upper(replace(self:get("contents"), to.case.snake)) end,
+      ["contents-as-all-uppercase"] = function(self) return self:get("c"):upper() end,
+      ["contents-as-upper-snake-case"] = function(self) return eutf8.upper(replace(self:get("c"), to.case.snake)) end,
       ["contents-as-upper-kebap-case"] = function (self)
-        return eutf8.upper(replace(self:get("contents"), to.case.kebap))
+        return eutf8.upper(replace(self:get("c"), to.case.kebap))
       end
     }
   },

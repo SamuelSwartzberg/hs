@@ -10,11 +10,11 @@ WordItemSpecifier = {
         return run({
           "echo",
           "-n",
-          "$" .. self:get("contents")
+          "$" .. self:get("c")
         })
       end,
       ["is-lowercase-word"] = function(self)
-        return not eutf8.find(self:get("contents"), "[^%l_]")
+        return not eutf8.find(self:get("c"), "[^%l_]")
       end,
     }
   },

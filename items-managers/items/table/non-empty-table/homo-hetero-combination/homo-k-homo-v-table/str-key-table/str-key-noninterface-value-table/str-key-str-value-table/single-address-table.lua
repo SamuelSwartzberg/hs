@@ -4,7 +4,7 @@ SingleAddressTableSpecifier = {
   properties = {
     getables = {
       ["name-and-address-string-oneline"] = function(self)
-        local address_table = self:get("contents")
+        local address_table = self:get("c")
         return string.format(
           "%s, %s, %s, %s, %s, %s, %s",
           address_table["Formatted name"],
@@ -20,7 +20,7 @@ SingleAddressTableSpecifier = {
         return self:get("name-and-address-string-oneline")
       end,
       ["name-and-address-string-postal"] = function(self)
-        local address_table = self:get("contents")
+        local address_table = self:get("c")
         return 
           address_table["Formatted name"] .. "\n" ..
           address_table["Extended"] .. "\n" ..
@@ -28,7 +28,7 @@ SingleAddressTableSpecifier = {
           address_table["Code"] .. " " .. address_table["City"] 
       end,
       ["name-and-address-string-form"] = function(self) -- there is of course not one type of form for addresses, this is just the most common I've encountered.
-        local address_table = self:get("contents")
+        local address_table = self:get("c")
         return 
           address_table["First name"] .. "\n" ..
           address_table["Last name"] .. "\n" ..

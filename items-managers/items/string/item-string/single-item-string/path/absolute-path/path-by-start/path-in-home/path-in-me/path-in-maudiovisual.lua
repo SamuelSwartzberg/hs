@@ -27,7 +27,7 @@ PathInMaudiovisualItemSpecifier = {
           :doThis("to-stream", specifier)
       end,
       ["do-unavailable-urls"] = function(self, do_after)
-        local urls = self:get("media-urls-array"):get("contents")
+        local urls = self:get("media-urls-array"):get("c")
         runThreaded(map(urls, function(url)
           return url, {"youtube-dl", "--get-title", "--flat-playlist", { value = url, type = "quoted" }}
         end, {"k", "kv"}), 10, nil, function (command_results)

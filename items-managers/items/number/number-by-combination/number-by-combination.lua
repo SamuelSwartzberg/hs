@@ -3,7 +3,7 @@ NumberByCombinationSpecifier = {
   properties = {
     getables = {
       ["is-pos-int"] = function(self)
-        return is.any.pos_int(self:get("contents"))
+        return is.any.pos_int(self:get("c"))
       end,
     },
     doThisables = {

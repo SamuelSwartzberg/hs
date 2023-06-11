@@ -24,10 +24,10 @@ ArrayOfNoninterfacesSpecifier = {
       ["sorted-to-new-array-default"] = function(self) return self:get("sorted-to-new-array") end,
       ["chooser-list-of-all"] = function(self) return self:get("chooser-list-of-noninterfaces") end,
       ["min"] = function(self)
-        return reduce(self:get("contents"), returnSmaller)
+        return reduce(self:get("c"), returnSmaller)
       end,
       ["max"] = function(self)
-        return reduce(self:get("contents"), returnLarger)
+        return reduce(self:get("c"), returnLarger)
       end,
     },
     doThisables = {

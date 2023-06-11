@@ -6,17 +6,17 @@ FileItemSpecifier = {
   properties = {
     getables = {
       ["is-image-file"] = function(self) 
-        return is.path.usable_as_filetype(self:get("contents"), "image") 
+        return is.path.usable_as_filetype(self:get("c"), "image") 
       end,
       ["is-plaintext-file"] = function(self) 
-        return not is.path.usable_as_filetype(self:get("contents"), "binary")
+        return not is.path.usable_as_filetype(self:get("c"), "binary")
       end,
       ["is-binary-file"] = function(self) 
-        return is.path.usable_as_filetype(self:get("contents"), "binary")
+        return is.path.usable_as_filetype(self:get("c"), "binary")
       end,
       ["dir-or-file-any-pass"] = function(self, query) return query(self) end,
       ["file-contents"] = function(self)
-        return stringy.strip(readFile(self:get("contents"), "error"))
+        return stringy.strip(readFile(self:get("c"), "error"))
       end,
       ["descendant-file-only-string-item-array"] = function(self)
         return CreateArray({self.root_super})
@@ -34,19 +34,19 @@ FileItemSpecifier = {
   
     doThisables = {
       ["overwrite-file-contents"] = function (self, contents)
-        writeFile(self:get("contents"), contents, "exists")
+        writeFile(self:get("c"), contents, "exists")
       end,
       ["append-file-contents"] = function (self, contents)
-        writeFile(self:get("contents"), contents, "exists", true, "a")
+        writeFile(self:get("c"), contents, "exists", true, "a")
       end,
       ["rm-file"] = function (self)
-        delete(self:get("contents"))
+        delete(self:get("c"))
       end,
       ["rename-to-parent"] = function(self)
         self:doThis("move-safe", self:get("name-of-parent-with-current-extension"))
       end,
       ["empty-file"] = function(self)
-        writeFile(self:get("contents"), "", "exists")
+        writeFile(self:get("c"), "", "exists")
       end,
       ["send-in-email"] = function(self, do_after)
         sendEmailInteractive({}, transf.path.attachment(self:get("completely-resolved-path")), editorEditFunc, do_after)

@@ -4,15 +4,15 @@ MenuItemTableSpecifier = {
   properties = {
     getables = {
       ["path-string"] = function(self)
-        return stringx.join(" > ", self:get("contents").path) 
+        return stringx.join(" > ", self:get("c").path) 
       end,
       ["full-path"] = function(self)
-        return concat(self:get("contents").path, {self:get("contents").AXTitle})
+        return concat(self:get("c").path, {self:get("c").AXTitle})
       end,
       ["full-path-string"] = function (self)
         local prefix = self:get("path-string")
         if prefix then prefix = prefix .. " > " end
-        return (prefix or "") .. self:get("contents").AXTitle
+        return (prefix or "") .. self:get("c").AXTitle
       end,
       ["to-string"] = function (self)
         local outstr = self:get("full-path-string")
@@ -23,13 +23,13 @@ MenuItemTableSpecifier = {
         return outstr
       end,
       ["modifiers"] = function (self)
-        return self:get("contents").AXMenuItemCmdModifiers
+        return self:get("c").AXMenuItemCmdModifiers
       end,
       ["modifier-symbols"] = function(self)
         return map(self:get("modifiers"), tblmap.mod.symbol)
       end,
       ["hotkey"] = function (self)
-        return self:get("contents").AXMenuItemCmdChar
+        return self:get("c").AXMenuItemCmdChar
       end,
       ["modifier-symbols-and-hotkey-str"] = function (self)
         return join.modifier_array.key.shortcut_string(self:get("modifiers"), self:get("hotkey"))
@@ -39,7 +39,7 @@ MenuItemTableSpecifier = {
     },
     doThisables = {
       ["exec"] = function(self)
-        self:get("contents").application:selectMenuItem(self:get("full-path"))
+        self:get("c").application:selectMenuItem(self:get("full-path"))
       end,
     }
   }

@@ -4,7 +4,7 @@ SqlFileItemSpecifier = {
   properties = {
     getables = {
       ["is-sqlite-file"] = function(self)
-        return is.path.usable_as_filetype(self:get("contents"), "possibly-sqlite")
+        return is.path.usable_as_filetype(self:get("c"), "possibly-sqlite")
       end,
     },
     doThisables = {

@@ -3,10 +3,10 @@ ChatApplicationItemSpecifier = {
   type = "chat-application",
   properties = {
     getables = {
-      ["is-discord"] = function(self) return self:get("contents") == "Discord" end,
-      ["is-facebook"] = function(self) return self:get("contents") == "Facebook" end,
-      ["is-signal"] = function(self) return self:get("contents") == "Signal" end,
-      ["is-telegram"] = function(self) return self:get("contents") == "Telegram Lite" end,
+      ["is-discord"] = function(self) return self:get("c") == "Discord" end,
+      ["is-facebook"] = function(self) return self:get("c") == "Facebook" end,
+      ["is-signal"] = function(self) return self:get("c") == "Signal" end,
+      ["is-telegram"] = function(self) return self:get("c") == "Telegram Lite" end,
       ["chat-dir"] = function(self)
         return env["MCHATS_" .. self:get("upper-name")]
       end,

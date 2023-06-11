@@ -16,10 +16,10 @@ WindowlikeItemSpecifier = {
         return self:get("filtered-title") or self:get("raw-title")
       end,
       ["is-tab"] = function (self)
-        return not not self:get("contents").type
+        return not not self:get("c").type
       end,
       ["is-window"] = function(self)
-        return not not self:get("contents").isFullScreen -- arbitrary property that a window has but a tab doesn't
+        return not not self:get("c").isFullScreen -- arbitrary property that a window has but a tab doesn't
       end,
 
 

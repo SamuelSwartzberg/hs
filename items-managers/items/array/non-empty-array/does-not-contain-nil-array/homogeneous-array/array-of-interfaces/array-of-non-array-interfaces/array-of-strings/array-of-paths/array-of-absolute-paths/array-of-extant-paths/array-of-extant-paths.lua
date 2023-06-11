@@ -15,7 +15,7 @@ ArrayOfExtantPathsSpecifier = {
       end,
       ["filter-to-array-of-non-dotfiles"] = function(self)
         return self:get("filter-to-new-array", function(item)
-          return not stringy.startswith(pathSlice(item:get("contents", "-1:-1"))[1], ".")
+          return not stringy.startswith(pathSlice(item:get("c", "-1:-1"))[1], ".")
         end)
       end,
       ["map-to-array-of-files"] = function(self)
@@ -33,8 +33,8 @@ ArrayOfExtantPathsSpecifier = {
         end)
       end,
       ["map-to-table-of-path-and-path-content-items"] = function(self)
-        local tbl = map(self:get("contents"), function(path_item)
-          return path_item:get("contents"), path_item:get("path-content-item")
+        local tbl = map(self:get("c"), function(path_item)
+          return path_item:get("c"), path_item:get("path-content-item")
         end, { "k", "kv" })
         return CreateTable(tbl)
       end,

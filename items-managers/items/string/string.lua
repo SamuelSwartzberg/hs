@@ -3,25 +3,25 @@ StringItemSpecifier = {
   properties = {
     getables = {
       ["stripped-contents"] = function(self)
-        return stringy.strip(self:get("contents"))
+        return stringy.strip(self:get("c"))
       end,
       ["is-single-item-string-item"] = function(self) 
-        return (not (#self:get("contents") < 2000)) or (not onig.find(self:get("contents"), mt._r.whitespace.large)) 
+        return (not (#self:get("c") < 2000)) or (not onig.find(self:get("c"), mt._r.whitespace.large)) 
       end,
-      ["is-multiline-string-item"] = function(self) return stringy.find(self:get("contents"), "\n") end,
+      ["is-multiline-string-item"] = function(self) return stringy.find(self:get("c"), "\n") end,
       ["is-has-lowercase-string-item"] = function(self)
-        return onig.find(self:get("contents"), mt._r.case.lower)
+        return onig.find(self:get("c"), mt._r.case.lower)
       end,
       ["is-has-uppercase-string-item"] = function(self)
-        return onig.find(self:get("contents"), mt._r.case.upper)
+        return onig.find(self:get("c"), mt._r.case.upper)
       end,
       ["is-might-be-json-item"] = function(self)
-        return  startsEndsWithFast(self:get("contents"), "{", "}") or startsEndsWithFast(self:get("contents"), "[", "]")
+        return  startsEndsWithFast(self:get("c"), "{", "}") or startsEndsWithFast(self:get("c"), "[", "]")
       end,
-      ["is-might-be-xml-item"] = function(self) return startsEndsWithFast(self:get("contents"), "<", ">") end,
-      ["is-might-be-bib-item"] =function(self) return startsEndsWithFast(self:get("contents"), "@", "}") end,
+      ["is-might-be-xml-item"] = function(self) return startsEndsWithFast(self:get("c"), "<", ">") end,
+      ["is-might-be-bib-item"] =function(self) return startsEndsWithFast(self:get("c"), "@", "}") end,
       ["to-string-array"] = function(self, sep) 
-        return CreateArray(stringy.split(self:get("contents"), sep)) 
+        return CreateArray(stringy.split(self:get("c"), sep)) 
       end,
       ["to-string-item-array"] = function(self, sep) return self:get("to-string-array", sep):get("to-string-item-array") end,
       ["to-array-of-string-arrays"] = function(self, seps)
@@ -31,47 +31,47 @@ StringItemSpecifier = {
         end)
       end,
       ["to-string"] = function(self)
-        return eutf8.gsub(self:get("contents"), "\n", " ")
+        return eutf8.gsub(self:get("c"), "\n", " ")
       end,
       ["new-string-item-from-contents"] = function(self)
-        return self:doThis("str-item", {key = "contents"})
+        return self:doThis("str-item", {key = "c"})
       end,
       ["starts-with"] = function(self, str)
-        return stringy.startswith(self:get("contents"), str)
+        return stringy.startswith(self:get("c"), str)
       end,
       ["ends-with"] = function(self, str)
-        return stringy.endswith(self:get("contents"), str)
+        return stringy.endswith(self:get("c"), str)
       end,
       ["difference-from-prefix-or-self"] = function(self, prefix) 
-        return mustNotStart(self:get("contents"), prefix)
+        return mustNotStart(self:get("c"), prefix)
       end,
       ["difference-from-prefix-or-nil"] = function(self, prefix)
-        if not stringy.startswith(self:get("contents"), prefix) then return nil end
-        return eutf8.sub(self:get("contents"), eutf8.len(prefix) + 1)
+        if not stringy.startswith(self:get("c"), prefix) then return nil end
+        return eutf8.sub(self:get("c"), eutf8.len(prefix) + 1)
       end,
       ["difference-from-suffix-or-self"] = function(self, suffix) 
-        return mustNotEnd(self:get("contents"), suffix)
+        return mustNotEnd(self:get("c"), suffix)
       end,
       ["difference-from-suffix-or-nil"] = function(self, suffix)
         if not self:get("ends-with", suffix) then return nil end
-        return eutf8.sub(self:get("contents"), 1, eutf8.len(self:get("contents")) - eutf8.len(suffix))
+        return eutf8.sub(self:get("c"), 1, eutf8.len(self:get("c")) - eutf8.len(suffix))
       end,
       ["contained-unicode-prop-tables"] = function(self)
         return transf.array_of_tables.item_array_of_item_tables(
-          transf.string.unicode_prop_table_array(self:get("contents"))
+          transf.string.unicode_prop_table_array(self:get("c"))
         )
       end,
       ["encoded-as"] = function(self, enc)
-        return transf.string[enc](self:get("contents"))
+        return transf.string[enc](self:get("c"))
       end,
       ["escaped-general-regex"] = function(self)
-        return replace(self:get("contents"), to.regex.general_escaped)
+        return replace(self:get("c"), to.regex.general_escaped)
       end,
       ["escape-lua-regex"] = function(self)
-        return replace(self:get("contents"), to.regex.lua_escaped)
+        return replace(self:get("c"), to.regex.lua_escaped)
       end,
       ["window-with-contents-as-title"] = function(self)
-        local res = hs.window.find(self:get("contents"))
+        local res = hs.window.find(self:get("c"))
         if type(res) == "table" then return res 
         else return {res} end
       end,
@@ -81,65 +81,65 @@ StringItemSpecifier = {
         end)
       end,
       ["evaluated-as-lua"] = function(self)
-        return singleLe(self:get("contents"))
+        return singleLe(self:get("c"))
       end,
       ["evaluated-as-bash"] = function(self)
-        local parts = stringy.split(self:get("contents"), " ")
+        local parts = stringy.split(self:get("c"), " ")
         return run(parts)
       end,
       ["fold"] = function(self)
-        return transf.string.folded(self:get("contents"))
+        return transf.string.folded(self:get("c"))
       end,
       ["template-evaluated-contents"] = function (self)
-        return le(self:get("contents"))
+        return le(self:get("c"))
       end,
-      ["contents-romanized"] = function (self) return transf.string.romanized(self:get("contents")) end,
+      ["contents-romanized"] = function (self) return transf.string.romanized(self:get("c")) end,
       ["contents-as-romanized-snake-case-string"] = function(self)
-        return transf.string.romanized_snake(self:get("contents"))
+        return transf.string.romanized_snake(self:get("c"))
       end,
       ["is-html-entity-encoded-string-item"] = function(self) 
-        return allOfFast(self:get("contents"), mt._list.html_entity_indicator.encoded)
+        return allOfFast(self:get("c"), mt._list.html_entity_indicator.encoded)
       end,
       ["is-html-entity-decoded-string-item"] = function(self)
-         return anyOfFast(self:get("contents"), mt._list.html_entity_indicator.decoded)
+         return anyOfFast(self:get("c"), mt._list.html_entity_indicator.decoded)
       end, -- 'decoded' = to be encoded
       ["extract-utf8"] = function(self, pattern)
-        return iterToTbl({tolist=true, ret="v"},eutf8.gmatch(self:get("contents"), pattern))
+        return iterToTbl({tolist=true, ret="v"},eutf8.gmatch(self:get("c"), pattern))
       end,
       ["extract-utf8-array"] = function(self, pattern)
         return CreateArray(self:get("extract-utf8", pattern))
       end,
       ["extract-onig"] = function(self, pattern)
-        return iterToTbl({tolist=true, ret="v"},onig.gmatch(self:get("contents"), pattern))
+        return iterToTbl({tolist=true, ret="v"},onig.gmatch(self:get("c"), pattern))
       end,
       ["extract-onig-array"] = function(self, pattern)
         return CreateArray(self:get("extract-onig", pattern))
       end,
       ["extract-utf8-first"] = function(self, pattern)
-        local res = eutf8.match(self:get("contents"), pattern)
+        local res = eutf8.match(self:get("c"), pattern)
         return res
       end,
       ["extract-onig-first"] = function(self, pattern)
-        local res = onig.match(self:get("contents"), pattern)
+        local res = onig.match(self:get("c"), pattern)
         return res
       end,
       ["to-title-case"] = function(self)
-        return transf.string.title_case(self:get("contents"))
+        return transf.string.title_case(self:get("c"))
       end,
       ["events-matching-search"] = function(self)
         return get.khal.search_event_tables(self:get("fold"))
       end,
       ["envsubst"] = function(self)
-        return transf.string.envsubsted(self:get("contents"))
+        return transf.string.envsubsted(self:get("c"))
       end,
       ["qr-utf8-image-bow"] = function(self)
-        return transf.string.qr_utf8_image_bow(self:get("contents"))
+        return transf.string.qr_utf8_image_bow(self:get("c"))
       end,
       ["qr-utf8-image-wob"] = function(self)
-        return transf.string.qr_utf8_image_wob(self:get("contents"))
+        return transf.string.qr_utf8_image_wob(self:get("c"))
       end,
       ["qr-png-path"] = function(self)
-        return transf.string.qr_png_in_cache(self:get("contents"))
+        return transf.string.qr_png_in_cache(self:get("c"))
       end,
     },
     doThisables = {
@@ -151,19 +151,19 @@ StringItemSpecifier = {
           :doThis("choose-action")
       end,
       ["copy-contents"] = function(self)
-        self:doThis("copy-result-of-get", {key = "contents"})
+        self:doThis("copy-result-of-get", {key = "c"})
       end,
       ["paste-contents"] = function(self)
-        self:doThis("paste-result-of-get", {key = "contents"})
+        self:doThis("paste-result-of-get", {key = "c"})
       end,
       ["say"] = function(self, lang)
-        dothis.string.say(self:get("contents"), lang)
+        dothis.string.say(self:get("c"), lang)
       end,
       ["add-to-log"] = function(self, path)
-        CreateStringItem(path):doThis("log-now", self:get("contents"))
+        CreateStringItem(path):doThis("log-now", self:get("c"))
       end,
       ["write-to-file"] = function(self, path)
-        writeFile(path, self:get("contents"))
+        writeFile(path, self:get("c"))
       end,
       ["search-with"] = function(self, search_engine)
         open(
@@ -174,7 +174,7 @@ StringItemSpecifier = {
         )
       end,
       ["open-in-vscode"] = function(self)
-        open({contents = self:get("contents")})
+        open({contents = self:get("c")})
       end,
       ["open-contents-in-browser"] = function(self)
         self:doThis("open-result-of-get-in-browser", { key = "fold"})
@@ -240,7 +240,7 @@ StringItemSpecifier = {
     }, {
       text = "🔍 ql.",
       key = "code-quick-look-result-of-get",
-      args = {key = "contents"}
+      args = {key = "c"}
     },{
       text = "🧬 eval.",
       key = "get-as-do",

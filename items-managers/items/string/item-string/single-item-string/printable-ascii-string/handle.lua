@@ -4,16 +4,16 @@ HandleItemSpecifier = {
   properties = {
     getables = {
       ["raw-handle"] = function(self)
-        return transf.handle.raw_handle(self:get("contents"))
+        return transf.handle.raw_handle(self:get("c"))
       end,
       ["youtube-channel-id"] = function(self)
-        return transf.handle.youtube_channel_id(self:get("contents"))
+        return transf.handle.youtube_channel_id(self:get("c"))
       end,
       ["youtube-feed-url"] = function(self)
-        return transf.handle.feed_url(self:get("contents"))
+        return transf.handle.feed_url(self:get("c"))
       end,
       ["youtube-channel-title"] = function(self)
-        return transf.handle.channel_title(self:get("contents"))
+        return transf.handle.channel_title(self:get("c"))
       end,
     },
     doThisables = {

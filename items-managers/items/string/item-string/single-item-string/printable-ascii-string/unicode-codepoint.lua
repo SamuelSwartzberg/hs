@@ -4,7 +4,7 @@ UnicodeCodepointItemSpecifier = {
   properties = {
     getables = {
       ["numeric-equivalent"] = function(self)
-        return tonumber(self:get("contents"):sub(3), 16)
+        return tonumber(self:get("c"):sub(3), 16)
       end,
       ["to-number-interface"] = function(self)
         return CreateNumber(self:get("numeric-equivalent"))

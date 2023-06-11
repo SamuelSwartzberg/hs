@@ -54,12 +54,12 @@ SystemSpecifier = {
 
 function CreateSystem()
   local system = RootInitializeInterface(SystemSpecifier, {})
-  system:get("contents")["global-hotkey-manager"] = CreateManagedHotkeyArrayDirectly()
-  system:get("contents")["global-timer-manager"] = CreateManagedTimerArrayDirectly()
-  system:get("contents")["global-clipboard-manager"] = CreateManagedClipboardArrayDirectly()
-  system:get("contents")["global-stream-manager"] = CreateManagedStreamArrayDirectly(system:get("contents")["global-timer-manager"])
-  system:get("contents")["global-watcher-manager"] = CreateManagedWatcherArrayDirectly()
-  system:get("contents")["global-task-manager"] = CreateManagedTaskArrayDirectly()
-  system:get("contents")["global-input-method-manager"] = CreateManagedInputMethodArrayDirectly()
+  system:get("c")["global-hotkey-manager"] = CreateManagedHotkeyArrayDirectly()
+  system:get("c")["global-timer-manager"] = CreateManagedTimerArrayDirectly()
+  system:get("c")["global-clipboard-manager"] = CreateManagedClipboardArrayDirectly()
+  system:get("c")["global-stream-manager"] = CreateManagedStreamArrayDirectly(system:get("c")["global-timer-manager"])
+  system:get("c")["global-watcher-manager"] = CreateManagedWatcherArrayDirectly()
+  system:get("c")["global-task-manager"] = CreateManagedTaskArrayDirectly()
+  system:get("c")["global-input-method-manager"] = CreateManagedInputMethodArrayDirectly()
   return system
 end

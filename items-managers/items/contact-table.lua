@@ -4,7 +4,7 @@ ContactTableSpecifier = {
   properties = {
     getables = {
       ["prop-policy"] = function(self, prop)
-        return self:get("contents")[prop]
+        return self:get("c")[prop]
       end,
       ["encrypted-data"] = function(self, type)
         return get.pass.contact_json(type, self:get("uid"))
@@ -16,7 +16,7 @@ ContactTableSpecifier = {
 
       -- simple properties
 
-      ["uid"] = function(self) return self:get("contents").uid end,
+      ["uid"] = function(self) return self:get("c").uid end,
       ["pref-name"] = function(self) return self:get("prop-policy", "Formatted name") end,
       ["name-pre"] = function(self) return self:get("prop-policy", "Prefix") end,
       ["first-name"] = function(self) return self:get("prop-policy", "First name") end,

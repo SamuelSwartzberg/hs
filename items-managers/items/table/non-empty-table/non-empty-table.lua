@@ -3,19 +3,19 @@ NonEmptyTableSpecifier = {
   properties = {
     getables = {
       ["keys"] = function(self)
-        return keys(self:get("contents"))
+        return keys(self:get("c"))
       end,
       ["keys-to-new-array"] = function(self)
         return CreateArray(self:get("keys"))
       end,
       ["value"] = function(self, key)
-        return self:get("contents")[key]
+        return self:get("c")[key]
       end,
       ["key"] = function(self, value)
-        return find(self:get("contents"), value, {"v", "k"})
+        return find(self:get("c"), value, {"v", "k"})
       end,
       ["first-match-in-list-of-keys"] = function (self, list_of_keys)
-        local contents = self:get("contents")
+        local contents = self:get("c")
         for _, key in ipairs(list_of_keys) do
           if contents[key] then
             return contents[key]
@@ -23,13 +23,13 @@ NonEmptyTableSpecifier = {
         end
       end,
       ["values"] = function(self)
-        return values(self:get("contents"))
+        return values(self:get("c"))
       end,
       ["values-to-new-array"] = function(self)
         return CreateArray(self:get("values"))
       end,
       ["pairs"] = function(self)
-        return map(self:get("contents"), function(k,v) return false, {k,v} end, "kv")
+        return map(self:get("c"), function(k,v) return false, {k,v} end, "kv")
       end,
       ["pairs-to-new-array"] = function(self)
         return CreateArray(self:get("pairs"))
@@ -53,61 +53,61 @@ NonEmptyTableSpecifier = {
         return self:get("pairs")[self:get("amount-of-elements")]
       end,
       ["all-keys-pass"] = function(self, predicate)
-        return not find(self:get("contents"), function(k) return not predicate(k) end, "k")
+        return not find(self:get("c"), function(k) return not predicate(k) end, "k")
       end,
       ["all-values-pass"] = function(self, predicate)
-        return not find(self:get("contents"), function(v) return not predicate(v) end, "v")
+        return not find(self:get("c"), function(v) return not predicate(v) end, "v")
       end,
       ["all-pairs-pass"] = function(self, predicate)
-        return not find(self:get("contents"), function(k,v) return not predicate(k,v) end, "kv")
+        return not find(self:get("c"), function(k,v) return not predicate(k,v) end, "kv")
       end,
       ["some-keys-pass"] = function(self, predicate)
-        return find(self:get("contents"), predicate, {"k", "boolean"})
+        return find(self:get("c"), predicate, {"k", "boolean"})
       end,
       ["some-values-pass"] = function(self, predicate)
-        return find(self:get("contents"), predicate, {"v", "boolean"})
+        return find(self:get("c"), predicate, {"v", "boolean"})
       end,
       ["some-pairs-pass"] = function(self, predicate)
-        return find(self:get("contents"), predicate, {"kv", "boolean"})
+        return find(self:get("c"), predicate, {"kv", "boolean"})
       end,
       ["none-keys-pass"] = function(self, predicate)
-        return not find(self:get("contents"), predicate, {"k", "boolean"})
+        return not find(self:get("c"), predicate, {"k", "boolean"})
       end,
       ["none-values-pass"] = function(self, predicate)
-        return not find(self:get("contents"), predicate, {"v", "boolean"})
+        return not find(self:get("c"), predicate, {"v", "boolean"})
       end,
       ["none-pairs-pass"] = function(self, predicate)
-         return not find(self:get("contents"), predicate, {"kv", "boolean"})
+         return not find(self:get("c"), predicate, {"kv", "boolean"})
       end,
       ["all-keys-are-in-list"] = function(self, list)
-        return not find(self:get("contents"), {
+        return not find(self:get("c"), {
           _list = list,
           _invert = true,
         }, "k")
       end,
       ["all-values-are-in-list"] = function(self, list)
-        return not find(self:get("contents"), {
+        return not find(self:get("c"), {
           _list = list,
           _invert = true,
         }, "v")
       end,
       ["all-pairs-are-in-list"] = function(self, list)
-        return not find(self:get("contents"), {
+        return not find(self:get("c"), {
           _list = list,
           _invert = true,
         }, "kv")
       end,
       ["find-key"] = function(self, predicate)
-        return find(self:get("contents"), predicate, "k")
+        return find(self:get("c"), predicate, "k")
       end,
       ["find-value"] = function (self, predicate)
-        return find(self:get("contents"), predicate)
+        return find(self:get("c"), predicate)
       end,
       ["find-pair"] = function (self, predicate)
-        return find(self:get("contents"), predicate, "kv") 
+        return find(self:get("c"), predicate, "kv") 
       end,
       ["map-table"] = function(self, callback)
-        return map(self:get("contents"), callback, {"kv", "kv"})
+        return map(self:get("c"), callback, {"kv", "kv"})
       end,
       ["map-keys"] = function(self, callback)
         return map(self:get("keys"), callback)
@@ -122,7 +122,7 @@ NonEmptyTableSpecifier = {
         return CreateArray(self:get("map-values", callback))
       end,
       ["map-to-flat-path-dot-table"] = function(self)
-        return CreateTable(flatten(self:get("contents"), {
+        return CreateTable(flatten(self:get("c"), {
           mode = "path-assoc",
           val = "plain",
           join_path = ".",
@@ -159,7 +159,7 @@ NonEmptyTableSpecifier = {
         return self:get("values-to-new-array"):get("chooser-list-of-all")
       end,
       ["map-pairs-to-string"] = function(self)
-        return map(self:get("contents"), function(k, v)
+        return map(self:get("c"), function(k, v)
           local pair_value_as_text
           if type(v) == "table" and v.get then 
             pair_value_as_text = v:get("to-string")
@@ -201,7 +201,7 @@ NonEmptyTableSpecifier = {
         buildChooser(
           self:get("chooser-list-of-pairs"),
           function(choice)
-            callback(self:get("contents")[choice.value], choice)
+            callback(self:get("c")[choice.value], choice)
           end,
           nil,
           { whole_chooser = { placeholderText = self:get("to-string") } }
@@ -211,7 +211,7 @@ NonEmptyTableSpecifier = {
         buildChooser(
           self:get("chooser-list-of-keys"),
           function(choice)
-            callback(self:get("contents")[choice.value])
+            callback(self:get("c")[choice.value])
           end,
           nil,
           { whole_chooser = { placeholderText = self:get("to-string") } }

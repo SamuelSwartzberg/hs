@@ -5,13 +5,13 @@ DirItemSpecifier = {
 
     getables = {
       ["is-parent-dir"] = function(self)
-        return testPath(self:get("contents"), {
+        return testPath(self:get("c"), {
           dirness = "dir",
           contents = true
         })
       end, 
       ["is-empty-dir"] = function(self)
-        return is.extant_path.empty_dir(self:get("contents"))
+        return is.extant_path.empty_dir(self:get("c"))
       end,
       ["is-dir-by-path"] = function()
         return true
@@ -62,7 +62,7 @@ DirItemSpecifier = {
       end,
 
       ["find-or-create-child-dir"] = function(self, specifier)
-        local child = get.dir_path.find_child(self:get("contents"), specifier.find_func)
+        local child = get.dir_path.find_child(self:get("c"), specifier.find_func)
         if child == nil or not testPath(child, "dir") then
           self:doThis("create-empty-dir-in-dir", specifier.default_name)
           child = self:get("parent-dir-path") .. "/" .. specifier.default_name
@@ -96,10 +96,10 @@ DirItemSpecifier = {
         }
       end,
       ["related-path-gui"] = function(self)
-        return CreateStringItem(prompt("dir", self:get("contents")))
+        return CreateStringItem(prompt("dir", self:get("c")))
       end,
       ["related-path-with-subdirs-gui"] = function(self)
-        return CreateStringItem(promptPathChildren(self:get("contents") .. "/"))
+        return CreateStringItem(promptPathChildren(self:get("c") .. "/"))
       end,
       ["ls"] = function (self)
         return run({"ls", "-F", "-1", { value = self:get("completely-resolved-path"), type = "quoted" }})
@@ -111,10 +111,10 @@ DirItemSpecifier = {
   
     doThisables = {
       ["copy-into"] = function(self, source)
-        srctgt("copy", source, self:get("contents"))
+        srctgt("copy", source, self:get("c"))
       end,
       ["move-into"] = function(self, source)
-        srctgt("move", source, self:get("contents"), "any", true, true)
+        srctgt("move", source, self:get("c"), "any", true, true)
       end,
       ["create-empty-file-in-dir"] = function(self, name)
         local path = self:get("path-ensure-final-slash") .. name
@@ -134,7 +134,7 @@ DirItemSpecifier = {
       end,
       ["table-to-fs-children-dispatch"] = function(self, specifier) 
         -- assumes a table where all values are of the same type
-        local child_filenames = transf.dir_path.children_leaves_array(self:get("contents"))
+        local child_filenames = transf.dir_path.children_leaves_array(self:get("c"))
         for k, v in fastpairs(specifier.payload) do
           local desired_name = k
 
@@ -168,10 +168,10 @@ DirItemSpecifier = {
         self:doThis("create-empty-file-in-dir", ".gitignore")
       end,
       ["rm-dir"] = function(self)
-        delete(self:get("contents"), "dir")
+        delete(self:get("c"), "dir")
       end,
       ["empty-dir"] = function(self)
-        delete(self:get("contents"), "dir", "empty")
+        delete(self:get("c"), "dir", "empty")
       end,
       ["choose-descendant"] = function(self)
         self:get("descendant-string-array"):doThis("choose-item-and-then-action")
@@ -187,7 +187,7 @@ DirItemSpecifier = {
       end,
       ["send-in-email"] = function(self, do_after)
         local temp_file = writeFile(nil, "")
-        srctgt("zip", self:get("contents"), temp_file)
+        srctgt("zip", self:get("c"), temp_file)
         delete(temp_file)
         if do_after then
           do_after()

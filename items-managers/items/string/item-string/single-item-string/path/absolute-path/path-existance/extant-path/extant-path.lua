@@ -6,7 +6,7 @@ ExtantPathItemSpecifier = {
       -- ["is-category-date-dir-structure-contained-item"] = function(self)
       --   return stringy.startswith(self:get("completely-resolved-path"), env.MDIARY) -- currently the only category-date-dir-structure-root is env.MDIARY, and this check is far cheaper then the alternative, so we'll use it for now
       -- end, 
-      ["is-dir"] = function(self) return testPath(self:get("contents"), "dir") end,
+      ["is-dir"] = function(self) return testPath(self:get("c"), "dir") end,
       ["is-file"] = function(self) return not self:get("is-dir") end, 
       ["is-dated-extant-path"] = function(self) 
         local path_leaf = pathSlice(self:get("completely-resolved-path", "-1:-1"))[1]
@@ -19,7 +19,7 @@ ExtantPathItemSpecifier = {
       end,
       ["is-in-git-dir-path"] = function(self) 
         return find(
-          getItemsForAllLevelsInSlice(self:get("contents"), "1:-1", { include_files = false }),
+          getItemsForAllLevelsInSlice(self:get("c"), "1:-1", { include_files = false }),
           function(item)
             return stringy.endswith(item, ".git")
           end
@@ -42,13 +42,13 @@ ExtantPathItemSpecifier = {
         return run(self:get("cd-and-this-task", task))
       end,
       ["sibling-string-array"] = function(self)
-        return CreateArray(getItemsForAllLevelsInSlice(self:get("contents"), "-2:-2"))
+        return CreateArray(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2"))
       end,
       ["sibling-file-only-string-array"] = function(self)
-        return CreateArray(getItemsForAllLevelsInSlice(self:get("contents"), "-2:-2", { include_dirs = false }))
+        return CreateArray(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2", { include_dirs = false }))
       end,
       ["sibling-dir-only-string-array"] = function(self)
-        return CreateArray(getItemsForAllLevelsInSlice(self:get("contents"), "-2:-2", { include_files = false }))
+        return CreateArray(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2", { include_files = false }))
       end,
       ["find-sibling"] = function(self, func)
         return self:get("sibling-string-array"):get("find", function(sibling)
@@ -114,16 +114,16 @@ ExtantPathItemSpecifier = {
         open(self:get("completely-resolved-path"))
       end,
       ["move-safe"] = function(self, target)
-        srctgt("move", self:get("contents"), target, "not-exists")
+        srctgt("move", self:get("c"), target, "not-exists")
       end,
       ["move-force"] = function(self, target)
-        srctgt("move", self:get("contents"), target)
+        srctgt("move", self:get("c"), target)
       end,
       ["move-replace-self"] = function(self, origin)
-        srctgt("move", origin, self:get("contents"))
+        srctgt("move", origin, self:get("c"))
       end,
       ["move-into-dir"] = function (self, target)
-        srctgt("move", self:get("contents"), target, nil, true, true)
+        srctgt("move", self:get("c"), target, nil, true, true)
       end,
       ["move-safe-and-choose-action"] = function(self, target)
         self:doThis("move-safe", target)
@@ -137,10 +137,10 @@ ExtantPathItemSpecifier = {
         self:doThis("move-safe-and-choose-action", self:get("parent-dir-path"))
       end,
       ["copy-safe"] = function(self, target)
-        srctgt("copy", self:get("contents"), target, "not-exists")
+        srctgt("copy", self:get("c"), target, "not-exists")
       end,
       ["copy-force"] = function(self, target)
-        srctgt("copy", self:get("contents"), target)
+        srctgt("copy", self:get("c"), target)
       end,
       ["copy-safe-and-choose-action"] = function(self, target)
         self:doThis("copy-safe", target)
@@ -155,10 +155,10 @@ ExtantPathItemSpecifier = {
         self:get("move-safe", new_path)
       end,
       ["zip"] = function(self, target_path)
-        srctgt("zip", self:get("contents"), target_path)
+        srctgt("zip", self:get("c"), target_path)
       end,
       ["zip-and-choose-action"] = function(self, target_path)
-        srctgt("zip", self:get("contents"), target_path, function(target)
+        srctgt("zip", self:get("c"), target_path, function(target)
           CreateStringItem(target):doThis("choose-action")
         end)
       end,

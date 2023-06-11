@@ -4,14 +4,14 @@ TableSpecifier = {
   type = "table",
   properties = {
     getables = {
-      ["amount-of-elements"] = function(self) return #keys(self:get("contents")) end,
+      ["amount-of-elements"] = function(self) return #keys(self:get("c")) end,
       ["is-empty-table"] = function(self) return self:get("amount-of-elements") == 0 end,
       ["is-non-empty-table"] = function(self) return self:get("amount-of-elements") > 0 end,
       ["to-json-string"] = function(self)
-        return json.encode(self:get("contents"))
+        return json.encode(self:get("c"))
       end,
       ["to-yaml-string"] = function(self)
-        return json.encode(self:get("contents"))
+        return json.encode(self:get("c"))
       end,
     },
     doThisables = {

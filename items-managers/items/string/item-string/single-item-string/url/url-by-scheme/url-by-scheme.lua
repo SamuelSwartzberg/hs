@@ -4,16 +4,16 @@ URLBySchemeItemSpecifier = {
   properties = {
     getables = {
       ["is-mailto-url"] = function (self)
-        return is.url.mailto_url(self:get("contents"))
+        return is.url.mailto_url(self:get("c"))
       end,
       ["is-tel-url"] = function (self)
-        return is.url.tel_url(self:get("contents"))
+        return is.url.tel_url(self:get("c"))
       end,
       ["is-otpauth-url"] = function (self)
-        return is.url.otpauth_url(self:get("contents"))
+        return is.url.otpauth_url(self:get("c"))
       end,
       ["is-data-url"] = function(self)
-        return is.url.data_url(self:get("contents"))
+        return is.url.data_url(self:get("c"))
       end,
     }
   },

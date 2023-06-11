@@ -16,10 +16,10 @@ AudiodeviceItemSpecifier = {
         return self:get("is-default-device")
       end,
       ["device"] = function (self)
-        return self:get("contents").device
+        return self:get("c").device
       end,
       ["subtype"] = function (self)
-        return self:get("contents").subtype
+        return self:get("c").subtype
       end,
     },
     doThisables = {

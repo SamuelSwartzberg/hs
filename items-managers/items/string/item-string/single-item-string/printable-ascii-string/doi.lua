@@ -5,7 +5,7 @@ DoiItemSpecifier = {
     getables = {
       ["is-citable-object-id"] = function() return true end,
       ["bibtex-from-internet"] = function(self)
-        return transf.doi.bibtex(self:get("contents"))
+        return transf.doi.bibtex(self:get("c"))
       end,
     }
   },

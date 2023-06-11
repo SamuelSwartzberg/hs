@@ -3,11 +3,11 @@ PathInterfaceItemSpecifier = {
   type = "absolute-path",
   properties = {
     getables = {
-      ["is-tilde-absolute-path"] = function(self) return self:get("contents"):find("^~") end,
-      ["is-true-absolute-path"] = function(self) return self:get("contents"):find("^/") end,
-      ["is-extant-path"] = function(self) return testPath(self:get("contents")) end,
+      ["is-tilde-absolute-path"] = function(self) return self:get("c"):find("^~") end,
+      ["is-true-absolute-path"] = function(self) return self:get("c"):find("^/") end,
+      ["is-extant-path"] = function(self) return testPath(self:get("c")) end,
       ["is-non-extant-path"] = function(self) return not self:get("is-extant-path") end,
-      ["is-volume"] = function(self) return stringy.startswith(self:get("contents"), "/Volumes/") end,
+      ["is-volume"] = function(self) return stringy.startswith(self:get("c"), "/Volumes/") end,
       ["is-path-by-start"] = returnTrue,
       ["relative-path-from"] = function(self, starting_point)
         starting_point = starting_point or env.HOME
@@ -21,25 +21,25 @@ PathInterfaceItemSpecifier = {
       end,
     },
     doThisables = {
-      ["create-file"] = function(self, contents) writeFile(self:get("contents"), contents, "not-exists") end,
-      ["write-file"] = function(self, contents) writeFile(self:get("contents"), contents) end,
+      ["create-file"] = function(self, contents) writeFile(self:get("c"), contents, "not-exists") end,
+      ["write-file"] = function(self, contents) writeFile(self:get("c"), contents) end,
       ["create-as-path"] = function(self)
-        createPath(self:get("contents"))
+        createPath(self:get("c"))
       end,
       ["table-to-fs"] = function(self, specifier) 
         if not specifier.payload then 
           -- payload was null or false. Meaning: mode, overwrite doesn't matter
           -- just create the path up to this point, and do nothing else
-          createPath(self:get("contents"))
+          createPath(self:get("c"))
         elseif type(specifier.payload) ~= "table" or isListOrEmptyTable(specifier.payload) then
          --[[  if specifier.mode == "copy" and specifier.overwrite == true then
-            srctgt("copy", self:get("contents"), specifier.payload)
+            srctgt("copy", self:get("c"), specifier.payload)
           elseif specifier.mode == "copy" and specifier.overwrite == false then
-            srctgt("copy", self:get("contents"), specifier.payload, "not-exists")
+            srctgt("copy", self:get("c"), specifier.payload, "not-exists")
           elseif specifier.mode == "move" and specifier.overwrite == true then
-            srctgt("move", (self:get("contents"), specifier.payload)
+            srctgt("move", (self:get("c"), specifier.payload)
           elseif specifier.mode == "move" and specifier.overwrite == false then
-            srctgt("move", IfDoesntExist(self:get("contents"), specifier.payload)
+            srctgt("move", IfDoesntExist(self:get("c"), specifier.payload)
           else ]]if specifier.mode == "write" then
             if self:get("is-non-extant-path") or specifier.overwrite then 
               local filename = self:get("completely-resolved-path")

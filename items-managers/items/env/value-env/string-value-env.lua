@@ -4,7 +4,7 @@ StringValueEnvItemSpecifier = {
   properties = {
     getables = {
       ["value-to-env-line-value"] = function(self, pkey_var)
-        return pkey_var .. self:get("contents").value
+        return pkey_var .. self:get("c").value
       end,
     },
     doThisables = {

@@ -4,7 +4,7 @@ CategoryDateDirStructureContainedItemSpecifier = {
   properties = {
     getables = {
       ["is-category-date-dir-structure-dir"] = function(self)
-        return testPath(self:get("contents"), "dir")
+        return testPath(self:get("c"), "dir")
       end,
     },
   },

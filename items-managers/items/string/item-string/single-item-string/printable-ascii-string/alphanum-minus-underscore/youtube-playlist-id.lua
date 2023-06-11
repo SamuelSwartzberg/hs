@@ -4,7 +4,7 @@ YoutubePlaylistIdItemSpecifier = {
   properties = {
     getables = {
       ["youtube-playlist-id"] = function(self)
-        return transf.youtube_playlist_id.youtube_playlist_url(self:get("contents"))
+        return transf.youtube_playlist_id.youtube_playlist_url(self:get("c"))
       end,
     }
   },

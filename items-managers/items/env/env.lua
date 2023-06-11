@@ -4,22 +4,22 @@ EnvItemSpecifier = {
   properties = {
     getables = {
       ["is-value-env-item"] = function(self)
-        return self:get("contents").value
+        return self:get("c").value
       end,
       ["is-no-value-env-item"] = function(self)
-        return self:get("contents").value == nil
+        return self:get("c").value == nil
       end,
       ["is-dependents-env-item"] = function(self)
-        return self:get("contents").dependents
+        return self:get("c").dependents
       end,
       ["is-nodependents-env-item"] = function(self)
-        return not self:get("contents").dependents
+        return not self:get("c").dependents
       end,
       ["is-aliases-env-item"] = function(self)
-        return self:get("contents").aliases
+        return self:get("c").aliases
       end,
       ["is-noaliases-env-item"] = function(self)
-        return not self:get("contents").aliases
+        return not self:get("c").aliases
       end,
       ["env-lines"] = function(self, specifier)
         local my_lines = self:get("self-to-env-lines", specifier)

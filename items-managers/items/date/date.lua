@@ -10,7 +10,7 @@ DateSpecifier = {
   properties = {
     getables = {
       ["with-added"] = function(self, specifier)
-        local date = self:get("contents"):copy()
+        local date = self:get("c"):copy()
         return CreateDate(
           date["add" .. specifier["unit"]](date, specifier["amount"])
         )
@@ -22,15 +22,15 @@ DateSpecifier = {
         })
       end,
       ["val"] = function(self, unit)
-        local dt = self:get("contents")
+        local dt = self:get("c")
         return dt["get" .. unit](dt)
       end,
       ["span"] = function(self, unit)
-        local dt = self:get("contents")
+        local dt = self:get("c")
         return dt["span" .. unit](dt)
       end,
       ["diff"] = function(self, other_date)
-        return date.diff(self:get("contents"), other_date)
+        return date.diff(self:get("c"), other_date)
       end,
       ["diff-item"] = function(self, other_date)
         return CreateDate(self:get("diff", other_date))
@@ -39,8 +39,8 @@ DateSpecifier = {
         return self:get("diff-item", specifier["end"]):get("span", specifier["unit"])
       end,
       ["start-end"] = function(self, specifier)
-        local startdt = processDateSpecification(specifier.start, self:get("contents"))
-        local enddt = processDateSpecification(specifier["end"], self:get("contents"))
+        local startdt = processDateSpecification(specifier.start, self:get("c"))
+        local enddt = processDateSpecification(specifier["end"], self:get("c"))
         return {startdt, enddt}
       end,
       ["range"] = function(self, specifier)
@@ -97,7 +97,7 @@ DateSpecifier = {
         return res
       end,
       ["event-items-between"] = function(self, specifier)
-        specifier["end"] = specifier["end"] or self:get("contents"):copy():adddays(30)
+        specifier["end"] = specifier["end"] or self:get("c"):copy():adddays(30)
         local startdt, enddt = table.unpack(self:get("start-end", specifier))
         return CreateArray({
           CreateDate(startdt),
@@ -105,7 +105,7 @@ DateSpecifier = {
         }):get("map-to-event-items")
       end,
       ["to-formatted"] = function(self, format_str)
-        return self:get("contents"):fmt(format_str)
+        return self:get("c"):fmt(format_str)
       end,
       ["format-map"] = function(self)
         return format_map
@@ -114,7 +114,7 @@ DateSpecifier = {
         return self:get("to-formatted", self:get("format-map")[format])
       end,
       ["has-time"] = function(self)
-        local dt = self:get("contents")
+        local dt = self:get("c")
         return 
           dt.gethours(dt) ~= 0 or
           dt.getminutes(dt) ~= 0 or
@@ -122,16 +122,16 @@ DateSpecifier = {
           dt.getfracs(dt) ~= 0
       end,
       ["weekday-number-start-1"] = function(self) 
-        return self:get("contents"):getisoweekday()
+        return self:get("c"):getisoweekday()
       end,
       ["weekday-number-start-0"] = function(self) 
-        return self:get("contents"):getisoweekday() - 1
+        return self:get("c"):getisoweekday() - 1
       end,
       ["weekday-str"] = function(self)
         return transf.mon1_int.weekday_en[self:get("weekday-number-start-1")] 
       end,
       ["weeknumber"] = function(self)
-        return self:get("contents"):getweeknumber()
+        return self:get("c"):getweeknumber()
       end,
       ["weekday-offset"] = function(self, specifier) -- get the nth previous/next weekday
         -- specifier has keys "weekday" and "offset"
@@ -161,11 +161,11 @@ DateSpecifier = {
       end,
 
       ["timestamp"] = function(self)
-        return date.diff(self:get("contents"), date.epoch()):spanseconds()
+        return date.diff(self:get("c"), date.epoch()):spanseconds()
       end,
       
       ["to-precision"] = function(self, component) -- component is a string, either "year", "month", "day", "hour", "minute", "second"
-        return self:get("contents"):fmt(tblmap.dt_component.rfc3339[component])
+        return self:get("c"):fmt(tblmap.dt_component.rfc3339[component])
       end,
       ["date-to-precision"] = function (self, component)
         return date(self:get("to-precision", component))
@@ -177,10 +177,10 @@ DateSpecifier = {
         return format_array
       end,
       ["to-string"] = function(self)
-        return self:get("contents"):fmt("%A, %Y-%m-%d %H:%M:%S")
+        return self:get("c"):fmt("%A, %Y-%m-%d %H:%M:%S")
       end,
       ["to-y-ym-ymd-array"] = function(self)
-        local contents = self:get("contents")
+        local contents = self:get("c")
         return {
           contents:fmt("%Y"),
           contents:fmt("%Y-%m"),
@@ -188,7 +188,7 @@ DateSpecifier = {
         }
       end,
       ["corresponding-logfile"] = function(self, logging_dir)
-        return CreateStringItem(logging_dir):get("log-for-date", self:get("contents"))
+        return CreateStringItem(logging_dir):get("log-for-date", self:get("c"))
       end,
     },
     doThisables = {
@@ -216,7 +216,7 @@ DateSpecifier = {
       end,
       ["log-open-diary"] = function(self)
         self:doThis("create-empty-log-entry", env.MENTRY_LOGS)
-        open(CreateStringItem(env.MENTRY_LOGS):get("log-for-date", self:get("contents")))
+        open(CreateStringItem(env.MENTRY_LOGS):get("log-for-date", self:get("c")))
       end,
       ["choose-surrounding-day"] = function(self, amount)
         CreateArray(self:get(

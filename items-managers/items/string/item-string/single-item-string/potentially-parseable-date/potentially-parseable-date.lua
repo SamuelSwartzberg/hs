@@ -4,7 +4,7 @@ PotentiallyParseableDateItemSpecifier = {
   properties = {
     getables = {
       ["to-timestamp"] = function(self)
-        return parseDate(self:get("contents"))
+        return parseDate(self:get("c"))
       end,
     }
   },

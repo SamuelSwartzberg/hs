@@ -3,10 +3,10 @@ NumberByNumberSetSpecifier = {
   properties = {
     getables = {
       ["is-int"] = function(self)
-        return is.number.int(self:get("contents"))
+        return is.number.int(self:get("c"))
       end,
       ["is-float"] = function(self)
-        return is.number.float(self:get("contents"))
+        return is.number.float(self:get("c"))
       end,
       
     },

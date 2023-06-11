@@ -7,7 +7,7 @@ MullvadRelayIdentifierItemSpecifier = {
     },
     doThisables = {
       ["relay-set"] = function(self)
-        dothis.mullvad.relay_set(self:get("contents"))
+        dothis.mullvad.relay_set(self:get("c"))
       end,
     }
   },

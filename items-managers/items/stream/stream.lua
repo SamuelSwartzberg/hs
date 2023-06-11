@@ -11,16 +11,16 @@ function CreateStreamItem(specified_contents)
         ["is-control"] = returnTrue,
         --- @return "booting" | "active" | "ended"
         ["state"] = function(self) 
-          return self:get("contents").state
+          return self:get("c").state
         end,
         ["initial-flag"] = function(self, flag)
-          return self:get("contents").initial_flags[flag]
+          return self:get("c").initial_flags[flag]
         end,
         ["initial-data"] = function(self, key)
-          return self:get("contents").initial_data[key]
+          return self:get("c").initial_data[key]
         end,
         ["initial-stream-config"] = function(self, key)
-          return self:get("contents").initial_stream_config[key]
+          return self:get("c").initial_stream_config[key]
         end,
         ["initial-urls-to-string-item-array"] = function(self)
           return CreateArray(self:get("initial-data", "urls"))
@@ -52,7 +52,7 @@ function CreateStreamItem(specified_contents)
         end,
         ["to-initial-args"] = function(self)
           local args = {}
-          for key, value in fastpairs(self:get("contents").initial_flags) do
+          for key, value in fastpairs(self:get("c").initial_flags) do
             if value then
               table.insert(args, "--" .. key)
             end
@@ -66,7 +66,7 @@ function CreateStreamItem(specified_contents)
         ["urls-as-command-parts"] = function(self)
           return self:get("initial-data", "urls"):get("map",
             function(url_item)
-              return { value = url_item:get("contents"), type = "quoted" }
+              return { value = url_item:get("c"), type = "quoted" }
             end
           )
         end,
@@ -94,11 +94,11 @@ function CreateStreamItem(specified_contents)
         ["update"] = function(self)
           if self:get("state") == "booting" then
             if self:get("alive") then
-              self:get("contents").state = "active"
+              self:get("c").state = "active"
             end
           elseif self:get("state") == "active" then
             if not self:get("alive") then
-              self:get("contents").state = "ended"
+              self:get("c").state = "ended"
             end
           end
           -- no update for ended
@@ -218,7 +218,7 @@ function CreateStreamItem(specified_contents)
 
   local interface = RootInitializeInterface(interface_specifier, contents)
 
-  interface:get("contents").initial_stream_config.socket = interface:get("socket")
-  interface:get("contents")["task"] = run(interface:get("command-parts"), true)
+  interface:get("c").initial_stream_config.socket = interface:get("socket")
+  interface:get("c")["task"] = run(interface:get("command-parts"), true)
   return interface
 end

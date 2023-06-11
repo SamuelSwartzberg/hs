@@ -12,13 +12,13 @@ LowercaseWordItemSpecifier = {
             slice_results = "-2:-2",
             slice_results_opts = { ext_sep = true },
           }),
-          {_exactly = self:get("contents")}
+          {_exactly = self:get("c")}
         )
       end,
     },
     doThisables = {
       ["add-as-pass-name"] = function(self, password)
-        dothis.pass.add_password(password, self:get("contents"))
+        dothis.pass.add_password(password, self:get("c"))
       end,
     }
   },

@@ -4,13 +4,13 @@ IbanItemSpecifier = {
   properties = {
     getables = {
       ["cleaned-iban"] = function(self)
-        return transf.iban.cleaned_iban(self:get("contents"))
+        return transf.iban.cleaned_iban(self:get("c"))
       end,
       ["bic"] = function (self)
-        return transf.iban.bic(self:get("contents"))
+        return transf.iban.bic(self:get("c"))
       end,
       ["bank-name"] = function (self)
-        return transf.iban.bank_name(self:get("contents"))
+        return transf.iban.bank_name(self:get("c"))
       end
     },
     doThisables = {

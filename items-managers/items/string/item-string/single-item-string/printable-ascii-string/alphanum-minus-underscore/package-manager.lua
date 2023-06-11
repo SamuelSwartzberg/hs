@@ -4,7 +4,7 @@ PackageManagerItemSpecifier = {
   properties = {
     getables = {
       ["list-packages-array"] = function (self)
-        return CreateArray(get.upkg.list(self:get("contents")))
+        return CreateArray(get.upkg.list(self:get("c")))
       end
     }
   },

@@ -7,7 +7,7 @@ NumberSpecifier = {
       ["is-number-by-combination"] = function() return true end,
       ["to-date-obj-item"] = function(self, adjustment_factor)
         adjustment_factor = adjustment_factor or 1
-        return CreateDate(date(self:get("contents") / adjustment_factor):tolocal())
+        return CreateDate(date(self:get("c") / adjustment_factor):tolocal())
       end
     },
     doThisables = {

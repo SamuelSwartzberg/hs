@@ -17,7 +17,7 @@ BooruURLItemSpecifier = {
     doThisables = {
       ["add-to-local"] = function(self)
         CreateStringItem(env.MBOORU_FAVORITE_LOGS):doThis("log-timestamp-table", {
-          [os.time] = "add," .. self:get("contents")
+          [os.time] = "add," .. self:get("c")
         })
         rest({
           api_name = "hydrus",

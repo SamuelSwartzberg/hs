@@ -2,7 +2,7 @@ local test_date_1 = date("2021-05-07T12:08:25")
 local test_date_item_1 = CreateDate(test_date_1:copy())
 
 assertMessage(
-  test_date_item_1:get("contents"),
+  test_date_item_1:get("c"),
   test_date_1
 )
 
@@ -10,7 +10,7 @@ assertMessage(
   test_date_item_1:get("with-added", {
     unit = "years",
     amount = 1
-  }):get("contents"),
+  }):get("c"),
   test_date_1:copy():addyears(1)
 )
 
@@ -18,7 +18,7 @@ assertMessage(
   test_date_item_1:get("with-subtracted", {
     unit = "years",
     amount = 1
-  }):get("contents"),
+  }):get("c"),
   test_date_1:copy():addyears(-1)
 )
 

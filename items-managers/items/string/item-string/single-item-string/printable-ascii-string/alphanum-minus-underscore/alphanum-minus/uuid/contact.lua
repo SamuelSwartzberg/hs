@@ -4,7 +4,7 @@ ContactItemSpecifier = {
   properties = {
     getables = {
       ["to-contact-table"] = function(self)
-        return transf.uuid.contact_table(self:get("contents"))
+        return transf.uuid.contact_table(self:get("c"))
       end,
 
     }

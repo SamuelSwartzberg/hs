@@ -4,13 +4,13 @@ YoutubeChannelIdItemSpecifier = {
   properties = {
     getables = {
       ["youtube-feed-url"] = function(self)
-        return transf.youtube_channel_id.feed_url(self:get("contents"))
+        return transf.youtube_channel_id.feed_url(self:get("c"))
       end,
       ["youtube-channel-url"] = function(self)
-        return transf.youtube_channel_id.channel_url(self:get("contents"))
+        return transf.youtube_channel_id.channel_url(self:get("c"))
       end,
       ["youtube-channeltitle"] = function(self)
-        return transf.youtube_channel_id.channel_title(self:get("contents"))
+        return transf.youtube_channel_id.channel_title(self:get("c"))
       end,
     },
     doThisables = {

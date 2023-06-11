@@ -9,7 +9,7 @@ EmailAddressItemSpecifier = {
         specifier = specifier or {}
         sendEmailInteractive({
           from = env.MAIN_EMAIL,
-          to = self:get("contents"),
+          to = self:get("c"),
           subject = specifier.subject,
         }, specifier.body, specifier.edit_func or editorEditFunc)
       end

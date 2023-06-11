@@ -704,7 +704,7 @@ transf = {
 
     end,
     event_tagline = function(event_table)
-      local event_table = self:get("contents")
+      local event_table = self:get("c")
       local str = event_table.start
       if event_table["end"] then
         str = str .. " - " .. event_table["end"]

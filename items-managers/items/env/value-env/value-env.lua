@@ -4,10 +4,10 @@ ValueEnvItemSpecifier = {
   properties = {
     getables = {
       ["is-list-value-env-item"] = function(self)
-        return isListOrEmptyTable(self:get("contents").value)
+        return isListOrEmptyTable(self:get("c").value)
       end,
       ["is-string-value-env-item"] = function(self)
-        return type(self:get("contents").value) == "string"
+        return type(self:get("c").value) == "string"
       end
     },
     doThisables = {

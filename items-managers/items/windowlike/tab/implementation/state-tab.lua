@@ -6,20 +6,20 @@ StateTabItemSpecifier = {
   properties = {
     getables = {
       ["current-hist-attrs"] = function(self)
-        local hist_entries = self:get("contents").entries
+        local hist_entries = self:get("c").entries
         return hist_entries[#hist_entries]
       end,
       ["raw-title"] = function(self)
         return self:get("current-hist-attrs").title
       end,
       ["running-application"] = function(self)
-        return self:get("contents").app
+        return self:get("c").app
       end,
       ["index"] = function (self)
-        return self:get("contents").index
+        return self:get("c").index
       end,
       ["window"] = function(self) -- we injected window into the object when creating this
-        return self:get("contents").window
+        return self:get("c").window
       end,
       ["url"] = function (self)
         return self:get("current-hist-attrs").url

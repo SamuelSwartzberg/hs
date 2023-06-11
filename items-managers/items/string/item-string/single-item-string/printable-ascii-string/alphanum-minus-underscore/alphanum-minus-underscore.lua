@@ -4,19 +4,19 @@ AlphanumMinusUnderscoreItemSpecifier = {
   properties = {
     getables = {
       ["is-word"] = function(self) 
-        return is.alphanum_minus_underscore.word(self:get("contents"))
+        return is.alphanum_minus_underscore.word(self:get("c"))
       end,
       ["is-alphanum-minus"] = function(self)
-        return is.alphanum_minus_underscore.alphanum_minus(self:get("contents"))
+        return is.alphanum_minus_underscore.alphanum_minus(self:get("c"))
       end,
       ["is-youtube-video-id"] = function(self)
-        return is.alphanum_minus_underscore.youtube_video_id(self:get("contents"))
+        return is.alphanum_minus_underscore.youtube_video_id(self:get("c"))
       end,
       ["is-youtube-channel-id"] = function(self)
-        return is.alphanum_minus_underscore.youtube_channel_id(self:get("contents"))
+        return is.alphanum_minus_underscore.youtube_channel_id(self:get("c"))
       end,
       ["is-package-manager"] = function(self)
-        return is.alphanum_minus_underscore.package_manager(self:get("contents"))
+        return is.alphanum_minus_underscore.package_manager(self:get("c"))
       end,
     }
   },

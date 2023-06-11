@@ -182,9 +182,9 @@ OmegatProjectDirItemSpecifier = {
       ["generate-target-txts"] = function(self, do_after)
         local generation_tasks = self:get("target-files-extension", "odt"):get("map", function(odt)
           return "cd" ..
-          transf.string.single_quoted_escaped(pathSlice(odt:get("contents"), ":-2", {rejoin_at_end=true})) ..
+          transf.string.single_quoted_escaped(pathSlice(odt:get("c"), ":-2", {rejoin_at_end=true})) ..
           "&& soffice --headless --convert-to txt:Text" ..
-          transf.string.single_quoted_escaped(pathSlice(odt:get("contents"), "-1:-1")[1])
+          transf.string.single_quoted_escaped(pathSlice(odt:get("c"), "-1:-1")[1])
         end)
         runThreaded(generation_tasks, 1, do_after)
       end,
@@ -225,8 +225,8 @@ OmegatProjectDirItemSpecifier = {
         self:get("str-item", "rechnung-pdf-path"):doThis("move-into-dir", rechnung_target)
       end,
       ["file-source-and-target"] = function(self)
-        local source_odts = self:get("source-files-extension", "odt"):get("contents")
-        local target_odts = self:get("target-files-extension", "odt"):get("contents")
+        local source_odts = self:get("source-files-extension", "odt"):get("c")
+        local target_odts = self:get("target-files-extension", "odt"):get("c")
         local odts = tablex.zip(source_odts, target_odts)
         for i, odt_pair in ipairs(odts) do 
           for j, odt in ipairs(odt_pair) do

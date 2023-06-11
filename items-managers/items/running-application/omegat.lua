@@ -9,10 +9,10 @@ OmegatApplicationSpecifier = {
     },
     doThisables = {
       ["create-all-translated-documents"] = function(self)
-        self:get("contents"):selectMenuItem({"Project", "Create Translated Documents"})
+        self:get("c"):selectMenuItem({"Project", "Create Translated Documents"})
       end,
       ["create-current-translated-document"] = function(self)
-        self:get("contents"):selectMenuItem({"Project", "Create Current Translated Document"})
+        self:get("c"):selectMenuItem({"Project", "Create Current Translated Document"})
       end,
     }
   },

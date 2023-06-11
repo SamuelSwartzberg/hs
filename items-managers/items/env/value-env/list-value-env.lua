@@ -4,7 +4,7 @@ ListValueEnvItemSpecifier = {
   properties = {
     getables = {
       ["value-to-env-line-value"] = function(self, pkey_var)
-        local values = map(self:get("contents").value, function(v) return pkey_var .. v end)
+        local values = map(self:get("c").value, function(v) return pkey_var .. v end)
         return stringx.join(":", values)
       end,
     },

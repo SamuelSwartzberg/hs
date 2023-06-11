@@ -3,7 +3,7 @@ local menu_item_list_finder = getMenuItemList("Finder")
 local new_folder_menu_item = find(
   menu_item_list_finder,
   function(menu_item)
-    return menu_item:get("contents").AXTitle == "New Folder"
+    return menu_item:get("c").AXTitle == "New Folder"
   end
 )
 

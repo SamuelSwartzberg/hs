@@ -5,7 +5,7 @@ ParentDirItemSpecifier = {
 
     getables = {
       ["children"] = function(self)
-        return transf.dir_path.children_array(self:get("contents"))
+        return transf.dir_path.children_array(self:get("c"))
       end,
       ["child-string-array"] = function(self) 
         return CreateArray(self:get("children")) 
@@ -18,11 +18,11 @@ ParentDirItemSpecifier = {
         return self:get("child-string-item-array"):get("filter-to-array-of-dirs")
       end,
       ["raw-child-string-array"] = function(self)
-        return CreateArray(itemsInPath(self:get("contents")))
+        return CreateArray(itemsInPath(self:get("c")))
       end,
       ["children-any-pass"] = function(self, query) return self:get("child-string-item-array"):get("some-pass", query) end,
       ["is-grandparent-dir"] = function(self)
-        return is.dir_path.grandparent_dir(self:get("contents"))
+        return is.dir_path.grandparent_dir(self:get("c"))
       end,
       ["is-parent-but-not-grandparent-dir"] = function(self)
         return not self:get("is-grandparent-dir")
@@ -57,7 +57,7 @@ ParentDirItemSpecifier = {
         self:get("child-dir-only-string-item-array"):doThis("choose-item-and-then-action")
       end,
       ["move-contents"] = function(self, target)
-        srctgt("move", self:get("contents"), target, "any", false, false, true)
+        srctgt("move", self:get("c"), target, "any", false, false, true)
       end,
     }
   },

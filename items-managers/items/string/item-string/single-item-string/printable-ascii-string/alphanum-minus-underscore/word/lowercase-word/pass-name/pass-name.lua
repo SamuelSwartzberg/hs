@@ -4,27 +4,27 @@ PassNameItemSpecifier = {
   properties = {
     getables = {
       ["pass-value"] = function(self, type)
-        return get.pass.value(type, self:get("contents"))
+        return get.pass.value(type, self:get("c"))
       end,
       ["as-gpg-file"] = function(self)
-        return self:get("contents") .. ".gpg"
+        return self:get("c") .. ".gpg"
       end,
 
       
       ["pass-passw-path"] = function(self)
-        return env.MPASSPASSW .. "/" .. self:get("contents") .. ".gpg"
+        return env.MPASSPASSW .. "/" .. self:get("c") .. ".gpg"
       end,
       ["pass-otp-path"] = function(self)
-        return env.MPASSOTP .. "/" .. self:get("contents") .. ".gpg"
+        return env.MPASSOTP .. "/" .. self:get("c") .. ".gpg"
       end,
       ["pass-recovery-path"] = function(self)
-        return env.MPASSRECOVERY .. "/" .. self:get("contents") .. ".gpg"
+        return env.MPASSRECOVERY .. "/" .. self:get("c") .. ".gpg"
       end,
       ["pass-security-question-path"] = function(self)
-        return env.MPASSSECQ .. "/" .. self:get("contents") .. ".gpg"
+        return env.MPASSSECQ .. "/" .. self:get("c") .. ".gpg"
       end,
       ["pass-username-path"] = function(self)
-        return env.MPASSUSERNAME .. "/" .. self:get("contents") .. ".txt"
+        return env.MPASSUSERNAME .. "/" .. self:get("c") .. ".txt"
       end,
       
       ["is-pass-otp"] = function(self) return testPath(self:get("pass-otp-path")) end,

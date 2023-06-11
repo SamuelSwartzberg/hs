@@ -3,13 +3,13 @@ NumberBySignSpecifier = {
   properties = {
     getables = {
       ["is-pos"] = function(self)
-        return is.number.pos(self:get("contents"))
+        return is.number.pos(self:get("c"))
       end,
       ["is-neg"] = function(self)
-        return is.number.neg(self:get("contents"))
+        return is.number.neg(self:get("c"))
       end,
       ["is-zero"] = function(self)
-        return is.number.zero(self:get("contents"))
+        return is.number.zero(self:get("c"))
       end,
     },
     doThisables = {

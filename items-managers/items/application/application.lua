@@ -4,31 +4,31 @@ ApplicationItemSpecifier = {
   properties = {
     getables = {
       ["application-support-dir"] = function(self) -- generally true, but may need to be overwritten in subclasses for some applications
-        return env.MAC_APPLICATION_SUPPORT .. "/" .. self:get("contents") .. "/"
+        return env.MAC_APPLICATION_SUPPORT .. "/" .. self:get("c") .. "/"
       end,
       ["application-dir"] = function(self)
-        return "/Applications/" .. self:get("contents") .. ".app/"
+        return "/Applications/" .. self:get("c") .. ".app/"
       end,
       ["is-title-url-application"] = function(self)
-        return find({"Firefox", "Newpipe"}, self:get("contents"))
+        return find({"Firefox", "Newpipe"}, self:get("c"))
       end,
       ["is-hydrus-network"] = function(self)
-        return self:get("contents") == "Hydrus Network"
+        return self:get("c") == "Hydrus Network"
       end,
       ["is-tachiyomi"] = function(self)
-        return self:get("contents") == "Tachiyomi"
+        return self:get("c") == "Tachiyomi"
       end,
       ["is-git"] = function(self)
-        return self:get("contents") == "Git"
+        return self:get("c") == "Git"
       end,
       ["is-chat-application"] = function(self)
-        return find({"Discord", "Telegram Lite", "WhatsApp", "Signal", "Facebook"}, self:get("contents"))
+        return find({"Discord", "Telegram Lite", "WhatsApp", "Signal", "Facebook"}, self:get("c"))
       end,
       ["upper-name"] = function (self)
-        return self:get("contents"):upper()
+        return self:get("c"):upper()
       end,
       ["running-application-raw"] = function (self)
-        return hs.application.get(self:get("contents"))
+        return hs.application.get(self:get("c"))
       end,
       ["running-application-item"] = function (self)
         return CreateRunningApplicationItem(self:get("running-application-raw"))

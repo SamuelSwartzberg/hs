@@ -4,7 +4,7 @@ TelURLItemSpecifier = {
   properties = {
     getables = {
       ['phone-number'] = function (self)
-        return transf.tel_url.phone_number(self:get("contents"))
+        return transf.tel_url.phone_number(self:get("c"))
       end
     }, 
     doThisables = {

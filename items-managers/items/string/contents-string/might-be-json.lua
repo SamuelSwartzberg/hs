@@ -4,7 +4,7 @@ MightBeJsonItemSpecifier = {
   properties = {
     getables = {
       ["parse-as-json"] = function(self)
-        return json.decode(self:get("contents"))
+        return json.decode(self:get("c"))
       end,
     }
   },

@@ -7,7 +7,7 @@ DiceNotationItemSpecifier = {
         local res = run({
           "roll",
           {
-            value = self:get("contents"),
+            value = self:get("c"),
             type = "quoted"
           }
         })

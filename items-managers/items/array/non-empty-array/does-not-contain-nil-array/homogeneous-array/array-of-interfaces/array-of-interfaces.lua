@@ -60,39 +60,39 @@ ArrayOfInterfacesSpecifier = {
         end)
       end,
       ["min-contents"] = function(self)
-        return reduce(self:get("map", function(item) return item:get("contents") end), returnSmaller)
+        return reduce(self:get("map", function(item) return item:get("c") end), returnSmaller)
       end,
       ["min-contents-item"] = function(self)
         local target
-        for i, item in ipairs(self:get("contents")) do
-          if not target or item:get("contents") < target:get("contents") then
+        for i, item in ipairs(self:get("c")) do
+          if not target or item:get("c") < target:get("c") then
             target = item
           end
         end
         return target
       end,
       ["max-contents"] = function(self)
-        return reduce(self:get("map", function(item) return item:get("contents") end))
+        return reduce(self:get("map", function(item) return item:get("c") end))
       end,
       ["max-contents-item"] = function(self)
         local target
-        for i, item in ipairs(self:get("contents")) do
-          if not target or item:get("contents") > target:get("contents") then
+        for i, item in ipairs(self:get("c")) do
+          if not target or item:get("c") > target:get("c") then
             target = item
           end
         end
         return target
       end,
       ["median-contents"] = function (self)
-        return listMedian(self:get("map", function(item) return item:get("contents") end))
+        return listMedian(self:get("map", function(item) return item:get("c") end))
       end,
       ["find-contents"] = function(self, contents)
         return self:get("find", function(item)
-          return item:get("contents") == contents
+          return item:get("c") == contents
         end)
       end,
       ["map-to-table-of-contents"] = function(self)
-        return self:get("map", function(item) return item:get("contents") end)
+        return self:get("map", function(item) return item:get("c") end)
       end,
 
     },
@@ -112,12 +112,12 @@ ArrayOfInterfacesSpecifier = {
         end)
       end,
       ["set-all"] = function(self, do_specifier)
-        for i, item in ipairs(self:get("contents")) do
+        for i, item in ipairs(self:get("c")) do
           item:set(item, do_specifier.key, do_specifier.value)
         end
       end,
       ["do-all"] = function(self, do_specifier)
-        for i, item in ipairs(self:get("contents")) do
+        for i, item in ipairs(self:get("c")) do
           item:doThis(do_specifier.key, do_specifier.args)
         end
       end,

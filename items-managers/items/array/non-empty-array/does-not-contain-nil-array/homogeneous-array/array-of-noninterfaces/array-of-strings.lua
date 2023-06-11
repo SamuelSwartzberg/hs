@@ -12,7 +12,7 @@ ArrayOfStringsSpecifier = {
         return self:get("filter-to-new-array", function(item) return item ~= "" end)
       end,
       ["joined-string-contents"] = function(self, joiner)
-        return table.concat(self:get("contents"), joiner)
+        return table.concat(self:get("c"), joiner)
       end,
       ["to-joined-string-item"] = function(self, joiner) return CreateStringItem(self:get("joined-string-contents", joiner)) end,
       ["joined-string-contents-with-no-blank-lines"] = function(self)
@@ -27,7 +27,7 @@ ArrayOfStringsSpecifier = {
       ["to-resplit-string-array-assume-sep"] = function(self, sep) -- the difference between this and to-resplit-string-array-assume-no-sep is that here we assume that the current array represents a string that was split by sep, and so we only need to split substrings that contain sep, and then flatten, while for to-resplit-string-array-assume-no-sep we assume that the divisions between the strings in the current array are arbitrary, and so we need to join the strings and then split by sep
         return CreateArray(
           map(
-            self:get("contents"), 
+            self:get("c"), 
             function (str) return stringy.split(str, sep) end,
             { flatten = true }
           )   
@@ -46,7 +46,7 @@ ArrayOfStringsSpecifier = {
         end)
       end,
       ["longest-common-prefix"] = function(self)
-        return longestCommonPrefix(self:get("contents"))
+        return longestCommonPrefix(self:get("c"))
       end,
       ["map-prepend-all"] = function(self, prefix)
         return self:get("map-to-new-array", function(item) return prefix .. item end)
@@ -61,7 +61,7 @@ ArrayOfStringsSpecifier = {
       end,
       ["tab-fill-with"] = function(self)
         local str = le(
-          stringx.join("\t", self:get("to-string-array"):get("contents"))
+          stringx.join("\t", self:get("to-string-array"):get("c"))
         )
         dothis.string.paste(str)
       end,

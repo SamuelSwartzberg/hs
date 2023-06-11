@@ -4,13 +4,13 @@ PathItemSpecifier = {
   properties = {
     getables = {
       ["is-absolute-path"] = function(self) 
-        return stringy.startswith(self:get("contents"), "/") or stringy.startswith(self:get("contents"), "~")
+        return stringy.startswith(self:get("c"), "/") or stringy.startswith(self:get("c"), "~")
       end,
       ["is-relative-path"] = function(self) return not self:get("is-absolute-path") end,
       ["is-path-leaf"] = returnTrue,
       ["is-in-path"] = function(self, path) return stringy.startswith(self:get("resolved-path"), path) end,
       ["resolved-path"] = function(self)
-        return transf.string.path_resolved(self:get("contents"))
+        return transf.string.path_resolved(self:get("c"))
       end,
       ["parent-dir-name"] = function(self)
         return pathSlice(self:get("resolved-path"), "-2:-2")[1]

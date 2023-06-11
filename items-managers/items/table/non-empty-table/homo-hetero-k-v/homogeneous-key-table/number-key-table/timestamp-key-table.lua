@@ -3,7 +3,7 @@ TimestampKeyTableSpecifier = {
   properties = {
     getables = {
       ["to-ymd-array-table"] = function(self)
-        return CreateTable(transf.timestamp_table.ymd_table(self:get("contents")))
+        return CreateTable(transf.timestamp_table.ymd_table(self:get("c")))
       end,
     },
     doThisables = {

@@ -9,7 +9,7 @@ YoutubePlaylistItemSpecifier = {
             "youtube-dl",
             "--no-warnings",
             "--dump-single-json",
-            {value = self:get("contents"), type = "quoted"},
+            {value = self:get("c"), type = "quoted"},
             "|",
             "jq",
             "-r",

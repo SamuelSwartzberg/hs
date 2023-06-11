@@ -4,21 +4,21 @@ NonExtantPathItemSpecifier = {
   properties = {
     getables = {
       ["is-path-with-line-andor-character-number"] = function(self)
-        return self:get("contents"):match(":%d+$")
+        return self:get("c"):match(":%d+$")
       end,
     },
     doThisables = {
       ["write-file-contents"] = function(self, contents)
-        writeFile(self:get("contents"), contents, "not-exists")
+        writeFile(self:get("c"), contents, "not-exists")
       end,
       ["overwrite-file-contents"] = function (self, contents)
-        writeFile(self:get("contents"), contents, "not-exists") -- same as write-file-contents since file doesn't exist
+        writeFile(self:get("c"), contents, "not-exists") -- same as write-file-contents since file doesn't exist
       end,
       ["append-file-contents"] = function (self, contents)
-        writeFile(self:get("contents"), contents, "not-exists") -- same as write-file-contents since file doesn't exist
+        writeFile(self:get("c"), contents, "not-exists") -- same as write-file-contents since file doesn't exist
       end,
       ["create-self-as-empty-dir"] = function(self)
-        createPath(self:get("contents"))
+        createPath(self:get("c"))
       end,
         
       ["table-to-fs-children-dispatch"] = function(self, specifier)
@@ -42,14 +42,14 @@ NonExtantPathItemSpecifier = {
       key = "do-multiple",
       args = {
         { key = "create-self-as-empty-dir" },
-        { key = "choose-action-on-str-item-result-of-get", args = "contents" } 
+        { key = "choose-action-on-str-item-result-of-get", args = "c" } 
       }
     },{
       text = "👉🌄📄 ccrfl.",
       key = "do-multiple",
       args = {
         { key = "write-file-contents" },
-        { key = "choose-action-on-str-item-result-of-get", args = "contents" } 
+        { key = "choose-action-on-str-item-result-of-get", args = "c" } 
       }
     },
   }

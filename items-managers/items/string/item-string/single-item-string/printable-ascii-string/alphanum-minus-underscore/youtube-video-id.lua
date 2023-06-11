@@ -4,7 +4,7 @@ YoutubeVideoIdItemSpecifier = {
   properties = {
     getables = {
       ["youtube-video-id"] = function(self)
-        return transf.youtube_video_id.youtube_video_url(self:get("contents"))
+        return transf.youtube_video_id.youtube_video_url(self:get("c"))
       end,
     }
   },

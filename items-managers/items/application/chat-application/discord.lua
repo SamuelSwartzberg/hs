@@ -69,8 +69,8 @@ DiscordItemSpecifier = {
       end,
       ["chat-obj"] = function(self, chat_dir)
         local message_json_file = chat_dir:get("child-ending-with", ".json")
-        local chat_obj = json.decode(message_json_file:get("contents"))
-        chat_obj.found_in = chat_dir:get("contents")
+        local chat_obj = json.decode(message_json_file:get("c"))
+        chat_obj.found_in = chat_dir:get("c")
         return chat_obj
       end,
       ["backup-interval"] = function(self)

@@ -4,7 +4,7 @@ PassUsernameItemSpecifier = {
   properties = {
     getables = {
       ["pass-username-as-filename"] = function(self)
-        return self:get("contents") .. ".txt"
+        return self:get("c") .. ".txt"
       end,
       ["pass-username-raw"] = function(self)
         return CreateStringItem(env.MPASSUSERNAME .. "/" .. self:get("pass-username-as-filename")):get("file-contents-to-string")

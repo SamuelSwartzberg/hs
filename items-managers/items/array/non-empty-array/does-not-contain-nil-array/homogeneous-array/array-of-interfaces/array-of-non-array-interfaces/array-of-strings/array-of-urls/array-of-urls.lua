@@ -17,7 +17,7 @@ ArrayOfUrlsSpecifier = {
         local path = CreateStringItem(env.MURLS):get("related-path-with-subdirs-gui")
         self:doThis("for-all", function(item)
           path:doThis('create-file-with-contents', {
-            contents = item:get("contents"),
+            contents = item:get("c"),
             name = item:get("html-title") .. ".url2"
           })
         end)

@@ -4,7 +4,7 @@ DbFileItemSpecifier = {
   properties = {
     getables = {
       ["is-sql-file"] = function(self)
-        return is.path.usable_as_filetype(self:get("contents"), "possibly-sql")
+        return is.path.usable_as_filetype(self:get("c"), "possibly-sql")
       end,
     },
     doThisables = {

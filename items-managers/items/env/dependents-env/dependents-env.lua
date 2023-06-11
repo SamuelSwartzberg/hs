@@ -4,7 +4,7 @@ DependentsEnvItemSpecifier = {
   properties = {
     getables = {
       ["dependents"] = function(self)
-        return self:get("contents").dependents
+        return self:get("c").dependents
       end,
       ["dependents-to-env-lines"] = function(self, key)
         return self:get("dependents"):get("env-lines", key)

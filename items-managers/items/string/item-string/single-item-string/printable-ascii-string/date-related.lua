@@ -4,7 +4,7 @@ DateRelatedItemSpecifier = {
   properties = {
     getables = {
       ["to-date-obj"] = function(self)
-        return date(self:get("contents"))
+        return date(self:get("c"))
       end,
       ["to-date-obj-item"] = function(self)
         return CreateDate(self:get("to-date-obj"))

@@ -4,7 +4,7 @@ ArraySpecifier = {
   type = "array",
   properties = {
     getables = {
-      ["length"] = function(self) return #values(self:get("contents")) end,
+      ["length"] = function(self) return #values(self:get("c")) end,
       ["is-empty-array"] = function(self) return self:get("length") == 0 end,
       ["is-non-empty-array"] = function(self) return self:get("length") > 0 end,
     },

@@ -3,13 +3,13 @@ SynonymsTableSpecifier = {
   properties = {
     getables = {
       ["synonyms"] = function(self)
-        return self:get("contents").synonyms
+        return self:get("c").synonyms
       end,
       ["antonyms"] = function (self)
-        return self:get("contents").antonyms
+        return self:get("c").antonyms
       end,
       ["to-string"] = function(self)
-        local contents = self:get("contents")
+        local contents = self:get("c")
         local outstr = contents.term .. ": "
         if contents.synonyms then 
           outstr = outstr .. "synonyms: " .. table.concat(slice(contents.synonyms, {stop = 2, sliced_indicator = "..."})) .. "; "

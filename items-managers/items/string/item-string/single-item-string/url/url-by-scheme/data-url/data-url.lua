@@ -4,16 +4,16 @@ DataURLItemSpecifier = {
   properties = {
     getables = {
       ["data-content-type"] = function(self)
-        return transf.data_url.content_type(self:get("contents"))
+        return transf.data_url.content_type(self:get("c"))
       end,
       ["is-image-data-url"] = function(self)
         return is.media_type.image(self:get("data-content-type"))
       end,
       ["is-base-64-data-url"] = function (self)
-        return is.data_url.base64(self:get("contents"))
+        return is.data_url.base64(self:get("c"))
       end,
       ["payload-part"] = function (self)
-        return transf.data_url.payload_part(self:get("contents"))
+        return transf.data_url.payload_part(self:get("c"))
       end
     }, 
     doThisables = {

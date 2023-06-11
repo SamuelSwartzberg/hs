@@ -157,7 +157,7 @@ InterfaceDefaultTemplate = {
   properties = {
     getables = {
       contents = function(self)
-        if self.super then return self.root_super:get("contents") 
+        if self.super then return self.root_super:get("c") 
         else return self.contents end
       end,
       ["chooser-list-entry"] = function(self) 
@@ -285,7 +285,7 @@ InterfaceDefaultTemplate = {
       end,
       ["use-action"] = function(self, action_item)
         if action_item.dothis then
-          action_item.dothis(self:get("contents"))
+          action_item.dothis(self:get("c"))
         
         else
           self:doThis(action_item["key"], action_item["args"])
@@ -321,7 +321,7 @@ InterfaceDefaultTemplate = {
       end,
       ["do-staggered-action"] = function(self, specifier)
         local counter = 1
-        System:get("contents")["global-timer-manager"]:doThis("create", { 
+        System:get("c")["global-timer-manager"]:doThis("create", { 
           interval = specifier.interval,
           fn = function()
             self:doThis(specifier.key, specifier.args)
@@ -414,7 +414,7 @@ function NewDynamicContentsComponentInterface(interface_specifier, super)
   if super then 
     interface.super = super
     interface.root_super = super.root_super
-    interface:setContents(super.root_super:get("contents"))
+    interface:setContents(super.root_super:get("c"))
   end
   return interface
 end

@@ -6,7 +6,7 @@ ManagedTimerArraySpecifier = {
     doThisables = {
       ["space-firings"] = function(self)
         local firings = {}
-        for _, item in ipairs(self:get("contents")) do
+        for _, item in ipairs(self:get("c")) do
           local next_firing = item:get("next-firing")
           if not item:get("low-impact") and item:get("is-running") then -- no need to space out low-impact timers
             if not firings[next_firing] then

@@ -4,7 +4,7 @@ HTMLEntityEncodedStringItemSpecifier = {
   properties = {
     getables = {
       ["html-entities-decoded"] = function(self)
-        return htmlEntities.decode(self:get("contents"))
+        return htmlEntities.decode(self:get("c"))
       end
     }
   },
@@ -26,7 +26,7 @@ HTMLEntityDecodedStringItemSpecifier = {
   properties = {
     getables = {
       ["html-entities-encoded"] = function(self)
-        return htmlEntities.encode(self:get("contents"))
+        return htmlEntities.encode(self:get("c"))
       end
     }
   },

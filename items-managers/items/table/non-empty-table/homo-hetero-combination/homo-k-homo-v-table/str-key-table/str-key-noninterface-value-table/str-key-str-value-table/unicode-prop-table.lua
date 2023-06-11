@@ -3,30 +3,30 @@ UnicodePropTableSpecifier = {
   properties = {
     getables = {
       ["to-string"] = function(self)
-        local contents = self:get("contents")
+        local contents = self:get("c")
         return contents.char .. ": "  .. contents.cpoint .. " " .. contents.name ..
           "(cat: " .. contents.category .. ")"
       end,
       ["category"] = function(self)
-        return self:get("contents").cat
+        return self:get("c").cat
       end,
       ["char"] = function(self)
-        return self:get("contents").char
+        return self:get("c").char
       end,
       ["cpoint"] = function(self)
-        return self:get("contents").cpoint
+        return self:get("c").cpoint
       end,
       ["name"] = function(self)
-        return self:get("contents").name
+        return self:get("c").name
       end,
       ["html"] = function(self)
-        return self:get("contents")["html"]
+        return self:get("c")["html"]
       end,
       ["decimal-codepoint"] = function(self)
-        return self:get("contents")["dec"]
+        return self:get("c")["dec"]
       end,
       ["eutf8"] = function(self)
-        return self:get("contents")["eutf8"]
+        return self:get("c")["eutf8"]
       end,
     },
     doThisables = {

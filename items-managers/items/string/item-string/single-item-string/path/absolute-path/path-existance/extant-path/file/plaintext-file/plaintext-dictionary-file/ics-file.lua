@@ -9,7 +9,7 @@ IcsFileItemSpecifier = {
         local basename = self:get("leaf-without-extension")
         local tmpdir_ics_path = env.TMPDIR .. "/" .. basename .. ".ics"
         local tmpdir_json_path = env.TMPDIR .. "/" .. basename .. ".json"
-        srctgt("copy", self:get("contents"), tmpdir_ics_path)
+        srctgt("copy", self:get("c"), tmpdir_ics_path)
         run({
           "ical2json",
           { value = tmpdir_ics_path, type = "quoted" }
@@ -39,7 +39,7 @@ IcsFileItemSpecifier = {
     doThisables = {
       ["add-events-to-calendar"] = function(self)
         CreateArray(get.khal.writeable_calendars()):doThis("choose-item", function(calendar)
-          dothis.khal.add_event_from_file(calendar, self:get("contents"))
+          dothis.khal.add_event_from_file(calendar, self:get("c"))
         end)
       end,
     }

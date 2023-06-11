@@ -6,10 +6,10 @@ WindowItemSpecifier = {
       ["is-implementation"] = returnTrue,
       ["is-interface"] = returnTrue,
       ["raw-title"] = function(self)
-        return self:get("contents"):title()
+        return self:get("c"):title()
       end,
       ["running-application"] = function(self)
-        return self:get("contents"):application()
+        return self:get("c"):application()
       end,
       ["running-application-item"] = function(self)
         return CreateRunningApplicationItem(self:get("running-application"))
@@ -21,13 +21,13 @@ WindowItemSpecifier = {
         return self:get("running-application"):name()
       end,
       ["snapshot"] = function(self)
-        return self:get("contents"):snapshot()
+        return self:get("c"):snapshot()
       end,
       ["accessibility-interface"] = function(self)
-        hs.axuielement.windowElement(self:get("contents"))
+        hs.axuielement.windowElement(self:get("c"))
       end,
       ["rect"] = function(self)
-        return self:get("contents"):frame()
+        return self:get("c"):frame()
       end,
       ["point-tl"] = function (self)
         return self:get("rect").topleft
@@ -46,7 +46,7 @@ WindowItemSpecifier = {
         return self:get("rect").bottomright
       end,
       ["size"] = function(self)
-        return self:get("contents"):size()
+        return self:get("c"):size()
       end,
       ["relative-center"] = function(self)
         return self:get("size").center
@@ -84,7 +84,7 @@ WindowItemSpecifier = {
         return ("%s (%s)"):format(self:get("title"), self:get("application-name"))
       end,
       ["screen"] = function(self)
-        return self:get("contents"):screen()
+        return self:get("c"):screen()
       end,
     },
     doThisables = {
@@ -92,13 +92,13 @@ WindowItemSpecifier = {
         self:get("accessibility-interface"):elementSearch(specifier.callback, specifier.criteria)
       end,
       ["focus"] = function(self)
-        self:get("contents"):focus()
+        self:get("c"):focus()
       end,
       ["close"] = function(self)
-        self:get("contents"):close()
+        self:get("c"):close()
       end,
       ["make-main"] = function(self)
-        self:get("contents"):becomeMain()
+        self:get("c"):becomeMain()
       end,
       ["do-on-application-w-window-as-main"] = function(self, callback)
         local application = self:get("running-application-item")
@@ -110,19 +110,19 @@ WindowItemSpecifier = {
         end
       end,
       ["set-size"] = function(self, size)
-        self:get("contents"):setSize(size)
+        self:get("c"):setSize(size)
       end,
       ["set-rect"] = function (self, specifier)
-        self:get("contents"):move(specifier)
+        self:get("c"):move(specifier)
       end,
       ["set-position"] = function(self, position)
-        self:get("contents"):setTopLeft(position)
+        self:get("c"):setTopLeft(position)
       end,
       ["set-grid"] = function(self, grid)
         hs.grid.set(grid, self:get("screen"))
       end,
       ["set-cell"] = function (self, cell)
-        hs.grid.set(self:get("contents"), cell, self:get("screen"))
+        hs.grid.set(self:get("c"), cell, self:get("screen"))
       end,
       ["click-relative-to"] = function(self, specifier)
         local click_point = self:get("point-with-offset-from", specifier)

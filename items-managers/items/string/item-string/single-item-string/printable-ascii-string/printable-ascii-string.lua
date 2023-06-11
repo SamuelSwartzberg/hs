@@ -4,62 +4,62 @@ PrintableAsciiStringItemSpecifier = {
   properties = {
     getables = {
       ["is-alphanum-minus-underscore"] = function(self) 
-        return not string.find(self:get("contents"), "[^%w%-_]")
+        return not string.find(self:get("c"), "[^%w%-_]")
       end,
       ["is-iban"] = function(self)
-        local contents = self:get("contents")
+        local contents = self:get("c")
         return contents:len() < 42 -- 30 (BBAN) + 2 (country code) + 2 (check digits) + 8 (optional spaces)
           and contents:find("^%w%w")
           and not contents:find("[^%w%-%_ ]")
       end,
-      ["is-doi"] = function(self) return memoize(onig.find)(self:get("contents"), whole(mt._r.id.doi)) end,
-      ["is-num"] = function(self) return tonumber(self:get("contents")) ~= nil end,
+      ["is-doi"] = function(self) return memoize(onig.find)(self:get("c"), whole(mt._r.id.doi)) end,
+      ["is-num"] = function(self) return tonumber(self:get("c")) ~= nil end,
       ["is-email-address"] = function(self) -- trying to determine what string is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
-        local contents = self:get("contents")
+        local contents = self:get("c")
         return stringy.find(contents, "@") and stringy.find(contents, ".") and not eutf8.find(contents, "%s")
       end,
       ["is-phone-number"] = function(self)
-        return is.string.potentially_phone_number(self:get("contents"))
+        return is.string.potentially_phone_number(self:get("c"))
       end,
-      ["is-digit-string"] = function(self) return onig.find(self:get("contents"), "^-?[0-9a-fA-F]*[\\.,]?[0-9a-fA-F]+$") end,
+      ["is-digit-string"] = function(self) return onig.find(self:get("c"), "^-?[0-9a-fA-F]*[\\.,]?[0-9a-fA-F]+$") end,
       ["is-date-related-item"] = function(self) 
-        return memoize(onig.find)(self:get("contents"), whole(mt._r.date.rfc3339))
+        return memoize(onig.find)(self:get("c"), whole(mt._r.date.rfc3339))
       end,
       ["is-dice-notation-item"] = function(self)
-        return onig.match(self:get("contents"), whole(mt._r.syntax.dice))
+        return onig.match(self:get("c"), whole(mt._r.syntax.dice))
       end,
       ["is-unicode-codepoint"] = function(self)
-        return stringy.startswith(self:get("contents"), "U+") and string.match(self:get("contents"), "^U+%x+$")
+        return stringy.startswith(self:get("c"), "U+") and string.match(self:get("c"), "^U+%x+$")
       end,
       ["is-handle"] = function(self)
-        return stringy.startswith(self:get("contents"), "@")
+        return stringy.startswith(self:get("c"), "@")
       end,
       ["is-url-base64"] = function(self)
-        return onig.find(self:get("contents"), whole(mt._r.b.b64.url))
+        return onig.find(self:get("c"), whole(mt._r.b.b64.url))
       end,
       ["is-general-base64"] = function(self)
-        return onig.find(self:get("contents"), whole(mt._r.b.b64.gen))
+        return onig.find(self:get("c"), whole(mt._r.b.b64.gen))
       end,
       ["is-general-base32"] = function(self)
-        return onig.find(self:get("contents"), whole(mt._r.b.b32.gen))
+        return onig.find(self:get("c"), whole(mt._r.b.b32.gen))
       end,
       ["is-crockford-base32"] =  function(self)
-        return onig.find(self:get("contents"), whole(mt._r.b.b32.crockford))
+        return onig.find(self:get("c"), whole(mt._r.b.b32.crockford))
       end,
       ["is-installed-package"] = function(self, mgr)
-        return get.upkg.is_installed(mgr, self:get("contents"))
+        return get.upkg.is_installed(mgr, self:get("c"))
       end,
       ["with-version-package-manager-array"] = function(self, mgr)
-        return CreateArray(get.upkg.with_version_package_manager(mgr, self:get("contents")))
+        return CreateArray(get.upkg.with_version_package_manager(mgr, self:get("c")))
       end,
 
     },
     doThisables = {
       ["add-as-password"] = function(self, name)
-        run("yes" .. transf.string.single_quoted_escaped(self:get("contents")) .. "| pass insert passw/" .. name, true)
+        run("yes" .. transf.string.single_quoted_escaped(self:get("c")) .. "| pass insert passw/" .. name, true)
       end,
       ["add-as-username"] = function(self, name)
-        writeFile(env.MPASSUSERNAME .. "/" .. name .. ".txt", self:get("contents"))
+        writeFile(env.MPASSUSERNAME .. "/" .. name .. ".txt", self:get("c"))
       end,
       ["add-as-password-with-prompt-username"] = function(self, name)
         local username = prompt("string", "Username")
@@ -67,10 +67,10 @@ PrintableAsciiStringItemSpecifier = {
         CreateStringItem(username):doThis("add-as-username", name)
       end,
       ["upkg-install"] = function(self, mgr)
-        dothis.upkg.install(mgr, self:get("contents"))
+        dothis.upkg.install(mgr, self:get("c"))
       end,
       ["upkg-remove"] = function(self, mgr)
-        dothis.upkg.remove(mgr, self:get("contents"))
+        dothis.upkg.remove(mgr, self:get("c"))
       end,
 
     }

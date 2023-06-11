@@ -13,10 +13,10 @@ ManagedClipboardArraySpecifier = {
     doThisables = {
       ["use-custom-create-logic"] = function(self, args)
         local item = CreateStringItem(args)
-        local contents = item:get("contents")
+        local contents = item:get("c")
         local element_with_same_contents = self:get(
           "find",
-          function (find_item) return find_item:get("contents") == contents end
+          function (find_item) return find_item:get("c") == contents end
         )
         if element_with_same_contents then
           self:doThis("move-to-front", element_with_same_contents)

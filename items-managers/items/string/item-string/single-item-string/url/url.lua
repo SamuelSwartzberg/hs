@@ -4,7 +4,7 @@ URLItemSpecifier = {
   properties = {
     getables = {
       ["parsed-url"] = function(self)
-        return memoize(parseGuessScheme)(self:get("contents"))
+        return memoize(parseGuessScheme)(self:get("c"))
       end,
       ["url-scheme"] = function(self) return self:get("parsed-url").scheme end,
       ["url-host"] = function(self) return self:get("parsed-url").host end,
@@ -33,7 +33,7 @@ URLItemSpecifier = {
         return self:get("url-scheme")
       end,
       ["by-selector"] = function(self, specifier)
-        return memoize(queryPage)(self:get("contents"), specifier.selector, specifier.only_text)
+        return memoize(queryPage)(self:get("c"), specifier.selector, specifier.only_text)
       end,
       ["text-by-selector"] = function(self, selector)
         return self:get("by-selector", {
@@ -48,26 +48,26 @@ URLItemSpecifier = {
         return self:get("text-by-selector", "meta[name=description]")
       end,
       ["default-negotation-url-contents"] = function(self)
-        return transf.url.default_negotation_url_contents(self:get("contents"))
+        return transf.url.default_negotation_url_contents(self:get("c"))
       end,
       ["url-in-wayback-machine"] = function (self)
-        return transf.url.in_wayback_machine(self:get("contents"))
+        return transf.url.in_wayback_machine(self:get("c"))
       end,
       ["param-table"] = function(self)
-        return transf.url.param_table(self:get("contents"))
+        return transf.url.param_table(self:get("c"))
       end
       
     },
     doThisables = {
       ["download-url"] = function(self, path)
-        dothis.url.download_to(self:get("contents"), path, true)
+        dothis.url.download_to(self:get("c"), path, true)
       end,
       ["download-url-to-downloads"] = function(self)
         self:doThis("download-url", { value = "$HOME/Downloads", type = "quoted" })
       end,
       ["add-to-newsboat"] = function(self, category)
         CreateStringItem(env.NEWSBOAT_URLS):doThis("append-newsboat-url", {
-          url = self:get("contents"),
+          url = self:get("c"),
           title = self:get("html-title"),
           category = category
         })
@@ -75,7 +75,7 @@ URLItemSpecifier = {
       ["add-to-urls"] = function(self, name)
         local path = CreateStringItem(env.MURLS):get("related-path-with-subdirs-gui")
         path:doThis('create-file-with-contents', {
-          contents = self:get("contents"),
+          contents = self:get("c"),
           name = ((name and #name > 0) and name) or self:get("html-title") .. ".url2"
         })
       end,
@@ -83,7 +83,7 @@ URLItemSpecifier = {
         local name = self:get("url-domain")
         local khal_config = CreateStringItem(env.KHAL_CONFIG .. "/config")
         local vdirsyncer_config = CreateStringItem(env.VDIRSYNCER_CONFIG .. "/config" )
-        local vdirsyncer_data = vdirsyncer_config:get("vdirsyncer-pair-and-corresponding-storages-for-webcal", self:get("contents"))
+        local vdirsyncer_data = vdirsyncer_config:get("vdirsyncer-pair-and-corresponding-storages-for-webcal", self:get("c"))
         local khal_data = khal_config:get("table-to-ini-section", {
           header = "[ro:" .. name .. "]", -- this results in double [[ ]] in the file, which is the format khal expects (don't ask me why)
           body = {
@@ -108,7 +108,7 @@ URLItemSpecifier = {
       end,
       ["add-events-to-calendar"] = function(self)
         CreateArray(get.khal.writeable_calendars()):doThis("choose-item", function(calendar)
-          dothis.khal.add_event_from_url(calendar, self:get("contents"))
+          dothis.khal.add_event_from_url(calendar, self:get("c"))
         end)
       end,
 

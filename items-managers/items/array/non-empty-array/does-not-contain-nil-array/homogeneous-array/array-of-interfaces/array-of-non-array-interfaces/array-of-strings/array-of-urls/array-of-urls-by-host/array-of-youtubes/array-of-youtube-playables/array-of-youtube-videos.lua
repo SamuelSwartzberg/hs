@@ -7,7 +7,7 @@ ArrayOfYoutubeVideosSpecifier = {
     },
     doThisables = {
       ["create-youtube-playlist-with-videos"] = function(self, name)
-        createYoutubePlaylist({videos = self:get("contents"), name = name})
+        createYoutubePlaylist({videos = self:get("c"), name = name})
       end,
           
     },

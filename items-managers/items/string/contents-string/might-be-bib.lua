@@ -4,7 +4,7 @@ MightBeBibItemSpecifier = {
   properties = {
     getables = {
       ["bib-url"] = function(self)
-        return slice(self:get("contents"), "url = \\{", "\\}")
+        return slice(self:get("c"), "url = \\{", "\\}")
       end,
       ["to-citable-object-id"] = function(self)
         return CreateStringItem(transf.string.base64_url(self:get("bib-url")))
@@ -15,7 +15,7 @@ MightBeBibItemSpecifier = {
         local path = promptPathChildren(env.MCITATIONS)
         if path then
           local filename = self:get("to-citable-object-id"):get("to-bib-filename")
-          local bibtex = self:get("contents")
+          local bibtex = self:get("c")
           writeFile(path .. "/" .. filename, bibtex)
         end
       end,
