@@ -342,6 +342,23 @@ dothis = {
       })
     end
   },
+  table = {
+    write_ics_file = function(tbl, path)
+      local tmpdir_json_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".json"
+      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
+      writeFile(tmpdir_json_path, json.encode(tbl))
+      run({
+        "ical2json",
+        "-r",
+        { value = tmpdir_ics_path, type = "quoted" }
+      })
+      delete(tmpdir_json_path)
+      if path then
+        srctgt("move", tmpdir_ics_path, path)
+        delete(tmpdir_ics_path)
+      end
+    end
+  },
   string = {
     generate_qr_png = function(data, path)
       if not testPath(path) then
@@ -427,6 +444,17 @@ dothis = {
     activate = function(source_id)
       hs.keycodes.currentSourceID(source_id)
       hs.alert.show(transf.source_id.language(source_id))
+    end,
+  },
+  ics_file = {
+    generate_json_file = function(path)
+      return run({
+        "ical2json",
+        {
+          value = path,
+          type = "quoted"
+        }
+      })
     end,
   }
 

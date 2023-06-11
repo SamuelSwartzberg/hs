@@ -261,6 +261,11 @@ get = {
     end,
 
   },
+  path = {
+    with_different_extension = function(path, ext)
+      return transf.path.no_extension(path) .. "." .. ext
+    end,
+  },
   absolute_path = {
     relative_path_from = function(path, starting_point)
       return mustNotStart(path, mustEnd(starting_point, "/"))
@@ -305,6 +310,7 @@ get = {
       })
     end,
   },
+
   logging_dir = {
     log_for_date = function(path, date)
       return transf.string.path_resolved(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"

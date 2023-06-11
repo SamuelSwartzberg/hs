@@ -10,6 +10,10 @@ refstore = {
         rejoin_at_end = {
           rejoin_at_end = true
         },
+        sep_rejoin = {
+          ext_sep = true,
+          rejoin_at_end = true
+        },
       }
     },
     memoize = {

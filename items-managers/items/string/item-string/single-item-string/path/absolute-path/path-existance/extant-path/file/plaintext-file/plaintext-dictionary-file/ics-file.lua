@@ -19,21 +19,6 @@ IcsFileItemSpecifier = {
         delete(tmpdir_json_path)
         return res
       end,
-      ["lua-table-to-string"] = function(self, tbl)
-        local basename = self:get("leaf-without-extension")
-        local tmpdir_ics_path = env.TMPDIR .. "/" .. basename .. ".ics"
-        local tmpdir_json_path = env.TMPDIR .. "/" .. basename .. ".json"
-        writeFile(tmpdir_json_path, json.encode(tbl))
-        run({
-          "ical2json",
-          "-r",
-          { value = tmpdir_ics_path, type = "quoted" }
-        })
-        local res = readFile(tmpdir_ics_path)
-        delete(tmpdir_ics_path)
-        delete(tmpdir_json_path)
-        return res
-      end,
       
     },
     doThisables = {

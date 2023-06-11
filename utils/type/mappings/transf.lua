@@ -111,6 +111,9 @@ transf = {
     extension = function(path)
       return pathSlice(path, "-1:-1", refstore.params.path_slice.opts.ext_sep)[1]
     end,
+    no_extension = function(path)
+      return pathSlice(path, "1:-2", refstore.params.path_slice.opts.sep_rejoin)
+    end,
     filename = function(path)
       return pathSlice(path, "-2:-2", refstore.params.path_slice.opts.ext_sep)[1]
     end,
@@ -275,6 +278,19 @@ transf = {
       })
     end,
 
+  },
+
+  ics_file = {
+    array_of_tables = function(path)
+      local temppath = transf.string.in_tmp_dir(transf.path.filename(path) .. ".ics")
+      srctgt("copy", path, temppath)
+      dothis.ics_file.generate_json_file(temppath)
+      local jsonpath = readFile(get.path.with_different_extension(temppath, "json"))
+      local res = json.decode(readFile(jsonpath))
+      delete(jsonpath)
+      delete(temppath)
+      return res
+    end,
   },
 
   semver = {
@@ -472,6 +488,9 @@ transf = {
   string = {
     in_cache_dir = function(data, type)
       return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.string.safe_filename(data)
+    end,
+    in_tmp_dir = function(data, type) -- in contrast to the above method, we also ensure that it's unique by using a timestamp
+      return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.string.safe_filename(data)
     end,
     qr_utf8_image_bow = function(data)
       return memoize(run)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
@@ -1016,6 +1035,13 @@ transf = {
     fs_tag_string = function(t)
       return "%" .. table.concat(transf.table.fs_tag_array(t), "%")
     end,
+    ics_string = function(t)
+      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
+      dothis.table.write_ics_file(t, tmpdir_ics_path)
+      local contents = readFile(tmpdir_ics_path)
+      delete(tmpdir_ics_path)
+      return contents
+    end
   },
   timestamp_table = {
     --- transforms a timestamp-key orderedtable into a table of the structure [yyyy] = { [yyyy-mm] = { [yyyy-mm-dd] = { [hh:mm:ss, ...] } } }
@@ -1174,7 +1200,7 @@ transf = {
   not_userdata_or_function = {
     md5 = function(thing)
       if type(thing) ~= "string" then 
-        thing = json.encode(thing)
+        thing = json.encode(thing) 
       end
       local md5 = hashings("md5")
       md5:update(thing)
@@ -1182,6 +1208,12 @@ transf = {
     end,
     in_cache_dir = function(data, type)
       return transf.string.in_cache_dir(
+        transf.not_userdata_or_function.md5(data),
+        type
+      )
+    end,
+    in_tmp_dir = function(data, type)
+      return transf.string.in_tmp_dir(
         transf.not_userdata_or_function.md5(data),
         type
       )
