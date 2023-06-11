@@ -7,7 +7,7 @@ BibFileItemSpecifier = {
     getables = {
       ["to-csl-table"] = function(self)
         local raw_table = self:get("parse-to-lua-table")
-        return ar(map(raw_table, CreateTable))
+        return ar(map(raw_table, tb))
       end,
       
         

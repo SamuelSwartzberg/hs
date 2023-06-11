@@ -26,11 +26,11 @@ PlaintextDictionaryFileItemSpecifier = {
       end,
       ["to-env-map"] = function(self)
         local table = self:get("parse-to-lua-table")
-        local env_map_item = CreateTable(table)
+        local env_map_item = tb(table)
         return env_map_item:get("parse-to-env-map")
       end,
       ["parse-to-table-item"] = function(self)
-        return CreateTable(self:get("parse-to-lua-table"))
+        return tb(self:get("parse-to-lua-table"))
       end,
     },
     doThisables = {

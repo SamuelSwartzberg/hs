@@ -755,12 +755,12 @@ local item_creation_map = {
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-dates" },
     },
     {
-      value = { CreateTable({foo = "bar"}), CreateTable({bar = "foo"}) },
+      value = { tb({foo = "bar"}), tb({bar = "foo"}) },
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-tables", "array-of-non-empty-tables" },
       must_not_be = { "array-of-empty-tables" }
     },
     {
-      value = { CreateTable({}), CreateTable({}) },
+      value = { tb({}), tb({}) },
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-tables", "array-of-empty-tables" },
       must_not_be = { "array-of-non-empty-tables" }
     },
@@ -882,7 +882,7 @@ local item_creation_map = {
   --     must_be = { "running-application", "omegat" }
   --   }
   -- }, -- stays commented out most of the time since having applications open is annoying while I'm constantly rerunning this while debugging
-  [CreateTable] = {
+  [tb] = {
     {
       value = {},
       must_be = { "table", "empty-table" },
@@ -964,7 +964,7 @@ local item_creation_map = {
     }
     ,
     {
-      value = { FOO = CreateTable({ Street = "Somestr", Code="12345"}) },
+      value = { FOO = tb({ Street = "Somestr", Code="12345"}) },
       must_be = {"address-table"}
     }
   }, -- todo

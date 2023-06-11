@@ -43,7 +43,7 @@ EnvItemSpecifier = {
 --- @type BoundRootInitializeInterface
 function CreateEnvItem(contents)
   if contents.dependents then 
-    contents.dependents = CreateTable(contents.dependents):get("parse-to-env-map")
+    contents.dependents = tb(contents.dependents):get("parse-to-env-map")
   end
   local interface = RootInitializeInterface(EnvItemSpecifier, contents)
   return interface

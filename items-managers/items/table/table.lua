@@ -26,4 +26,4 @@ TableSpecifier = {
 }
 
 --- @type BoundRootInitializeInterface
-CreateTable = bindArg(RootInitializeInterface, TableSpecifier)
+tb = bindArg(RootInitializeInterface, TableSpecifier)

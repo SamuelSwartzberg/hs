@@ -27,8 +27,8 @@ require("items-managers")
 projectDirsArray = ar(itemsInPath({path = env.ME, recursion = 2, include_files = false})):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)
 
 
-envTable = CreateTable(env)
-compTable = CreateTable(flatten(comp, {
+envTable = tb(env)
+compTable = tb(flatten(comp, {
   mode = "path-assoc",
   val = "plain",
   join_path = ".",
@@ -142,7 +142,7 @@ local keymap = {
       searches["subj_cont"] = "magrep -i subject:%s"
       searches["body_cont"] = "magrep -i /:%s"
       searches["adv"] = "mpick -t %s"
-      CreateTable(searches)
+      tb(searches)
         :doThis("choose-item", function(val)
           local true_val = returnLast(stringy.split(val, " ")) -- ignore all the `magrep -i` or `mpick -t` stuff, that's just for user comprehension
           true_val = string.format(true_val, prompt("string", "Search for: "))

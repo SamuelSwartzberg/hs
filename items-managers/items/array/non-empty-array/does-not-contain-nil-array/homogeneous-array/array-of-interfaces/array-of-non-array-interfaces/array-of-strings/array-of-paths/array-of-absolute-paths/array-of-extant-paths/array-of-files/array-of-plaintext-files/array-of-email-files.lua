@@ -7,7 +7,7 @@ ArrayOfEmailFilesSpecifier = {
         local raw_table = map(self:get("c"), function(path)
           return path:get("c"), path:get("email-summary")
         end, { "k", "kv" })
-        return CreateTable(raw_table)
+        return tb(raw_table)
       end,
     },
     doThisables = {
@@ -15,7 +15,7 @@ ArrayOfEmailFilesSpecifier = {
         runThreaded(map(self:get("c"), function(path)
           return path:get("c"), path:get("email-summary-task")
         end, {"v", "kv"}), function(raw_summary_path_table)
-          do_after(CreateTable(raw_summary_path_table))
+          do_after(tb(raw_summary_path_table))
         end)
       end,
       ["to-summary-line-body-path-table-parallel"] = function(self, do_after)
@@ -29,7 +29,7 @@ ArrayOfEmailFilesSpecifier = {
           raw_summary_path_table = map(raw_summary_path_table, function(text)
             return stringx.shorten(text, 500)
           end)
-          do_after(CreateTable(raw_summary_path_table))
+          do_after(tb(raw_summary_path_table))
         end)
       end,
       ["choose-email-and-then-action-parallel"] = function(self)

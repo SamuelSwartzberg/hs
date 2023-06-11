@@ -76,7 +76,7 @@ ContactTableSpecifier = {
         return self:get("table-prop-policy", replace(type, to.case.capitalized))
       end,
       ["contact-addr-table-item"] = function (self, type)
-        return CreateTable(self:get("contact-addr-table", type))
+        return tb(self:get("contact-addr-table", type))
       end,
       ["contact-addr"] = function(self, specifier)
         local addr_table = self:get("contact-addr-table", specifier.type)
@@ -105,9 +105,9 @@ ContactTableSpecifier = {
               ["Last name"] = self:get("last-name"),
             }
           )
-          return CreateTable(raw_single)
+          return tb(raw_single)
         end)
-        return CreateTable(processed)
+        return tb(processed)
       end,
       ["address-table-raw"] = function(self, type) -- type may be one of "home", "pref", "work" in VCard 4.0, more in VCard 3.0.
         return  self:get("table-prop-policy", "Address")[type]

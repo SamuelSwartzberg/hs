@@ -12,7 +12,7 @@ function getMenuItemList(application_name)
   for k, v in pairs(filtered) do
     v.application = application
   end
-  local mapped_to_items = map(filtered, function (v) return CreateTable(v) end)
+  local mapped_to_items = map(filtered, function (v) return tb(v) end)
   local res =  ar(mapped_to_items)
   return res
 end

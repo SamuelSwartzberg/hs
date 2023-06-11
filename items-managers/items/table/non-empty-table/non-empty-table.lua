@@ -122,7 +122,7 @@ NonEmptyTableSpecifier = {
         return ar(self:get("map-values", callback))
       end,
       ["map-to-flat-path-dot-table"] = function(self)
-        return CreateTable(flatten(self:get("c"), {
+        return tb(flatten(self:get("c"), {
           mode = "path-assoc",
           val = "plain",
           join_path = ".",
@@ -187,7 +187,7 @@ NonEmptyTableSpecifier = {
         return list
       end,
       ["parse-to-env-map"] = function(self)
-        return CreateTable(self:get("map-table", function(key, val)
+        return tb(self:get("map-table", function(key, val)
           if type(val) == "table" then 
             return key, CreateEnvItem(val)
           else

@@ -7,7 +7,7 @@ MightBeXmlItemSpecifier = {
         return xml.parse(self:get("c"))
       end,
       ["parse-as-rooted-xml-to-table"] = function(self)
-        return CreateTable(self:get("parse-as-xml").children[1])
+        return tb(self:get("parse-as-xml").children[1])
       end,
     }
   },

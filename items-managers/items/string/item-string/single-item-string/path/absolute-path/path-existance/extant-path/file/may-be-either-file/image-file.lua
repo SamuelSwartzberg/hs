@@ -38,7 +38,7 @@ ImageFileItemSpecifier = {
           { type = "image", format = "jpg" },
           { type = "image", format = "png", resize = true },
           { type = "image", format = "jpg", resize = true },
-        },CreateTable ))
+        },tb ))
         shrink_specifier_array:doThis("create-shrunken-versions", self:get("completely-resolved-path"))
         self:doThis("move-replace-self", shrink_specifier_array:get("best-version"))
         shrink_specifier_array:doThis("delete-non-best-versions")

@@ -36,7 +36,7 @@ ArrayOfExtantPathsSpecifier = {
         local tbl = map(self:get("c"), function(path_item)
           return path_item:get("c"), path_item:get("path-content-item")
         end, { "k", "kv" })
-        return CreateTable(tbl)
+        return tb(tbl)
       end,
     },
     doThisables = {

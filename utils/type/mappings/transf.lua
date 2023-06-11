@@ -274,7 +274,7 @@ transf = {
         "--output-language", "json"
       })
     end,
-    
+
   },
 
   semver = {
@@ -919,7 +919,7 @@ transf = {
       return ar(map(
         arr,
         function (arr)
-          return CreateTable(arr)
+          return tb(arr)
         end
       ))
     end
