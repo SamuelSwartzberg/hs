@@ -35,7 +35,7 @@ assert(
 )
 
 assert(
-  #lines(get.khard.list()) > 20 -- unlikely to be less than 20 contacts, since I'm just that popular
+  #transf.string.lines(get.khard.list()) > 20 -- unlikely to be less than 20 contacts, since I'm just that popular
 )
 
 assert(

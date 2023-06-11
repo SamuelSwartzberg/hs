@@ -48,19 +48,19 @@ get = {
   },
   upkg = {
     package_managers = function()
-      return lines(run("upkg list-package-managers"))
+      return transf.string.lines(run("upkg list-package-managers"))
     end,
     backed_up_packages = function(mgr)
-      return lines(run("upkg " .. (mgr or "") .. " read-backup"))
+      return transf.string.lines(run("upkg " .. (mgr or "") .. " read-backup"))
     end,
     missing_packages = function(mgr)
-      return lines(run("upkg " .. (mgr or "") .. " missing"))
+      return transf.string.lines(run("upkg " .. (mgr or "") .. " missing"))
     end,
     added_packages = function(mgr)
-      return lines(run("upkg " .. (mgr or "") .. " added"))
+      return transf.string.lines(run("upkg " .. (mgr or "") .. " added"))
     end,
     difference_packages = function(mgr)
-      return lines(run("upkg " .. (mgr or "") .. " difference"))
+      return transf.string.lines(run("upkg " .. (mgr or "") .. " difference"))
     end,
     package_manager_version = function(mgr)
       return run("upkg " .. (mgr or "") .. " package-manager-version")
@@ -69,27 +69,27 @@ get = {
       return run("upkg " .. (mgr or "") .. " which-package-manager")
     end,
     package_managers_with_missing_packages = function()
-      return lines(run("upkg missing-package-manager"))
+      return transf.string.lines(run("upkg missing-package-manager"))
     end,
-    list = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list ")) end,
-    list_version = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list-version ")) end,
-    list_no_version = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list-no-version ")) end,
-    list_version_package_manager = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
-    list_with_package_manager = function(mgr) return lines(run("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
-    count = function(mgr) return lines(run("upkg " .. (mgr or "") .. " count ")) end,
-    with_version = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
-    with_version_package_manager = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
-    with_package_manager = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
-    version = function(mgr, arg) return lines(run("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
-    which = function(mgr, arg) return lines(run("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
+    list = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list ")) end,
+    list_version = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-version ")) end,
+    list_no_version = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-no-version ")) end,
+    list_version_package_manager = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
+    list_with_package_manager = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
+    count = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " count ")) end,
+    with_version = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
+    with_version_package_manager = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
+    with_package_manager = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
+    version = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
+    which = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
     is_installed = function(mgr, arg) return pcall(run, "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
-    installed_package_manager = function(arg) return lines(run("upkg " .. (arg or "") .. " installed-package-manager")) end,
+    installed_package_manager = function(arg) return transf.string.lines(run("upkg " .. (arg or "") .. " installed-package-manager")) end,
   
   },
   khal = {
     all_calendars = function()
-      return lines(run("khal printcalendars"))
+      return transf.string.lines(run("khal printcalendars"))
     end,
     writeable_calendars = function()
       return filter(
@@ -235,6 +235,44 @@ get = {
       return device:name()
     end,
   },
+  table = {
+    ---@param table table
+    ---@param keystop integer
+    ---@param valuestop integer
+    ---@param depth integer
+    ---@return string[]
+    yaml_lines_aligned_with_predetermined_stops = function(table, keystop, valuestop, depth)
+      local lines = {}
+      for value_k, value_v in fastpairs(table) do
+        local pre_padding_length = depth * 2
+        local key_length = #value_k
+        local key_padding_length = keystop - (key_length + pre_padding_length)
+        if type(value_v) == "table" and not (value_v.value or value_v.comment) then 
+          push(lines, string.rep(" ", depth * 2) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " ")
+          lines = concat(lines, get.table.yaml_lines_aligned_with_predetermined_stops(value_v, keystop, valuestop, depth + 1))
+        elseif type(value_v) == "table" and (value_v.value or value_v.comment) then 
+          local key_part = string.rep(" ", pre_padding_length) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " "
+          local value_length = 0
+          local value_part = ""
+          if value_v.value then
+            value_length = #value_v.value
+            value_part = value_v.value
+          end
+          local comment_part = ""
+          if value_v.comment then
+            local value_padding_length = valuestop - value_length
+            comment_part = string.rep(" ", value_padding_length) .. " # " .. value_v.comment
+          end
+          push(lines, key_part .. value_part .. comment_part)
+        else
+          -- do nothing
+        end
+      end
+      
+      return lines
+    end
+    
+  },
   array = {
     some_pass = function(arr, cond)
       return find(arr, cond, {"v", "boolean"})
@@ -261,9 +299,24 @@ get = {
     end,
 
   },
+  array_of_string_arrays = {
+    array_of_string_records = function(arr, field_sep)
+      return hs.fnutils.imap(arr, function(x) return table.concat(x, field_sep) end)
+    end,
+    string_table = function(arr, field_sep, record_sep)
+      return table.concat(get.array_of_string_arrays.array_of_string_records(arr, field_sep), record_sep)
+    end,
+    
+  },
   path = {
     with_different_extension = function(path, ext)
       return transf.path.no_extension(path) .. "." .. ext
+    end,
+    leaf_starts_with = function(path, str)
+      return stringy.startswith(transf.path.leaf(path), str)
+    end,
+    is_extension = function(path, ext)
+      return transf.path.extension(path) == ext
     end,
   },
   absolute_path = {
@@ -295,6 +348,77 @@ get = {
       return find(transf.dir_path.children_extensions_array(dir_path), {_exactly = extension})
     end,
   },
+  plaintext_file = {
+    lines_tail = function(path, n)
+      return slice(transf.plaintext_file.lines(path), -(n or 10))
+    end,
+    lines_head = function(path, n)
+      return slice(transf.plaintext_file.lines(path), 1, n or 10)
+    end,
+    nth_line = function(path, n)
+      return transf.plaintext_file.lines(path)[n]
+    end,
+    contents_lines_appended = function(path, lines)
+      local extlines = transf.plaintext_file.lines(path)
+      return glue(extlines, lines)
+    end,
+    contents_line_appended = function(path, line)
+      return dothis.plaintext_file.lines_appended(path, {line})
+    end,
+    contents_lines_appended_to_string = function(path, lines)
+      return table.concat(dothis.plaintext_file.lines_appended(path, lines), "\n")
+    end,
+    contents_line_appended_to_string = function(path, line)
+      return dothis.plaintext_file.lines_appended_to_string(path, {line})
+    end,
+
+  },
+  plaintext_table_file = {
+    
+  },
+  timestamp_first_column_plaintext_table_file = {
+    something_newer_than_timestamp = function(path, timestamp, assoc_arr)
+      local rows = transf.plaintext_table_file.iter_of_array_of_fields(path)
+      local _, first_row = rows()
+      local _, second_row = rows()
+      if not first_row then return nil end
+      if not second_row then second_row = {"0"} end
+      local first_timestamp, second_timestamp = tonumber(first_row[1]), tonumber(second_row[1])
+      if first_timestamp < second_timestamp then
+        error("Timestamps are not in descending order. This is not recommended, as it forces us to read the entire file.")
+      end
+      local res
+      if assoc_arr then 
+        res = ovtable.new()
+        table.remove(first_row, 1)
+        res[first_timestamp] = first_row
+        table.remove(second_row, 1)
+        res[second_timestamp] = second_row
+      else
+        res = {first_row, second_row}
+      end
+      for i, row in rows do
+        local current_timestamp = row[1]
+        if tonumber(current_timestamp) > timestamp then
+          if assoc_arr then 
+            table.remove(row, 1)
+            res[current_timestamp] = row
+          else
+            table.insert(res, row)
+          end
+        else
+          break
+        end
+      end
+      return res
+    end,
+    array_of_fields_newer_than_timestamp = function(path, timestamp)
+      return transf.timestamp_first_column_plaintext_table_file.something_newer_than_timestamp(path, timestamp, false)
+    end,
+    timestamp_table_newer_than_timestamp = function(path, timestamp)
+      return transf.timestamp_first_column_plaintext_table_file.something_newer_than_timestamp(path, timestamp, true)
+    end,
+  },
   bib_file = {
     citation = function(path, format)
       return run({
@@ -308,6 +432,14 @@ get = {
           type = "quoted"
         }
       })
+    end,
+  },
+  shellscript_file = {
+    lint_table = function(path, severity)
+      return runJSON("shellcheck --format=json --severity=" .. severity .. transf.string.single_quoted_escaped(path))
+    end,
+    lint_gcc_string = function(path, severity)
+      return run("shellcheck --format=gcc --severity=" .. severity .. transf.string.single_quoted_escaped(path))
     end,
   },
 

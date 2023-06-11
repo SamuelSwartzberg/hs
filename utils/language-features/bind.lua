@@ -38,3 +38,11 @@ function bind(func, arg_spec, ignore_spec)
 
   return inner_func
 end
+
+--- bind the "c" contents of an item to a function
+function bc(fn, ...)
+  local args = {...} 
+  return function(item)
+    return fn(item:get("c"), table.unpack(args))
+  end
+end

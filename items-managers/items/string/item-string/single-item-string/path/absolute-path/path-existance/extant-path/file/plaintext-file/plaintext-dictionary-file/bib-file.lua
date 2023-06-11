@@ -3,6 +3,12 @@
 --- @type ItemSpecifier
 BibFileItemSpecifier = {
   type = "bib-file",
+  properties = {
+    getables = {
+      ["parse-to-lua-table"] = bc(transf.bib_file.array_of_tables)
+      
+    },
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

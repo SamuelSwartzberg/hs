@@ -49,9 +49,9 @@ PathInterfaceItemSpecifier = {
               writeFile(filename, "", "not-exists")
               self = st(filename)
             end
-            self:doThis("append-rows", specifier.payload)
+            -- todo append_rows
           elseif specifier.mode == "append" then 
-            self:doThis("append-rows", specifier.payload)
+            -- todo append_rows
           end
         else
           self:doThis("table-to-fs-children-dispatch", specifier)

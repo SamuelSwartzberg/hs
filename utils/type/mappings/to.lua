@@ -64,6 +64,16 @@ to = {
       limit = 1,
       proc = eutf8.lower
     },
+    alphanum = {
+      {
+        cond = {
+          _r = "[^%w%d]+",
+          _regex_engine = "eutf8",
+          _ignore_case = true,
+        },
+        mode = "remove"
+      }
+    }
   },
   url = {
     decoded = {

@@ -15,7 +15,7 @@ local function listRemoteDir(listerpath)
     catch = function() return nil end,
   }) 
   if output then
-    items = lines(output)
+    items = transf.string.lines(output)
     items = memoize(filter, refstore.params.memoize.opts.stringify_json)(items, false)
     items = memoize(map, refstore.params.memoize.opts.stringify_json)(
       items,

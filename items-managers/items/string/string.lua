@@ -173,9 +173,6 @@ StringItemSpecifier = {
       ["open-contents-in-browser"] = function(self)
         open({url = self:get("fold")})
       end,
-      ["append-as-line-to-file"] = function(self, path)
-        st(path):doThis("append-line-and-commit", self:get("fold"))
-      end,
       ["append-to-qf-file"] = function(self)
         st(env.MQF):get("descendant-file-only-string-item-array"):doThis("choose-item", function(path)
           path:doThis("append-line-and-commit", self:get("fold"))

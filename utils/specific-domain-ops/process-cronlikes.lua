@@ -45,7 +45,7 @@ end
 function processCronlikeContents(rawcnt, fn)
   local contents = run({ "envsubst", "<<<", { value =rawcnt, type ="sq"} })
   local specs = {}
-  for line in stringx.lines(contents) do
+  for line in stringx.transf.string.lines(contents) do
     line = stringy.strip(line)
     if not stringy.startswith(line, "#") and #line > 0 then -- allow for simple comments
       push(specs, processCronlikeLine(line, fn))

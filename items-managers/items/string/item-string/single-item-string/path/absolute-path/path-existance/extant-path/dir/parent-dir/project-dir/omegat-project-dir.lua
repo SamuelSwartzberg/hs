@@ -10,7 +10,7 @@ OmegatProjectDirItemSpecifier = {
         return self:get("completely-resolved-path") .. "/data.yaml"
       end,
       ["local-data-object"] = function(self)
-        return yamlLoad(
+        return transf.yaml_string.table(
           readFile(
             self:get("local-data-object-path"),
             "error"
@@ -73,7 +73,7 @@ OmegatProjectDirItemSpecifier = {
       end,
       ["length-target-files"] = function(self)
         return self:get("target-files-extension", "txt"):get("map", function(file)
-          return file:get("file-contents-utf8-chars")
+          return transf.plaintext_file.chars(file:get("c"))
         end)
       end,
       
@@ -254,7 +254,7 @@ OmegatProjectDirItemSpecifier = {
         self:doThis("file-source-and-target")
       end,
       ["create-default-data-yaml"] = function(self)
-        writeFile(self:get("local-data-object-path"), yamlDump({
+        writeFile(self:get("local-data-object-path"), transf.table.yaml_string({
           rechnung = {
             nr = 1,
             delivery_date = os.date("%d.%m.%Y")

@@ -1,27 +1,17 @@
 --- @type ItemSpecifier
 PassUsernameItemSpecifier = {
   type = "pass-username",
-  properties = {
-    getables = {
-      ["pass-username-as-filename"] = function(self)
-        return self:get("c") .. ".txt"
-      end,
-      ["pass-username-raw"] = function(self)
-        return st(env.MPASSUSERNAME .. "/" .. self:get("pass-username-as-filename")):get("file-contents-to-string")
-      end,
-    }
-  },
-  action_table = getChooseItemTable({
+  action_table = {
     {
       description = "usrnm",
       emoji_icon = "👤",
-      key = "pass-username"
+      getfn = transf.pass_name.username,
     },{
       description = "usrnmpth",
       emoji_icon = "👤📁",
       key = "pass-username-path"
     }
-  })
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

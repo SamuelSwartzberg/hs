@@ -1,59 +1,59 @@
 assertMessage(
-  chars("hello"),
+  transf.string.chars("hello"),
   {"h", "e", "l", "l", "o"}
 )
 
 assertMessage(
-  chars(""),
+  transf.string.chars(""),
   {}
 )
 
 assertMessage(
-  chars("😁"),
+  transf.string.chars("😁"),
   {"😁"}
 )
 
 assertMessage(
-  chars("😁😁"),
+  transf.string.chars("😁😁"),
   {"😁", "😁"}
 )
 
 assertMessage(
-  chars("😁~yaay~😁"),
+  transf.string.chars("😁~yaay~😁"),
   {"😁", "~", "y", "a", "a", "y", "~", "😁"}
 )
 
 assertMessage(
-  bytechars("hello"),
+  transf.string.bytechars("hello"),
   {"h", "e", "l", "l", "o"}
 )
 
 assertMessage(
-  bytechars(""),
+  transf.string.bytechars(""),
   {}
 )
 
 assertMessage(
-  #bytechars("😁"),
+  #transf.string.bytechars("😁"),
   4
 )
 
 assertMessage(
-  #bytechars("😁😁"),
+  #transf.string.bytechars("😁😁"),
   8
 )
 
 assertMessage(
-  #bytechars("😁~yaay~😁"),
+  #transf.string.bytechars("😁~yaay~😁"),
   14
 )
 
 assertMessage(
-  lines("hello\nworld"),
+  transf.string.lines("hello\nworld"),
   {"hello", "world"}
 )
 
 assertMessage(
-  lines("yo"),
+  transf.string.lines("yo"),
   {"yo"}
 )

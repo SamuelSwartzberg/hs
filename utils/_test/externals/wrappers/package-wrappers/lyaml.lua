@@ -15,7 +15,7 @@ tbl_to_be_dumped["longagain"] = { value = "meeepmoop"}
 
 
 assertMessage(
-  yamlDumpAligned(tbl_to_be_dumped),
+  transf.table.yaml_aligned(tbl_to_be_dumped),
 [[s:            foo
 short:        awawai     # I has comment
 longlonglong: b8

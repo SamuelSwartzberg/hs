@@ -10,7 +10,7 @@ TachiyomiItemSpecifier = {
         run({ "jsonify-tachiyomi-backup" }, function()
           st(env.MMANGA_LOGS):doThis(
             "log-timestamp-table",
-            st(env.TMP_TACHIYOMI_JSON):get("to-timestamp-key-history-list")
+            transf.tachiyomi_json_table.timestamp_table(transf.json_file.table(env.TMP_TACHIYOMI_JSON))
           )
         end)
       end,

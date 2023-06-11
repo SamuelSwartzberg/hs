@@ -1,7 +1,7 @@
 is = {
   string = {
     package_manager = function(str)
-      return find(lines(
+      return find(transf.string.lines(
         memoize(run)("upkg list-package-managers")
       ), {_exactly = str})
     end,
@@ -52,6 +52,11 @@ is = {
     playable_file = function (path)
       return is.path.usable_as_filetype(path, "audio") or is.path.usable_as_filetype(path, "video")
     end,
+    shellscript_file = function(path)
+      return testPath(path, {
+        contents = { _r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" }
+      }) or is.path.usable_as_filetype(path, "shell-script")
+    end,
     has_extension = function(path)
       return transf.path.extension(path) ~= ""
     end,
@@ -80,6 +85,7 @@ is = {
     absolute_path = function(path)
       return is.path.tilde_absolute_path(path) or is.path.true_absolute_path(path)
     end,
+
   },
   extant_path = {
     
@@ -98,6 +104,26 @@ is = {
         transf.dir_path.children_array(path),
         is.path.dir
       )
+    end
+  },
+  shellscript_file = {
+    errors = function(path)
+      return transf.shellscript_file.gcc_string_errors(path) ~= ""
+    end,
+    warnings = function(path)
+      return transf.shellscript_file.gcc_string_warnings(path) ~= ""
+    end,
+  },
+  plaintext_table_file = {
+    timestamp_first_column_plaintext_table_file = function(path)
+      local line = get.plaintext_file.nth_line(path, 1)
+      if not line then return false end
+      local leading_number = eutf8.match(line, "^(%d+)%D")
+      if leading_number and #leading_number < 11 then -- a unix timestamp will only be larger than 10 digits starting at 2286-11-20, at which point this code will need to be updated
+        return true
+      else
+        return false
+      end
     end
   },
   alphanum_minus_underscore = {

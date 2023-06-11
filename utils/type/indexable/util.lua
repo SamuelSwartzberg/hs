@@ -32,13 +32,13 @@ function defaultOpts(opts, retdefault)
   -- process raw form of table
 
   if type(opts.args) == "string" then
-    opts.args = chars(opts.args)
+    opts.args = transf.string.chars(opts.args)
   end
   if type(opts.ret) == "string" then
     if opts.ret == "boolean" then
       -- no-op
     else
-      opts.ret = chars(opts.ret)
+      opts.ret = transf.string.chars(opts.ret)
     end
   end
 

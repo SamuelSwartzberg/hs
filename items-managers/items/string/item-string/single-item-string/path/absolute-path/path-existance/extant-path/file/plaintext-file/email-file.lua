@@ -55,7 +55,7 @@ EmailFileItemSpecifier = {
       ["attachments"] = function(self)
         local raw_mime = self:get("mime-parts-raw")
         local attachments = {}
-        for line in stringx.lines(raw_mime) do
+        for line in stringx.transf.string.lines(raw_mime) do
           local name = line:match("name=\"(.-)\"")
           if name then
             table.insert(attachments, name)

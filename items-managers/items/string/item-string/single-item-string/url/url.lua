@@ -83,25 +83,26 @@ URLItemSpecifier = {
         local name = self:get("url-domain")
         local khal_config = st(env.KHAL_CONFIG .. "/config")
         local vdirsyncer_config = st(env.VDIRSYNCER_CONFIG .. "/config" )
-        local vdirsyncer_data = vdirsyncer_config:get("vdirsyncer-pair-and-corresponding-storages-for-webcal", self:get("c"))
+        local vdirsyncer_pair_specifier = vdirsyncer_config:get("vdirsyncer-pair-and-corresponding-storages-for-webcal", self:get("c"))
+        local path  = env.XDG_STATE_HOME .. "/vdirsyncer/" .. vdirsyncer_pair_specifier.name
         local khal_data = khal_config:get("table-to-ini-section", {
           header = "[ro:" .. name .. "]", -- this results in double [[ ]] in the file, which is the format khal expects (don't ask me why)
           body = {
-            path = vdirsyncer_data.at,
+            path = path,
             priority = 0
           }
         })
         khal_config:doThis("append-file-contents", "\n\n" .. khal_data)
-        vdirsyncer_config:doThis("append-file-contents", "\n\n" .. vdirsyncer_data.value)
-        createPath(vdirsyncer_data.at)
+        vdirsyncer_config:doThis("append-file-contents", "\n\n" .. transf.vdirsyncer_pair_specifier.ini_string(vdirsyncer_pair_specifier))
+        createPath(path)
         run({
           "vdirsyncer",
           "discover",
-          { value = vdirsyncer_data.name, type = "quoted" }
+          { value = vdirsyncer_pair_specifier.name, type = "quoted" }
         }, {
           "vdirsyncer",
           "sync",
-          { value = vdirsyncer_data.name, type = "quoted" }
+          { value = vdirsyncer_pair_specifier.name, type = "quoted" }
         }, true)
         khal_config:doThis("git-commit-self", "Add web-calendar " .. name)
         khal_config:doThis("git-push")

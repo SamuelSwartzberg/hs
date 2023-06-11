@@ -9,39 +9,6 @@ PlaintextFileItemSpecifier = {
       ["path-content-item"] = function(self)
         return self:get("str-item", "file-contents")
       end,
-      ["lines-of-file-contents"] = function(self)
-        return stringy.split(self:get("file-contents"), "\n")
-      end,
-      ["file-contents-tail"] = function(self, n)
-        n = n or 10
-        local lines = self:get("lines-of-file-contents")
-        return table.concat(lines, "\n", #lines - n + 1, #lines)
-      end,
-      ["file-contents-head"] = function(self, n)
-        n = n or 10
-        local lines = self:get("lines-of-file-contents")
-        return table.concat(lines, "\n", 1, n)
-      end,
-      ["first-line-of-file-contents"] = function(self)
-        return self:get("lines-of-file-contents")[1]
-      end,
-      ["last-line-of-file-contents"] = function(self)
-        local lines = self:get("lines-of-file-contents")
-        return lines[#lines]
-      end,
-      ["nth-line-of-file-contents"] = function(self, n)
-        return self:get("lines-of-file-contents")[n]
-      end,
-      ["range-lines-of-file-contents"] = function(self, specifier)
-        return select(1, slice(self:get("lines-of-file-contents"), specifier))
-      end,
-      ["range-chars-of-file-contents"] = function(self, specifier)
-        return select(1, slice(self:get("file-contents"), specifier))
-      end,
-      ["file-contents-to-string"] = function(self) return self:get("file-contents") end,
-      ["file-contents-to-tsv-dict"] = function(self)
-        return self:get("str-item", "file-contents"):get("to-array-of-string-arrays", { upper = "\n", lower = "\t" })
-      end,
       ["to-line-array"] = function(self) 
         return ar(stringx.splitlines(self:get("file-contents")))
       end,
@@ -78,37 +45,11 @@ PlaintextFileItemSpecifier = {
       ["is-md-file"] = function(self)
         return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "md"
       end,
-      ["file-contents-utf8-chars"] = function(self)
-        return eutf8.len(self:get("file-contents"))
-      end,
-      ["file-contents-bytes"] = function(self)
-        return string.len(self:get("file-contents"))
-      end,
     },
     doThisables = {
-      ["append-lines"] = function(self, lines)
-        if self:get("range-chars-of-file-contents", { start = -1, stop = -1 }) ~= "\n" then
-          self:get("append-file-contents", "\n")
-        end
-        self:doThis("append-file-contents", stringx.join("\n", lines) .. "\n")
-      end,
-      ["set-lines"] = function(self, lines)
-        self:doThis("overwrite-file-content", stringx.join("\n", lines) .. "\n")
-      end,
-      ["append-line"] = function(self, line)
-        self:doThis("append-lines", { line })
-      end,
-      ["set-line"] = function(self, line)
-        self:doThis("set-lines", { line })
-      end,
       ["append-line-and-commit"] = function(self, line)
-        self:doThis("append-line", line)
+        dothis.plaintext_file.append_line(self:get("c"), line)
         self:doThis("git-commit-self", ("Added line: %s to %s"):format(line, self:get("relative-path-from", self:get("git-root-dir"))))
-        self:doThis("git-push")
-      end,
-      ["set-line-and-commit"] = function(self, line)
-        self:doThis("set-line", line)
-        self:doThis("git-commit-self", ("Set line: %s to %s"):format(line, self:get("relative-path-from", self:get("git-root-dir"))))
         self:doThis("git-push")
       end,
       ["choose-item-remove-and-choose-action"] = function(self, splitter)

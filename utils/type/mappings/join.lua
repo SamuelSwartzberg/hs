@@ -11,16 +11,16 @@ join = {
           -- splice in the metadata
           local parts = filter(stringy.split(str, "---"), true) -- this should now have the existing metadata as [1], and the content as [2] ... [n]
           local extant_metadata = table.remove(parts, 1)
-          final_metadata = extant_metadata .. "\n" .. yamlDump(tbl)
+          final_metadata = extant_metadata .. "\n" .. transf.table.yaml_string(tbl)
           final_contents = concat(parts, "---")
         else
-          final_metadata = yamlDump(tbl)
+          final_metadata = transf.table.yaml_string(tbl)
           final_contents = str
         end
         return "---\n" .. final_metadata .. "\n---\n" .. final_contents
       end,
       email = function(str, tbl)
-        local header = transf.table.email_header(tbl)
+        local header = transf.dict.email_header(tbl)
         local mail = string.format("%s\n\n%s", header, str)
         return mail
       end

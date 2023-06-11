@@ -123,6 +123,12 @@ transf = {
     leaf = function(path)
       return pathSlice(path, "-1:-1")[1]
     end,
+    parent_path = function(path)
+      return pathSlice(path, "1:-2", refstore.params.path_slice.opts.sep_rejoin)
+    end,
+    parent_leaf = function(path)
+      return pathSlice(path, "-2:-2", refstore.params.path_slice.opts.ext_sep)[1]
+    end,
 
   },
   extant_path = {
@@ -292,6 +298,100 @@ transf = {
       return res
     end,
   },
+  json_file = {
+    table = function(path)
+      return transf.json_string.table(readFile(path))
+    end,
+  },
+  ini_file = {
+    table = function(path)
+      return transf.ini_string.table(readFile(path))
+    end,
+  },
+  toml_file = {
+    table = function(path)
+      return transf.toml_string.table(readFile(path))
+    end,
+  },
+  xml_file = {
+    tree = xml.parseFile
+  },
+
+  shellscript_file = {
+    gcc_string_errors = function(path)
+      return get.shellscript_file.lint_gcc_string(path, "errors")
+    end,
+    gcc_string_warnings = function(path)
+      return get.shellscript_file.lint_gcc_string(path, "warnings")
+    end,
+  },
+
+  plaintext_file = {
+    contents = function(path)
+      return readFile(path)
+    end,
+    lines = function(path)
+      return transf.string.lines(transf.plaintext_file.contents(path))
+    end,
+    first_line = function(path)
+      return transf.string.first_line(transf.plaintext_file.contents(path))
+    end,
+    last_line = function(path)
+      return transf.string.last_line(transf.plaintext_file.contents(path))
+    end,
+    bytechars = function(path)
+      return transf.string.bytechars(transf.plaintext_file.contents(path))
+    end,
+    chars = function(path)
+      return transf.string.chars(transf.plaintext_file.contents(path))
+    end,
+    no_final_newlines = function(path)
+      return transf.string.no_final_newlines(transf.plaintext_file.contents(path))
+    end,
+    one_final_newline = function(path)
+      return transf.string.one_final_newline(transf.plaintext_file.contents(path))
+    end,
+
+    
+  },
+
+  plaintext_table_file = {
+    field_separator = function(path)
+      return tblmap.extension.likely_field_separator[transf.path.extension(path)]
+    end,
+    record_separator = function(path)
+      return tblmap.extension.likely_record_separator[transf.path.extension(path)]
+    end,
+    array_of_array_of_fields = function(path)
+      return ftcsv.parse(path, transf.plaintext_table_file.field_separator(path), refstore.params.ftcsv_parse.opts.noheaders)
+    end,
+    iter_of_array_of_fields = function(path)
+      local iter = ftcsv.parseLine(path, transf.plaintext_table_file.field_separator(path), refstore.params.ftcsv_parse.opts.noheaders)
+      iter() -- skip header, seems to be a bug in ftcsv
+      return iter
+    end,
+    array_of_dicts = function(path)
+      return select(1, ftcsv.parse(path, transf.plaintext_table_file.field_separator(path)))
+    end,
+    iter_of_dicts = function(path)
+      return ftcsv.parseLine(path, transf.plaintext_table_file.field_separator(path))
+    end,
+  },
+  timestamp_first_column_plaintext_table_file = {
+    last_accessed = function(path)
+      return tonumber(readFile(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
+    end,
+    new_timestamp_table = function(path)
+      local last_access = transf.timestamp_first_column_plaintext_table_file.last_accessed(path)
+      local new_timestamp = os.time()
+      local new_timestamp_table = get.timestamp_first_column_plaintext_table_file.timestamp_table_newer_than_timestamp(path, last_access)
+      if new_timestamp_table then
+        writeFile(env.MLAST_BACKUP .. transf.path.filename(path), new_timestamp)
+      end
+      return new_timestamp_table
+    end,
+
+  },
 
   semver = {
     components = function(str)
@@ -346,7 +446,7 @@ transf = {
     end,
     contact_table = function(uuid)
       local raw_contact = transf.uuid.raw_contact(uuid)
-      local contact_table = yamlLoad(raw_contact)
+      local contact_table = transf.yaml_string.table(raw_contact)
       contact_table.uid = uuid
       return contact_table
     end,
@@ -543,6 +643,9 @@ transf = {
     upper_snake_case = function(str)
       return eutf8.upper(transf.string.snake_case(str))
     end,
+    alphanum = function(str)
+      return replace(str, to.case.alphanum)
+    end,
 
     --- URL-encodes a string.
     --- @param url string
@@ -626,6 +729,65 @@ transf = {
     end,
     folded = function(str)
       return eutf8.gsub(str, "\n", " ")
+    end,
+    --- @param str string
+    --- @return string[]
+    bytechars = function(str)
+      local t = {}
+      for i = 1, #str do
+        t[i] = str:sub(i, i)
+      end
+      return t
+    end,
+
+
+    --- @param str string
+    --- @return string[]
+    chars = function(str)
+      local t = {}
+      for i = 1, eutf8.len(str) do
+        t[i] = eutf8.sub(str, i, i)
+      end
+      return t
+    end,
+
+    --- @param str string
+    --- @return string[]
+    lines = function(str)
+      return stringy.split(
+        stringy.strip(str),
+        "\n"
+      )
+    end,
+    content_lines = function(str)
+      return memoize(filter)(transf.string.lines(str), true)
+    end,
+
+    first_line = function(str)
+      return transf.string.lines(str)[1]
+    end,
+    first_content_line = function(str)
+      return transf.string.content_lines(str)[1]
+    end,
+    last_line = function(str)
+      local lines = transf.string.lines(str)
+      return lines[#lines]
+    end,
+    last_content_line = function(str)
+      local lines = transf.string.content_lines(str)
+      return lines[#lines]
+    end,
+    first_char = function(str)
+      return eutf8.sub(str, 1, 1)
+    end,
+    last_char = function(str)
+      return eutf8.sub(str, -1)
+    end,
+    no_final_newlines = function(str)
+      return eutf8.gsub(str, "\n+$", "")
+    end,
+    one_final_newline = function(str)
+      return eutf8.gsub(str, "\n+$", "\n")
     end,
     
     path_resolved = function(path, resolve_tilde)
@@ -711,7 +873,7 @@ transf = {
     end,
     contact_table = function(searchstr)
       local raw_contact = transf.string.raw_contact(searchstr)
-      local contact = yamlLoad(raw_contact)
+      local contact = transf.yaml_string.table(raw_contact)
       return contact
     end,
     event_table = function(str)
@@ -783,8 +945,37 @@ transf = {
           end
         )
       )
+    end,
+  },
+  pass_name = {
+    password = function(pass_name)
+      return get.pass.value("passw", pass_name)
+    end,
+    username = function(pass_name)
+      return transf.plaintext_file.no_final_newlines(st(env.MPASSUSERNAME .. "/" .. pass_name .. ".txt") or env.MAIN_EMAIL)
     end
   },
+  yaml_string = {
+    table = function(str)
+      local res = yaml.load(str)
+      null2nil(res)
+      return res
+    end
+  },
+  json_string = {
+    table = json.decode
+  },
+  toml_string = {
+    table = toml.decode
+  },
+  ini_string = {
+    table = function(str)
+      return runJSON(
+        "jc --ini <<EOF " .. str .. "EOF"
+      )
+    end,
+  },
+
   event_table = {
     calendar_template = function(event_table)
       local template = get.khal.calendar_template_empty()
@@ -802,11 +993,10 @@ transf = {
       if template.alarms.value then 
         template.alarms.value = table.concat(template.alarms.value, ",")
       end
-      return yamlDumpAligned(template)
+      return transf.table.yaml_aligned(template)
 
     end,
     event_tagline = function(event_table)
-      local event_table = self:get("c")
       local str = event_table.start
       if event_table["end"] then
         str = str .. " - " .. event_table["end"]
@@ -957,9 +1147,14 @@ transf = {
           function (itm)
             return " " .. opt .. " " .. itm
           end
-        )
+        ),
+        ""
       )
     end,
+
+  },
+  array_of_string_arrays = {
+
   },
   array_of_event_tables = {
     item_array_of_event_table_items = function(arr)
@@ -970,6 +1165,70 @@ transf = {
     end,
   },
   table = {
+    
+    --- wraps yaml.dump into a more intuitive form which always encodes a single document
+    --- @param tbl any
+    --- @return string
+    yaml_string = function(tbl)
+      local raw_yaml = yaml.dump({tbl})
+      local lines = stringy.split(raw_yaml, "\n")
+      return table.concat(lines, "\n", 2, #lines - 2)
+    end,
+    json_string = json.encode,
+    toml_string = toml.encode,
+    --- allows for aligned values and comments, but may be less robust than transf.table.yaml_string, since I'm implementing it myself
+    --- value and comment must be strings
+    yaml_aligned = function(tbl)
+      local value_table = map(
+        tbl,
+        {_k = "value", _ret = "orig" },
+        { recurse = true, treat_as_leaf = "list" }
+      )
+      local stops = flatten(value_table, {
+        treat_as_leaf = "list",
+        mode = "assoc",
+        val = {"valuestop", "keystop"},
+      })
+      local valuestop = reduce(map(stops, {_k = "valuestop"}, {tolist = true}))
+      local keystop = reduce(map(stops, {_k = "keystop"}, {tolist = true}))
+      return table.concat(get.table.yaml_lines_aligned_with_predetermined_stops(tbl, keystop, valuestop, 0), "\n")
+    end,
+    yaml_metadata = function(t)
+      local string_contents = transf.table.yaml_string(t)
+      return "---\n" .. string_contents .. "\n---\n"
+    end,
+    fs_tag_array = function(t)
+       local arr = map(
+        t,
+        function(tag_key, tag_value)
+          if type(tag_value) == "table" then tag_value = table.concat(tag_value, ",") end
+          return string.format("%s-%s", tag_key, tag_value)
+        end,
+        {
+          args = "kv",
+          ret = "v",
+          tolist = true,
+        }
+      )
+      table.sort(arr)
+      return arr
+    end,
+    fs_tag_string = function(t)
+      return "%" .. table.concat(transf.table.fs_tag_array(t), "%")
+    end,
+    ics_string = function(t)
+      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
+      dothis.table.write_ics_file(t, tmpdir_ics_path)
+      local contents = readFile(tmpdir_ics_path)
+      delete(tmpdir_ics_path)
+      return contents
+    end,
+    
+  },
+  assoc_arr = {
+
+  },
+  dict = {
     url_params = function(t)
       local params = {}
       for k, v in pairs(t) do
@@ -1012,36 +1271,51 @@ transf = {
       end
       return fields
     end,
-    yaml_metadata = function(t)
-      local string_contents = yamlDump(t)
-      return "---\n" .. string_contents .. "\n---\n"
+    ini_string = function(tbl)
+      for k, v in fastpairs(tbl) do
+        local out_lines = { "[" .. k .. "]" }
+        for k, v in fastpairs(v) do
+          local val
+          if stringy.startswith(v, "noquote:") then
+            val = v:match("noquote:(.+)")
+          else
+            val = "\"" .. v .. "\""
+          end
+          table.insert(out_lines, k .. " = " .. val)
+        end
+        return table.concat(out_lines, "\n")
+      end
     end,
-    fs_tag_array = function(t)
-       local arr = map(
-        t,
-        function(tag_key, tag_value)
-          if type(tag_value) == "table" then tag_value = table.concat(tag_value, ",") end
-          return string.format("%s-%s", tag_key, tag_value)
-        end,
-        {
-          args = "kv",
-          ret = "v",
-          tolist = true,
-        }
-      )
-      table.sort(arr)
-      return arr
+    labeled_dict_by_space = function(tbl)
+      local res = {}
+      for k, v in fastpairs(tbl) do
+        local key_parts = stringy.split(k, " ")
+        local label = key_parts[1]
+        local key = key_parts[2]
+        if not key then
+          res[label] = v
+        else
+          res[label] = res[label] or {}
+          res[label][key] = v
+        end
+      end
+      return res
     end,
-    fs_tag_string = function(t)
-      return "%" .. table.concat(transf.table.fs_tag_array(t), "%")
+  },
+  labeled_dict = {
+    dict_by_space = function(labeled_dict)
+      local res = {}
+      for label, dict in fastpairs(labeled_dict) do
+        for k, v in fastpairs(dict) do
+          res[label .. " " .. k] = v
+        end
+      end
+      return res
     end,
-    ics_string = function(t)
-      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
-      dothis.table.write_ics_file(t, tmpdir_ics_path)
-      local contents = readFile(tmpdir_ics_path)
-      delete(tmpdir_ics_path)
-      return contents
+    ini_string = function (labeled_dict)
+      return transf.dict.ini_string(transf.labeled_dict.dict_by_space(labeled_dict))
     end
+
   },
   timestamp_table = {
     --- transforms a timestamp-key orderedtable into a table of the structure [yyyy] = { [yyyy-mm] = { [yyyy-mm-dd] = { [hh:mm:ss, ...] } } }
@@ -1064,6 +1338,70 @@ transf = {
       return year_month_day_time_table
     end
   },
+  tachiyomi_json_table = {
+    timestamp_table = function(raw_backup)
+      -- data we care about is in the backupManga array in the json file
+      -- each array element is a manga which has general metadata keys such as title, author, url, etc
+      -- and a chapters array which has chapter metadata keys such as name, chapterNumber, url, etc
+      -- and a history array which has the keys url and lastRead (unix timestamp in ms)
+      -- we want to transform this into a table of our own design, where the key is a timestamp (but in seconds) and the value is an array consisting of some of the metadata of the manga and some of the metadata of the chapter
+      -- specifically: url (of the manga), title, chapterNumber, name (of the chapter)
+      -- for that, we need to match the key url in the history array with the key url in the chapters array, for which we will create a temporary table with the urls as keys and the chapter metadata we will use as values
+
+      local manga = raw_backup.backupManga
+      local manga_url, manga_title = manga.url, manga.title
+      local chapter_map = {}
+      for _, chapter in ipairs(manga.chapters) do
+        chapter_map[chapter.url] = {
+          chapterNumber = chapter.chapterNumber,
+          name = chapter.name
+        }
+      end
+      local history_list = {}
+      for _, hist_item in ipairs(manga.history) do
+        local chapter = chapter_map[hist_item.url]
+        history_list[hist_item.lastRead / 1000] = {
+          manga_url,
+          manga_title,
+          chapter.chapterNumber,
+          chapter.name
+        }
+      end
+      return history_list
+    end,
+  },
+  vdirsyncer_pair_specifier = {
+    labeled_dict = function(specifier)
+      local local_name = specifier.name .. "_local"
+      local remote_name = specifier.name .. "_remote"
+      return {
+        pair = {
+          [specifier.name] = {
+            a = local_name,
+            b = remote_name,
+            collections = specifier.collections,
+            conflict_resolution = specifier.conflict_resolution,
+          }
+        },
+        storage = {
+          [local_name] = {
+            type = specifier.local_storage_type,
+            path = specifier.local_storage_path,
+            fileext = specifier.local_storage_fileext,
+          },
+          [remote_name] = {
+            type = specifier.remote_storage_type,
+            url = specifier.remote_storage_url,
+            username = specifier.remote_storage_username,
+            password = specifier.remote_storage_password,
+          }
+        }
+      }         
+    end,
+    ini_string = function(specifier)
+      return transf.labeled_dict.ini_string(transf.vdirsyncer_pair_specifier.labeled_dict(specifier))
+    end
+  },
   url_components = {
     url = function(comps)
       local url
@@ -1082,7 +1420,7 @@ transf = {
       end     
       if comps.params then
         if type(comps.params) == "table" then
-          url = url .. "?" .. transf.table.url_params(comps.params)
+          url = url .. "?" .. transf.dict.url_params(comps.params)
         else
           url = url .. mustStart(comps.params, "?")
         end
@@ -1139,6 +1477,42 @@ transf = {
     in_cache_dir = function(url)
       return transf.not_userdata_or_function.in_cache_dir(url, "url")
     end,
+    url_table = function(url)
+      return memoize(parseGuessScheme)(url)
+    end,
+    scheme = function(url)
+      return transf.url.url_table(url).scheme
+    end,
+    host = function(url)
+      return transf.url.url_table(url).host
+    end,
+    sld_and_tld = function(url)
+      return eutf8.match(transf.url.host(url), "(%w+%.%w+)$")
+    end,
+    sld = function(url)
+      return eutf8.match(transf.url.host(url), "(%w+)%.%w+$") 
+    end,
+    tld = function(url)
+      return eutf8.match(transf.url.host(url), "%w+%.(%w+)$")
+    end,
+    path = function(url)
+      return transf.url.url_table(url).path
+    end,
+    query = function(url)
+      return transf.url.url_table(url).query
+    end,
+    fragment = function(url)
+      return transf.url.url_table(url).fragment
+    end,
+    port = function(url)
+      return transf.url.url_table(url).port
+    end,
+    user = function(url)
+      return transf.url.url_table(url).user
+    end,
+    password = function(url)
+      return transf.url.url_table(url).password
+    end,
     param_table = function(url)
       local params = {}
       local url_parts = stringy.split(url, "?")
@@ -1158,6 +1532,20 @@ transf = {
       table.remove(parts, 1)
       local rejoined = table.concat(parts, ":")
       return mustNotStart(rejoined, "//")
+    end,
+    vdirsyncer_pair_specifier = function(url)
+      local name = "webcal_readonly_" .. transf.not_userdata_or_function.md5(url)
+      local local_storage_path =  env.XDG_STATE_HOME .. "/vdirsyncer/" .. name
+      return  {
+        name = name,
+        collections = "noquote:null",
+        conflict_resolution = "b wins",
+        local_storage_type = "filesystem",
+        local_storage_path = local_storage_path,
+        local_storage_fileext = ".ics",
+        remote_storage_type = "http",
+        remote_storage_url = url,
+      }
     end,
 
   },

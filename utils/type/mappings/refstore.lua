@@ -76,6 +76,13 @@ refstore = {
           tolist = true
         }
       }
+    },
+    ftcsv_parse = {
+      opts = {
+        noheaders = {
+          headers = false
+        },
+      }
     }
   }
 }

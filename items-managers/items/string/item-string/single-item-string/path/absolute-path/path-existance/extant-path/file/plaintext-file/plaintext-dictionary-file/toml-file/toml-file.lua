@@ -5,12 +5,7 @@ TomlFileItemSpecifier = {
   type = "toml-file",
   properties = {
     getables = {
-      ["parse-to-lua-table"] = function(self)
-        return toml.decode(self:get("file-contents"))
-      end,
-      ["lua-table-to-string"] = function(_, tbl)
-        return toml.encode(tbl)
-      end,
+      ["parse-to-lua-table"] = bc(transf.toml_file.table)
     },
     doThisables = {
       

@@ -15,7 +15,7 @@ TitleUrlApplicationItemSpecifier = {
         self:doThis("pre-backup", function()
           dothis.sqlite_file.write_to_csv(self:get("backup-sqlite"), tblmap.application.history_sql_query[self:get("c")], self:get("backup-csv-file-path"), function()
             local hist_csv = self:get("str-item", "backup-csv-file-path")
-            local new = hist_csv:get("rows-after-using-last-access", true)
+            local new = transf.timestamp_first_column_plaintext_table_file.new_timestamp_table(hist_csv:get("c"))
             if new then 
               st(self:get("backup-path")):doThis(
                 "log-timestamp-table", 

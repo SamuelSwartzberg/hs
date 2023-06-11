@@ -9,8 +9,7 @@ M3uFileItemSpecifier = {
     },
     doThisables = {
       ["lines-as-stream-queue"] = function(self)
-        self
-          :get("new-array-from-result-of-get", {key = "lines-of-file-contents"}):doThis("for-all", function(url)
+        ar(transf.plaintext_file.lines(self:get("c"))):doThis("for-all", function(url)
             if url == "" then return end
             System:get("manager", "stream")
               :doThis(

@@ -5,17 +5,7 @@ ExecutableCodeFileItemSpecifier = {
   type = "executable-code-file",
   properties = {
     getables = {
-      ["is-shellscript-file"] = function(self)
-        return testPath(self:get("c"), {
-          contents = { r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" }
-        }) or is.path.usable_as_filetype(self:get("c"), "shell-script")
-      end,
-      ["has-errors"] = function(self)
-        return stringy.strip(self:get("lint-simple-text", "error")) ~= ""
-      end,
-      ["has-warnings"] = function (self)
-        return stringy.strip(self:get("lint-simple-text", "warning")) ~= ""
-      end
+      ["is-shellscript-file"] = bc(is.path.shellscript_file)
     },
   },
   potential_interfaces = ovtable.init({

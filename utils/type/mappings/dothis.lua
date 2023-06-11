@@ -181,7 +181,7 @@ dothis = {
       local do_after = event_table.do_after
       event_table.do_after = nil
       doWithTempFile({edit_before = true, contents = temp_file_contents, use_contents = true}, function(tmp_file)
-        local new_specifier = yamlLoad(tmp_file)
+        local new_specifier = transf.yaml_string.table(tmp_file)
         new_specifier.do_after = do_after
         dothis.khal.add_event_from_specifier(new_specifier)
       end)
@@ -327,6 +327,21 @@ dothis = {
       end
     end,
   },
+  vdirsyncer = {
+    sync = function()
+      run("vdirsyncer sync", true)
+    end
+  },
+  newsboat = {
+    reload = function()
+      run("newsboat -x reload", true)
+    end,
+  },
+  mbsync = {
+    sync = function()
+      run('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel', true)
+    end,
+  },
   url = {
     download = function(url, target)
       run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
@@ -397,6 +412,36 @@ dothis = {
     end
   },
   image_file = {
+
+  },
+  plaintext_file = {
+    append_contents = function(path, str)
+      writeFile(path, str, "exists", "a")
+    end,
+    append_lines = function(path, lines)
+      local contents = transf.plaintext_file.one_final_newline(path)
+      writeFile(path, contents .. table.concat(lines, "\n"), "exists", "w")
+    end,
+    append_line = function(path, line)
+      dothis.plaintext_file.append_lines(path, {line})
+    end,
+    write_lines = function(path, lines)
+      writeFile(path, table.concat(lines, "\n"), nil, "w")
+    end,
+    set_line = function(path, line, line_number)
+      local lines = transf.plaintext_file.lines(path)
+      lines[line_number] = line
+      dothis.plaintext_file.write_lines(path, lines)
+    end,
+
+  },
+  plaintext_table_file = {
+    append_arrays_of_fields = function(path, arrays_of_fields)
+      local lines = hs.fnutils.imap(arrays_of_fields, function (arr)
+        return table.concat(arr, transf.plaintext_table_file.field_separator())
+      end)
+      dothis.plaintext_file.append_lines(path, lines)
+    end,
 
   },
   empty_dir = {

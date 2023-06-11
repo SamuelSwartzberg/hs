@@ -202,8 +202,7 @@ local keymap = {
   i = {
     explanation = "Choose a favorite stream",
     fn = function() 
-      st("/Users/sam/me/state/init_playlists")
-        :get("array", "lines-of-file-contents")
+      ar(transf.plaintext_file.lines("/Users/sam/me/state/init_playlists"))
         :doThis("choose-item", function(item)
           System:get("manager", "stream"):doThis("create-background-stream", item)
         end)
@@ -382,18 +381,14 @@ System:get("manager", "creatable"):doThis("create-all", {
 
 
 System:get("manager", "timer"):doThis("create-all", {
-  bindArg(run, {"newsboat -x reload"}),
-  syncVdirSyncer,
+  dothis.newsboat.reload,
+  dothis.vdirsyncer.sync,
   bind(syncHomeRelativePath, {"me/state/todo", "push"}),
   st(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
   { 
-    fn = bindArg(run, {
-      "mbsync -c",
-      { value = "$XDG_CONFIG_HOME/isync/mbsyncrc", type = "quoted"},
-      "mb-channel"
-    }), 
+    fn = dothis.mbsync.sync, 
     interval = "* * * * *"
   },
   st(env.MENV):get("refresh-env-task"),

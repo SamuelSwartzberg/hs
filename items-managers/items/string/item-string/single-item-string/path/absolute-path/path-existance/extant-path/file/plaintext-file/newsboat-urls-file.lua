@@ -9,8 +9,8 @@ NewsboatUrlsFileItemSpecifier = {
     },
     doThisables = {
       ["append-newsboat-url"] = function(self, specifier)
-        self:doThis(
-          "append-line", 
+        transf.plaintext_file.append_line(
+          self:get('c'), 
           ('%s\t"~%s"\t"_%s"'):format(
             specifier.url,
             specifier.title,

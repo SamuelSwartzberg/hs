@@ -216,6 +216,16 @@ tblmap = {
       }
     },
   },
+  extension = {
+    likely_field_separator = {
+      csv = ",",
+      tsv = "\t",
+    },
+    likely_record_separator = {
+      csv = "\n",
+      tsv = "\n",
+    },
+  },
   pandoc_format = {
     extension = {
       pdf = "pdf",

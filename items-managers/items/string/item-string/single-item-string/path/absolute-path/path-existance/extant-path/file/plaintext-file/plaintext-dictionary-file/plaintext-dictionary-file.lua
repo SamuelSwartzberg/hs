@@ -6,31 +6,16 @@ PlaintextDictionaryFileItemSpecifier = {
   type = "plaintext-dictionary-file",
   properties = {
     getables = {
-      ["is-yaml-file"] = function(self)
-        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "yaml"
-      end,
-      ["is-json-file"] = function(self)
-        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "json"
-      end,
-      ["is-bib-file"] = function(self)
-        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "bib"
-      end,
-      ["is-toml-file"] = function(self)
-        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "toml" 
-      end,
-      ["is-ini-file"] = function(self)
-        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "ini"
-      end,
-      ["is-ics-file"] = function(self)
-        return pathSlice(self:get("resolved-path"), "-1:-1", { ext_sep = true, standartize_ext = true })[1] == "ics"
-      end,
+      ["is-yaml-file"] = bc(get.path.is_extension, "yaml"),
+      ["is-json-file"] = bc(get.path.is_extension, "json"),
+      ["is-bib-file"] = bc(get.path.is_extension, "bib"),
+      ["is-toml-file"] = bc(get.path.is_extension, "toml" ),
+      ["is-ini-file"] = bc(get.path.is_extension, "ini"),
+      ["is-ics-file"] = bc(get.path.is_extension, "ics"),
       ["to-env-map"] = function(self)
         local table = self:get("parse-to-lua-table")
         local env_map_item = tb(table)
         return env_map_item:get("parse-to-env-map")
-      end,
-      ["parse-to-table-item"] = function(self)
-        return tb(self:get("parse-to-lua-table"))
       end,
     },
     doThisables = {
@@ -44,14 +29,15 @@ PlaintextDictionaryFileItemSpecifier = {
     { key = "ini-file", value = CreateIniFileItem },
     { key = "ics-file", value = CreateIcsFileItem },
   }),
-  action_table = concat({{
+  action_table = {
     {
       text = "👉#️⃣💎 ctbl.",
-      key = "choose-action-on-result-of-get",
-      args = "parse-to-table-item"
+      filter = tb,
+      getfn = returnSame,
+      get = "parse-to-lua-table"
 
     }
-  }})
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface
