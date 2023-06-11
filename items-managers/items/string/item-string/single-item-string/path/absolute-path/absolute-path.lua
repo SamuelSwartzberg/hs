@@ -76,12 +76,12 @@ PathInterfaceItemSpecifier = {
     },
     getChooseItemTable({
       {
-        description = "httpsrvurl",
-        emoji_icon = "💻🌐🏠🔗",
+        d = "httpsrvurl",
+        i = "💻🌐🏠🔗",
         key = "local-http-server-url",
       },{
-        description = "flurl",
-        emoji_icon = "📄🔗",
+        d = "flurl",
+        i = "📄🔗",
         key = "file-url",
       }
     })

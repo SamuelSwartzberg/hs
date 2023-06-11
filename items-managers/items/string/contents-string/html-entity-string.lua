@@ -10,8 +10,8 @@ HTMLEntityEncodedStringItemSpecifier = {
   },
   action_table = getChooseItemTable({
     {
-      description = "hendc",
-      emoji_icon = "🔶📖",
+      d = "hendc",
+      i = "🔶📖",
       key = "html-entities-decoded"
     }
   })
@@ -32,8 +32,8 @@ HTMLEntityDecodedStringItemSpecifier = {
   },
   action_table = getChooseItemTable({
     {
-      description = "henec",
-      emoji_icon = "🔶📦",
+      d = "henec",
+      i = "🔶📦",
       key = "html-entities-encoded"
     }
   })

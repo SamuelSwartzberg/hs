@@ -89,25 +89,25 @@ EmailFileItemSpecifier = {
     }
   }, getChooseItemTable({
     {
-      description = "sbj",
-      emoji_icon = "👒",
+      d = "sbj",
+      i = "👒",
       getfn = transf.email_file.subject,
     },{
-      description = "bdy",
-      emoji_icon = "📜",
+      d = "bdy",
+      i = "📜",
       key = "email-body"
     },{
-      description = "bdyqt",
-      emoji_icon = "📜💬",
+      d = "bdyqt",
+      i = "📜💬",
       getfn = transf.email_file.quoted_body,
       get = "email-body-rendered"
     },{
-      description = "smm",
-      emoji_icon = "⋯",
+      d = "smm",
+      i = "⋯",
       key = "email-summary"
     },{
-      description = "hdrs",
-      emoji_icon = "📊",
+      d = "hdrs",
+      i = "📊",
       key = "email-all-decoded-headers"
     }
   }))

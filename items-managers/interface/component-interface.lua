@@ -196,21 +196,25 @@ InterfaceDefaultTemplate = {
       ["action-table"] = function(self)
         local chooser_table = {}
         for action_index, action in ipairs(self:get("filtered-action-table")) do
-          local chooser_string = ""
-          if type(action.text) == "string" then
-            chooser_string = action.text
-          elseif type(action.text) == "function" then
-            chooser_string = action.text(self)
-          else
-            error("String key of action table entry is not a string or a function.")
+          local n_action = copy(action)
+          n_action.id = self:get("id")
+          n_action.action_id = rand({len=10})
+          n_action.text = n_action.text or ""
+          local choose =  n_action.act and stringy.startswith(n_action.act, "c") 
+          if choose then
+            n_action.text = mustStart(n_action.text, "👉")
           end
-          chooser_table[#chooser_table + 1] = {
-            text = chooser_string,
-            key = action.key,
-            args = action.args,
-            id = self:get("id"),
-            action_id = rand({len=10})
-          }
+          if n_action.e then
+            n_action.text = n_action.e .. " " .. n_action.text
+          end
+          if choose then
+            n_action.text = "c" .. n_action.text
+          end 
+          if n_action.d then
+            n_action.text = n_action.text .. n_action.d
+          end
+          n_action.text = mustEnd(n_action.text, ".")
+
         end
         return chooser_table
       end,

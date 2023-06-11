@@ -254,89 +254,89 @@ StringItemSpecifier = {
     }
   }, getChooseItemTable({
     {
-      description = "binec",
-      emoji_icon = "🅱️2️⃣📦",
+      d = "binec",
+      i = "🅱️2️⃣📦",
       key = "encoded-as",
       args = "bits"
     }, {
-      description = "hexec",
-      emoji_icon = "🅱️1️⃣6️⃣📦",
+      d = "hexec",
+      i = "🅱️1️⃣6️⃣📦",
       key = "encoded-as",
       args = "hex"
     }, {
-      description = "urlb64ec",
-      emoji_icon = "🔗🅱️6️⃣4️⃣📦",
+      d = "urlb64ec",
+      i = "🔗🅱️6️⃣4️⃣📦",
       key = "encoded-as",
       args = "base64_url"
     }, {
-      description = "genb64ec",
-      emoji_icon = "🤝🅱️6️⃣4️⃣📦",
+      d = "genb64ec",
+      i = "🤝🅱️6️⃣4️⃣📦",
       key = "encoded-as",
       args = "base64_gen"
     }, {
-      description = "crc32ec",
-      emoji_icon = "👴🏻🅱️3️⃣2️⃣📦",
+      d = "crc32ec",
+      i = "👴🏻🅱️3️⃣2️⃣📦",
       key = "encoded-as",
       args = "base32_crock"
     }, {
-      description = "gen32ec",
-      emoji_icon = "🤝🅱️3️⃣2️⃣📦",
+      d = "gen32ec",
+      i = "🤝🅱️3️⃣2️⃣📦",
       key = "encoded-as",
       args = "base32_gen"
     }, {
-      description = "escrgx",
-      emoji_icon = "🏃🏾‍♀️🧩",
+      d = "escrgx",
+      i = "🏃🏾‍♀️🧩",
       key = "escaped-general-regex"
     }, {
-      description = "escluargx",
-      emoji_icon = "🏃🏾‍♀️🔵🧩",
+      d = "escluargx",
+      i = "🏃🏾‍♀️🔵🧩",
       key = "escape-lua-regex"
     }, {
-      description = "eval",
-      emoji_icon = "🧬",
+      d = "eval",
+      i = "🧬",
       key = "evaluated-as-lua"
     },
     {
-      description = "tmpeval",
-      emoji_icon = "🕳🧬",
+      d = "tmpeval",
+      i = "🕳🧬",
       key = "template-evaluated-contents"
     }, {
-      description = "basheval",
-      emoji_icon = "🐚🧬",
+      d = "basheval",
+      i = "🐚🧬",
       key = "evaluated-as-bash"
     }, {
-      description = "envsubst",
-      emoji_icon = "🌥🧬",
+      d = "envsubst",
+      i = "🌥🧬",
       key = "envsubst"
     }, {
-      description = "rsnu",
-      emoji_icon = "🅰🐍🧗‍♀️",
+      d = "rsnu",
+      i = "🅰🐍🧗‍♀️",
       key = "contents-as-romanized-snake-case-string"
     },
     {
-      description = "r",
-      emoji_icon = "🅰",
+      d = "r",
+      i = "🅰",
       key = "contents-romanized"
     },{
-      description = "1stnum",
-      emoji_icon = "#️⃣",
+      d = "1stnum",
+      i = "#️⃣",
       key = "extract-utf8-first",
       args = "%d+"
     },{
-      emoji_icon = "📰",
-      description = "ttlcs",
+      i = "📰",
+      d = "ttlcs",
       key = "to-title-case"
     },{
-      emoji_icon = "🔳🏞🛣",
-      description = "qrimgpth",
+      i = "🔳🏞🛣",
+      d = "qrimgpth",
       key = "qr-image-path"
     },{
-      emoji_icon = "🔳🔡⬜️",
-      description = "qrstrbow",
+      i = "🔳🔡⬜️",
+      d = "qrstrbow",
       key = "qr-utf8-image-bow"
     },{
-      emoji_icon = "🔳🔡⬛️", 
-      description = "qrstrwob",
+      i = "🔳🔡⬛️", 
+      d = "qrstrwob",
       key = "qr-utf8-image-wob"
     }
   }),

@@ -1,7 +1,7 @@
 --- @class CopySpecifier
 --- @field key string
 --- @field description string
---- @field emoji_icon string
+--- @field i string
 --- @field args any
 --- @field check? boolean
 
@@ -18,7 +18,7 @@ function getChooseItemTable(specifiers)
     end
 
     action_table[#action_table + 1] =  {
-      text = string.format("%s%s %s%s.", "👉", specifier.emoji_icon, "c", specifier.description),
+      text = string.format("%s%s %s%s.", "👉", specifier.i, "c", specifier.description),
       key = "choose-action-on-str-item-result-of-get",
       condition = specifier.condition,
       args = {

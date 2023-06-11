@@ -48,13 +48,13 @@ ImageFileItemSpecifier = {
   action_table = concat(
     getChooseItemTable({
       {
-        emoji_icon = "🍡",
-        description = "bruurl",
+        i = "🍡",
+        d = "bruurl",
         key = "booru-url"
       },
       {
-        emoji_icon = "🔳🎒",
-        description = "qrcnt",
+        i = "🔳🎒",
+        d = "qrcnt",
         key = "qr-data"
       }
     }),{

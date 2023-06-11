@@ -266,8 +266,8 @@ DateSpecifier = {
     }
   }, getChooseItemTable({
     {
-      description = "wkd.",
-      emoji_icon = "🌞",
+      d = "wkd.",
+      i = "🌞",
       key = "weekday-str"
     }
   }))

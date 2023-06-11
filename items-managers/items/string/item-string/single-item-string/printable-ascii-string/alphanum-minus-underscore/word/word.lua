@@ -23,8 +23,8 @@ WordItemSpecifier = {
   }),
   action_table = getChooseItemTable({
     {
-      description = "evshv",
-      emoji_icon = "💰🛄",
+      d = "evshv",
+      i = "💰🛄",
       key = "evaluated-as-shell-var"
     },
   })

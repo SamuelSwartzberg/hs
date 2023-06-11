@@ -82,24 +82,24 @@ PlaintextFileItemSpecifier = {
   }),
   action_table = concat(getChooseItemTable({
     { 
-      description = "cnt",
-      emoji_icon = "🎒",
+      d = "cnt",
+      i = "🎒",
       key = "file-contents"
     },{
-      description = "cntchln",
-      emoji_icon = "🎒🀇📏",
+      d = "cntchln",
+      i = "🎒🀇📏",
       key = "file-contents-utf8-chars"
     },{
-      description = "cntbln",
-      emoji_icon = "🎒8️⃣📏",
+      d = "cntbln",
+      i = "🎒8️⃣📏",
       key = "file-contents-bytes"
     },{
-      description = "cnthd",
-      emoji_icon = "🎒👆",
+      d = "cnthd",
+      i = "🎒👆",
       key = "file-contents-head"
     },{
-      description = "cnttl",
-      emoji_icon = "🎒👇",
+      d = "cnttl",
+      i = "🎒👇",
       key = "file-contents-tail"
     }
   }), {

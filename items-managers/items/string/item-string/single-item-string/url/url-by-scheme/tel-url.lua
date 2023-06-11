@@ -14,8 +14,8 @@ TelURLItemSpecifier = {
 
   action_table =concat(getChooseItemTable({
     {
-      emoji_icon = "📞",
-      description = "phone.",
+      i = "📞",
+      d = "phone.",
       key = "phone-number"
     },
   }),{})

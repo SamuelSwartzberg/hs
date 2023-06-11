@@ -10,12 +10,12 @@ PassSecurityQuestionItemSpecifier = {
   },
   action_table = getChooseItemTable({
     {
-      description = "secq",
-      emoji_icon = "🎭❓",
+      d = "secq",
+      i = "🎭❓",
       key = "pass-passw"
     },{
-      description = "secqpth",
-      emoji_icon = "🎭❓📁",
+      d = "secqpth",
+      i = "🎭❓📁",
       key = "pass-security-question-path"
     }
   })

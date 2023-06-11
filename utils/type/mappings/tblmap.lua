@@ -287,7 +287,7 @@ tblmap = {
       ["danbooru"] = "db",
       ["gelbooru"] = "gb",
     },
-    emoji_icon = {
+    i = {
       wiktionary = "⬜️",
       wikipedia = "🏐",
       youtube = "🟥▶️",

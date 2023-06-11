@@ -26,29 +26,29 @@ NumItemSpecifier = {
   action_table = concat(
     getChooseItemTable({
       {
-        description = "rndb64",
-        emoji_icon = "🎰🔠6️⃣4️⃣",
+        d = "rndb64",
+        i = "🎰🔠6️⃣4️⃣",
         key = "random-of-length",
         args = {
           "base64"
         }
       },{
-        description = "rndpint",
-        emoji_icon = "🎰🔢➕#️",
+        d = "rndpint",
+        i = "🎰🔢➕#️",
         key = "random-of-length",
         args = {
           "pos-int"
         }
       },{
-        description = "rndalnum",
-        emoji_icon = "🎰🔠🔡🔢",
+        d = "rndalnum",
+        i = "🎰🔠🔡🔢",
         key = "random-of-length",
         args = {
           "alphanum"
         }
       },{
-        description = "rndlalnum",
-        emoji_icon = "🎰🔡🔢",
+        d = "rndlalnum",
+        i = "🎰🔡🔢",
         key = "random-of-length",
         args = {
           "lower-alphanum"

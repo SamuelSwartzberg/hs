@@ -89,8 +89,8 @@ CslTableSpecifier = {
   action_table = concat(
     getChooseItemTable({
       {
-        emoji_icon = "📖",
-        description = "cttn",
+        i = "📖",
+        d = "cttn",
         key = "get-interactive",
         args = { key = "to-citation", thing = "citation style (e.g.apa or apa-6th-edition)" }
       }

@@ -25,13 +25,13 @@ YoutubeChannelIdItemSpecifier = {
   },
   action_table = concat(getChooseItemTable({
     {
-      description = "ytfeedurl",
-      emoji_icon = "🟥▶️🔶🔗",
+      d = "ytfeedurl",
+      i = "🟥▶️🔶🔗",
       key = "youtube-feed-url"
     },
     {
-      description = "ytchannelurl",
-      emoji_icon = "🟥▶️📺🔗",
+      d = "ytchannelurl",
+      i = "🟥▶️📺🔗",
       key = "youtube-channel-url"
     },
   }),{

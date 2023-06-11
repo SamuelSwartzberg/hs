@@ -32,12 +32,12 @@ EventTableSpecifier = {
   
   action_table = concat(
     getChooseItemTable({
-      { emoji_icon = "📇", description = "cl", key = "val", args = "calendar"},
+      { i = "📇", d = "cl", key = "val", args = "calendar"},
       
-      { emoji_icon = "🏧", description = "ttl", key = "val", args = "title"},
-      { emoji_icon = "💬", description = "dsc", key = "val", args = "description", check = true},
-      { emoji_icon = "🔗", description = "url", key = "val", args = "url", check = true},
-      { emoji_icon = "📍", description = "lc", key = "val", args = "location"},
+      { i = "🏧", d = "ttl", key = "val", args = "title"},
+      { i = "💬", d = "dsc", key = "val", args = "d", check = true},
+      { i = "🔗", d = "url", key = "val", args = "url", check = true},
+      { i = "📍", d = "lc", key = "val", args = "location"},
 
     }),
     {

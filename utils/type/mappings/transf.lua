@@ -1060,7 +1060,7 @@ transf = {
   search_engine = {
     action_table_item = function(search_engine)
       return {
-        text = string.format("%s🔎 s%s.", tblmap.search_engine.emoji_icon[search_engine], tblmap.search_engine.short[search_engine]),
+        text = string.format("%s🔎 s%s.", tblmap.search_engine.i[search_engine], tblmap.search_engine.short[search_engine]),
         key = "search-with",
         args = search_engine
       }

@@ -18,8 +18,8 @@ BinaryDigitStringItemSpecifier = {
   
   action_table = concat({}, getChooseItemTable({
     {
-      description = "bindc",
-      emoji_icon = "2️⃣📖",
+      d = "bindc",
+      i = "2️⃣📖",
       key = "binary-to-corresponding-string"
     }
   }))

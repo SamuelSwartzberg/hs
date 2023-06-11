@@ -10,12 +10,12 @@ PassOtpItemSpecifier = {
   },
   action_table = concat({getChooseItemTable({
     {
-      description = "otp",
-      emoji_icon = "⌚️🗝",
+      d = "otp",
+      i = "⌚️🗝",
       key = "pass-otp"
     },{
-      emoji_icon = "⌚️🗝📁",
-      description = "otppth",
+      i = "⌚️🗝📁",
+      d = "otppth",
       key = "pass-otp-path"
     },
   })})

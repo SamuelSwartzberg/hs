@@ -44,8 +44,8 @@ URLItemSpecifier = {
       ["html-title"] = function (self)
         return stringy.split(self:get("text-by-selector", "title"), "\n")[1]
       end,
-      ["html-description"] = function (self)
-        return self:get("text-by-selector", "meta[name=description]")
+      ["html-d"] = function (self)
+        return self:get("text-by-selector", "meta[name=d]")
       end,
       ["default-negotation-url-contents"] = function(self)
         return transf.url.default_negotation_url_contents(self:get("c"))
@@ -123,45 +123,45 @@ URLItemSpecifier = {
   }),
   action_table = concat(getChooseItemTable({
     {
-      emoji_icon = "🏛⚙️🔗",
-      description = "wbmchurl",
+      i = "🏛⚙️🔗",
+      d = "wbmchurl",
       key = "url-in-wayback-machine",
     },{
       key = "url-scheme",
-      emoji_icon = "🔗：⁄⁄",
-      description = "urlschm",
+      i = "🔗：⁄⁄",
+      d = "urlschm",
     },{
       key = "url-host",
-      emoji_icon = "🔗👩‍💼",
-      description = "urlhst"
+      i = "🔗👩‍💼",
+      d = "urlhst"
     },{
       key = "url-domain-and-tld",
-      emoji_icon = "🔗🌐",
-      description = "urldntld"
+      i = "🔗🌐",
+      d = "urldntld"
     },{
       key = "url-path",
-      emoji_icon = "🔗📁",
-      description = "urlpth"
+      i = "🔗📁",
+      d = "urlpth"
     },{
       key = "url-query",
-      emoji_icon = "🔗🔍",
-      description = "urlqry"
+      i = "🔗🔍",
+      d = "urlqry"
     },{
       key = "url-fragment",
-      emoji_icon = "🔗#️⃣",
-      description = "urlfrg"
+      i = "🔗#️⃣",
+      d = "urlfrg"
     },{
       key = "url-port",
-      emoji_icon = "🔗🔌",
-      description = "urlprt"
+      i = "🔗🔌",
+      d = "urlprt"
     },{
       key = "html-title",
-      emoji_icon = "🔗🔶🏧",
-      description = "urlhtmlttl"
+      i = "🔗🔶🏧",
+      d = "urlhtmlttl"
     },{
-      key = "html-description",
-      emoji_icon = "🔗🔶💬",
-      description = "urlhtmldsc"
+      key = "html-d",
+      i = "🔗🔶💬",
+      d = "urlhtmldsc"
     }
   }),{
     {

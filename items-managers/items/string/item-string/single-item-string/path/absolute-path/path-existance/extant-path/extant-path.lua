@@ -246,7 +246,7 @@ ExtantPathItemSpecifier = {
     }
   }, getChooseItemTable({
     {
-      description = "👉📏 pthsz.",
+      d = "👉📏 pthsz.",
       getfn = transf.path.size
     }
   }))

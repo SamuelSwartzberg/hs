@@ -10,12 +10,12 @@ PassPasswItemSpecifier = {
   },
   action_table = getChooseItemTable({
     {
-      description = "passw",
-      emoji_icon = "🔑",
+      d = "passw",
+      i = "🔑",
       key = "pass-passw"
     },{
-      emoji_icon = "🔑📁",
-      description = "passwpth",
+      i = "🔑📁",
+      d = "passwpth",
       key = "pass-passw-path"
     },
   })

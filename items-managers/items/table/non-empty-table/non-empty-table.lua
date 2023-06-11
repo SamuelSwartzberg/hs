@@ -247,13 +247,13 @@ NonEmptyTableSpecifier = {
     } 
   }, getChooseItemTable({
     {
-      description = "tstr",
-      emoji_icon = "💻🔡",
+      d = "tstr",
+      i = "💻🔡",
       key = "to-string",
     },
     {
-      description = "tstrml",
-      emoji_icon = "💻🔡📜",
+      d = "tstrml",
+      i = "💻🔡📜",
       key = "to-string-multiline",
     },
   })),

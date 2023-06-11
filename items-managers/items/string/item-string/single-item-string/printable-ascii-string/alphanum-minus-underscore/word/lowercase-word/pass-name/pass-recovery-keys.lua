@@ -10,12 +10,12 @@ PassRecoveryKeysItemSpecifier = {
   },
   action_table = concat({getChooseItemTable({
     {
-      description = "rcvry",
-      emoji_icon = "🔧🔑",
+      d = "rcvry",
+      i = "🔧🔑",
       key = "pass-passw"
     },{
-      emoji_icon = "🔧🔑📁",
-      description = "rcvrypth",
+      i = "🔧🔑📁",
+      d = "rcvrypth",
       key = "pass-recovery-path"
     }
   })}),

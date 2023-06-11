@@ -3,12 +3,12 @@ PassUsernameItemSpecifier = {
   type = "pass-username",
   action_table = {
     {
-      description = "usrnm",
-      emoji_icon = "👤",
+      d = "usrnm",
+      i = "👤",
       getfn = transf.pass_name.username,
     },{
-      description = "usrnmpth",
-      emoji_icon = "👤📁",
+      d = "usrnmpth",
+      i = "👤📁",
       key = "pass-username-path"
     }
   }

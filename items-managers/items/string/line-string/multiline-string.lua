@@ -38,16 +38,16 @@ MultilineStringItemSpecifier = {
   action_table = concat(
     getChooseItemTable({
       {
-        description = "fld",
-        emoji_icon = "🗺",
+        d = "fld",
+        i = "🗺",
         key = "fold"
       },{
-        description = "lnhd",
-        emoji_icon = "⩶👆",
+        d = "lnhd",
+        i = "⩶👆",
         key = "head"
       },{
-        description = "lntl",
-        emoji_icon = "⩶👇",
+        d = "lntl",
+        i = "⩶👇",
         key = "tail"
       }
     }),{

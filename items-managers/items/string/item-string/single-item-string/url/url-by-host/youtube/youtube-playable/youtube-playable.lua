@@ -68,13 +68,13 @@ YoutubePlayableItemItemSpecifier = {
   action_table = concat(
     getChooseItemTable({
       {
-        description = "ttl",
-        emoji_icon = "🏧",
+        d = "ttl",
+        i = "🏧",
         key = "youtube-playable-item-title-cleaned"
       },
       {
-        description = "crea",
-        emoji_icon = "👩‍🎤",
+        d = "crea",
+        i = "👩‍🎤",
         key = "youtube-playable-item-channel-cleaned"
       }
     }),

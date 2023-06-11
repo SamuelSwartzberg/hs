@@ -153,24 +153,24 @@ InGitDirPathItemSpecifier = {
     },
   }, getChooseItemTable({
     {
-      emoji_icon = "🐙❗️",
-      description = "gtig",
+      i = "🐙❗️",
+      d = "gtig",
       key = "gitignore-path"
     },{
-      emoji_icon = "🐙👩🏽‍💻🔗",
-      description = "gtremurl",
+      i = "🐙👩🏽‍💻🔗",
+      d = "gtremurl",
       key = "git-remote"
     },{
-      emoji_icon = "🐙👩🏽‍💻📄🔗",
-      description = "gtremitmurl",
+      i = "🐙👩🏽‍💻📄🔗",
+      d = "gtremitmurl",
       key = "url-on-master-remote"
     },{
-      emoji_icon = "🐙👩🏽‍💻🍣📄🔗",
-      description = "gtremitmrawurl",
+      i = "🐙👩🏽‍💻🍣📄🔗",
+      d = "gtremitmrawurl",
       key = "raw-url-on-github-remote"
     },{
-      emoji_icon = "🐙🙋🏽‍♀️💼",
-      description = "gtremownitm",
+      i = "🐙🙋🏽‍♀️💼",
+      d = "gtremownitm",
       key = "git-remote-owner-item"
     }
   }))

@@ -17,8 +17,8 @@ HexadecimalDigitStringItemSpecifier = {
   
   action_table = concat({}, getChooseItemTable({
     {
-      description = "hexdc",
-      emoji_icon = "1️⃣6️⃣📖",
+      d = "hexdc",
+      i = "1️⃣6️⃣📖",
       key = "hexadecimal-to-corresponding-string"
     }
   }))

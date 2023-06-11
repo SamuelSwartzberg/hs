@@ -23,16 +23,16 @@ MailtoURLItemSpecifier = {
 
   action_table = concat(getChooseItemTable({
     {
-      description = "sbj",
-      emoji_icon = "👒",
+      d = "sbj",
+      i = "👒",
       key = "mailto-subject"
     },{
-      description = "bdy",
-      emoji_icon = "📜",
+      d = "bdy",
+      i = "📜",
       key = "mailto-body"
     },{
-      description = "1steml",
-      emoji_icon = "📧",
+      d = "1steml",
+      i = "📧",
       key = "first-email"
     },
   }),{

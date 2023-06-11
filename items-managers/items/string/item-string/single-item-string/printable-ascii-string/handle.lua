@@ -25,18 +25,18 @@ HandleItemSpecifier = {
   
   action_table = concat(getChooseItemTable({
     {
-      description = "ytchannelid",
-      emoji_icon = "🟥▶️📺🆔",
+      d = "ytchannelid",
+      i = "🟥▶️📺🆔",
       key = "youtube-channel-id"
     },
     {
-      description = "ytfeedurl",
-      emoji_icon = "🟥▶️🔶🔗",
+      d = "ytfeedurl",
+      i = "🟥▶️🔶🔗",
       key = "youtube-feed-url"
     },
     {
-      description = "ytchannelurl",
-      emoji_icon = "🟥▶️📺🔗",
+      d = "ytchannelurl",
+      i = "🟥▶️📺🔗",
       key = "youtube-channel-url"
     },
   }),{

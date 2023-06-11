@@ -23,8 +23,8 @@ DataURLItemSpecifier = {
 
   action_table =concat(getChooseItemTable({
     {
-      emoji_icon = "📊🔗🎒",
-      description = "dturlct.",
+      i = "📊🔗🎒",
+      d = "dturlct.",
       key = "payload-part"
     },
   }),{}),

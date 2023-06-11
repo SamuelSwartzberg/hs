@@ -25,8 +25,8 @@ ImageURLItemSpecifier = {
   action_table = concat(
     getChooseItemTable({
       {
-        emoji_icon = "🍡",
-        description = "bruurl",
+        i = "🍡",
+        d = "bruurl",
         key = "booru-url"
       }
     }),{

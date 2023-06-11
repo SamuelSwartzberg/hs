@@ -12,18 +12,18 @@ HasUppercaseStringItemSpecifier = {
   },
   action_table = getChooseItemTable({
     {
-      description = "al",
-      emoji_icon = "🪂",
+      d = "al",
+      i = "🪂",
       key = "contents-as-all-lowercase"
     },
     {
-      description = "snl",
-      emoji_icon = "🐍🪂",
+      d = "snl",
+      i = "🐍🪂",
       key = "contents-as-lower-snake-case"
     },
     {
-      description = "kbl",
-      emoji_icon = "🍢🪂",
+      d = "kbl",
+      i = "🍢🪂",
       key = "contents-as-lower-kebap-case"
     }
   })
@@ -47,18 +47,18 @@ HasLowercaseStringItemSpecifier = {
   },
   action_table = getChooseItemTable({
     {
-      description = "au",
-      emoji_icon = "🧗‍♀️",
+      d = "au",
+      i = "🧗‍♀️",
       key = "contents-as-all-uppercase"
     },
     {
-      description = "snu",
-      emoji_icon = "🐍🧗‍♀️",
+      d = "snu",
+      i = "🐍🧗‍♀️",
       key = "contents-as-upper-snake-case"
     },
     {
-      description = "kbu",
-      emoji_icon = "🍢🧗‍♀️",
+      d = "kbu",
+      i = "🍢🧗‍♀️",
       key = "contents-as-upper-kebap-case"
     }
   })

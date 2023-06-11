@@ -15,8 +15,8 @@ JsonFileItemSpecifier = {
   },
 
   action_table = concat(getChooseItemTable({
-    description = "srvjsonport",
-    emoji_icon = "🚚｛：",
+    d = "srvjsonport",
+    i = "🚚｛：",
     key = "port-of-hosting-json-server",
   }),{})
 }

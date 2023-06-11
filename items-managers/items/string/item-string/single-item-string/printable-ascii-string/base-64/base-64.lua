@@ -9,8 +9,8 @@ Base64ItemSpecifier = {
   
   action_table = concat({}, getChooseItemTable({
     {
-      description = "b64dc",
-      emoji_icon = "🅱️6️⃣4️⃣📖",
+      d = "b64dc",
+      i = "🅱️6️⃣4️⃣📖",
       key = "decode-base-64"
     }
   }))

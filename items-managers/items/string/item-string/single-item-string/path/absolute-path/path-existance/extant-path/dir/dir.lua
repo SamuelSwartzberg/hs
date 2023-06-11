@@ -223,13 +223,13 @@ DirItemSpecifier = {
   }),
   action_table = concat(getChooseItemTable({
     {
-      description = "ls",
-      emoji_icon = "🗂️",
+      d = "ls",
+      i = "🗂️",
       key = "ls",
     },
     {
-      description = "tree",
-      emoji_icon = "🌲",
+      d = "tree",
+      i = "🌲",
       key = "tree",
     },
   }),{

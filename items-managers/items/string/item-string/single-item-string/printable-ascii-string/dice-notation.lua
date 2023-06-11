@@ -17,8 +17,8 @@ DiceNotationItemSpecifier = {
   },
   action_table = concat(
     getChooseItemTable({
-      emoji_icon = "🎲",
-      description = "rll",
+      i = "🎲",
+      d = "rll",
       key = "roll-result"
     }), {}
   ),

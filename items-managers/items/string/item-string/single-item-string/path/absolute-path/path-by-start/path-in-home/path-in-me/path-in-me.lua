@@ -24,8 +24,8 @@ PathInMeItemSpecifier = {
   }),
   action_table = concat(getChooseItemTable({
     {
-      description = "srvpth",
-      emoji_icon = "🚚",
+      d = "srvpth",
+      i = "🚚",
       key = "local-server-path",
     }
   }),{})
