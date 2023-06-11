@@ -71,18 +71,6 @@ ExtantPathItemSpecifier = {
           return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true }))[1]
         end)
       end,
-      ["path-attr"] = function(self, attr)
-        return hs.fs.attributes(self:get("completely-resolved-path"), attr)
-      end,
-      ["path-size"] = function(self)
-        return self:get("path-attr", "size")
-      end,
-      ["path-date"] = function(self, attr) -- attr must be one of "access", "modification", "change", "creation"
-        return date(self:get("path-attr", attr))
-      end,
-      ["path-date-item"] = function (self, attr)
-        return CreateDate(self:get("path-date", attr))
-      end,
     },
     doThisables = {
       ["cd-and-run-this-task"] = function(self, task)
@@ -240,39 +228,26 @@ ExtantPathItemSpecifier = {
       key = "do-interactive",
       args = {thing = "file name", key = "create-sibling-file-and-choose-action"}
     }, {
-      text = "👉✏️🕚 cmtime.",
-      key = "choose-action-on-result-of-get",
-      args = {
-        key = "path-date-item",
-        args = "modification"
-      }
+      text = "👉✏️🕚 cmdt.",
+      filter = dat,
+      getfn = transf.path.m_date
     }, {
-      text = "👉🫳🕚 catime.",
-      key = "choose-action-on-result-of-get",
-      args = {
-        key = "path-date-item",
-        args = "access"
-      }
+      text = "👉🫳🕚 cadt.",
+      filter = dat,
+      getfn = transf.path.a_date
     },{
-      text = "👉👩🏽‍💻🕚 cctime.",
-      key = "choose-action-on-result-of-get",
-      args = {
-        key = "path-date-item",
-        args = "change"
-      }
+      text = "👉👩🏽‍💻🕚 ccdt.",
+      filter = dat,
+      getfn = transf.path.c_date
     },{
-      text = "👉🌄🕚 ccrtime.",
-      key = "choose-action-on-result-of-get",
-      args = {
-        key = "path-date-item",
-        args = "creation"
-      }
+      text = "👉🌄🕚 ccrdt.",
+      filter = dat,
+      getfn = transf.path.cr_date
     }
   }, getChooseItemTable({
     {
-      description = "pthsz",
-      key = "path-size",
-      emoji_icon = "📏",
+      description = "👉📏 pthsz.",
+      getfn = transf.path.size
     }
   }))
 }

@@ -38,18 +38,6 @@ ArrayOfExtantPathsSpecifier = {
         end, { "k", "kv" })
         return CreateTable(tbl)
       end,
-      ["sorted-path-attr"] = function(self, attr)
-        return self:get("sorted", function(a, b)
-          return a:get("path-attr", attr) > b:get("path-attr", attr)
-        end)
-      end,
-      ["find-largest-path-attr"] = function(self, attr)
-        local sorted_by_attr = self:get("sorted-path-attr", attr)
-        return sorted_by_attr[1]
-      end,
-      ["newest-path"] = function(self)
-        return self:get("find-largest-path-attr", "creation")
-      end,
     },
     doThisables = {
       ["choose-dir-until-file"] = function(self, callback)
@@ -66,27 +54,6 @@ ArrayOfExtantPathsSpecifier = {
           item:doThis("choose-action")
         end)
       end,
-      ["move-all-to"] = function(self, target_dir)
-        self:doThis("for-all", function(extant_path)
-          createPath(target_dir) -- ensures path exists
-          local path_leaf = extant_path:get("path_leaf")
-          local target_path = mustEnd(target_dir, "/") .. path_leaf
-          extant_path:doThis("move-safe", target_path)
-        end)
-      end,
-      ["move-from-common-ancestor-to"] = function(self, target)
-        local common_ancestor = self:get("common-ancestor")
-        self:doThis("for-all", function(extant_path)
-          local relpath = extant_path:get("relative-path-from", common_ancestor)
-          local target_path = mustEnd(target, "/") .. relpath
-          extant_path:doThis("move-safe", target_path)
-        end)
-      end,
-      ["move-to-new-dir-under-common-ancestor"] = function(self, new_dir_name)
-        local common_ancestor = self:get("common-ancestor")
-        local new_dir = common_ancestor .. "/" .. new_dir_name
-        self:doThis("move-all-to", new_dir)
-      end
     },
   },
   action_table = {},

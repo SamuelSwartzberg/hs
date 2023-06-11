@@ -150,12 +150,6 @@ StringItemSpecifier = {
         self:get("to-string-item-array", sep)
           :doThis("choose-action")
       end,
-      ["copy-contents"] = function(self)
-        self:doThis("copy-result-of-get", {key = "c"})
-      end,
-      ["paste-contents"] = function(self)
-        self:doThis("paste-result-of-get", {key = "c"})
-      end,
       ["say"] = function(self, lang)
         dothis.string.say(self:get("c"), lang)
       end,
@@ -177,7 +171,7 @@ StringItemSpecifier = {
         open({contents = self:get("c")})
       end,
       ["open-contents-in-browser"] = function(self)
-        self:doThis("open-result-of-get-in-browser", { key = "fold"})
+        open({url = self:get("fold")})
       end,
       ["append-as-line-to-file"] = function(self, path)
         st(path):doThis("append-line-and-commit", self:get("fold"))
@@ -204,10 +198,10 @@ StringItemSpecifier = {
   action_table = concat({
     {
       text = "📋 cp.",
-      key = "copy-contents"
+      dothis = dothis.string.copy
     },{
       text = "📎 pst.",
-      key = "paste-contents"
+      dothis = dothis.string.paste
     },{
       text = "👄🇺🇸 sayen.",
       key = "say",
@@ -239,8 +233,7 @@ StringItemSpecifier = {
       }
     }, {
       text = "🔍 ql.",
-      key = "code-quick-look-result-of-get",
-      args = {key = "c"}
+      dothis = alert
     },{
       text = "🧬 eval.",
       key = "get-as-do",

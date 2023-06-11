@@ -57,9 +57,7 @@ LatexProjectDirItemSpecifier = {
       end,
       ["build-and-open-pdf"] = function(self)
         run(self:get("build-task")) -- outputTask since it is blocking, and we want to open the pdf after it is done
-        self:doThis("open-result-of-get", {
-          key = "latex-main-pdf"
-        })
+        open(self:get("latex-main-pdf"))
       end,
       -- things like opening of various files, e.g. bibfile can be achieved by doing self:doThis("open-result-of-get", {action = "get", key = <whatever-key>, e.g. "latex-biblfile"}), so there's no need to implement them here
       ["open-project"] = function(self)

@@ -25,19 +25,8 @@ MenvDirItemSpecifier = {
           error("Envfile had errors: \n" .. envfile_string_item:get("lint-simple-text", "warning"))
         end
       end,
-      ["update-env-source-file"] = function(self, specifier)
-        self:get("str-item", {args = specifier.name .. ".yaml", key = "descendant-ending-with"}):doThis("merge-file-contents-with-lua-table", specifier.payload)
-      end,
-      ["update-env-source-file-and-write-env-file"] = function(self, specifier)
-        self:doThis("update-env-source-file", specifier)
-        self:doThis("write-env-file")
-      end,
       ["source-env"] = function()
         env = getEnvAsTable()
-      end,
-      ["update-env-source-file-write-and-re-source-env"] = function(self, specifier)
-        self:doThis("update-env-source-file-and-write-env-file", specifier)
-        self:doThis("source-env")
       end,
         
     }

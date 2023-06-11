@@ -261,6 +261,21 @@ get = {
     end,
 
   },
+  absolute_path = {
+    relative_path_from = function(path, starting_point)
+      return mustNotStart(path, mustEnd(starting_point, "/"))
+    end,
+  },
+  extant_path = {
+    attr = function(path, attr)
+      return hs.fs.attributes(transf.string.path_resolved(path, true))[attr]
+    end,
+    date_attr = function(path, attr) -- attr must be one of "access", "modification", "change", "creation"
+      return date(get.extant_path.attr(path, attr))
+    end,
+    
+
+  },
   dir_path = {
     find_child = function(dir_path, cond, opts)
       return find(transf.dir_path.children_array(dir_path), cond, opts)
@@ -273,6 +288,36 @@ get = {
     end,
     find_child_with_extension = function(dir_path, extension)
       return find(transf.dir_path.children_extensions_array(dir_path), {_exactly = extension})
+    end,
+  },
+  bib_file = {
+    citation = function(path, format)
+      return run({
+        "pandoc",
+        "--citeproc",
+        "-t", "plain",
+        "--csl",
+        { value = "styles/" .. format, type = "quoted" },
+        {
+          value = path,
+          type = "quoted"
+        }
+      })
+    end,
+  },
+  logging_dir = {
+    log_for_date = function(path, date)
+      return transf.string.path_resolved(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"
+    end
+  },
+  extant_path_array = {
+    sorted_by_attr_extant_path_array = function(arr, attr)
+      return table.sort(arr, function(a, b)
+        return get.extant_path.attr(a, attr) < get.extant_path.attr(b, attr)
+      end)
+    end,
+    largest_by_attr = function(arr, attr)
+      return get.extant_path_array.sorted_by_attr_extant_path_array(arr, attr)[1]
     end,
   }
 }

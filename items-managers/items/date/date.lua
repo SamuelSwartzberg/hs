@@ -11,7 +11,7 @@ DateSpecifier = {
     getables = {
       ["with-added"] = function(self, specifier)
         local date = self:get("c"):copy()
-        return CreateDate(
+        return dat(
           date["add" .. specifier["unit"]](date, specifier["amount"])
         )
       end,
@@ -33,7 +33,7 @@ DateSpecifier = {
         return date.diff(self:get("c"), other_date)
       end,
       ["diff-item"] = function(self, other_date)
-        return CreateDate(self:get("diff", other_date))
+        return dat(self:get("diff", other_date))
       end,
       ["diff-span"] = function(self, specifier)
         return self:get("diff-item", specifier["end"]):get("span", specifier["unit"])
@@ -51,7 +51,7 @@ DateSpecifier = {
         return map(
           self:get("range", specifier),
           function(dt)
-            return CreateDate(dt)
+            return dat(dt)
           end
         )
       end,
@@ -66,7 +66,7 @@ DateSpecifier = {
         return map(
           self:get("hours-in-day-range"),
           function(dt)
-            return CreateDate(dt)
+            return dat(dt)
           end
         )
       end,
@@ -82,7 +82,7 @@ DateSpecifier = {
         return map(
           self:get("quarters-in-day-range"),
           function(dt)
-            return CreateDate(dt)
+            return dat(dt)
           end
         )
       end,
@@ -100,8 +100,8 @@ DateSpecifier = {
         specifier["end"] = specifier["end"] or self:get("c"):copy():adddays(30)
         local startdt, enddt = table.unpack(self:get("start-end", specifier))
         return ar({
-          CreateDate(startdt),
-          CreateDate(enddt)
+          dat(startdt),
+          dat(enddt)
         }):get("map-to-event-items")
       end,
       ["to-formatted"] = function(self, format_str)
@@ -171,7 +171,7 @@ DateSpecifier = {
         return date(self:get("to-precision", component))
       end,
       ["date-item-to-precision"] = function(self, component)
-        return CreateDate(self:get("date-to-precision", component))
+        return dat(self:get("date-to-precision", component))
       end,
       ["format-array"] = function()
         return format_array
@@ -188,7 +188,7 @@ DateSpecifier = {
         }
       end,
       ["corresponding-logfile"] = function(self, logging_dir)
-        return st(logging_dir):get("log-for-date", self:get("c"))
+        return get.logging_dir.log_for_date(logging_dir, self:get("c"))
       end,
     },
     doThisables = {
@@ -216,7 +216,7 @@ DateSpecifier = {
       end,
       ["log-open-diary"] = function(self)
         self:doThis("create-empty-log-entry", env.MENTRY_LOGS)
-        open(st(env.MENTRY_LOGS):get("log-for-date", self:get("c")))
+        open(get.logging_dir.log_for_date(env.MENTRY_LOGS, self:get("c")))
       end,
       ["choose-surrounding-day"] = function(self, amount)
         ar(self:get(
@@ -275,4 +275,4 @@ DateSpecifier = {
 
 
 --- @type BoundNewDynamicContentsComponentInterface
-CreateDate = bindArg(RootInitializeInterface, DateSpecifier)
+dat = bindArg(RootInitializeInterface, DateSpecifier)

@@ -188,18 +188,13 @@ NonEmptyArraySpecifier = {
       args = { key = "revsorted-to-new-array-default" },
     },{
       text = "👉👆 chd.",
-      key = "choose-action-on-result-of-get",
-      args = { 
-        key = "array",
-        args = { key = "head" },
-      }
+      getfn = get.array.head,
+      get = "c",
+      
     },{
       text = "👉👇 ctl.",
-      key = "choose-action-on-result-of-get",
-      args = { 
-        key = "array",
-        args = { key = "tail" },
-      }
+      getfn = get.array.tail,
+      get = "c",
     },{
       text = "👉#️⃣ cln.",
       key = "choose-action-on-string-item-result-of-get",

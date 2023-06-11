@@ -748,7 +748,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.real_image_path.qr_data(qr_code_png_path),
+  transf.image_file.qr_data(qr_code_png_path),
   qr_code_test_contents
 )
 
@@ -918,7 +918,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.real_audio_path.transcribed(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3"),
+  transf.audio_file.transcribed(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3"),
   "This is a testfile containing my voice."
 )
 
@@ -1119,7 +1119,7 @@ assertMessage(
 )
 
 assert(
-  transf.real_image_path.hs_image(env.MMOCK .. "/files/binary/image/png/basic.png").toASCII
+  transf.image_file.hs_image(env.MMOCK .. "/files/binary/image/png/basic.png").toASCII
 )
 
 assertMessage(
@@ -1436,13 +1436,13 @@ assertMessage(
 )
 
 assertMessage(
-  transf.real_image_path.booru_url(transf.url.in_cache_dir("https://cdn.donmai.us/original/82/cf/__kia_and_ati_steampunk_and_1_more_drawn_by_ooishi_ryuuko__82cf8ce1f00c40754920eb87f296f2c8.png")),
+  transf.image_file.booru_url(transf.url.in_cache_dir("https://cdn.donmai.us/original/82/cf/__kia_and_ati_steampunk_and_1_more_drawn_by_ooishi_ryuuko__82cf8ce1f00c40754920eb87f296f2c8.png")),
   "https://danbooru.donmai.us/posts/199016"
 )
 
 assert(
   stringy.startswith(
-    transf.real_image_path.data_url(env.MMOCK .. "files/binary/image/png/tiny_blank.png"),
+    transf.image_file.data_url(env.MMOCK .. "files/binary/image/png/tiny_blank.png"),
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKEAYAAADdohP"
   )
 )

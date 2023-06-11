@@ -355,17 +355,17 @@ end)
 
 dothis.sox.rec_start_cache(function(path)
   dothis.audiodevice_system.ensure_sound_played_on_speakers()
-  dothis.real_audio_path.play(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3", function()
+  dothis.audio_file.play(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3", function()
     dothis.sox.rec_stop(function()
       assertMessage(
-        transf.real_audio_path.transcribed(path),
+        transf.audio_file.transcribed(path),
         "This is a testfile containing my voice."
       )
       dothis.sox.rec_toggle_cache()
-      dothis.real_audio_path.play(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3", function()
+      dothis.audio_file.play(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3", function()
         dothis.sox.rec_toggle_cache(function(recpath)
           assertMessage(
-            transf.real_audio_path.transcribed(recpath),
+            transf.audio_file.transcribed(recpath),
             "This is a testfile containing my voice."
           )
         end)

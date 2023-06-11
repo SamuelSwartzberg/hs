@@ -39,7 +39,7 @@ ParentDirItemSpecifier = {
         end)
       end,
       ["newest-child-string-item"] = function(self)
-        return self:get("child-string-item-array"):get("newest-path")
+        return transf.dir_path.newest_child(self:get("c"))
       end,
     },
   

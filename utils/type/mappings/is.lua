@@ -71,6 +71,15 @@ is = {
         contents = true
       })
     end,
+    tilde_absolute_path = function(path)
+      return stringy.startswith(path, "~/")
+    end,
+    true_absolute_path = function(path)
+      return stringy.startswith(path, "/")
+    end,
+    absolute_path = function(path)
+      return is.path.tilde_absolute_path(path) or is.path.true_absolute_path(path)
+    end,
   },
   extant_path = {
     

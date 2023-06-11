@@ -751,7 +751,7 @@ local item_creation_map = {
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-audiodevices" },
     },
     {
-      value = { CreateDate(date())},
+      value = { dat(date())},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-dates" },
     },
     {
@@ -809,7 +809,7 @@ local item_creation_map = {
       }
     }
   },
-  [CreateDate] = {
+  [dat] = {
     {
       value = date(),
       must_be = { "date" }

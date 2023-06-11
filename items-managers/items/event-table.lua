@@ -10,7 +10,7 @@ EventTableSpecifier = {
         return date(self:get("val", key))
       end,
       ["date-item"] = function(self, key)
-        return CreateDate(self:get("date", key))
+        return dat(self:get("date", key))
       end,
       ["to-string"] = function (self)
         return transf.event_table.event_tagline(self:get("c"))

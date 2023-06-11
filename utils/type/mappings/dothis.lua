@@ -330,6 +330,16 @@ dothis = {
   url = {
     download = function(url, target)
       run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
+    end,
+  },
+  booru_url = {
+    add_to_local = function(url)
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_urls/add_url",
+        request_table = { url = url },
+        request_verb = "POST",
+      })
     end
   },
   string = {
@@ -364,10 +374,13 @@ dothis = {
       run("open -a " .. transf.string.single_quoted_escaped(app) .. " " .. transf.string.single_quoted_escaped(path), do_after)
     end,
   },
-  real_audio_path = {
+  audio_file = {
     play = function(path, do_after)
       run("play " .. transf.string.single_quoted_escaped(path), do_after)
     end
+  },
+  image_file = {
+
   },
   empty_dir = {
 

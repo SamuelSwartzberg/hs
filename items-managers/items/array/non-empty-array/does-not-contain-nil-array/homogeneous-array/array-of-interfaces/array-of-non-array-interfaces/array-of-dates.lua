@@ -3,7 +3,7 @@ ArrayOfDatesSpecifier = {
   properties = {
     getables = {
       ["max-diff"] = function(self)
-        return CreateDate(
+        return dat(
           date.diff(
             self:get("max-content"),
             self:get("min-content")
@@ -25,7 +25,7 @@ ArrayOfDatesSpecifier = {
         return map(
           self:get("range", specifier),
           function(dt)
-            return CreateDate(dt)
+            return dat(dt)
           end
         )
       end,

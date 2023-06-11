@@ -122,6 +122,23 @@ transf = {
     end,
 
   },
+  extant_path = {
+    size = function(path)
+      return get.extant_path.attr(path, "size")
+    end,
+    m_date = function(path)
+      return get.extant_path.date_attr(path, "modification")
+    end,
+    c_date = function(path)
+      return get.extant_path.date_attr(path, "change")
+    end,
+    a_date = function(path)
+      return get.extant_path.date_attr(path, "access")
+    end,
+    cr_date = function(path)
+      return get.extant_path.date_attr(path, "creation")
+    end,
+  },
   path_array = {
     leaves_array = function(path_array)
       return hs.fnutils.imap(path_array, transf.path.leaf)
@@ -135,6 +152,11 @@ transf = {
       return toSet(extensions)
     end,
   },
+  extant_path_array = {
+    newest = function(path_array)
+      return get.extant_path_array.largest_by_attr(path_array, "creation")
+    end
+  },
   dir_path = {
     children_array = function(dir_path)
       return itemsInPath(dir_path)
@@ -147,6 +169,9 @@ transf = {
     end,
     children_extensions_array = function(dir_path)
       return transf.path_array.extensions_array(transf.dir_path.children_array(dir_path))
+    end,
+    newest_child = function(dir_path)
+      return transf.extant_path_array.newest(transf.dir_path.children_array(dir_path))
     end,
     descendants_array = function(dir_path)
       return itemsInPath({
@@ -192,7 +217,7 @@ transf = {
       .. transf.path_leaf_parts.extension_string(path_leaf_parts)
     end
   },
-  real_audio_path = {
+  audio_file = {
     transcribed = function(path)
       return memoize(rest, refstore.params.memoize.opts.invalidate_1_year_fs, "rest")({
         api_name = "openai",
@@ -205,7 +230,7 @@ transf = {
       }).text
     end
   },
-  real_image_path = {
+  image_file = {
     qr_data = function(path)
       return run("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
     end,
@@ -221,9 +246,37 @@ transf = {
     end,
     data_url = function(path)
       local ext = transf.path.extension(path)
-      return memoize(hs.image.encodeAsURLString)(transf.real_image_path.hs_image(path), ext)
+      return memoize(hs.image.encodeAsURLString)(transf.image_file.hs_image(path), ext)
     end,
   },
+  email_file = {
+    all_headers_raw = function(path)
+      return run(
+        "mshow -L" .. transf.string.single_quoted_escaped(path)
+      )
+    end,
+    all_useful_headers_raw = function(path)
+      return run(
+        "mshow -q" .. transf.string.single_quoted_escaped(path)
+      )
+    end,
+
+  },
+  bib_file = {
+    array_of_tables = function(path)
+      return runJSON({
+        "citation-js",
+        "--input",
+        {
+          value = path,
+          type = "quoted"
+        },
+        "--output-language", "json"
+      })
+    end,
+    
+  },
+
   semver = {
     components = function(str)
       local major, minor, patch, prerelease, build = onig.match(str, mt._r.version.semver)
@@ -235,6 +288,19 @@ transf = {
         build = build
       }
     end,
+  },
+  date = {
+    y_ym_ymd_table = function(date)
+      return  {
+        date:fmt("%Y"),
+        date:fmt("%Y-%m"),
+        date:fmt("%Y-%m-%d"),
+      }
+    end,
+    y_ym_ymd_path = function(date)
+      return table.concat(transf.date.y_ym_ymd_table(date), "/")
+    end,
+
   },
   iban = {
     cleaned_iban = function(iban)
@@ -681,6 +747,23 @@ transf = {
       res = styleText(res, { style = "light", starts = 1, ends = 1 })
       res = styleText(res, { style = "light", starts = #res, ends = #res})
       return res
+    end,
+    email_quoted = function(str)
+      return stringx.join(
+        "\n",
+        hs.fnutils.imap(
+          stringx.splitlines(
+            stringy.strip(str)
+          ),
+          function(v)
+            if stringy.startswith(v, ">") then
+              return ">" .. v
+            else
+              return ">" .. " " .. v
+            end
+          end
+        )
+      )
     end
   },
   event_table = {
@@ -1056,7 +1139,7 @@ transf = {
     transcribed = function(url)
       local path = transf.url.in_cache_dir(url)
       dothis.url.download(url, path)
-      return transf.real_audio_path.transcribed(path)
+      return transf.audio_file.transcribed(path)
 
     end
   },
@@ -1074,7 +1157,7 @@ transf = {
     qr_data = function(url)
       local path = transf.url.in_cache_dir(url)
       dothis.url.download(url, path)
-      return transf.real_image_path.qr_data(path)
+      return transf.image_file.qr_data(path)
     end,
     data_url = function(url)
       local ext = transf.path.extension(url)

@@ -17,30 +17,13 @@ EmailFileItemSpecifier = {
           self:get("email-body-rendered-task")
         )
       end,
-      ["email-body-quoted"] = function(self)
-        return stringx.join(
-          "\n",
-          map(
-            stringx.splitlines(
-              stringy.strip(self:get("email-body-rendered"))
-            ),
-            function(v)
-              if stringy.startswith(v, ">") then
-                return ">" .. v
-              else
-                return ">" .. " " .. v
-              end
-            end
-          )
-        )
-      end,
+
       ["with-email-body-quoted"] = function(self, response)
-        return response .. "\n\n" .. self:get("email-body-quoted")
+        return response .. "\n\n" .. transf.string.email_quoted(self:get("email-body-rendered"))
       end,
       ["email-useful-headers"] = function (self)
         return run({
-          "mshow",
-          "-q",
+          "mshow -q",
           { value = self:get("completely-resolved-path"), type = "quoted"}
         })
       end,
@@ -212,7 +195,8 @@ EmailFileItemSpecifier = {
     },{
       description = "bdyqt",
       emoji_icon = "📜💬",
-      key = "email-body-quoted"
+      getfn = transf.email_file.email_quoted,
+      get = "email-body-rendered"
     },{
       description = "smm",
       emoji_icon = "⋯",

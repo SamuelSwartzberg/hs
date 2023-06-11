@@ -34,15 +34,6 @@ PlaintextDictionaryFileItemSpecifier = {
       end,
     },
     doThisables = {
-      ["overwrite-file-contents-with-lua-table"] = function(self, tbl)
-        local contents = self:get("lua-table-to-string", tbl)
-        self:doThis("overwrite-file-contents", contents)
-      end,
-      ["merge-file-contents-with-lua-table"] = function(self, tbl)
-        local prev_contents = self:get("parse-to-lua-table")
-        local new_contents = concat(prev_contents, tbl)
-        self:doThis("overwrite-file-contents-with-lua-table", new_contents)
-      end,
     }
   },
   potential_interfaces = ovtable.init({

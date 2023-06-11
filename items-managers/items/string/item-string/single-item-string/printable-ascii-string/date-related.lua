@@ -7,7 +7,7 @@ DateRelatedItemSpecifier = {
         return date(self:get("c"))
       end,
       ["to-date-obj-item"] = function(self)
-        return CreateDate(self:get("to-date-obj"))
+        return dat(self:get("to-date-obj"))
       end,
       
     }

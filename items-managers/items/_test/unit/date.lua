@@ -1,5 +1,5 @@
 local test_date_1 = date("2021-05-07T12:08:25")
-local test_date_item_1 = CreateDate(test_date_1:copy())
+local test_date_item_1 = dat(test_date_1:copy())
 
 assertMessage(
   test_date_item_1:get("c"),

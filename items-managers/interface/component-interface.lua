@@ -228,21 +228,6 @@ InterfaceDefaultTemplate = {
           return interface:get("type") == interface_type
         end)
       end,
-      ["str-item"] = bind(
-        getThenUse, {a_use, a_use, function (_, contents)
-          return st(contents)
-        end}
-      ),
-      ["array"] = bind(
-        getThenUse, {a_use, a_use, function (_, contents)
-          return ar(contents)
-        end}
-      ),
-      ["new-array-from-result-of-get"] = bind(
-        getThenUse, {a_use, a_use, function (_, contents)
-          return ar(contents)
-        end}
-      ),
       ["get-interactive"] = function(self, specifier)
         specifier.action = "get"
         return interactiveFunc(self, specifier)
@@ -284,23 +269,28 @@ InterfaceDefaultTemplate = {
         interactiveFunc(self, specifier)
       end,
       ["use-action"] = function(self, action_item)
-        if action_item.dothis then
-          action_item.dothis(self:get("c"))
-        
+        local first_arg
+        if action_item.getfn or action_item.dothis then
+          action_item.get = action_item.get or "c"
+          first_arg = self:get(action_item.get)
         else
-          self:doThis(action_item["key"], action_item["args"])
+          first_arg = self
+        end
+        if action_item.dothis then
+          action_item.dothis(first_arg)
+        elseif action_item.key then
+          self:doThis(action_item.key, action_item.args)
+        else
+          local res = action_item.getfn(first_arg, action_item.args)
+          action_item.filter = action_item.filter or st
+          action_item.postfilter = action_item.postfilter or "choose-action"
+          self:doThis(action_item.postfilter, action_item.filter(res))
         end
       end,
       ["update"] = function() end,
       ["get-as-do"] = function(self, key)
         self:get(key)
       end,
-      ["copy-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.pasteboard.setContents, {}, 1)}),
-      ["paste-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(pasteMultilineString, {}, 1)}),
-      ["open-result-of-get-in-browser"] = bind(getThenUse, { a_use, a_use, function(_, thing) open({url=thing}) end}),
-      ["view-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.alert.show, {}, 1)}),
-      ["open-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(open, {}, 1)}),
-      ["quick-look-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(hs.alert.show, {}, 1)}),
       ["code-quick-look-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(alert, {}, 1)}),
       ["choose-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
         item:doThis("choose-action")
@@ -314,24 +304,6 @@ InterfaceDefaultTemplate = {
       ["choose-item-or-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
         item:doThis("choose-item-or-action")
       end}),
-      ["repeat-action"] = function(self, specifier)
-        for i = 1, specifier.limit + 1 do
-          self:doThis(specifier.key, specifier.args)
-        end
-      end,
-      ["do-staggered-action"] = function(self, specifier)
-        local counter = 1
-        System:get("c")["global-timer-manager"]:doThis("create", { 
-          interval = specifier.interval,
-          fn = function()
-            self:doThis(specifier.key, specifier.args)
-            counter = counter + 1
-            if counter > specifier.limit then
-              error("staggered action limit reached, stop timer.", 0)
-            end
-          end
-        })
-      end,
       ["do-multiple"] = function(self, actions)
         for _, action in ipairs(actions) do
           self:doThis(action.key, action.args)

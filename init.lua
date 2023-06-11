@@ -177,7 +177,7 @@ local keymap = {
   t = {
     explanation = "Choose an action on the current date.",
     fn = function() 
-      CreateDate(date())
+      dat(date())
         :doThis("choose-action") 
     end,
   },
