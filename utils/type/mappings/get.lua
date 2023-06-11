@@ -442,7 +442,35 @@ get = {
       return run("shellcheck --format=gcc --severity=" .. severity .. transf.string.single_quoted_escaped(path))
     end,
   },
+  email_file = {
+    with_body_quoted = function(path, response)
+      return response .. "\n\n" .. transf.email_file.quoted_body(path)
+    end,
+    header = function(path, header)
+      return run(
+        "mshow -h" .. transf.string.single_quoted_escaped(header) .. transf.string.single_quoted_escaped(path)
+      )
+    end,
+    addresses = function(path, header, only)
+      if not listContains(mt._list.email_headers_containin_emails, header) then
+        error("Header can't contain email addresses")
+      end
+      only = defaultIfNil(only, true)
+      local headerpart
+      if header then
+        headerpart = "-h" .. transf.string.single_quoted_escaped(header)
+      else
+        headerpart = ""
+      end
+      local res = run("maddr " .. (only and "-a" or "")  .. headerpart .. transf.string.single_quoted_escaped(path))
+      return toSet(transf.string.lines(res))
+    end,
+    displayname_addresses_labeled_dict = function(path, header)
+      local w_displaynames = transf.email_file.addresses(path, header, false)
+      return hs.fnutils.imap(w_displaynames, transf.email_or_displayname_email.displayname_email_dict)
+    end,
 
+  },
   logging_dir = {
     log_for_date = function(path, date)
       return transf.string.path_resolved(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"

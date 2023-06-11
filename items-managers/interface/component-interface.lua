@@ -256,14 +256,6 @@ InterfaceDefaultTemplate = {
           self:doThis("use-action", chosen_item)
         end)
       end,
-      ["choose-item-or-action"] = function(self)
-        local chose_item = self:doThis("choose-item", function (chosen_item)
-          chosen_item:doThis("choose-item-or-action")
-        end)
-        if not chose_item then
-          self:doThis("choose-action")
-        end
-      end,
       ["do-interactive"] = function(self, specifier)
         specifier.action = "doThis"
         interactiveFunc(self, specifier)
@@ -283,31 +275,18 @@ InterfaceDefaultTemplate = {
         else
           local res = action_item.getfn(first_arg, action_item.args)
           action_item.filter = action_item.filter or st
-          action_item.postfilter = action_item.postfilter or "choose-action"
-          self:doThis(action_item.postfilter, action_item.filter(res))
+          action_item.act = action_item.act or "ca"
+          if action_item.act == "ca" then
+            action_item.act = "choose-action"
+          elseif action_item.act == "cia" then
+            action_item.act = "choose-item-and-then-action"
+          end
+          self:doThis(action_item.act, action_item.filter(res))
         end
       end,
       ["update"] = function() end,
       ["get-as-do"] = function(self, key)
         self:get(key)
-      end,
-      ["code-quick-look-result-of-get"] = bind(getThenUse, { a_use, a_use, bind(alert, {}, 1)}),
-      ["choose-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
-        item:doThis("choose-action")
-      end}),
-      ["choose-action-on-str-item-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
-        st(item):doThis("choose-action")
-      end}),
-      ["choose-item-and-then-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
-        item:doThis("choose-item-and-then-action")
-      end}),
-      ["choose-item-or-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
-        item:doThis("choose-item-or-action")
-      end}),
-      ["do-multiple"] = function(self, actions)
-        for _, action in ipairs(actions) do
-          self:doThis(action.key, action.args)
-        end
       end,
     },
   },

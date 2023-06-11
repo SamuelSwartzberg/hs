@@ -4,99 +4,6 @@
 EmailFileItemSpecifier = {
   type = "email-file",
   properties = {
-    getables = {
-      ["email-body-rendered-task"] = function(self)
-        return {
-          "mshow",
-          "-R",
-          { value = self:get("completely-resolved-path"), type = "quoted"}
-        }
-      end,
-      ["email-body-rendered"] = function(self)
-        return run(
-          self:get("email-body-rendered-task")
-        )
-      end,
-
-      ["with-email-body-quoted"] = function(self, response)
-        return response .. "\n\n" .. transf.string.email_quoted(self:get("email-body-rendered"))
-      end,
-      ["email-useful-headers"] = function (self)
-        return run({
-          "mshow -q",
-          { value = self:get("completely-resolved-path"), type = "quoted"}
-        })
-      end,
-      ["email-all-decoded-headers"] = function(self)
-        return run({
-          "mshow",
-          "-L",
-          { value = self:get("completely-resolved-path"), type = "quoted"}
-        })
-      end,
-      ["email-header"] = function(self, type)
-        local raw_res = run({
-          "mhdr",
-          "-h",
-          { value = type, type = "quoted" },
-          "-d",
-          { value = self:get("completely-resolved-path"), type = "quoted"}
-        })
-        return raw_res
-      end,
-      -- there is also -r to get the raw body, and -H to get all raw headers. However, those present a possible attack vector, so it's better to see if I can get by without them.
-      ["mime-parts-raw"] = function(self)
-        return run({
-          "mshow",
-          "-t",
-          { value = self:get("completely-resolved-path"), type = "quoted"}
-        })
-      end,
-      ["attachments"] = function(self)
-        local raw_mime = self:get("mime-parts-raw")
-        local attachments = {}
-        for line in stringx.transf.string.lines(raw_mime) do
-          local name = line:match("name=\"(.-)\"")
-          if name then
-            table.insert(attachments, name)
-          end
-        end
-        return attachments
-      end,
-      --- @param type "from"|"sender"|"reply-to"|"to"|"cc"|"bcc"
-      ["involved-email-addresses"] = function(self, type)
-        local raw_res
-        if type then
-          raw_res = run({
-            "maddr",
-            "-h",
-            { value = type, type = "quoted" },
-            { value = self:get("completely-resolved-path"), type = "quoted"}  
-          })
-        else
-          raw_res = run({
-            "maddr",
-            { value = self:get("completely-resolved-path"), type = "quoted"}  
-          })
-        end
-        local all_addr = stringy.split(raw_res, "\n")
-        local addr = toSet(filter(all_addr, true))
-        return addr
-      end,
-      ["email-summary-task"] = function(self, format_specifier)
-        format_specifier = format_specifier or "%D **%f** %200s"
-        return {
-          "mscan",
-          "-f",
-          { value = format_specifier, type = "quoted" },
-          { value = self:get("completely-resolved-path"), type = "quoted" }
-        }
-      end,
-      ["email-summary"] = function(self, format_specifier)
-        return run(self:get("email-summary-task", format_specifier))
-      end,
-
-    },
     doThisables = {
       ["download-attachment"] = function(self, name)
         run({
@@ -120,8 +27,8 @@ EmailFileItemSpecifier = {
       ["email-reply"] = function(self, specifier)
         sendEmailInteractive({
           from = env.MAIN_EMAIL,
-          to = self:get("email-header", "from"),
-          subject = "Re: " .. self:get("email-header", "subject")
+          to = transf.email_file.to(self:get("completely-resolved-path")),
+          subject = "Re: " .. transf.email_file.subject(self:get("completely-resolved-path")),
         }, self:get("with-email-body-quoted", specifier.response or ""), specifier.edit_func)
       end,
       ["email-reply-interactive"] = function(self, response)
@@ -130,15 +37,11 @@ EmailFileItemSpecifier = {
           edit_func = editorEditFunc
         })
       end,
-      ["choose-involved-email"] = function(self)
-        ar(self:get("involved-email-addresses")):doThis("choose-item", function(email)
-          st(email):doThis("choose-action")
-        end)
-      end,
+
       ["email-forward"] = function (self, specifier)
         sendEmailInteractive({
           from = env.MAIN_EMAIL,
-          subject = "Fwd: " .. self:get("email-header", "subject"),
+          subject = "Fwd: " .. transf.email_file.subject(self:get("completely-resolved-path")),
           to = specifier.to or ""
         }, self:get("with-email-body-quoted", specifier.response or ""), specifier.edit_func)
       end,
@@ -180,14 +83,15 @@ EmailFileItemSpecifier = {
       args = env.MBSYNC_ARCHIVE
     },{
       text = "👉📬 cemladdr.",
-      key = "choose-involved-email"
+      getfn = get.email_file.addresses,
+      filter = ar,
+      act = "cia"
     }
   }, getChooseItemTable({
     {
       description = "sbj",
       emoji_icon = "👒",
-      key = "email-header",
-      args = "subject"
+      getfn = transf.email_file.subject,
     },{
       description = "bdy",
       emoji_icon = "📜",
@@ -195,7 +99,7 @@ EmailFileItemSpecifier = {
     },{
       description = "bdyqt",
       emoji_icon = "📜💬",
-      getfn = transf.email_file.email_quoted,
+      getfn = transf.email_file.quoted_body,
       get = "email-body-rendered"
     },{
       description = "smm",

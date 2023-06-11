@@ -269,7 +269,47 @@ transf = {
         "mshow -q" .. transf.string.single_quoted_escaped(path)
       )
     end,
+    rendered_body = function(path)
+      return run(
+        "mshow -R" .. transf.string.single_quoted_escaped(path)
+      )
+    end,
+    quoted_body = function(path)
+      transf.string.email_quoted(transf.email_file.rendered_body(path))
+    end,
+    from = function(path)
+      return get.email_file.header(path, "from")
+    end,
+    to = function(path)
+      return get.email_file.header(path, "to")
+    end,
+    subject = function(path)
+      return get.email_file.header(path, "subject")
+    end,
+    mime_parts_raw = function(path)
+      return run(
+        "mshow -t" .. transf.string.single_quoted_escaped(path)
+      )
+    end,
+    attachments = function(path)
+      return transf.mime_parts_raw.attachments(transf.email_file.mime_parts_raw(path))
+    end,
+    summary = function(path)
+      return run("mscan -f %D **%f** %200s" .. transf.string.single_quoted_escaped(path))
+    end,
 
+  },
+  mime_parts_raw = {
+    attachments = function(mime_parts_raw)
+      local attachments = {}
+      for line in transf.string.lines(mime_parts_raw) do
+        local name = line:match("name=\"(.-)\"")
+        if name then
+          table.insert(attachments, name)
+        end
+      end
+      return attachments
+    end,
   },
   bib_file = {
     array_of_tables = function(path)
@@ -1122,6 +1162,38 @@ transf = {
         return items
       end,
     }
+  },
+  displayname_email = {
+    email = function(str)
+      return eutf8.match(str, " <(.*)> *$")
+    end,
+    displayname = function(str)
+      return eutf8.match(str, "^(.*) <")
+    end,
+    displayname_email_dict = function(str)
+      local displayname = transf.displayname_email.displayname(str)
+      local email = transf.displayname_email.email(str)
+      return {
+        displayname = displayname,
+        email = email,
+      }
+    end,
+  },
+  email_or_displayname_email = {
+    email = function(str)
+      return transf.displayname_email.email(str) or str
+    end,
+    displayname = function(str)
+      return transf.displayname_email.displayname(str) or nil
+    end,
+    displayname_email_dict = function(str)
+      local displayname = transf.email_or_displayname_email.displayname(str)
+      local email = transf.email_or_displayname_email.email(str)
+      return {
+        displayname = displayname,
+        email = email,
+      }
+    end,
   },
   array_of_tables = {
     item_array_of_item_tables = function(arr)
