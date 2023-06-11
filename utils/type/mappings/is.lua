@@ -58,6 +58,24 @@ is = {
     remote = function(path)
       return not not path:find("^[^/:]-:") 
     end,
+    dir = bind(testPath, {a_use, "dir"}),
+    empty_dir = function(path)
+      return testPath(path, {
+        dirness = "dir",
+        contents = false
+      })
+    end,
+    parent_dir = function (path)
+      return testPath(path, {
+        dirness = "dir",
+        contents = true
+      })
+    end,
+  },
+  extant_path = {
+    
+  },
+  dir_path = {
     git_root_dir = function(path)
       return find(itemsInPath({
         path = path,
@@ -66,6 +84,12 @@ is = {
       }), {_stop = ".git"})
     end,
     
+    grandparent_dir = function (path)
+      return get.array.some_pass(
+        transf.dir_path.children_array(path),
+        is.path.dir
+      )
+    end
   },
   alphanum_minus_underscore = {
     word =  function(str) 
@@ -108,9 +132,49 @@ is = {
       return stringy.startswith(media_type, "image/")
     end,
   },
+  source_id = {
+    active = function(source_id)
+      return hs.keycodes.currentSourceID() == source_id
+    end,
+  },
+  number = {
+    pos = function(num)
+      return num > 0
+    end,
+    neg = function(num)
+      return num < 0
+    end,
+    zero = function(num)
+      return num == 0
+    end,
+    int = function(num)
+      return math.floor(num) == num 
+    end,
+    float = function(num)
+      return not is.number.int(num)
+    end,
+  },
+  int = {
+  },
   any = {
     component_interface = function(val)
       return type(val) == "table" and val.is_interface == true
     end,
-  }
+    number = function(val)
+      return type(val) == "number"
+    end,
+    int = function(val)
+      return is.any.number(val) and is.number.int(val)
+    end,
+    pos_int = function(val)
+      return is.any.int(val) and is.number.pos(val)
+    end,
+    neg_int = function(val)
+      return is.any.int(val) and is.number.neg(val)
+    end,
+    float = function(val)
+      return is.any.number(val) and is.number.float(val)
+    end,
+  },
+
 }

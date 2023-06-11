@@ -284,7 +284,12 @@ InterfaceDefaultTemplate = {
         interactiveFunc(self, specifier)
       end,
       ["use-action"] = function(self, action_item)
-        self:doThis(action_item["key"], action_item["args"])
+        if action_item.dothis then
+          action_item.dothis(self:get("contents"))
+        
+        else
+          self:doThis(action_item["key"], action_item["args"])
+        end
       end,
       ["update"] = function() end,
       ["get-as-do"] = function(self, key)

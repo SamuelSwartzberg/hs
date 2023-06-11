@@ -3,15 +3,8 @@ local project_type_init_map = {
     run({
       "cd",
       { value = path, type = "quoted" },
-      "&&",
-      "npm",
-      "init",
-      "--yes",
-      "&&",
-      "npm",
-      "pkg",
-      "set",
-      { value = "name=" .. pathSlice(path, "-1:-1")[1], type = "quoted" },
+      "&& npm init --yes && npm pkg set",
+      { value = "name=" .. transf.path.leaf(path), type = "quoted" },
     }, true)
   end,
   omegat = function(path)

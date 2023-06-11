@@ -4,16 +4,15 @@ InputMethodItemSpecifier = {
   properties = {
     getables = {
       ["to-string"] = function(self)
-        return slice(stringy.split(self:get("contents"), "."), -1, -1)[1]
+        return transf.source_id.language(self:get("contents"))
       end,
       ["is-active"] = function(self)
-        return hs.keycodes.currentSourceID() == self:get("contents")
+        return is.source_id.active(self:get("contents"))
       end,
     },
     doThisables = {
       ["activate"] = function(self)
-        hs.keycodes.currentSourceID(self:get("contents"))
-        hs.alert.show(self:get("to-string"))
+        dothis.source_id.activate(self:get("contents"))
       end,
     }
   }

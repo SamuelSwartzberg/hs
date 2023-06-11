@@ -1,12 +1,12 @@
 -- build single header
 
 assertMessage(
-  buildEmailHeader("foo", "bar"),
+  join.string.string.email_header("foo", "bar"),
   "Foo: bar"
 )
 
 assertMessage(
-  buildEmailHeader("foo", "bar {{[ 2 + 2 ]}}"),
+  join.string.string.email_header("foo", "bar {{[ 2 + 2 ]}}"),
   "Foo: bar 4"
 )
 
@@ -15,7 +15,7 @@ assertMessage(
 -- fake headers
 
 assertMessage(
-  buildEmailHeaders({
+  transf.table.email_header({
     foo = "bar",
     baz = "qux",
   }),
@@ -25,7 +25,7 @@ assertMessage(
 -- real headers (are auto-sorted)
 
 assertMessage(
-  buildEmailHeaders({
+  transf.table.email_header({
     subject = "test",
     from = "test@example.com",
     to = "test2@example.com",
@@ -36,7 +36,7 @@ assertMessage(
 -- mixture of real and fake headers
 
 assertMessage(
-  buildEmailHeaders({
+  transf.table.email_header({
     foo = "bar",
     baz = "qux",
     subject = "test",
@@ -49,7 +49,7 @@ assertMessage(
 -- build email
 
 assertMessage(
-  buildEmail({
+  join.string.table.email({
     foo = "bar",
     baz = "qux",
     subject = "test",

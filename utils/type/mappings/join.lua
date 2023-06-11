@@ -18,6 +18,16 @@ join = {
           final_contents = str
         end
         return "---\n" .. final_metadata .. "\n---\n" .. final_contents
+      end,
+      email = function(str, tbl)
+        local header = transf.table.email_header(tbl)
+        local mail = string.format("%s\n\n%s", header, str)
+        return mail
+      end
+    },
+    string = {
+      email_header = function(name, val)
+        return string.format("%s: %s", transf.word.capitalized(name), le(val))
       end
     }
   },
@@ -36,5 +46,5 @@ join = {
         end
       end
     }
-  }
+  },
 }

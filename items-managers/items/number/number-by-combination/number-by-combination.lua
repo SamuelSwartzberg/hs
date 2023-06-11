@@ -3,7 +3,7 @@ NumberByCombinationSpecifier = {
   properties = {
     getables = {
       ["is-pos-int"] = function(self)
-        return isNumber(self:get("contents"), "pos-int") -- can't use the self:get("is-int") etc. methods since we can't guarantee that the interface has been initialized yet
+        return is.any.pos_int(self:get("contents"))
       end,
     },
     doThisables = {

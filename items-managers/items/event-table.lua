@@ -13,26 +13,8 @@ EventTableSpecifier = {
         return CreateDate(self:get("date", key))
       end,
       ["to-string"] = function (self)
-        local contents = self:get("contents")
-        local str = contents.start
-        if contents["end"] then
-          str = str .. " - " .. contents["end"]
-        end
-        str = str .. " " .. contents.calendar .. ":"
-        if contents.title then
-          str = str .. " " .. contents.title
-        end
-        if contents.location then
-          str = str .. " @ " .. contents.location
-        end
-        if contents.description then
-          str = str .. " :: " .. contents.description
-        end
-        if contents.url then
-          str = str .. " Link: " .. contents.url
-        end
-        return str
-      end
+        return transf.event_table.event_tagline(self:get("contents"))
+      end,
     },
     doThisables = {
       ["delete-event"] = function(self)

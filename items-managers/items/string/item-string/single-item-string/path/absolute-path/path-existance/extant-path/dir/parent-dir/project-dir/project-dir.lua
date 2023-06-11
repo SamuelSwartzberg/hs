@@ -4,19 +4,19 @@ ProjectDirItemSpecifier = {
   properties = {
     getables = {
       ["is-latex-project-dir"] = function(self)
-        return not not self:get("child-ending-with", "main.tex")
+        return get.dir_path.find_child_with_leaf("main.tex")
       end,
       ["is-omegat-project-dir"] = function(self)
-        return not not self:get("child-ending-with", "omegat.project")
+        return get.dir_path.find_child_with_leaf("omegat.project")
       end,
       ["is-npm-project-dir"] = function(self)
-        return not not self:get("child-ending-with", "package.json")
+        return get.dir_path.find_child_with_leaf("package.json")
       end,
       ["is-cargo-project-dir"] = function(self)
-        return not not self:get("child-ending-with", "Cargo.toml")
+        return get.dir_path.find_child_with_leaf("Cargo.toml")
       end,
       ["is-sass-project-dir"] = function(self)
-        return not not self:get("child-ending-with", ".sass")
+        return get.dir_path.find_child_with_extension("sass")
       end,
       ["project-name"] = function(self)
         return self:get("path-leaf-general-name") or self:get("path-leaf")

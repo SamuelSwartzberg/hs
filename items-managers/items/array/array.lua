@@ -7,24 +7,6 @@ ArraySpecifier = {
       ["length"] = function(self) return #values(self:get("contents")) end,
       ["is-empty-array"] = function(self) return self:get("length") == 0 end,
       ["is-non-empty-array"] = function(self) return self:get("length") > 0 end,
-      ["with-appended"] = function(self, other_array)
-        local to_append
-        if isListOrEmptyTable(other_array) then
-          to_append = other_array
-        elseif type(other_array) == "table" and other_array.get then 
-          to_append = other_array:get("contents")
-        elseif other_array == nil then 
-          to_append = nil 
-        else
-          to_append = { other_array }
-        end
-        return CreateArray(
-          concat(
-            self:get("contents"), 
-            to_append
-          )
-        )
-      end,
     },
     doThisables = {
     },

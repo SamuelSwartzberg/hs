@@ -50,7 +50,6 @@ YoutubePlayableItemItemSpecifier = {
         })
       end,
       ["add-as-m3u"] = function(self, deduced_tags)
-        --- @type path_leaf_parts
         local specifier = {}
         local edited_tags = map(deduced_tags, {_p = "string"})
         specifier.tag = glue(edited_tags, promptUserToAddNKeyValuePairs("tag"))
@@ -59,8 +58,7 @@ YoutubePlayableItemItemSpecifier = {
           {"string-path", {prompt_args = {message = "Subdirectory name", default = specifier.tag.srs or specifier.tag.tcrea }}},
         })
         specifier.extension = "m3u"
-        local path_string = CreatePathLeafParts(specifier):get("str-item", "path-leaf-parts-as-string")
-        path_string:doThis("create-file", self:get("contents"))
+        writeFile(transf.path_leaf_parts.full_path(specifier), self:get("contents"))
       end,
       ["to-stream"] = function(self, specifier)
         return CreateArray({self.root_super}):doThis("to-stream", specifier)

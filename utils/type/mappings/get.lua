@@ -234,5 +234,45 @@ get = {
     name = function(device)
       return device:name()
     end,
+  },
+  array = {
+    some_pass = function(arr, cond)
+      return find(arr, cond, {"v", "boolean"})
+    end,
+    none_pass = function(arr, cond)
+      return not get.array.some_pass(arr, cond)
+    end,
+    all_pass = function(arr, cond)
+      if type(cond) == "table" then
+        cond._invert = not cond._invert
+      elseif type(cond) == "function" then
+        local oldcond = cond
+        cond = function(x) return not oldcond(x) end
+      else
+        error("Due to the transformations we need to do to the condition, it needs to be either a table or a function")
+      end
+      return get.array.none_pass(arr, cond)
+    end,
+    head = function(arr, n)
+      return slice(arr, 1, n)
+    end,
+    tail = function(arr, n)
+      return slice(arr, -n)
+    end,
+
+  },
+  dir_path = {
+    find_child = function(dir_path, cond, opts)
+      return find(transf.dir_path.children_array(dir_path), cond, opts)
+    end,
+    find_child_ending_with = function(dir_path, ending)
+      return get.dir_path.find_child(dir_path, {_stop = ending})
+    end,
+    find_child_with_leaf = function(dir_path, filename)
+      return find(transf.dir_path.children_leaves_array(dir_path), {_exactly = filename})
+    end,
+    find_child_with_extension = function(dir_path, extension)
+      return find(transf.dir_path.children_extensions_array(dir_path), {_exactly = extension})
+    end,
   }
 }

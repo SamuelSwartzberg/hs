@@ -11,10 +11,7 @@ DirItemSpecifier = {
         })
       end, 
       ["is-empty-dir"] = function(self)
-        return testPath(self:get("contents"), {
-          dirness = "dir",
-          contents = false
-        })
+        return is.extant_path.empty_dir(self:get("contents"))
       end,
       ["is-dir-by-path"] = function()
         return true
@@ -65,7 +62,7 @@ DirItemSpecifier = {
       end,
 
       ["find-or-create-child-dir"] = function(self, specifier)
-        local child = self:get("find-child", specifier.find_func)
+        local child = get.dir_path.find_child(self:get("contents"), specifier.find_func)
         if child == nil or not testPath(child, "dir") then
           self:doThis("create-empty-dir-in-dir", specifier.default_name)
           child = self:get("parent-dir-path") .. "/" .. specifier.default_name
@@ -137,14 +134,14 @@ DirItemSpecifier = {
       end,
       ["table-to-fs-children-dispatch"] = function(self, specifier) 
         -- assumes a table where all values are of the same type
-        local child_filenames = self:get("child-leaf-only-array")
+        local child_filenames = transf.dir_path.children_leaves_array(self:get("contents"))
         for k, v in fastpairs(specifier.payload) do
           local desired_name = k
 
           -- allow for regex names 
           if stringy.startswith(k, "match:") then
             local search_string = eutf8.sub(k, 7)
-            local match = child_filenames:get("find", function(item)
+            local match = find(child_filenames, function(item)
               return eutf8.match(item, search_string)
             end)
             if match then

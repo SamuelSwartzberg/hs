@@ -223,6 +223,18 @@ tblmap = {
       revealjs = "html",
     }
   },
+  application = {
+    history_sql_query = {
+      Firefox = "SELECT visit_date/1000000 AS timestamp,title,url " .. 
+      "FROM moz_places " ..
+      "INNER JOIN moz_historyvisits ON moz_places.id = moz_historyvisits.place_id " ..
+      "ORDER BY timestamp DESC;",
+      Newpipe = "SELECT access_date/1000 AS timestamp,title,url " .. 
+      "FROM stream_history " ..
+      "INNER JOIN streams ON stream_history.stream_id = streams.uid " ..
+      "ORDER BY timestamp DESC;"
+    }
+  },
   search_engine = {
     url = {
       wiktionary = "https://en.wiktionary.org/wiki/%s",

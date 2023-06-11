@@ -338,11 +338,48 @@ dothis = {
         run("qrencode -l M -m 2 -t PNG -o" .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(data))
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
     end,
+    say = function(str, lang)
+      lang = lang or "en"
+      speak:voice(tblmap.lang.voice[lang]):speak(transf.string.folded(str))
+    end,
+  },
+  path = {
+    open_default = function(path, do_after)
+      run("open " .. transf.string.single_quoted_escaped(path), do_after)
+    end,
+    open_app = function(path, app, do_after)
+      run("open -a " .. transf.string.single_quoted_escaped(app) .. " " .. transf.string.single_quoted_escaped(path), do_after)
+    end,
   },
   real_audio_path = {
     play = function(path, do_after)
       run("play " .. transf.string.single_quoted_escaped(path), do_after)
     end
+  },
+  empty_dir = {
+
+  },
+  sqlite_file = {
+    write_to_csv = function(sqlite_file, query, output_path, do_after)
+      run({
+        "sqlite3",
+        {value = sqlite_file, type = "quoted"},
+        "-csv",
+        {value = query, type = "quoted"},
+        ">",
+        {value = output_path, type = "quoted"},
+      }, do_after)
+    end,
+    write_to_csv_cache = function(sqlite_file, query, do_after)
+      dothis.sqlite_file.write_to_csv(
+        sqlite_file, 
+        query, 
+        transf.string.in_cache_dir(
+          query .. "@" .. transf.path.filename(sqlite_file) .. ".csv",
+          "sqlite_csv"
+        )
+      )
+    end,
   },
   audiodevice = {
     set_default = function(device, type)
@@ -358,6 +395,12 @@ dothis = {
       local device = hs.audiodevice.findOutputByName("Built-in Output")
       dothis.audiodevice.ensure_sound_will_be_played(device)
       dothis.audiodevice.set_default(device, "output")
+    end,
+  },
+  source_id = {
+    activate = function(source_id)
+      hs.keycodes.currentSourceID(source_id)
+      hs.alert.show(transf.source_id.language(source_id))
     end,
   }
 

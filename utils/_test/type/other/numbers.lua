@@ -1,40 +1,40 @@
 assertMessage(
-  isNumber(1.6, "int"),
+  is.any.int(1.6),
   false
 )
 
 assertMessage(
-  isNumber(1, "int"),
+  is.any.int(1),
   true
 )
 
 assertMessage(
-  isNumber(-1.6, "neg-int"),
+  is.any.neg_int(-1.6),
   false
 )
 
 assertMessage(
-  isNumber(-1, "neg-int"),
+  is.any.neg_int(-1),
   true
 )
 
 assertMessage(
-  isNumber(1, "neg-int"),
+  is.any.neg_int(1),
   false
 )
 
 assertMessage(
-  isNumber(1.6, "float"),
+  is.any.float(1.6),
   true
 )
 
 assertMessage(
-  isNumber(1, "float"),
+  is.any.float(1),
   true
 )
 
 assertMessage(
-  isNumber(-1.2, "float"),
+  is.any.float(-1.2),
   true
 )
 
@@ -82,21 +82,18 @@ local upper = 179
 
 local randnr1 = rand({low = lower, high = upper})
 
-assertMessage(
-  randnr1 >= lower,
-  true
+assert(
+  randnr1 >= lower
 )
 
-assertMessage(
-  randnr1 <= upper,
-  true
+assert(
+  randnr1 <= upper
 )
 
 local randMustBeInt = rand({low = lower, high = upper})
 
-assertMessage(
-  isNumber(randMustBeInt, "int"),
-  true
+assert(
+  is.number.int(randMustBeInt)
 )
 
 local randMustBeFloat = rand({low = 12.34, high = 12.34})

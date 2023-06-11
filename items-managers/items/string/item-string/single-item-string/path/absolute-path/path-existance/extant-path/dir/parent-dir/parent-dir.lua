@@ -5,13 +5,10 @@ ParentDirItemSpecifier = {
 
     getables = {
       ["children"] = function(self)
-        return itemsInPath(self:get("contents"))
+        return transf.dir_path.children_array(self:get("contents"))
       end,
       ["child-string-array"] = function(self) 
         return CreateArray(self:get("children")) 
-      end,
-      ["find-child"] = function(self, func)
-        return self:get("child-string-array"):get("find", func)
       end,
       ["child-string-item-array"] = function(self) return self:get("child-string-array"):get("to-string-item-array") end,
       ["child-file-only-string-item-array"] = function(self)
@@ -25,9 +22,7 @@ ParentDirItemSpecifier = {
       end,
       ["children-any-pass"] = function(self, query) return self:get("child-string-item-array"):get("some-pass", query) end,
       ["is-grandparent-dir"] = function(self)
-        return self:get("child-string-array"):get("some-pass", function(item)
-          return testPath(item, "dir")
-        end)
+        return is.dir_path.grandparent_dir(self:get("contents"))
       end,
       ["is-parent-but-not-grandparent-dir"] = function(self)
         return not self:get("is-grandparent-dir")
@@ -38,16 +33,6 @@ ParentDirItemSpecifier = {
 --[[       ["is-managed-date-project-dir"] = function(self)
         return self:get("child-string-item-array"):get("is-path-leaf-date-array")
       end, ]] -- currently disabled as converting to a string-item-array in an is-function of a string-item, which gets called during initialization, obviously will cause an infinite loop
-      ["child-filename-only-array"] = function(self)
-        return self:get("child-string-array"):get("map-to-new-array", function(item)
-          return pathSlice(item, "-2:-2", { ext_sep = true })[1]
-        end)
-      end,
-      ["child-leaf-only-array"] = function(self)
-        return self:get("child-string-array"):get("map-to-new-array", function(item)
-          return pathSlice(item, "-1:-1")[1]
-        end)
-      end,
       ["child-ending-with"] = function(self, ending)
         return self:get("child-string-array"):get("find", function(item)
           return stringy.endswith(item, ending)

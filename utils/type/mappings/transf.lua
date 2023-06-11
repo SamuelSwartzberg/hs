@@ -65,6 +65,11 @@ transf = {
       return transf.hex.utf8_unicode_prop_table(transf.number.hex_string(num))
     end,
   },
+  int = {
+    length = function(int)
+      return #tostring(int)
+    end,
+  },
   not_nil = {
     string = function(arg)
       if arg == nil then
@@ -73,6 +78,9 @@ transf = {
         return tostring(arg)
       end
     end,
+  },
+  array = {
+
   },
   char = {
     hex = function(char)
@@ -103,6 +111,86 @@ transf = {
     extension = function(path)
       return pathSlice(path, "-1:-1", refstore.params.path_slice.opts.ext_sep)[1]
     end,
+    filename = function(path)
+      return pathSlice(path, "-2:-2", refstore.params.path_slice.opts.ext_sep)[1]
+    end,
+    ending_with_slash = function(path)
+      return mustEnd(path or "", "/")
+    end,
+    leaf = function(path)
+      return pathSlice(path, "-1:-1")[1]
+    end,
+
+  },
+  path_array = {
+    leaves_array = function(path_array)
+      return hs.fnutils.imap(path_array, transf.path.leaf)
+    end,
+    filenames_array = function(path_array)
+      local filenames = hs.fnutils.imap(path_array, transf.path.filename)
+      return toSet(filenames)
+    end,
+    extensions_array = function(path_array)
+      local extensions = hs.fnutils.imap(path_array, transf.path.extension)
+      return toSet(extensions)
+    end,
+  },
+  dir_path = {
+    children_array = function(dir_path)
+      return itemsInPath(dir_path)
+    end,
+    children_leaves_array = function(dir_path)
+      return transf.path_array.leaves_array(transf.dir_path.children_array(dir_path))
+    end,
+    children_filenames_array = function(dir_path)
+      return transf.path_array.filenames_array(transf.dir_path.children_array(dir_path))
+    end,
+    children_extensions_array = function(dir_path)
+      return transf.path_array.extensions_array(transf.dir_path.children_array(dir_path))
+    end,
+    descendants_array = function(dir_path)
+      return itemsInPath({
+        path = dir_path,
+        recursive = true,
+      })
+    end,
+    descendants_leaves_array = function(dir_path)
+      return transf.path_array.leaves_array(transf.dir_path.descendants_array(dir_path))
+    end,
+    descendants_filenames_array = function(dir_path)
+      return transf.path_array.filenames_array(transf.dir_path.descendants_array(dir_path))
+    end,
+    descendants_extensions_array = function(dir_path)
+      return transf.path_array.extensions_array(transf.dir_path.descendants_array(dir_path))
+    end,
+
+  },
+  
+  path_leaf_parts = {
+    general_name_string = function(path_leaf_parts)
+      if path_leaf_parts["general-name"] then 
+        return "--" .. path_leaf_parts["general-name"]
+      else
+        return ""
+      end
+    end,
+    extension_string = function(path_leaf_parts)
+      if path_leaf_parts["extension"] then 
+        return "." .. path_leaf_parts["extension"]
+      else
+        return ""
+      end
+    end,
+    date_string = function(path_leaf_parts)
+      return path_leaf_parts["date"] or ""
+    end,
+    full_path = function(path_leaf_parts)
+      return transf.path.ending_with_slash(path_leaf_parts.path) 
+      .. transf.path_leaf_parts.date_string(path_leaf_parts)
+      .. transf.path_leaf_parts.general_name_string(path_leaf_parts)
+      .. transf.table.fs_tag_string(path_leaf_parts.tag)
+      .. transf.path_leaf_parts.extension_string(path_leaf_parts)
+    end
   },
   real_audio_path = {
     transcribed = function(path)
@@ -361,6 +449,15 @@ transf = {
       
       return filename
     end,
+    snake_case = function(str)
+      return replace(str, to.case.snake)
+    end,
+    lower_snake_case = function(str)
+      return eutf8.lower(transf.string.snake_case(str))
+    end,
+    upper_snake_case = function(str)
+      return eutf8.upper(transf.string.snake_case(str))
+    end,
 
     --- URL-encodes a string.
     --- @param url string
@@ -393,6 +490,9 @@ transf = {
     end,
     double_quoted_escaped = function(str)
       return ' "' .. memoize(replace)(str, to.string.escaped_double_quote_safe) .. '"'
+    end,
+    envsubsted = function(str)
+      return run("echo " .. transf.string.single_quoted_escaped(str) .. " | envsubst")
     end,
     bits = basexx.to_bit,
     hex = basexx.to_hex,
@@ -438,6 +538,9 @@ transf = {
       else
         return path
       end
+    end,
+    folded = function(str)
+      return eutf8.gsub(str, "\n", " ")
     end,
     
     path_resolved = function(path, resolve_tilde)
@@ -599,6 +702,27 @@ transf = {
       end
       return yamlDumpAligned(template)
 
+    end,
+    event_tagline = function(event_table)
+      local event_table = self:get("contents")
+      local str = event_table.start
+      if event_table["end"] then
+        str = str .. " - " .. event_table["end"]
+      end
+      str = str .. " " .. event_table.calendar .. ":"
+      if event_table.title then
+        str = str .. " " .. event_table.title
+      end
+      if event_table.location then
+        str = str .. " @ " .. event_table.location
+      end
+      if event_table.description then
+        str = str .. " :: " .. event_table.description
+      end
+      if event_table.url then
+        str = str .. " Link: " .. event_table.url
+      end
+      return str
     end
   },
   search_engine = {
@@ -752,6 +876,23 @@ transf = {
       end
       return table.concat(params, "&")
     end,
+    --- @param t { [string]: string }
+    --- @return string
+    email_header = function(t)
+      local header_lines = {}
+      local initial_headers = mt._list.initial_headers
+      for _, header_name in ipairs(initial_headers) do
+        local header_value = t[header_name]
+        if header_value then
+          table.insert(header_lines, join.string.string.email_header(header_name, header_value))
+          t[header_name] = nil
+        end
+      end
+      for key, value in prs(t) do
+        table.insert(header_lines, join.string.string.email_header(key, value))
+      end
+      return table.concat(header_lines, "\n")
+    end,
     curl_form_field_list = function(t)
       local fields = {}
       for k, v in pairs(t) do
@@ -772,6 +913,25 @@ transf = {
     yaml_metadata = function(t)
       local string_contents = yamlDump(t)
       return "---\n" .. string_contents .. "\n---\n"
+    end,
+    fs_tag_array = function(t)
+       local arr = map(
+        t,
+        function(tag_key, tag_value)
+          if type(tag_value) == "table" then tag_value = table.concat(tag_value, ",") end
+          return string.format("%s-%s", tag_key, tag_value)
+        end,
+        {
+          args = "kv",
+          ret = "v",
+          tolist = true,
+        }
+      )
+      table.sort(arr)
+      return arr
+    end,
+    fs_tag_string = function(t)
+      return "%" .. table.concat(transf.table.fs_tag_array(t), "%")
     end,
   },
   timestamp_table = {
@@ -1015,5 +1175,10 @@ transf = {
         return kv[1], kv[2]
       end, {"v", "kv"})
     end
-  }
+  },
+  source_id = {
+    language = function(source_id)
+      return slice(stringy.split(source_id, "."), -1, -1)[1]
+    end,
+  },
 }

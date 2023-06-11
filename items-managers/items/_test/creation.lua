@@ -1012,14 +1012,6 @@ local item_creation_map = {
       must_be = {"input-method"}
     }
   },
-  [CreatePathLeafParts] = {
-    {
-      value = {
-        ["general-name"] = "foo"
-      },
-      must_be = {"path-leaf-parts"}
-    }
-  },
 }
 
 local iters = 0

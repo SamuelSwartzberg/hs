@@ -4,7 +4,7 @@ WhisperFileItemSpecifier = {
   properties = {
     getables = {
       ["transcribed"] = function (self)
-        return transf.real_audio_path.transcribed(self:get("completely-resolved-path"))
+        return (self:get("completely-resolved-path"))
       end
     },
     doThisables = {
@@ -12,17 +12,15 @@ WhisperFileItemSpecifier = {
   },
   potential_interfaces = ovtable.init({
   }),
-  action_table = concat(
-    getChooseItemTable({
-      {
-        emoji_icon = "🗣️➡️📝",
-        description = "trsc",
-        key = "transcribed"
-      }
-    }),{
-      
+  action_table = {
+    {
+      i = "🗣️➡️📝",
+      d = "trsc",
+      filter = CreateStringItem,
+      get = transf.real_audio_path.transcribed,
+      key = "transcribed"
     }
-  ),
+  },
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

@@ -30,8 +30,8 @@ end
 --- Returns a table of all things in a directory
 --- @param opts itemsInPathOpts | string
 --- @param path? string Internal use only. The path to the directory during recursion
---- @param is_recursive_call? boolean Whether this is a recursive call. Allows us to avoid some duplicate work
---- @param depth? integer Internal use only. The current depth of recursion. 
+--- @param is_recursive_call? boolean Whether this is a recursive call. Allows us to avoid some duplicate work.
+--- @param depth? integer Internal use only. The current depth of recursion.  
 --- @param seen_paths? string[] Internal use only. A table of paths we have already seen. Used to avoid infinite recursion
 --- @return string[] #A table of all things in the directory
 function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)

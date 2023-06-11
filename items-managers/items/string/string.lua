@@ -46,7 +46,7 @@ StringItemSpecifier = {
         return mustNotStart(self:get("contents"), prefix)
       end,
       ["difference-from-prefix-or-nil"] = function(self, prefix)
-        if not self:get("starts-with", prefix) then return nil end
+        if not stringy.startswith(self:get("contents"), prefix) then return nil end
         return eutf8.sub(self:get("contents"), eutf8.len(prefix) + 1)
       end,
       ["difference-from-suffix-or-self"] = function(self, suffix) 
@@ -88,7 +88,7 @@ StringItemSpecifier = {
         return run(parts)
       end,
       ["fold"] = function(self)
-        return eutf8.gsub(self:get("contents"), "\n", " ")
+        return transf.string.folded(self:get("contents"))
       end,
       ["template-evaluated-contents"] = function (self)
         return le(self:get("contents"))
@@ -130,12 +130,7 @@ StringItemSpecifier = {
         return get.khal.search_event_tables(self:get("fold"))
       end,
       ["envsubst"] = function(self)
-        return run({
-          "echo", 
-          {value = self:get("contents"), type = "quoted"},
-          "|",
-          "envsubst"
-        })
+        return transf.string.envsubsted(self:get("contents"))
       end,
       ["qr-utf8-image-bow"] = function(self)
         return transf.string.qr_utf8_image_bow(self:get("contents"))
@@ -162,7 +157,7 @@ StringItemSpecifier = {
         self:doThis("paste-result-of-get", {key = "contents"})
       end,
       ["say"] = function(self, lang)
-        speak:voice(tblmap.lang.voice[lang]):speak(self:get("fold"))
+        dothis.string.say(self:get("contents"), lang)
       end,
       ["add-to-log"] = function(self, path)
         CreateStringItem(path):doThis("log-now", self:get("contents"))

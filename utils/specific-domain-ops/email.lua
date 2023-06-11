@@ -1,44 +1,9 @@
---- @param header_name string
---- @param header_value string
---- @return string
-function buildEmailHeader(header_name, header_value)
-  return string.format("%s: %s", replace(header_name, to.case.capitalized), le(header_value))
-end
-
-
---- @param headers { [string]: string }
---- @return string
-function buildEmailHeaders(headers)
-  local header_lines = {}
-  local initial_headers = {"from", "to", "cc", "bcc", "subject"}
-  for _, header_name in ipairs(initial_headers) do
-    local header_value = headers[header_name]
-    if header_value then
-      table.insert(header_lines, buildEmailHeader(header_name, header_value))
-      headers[header_name] = nil
-    end
-  end
-  for key, value in prs(headers) do
-    table.insert(header_lines, buildEmailHeader(key, value))
-  end
-  return table.concat(header_lines, "\n")
-end
-
---- @param headers { [string]: string }
---- @param body string
---- @return string
-function buildEmail(headers, body)
-  local header = buildEmailHeaders(headers)
-  local mail = string.format("%s\n\n%s", header, body)
-  return mail
-end
-
 --- @param headers { [string]: string }
 --- @param body string
 --- @param edit_func? fun(mail: string, do_after: fun(mail: string))
 --- @param do_after fun(mail: string)
 function buildEmailInteractive(headers, body, edit_func, do_after)
-  local mail = buildEmail(headers, body)
+  local mail = join.string.table.email(headers, body)
   edit_func = edit_func  or function(mail, do_after)
     do_after(mail)
   end

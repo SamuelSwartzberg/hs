@@ -13,7 +13,7 @@ TitleUrlApplicationItemSpecifier = {
     doThisables = {
       ["backup-application"] = function(self)
         self:doThis("pre-backup", function()
-          self:get("str-item", "backup-sqlite"):doThis("write-history-to-csv", function()
+          dothis.sqlite_file.write_to_csv(self:get("backup-sqlite"), tblmap.application.history_sql_query[self:get("contents")], self:get("backup-csv-file-path"), function()
             local hist_csv = self:get("str-item", "backup-csv-file-path")
             local new = hist_csv:get("rows-after-using-last-access", true)
             if new then 

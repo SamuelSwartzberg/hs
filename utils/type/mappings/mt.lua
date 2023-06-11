@@ -150,6 +150,7 @@ mt = {
     mullvad_states ={
       "Connected", "Disconnected"
     },
+    initial_headers = {"from", "to", "cc", "bcc", "subject"},
     datelib = {
       gettable_units  = { "date", "year", "isoyear", "month", "yearday", "weekday", "isoweekday", "weeknum", "isoweeknum", "day", "time", "hours", "minutes", "seconds", "fracs", "ticks" },
       addable_units = { "years", "months", "days", "hours", "minutes", "seconds", "ticks" }

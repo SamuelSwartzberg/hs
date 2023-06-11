@@ -60,9 +60,8 @@ RunningApplicationItemSpecifier = {
         return self:get("str-item", {key = "relevant-application-relative-dir", args = "SESSIONS"}):get("descendant-string-item-array")
       end,
       ["relevant-sessions"] = function(self)
-        return self
-          :get("relevant-application-relative-sessions")
-          :get("with-appended", 
+        return glue(self
+          :get("relevant-application-relative-sessions"):get("contents"), 
             CreateStringItem(env.MSESSIONS .. "/global"):get("descendant-string-item-array")
           )
       end,

@@ -9,18 +9,18 @@ PathLeafSpecifier = {
         return pathSlice(self:get("resolved-path", "-1:-1"))[1]
       end,
       ["to-path-leaf-parts"] = function(self)
-        return CreatePathLeafParts({
+        return {
           ["general-name"] = self:get("path-leaf-general-name"),
           tag = self:get("path-leaf-tags"),
           extension = self:get("path-leaf-extension"),
           path = self:get("parent-dir-path"),
           date = self:get("path-leaf-date"),
-        })
+        }
       end,
       ["with-path-leaf-part-substituted"] = function(self, specifier)
         local parts = self:get("to-path-leaf-parts")
-        parts:get("contents")[specifier.key] = specifier.value
-        return parts:get("path-leaf-parts-as-string")
+        parts[specifier.key] = specifier.value
+        return transf.path_leaf_parts.full_path(parts)
       end,
       
       ["path-leaf-no-date"] = function(self)

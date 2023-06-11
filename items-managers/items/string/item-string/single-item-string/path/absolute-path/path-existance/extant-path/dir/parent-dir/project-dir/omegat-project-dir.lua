@@ -220,7 +220,8 @@ OmegatProjectDirItemSpecifier = {
   
       end,
       ["file-rechnung"] = function(self)
-        local rechnung_target = CreateStringItem(env.MDIARY .. "/moments/work"):get("find-child", function(child) return stringy.endswith(child, "translation") end) .. "/rechnungen"
+        local rechnung_target = get.dir_path.find_child(env.MDIARY .. "/moments/work", {_stop =  "translation"}) .. "/rechnungen"
+
         self:get("str-item", "rechnung-pdf-path"):doThis("move-into-dir", rechnung_target)
       end,
       ["file-source-and-target"] = function(self)
@@ -230,7 +231,7 @@ OmegatProjectDirItemSpecifier = {
         for i, odt_pair in ipairs(odts) do 
           for j, odt in ipairs(odt_pair) do
             local client = self:get("local-data-object").client
-            local path = CreatePathLeafParts({
+            local path = transf.path_leaf_parts.full_path({
               date = os.date(tblmap.dt_component.rfc3339["day"]),
               path = env.MDIARY .. "/i_made_this/translations/",
               ["general-name"] = pathSlice(odt:get("completely-resolved-path"), "-2:-2", { ext_sep = true })[1],
@@ -240,7 +241,7 @@ OmegatProjectDirItemSpecifier = {
                 n = i,
                 tcrea = j == 1 and client or "me"
               }
-            }):get("path-leaf-parts-as-string")
+            })
             odt:doThis("move-safe",  path)
           end
         end

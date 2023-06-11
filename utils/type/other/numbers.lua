@@ -1,45 +1,7 @@
---- @param val any
---- @param mode? "num" | "int" | "pos-int" | "neg-int" | "float"
---- @return boolean
-function isNumber(val, mode)
-  mode = mode or "num"
-  if type(val) == "number" then
-    if math.floor(val) == val then -- is int
-      if val > 0 then
-        if mode == "neg-int" then
-          return false
-        else
-          return true
-        end
-      elseif val < 0 then
-        if mode == "pos-int" then
-          return false
-        else
-          return true
-        end
-      else
-        if mode == "pos-int" or mode == "neg-int" then
-          return false
-        else
-          return true
-        end
-      end
-    else
-      if mode == "num" or mode == "float" then
-        return true
-      else 
-        return false
-      end
-    end
-  else
-    return false
-  end
-end
-
 --- @param val integer
 --- @return integer
 function lengthOfInt(val)
-  if isNumber(val, "int") then
+  if is.any.int(val) then
     return #tostring(val)
   else
     error("Value is not an integer")
@@ -76,8 +38,8 @@ function rand(spec, type)
   if 
     spec.len or
     (
-      (not spec.low or isNumber(spec.low, "int")) and
-      (not spec.high or isNumber(spec.high, "int"))
+      (not spec.low or is.number.int(spec.low)) and
+      (not spec.high or is.number.int(spec.high))
     )
   then
     type = type or "int"
