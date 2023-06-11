@@ -14,7 +14,7 @@ SingleItemStringItemSpecifier = {
     },
     getables = {
       ["is-url"] = function(self) return memoize(isUrl)(self:get("contents")) end,
-      ["is-path"] = function(self) return memoize(looksLikePath)(self:get("contents")) end,
+      ["is-path"] = function(self) return memoize(is.string.looks_like_path)(self:get("contents")) end,
       ["is-printable-ascii-string-item"] = function(self) 
         return memoize(onig.find)(self:get("contents"), mt._r.charset.printable_ascii)
       end,

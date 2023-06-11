@@ -32,7 +32,7 @@ MenuItemTableSpecifier = {
         return self:get("contents").AXMenuItemCmdChar
       end,
       ["modifier-symbols-and-hotkey-str"] = function (self)
-        return shortcutToString(self:get("modifiers"), self:get("hotkey"))
+        return join.modifier_array.key.shortcut_string(self:get("modifiers"), self:get("hotkey"))
       end,
         
       

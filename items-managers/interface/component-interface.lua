@@ -170,7 +170,7 @@ InterfaceDefaultTemplate = {
         }
       end,
       ["chooser-text"] = function(self)
-        return surroundByStartEndMarkers(self:get("to-string"))
+        return transf.string.with_styled_start_end_markers(self:get("to-string"))
       end,
       ["chooser-subtext"] = function(self)
         local chooser_subtext_parts = self:get_all("chooser-subtext-part")

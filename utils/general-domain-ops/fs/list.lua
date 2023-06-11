@@ -83,7 +83,7 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
     end
   end
 
-  local remote = pathIsRemote(path)
+  local remote = is.path.remote(path)
 
   local lister
   if not remote then

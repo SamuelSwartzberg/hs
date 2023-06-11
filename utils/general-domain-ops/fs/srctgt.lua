@@ -40,8 +40,8 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   -- check if path is remote, customize things accordingly
 
-  local source_is_remote = pathIsRemote(source)
-  local target_is_remote = pathIsRemote(target)
+  local source_is_remote = is.path.remote(source)
+  local target_is_remote = is.path.remote(target)
   local has_remote_path = source_is_remote or target_is_remote
 
   -- resolve relative_to
@@ -53,7 +53,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
         root = relative_to,
       },
       t = {
-        prefix = pathIsRemote(target) and "hsftp:" or nil
+        prefix = is.path.remote(target) and "hsftp:" or nil
       }
     })
   end

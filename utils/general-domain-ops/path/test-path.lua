@@ -22,7 +22,7 @@ function testPath(path, opts)
   end
   path = path or env.HOME
   path = transf.string.path_resolved(path, true)
-  local remote = pathIsRemote(path)
+  local remote = is.path.remote(path)
 
   local results = {}
 

@@ -6,7 +6,7 @@
 function readFile(path, mode)
   path = transf.string.path_resolved(path, true)
   mode = mode or "nil"
-  local path_is_remote = pathIsRemote(path)
+  local path_is_remote = is.path.remote(path)
   if not path_is_remote then 
     local file = io.open(path, "r")
     if file ~= nil then

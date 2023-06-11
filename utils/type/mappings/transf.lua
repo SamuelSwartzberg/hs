@@ -571,6 +571,14 @@ transf = {
     ruby_annotated_kana = function(str)
       return gpt("Add kana readings to this text as <ruby> annotations, including <rp> fallback: " .. str, {temperature = 0})
     end,
+    --- @param str string
+    --- @return hs.styledtext
+    with_styled_start_end_markers = function(str)
+      local res =  hs.styledtext.new("^" .. str .. "$")
+      res = styleText(res, { style = "light", starts = 1, ends = 1 })
+      res = styleText(res, { style = "light", starts = #res, ends = #res})
+      return res
+    end
   },
   event_table = {
     calendar_template = function(event_table)
@@ -592,6 +600,15 @@ transf = {
       return yamlDumpAligned(template)
 
     end
+  },
+  search_engine = {
+    action_table_item = function(search_engine)
+      return {
+        text = string.format("%s🔎 s%s.", tblmap.search_engine.emoji_icon[search_engine], tblmap.search_engine.short[search_engine]),
+        key = "search-with",
+        args = search_engine
+      }
+    end,
   },
   multiline_string = {
     trimmed_lines = function(str)
@@ -756,6 +773,27 @@ transf = {
       local string_contents = yamlDump(t)
       return "---\n" .. string_contents .. "\n---\n"
     end,
+  },
+  timestamp_table = {
+    --- transforms a timestamp-key orderedtable into a table of the structure [yyyy] = { [yyyy-mm] = { [yyyy-mm-dd] = { [hh:mm:ss, ...] } } }
+    --- @param timestamp_key_table orderedtable
+    --- @return { [string]: { [string]: { [string]: string[] } } }
+    ymd_table = function(timestamp_key_table)
+      local year_month_day_time_table = {}
+      for timestamp_str, fields in prs(timestamp_key_table,-1,1,-1) do 
+        local timestamp = tonumber(timestamp_str)
+        local year = os.date("%Y", timestamp)
+        local year_month = os.date("%Y-%m", timestamp)
+        local year_month_day = os.date("%Y-%m-%d", timestamp)
+        local time = os.date("%H:%M:%S", timestamp)
+        if not year_month_day_time_table[year] then year_month_day_time_table[year] = {} end
+        if not year_month_day_time_table[year][year_month] then year_month_day_time_table[year][year_month] = {} end
+        if not year_month_day_time_table[year][year_month][year_month_day] then year_month_day_time_table[year][year_month][year_month_day] = {} end
+        local contents = concat({time}, fields)
+        table.insert(year_month_day_time_table[year][year_month][year_month_day], contents)
+      end
+      return year_month_day_time_table
+    end
   },
   url_components = {
     url = function(comps)

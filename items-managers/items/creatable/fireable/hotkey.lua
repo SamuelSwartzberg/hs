@@ -19,7 +19,7 @@ HotkeyItemSpecifier = {
         return self:get("specifier").key
       end,
       ["to-string"] = function(self)
-        local shortcut_str = shortcutToString(self:get("mods"), self:get("key"))
+        local shortcut_str = join.modifier_array.key.shortcut_string(self:get("mods"), self:get("key"))
         local pre_colon_str = shortcut_str
         local mnemonic = self:get("mnemonic")
         if mnemonic then

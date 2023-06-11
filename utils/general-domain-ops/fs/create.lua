@@ -9,7 +9,7 @@ function createPath(path, slice, fail)
     --- @cast sliced string
     resolved_path = sliced
   end
-  local remote = pathIsRemote(resolved_path)
+  local remote = is.path.remote(resolved_path)
   local succ, res = pcall(function()
     if not remote then
       run({"mkdir -p '" .. resolved_path .. "'"})
@@ -42,7 +42,7 @@ function writeFile(path, contents, condition, create_path, mode, fail)
   path = transf.string.path_resolved(path, true)
   fail = defaultIfNil(fail, "nil")
 
-  local path_is_remote = pathIsRemote(path)
+  local path_is_remote = is.path.remote(path)
 
   local parent_path = pathSlice(path, {start = 1, stop = -2}, {rejoin_at_end = true})
 

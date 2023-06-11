@@ -19,7 +19,7 @@ PrintableAsciiStringItemSpecifier = {
         return stringy.find(contents, "@") and stringy.find(contents, ".") and not eutf8.find(contents, "%s")
       end,
       ["is-phone-number"] = function(self)
-        return isPotentiallyPhoneNumber(self:get("contents"))
+        return is.string.potentially_phone_number(self:get("contents"))
       end,
       ["is-digit-string"] = function(self) return onig.find(self:get("contents"), "^-?[0-9a-fA-F]*[\\.,]?[0-9a-fA-F]+$") end,
       ["is-date-related-item"] = function(self) 

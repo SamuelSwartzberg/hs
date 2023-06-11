@@ -21,7 +21,7 @@ GrandparentDirItemSpecifier = {
       end,
       ["all-git-roots"] = function(self)
         return CreateArray(map(
-          itemsInPath({path = self:get("contents"), recursion = 4, include_files = false, validator_result = isGitRootDir}),
+          itemsInPath({path = self:get("contents"), recursion = 4, include_files = false, validator_result = is.path.git_root_dir}),
           function(git_dir)
             return CreateStringItem(git_dir)
           end

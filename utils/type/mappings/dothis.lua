@@ -304,7 +304,6 @@ dothis = {
         },
       },do_after)
     end,
-
   },
   sox = {
     rec_start = function(path, do_after)

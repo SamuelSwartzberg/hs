@@ -16,7 +16,7 @@ ArrayOfNoninterfacesSpecifier = {
             text = formatted_item
           end
           return {
-            text = surroundByStartEndMarkers(text),
+            text = transf.string.with_styled_start_end_markers(text),
             value = item
           }
         end) 

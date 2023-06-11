@@ -1,7 +1,4 @@
 local rrq = bindArg(relative_require, "utils._test.specific-domain-ops")
-
-
-rrq("parse")
 rrq("build-chooser")
 rrq("component-interface")
 rrq("do-with-temp-file")
@@ -15,5 +12,3 @@ rrq("process-date-specification")
 rrq("quick-path-checks")
 rrq("sync-home-relative-path")
 rrq("tags")
-rrq("timestamp-key-table-to-ymd-table")
-rrq("urlencode")

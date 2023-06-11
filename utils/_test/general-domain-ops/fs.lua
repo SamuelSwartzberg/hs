@@ -5,12 +5,12 @@ delete(env.HSFTP_TMPDIR .. "/foo/")
 
 
 assertMessage(
-  pathIsRemote("/Applications"),
+  is.path.remote("/Applications"),
   false
 )
 
 assertMessage(
-  pathIsRemote("foo:/bar"),
+  is.path.remote("foo:/bar"),
   true
 )
 

@@ -3,10 +3,10 @@ HomogeneousValueTableSpecifier = {
   properties = {
     getables = {
       ["is-interface-value-table"] = function (self)
-        return valueIsComponentInterface(self:get("first-value"))
+        return is.any.component_interface(self:get("first-value"))
       end,
       ["is-noninterface-value-table"] = function (self)
-        return not valueIsComponentInterface(self:get("first-value"))
+        return not is.any.component_interface(self:get("first-value"))
       end,
     },
     doThisables = {

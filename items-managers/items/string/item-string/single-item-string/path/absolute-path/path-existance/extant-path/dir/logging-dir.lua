@@ -15,7 +15,7 @@ LoggingDirSpecifier = {
     },
     doThisables = {
       ["log-timestamp-table"] = function(self, timestamp_table)
-        local ymd_array_table = timestampKeyTableToYMDTable(timestamp_table)
+        local ymd_array_table = transf.timestamp_table.ymd_table(timestamp_table)
         self:doThis("table-to-fs", {
           payload = ymd_array_table,
           mode = "write",

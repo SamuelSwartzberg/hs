@@ -5,6 +5,20 @@ is = {
         memoize(run)("upkg list-package-managers")
       ), {_exactly = str})
     end,
+    potentially_phone_number = function(str)
+      if #str > 16 then return false end
+      local _, amount_of_digits = eutf8.gsub(str, "%d", "")
+      local _, amount_of_non_digits = eutf8.gsub(str, "%D", "")
+      local digit_non_digit_ratio = amount_of_digits / amount_of_non_digits
+      return digit_non_digit_ratio > 0.5
+    end,
+    looks_like_path = function(str)
+      return 
+        str:find("/") ~= nil
+        and str:find("[\n\t\r\f]") == nil
+        and str:find("^%s") == nil
+        and str:find("%s$") == nil
+      end
   },
   uuid = {
     contact = function(uuid)
@@ -40,7 +54,17 @@ is = {
     end,
     has_extension = function(path)
       return transf.path.extension(path) ~= ""
-    end
+    end,
+    remote = function(path)
+      return not not path:find("^[^/:]-:") 
+    end,
+    git_root_dir = function(path)
+      return find(itemsInPath({
+        path = path,
+        recursion = false,
+        validator = returnTrue
+      }), {_stop = ".git"})
+    end,
     
   },
   alphanum_minus_underscore = {
@@ -84,5 +108,9 @@ is = {
       return stringy.startswith(media_type, "image/")
     end,
   },
-  
+  any = {
+    component_interface = function(val)
+      return type(val) == "table" and val.is_interface == true
+    end,
+  }
 }

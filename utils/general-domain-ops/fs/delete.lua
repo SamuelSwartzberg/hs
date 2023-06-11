@@ -20,7 +20,7 @@ function delete(path, thing, action, onlyif, fail)
 
   -- set local vars
 
-  local path_is_remote = pathIsRemote(path)
+  local path_is_remote = is.path.remote(path)
   local exists = testPath(path)
 
   -- return early if path doesn't exist

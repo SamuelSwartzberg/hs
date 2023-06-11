@@ -173,10 +173,8 @@ StringItemSpecifier = {
       ["search-with"] = function(self, search_engine)
         open(
           string.format(
-            self:get('fold'), 
-            transf.string.urlencoded(
-              g_search_engines[search_engine].url, g_search_engines[search_engine].spaces_percent
-            )
+            tblmap.search_engine.url[search_engine],
+            transf.string.urlencoded(self:get("fold"), tblmap.search_engine.spaces_percent[search_engine])
           )
         )
       end,
@@ -357,7 +355,10 @@ StringItemSpecifier = {
       key = "qr-utf8-image-wob"
     }
   }),
-  getSearchEngineActionTable(g_search_engines))
+  hs.fnutils.imap(
+    mt._list.search_engine_names,
+    transf.search_engine.action_table_item
+  ))
 }
 
 --- @type BoundRootInitializeInterface
