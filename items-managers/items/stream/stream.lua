@@ -23,7 +23,7 @@ function CreateStreamItem(specified_contents)
           return self:get("c").initial_stream_config[key]
         end,
         ["initial-urls-to-string-item-array"] = function(self)
-          return CreateArray(self:get("initial-data", "urls"))
+          return ar(self:get("initial-data", "urls"))
         end,
         ["summary-line-plain"] = function(self)
           return string.format(

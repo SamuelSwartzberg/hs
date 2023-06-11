@@ -1,6 +1,6 @@
 local format_map = tblmap.date_format_name.date_format
 local formats = keys(format_map)
-local format_array = CreateArray(formats)
+local format_array = ar(formats)
 
 
 
@@ -99,7 +99,7 @@ DateSpecifier = {
       ["event-items-between"] = function(self, specifier)
         specifier["end"] = specifier["end"] or self:get("c"):copy():adddays(30)
         local startdt, enddt = table.unpack(self:get("start-end", specifier))
-        return CreateArray({
+        return ar({
           CreateDate(startdt),
           CreateDate(enddt)
         }):get("map-to-event-items")
@@ -219,7 +219,7 @@ DateSpecifier = {
         open(CreateStringItem(env.MENTRY_LOGS):get("log-for-date", self:get("c")))
       end,
       ["choose-surrounding-day"] = function(self, amount)
-        CreateArray(self:get(
+        ar(self:get(
           "surrounding-days-range",
           amount
         )):doThis("choose-item-and-then-action")

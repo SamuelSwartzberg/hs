@@ -127,7 +127,7 @@ EmailFileItemSpecifier = {
         }, true)
       end,
       ["choose-save-act-on-attachment"] = function(self)
-        CreateArray(self:get("attachments")):doThis("choose-item", function(attachment)
+        ar(self:get("attachments")):doThis("choose-item", function(attachment)
           self:doThis("download-attachment", attachment)
           local path = mustEnd(env.TMPDIR, "/") .. attachment
           local file = CreateStringItem(path)
@@ -148,7 +148,7 @@ EmailFileItemSpecifier = {
         })
       end,
       ["choose-involved-email"] = function(self)
-        CreateArray(self:get("involved-email-addresses")):doThis("choose-item", function(email)
+        ar(self:get("involved-email-addresses")):doThis("choose-item", function(email)
           CreateStringItem(email):doThis("choose-action")
         end)
       end,

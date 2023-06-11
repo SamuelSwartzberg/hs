@@ -15,7 +15,7 @@ ExtantPathItemSpecifier = {
           or path_leaf:match("^(%d[^%%]+)") 
       end, 
       ["get-ancestor-string-array"] = function(self)
-        return CreateArray(pathSlice(self:get("completely-resolved-path"), "1:-2", { entire_path_for_each = true }))
+        return ar(pathSlice(self:get("completely-resolved-path"), "1:-2", { entire_path_for_each = true }))
       end,
       ["is-in-git-dir-path"] = function(self) 
         return find(
@@ -42,13 +42,13 @@ ExtantPathItemSpecifier = {
         return run(self:get("cd-and-this-task", task))
       end,
       ["sibling-string-array"] = function(self)
-        return CreateArray(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2"))
+        return ar(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2"))
       end,
       ["sibling-file-only-string-array"] = function(self)
-        return CreateArray(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2", { include_dirs = false }))
+        return ar(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2", { include_dirs = false }))
       end,
       ["sibling-dir-only-string-array"] = function(self)
-        return CreateArray(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2", { include_files = false }))
+        return ar(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2", { include_files = false }))
       end,
       ["find-sibling"] = function(self, func)
         return self:get("sibling-string-array"):get("find", function(sibling)

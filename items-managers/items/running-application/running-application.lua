@@ -28,7 +28,7 @@ RunningApplicationItemSpecifier = {
         return self:get("c"):allWindows()
       end,
       ["all-windows-array"] = function(self)
-        return CreateArray(self:get("all-windows"))
+        return ar(self:get("all-windows"))
       end,
       ["find-window"] = function(self, titlePattern)
         return self:get("c"):findWindow(titlePattern)

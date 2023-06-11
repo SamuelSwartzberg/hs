@@ -10,7 +10,7 @@ get = {
       return memoize(run)("mullvad relay list")
     end,
     flat_relay_array = function()
-      return CreateArray(
+      return ar(
         flatten(
           transf.multiline_string.relay_table(
             get.mullvad.relay_list_raw()

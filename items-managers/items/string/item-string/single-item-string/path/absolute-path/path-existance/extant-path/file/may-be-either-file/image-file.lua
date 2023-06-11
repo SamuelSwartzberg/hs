@@ -33,7 +33,7 @@ ImageFileItemSpecifier = {
         dothis.pass.add_otp_url(transf.real_image_path.qr_data(self:get("completely-resolved-path")), name)
       end,
       ["shrink"] = function(self)
-        local shrink_specifier_array = CreateArray(map( {
+        local shrink_specifier_array = ar(map( {
           { type = "image", format = "png" },
           { type = "image", format = "jpg" },
           { type = "image", format = "png", resize = true },

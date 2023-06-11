@@ -61,7 +61,7 @@ YoutubePlayableItemItemSpecifier = {
         writeFile(transf.path_leaf_parts.full_path(specifier), self:get("c"))
       end,
       ["to-stream"] = function(self, specifier)
-        return CreateArray({self.root_super}):doThis("to-stream", specifier)
+        return ar({self.root_super}):doThis("to-stream", specifier)
       end,
     }
   },

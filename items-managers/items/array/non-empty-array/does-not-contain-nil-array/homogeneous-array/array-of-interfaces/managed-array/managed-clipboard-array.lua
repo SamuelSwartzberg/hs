@@ -39,6 +39,6 @@ ManagedClipboardArraySpecifier = {
 CreateManagedClipboardArray = bindArg(NewDynamicContentsComponentInterface, ManagedClipboardArraySpecifier)
 
 function CreateManagedClipboardArrayDirectly()
-  local managed_clipboard_array = CreateArray({}, "clipboard")
+  local managed_clipboard_array = ar({}, "clipboard")
   return managed_clipboard_array
 end

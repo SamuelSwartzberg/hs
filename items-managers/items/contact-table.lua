@@ -158,7 +158,7 @@ ContactTableSpecifier = {
       ["do-bank-deets-array"] = function(self, do_after)
         local iban = self:get("iban")
         CreateStringItem(iban):doThis("get-iban-api-data", function(data)
-          local bank_deets_array = CreateArray({
+          local bank_deets_array = ar({
             self:get("full-name"),
             iban,
             data.bic

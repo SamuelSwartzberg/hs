@@ -24,7 +24,7 @@ comp = fsTree(env.MCOMPOSITE, "as-tree")
 
 require("items-managers")
 
-projectDirsArray = CreateArray(itemsInPath({path = env.ME, recursion = 2, include_files = false})):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)
+projectDirsArray = ar(itemsInPath({path = env.ME, recursion = 2, include_files = false})):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)
 
 
 envTable = CreateTable(env)
@@ -67,7 +67,7 @@ local keymap = {
   a_use, {
     explanation = "Choose contact and action on that contact (from local vcf files)",
     fn = function()
-      CreateArray(
+      ar(
         memoize(get.khard.all_contact_tables)
       ):doThis("choose-item-and-then-action") 
     end,
@@ -96,14 +96,14 @@ local keymap = {
   ["7"] = {
     explanation = "Switch ·to a different mullvad server",
     fn = function ()
-      CreateArray(get.mullvad.flat_relay_array)
+      ar(get.mullvad.flat_relay_array)
         :doThis("choose-item", dothis.mullvad.relay_set)
     end
   },
   ["8"] = {
     explanation = "Choose a email in your inbox and action on it",
     fn = function()
-      CreateArray(getSortedEmailPaths(env.MBSYNC_INBOX, true))
+      ar(getSortedEmailPaths(env.MBSYNC_INBOX, true))
         :get("to-string-item-array")
         :doThis("choose-email-and-then-action")
     end,
@@ -152,7 +152,7 @@ local keymap = {
           elseif stringy.startswith(val, "mpick") then
             results = getSortedEmailPaths(env.MBSYNC_ARCHIVE, true, nil, true_val)
           end
-          CreateArray(results)
+          ar(results)
             :get("to-string-item-array")
             :doThis("choose-email-and-then-action-parallel")
         end)
@@ -215,7 +215,7 @@ local keymap = {
   p = {
     explanation = "Choose a pass and fill it",
     fn = function()
-      CreateArray(
+      ar(
         map(itemsInPath(env.MPASSPASSW), function(fl) return pathSlice(fl, "-2:-2", { ext_sep = true })[1] end)
       ):doThis("choose-item-and-then-action")
     end,

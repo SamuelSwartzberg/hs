@@ -15,7 +15,7 @@ M3uFileItemSpecifier = {
             System:get("manager", "stream")
               :doThis(
                 "create", 
-                { initial_data = { urls = CreateArray({CreateStringItem(url)})}}
+                { initial_data = { urls = ar({CreateStringItem(url)})}}
               )
         end)
         self:doThis("empty-file")

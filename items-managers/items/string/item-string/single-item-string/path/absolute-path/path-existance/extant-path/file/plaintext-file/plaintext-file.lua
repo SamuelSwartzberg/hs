@@ -43,7 +43,7 @@ PlaintextFileItemSpecifier = {
         return self:get("str-item", "file-contents"):get("to-array-of-string-arrays", { upper = "\n", lower = "\t" })
       end,
       ["to-line-array"] = function(self) 
-        return CreateArray(stringx.splitlines(self:get("file-contents")))
+        return ar(stringx.splitlines(self:get("file-contents")))
       end,
       ["descendants-to-line-array"] = function(self) return self:get("to-line-array") end, -- polymorphic implementation
       ["is-m3u-file"] = function(self)
@@ -113,7 +113,7 @@ PlaintextFileItemSpecifier = {
       end,
       ["choose-item-remove-and-choose-action"] = function(self, splitter)
         local parts = stringx.split(self:get("file-contents"), splitter)
-        CreateArray(parts):doThis("choose-item", function(part)
+        ar(parts):doThis("choose-item", function(part)
           parts = filter(parts, {
             _exactly = part,
             _invert = true,

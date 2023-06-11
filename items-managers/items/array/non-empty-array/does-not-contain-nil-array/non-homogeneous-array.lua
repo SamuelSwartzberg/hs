@@ -30,8 +30,8 @@ NonHomogeneousArraySpecifier = {
     },
     doThisables = {
       ["continue-with-chosen-homogeneous-array"] = function(self, callback)
-        CreateArray(keys(self:get("to-map-of-homogeneous-arrays"))):doThis("choose-item", function(chosen_item)
-          local homogeneous_array = CreateArray(self:get("to-homogeneous-array-of-type", chosen_item.text))
+        ar(keys(self:get("to-map-of-homogeneous-arrays"))):doThis("choose-item", function(chosen_item)
+          local homogeneous_array = ar(self:get("to-homogeneous-array-of-type", chosen_item.text))
           callback(homogeneous_array)
         end)
       end,

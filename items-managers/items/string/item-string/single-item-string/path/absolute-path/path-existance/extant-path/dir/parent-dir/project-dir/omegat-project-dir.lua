@@ -203,7 +203,7 @@ OmegatProjectDirItemSpecifier = {
         
       end,
       ["send-rechnung-email"] = function(self)
-        CreateArray(
+        ar(
           getSortedEmailPaths(env.MBSYNC_ARCHIVE, true, "from:" .. self:get("local-data-object").email)
         )
           :get("to-string-item-array")

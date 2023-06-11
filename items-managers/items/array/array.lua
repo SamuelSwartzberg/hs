@@ -20,7 +20,7 @@ ArraySpecifier = {
   
 }
 
-function CreateArray(contents, managed_array_type)
+function ar(contents, managed_array_type)
   if contents == nil then contents = {} end
   local interface_specifier = ArraySpecifier 
   if managed_array_type then 

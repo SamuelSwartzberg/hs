@@ -38,7 +38,7 @@ IcsFileItemSpecifier = {
     },
     doThisables = {
       ["add-events-to-calendar"] = function(self)
-        CreateArray(get.khal.writeable_calendars()):doThis("choose-item", function(calendar)
+        ar(get.khal.writeable_calendars()):doThis("choose-item", function(calendar)
           dothis.khal.add_event_from_file(calendar, self:get("c"))
         end)
       end,

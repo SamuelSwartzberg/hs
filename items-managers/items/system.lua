@@ -4,7 +4,7 @@ SystemSpecifier = {
   properties = {
     getables = {
       ["all-non-root-volumes-string-array"] = function()
-        local volume_arr = CreateArray(filter(
+        local volume_arr = ar(filter(
           keys(hs.fs.volume.allVolumes()),
           {
             _exactly = "/",
@@ -21,7 +21,7 @@ SystemSpecifier = {
         return self:get("all-non-root-volumes-string-array"):get("to-string-item-array")
       end,
       ["all-devices-of-type-audiodevice-array"] = function(self, subtype)
-        return CreateArray(map(
+        return ar(map(
           values(
             hs.audiodevice["all" .. replace(subtype, to.case.capitalized) .. "Devices"]()
           ),
@@ -36,7 +36,7 @@ SystemSpecifier = {
       end,
       ["all-windows-array"] = function(self)
         local all_windows_raw = hs.window.filter.default:getWindows()
-        return CreateArray(map(
+        return ar(map(
           all_windows_raw,
           CreateWindowlikeItem
         ))

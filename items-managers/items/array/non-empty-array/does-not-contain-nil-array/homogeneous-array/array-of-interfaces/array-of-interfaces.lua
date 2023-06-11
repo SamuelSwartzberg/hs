@@ -6,13 +6,13 @@ ArrayOfInterfacesSpecifier = {
         return self:get("first"):get("all-queriable-properties")
       end,
       ["all-queriable-properties-to-string-array"] = function(self)
-        return CreateArray(self:get("all-queriable-properties"))
+        return ar(self:get("all-queriable-properties"))
       end,
       ["all-possible-values"] = function(self, key)
         return toSet(self:get("map", function(item) return item:get(key) end))
       end,
       ["all-possible-values-to-string-array"] = function(self, key)
-        return CreateArray(self:get("all-possible-values", key))
+        return ar(self:get("all-possible-values", key))
       end,
       ["item-by-id"] = function (self, id)
         return self:get("find", function(item) return item:get("id") == id end)

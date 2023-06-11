@@ -25,6 +25,6 @@ ManagedInputMethodArraySpecifier = {
 CreateManagedInputMethodArray = bindArg(NewDynamicContentsComponentInterface, ManagedInputMethodArraySpecifier)
 
 function CreateManagedInputMethodArrayDirectly()
-  local managed_inputmethod_array = CreateArray({}, "input-method")
+  local managed_inputmethod_array = ar({}, "input-method")
   return managed_inputmethod_array
 end

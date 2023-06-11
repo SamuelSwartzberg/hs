@@ -26,7 +26,7 @@ DirItemSpecifier = {
       
       -- the following methods can be implemented here, even though we don't know yet if we have descendants or only children, since we implement self:get("descendant-string-array") polymorphically, and as such getting 'descendants' actually gets children if there are no descendants
       ["descendant-string-array"] = function(self) 
-        return CreateArray(self:get("descendants")) end,
+        return ar(self:get("descendants")) end,
       ["descendant-string-item-array"] = function(self) 
         return self:get("descendant-string-array"):get("to-string-item-array") 
       end,

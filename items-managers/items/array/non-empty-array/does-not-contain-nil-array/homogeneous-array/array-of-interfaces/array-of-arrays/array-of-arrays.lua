@@ -15,7 +15,7 @@ ArrayOfArraysSpecifier = {
         end
       end,
       ["column"] = function(self, n) return self:get("map", function(row) return row:get("nth-element", n) end) end,
-      ["column-to-new-array"] = function(self, n) return CreateArray(self:get("column", n)) end,
+      ["column-to-new-array"] = function(self, n) return ar(self:get("column", n)) end,
       ["columns"] = function(self) 
         local row_length = self:get("row-length")
         local columns = {}
@@ -24,9 +24,9 @@ ArrayOfArraysSpecifier = {
         end
         return columns
       end,
-      ["columns-to-new-array"] = function(self) return CreateArray(self:get("columns")) end,
+      ["columns-to-new-array"] = function(self) return ar(self:get("columns")) end,
       ["column-range"] = function(self, specifier) return self:get("columns-to-new-array"):get("range", specifier) end,
-      ["column-range-to-new-array"] = function(self, specifier) return CreateArray(self:get("column-range", specifier)) end,
+      ["column-range-to-new-array"] = function(self, specifier) return ar(self:get("column-range", specifier)) end,
       
     },
     doThisables = {

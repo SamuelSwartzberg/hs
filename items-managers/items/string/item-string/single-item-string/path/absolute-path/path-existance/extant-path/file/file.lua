@@ -19,7 +19,7 @@ FileItemSpecifier = {
         return stringy.strip(readFile(self:get("c"), "error"))
       end,
       ["descendant-file-only-string-item-array"] = function(self)
-        return CreateArray({self.root_super})
+        return ar({self.root_super})
       end,
       ["cd-and-task"] = function(self)
         return self:get("cd-to-parent-dir-and-task")

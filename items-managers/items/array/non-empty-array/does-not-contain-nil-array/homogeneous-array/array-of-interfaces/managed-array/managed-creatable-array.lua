@@ -23,6 +23,6 @@ ManagedCreatableArraySpecifier = {
 CreateManagedCreatableArray = bindArg(NewDynamicContentsComponentInterface, ManagedCreatableArraySpecifier)
 
 function CreateManagedCreatableArrayDirectly()
-  local managed_creatable_array = CreateArray({}, "creatable")
+  local managed_creatable_array = ar({}, "creatable")
   return managed_creatable_array
 end

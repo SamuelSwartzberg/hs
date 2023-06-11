@@ -7,7 +7,7 @@ MailtoURLItemSpecifier = {
         return get.mailto_url.first_email(self:get("c"))
       end,
       ["emails-array"] = function (self)
-        return CreateArray(transf.mailto_url.emails(self:get("c")))
+        return ar(transf.mailto_url.emails(self:get("c")))
       end,
       ["mailto-subject"] = function (self)
         return get.mailto_url.subject(self:get("c"))

@@ -23,7 +23,7 @@ SingleItemStringItemSpecifier = {
         return res
       end,
       ["synonyms-av-to-array"] = function(self)
-        return CreateArray(transf.word.synonyms.array_av(self:get("c")))
+        return ar(transf.word.synonyms.array_av(self:get("c")))
       end,
       ["synonyms-th-to-array"] = function(self)
         return transf.array_of_tables.item_array_of_item_tables(

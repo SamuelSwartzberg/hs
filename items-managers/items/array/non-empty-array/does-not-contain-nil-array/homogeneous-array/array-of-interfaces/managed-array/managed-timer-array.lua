@@ -32,7 +32,7 @@ ManagedTimerArraySpecifier = {
 CreateManagedTimerArray = bindArg(NewDynamicContentsComponentInterface, ManagedTimerArraySpecifier)
 
 function CreateManagedTimerArrayDirectly()
-  local managed_timer_array = CreateArray({}, "timer")
+  local managed_timer_array = ar({}, "timer")
 
   managed_timer_array:doThis("create", {
     interval = "*/10 * * * * *",

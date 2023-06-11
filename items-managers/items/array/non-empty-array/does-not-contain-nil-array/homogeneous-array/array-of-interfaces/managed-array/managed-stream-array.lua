@@ -35,7 +35,7 @@ CreateManagedStreamArray = bindArg(NewDynamicContentsComponentInterface, Managed
 
 --- @type BoundRootInitializeInterface
 function CreateManagedStreamArrayDirectly(timer_manager)
-  local managed_stream_array = CreateArray({}, "stream")
+  local managed_stream_array = ar({}, "stream")
   timer_manager:doThis("create", {
     interval = "*/3 * * * * *",
     low_impact = true,

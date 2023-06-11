@@ -8,7 +8,7 @@ ParentDirItemSpecifier = {
         return transf.dir_path.children_array(self:get("c"))
       end,
       ["child-string-array"] = function(self) 
-        return CreateArray(self:get("children")) 
+        return ar(self:get("children")) 
       end,
       ["child-string-item-array"] = function(self) return self:get("child-string-array"):get("to-string-item-array") end,
       ["child-file-only-string-item-array"] = function(self)
@@ -18,7 +18,7 @@ ParentDirItemSpecifier = {
         return self:get("child-string-item-array"):get("filter-to-array-of-dirs")
       end,
       ["raw-child-string-array"] = function(self)
-        return CreateArray(itemsInPath(self:get("c")))
+        return ar(itemsInPath(self:get("c")))
       end,
       ["children-any-pass"] = function(self, query) return self:get("child-string-item-array"):get("some-pass", query) end,
       ["is-grandparent-dir"] = function(self)

@@ -21,13 +21,13 @@ NonEmptyArraySpecifier = {
       end,
       ["range"] = function(self, specifier) return slice(self:get("c"), specifier) end,
       ["range-to-new-array"] = function(self, specifier)
-        return CreateArray(self:get("range", specifier))
+        return ar(self:get("range", specifier))
       end,
       ["map"] = function(self, callback)
         return map(self:get("c"), callback)
       end,
       ["map-to-new-array"] = function(self, callback)
-        return CreateArray(self:get("map", callback))
+        return ar(self:get("map", callback))
       end,
       ["sorted"] = function(self, callback)
         local res = copy(self:get("c"), false)
@@ -35,13 +35,13 @@ NonEmptyArraySpecifier = {
         return res
       end,
       ["sorted-to-new-array"] = function(self, callback)
-        return CreateArray(self:get("sorted", callback))
+        return ar(self:get("sorted", callback))
       end,
       ["reverse"] = function(self)
         return rev(self:get("c"))
       end,
       ["reverse-to-new-array"] = function(self)
-        return CreateArray(self:get("reverse"))
+        return ar(self:get("reverse"))
       end,
       ["revsorted"] = function(self, callback)
         local res = copy(self:get("c"), false)
@@ -49,7 +49,7 @@ NonEmptyArraySpecifier = {
         return rev(res)
       end,
       ["revsorted-to-new-array"] = function(self, callback)
-        return CreateArray(self:get("revsorted", callback))
+        return ar(self:get("revsorted", callback))
       end,
       ["revsorted-to-new-array-default"] = function(self)
         return self:get("sorted-to-new-array-default"):get("reverse-to-new-array")
@@ -58,11 +58,11 @@ NonEmptyArraySpecifier = {
         return filter(self:get("c"), callback)
       end,
       ["filter-to-new-array"] = function(self, callback)
-        local res = CreateArray(self:get("filter", callback))
+        local res = ar(self:get("filter", callback))
         return res
       end,
       ["filter-to-unique-array"]= function(self)
-        return CreateArray(toSet(self:get("c")))
+        return ar(toSet(self:get("c")))
       end,
       ["find"] = function(self, callback)
         return find(self:get("c"), callback)
@@ -124,17 +124,17 @@ NonEmptyArraySpecifier = {
         return new_arr
       end,
       ["flatten-to-new-array"] = function(self)
-        return CreateArray(self:get("flatten"))
+        return ar(self:get("flatten"))
       end,
       ["flat-map"] = function(self, callback)
         local res = map(self:get("c"), callback, {flatten = true})
-        return CreateArray(res)
+        return ar(res)
       end,
       ["filter-nil-map"] = function(self, callback)
         return fixListWithNil(map(self:get("c"), callback))
       end,
       ["filter-nil-map-to-new-array"] = function(self, callback)
-        return CreateArray(self:get("filter-nil-map", callback))
+        return ar(self:get("filter-nil-map", callback))
       end,
 
     },

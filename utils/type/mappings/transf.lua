@@ -833,7 +833,7 @@ transf = {
   },
   array_of_tables = {
     item_array_of_item_tables = function(arr)
-      return CreateArray(map(
+      return ar(map(
         arr,
         function (arr)
           return CreateTable(arr)
@@ -843,7 +843,7 @@ transf = {
   },
   array_of_strings = {
     item_array_of_string_items = function(arr)
-      return CreateArray(hs.fnutils.imap(
+      return ar(hs.fnutils.imap(
         arr,
         CreateStringItem
       ))
@@ -861,7 +861,7 @@ transf = {
   },
   array_of_event_tables = {
     item_array_of_event_table_items = function(arr)
-      return CreateArray(hs.fnutils.imap(
+      return ar(hs.fnutils.imap(
         arr,
         CreateEventTableItem
       ))

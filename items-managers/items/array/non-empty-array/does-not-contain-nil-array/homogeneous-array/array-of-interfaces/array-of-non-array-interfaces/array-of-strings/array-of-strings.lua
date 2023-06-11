@@ -12,7 +12,7 @@ ArrayOfStringItemsSpecifier = {
       ["joined-string-contents-with-no-blank-lines"] = function(self) return self:get("to-string-array"):get("joined-string-contents-with-no-blank-lines") end,
       ["to-joined-string-item-with-no-blank-lines"] = function(self) return CreateStringItem(self:get("to-string-array"):get("joined-string-contents-with-no-blank-lines")) end,
       ["to-resplit-string-item-array-assume-sep"] = function(self, sep)
-        return CreateArray(
+        return ar(
           map(
             self:get("c"),
             function (strItem) 

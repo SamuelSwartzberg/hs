@@ -36,7 +36,7 @@ PassNameItemSpecifier = {
         return self:get("pass-username") or env.MAIN_EMAIL
       end,
       ["username-and-password-as-string-array"] = function(self)
-        return CreateArray({
+        return ar({
           self:get("pass-username"),
           self:get("pass-passw") or ""
         })

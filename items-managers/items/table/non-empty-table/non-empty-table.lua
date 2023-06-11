@@ -6,7 +6,7 @@ NonEmptyTableSpecifier = {
         return keys(self:get("c"))
       end,
       ["keys-to-new-array"] = function(self)
-        return CreateArray(self:get("keys"))
+        return ar(self:get("keys"))
       end,
       ["value"] = function(self, key)
         return self:get("c")[key]
@@ -26,13 +26,13 @@ NonEmptyTableSpecifier = {
         return values(self:get("c"))
       end,
       ["values-to-new-array"] = function(self)
-        return CreateArray(self:get("values"))
+        return ar(self:get("values"))
       end,
       ["pairs"] = function(self)
         return map(self:get("c"), function(k,v) return false, {k,v} end, "kv")
       end,
       ["pairs-to-new-array"] = function(self)
-        return CreateArray(self:get("pairs"))
+        return ar(self:get("pairs"))
       end,
       ["first-key"] = function(self)
         return self:get("keys")[1]
@@ -116,10 +116,10 @@ NonEmptyTableSpecifier = {
         return map(self:get("values"), callback)
       end,
       ["map-keys-to-new-array"] = function(self, callback)
-        return CreateArray(self:get("map-keys", callback))
+        return ar(self:get("map-keys", callback))
       end,
       ["map-values-to-new-array"] = function(self, callback)
-        return CreateArray(self:get("map-values", callback))
+        return ar(self:get("map-values", callback))
       end,
       ["map-to-flat-path-dot-table"] = function(self)
         return CreateTable(flatten(self:get("c"), {

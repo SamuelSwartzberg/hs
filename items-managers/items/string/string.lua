@@ -21,13 +21,13 @@ StringItemSpecifier = {
       ["is-might-be-xml-item"] = function(self) return startsEndsWithFast(self:get("c"), "<", ">") end,
       ["is-might-be-bib-item"] =function(self) return startsEndsWithFast(self:get("c"), "@", "}") end,
       ["to-string-array"] = function(self, sep) 
-        return CreateArray(stringy.split(self:get("c"), sep)) 
+        return ar(stringy.split(self:get("c"), sep)) 
       end,
       ["to-string-item-array"] = function(self, sep) return self:get("to-string-array", sep):get("to-string-item-array") end,
       ["to-array-of-string-arrays"] = function(self, seps)
         return self:get("to-string-array", seps.upper):get("map-to-new-array", 
         function(line) 
-          return CreateArray(stringy.split(line, seps.lower))
+          return ar(stringy.split(line, seps.lower))
         end)
       end,
       ["to-string"] = function(self)
@@ -107,13 +107,13 @@ StringItemSpecifier = {
         return iterToTbl({tolist=true, ret="v"},eutf8.gmatch(self:get("c"), pattern))
       end,
       ["extract-utf8-array"] = function(self, pattern)
-        return CreateArray(self:get("extract-utf8", pattern))
+        return ar(self:get("extract-utf8", pattern))
       end,
       ["extract-onig"] = function(self, pattern)
         return iterToTbl({tolist=true, ret="v"},onig.gmatch(self:get("c"), pattern))
       end,
       ["extract-onig-array"] = function(self, pattern)
-        return CreateArray(self:get("extract-onig", pattern))
+        return ar(self:get("extract-onig", pattern))
       end,
       ["extract-utf8-first"] = function(self, pattern)
         local res = eutf8.match(self:get("c"), pattern)

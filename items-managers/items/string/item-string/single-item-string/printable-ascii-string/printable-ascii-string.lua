@@ -50,7 +50,7 @@ PrintableAsciiStringItemSpecifier = {
         return get.upkg.is_installed(mgr, self:get("c"))
       end,
       ["with-version-package-manager-array"] = function(self, mgr)
-        return CreateArray(get.upkg.with_version_package_manager(mgr, self:get("c")))
+        return ar(get.upkg.with_version_package_manager(mgr, self:get("c")))
       end,
 
     },

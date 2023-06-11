@@ -566,7 +566,7 @@ local item_creation_map = {
     }
   },
 
-  [CreateArray] = {
+  [ar] = {
     {
       value = {},
       must_be = { "array", "empty-array" },
@@ -742,7 +742,7 @@ local item_creation_map = {
       must_not_be = { "array-of-youtube-playlists" }
     },
     {
-      value = { CreateArray({1, 2}), CreateArray({3, 4}) },
+      value = { ar({1, 2}), ar({3, 4}) },
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-arrays" },
       must_not_be = { "empty-array", "non-homogeneous-array", "array-of-non-array-interfaces" }
     },

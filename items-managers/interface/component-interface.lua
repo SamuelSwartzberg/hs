@@ -235,12 +235,12 @@ InterfaceDefaultTemplate = {
       ),
       ["array"] = bind(
         getThenUse, {a_use, a_use, function (_, contents)
-          return CreateArray(contents)
+          return ar(contents)
         end}
       ),
       ["new-array-from-result-of-get"] = bind(
         getThenUse, {a_use, a_use, function (_, contents)
-          return CreateArray(contents)
+          return ar(contents)
         end}
       ),
       ["get-interactive"] = function(self, specifier)

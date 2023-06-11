@@ -13,6 +13,6 @@ function getMenuItemList(application_name)
     v.application = application
   end
   local mapped_to_items = map(filtered, function (v) return CreateTable(v) end)
-  local res =  CreateArray(mapped_to_items)
+  local res =  ar(mapped_to_items)
   return res
 end
