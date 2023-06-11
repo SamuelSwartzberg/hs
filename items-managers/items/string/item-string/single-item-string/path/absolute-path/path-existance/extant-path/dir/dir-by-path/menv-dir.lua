@@ -19,7 +19,7 @@ MenvDirItemSpecifier = {
     },
     doThisables = {
       ["write-env-file"] = function(self)
-        local envfile_string_item = CreateStringItem(env.ENVFILE)
+        local envfile_string_item = st(env.ENVFILE)
         envfile_string_item:doThis("overwrite-file-contents", self:get("all-env-vars"))
         if envfile_string_item:get("has-warnings") then
           error("Envfile had errors: \n" .. envfile_string_item:get("lint-simple-text", "warning"))

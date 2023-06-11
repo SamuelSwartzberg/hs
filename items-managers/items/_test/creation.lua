@@ -17,7 +17,7 @@ error("Temp stop foo")
 
 --- @type { [function]: TestSpecifier[] }
 local item_creation_map = {
-  [CreateStringItem] = {
+  [st] = {
     {
       value = "foo/bar",
       must_be = { "string", "single-item-string", "path", "relative-path" },
@@ -596,26 +596,26 @@ local item_creation_map = {
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-noninterfaces", "array-of-strings" },
     },
     {
-      value = { CreateStringItem("1"), CreateStringItem("2") },
+      value = { st("1"), st("2") },
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item" },
       must_not_be = { "empty-array", "non-homogeneous-array", "array-of-noninterfaces" }
     },
     {
       value = { 
-        CreateStringItem("/foo"), CreateStringItem("bar/baz")
+        st("/foo"), st("bar/baz")
       },
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis" },
       must_not_be = { "array-of-absolute-paths", "array-of-urls" }
     },
     {
-      value = { CreateStringItem("/foo"), CreateStringItem("/home/user/bar/baz")},
+      value = { st("/foo"), st("/home/user/bar/baz")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-absolute-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis" },
       must_not_be = { "array-of-extant-paths" }
     },
     {
       value = {
-        CreateStringItem(env.DESKTOP),
-        CreateStringItem(env.DOWNLOADS),
+        st(env.DESKTOP),
+        st(env.DOWNLOADS),
       },
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis", "array-of-dirs"},
       must_not_be = { "array-of-files" }
@@ -626,8 +626,8 @@ local item_creation_map = {
         writeFile(TMPDIR_NOW .. "test-array-of-files-2")
       end,
       value = {
-        CreateStringItem(TMPDIR_NOW .. "test-array-of-files-1"),
-        CreateStringItem(TMPDIR_NOW .. "test-array-of-files-2"),
+        st(TMPDIR_NOW .. "test-array-of-files-1"),
+        st(TMPDIR_NOW .. "test-array-of-files-2"),
       },
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis", "array-of-files"},
       must_not_be = { "array-of-dirs" }
@@ -635,20 +635,20 @@ local item_creation_map = {
     },
     {
       value = {
-        CreateStringItem(env.MENV),
-        CreateStringItem(env.MDOTCONFIG)
+        st(env.MENV),
+        st(env.MDOTCONFIG)
       },
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis", "array-of-dirs", "array-of-git-root-dirs", "array-of-in-git-dir-paths"},
     },
     {
       value = {
-        CreateStringItem(
+        st(
           itemsInPath({
             path = env.MENV,
             include_dirs = false,
           })[1]
         ),
-        CreateStringItem(
+        st(
           itemsInPath({
             path = env.MDOTCONFIG,
             include_dirs = false,
@@ -664,34 +664,34 @@ local item_creation_map = {
         writeFile(TMPDIR_NOW .. "test-array-of-plaintext-dictionary-files.json")
       end,
       value = {
-        CreateStringItem(TMPDIR_NOW .. "test-array-of-plaintext-dictionary-files.yaml"),
-        CreateStringItem(TMPDIR_NOW .. "test-array-of-plaintext-dictionary-files.json"),
+        st(TMPDIR_NOW .. "test-array-of-plaintext-dictionary-files.yaml"),
+        st(TMPDIR_NOW .. "test-array-of-plaintext-dictionary-files.json"),
       },
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-extant-paths", "array-of-paths", "array-of-path-leafs", "array-of-printable-asciis", "array-of-files", "array-of-plaintext-files", "array-of-plaintext-dictionary-files"},
     },
     {
-      value = {CreateStringItem("/Volumes/foo"), CreateStringItem("/Volumes/bar")},
+      value = {st("/Volumes/foo"), st("/Volumes/bar")},
       must_be = {"array-of-absolute-paths", "array-of-volumes"},
     },
     {
-      value = {CreateStringItem("foo"), CreateStringItem("bar\0baz")},
+      value = {st("foo"), st("bar\0baz")},
       must_not_be = { "array-of-printable-asciis" }
     },
     {
-      value = {CreateStringItem("a_b-c"), CreateStringItem("def")},
+      value = {st("a_b-c"), st("def")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-printable-asciis", "array-of-alphanum-minus-underscores" },
       must_not_be = { "array-of-alphanum-minuss" }
     },
     {
-      value = {CreateStringItem("b-c"), CreateStringItem("2022-02")},
+      value = {st("b-c"), st("2022-02")},
       must_be = { "array-of-alphanum-minuss" },
       must_not_be = { "array-of-date-relateds" }
     },
     {
       value = {
-        CreateStringItem("15af8992-7b9b-094d-a363-1cdb45a90f5f"),
-        CreateStringItem("2c05471a-2970-45c4-81f2-44f79566b432"),
-        CreateStringItem("123e4567-e89b-12d3-a456-426614174000"),
+        st("15af8992-7b9b-094d-a363-1cdb45a90f5f"),
+        st("2c05471a-2970-45c4-81f2-44f79566b432"),
+        st("123e4567-e89b-12d3-a456-426614174000"),
       },
       must_be = { "array", "non-empty-array", "homogeneous-array",  "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-printable-asciis", "array-of-alphanum-minus-underscores","array-of-alphanum-minuss",
       "array-of-uuids"
@@ -700,8 +700,8 @@ local item_creation_map = {
     },
     {
       value = {
-        CreateStringItem("15af8992-7b9b-094d-a363-1cdb45a90f5f"),
-        CreateStringItem("2c05471a-2970-45c4-81f2-44f79566b432"),
+        st("15af8992-7b9b-094d-a363-1cdb45a90f5f"),
+        st("2c05471a-2970-45c4-81f2-44f79566b432"),
       },
       must_be = { "array", "non-empty-array", "homogeneous-array",  "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-printable-asciis", "array-of-alphanum-minus-underscores","array-of-alphanum-minuss",
       "array-of-uuids",
@@ -709,35 +709,35 @@ local item_creation_map = {
       },
     },
     {
-      value = {CreateStringItem("2022-02-01"), CreateStringItem("2022-02-02T08:00")},
+      value = {st("2022-02-01"), st("2022-02-02T08:00")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-printable-asciis", "array-of-date-relateds" },
     },
     {
-      value = {CreateStringItem("dsc"), CreateStringItem("ma"), CreateStringItem("uniqlo")},
+      value = {st("dsc"), st("ma"), st("uniqlo")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-printable-asciis", "array-of-pass-names", "array-of-pass-passws" },
       must_not_be = { "array-of-pass-otps" }
     },
     {
-      value = {CreateStringItem("dsc"), CreateStringItem("ma")},
+      value = {st("dsc"), st("ma")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-printable-asciis", "array-of-pass-names", "array-of-pass-passws" , "array-of-pass-otps" }
     },
     {
-      value = {CreateStringItem("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), CreateStringItem("https://www.google.com")},
+      value = {st("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), st("https://www.google.com")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-urls", "array-of-urls-by-host" },
       must_not_be = { "array-of-youtubes" }
     },
     {
-      value = {CreateStringItem("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), CreateStringItem("https://www.youtube.com/playlist?list=PLYlndC1jl8s3_Sy4zCIU77wQv1zQs38qX"), CreateStringItem("https://www.youtube.com")},
+      value = {st("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), st("https://www.youtube.com/playlist?list=PLYlndC1jl8s3_Sy4zCIU77wQv1zQs38qX"), st("https://www.youtube.com")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-urls", "array-of-urls-by-host", "array-of-youtubes" },
       must_not_be = { "array-of-youtube-playables" }
     },
     {
-      value = {CreateStringItem("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), CreateStringItem("https://www.youtube.com/playlist?list=PLYlndC1jl8s3_Sy4zCIU77wQv1zQs38qX"),},
+      value = {st("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), st("https://www.youtube.com/playlist?list=PLYlndC1jl8s3_Sy4zCIU77wQv1zQs38qX"),},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-urls", "array-of-urls-by-host", "array-of-youtubes", "array-of-youtube-playables" },
       must_not_be = {  "array-of-youtube-videos" }
     },
     {
-      value = {CreateStringItem("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), CreateStringItem("https://www.youtube.com/watch?v=QH2-TGUlwu4")},
+      value = {st("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), st("https://www.youtube.com/watch?v=QH2-TGUlwu4")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-strings-item", "array-of-urls", "array-of-urls-by-host", "array-of-youtubes", "array-of-youtube-playables", "array-of-youtube-videos" },
       must_not_be = { "array-of-youtube-playlists" }
     },
@@ -924,7 +924,7 @@ local item_creation_map = {
       must_not_be = { "empty-table", "heterogeneous-value-table", "homogeneous-key-table",  "homo-k-hetero-v-table", "homo-k-homo-v-table", "hetero-k-hetero-v-table"}
     },
     {
-      value = { [false] = CreateStringItem("haiiro") },
+      value = { [false] = st("haiiro") },
       must_be = { "table", "non-empty-table", "homogeneous-key-table", "homogeneous-value-table", "homo-k-homo-v-table", "interface-value-table" },
       must_not_be = { "empty-table", "heterogeneous-value-table"}
     },
@@ -934,7 +934,7 @@ local item_creation_map = {
       must_not_be = { "empty-table", "homogeneous-value-table", "homogeneous-key-table",  "homo-k-homo-v-table", "hetero-k-homo-v-table", "homo-k-hetero-v-table"}
     },
     {
-      value = { foo = CreateStringItem("foo"), quuz = CreateStringItem("cute") },
+      value = { foo = st("foo"), quuz = st("cute") },
       must_be = { "table", "non-empty-table", "homogeneous-key-table", "homogeneous-value-table", "homo-k-homo-v-table", "string-key-table", "str-key-interface-value-table" },
       must_not_be = { "empty-table", "heterogeneous-value-table", "heterogeneous-key-table",  "homo-k-hetero-v-table", "hetero-k-homo-v-table", "hetero-k-hetero-v-table"}
     },

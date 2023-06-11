@@ -97,7 +97,7 @@ SignalItemSpecifier = {
       --- @param self ItemSpecifier
       --- @param func function
       ["foreach-chat"] = function(self, func)
-        CreateStringItem(env.TMP_SIGNAL_EXPORT_PARENT):get("child-dir-only-string-item-array"):doThis("for-all", func)
+        st(env.TMP_SIGNAL_EXPORT_PARENT):get("child-dir-only-string-item-array"):doThis("for-all", func)
       end,
       ["pre-process-chat-messages-hook"] = function (self, chat_obj)
         -- annoyingly, the attachments object in a given message json object doesn't include the name of the attachment (just a hash of something), so we need to create a map of (mimetypes to) filesizes (!) to filenames, since the attachment object does include a filesize field and it is fairly likely that no two attachments will have the same filesize in bytes, especially if we control for file type

@@ -10,10 +10,10 @@ DecimalIdItemSpecifier = {
         return "https://danbooru.donmai.us/posts/" .. self:get("decimal-numeric-value")
       end,
       ["get-gelbooru-url-string-item"] = function(self)
-        return CreateStringItem(self:get("get-gelbooru-url"))
+        return st(self:get("get-gelbooru-url"))
       end,
       ["get-danbooru-url-string-item"] = function(self)
-        return CreateStringItem(self:get("get-danbooru-url"))
+        return st(self:get("get-danbooru-url"))
       end,
     },
     doThisables = { }

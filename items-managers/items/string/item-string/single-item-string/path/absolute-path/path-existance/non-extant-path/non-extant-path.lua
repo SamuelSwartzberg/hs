@@ -23,7 +23,7 @@ NonExtantPathItemSpecifier = {
         
       ["table-to-fs-children-dispatch"] = function(self, specifier)
         for k, v in fastpairs(specifier.payload) do
-          local child  = CreateStringItem(self:get("path-ensure-final-slash") .. k)
+          local child  = st(self:get("path-ensure-final-slash") .. k)
           specifier.payload = v
           child:doThis("table-to-fs", specifier)
         end

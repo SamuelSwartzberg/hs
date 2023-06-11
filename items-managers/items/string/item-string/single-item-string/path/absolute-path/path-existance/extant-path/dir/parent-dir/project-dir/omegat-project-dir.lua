@@ -210,7 +210,7 @@ OmegatProjectDirItemSpecifier = {
           :doThis("to-summary-line-body-path-table-parallel", function(table)
             table:doThis("choose-item", function(_, choice)
 
-              CreateStringItem(choice.value)
+              st(choice.value)
                 :doThis(
                   "email-reply-interactive", 
                   self:get("rechnung-email")
@@ -265,7 +265,7 @@ OmegatProjectDirItemSpecifier = {
       end,
       ["specific-initialize"] = function(self)
         self:doThis("create-default-data-yaml")
-        CreateStringItem(self:get("local-data-object-path")):doThis("edit-file-interactive", function()
+        st(self:get("local-data-object-path")):doThis("edit-file-interactive", function()
           self:doThis("pull-omegat")
           self:doThis("do-interactive", {
             thing = "Initial source document name",

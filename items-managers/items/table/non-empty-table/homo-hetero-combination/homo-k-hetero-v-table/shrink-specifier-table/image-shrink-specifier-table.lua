@@ -15,7 +15,7 @@ ImageShrinkSpecifierTableSpecifier = {
         return multiplier
       end,
       ["result-file"] = function(self)
-        return CreateStringItem(self:get("value", "result"))
+        return st(self:get("value", "result"))
       end,
       ["score"] = function(self)
         return self:get("value", "size") * self:get("multiplier")

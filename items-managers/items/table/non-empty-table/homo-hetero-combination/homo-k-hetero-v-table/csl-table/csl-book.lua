@@ -12,7 +12,7 @@ CslBookSpecifier = {
           "ISBN: " .. (self:get("value", "ISBN") or "No ISBN")
       end,
       ["to-citable-object-id"] = function(self)
-        return CreateStringItem(self:get("value", "ISBN"))
+        return st(self:get("value", "ISBN"))
       end,
     },
     doThisables = {

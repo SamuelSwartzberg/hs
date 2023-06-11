@@ -127,11 +127,11 @@ ExtantPathItemSpecifier = {
       end,
       ["move-safe-and-choose-action"] = function(self, target)
         self:doThis("move-safe", target)
-        CreateStringItem(target):doThis("choose-action")
+        st(target):doThis("choose-action")
       end,
       ["move-force-and-choose-action"] = function(self, target)
         self:doThis("move-force", target)
-        CreateStringItem(target):doThis("choose-action")
+        st(target):doThis("choose-action")
       end,
       ["move-up-and-choose-action"] = function(self)
         self:doThis("move-safe-and-choose-action", self:get("parent-dir-path"))
@@ -144,11 +144,11 @@ ExtantPathItemSpecifier = {
       end,
       ["copy-safe-and-choose-action"] = function(self, target)
         self:doThis("copy-safe", target)
-        CreateStringItem(target):doThis("choose-action")
+        st(target):doThis("choose-action")
       end,
       ["copy-force-and-choose-action"] = function(self, target)
         self:doThis("copy-force", target)
-        CreateStringItem(target):doThis("choose-action")
+        st(target):doThis("choose-action")
       end,
       ["rename"] = function(self, new_name)
         local new_path = self:get("parent-dir-path") .. "/" .. new_name
@@ -159,18 +159,18 @@ ExtantPathItemSpecifier = {
       end,
       ["zip-and-choose-action"] = function(self, target_path)
         srctgt("zip", self:get("c"), target_path, function(target)
-          CreateStringItem(target):doThis("choose-action")
+          st(target):doThis("choose-action")
         end)
       end,
       ["send-in-email-and-choose-action"] = function(self)
         self:doThis("send-in-email", function(target)
-          CreateStringItem(target):doThis("choose-action")
+          st(target):doThis("choose-action")
         end)
       end,
       ["create-sibling-file-and-choose-action"] = function(self, filename)
         local path = self:get("parent-dir-path") .. "/" .. filename
         writeFile(path, "", "not-exists")
-        CreateStringItem(path):doThis("choose-action")
+        st(path):doThis("choose-action")
       end,
 
     }

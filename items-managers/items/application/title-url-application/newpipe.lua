@@ -7,7 +7,7 @@ NewpipeItemSpecifier = {
         return env.NEWPIPE_STATE_DIR .. "/newpipe.db"
       end,
       ["backup-sqlite-file-string-item"] = function(self)
-        return CreateStringItem(self:get("backup-sqlite"))
+        return st(self:get("backup-sqlite"))
       end,
       ["backup-csv-file-path"] = function(self)
         return env.TMP_NEWPIPE_HISTORY_CSV

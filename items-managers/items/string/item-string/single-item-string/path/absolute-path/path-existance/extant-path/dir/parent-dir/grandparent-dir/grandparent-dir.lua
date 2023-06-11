@@ -23,7 +23,7 @@ GrandparentDirItemSpecifier = {
         return ar(map(
           itemsInPath({path = self:get("c"), recursion = 4, include_files = false, validator_result = is.path.git_root_dir}),
           function(git_dir)
-            return CreateStringItem(git_dir)
+            return st(git_dir)
           end
         ))
       end,

@@ -35,13 +35,13 @@ ArrayOfEmailFilesSpecifier = {
       ["choose-email-and-then-action-parallel"] = function(self)
         self:doThis("to-summary-line-path-table-parallel", function(table)
           table:doThis("choose-value-act-on-key", function(email)
-            CreateStringItem(email):doThis("choose-action")
+            st(email):doThis("choose-action")
           end)
         end)
       end,
       ["choose-email-and-then-action"] = function(self)
         self:get("to-summary-line-path-table"):doThis("choose-value-act-on-key", function(email)
-          CreateStringItem(email):doThis("choose-action")
+          st(email):doThis("choose-action")
         end)
       end,
 

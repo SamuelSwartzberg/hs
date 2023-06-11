@@ -24,7 +24,7 @@ LatexProjectDirItemSpecifier = {
       end,
       ["latex-imports-as-string-item-array"] = function(self)
         return self:get("str-item", { key = "latex-importfile-to-string-item" }):get("to-line-array"):get("map-to-new-array", function(line)
-          return CreateStringItem(line)
+          return st(line)
         end)
       end,
       ["local-build-task"] = function() -- minimal implementation, may be expanded later

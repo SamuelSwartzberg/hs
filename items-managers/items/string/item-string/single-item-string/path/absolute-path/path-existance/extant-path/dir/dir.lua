@@ -58,7 +58,7 @@ DirItemSpecifier = {
         end)
       end,
       ["descendant-ending-with-to-string-item"] = function(self, ending)
-        return CreateStringItem(self:get("descendant-ending-with", ending))
+        return st(self:get("descendant-ending-with", ending))
       end,
 
       ["find-or-create-child-dir"] = function(self, specifier)
@@ -96,10 +96,10 @@ DirItemSpecifier = {
         }
       end,
       ["related-path-gui"] = function(self)
-        return CreateStringItem(prompt("dir", self:get("c")))
+        return st(prompt("dir", self:get("c")))
       end,
       ["related-path-with-subdirs-gui"] = function(self)
-        return CreateStringItem(promptPathChildren(self:get("c") .. "/"))
+        return st(promptPathChildren(self:get("c") .. "/"))
       end,
       ["ls"] = function (self)
         return run({"ls", "-F", "-1", { value = self:get("completely-resolved-path"), type = "quoted" }})
@@ -126,7 +126,7 @@ DirItemSpecifier = {
       end,
       ["create-child-as-project-dir"] = function(self, specifier)
         self:doThis("create-empty-dir-in-dir", specifier.name)
-        CreateStringItem(self:get("completely-resolved-path") .. "/" .. specifier.name):doThis("initalize-as-project-dir", specifier.type)
+        st(self:get("completely-resolved-path") .. "/" .. specifier.name):doThis("initalize-as-project-dir", specifier.type)
       end,
       ["create-file-with-contents"] = function(self, specifier)
         local path = self:get("path-ensure-final-slash") .. specifier.name
@@ -151,7 +151,7 @@ DirItemSpecifier = {
             end
           end
 
-          local child = CreateStringItem(self:get("path-ensure-final-slash") .. desired_name)
+          local child = st(self:get("path-ensure-final-slash") .. desired_name)
 
           specifier.payload = v
 
@@ -196,12 +196,12 @@ DirItemSpecifier = {
       ["create-child-file-and-choose-action"] = function(self, filename)
         local path = self:get("completely-resolved-path") .. "/" .. filename
         writeFile(path, "", "not-exists")
-        CreateStringItem(path):doThis("choose-action")
+        st(path):doThis("choose-action")
       end,
       ["create-child-dir-and-choose-action"] = function(self, dirname)
         local path = self:get("completely-resolved-path") .. "/" .. dirname
         createPath(path)
-        CreateStringItem(path):doThis("choose-action")
+        st(path):doThis("choose-action")
       end,
       ["create-descendant-file-and-choose-action"] = function(self, filename)
         self:get("descendant-dir-only-string-item-array"):doThis("choose-item", function(dir)

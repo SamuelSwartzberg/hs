@@ -16,10 +16,10 @@ PathLeafDateSpecifier = {
         return not eutf8.match(self:get("path-leaf-date"), "_to_")
       end,
       ["largest-date-to-date"] = function(self)
-        return CreateStringItem(self:get("largest-date"))
+        return st(self:get("largest-date"))
       end,
       ["smallest-date-to-date"] = function(self)
-        return CreateStringItem(self:get("smallest-date"))
+        return st(self:get("smallest-date"))
       end,
       ["largest-date-to-date-obj"] = function(self)
         return date(self:get("largest-date"))

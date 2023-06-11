@@ -188,7 +188,7 @@ DateSpecifier = {
         }
       end,
       ["corresponding-logfile"] = function(self, logging_dir)
-        return CreateStringItem(logging_dir):get("log-for-date", self:get("c"))
+        return st(logging_dir):get("log-for-date", self:get("c"))
       end,
     },
     doThisables = {
@@ -199,11 +199,11 @@ DateSpecifier = {
       end,
       ["choose-format-and-action"] = function(self)
         self:doThis("choose-format", function(format)
-          CreateStringItem(format):doThis("choose-action")
+          st(format):doThis("choose-action")
         end)
       end,
       ["create-log-entry"] = function(self, specifier)
-        CreateStringItem(specifier.path):doThis("log-timestamp-table", ovtable.init({{
+        st(specifier.path):doThis("log-timestamp-table", ovtable.init({{
           key = tostring(self:get("timestamp")),
           value = specifier.contents
         }}))
@@ -216,7 +216,7 @@ DateSpecifier = {
       end,
       ["log-open-diary"] = function(self)
         self:doThis("create-empty-log-entry", env.MENTRY_LOGS)
-        open(CreateStringItem(env.MENTRY_LOGS):get("log-for-date", self:get("c")))
+        open(st(env.MENTRY_LOGS):get("log-for-date", self:get("c")))
       end,
       ["choose-surrounding-day"] = function(self, amount)
         ar(self:get(

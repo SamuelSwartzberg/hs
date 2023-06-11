@@ -12,7 +12,7 @@ ManagedClipboardArraySpecifier = {
     },
     doThisables = {
       ["use-custom-create-logic"] = function(self, args)
-        local item = CreateStringItem(args)
+        local item = st(args)
         local contents = item:get("c")
         local element_with_same_contents = self:get(
           "find",

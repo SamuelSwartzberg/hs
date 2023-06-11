@@ -230,7 +230,7 @@ InterfaceDefaultTemplate = {
       end,
       ["str-item"] = bind(
         getThenUse, {a_use, a_use, function (_, contents)
-          return CreateStringItem(contents)
+          return st(contents)
         end}
       ),
       ["array"] = bind(
@@ -306,7 +306,7 @@ InterfaceDefaultTemplate = {
         item:doThis("choose-action")
       end}),
       ["choose-action-on-str-item-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
-        CreateStringItem(item):doThis("choose-action")
+        st(item):doThis("choose-action")
       end}),
       ["choose-item-and-then-action-on-result-of-get"] = bind(getThenUse, { a_use, a_use, function(_, item)
         item:doThis("choose-item-and-then-action")

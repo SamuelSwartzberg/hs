@@ -66,14 +66,14 @@ URLItemSpecifier = {
         self:doThis("download-url", { value = "$HOME/Downloads", type = "quoted" })
       end,
       ["add-to-newsboat"] = function(self, category)
-        CreateStringItem(env.NEWSBOAT_URLS):doThis("append-newsboat-url", {
+        st(env.NEWSBOAT_URLS):doThis("append-newsboat-url", {
           url = self:get("c"),
           title = self:get("html-title"),
           category = category
         })
       end,
       ["add-to-urls"] = function(self, name)
-        local path = CreateStringItem(env.MURLS):get("related-path-with-subdirs-gui")
+        local path = st(env.MURLS):get("related-path-with-subdirs-gui")
         path:doThis('create-file-with-contents', {
           contents = self:get("c"),
           name = ((name and #name > 0) and name) or self:get("html-title") .. ".url2"
@@ -81,8 +81,8 @@ URLItemSpecifier = {
       end,
       ["subscribe-to-calendar"] = function(self)
         local name = self:get("url-domain")
-        local khal_config = CreateStringItem(env.KHAL_CONFIG .. "/config")
-        local vdirsyncer_config = CreateStringItem(env.VDIRSYNCER_CONFIG .. "/config" )
+        local khal_config = st(env.KHAL_CONFIG .. "/config")
+        local vdirsyncer_config = st(env.VDIRSYNCER_CONFIG .. "/config" )
         local vdirsyncer_data = vdirsyncer_config:get("vdirsyncer-pair-and-corresponding-storages-for-webcal", self:get("c"))
         local khal_data = khal_config:get("table-to-ini-section", {
           header = "[ro:" .. name .. "]", -- this results in double [[ ]] in the file, which is the format khal expects (don't ask me why)

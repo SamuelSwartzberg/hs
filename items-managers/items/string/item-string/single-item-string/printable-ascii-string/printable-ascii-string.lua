@@ -64,7 +64,7 @@ PrintableAsciiStringItemSpecifier = {
       ["add-as-password-with-prompt-username"] = function(self, name)
         local username = prompt("string", "Username")
         self:doThis("add-as-password", name)
-        CreateStringItem(username):doThis("add-as-username", name)
+        st(username):doThis("add-as-username", name)
       end,
       ["upkg-install"] = function(self, mgr)
         dothis.upkg.install(mgr, self:get("c"))

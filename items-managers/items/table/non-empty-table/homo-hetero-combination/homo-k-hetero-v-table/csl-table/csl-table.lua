@@ -71,7 +71,7 @@ CslTableSpecifier = {
         })
       end,
       ["to-url-item"] = function(self)
-        return CreateStringItem(self:get("value", "url"))
+        return st(self:get("value", "url"))
       end,
         
     },

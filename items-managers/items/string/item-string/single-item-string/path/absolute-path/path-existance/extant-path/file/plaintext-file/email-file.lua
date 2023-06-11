@@ -130,7 +130,7 @@ EmailFileItemSpecifier = {
         ar(self:get("attachments")):doThis("choose-item", function(attachment)
           self:doThis("download-attachment", attachment)
           local path = mustEnd(env.TMPDIR, "/") .. attachment
-          local file = CreateStringItem(path)
+          local file = st(path)
           file:doThis("choose-action")
         end)
       end,
@@ -149,7 +149,7 @@ EmailFileItemSpecifier = {
       end,
       ["choose-involved-email"] = function(self)
         ar(self:get("involved-email-addresses")):doThis("choose-item", function(email)
-          CreateStringItem(email):doThis("choose-action")
+          st(email):doThis("choose-action")
         end)
       end,
       ["email-forward"] = function (self, specifier)

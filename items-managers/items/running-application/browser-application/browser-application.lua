@@ -7,7 +7,7 @@ BrowserApplicationApplicationSpecifier = {
         return self:get("focused-window-item"):get("url")
       end,
       ["url-item"] = function(self)
-        return CreateStringItem(self:get("current-url"))
+        return st(self:get("current-url"))
       end,
       ["relevant-subdivision"] = function(self)
         local url_item = self:get("url-item")

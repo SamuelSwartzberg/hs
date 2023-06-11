@@ -62,7 +62,7 @@ RunningApplicationItemSpecifier = {
       ["relevant-sessions"] = function(self)
         return glue(self
           :get("relevant-application-relative-sessions"):get("c"), 
-            CreateStringItem(env.MSESSIONS .. "/global"):get("descendant-string-item-array")
+            st(env.MSESSIONS .. "/global"):get("descendant-string-item-array")
           )
       end,
       ["application-icon"] = function(self)

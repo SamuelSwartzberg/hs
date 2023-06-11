@@ -15,7 +15,7 @@ YoutubeChannelIdItemSpecifier = {
     },
     doThisables = {
       ["add-to-newsboat-urls"] = function(self, category)
-        CreateStringItem(env.NEWSBOAT_URLS):doThis("append-newsboat-url", {
+        st(env.NEWSBOAT_URLS):doThis("append-newsboat-url", {
           url = self:get("youtube-feed-url"),
           title = self:get("youtube-title"),
           category = category

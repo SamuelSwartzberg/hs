@@ -119,7 +119,7 @@ PlaintextFileItemSpecifier = {
             _invert = true,
           })
           self:doThis("overwrite-file-content", stringx.join(splitter, parts))
-          CreateStringItem(part):doThis("choose-action")
+          st(part):doThis("choose-action")
         end)
       end,
 

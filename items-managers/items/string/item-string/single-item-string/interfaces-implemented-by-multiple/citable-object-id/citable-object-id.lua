@@ -13,12 +13,12 @@ CitableObjectIdItemSpecifier = {
         return self:get("c") .. ".epub"
       end,
       ["local-citation-file-if-any"] = function(self)
-        return CreateStringItem(env.MCITATIONS):get("descendant-ending-with",self:get("to-bib-filename"))
+        return st(env.MCITATIONS):get("descendant-ending-with",self:get("to-bib-filename"))
       end,
       ["local-corresponding-paper-if-any"] = function(self)
         return 
-          CreateStringItem(env.MPAPERS):get("descendant-ending-with",self:get("to-pdf-filename"))
-          or CreateStringItem(env.MPAPERS):get("descendant-ending-with",self:get("to-epub-filename"))
+          st(env.MPAPERS):get("descendant-ending-with",self:get("to-pdf-filename"))
+          or st(env.MPAPERS):get("descendant-ending-with",self:get("to-epub-filename"))
       end,
       ["is-local-citable-object-id"] = function(self)
         return not not self:get("local-citation-file-if-any")
@@ -30,7 +30,7 @@ CitableObjectIdItemSpecifier = {
     },
     doThisables = {
       ["import-citation"] = function(self, project_path)
-        local project_item = CreateStringItem(project_path)
+        local project_item = st(project_path)
         project_item:get("str-item", "latex-importfile"):doThis("append-file-contents", self:get("c") .. "\n")
         project_item:get("str-item", "latex-imported-papers"):doThis("copy-into", self:get("local-corresponding-paper-if-any"))
         project_item:get("str-item", "latex-paper-notes"):doThis("create-empty-file-in-dir", self:get("c") .. "_notes.md")

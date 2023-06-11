@@ -43,14 +43,14 @@ ChatApplicationItemSpecifier = {
     },
     doThisables = {
       ["log-chat-messages"] = function(self, chat_obj)
-        local chat_parent = CreateStringItem(env.MCHATS_DISCORD):get(
+        local chat_parent = st(env.MCHATS_DISCORD):get(
           "find-or-create-logging-date-managed-child-dir", 
           {
             find_identifier_suffix = self:get("convo-id", chat_obj),
             readable_name_part = self:get("author", chat_obj),
           }
         )
-        CreateStringItem(chat_parent):doThis("log-timestamp-table", chat_obj.processed_messages)
+        st(chat_parent):doThis("log-timestamp-table", chat_obj.processed_messages)
       end,
       ["process-chat-messages"] = function(self, chat_obj)
         local messages = self:get("assemble-messages", chat_obj)

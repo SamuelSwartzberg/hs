@@ -5,7 +5,7 @@ ArrayOfStringsSpecifier = {
     getables = {
       ["to-string-item-array"] = function (self)
         return self:get("map-to-new-array", function(item) 
-          return CreateStringItem(item) 
+          return st(item) 
         end)
       end,
       ["filter-empty-strings-to-new-array"] = function(self)
@@ -14,7 +14,7 @@ ArrayOfStringsSpecifier = {
       ["joined-string-contents"] = function(self, joiner)
         return table.concat(self:get("c"), joiner)
       end,
-      ["to-joined-string-item"] = function(self, joiner) return CreateStringItem(self:get("joined-string-contents", joiner)) end,
+      ["to-joined-string-item"] = function(self, joiner) return st(self:get("joined-string-contents", joiner)) end,
       ["joined-string-contents-with-no-blank-lines"] = function(self)
         return self:get("to-joined-string-item")
                    :get("to-string-array", "\n")
@@ -22,7 +22,7 @@ ArrayOfStringsSpecifier = {
                    :get("joined-string-contents", "\n")
       end,
       ["to-joined-string-item-with-no-blank-lines"] = function(self)
-        return CreateStringItem(self:get("joined-string-contents-with-no-blank-lines"))
+        return st(self:get("joined-string-contents-with-no-blank-lines"))
       end,
       ["to-resplit-string-array-assume-sep"] = function(self, sep) -- the difference between this and to-resplit-string-array-assume-no-sep is that here we assume that the current array represents a string that was split by sep, and so we only need to split substrings that contain sep, and then flatten, while for to-resplit-string-array-assume-no-sep we assume that the divisions between the strings in the current array are arbitrary, and so we need to join the strings and then split by sep
         return ar(
@@ -56,7 +56,7 @@ ArrayOfStringsSpecifier = {
     doThisables = {
       ["choose-item-and-then-action"] = function(self)
         self:doThis("choose-item", function(item)
-          CreateStringItem(item):doThis("choose-action")
+          st(item):doThis("choose-action")
         end)
       end,
       ["tab-fill-with"] = function(self)

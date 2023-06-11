@@ -160,7 +160,7 @@ StringItemSpecifier = {
         dothis.string.say(self:get("c"), lang)
       end,
       ["add-to-log"] = function(self, path)
-        CreateStringItem(path):doThis("log-now", self:get("c"))
+        st(path):doThis("log-now", self:get("c"))
       end,
       ["write-to-file"] = function(self, path)
         writeFile(path, self:get("c"))
@@ -180,10 +180,10 @@ StringItemSpecifier = {
         self:doThis("open-result-of-get-in-browser", { key = "fold"})
       end,
       ["append-as-line-to-file"] = function(self, path)
-        CreateStringItem(path):doThis("append-line-and-commit", self:get("fold"))
+        st(path):doThis("append-line-and-commit", self:get("fold"))
       end,
       ["append-to-qf-file"] = function(self)
-        CreateStringItem(env.MQF):get("descendant-file-only-string-item-array"):doThis("choose-item", function(path)
+        st(env.MQF):get("descendant-file-only-string-item-array"):doThis("choose-item", function(path)
           path:doThis("append-line-and-commit", self:get("fold"))
         end)
       end,
@@ -357,7 +357,7 @@ StringItemSpecifier = {
 }
 
 --- @type BoundRootInitializeInterface
-function CreateStringItem(contents)
+function st(contents)
   if type(contents) ~= "string" then
     if type(contents) == "number" then 
       contents = tostring(contents)

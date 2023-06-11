@@ -25,7 +25,7 @@ CslArticleJournalSpecifier = {
           "DOI: " .. (self:get("value", "DOI") or "No DOI"))
       end,
       ["to-citable-object-id"] = function(self)
-        return CreateStringItem(self:get("value", "DOI"))
+        return st(self:get("value", "DOI"))
       end,
 
         

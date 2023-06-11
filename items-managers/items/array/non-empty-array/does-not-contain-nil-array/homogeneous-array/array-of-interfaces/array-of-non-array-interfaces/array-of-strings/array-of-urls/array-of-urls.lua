@@ -7,14 +7,14 @@ ArrayOfUrlsSpecifier = {
     },
     doThisables = {
       ["create-session"] = function(self, session_name)
-        local path = CreateStringItem(env.MSESSIONS):get("related-path-with-subdirs-gui")
+        local path = st(env.MSESSIONS):get("related-path-with-subdirs-gui")
         path:doThis('create-file-with-contents', {
           contents = self:get("joined-string-contents", "\n"),
           name = session_name
         })
       end,
       ["create-all-as-urls"] = function(self)
-        local path = CreateStringItem(env.MURLS):get("related-path-with-subdirs-gui")
+        local path = st(env.MURLS):get("related-path-with-subdirs-gui")
         self:doThis("for-all", function(item)
           path:doThis('create-file-with-contents', {
             contents = item:get("c"),

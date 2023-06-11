@@ -25,7 +25,7 @@ EmptyDirItemSpecifier = {
     doThisables = {
       ["initalize-as-project-dir"] = function(self, type)
         project_type_init_map[type](self:get("completely-resolved-path"))
-        CreateStringItem(self:get("completely-resolved-path")):doThis("initialize")
+        st(self:get("completely-resolved-path")):doThis("initialize")
       end,
     }
   },

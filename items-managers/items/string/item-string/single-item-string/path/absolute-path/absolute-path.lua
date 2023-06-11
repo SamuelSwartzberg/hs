@@ -47,7 +47,7 @@ PathInterfaceItemSpecifier = {
                 filename = filename .. "." .. specifier.extension 
               end
               writeFile(filename, "", "not-exists")
-              self = CreateStringItem(filename)
+              self = st(filename)
             end
             self:doThis("append-rows", specifier.payload)
           elseif specifier.mode == "append" then 

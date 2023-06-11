@@ -12,7 +12,7 @@ MdFileItemSpecifier = {
       end,
       ["to-pandoc-export-and-then-choose-action"] = function(self, format)
         dothis.pandoc.markdown_to(self:get("resolved-path"), format, nil, function(target)
-          CreateStringItem(target):doThis("choose-action")
+          st(target):doThis("choose-action")
         end)
       end,
 

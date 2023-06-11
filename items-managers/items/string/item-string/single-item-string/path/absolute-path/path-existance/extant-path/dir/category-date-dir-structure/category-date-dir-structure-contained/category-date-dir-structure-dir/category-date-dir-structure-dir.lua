@@ -5,7 +5,7 @@ CategoryDateDirStructureDirSpecifier = {
     getables = {
       ["is-category-date-dir-structure-date-containing-dir"] = function(self)
         self:get("child-string-array"):get("all-pass", function(self)
-          return CreateStringItem(self):get("is-path-leaf-date")
+          return st(self):get("is-path-leaf-date")
         end)
       end,
     },

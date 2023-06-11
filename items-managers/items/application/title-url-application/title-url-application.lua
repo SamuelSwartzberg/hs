@@ -17,7 +17,7 @@ TitleUrlApplicationItemSpecifier = {
             local hist_csv = self:get("str-item", "backup-csv-file-path")
             local new = hist_csv:get("rows-after-using-last-access", true)
             if new then 
-              CreateStringItem(self:get("backup-path")):doThis(
+              st(self:get("backup-path")):doThis(
                 "log-timestamp-table", 
                 new
               )

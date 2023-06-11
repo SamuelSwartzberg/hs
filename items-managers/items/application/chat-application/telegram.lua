@@ -95,8 +95,8 @@ TelegramItemSpecifier = {
         )
       end,
       ["foreach-chat"] = function(self, func)
-        local export_dir = CreateStringItem(env.TMP_TELEGRAM_EXPORT_PARENT)
-        local export_json = CreateStringItem(export_dir:get("child-ending-with", "result.json")):get("parse-to-lua-table")
+        local export_dir = st(env.TMP_TELEGRAM_EXPORT_PARENT)
+        local export_json = st(export_dir:get("child-ending-with", "result.json")):get("parse-to-lua-table")
         local chats = export_json.chats.list
 
         for chat_index, chat in ipairs(chats) do
@@ -108,7 +108,7 @@ TelegramItemSpecifier = {
         -- we need to figure out which directory contains the attachments for this chat, and then move them. The dirs are named chat_<index>. I assume (hope) that the index is the same as the index in the chats array in the json file. Otherwise, I cry. :(
         local attachment_dir_path = env.TMP_TELEGRAM_EXPORT_PARENT .. "/chats/chat_" .. chat_obj.chat_index
         -- for some reason, telegram separates the media into subdirs by type, so we need to move each subdir separately
-        CreateStringItem(attachment_dir_path):get("child-dir-only-string-item-array"):doThis("for-all", function(attachment_dir)
+        st(attachment_dir_path):get("child-dir-only-string-item-array"):doThis("for-all", function(attachment_dir)
           attachment_dir:doThis("move-contents", self:get("media-dir-for-chat", chat_obj))
         end)
       end

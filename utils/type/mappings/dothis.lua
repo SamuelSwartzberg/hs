@@ -48,11 +48,11 @@ dothis = {
         
         if mgr then
           message = message .. " for " .. mgr
-          local mgr_backup = CreateStringItem(env.MDEPENDENCIES .. "/" .. mgr)
+          local mgr_backup = st(env.MDEPENDENCIES .. "/" .. mgr)
           mgr_backup:doThis("git-commit-self", message)
           mgr_backup:doThis("git-push")
         else 
-          local mdependencies = CreateStringItem(env.MDEPENDENCIES)
+          local mdependencies = st(env.MDEPENDENCIES)
           mdependencies:doThis("git-commit-all", message)
           mdependencies:doThis("git-push")
         end

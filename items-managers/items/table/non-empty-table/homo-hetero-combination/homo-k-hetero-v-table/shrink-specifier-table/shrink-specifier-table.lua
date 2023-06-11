@@ -20,7 +20,7 @@ ShrinkSpecifierTableSpecifier = {
         return env.TMPDIR .. "/shrink/" .. basexx.to_url64(self:get("to-string") .. original_path):sub(1, 255)
       end,
       ["result-file"] = function(self)
-        return CreateStringItem(self:get("value", "result"))
+        return st(self:get("value", "result"))
       end,
     },
     doThisables = {

@@ -9,7 +9,7 @@ ManagedStreamArraySpecifier = {
     },
     doThisables = {
       ["create-background-stream"] = function(self, relative_path)
-        CreateStringItem(env.MAUDIOVISUAL .. "/" .. relative_path):doThis("to-stream", {
+        st(env.MAUDIOVISUAL .. "/" .. relative_path):doThis("to-stream", {
           initial_flags = {
             shuffle = true,
             ["loop-playlist"] = true,

@@ -10,12 +10,12 @@ end
 
 ---@param path string
 function commitAllAndPush(path)
-  CreateStringItem(path):doThis("git-commit-all-and-push")
+  st(path):doThis("git-commit-all-and-push")
 end
 
 ---@param path string
 function pullAll(path)
-  CreateStringItem(path):doThis("git-pull-all")
+  st(path):doThis("git-pull-all")
 end
 
 --- @param ... string[]

@@ -40,7 +40,7 @@ System = CreateSystem()
 System:get("manager", "hotkey"):doThis("create", {key = "r", fn = hs.reload})
 
 local function createCSLArray()
-  return CreateStringItem(env.MCITATIONS)
+  return st(env.MCITATIONS)
     :get("descendant-file-only-string-item-array")
     :get("map-to-new-array", function(file) 
       return file:get("to-csl-table") 
@@ -84,7 +84,7 @@ local keymap = {
   ["4"] = {
     explanation = "Choose a screenshot and action on it",
     fn = function() 
-      CreateStringItem(env.SCREENSHOTS)
+      st(env.SCREENSHOTS)
         :get("child-string-item-array")
         :doThis("choose-item-and-then-action")
       end,
@@ -170,7 +170,7 @@ local keymap = {
     explanation = "Record some audio, then choose an action on it",
     fn = function() 
       dothis.sox.rec_toggle_cache(function(file)
-        CreateStringItem(file):doThis("choose-action")
+        st(file):doThis("choose-action")
       end)
     end,
   },
@@ -184,7 +184,7 @@ local keymap = {
   y = {
     explanation = "Choose action on tag name and value in MAUDIOVISUAL (mostly for interacting with streams)",
     fn = function() 
-      CreateStringItem(env.MAUDIOVISUAL)
+      st(env.MAUDIOVISUAL)
         :get("descendant-string-item-array")
         :doThis("choose-tag-name-value-and-thenx-action")
     end,
@@ -193,7 +193,7 @@ local keymap = {
     explanation = "Choose item and action on it in MAUDIOVISUAL (mostly for interacting with streams)",
     fn = function() 
       memoize(function()
-        return CreateStringItem(env.MAUDIOVISUAL)
+        return st(env.MAUDIOVISUAL)
           :get("descendant-string-item-array")
           :get("map-to-table-of-path-and-path-content-items")
       end)():doThis("choose-item-and-then-action")
@@ -202,7 +202,7 @@ local keymap = {
   i = {
     explanation = "Choose a favorite stream",
     fn = function() 
-      CreateStringItem("/Users/sam/me/state/init_playlists")
+      st("/Users/sam/me/state/init_playlists")
         :get("array", "lines-of-file-contents")
         :doThis("choose-item", function(item)
           System:get("manager", "stream"):doThis("create-background-stream", item)
@@ -225,7 +225,7 @@ local keymap = {
   a = {
     explanation = "Choose a file in MAUDIOVISUAL and an action on it.",
     fn = function()
-      CreateStringItem(env.MAUDIOVISUAL)
+      st(env.MAUDIOVISUAL)
         :get("child-string-item-array")
         :doThis("choose-dir-until-file-then-choose-action")
     end,
@@ -239,7 +239,7 @@ local keymap = {
   d = {
     explanation = "Choose an file in DOWNLOADS and an action on it.",
     fn = function()
-      CreateStringItem(env.MAC_DOWNLOADS)
+      st(env.MAC_DOWNLOADS)
         :get("child-string-item-array")
         :doThis("choose-item-and-then-action") 
     end,
@@ -248,7 +248,7 @@ local keymap = {
     explanation = "Choose a composite item, eval and choose an action on it.",
     fn = function()
       compTable:doThis("choose-item", function (item)
-        CreateStringItem(le(item)):doThis("choose-action")
+        st(le(item)):doThis("choose-action")
       end)
     end,
   },
@@ -285,7 +285,7 @@ local keymap = {
     fn = function()
       local res = prompt("string", "String to act on")
       if res then 
-        CreateStringItem(res):doThis("choose-action")
+        st(res):doThis("choose-action")
       end
     end,
   },
@@ -359,17 +359,17 @@ System:get("manager", "creatable"):doThis("create-all", {
     watchertype = hs.fs.volume,
     fn = function(event, information)
       if event == hs.fs.volume.didMount then
-        local vol = CreateStringItem(information.path)
+        local vol = st(information.path)
         if vol:get("is-time-machine-volume") then
           hs.alert.show("Starting backup...")
           run({"tmutil", "startbackup"})
         end
       elseif event == hs.fs.volume.didUnmount then
-        local vol = CreateStringItem(information.path)
+        local vol = st(information.path)
         if vol:get("is-dynamic-time-machine-volume") then
           hs.timer.doAfter(30, function()
             hs.alert.show("Backup completed. Ejecting...")
-            CreateStringItem(env.TMBACKUPVOL):doThis("eject")
+            st(env.TMBACKUPVOL):doThis("eject")
           end)
         end
       end
@@ -385,7 +385,7 @@ System:get("manager", "timer"):doThis("create-all", {
   bindArg(run, {"newsboat -x reload"}),
   syncVdirSyncer,
   bind(syncHomeRelativePath, {"me/state/todo", "push"}),
-  CreateStringItem(env.MEDIA_QUEUE):get("timer-that-does", { 
+  st(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
   { 
@@ -396,7 +396,7 @@ System:get("manager", "timer"):doThis("create-all", {
     }), 
     interval = "* * * * *"
   },
-  CreateStringItem(env.MENV):get("refresh-env-task"),
+  st(env.MENV):get("refresh-env-task"),
   {
     fn = dothis.upkg.upgrade_all,
     interval = "0 0 * * *"

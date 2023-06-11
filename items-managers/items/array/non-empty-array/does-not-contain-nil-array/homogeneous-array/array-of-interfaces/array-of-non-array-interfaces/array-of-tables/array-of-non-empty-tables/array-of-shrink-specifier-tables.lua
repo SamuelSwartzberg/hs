@@ -17,7 +17,7 @@ ArrayOfShrinkSpecifierTablesSpecifier = {
         self:get("filter-to-new-array", function(shrink_specifier_table)
           return shrink_specifier_table ~= bestver
         end):get("map-to-new-array", function(shrink_specifier_table)
-          return CreateStringItem(shrink_specifier_table:get("value", "result"))
+          return st(shrink_specifier_table:get("value", "result"))
         end):doThis("do-all", {key = "rm-file"})
       end,
     },

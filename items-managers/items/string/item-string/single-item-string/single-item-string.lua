@@ -7,7 +7,7 @@ SingleItemStringItemSpecifier = {
         self:get("synonyms-th-to-array")
           :doThis("choose-item", function(item)
             item:doThis("choose-synonym", function(synonym)
-              CreateStringItem(synonym):doThis("choose-action")
+              st(synonym):doThis("choose-action")
             end)
           end)
       end,

@@ -7,7 +7,7 @@ StringValueTableSpecifier = {
     doThisables = {
       ["choose-item-and-then-action"] = function(self)
         self:doThis("choose-item", function(item)
-          CreateStringItem(item):doThis("choose-action")
+          st(item):doThis("choose-action")
         end)
       end
     },

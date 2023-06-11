@@ -845,7 +845,7 @@ transf = {
     item_array_of_string_items = function(arr)
       return ar(hs.fnutils.imap(
         arr,
-        CreateStringItem
+        st
       ))
     end,
     repeated_option_string = function(arr, opt)

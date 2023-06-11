@@ -91,10 +91,10 @@ DiscordItemSpecifier = {
           do_after
         )
       end,
-      ["foreach-chat"] = function(self, func)CreateStringItem(env.TMP_DISCORD_EXPORT_PARENT):get("child-dir-only-string-item-array"):doThis("for-all", func)
+      ["foreach-chat"] = function(self, func)st(env.TMP_DISCORD_EXPORT_PARENT):get("child-dir-only-string-item-array"):doThis("for-all", func)
       end,
       ["pre-process-chat-messages-hook"] = function (self, chat_obj)
-        local media_dir = CreateStringItem(chat_obj.found_in):get("child-ending-with", "_Files")
+        local media_dir = st(chat_obj.found_in):get("child-ending-with", "_Files")
         srctgt("move", media_dir, self:get("media-dir-for-chat", chat_obj), "any", false, false, true)
       end,
     }

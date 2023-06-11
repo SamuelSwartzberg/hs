@@ -10,7 +10,7 @@ PathLeafSingleDateSpecifier = {
         return self:get("path-leaf-date")
       end,
       ["to-date"] = function(self)
-        return CreateStringItem(self:get("path-leaf-date"))
+        return st(self:get("path-leaf-date"))
       end,
       ["to-date-obj"] = function(self)
         return date(self:get("path-leaf-date"))
