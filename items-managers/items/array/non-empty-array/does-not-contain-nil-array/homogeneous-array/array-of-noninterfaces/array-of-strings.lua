@@ -63,7 +63,7 @@ ArrayOfStringsSpecifier = {
         local str = le(
           stringx.join("\t", self:get("to-string-array"):get("contents"))
         )
-        pasteMultilineString(str)
+        dothis.string.paste(str)
       end,
     },
   },

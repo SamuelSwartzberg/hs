@@ -29,17 +29,3 @@ function getChooseItemTable(specifiers)
   end
   return action_table
 end
-
---- @alias search_engine_specifier {name: string, emoji_icon: string}[]
-
---- @param search_engines search_engine_specifier
---- @return action_table
-function getSearchEngineActionTable(search_engines)
-  local res = {}
-  for _, search_engine in ipairs(search_engines) do
-    res[#res + 1] = {
-      
-    }
-  end
-  return res
-end

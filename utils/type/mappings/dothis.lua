@@ -342,6 +342,19 @@ dothis = {
       lang = lang or "en"
       speak:voice(tblmap.lang.voice[lang]):speak(transf.string.folded(str))
     end,
+    paste = function(str)
+      local lines = stringy.split(str, "\n")
+      local is_first_line = true
+      for _, line in ipairs(lines) do
+        if is_first_line then
+          is_first_line = false
+        else
+          hs.eventtap.keyStroke({}, "return")
+        end
+        hs.eventtap.keyStrokes(line)
+      end
+    end,
+    copy = hs.pasteboard.setContents
   },
   path = {
     open_default = function(path, do_after)

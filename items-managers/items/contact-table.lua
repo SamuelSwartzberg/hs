@@ -202,17 +202,11 @@ ContactTableSpecifier = {
         text = "👉✉ cmail.",
         key = "choose-item-and-then-action-on-result-of-get",
         args = { key = "contact-addr-table-item", args = "email" },
-        condition = function(self)
-          return self:get("has-at-least-one-contact-addr", "email")
-        end
       },
       {
         text = "👉📞 cphone.",
         key = "choose-item-and-then-action-on-result-of-get",
         args = { key = "contact-addr-table-item", args = "phone" },
-        condition = function(self)
-          return self:get("has-at-least-one-contact-addr", "phone")
-        end
       },
       {
         text = "👉🏡 caddr.",
