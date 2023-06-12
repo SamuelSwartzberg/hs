@@ -56,6 +56,8 @@ is = {
       return not not path:find("^[^/:]-:") 
     end,
     dir = bind(testPath, {a_use, "dir"}),
+    file = bind(testPath, {a_use, "not-dir"}),
+    exists = bind(testPath, {a_use, true}),
     empty_dir = function(path)
       return testPath(path, {
         dirness = "dir",
@@ -81,27 +83,31 @@ is = {
      return 
       get.path.is_extension(path, "eml") or 
       transf.path.parent_leaf(path) == "new" or
-      transf.path.parent_leaf(path == "cur"
+      transf.path.parent_leaf(path == "cur")
     end
   },
   extant_path = {
     
   },
-  dir_path = {
+  dir = {
     git_root_dir = function(path)
-      return find(itemsInPath({
-        path = path,
-        recursion = false,
-        validator = returnTrue
-      }), {_stop = ".git"})
+      return get.array.some_pass(
+        transf.dir.children_filenames_array(path),
+        {_exactly = ".git"}
+      )
     end,
     
     grandparent_dir = function (path)
       return get.array.some_pass(
-        transf.dir_path.children_array(path),
+        transf.dir.children_array(path),
         is.path.dir
       )
     end
+  },
+  in_git_dir = {
+    has_changes = function(path)
+      return transf.in_git_dir.status(path) ~= ""
+    end,
   },
   shellscript_file = {
     errors = function(path)

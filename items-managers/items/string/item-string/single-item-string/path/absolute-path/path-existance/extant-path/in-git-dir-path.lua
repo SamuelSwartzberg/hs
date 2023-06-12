@@ -3,51 +3,6 @@ InGitDirPathItemSpecifier = {
   type = "in-git-dir-path",
   properties = {
     getables = {
-      ["git-root-dir"] = function(self)
-        if self:get("is-git-root-dir") then return self:get("completely-resolved-path") end
-        local dotgit = memoize(getItemsForAllLevelsInSlice)(self:get("c"), "1:-2", {
-          include_files = false,
-          validator_result = bind(stringy.endswith, {a_use, "/.git"})
-        })[1]
-        if not dotgit then
-          return nil
-        end
-        return pathSlice(dotgit, ":-2", {rejoin_at_end = true})
-      end,
-      ["git-root-dir-relative-path"] = function(self)
-        return self:get("relative-path-from", self:get("git-root-dir"))
-      end,
-      ["git-remote"] = function(self)
-        local remote = self:get("cd-and-output-this-task", {
-          "git",
-          "config",
-          "--get",
-          "remote.origin.url",
-        })
-        remote = mustNotEnd(remote, ".git")
-        remote = mustNotEnd(remote, "/")
-        return remote
-      end,
-      ["git-remote-owner-item"] = function(self)
-        return self:get("git-remote"):find("/([^/]+[^/]+)$")
-      end,
-      ["url-on-master-remote"] = function(self)
-        return self:get("git-remote") .. "/blob/master" .. self:get("git-root-dir-relative-path")
-      end,
-      ["raw-url-on-github-remote"] = function(self)
-        return "https://raw.githubusercontent.com/" .. self:get("git-remote-owner-item") .. "/master" .. self:get("git-root-dir-relative-path")
-      end,
-      ["gitignore-path"] = function(self)
-        return self:get("git-root-dir") .. "/.gitignore"
-      end,
-      ["has-changes"] = function(self)
-        local git_status = self:get("cd-and-output-this-task", {
-          "git",
-          "status",
-          "--porcelain",
-        })
-        return git_status ~= ""
-      end,
       ["unpushed-commits"] = function(self)
         return self:get("cd-and-output-this-task", {
           "git",
@@ -64,31 +19,6 @@ InGitDirPathItemSpecifier = {
       
     },
     doThisables = {
-      ["git-push"] = function(self)
-        self:doThis("cd-and-run-this-task", {
-          "git",
-          "push",
-        })
-      end,
-      ["git-pull"] = function(self)
-        self:doThis("cd-and-run-this-task", {
-          "git",
-          "pull",
-        })
-      end,
-      ["git-fetch"] = function(self)
-        self:doThis("cd-and-run-this-task", {
-          "git",
-          "fetch",
-        })
-      end,
-      ["git-add-self"] = function(self)
-        self:doThis("cd-and-run-this-task", {
-          "git",
-          "add",
-          { value = self:get("completely-resolved-path"), type = "quoted"}
-        })
-      end,
       ["git-add-all"] = function(self)
         self:doThis("cd-and-run-this-task", {
           "git",

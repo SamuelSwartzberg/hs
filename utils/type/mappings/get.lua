@@ -349,22 +349,51 @@ get = {
     date_attr = function(path, attr) -- attr must be one of "access", "modification", "change", "creation"
       return date(get.extant_path.attr(path, attr))
     end,
+    find_self_or_ancestor = function(path, fn)
+      local ancestor = path
+      while ancestor ~= "/" or ancestor ~= "" do
+        if fn(ancestor) then
+          return ancestor
+        else
+          ancestor = transf.path.parent_path(ancestor)
+        end
+      end
+    end,
+    find_ancestor = function(path, fn)
+      return get.extant_path.find_self_or_ancestor(transf.path.parent_path(path), fn)
+    end,
+    find_self_or_ancestor_siblings = function(path, cond, opts)
+      return get.extant_path.find_self_or_ancestor(path, function(x)
+        return find(transf.dir.children_array(transf.path.parent_path(x)), cond, opts)
+      end)
+    end,
+    cmd_output_from_path = function(path, cmd)
+      if is.path.dir(path) then
+        return get.dir.cmd_output_from_path(path, cmd)
+      else
+        return get.dir.cmd_output_from_path(transf.path.parent_path(path), cmd)
+      end
+    end,
+
     
 
   },
-  dir_path = {
-    find_child = function(dir_path, cond, opts)
-      return find(transf.dir_path.children_array(dir_path), cond, opts)
+  dir = {
+    find_child = function(dir, cond, opts)
+      return find(transf.dir.children_array(dir), cond, opts)
     end,
-    find_child_ending_with = function(dir_path, ending)
-      return get.dir_path.find_child(dir_path, {_stop = ending})
+    find_child_ending_with = function(dir, ending)
+      return get.dir.find_child(dir, {_stop = ending})
     end,
-    find_child_with_leaf = function(dir_path, filename)
-      return find(transf.dir_path.children_leaves_array(dir_path), {_exactly = filename})
+    find_child_with_leaf = function(dir, filename)
+      return find(transf.dir.children_leaves_array(dir), {_exactly = filename})
     end,
-    find_child_with_extension = function(dir_path, extension)
-      return find(transf.dir_path.children_extensions_array(dir_path), {_exactly = extension})
+    find_child_with_extension = function(dir, extension)
+      return find(transf.dir.children_extensions_array(dir), {_exactly = extension})
     end,
+    cmd_output_from_path = function(path, cmd)
+      return run("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd)
+    end
   },
   git_root_dir = {
     hook_path = function(path, hook)
@@ -373,6 +402,34 @@ get = {
     hook_res = function(path, hook)
       local hook_path = get.git_root_dir.hook_path(path, hook)
       return run(hook_path)
+    end,
+  },
+  in_git_dir = {
+    remote_blob_link = function(path, branch)
+      local remote_type = transf.in_git_dir.remote_type(path)
+      branch = branch or "master" -- TODO: now that hosts are switching away from master as a name, we probably need some smart default searching. but how?
+      local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
+      local relative_path = transf.in_git_dir.relative_path_from_git_root_dir(path)
+      return get.git_hosting_service.file_link(
+        transf.in_git_dir.remote_blob_host(path),
+        tblmap.remote_type.blob_indicator[remote_type],
+        remote_owner_item,
+        branch,
+        relative_path
+      )
+    end,
+    remote_raw_link = function(path, branch)
+      local remote_type = transf.in_git_dir.remote_type(path)
+      branch = branch or "master" -- TODO: now that hosts are switching away from master as a name, we probably need some smart default searching. but how?
+      local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
+      local relative_path = transf.in_git_dir.relative_path_from_git_root_dir(path)
+      return get.git_hosting_service.file_link(
+        transf.in_git_dir.remote_raw_host(path),
+        tblmap.remote_type.raw_indicator[remote_type],
+        remote_owner_item,
+        branch,
+        relative_path
+      )
     end,
   },
   plaintext_file = {
@@ -539,5 +596,10 @@ get = {
     largest_by_attr = function(arr, attr)
       return get.extant_path_array.sorted_by_attr_extant_path_array(arr, attr)[1]
     end,
-  }
+  },
+  git_hosting_service = {
+    file_link = function(host, indicator, owner_item, branch, relative_path)
+      return "https://" .. host .. "/" .. owner_item .. "/" .. indicator .. branch .. "/" .. relative_path
+    end,
+  },
 }

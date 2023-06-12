@@ -59,7 +59,7 @@ PlaintextFileItemSpecifier = {
     },{
       d = "cnttl",
       i = "🎒👇",
-      key = "file-contents-tail"
+      key = get.plaintext_file.tail
     },
     {
       text = "👉🎒全⩶ ccntlns.",
@@ -80,7 +80,7 @@ PlaintextFileItemSpecifier = {
       dothis = dothis.plaintext_file.append_line,
       args = pt( { line = "string" })
     }
-  })
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

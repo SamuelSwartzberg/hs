@@ -4,7 +4,7 @@ ApplicationsDirItemSpecifier = {
   properties = {
     getables = {
       ["all-applications"] = function(self)
-        return transf.dir_path.children_filenames_array(self:get("c"))
+        return transf.dir.children_filenames_array(self:get("c"))
       end,
     },
   },

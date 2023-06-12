@@ -5,7 +5,7 @@ ParentDirItemSpecifier = {
 
     getables = {
       ["children"] = function(self)
-        return transf.dir_path.children_array(self:get("c"))
+        return transf.dir.children_array(self:get("c"))
       end,
       ["child-string-array"] = function(self) 
         return ar(self:get("children")) 
@@ -22,7 +22,7 @@ ParentDirItemSpecifier = {
       end,
       ["children-any-pass"] = function(self, query) return self:get("child-string-item-array"):get("some-pass", query) end,
       ["is-grandparent-dir"] = function(self)
-        return is.dir_path.grandparent_dir(self:get("c"))
+        return is.dir.grandparent_dir(self:get("c"))
       end,
       ["is-parent-but-not-grandparent-dir"] = function(self)
         return not self:get("is-grandparent-dir")
@@ -39,7 +39,7 @@ ParentDirItemSpecifier = {
         end)
       end,
       ["newest-child-string-item"] = function(self)
-        return transf.dir_path.newest_child(self:get("c"))
+        return transf.dir.newest_child(self:get("c"))
       end,
     },
   

@@ -62,7 +62,7 @@ DirItemSpecifier = {
       end,
 
       ["find-or-create-child-dir"] = function(self, specifier)
-        local child = get.dir_path.find_child(self:get("c"), specifier.find_func)
+        local child = get.dir.find_child(self:get("c"), specifier.find_func)
         if child == nil or not testPath(child, "dir") then
           self:doThis("create-empty-dir-in-dir", specifier.default_name)
           child = self:get("parent-dir-path") .. "/" .. specifier.default_name
@@ -134,7 +134,7 @@ DirItemSpecifier = {
       end,
       ["table-to-fs-children-dispatch"] = function(self, specifier) 
         -- assumes a table where all values are of the same type
-        local child_filenames = transf.dir_path.children_leaves_array(self:get("c"))
+        local child_filenames = transf.dir.children_leaves_array(self:get("c"))
         for k, v in fastpairs(specifier.payload) do
           local desired_name = k
 

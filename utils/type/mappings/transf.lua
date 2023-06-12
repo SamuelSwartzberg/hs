@@ -163,43 +163,127 @@ transf = {
       local extensions = hs.fnutils.imap(path_array, transf.path.extension)
       return toSet(extensions)
     end,
+    extant_path_array = function(path_array)
+      return hs.fnutils.ifilter(path_array, is.path.exists)
+    end,
   },
   extant_path_array = {
     newest = function(path_array)
       return get.extant_path_array.largest_by_attr(path_array, "creation")
-    end
+    end,
+    filter_dir_array = function(path_array)
+      return hs.fnutils.ifilter(path_array, is.path.dir)
+    end,
+    filter_file_array = function(path_array)
+      return hs.fnutils.ifilter(path_array, is.path.file)
+    end,
+    filter_git_root_dir_array = function(path_array)
+      return transf.dir_array.filter_git_root_dir_array(transf.extant_path_array.filter_dir_array(path_array))
+    end,
   },
-  dir_path = {
-    children_array = function(dir_path)
-      return itemsInPath(dir_path)
+  dir_array = {
+    filter_git_root_dir_array = function(path_array)
+      return hs.fnutils.ifilter(path_array, is.dir.git_root_dir)
     end,
-    children_leaves_array = function(dir_path)
-      return transf.path_array.leaves_array(transf.dir_path.children_array(dir_path))
+  },
+  dir = {
+    children_array = function(dir)
+      return itemsInPath(dir)
     end,
-    children_filenames_array = function(dir_path)
-      return transf.path_array.filenames_array(transf.dir_path.children_array(dir_path))
+    children_leaves_array = function(dir)
+      return transf.path_array.leaves_array(transf.dir.children_array(dir))
     end,
-    children_extensions_array = function(dir_path)
-      return transf.path_array.extensions_array(transf.dir_path.children_array(dir_path))
+    children_filenames_array = function(dir)
+      return transf.path_array.filenames_array(transf.dir.children_array(dir))
     end,
-    newest_child = function(dir_path)
-      return transf.extant_path_array.newest(transf.dir_path.children_array(dir_path))
+    children_extensions_array = function(dir)
+      return transf.path_array.extensions_array(transf.dir.children_array(dir))
     end,
-    descendants_array = function(dir_path)
+    newest_child = function(dir)
+      return transf.extant_path_array.newest(transf.dir.children_array(dir))
+    end,
+    descendants_array = function(dir)
       return itemsInPath({
-        path = dir_path,
+        path = dir,
         recursive = true,
       })
     end,
-    descendants_leaves_array = function(dir_path)
-      return transf.path_array.leaves_array(transf.dir_path.descendants_array(dir_path))
+    descendants_leaves_array = function(dir)
+      return transf.path_array.leaves_array(transf.dir.descendants_array(dir))
     end,
-    descendants_filenames_array = function(dir_path)
-      return transf.path_array.filenames_array(transf.dir_path.descendants_array(dir_path))
+    descendants_filenames_array = function(dir)
+      return transf.path_array.filenames_array(transf.dir.descendants_array(dir))
     end,
-    descendants_extensions_array = function(dir_path)
-      return transf.path_array.extensions_array(transf.dir_path.descendants_array(dir_path))
+    descendants_extensions_array = function(dir)
+      return transf.path_array.extensions_array(transf.dir.descendants_array(dir))
     end,
+    grandchildren_array = function(dir)
+      return map(transf.dir.children_array(dir), transf.dir.children_array, { flatten = true })
+    end,
+    git_root_dir_descendants = function(dir)
+      return transf.dir_array.filter_git_root_dir_array(transf.dir.descendants_array(dir))
+    end,
+
+  },
+
+  in_git_dir = {
+    git_root_dir = function(path)
+      return get.extant_path.find_self_or_ancestor(
+        path,
+        is.dir.git_root_dir
+      )
+    end,
+    relative_path_from_git_root_dir = function(path)
+      return transf.path.relative_path(
+        path,
+        transf.in_git_dir.git_root_dir(path)
+      )
+    end,
+    gitignore_path = function(path)
+      return transf.path.ending_with_slash(transf.in_git_dir.gitignore_path(path)) .. ".gitignore"
+    end,
+    git_remote_url = function(path)
+      local raw= get.extant_path.cmd_output_from_path(
+        path,
+        "git config --get remote.origin.url"
+      )
+      raw = mustNotEnd(raw, ".git")
+      raw = mustNotEnd(raw, "/")
+      return raw
+    end,
+    remote_owner_item = function(path)
+      return transf.owner_item_url.owner_item(transf.in_git_dir.git_remote_url(path))
+    end,
+    remote_host = function(path)
+      return transf.url.host(transf.in_git_dir.git_remote_url(path))
+    end,
+    remote_sld = function(path)
+      return transf.url.sld(transf.in_git_dir.git_remote_url(path))
+    end,
+    remote_type = function(path)
+      if listContains(mt._list.remote_types, transf.in_git_dir.remote_sld(path)) then
+        return transf.in_git_dir.remote_sld(path)
+      else
+        return tblmap.host.remote_type[transf.in_git_dir.remote_host(path)] -- we'll hardcode known hosts there
+      end
+    end,
+    remote_blob_host = function(path)
+      local remote_type = transf.in_git_dir.remote_type(path)
+      local remote_host = transf.in_git_dir.remote_host(path)
+      return tblmap.host.blob_host[remote_host] or tblmap.remote_type.blob_default_host[remote_type]
+    end,
+    remote_raw_host = function(path)
+      local remote_type = transf.in_git_dir.remote_type(path)
+      local remote_host = transf.in_git_dir.remote_host(path)
+      return tblmap.host.raw_host[remote_host] or tblmap.remote_type.raw_default_host[remote_type]
+    end,
+    status = function(path)
+      return get.extant_path.cmd_output_from_path(
+        path,
+        "git status"
+      )
+    end,
+
 
   },
 
@@ -860,22 +944,22 @@ transf = {
     end,
 
 
-    content_lines = function(str)
+    raw_lines = function(str)
       return memoize(filter)(transf.string.lines(str), true)
     end,
 
     first_line = function(str)
       return transf.string.lines(str)[1]
     end,
-    first_content_line = function(str)
-      return transf.string.content_lines(str)[1]
+    first_raw_line = function(str)
+      return transf.string.raw_lines(str)[1]
     end,
     last_line = function(str)
       local lines = transf.string.lines(str)
       return lines[#lines]
     end,
-    last_content_line = function(str)
-      local lines = transf.string.content_lines(str)
+    last_raw_line = function(str)
+      local lines = transf.string.raw_lines(str)
       return lines[#lines]
     end,
     first_char = function(str)
@@ -1682,6 +1766,14 @@ transf = {
     end,
 
   },
+  owner_item_url = {
+    owner_item = function(url)
+      return eutf8.match(transf.url.path(url), "^/([^/]+[^/]+)")
+    end,
+  },
+  github_url = {
+
+  },
   whisper_url = {
     transcribed = function(url)
       local path = transf.url.in_cache_dir(url)
@@ -1782,7 +1874,7 @@ transf = {
     
   },
   data_url = {
-    content_type = function(data_url)
+    raw_type = function(data_url)
       return stringy.split(transf.url.no_scheme(data_url), ";")[1]
     end,
     header_part = function(data_url) -- the non-data part will either be separated from the rest of the url by `;,` or `;base64,`, so we need to split on `,`, then find the first part that ends `;` or `base64;`, and then join and return all parts before that part
@@ -1802,7 +1894,7 @@ transf = {
       return mustNotStart(transf.url.no_scheme(data_url), transf.data_url.header_part(data_url))
     end,
       
-    content_type_param_table = function(data_url)
+    raw_type_param_table = function(data_url)
       local parts = stringy.split(transf.data_url.header_part(data_url), ";")
       table.remove(parts, 1) -- this is the content type
       table.remove(parts, #parts) -- this is the base64, or ""

@@ -206,7 +206,7 @@ tblmap = {
     empty_post_body = {
       dropbox = "null"
     },
-    empty_post_body_content_type = {
+    empty_post_body_raw_type = {
       dropbox = "application/json"
     },
     additional_auth_params = {
@@ -312,6 +312,33 @@ tblmap = {
       ["deepl-en-ja"] = true,
       ["deepl-de-en"] = true,
     }
+  },
+  host = {
+    remote_type = {},
+    blob_host = {},
+    raw_host = {},
+  },
+  remote_type = {
+    blob_indicator = {
+      github = "blob/",
+      gitlab = "blob/",
+      bitbucket = "src/",
+    },
+    blob_default_host = {
+      github = "github.com",
+      gitlab = "gitlab.com",
+      bitbucket = "bitbucket.org",
+    },
+    raw_indicator = {
+      github = "",
+      gitlab = "raw/",
+      bitbucket = "raw/",
+    },
+    raw_default_host = {
+      github = "raw.githubusercontent.com",
+      gitlab = "gitlab.com",
+      bitbucket = "bitbucket.org",
+    },
   }
 }
 

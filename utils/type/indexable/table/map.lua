@@ -96,8 +96,6 @@ function map(tbl, f, opts, visited)
           })
           return new_v or v
         end
-
-        end
       end
     else
       f = function(arg)

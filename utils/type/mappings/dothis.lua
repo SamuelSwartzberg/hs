@@ -410,6 +410,19 @@ dothis = {
     make_executable = function(path)
       run("chmod +x " .. transf.string.single_quoted_escaped(path))
     end,
+    do_in_path = function(path, cmd, do_after)
+      if is.path.dir(path) then
+        dothis.dir.do_in_path(path, cmd, do_after)
+      else
+        dothis.dir.do_in_path(transf.path.parent_path(path), cmd, do_after)
+      end
+    end,
+    
+  },
+  file = {
+    do_in_path = function(path, cmd, do_after)
+      run("cd " .. transf.string.single_quoted_escaped(transf.path.parent_path(path)) .. " && " .. cmd, do_after)
+    end
   },
   audio_file = {
     play = function(path, do_after)
@@ -563,6 +576,16 @@ dothis = {
       
     
   },
+  dir = {
+    pull_all = function(path)
+      dothis.in_git_dir_array.pull_all(
+        transf.dir.git_root_dir_descendants(path)
+      )
+    end,
+    do_in_path = function(path, cmd, do_after)
+      run("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd, do_after)
+    end
+  },
   maildir_dir = {
     
   },
@@ -663,6 +686,55 @@ dothis = {
       name = name or transf.path.filename(hook_path)
       srctgt("copy", hook_path, get.git_root_dir.hook_path(path, name))
       dothis.extant_path.make_executable(get.git_root_dir.hook_path(path, name))
+    end,
+    copy_hook = function(path, type, name)
+      type = type or "default"
+      local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
+      dothis.extant_path.make_executable(source_hook)
+      srctgt("copy", source_hook, get.git_root_dir.hook_path(path, name))
+    end,
+    link_hook = function(path, type, name)
+      type = type or "default"
+      local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
+      dothis.extant_path.make_executable(source_hook)
+      srctgt("link", source_hook, get.git_root_dir.hook_path(path, name))
+    end,
+    link_all_hooks = function(path, type)
+      local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
+      for _, hook in ipairs(get.dir.files(source_hooks)) do
+        dothis.git_root_dir.link_hook(path, type, hook)
+      end
+    end,
+    copy_all_hooks = function(path, type)
+      local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
+      for _, hook in ipairs(get.dir.files(source_hooks)) do
+        dothis.git_root_dir.copy_hook(path, type, hook)
+      end
+    end,
+
+  },
+  git_root_dir_array = {
+    
+  },
+  in_git_dir = {
+    pull = function(path)
+      dothis.extant_path.do_in_path(path, "git pull")
+    end,
+    push = function(path)
+      dothis.extant_path.do_in_path(path, "git push")
+    end,
+    fetch = function(path)
+      dothis.extant_path.do_in_path(path, "git fetch")
+    end,
+    add_self = function(path)
+      dothis.extant_path.do_in_path(path, "git add" .. transf.string.single_quoted_escaped(path))
+    end,
+  },
+  in_git_dir_array = {
+    pull_all = function(paths)
+      for _, path in ipairs(paths) do
+        dothis.in_git_dir.pull(path)
+      end
     end,
   }
 

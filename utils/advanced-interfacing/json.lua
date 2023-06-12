@@ -104,7 +104,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
           params = {
             response_type = "code",
             client_id = clientid,
-            redirect_uri = "http://127.0.0.1:8412/?api_name=" .. specifier.api_name
+            reblob_uri = "http://127.0.0.1:8412/?api_name=" .. specifier.api_name
           }
         }
         if tblmap.api_name.needs_scopes[specifier.api_name] then
@@ -125,7 +125,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
             client_secret = clientsecret,
             code = authorization_code,
             grant_type = "authorization_code",
-            redirect_uri = "http://127.0.0.1:8412/?api_name=" .. specifier.api_name
+            reblob_uri = "http://127.0.0.1:8412/?api_name=" .. specifier.api_name
           }
           rest({
             url = specifier.oauth2_url,
