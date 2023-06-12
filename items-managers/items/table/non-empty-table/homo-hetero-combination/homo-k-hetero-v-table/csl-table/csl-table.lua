@@ -86,15 +86,13 @@ CslTableSpecifier = {
     { key = "csl-motion-picture", value = CreateCslMotionPicture },
     
   }),
-  action_table = concat(
-    getChooseItemTable({
+  action_table = {
       {
         i = "📖",
         d = "cttn",
         key = "get-interactive",
         args = { key = "to-citation", thing = "citation style (e.g.apa or apa-6th-edition)" }
-      }
-    }),{
+      },
       {
         text = "👉🔬 ccitid.",
         key ="choose-action-on-result-of-get",
@@ -105,7 +103,7 @@ CslTableSpecifier = {
         args = { key = "to-url-item"}
       },
     }
-  )
+  
   
 }
 --- @type BoundNewDynamicContentsComponentInterface

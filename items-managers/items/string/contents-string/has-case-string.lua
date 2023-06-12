@@ -10,7 +10,7 @@ HasUppercaseStringItemSpecifier = {
       end
     }
   },
-  action_table = getChooseItemTable({
+  action_table = {
     {
       d = "al",
       i = "🪂",
@@ -26,7 +26,7 @@ HasUppercaseStringItemSpecifier = {
       i = "🍢🪂",
       key = "contents-as-lower-kebap-case"
     }
-  })
+  }
 
 }
 

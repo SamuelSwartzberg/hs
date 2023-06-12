@@ -14,6 +14,10 @@ refstore = {
           ext_sep = true,
           rejoin_at_end = true
         },
+        sep_standartize = {
+          ext_sep = true,
+          standartize_ext = true
+        },
       }
     },
     memoize = {

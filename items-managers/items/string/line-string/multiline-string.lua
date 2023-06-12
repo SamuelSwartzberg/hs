@@ -35,8 +35,7 @@ MultilineStringItemSpecifier = {
       end
     }
   },
-  action_table = concat(
-    getChooseItemTable({
+  action_table = {
       {
         d = "fld",
         i = "🗺",
@@ -49,8 +48,8 @@ MultilineStringItemSpecifier = {
         d = "lntl",
         i = "⩶👇",
         key = "tail"
-      }
-    }),{
+      },
+    
       {
         text = "👉⩶　cln.",
         key = "split-and-choose-action",
@@ -61,7 +60,7 @@ MultilineStringItemSpecifier = {
         key = "save-session",
       }
     }
-  )
+  
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

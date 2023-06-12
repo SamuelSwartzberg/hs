@@ -4,22 +4,12 @@ EmailAddressItemSpecifier = {
   properties = {
     getables = {
     },
-    doThisables = {
-      ["send-email"] = function(self, specifier)
-        specifier = specifier or {}
-        sendEmailInteractive({
-          from = env.MAIN_EMAIL,
-          to = self:get("c"),
-          subject = specifier.subject,
-        }, specifier.body, specifier.edit_func or editorEditFunc)
-      end
-    }
   },
   
   action_table = {
     {
       text = "📧 ma.",
-      key = "send-email"
+      dothis = dothis.email_address.edit_then_send
     }
   }
 

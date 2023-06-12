@@ -22,13 +22,13 @@ PathInMeItemSpecifier = {
     { key = "path-in-maudiovisual", value = CreatePathInMaudiovisualItem },
     { key = "path-in-mspec", value = CreatePathInMspecItem },
   }),
-  action_table = concat(getChooseItemTable({
+  action_table = {
     {
       d = "srvpth",
       i = "🚚",
       key = "local-server-path",
     }
-  }),{})
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

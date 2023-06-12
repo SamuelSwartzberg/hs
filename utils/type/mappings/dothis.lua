@@ -406,6 +406,11 @@ dothis = {
       run("open -a " .. transf.string.single_quoted_escaped(app) .. " " .. transf.string.single_quoted_escaped(path), do_after)
     end,
   },
+  extant_path = {
+    make_executable = function(path)
+      run("chmod +x " .. transf.string.single_quoted_escaped(path))
+    end,
+  },
   audio_file = {
     play = function(path, do_after)
       run("play " .. transf.string.single_quoted_escaped(path), do_after)
@@ -417,6 +422,9 @@ dothis = {
   plaintext_file = {
     append_contents = function(path, str)
       writeFile(path, str, "exists", "a")
+    end,
+    replace_contents = function(path, str)
+      writeFile(path, str, "exists", "w")
     end,
     append_lines = function(path, lines)
       local contents = transf.plaintext_file.one_final_newline(path)
@@ -433,6 +441,12 @@ dothis = {
       lines[line_number] = line
       dothis.plaintext_file.write_lines(path, lines)
     end,
+    pop_line = function(path)
+      local lines = transf.plaintext_file.lines(path)
+      local line = table.remove(lines, #lines)
+      dothis.plaintext_file.write_lines(path, lines)
+      return line
+    end,
 
   },
   plaintext_table_file = {
@@ -443,6 +457,127 @@ dothis = {
       dothis.plaintext_file.append_lines(path, lines)
     end,
 
+  },
+  email_file ={
+    download_attachment = function(path, name, do_after)
+      local cache_path = env.XDG_CACHE_HOME .. '/hs/email_attachments'
+      local att_path = cache_path .. '/' .. name
+      if type(do_after) == "function" then
+        local old_do_after = do_after
+        do_after = function()
+          old_do_after(att_path)
+        end
+      end
+      run(
+        'cd ' .. transf.single_quoted_escaped(cache_path) .. ' && mshow -x'
+        .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(name),
+        do_after
+      )
+    end,
+    send = function(path, do_after)
+      run({
+        args = {
+          "msmtp",
+          "-t",
+          "<",
+          { value = path, type = "quoted" },
+        },
+        catch = function()
+          writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), readFile(path, "error"))
+        end,
+        finally = function()
+          delete(path)
+        end,
+      }, 
+      {
+        "cat",
+        { value = path, type = "quoted" },
+        "|",
+        "msed",
+        { value = "/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time()), type = "quoted" },
+        "|",
+        "msed",
+        { value = "/Status/a/S/", type = "quoted" },
+        "|",
+        "mdeliver",
+        "-c",
+        { value = env.MBSYNC_ARCHIVE, type = "quoted" },
+      }, function()
+        delete(path)
+        if do_after then
+          do_after()
+        end
+      end, true)
+    end,
+    edit_then_send = function(email_file, do_after)
+      doWithTempFile({
+        path = email_file,
+        edit_before = true,
+      }, function(path)
+        writeFile(path, le(readFile(path))) -- re-eval
+        dothis.email_file.send(path, do_after)
+      end)
+    end,
+    reply = function(email_file, specifier, do_after)
+      specifier = glue({
+        to = transf.email_file.from(email_file),
+        subject = "Re: " .. transf.email_file.subject(email_file)
+      }, specifier)
+      specifier.body = get.email_file.with_body_quoted(email_file, specifier.body)
+      dothis.email_specifier.send(specifier, do_after)
+    end,
+    edit_then_reply = function(email_file, do_after)
+      dothis.email_specifier.edit_then_send({
+        to = transf.email_file.from(email_file),
+        subject = "Re: " .. transf.email_file.subject(email_file),
+        body = "\n\n" .. transf.email_file.quoted_body(email_file)
+      }, do_after)
+    end,
+    forward = function(email_file, specifier, do_after)
+      specifier = glue({
+        subject = "Fwd: " .. transf.email_file.subject(email_file)
+      }, specifier)
+      specifier.body = get.email_file.with_body_quoted(email_file, specifier.body)
+      dothis.email_specifier.send(specifier, do_after)
+    end,
+    edit_then_forward = function(email_file, do_after)
+      dothis.email_specifier.edit_then_send({
+        subject = "Fwd: " .. transf.email_file.subject(email_file),
+        body = "\n\n" .. transf.email_file.quoted_body(email_file)
+      }, do_after)
+    end,
+    move = function(source, target)
+      run({
+        "mdeliver",
+        { value = target, type = "quoted" },
+        "<",
+        { value = source, type = "quoted" }
+      }, {
+        "minc", -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
+        { value = target, type = "quoted" }
+      }, {
+        "rm",
+        { value = source, type = "quoted" }
+      }, true)
+    end,
+      
+    
+  },
+  maildir_dir = {
+    
+  },
+  email_specifier = {
+    send = function(specifier, do_after)
+      dothis.email_file.send(transf.email_specifier.draft_email_file(specifier), do_after)
+    end,
+    edit_then_send = function(specifier, do_after)
+      dothis.email_file.edit_then_send(transf.email_specifier.draft_email_file(specifier), do_after)
+    end,
+  },
+  email_address = {
+    edit_then_send = function(address, do_after)
+      dothis.email_specifier.edit_then_send({to = address}, do_after)
+    end,
   },
   empty_dir = {
 
@@ -466,6 +601,23 @@ dothis = {
           query .. "@" .. transf.path.filename(sqlite_file) .. ".csv",
           "sqlite_csv"
         )
+      )
+    end,
+  },
+  newsboat_urls_file = {
+    append_newsboat_url_specifier = function(path, specifier)
+      dothis.plaintext_file.append_line(path, transf.newsboat_url_specifier.newsboat_url_line(specifier))
+    end,
+  },
+  youtube_channel_id = {
+    add_to_newsboat_urls_file = function(channel_id, category)
+      dothis.newsboat_urls_file.append_newsboat_url_specifier(
+        env.NEWSBOAT_URLS,
+        {
+          url = transf.youtube_channel_id.feed_url(channel_id),
+          title = transf.youtube_channel_id.channel_title(channel_id),
+          category = category,
+        }
       )
     end,
   },
@@ -500,6 +652,17 @@ dothis = {
           type = "quoted"
         }
       })
+    end,
+  },
+  git_root_dir = {
+    run_hook =  function(path, hook)
+      local hook_path = get.git_root_dir.hook_path(path, hook)
+      run(hook_path, true)
+    end,
+    add_hook = function(path, hook_path, name)
+      name = name or transf.path.filename(hook_path)
+      srctgt("copy", hook_path, get.git_root_dir.hook_path(path, name))
+      dothis.extant_path.make_executable(get.git_root_dir.hook_path(path, name))
     end,
   }
 

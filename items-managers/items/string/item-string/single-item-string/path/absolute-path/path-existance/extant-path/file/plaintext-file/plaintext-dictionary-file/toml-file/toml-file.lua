@@ -7,9 +7,6 @@ TomlFileItemSpecifier = {
     getables = {
       ["parse-to-lua-table"] = bc(transf.toml_file.table)
     },
-    doThisables = {
-      
-    }
   },
   
 }

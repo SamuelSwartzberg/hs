@@ -240,12 +240,11 @@ NonEmptyTableSpecifier = {
     { key = "hetero-k-hetero-v-table", value = CreateHeteroKHeteroVTable },
 
   }),
-  action_table = concat({
+  action_table = {
     {
       text = "👉 c.",
       key = "choose-item-and-then-action"
-    } 
-  }, getChooseItemTable({
+    },
     {
       d = "tstr",
       i = "💻🔡",
@@ -256,7 +255,7 @@ NonEmptyTableSpecifier = {
       i = "💻🔡📜",
       key = "to-string-multiline",
     },
-  })),
+  }
   
 }
 --- @type BoundNewDynamicContentsComponentInterface

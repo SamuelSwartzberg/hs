@@ -626,7 +626,7 @@ assertMessage(
   false
 )
 
---- new {_p: string} processor
+--- new {_pd: string} processor
 
 assertMessage(
   doGui(
@@ -634,7 +634,7 @@ assertMessage(
     function() 
       return map(
         {"foo"},
-        {_p = "string"}
+        {_pd = "string"}
       )
     end
   ),
@@ -647,7 +647,7 @@ assertMessage(
     function()
       return map(
         {1},
-        {_p = "number"}
+        {_pd = "number"}
       )
     end
   ),

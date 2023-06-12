@@ -3,20 +3,6 @@ GitRootDirItemSpecifier = {
   type = "git-root-dir",
   properties = {
     getables = {
-      ["dotgit-dir"] = function(self)
-        return self:get("path-ensure-final-slash") .. ".git/"
-      end,
-      ["hooks-dir"] = function(self)
-        return self:get("path-ensure-final-slash") .. ".git/hooks/"
-      end,
-      ["run-hook-and-get-output"] = function(self)
-        return self:get("cd-and-output-this-task", {
-          self:get("hooks-dir") .. "run-hook-and-get-output",
-        })
-      end,
-      ["all-hooks"] = function(self)
-        return itemsInPath({path = self:get("hooks-dir"), include_dirs = false})
-      end,
     },
     doThisables = {
       ["copy-as-hook"] = function(self, hook_path)
@@ -38,11 +24,6 @@ GitRootDirItemSpecifier = {
         for _, hook_path in fastpairs(itemsInPath({path = env.GITCONFIGHOOKS, include_dirs = false})) do
           self:doThis("copy-as-hook", hook_path)
         end
-      end,
-      ["run-hook"] = function(self, hook_name)
-        self:doThis("cd-and-run-this-task", {
-          self:get("hooks-dir") .. hook_name,
-        })
       end,
 
     }

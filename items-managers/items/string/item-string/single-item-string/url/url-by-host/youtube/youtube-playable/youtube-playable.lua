@@ -51,7 +51,7 @@ YoutubePlayableItemItemSpecifier = {
       end,
       ["add-as-m3u"] = function(self, deduced_tags)
         local specifier = {}
-        local edited_tags = map(deduced_tags, {_p = "string"})
+        local edited_tags = map(deduced_tags, {_pd = "string"})
         specifier.tag = glue(edited_tags, promptUserToAddNKeyValuePairs("tag"))
         specifier.path  = promptPipeline({
           {"dir", {prompt_args = {default = env.MAUDIOVISUAL}}},
@@ -65,8 +65,7 @@ YoutubePlayableItemItemSpecifier = {
       end,
     }
   },
-  action_table = concat(
-    getChooseItemTable({
+  action_table = {
       {
         d = "ttl",
         i = "🏧",
@@ -76,9 +75,7 @@ YoutubePlayableItemItemSpecifier = {
         d = "crea",
         i = "👩‍🎤",
         key = "youtube-playable-item-channel-cleaned"
-      }
-    }),
-    {
+      },
       {
         text = "📌🎸🔨 addm3udet.",
         key = "add-as-m3u-deterministic",
@@ -88,7 +85,6 @@ YoutubePlayableItemItemSpecifier = {
         key = "add-as-m3u-ai",
       }
     },
-    createAllCreationEntryCombinations()
   ),
   potential_interfaces = ovtable.init({
     { key = "youtube-playlist", value = CreateYoutubePlaylistItem },

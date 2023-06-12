@@ -5,89 +5,32 @@ EmailFileItemSpecifier = {
   type = "email-file",
   properties = {
     doThisables = {
-      ["download-attachment"] = function(self, name)
-        run({
-          "cd",
-          env.TMPDIR,
-          "&&",
-          "mshow",
-          "-x",
-          { value = self:get("completely-resolved-path"), type = "quoted" },
-          { value = name, type = "quoted" },
-        }, true)
-      end,
       ["choose-save-act-on-attachment"] = function(self)
-        ar(self:get("attachments")):doThis("choose-item", function(attachment)
-          self:doThis("download-attachment", attachment)
-          local path = mustEnd(env.TMPDIR, "/") .. attachment
-          local file = st(path)
-          file:doThis("choose-action")
+        ar(transf.email_file.attachments(self:get("c"))):doThis("choose-item", function(attachment)
+          dothis.email_file.download_attachment(self:get("c"), attachment, function(att_path)
+            st(att_path):doThis("choose-action")
+          end)
         end)
       end,
-      ["email-reply"] = function(self, specifier)
-        sendEmailInteractive({
-          from = env.MAIN_EMAIL,
-          to = transf.email_file.to(self:get("completely-resolved-path")),
-          subject = "Re: " .. transf.email_file.subject(self:get("completely-resolved-path")),
-        }, self:get("with-email-body-quoted", specifier.response or ""), specifier.edit_func)
-      end,
-      ["email-reply-interactive"] = function(self, response)
-        self:doThis("email-reply", {
-          response = response,
-          edit_func = editorEditFunc
-        })
-      end,
-
-      ["email-forward"] = function (self, specifier)
-        sendEmailInteractive({
-          from = env.MAIN_EMAIL,
-          subject = "Fwd: " .. transf.email_file.subject(self:get("completely-resolved-path")),
-          to = specifier.to or ""
-        }, self:get("with-email-body-quoted", specifier.response or ""), specifier.edit_func)
-      end,
-      ["email-forward-interactive"] = function(self, response)
-        self:doThis("email-forward", {
-          response = response,
-          edit_func = editorEditFunc
-        })
-      end,
-      ["email-move-to"] = function(self, path)
-        run({
-          "mdeliver",
-          { value = path, type = "quoted" },
-          "<",
-          { value = self:get("completely-resolved-path"), type = "quoted" }
-        }, {
-          "minc", -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
-          { value = path, type = "quoted" }
-        }, {
-          "rm",
-          { value = self:get("completely-resolved-path"), type = "quoted" }
-        }, true)
-      end,
+        
     }
   },
-  action_table = concat({
+  action_table = {
     {
       text = "👉📎 cattch.",
       key = "choose-save-act-on-attachment"
     },{
       text = "↩️📧 re.",
-      key = "email-reply-interactive"
+      dothis = dothis.email_file.edit_then_reply
     },{
       text = "↪️📧 fwd.",
-      key = "email-forward-interactive"
-    },{
-      text = "☑️ arch.",
-      key = "email-move-to",
-      args = env.MBSYNC_ARCHIVE
+      dothis = dothis.email_file.edit_then_forward
     },{
       text = "👉📬 cemladdr.",
       getfn = get.email_file.addresses,
       filter = ar,
       act = "cia"
-    }
-  }, getChooseItemTable({
+    },
     {
       d = "sbj",
       i = "👒",
@@ -95,22 +38,17 @@ EmailFileItemSpecifier = {
     },{
       d = "bdy",
       i = "📜",
-      key = "email-body"
+      getfn = transf.email_file.rendered_body,
     },{
       d = "bdyqt",
       i = "📜💬",
       getfn = transf.email_file.quoted_body,
-      get = "email-body-rendered"
     },{
       d = "smm",
       i = "⋯",
-      key = "email-summary"
-    },{
-      d = "hdrs",
-      i = "📊",
-      key = "email-all-decoded-headers"
+      getfn = transf.email_file.summary,
     }
-  }))
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

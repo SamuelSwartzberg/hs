@@ -103,7 +103,7 @@ local keymap = {
   ["8"] = {
     explanation = "Choose a email in your inbox and action on it",
     fn = function()
-      ar(getSortedEmailPaths(env.MBSYNC_INBOX, true))
+      ar(get.maildir_dir.sorted_email_paths(env.MBSYNC_INBOX, true))
         :get("to-string-item-array")
         :doThis("choose-email-and-then-action")
     end,
@@ -148,9 +148,9 @@ local keymap = {
           true_val = string.format(true_val, prompt("string", "Search for: "))
           local results
           if stringy.startswith(val, "magrep") then
-            results = getSortedEmailPaths(env.MBSYNC_ARCHIVE, true, true_val)
+            results = get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, true_val)
           elseif stringy.startswith(val, "mpick") then
-            results = getSortedEmailPaths(env.MBSYNC_ARCHIVE, true, nil, true_val)
+            results = get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, nil, true_val)
           end
           ar(results)
             :get("to-string-item-array")

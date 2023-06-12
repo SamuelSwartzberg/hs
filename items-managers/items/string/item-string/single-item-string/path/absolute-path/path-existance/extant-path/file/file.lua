@@ -6,13 +6,13 @@ FileItemSpecifier = {
   properties = {
     getables = {
       ["is-image-file"] = function(self) 
-        return is.path.usable_as_filetype(self:get("c"), "image") 
+        return get.path.usable_as_filetype(self:get("c"), "image") 
       end,
       ["is-plaintext-file"] = function(self) 
-        return not is.path.usable_as_filetype(self:get("c"), "binary")
+        return not get.path.usable_as_filetype(self:get("c"), "binary")
       end,
       ["is-binary-file"] = function(self) 
-        return is.path.usable_as_filetype(self:get("c"), "binary")
+        return get.path.usable_as_filetype(self:get("c"), "binary")
       end,
       ["dir-or-file-any-pass"] = function(self, query) return query(self) end,
       ["file-contents"] = function(self)
@@ -49,7 +49,7 @@ FileItemSpecifier = {
         writeFile(self:get("c"), "", "exists")
       end,
       ["send-in-email"] = function(self, do_after)
-        sendEmailInteractive({}, transf.path.attachment(self:get("completely-resolved-path")), editorEditFunc, do_after)
+        dothis.email_specifier.send({body = transf.path.attachment(self:get("completely-resolved-path")} do_after)
       end,
       ["edit-file-interactive"] = function(self, do_after)
         run({

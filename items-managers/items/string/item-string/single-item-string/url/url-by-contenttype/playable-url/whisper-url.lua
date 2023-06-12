@@ -1,26 +1,13 @@
 --- @type ItemSpecifier
 WhisperURLItemSpecifier = {
   type = "whisper-url",
-  properties = {
-    getables = {
-      ["transcribed"] = function (self)
-        return transf.whisper_url.transcribed(self:get("url-path"))
-      end
-    },
-    doThisables = {
-    
-    }
-  },
-  action_table = concat(
-    getChooseItemTable({
+  action_table = {
       {
-        i = "🍡",
-        d = "bruurl",
-        key = "booru-url"
+        i = "",
+        d = "",
+        getfn = transf.whisper_url.transcribed
       }
-    }),{
-    }
-  )
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

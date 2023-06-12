@@ -3,24 +3,9 @@ PlayableURLItemSpecifier = {
   type = "playable-url",
   properties = {
     getables = {
-      ["is-whisper-url"] = function(self)
-        return is.path.usable_as_filetype(self:get("url-path"), "whisper-audio")
-      end,
+      ["is-whisper-url"] = bc(get.path.usable_as_filetype, "whisper-audio")
     },
-    doThisables = {
-    
-    }
   },
-  action_table = concat(
-    getChooseItemTable({
-      {
-        i = "🍡",
-        d = "bruurl",
-        key = "booru-url"
-      }
-    }),{
-    }
-  ),
   potential_interfaces = ovtable.init({
     { key = "whisper-url", value = CreateWhisperURLItem },
   })

@@ -16,16 +16,15 @@ IcsFileItemSpecifier = {
       end,
     }
   },
-  action_table = concat(
+  action_table = 
     {
       {
-        {
-          key = "add-events-to-calendar",
-          text = "➕📅 addevcal",
-        }
+        key = "add-events-to-calendar",
+        text = "➕📅 addevcal",
       }
     }
-  )
+    
+  
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

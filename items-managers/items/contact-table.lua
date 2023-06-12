@@ -175,8 +175,7 @@ ContactTableSpecifier = {
     }
   },
   
-  action_table = concat(
-    getChooseItemTable({
+  action_table = {
       { i = "⏪🙋🏻‍♀️", d = "nmpr", key = "name-pre", check = true },
       { i = "◀️🙋🏻‍♀️", d = "fnm", key = "first-name", check = true },
       { i = "⏺🙋🏻‍♀️", d = "mnm", key = "first-name", check = true },
@@ -196,8 +195,6 @@ ContactTableSpecifier = {
       { i = "🏦🔢", d = "iban", key = "iban", },
       { i = "✉♥️", d = "pmail", key = "contact-addr", args = { type = "email", addr_type = "pref" }, check = true },
       { i = "📞♥️", d = "pphone", key = "contact-addr", args = { type = "phone", addr_type = "pref" }, check = true },
-    }),
-    {
       {
         text = "👉✉ cmail.",
         key = "choose-item-and-then-action-on-result-of-get",
@@ -221,8 +218,8 @@ ContactTableSpecifier = {
         text = "✏️ ed.",
         key = "edit",
       }
-    }
-  )
+  }
+  
 
 }
 

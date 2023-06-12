@@ -6,12 +6,7 @@ function serve(type, tcp_port, path)
   local args
   if type == "http" then
      args = {
-      "http-server",
-      "-a",
-      "127.0.0.1",
-      "-p",
-      tcp_port,
-      "-c60",
+      'http-server -a 127.0.0.1 -p "$FS_HTTP_SERVER_PORT" "$HOME" -c60',
       path
     }
   elseif type == "json" then 

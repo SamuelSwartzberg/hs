@@ -111,6 +111,9 @@ transf = {
     extension = function(path)
       return pathSlice(path, "-1:-1", refstore.params.path_slice.opts.ext_sep)[1]
     end,
+    standartized_extension = function(path)
+      return pathSlice(path, "-1:-1", refstore.params.path_slice.opts.sep_standartize)[1]
+    end,
     no_extension = function(path)
       return pathSlice(path, "1:-2", refstore.params.path_slice.opts.sep_rejoin)
     end,
@@ -198,6 +201,18 @@ transf = {
       return transf.path_array.extensions_array(transf.dir_path.descendants_array(dir_path))
     end,
 
+  },
+
+  git_root_dir = {
+    dotgit_dir = function(git_root_dir)
+      return transf.path.ending_with_slash(git_root_dir) .. ".git"
+    end,
+    hooks_dir = function(git_root_dir)
+      return transf.path.ending_with_slash(git_root_dir) .. ".git/hooks"
+    end,
+    hooks = function(git_root_dir)
+      return itemsInPath(transf.git_root_dir.hooks_dir(git_root_dir))
+    end,
   },
   
   path_leaf_parts = {
@@ -299,6 +314,20 @@ transf = {
     end,
 
   },
+  email_specifier = {
+    draft_email_file = function(specifier)
+      specifier = copy(specifier)
+      local body = specifier.body or ""
+      specifier.body = nil
+      local mail = join.string.table.email(specifier, body)
+      local evaled_mail = le(mail)
+      local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
+      local outpath = temppath .. "_out"
+      run("mmime < " .. transf.string.single_quoted_escaped(temppath) .. " > " .. transf.string.single_quoted_escaped(outpath))
+      delete(temppath)
+      return outpath
+    end
+  },
   mime_parts_raw = {
     attachments = function(mime_parts_raw)
       local attachments = {}
@@ -391,6 +420,15 @@ transf = {
     one_final_newline = function(path)
       return transf.string.one_final_newline(transf.plaintext_file.contents(path))
     end,
+    len_lines = function(path)
+      return transf.string.len_lines(transf.plaintext_file.contents(path))
+    end,
+    len_chars = function(path)
+      return transf.string.len_chars(transf.plaintext_file.contents(path))
+    end,
+    len_bytechars = function(path)
+      return transf.string.len_bytechars(transf.plaintext_file.contents(path))
+    end,
 
     
   },
@@ -433,6 +471,15 @@ transf = {
 
   },
 
+  newsboat_url_specifier = {
+    newsboat_url_line = function(specifier)
+      return ('%s\t"~%s"\t"_%s"'):format(
+        specifier.url,
+        specifier.title,
+        ((specifier.category and #specifier.category > 0) and specifier.category) or "edu"
+      )
+    end
+  },
   semver = {
     components = function(str)
       local major, minor, patch, prerelease, build = onig.match(str, mt._r.version.semver)
@@ -780,6 +827,10 @@ transf = {
       return t
     end,
 
+    len_bytechars = function(str)
+      return #transf.string.bytechars(str)
+    end,
+
 
     --- @param str string
     --- @return string[]
@@ -791,6 +842,10 @@ transf = {
       return t
     end,
 
+    len_chars = function(str)
+      return #transf.string.chars(str)
+    end,
+
     --- @param str string
     --- @return string[]
     lines = function(str)
@@ -799,6 +854,12 @@ transf = {
         "\n"
       )
     end,
+
+    len_lines = function(str)
+      return #transf.string.lines(str)
+    end,
+
+
     content_lines = function(str)
       return memoize(filter)(transf.string.lines(str), true)
     end,

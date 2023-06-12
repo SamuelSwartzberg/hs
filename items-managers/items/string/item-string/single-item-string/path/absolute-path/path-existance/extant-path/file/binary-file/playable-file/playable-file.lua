@@ -4,7 +4,7 @@ PlayableFileItemSpecifier = {
   properties = {
     getables = {
       ["is-whisper-file"] = function(self)
-        return is.path.usable_as_filetype(self:get("c"), "whisper-audio")
+        return get.path.usable_as_filetype(self:get("c"), "whisper-audio")
       end,
     },
     doThisables = {

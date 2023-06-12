@@ -4,10 +4,10 @@ URLByContenttypeItemSpecifier = {
   properties = {
     getables = {
       ["is-image-url"] = function(self)
-        return is.path.usable_as_filetype(self:get("url-path"), "image")
+        return get.path.usable_as_filetype(self:get("url-path"), "image")
       end,
       ["is-playable-url"] = function(self)
-        return is.path.usable_as_filetype(self:get("url-path"), "playable")
+        return get.path.usable_as_filetype(self:get("url-path"), "playable")
       end,
     }
   },

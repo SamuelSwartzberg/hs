@@ -171,7 +171,7 @@ ExtantPathItemSpecifier = {
   --[[   { key = "category-date-dir-structure-contained-item", value = CreateCategoryDateDirStructureContainedItem },
  ]]
   }),
-  action_table = concat({
+  action_table = {
     {
       text = "🗄 op.",
       key = "open-path"
@@ -232,24 +232,23 @@ ExtantPathItemSpecifier = {
       filter = dat,
       getfn = transf.path.m_date
     }, {
-      text = "👉🫳🕚 cadt.",
+      text = "🫳🕚 cadt.",
       filter = dat,
       getfn = transf.path.a_date
     },{
-      text = "👉👩🏽‍💻🕚 ccdt.",
+      text = "👩🏽‍💻🕚 ccdt.",
       filter = dat,
       getfn = transf.path.c_date
     },{
-      text = "👉🌄🕚 ccrdt.",
+      text = "🌄🕚 ccrdt.",
       filter = dat,
       getfn = transf.path.cr_date
-    }
-  }, getChooseItemTable({
+    },
     {
-      d = "👉📏 pthsz.",
+      d = "📏 pthsz.",
       getfn = transf.path.size
     }
-  }))
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

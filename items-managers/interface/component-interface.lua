@@ -46,55 +46,6 @@ local function getOrDoAll(self, action, key, value, not_recursive_children, not_
   return output
 end
 
---- @param self ComponentInterface
---- @param thing string | functable
-local function singleInteractiveFunc(self, thing)
-  if type(thing) == "string" then
-    if stringy.startswith(thing, "path_from:") then
-      local start = eutf8.sub(thing, 11)
-      return prompt("path", start)
-    else 
-      return prompt("string", "Enter value for " .. thing)
-    end
-  elseif type(thing) == "table" and thing.func then -- we can't use functions directly since hs.chooser can't serialize them and doesn't like unserializable things
-    return _G[thing.func](thing.args)
-  else
-    error("Unknown specifier thing type for do-interactive: " .. type(thing))
-  end
-end
-
---- @alias functable { func: string, args: string}
-
---- allow for some sort of dynamic getting of args to pass to methods of the interface without having to write wrappers
---- the passed specifier contains the key action (e.g. "doThis") and the key key identifying the method of that action
---- most importantly, it contains the key thing, which does the work of specifying how to get the args to pass to the method
---- thing can be a string, in which case it will be used as a prompt for the user to enter a string
---- thing can also be a functable
---- or it can be an assoc arr or array of strings or functables, which will be handled the same as the above, but will be passed as an assoc arr or array to the method
---- @param self ComponentInterface
---- @param specifier { action: string, key: string, thing: string | functable | { [string]: string | function } | (string | functable)[]}
-local function interactiveFunc(self, specifier)
-  local args_to_pass
-  local thing = specifier.thing
-  if isListOrEmptyTable(specifier.thing) then
-    --- @cast thing (string | function)[]
-    args_to_pass = {}
-    for _, thing in ipairs(thing) do
-      push(args_to_pass, singleInteractiveFunc(self, thing))
-    end
-  elseif type(thing) == "table" and not thing.func then
-    args_to_pass = {}
-    --- @cast thing { [string]: string | function }
-    for key, val in fastpairs(thing) do
-      args_to_pass[key] = singleInteractiveFunc(self, val)
-    end
-  else
-    --- @cast thing string | functable
-    args_to_pass= singleInteractiveFunc(self, thing)
-  end
-  return self[specifier.action](self, specifier.key, args_to_pass)
-end
-
 --- @alias nonstring function | number | boolean | table | any[]
 
 --- @alias propfunc fun(self?: ComponentInterface, arg?: any)
@@ -232,10 +183,6 @@ InterfaceDefaultTemplate = {
           return interface:get("type") == interface_type
         end)
       end,
-      ["get-interactive"] = function(self, specifier)
-        specifier.action = "get"
-        return interactiveFunc(self, specifier)
-      end,
       ["timer-that-does"] = function(self, specifier)
         return {
           interval = specifier.interval,
@@ -260,10 +207,6 @@ InterfaceDefaultTemplate = {
           self:doThis("use-action", chosen_item)
         end)
       end,
-      ["do-interactive"] = function(self, specifier)
-        specifier.action = "doThis"
-        interactiveFunc(self, specifier)
-      end,
       ["use-action"] = function(self, action_item)
         local first_arg
         if action_item.getfn or action_item.dothis then
@@ -272,12 +215,23 @@ InterfaceDefaultTemplate = {
         else
           first_arg = self
         end
+        local args = {}
+        if not isListOrEmptyTable(action_item.args) then
+          args = {action_item.args}
+        end
+        for k, v in pairs(action_item.args) do
+          if args.isprompttbl then
+            args[k] = map(v, {_pm = false}, {tolist = true})[1]
+          else
+            args[k] = v
+          end
+        end
         if action_item.dothis then
-          action_item.dothis(first_arg)
+          action_item.dothis(first_arg, table.unpack(args))
         elseif action_item.key then
-          self:doThis(action_item.key, action_item.args)
+          self:doThis(action_item.key, table.unpack(args))
         else
-          local res = action_item.getfn(first_arg, action_item.args)
+          local res = action_item.getfn(first_arg, table.unpack(args))
           action_item.filter = action_item.filter or st
           action_item.act = action_item.act or "ca"
           if action_item.act == "ca" then

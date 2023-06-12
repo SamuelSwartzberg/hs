@@ -29,7 +29,7 @@ PathLeafSpecifier = {
   
       
       ["is-usable-as-filetype"] = function(self, filetype)
-        return is.path.usable_as_filetype(self:get("path-leaf-extension"), filetype)
+        return get.path.usable_as_filetype(self:get("path-leaf-extension"), filetype)
       end,
       ["leaf-without-extension"] = function (self)
         return pathSlice(self:get("resolved-path"), "-2:-2", { ext_sep = true } )[1]

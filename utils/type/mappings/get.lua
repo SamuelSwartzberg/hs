@@ -309,6 +309,15 @@ get = {
     
   },
   path = {
+    usable_as_filetype = function(path, filetype)
+      path = transf.string.path_resolved(path)
+      local extension = pathSlice(path, "-1:-1", { ext_sep = true, standartize_ext = true })[1]
+      if find(mt._list.filetype[filetype], extension) then
+        return true
+      else
+        return false
+      end
+    end,
     with_different_extension = function(path, ext)
       return transf.path.no_extension(path) .. "." .. ext
     end,
@@ -317,6 +326,15 @@ get = {
     end,
     is_extension = function(path, ext)
       return transf.path.extension(path) == ext
+    end,
+    is_standartized_extension = function(path, ext)
+      return transf.path.standartized_extension(path) == ext
+    end,
+    is_filename = function(path, filename)
+      return transf.path.filename(path) == filename
+    end,
+    is_leaf = function(path, leaf)
+      return transf.path.leaf(path) == leaf
     end,
   },
   absolute_path = {
@@ -346,6 +364,15 @@ get = {
     end,
     find_child_with_extension = function(dir_path, extension)
       return find(transf.dir_path.children_extensions_array(dir_path), {_exactly = extension})
+    end,
+  },
+  git_root_dir = {
+    hook_path = function(path, hook)
+      return transf.git_root_dir.hooks_dir(path) .. "/" .. hook
+    end,
+    hook_res = function(path, hook)
+      local hook_path = get.git_root_dir.hook_path(path, hook)
+      return run(hook_path)
     end,
   },
   plaintext_file = {
@@ -470,6 +497,33 @@ get = {
       return hs.fnutils.imap(w_displaynames, transf.email_or_displayname_email.displayname_email_dict)
     end,
 
+  },
+  maildir_dir = {
+    --- @param path string
+    --- @param reverse? boolean
+    --- @param magrep? string
+    --- @param mpick? string
+    --- @return string[]
+    sorted_email_paths = function(path, reverse, magrep, mpick)
+      local flags = "-d"
+      if reverse then
+        flags = flags .. "r"
+      end
+      local cmd = "mlist" .. transf.string.single_quoted_escaped(path)
+      if magrep then
+        cmd = cmd .. " | magrep -i" .. transf.string.single_quoted_escaped(magrep)
+      end
+      if mpick then
+        cmd = cmd .. " | mpick -i" .. transf.string.single_quoted_escaped(mpick)
+      end
+      cmd = cmd .. " | msort " .. flags
+
+      return transf.string.lines(run(cmd))
+    end
+
+  },
+  email_specifier = {
+    
   },
   logging_dir = {
     log_for_date = function(path, date)

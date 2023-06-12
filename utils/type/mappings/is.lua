@@ -40,22 +40,14 @@ is = {
     end,
   },
   path = {
-    usable_as_filetype = function(path, filetype)
-      path = transf.string.path_resolved(path)
-      local extension = pathSlice(path, "-1:-1", { ext_sep = true, standartize_ext = true })[1]
-      if find(mt._list.filetype[filetype], extension) then
-        return true
-      else
-        return false
-      end
-    end,
+    
     playable_file = function (path)
-      return is.path.usable_as_filetype(path, "audio") or is.path.usable_as_filetype(path, "video")
+      return get.path.usable_as_filetype(path, "audio") or get.path.usable_as_filetype(path, "video")
     end,
     shellscript_file = function(path)
       return testPath(path, {
         contents = { _r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" }
-      }) or is.path.usable_as_filetype(path, "shell-script")
+      }) or get.path.usable_as_filetype(path, "shell-script")
     end,
     has_extension = function(path)
       return transf.path.extension(path) ~= ""
@@ -85,7 +77,12 @@ is = {
     absolute_path = function(path)
       return is.path.tilde_absolute_path(path) or is.path.true_absolute_path(path)
     end,
-
+    email_file = function(path)
+     return 
+      get.path.is_extension(path, "eml") or 
+      transf.path.parent_leaf(path) == "new" or
+      transf.path.parent_leaf(path == "cur"
+    end
   },
   extant_path = {
     
