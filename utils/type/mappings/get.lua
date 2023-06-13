@@ -638,10 +638,14 @@ get = {
     with_body_quoted = function(path, response)
       return response .. "\n\n" .. transf.email_file.quoted_body(path)
     end,
-    header = function(path, header)
+    prefixed_header = function(path, header)
       return run(
-        "mshow -h" .. transf.string.single_quoted_escaped(header) .. transf.string.single_quoted_escaped(path)
+        "mshow -qh" .. transf.string.single_quoted_escaped(header) .. transf.string.single_quoted_escaped(path)
       )
+    end,
+    header = function(path, header)
+      local prefixed_header = transf.email_file.prefixed_header(path, header)
+      return eutf8.sub(prefixed_header, #header + 2) -- +2 for the colon and the space
     end,
     addresses = function(path, header, only)
       if not listContains(mt._list.email_headers_containin_emails, header) then

@@ -4,7 +4,9 @@ MenvDirItemSpecifier = {
   properties = {
     getables = {
       ["all-env-vars"] = function(self)
-        return self:get("descendant-file-only-string-item-array"):get("filter-to-array-of-non-dotfiles"):get("to-single-env-map"):get("to-env-file-string")
+        return self:get("descendant-file-only-string-item-array"):get("filter-to-array-of-non-dotfiles"):get("map-to-new-array", function(item)
+          return item:get("to-env-map")
+        end):get("flatten-to-single-table"):get("to-env-file-string")
       end,
       ["refresh-env-task"] = function(self)
         return {

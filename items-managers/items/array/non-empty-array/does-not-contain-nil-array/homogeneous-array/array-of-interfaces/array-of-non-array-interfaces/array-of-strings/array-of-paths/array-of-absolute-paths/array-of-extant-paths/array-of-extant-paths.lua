@@ -7,12 +7,6 @@ ArrayOfExtantPathsSpecifier = {
       ["is-array-of-files"] = bind(isArrayOfInterfacesOfType, {a_use, "file" }),
       ["is-array-of-dated-extant-paths"] = bind(isArrayOfInterfacesOfType, {a_use, "dated-extant-path" }),
       ["is-array-of-in-git-dir-path-items"] = bind(isArrayOfInterfacesOfType, {a_use, "in-git-dir-path" }),
-      ["filter-to-array-of-dirs"] = function(self)
-        return self:get("filter-to-array-of-type", "dir")
-      end,
-      ["filter-to-array-of-files"] = function(self)
-        return self:get("filter-to-array-of-type", "file")
-      end,
       ["filter-to-array-of-non-dotfiles"] = function(self)
         return self:get("filter-to-new-array", function(item)
           return not stringy.startswith(pathSlice(item:get("c", "-1:-1"))[1], ".")

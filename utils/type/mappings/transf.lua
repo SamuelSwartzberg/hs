@@ -167,6 +167,13 @@ transf = {
     end,
     sibling_array = function(path)
       return transf.dir.children_array(transf.path.parent_path(path))
+    end,
+    contained_files_array = function(path)
+      if is.path.dir(path) then
+        return transf.dir.descendant_file_array(path)
+      else
+        return {path}
+      end
     end
   },
   path_array = {
@@ -183,7 +190,7 @@ transf = {
     end,
     extant_path_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.exists)
-    end,
+    end
     
   },
   extant_path_array = {
@@ -225,6 +232,13 @@ transf = {
       return itemsInPath({
         path = dir,
         recursive = true,
+      })
+    end,
+    descendant_file_array = function(dir)
+      return itemsInPath({
+        path = dir,
+        recursive = true,
+        include_dirs = false,
       })
     end,
     descendants_leaves_array = function(dir)
@@ -401,10 +415,28 @@ transf = {
         "mshow -q" .. transf.string.single_quoted_escaped(path)
       )
     end,
+    useful_header_dict = function(path)
+      error("TODO: currently the way the headers are rendered contains a bunch of stuff we wouldn't want in the dict. In particular, emails without a name are rendered as <email>, which may not be what we want.")
+      return transf.header_string.dict(transf.email_file.all_useful_headers_raw(path))
+    end,
     rendered_body = function(path)
-      return run(
+      return memoize(run)(
         "mshow -R" .. transf.string.single_quoted_escaped(path)
       )
+    end,
+    simple_view = function(path)
+      return transf.email_file.all_useful_headers_raw(path) .. "\n\n" .. transf.email_file.rendered_body(path)
+    end,
+    email_specifier = function(path)
+      local specifier = transf.email_file.useful_header_dict(path)
+      specifier.body = transf.email_file.rendered_body(path)
+      return specifier
+    end,
+    reply_email_specifier = function(path)
+      return transf.email_specifier.reply_email_specifier(transf.email_file.email_specifier(path))
+    end,
+    forward_email_specifier = function(path)
+      return transf.email_specifier.forward_email_specifier(transf.email_file.email_specifier(path))
     end,
     quoted_body = function(path)
       transf.string.email_quoted(transf.email_file.rendered_body(path))
@@ -427,11 +459,30 @@ transf = {
       return transf.mime_parts_raw.attachments(transf.email_file.mime_parts_raw(path))
     end,
     summary = function(path)
-      return run("mscan -f %D **%f** %200s" .. transf.string.single_quoted_escaped(path))
+      return memoize(run)("mscan -f %D **%f** %200s" .. transf.string.single_quoted_escaped(path))
+    end,
+    email_file_summary_key_value = function(path)
+      return path, transf.email_file.summary(path)
+    end,
+    email_file_simple_view_key_value = function(path)
+      return path, transf.email_file.simple_view(path)
     end,
 
   },
   email_specifier = {
+    reply_email_specifier = function(specifier)
+      return {
+        to = specifier.from,
+        subject = "Re: " .. specifier.subject,
+        body = "\n\n" .. transf.string.email_quoted(specifier.body)
+      }
+    end,
+    forward_email_specifier = function(specifier)
+      return {
+        subject = "Fwd: " .. specifier.subject,
+        body = "\n\n" .. transf.string.email_quoted(specifier.body)
+      }
+    end,
     draft_email_file = function(specifier)
       specifier = copy(specifier)
       local body = specifier.body or ""
@@ -518,6 +569,9 @@ transf = {
     end,
     lines = function(path)
       return transf.string.lines(transf.plaintext_file.contents(path))
+    end,
+    content_lines = function(path)
+      return transf.string.content_lines(transf.plaintext_file.contents(path))
     end,
     first_line = function(path)
       return transf.string.first_line(transf.plaintext_file.contents(path))
@@ -1093,6 +1147,10 @@ transf = {
     base64_url = basexx.to_url64,
     base32_gen = basexx.to_base32,
     base32_crock = basexx.to_crockford,
+    header_key_value = function(str)
+      local k, v = eutf8.match(str, "^([^:]+):%s*(.+)$")
+      return transf.word.notcapitalized(k), v
+    end,
     title_case = function(str)
       local words, removed = split(str, {_r = "[ :–\\—\\-\\t\\n]", _regex_engine = "onig"})
       local title_cased_words = map(words, transf.word.title_case_policy)
@@ -1367,7 +1425,16 @@ transf = {
       )
     end,
   },
-
+  header_string = {
+    dict = function(str)
+      local lines = transf.string.content_lines(str)
+      return map(
+        lines,
+        transf.string.header_key_value,
+        {"v", "kv"}
+      )
+    end
+  },
   event_table = {
     calendar_template = function(event_table)
       local template = get.khal.calendar_template_empty()
@@ -1472,6 +1539,9 @@ transf = {
     capitalized = function(word)
       return replace(word, to.case.capitalized)
     end,
+    notcapitalized = function(word)
+      return replace(word, to.case.notcapitalized)
+    end,
     synonyms = {
 
       raw_syn = function(str)
@@ -1514,6 +1584,11 @@ transf = {
         return items
       end,
     }
+  },
+  pair = {
+    header = function(pair)
+      return transf.word.capitalized(pair[1]) .. ": " .. pair[2]
+    end
   },
   displayname_email = {
     email = function(str)
@@ -1580,12 +1655,39 @@ transf = {
   array_of_string_arrays = {
 
   },
+  plaintext_file_array = {
+    contents_array = function(arr)
+      return hs.fnutils.imap(arr, transf.plaintext_file.contents)
+    end,
+    lines_array = function(arr)
+      return map(arr, transf.plaintext_file.lines, {flatten = true})
+    end,
+    content_lines_array = function(arr)
+      return map(arr, transf.plaintext_file.content_lines, {flatten = true})
+    end,
+  },
   array_of_event_tables = {
     item_array_of_event_table_items = function(arr)
       return ar(hs.fnutils.imap(
         arr,
         CreateEventTableItem
       ))
+    end,
+  },
+  email_file_array = {
+    email_file_summary_dict = function(email_file_array)
+      return map(
+        email_file_array,
+        transf.email_file.email_file_summary_key_value
+        {"v", "kv"}
+      )
+    end,
+    email_file_simple_view_dict = function(email_file_array)
+      return map(
+        email_file_array,
+        transf.email_file.email_file_simple_view_key_value
+        {"v", "kv"}
+      )
     end,
   },
   table = {

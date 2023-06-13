@@ -10,13 +10,13 @@ ArrayOfPlaintextFilesSpecifier = {
   action_table = {
     {
       text = "👉⩶👊　clnact.",
-      key = "choose-item-and-then-action-on-result-of-get",
-      args = { key = "map-to-line-array-of-file-contents-with-no-empty-strings" }
+      getfn = transf.plaintext_file_array.content_lines_array,
+      act = "cia"
     },
     {
       text = "👉⩶📜👊　clnarract.",
-      key = "choose-action-on-result-of-get",
-      args = { key = "map-to-line-array-of-file-contents-with-no-empty-strings" }
+      getfn = transf.plaintext_file_array.content_lines_array,
+      act = "ca"
 
     }
   },

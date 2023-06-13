@@ -539,42 +539,28 @@ dothis = {
         end
       end, true)
     end,
-    edit_then_send = function(email_file, do_after)
+    edit_then_send = function(path, do_after)
       doWithTempFile({
-        path = email_file,
+        path = path,
         edit_before = true,
       }, function(path)
         writeFile(path, le(readFile(path))) -- re-eval
         dothis.email_file.send(path, do_after)
       end)
     end,
-    reply = function(email_file, specifier, do_after)
-      specifier = glue({
-        to = transf.email_file.from(email_file),
-        subject = "Re: " .. transf.email_file.subject(email_file)
-      }, specifier)
-      specifier.body = get.email_file.with_body_quoted(email_file, specifier.body)
+    reply = function(path, specifier, do_after)
+      specifier = glue(transf.email_file.reply_email_specifier(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
-    edit_then_reply = function(email_file, do_after)
-      dothis.email_specifier.edit_then_send({
-        to = transf.email_file.from(email_file),
-        subject = "Re: " .. transf.email_file.subject(email_file),
-        body = "\n\n" .. transf.email_file.quoted_body(email_file)
-      }, do_after)
+    edit_then_reply = function(path, do_after)
+      dothis.email_specifier.edit_then_send(transf.email_file.reply_email_specifier(path), do_after)
     end,
-    forward = function(email_file, specifier, do_after)
-      specifier = glue({
-        subject = "Fwd: " .. transf.email_file.subject(email_file)
-      }, specifier)
-      specifier.body = get.email_file.with_body_quoted(email_file, specifier.body)
+    forward = function(path, specifier, do_after)
+      specifier = glue(transf.email_file.forward_email_specifier(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
-    edit_then_forward = function(email_file, do_after)
-      dothis.email_specifier.edit_then_send({
-        subject = "Fwd: " .. transf.email_file.subject(email_file),
-        body = "\n\n" .. transf.email_file.quoted_body(email_file)
-      }, do_after)
+    edit_then_forward = function(path, do_after)
+      dothis.email_specifier.edit_then_send(transf.email_file.forward_email_specifier(path), do_after)
     end,
     move = function(source, target)
       run({

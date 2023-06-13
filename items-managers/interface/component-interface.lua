@@ -1,14 +1,3 @@
-local function getThenUse(self, do_specifier, use_callback)
-  if not (type(do_specifier) == "table") or not do_specifier.key then
-    do_specifier = { key = do_specifier }
-  end
-  local thing_to_use = self:get(do_specifier.key, do_specifier.args)
-  if not thing_to_use then
-    print("WARN: getThenUse couldn't get thing to use for key " .. (do_specifier.key or "no key"))
-  end
-  return use_callback(self, thing_to_use)
-end
-
 --- @alias recursiveDoFunction fun(self: ComponentInterface, action: "doThis", key: string, value: any, previous_lower_node_id: integer): true | nil
 --- @alias recursiveGetFunction fun(self: ComponentInterface, action: "get", key: string, value: any, previous_lower_node_id: integer): any
 
@@ -54,7 +43,7 @@ end
 --- @alias getables table<string, getfunc>,
 --- @alias interface_table { [string]: ComponentInterface }
 --- @alias interface_properties {  doThisables: doThisables, getables: getables, [nonstring]: nil }
---- @alias action_table_item { text: string, key: string, args: any }
+--- @alias action_table_item { text: string, key: string, args: any, e: string, d: string, getfn: function, dothis: function, filter: function, get: string, act: string }
 --- @alias action_table action_table_item[]
 --- @alias get_func fun(self: ComponentInterface, key: string, value?: `T`, not_recursive_children?: boolean, not_recursive_super?: boolean,  previous_lower_node_id?: integer): any
 --- @alias non_get_func fun(self: ComponentInterface, key: string, value?: `T`, not_recursive_children?: boolean, not_recursive_super?: boolean, previous_lower_node_id?: integer): true | nil

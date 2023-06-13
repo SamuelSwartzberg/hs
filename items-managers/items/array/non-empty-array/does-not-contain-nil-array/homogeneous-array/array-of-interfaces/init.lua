@@ -1,7 +1,7 @@
 
 
 function isArrayOfInterfacesOfType(self, type)
-  local res = self:get("all-pass", function(item) 
+  local res = get.array.all_pass(self:get("c"), function(item) 
     local inner_res =  not not item:get("is-" .. type) 
     return inner_res
   end)
