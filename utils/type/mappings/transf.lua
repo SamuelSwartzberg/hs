@@ -80,7 +80,15 @@ transf = {
     end,
   },
   array = {
-
+    first = function(arr)
+      return arr[1]
+    end,
+    last = function(arr)
+      return arr[#arr]
+    end,
+    length = function(arr)
+      return #arr
+    end
   },
   char = {
     hex = function(char)
@@ -132,6 +140,13 @@ transf = {
     parent_leaf = function(path)
       return pathSlice(path, "-2:-2", refstore.params.path_slice.opts.ext_sep)[1]
     end,
+    ancestor_array = function(path)
+      return pathSlice(path, "1:-2", {entire_path_for_each = true})
+    end,
+    
+
+  },
+  absolute_path = {
 
   },
   extant_path = {
@@ -150,6 +165,9 @@ transf = {
     cr_date = function(path)
       return get.extant_path.date_attr(path, "creation")
     end,
+    sibling_array = function(path)
+      return transf.dir.children_array(transf.path.parent_path(path))
+    end
   },
   path_array = {
     leaves_array = function(path_array)
@@ -166,6 +184,7 @@ transf = {
     extant_path_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.exists)
     end,
+    
   },
   extant_path_array = {
     newest = function(path_array)
@@ -242,7 +261,13 @@ transf = {
     gitignore_path = function(path)
       return transf.path.ending_with_slash(transf.in_git_dir.gitignore_path(path)) .. ".gitignore"
     end,
-    git_remote_url = function(path)
+    current_branch = function(path)
+      return get.extant_path.cmd_output_from_path(
+        path,
+        "git rev-parse --abbrev-ref HEAD"
+      )
+    end,
+    remote_url = function(path)
       local raw= get.extant_path.cmd_output_from_path(
         path,
         "git config --get remote.origin.url"
@@ -252,13 +277,13 @@ transf = {
       return raw
     end,
     remote_owner_item = function(path)
-      return transf.owner_item_url.owner_item(transf.in_git_dir.git_remote_url(path))
+      return transf.owner_item_url.owner_item(transf.in_git_dir.remote_url(path))
     end,
     remote_host = function(path)
-      return transf.url.host(transf.in_git_dir.git_remote_url(path))
+      return transf.url.host(transf.in_git_dir.remote_url(path))
     end,
     remote_sld = function(path)
-      return transf.url.sld(transf.in_git_dir.git_remote_url(path))
+      return transf.url.sld(transf.in_git_dir.remote_url(path))
     end,
     remote_type = function(path)
       if listContains(mt._list.remote_types, transf.in_git_dir.remote_sld(path)) then
@@ -283,6 +308,14 @@ transf = {
         "git status"
       )
     end,
+    unpushed_commit_hash_list = function(path)
+      local raw_hashes = get.extant_path.cmd_output_from_path(
+        path,
+        "git log --branches --not --remotes --pretty=format:'%h'"
+      )
+      local lines = transf.string.lines(raw_hashes)
+      return filter(lines, true)
+    end
 
 
   },
@@ -315,7 +348,7 @@ transf = {
       end
     end,
     date_string = function(path_leaf_parts)
-      return path_leaf_parts["date"] or ""
+      return path_leaf_parts.date_or_date_range or ""
     end,
     full_path = function(path_leaf_parts)
       return transf.path.ending_with_slash(path_leaf_parts.path) 
@@ -565,7 +598,7 @@ transf = {
     end
   },
   semver = {
-    components = function(str)
+    semver_components = function(str)
       local major, minor, patch, prerelease, build = onig.match(str, mt._r.version.semver)
       return {
         major = tonumber(major),
@@ -574,6 +607,11 @@ transf = {
         prerelease = prerelease,
         build = build
       }
+    end,
+  },
+  dice_notation = {
+    result = function(dice_notation)
+      return run("roll" .. transf.string.single_quoted_escaped(dice_notation))
     end,
   },
   date = {
@@ -587,7 +625,203 @@ transf = {
     y_ym_ymd_path = function(date)
       return table.concat(transf.date.y_ym_ymd_table(date), "/")
     end,
+    weekday_number_start_1 = function(date)
+      return date:getisoweekday()
+    end,
+    weekday_number_start_0 = function(date)
+      return date:getisoweekday() - 1
+    end,
+    weeknumber = function(date)
+      return date:getisoweeknumber()
+    end,
+    full_date_components = function(date)
+      local tbl = glue(
+        date:getdate(),
+        date:gettime()
+      )
+      tbl.ticks = nil
+      return tbl
+    end,
+    quarter_hours_date_range_specifier = function(date)
+      return get.date.date_range_specifier_of_lower_component(date, 15, "hour")
+    end,
+    quarter_hours_of_day_date_range_specifier = function(date)
+      return get.date.date_range_specifier_of_lower_component(date, 15, "day")
+    end,
+    entry_in_diary = function(date)
+      return get.logging_dir.log_for_date(env.MENTRY_LOGS, date)
+    end,
+    rfc3339like_dt = function(date)
+      return get.date.formatted(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
+    end,
+    timestamp_s = function(date)
+      return os.time(
+        transf.date.full_date_components(date)
+      )
+    end,
+    timestamp_ms = function(date)
+      return transf.date.timestamp_s(date) * 1000
+    end,
 
+  },
+  timestamp_s = {
+    timestamp_ms = function(timestamp)
+      return timestamp * 1000
+    end,
+    date = function(timestamp)
+      return date(timestamp)
+    end
+  },
+  timestamp_ms = {
+    timestamp_s = function(timestamp)
+      return timestamp / 1000
+    end,
+    date = function(timestamp)
+      return date(timestamp / 1000)
+    end
+  },
+  date_component = {
+    date_component_list_larger_or_same = function(component)
+      return slice(mt._list.date.dt_component, 1, {_exactly = component})
+    end,
+    date_component_list_same_or_smaller = function(component)
+      return slice(mt._list.date.dt_component, {_exactly = component})
+    end,
+    date_components_larger_all_same = function(component)
+      return map(
+        transf.date_component.date_component_list_larger_or_same(component),
+        returnSame,
+        {"v", "k"}
+      )
+    end,
+    index = function(component)
+      return tblmap.dt_component.index[component]
+    end,
+    
+  },
+  date_component_list = {
+    min_date_components = function(list)
+      return map(
+        list,
+        function(component)
+          return component, tblmap.dt_component.min[component]
+        end,
+        {"v", "kv"}
+      )
+    end,
+    max_date_components = function(list)
+      return map(
+        list,
+        function(component)
+          return component, tblmap.dt_component.max[component]
+        end,
+        {"v", "kv"}
+      )
+    end,
+    date_components_ordered_list = function(list)
+      return get.array.sorted(list, join.date_component.date_component.larger)
+    end,
+    date_component_list_inverse = function(list)
+      return setDifference(mt._list.date.dt_component_few_chars, list)
+    end
+  },
+  rfc3339like_dt = {
+    date_components = function(str)
+      local comps = {onig.match(str, mt._r.date.rfc3339)}
+      return map(mt._list.date.dt_component_few_chars, function(k, v)
+        return v and tonumber(comps[k]) or nil
+      end, {"kv", "kv"})
+    end,
+    date_range_specifier = function(str)
+      return transf.date_components.date_range_specifier(transf.rfc3339like_dt.date_components(str))
+    end,
+
+  },
+  rfc3339like_range = {
+    start_rfc3339like_dt = function(str)
+      return stringx.split(str, "_to_")[1]
+    end,
+    end_rfc3339like_dt = function(str)
+      return stringx.split(str, "_to_")[2]
+    end,
+    date_range_specifier = function(str)
+    end,
+  },
+  rf3339like_dt_or_range = {
+
+  },
+  -- range specifier: table of start, stop, step, unit?
+  range_specifier = {
+    seq = function(range)
+      return seq(range.start, range.stop, range.step, range.unit)
+    end,
+    diff = function(range)
+      return range.stop - range.start
+    end,
+  },
+  date_range_specifier = {
+    --- we can reduce a range to a single rfc3339like_dt if the first n components are the same, and for those that differ, start is min[component] and stop is max[component]
+    rf3339like_dt_or_range = function(date_range_specifier)
+      
+    end,
+    event_table = function(date_range_specifier)
+      return {
+        start = transf.date.rfc3339like_dt(date_range_specifier.start),
+        ["end"] = transf.date.rfc3339like_dt(date_range_specifier.stop),
+      }
+    end,
+
+  },
+  date_components = {
+    date_components_list_set = function(date_components)
+      return keys(date_components)
+    end,
+    date_components_list_not_set = function(date_components)
+      return transf.date_component_list.date_components_list_inverse(transf.date_components.date_components_list_set(date_components))
+    end,
+    date_component_ordered_list_set = function(date_components)
+      return transf.date_component_list.date_components_ordered_list(transf.date_components.date_components_list_set(date_components))
+    end,
+    date_component_ordered_list_not_set = function(date_components)
+      return transf.date_component_list.date_components_ordered_list(transf.date_components.date_components_list_not_set(date_components))
+    end,
+    min_date_components_not_set = function(date_components)
+      return transf.date_component_list.min_date_components(transf.date_components.date_components_list_not_set(date_components))
+    end,
+    max_date_components_not_set = function(date_components)
+      return transf.date_component_list.max_date_components(transf.date_components.date_components_list_not_set(date_components))
+    end,
+    min_date_components = function(date_components)
+      return glue(
+        date_components,
+        transf.date_components.min_date_components_not_set(date_components)
+      )
+    end,
+    max_date_components = function(date_components)
+      return glue(
+        date_components,
+        transf.date_components.max_date_components_not_set(date_components)
+      )
+    end,
+    date_range_specifier = function(date_components)
+      return get.date_components.date_range_specifier(date_components, 1, "minute")
+    end,
+
+  },
+  prefix_partial_date_components = {
+    
+  },
+  suffix_partial_date_components = {
+
+  },
+  partial_date_components = {
+
+  },
+  -- date components are full if all components are set
+  full_date_components = {
+    date = function(date_components)
+      return date(date_components)
+    end,
   },
   iban = {
     cleaned_iban = function(iban)
@@ -1014,44 +1248,8 @@ transf = {
         end
       end
     end,
-    timestamp_or_nil = function(str)
-      if eutf8.match(str, "^%d") then
-        str = slice(str, {start = {_r = "%d"}})
-      end
-      -- date is already a timestamp
-    
-      if #str == 13 then
-        return tonumber(eutf8.sub(str, 1, 10))
-      elseif #str == 10 then
-        return tonumber(str)
-      end
-    
-      -- we have to parse the date
-    
-      for _, sep in ipairs(mt._list.date.long_dt_seps) do
-        eutf8.gsub(str, _r_comp.lua.data.sep, " ")
-      end
-    
-      local date_parts
-    
-      for _, date_regex in fastpairs(mt._r_lua.date) do
-        date_parts = {eutf8.match(str, date_regex)}
-        if #date_parts > 0 then
-          break
-        end
-      end
-    
-      if #date_parts == 0 then
-        return nil
-      end
-    
-      local date_table = map(mt._list.date.dt_component_few_chars, function(k,v) return v, date_parts[k] end, "kv")
-      local res, timestamp = pcall(os.time, date_table)
-      if res then
-        return timestamp
-      else
-        return nil
-      end
+    rfc3339like = function(str)
+      return gpt("Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified.:\n\n" .. str, {temperature = 0})
     end,
     raw_contact = function(searchstr)
       return memoize(run)("khard show --format=yaml " .. searchstr, {catch = true} )

@@ -846,7 +846,7 @@ local item_creation_map = {
       must_be = { "env", "no-value-env", "aliases-env", "nodependents-env" },
     }
   }, -- todo
-  [CreateNumber] = {
+  [nr] = {
     {
       value = 1,
       must_be = { "number" , "number-by-sign", "pos", "number-by-number-set", "int", "number-by-combination", "pos-int" }

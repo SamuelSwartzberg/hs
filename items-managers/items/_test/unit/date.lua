@@ -35,37 +35,6 @@ assertMessage(
   -8
 )
 
-assertMessage(
-  test_date_item_1:get("start-end", {
-    start = { dt = test_date_1:copy():adddays(-1) },
-    ["end"] = { dt = test_date_1:copy():adddays(1) }
-  }),
-  {
-    test_date_1:copy():adddays(-1),
-    test_date_1:copy():adddays(1)
-  }
-)
-
-assertMessage(
-  test_date_item_1:get("start-end", {
-    ["end"] = { unit = "days", amount = 1 }
-  }),
-  {
-    test_date_1:copy(),
-    test_date_1:copy():adddays(1)
-  }
-)
-
-assertMessage(
-  test_date_item_1:get("start-end", {
-    ["end"] = { unit = "hours", amount = 1,precision = "min" },
-    
-  }),
-  {
-    test_date_1:copy(),
-    test_date_1:copy():addhours(1):setseconds(0)
-  }
-)
 
 assertMessage(
   test_date_item_1:get("range", {

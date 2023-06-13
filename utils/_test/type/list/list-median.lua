@@ -1,29 +1,29 @@
 assertMessage(
-  listMedian({-27, 5, 1, 8, 9}),
+  get.array.median({-27, 5, 1, 8, 9}),
   5
 )
 
 assertMessage(
-  listMedian({-27, 5, 1, 8, 9, 22}),
+  get.array.median({-27, 5, 1, 8, 9, 22}),
   5
 )
 
 assertMessage(
-  listMedian({-27, 5, 1, 8, 9, 22}, nil, "lower"),
+  get.array.median({-27, 5, 1, 8, 9, 22}, nil, "lower"),
   5
 )
 
 assertMessage(
-  listMedian({-27, 5, 1, 8, 9, 22}, nil, "higher"),
+  get.array.median({-27, 5, 1, 8, 9, 22}, nil, "higher"),
   8
 )
 
 assertMessage(
-  listMedian({-27, 5, 1, 8, 9, 22}, nil, "average"),
+  get.array.median({-27, 5, 1, 8, 9, 22}, nil, "average"),
   6.5
 )
 
 assertMessage(
-  listMedian({-27, 5, 1, 8, 9, 22}, nil, "both"),
+  get.array.median({-27, 5, 1, 8, 9, 22}, nil, "both"),
   {5, 8}
 )

@@ -7,7 +7,7 @@ BinaryDigitStringItemSpecifier = {
         return tonumber(self:get("c"), 2)
       end,
       ["binary-to-number-interface"] = function(self)
-        return CreateNumber(self:get("binary-numeric-equivalent"))
+        return nr(self:get("binary-numeric-equivalent"))
       end,
       ["binary-to-corresponding-string"] = function(self)
         return basexx.from_bit(self:get("c"))

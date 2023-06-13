@@ -5,9 +5,6 @@ PathLeafSpecifier = {
   type = "path-leaf",
   properties = {
     getables = {
-      ["path-leaf"] = function(self)
-        return pathSlice(self:get("resolved-path", "-1:-1"))[1]
-      end,
       ["to-path-leaf-parts"] = function(self)
         return {
           ["general-name"] = self:get("path-leaf-general-name"),
@@ -26,19 +23,6 @@ PathLeafSpecifier = {
       ["path-leaf-no-date"] = function(self)
         return self:get("path-leaf"):match("^.-%-%-(.*)$") or self:get("path-leaf")
       end,
-  
-      
-      ["is-usable-as-filetype"] = function(self, filetype)
-        return get.path.usable_as_filetype(self:get("path-leaf-extension"), filetype)
-      end,
-      ["leaf-without-extension"] = function (self)
-        return pathSlice(self:get("resolved-path"), "-2:-2", { ext_sep = true } )[1]
-      end,
-
-      ["path-leaf-starts-with"] = function(self, prefix)
-        return stringy.startswith(self:get("path-leaf"), prefix)
-      end,
-
       ["is-path-leaf-date"] = function(self)
         local path_leaf =  self:get("path-leaf")
         if not memoize(onig.match)(path_leaf,"^\\d") then return false end 

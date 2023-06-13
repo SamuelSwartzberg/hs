@@ -7,7 +7,7 @@ NumItemSpecifier = {
         return tonumber(self:get("c"))
       end,
       ["to-number-interface"] = function(self)
-        return CreateNumber(self:get("numeric-equivalent"))
+        return nr(self:get("numeric-equivalent"))
       end,
       ["random-of-length"] = function(self, type)
         return self:get("to-number-interface"):get("random-" .. type .. "-of-length")
@@ -19,7 +19,7 @@ NumItemSpecifier = {
         return self:get("to-number-interface"):get("eutf8-to-unicode-prop-table")
       end,
       ["to-date-obj-item"] = function(self, adjustment_factor)
-        return CreateNumber(self:get("numeric-equivalent")):get("to-date-obj-item", adjustment_factor)
+        return nr(self:get("numeric-equivalent")):get("to-date-obj-item", adjustment_factor)
       end
     },
   },

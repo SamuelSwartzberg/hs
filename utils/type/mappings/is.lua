@@ -108,6 +108,9 @@ is = {
     has_changes = function(path)
       return transf.in_git_dir.status(path) ~= ""
     end,
+    has_unpushed_commits = function(path)
+      return #transf.in_git_dir.unpushed_commit_hash_list(path) > 0
+    end,
   },
   shellscript_file = {
     errors = function(path)

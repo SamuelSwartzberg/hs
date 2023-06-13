@@ -10,7 +10,7 @@ DecimalDigitStringItemSpecifier = {
         return not onig.find(self:get("c"), "[^0-9]")
       end,
       ["decimal-to-number-interface"] = function(self)
-        return CreateNumber(self:get("decimal-numeric-equivalent"))
+        return nr(self:get("decimal-numeric-equivalent"))
       end,
     }
   },

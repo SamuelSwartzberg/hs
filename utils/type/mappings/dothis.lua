@@ -417,6 +417,12 @@ dothis = {
         dothis.dir.do_in_path(transf.path.parent_path(path), cmd, do_after)
       end
     end,
+    delete = function(path)
+      delete(path, "any", "delete", "any", "error")
+    end,
+    empty = function(path)
+      delete(path, "any", "empty", "any", "error")
+    end,
     
   },
   file = {
@@ -726,9 +732,40 @@ dothis = {
     fetch = function(path)
       dothis.extant_path.do_in_path(path, "git fetch")
     end,
-    add_self = function(path)
-      dothis.extant_path.do_in_path(path, "git add" .. transf.string.single_quoted_escaped(path))
+    add_self = function(path, do_after)
+      dothis.extant_path.do_in_path(path, "git add" .. transf.string.single_quoted_escaped(path), do_after)
     end,
+    -- will also add untracked files
+    add_all = function(path, do_after)
+      dothis.extant_path.do_in_path(path, "git add -A", do_after)
+    end,
+    add_all_root = function(path, do_after)
+      dothis.in_git_dir.add_all(transf.in_git_dir.git_root_dir(path), do_after)
+    end,
+    commit_staged = function(path, message, do_after)
+      dothis.extant_path.do_in_path(
+        path, 
+        "git commit -m" .. transf.string.single_quoted_escaped(message or ("Programmatic commit at " .. os.date("%Y-%m-%dT%H:%M:%S"))),
+        do_after
+      )
+    end,
+    commit_all = function(path, message, do_after)
+      dothis.in_git_dir.add_all(path, function()
+        dothis.in_git_dir.commit_staged(path, message, do_after)
+      end)
+    end,
+    commit_all_root = function(path, message, do_after)
+      dothis.in_git_dir.add_all_root(path, function()
+        dothis.in_git_dir.commit_staged(transf.in_git_dir.git_root_dir(path), message, do_after)
+      end)
+    end,
+    commit_all_root_no_untracked = function(path, message, do_after)
+      dothis.extant_path.do_in_path(
+        transf.in_git_dir.git_root_dir(path), 
+        "git commit -am" .. transf.string.single_quoted_escaped(message or ("Programmatic commit at " .. os.date("%Y-%m-%dT%H:%M:%S"))),
+        do_after
+      )
+    end
   },
   in_git_dir_array = {
     pull_all = function(paths)
@@ -736,6 +773,10 @@ dothis = {
         dothis.in_git_dir.pull(path)
       end
     end,
+  },
+  date = {
+    create_log_entry = function(date, path, contents)
+      error("todo")
+    end
   }
-
 }

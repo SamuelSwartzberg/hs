@@ -7,7 +7,7 @@ UnicodeCodepointItemSpecifier = {
         return tonumber(self:get("c"):sub(3), 16)
       end,
       ["to-number-interface"] = function(self)
-        return CreateNumber(self:get("numeric-equivalent"))
+        return nr(self:get("numeric-equivalent"))
       end,
     }
   },

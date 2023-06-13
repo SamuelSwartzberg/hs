@@ -1,109 +1,39 @@
 --- @type ItemSpecifier
 InGitDirPathItemSpecifier = {
   type = "in-git-dir-path",
-  properties = {
-    getables = {
-      ["unpushed-commits"] = function(self)
-        return self:get("cd-and-output-this-task", {
-          "git",
-          "log",
-          "--branches",
-          "--not",
-          "--remotes",
-          "--pretty=format:%h",
-        })
-      end,
-      ["has-unpushed"] = function(self)
-        return self:get("unpushed-commits") ~= ""
-      end,
-      
-    },
-    doThisables = {
-      ["git-add-all"] = function(self)
-        self:doThis("cd-and-run-this-task", {
-          "git",
-          "add",
-          "**",
-        })
-      end,
-      ["git-commit-self"] = function(self, message)
-        self:doThis("cd-and-run-this-task", {
-          "git",
-          "commit",
-          "-m",
-          { value = message or ("changed " .. self:get("relative-path-from", self:get("git-root-dir"))), type = "quoted"},
-          { value = self:get("completely-resolved-path"), type = "quoted"}
-        })
-      end,
-      ["git-commit-staged"] = function(self, message)
-        self:doThis("cd-and-run-this-task", {
-          "git",
-          "commit",
-          "-m",
-          { value = message, type = "quoted"}
-        })
-      end,
-      ["git-commit-all"] = function(self, message)
-        self:doThis("cd-and-run-this-task", {
-          "git",
-          "commit",
-          "-a",
-          "-m",
-          { value = message or ("Programmatic commit at " .. os.date(tblmap.dt_component.rfc3339["sec"])), type = "quoted" }
-        })
-      end,
-      ["git-commit-all-and-push"] = function(self, message)
-        self:doThis("git-add-all")
-        hs.timer.doAfter(2, function ()
-          self:doThis("git-commit-all", message)
-          hs.timer.doAfter(2, function ()
-            self:doThis("git-push")
-          end)
-        end)
-      end,
-      
-    }
-  },
-  action_table = concat({
+  action_table = {
     {
       text = "🐙⬆️ gtpsh.",
-      key = "git-push"
+      dothis = dothis.in_git_dir.push
     },{
       text = "🐙⬇️ gtpll.",
-      key = "git-pull"
+      dothis = dothis.in_git_dir.pull
     },{
       text = "🐙🔄 gtftch.",
-      key = "git-fetch"
-    },{
-      text = "🐙📝 gtcmmt.",
-      key = "do-interactive",
-      args = {
-        key = "git-commit-all"
-      }
+      dothis = dothis.in_git_dir.fetch
     },
-  }, getChooseItemTable({
     {
       i = "🐙❗️",
       d = "gtig",
-      key = "gitignore-path"
+      getfn = transf.in_git_dir.gitignore_path
     },{
       i = "🐙👩🏽‍💻🔗",
       d = "gtremurl",
-      key = "git-remote"
+      getfn = transf.in_git_dir.remote_url
     },{
       i = "🐙👩🏽‍💻📄🔗",
-      d = "gtremitmurl",
-      key = "url-on-master-remote"
+      d = "gtremblburl",
+      getfn = get.in_git_dir.remote_blob_url
     },{
-      i = "🐙👩🏽‍💻🍣📄🔗",
-      d = "gtremitmrawurl",
-      key = "raw-url-on-github-remote"
+      i = "🐙👩🏽‍💻🍣🔗",
+      d = "gtremrawurl",
+      getfn = get.in_git_dir.remote_raw_url
     },{
       i = "🐙🙋🏽‍♀️💼",
       d = "gtremownitm",
-      key = "git-remote-owner-item"
+      getfn = transf.in_git_dir.remote_owner_item
     }
-  }))
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

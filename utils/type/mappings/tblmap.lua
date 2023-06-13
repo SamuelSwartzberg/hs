@@ -93,6 +93,37 @@ tblmap = {
       minute = "%Y-%m-%dT%H:%M",
       second = "%Y-%m-%dT%H:%M:%SZ",
     },
+    max = {
+      second = 60,
+      minute = 60,
+      hour = 24,
+      day = 30,
+      month = 12,
+    },
+    min = {
+      second = 0,
+      minute = 0,
+      hour = 0,
+      day = 1,
+      month = 1,
+    },
+    few_char_name = {
+      second = "sec",
+      minute = "min",
+      hour = "hour",
+      day = "day",
+      month = "month",
+      year = "year",
+    },
+    index = {
+      year = 1,
+      month = 2,
+      day = 3,
+      hour = 4,
+      minute = 5,
+      second = 6,
+    }
+
   },
   date_format_name = {
     date_format = {

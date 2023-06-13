@@ -481,7 +481,7 @@ assertValuesContain(
   { "screw" }
 )
 
-local semver_components = transf.semver.components("1.2.3")
+local semver_components = transf.semver.semver_components("1.2.3")
 
 assertMessage(
   semver_components,
@@ -492,7 +492,7 @@ assertMessage(
   }
 )
 
-local semver_components = transf.semver.components("1.2.3-alpha.1")
+local semver_components = transf.semver.semver_components("1.2.3-alpha.1")
 
 assertMessage(
   semver_components,
@@ -504,7 +504,7 @@ assertMessage(
   }
 )
 
-local semver_components = transf.semver.components("1.2.3+build.1")
+local semver_components = transf.semver.semver_components("1.2.3+build.1")
 
 assertMessage(
   semver_components,
@@ -516,7 +516,7 @@ assertMessage(
   }
 )
 
-local semver_components = transf.semver.components("1.2.3-alpha.1+build.1")
+local semver_components = transf.semver.semver_components("1.2.3-alpha.1+build.1")
 
 assertMessage(
   semver_components,
@@ -530,7 +530,7 @@ assertMessage(
 )
 
 local os_pkg_manager_semver = get.upkg.array.package_manager_version("os")
-local os_pkg_manager_semver_components = transf.semver.components(os_pkg_manager_semver)
+local os_pkg_manager_semver_components = transf.semver.semver_components(os_pkg_manager_semver)
 
 assert(os_pkg_manager_semver_components.major >= 0)
 assert(os_pkg_manager_semver_components.minor >= 0)

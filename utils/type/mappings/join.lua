@@ -47,4 +47,11 @@ join = {
       end
     }
   },
+  date_component = {
+    date_component = {
+      larger = function(a, b)
+        return tblmap.date_component.index[a] > tblmap.date_component.index[b]
+      end
+    }
+  }
 }

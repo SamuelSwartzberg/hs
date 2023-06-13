@@ -14,9 +14,6 @@ ExtantPathItemSpecifier = {
           path_leaf:match("^(.-)%-%-") 
           or path_leaf:match("^(%d[^%%]+)") 
       end, 
-      ["get-ancestor-string-array"] = function(self)
-        return ar(pathSlice(self:get("completely-resolved-path"), "1:-2", { entire_path_for_each = true }))
-      end,
       ["is-in-git-dir-path"] = function(self) 
         return find(
           getItemsForAllLevelsInSlice(self:get("c"), "1:-1", { include_files = false }),
@@ -24,52 +21,6 @@ ExtantPathItemSpecifier = {
             return stringy.endswith(item, ".git")
           end
         )
-      end,
-      ["cd-to-parent-dir-and-task"] = function(self)
-        return {
-          "cd",
-          { value = self:get("parent-dir-path"), type = "quoted" },
-          "&&",
-        }
-      end,
-      ["cd-and-this-task"] = function(self, task)
-        return concat(
-          self:get("cd-and-task"),
-          task
-        )
-      end,
-      ["cd-and-output-this-task"] = function(self, task)
-        return run(self:get("cd-and-this-task", task))
-      end,
-      ["sibling-string-array"] = function(self)
-        return ar(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2"))
-      end,
-      ["sibling-file-only-string-array"] = function(self)
-        return ar(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2", { include_dirs = false }))
-      end,
-      ["sibling-dir-only-string-array"] = function(self)
-        return ar(getItemsForAllLevelsInSlice(self:get("c"), "-2:-2", { include_files = false }))
-      end,
-      ["find-sibling"] = function(self, func)
-        return self:get("sibling-string-array"):get("find", function(sibling)
-          if sibling == self:get("completely-resolved-path") then return false end -- don't return self
-          return func(sibling)
-        end)
-      end,
-      ["find-sibling-with-same-filename"] = function(self)
-        return self:get("find-sibling", function(sibling)
-          return pathSlice(sibling, "-2:-2", { ext_sep = true })[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true }))[1]
-        end)
-      end,
-      ["find-sibling-with-different-extension"] = function(self, ext)
-        return self:get("find-sibling", function(sibling)
-          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true }))[1] .. "." .. ext
-        end)
-      end,
-      ["find-sibling-dir-with-same-filename"] = function(self)
-        return self:get("find-sibling", function(sibling)
-          return pathSlice(sibling, "-1:-1")[1] == pathSlice(self:get("completely-resolved-path", "-2:-2", { ext_sep = true }))[1]
-        end)
       end,
     },
     doThisables = {

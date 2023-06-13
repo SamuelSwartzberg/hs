@@ -15,13 +15,15 @@ DiceNotationItemSpecifier = {
       end,
     },
   },
-  action_table = concat(
-    getChooseItemTable({
+  action_table = {
+    {
       i = "🎲",
       d = "rll",
-      key = "roll-result"
-    }), {}
-  ),
+      getfn = transf.dice_notation.result,
+      filter = nr
+    }
+  }
+  ,
   
 }
 

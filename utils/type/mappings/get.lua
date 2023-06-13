@@ -297,6 +297,55 @@ get = {
     tail = function(arr, n)
       return slice(arr, -n)
     end,
+    nth_element = function(arr, n)
+      return arr[n]
+    end,
+    next = function(arr, n)
+      return arr[n + 1]
+    end,
+    next_wrapping = function(arr, n)
+      return arr[(n % #arr) + 1]
+    end,
+    previous = function(arr, n)
+      return arr[n - 1]
+    end,
+    previous_wrapping = function(arr, n)
+      return arr[(n - 2) % #arr + 1]
+    end,
+    sorted = function(list, comp)
+      local new_list = copy(list, false)
+      table.sort(new_list, comp)
+      return new_list
+    end,
+    revsorted = function(arr, comp)
+      return rev(get.array.sorted(arr, comp))
+    end,
+    --- @generic T
+    --- @param list T[]
+    --- @param comp? fun(a: T, b: T):boolean
+    --- @param if_even? "lower" | "higher" | "average" | "both"
+    --- @return T
+    median = function (list, comp, if_even)
+      if_even = if_even or "lower"
+      list = copy(list, false) -- don't modify the original list
+      table.sort(list, comp)
+      local mid = math.floor(#list / 2)
+      if #list % 2 == 0 then
+        if if_even == "lower" then
+          return list[mid]
+        elseif if_even == "higher" then
+          return list[mid + 1]
+        elseif if_even == "average" then
+          return (list[mid] + list[mid + 1]) / 2
+        else
+          return {list[mid], list[mid + 1]}
+        end
+      else
+        return list[mid + 1]
+      end
+    end
+
+
 
   },
   array_of_string_arrays = {
@@ -405,12 +454,12 @@ get = {
     end,
   },
   in_git_dir = {
-    remote_blob_link = function(path, branch)
+    remote_blob_url = function(path, branch)
       local remote_type = transf.in_git_dir.remote_type(path)
-      branch = branch or "master" -- TODO: now that hosts are switching away from master as a name, we probably need some smart default searching. but how?
+      branch = branch or transf.in_git_dir.current_branch(path)
       local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
       local relative_path = transf.in_git_dir.relative_path_from_git_root_dir(path)
-      return get.git_hosting_service.file_link(
+      return get.git_hosting_service.file_url(
         transf.in_git_dir.remote_blob_host(path),
         tblmap.remote_type.blob_indicator[remote_type],
         remote_owner_item,
@@ -418,12 +467,12 @@ get = {
         relative_path
       )
     end,
-    remote_raw_link = function(path, branch)
+    remote_raw_url = function(path, branch)
       local remote_type = transf.in_git_dir.remote_type(path)
-      branch = branch or "master" -- TODO: now that hosts are switching away from master as a name, we probably need some smart default searching. but how?
+      branch = branch or transf.in_git_dir.current_branch(path)
       local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
       local relative_path = transf.in_git_dir.relative_path_from_git_root_dir(path)
-      return get.git_hosting_service.file_link(
+      return get.git_hosting_service.file_url(
         transf.in_git_dir.remote_raw_host(path),
         tblmap.remote_type.raw_indicator[remote_type],
         remote_owner_item,
@@ -587,6 +636,28 @@ get = {
       return transf.string.path_resolved(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"
     end
   },
+  path_array = {
+    filter_to_same_filename = function(path_array, filename)
+      return hs.fnutils.ifilter(path_array, function(path)
+        return get.path.is_filename(path, filename)
+      end)
+    end,
+    filter_to_different_filename = function(path_array, filename)
+      return hs.fnutils.ifilter(path_array, function(path)
+        return not get.path.is_filename(path, filename)
+      end)
+    end,
+    filter_to_same_extension = function(path_array, extension)
+      return hs.fnutils.ifilter(path_array, function(path)
+        return get.path.is_extension(path, extension)
+      end)
+    end,
+    filter_to_different_extension = function(path_array, extension)
+      return hs.fnutils.ifilter(path_array, function(path)
+        return not get.path.is_extension(path, extension)
+      end)
+    end,
+  },
   extant_path_array = {
     sorted_by_attr_extant_path_array = function(arr, attr)
       return table.sort(arr, function(a, b)
@@ -598,8 +669,102 @@ get = {
     end,
   },
   git_hosting_service = {
-    file_link = function(host, indicator, owner_item, branch, relative_path)
+    file_url = function(host, indicator, owner_item, branch, relative_path)
       return "https://" .. host .. "/" .. owner_item .. "/" .. indicator .. branch .. "/" .. relative_path
     end,
   },
+  date_component = {
+    next = function(component, n)
+      n = n or 0
+      return get.array.next(mt._list.date.dt_component, transf.date_component.index(component) + n)
+    end,
+    previous = function(component, n)
+      n = n or 0
+      return get.array.previous(mt._list.date.dt_component, transf.date_component.index(component) - n)
+    end,
+  },
+  date = {
+    with_added = function(date, amount, component)
+      local dtcp = date:copy()
+      return dtcp["add" .. normalize.dt_component[component] .. "s"](dtcp, amount)
+    end,
+    with_subtracted = function(date, amount, component)
+      return get.date.with_added(date, -amount, component)
+    end,
+    component_value = function(date, component)
+      return date["get" .. normalize.dt_component[component]](date)
+    end,
+    surrounding_date_range_specifier = function(date, amount, step, unit)
+      return {
+        start = get.date.with_subtracted(date, amount, step),
+        stop = get.date.with_added(date, amount, step),
+        step = step,
+        unit = unit,
+      }
+    end,
+    date_range_specifier_of_lower_component = function(date, step, component)
+      return get.full_date_components.date_range_specifier_of_lower_component(
+        transf.date.full_date_components(date),
+        step,
+        component
+      )
+    end,
+    hours_date_range_specifier = function(date, amount)
+      return get.date.date_range_specifier_of_lower_component(date, amount, "day")
+    end,
+    to_precision = function(date, component)
+      return get.full_date_components.to_precision_date(
+        transf.date.full_date_components(date),
+        component
+      )
+    end,
+    formatted = function(date, format)
+      local retrieved_format = tblmap.date_format_name.date_format[format]
+      return date:fmt(retrieved_format or format)
+    end,
+
+  },
+  date_components = {
+    date_range_specifier = function(date_components, step, unit)
+      return {
+        start = date(transf.date_components.min_date_components(date_components)),
+        stop = date(transf.date_components.max_date_components(date_components)),
+        step = step or 1,
+        unit = unit or "minute"
+      }
+    end,
+  },
+  date_range_specifier = {
+    event_tables_within_range = function(date_range_specifier, specifier, include, exclude)
+      specifier = glue(transf.date_range_specifier.event_table(date_range_specifier), specifier)
+      return get.khal.list_event_tables(
+        specifier,
+        include,
+        exclude
+      )
+    end,
+  },
+  full_date_components = {
+    prefix_partial_date_components = function(date_components, component)
+      return map(
+        transf.date_component.date_components_larger_or_same(component),
+        date_components
+      )
+    end,
+    date_range_specifier_of_lower_component = function (date_components, step, component, additional_steps_down)
+      return get.date_components.date_range_specifier(
+        transf.full_date_components.prefix_partial_date_components(date_components, component),
+        step,
+        get.date_component.next(component, additional_steps_down)
+      )      
+    end,
+    to_precision_full_date_components = function(date_components, component)
+      return transf.date_components.min_date_components(
+        transf.full_date_components.prefix_partial_date_components(date_components, component)
+      )
+    end,
+    to_precision_date = function(date_components, component)
+      return date(transf.full_date_components.to_precision_full_date_components(date_components, component))
+    end,
+  }
 }

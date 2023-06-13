@@ -7,7 +7,7 @@ OctalDigitStringItemSpecifier = {
         return tonumber(self:get("c"), 8)
       end,
       ["octal-to-number-interface"] = function(self)
-        return CreateNumber(self:get("octal-numeric-equivalent"))
+        return nr(self:get("octal-numeric-equivalent"))
       end,
     }
   },

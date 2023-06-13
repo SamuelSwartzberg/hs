@@ -34,4 +34,4 @@ NumberSpecifier = {
 }
 
 --- @type BoundNewDynamicContentsComponentInterface
-CreateNumber = bindArg(RootInitializeInterface, NumberSpecifier)
+nr = bindArg(RootInitializeInterface, NumberSpecifier)

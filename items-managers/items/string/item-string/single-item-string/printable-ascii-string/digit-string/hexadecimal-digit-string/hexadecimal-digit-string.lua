@@ -7,7 +7,7 @@ HexadecimalDigitStringItemSpecifier = {
         return tonumber(self:get("c"), 16)
       end,
       ["hexadecimal-to-number-interface"] = function(self)
-        return CreateNumber(self:get("hexadecimal-numeric-equivalent"))
+        return nr(self:get("hexadecimal-numeric-equivalent"))
       end,
       ["hexadecimal-to-corresponding-string"] = function(self)
         return basexx.from_hex(self:get("c"))

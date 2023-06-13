@@ -1,6 +1,4 @@
-local format_map = tblmap.date_format_name.date_format
-local formats = keys(format_map)
-local format_array = ar(formats)
+
 
 
 
@@ -9,129 +7,8 @@ DateSpecifier = {
   type = "date",
   properties = {
     getables = {
-      ["with-added"] = function(self, specifier)
-        local date = self:get("c"):copy()
-        return dat(
-          date["add" .. specifier["unit"]](date, specifier["amount"])
-        )
-      end,
-      ["with-subtracted"] = function(self, specifier)
-        return self:get("with-added", {
-          unit = specifier["unit"],
-          amount = -specifier["amount"]
-        })
-      end,
-      ["val"] = function(self, unit)
-        local dt = self:get("c")
-        return dt["get" .. unit](dt)
-      end,
-      ["span"] = function(self, unit)
-        local dt = self:get("c")
-        return dt["span" .. unit](dt)
-      end,
-      ["diff"] = function(self, other_date)
-        return date.diff(self:get("c"), other_date)
-      end,
-      ["diff-item"] = function(self, other_date)
-        return dat(self:get("diff", other_date))
-      end,
-      ["diff-span"] = function(self, specifier)
-        return self:get("diff-item", specifier["end"]):get("span", specifier["unit"])
-      end,
-      ["start-end"] = function(self, specifier)
-        local startdt = processDateSpecification(specifier.start, self:get("c"))
-        local enddt = processDateSpecification(specifier["end"], self:get("c"))
-        return {startdt, enddt}
-      end,
-      ["range"] = function(self, specifier)
-        local startdt, enddt = table.unpack(self:get("start-end", specifier))
-        return seq(startdt, enddt, specifier.step, specifier.unit)
-      end,
-      ["item-range"] = function(self, specifier)
-        return map(
-          self:get("range", specifier),
-          function(dt)
-            return dat(dt)
-          end
-        )
-      end,
-      ["hours-in-day-range"] = function(self)
-        return self:get("range", {
-          start = { precision = "day" },
-          ["end"] = { precision = "day", unit = "days", amount = 1 },
-          unit = "hours"
-        })
-      end,
-      ["hours-in-day-item-range"] = function(self)
-        return map(
-          self:get("hours-in-day-range"),
-          function(dt)
-            return dat(dt)
-          end
-        )
-      end,
-      ["quarters-in-day-range"] = function(self)
-        return self:get("range", {
-          start = { precision = "day" },
-          ["end"] = { precision = "day", unit = "days", amount = 1 },
-          unit = "minutes",
-          step = 15
-        })
-      end,
-      ["quarters-in-day-item-range"] = function(self)
-        return map(
-          self:get("quarters-in-day-range"),
-          function(dt)
-            return dat(dt)
-          end
-        )
-      end,
-      ["surrounding-days-range"] = function(self, amount)
-        amount = amount or 45
-        local res = self:get("item-range", {
-          start = { unit = "days", amount = -amount, precision = "day" },
-          ["end"] = { unit = "days", amount = amount, precision = "day" },
-          unit = "days"
-        })
-        res[amount + 1].properties.getables["chooser-initial-selected"] = returnTrue
-        return res
-      end,
-      ["event-items-between"] = function(self, specifier)
-        specifier["end"] = specifier["end"] or self:get("c"):copy():adddays(30)
-        local startdt, enddt = table.unpack(self:get("start-end", specifier))
-        return ar({
-          dat(startdt),
-          dat(enddt)
-        }):get("map-to-event-items")
-      end,
-      ["to-formatted"] = function(self, format_str)
-        return self:get("c"):fmt(format_str)
-      end,
-      ["format-map"] = function(self)
-        return format_map
-      end,
-      ["to-given-format"] = function(self, format)
-        return self:get("to-formatted", self:get("format-map")[format])
-      end,
-      ["has-time"] = function(self)
-        local dt = self:get("c")
-        return 
-          dt.gethours(dt) ~= 0 or
-          dt.getminutes(dt) ~= 0 or
-          dt.getseconds(dt) ~= 0 or
-          dt.getfracs(dt) ~= 0
-      end,
-      ["weekday-number-start-1"] = function(self) 
-        return self:get("c"):getisoweekday()
-      end,
-      ["weekday-number-start-0"] = function(self) 
-        return self:get("c"):getisoweekday() - 1
-      end,
       ["weekday-str"] = function(self)
         return transf.mon1_int.weekday_en[self:get("weekday-number-start-1")] 
-      end,
-      ["weeknumber"] = function(self)
-        return self:get("c"):getweeknumber()
       end,
       ["weekday-offset"] = function(self, specifier) -- get the nth previous/next weekday
         -- specifier has keys "weekday" and "offset"
@@ -159,36 +36,8 @@ DateSpecifier = {
           amount = math.abs(specifier.offset - 1)
         })
       end,
-
-      ["timestamp"] = function(self)
-        return date.diff(self:get("c"), date.epoch()):spanseconds()
-      end,
-      
-      ["to-precision"] = function(self, component) -- component is a string, either "year", "month", "day", "hour", "minute", "second"
-        return self:get("c"):fmt(tblmap.dt_component.rfc3339[component])
-      end,
-      ["date-to-precision"] = function (self, component)
-        return date(self:get("to-precision", component))
-      end,
-      ["date-item-to-precision"] = function(self, component)
-        return dat(self:get("date-to-precision", component))
-      end,
-      ["format-array"] = function()
-        return format_array
-      end,
       ["to-string"] = function(self)
         return self:get("c"):fmt("%A, %Y-%m-%d %H:%M:%S")
-      end,
-      ["to-y-ym-ymd-array"] = function(self)
-        local contents = self:get("c")
-        return {
-          contents:fmt("%Y"),
-          contents:fmt("%Y-%m"),
-          contents:fmt("%Y-%m-%d"),
-        }
-      end,
-      ["corresponding-logfile"] = function(self, logging_dir)
-        return get.logging_dir.log_for_date(logging_dir, self:get("c"))
       end,
     },
     doThisables = {
@@ -201,28 +50,6 @@ DateSpecifier = {
         self:doThis("choose-format", function(format)
           st(format):doThis("choose-action")
         end)
-      end,
-      ["create-log-entry"] = function(self, specifier)
-        st(specifier.path):doThis("log-timestamp-table", ovtable.init({{
-          key = tostring(self:get("timestamp")),
-          value = specifier.contents
-        }}))
-      end,
-      ["create-empty-log-entry"] = function(self, path)
-        self:doThis("create-log-entry", {
-          path = path,
-          contents = {}
-        })
-      end,
-      ["log-open-diary"] = function(self)
-        self:doThis("create-empty-log-entry", env.MENTRY_LOGS)
-        open(get.logging_dir.log_for_date(env.MENTRY_LOGS, self:get("c")))
-      end,
-      ["choose-surrounding-day"] = function(self, amount)
-        ar(self:get(
-          "surrounding-days-range",
-          amount
-        )):doThis("choose-item-and-then-action")
       end,
       ["create-event-with-start"] = function(self)
         dothis.khal.add_event_interactive({

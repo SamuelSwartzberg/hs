@@ -3,18 +3,6 @@ ArrayOfStringsSpecifier = {
   type = "array-of-strings",
   properties = {
     getables = {
-      ["to-string-item-array"] = function (self)
-        return self:get("map-to-new-array", function(item) 
-          return st(item) 
-        end)
-      end,
-      ["filter-empty-strings-to-new-array"] = function(self)
-        return self:get("filter-to-new-array", function(item) return item ~= "" end)
-      end,
-      ["joined-string-contents"] = function(self, joiner)
-        return table.concat(self:get("c"), joiner)
-      end,
-      ["to-joined-string-item"] = function(self, joiner) return st(self:get("joined-string-contents", joiner)) end,
       ["joined-string-contents-with-no-blank-lines"] = function(self)
         return self:get("to-joined-string-item")
                    :get("to-string-array", "\n")
@@ -44,12 +32,6 @@ ArrayOfStringsSpecifier = {
         return self:get("map-to-new-array", function(item)
           return eutf8.match(item, regex)
         end)
-      end,
-      ["longest-common-prefix"] = function(self)
-        return longestCommonPrefix(self:get("c"))
-      end,
-      ["map-prepend-all"] = function(self, prefix)
-        return self:get("map-to-new-array", function(item) return prefix .. item end)
       end,
     
     },

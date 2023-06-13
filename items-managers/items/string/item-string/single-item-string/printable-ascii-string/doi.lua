@@ -4,9 +4,6 @@ DoiItemSpecifier = {
   properties = {
     getables = {
       ["is-citable-object-id"] = function() return true end,
-      ["bibtex-from-internet"] = function(self)
-        return transf.doi.bibtex(self:get("c"))
-      end,
     }
   },
   potential_interfaces = ovtable.init({

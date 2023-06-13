@@ -14,16 +14,6 @@ FileItemSpecifier = {
       ["is-binary-file"] = function(self) 
         return get.path.usable_as_filetype(self:get("c"), "binary")
       end,
-      ["dir-or-file-any-pass"] = function(self, query) return query(self) end,
-      ["file-contents"] = function(self)
-        return stringy.strip(readFile(self:get("c"), "error"))
-      end,
-      ["descendant-file-only-string-item-array"] = function(self)
-        return ar({self.root_super})
-      end,
-      ["cd-and-task"] = function(self)
-        return self:get("cd-to-parent-dir-and-task")
-      end,
       ["name-of-parent-with-current-extension"] = function(self)
         local extension = self:get("path-leaf-extension") or ".file"
         local parent_path = self:get("parent-dir-path")
@@ -33,20 +23,8 @@ FileItemSpecifier = {
     },
   
     doThisables = {
-      ["overwrite-file-contents"] = function (self, contents)
-        writeFile(self:get("c"), contents, "exists")
-      end,
-      ["append-file-contents"] = function (self, contents)
-        writeFile(self:get("c"), contents, "exists", true, "a")
-      end,
-      ["rm-file"] = function (self)
-        delete(self:get("c"))
-      end,
       ["rename-to-parent"] = function(self)
         self:doThis("move-safe", self:get("name-of-parent-with-current-extension"))
-      end,
-      ["empty-file"] = function(self)
-        writeFile(self:get("c"), "", "exists")
       end,
       ["send-in-email"] = function(self, do_after)
         dothis.email_specifier.send({body = transf.path.attachment(self:get("completely-resolved-path")} do_after)

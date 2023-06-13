@@ -84,7 +84,7 @@ ArrayOfInterfacesSpecifier = {
         return target
       end,
       ["median-contents"] = function (self)
-        return listMedian(self:get("map", function(item) return item:get("c") end))
+        return get.array.median(self:get("map", function(item) return item:get("c") end))
       end,
       ["find-contents"] = function(self, contents)
         return self:get("find", function(item)
