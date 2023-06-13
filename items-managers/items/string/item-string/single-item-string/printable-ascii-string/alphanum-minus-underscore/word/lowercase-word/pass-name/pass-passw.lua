@@ -1,24 +1,17 @@
 --- @type ItemSpecifier
 PassPasswItemSpecifier = {
   type = "pass-passw",
-  properties = {
-    getables = {
-      ["pass-passw"] = function(self)
-        return self:get("pass-value", "passw")
-      end,
-    }
-  },
-  action_table = getChooseItemTable({
+  action_table = {
     {
       d = "passw",
       i = "🔑",
-      key = "pass-passw"
+      getfn = transf.pass_name.password
     },{
       i = "🔑📁",
       d = "passwpth",
       key = "pass-passw-path"
-    },
-  })
+    }
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

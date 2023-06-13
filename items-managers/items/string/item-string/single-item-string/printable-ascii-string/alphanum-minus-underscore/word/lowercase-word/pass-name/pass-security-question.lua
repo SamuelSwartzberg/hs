@@ -1,24 +1,17 @@
 --- @type ItemSpecifier
 PassSecurityQuestionItemSpecifier = {
   type = "pass-security-question",
-  properties = {
-    getables = {
-      ["pass-security-question"] = function(self)
-        return self:get("pass-value", "secq")
-      end,
-    }
-  },
-  action_table = getChooseItemTable({
+  action_table = {
     {
       d = "secq",
       i = "🎭❓",
-      key = "pass-passw"
+      getfn = transf.pass_name.security_question
     },{
       d = "secqpth",
       i = "🎭❓📁",
       key = "pass-security-question-path"
     }
-  })
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

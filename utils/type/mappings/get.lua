@@ -113,8 +113,8 @@ get = {
     end,
     basic_command_parts = function(include, exclude)
       local command = " --format=" .. transf.string.single_quoted_escaped(get.khal.parseable_format_specifier())
-      if include then command = command .. transf.array_of_strings.repeated_option_string(include, "--include-calendar") end
-      if exclude then command = command .. transf.array_of_strings.repeated_option_string(exclude, "--exclude-calendar") end
+      if include then command = command .. transf.string_array.repeated_option_string(include, "--include-calendar") end
+      if exclude then command = command .. transf.string_array.repeated_option_string(exclude, "--exclude-calendar") end
       return command
     end,
        
@@ -206,15 +206,19 @@ get = {
     value = function(type, item)
       return memoize(run, refstore.params.memoize.opts.invalidate_1_day)("pass show " .. type .. "/" .. item)
     end,
+    path = function(type, item, ext)
+      return env.PASSWORD_STORE_DIR .. "/" .. type .. "/" .. item .. "." .. (ext or "gpg")
+    end,
+    exists = function(type, item, ext)
+      return testPath(get.pass.path(type, item, ext))
+    end,
     json = function(type, item)
       return runJSON("pass show " .. type .. "/" .. item)
     end,
     contact_json = function(type, item)
       return get.pass.json("contacts/" .. type, item)
     end,
-    otp = function(item)
-      return run("pass otp otp/" .. item)
-    end,
+    
   },
   sox = {
     is_recording = function()
@@ -346,6 +350,61 @@ get = {
     end
 
 
+
+  },
+  string = {
+    split_single_char = stringy.split,
+    split = stringx.split,
+  },
+  string_array = {
+    join = function(arr, sep)
+      return table.concat(arr, sep)
+    end,
+    resplit_by_oldnew = function(arr, sep)
+      return get.string.split(
+        get.string_array.join(
+          arr,
+          sep
+        ),
+        sep
+      )
+    end,
+    resplit_by_new = function(arr, sep)
+      return get.string.split(
+        get.string_array.join(
+          arr,
+          ""
+        ),
+        sep
+      )
+    end,
+    resplit_by_oldnew_single_char = function(arr, sep)
+      return get.string.split_single_char(
+        get.string_array.join(
+          arr,
+          sep
+        ),
+        sep
+      )
+    end,
+    resplit_by_oldnew_single_char_noempty = function(arr, sep)
+      return filter(get.string.split_single_char(
+        get.string_array.join(
+          arr,
+          sep
+        ),
+        sep
+      ), true)
+    end,
+    resplit_by_new_single_char = function(arr, sep)
+      return get.string.split_single_char(
+        get.string_array.join(
+          arr,
+          ""
+        ),
+        sep
+      )
+    end,
 
   },
   array_of_string_arrays = {
@@ -766,5 +825,9 @@ get = {
     to_precision_date = function(date_components, component)
       return date(transf.full_date_components.to_precision_full_date_components(date_components, component))
     end,
-  }
+  },
+  array_of_arrays = {
+    column = array2d.column,
+    row = array2d.row,
+  },
 }

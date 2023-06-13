@@ -1,14 +1,7 @@
 --- @type ItemSpecifier
 PassRecoveryKeysItemSpecifier = {
   type = "pass-recovery-keys",
-  properties = {
-    getables = {
-      ["pass-recovery-key"] = function(self)
-        return self:get("pass-value", "recovery")
-      end,
-    }
-  },
-  action_table = concat({getChooseItemTable({
+  action_table = {
     {
       d = "rcvry",
       i = "🔧🔑",
@@ -18,8 +11,7 @@ PassRecoveryKeysItemSpecifier = {
       d = "rcvrypth",
       key = "pass-recovery-path"
     }
-  })}),
-  potential_interfaces = ovtable.init({})
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

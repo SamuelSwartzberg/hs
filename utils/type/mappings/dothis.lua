@@ -270,6 +270,14 @@ dothis = {
       end)
     end,
   },
+  pass_name = {
+    fill = function(name)
+      dothis.string_array.fill_with({
+        transf.pass_name.username(name),
+        transf.pass_name.password(name),
+      })
+    end
+  },
   youtube = {
     do_extracted_attrs_via_ai = function(video_id, do_after)
       fillTemplateGPT({
@@ -395,6 +403,9 @@ dothis = {
         end
         hs.eventtap.keyStrokes(line)
       end
+    end,
+    paste_le = function(str)
+      dothis.string.paste(le(str))
     end,
     copy = hs.pasteboard.setContents
   },
@@ -777,6 +788,14 @@ dothis = {
   date = {
     create_log_entry = function(date, path, contents)
       error("todo")
+    end
+  },
+  string_array = {
+    join_and_paste = function(array, sep)
+      dothis.string.paste_le(transf.string.join(array, sep))
+    end,
+    fill_with = function(array)
+      dothis.string_array.join_and_paste(array, "\t")
     end
   }
 }

@@ -541,7 +541,7 @@ local array_of_tables = {
   { baz = "quuz" }
 }
 
-local item_array_of_item_tables = transf.array_of_tables.item_array_of_item_tables(array_of_tables)
+local item_array_of_item_tables = transf.table_array.item_array_of_item_tables(array_of_tables)
 
 assertMessage(
   item_array_of_item_tables.type,
@@ -806,7 +806,7 @@ assertMessage(
   '{"foo":"foon\\\'t","bar":false}'
 )
 
-local stritmarr = transf.array_of_strings.item_array_of_string_items({
+local stritmarr = transf.string_array.item_array_of_string_items({
     "foo",
     "bar",
     "baz"
@@ -889,7 +889,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.array_of_strings.repeated_option_string({"a", "b"}, "--include"),
+  transf.string_array.repeated_option_string({"a", "b"}, "--include"),
   "--include a --include b"
 )
 

@@ -1,16 +1,7 @@
 
 ArrayOfGitRootDirsSpecifier = {
   type = "array-of-git-root-dirs",
-  properties = {
-    getables = {
-      
-    },
-    doThisables = {
-    },
-  },
-  action_table = {},
-  
-  
+  action_table = {},  
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

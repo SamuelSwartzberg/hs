@@ -3,66 +3,22 @@ PassNameItemSpecifier = {
   type = "pass-name",
   properties = {
     getables = {
-      ["pass-value"] = function(self, type)
-        return get.pass.value(type, self:get("c"))
-      end,
-      ["as-gpg-file"] = function(self)
-        return self:get("c") .. ".gpg"
-      end,
-
-      
-      ["pass-passw-path"] = function(self)
-        return env.MPASSPASSW .. "/" .. self:get("c") .. ".gpg"
-      end,
-      ["pass-otp-path"] = function(self)
-        return env.MPASSOTP .. "/" .. self:get("c") .. ".gpg"
-      end,
-      ["pass-recovery-path"] = function(self)
-        return env.MPASSRECOVERY .. "/" .. self:get("c") .. ".gpg"
-      end,
-      ["pass-security-question-path"] = function(self)
-        return env.MPASSSECQ .. "/" .. self:get("c") .. ".gpg"
-      end,
-      ["pass-username-path"] = function(self)
-        return env.MPASSUSERNAME .. "/" .. self:get("c") .. ".txt"
-      end,
-      
-      ["is-pass-otp"] = function(self) return testPath(self:get("pass-otp-path")) end,
-      ["is-pass-passw"] = function(self) return testPath(self:get("pass-passw-path")) end,
-      ["is-pass-recovery-keys"] = function(self) return testPath(self:get("pass-recovery-path")) end,
-      ["is-pass-security-question"] = function(self) return testPath(self:get("pass-security-question-path")) end,
-      ["is-pass-username"] = function(self) return testPath(self:get("pass-username-path")) end,
-      ["pass-username"] = function(self)
-        return self:get("pass-username") or env.MAIN_EMAIL
-      end,
-      ["username-and-password-as-string-array"] = function(self)
-        return ar({
-          self:get("pass-username"),
-          self:get("pass-passw") or ""
-        })
-      end,
+      ["is-pass-otp"] = bc(is.pass_name.otp),
+      ["is-pass-passw"] = bc(is.pass_name.password),
+      ["is-pass-recovery-keys"] = bc(is.pass_name.recovery),
+      ["is-pass-security-question"] = bc(is.pass_name.security_question),
+      ["is-pass-username"] = bc(is.pass_name.username),
     },
-    doThisables = {
-      ["fill-pass"] = function(self)
-        local arr = self:get("username-and-password-as-string-array")
-          :get("to-string-item-array")
-        arr:doThis("tab-fill-with")
-      end,
-      ["copy-pass"] = function(self)
-        hs.pasteboard.setContents(self:get("pass-username"))
-        hs.pasteboard.setContents(self:get("pass-passw"))
-      end,
-    }
   },
-  action_table = concat({{
+  action_table = {
     {
       text = "✍️🔑 fllpss",
-      key = "fill-pass"
+      dothis = dothis.pass_name.fill
     },{
       text = "📋🔑 cpypss",
       key = "copy-pass"
     },
-  }}),
+  },
   potential_interfaces = ovtable.init({
     { key = "pass-passw", value = CreatePassPasswItem },
     { key = "pass-otp", value = CreatePassOtpItem },

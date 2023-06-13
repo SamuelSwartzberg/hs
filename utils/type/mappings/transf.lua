@@ -1178,22 +1178,22 @@ transf = {
     end,
 
 
-    raw_lines = function(str)
+    content_lines = function(str)
       return memoize(filter)(transf.string.lines(str), true)
     end,
 
     first_line = function(str)
       return transf.string.lines(str)[1]
     end,
-    first_raw_line = function(str)
-      return transf.string.raw_lines(str)[1]
+    first_content_line = function(str)
+      return transf.string.content_lines(str)[1]
     end,
     last_line = function(str)
       local lines = transf.string.lines(str)
       return lines[#lines]
     end,
-    last_raw_line = function(str)
-      local lines = transf.string.raw_lines(str)
+    last_content_line = function(str)
+      local lines = transf.string.content_lines(str)
       return lines[#lines]
     end,
     first_char = function(str)
@@ -1334,9 +1334,18 @@ transf = {
     password = function(pass_name)
       return get.pass.value("passw", pass_name)
     end,
+    recovery = function(pass_name)
+      return get.pass.value("recovery", pass_name)
+    end,
+    security_question = function(pass_name)
+      return get.pass.value("security_question", pass_name)
+    end,
     username = function(pass_name)
       return transf.plaintext_file.no_final_newlines(st(env.MPASSUSERNAME .. "/" .. pass_name .. ".txt") or env.MAIN_EMAIL)
-    end
+    end,
+    otp = function(item)
+      return run("pass otp otp/" .. item)
+    end,
   },
   yaml_string = {
     table = function(str)
@@ -1538,7 +1547,7 @@ transf = {
       }
     end,
   },
-  array_of_tables = {
+  table_array = {
     item_array_of_item_tables = function(arr)
       return ar(map(
         arr,
@@ -1548,7 +1557,7 @@ transf = {
       ))
     end
   },
-  array_of_strings = {
+  string_array = {
     item_array_of_string_items = function(arr)
       return ar(hs.fnutils.imap(
         arr,

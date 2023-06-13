@@ -4,21 +4,21 @@ PassOtpItemSpecifier = {
   properties = {
     getables = {
       ["pass-otp"] = function(self)
-        return get.pass.otp(self:get("c"))
+        return transf.pass_name.otp(self:get("c"))
       end,
     },
   },
-  action_table = concat({getChooseItemTable({
+  action_table = {
     {
       d = "otp",
       i = "⌚️🗝",
-      key = "pass-otp"
+      getfn = transf.pass_name.otp
     },{
       i = "⌚️🗝📁",
       d = "otppth",
       key = "pass-otp-path"
     },
-  })})
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

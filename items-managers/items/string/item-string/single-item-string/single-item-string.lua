@@ -26,7 +26,7 @@ SingleItemStringItemSpecifier = {
         return ar(transf.word.synonyms.array_av(self:get("c")))
       end,
       ["synonyms-th-to-array"] = function(self)
-        return transf.array_of_tables.item_array_of_item_tables(
+        return transf.table_array.item_array_of_item_tables(
           transf.word.synonyms.array_syn_tbls(self:get("c"))
         )
       end,

@@ -217,5 +217,24 @@ is = {
       return is.any.number(val) and is.number.float(val)
     end,
   },
+  pass_name = {
+    password = function(name)
+      return get.pass.exists("passw", name)
+    end,
+    username = function(name)
+      return get.pass.exists("username", name, "txt")
+    end,
+    recovery = function(name)
+      return get.pass.exists("recovery", name)
+    end,
+    otp = function(name)
+      return get.pass.exists("otp", name)
+    end,
+    security_question = function(name)
+      return get.pass.exists("secq", name)
+    end,
+
+
+  }
 
 }

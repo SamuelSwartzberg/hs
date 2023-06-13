@@ -3,42 +3,9 @@ ArrayOfStringItemsSpecifier = {
   type = "array-of-strings-item",
   properties = {
     getables = {
-      ["to-string-array"] = function(self) return self:get("map-to-new-array", function(item) return item:get("c") end) end,
-      ["filter-empty-strings-to-new-array"] = function(self)
-        return self:get("filter-to-new-array", function(item) return item:get("c") ~= "" end)
-      end,
-      ["joined-string-contents"] = function(self, joiner) return self:get("to-string-array"):get("joined-string-contents", joiner) end,
-      ["to-joined-string-item"] = function(self, joiner) return st(self:get("to-string-array"):get("joined-string-contents", joiner)) end,
-      ["joined-string-contents-with-no-blank-lines"] = function(self) return self:get("to-string-array"):get("joined-string-contents-with-no-blank-lines") end,
-      ["to-joined-string-item-with-no-blank-lines"] = function(self) return st(self:get("to-string-array"):get("joined-string-contents-with-no-blank-lines")) end,
-      ["to-resplit-string-item-array-assume-sep"] = function(self, sep)
-        return ar(
-          map(
-            self:get("c"),
-            function (strItem) 
-              return strItem:get("to-string-item-array", sep) 
-            end,
-            { flatten = true }
-          )
-        )
-      end,
-      ["to-resplit-string-item-array-assume-no-sep"] = function(self, sep)
-        return self:get("to-joined-string-item"):get("to-string-item-array", sep)
-      end,
-      ["longest-common-prefix"] = function(self)
-        return self:get("to-string-array"):get("longest-common-prefix")
-      end,
-      ["map-prepend-all"] = function(self, prefix)
-        return self:get("to-string-array"):get("map-to-new-array", function(item) return prefix .. item end)
-      end,
       ["is-array-of-urls"] = bind(isArrayOfInterfacesOfType, {a_use, "url" }),
       ["is-array-of-paths"] = bind(isArrayOfInterfacesOfType, {a_use, "path" }),
       ["is-array-of-printable-ascii-string-items"] = bind(isArrayOfInterfacesOfType, {a_use, "printable-ascii-string" }),
-    },
-    doThisables = {
-      ["tab-fill-with"] = function(self)
-        self:get("to-string-array"):doThis("tab-fill-with")
-      end,
     },
   },
   action_table = {
