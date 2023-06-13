@@ -23,23 +23,22 @@ HandleItemSpecifier = {
     }
   },
   
-  action_table = concat(getChooseItemTable({
+  action_table = {
     {
       d = "ytchannelid",
       i = "🟥▶️📺🆔",
-      key = "youtube-channel-id"
+      getfn = transf.handle.youtube_channel_id,
     },
     {
       d = "ytfeedurl",
       i = "🟥▶️🔶🔗",
-      key = "youtube-feed-url"
+      getfn = transf.handle.feed_url,
     },
     {
       d = "ytchannelurl",
       i = "🟥▶️📺🔗",
-      key = "youtube-channel-url"
+      getfn = transf.handle.channel_url,
     },
-  }),{
     {
       text = "📌@⛵️ addhndlnwsb.",
       key = "do-interactive",
@@ -48,7 +47,7 @@ HandleItemSpecifier = {
         thing = "category"
       }
     }
-  })
+  }
 
 }
 

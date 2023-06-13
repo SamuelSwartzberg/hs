@@ -1,11 +1,6 @@
 --- @type ItemSpecifier
 EmailAddressItemSpecifier = {
   type = "email-address",
-  properties = {
-    getables = {
-    },
-  },
-  
   action_table = {
     {
       text = "📧 ma.",
