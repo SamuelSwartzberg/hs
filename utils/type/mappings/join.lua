@@ -31,19 +31,28 @@ join = {
       end
     }
   },
-  modifier_array = {
+  mod_array = {
     key = {
       --- mods + key to the kind of string you'd see in a hotkey hint in a macos menu
       --- @param mods string[]
       --- @param key string
       --- @return string | nil
       shortcut_string = function(mods, key)
-        local modstr = stringx.join("", map(mods, tblmap.mod.symbol))
+        local modstr = stringx.join("", map(mods, tblmap.mod.mod_symbol))
         if modstr == "" then
           return key
         else
           return modstr .. " " .. key
         end
+      end,
+      shortcut_array = function(mods, key)
+        return glue(mods, key)
+      end,
+      shortcut_specifier = function(mods, key)
+        return {
+          mods = mods,
+          key = key
+        }
       end
     }
   },

@@ -29,13 +29,13 @@ assertMessage(
 )
 
 -- Test case 1: mods and key present
-assertMessage(join.modifier_array.key.shortcut_string({"cmd", "shift"}, "N"), "⌘⇧ N")
+assertMessage(join.mod_array.key.shortcut_string({"cmd", "shift"}, "N"), "⌘⇧ N")
 
 -- Test case 2: only mods present
-assertMessage(join.modifier_array.key.shortcut_string({"ctrl", "alt", "cmd"}, ""), "⌃⌥⌘ ")
+assertMessage(join.mod_array.key.shortcut_string({"ctrl", "alt", "cmd"}, ""), "⌃⌥⌘ ")
 
 -- Test case 3: only key present
-assertMessage(join.modifier_array.key.shortcut_string({}, "space"), "space")
+assertMessage(join.mod_array.key.shortcut_string({}, "space"), "space")
 
 -- Test case 4: no mods or key present
-assertMessage(join.modifier_array.key.shortcut_string({}, ""), "") 
+assertMessage(join.mod_array.key.shortcut_string({}, ""), "") 

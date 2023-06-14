@@ -14,6 +14,6 @@ assertMessage(
 )
 
 assertMessage(
-  tblmap.mod.symbol["⌘"],
+  tblmap.mod.mod_symbol["⌘"],
   "⌘"
 )

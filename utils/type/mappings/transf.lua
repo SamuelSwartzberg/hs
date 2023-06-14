@@ -2037,6 +2037,15 @@ transf = {
         ""
       )
     end,
+    action_path_string = function(arr)
+      return table.concat(arr, " > ")
+    end,
+    path = function(arr)
+      return table.concat(
+        hs.fnutils.imap(arr, transf.string.safe_filename), 
+        "/"
+      )
+    end,
 
   },
   array_of_string_arrays = {
@@ -2643,6 +2652,54 @@ transf = {
   source_id = {
     language = function(source_id)
       return slice(stringy.split(source_id, "."), -1, -1)[1]
+    end,
+  },
+  -- for future reference, since I'll forget: mod is a hypernym of mod_name, mod_symbol, and mod_char. Via the implementation in `normalize` we can be sure that no matter what we provide when we use tblmap, we will get the desired thing back.
+  menu_item_table = {
+    mod_name_array = function(menu_item_table)
+      return menu_item_table.AXMenuItemCmdModifiers
+    end,
+    mod_symbol_array = function(menu_item_table)
+      return transf.mod_array.mod_symbol_array(transf.menu_item_table.mod_name_array(menu_item_table))
+    end,
+    hotkey = function(menu_item_table)
+      return menu_item_table.AXMenuItemCmdChar
+    end,
+    shortcut_string = function(menu_item_table)
+      return join.mod_array.key.shortcut_string(
+        transf.menu_item_table.mod_name_array(menu_item_table),
+        transf.menu_item_table.hotkey(menu_item_table)
+      )
+    end,
+    title = function(menu_item_table)
+      return menu_item_table.AXTitle
+    end,
+    full_action_path = function(menu_item_table)
+      return glue(menu_item_table.path, menu_item_table.AXTitle)
+    end,
+    full_action_path_string = function(menu_item_table)
+      return transf.string_array.action_path_string(transf.menu_item_table.full_action_path(menu_item_table))
+    end,
+    running_application = function(menu_item_table)
+      return menu_item_table.application
+    end,
+    summary = function(menu_item_table)
+      if transf.menu_item_table.hotkey(menu_item_table) then
+        return transf.menu_item_table.full_action_path_string(menu_item_table) .. " (" .. transf.menu_item_table.shortcut_string(menu_item_table) .. ")"
+      else
+        return transf.menu_item_table.full_action_path_string(menu_item_table)
+      end
+    end
+  },
+  mod_array = {
+    mod_symbol_array = function(mod_array)
+      return memoize(map, refstore.params.memoize.opts.stringify_json)(mod_array, transf.mod.mod_symbol)
+    end,
+    mod_char_array = function(mod_array)
+      return memoize(map, refstore.params.memoize.opts.stringify_json)(mod_array, transf.mod.mod_char)
+    end,
+    mod_name_array = function(mod_array)
+      return memoize(map, refstore.params.memoize.opts.stringify_json)(mod_array, transf.mod.mod_name)
     end,
   },
 }

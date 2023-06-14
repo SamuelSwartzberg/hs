@@ -49,13 +49,27 @@ tblmap = {
     }
   },
   mod = {
-    symbol = {
+    mod_symbol = {
       cmd = "⌘",
       alt = "⌥",
       shift = "⇧",
       ctrl = "⌃",
       fn = "fn",
-    }
+    },
+    mod_name = {
+      cmd = "cmd",
+      alt = "alt",
+      shift = "shift",
+      ctrl = "ctrl",
+      fn = "fn",
+    },
+    mod_char = {
+      cmd = "c",
+      alt = "a",
+      shift = "s",
+      ctrl = "ct",
+      fn = "f",
+    },
   },
   
   dt_component = {

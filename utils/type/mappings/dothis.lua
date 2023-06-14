@@ -871,5 +871,18 @@ dothis = {
     fill_bank_form = function(iban)
       dothis.string_array.fill_with(transf.iban.iban_bic_bank_name_array(iban))
     end
-  }
+  },
+  running_application = {
+    execute_full_action_path = function(running_application, full_action_path)
+      running_application:selectMenuItem(full_action_path)
+    end,
+  },
+  menu_item_table = {
+    execute = function(menu_item_table)
+      dothis.running_application.execute_full_action_path(
+        transf.menu_item_table.running_application(menu_item_table),
+        transf.menu_item_table.full_action_path(menu_item_table)
+      )
+    end,
+  },
 }
