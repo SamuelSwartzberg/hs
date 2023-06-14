@@ -264,6 +264,15 @@ get = {
     encrypted_data = function(contact_table, type)
       return get.pass.contact_json(type, contact_table.uid)
     end,
+    email = function(contact_table, type)
+      return transf.contact_table.vcard_type_email_dict(contact_table)[type]
+    end,
+    phone_number = function(contact_table, type)
+      return transf.contact_table.vcard_type_phone_dict(contact_table)[type]
+    end,
+    address_table = function(contact_table, type)
+      return transf.contact_table.vcard_type_address_dict(contact_table)[type]
+    end,
   },
   table = {
     ---@param table table
@@ -890,5 +899,6 @@ get = {
   },
   chat_mac_application_name = {
 
-  }
+  },
+
 }

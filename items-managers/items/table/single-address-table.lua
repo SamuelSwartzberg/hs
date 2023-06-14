@@ -1,6 +1,6 @@
 --- @type ItemSpecifier
-SingleAddressTableSpecifier = {
-  type = "single-address-table",
+AddressTableSpecifier = {
+  type = "address-table",
   properties = {
     getables = {
       ["name-and-address-string-oneline"] = function(self)
@@ -47,7 +47,7 @@ SingleAddressTableSpecifier = {
 }
 
 --- @type BoundNewDynamicContentsComponentInterface
-function CreateSingleAddressTable(super)
-  return NewDynamicContentsComponentInterface(SingleAddressTableSpecifier, super)
+function CreateAddressTable(super)
+  return NewDynamicContentsComponentInterface(AddressTableSpecifier, super)
 end
 

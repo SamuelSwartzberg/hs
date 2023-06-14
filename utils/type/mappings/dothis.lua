@@ -278,6 +278,14 @@ dothis = {
       })
     end
   },
+  contact_table = {
+    add_iban = function(contact_table, iban)
+      dothis.pass.add_contact_data(iban, "iban", transf.contact_table.uid(contact_table))
+    end,
+    edit = function(contact_table)
+      dothis.khard.edit_contact(transf.contact_table.uid(contact_table))
+    end,
+  },
   youtube = {
     do_extracted_attrs_via_ai = function(video_id, do_after)
       fillTemplateGPT({

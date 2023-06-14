@@ -1178,13 +1178,59 @@ transf = {
       )
     end,
   },
+  raw_contact = {
+    -- Function for transforming a raw contact data into a structured table
+    contact_table = function(raw_contact)
+
+      -- The raw contact data, which is in yaml string format, is transformed into a table. 
+      -- This is done because table format is easier to handle and manipulate in Lua.
+      local contact_table = transf.yaml_string.table(raw_contact)
+
+      -- In the vCard standard, some properties can have vcard_types. 
+      -- For example, a phone number can be 'work' or 'home'. 
+      -- Here, we're iterating over the keys in the contact data that have associated vcard_types.
+      for _, vcard_key in ipairs(mt._list.vcard.keys_with_vcard_type) do
+      
+          -- We iterate over each of these keys. Each key can have multiple vcard_types, 
+          -- which we get as a comma-separated string (type_list). 
+          -- We also get the corresponding value for these vcard_types.
+          for type_list, value in ipairs(contact_table[vcard_key]) do
+          
+              -- We split the type_list into individual vcard_types. This is done because 
+              -- each vcard_type might need to be processed independently in the future. 
+              -- It also makes the data more structured and easier to handle.
+              local vcard_types = stringx.split(type_list, ", ")
+        
+              -- For each vcard_type, we create a new key-value pair in the contact_table. 
+              -- This way, we can access the value directly by vcard_type, 
+              -- without needing to parse the type_list each time.
+              for _, vcard_type in ipairs(vcard_types) do
+                  contact_table[vcard_key][vcard_type] = value
+              end
+          end
+      end
+
+      -- Here, we're handling the 'Addresses' key separately. Each address is a table itself,
+      -- and we're adding a 'contact' field to each of these tables. 
+      -- This 'contact' field holds the complete contact information.
+      -- This could be useful in scenarios where address tables are processed individually,
+      -- and there's a need to reference back to the full contact details.
+      for _, single_address_table in ipairs(contact_table["Addresses"]) do
+          single_address_table.contact = contact_table
+      end
+      
+      -- Finally, we return the contact_table, which now has a more structured and accessible format.
+      return contact_table
+    end
+
+  },
   uuid = {
     raw_contact = function(uuid)
       return memoize(run)( "khard show --format=yaml uid:" .. uuid, {catch = true} )
     end,
     contact_table = function(uuid)
       local raw_contact = transf.uuid.raw_contact(uuid)
-      local contact_table = transf.yaml_string.table(raw_contact)
+      local contact_table = transf.raw_contact.contact_table(raw_contact)
       contact_table.uid = uuid
       return contact_table
     end,
@@ -1230,6 +1276,9 @@ transf = {
         " "
       )
     end,
+    main_name = function(contact_table)
+      return transf.contact_table.pref_name(contact_table) or transf.contact_table.full_name_western(contact_table)
+    end,
     full_name_eastern_array = function(contact_table)
       return transf.hole_y_arraylike.array({ 
         transf.contact_table.name_pref(contact_table),
@@ -1244,6 +1293,22 @@ transf = {
         " "
       )
     end,
+    name_additions_array = function(contact_table)
+      return transf.hole_y_arraylike.array({ 
+        transf.contact_table.title(contact_table),
+        transf.contact_table.role(contact_table),
+        transf.contact_table.organization(contact_table),
+      })
+    end,
+    name_additions = function(contact_table)
+      return table.concat(
+        transf.contact_table.name_additions_array(contact_table),
+        ", "
+      )
+    end,
+    indicated_nickname = function(contact_table)
+      return '"' .. transf.contact_table.nickname(contact_table) .. '"'
+    end,
     full_name_iban_bic_bank_name_array = function(contact_table)
       return {
         transf.contact_table.full_name_western(contact_table),
@@ -1252,6 +1317,144 @@ transf = {
         transf.contact_table.bank_name(contact_table),
       }
     end,
+    vcard_type_phone_number_dict = function (contact_table)
+      return contact_table.Phone
+    end,
+    phone_number_array = function (contact_table)
+      return transf.table.value_set(transf.contact_table.vcard_type_phone_number_dict(contact_table))
+    end,
+    phone_number_string = function (contact_table)
+      return table.concat(transf.contact_table.phone_number_array(contact_table), ", ")
+    end,
+    vcard_type_email_dict = function (contact_table)
+      return contact_table.Email
+    end,
+    email_array = function (contact_table)
+      return transf.table.value_set(transf.contact_table.vcard_type_email_dict(contact_table))
+    end,
+    email_string = function (contact_table)
+      return table.concat(transf.contact_table.email_array(contact_table), ", ")
+    end,
+    vcard_type_address_table_dict = function (contact_table)
+      return contact_table.Addresses
+    end,
+    address_table_array = function (contact_table)
+      return transf.table.value_set(transf.contact_table.vcard_type_address_table_dict(contact_table))
+    end,
+    summary = function (contact_table)
+      local sumstr = transf.contact_table.full_name_western(contact_table)
+      if transf.contact_table.nickname(contact_table) then
+        sumstr = sumstr .. " " .. transf.contact_table.indicated_nickname(contact_table)
+      end
+      if transf.contact_table.name_additions(contact_table) then
+        sumstr = sumstr .. " (" .. transf.contact_table.name_additions(contact_table) .. ")"
+      end
+      if transf.contact_table.phone_number_string(contact_table) ~= "" then
+        sumstr = sumstr .. " [" .. transf.contact_table.phone_number_string(contact_table) .. "]"
+      end
+      if transf.contact_table.email_string(contact_table) ~= "" then
+        sumstr = sumstr .. " <" .. transf.contact_table.email_string(contact_table) .. ">"
+      end
+    end,
+    main_email = function (contact_table)
+      return get.contact_table.email(contact_table, "pref") or transf.contact_table.email_array(contact_table)[1]
+    end,
+    main_phone_number = function (contact_table)
+      return get.contact_table.phone_number(contact_table, "pref") or transf.contact_table.phone_number_array(contact_table)[1]
+    end,
+    main_address_table = function (contact_table)
+      return get.contact_table.address_table(contact_table, "pref") or transf.contact_table.address_table_array(contact_table)[1]
+    end,
+
+  },
+  vcard_type_dict = {
+    vcard_types = function (vcard_type_dict)
+      return keys(vcard_type_dict)
+    end
+  },
+  vcard_type_address_table_dict = {
+
+  },
+  address_table = {
+    contact = function(single_address_table)
+      return single_address_table.contact
+    end,
+    extended = function(single_address_table)
+      return single_address_table.Extended
+    end,
+    postal_code = function(single_address_table)
+      return single_address_table.Code
+    end,
+    region = function(single_address_table)
+      return single_address_table.Region
+    end,
+    country = function(single_address_table)
+      return single_address_table.Country
+    end,
+    street = function(single_address_table)
+      return single_address_table.Street
+    end,
+    city = function(single_address_table)
+      return single_address_table.City
+    end,
+    postal_code_city_line = function(single_address_table)
+      return 
+        transf.address_table.postal_code(single_address_table) .. " " ..
+        transf.address_table.city(single_address_table)
+    end,
+    region_country_line = function(single_address_table)
+      return 
+        transf.address_table.region(single_address_table) .. ", " ..
+        transf.address_table.country(single_address_table)
+    end,
+    addressee_array = function(single_address_table)
+      return transf.hole_y_arraylike.array({
+        transf.contact_table.main_name(single_address_table.contact),
+        transf.address_table.extended(single_address_table)
+      })
+    end,
+    in_country_location_array = function(single_address_table)
+      return transf.hole_y_arraylike.array({
+        transf.address_table.street(single_address_table),
+        transf.address_table.postal_code(single_address_table),
+        transf.address_table.city(single_address_table),
+      })
+    end,
+    international_location_array = function(single_address_table)
+      return transf.hole_y_arraylike.array({
+        transf.address_table.street(single_address_table),
+        transf.address_table.postal_code(single_address_table),
+        transf.address_table.city(single_address_table),
+        transf.address_table.region(single_address_table),
+        transf.address_table.country(single_address_table),
+      })
+    end,
+    in_country_address_array = function(single_address_table)
+      return glue(
+        transf.address_table.addressee_array(single_address_table),
+        transf.address_table.in_country_location_array(single_address_table)
+      )
+    end,
+    international_address_array = function(single_address_table)
+      return glue(
+        transf.address_table.addressee_array(single_address_table),
+        transf.address_table.international_location_array(single_address_table)
+      )
+    end,
+    in_country_address_label = function(single_address_table)
+      return 
+        table.concat(transf.address_table.addressee_array(single_address_table), "\n") .. "\n" ..
+        transf.address_table.street(single_address_table) .. "\n" ..
+        transf.address_table.postal_code_city_line(single_address_table)
+    end,
+    international_address_label = function(single_address_table)
+      return 
+        table.concat(transf.address_table.addressee_array(single_address_table), "\n") .. "\n" ..
+        transf.address_table.street(single_address_table) .. "\n" ..
+        transf.address_table.postal_code_city_line(single_address_table) .. "\n" ..
+        transf.address_table.region_country_line(single_address_table)
+    end,
+
   },
   youtube_video_id = {
     youtube_video_item = function(id)
@@ -1666,7 +1869,7 @@ transf = {
     end,
     contact_table = function(searchstr)
       local raw_contact = transf.string.raw_contact(searchstr)
-      local contact = transf.yaml_string.table(raw_contact)
+      local contact = transf.raw_contact.contact_table(raw_contact)
       return contact
     end,
     event_table = function(str)
@@ -1977,6 +2180,11 @@ transf = {
       return transf.word.capitalized(pair[1]) .. ": " .. pair[2]
     end
   },
+  email = {
+    mailto_url = function(str)
+      return "mailto:" .. str
+    end,
+  },
   displayname_email = {
     email = function(str)
       return eutf8.match(str, " <(.*)> *$")
@@ -1991,6 +2199,10 @@ transf = {
         displayname = displayname,
         email = email,
       }
+    end,
+    mailto_url = function(str)
+      local email = transf.displayname_email.email(str)
+      return transf.email.mailto_url(email)
     end,
   },
   email_or_displayname_email = {
@@ -2008,6 +2220,9 @@ transf = {
         email = email,
       }
     end,
+  },
+  phone_number = {
+
   },
   table_array = {
     item_array_of_item_tables = function(arr)
@@ -2127,6 +2342,9 @@ transf = {
       delete(tmpdir_ics_path)
       return contents
     end,
+    value_set = function(t)
+      return toSet(values(t))
+    end
     
   },
   assoc_arr = {
