@@ -1,19 +1,19 @@
 assertMessage(
-  get.array.sorted(fixListWithNil({1, nil, 2, nil, 3})),
+  get.array.sorted(transf.hole_y_arraylike.array({1, nil, 2, nil, 3})),
   {1, 2, 3}
 )
 
 assertMessage(
-  get.array.sorted(fixListWithNil({1, 2, 3})),
+  get.array.sorted(transf.hole_y_arraylike.array({1, 2, 3})),
   {1, 2, 3}
 )
 
 assertMessage(
-  get.array.sorted(fixListWithNil({nil, 1, 2, nil})),
+  get.array.sorted(transf.hole_y_arraylike.array({nil, 1, 2, nil})),
   {1, 2}
 )
 
 assertMessage(
-  fixListWithNil({nil, { "ja" }, { "nein" }, nil}),
+  transf.hole_y_arraylike.array({nil, { "ja" }, { "nein" }, nil}),
   {{ "ja" }, { "nein" }}
 )

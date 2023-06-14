@@ -8,7 +8,7 @@ function buildInnerCommand(command_parts)
   if type(command_parts) == "string" then
     return command_parts
   end
-  command_parts = fixListWithNil(command_parts) -- this allows us to have optional args simply by having them be nil
+  command_parts = transf.hole_y_arraylike.array(command_parts) -- this allows us to have optional args simply by having them be nil
   for _, command_part in ipairs(command_parts) do
     if type(command_part) == "string" then -- simply concat the command_part
       command = command .. " " .. command_part

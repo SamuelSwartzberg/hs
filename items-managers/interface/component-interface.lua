@@ -31,7 +31,7 @@ local function getOrDoAll(self, action, key, value, not_recursive_children, not_
     local result_for_super = getOrDoAll(self.super, action, key, value, false, false, self.id)
     output = concat(output, result_for_super)
   end
-  output = fixListWithNil(output)
+  output = transf.hole_y_arraylike.array(output)
   return output
 end
 

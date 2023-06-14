@@ -7,10 +7,10 @@ transf = {
       return string.char(get.string_or_number.number(hex, 16))
     end,
     utf8_unicode_prop_table = function(hex)
-      return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped("utf8:" .. tostring(hex)))[1]
+      return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped("utf8:" .. transf.digit_string.canonical_digit_string(hex)))[1]
     end,
     unicode_codepoint = function(hex)
-      return "U+" .. hex
+      return "U+"  .. transf.digit_string.canonical_digit_string(hex)
     end,
   },
   potentially_indicated_digit_string = {
@@ -97,11 +97,64 @@ transf = {
   },
   unicode_codepoint = { -- U+X...
     number = function(codepoint)
-      return get.string_or_number.number(codepoint:sub(3), 16)
+      return get.potentially_indicated_hex_string.number(transf.unicode_codepoint.hex_string(codepoint))
+    end,
+    hex_string = function(codepoint)
+      return codepoint:sub(3)
     end,
     unicode_prop_table = function(codepoint)
-      return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped(codepoint))[1]
+      return memoize(runJSON)(
+        "uni print -compact -format=all -as=json" 
+        .. transf.string.single_quoted_escaped(
+          "U+" .. transf.digit_string.canonical_digit_string(
+            transf.unicode_codepoint.hex_string(codepoint)
+          )
+        )
+      )[1]
     end
+  },
+  unicode_prop_table = {
+    unicode_codepoint_binary_string = function(unicode_prop_table)
+      return unicode_prop_table.bin
+    end,
+    unicode_block_name = function(unicode_prop_table)
+      return unicode_prop_table.block
+    end,
+    unicode_category_name = function(unicode_prop_table)
+      return unicode_prop_table.cat
+    end,
+    char = function(unicode_prop_table)
+      return unicode_prop_table.char
+    end,
+    unicode_codepoint = function(unicode_prop_table)
+      return unicode_prop_table.cpoint
+    end,
+    unicode_codepoint_decimal_string = function(unicode_prop_table)
+      return unicode_prop_table.dec
+    end,
+    unicode_codepoint_hex_string = function(unicode_prop_table)
+      return unicode_prop_table.hex
+    end,
+    unicode_codepoint_octal_string = function(unicode_prop_table)
+      return unicode_prop_table.oct
+    end,
+    html_character_reference = function(unicode_prop_table)
+      return unicode_prop_table.html
+    end,
+    unicode_character_name = function(unicode_prop_table)
+      return unicode_prop_table.name
+    end,
+    unicode_plane = function(unicode_prop_table)
+      return unicode_prop_table.plane
+    end,
+    utf8_hex_string = function(unicode_prop_table)
+      return transf.string.nowhitespace(unicode_prop_table.utf8)
+    end,
+    summary = function(unicode_prop_table)
+      return transf.unicode_prop_table.char(unicode_prop_table) .. ": "
+        .. transf.unicode_prop_table.unicode_codepoint(unicode_prop_table) .. " "
+        .. transf.unicode_prop_table.unicode_character_name(unicode_prop_table)
+    end,
   },
   number = {
     decimal_string = function(num)
@@ -225,6 +278,17 @@ transf = {
     end,
     length = function(arr)
       return #arr
+    end
+  },
+  hole_y_arraylike = {
+    array = function(tbl)
+      local new_tbl = list({})
+      for i = 1, #tbl do
+        if tbl[i] ~= nil then
+          new_tbl[#new_tbl + 1] = tbl[i]
+        end
+      end
+      return new_tbl
     end
   },
   char = {
@@ -741,6 +805,15 @@ transf = {
   xml_file = {
     tree = xml.parseFile
   },
+  tree_node = {
+
+  },
+  inner_tree_node = {
+
+  },
+  leaf_tree_node = {
+
+  },
 
   shellscript_file = {
     gcc_string_errors = function(path)
@@ -1117,9 +1190,68 @@ transf = {
     end,
   },
   contact_table = {
+    uid = function (contact_table)
+      return contact_table.uid
+    end,
+    pref_name = function(contact_table) return contact_table["Formatted name"] end,
+    name_pre = function(contact_table) return contact_table["Prefix"] end,
+    first_name = function(contact_table) return contact_table["First name"] end,
+    middle_name = function(contact_table) return contact_table["Additional"] end,
+    last_name = function(contact_table) return contact_table["Last name"] end,
+    name_suf = function(contact_table) return contact_table["Suffix"] end,
+    nickname = function(contact_table) return contact_table["Nickname"] end,
+    anniversary = function(contact_table) return contact_table["Anniversary"] end,
+    birthday = function(contact_table) return contact_table["Birthday"] end,
+    organization = function(contact_table) return contact_table["Organization"] end,
+    title = function(contact_table) return contact_table["Title"] end,
+    role = function(contact_table) return contact_table["Role"] end,
+    homepage = function(contact_table) return contact_table["Webpage"] end,
     iban = function (contact_table)
       return get.contact_table.encrypted_data(contact_table, "iban")
-    end
+    end,
+    bic = function (contact_table)
+      return transf.iban.bic(transf.contact_table.iban(contact_table))
+    end,
+    bank_name = function (contact_table)
+      return transf.iban.bank_name(transf.contact_table.iban(contact_table))
+    end,
+    full_name_western_array = function(contact_table)
+      return transf.hole_y_arraylike.array({ 
+        transf.contact_table.name_pref(contact_table),
+        transf.contact_table.first_name(contact_table),
+        transf.contact_table.middle_name(contact_table),
+        transf.contact_table.last_name(contact_table),
+        transf.contact_table.name_suf(contact_table)
+      })
+    end,
+    full_name_western = function(contact_table)
+      return table.concat(
+        transf.contact_table.full_name_western_array(contact_table),
+        " "
+      )
+    end,
+    full_name_eastern_array = function(contact_table)
+      return transf.hole_y_arraylike.array({ 
+        transf.contact_table.name_pref(contact_table),
+        transf.contact_table.last_name(contact_table),
+        transf.contact_table.first_name(contact_table),
+        transf.contact_table.name_suf(contact_table)
+      })
+    end,
+    full_name_eastern = function(contact_table)
+      return table.concat(
+        transf.contact_table.full_name_eastern_array(contact_table),
+        " "
+      )
+    end,
+    full_name_iban_bic_bank_name_array = function(contact_table)
+      return {
+        transf.contact_table.full_name_western(contact_table),
+        transf.contact_table.iban(contact_table),
+        transf.contact_table.bic(contact_table),
+        transf.contact_table.bank_name(contact_table),
+      }
+    end,
   },
   youtube_video_id = {
     youtube_video_item = function(id)
@@ -1409,6 +1541,9 @@ transf = {
     end,
     folded = function(str)
       return eutf8.gsub(str, "\n", " ")
+    end,
+    nowhitespace = function(str)
+      return eutf8.gsub(str, "%s", "")
     end,
     --- @param str string
     --- @return string[]

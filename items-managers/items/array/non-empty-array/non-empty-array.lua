@@ -17,7 +17,7 @@ NonEmptyArraySpecifier = {
         return ar(res)
       end,
       ["filter-nil-map"] = function(self, callback)
-        return fixListWithNil(map(self:get("c"), callback))
+        return transf.hole_y_arraylike.array(map(self:get("c"), callback))
       end,
       ["filter-nil-map-to-new-array"] = function(self, callback)
         return ar(self:get("filter-nil-map", callback))

@@ -1,11 +1,6 @@
 --- @type ItemSpecifier
 AddressTableSpecifier = {
   type = "address-table",
-  properties = {
-    doThisables = {},
-    getables = { }
-  },
-  
   action_table = { }
 }
 

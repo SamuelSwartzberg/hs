@@ -4,7 +4,7 @@ ContainsNilArraySpecifier = {
   properties = {
     getables = {
       ["to-does-not-contain-nil-array"] = function(self)
-        return ar(fixListWithNil(self:get("c")))
+        return ar(transf.hole_y_arraylike.array(self:get("c")))
       end,
     },
     doThisables = {

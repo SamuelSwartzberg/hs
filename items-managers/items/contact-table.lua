@@ -3,51 +3,6 @@ ContactTableSpecifier = {
   type = "contact-table",
   properties = {
     getables = {
-
-      ["iban"] = function(self)
-        return self:get("encrypted-data", "iban")
-      end,
-
-      -- simple properties
-
-      ["uid"] = function(self) return self:get("c").uid end,
-      ["pref-name"] = function(self) return self:get("prop-policy", "Formatted name") end,
-      ["name-pre"] = function(self) return self:get("prop-policy", "Prefix") end,
-      ["first-name"] = function(self) return self:get("prop-policy", "First name") end,
-      ["middle-name"] = function(self) return self:get("prop-policy", "Additional") end,
-      ["last-name"] = function(self) return self:get("prop-policy", "Last name") end,
-      ["name-suf"] = function(self) return self:get("prop-policy", "Suffix") end,
-      ["nickname"] = function(self) return self:get("prop-policy", "Nickname") end,
-      ["anniversary"] = function (self) return self:get("prop-policy", "Anniversary") end,
-      ["birthday"] = function (self) return self:get("prop-policy", "Birthday") end,
-      ["organization"] = function (self) return self:get("prop-policy", "Organization") end,
-      ["title"] = function (self) return self:get("prop-policy", "Title") end,
-      ["role"] = function (self) return self:get("prop-policy", "Role") end,
-      ["homepage"] = function(self) return self:get("prop-policy", "Webpage") end,
-
-      ["full-name-western"] = function(self)
-        local parts = fixListWithNil({ 
-          self:get("name-pref"),
-          self:get("first-name"),
-          self:get("middle-name"),
-          self:get("last-name"),
-          self:get("name-suf")
-        })
-        return table.concat(parts, " ")
-      end,
-      ["full-name-eastern"] = function(self)
-        local parts = fixListWithNil({ 
-          self:get("name-pref"),
-          self:get("last-name"),
-          self:get("first-name"),
-          self:get("name-suf")
-        })
-        return table.concat(parts, " ")
-      end,
-      ["full-name"] = function(self)
-        return self:get("full-name-western")
-      end,
-
       -- tables
 
       ["table-prop-policy"] = function (self, prop)
@@ -88,7 +43,7 @@ ContactTableSpecifier = {
       ["has-at-least-one-contact-addr"] = function (self, type)
         return #self:get("all-contact-addr", type) > 0
       end,
-      ["addresses-table"] = function(self)
+      ["addresses-table"] = function(contact_table)
         local raw = self:get("table-prop-policy", "Address")
         local processed = map(raw, function(v)
           local raw_single = concat(
@@ -109,13 +64,13 @@ ContactTableSpecifier = {
       ["address-table"] = function(self, type)
         self:get("addresses-table"):get("value", type)
       end,
-      ["all-address-types"] = function(self)
+      ["all-address-types"] = function(contact_table)
         return keys(self:get("addresses-table"))
       end,
 
       -- complex properties
 
-      ["to-string"] = function(self)
+      ["to-string"] = function(contact_table)
         local str = self:get("full-name")
         for _, name_addition in ipairs({"nickname", "title", "organization", "role"}) do
           local name_addition_res = self:get(name_addition)
@@ -143,7 +98,7 @@ ContactTableSpecifier = {
       
     },
     doThisables = {
-      ["edit"] = function (self)
+      ["edit"] = function(contact_table)
         dothis.khard.edit(self:get("uid"))
       end,
       ["add-iban"] = function(self, iban)
@@ -160,7 +115,7 @@ ContactTableSpecifier = {
           do_after(bank_deets_array)
         end)
       end,
-      ["choose-action-bank-deets-array"] = function(self)
+      ["choose-action-bank-deets-array"] = function(contact_table)
         self:doThis("do-bank-deets-array", function(bank_deets_array)
           bank_deets_array:doThis("choose-action")
         end)

@@ -150,7 +150,7 @@ function parseSeriesSpecifier(series_specifier)
     end
   elseif stringy.startswith(series_specifier, ":") then
     parsed_series_specifier.mode = "key"
-    parsed_series_specifier.keys = fixListWithNil(stringy.split(string.sub(series_specifier, 2), "+")) -- separating modifier keys with `+`
+    parsed_series_specifier.keys = transf.hole_y_arraylike.array(stringy.split(string.sub(series_specifier, 2), "+")) -- separating modifier keys with `+`
   else
     local mode_char, x, y, optional_relative_specifier = onig.match(series_specifier, "^(.)"..mt._r.syntax.point.."( %[a-zA-Z]+)?$")
     if not mode_char or not x or not y then
