@@ -5,29 +5,11 @@ AlphanumMinusItemSpecifier = {
   type = "alphanum-minus",
   properties = {
     getables = {
-      ["alphanum"] = function(self)
-        return select(1, eutf8.gsub(self:get("c"), "-", ""))
-      end,
-      ["is-isbn"] = function(self) return memoize(onig.find)(self:get("alphanum"), whole(mt._r.id.isbn)) end,
-      ["is-issn"] = function(self) return memoize(onig.find)(self:get("c"), whole(mt._r.id.issn)) end,
-      ["is-uuid"] = function(self)
-        return onig.find(self:get("c"), whole(mt._r.id.uuid), 1, "i")
-      end,
-      ["is-package-manager"] = function(self)
-        return is.string.package_manager(self:get("c"))
-      end,
-      ["is-mullvad-relay-identifier"] = function(self)
-        return 
-          onig.find(
-            self:get("c"), 
-            "^[a-z]{2}-[a-z]{3}(?:-(?:wg|ovpn))?-\\d{3}$"
-          )
-          or 
-          onig.find(
-            self:get("c"), 
-            "^[a-z]{2}\\d-wireguard$"
-          )
-      end,
+      ["is-isbn"] = bc(is.alphanum_minus.isbn),
+      ["is-issn"] = bc(is.ascii.issn),
+      ["is-uuid"] = bc(is.ascii.uuid),
+      ["is-package-manager"] = bc(is.string.package_manager),
+      ["is-mullvad-relay-identifier"] = bc(is.ascii.relay_identifier)
 
     }
   },

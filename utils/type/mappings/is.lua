@@ -18,7 +18,55 @@ is = {
         and str:find("[\n\t\r\f]") == nil
         and str:find("^%s") == nil
         and str:find("%s$") == nil
-      end
+    end,
+    number = function(str)
+      return tonumber(str) ~= nil
+    end,
+    int = function(str)
+      return is.string.number(str) and is.number.int(tonumber(str))
+    end,
+  },
+  ascii = {
+    issn = function(str)
+      return onig.find(str, whole(mt._r.id.issn))
+    end,
+    uuid = function(str)
+      return onig.find(str, whole(mt._r.id.uuid), 1, "i")
+    end,
+    relay_identifier = function(str)
+      return onig.find(str, whole(mt._r.id.relay_identifier))
+    end,
+    base32_gen = function(str)
+      return onig.find(str, whole(mt._r.id.b32.gen))
+    end,
+    base32_crockford = function(str)
+      return onig.find(str, whole(mt._r.id.b32.crockford))
+    end,
+    base64_gen = function(str)
+      return onig.find(str, whole(mt._r.id.b64.gen))
+    end,
+    base64_url = function(str)
+      return onig.find(str, whole(mt._r.id.b64.url))
+    end,
+    base32 = function(str)
+      return is.ascii.base32_gen(str) or is.ascii.base32_crockford(str)
+    end,
+    base64 = function(str)
+      return is.ascii.base64_gen(str) or is.ascii.base64_url(str)
+    end,
+    digit_string = function(str)
+      str = mustNotStart(str, "-")
+    end,
+    indicated_binary_string = function(str)
+      return stringy.startswith(str, "0b") and is.ascii.binary_string(str:sub(3))
+    end,
+
+  },
+  alphanum_minus = {
+    isbn = function(str)
+      return onig.find(transf.alphanum_minus.alphanum(str), whole(mt._r.id.isbn))
+    end,
+    
   },
   uuid = {
     contact = function(uuid)
@@ -58,6 +106,7 @@ is = {
     dir = bind(testPath, {a_use, "dir"}),
     file = bind(testPath, {a_use, "not-dir"}),
     exists = bind(testPath, {a_use, true}),
+    does_not_exist = bind(testPath, {a_use, false}),
     empty_dir = function(path)
       return testPath(path, {
         dirness = "dir",
@@ -79,7 +128,7 @@ is = {
     absolute_path = function(path)
       return is.path.tilde_absolute_path(path) or is.path.true_absolute_path(path)
     end,
-    volumne = function(path)
+    volume = function(path)
       return stringy.startswith(path, "/Volumes/")
     end,
     email_file = function(path)
@@ -87,7 +136,10 @@ is = {
       get.path.is_extension(path, "eml") or 
       transf.path.parent_leaf(path) == "new" or
       transf.path.parent_leaf(path == "cur")
-    end
+    end,
+    path_with_intra_file_locator = function(path)
+      return eutf8.find(transf.path.leaf(path), ":%d+$") ~= nil
+    end,
   },
   extant_path = {
     

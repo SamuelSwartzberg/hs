@@ -2,12 +2,15 @@
 
 
 transf = {
-  hex = { -- a hex string
+  hex_string = { -- a hex string
     char = function(hex)
       return string.char(tonumber(hex, 16))
     end,
     indicated_hex_string = function(hex)
       return "0x" .. hex
+    end,
+    number = function(hex)
+      return tonumber(hex, 16)
     end,
     utf8_unicode_prop_table = function(hex)
       return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped("utf8:" .. tostring(hex)))[1]
@@ -16,6 +19,47 @@ transf = {
       return "U+" .. hex
     end,
   },
+  indicated_hex_string = {
+    hex_string = function(indicated_hex)
+      return indicated_hex:sub(3)
+    end,
+    number = function(indicated_hex)
+      return tonumber(indicated_hex:sub(3), 16)
+    end,
+  },
+  binary_string = {
+    indicated_binary_string = function(bin)
+      return "0b" .. bin
+    end,
+    number = function(bin)
+      return tonumber(bin, 2)
+    end,
+  },
+  indicated_binary_string = {
+    binary_string = function(indicated_bin)
+      return indicated_bin:sub(3)
+    end,
+    number = function(indicated_bin)
+      return tonumber(indicated_bin:sub(3), 2)
+    end,
+  },
+  octal_string = {
+    indicated_octal_string = function(oct)
+      return "0o" .. oct
+    end,
+    number = function(oct)
+      return tonumber(oct, 8)
+    end,
+  },
+  indicated_octal_string = {
+    octal_string = function(indicated_oct)
+      return indicated_oct:sub(3)
+    end,
+    number = function(indicated_oct)
+      return tonumber(indicated_oct:sub(3), 8)
+    end,
+  },
+
   percent = {
     char = function(percent)
       local num = percent:sub(2, 3)
@@ -62,12 +106,76 @@ transf = {
       return transf.unicode_codepoint.unicode_prop_table(transf.number.unicode_codepoint(num))
     end,
     utf8_unicode_prop_table = function(num)
-      return transf.hex.utf8_unicode_prop_table(transf.number.hex_string(num))
+      return transf.hex_string.utf8_unicode_prop_table(transf.number.hex_string(num))
     end,
+    int = function(num)
+      return math.floor(num + 0.5)
+    end,
+    int_or_nil = function(num)
+      if is.number.int(num) then
+        return num
+      else
+        return nil
+      end
+    end,
+    pos_int_or_nil = function(num)
+      if is.number.int(num) and num > 0 then
+        return num
+      else
+        return nil
+      end
+    end,
+    neg_int_or_nil = function(num)
+      if is.number.int(num) and num < 0 then
+        return num
+      else
+        return nil
+      end
+    end,
+    pos_int = function(num)
+      return transf.int.pos_int(transf.number.int(num))
+    end,
+    neg_int = function(num)
+      return transf.int.neg_int(transf.number.int(num))
+    end,
+    floor = math.floor,
+    ceil = math.ceil,
   },
+  
   int = {
     length = function(int)
       return #tostring(int)
+    end,
+    pos_int_or_nil = function(int)
+      if int > 0 then
+        return int
+      else
+        return nil
+      end
+    end,
+    neg_int_or_nil = function(int)
+      if int < 0 then
+        return int
+      else
+        return nil
+      end
+    end,
+    pos_int = function(int)
+      return math.abs(int)
+    end,
+    neg_int = function(int)
+      return -math.abs(int)
+    end,
+  },
+  pos_int = {
+    largest_int_of_length = function(int)
+      return 10^int - 1
+    end,
+    smallest_int_of_length = function(int)
+      return (transf.pos_int.largest_int_of_length(int)+1) / 10
+    end,
+    center_int_of_length = function(int)
+      return (transf.pos_int.largest_int_of_length(int)+1) / 2
     end,
   },
   not_nil = {
@@ -143,9 +251,54 @@ transf = {
     
 
   },
+  path_with_intra_file_locator = {
+    path_with_intra_file_locator_specifier = function(path)
+      local parts = stringy.split(path, ":")
+      local final_part = pop(parts)
+      local specifier = {}
+      if is.string.number(parts[#parts]) then
+        specifier = {
+          column = final_part,
+          line = pop(parts),
+          path = table.concat(parts, ":")
+        }
+      else
+        specifier = {
+          line = final_part,
+          path = table.concat(parts, ":")
+        }
+      end
+      return specifier
+    end,
+  },
+  path_with_intra_file_locator_specifier = {
+    line = function(specifier)
+      return specifier.line
+    end,
+    column = function(specifier)
+      return specifier.column
+    end,
+    path = function(specifier)
+      return specifier.path
+    end,
+    intra_file_locator = function(specifier)
+      if specifier.column then
+        return ":" .. specifier.line .. ":" .. specifier.column
+      else
+        return ":" .. specifier.line
+      end
+    end,
+    series_specifier = function(specifier)
+      return ":ctrl+g,:+" .. transf.path_with_intra_file_locator_specifier.intra_file_locator(specifier) .. ",:+return"
+    end,
+     
+  },
   absolute_path = {
     file_url = function(path)
       return "file://" .. path
+    end,
+    local_http_server_url = function(path)
+      return env.FS_HTTP_SERVER .. path
     end,
   },
   extant_path = {
@@ -1400,6 +1553,11 @@ transf = {
       )
     end,
   },
+  alphanum_minus = {
+    alphanum = function(str)
+      return eutf8.gsub(str, "-", "")
+    end,
+  },
   pass_name = {
     password = function(pass_name)
       return get.pass.value("passw", pass_name)
@@ -1445,6 +1603,36 @@ transf = {
         transf.string.header_key_value,
         {"v", "kv"}
       )
+    end
+  },
+  base64_gen = {
+    decoded_string = basexx.from_base64,
+  },
+  base64_url = {
+    decoded_string = basexx.from_url64,
+  },
+  base32_gen = {
+    decoded_string = basexx.from_base32,
+  },
+  base32_crock = {
+    decoded_string = basexx.from_crockford,
+  },
+  base64 = {
+    decoded_string = function(b64)
+      if is.ascii.base64_gen(b64) then
+        return transf.base64_gen.decoded_string(b64)
+      else
+        return transf.base64_url.decoded_string(b64)
+      end
+    end
+  },
+  base32 = {
+    decoded_string = function(b32)
+      if is.ascii.base32_gen(b32) then
+        return transf.base32_gen.decoded_string(b32)
+      else
+        return transf.base32_crock.decoded_string(b32)
+      end
     end
   },
   event_table = {

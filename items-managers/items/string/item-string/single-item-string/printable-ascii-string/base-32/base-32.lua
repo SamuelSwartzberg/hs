@@ -1,19 +1,14 @@
 --- @type ItemSpecifier
 Base32ItemSpecifier = {
   type = "base32",
-  properties = {
-    getables = {
-      
-    }
-  },
   
-  action_table = concat({}, getChooseItemTable({
+  action_table = {
     {
       d = "b32dc",
       i = "🅱️3️⃣2️⃣📖",
-      key = "decode-base-32"
+      getfn = transf.base32.decoded_string
     }
-  }))
+  }
 
 }
 

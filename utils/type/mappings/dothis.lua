@@ -845,5 +845,26 @@ dothis = {
     extract_backup = function(do_after)
       run('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
     end
+  },
+  path_with_intra_file_locator_specifier = {
+    go_to = function(specifier)
+      doSeries(
+        transf.path_with_intra_file_locator_specifier.series_specifier(specifier)
+      )
+    end,
+    open_go_to = function(specifier)
+      dothis.path.open_app(
+        transf.path_with_intra_file_locator_specifier.path(specifier),
+        "Visual Studio Code - Insiders",
+        hs.fnutils.partial(dothis.path_with_intra_file_locator_specifier.go_to, specifier)
+      )
+    end
+  },
+  path_with_intra_file_locator = {
+    open_go_to = function(path_with_intra_file_locator)
+      dothis.path_with_intra_file_locator_specifier.open_go_to(
+        transf.path_with_intra_file_locator.path_with_intra_file_locator_specifier(path_with_intra_file_locator)
+      )
+    end
   }
 }

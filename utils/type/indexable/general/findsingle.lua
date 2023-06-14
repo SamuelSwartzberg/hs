@@ -182,7 +182,7 @@ function findsingle(item, conditions, opts)
         found_other_use_for_table = true
       end
       if condition._contains ~= nil then -- contains
-        local mstart = toNumber(stringy.find(potentially_sliced_item_maybe_nocase, lowerIfNecessary(condition._contains)), "pos-int", "nil")
+        local mstart = get.string_or_number.pos_int_or_nil(stringy.find(potentially_sliced_item_maybe_nocase, lowerIfNecessary(condition._contains)))
         if start ~= nil and mstart ~= nil then
           mstart = mstart + start - 1
         end

@@ -1,4 +1,19 @@
 get = {
+  string_or_number = {
+    number = function(t, base)
+
+    end,
+    int = function(t, base)
+      return transf.number.int(
+        get.string_or_number.number(t, base)
+      )
+    end,
+    pos_int_or_nil = function(t, base)
+      return transf.number.pos_int_or_nil(
+        get.string_or_number.number(t, base)
+      )
+    end,
+  },
   mullvad = {
     status = function()
       return run("mullvad status")

@@ -5,16 +5,13 @@ PathInterfaceItemSpecifier = {
     getables = {
       ["is-tilde-absolute-path"] = function(self) return self:get("c"):find("^~") end,
       ["is-true-absolute-path"] = function(self) return self:get("c"):find("^/") end,
-      ["is-extant-path"] = function(self) return testPath(self:get("c")) end,
-      ["is-non-extant-path"] = function(self) return not self:get("is-extant-path") end,
-      ["is-volume"] = function(self) return stringy.startswith(self:get("c"), "/Volumes/") end,
+      ["is-extant-path"] = bc(is.path.exists),
+      ["is-non-extant-path"] = bc(is.path.does_not_exist),
+      ["is-volume"] = bc(is.path.volume),
       ["is-path-by-start"] = returnTrue,
       ["relative-path-from"] = function(self, starting_point)
         starting_point = starting_point or env.HOME
         return self:get("difference-from-prefix-or-nil", mustEnd(starting_point, "/"))
-      end,
-      ["local-http-server-url"] = function(self)
-        return env.FS_HTTP_SERVER .. self:get("completely-resolved-path")
       end,
     },
   },
@@ -28,22 +25,17 @@ PathInterfaceItemSpecifier = {
     { key = "volume", value = CreateVolumeItem },
     { key = "path-by-start", value = CreatePathByStartItem },
   }),
-  action_table = concat(
+  action_table ={
     {
-
-    },
-    getChooseItemTable({
-      {
-        d = "httpsrvurl",
-        i = "💻🌐🏠🔗",
-        key = "local-http-server-url",
-      },{
-        d = "flurl",
-        i = "📄🔗",
-        key = "file-url",
-      }
-    })
-  )
+      d = "httpsrvurl",
+      i = "💻🌐🏠🔗",
+      getfn = transf.absolute_path.local_http_server_url
+    },{
+      d = "flurl",
+      i = "📄🔗",
+      getfn = transf.absolute_path.file_url
+    }
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

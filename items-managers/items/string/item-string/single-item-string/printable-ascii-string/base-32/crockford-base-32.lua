@@ -4,10 +4,6 @@ CrockfordBase32ItemSpecifier = {
   properties = {
     getables = {
       ["is-base-32"] = returnTrue,
-      ["decode-crockford-base-32"] = function(self)
-        return transf.string.base32_crock(self:get("c"))
-      end,
-      ["decode-base-32"] = function(self) return self:get("decode-crockford-base-32") end
     }
   },
   potential_interfaces = ovtable.init({

@@ -222,7 +222,7 @@ function prompt(ptype, prompt_spec, loop)
   local untransformer
   if ptype == "int" then
     prompt_spec = prompt_spec or {}
-    prompt_spec.transformer = prompt_spec.transformer or bind(toNumber, {a_use, "int" })
+    prompt_spec.transformer = prompt_spec.transformer or get.string_or_number.int
   elseif ptype == "number" then
     prompt_spec.transformer = prompt_spec.transformer or tonumber
   elseif ptype == "string" then

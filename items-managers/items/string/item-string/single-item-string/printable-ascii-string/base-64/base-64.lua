@@ -1,19 +1,13 @@
 --- @type ItemSpecifier
 Base64ItemSpecifier = {
   type = "base64",
-  properties = {
-    getables = {
-      
-    }
-  },
-  
-  action_table = concat({}, getChooseItemTable({
+  action_table = {
     {
       d = "b64dc",
       i = "🅱️6️⃣4️⃣📖",
-      key = "decode-base-64"
+      getfn = transf.base64.decoded_string
     }
-  }))
+  }
 
 }
 

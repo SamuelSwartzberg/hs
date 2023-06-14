@@ -1,10 +1,11 @@
 POLLING_INTERVAL = 0.01 -- seconds, seems like good compromise between what applications might expect and performance
 DELAY = POLLING_INTERVAL * 5
 
---- @param distance number
---- @param factor_of_deceleration number
---- @param steps number
---- @return number
+--- Function that calculates the initial delta value given a certain distance, factor of deceleration and number of steps.
+--- @param distance number: The total distance to travel.
+--- @param factor_of_deceleration number: The deceleration factor to use. If this is >= 1, we'll move linearly.
+--- @param steps number: The number of steps to take in total.
+--- @return number: The starting delta value.
 function getStartingDelta(distance, factor_of_deceleration, steps)
   if factor_of_deceleration >= 1 then -- invalid deceleration factor, would never reach target ≙ we're just going to move linearly
     return distance / steps 
@@ -13,13 +14,13 @@ function getStartingDelta(distance, factor_of_deceleration, steps)
   end
 end
 
---- @class deltaOpts
---- @field mode "scroll" | "move" sets the type of movement to perform. configures some other options, and is overridden by them if they are set
---- @field target_point hs_geometry_point_like | string
---- @field factor_of_deceleration? number 0 will teleport, 1 will move linearly
---- @field duration? number
---- @field jitter_factor? number
---- @field relative_to? "tl"| "tr"| "bl"| "br"| "c"|"curpos"
+--- @class deltaOpts: Options for controlling movement.
+--- @field mode "scroll" | "move" sets the type of movement to perform. configures some other options, and is overridden by them if they are set.
+--- @field target_point hs_geometry_point_like | string: The target point for the movement. This can be an actual point or a string representing a point.
+--- @field factor_of_deceleration? number: Optional. Determines the deceleration of the movement. A value of 0 means instant teleportation, while 1 indicates linear movement. Default is 0.95.
+--- @field duration? number: Optional. The duration of the movement in seconds. Default is a random value between 0.1 and 0.3.
+--- @field jitter_factor? number: Optional. The jitter factor of the movement. Default is 0.1.
+--- @field relative_to? "tl"| "tr"| "bl"| "br"| "c"|"curpos": Optional. The position relative to which the movement should be calculated.
 
 --- naive implementations of moving a thing such that applications that expect human-like movement will not notice / get confused
 --- not sure if this is necessary, but it's a good idea to be careful
@@ -40,7 +41,7 @@ function doDelta(specifier, do_after)
 
   if type(specifier.target_point) == "string" then
     local x, y = onig.match(specifier.target_point, whole(mt._r.syntax.point))
-    specifier.target_point = hs.geometry.point(toNumber(x, "number", "error"), toNumber(y, "number", "error"))
+    specifier.target_point = hs.geometry.point(get.string_or_number.number(x), get.string_or_number.number(y))
   elseif type(specifier.target_point) == "table" and not specifier.target_point.type then 
     specifier.target_point = hs.geometry.new(specifier.target_point)
   end
@@ -63,7 +64,7 @@ function doDelta(specifier, do_after)
   if specifier.mode == "scroll" then
     current_point = { x = 0, y = 0}
     specifier.set_pos_func = function(_, deltas)
-      hs.eventtap.scrollWheel({toNumber(deltas.x, "int"), toNumber(deltas.y, "int")}, {}, "pixel") 
+      hs.eventtap.scrollWheel({get.string_or_number.int(deltas.x), get.string_or_number.int(deltas.y)}, {}, "pixel") 
     end
   elseif specifier.mode == "move" then
     current_point = hs.mouse.absolutePosition()
@@ -121,8 +122,23 @@ end
 --- @alias series_specifier_inner { mode: "move"|"scroll"|"click"|"key", [string]: any }
 --- @alias series_specifier series_specifier_inner | string
 
---- @param series_specifier string
---- @return series_specifier_inner
+-- <series_specifier> ::= <click_specifier> | <key_specifier> | <move_scroll_specifier>
+-- <click_specifier> ::= "." <mouse_button>
+-- <mouse_button> ::= "l" | "r" | "m" | ... -- l for left, r for right, m for middle, etc.
+-- <key_specifier> ::= ":" <keys>
+-- <keys> ::= <key> | <key> "+" <keys>
+-- <key> ::= <any_valid_key_representation>
+-- <move_scroll_specifier> ::= <mode> <target_point> [<relative_position_specifier>]
+-- <mode> ::= "m" | "s" -- m for move, s for scroll
+-- <target_point> ::= <coordinate> "," <coordinate>
+-- <coordinate> ::= <number>
+-- <relative_position_specifier> ::= " " <relative_position>
+-- <relative_position> ::= "tl" | "tr" | "bl" | "br" | "c" | "curpos" -- tl for top-left, tr for top-right, bl for bottom-left, br for bottom-right, c for center, curpos for current position.
+
+
+--- Function that parses a series specifier string into a series specifier table.
+--- @param series_specifier string: The string to parse into a series specifier.
+--- @return series_specifier_inner: The parsed series specifier.
 function parseSeriesSpecifier(series_specifier)
   local parsed_series_specifier = {}
   if stringy.startswith(series_specifier, ".") then

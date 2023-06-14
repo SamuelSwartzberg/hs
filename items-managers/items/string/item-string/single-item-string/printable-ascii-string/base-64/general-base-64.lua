@@ -4,10 +4,6 @@ GeneralBase64ItemSpecifier = {
   properties = {
     getables = {
       ["is-base-64"] = returnTrue,
-      ["decode-general-base-64"] = function(self)
-        return transf.string.base64_gen(self:get("c"))
-      end,
-      ["decode-base-64"] = function(self) return self:get("decode-general-base-64") end
     }
   },
   potential_interfaces = ovtable.init({

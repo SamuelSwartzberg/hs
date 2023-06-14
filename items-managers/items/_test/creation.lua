@@ -113,11 +113,11 @@ local item_creation_map = {
     },
     {
       value = "/foo/bar:289",
-      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-with-line-andor-character-number" },
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-with-intra-file-locator" },
     },
     {
       value = "/foo/bar:289:12",
-      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-with-line-andor-character-number" },
+      must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "non-extant-path", "path-with-intra-file-locator" },
     },
     {
       value = itemsInPath(env.MENV)[1],

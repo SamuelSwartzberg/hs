@@ -305,7 +305,7 @@ end
 dothis.pass.add_otp_url(readFile(env.MMOCK .. "/strings/urls/otpauth/basic"), "testotp")
 hs.timer.doAfter(1, function()
   assert(
-    toNumber(get.pass.otp("testotp"), "int") > 0
+    get.string_or_number.int(get.pass.otp("testotp")) > 0
   )
   dothis.pass.delete_otp("testotp")
 end)

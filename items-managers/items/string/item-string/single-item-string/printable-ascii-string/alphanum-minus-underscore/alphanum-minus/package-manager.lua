@@ -3,11 +3,6 @@
 --- @type ItemSpecifier
 PackageManagerItemSpecifier = {
   type = "package-manager",
-  properties = {
-    getables = {
-      
-    }
-  },
   action_table ={
     
   }

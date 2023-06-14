@@ -136,23 +136,23 @@ assertMessage(
 
 
 assertMessage(
-  transf.hex.char("6d"),
+  transf.hex_string.char("6d"),
   "m"
 )
 
 assertMessage(
-  transf.hex.indicated_hex_string("6d"),
+  transf.hex_string.indicated_hex_string("6d"),
   "0x6d"
 )
 
 assertMessage(
-  transf.hex.utf8_unicode_prop_table("6d").name,
+  transf.hex_string.utf8_unicode_prop_table("6d").name,
   "LATIN SMALL LETTER M"
 )
 
 -- Test for hex -> unicode_codepoint
 assertMessage(
-  transf.hex.unicode_codepoint("6d"),
+  transf.hex_string.unicode_codepoint("6d"),
   "U+6d"
 )
 

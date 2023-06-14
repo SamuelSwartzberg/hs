@@ -3,12 +3,6 @@
 --- @type ItemSpecifier
 IssnItemSpecifier = {
   type = "issn",
-  properties = {
-    getables = {
-
-    }
-  },
-  
   action_table ={
     
   }

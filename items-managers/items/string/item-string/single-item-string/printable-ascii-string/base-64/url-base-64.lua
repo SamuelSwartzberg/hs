@@ -4,11 +4,7 @@ UrlBase64ItemSpecifier = {
   properties = {
     getables = {
       ["is-base-64"] = returnTrue,
-      ["is-citable-object-id"] = returnTrue,
-      ["decode-url-base-64"] = function(self)
-        return transf.string.base64_url(self:get("c"))
-      end,
-      ["decode-base-64"] = function(self) return self:get("decode-url-base-64") end
+      ["is-citable-object-id"] = returnTrue
     }
   },
   potential_interfaces = ovtable.init({

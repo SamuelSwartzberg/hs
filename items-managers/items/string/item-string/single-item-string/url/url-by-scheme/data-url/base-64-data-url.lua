@@ -1,18 +1,7 @@
 --- @type ItemSpecifier
 Base64DataURLItemSpecifier = {
   type = "base64-data-url",
-  properties = {
-    getables = {
-      
-    }, 
-    doThisables = {
-      
-    }
-  },
-
-  action_table =concat(getChooseItemTable({
-    
-  }),{})
+  action_table ={}
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

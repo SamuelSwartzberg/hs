@@ -1,33 +1,3 @@
---- @param val integer
---- @return integer
-function lengthOfInt(val)
-  if is.any.int(val) then
-    return #tostring(val)
-  else
-    error("Value is not an integer")
-  end
-end
-
---- @param length integer
---- @param target? "upper" | "lower" | "center"
---- @return integer
-function intOfLength(length, target)
-  target = target or "center"
-  if length < 1 then
-    error("Length must be at least 1")
-  end
-  local largest_plus_1 = math.floor(1 * 10 ^ length)
-  if target == "upper" then
-    return largest_plus_1 - 1
-  elseif target == "lower" then
-    return largest_plus_1 / 10
-  elseif target == "center" then
-    return largest_plus_1 / 2
-  else
-    error("Invalid target: " .. target)
-  end
-end
-
 --- @alias randSpec { low?: number, high?: number, len?: number }
 
 --- @type fun(spec?: randSpec, type?: "int"): (integer) | fun(spec?: randSpec, type?: "number"): (number) | fun(spec?: randSpec, type?: "b64"): (string)
@@ -51,8 +21,8 @@ function rand(spec, type)
 
   -- handle len case
   if spec.len then
-    low = intOfLength(spec.len, "lower")
-    high = intOfLength(spec.len, "upper")
+    low = transf.pos_int.smallest_int_of_length(spec.len)
+    high = transf.pos_int.largest_int_of_length(spec.len)
   end
 
   -- set defaults for low and high
@@ -64,11 +34,11 @@ function rand(spec, type)
   end
   local randnr = low + math.random()  * (high - low);
   if type == "int" then
-    return toNumber(randnr, "int", "error")
+    return get.string_or_number.int(randnr)
   elseif type == "number" then
     return randnr
   elseif type == "b64" then
-    local len = lengthOfInt(randnr)
+    local len = transf.int.length(randnr)
     return run({
       "openssl",
       "rand",
@@ -77,48 +47,5 @@ function rand(spec, type)
     })
   else
     error("Invalid type: " .. type)
-  end
-end
-
---- @param thing any The thing to convert.
---- @param target? "number" | "int" | "pos-int" What to convert to. Defaults to "number".
---- @param mode? "error" | "nil" | "invalid-number" What to do if the value cannot be converted to the target type. Defaults to "nil".
---- @return number | nil
-function toNumber(thing, target, mode)
-  target = target or "number"
-  mode = mode or "nil"
-  local conv_func
-  if target == "number" then
-    conv_func = tonumber
-  elseif target == "int" then
-    conv_func = function(t)
-      local t = tonumber(t)
-      if not t then return nil end
-      return math.floor(tonumber(t) + 0.5)
-    end
-  elseif target == "pos-int" then
-    conv_func = function(t)
-      local t = tonumber(t)
-      if not t or t < 0 then return nil end
-      return math.floor(tonumber(t) + 0.5)
-    end
-  else
-    error("Invalid target: " .. target)
-  end
-
-  local res = conv_func(thing)
-
-  if res == nil then
-    if mode == "error" then
-      error("Value cannot be converted to a " .. target .. ": " .. tostring(thing))
-    elseif mode == "nil" then
-      return nil
-    elseif mode == "invalid-number" then
-      return -math.huge
-    else
-      error("Invalid mode: " .. mode)
-    end
-  else
-    return res
   end
 end

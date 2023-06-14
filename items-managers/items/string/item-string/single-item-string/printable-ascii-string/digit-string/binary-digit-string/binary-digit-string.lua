@@ -16,13 +16,13 @@ BinaryDigitStringItemSpecifier = {
     },
   },
   
-  action_table = concat({}, getChooseItemTable({
+  action_table = {
     {
       d = "bindc",
       i = "2️⃣📖",
       key = "binary-to-corresponding-string"
     }
-  }))
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

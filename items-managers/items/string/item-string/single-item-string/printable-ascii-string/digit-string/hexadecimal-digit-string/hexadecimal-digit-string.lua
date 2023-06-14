@@ -15,13 +15,13 @@ HexadecimalDigitStringItemSpecifier = {
     }
   },
   
-  action_table = concat({}, getChooseItemTable({
+  action_table = {
     {
       d = "hexdc",
       i = "1️⃣6️⃣📖",
       key = "hexadecimal-to-corresponding-string"
     }
-  }))
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface
