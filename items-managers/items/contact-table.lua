@@ -3,12 +3,6 @@ ContactTableSpecifier = {
   type = "contact-table",
   properties = {
     getables = {
-      ["prop-policy"] = function(self, prop)
-        return self:get("c")[prop]
-      end,
-      ["encrypted-data"] = function(self, type)
-        return get.pass.contact_json(type, self:get("uid"))
-      end,
 
       ["iban"] = function(self)
         return self:get("encrypted-data", "iban")

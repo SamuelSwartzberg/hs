@@ -1,25 +1,29 @@
 --- @type ItemSpecifier
 IbanItemSpecifier = {
   type = "iban",
-  properties = {
-    getables = {
-      ["cleaned-iban"] = function(self)
-        return transf.iban.cleaned_iban(self:get("c"))
-      end,
-      ["bic"] = function (self)
-        return transf.iban.bic(self:get("c"))
-      end,
-      ["bank-name"] = function (self)
-        return transf.iban.bank_name(self:get("c"))
-      end
-    },
-    doThisables = {
-      
-    }
-  },
  
   action_table = {
-
+    {
+      i = "🌐💳",
+      d = "iban",
+      getfn = transf.iban.cleaned_iban
+    },{
+      i = "🌐💳✂️",
+      d = "ibansp",
+      getfn = transf.iban.separated_iban
+    },{
+      i = "🔍🏦",
+      d = "bic",
+      getfn = transf.iban.bic
+    },{
+      i = "🏷️🏦",
+      d = "bnknm",
+      getfn = transf.iban.bank_name
+    },{
+      i = "🌐💳🔍🏦🏷️🏦",
+      d = "ibanbicbnknmarr",
+      getfn = transf.iban.iban_bic_bank_name_array
+    }
   }
 
 }

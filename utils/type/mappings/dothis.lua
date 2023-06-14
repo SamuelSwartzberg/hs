@@ -866,5 +866,10 @@ dothis = {
         transf.path_with_intra_file_locator.path_with_intra_file_locator_specifier(path_with_intra_file_locator)
       )
     end
+  },
+  iban = {
+    fill_bank_form = function(iban)
+      dothis.string_array.fill_with(transf.iban.iban_bic_bank_name_array(iban))
+    end
   }
 }

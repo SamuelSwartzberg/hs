@@ -1068,7 +1068,19 @@ transf = {
   iban = {
     cleaned_iban = function(iban)
       return select(1, string.gsub(iban, "[ %-_]", ""))
-    end
+    end,
+    bic = function(iban)
+      return transf.cleaned_iban.bic(transf.iban.cleaned_iban(iban))
+    end,
+    bank_name = function(iban)
+      return transf.cleaned_iban.bank_name(transf.iban.cleaned_iban(iban))
+    end,
+    iban_bic_bank_name_array = function(iban)
+      return {iban, transf.iban.bic(iban), transf.iban.bank_name(iban)}
+    end,
+    separated_iban = function(iban)
+      return transf.cleaned_iban.separated_iban(transf.iban.cleaned_iban(iban))
+    end,
   },
   cleaned_iban = {
     data = function(iban)
@@ -1086,6 +1098,12 @@ transf = {
     bank_name = function(iban)
       return transf.cleaned_iban.data(iban).bankName
     end,
+    separated_iban = function(iban)
+      return table.concat(
+        chunk(iban, 4),
+        " "
+      )
+    end,
   },
   uuid = {
     raw_contact = function(uuid)
@@ -1097,6 +1115,11 @@ transf = {
       contact_table.uid = uuid
       return contact_table
     end,
+  },
+  contact_table = {
+    iban = function (contact_table)
+      return get.contact_table.encrypted_data(contact_table, "iban")
+    end
   },
   youtube_video_id = {
     youtube_video_item = function(id)

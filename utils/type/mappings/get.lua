@@ -260,6 +260,11 @@ get = {
       return device:name()
     end,
   },
+  contact_table = {
+    encrypted_data = function(contact_table, type)
+      return get.pass.contact_json(type, contact_table.uid)
+    end,
+  },
   table = {
     ---@param table table
     ---@param keystop integer
