@@ -164,8 +164,8 @@ function parseSeriesSpecifier(series_specifier)
       error("doInput: invalid mode character `" .. mode_char .. "` in series specifier:\n\n" .. series_specifier)
     end
     parsed_series_specifier.target_point = {
-      x = tonumber(x),
-      y = tonumber(y)
+      x = get.string_or_number.number(x),
+      y = get.string_or_number.number(y)
     }
     if optional_relative_specifier and #optional_relative_specifier > 0 then
       parsed_series_specifier.relative_to = string.sub(optional_relative_specifier, 3)

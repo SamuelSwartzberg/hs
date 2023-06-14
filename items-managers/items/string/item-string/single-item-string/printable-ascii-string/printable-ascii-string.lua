@@ -13,7 +13,7 @@ PrintableAsciiStringItemSpecifier = {
           and not contents:find("[^%w%-%_ ]")
       end,
       ["is-doi"] = function(self) return memoize(onig.find)(self:get("c"), whole(mt._r.id.doi)) end,
-      ["is-num"] = function(self) return tonumber(self:get("c")) ~= nil end,
+      ["is-num"] = function(self) return get.string_or_number.number(self:get("c")) ~= nil end,
       ["is-email-address"] = function(self) -- trying to determine what string is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
         local contents = self:get("c")
         return stringy.find(contents, "@") and stringy.find(contents, ".") and not eutf8.find(contents, "%s")

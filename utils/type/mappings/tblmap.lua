@@ -389,6 +389,14 @@ tblmap = {
       gitlab = "gitlab.com",
       bitbucket = "bitbucket.org",
     },
+  },
+  base_letter = {
+    base = {
+      b = 2,
+      o = 8,
+      d = 10,
+      x = 16,
+    }
   }
 }
 

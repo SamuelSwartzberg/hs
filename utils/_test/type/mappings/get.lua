@@ -175,7 +175,7 @@ assertMessage(
 )
 
 assert(
-  tonumber(get.upkg.count("os")) > 50  -- 50 is a safe number to assume there are more than (at time of writing, 388)
+  get.string_or_number.number(get.upkg.count("os")) > 50  -- 50 is a safe number to assume there are more than (at time of writing, 388)
 )
 
 assert(

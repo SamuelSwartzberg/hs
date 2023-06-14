@@ -20,10 +20,10 @@ is = {
         and str:find("%s$") == nil
     end,
     number = function(str)
-      return tonumber(str) ~= nil
+      return get.string_or_number.number(str) ~= nil
     end,
     int = function(str)
-      return is.string.number(str) and is.number.int(tonumber(str))
+      return is.string.number(str) and is.number.int(get.string_or_number.number(str))
     end,
   },
   ascii = {
@@ -55,10 +55,53 @@ is = {
       return is.ascii.base64_gen(str) or is.ascii.base64_url(str)
     end,
     digit_string = function(str)
-      str = mustNotStart(str, "-")
+      return get.string_or_number.number(str, 16) ~= nil -- this may not return the correct value for non-hex strings, but that doesn't matter, we're only checking if it is a digit string of whatever kind, so what value exactly it returns doesn't matter
     end,
+    indicated_digit_string = function(str)
+      return 
+        stringy.startswith(str, "0") and
+        listContains(keys(tblmap.base_letter.base), str:sub(2, 2)) and
+        is.ascii.digit_string(str:sub(3))
+    end,
+    potentially_indicated_digit_string = function(str)
+      return is.ascii.indicated_digit_string(str) or is.ascii.digit_string(str)
+    end,
+    binary_string = function(str)
+      return get.string_or_number.number(str, 2) ~= nil
+    end,
+    hex_string = function(str)
+      return get.string_or_number.number(str, 16) ~= nil
+    end,
+    octal_string = function(str)
+      return get.string_or_number.number(str, 8) ~= nil
+    end,
+    decimal_string = function(str)
+      return get.string_or_number.number(str, 10) ~= nil
+    end,
+
     indicated_binary_string = function(str)
       return stringy.startswith(str, "0b") and is.ascii.binary_string(str:sub(3))
+    end,
+    indicated_hex_string = function(str)
+      return stringy.startswith(str, "0x") and is.ascii.hex_string(str:sub(3))
+    end,
+    indicated_octal_string = function(str)
+      return stringy.startswith(str, "0o") and is.ascii.octal_string(str:sub(3))
+    end,
+    indicated_decimal_string = function(str)
+      return stringy.startswith(str, "0d") and is.ascii.decimal_string(str:sub(3))
+    end,
+    potentially_indicated_binary_string = function(str)
+      return is.ascii.indicated_binary_string(str) or is.ascii.binary_string(str)
+    end,
+    potentially_indicated_hex_string = function(str)
+      return is.ascii.indicated_hex_string(str) or is.ascii.hex_string(str)
+    end,
+    potentially_indicated_octal_string = function(str)
+      return is.ascii.indicated_octal_string(str) or is.ascii.octal_string(str)
+    end,
+    potentially_indicated_decimal_string = function(str)
+      return is.ascii.indicated_decimal_string(str) or is.ascii.decimal_string(str)
     end,
 
   },

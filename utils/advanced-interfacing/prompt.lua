@@ -224,7 +224,7 @@ function prompt(ptype, prompt_spec, loop)
     prompt_spec = prompt_spec or {}
     prompt_spec.transformer = prompt_spec.transformer or get.string_or_number.int
   elseif ptype == "number" then
-    prompt_spec.transformer = prompt_spec.transformer or tonumber
+    prompt_spec.transformer = prompt_spec.transformer or get.string_or_number.number
   elseif ptype == "string" then
     if type(non_table_prompt_spec) == "string" then
       prompt_spec = { prompt_args = { message = non_table_prompt_spec } } -- prompt_spec shorthand when type is string: prompt_spec is the message
@@ -272,7 +272,7 @@ function prompt(ptype, prompt_spec, loop)
     prompt_spec.transformer = function(x)
       local key, value = x:match("^(.-)-(.*)$")
       if key ~= nil and value ~= nil then
-        ---@diagnostic disable-next-line: return-type-mismatch -- not sure why, but lua-language-server seems to have cast prompt_spec.transformer to `tonumber` for some reason. Since lua-language-server is often a bit buggy, I'm just going to disable the warning for now.
+        ---@diagnostic disable-next-line: return-type-mismatch -- not sure why, but lua-language-server seems to have cast prompt_spec.transformer to `get.string_or_number.number` for some reason. Since lua-language-server is often a bit buggy, I'm just going to disable the warning for now.
         return { key, value }
       else
         ---@diagnostic disable-next-line: return-type-mismatch

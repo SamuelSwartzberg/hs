@@ -141,7 +141,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.hex_string.indicated_hex_string("6d"),
+  transf.potentially_indicated_hex_string.indicated_hex_string("6d"),
   "0x6d"
 )
 

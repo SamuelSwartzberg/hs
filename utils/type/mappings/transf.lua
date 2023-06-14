@@ -4,13 +4,7 @@
 transf = {
   hex_string = { -- a hex string
     char = function(hex)
-      return string.char(tonumber(hex, 16))
-    end,
-    indicated_hex_string = function(hex)
-      return "0x" .. hex
-    end,
-    number = function(hex)
-      return tonumber(hex, 16)
+      return string.char(get.string_or_number.number(hex, 16))
     end,
     utf8_unicode_prop_table = function(hex)
       return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped("utf8:" .. tostring(hex)))[1]
@@ -19,56 +13,91 @@ transf = {
       return "U+" .. hex
     end,
   },
-  indicated_hex_string = {
-    hex_string = function(indicated_hex)
-      return indicated_hex:sub(3)
-    end,
-    number = function(indicated_hex)
-      return tonumber(indicated_hex:sub(3), 16)
+  potentially_indicated_digit_string = {
+    digit_string = function(indicated_number)
+      return onig.match(indicated_number, "^(?:0[" .. table.concat(keys(tblmap.base_letter.base), "") .. "])?(.+)$")
     end,
   },
-  binary_string = {
+  digit_string = {
+    canonical_digit_string = function(digit_string)
+      local cleaned = eutf8.gsub(digit_string, "[_ ]", "")
+      local seps_fixed = eutf8.gsub(cleaned, ",", ".")
+      return seps_fixed
+    end,
+    nonfractional_fractional_part = function(digit_string)
+      return onig.match(
+        transf.digit_string.canonical_digit_string(digit_string), 
+        "^(\\d*+)(\\.\\d+?)?$"
+      )
+    end,
+    separated_canonical_digit_string = function(digit_string)
+      local nonfractional, fractional = transf.digit_string.nonfractional_fractional_part(digit_string)
+      local nonfractional_separated = table.concat(
+        chunk(nonfractional, 3),
+        "_"
+      )
+      return nonfractional_separated .. fractional
+    end,
+
+  },
+  indicated_digit_string = {
+    number_string = function(indicated_number)
+      return indicated_number:sub(3)
+    end,
+    base = function(indicated_number)
+      return tblmap.base_letter.base[
+          indicated_number:sub(2, 2)
+        ]
+    end,
+    number = function(indicated_number)
+      return get.string_or_number.number(
+        indicated_number:sub(3),
+        transf.indicated_digit_string.base(indicated_number)
+      )
+    end,
+  },
+  potentially_indicated_binary_string = {
     indicated_binary_string = function(bin)
-      return "0b" .. bin
+      return mustStart(bin, "0b")
     end,
     number = function(bin)
-      return tonumber(bin, 2)
-    end,
+      return get.string_or_number.number(mustNotStart(bin, "0b"), 2)
+    end
   },
-  indicated_binary_string = {
-    binary_string = function(indicated_bin)
-      return indicated_bin:sub(3)
-    end,
-    number = function(indicated_bin)
-      return tonumber(indicated_bin:sub(3), 2)
-    end,
-  },
-  octal_string = {
+  potentially_indicated_octal_string = {
     indicated_octal_string = function(oct)
-      return "0o" .. oct
+      return mustStart(oct, "0o")
     end,
     number = function(oct)
-      return tonumber(oct, 8)
-    end,
+      return get.string_or_number.number(mustNotStart(oct, "0o"), 8)
+    end
   },
-  indicated_octal_string = {
-    octal_string = function(indicated_oct)
-      return indicated_oct:sub(3)
+  potentially_indicated_decimal_string = {
+    indicated_decimal_string = function(dec)
+      return mustStart(dec, "0d")
     end,
-    number = function(indicated_oct)
-      return tonumber(indicated_oct:sub(3), 8)
+    number = function(dec)
+      return get.string_or_number.number(mustNotStart(dec, "0d"), 10)
+    end
+  },
+  potentially_indicated_hex_string = {
+    indicated_hex_string = function(hex)
+      return mustStart(hex, "0x")
     end,
+    number = function(hex)
+      return get.string_or_number.number(mustNotStart(hex, "0x"), 16)
+    end
   },
 
   percent = {
     char = function(percent)
       local num = percent:sub(2, 3)
-      return string.char(tonumber(num, 16))
+      return string.char(get.string_or_number.number(num, 16))
     end,
   },
   unicode_codepoint = { -- U+X...
     number = function(codepoint)
-      return tonumber(codepoint:sub(3), 16)
+      return get.string_or_number.number(codepoint:sub(3), 16)
     end,
     unicode_prop_table = function(codepoint)
       return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped(codepoint))[1]
@@ -787,7 +816,7 @@ transf = {
   },
   timestamp_first_column_plaintext_table_file = {
     last_accessed = function(path)
-      return tonumber(readFile(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
+      return get.string_or_number.number(readFile(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
     end,
     new_timestamp_table = function(path)
       local last_access = transf.timestamp_first_column_plaintext_table_file.last_accessed(path)
@@ -814,9 +843,9 @@ transf = {
     semver_components = function(str)
       local major, minor, patch, prerelease, build = onig.match(str, mt._r.version.semver)
       return {
-        major = tonumber(major),
-        minor = tonumber(minor),
-        patch = tonumber(patch),
+        major = get.string_or_number.number(major),
+        minor = get.string_or_number.number(minor),
+        patch = get.string_or_number.number(patch),
         prerelease = prerelease,
         build = build
       }
@@ -942,7 +971,7 @@ transf = {
     date_components = function(str)
       local comps = {onig.match(str, mt._r.date.rfc3339)}
       return map(mt._list.date.dt_component_few_chars, function(k, v)
-        return v and tonumber(comps[k]) or nil
+        return v and get.string_or_number.number(comps[k]) or nil
       end, {"kv", "kv"})
     end,
     date_range_specifier = function(str)
@@ -2060,7 +2089,7 @@ transf = {
     ymd_table = function(timestamp_key_table)
       local year_month_day_time_table = {}
       for timestamp_str, fields in prs(timestamp_key_table,-1,1,-1) do 
-        local timestamp = tonumber(timestamp_str)
+        local timestamp = get.string_or_number.number(timestamp_str)
         local year = os.date("%Y", timestamp)
         local year_month = os.date("%Y-%m", timestamp)
         local year_month_day = os.date("%Y-%m-%d", timestamp)

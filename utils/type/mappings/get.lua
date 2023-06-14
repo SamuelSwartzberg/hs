@@ -1,7 +1,13 @@
 get = {
   string_or_number = {
     number = function(t, base)
-
+      if type(t) == "string" then
+        t = eutf8.gsub(t, "[ \t\n\r_]", "")
+        t = eutf8.gsub(t, ",", ".")
+        return get.string_or_number.number(t, base)
+      else
+        return t
+      end
     end,
     int = function(t, base)
       return transf.number.int(
@@ -608,7 +614,7 @@ get = {
       local _, second_row = rows()
       if not first_row then return nil end
       if not second_row then second_row = {"0"} end
-      local first_timestamp, second_timestamp = tonumber(first_row[1]), tonumber(second_row[1])
+      local first_timestamp, second_timestamp = get.string_or_number.number(first_row[1]), get.string_or_number.number(second_row[1])
       if first_timestamp < second_timestamp then
         error("Timestamps are not in descending order. This is not recommended, as it forces us to read the entire file.")
       end
@@ -624,7 +630,7 @@ get = {
       end
       for i, row in rows do
         local current_timestamp = row[1]
-        if tonumber(current_timestamp) > timestamp then
+        if get.string_or_number.number(current_timestamp) > timestamp then
           if assoc_arr then 
             table.remove(row, 1)
             res[current_timestamp] = row

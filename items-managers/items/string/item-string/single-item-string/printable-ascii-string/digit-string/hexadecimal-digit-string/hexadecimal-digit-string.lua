@@ -4,7 +4,7 @@ HexadecimalDigitStringItemSpecifier = {
   properties = {
     getables = {
       ["hexadecimal-numeric-value"] = function(self)
-        return tonumber(self:get("c"), 16)
+        return get.string_or_number.number(self:get("c"), 16)
       end,
       ["hexadecimal-to-number-interface"] = function(self)
         return nr(self:get("hexadecimal-numeric-equivalent"))

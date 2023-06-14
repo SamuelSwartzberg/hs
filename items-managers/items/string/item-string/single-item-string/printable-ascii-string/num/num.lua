@@ -4,7 +4,7 @@ NumItemSpecifier = {
   properties = {
     getables = {
       ["numeric-equivalent"] = function(self)
-        return tonumber(self:get("c"))
+        return get.string_or_number.number(self:get("c"))
       end,
       ["to-number-interface"] = function(self)
         return nr(self:get("numeric-equivalent"))

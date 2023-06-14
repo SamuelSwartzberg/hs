@@ -70,7 +70,7 @@ M.services = {
 
 local function decode(str)
 	return (str:gsub("%%(%x%x)", function(c)
-		return string.char(tonumber(c, 16))
+		return string.char(get.string_or_number.number(c, 16))
 	end))
 end
 
@@ -167,7 +167,7 @@ function M.buildQuery(tab, sep, key)
 		keys[#keys+1] = k
 	end
 	table.sort(keys, function (a, b)
-  		local function padnum(n, rest) return ("%03d"..rest):format(tonumber(n)) end
+  		local function padnum(n, rest) return ("%03d"..rest):format(get.string_or_number.number(n)) end
   		return tostring(a):gsub("(%d+)(%.)",padnum) < tostring(b):gsub("(%d+)(%.)",padnum)
 	end)
 	for _,name in ipairs(keys) do
@@ -213,7 +213,7 @@ function M.parseQuery(str, sep)
 		key = key:gsub('%[([^%]]*)%]', function(v)
 				-- extract keys between balanced brackets
 				if string.find(v, "^-?%d+$") then
-					v = tonumber(v)
+					v = get.string_or_number.number(v)
 				else
 					v = decodeValue(v)
 				end
@@ -289,7 +289,7 @@ function M:setAuthority(authority)
 	end)
 
 	authority = authority:gsub(':(%d+)$', function(v)
-		self.port = tonumber(v)
+		self.port = get.string_or_number.number(v)
 		return ''
 	end)
 
@@ -298,7 +298,7 @@ function M:setAuthority(authority)
 		local chunks = { str:match("^(%d+)%.(%d+)%.(%d+)%.(%d+)$") }
 		if #chunks == 4 then
 			for _, v in pairs(chunks) do
-				if tonumber(v) > 255 then
+				if get.string_or_number.number(v) > 255 then
 					return false
 				end
 			end
@@ -309,7 +309,7 @@ function M:setAuthority(authority)
 		if #chunks == 8 or #chunks < 8 and
 			str:match('::') and not str:gsub("::", "", 1):match('::') then
 			for _,v in pairs(chunks) do
-				if #v > 0 and tonumber(v, 16) > 65535 then
+				if #v > 0 and get.string_or_number.number(v, 16) > 65535 then
 					return false
 				end
 			end

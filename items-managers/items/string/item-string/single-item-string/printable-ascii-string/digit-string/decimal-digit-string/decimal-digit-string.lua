@@ -4,7 +4,7 @@ DecimalDigitStringItemSpecifier = {
   properties = {
     getables = {
       ["decimal-numeric-value"] = function(self)
-        return tonumber(self:get("c"), 10)
+        return get.string_or_number.number(self:get("c"), 10)
       end,
       ["is-decimal-id"] = function(self)
         return not onig.find(self:get("c"), "[^0-9]")
