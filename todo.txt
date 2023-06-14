@@ -12,6 +12,7 @@ post 'lua is working':
     - consider how to integrate email into history
     - is self-renaming of dated dirs implemented?
     - import/sync strava
+    - must run cd '$NEWPIPE_STATE_DIR' && unzip *.zip && rm *.zip *.settings regularly, currently extracted due to refactor
   - process bookmarks to sessions, urls
   - old contact importing
     - contact em 

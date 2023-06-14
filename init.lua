@@ -49,7 +49,6 @@ end
 
 --- @alias key_inner_specifier { explanation: string, fn: function, mnemonic?: string }
 
-
 --- @type { [string]: key_inner_specifier | nil}
 local keymap = {
   ["tab"] = {

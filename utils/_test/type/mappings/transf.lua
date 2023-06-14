@@ -1114,7 +1114,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.whisper_url.transcribed(transf.path.file_url(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3")),
+  transf.whisper_url.transcribed(transf.absolute_path.file_url(env.MMOCK .. "/files/binary/audio/mp3/myvoice.mp3")),
   "This is a testfile containing my voice."
 )
 
@@ -1421,7 +1421,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.path.file_url("/home/user/test.txt"),
+  transf.absolute_path.file_url("/home/user/test.txt"),
   "file:///home/user/test.txt"
 )
 

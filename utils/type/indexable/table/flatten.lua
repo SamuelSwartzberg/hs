@@ -1,28 +1,28 @@
 
---- @class flattenItems
+--- @class flattenItems For each, if true, the flattened result will include the corresponding value from the original table. Default is false.
 --- @field path boolean
 --- @field depth boolean
 --- @field value boolean
 --- @field keystop boolean
 --- @field valuestop boolean
 
---- @alias flattenItemsArr ("path" | "depth" | "value" | "keystop" | "valuestop" )[]
+--- @alias flattenItemsArr ("path" | "depth" | "value" | "keystop" | "valuestop" )[] An array of strings, each string represents a key of the flattenItems class.
 
 --- @class flattenOpts
---- @field treat_as_leaf? "assoc" | "list" | false
---- @field mode? "list" | "path-assoc" | "assoc"
---- @field val? boolean | "plain" |  "path" | "depth" | "keystop" | "valuestop" | flattenItemsArr | flattenItems
---- @field join_path? string
---- @field recurse? boolean | integer `false` means no recursion, `true` means infinite recursion, `integer` means recursion up to that depth
+--- @field treat_as_leaf? "assoc" | "list" | boolean Defines what type of value should be treated as a leaf node during the flatten operation. Default is "assoc".
+--- @field mode? "list" | "path-assoc" | "assoc" Defines how the output should be structured. "list" for a flat list, "path-assoc" for an associative array with paths as keys, "assoc" for a generic associative array. Default is "list".
+--- @field val? boolean | "plain" |  "path" | "depth" | "keystop" | "valuestop" | flattenItemsArr | flattenItems Defines what values to include in the flattened result. Default is "plain", which means the value of the original table will be included in the flattened result.
+--- @field join_path? string The string used to join path segments when constructing the string path. Relevant only if the mode is "path-assoc" or if the val includes "path". Default is nil.
+--- @field recurse? boolean | integer Defines how deep the recursion should go when flattening. False means no recursion, true means infinite recursion, and an integer means recursion up to that depth. Default is true.
 --- @field path? any[]
---- @field depth? integer
---- @field indentation? integer only relevant if val.keystop is true
---- @field nooverwrite? boolean
+--- @field depth? integer Specifies the initial depth level to start the flattening from. Default is 0. In general, this should not be set by the user, rather the `recurse` option should be used instead. This field is mainly used internally to keep track of the current depth level.
+--- @field indentation? integer: Specifies the number of spaces per depth level for keystop calculation. Relevant only if val.keystop is true. Default is 2.
+--- @field nooverwrite? boolean If true, the function will not overwrite existing values in the output table. Default is false.
 
---- @param tbl table
---- @param opts? flattenOpts
---- @param visited? table
---- @return table
+--- @param tbl table The table to flatten.
+--- @param opts? flattenOpts An optional set of options for the flatten operation.
+--- @param visited? table An optional table to keep track of already visited nodes during the flatten operation to avoid infinite recursion.
+--- @return table The table resulting from the flatten operation, structured according to the provided options.
 function flatten(tbl, opts, visited)
 
   if not opts then opts = {} 

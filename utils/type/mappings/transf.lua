@@ -113,9 +113,6 @@ transf = {
     form_path = function(path)
       return "@" .. path
     end,
-    file_url = function(path)
-      return "file://" .. path
-    end,
     extension = function(path)
       return pathSlice(path, "-1:-1", refstore.params.path_slice.opts.ext_sep)[1]
     end,
@@ -147,7 +144,9 @@ transf = {
 
   },
   absolute_path = {
-
+    file_url = function(path)
+      return "file://" .. path
+    end,
   },
   extant_path = {
     size = function(path)
@@ -190,7 +189,7 @@ transf = {
     end,
     extant_path_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.exists)
-    end
+    end,
     
   },
   extant_path_array = {
@@ -205,6 +204,13 @@ transf = {
     end,
     filter_git_root_dir_array = function(path_array)
       return transf.dir_array.filter_git_root_dir_array(transf.extant_path_array.filter_dir_array(path_array))
+    end,
+    contained_files_array = function(path_array)
+      return map(
+        path_array,
+        transf.extant_path.contained_files_array,
+        {flatten = true}
+      )
     end,
   },
   dir_array = {
@@ -1102,6 +1108,12 @@ transf = {
     upper_snake_case = function(str)
       return eutf8.upper(transf.string.snake_case(str))
     end,
+    lowercase = function(str)
+      return eutf8.lower(str)
+    end,
+    uppercase = function(str)
+      return eutf8.upper(str)
+    end,
     alphanum = function(str)
       return replace(str, to.case.alphanum)
     end,
@@ -1723,8 +1735,19 @@ transf = {
       local string_contents = transf.table.yaml_string(t)
       return "---\n" .. string_contents .. "\n---\n"
     end,
+    
+    ics_string = function(t)
+      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
+      dothis.table.write_ics_file(t, tmpdir_ics_path)
+      local contents = readFile(tmpdir_ics_path)
+      delete(tmpdir_ics_path)
+      return contents
+    end,
+    
+  },
+  assoc_arr = {
     fs_tag_array = function(t)
-       local arr = map(
+      local arr = map(
         t,
         function(tag_key, tag_value)
           if type(tag_value) == "table" then tag_value = table.concat(tag_value, ",") end
@@ -1740,19 +1763,18 @@ transf = {
       return arr
     end,
     fs_tag_string = function(t)
-      return "%" .. table.concat(transf.table.fs_tag_array(t), "%")
+      return "%" .. table.concat(transf.assoc_arr.fs_tag_array(t), "%")
     end,
-    ics_string = function(t)
-      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
-      dothis.table.write_ics_file(t, tmpdir_ics_path)
-      local contents = readFile(tmpdir_ics_path)
-      delete(tmpdir_ics_path)
-      return contents
+    key_as_relative_path_dict = function(t)
+      return flatten(
+        t,
+        {
+          treat_as_leaf = "list",
+          mode = "path-assoc",
+          join_path = "/"
+        }
+      )
     end,
-    
-  },
-  assoc_arr = {
-
   },
   dict = {
     url_params = function(t)
@@ -1985,6 +2007,36 @@ transf = {
       return run(
         "to_isbn10" .. transf.string.single_quoted_escaped(isbn13)
       )
+    end,
+  },
+  running_application = {
+
+  },
+  dotapp_path = {
+    mac_application_name = function(dotapp_path)
+      return transf.path.filename(dotapp_path)
+    end
+  },
+  mac_application_name = {
+    application_support_dir_path = function(app_name)
+      return env.MAC_APPLICATION_SUPPORT .. "/" .. app_name
+    end,
+    app_dir = function(app_name)
+      return "/Applications/" .. app_name .. ".app"
+    end,
+    running_application = function(app_name)
+      return hs.application.get(app_name)
+    end,
+  },
+  chat_mac_application_name = {
+    chat_storage_dir = function(app_name)
+      return env.MCHATS .. "/" .. transf.string.lowercase(app_name)
+    end,
+    chat_media_dir = function(app_name)
+      return transf.chat_mac_application_name.chat_storage_dir(app_name) .. "/media"
+    end,
+    chat_chats_dir = function(app_name)
+      return transf.chat_mac_application_name.chat_storage_dir(app_name) .. "/chats"
     end,
   },
   bibtex_string = {

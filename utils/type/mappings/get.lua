@@ -277,6 +277,24 @@ get = {
     end
     
   },
+  relative_path_dict = {
+    absolute_path_dict = function(relative_path_dict, starting_point, extension)
+      return map(relative_path_dict, function(k)
+        local ext_part = ""
+        if extension then ext_part = "." .. extension end
+        return (starting_point or "") .. "/" .. k .. ext_part
+      end, "k")
+    end,
+  },
+  assoc_arr = {
+    absolute_path_dict = function(t, starting_point, extension)
+      return get.relative_path_dict.absolute_path_dict(
+        transf.assoc_arr.to_relative_path_dict(t),
+        starting_point,
+        extension
+      )
+    end,
+  },
   array = {
     some_pass = function(arr, cond)
       return find(arr, cond, {"v", "boolean"})
@@ -834,4 +852,17 @@ get = {
     column = array2d.column,
     row = array2d.row,
   },
+  application_name = {
+    in_tmp_dir = function(app_name, file)
+      return get.string.in_tmp_dir("app/" .. app_name, file)
+    end,
+  },
+  mac_application_name = {
+    
+  },
+  firefox = {
+  },
+  chat_mac_application_name = {
+
+  }
 }

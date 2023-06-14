@@ -16,49 +16,7 @@ PathInterfaceItemSpecifier = {
       ["local-http-server-url"] = function(self)
         return env.FS_HTTP_SERVER .. self:get("completely-resolved-path")
       end,
-      ["file-url"] = function (self)
-        return "file://" .. self:get("completely-resolved-path")
-      end,
     },
-    doThisables = {
-      ["create-file"] = function(self, contents) writeFile(self:get("c"), contents, "not-exists") end,
-      ["write-file"] = function(self, contents) writeFile(self:get("c"), contents) end,
-      ["create-as-path"] = function(self)
-        createPath(self:get("c"))
-      end,
-      ["table-to-fs"] = function(self, specifier) 
-        if not specifier.payload then 
-          -- payload was null or false. Meaning: mode, overwrite doesn't matter
-          -- just create the path up to this point, and do nothing else
-          createPath(self:get("c"))
-        elseif type(specifier.payload) ~= "table" or isListOrEmptyTable(specifier.payload) then
-         --[[  if specifier.mode == "copy" and specifier.overwrite == true then
-            srctgt("copy", self:get("c"), specifier.payload)
-          elseif specifier.mode == "copy" and specifier.overwrite == false then
-            srctgt("copy", self:get("c"), specifier.payload, "not-exists")
-          elseif specifier.mode == "move" and specifier.overwrite == true then
-            srctgt("move", (self:get("c"), specifier.payload)
-          elseif specifier.mode == "move" and specifier.overwrite == false then
-            srctgt("move", IfDoesntExist(self:get("c"), specifier.payload)
-          else ]]if specifier.mode == "write" then
-            if self:get("is-non-extant-path") or specifier.overwrite then 
-              local filename = self:get("completely-resolved-path")
-              if specifier.extension then 
-                filename = filename .. "." .. specifier.extension 
-              end
-              writeFile(filename, "", "not-exists")
-              self = st(filename)
-            end
-            -- todo append_rows
-          elseif specifier.mode == "append" then 
-            -- todo append_rows
-          end
-        else
-          self:doThis("table-to-fs-children-dispatch", specifier)
-        end
-      end,
-
-    }
   },
   potential_interfaces = ovtable.init({
     -- these two must come first, since checking later potential_interfaces depends on them

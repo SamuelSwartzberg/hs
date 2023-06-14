@@ -79,6 +79,9 @@ is = {
     absolute_path = function(path)
       return is.path.tilde_absolute_path(path) or is.path.true_absolute_path(path)
     end,
+    volumne = function(path)
+      return stringy.startswith(path, "/Volumes/")
+    end,
     email_file = function(path)
      return 
       get.path.is_extension(path, "eml") or 
@@ -235,6 +238,11 @@ is = {
     end,
 
 
+  },
+  mac_application_name = {
+    running = function(name)
+      return get.mac_application_name.running_application(name) ~= nil
+    end,
   }
 
 }

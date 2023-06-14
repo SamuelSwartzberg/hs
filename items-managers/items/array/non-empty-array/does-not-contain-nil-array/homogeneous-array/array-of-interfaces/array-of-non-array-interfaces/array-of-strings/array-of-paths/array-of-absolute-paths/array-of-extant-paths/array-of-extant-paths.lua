@@ -12,20 +12,6 @@ ArrayOfExtantPathsSpecifier = {
           return not stringy.startswith(pathSlice(item:get("c", "-1:-1"))[1], ".")
         end)
       end,
-      ["map-to-array-of-files"] = function(self)
-        return self:get("map-to-new-array", function(item)
-          if item:get("is-dir") then
-            return item:get("contents-to-array-of-files")
-          else
-            return item
-          end
-        end):get("flatten")
-      end,
-      ["map-to-array-of-path-contents-items"] = function(self)
-        return self:get("map-to-new-array", function(path)
-          return path:get("path-content-item")
-        end)
-      end,
       ["map-to-table-of-path-and-path-content-items"] = function(self)
         local tbl = map(self:get("c"), function(path_item)
           return path_item:get("c"), path_item:get("path-content-item")

@@ -7,12 +7,6 @@ ChatApplicationItemSpecifier = {
       ["is-facebook"] = function(self) return self:get("c") == "Facebook" end,
       ["is-signal"] = function(self) return self:get("c") == "Signal" end,
       ["is-telegram"] = function(self) return self:get("c") == "Telegram Lite" end,
-      ["chat-dir"] = function(self)
-        return env["MCHATS_" .. self:get("upper-name")]
-      end,
-      ["media-dir"] = function(self)
-        return env["MCHATS_" .. self:get("upper-name") .. "_MEDIA"]
-      end,
       ["media-dir-for-chat"] = function(self, chat_obj)
         return self:get("media-dir") .. "/" .. self:get("convo-id", chat_obj)
       end,

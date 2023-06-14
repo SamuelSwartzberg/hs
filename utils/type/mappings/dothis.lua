@@ -416,6 +416,22 @@ dothis = {
     open_app = function(path, app, do_after)
       run("open -a " .. transf.string.single_quoted_escaped(app) .. " " .. transf.string.single_quoted_escaped(path), do_after)
     end,
+    
+  },
+  absolute_path = {
+    write_file = function(path, content)
+      writeFile(path, content, "any", true)
+    end,
+    create_file = function(path, contents)
+      writeFile(path, contents, "not-exists", true)
+    end,
+    replace_file = function(path, contents)
+      writeFile(path, contents, "exists", true)
+    end,
+    create_path = function(path)
+      createPath(path)
+    end,
+
   },
   extant_path = {
     make_executable = function(path)
@@ -782,6 +798,52 @@ dothis = {
     end,
     fill_with = function(array)
       dothis.string_array.join_and_paste(array, "\t")
+    end
+  },
+  absolute_path_dict = {
+
+  },
+  absolute_path_string_dict = {
+    write = function(absolute_path_string_dict)
+      for absolute_path, contents in pairs(absolute_path_string_dict) do
+        dothis.absolute_path_string.write(absolute_path, contents)
+      end
+    end,
+  },
+  application_name = {
+    backup = function(application_name)
+      local before_backup = tblmap.application_name.before_backup[application_name]
+      if before_backup then
+        before_backup(function ()
+          dothis.application_name.backup_once_ready(application_name)
+        end)
+      else
+        dothis.application_name.backup_once_ready(application_name)
+      end
+    end,
+    backup_once_ready = function(application_name)
+      local histfile =tblmap.application_name.history_file_path[application_name]
+      local csv_export_histfile = get.application_name.in_tmp_dir(application_name, transf.path.leaf(histfile))
+      dothis.sqlite_file.write_to_csv(
+        histfile,
+        tblmap.application_name.history_sql_query[application_name],
+        csv_export_histfile,
+        function()
+        end)
+    end
+  },
+  mac_application_name = {
+
+  },
+  firefox = {
+    dump_state = function(do_after)
+      run('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
+    end
+
+  },
+  newpipe = {
+    extract_backup = function(do_after)
+      run('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
     end
   }
 }

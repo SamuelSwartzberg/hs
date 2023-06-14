@@ -264,7 +264,7 @@ tblmap = {
       revealjs = "html",
     }
   },
-  application = {
+  application_name = {
     history_sql_query = {
       Firefox = "SELECT visit_date/1000000 AS timestamp,title,url " .. 
       "FROM moz_places " ..
@@ -274,6 +274,25 @@ tblmap = {
       "FROM stream_history " ..
       "INNER JOIN streams ON stream_history.stream_id = streams.uid " ..
       "ORDER BY timestamp DESC;"
+    },
+    history_file_path = {
+      Firefox = env.MAC_FIREFOX_PLACES_SQULITE,
+      Newpipe = env.NEWPIPE_STATE_DIR .. "/history.db"
+    },
+    backup_type = {
+      Firefox = "browser",
+      Newpipe = "media"
+    },
+    backup_condition = {
+      Firefox = function()
+        return not is.mac_application_name.running("Firefox")
+      end,
+      Newpipe = function()
+        return is.path.exists(tblmap.application_name.history_file_path.Newpipe)
+      end
+    },
+    before_backup = {
+      Newpipe = dothis.newpipe.extract_backup
     }
   },
   search_engine = {
