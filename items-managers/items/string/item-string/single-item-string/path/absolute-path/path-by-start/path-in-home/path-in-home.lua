@@ -17,7 +17,14 @@ PathInHomeItemSpecifier = {
   potential_interfaces = ovtable.init({
     { key = "path-in-me", value = CreatePathInMeItem },
     { key = "path-in-screenshots", value = CreatePathInScreenshotsItem },
-  })
+  }),
+  action_table = {
+    {
+      d = "httpsrvurl",
+      i = "💻🌐🏠🔗",
+      getfn = transf.absolute_path.local_http_server_url
+    }
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

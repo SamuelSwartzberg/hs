@@ -1,12 +1,6 @@
 --- @type ItemSpecifier
 DiaryDirItemSpecifier = {
   type = "diary-dir",
-  properties = {
-    getables = {
-      
-    },
-  },
-  
 }
 
 

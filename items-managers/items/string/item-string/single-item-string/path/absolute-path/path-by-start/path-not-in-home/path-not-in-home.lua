@@ -1,13 +1,6 @@
 --- @type ItemSpecifier
 PathNotInHomeItemSpecifier = {
   type = "path-not-in-home",
-  properties = {
-    getables = {
-    },
-    doThisables = {
-     
-    }
-  },
   
 }
 

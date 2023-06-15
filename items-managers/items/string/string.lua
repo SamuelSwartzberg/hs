@@ -9,12 +9,6 @@ StringItemSpecifier = {
         return (not (#self:get("c") < 2000)) or (not onig.find(self:get("c"), mt._r.whitespace.large)) 
       end,
       ["is-multiline-string-item"] = function(self) return stringy.find(self:get("c"), "\n") end,
-      ["is-has-lowercase-string-item"] = function(self)
-        return onig.find(self:get("c"), mt._r.case.lower)
-      end,
-      ["is-has-uppercase-string-item"] = function(self)
-        return onig.find(self:get("c"), mt._r.case.upper)
-      end,
       ["is-might-be-json-item"] = function(self)
         return  startsEndsWithFast(self:get("c"), "{", "}") or startsEndsWithFast(self:get("c"), "[", "]")
       end,
@@ -338,6 +332,43 @@ StringItemSpecifier = {
       i = "🔳🔡⬛️", 
       d = "qrstrwob",
       key = "qr-utf8-image-wob"
+    },{
+      d = "al",
+      i = "🪂",
+      getfn = transf.string.lowercase
+    },
+    {
+      d = "snl",
+      i = "🐍🪂",
+      getfn = transf.string.lower_snake_case
+    },
+    {
+      d = "kbl",
+      i = "🍢🪂",
+      getfn = transf.string.lower_kebap_case
+    },
+    {
+      d = "au",
+      i = "🧗‍♀️",
+      getfn = transf.string.uppercase
+    },
+    {
+      d = "snu",
+      i = "🐍🧗‍♀️",
+      getfn = transf.string.upper_snake_case
+    },
+    {
+      d = "kbu",
+      i = "🍢🧗‍♀️",
+      getfn = transf.string.upper_kebap_case
+    },{
+      d = "hendc",
+      i = "🔶📖",
+      getfn = transf.string.html_entitiy_decoded
+    },{
+      d = "henec",
+      i = "🔶📦",
+      getfn = transf.string.html_entitiy_encoded
     }
   }),
   hs.fnutils.imap(

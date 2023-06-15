@@ -3,12 +3,8 @@ PathInMpassItemSpecifier = {
   type = "path-in-mpass",
   properties = {
     getables = {
-      ["is-path-in-mpassotp"] = function(self)
-        return stringy.startswith(self:get("completely-resolved-path"), env.MPASSOTP)
-      end,
-      ["is-path-in-mpasspassw"] = function(self)
-        return stringy.startswith(self:get("completely-resolved-path"), env.MPASSPASSW)
-      end,
+      ["is-path-in-mpassotp"] = bc(stringy.startswith, env.MPASSOTP),
+      ["is-path-in-mpasspassw"] = bc(stringy.startswith, env.MPASSPASSW)
     },
     doThisables = {
      

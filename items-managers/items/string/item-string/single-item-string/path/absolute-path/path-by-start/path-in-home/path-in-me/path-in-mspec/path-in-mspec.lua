@@ -3,9 +3,7 @@ PathInMspecItemSpecifier = {
   type = "path-in-mspec",
   properties = {
     getables = {
-      ["is-path-in-mpass"] = function(self)
-        return stringy.startswith(self:get("completely-resolved-path"), env.MPASS)
-      end
+      ["is-path-in-mpass"] = bc(stringy.startswith, env.MPASS)
     },
     doThisables = {
      

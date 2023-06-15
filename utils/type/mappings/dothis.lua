@@ -957,5 +957,12 @@ dothis = {
         env.ENVFILE
       )
     end,
+  },
+  env_yaml_file_container = {
+    write_env_and_check = function(env_yaml_file_container)
+      dothis.env_string.write_env_and_check(
+        transf.env_yaml_file_container.env_string(env_yaml_file_container)
+      )
+    end,
   }
 }

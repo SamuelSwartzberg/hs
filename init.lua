@@ -392,7 +392,7 @@ System:get("manager", "timer"):doThis("create-all", {
   },
   {
     fn = function()
-      self:doThis("write-env-file")
+      dothis.env_yaml_file_container.write_env_and_check(env.ENVFILE)
       env = run("env | jc --ini")
     end,
     interval = "*/5 * * * *",

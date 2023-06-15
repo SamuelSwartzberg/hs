@@ -138,7 +138,7 @@ transf = {
     unicode_codepoint_octal_string = function(unicode_prop_table)
       return unicode_prop_table.oct
     end,
-    html_character_reference = function(unicode_prop_table)
+    html_entity = function(unicode_prop_table)
       return unicode_prop_table.html
     end,
     unicode_character_name = function(unicode_prop_table)
@@ -390,9 +390,6 @@ transf = {
     file_url = function(path)
       return "file://" .. path
     end,
-    local_http_server_url = function(path)
-      return env.FS_HTTP_SERVER .. path
-    end,
   },
   extant_path = {
     size = function(path)
@@ -420,6 +417,11 @@ transf = {
         return {path}
       end
     end
+  },
+  path_in_home = {
+    local_http_server_url = function(path)
+      return env.FS_HTTP_SERVER .. path
+    end,
   },
   path_array = {
     leaves_array = function(path_array)
@@ -1752,6 +1754,15 @@ transf = {
     upper_snake_case = function(str)
       return eutf8.upper(transf.string.snake_case(str))
     end,
+    kebap_case = function(str)
+      return replace(str, to.case.kebap)
+    end,
+    lower_kebap_case = function(str)
+      return eutf8.lower(transf.string.kebap_case(str))
+    end,
+    upper_kebap_case = function(str)
+      return eutf8.upper(transf.string.kebap_case(str))
+    end,
     lowercase = function(str)
       return eutf8.lower(str)
     end,
@@ -1803,6 +1814,8 @@ transf = {
     base64_url = basexx.to_url64,
     base32_gen = basexx.to_base32,
     base32_crock = basexx.to_crockford,
+    html_entitiy_encoded = htmlEntities.encode,
+    html_entitiy_decoded = htmlEntities.decode,
     header_key_value = function(str)
       local k, v = eutf8.match(str, "^([^:]+):%s*(.+)$")
       return transf.word.notcapitalized(k), v
@@ -2082,6 +2095,13 @@ transf = {
   toml_string = {
     table = toml.decode
   },
+  yaml_file = {
+    table = function(path)
+      return transf.yaml_string.table(transf.plaintext_file.contents(path))
+    end
+  },
+
+  
   ini_string = {
     table = function(str)
       return runJSON(
@@ -3171,6 +3191,26 @@ transf = {
   audiodevice = {
     name = function(audiodevice)
       return audiodevice:name()
+    end,
+  },
+  env_var_name_env_node_dict = {
+    env_string = function(env_var_name_env_node_dict)
+      return transf.env_var_name_value_dict.env_string(
+        get.env_var_name_env_node_dict.env_var_name_value_dict(env_var_name_env_node_dict)
+      )
+    end
+
+  },
+  env_yaml_file_container = {
+    env_string = function(env_yaml_file_container)
+      local files = transf.dir.descendant_file_array(env_yaml_file_container)
+      local yaml_files = get.path_array.filter_to_same_extension(files, "yaml")
+      local env_var_name_env_node_dict_array = hs.fnutils.imap(
+        yaml_files,
+        transf.yaml_file.table
+      )
+      local env_var_name_env_node_dict = concat(env_var_name_env_node_dict_array)
+      return transf.env_var_name_env_node_dict.env_string(env_var_name_env_node_dict)
     end,
   }
 }

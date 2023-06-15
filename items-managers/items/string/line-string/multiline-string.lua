@@ -6,22 +6,6 @@ MultilineStringItemSpecifier = {
   type = "multiline-string",
   properties = {
     getables = {
-      ["parsed-as-yaml"] = function(self) -- not guaranteed to work, as the string may not be yaml. ensure this yourself
-        return yaml.load(self:get("c"))
-      end,
-      ["lines"] = function(self)
-        return stringy.split(self:get("c"), "\n")
-      end,
-      ["tail"] = function(self, n)
-        n = n or 10
-        local lines = self:get("lines")
-        return table.concat(slice(lines, #lines - n + 1, #lines), "\n")
-      end,
-      ["head"] = function(self, n)
-        n = n or 10
-        local lines = self:get("lines")
-        return table.concat(slice(lines, 1, n), "\n")
-      end,
     },
     doThisables = {
       ["save-session"] = function(self)
@@ -39,11 +23,11 @@ MultilineStringItemSpecifier = {
       {
         d = "fld",
         i = "🗺",
-        key = "fold"
+        getfn = transf.string.folded
       },{
         d = "lnhd",
         i = "⩶👆",
-        key = "head"
+
       },{
         d = "lntl",
         i = "⩶👇",

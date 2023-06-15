@@ -1,14 +1,6 @@
 --- @type ItemSpecifier
 MCurProjDirItemSpecifier = {
   type = "mcur-proj-dir",
-  properties = {
-    getables = {
-      
-    },
-    doThisables = {
-      
-    }
-  },
   
 }
 

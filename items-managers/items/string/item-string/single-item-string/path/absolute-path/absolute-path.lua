@@ -27,10 +27,6 @@ PathInterfaceItemSpecifier = {
   }),
   action_table ={
     {
-      d = "httpsrvurl",
-      i = "💻🌐🏠🔗",
-      getfn = transf.absolute_path.local_http_server_url
-    },{
       d = "flurl",
       i = "📄🔗",
       getfn = transf.absolute_path.file_url

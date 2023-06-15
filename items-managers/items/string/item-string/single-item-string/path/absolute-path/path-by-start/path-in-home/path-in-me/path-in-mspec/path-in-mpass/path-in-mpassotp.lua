@@ -1,15 +1,6 @@
 --- @type ItemSpecifier
 PathInMpassotpItemSpecifier = {
   type = "path-in-mpassotp",
-  properties = {
-    getables = {
-
-    },
-    doThisables = {
-     
-    }
-  },
- 
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

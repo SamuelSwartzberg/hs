@@ -9,13 +9,7 @@ PathByStartItemSpecifier = {
       ["is-path-not-in-home"] = function(self)
         return not self:get("is-path-in-home")
       end,
-      ["relative-path"] = function(self)
-        return mustNotStart(self:get("completely-resolved-path"), self:get("base-path"))
-      end,
     },
-    doThisables = {
-     
-    }
   },
   potential_interfaces = ovtable.init({
     { key = "path-in-home", value = CreatePathInHomeItem },

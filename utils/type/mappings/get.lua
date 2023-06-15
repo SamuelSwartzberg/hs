@@ -409,6 +409,7 @@ get = {
   string = {
     split_single_char = stringy.split,
     split = stringx.split,
+    
   },
   string_array = {
     join = function(arr, sep)
@@ -971,5 +972,10 @@ get = {
       return values
     end,
   },
+  system = {
+    all_applications = function()
+      return transf.dir.children_filenames_array("/Applications")
+    end
+  }
 
 }
