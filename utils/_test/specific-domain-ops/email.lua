@@ -1,21 +1,10 @@
--- build single header
-
-assertMessage(
-  join.string.string.email_header("foo", "bar"),
-  "Foo: bar"
-)
-
-assertMessage(
-  join.string.string.email_header("foo", "bar {{[ 2 + 2 ]}}"),
-  "Foo: bar 4"
-)
 
 -- build multiple headers
 
 -- fake headers
 
 assertMessage(
-  transf.dict.email_header({
+  transf.stringable_value_dict.email_header({
     foo = "bar",
     baz = "qux",
   }),
@@ -25,7 +14,7 @@ assertMessage(
 -- real headers (are auto-sorted)
 
 assertMessage(
-  transf.dict.email_header({
+  transf.stringable_value_dict.email_header({
     subject = "test",
     from = "test@example.com",
     to = "test2@example.com",
@@ -36,7 +25,7 @@ assertMessage(
 -- mixture of real and fake headers
 
 assertMessage(
-  transf.dict.email_header({
+  transf.stringable_value_dict.email_header({
     foo = "bar",
     baz = "qux",
     subject = "test",

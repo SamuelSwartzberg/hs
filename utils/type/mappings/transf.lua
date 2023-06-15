@@ -815,6 +815,63 @@ transf = {
 
   },
 
+  env_var_name_value_dict = {
+    key_value_and_dependency_dict = function(dict)
+      return hs.fnutils.imap(dict, function(value)
+        return {
+          value = value,
+          dependencies = iterToTbl({tolist=true, ret="v"},eutf8.gmatch(value, "%$([A-Z0-9_]+)"))
+        }
+      end)
+    end,
+    dependency_ordered_key_value_pair_array = function(dict)
+      return transf.key_value_and_dependency_dict.dependency_ordered_key_value_pair_array(
+        transf.key_value_and_dependency_dict.key_value_and_dependency_dict(dict)
+      )
+    end,
+    env_string = function(dict)
+      transf.env_line_array.env_string(
+        transf.pair_array.env_line_array(
+          transf.env_var_name_value_dict.dependency_ordered_key_value_pair_array(dict)
+        )
+      )
+    end
+
+  },
+  key_value_and_dependency_dict = {
+    dependency_ordered_key_value_pair_array = function(dict)local result = {}  -- Table to store the sorted keys
+      local visited = {}  -- Table to keep track of visited keys
+      local temp_stack = {}  -- Table to detect cyclic dependencies
+  
+      -- Helper function for DFS traversal
+      local function dfs(key)
+          if temp_stack[key] then
+              error("Cyclic dependency detected")
+          end
+  
+          if not visited[key] then
+              temp_stack[key] = true  -- Add key to temporary stack to detect cyclic dependencies
+  
+              -- Traverse dependencies recursively
+              for _, dep in ipairs(dict[key]['dependencies']) do
+                  dfs(dep)
+              end
+  
+              temp_stack[key] = nil  -- Remove key from temporary stack
+              visited[key] = true  -- Mark key as visited
+              table.insert(result, { key, dict[key]['value'] })  -- Append {key, value} pair to result
+          end
+      end
+  
+      -- Perform DFS traversal for each key in the graph
+      for key, _ in pairs(dict) do
+          dfs(key)
+      end
+  
+      return result
+    end
+  },
+
   shellscript_file = {
     gcc_string_errors = function(path)
       return get.shellscript_file.lint_gcc_string(path, "errors")
@@ -2042,9 +2099,6 @@ transf = {
       )
     end
   },
-  env_string = {
-
-  },
   base64_gen = {
     decoded_string = basexx.from_base64,
   },
@@ -2278,7 +2332,10 @@ transf = {
   pair = {
     header = function(pair)
       return transf.word.capitalized(pair[1]) .. ": " .. pair[2]
-    end
+    end,
+    email_header = function(pair)
+      return transf.word.capitalized(pair[1]) .. ": " .. le(pair[2])
+    end,
   },
   email = {
     mailto_url = function(str)
@@ -2361,7 +2418,15 @@ transf = {
         "/"
       )
     end,
-
+  },
+  env_line_array = {
+    env_string = function(arr)
+      local env_string_inner = table.concat(arr, "\n")
+      return "#!/usr/bin/env bash\n\n" ..
+          "set -u\n\n" .. 
+          env_string_inner .. 
+          "\n\nset +u\n"
+    end,
   },
   array_of_string_arrays = {
 
@@ -2479,6 +2544,23 @@ transf = {
     end,
   },
   dict = {
+    dict_of_dicts_by_space = function(tbl)
+      local res = {}
+      for k, v in fastpairs(tbl) do
+        local key_parts = stringy.split(k, " ")
+        local label = key_parts[1]
+        local key = key_parts[2]
+        if not key then
+          res[label] = v
+        else
+          res[label] = res[label] or {}
+          res[label][key] = v
+        end
+      end
+      return res
+    end,
+  },
+  stringable_value_dict = {
     url_params = function(t)
       local params = {}
       for k, v in pairs(t) do
@@ -2495,12 +2577,12 @@ transf = {
       for _, header_name in ipairs(initial_headers) do
         local header_value = t[header_name]
         if header_value then
-          table.insert(header_lines, join.string.string.email_header(header_name, header_value))
+          table.insert(header_lines, transf.pair.email_header({header_name, header_value}))
           t[header_name] = nil
         end
       end
       for key, value in prs(t) do
-        table.insert(header_lines, join.string.string.email_header(key, value))
+        table.insert(header_lines, transf.pair.email_header({key, value}))
       end
       return table.concat(header_lines, "\n")
     end,
@@ -2521,50 +2603,65 @@ transf = {
       end
       return fields
     end,
-    ini_string = function(tbl)
-      for k, v in fastpairs(tbl) do
-        local out_lines = { "[" .. k .. "]" }
-        for k, v in fastpairs(v) do
-          local val
-          if stringy.startswith(v, "noquote:") then
-            val = v:match("noquote:(.+)")
-          else
-            val = "\"" .. v .. "\""
-          end
-          table.insert(out_lines, k .. " = " .. val)
-        end
-        return table.concat(out_lines, "\n")
-      end
+    ini_line_array = function(t)
+      return map(
+        t,
+        {_f = "%s = %s"},
+        {tolist = true, args = "kv", ret = "v"}
+      )
     end,
-    labeled_dict_by_space = function(tbl)
+    ini_string = function(t)
+      return table.concat(transf.stringable_value_dict.ini_line_array(t), "\n")
+    end,
+    envlike_line_array = function(t)
+      return map(
+        t,
+        {_f = "%s=%s"},
+        {tolist = true, args = "kv", ret = "v"}
+      )
+    end,
+    envlike_string = function(t)
+      return table.concat(transf.stringable_value_dict.envlike_line_array(t), "\n")
+    end,
+  },
+  pair_array = {
+    dict = function(arr)
       local res = {}
-      for k, v in fastpairs(tbl) do
-        local key_parts = stringy.split(k, " ")
-        local label = key_parts[1]
-        local key = key_parts[2]
-        if not key then
-          res[label] = v
-        else
-          res[label] = res[label] or {}
-          res[label][key] = v
-        end
+      for _, pair in ipairs(arr) do
+        res[pair[1]] = pair[2]
       end
       return res
     end,
+    env_line_array = function (arr)
+      return hs.fnutils.imap(
+        arr,
+        function(pair)
+          return "export " .. pair[1] .. "=" .. transf.string.double_quoted_escaped(pair[2])
+        end
+      )
+    end
+
   },
-  labeled_dict = {
-    dict_by_space = function(labeled_dict)
+  dict_of_string_value_dicts = {
+    ini_string = function(t)
+      return table.concat(map(
+        t,
+        function(k,v)
+          return "[" .. k .. "]\n" .. transf.stringable_value_dict.ini_string(v)
+        end
+      ), "\n\n")
+    end,
+  },
+  dict_of_dicts = {
+    dict_by_space = function(dict_of_dicts)
       local res = {}
-      for label, dict in fastpairs(labeled_dict) do
+      for label, dict in fastpairs(dict_of_dicts) do
         for k, v in fastpairs(dict) do
           res[label .. " " .. k] = v
         end
       end
       return res
     end,
-    ini_string = function (labeled_dict)
-      return transf.dict.ini_string(transf.labeled_dict.dict_by_space(labeled_dict))
-    end
 
   },
   timestamp_table = {
@@ -2621,7 +2718,7 @@ transf = {
     end,
   },
   vdirsyncer_pair_specifier = {
-    labeled_dict = function(specifier)
+    dict_of_dicts = function(specifier)
       local local_name = specifier.name .. "_local"
       local remote_name = specifier.name .. "_remote"
       return {
@@ -2649,7 +2746,11 @@ transf = {
       }         
     end,
     ini_string = function(specifier)
-      return transf.labeled_dict.ini_string(transf.vdirsyncer_pair_specifier.labeled_dict(specifier))
+      return transf.dict_of_string_value_dicts.ini_string(
+        transf.dict_of_dicts.dict_by_space(
+          transf.vdirsyncer_pair_specifier.dict_of_dicts(specifier)
+        )
+      )
     end
   },
   url_components = {
@@ -2670,7 +2771,7 @@ transf = {
       end     
       if comps.params then
         if type(comps.params) == "table" then
-          url = url .. "?" .. transf.dict.url_params(comps.params)
+          url = url .. "?" .. transf.stringable_value_dict.url_params(comps.params)
         else
           url = url .. mustStart(comps.params, "?")
         end

@@ -17,53 +17,17 @@ EnvMapSpecifier = {
   type = "env-map",
   properties = {
     getables = {
-      ["env-lines"] = function(self, pkey)
-        local  lines = {}
-        local pkey_var = pkey and "$" .. pkey .. "/" or ""
-        for key, value in fastpairs(self:get("c")) do
-          if type(value) == "string" then
-            push(lines, string.format("%s=\"%s%s\"", key, pkey_var, value))
-          elseif value.type == "env-item" then
-            lines = concat(lines, value:get("env-lines", { pkey_var = pkey_var, key = key }))
-          end
-        end
-        return lines
-      end,
+
       ["env-lines-dependency-ordered"] = function(self)
         -- order the env lines so that the dependencies are defined before the dependents
         local lines = self:get("env-lines")
-        local lines_with_dependencies = {}
-        for _, line in ipairs(lines) do
-          local key, value = string.match(line, "^([A-Z0-9_]-)=\"(.*)\"$")
-          local dependencies
-          if value then
-            local match = value:gmatch("%$([A-Z0-9_]+)")
-            dependencies = iterToTbl({tolist=true, ret="v"},match)
-          else
-            dependencies = {}
-          end
-          lines_with_dependencies[key] = { line = line, dependencies = dependencies }
-        end
+        local w_deps = {}
+        
         local out_lines = {}
-        for _, line_with_dependencies in fastpairs(lines_with_dependencies) do
-          out_lines = concat(out_lines, getDependencyLines(line_with_dependencies, lines_with_dependencies))
+        for _, line_with_dependencies in fastpairs(w_deps) do
+          out_lines = concat(out_lines, getDependencyLines(line_with_dependencies, w_deps))
         end
         return toSet(out_lines)
-      end,
-          
-      ["to-env-file-string"] = function(self)
-        local lines = self:get("env-lines-dependency-ordered")
-        local line_string = stringx.join("\n", lines)
-        line_string = table.concat(
-          map(
-            stringy.split(line_string, "\n"),
-            {_f = "export %s"}
-          )
-        )
-        return "#!/usr/bin/env bash\n\n" ..
-          "set -u\n\n" .. 
-          line_string .. 
-          "\n\nset +u\n"
       end,
     },
     doThisables = {

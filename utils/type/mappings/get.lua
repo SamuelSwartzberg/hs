@@ -715,7 +715,7 @@ get = {
       local res = run("maddr " .. (only and "-a" or "")  .. headerpart .. transf.string.single_quoted_escaped(path))
       return toSet(transf.string.lines(res))
     end,
-    displayname_addresses_labeled_dict = function(path, header)
+    displayname_addresses_dict_of_dicts = function(path, header)
       local w_displaynames = transf.email_file.addresses(path, header, false)
       return hs.fnutils.imap(w_displaynames, transf.email_or_displayname_email.displayname_email_dict)
     end,
@@ -918,6 +918,58 @@ get = {
         unit = unit or "minute"
       }
     end,
-  }
+  },
+  detailed_env_node = {
+    self_env_var_name_value_dict = function(node, prev_key, key)
+      prev_key = prev_key or ""
+      if node.value then
+        local value = node.value
+        if type(node.value) == 'table' then -- list value
+          value = table.concat(
+            map(node.value, {_f = prev_key .. "%s"}), 
+            ":"
+          )
+        else
+          value = prev_key .. value
+        end
+        local values = {
+          [key] = value
+        }
+        if node.aliases then
+          for _, alias in ipairs(node.aliases) do
+            values[alias] = value
+          end
+        end
+        return values
+      else
+        return {}
+      end
+    end,
+    env_var_name_value_dict = function(node, prev_key, key)
+      local self_dict = get.detailed_env_node.self_env_var_name_value_dict(node, prev_key, key)
+      local dependent_dict
+      if node.dependents then
+        dependent_dict = get.detailed_env_node.env_var_name_value_dict(node.dependents, key)
+      else
+        dependent_dict = {}
+      end
+      return concat({self_dict, dependent_dict})
+    end,
+  },
+  env_var_name_env_node_dict = {
+    env_var_name_value_dict = function(dict, prev_key)
+      if prev_key then prev_key = prev_key .. "/" else prev_key = "" end
+      local values = {}
+      for key, value in pairs(dict) do
+        if type(value) == "string" then
+          values[key] = prev_key .. value
+        else
+          local subvalues = get.detailed_env_node.env_var_name_value_dict(value, prev_key, key)
+          values = concat({values, subvalues})
+        end
+      end
+      return values
+    end,
+  },
 
 }

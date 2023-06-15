@@ -40,7 +40,7 @@ function open(opts, do_after)
       path = path .. mustNotStart(opts.path, "/")
     end
     if opts.params then 
-      path = path .. "?" .. transf.dict.url_params(opts.params)
+      path = path .. "?" .. transf.stringable_value_dict.url_params(opts.params)
     end
   elseif opts.contents then 
     if opts.path then

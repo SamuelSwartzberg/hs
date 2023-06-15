@@ -943,4 +943,19 @@ dothis = {
       )
     end,
   },
+  env_string = {
+    write_and_check = function(str, path)
+      writeFile(path, str)
+      local errors = transf.shellscript_file.gcc_string_errors(path)
+      if errors then
+        error("env file " .. path .. " has errors:\n" .. errors)
+      end
+    end,
+    write_env_and_check = function(str)
+      dothis.env_string.write_and_check(
+        str,
+        env.ENVFILE
+      )
+    end,
+  }
 }
