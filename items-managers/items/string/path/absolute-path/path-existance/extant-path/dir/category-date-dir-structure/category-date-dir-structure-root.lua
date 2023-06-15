@@ -10,7 +10,7 @@ CategoryDateDirStructureRootItemSpecifier = {
     doThisables = {
       ["add-to-structure"] = function(self, specifier)
         local subcategory_path = self:get("completely-resolved-path") .. specifier.category .. "/" .. specifier.subcategory
-        tb(specifier.table):doThis("write-to-fs", subcategory_path)
+        dc(specifier.table):doThis("write-to-fs", subcategory_path)
       end,
     }
   },

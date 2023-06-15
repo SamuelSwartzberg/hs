@@ -265,7 +265,7 @@ transf = {
       if arg == nil then
         return nil
       else
-        return tostring(arg)
+        return transf.any.string(arg)
       end
     end,
   },
@@ -791,7 +791,7 @@ transf = {
   },
   json_file = {
     table = function(path)
-      return transf.json_string.table(readFile(path))
+      return transf.not_userdata_or_function.table(readFile(path))
     end,
   },
   ini_file = {
@@ -2060,6 +2060,16 @@ transf = {
       )
     end,
   },
+  potentially_atpath = {
+    potentially_atpath_resolved = function(str)
+      if stringy.startswith(str, "@") then
+        local valpath = eutf8.sub(str, 2)
+        valpath = transf.string.path_resolved(valpath, true)
+        str = "@" .. valpath
+      end
+      return str
+    end,
+  },
   alphanum_minus = {
     alphanum = function(str)
       return eutf8.gsub(str, "-", "")
@@ -2327,6 +2337,16 @@ transf = {
       return items
     end,
   },
+  term_syn_specifier_dict = {
+    term_syn_specifier_item_dict_item = function(dict)
+      return dc(
+        hs.fnutils.map(
+          dict,
+          CreateSynSpecifier
+        )
+      )
+    end
+  },
   syn_specifier = {
     synoynms_array = function (syn_specifier)
       return syn_specifier.synonyms
@@ -2344,17 +2364,47 @@ transf = {
       return 
         "synonyms: " ..
         slice(syn_specifier.synonyms, { stop = 2, sliced_indicator = "..." }) ..
-        " | " ..
+        "\n" ..
         "antonyms: " ..
         slice(syn_specifier.antonyms, { stop = 2, sliced_indicator = "..." })
     end,
   },
   pair = {
+    key_value = function(pair)
+      return pair[1], pair[2]
+    end,
+  },
+  stringable_pair = {
     header = function(pair)
-      return transf.word.capitalized(pair[1]) .. ": " .. pair[2]
+      return transf.word.capitalized(transf.any.string(pair[1])) .. ": " .. transf.any.string(pair[2])
     end,
     email_header = function(pair)
-      return transf.word.capitalized(pair[1]) .. ": " .. le(pair[2])
+      return transf.word.capitalized(transf.any.string(pair[1])) .. ": " .. le(transf.any.string(pair[2]))
+    end,
+    url_param = function(pair)
+      return transf.any.string(pair[1]) .. "=" .. transf.string.urlencoded(transf.any.string(pair[2]))
+    end,
+    ini_line = function(pair)
+      return transf.any.string(pair[1]) .. " = " .. transf.any.string(pair[2])
+    end,
+    envlike_line = function(pair)
+      return transf.any.string(pair[1]) .. "=" .. transf.any.string(pair[2])
+    end,
+    curl_form_field_args = function(pair)
+      return {
+        "-F",
+        transf.any.string(pair[1]) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.string(pair[2])),
+      }
+    end,
+    dict_entry_string = function(pair)
+      return "[" .. transf.any.string(pair[1]) .. "] = " .. transf.any.string(pair[2])
+    end,
+    chooser_item = function(pair)
+      return {
+        text = transf.stringable_pair.dict_entry_string(pair),
+        k = pair[1],
+        v = pair[2],
+      }
     end,
   },
   email = {
@@ -2406,7 +2456,7 @@ transf = {
       return ar(map(
         arr,
         function (arr)
-          return tb(arr)
+          return dc(arr)
         end
       ))
     end
@@ -2496,7 +2546,6 @@ transf = {
       local lines = stringy.split(raw_yaml, "\n")
       return table.concat(lines, "\n", 2, #lines - 2)
     end,
-    json_string = json.encode,
     toml_string = toml.encode,
     --- allows for aligned values and comments, but may be less robust than transf.table.yaml_string, since I'm implementing it myself
     --- value and comment must be strings
@@ -2563,6 +2612,20 @@ transf = {
       )
     end,
   },
+  orderedtable = {
+    first_key = function(t)
+      return t:keyfromindex(1)
+    end,
+    last_key = function(t)
+      return t:keyfromindex(t:len())
+    end,
+    first_value = function(t)
+      return t[1]
+    end,
+    last_value = function(t)
+      return t[t:len()]
+    end,
+  },
   dict = {
     dict_of_dicts_by_space = function(tbl)
       local res = {}
@@ -2579,15 +2642,22 @@ transf = {
       end
       return res
     end,
+    pair_array = function(t)
+      return map(
+        t,
+        function(k, v)
+          return {k, v}
+        end,
+        refstore.params.map.opts.kv_to_list
+      )
+    end,
   },
   stringable_value_dict = {
+    url_param_array = function(t)
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.url_param)
+    end,
     url_params = function(t)
-      local params = {}
-      for k, v in pairs(t) do
-        local encoded_v = transf.string.urlencoded(tostring(v), true)
-        table.insert(params, k .. "=" .. encoded_v)
-      end
-      return table.concat(params, "&")
+      return table.concat(transf.stringable_value_dict.url_param_array(t), "&")
     end,
     --- @param t { [string]: string }
     --- @return string
@@ -2597,52 +2667,44 @@ transf = {
       for _, header_name in ipairs(initial_headers) do
         local header_value = t[header_name]
         if header_value then
-          table.insert(header_lines, transf.pair.email_header({header_name, header_value}))
+          table.insert(header_lines, transf.stringable_pair.email_header({header_name, header_value}))
           t[header_name] = nil
         end
       end
       for key, value in prs(t) do
-        table.insert(header_lines, transf.pair.email_header({key, value}))
+        table.insert(header_lines, transf.stringable_pair.email_header({key, value}))
       end
       return table.concat(header_lines, "\n")
     end,
     curl_form_field_list = function(t)
-      local fields = {}
-      for k, v in pairs(t) do
-        push(fields, "-F")
-        local val = v
-        if stringy.startswith(v, "@") then
-          local valpath = eutf8.sub(v, 2)
-          valpath = transf.string.path_resolved(valpath, true)
-          val = "@" .. valpath
-        end
-        push(fields, {
-          value = ("%s=%s"):format(k, val),
-          type = "quoted",
-        })
-      end
-      return fields
+      return concat(
+        hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.curl_form_field_args)
+      )
     end,
     ini_line_array = function(t)
-      return map(
-        t,
-        {_f = "%s = %s"},
-        {tolist = true, args = "kv", ret = "v"}
-      )
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.ini_line)
     end,
     ini_string = function(t)
       return table.concat(transf.stringable_value_dict.ini_line_array(t), "\n")
     end,
     envlike_line_array = function(t)
-      return map(
-        t,
-        {_f = "%s=%s"},
-        {tolist = true, args = "kv", ret = "v"}
-      )
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.envlike_line)
+    end,
+    dict_entry_string_array = function(t)
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.dict_entry_string)
+    end,
+    dict_entry_string_summary = function(t)
+      return "dict: " .. table.concat(transf.stringable_value_dict.dict_entry_string_array(t), ", ")
+    end,
+    dict_entry_string_detailed = function(t)
+      return table.concat(transf.stringable_value_dict.dict_entry_string_array(t), "\n")
     end,
     envlike_string = function(t)
       return table.concat(transf.stringable_value_dict.envlike_line_array(t), "\n")
     end,
+    chooser_item_list = function(t)
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.chooser_item)
+    end
   },
   pair_array = {
     dict = function(arr)
@@ -3053,6 +3115,32 @@ transf = {
     single_quoted_escaped_json = function(t)
       return transf.string.single_quoted_escaped(json.encode(t))
     end,
+    json_string = json.encode
+  },
+  any = {
+    inspect_string = function(thing)
+      return hs.inspect(thing, {depth = 5})
+    end,
+    string = function(stringable)
+      if type(stringable) == "string" then
+        return stringable
+      elseif type(stringable) ~= "table" then
+        return tostring(stringable)
+      else
+        if stringable.get then
+          local got_tostring = stringable:get("to-string")
+          if got_tostring then
+            return got_tostring
+          end
+        end
+        local succ, json = pcall(transf.not_userdata_or_function.json_string, stringable)
+        if succ then
+          return json
+        else
+          return transf.any.inspect_string(stringable)
+        end
+      end
+    end
   },
   mailto_url = {
    

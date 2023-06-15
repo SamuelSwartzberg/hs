@@ -2,9 +2,7 @@ NumberByCombinationSpecifier = {
   type = "number-by-combination",
   properties = {
     getables = {
-      ["is-pos-int"] = function(self)
-        return is.any.pos_int(self:get("c"))
-      end,
+      ["is-pos-int"] = bc(is.any.pos_int)
     },
     doThisables = {
      

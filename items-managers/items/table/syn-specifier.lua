@@ -6,8 +6,30 @@ SynSpecifierSpecifier = {
     },
   },
   
-  action_table = {}
+  action_table = {
+    {
+      i = "📚☯️",
+      d = "ant",
+      getnf = transf.syn_specifier.antonyms_array,
+      act = "cia"
+    },{
+      i = "📚☯️",
+      d = "ant",
+      getnf = transf.syn_specifier.antonyms_array,
+      act = "ci"
+    },{
+      i = "📚🟰",
+      d = "syn",
+      getnf = transf.syn_specifier.synoynms_array,
+      act = "cia"
+    },{
+      i = "📚🟰",
+      d = "syn",
+      getnf = transf.syn_specifier.synoynms_array,
+      act = "ci"
+    }
+  }
   
 }
---- @type BoundNewDynamicContentsComponentInterface
-CreateSynSpecifier = bindArg(NewDynamicContentsComponentInterface, SynSpecifierSpecifier)
+--- @type BoundRootInitializeInterface
+CreateSynSpecifier = bindArg(RootInitializeInterface, SynSpecifierSpecifier)

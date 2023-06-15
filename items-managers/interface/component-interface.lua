@@ -141,14 +141,16 @@ InterfaceDefaultTemplate = {
           n_action.action_id = rand({len=10})
           n_action.text = n_action.text or ""
           local choose =  n_action.act and stringy.startswith(n_action.act, "c") 
-          if choose then
+          if choose == "ci" then
             n_action.text = mustStart(n_action.text, "👉")
+          elseif choose == "cia" then
+            n_action.text = mustStart(n_action.text, "👉👊")
           end
           if n_action.e then
             n_action.text = n_action.e .. " " .. n_action.text
           end
           if choose then
-            n_action.text = "c" .. n_action.text
+            n_action.text = choose .. n_action.text
           end 
           if n_action.d then
             n_action.text = n_action.text .. n_action.d
@@ -227,6 +229,8 @@ InterfaceDefaultTemplate = {
             action_item.act = "choose-action"
           elseif action_item.act == "cia" then
             action_item.act = "choose-item-and-then-action"
+          elseif action_item.act == "ciia" then
+            action_item.act = "choose-item-item-and-then-action"
           end
           self:doThis(action_item.act, action_item.filter(res))
         end

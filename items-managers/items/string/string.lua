@@ -12,8 +12,6 @@ StringItemSpecifier = {
       ["is-might-be-json-item"] = function(self)
         return  startsEndsWithFast(self:get("c"), "{", "}") or startsEndsWithFast(self:get("c"), "[", "]")
       end,
-      ["is-might-be-xml-item"] = function(self) return startsEndsWithFast(self:get("c"), "<", ">") end,
-      ["is-might-be-bib-item"] =function(self) return startsEndsWithFast(self:get("c"), "@", "}") end,
       ["to-string-array"] = function(self, sep) 
         return ar(stringy.split(self:get("c"), sep)) 
       end,
@@ -369,6 +367,15 @@ StringItemSpecifier = {
       d = "henec",
       i = "🔶📦",
       getfn = transf.string.html_entitiy_encoded
+    },{
+      text = "👉📚 csynav.",
+      getfn = transf.word.synonym_string_array,
+      filter = ar
+    },{
+      text = "👉📚 csynth.",
+      getfn = transf.word.term_syn_specifier_dict,
+      filter = transf.term_syn_specifier_dict.term_syn_specifier_item_dict_item,
+      act = "cia"
     }
   }),
   hs.fnutils.imap(

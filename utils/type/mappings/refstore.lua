@@ -20,6 +20,11 @@ refstore = {
         },
       }
     },
+    map = {
+      opts = {
+        kv_to_list = {args = "kv", ret = "v", tolist = true}
+      }
+    },
     memoize = {
       opts = {
         stringify_table_params = {

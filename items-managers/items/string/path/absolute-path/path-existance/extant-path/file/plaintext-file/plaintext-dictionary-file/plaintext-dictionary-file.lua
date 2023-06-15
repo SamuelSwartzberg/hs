@@ -14,7 +14,7 @@ PlaintextDictionaryFileItemSpecifier = {
       ["is-ics-file"] = bc(get.path.is_extension, "ics"),
       ["to-env-map"] = function(self)
         local table = self:get("parse-to-lua-table")
-        local env_map_item = tb(table)
+        local env_map_item = dc(table)
         return env_map_item:get("parse-to-env-map")
       end,
     },
@@ -32,7 +32,7 @@ PlaintextDictionaryFileItemSpecifier = {
   action_table = {
     {
       text = "👉#️⃣💎 ctbl.",
-      filter = tb,
+      filter = dc,
       getfn = returnSame,
       get = "parse-to-lua-table"
 
