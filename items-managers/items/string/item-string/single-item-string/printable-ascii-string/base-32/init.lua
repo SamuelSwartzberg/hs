@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.string.item-string.single-item-string.printable-ascii-string.base-32")
+local rrq = bindArg(relative_require, "items-managers.items.string.printable-ascii-string.base-32")
 
 
 rrq("base-32")

@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.string.item-string.single-item-string.path.path-leaf")
+local rrq = bindArg(relative_require, "items-managers.items.string.path.path-leaf")
 
 rrq("path-leaf-date")
 rrq("path-leaf-general-name")

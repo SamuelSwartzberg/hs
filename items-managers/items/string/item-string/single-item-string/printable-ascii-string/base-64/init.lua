@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.string.item-string.single-item-string.printable-ascii-string.base-64")
+local rrq = bindArg(relative_require, "items-managers.items.string.printable-ascii-string.base-64")
 
 
 rrq("base-64")

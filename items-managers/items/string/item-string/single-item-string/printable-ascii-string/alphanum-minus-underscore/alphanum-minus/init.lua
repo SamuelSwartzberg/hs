@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.string.item-string.single-item-string.printable-ascii-string.alphanum-minus-underscore.alphanum-minus")
+local rrq = bindArg(relative_require, "items-managers.items.string.printable-ascii-string.alphanum-minus-underscore.alphanum-minus")
 
 rrq("uuid")
 rrq("isbn")

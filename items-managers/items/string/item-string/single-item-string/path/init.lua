@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.string.item-string.single-item-string.path")
+local rrq = bindArg(relative_require, "items-managers.items.string.path")
 
 rrq("absolute-path")
 rrq("relative-path")

@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.string.item-string.single-item-string.path.absolute-path.path-existance.extant-path.file")
+local rrq = bindArg(relative_require, "items-managers.items.string.path.absolute-path.path-existance.extant-path.file")
 
 rrq("binary-file")
 rrq("plaintext-file")

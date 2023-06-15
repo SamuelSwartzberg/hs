@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "items-managers.items.string.item-string.single-item-string.printable-ascii-string.digit-string")
+local rrq = bindArg(relative_require, "items-managers.items.string.printable-ascii-string.digit-string")
 
 rrq("decimal-digit-string")
 rrq("hexadecimal-digit-string")
