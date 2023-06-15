@@ -454,30 +454,30 @@ assertMessageAny(
 
 assert(
   findsingle(
-    transf.word.synonyms.raw_syn("love"),
+    transf.word.raw_syn_output("love"),
     "affection"
   )
 )
 
 assertValuesContain(
-  transf.word.synonyms.array_syn_tbls("love")[1].synonyms,
+  transf.word.term_syn_specifier_dict("love")[1].synonyms,
   { "affection" }
 )
 
 assertValuesContain(
-  transf.word.synonyms.array_syn_tbls("love")[1].antonym,
+  transf.word.term_syn_specifier_dict("love")[1].antonym,
   { "hate" }
 )
 
 assert(
   findsingle(
-    transf.word.synonyms.raw_av("love"),
+    transf.word.raw_av("love"),
     "screw"
   )
 )
 
 assertValuesContain(
-  transf.word.synonyms.array_av("love"),
+  transf.word.synonym_string_array("love"),
   { "screw" }
 )
 

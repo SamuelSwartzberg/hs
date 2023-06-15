@@ -252,13 +252,14 @@ get = {
       return hs.audiodevice["default" .. transf.word.capitalized(type) .. "Device"]()
     end,
   },
+  audiodevice_specifier = {
+
+  },
   audiodevice = {
     is_default = function (device, type)
       return device == get.audiodevice_system.default(type)
     end,
-    name = function(device)
-      return device:name()
-    end,
+    
   },
   contact_table = {
     encrypted_data = function(contact_table, type)
@@ -900,5 +901,23 @@ get = {
   chat_mac_application_name = {
 
   },
+  running_application = {
+    window_by_title = function(app, title)
+      return app:getWindow(title)
+    end,
+    window_by_pattern = function(app, pattern)
+      return app:findWindow(pattern)
+    end,
+  },
+  event_table = {
+    date_range_specifier = function(event_table, step, unit)
+      return {
+        start = transf.event_table.start_date(event_table),
+        stop = transf.event_table.end_date(event_table),
+        step = step or 1,
+        unit = unit or "minute"
+      }
+    end,
+  }
 
 }

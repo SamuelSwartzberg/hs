@@ -1,6 +1,7 @@
 --- @type ItemSpecifier
 MenuItemTableSpecifier = {
-  type = "menu-item-table"
+  type = "menu-item-table",
+
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

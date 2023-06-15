@@ -37,12 +37,12 @@ ContactTableSpecifier = {
         args = { key = "addresses-table" }
       },
       {
-        text = "👉🏦 cbnkdt.",
-        key = "choose-action-bank-deets-array"
+        text = "🏦 bnkdt.",
+        getfn = transf.contact_table.main_name_iban_bic_bank_name_array
       },
       {
         text = "✏️ ed.",
-        key = "edit",
+        dothis = dothis.contact_table.edit
       }
   }
   

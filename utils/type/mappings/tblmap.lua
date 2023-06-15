@@ -307,7 +307,15 @@ tblmap = {
     },
     before_backup = {
       Newpipe = dothis.newpipe.extract_backup
-    }
+    },
+  },
+  mac_application_name = {
+    recent_full_action_path = {
+      OmegaT = {"Project", "Open Recent Project"}
+    },
+    reload_full_action_path = {
+      LibreOffice = {"File", "Reload"}
+    },
   },
   search_engine = {
     url = {

@@ -201,6 +201,17 @@ dothis = {
       run(command, true)
     end,
   },
+  event_table = {
+    delete = function(event_table)
+      dothis.khal.delete_event(event_table.uid, event_table.calendar)
+    end,
+    edit = function(event_table)
+      dothis.khal.edit_event(event_table.uid, event_table.calendar)
+    end,
+    create_similar = function(event_table)
+      dothis.khal.add_event_interactive(event_table)
+    end,
+  },
   pandoc = {
     markdown_to = function(source, format, metadata, do_after)
       local source, target = resolve({s = {path = source}, t = {suffix = "." .. tblmap.pandoc_format.extension[format]}})
@@ -680,6 +691,14 @@ dothis = {
       device:setOutputVolume(100)
     end,
   },
+  audiodevice_specifier = {
+    set_default = function(specifier)
+      dothis.audiodevice.set_default(
+        transf.audiodevice_specifier.audiodevice(specifier),
+        transf.audiodevice_specifier.subtype(specifier)
+      )
+    end,
+  },
   audiodevice_system = {
     ensure_sound_played_on_speakers = function()
       local device = hs.audiodevice.findOutputByName("Built-in Output")
@@ -841,7 +860,18 @@ dothis = {
     end
   },
   mac_application_name = {
-
+    execute_full_action_path = function(application_name, full_action_path)
+      dothis.running_application.execute_full_action_path(
+        transf.mac_application_name.running_application(application_name),
+        full_action_path
+      )
+    end,
+    reload = function(application_name)
+      dothis.mac_application_name.execute_full_action_path(
+        application_name,
+        tblmap.mac_application_name.reload_full_action_path[application_name]
+      )
+    end,
   },
   firefox = {
     dump_state = function(do_after)
@@ -853,6 +883,26 @@ dothis = {
     extract_backup = function(do_after)
       run('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
     end
+  },
+  omegat = {
+    create_all_translated_documents = function()
+      dothis.mac_application_name.execute_full_action_path(
+        "OmegaT",
+        {
+          "Project",
+          "Create Translated Documents"
+        }
+      )
+    end,
+    create_current_translated_document = function()
+      dothis.mac_application_name.execute_full_action_path(
+        "OmegaT",
+        {
+          "Project",
+          "Create Current Translated Document"
+        }
+      )
+    end,
   },
   path_with_intra_file_locator_specifier = {
     go_to = function(specifier)

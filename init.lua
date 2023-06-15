@@ -390,7 +390,13 @@ System:get("manager", "timer"):doThis("create-all", {
     fn = dothis.mbsync.sync, 
     interval = "* * * * *"
   },
-  st(env.MENV):get("refresh-env-task"),
+  {
+    fn = function()
+      self:doThis("write-env-file")
+      self:doThis("source-env")
+    end,
+    interval = "*/5 * * * *",
+  },
   {
     fn = dothis.upkg.upgrade_all,
     interval = "0 0 * * *"

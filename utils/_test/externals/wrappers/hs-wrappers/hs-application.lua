@@ -1,4 +1,4 @@
-local menu_item_list_finder = getMenuItemList("Finder")
+local menu_item_list_finder = transf.running_application.menu_item_table_array("Finder")
 
 local new_folder_menu_item = find(
   menu_item_list_finder,

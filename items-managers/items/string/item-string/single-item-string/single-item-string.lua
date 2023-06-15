@@ -23,11 +23,11 @@ SingleItemStringItemSpecifier = {
         return res
       end,
       ["synonyms-av-to-array"] = function(self)
-        return ar(transf.word.synonyms.array_av(self:get("c")))
+        return ar(transf.word.synonym_string_array(self:get("c")))
       end,
       ["synonyms-th-to-array"] = function(self)
         return transf.table_array.item_array_of_item_tables(
-          transf.word.synonyms.array_syn_tbls(self:get("c"))
+          transf.word.term_syn_specifier_dict(self:get("c"))
         )
       end,
     }

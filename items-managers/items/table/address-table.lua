@@ -1,7 +1,11 @@
 --- @type ItemSpecifier
 AddressTableSpecifier = {
   type = "address-table",
-  action_table = { }
+  
+  action_table = {
+    
+  }
+
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

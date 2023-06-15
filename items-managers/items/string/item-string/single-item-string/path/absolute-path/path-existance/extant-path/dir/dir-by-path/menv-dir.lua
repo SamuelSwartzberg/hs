@@ -8,15 +8,6 @@ MenvDirItemSpecifier = {
           return item:get("to-env-map")
         end):get("flatten-to-single-table"):get("to-env-file-string")
       end,
-      ["refresh-env-task"] = function(self)
-        return {
-          fn = function()
-            self:doThis("write-env-file")
-            self:doThis("source-env")
-          end,
-          interval = "*/5 * * * *",
-        }
-      end,
       
     },
     doThisables = {
@@ -26,9 +17,6 @@ MenvDirItemSpecifier = {
         if envfile_string_item:get("has-warnings") then
           error("Envfile had errors: \n" .. envfile_string_item:get("lint-simple-text", "warning"))
         end
-      end,
-      ["source-env"] = function()
-        env = getEnvAsTable()
       end,
         
     }

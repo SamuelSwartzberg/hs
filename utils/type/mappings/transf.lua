@@ -970,7 +970,7 @@ transf = {
       return get.date.formatted(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
     end,
     timestamp_s = function(date)
-      return os.time(
+      return transf.full_date_components.timestamp_s(
         transf.date.full_date_components(date)
       )
     end,
@@ -1051,6 +1051,23 @@ transf = {
       return transf.date_components.date_range_specifier(transf.rfc3339like_dt.date_components(str))
     end,
 
+  },
+  full_rfc3339like_dt = {
+    date = function(str)
+      transf.full_date_components.date(
+        transf.rfc3339like_dt.date_components(str)
+      )
+    end,
+    timestamp_s = function(str)
+      return transf.date.timestamp_s(
+        transf.full_rfc3339like_dt.date(str)
+      )
+    end,
+    timestamp_ms = function(str)
+      return transf.date.timestamp_ms(
+        transf.full_rfc3339like_dt.date(str)
+      )
+    end,
   },
   rfc3339like_range = {
     start_rfc3339like_dt = function(str)
@@ -1137,6 +1154,12 @@ transf = {
     date = function(date_components)
       return date(date_components)
     end,
+    timestamp_s = function(date_components)
+      return os.time(date_components)
+    end,
+    timestamp_ms = function(date_components)
+      return transf.date.timestamp_s(date_components) * 1000
+    end,
   },
   iban = {
     cleaned_iban = function(iban)
@@ -1215,8 +1238,8 @@ transf = {
       -- This 'contact' field holds the complete contact information.
       -- This could be useful in scenarios where address tables are processed individually,
       -- and there's a need to reference back to the full contact details.
-      for _, single_address_table in ipairs(contact_table["Addresses"]) do
-          single_address_table.contact = contact_table
+      for _, address_table in ipairs(contact_table["Addresses"]) do
+          address_table.contact = contact_table
       end
       
       -- Finally, we return the contact_table, which now has a more structured and accessible format.
@@ -1276,8 +1299,20 @@ transf = {
         " "
       )
     end,
+    normal_name_western_array = function(contact_table)
+      return transf.hole_y_arraylike.array({ 
+        transf.contact_table.first_name(contact_table),
+        transf.contact_table.last_name(contact_table),
+      })
+    end,
+    normal_name_western = function(contact_table)
+      return table.concat(
+        transf.contact_table.normal_name_western_array(contact_table),
+        " "
+      )
+    end,
     main_name = function(contact_table)
-      return transf.contact_table.pref_name(contact_table) or transf.contact_table.full_name_western(contact_table)
+      return transf.contact_table.pref_name(contact_table) or transf.contact_table.normal_name_western(contact_table)
     end,
     full_name_eastern_array = function(contact_table)
       return transf.hole_y_arraylike.array({ 
@@ -1290,6 +1325,18 @@ transf = {
     full_name_eastern = function(contact_table)
       return table.concat(
         transf.contact_table.full_name_eastern_array(contact_table),
+        " "
+      )
+    end,
+    normal_name_eastern_array = function(contact_table)
+      return transf.hole_y_arraylike.array({ 
+        transf.contact_table.last_name(contact_table),
+        transf.contact_table.first_name(contact_table),
+      })
+    end,
+    normal_name_eastern = function(contact_table)
+      return table.concat(
+        transf.contact_table.normal_name_eastern_array(contact_table),
         " "
       )
     end,
@@ -1309,9 +1356,9 @@ transf = {
     indicated_nickname = function(contact_table)
       return '"' .. transf.contact_table.nickname(contact_table) .. '"'
     end,
-    full_name_iban_bic_bank_name_array = function(contact_table)
+    main_name_iban_bic_bank_name_array = function(contact_table)
       return {
-        transf.contact_table.full_name_western(contact_table),
+        transf.contact_table.main_name(contact_table),
         transf.contact_table.iban(contact_table),
         transf.contact_table.bic(contact_table),
         transf.contact_table.bank_name(contact_table),
@@ -1995,6 +2042,9 @@ transf = {
       )
     end
   },
+  env_string = {
+
+  },
   base64_gen = {
     decoded_string = basexx.from_base64,
   },
@@ -2064,7 +2114,38 @@ transf = {
         str = str .. " Link: " .. event_table.url
       end
       return str
-    end
+    end,
+    calendar = function(event_table)
+      return event_table.calendar
+    end,
+    title = function(event_table)
+      return event_table.title
+    end,
+    location = function(event_table)
+      return event_table.location
+    end,
+    description = function(event_table)
+      return event_table.description
+    end,
+    url = function(event_table)
+      return event_table.url
+    end,
+
+    start_fullrfc3339like_dt = function(event_table)
+      return event_table.start
+    end,
+    end_fullrfc3339like_dt = function(event_table)
+      return event_table["end"]
+    end,
+    start_date = function(event_table)
+      return transf.full_rfc3339like_dt.date(event_table.start)
+    end,
+    end_date = function(event_table)
+      return transf.full_rfc3339like_dt.date(event_table["end"])
+    end,
+    date_range_specifier = function(event_table)
+      return get.event_table.date_range_specifier(event_table)
+    end,
   },
   search_engine = {
     action_table_item = function(search_engine)
@@ -2132,48 +2213,67 @@ transf = {
     notcapitalized = function(word)
       return replace(word, to.case.notcapitalized)
     end,
-    synonyms = {
-
-      raw_syn = function(str)
-        return memoize(run)( "syn -p" .. transf.string.single_quoted_escaped(str) )
-      end,
-      array_syn_tbls = function(str)
-        local synonym_parts = stringx.split(transf.word.synonyms.raw_syn(str), "\n\n")
-        local synonym_tables = map(
-          synonym_parts,
-          function (synonym_part)
-            local synonym_part_lines = stringy.split(synonym_part, "\n")
-            local synonym_term = eutf8.sub(synonym_part_lines[1], 2) -- syntax: ❯<term>
-            local synonyms_raw = eutf8.sub(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
-            local antonyms_raw = eutf8.sub(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
-            local synonyms = map(stringy.split(synonyms_raw, ", "), stringy.strip)
-            local antonyms = map(stringy.split(antonyms_raw, ", "), stringy.strip)
-            return {
-              term = synonym_term,
-              synonyms = synonyms,
-              antonyms = antonyms,
-            }
-          end
-        )
-        return synonym_tables
-      end,
-      raw_av = function (str)
-        memoize(run)(
-          "synonym" .. transf.string.single_quoted_escaped(str)
-        )
-      end,
-      array_av = function(str)
-        local items = stringy.split(transf.word.synonyms.raw_av(str), "\t")
-        items = filter(items, function(itm)
-          if itm == nil then
-            return false
-          end
-          itm = stringy.strip(itm)
-          return #itm > 0
-        end)
-        return items
-      end,
-    }
+    raw_syn_output = function(str)
+      return memoize(run)( "syn -p" .. transf.string.single_quoted_escaped(str) )
+    end,
+    term_syn_specifier_dict = function(str)
+      local synonym_parts = stringx.split(transf.word.raw_syn_output(str), "\n\n")
+      local synonym_tables = map(
+        synonym_parts,
+        function (synonym_part)
+          local synonym_part_lines = stringy.split(synonym_part, "\n")
+          local synonym_term = eutf8.sub(synonym_part_lines[1], 2) -- syntax: ❯<term>
+          local synonyms_raw = eutf8.sub(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
+          local antonyms_raw = eutf8.sub(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
+          local synonyms = map(stringy.split(synonyms_raw, ", "), stringy.strip)
+          local antonyms = map(stringy.split(antonyms_raw, ", "), stringy.strip)
+          return synonym_term, {
+            synonyms = synonyms,
+            antonyms = antonyms,
+          }
+        end,
+        {"v", "kv"}
+      )
+      return synonym_tables
+    end,
+    raw_av_output = function (str)
+      memoize(run)(
+        "synonym" .. transf.string.single_quoted_escaped(str)
+      )
+    end,
+    synonym_string_array = function(str)
+      local items = stringy.split(transf.word.raw_av_output(str), "\t")
+      items = filter(items, function(itm)
+        if itm == nil then
+          return false
+        end
+        itm = stringy.strip(itm)
+        return #itm > 0
+      end)
+      return items
+    end,
+  },
+  syn_specifier = {
+    synoynms_array = function (syn_specifier)
+      return syn_specifier.synonyms
+    end,
+    antonyms_array = function (syn_specifier)
+      return syn_specifier.antonyms
+    end,
+    synonyms_string = function (syn_specifier)
+      return table.concat(syn_specifier.synonyms, ", ")
+    end,
+    antonyms_string = function (syn_specifier)
+      return table.concat(syn_specifier.antonyms, ", ")
+    end,
+    summary = function (syn_specifier)
+      return 
+        "synonyms: " ..
+        slice(syn_specifier.synonyms, { stop = 2, sliced_indicator = "..." }) ..
+        " | " ..
+        "antonyms: " ..
+        slice(syn_specifier.antonyms, { stop = 2, sliced_indicator = "..." })
+    end,
   },
   pair = {
     header = function(pair)
@@ -2612,7 +2712,39 @@ transf = {
     end,
   },
   running_application = {
-
+    main_window = function(app)
+      return app:mainWindow()
+    end,
+    focused_window = function(app)
+      return app:focusedWindow()
+    end,
+    window_array = function(app)
+      return app:allWindows()
+    end,
+    mac_application_name = function(app)
+      return app:name()
+    end,
+    bundle_id = function(app)
+      return app:bundleID()
+    end,
+    menu_item_table_array = function(app)
+      local flattened = listWithChildrenKeyToListIncludingPath(app:getMenuItems(), {}, { title_key_name = "AXTitle", children_key_name = "AXChildren", levels_of_nesting_to_skip = 1 })
+      local filtered = filter(flattened, function (v) return v.AXTitle ~= "" end)
+      for k, v in pairs(filtered) do
+        v.application = app
+      end
+      return filtered
+    end,
+    icon_hs_image = function(app)
+      return transf.bundle_id.icon_hs_image(
+        transf.running_application.bundle_id(app)
+      )
+    end
+  },
+  bundle_id = {
+    icon_hs_image = function(bundle_id)
+      return hs.image.imageFromAppBundle(bundle_id)
+    end,
   },
   dotapp_path = {
     mac_application_name = function(dotapp_path)
@@ -2628,6 +2760,9 @@ transf = {
     end,
     running_application = function(app_name)
       return hs.application.get(app_name)
+    end,
+    menu_item_table_array = function(app_name)
+      return transf.running_application.menu_item_table_array(transf.mac_application_name.running_application(app_name))
     end,
   },
   chat_mac_application_name = {
@@ -2920,4 +3055,21 @@ transf = {
       return memoize(map, refstore.params.memoize.opts.stringify_json)(mod_array, transf.mod.mod_name)
     end,
   },
+  audiodevice_specifier = {
+    audiodevice = function(audiodevice_specifier)
+      return audiodevice_specifier.device
+    end,
+    subtype = function(audiodevice_specifier)
+      return audiodevice_specifier.subtype
+    end,
+    name = function(audiodevice_specifier)
+      return transf.audiodevice.name(transf.audiodevice_specifier.audiodevice(audiodevice_specifier))
+    end
+
+  },
+  audiodevice = {
+    name = function(audiodevice)
+      return audiodevice:name()
+    end,
+  }
 }

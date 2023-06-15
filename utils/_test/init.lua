@@ -13,7 +13,7 @@ manual_tests = {} -- some tests don't work well when run automatically, especial
 rrq("type")
 rrq("externals")
 rrq("language-features")
-env = getEnvAsTable()
+env = run("env | jc --ini")
 rrq("basic-interfacing")
 
 

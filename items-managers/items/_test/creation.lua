@@ -747,7 +747,7 @@ local item_creation_map = {
       must_not_be = { "empty-array", "non-homogeneous-array", "array-of-non-array-interfaces" }
     },
     {
-      value = { CreateAudiodeviceItem("Test Device 1", "output")},
+      value = { CreateAudiodeviceSpecifierItem("Test Device 1", "output")},
       must_be = { "array", "non-empty-array", "homogeneous-array", "array-of-interfaces", "array-of-non-array-interfaces", "array-of-audiodevices" },
     },
     {
@@ -981,7 +981,7 @@ local item_creation_map = {
       must_be = {"timer"}
     }
   },
-  [CreateAudiodeviceItem] = {
+  [CreateAudiodeviceSpecifierItem] = {
     {
       value = {"foo", "input"},
       unpack = true,

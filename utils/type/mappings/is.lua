@@ -338,6 +338,11 @@ is = {
     running = function(name)
       return get.mac_application_name.running_application(name) ~= nil
     end,
+  },
+  audiodevice_specifier = {
+    default = function(audiodevice_specifier)
+      return get.audiodevice.is_default(audiodevice_specifier.device, audiodevice_specifier.subtype)
+    end,
   }
 
 }
