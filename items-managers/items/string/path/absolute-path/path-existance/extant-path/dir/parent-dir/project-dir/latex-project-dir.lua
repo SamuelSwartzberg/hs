@@ -46,7 +46,7 @@ LatexProjectDirItemSpecifier = {
       end,
       ["imported-bib-items"] = function(self)
         return self:get("latex-imports-as-string-item-array"):get("map", function(citable_object_id)
-          return citable_object_id:get("bibtex-from-citation-file")
+          return citable_object_id:get("bib-from-citation-file")
         end)
       end,
       ["is-actually-project-dir"] = returnTrue

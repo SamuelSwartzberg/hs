@@ -1329,14 +1329,14 @@ assertMessage(
 
 assert(
   stringy.startswith(
-    transf.doi.bibtex("10.1038/nature14539"),
+    transf.doi.online_bib("10.1038/nature14539"),
     "@article{LeCun_2015,"
   )
 )
 
 assert(
   stringy.startswith(
-    transf.isbn.bibtex("978-0-262-13472-9"),
+    transf.isbn.online_bib("978-0-262-13472-9"),
     "@book{9780262134729,"
   )
 )
@@ -1347,7 +1347,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.bib_string.array_of_csl_tables(transf.doi.bibtex("10.1038/nature14539")),
+  transf.bib_string.array_of_csl_tables(transf.doi.online_bib("10.1038/nature14539")),
   json.decode([[
     [
       {

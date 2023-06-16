@@ -43,7 +43,7 @@ local function createCSLArray()
   return st(env.MCITATIONS)
     :get("descendant-file-only-string-item-array")
     :get("map-to-new-array", function(file) 
-      return transf.table_array.item_array_of_item_tables(transf.bib_file.array_of_tables(file:get("contents")))
+      return transf.table_array.item_array_of_item_tables(transf.bib_file.array_of_csl_tables(file:get("contents")))
     end)
 end
 

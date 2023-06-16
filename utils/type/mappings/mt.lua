@@ -15,6 +15,7 @@ mt = {
     search_engine_names = {"wiktionary", "wikipedia", "youtube", "jisho", "glottopedia", "ruby-apidoc", "python-docs", "merriam-webster", "dict-cc", "deepl-en-ja", "deepl-de-en", "mdn", "scihub", "libgen", "semantic-scholar", "google-scholar", "google-images", "google-maps", "danbooru", "gelbooru"},
     tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"},
     apis_that_dont_support_authorization_code_fetch = {"google"},
+    csl_title_keys = { "title", "title-short" },
     remote_types = {"github", "gitlab", "bitbucket"},
     useless_files = {".git", "node_modules", ".vscode"},
     filetype = {

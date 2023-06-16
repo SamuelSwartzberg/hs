@@ -421,7 +421,20 @@ tblmap = {
     }
   },
   csl_type = {
-    
+    something = {
+      book,
+      ["article-journal"],
+      webpage,
+      motion_picture
+    },
+    preferred_citable_object_id = {
+      book = "isbn",
+      ["article-journal"] = "doi",
+      ["article-magazine"] = "doi",
+      ["article-newspaper"] = "TODO",
+      webpage = "md5-url",
+      motion_picture = "TODO",
+    },
   }
 }
 

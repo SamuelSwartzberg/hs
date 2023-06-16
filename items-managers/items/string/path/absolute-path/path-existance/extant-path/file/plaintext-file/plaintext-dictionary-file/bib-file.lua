@@ -5,7 +5,7 @@ BibFileItemSpecifier = {
   type = "bib-file",
   properties = {
     getables = {
-      ["parse-to-lua-table"] = bc(transf.bib_file.array_of_tables)
+      ["parse-to-lua-table"] = bc(transf.bib_file.array_of_csl_tables)
       
     },
   }

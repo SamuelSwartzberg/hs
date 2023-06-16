@@ -763,7 +763,7 @@ transf = {
     end,
   },
   bib_file = {
-    array_of_tables = function(path)
+    array_of_csl_tables = function(path)
       return runJSON({
         "citation-js",
         "--input",
@@ -1182,13 +1182,13 @@ transf = {
     max_date_components_not_set = function(date_components)
       return transf.date_component_list.max_date_components(transf.date_components.date_components_list_not_set(date_components))
     end,
-    min_date_components = function(date_components)
+    min_full_date_components = function(date_components)
       return glue(
         date_components,
         transf.date_components.min_date_components_not_set(date_components)
       )
     end,
-    max_date_components = function(date_components)
+    max_full_date_components = function(date_components)
       return glue(
         date_components,
         transf.date_components.max_date_components_not_set(date_components)
@@ -1754,6 +1754,25 @@ transf = {
     upper_snake_case = function(str)
       return eutf8.upper(transf.string.snake_case(str))
     end,
+    snake_case_parts = function(str) -- word separation is notoriously tricky. For now, we'll just use the same logic as in the snake_case function
+      return stringy.split(transf.string.snake_case(str), "_")
+    end,
+    upper_camel_snake_case = function(str)
+      local parts = transf.string.snake_case_parts(str)
+      local upper_parts = hs.fnutils.imap(parts, transf.word.capitalized)
+      return table.concat(upper_parts, "_")
+    end,
+    lower_camel_snake_case = function(str)
+      return eutf8.lower(transf.string.upper_camel_snake_case(str))
+    end,
+    upper_camel_case = function(str)
+      local parts = transf.string.snake_case_parts(str)
+      local upper_parts = hs.fnutils.imap(parts, transf.word.capitalized)
+      return table.concat(upper_parts, "")
+    end,
+    lower_camel_case = function(str)
+      return eutf8.lower(transf.string.upper_camel_case(str))
+    end,
     kebap_case = function(str)
       return replace(str, to.case.kebap)
     end,
@@ -1977,6 +1996,9 @@ transf = {
           return new_path
         end
       end
+    end,
+    here_string = function(str)
+      return " <<EOF\n" .. str .. "\nEOF"
     end,
     rfc3339like = function(str)
       return gpt("Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified.:\n\n" .. str, {temperature = 0})
@@ -2937,23 +2959,38 @@ transf = {
       return url
     end,
   },
+  doilike = {
+
+  },
+  resolver_doi_url = {
+
+  },
+  doi_doi_url = {
+
+  },
   doi = {
     doi_url = function(doi)
       return replace(doi, to.resolved.doi)
     end,
-    bibtex = function(doi)
+    online_bib = function(doi)
       return run(
         "curl -LH Accept: application/x-bibtex" .. transf.string.single_quoted_escaped(
           transf.doi.doi_url(doi)
         )
       )
     end,
+    local_bib_file = function(doi)
+      return transf.citable_object_id.local_bib_file(doi)
+    end
   },
   isbn = {
-    bibtex = function(isbn)
+    online_bib = function(isbn)
       return run(
         "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " bibtex"
       )
+    end,
+    local_bib_file = function(isbn)
+      return transf.citable_object_id.local_bib_file(isbn)
     end,
   },
   isbn10 = {
@@ -2969,6 +3006,16 @@ transf = {
         "to_isbn10" .. transf.string.single_quoted_escaped(isbn13)
       )
     end,
+  },
+  citable_object_id = {
+    local_bib_file = function(citable_object_id)
+      return get.dir.find_descendant_with_leaf_ending(env.MCITATIONS, citable_object_id)
+    end,
+    
+    local_citable_object_file = function(citable_object_id)
+      return get.dir.find_descendant_with_leaf_ending(env.MPAPERS, citable_object_id)
+    end,
+
   },
   running_application = {
     main_window = function(app)
@@ -3037,14 +3084,184 @@ transf = {
   },
   bib_string = {
     csl_table_array = function(str)
-      return runJSON(" pandoc -f bibtex -t csljson <<EOF " .. str .. "\nEOF")
+      return runJSON("pandoc -f bibtex -t csljson" .. transf.string.here_string(str))
     end,
   },
   csl_table_array = {
 
   },
   csl_table = {
+    main_title = function(csl_table)
+      return get.assoc_arr.first_matching_value_for_keys(csl_table, mt._list.csl_title_keys)
+    end,
+    issued_date_parts_single_or_range = function(csl_table)
+      return csl_table.issued
+    end,
+    issued_rf3339like_dt_or_range = function(csl_table)
+      return transf.date_parts_single_or_range.rf3339like_dt_or_range(
+        transf.csl_table.issued_date_parts_single_or_range(csl_table)
+      )
+    end,
+    issued_rfc3339like_dt_force_first = function(csl_table)
+      return transf.date_parts_single_or_range.rfc3339like_dt_force_first(
+        transf.csl_table.issued_date_parts_single_or_range(csl_table)
+      )
+    end,
+    issued_date_force_first = function(csl_table)
+      return transf.date_parts_single_or_range.date_force_first(
+        transf.csl_table.issued_date_parts_single_or_range(csl_table)
+      )
+    end,
+    issued_prefix_partial_date_components_force_first = function(csl_table)
+      return transf.date_parts_single_or_range.prefix_partial_date_components_force_first(
+        transf.csl_table.issued_date_parts_single_or_range(csl_table)
+      )
+    end,
+    issued_year_force_first = function(csl_table)
+      return transf.csl_table.issued_prefix_partial_date_components_force_first(csl_table).year
+    end,
+    author_array = function(csl_table)
+      return csl_table.author
+    end,
+    naive_author_summary = function(csl_table)
+      return table.concat(
+        hs.fnutils.imap(
+          transf.csl_table.author_array(csl_table),
+          transf.csl_person.naive_name
+        ),
+        ", "
+      )
+    end,
+    author_last_name_array = function(csl_table)
+      return hs.fnutils.imap(
+        transf.csl_table.author_array(csl_table),
+        transf.csl_person.family
+      )
+    end,
+    authors_et_al_array = function(csl_table)
+      return slice(
+        transf.csl_table.author_last_name_array(csl_table),
+        { stop = 5, sliced_indicator = "et_al" }
+      )
+    end,
+    authors_et_al_string = function(csl_table)
+      return table.concat(
+        transf.csl_table.authors_et_al_array(csl_table),
+        ", "
+      )
+    end,
+    main_title_filenamized = function(csl_table)
+      return transf.string.upper_camel_snake_case(
+        transf.csl_table.main_title(csl_table)
+      )
+    end,
+    filename = function(csl_table)
+      return slice(
+        table.concat(
+          {
+            transf.csl_table.authors_et_al_string(csl_table),
+            transf.csl_table.issued_year_force_first(csl_table),
+            transf.csl_table.main_title_filenamized(csl_table)
+          },
+          "__"
+        ),
+        { stop = 200 } -- max 255 chars filename and needs some room for the citatable object id
+      )
+    end,
+    url = function(csl)
 
+    end
+  },
+  csl_person = {
+    family = function(csl_person)
+      return csl_person.family
+    end,
+    given = function(csl_person)
+      return csl_person.given
+    end,
+    dropping_particle = function(csl_person)
+      return csl_person["dropping-particle"]
+    end,
+    non_dropping_particle = function(csl_person)
+      return csl_person["non-dropping-particle"]
+    end,
+    suffix = function(csl_person)
+      return csl_person.suffix
+    end,
+    literal = function(csl_person)
+      return csl_person.literal
+    end,
+    naive_name = function(csl_person)
+      return table.concat(
+        transf.hole_y_arraylike.array({
+          transf.csl_person.given(csl_person),
+          transf.csl_person.dropping_particle(csl_person),
+          transf.csl_person.non_dropping_particle(csl_person),
+          transf.csl_person.family(csl_person),
+          transf.csl_person.suffix(csl_person),
+          transf.csl_person.literal(csl_person) and '"' .. transf.csl_person.literal(csl_person) .. '"' or nil,
+        }),
+        " "
+      )
+    end,
+  },
+  csl_style = {
+    path = function(style)
+      return env.GIT_PACKAGES .. "/citation-style-language/styles/" .. style .. ".csl"
+    end,
+  },
+  date_parts_single = {
+    rfc3339like_dt = function(date_parts)
+      return table.concat(date_parts, "-")
+    end,
+    prefix_partial_date_components = function(date_parts)
+      return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
+    end,
+    full_date_components = function(date_parts)
+      return transf.date_components.min_full_date_components(
+        transf.date_parts_single.prefix_partial_date_components(date_parts)
+      )
+    end,
+    date = function(date_parts)
+      return transf.full_date_components.date(
+        transf.date_parts_single.full_date_components(date_parts)
+      )
+    end,
+  },
+  date_parts_range = {
+    rfc3339like_range = function(date_parts_range)
+      return transf.date_parts.rfc3339like_dt(date_parts_range[1]) .. "_to_" .. transf.date_parts.rfc3339like_dt(date_parts_range[2])
+    end,
+    date_range_specifier = function(date_parts_range)
+      return {
+        start = transf.date_parts_single.full_date_components(date_parts_range[1]),
+        stop = transf.date_parts_single.full_date_components(date_parts_range[2]),
+        step = 1,
+        unit = "day"
+      }
+    end
+  },
+  date_parts_single_or_range = {
+    rf3339like_dt_or_range = function(date_parts)
+      if #date_parts == 1 then
+        return transf.date_parts_single.rfc3339like_dt(date_parts[1])
+      else
+        return transf.date_parts_range.rfc3339like_range(date_parts)
+      end
+    end,
+    --- will pick the first date if there is a range
+    rf3339like_dt_force_first = function(date_parts)
+      return transf.date_parts_single.rfc3339like_dt(date_parts[1])
+    end,
+    prefix_partial_date_components_force_first = function(date_parts)
+      return transf.date_parts_single.prefix_partial_date_components(date_parts[1])
+    end,
+    full_date_components_force_first = function(date_parts)
+      return transf.date_parts_single.full_date_components(date_parts[1])
+    end,
+    date_force_first = function(date_parts)
+      return transf.date_parts_single.date(date_parts[1])
+    end,
   },
   url = {
     in_wayback_machine = function(url)
@@ -3197,7 +3414,10 @@ transf = {
     single_quoted_escaped_json = function(t)
       return transf.string.single_quoted_escaped(json.encode(t))
     end,
-    json_string = json.encode
+    json_string = json.encode,
+    json_here_string = function(t)
+      return transf.string.here_string(json.encode(t))
+    end,
   },
   any = {
     inspect_string = function(thing)

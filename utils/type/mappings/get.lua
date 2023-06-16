@@ -330,6 +330,9 @@ get = {
         extension
       )
     end,
+    first_matching_value_for_keys= function(t, keys)
+      return find(t, {_list = keys}, {"k", "v"})
+    end,
   },
   array = {
     some_pass = function(arr, cond)
@@ -409,7 +412,7 @@ get = {
   string = {
     split_single_char = stringy.split,
     split = stringx.split,
-    
+
   },
   string_array = {
     join = function(arr, sep)
@@ -546,14 +549,45 @@ get = {
       return find(transf.dir.children_array(dir), cond, opts)
     end,
     find_child_ending_with = function(dir, ending)
-      return get.dir.find_child(dir, {_stop = ending})
+      return get.path_array.find_ending_with(transf.dir.children_array(dir), ending)
     end,
-    find_child_with_leaf = function(dir, filename)
-      return find(transf.dir.children_leaves_array(dir), {_exactly = filename})
+    find_leaf_of_child = function(dir, filename)
+      return get.path_array.find_leaf(transf.dir.children_array(dir), filename)
+    end,
+    find_extension_of_child = function(dir, extension)
+      return get.path_array.find_extension(transf.dir.children_array(dir), extension)
+    end,
+    find_child_with_leaf = function(dir, leaf)
+      return get.path_array.find_path_with_leaf(transf.dir.children_array(dir), leaf)
     end,
     find_child_with_extension = function(dir, extension)
-      return find(transf.dir.children_extensions_array(dir), {_exactly = extension})
+      return get.path_array.find_path_with_extension(transf.dir.children_array(dir), extension)
     end,
+    find_child_with_leaf_ending = function(dir, leaf_ending)
+      return get.path_array.find_path_with_leaf_ending(transf.dir.children_array(dir), leaf_ending)
+    end,
+    find_descendant = function(dir, cond, opts)
+      return find(transf.dir.descendants_array(dir), cond, opts)
+    end,
+    find_descendant_ending_with = function(dir, ending)
+      return get.path_array.find_ending_with(transf.dir.descendants_array(dir), ending)
+    end,
+    find_leaf_of_descendant = function(dir, filename)
+      return get.path_array.find_leaf(transf.dir.descendants_array(dir), filename)
+    end,
+    find_extension_of_descendant = function(dir, extension)
+      return get.path_array.find_extension(transf.dir.descendants_array(dir), extension)
+    end,
+    find_descendant_with_leaf = function(dir, leaf)
+      return get.path_array.find_path_with_leaf(transf.dir.descendants_array(dir), leaf)
+    end,
+    find_descendant_with_extension = function(dir, extension)
+      return get.path_array.find_path_with_extension(transf.dir.descendants_array(dir), extension)
+    end,
+    find_descendant_with_leaf_ending = function(dir, leaf_ending)
+      return get.path_array.find_path_with_leaf_ending(transf.dir.descendants_array(dir), leaf_ending)
+    end,
+
     cmd_output_from_path = function(path, cmd)
       return run("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd)
     end
@@ -667,19 +701,16 @@ get = {
     end,
   },
   bib_file = {
-    citation = function(path, format)
-      return run({
-        "pandoc",
-        "--citeproc",
-        "-t", "plain",
-        "--csl",
-        { value = "styles/" .. format, type = "quoted" },
-        {
-          value = path,
-          type = "quoted"
-        }
-      })
+    raw_citations = function(path, format)
+      get.csl_table_or_csl_table_array.raw_citations(transf.bib_file.array_of_csl_tables(path), format)
     end,
+  },
+  csl_table_or_csl_table_array = {
+    raw_citations = function(csl_table, style)
+      return run(
+        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_function.json_here_string(csl_table)
+      )
+    end
   },
   shellscript_file = {
     lint_table = function(path, severity)
@@ -775,6 +806,30 @@ get = {
         return not get.path.is_extension(path, extension)
       end)
     end,
+    find_ending_with = function(path_array, ending)
+      return find(path_array, {_stop = ending})
+    end,
+    find_leaf = function(path_array, leaf)
+      return find(transf.path_array.leaves_array(path_array), {_exactly = leaf})
+    end,
+    find_extension = function(path_array, extension)
+      return find(transf.path_array.extensions_array(path_array), {_exactly = extension})
+    end,
+    find_path_with_leaf = function(path_array, leaf)
+      return hs.fnutils.find(path_array, function(path)
+        return get.path.leaf(path) == leaf
+      end)
+    end,
+    find_path_with_extension = function(path_array, extension)
+      return hs.fnutils.find(path_array, function(path)
+        return get.path.extension(path) == extension
+      end)
+    end,
+    find_path_with_leaf_ending = function(path_array, leaf_ending)
+      return hs.fnutils.find(path_array, function(path)
+        return stringy.endswith(get.path.leaf(path), leaf_ending)
+      end)
+    end,
   },
   extant_path_array = {
     sorted_by_attr_extant_path_array = function(arr, attr)
@@ -845,8 +900,8 @@ get = {
   date_components = {
     date_range_specifier = function(date_components, step, unit)
       return {
-        start = date(transf.date_components.min_date_components(date_components)),
-        stop = date(transf.date_components.max_date_components(date_components)),
+        start = date(transf.date_components.min_full_date_components(date_components)),
+        stop = date(transf.date_components.max_full_date_components(date_components)),
         step = step or 1,
         unit = unit or "minute"
       }
@@ -877,7 +932,7 @@ get = {
       )      
     end,
     to_precision_full_date_components = function(date_components, component)
-      return transf.date_components.min_date_components(
+      return transf.date_components.min_full_date_components(
         transf.full_date_components.prefix_partial_date_components(date_components, component)
       )
     end,
@@ -976,6 +1031,17 @@ get = {
     all_applications = function()
       return transf.dir.children_filenames_array("/Applications")
     end
+  },
+  citable_object_id = {
+    ensure_local_bib_file = function(citable_object_id, type)
+      local local_bib_file = transf.citable_object_id.local_bib_file(citable_object_id)
+      if not is.path.exists(local_bib_file) then
+        error("TODO: I want to give the files a nice name.")
+        local online_bib = transf[type]online_bib(citable_object_id)
+        writeFile(local_bib_file, online_bib)
+      end
+      return local_bib_file
+    end,
   }
 
 }

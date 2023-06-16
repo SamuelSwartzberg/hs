@@ -15,8 +15,8 @@ MightBeBibItemSpecifier = {
         local path = promptPathChildren(env.MCITATIONS)
         if path then
           local filename = self:get("to-citable-object-id"):get("to-bib-filename")
-          local bibtex = self:get("c")
-          writeFile(path .. "/" .. filename, bibtex)
+          local bib = self:get("c")
+          writeFile(path .. "/" .. filename, bib)
         end
       end,
     }
