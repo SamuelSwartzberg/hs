@@ -2100,7 +2100,7 @@ transf = {
     end
   },
   json_string = {
-    table = json.decode
+    not_userdata_or_function = json.decode
   },
   toml_string = {
     table = toml.decode
@@ -2110,7 +2110,6 @@ transf = {
       return transf.yaml_string.table(transf.plaintext_file.contents(path))
     end
   },
-
   
   ini_string = {
     table = function(str)
@@ -2373,39 +2372,99 @@ transf = {
     key_value = function(pair)
       return pair[1], pair[2]
     end,
-  },
-  stringable_pair = {
+    key = function(pair)
+      return pair[1]
+    end,
+    value = function(pair)
+      return pair[2]
+    end,
     header = function(pair)
-      return transf.word.capitalized(transf.any.string(pair[1])) .. ": " .. transf.any.string(pair[2])
+      return transf.key_value.header(pair[1], pair[2])
     end,
     email_header = function(pair)
-      return transf.word.capitalized(transf.any.string(pair[1])) .. ": " .. le(transf.any.string(pair[2]))
+      return transf.key_value.email_header(pair[1], pair[2])
     end,
     url_param = function(pair)
-      return transf.any.string(pair[1]) .. "=" .. transf.string.urlencoded(transf.any.string(pair[2]))
+      return transf.key_value.url_param(pair[1], pair[2])
     end,
     ini_line = function(pair)
-      return transf.any.string(pair[1]) .. " = " .. transf.any.string(pair[2])
+      return transf.key_value.ini_line(pair[1], pair[2])
     end,
     envlike_line = function(pair)
-      return transf.any.string(pair[1]) .. "=" .. transf.any.string(pair[2])
+      return transf.key_value.envlike_line(pair[1], pair[2])
     end,
     curl_form_field_args = function(pair)
-      return {
-        "-F",
-        transf.any.string(pair[1]) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.string(pair[2])),
-      }
+      return transf.key_value.curl_form_field_args(pair[1], pair[2])
     end,
     dict_entry_string = function(pair)
-      return "[" .. transf.any.string(pair[1]) .. "] = " .. transf.any.string(pair[2])
+      return transf.key_value.dict_entry_string(pair[1], pair[2])
     end,
     chooser_item = function(pair)
+      return transf.key_value.chooser_item(pair[1], pair[2])
+    end,
+    key_chooser_item = function(pair)
+      return transf.key_value.key_chooser_item(pair[1], pair[2])
+    end,
+    value_chooser_item = function(pair)
+      return transf.key_value.value_chooser_item(pair[1], pair[2])
+    end,
+  },
+  key_value = {
+    pair = function(key, value)
+      return {key, value}
+    end,
+    key = function(key, value)
+      return key
+    end,
+    value = function(key, value)
+      return value
+    end,
+    header = function(k, v)
+      return transf.word.capitalized(transf.any.string(k)) .. ": " .. transf.any.string(v)
+    end,
+    email_header = function(key, value)
+      return transf.word.capitalized(transf.any.string(key)) .. ": " .. le(transf.any.string(value))
+    end,
+    url_param = function(key, value)
+      return transf.any.string(key) .. "=" .. transf.string.urlencoded(transf.any.string(value))
+    end,
+    ini_line = function(key, value)
+      return transf.any.string(key) .. " = " .. transf.any.string(value)
+    end,
+    envlike_line = function(key, value)
+      return transf.any.string(key) .. "=" .. transf.any.string(value)
+    end,
+    curl_form_field_args = function(key, value)
       return {
-        text = transf.stringable_pair.dict_entry_string(pair),
-        k = pair[1],
-        v = pair[2],
+        "-F",
+        transf.any.string(key) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.string(value)),
       }
     end,
+    dict_entry_string = function(key, value)
+      return "[" .. transf.any.string(key) .. "] = " .. transf.any.string(value)
+    end,
+    chooser_item = function(key, value)
+      return {
+        text = transf.key_value.dict_entry_string(key, value),
+        k = key,
+        v = value,
+      }
+    end,
+    key_chooser_item = function(key, value)
+      return {
+        text = transf.any.string(key),
+        k = key,
+        v = value,
+      }
+    end,
+    value_chooser_item = function(key, value)
+      return {
+        text = transf.any.string(value),
+        k = key,
+        v = value,
+      }
+    end,
+    
   },
   email = {
     mailto_url = function(str)
@@ -2537,7 +2596,18 @@ transf = {
     end,
   },
   table = {
-    
+    first_key = function(t)
+      return elemAt(t, 1, "k")
+    end,
+    first_value = function(t)
+      return elemAt(t, 1, "v")
+    end,
+    last_key = function(t)
+      return elemAt(t, len(t), "k")
+    end,
+    last_value = function(t)
+      return elemAt(t, len(t), "v")
+    end,
     --- wraps yaml.dump into a more intuitive form which always encodes a single document
     --- @param tbl any
     --- @return string
@@ -2654,7 +2724,7 @@ transf = {
   },
   stringable_value_dict = {
     url_param_array = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.url_param)
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.url_param)
     end,
     url_params = function(t)
       return table.concat(transf.stringable_value_dict.url_param_array(t), "&")
@@ -2667,31 +2737,31 @@ transf = {
       for _, header_name in ipairs(initial_headers) do
         local header_value = t[header_name]
         if header_value then
-          table.insert(header_lines, transf.stringable_pair.email_header({header_name, header_value}))
+          table.insert(header_lines, transf.pair.email_header({header_name, header_value}))
           t[header_name] = nil
         end
       end
       for key, value in prs(t) do
-        table.insert(header_lines, transf.stringable_pair.email_header({key, value}))
+        table.insert(header_lines, transf.pair.email_header({key, value}))
       end
       return table.concat(header_lines, "\n")
     end,
     curl_form_field_list = function(t)
       return concat(
-        hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.curl_form_field_args)
+        hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.curl_form_field_args)
       )
     end,
     ini_line_array = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.ini_line)
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.ini_line)
     end,
     ini_string = function(t)
       return table.concat(transf.stringable_value_dict.ini_line_array(t), "\n")
     end,
     envlike_line_array = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.envlike_line)
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.envlike_line)
     end,
     dict_entry_string_array = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.dict_entry_string)
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.dict_entry_string)
     end,
     dict_entry_string_summary = function(t)
       return "dict: " .. table.concat(transf.stringable_value_dict.dict_entry_string_array(t), ", ")
@@ -2703,8 +2773,14 @@ transf = {
       return table.concat(transf.stringable_value_dict.envlike_line_array(t), "\n")
     end,
     chooser_item_list = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.stringable_pair.chooser_item)
-    end
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.chooser_item)
+    end,
+    value_chooser_item_list = function(t)
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.value_chooser_item)
+    end,
+    key_chooser_item_list = function(t)
+      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.key_chooser_item)
+    end,
   },
   pair_array = {
     dict = function(arr)
@@ -2959,10 +3035,16 @@ transf = {
       return transf.chat_mac_application_name.chat_storage_dir(app_name) .. "/chats"
     end,
   },
-  bibtex_string = {
-    csl_table = function(str)
+  bib_string = {
+    csl_table_array = function(str)
       return runJSON(" pandoc -f bibtex -t csljson <<EOF " .. str .. "\nEOF")
     end,
+  },
+  csl_table_array = {
+
+  },
+  csl_table = {
+
   },
   url = {
     in_wayback_machine = function(url)

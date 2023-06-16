@@ -1347,7 +1347,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.bibtex_string.csl_table(transf.doi.bibtex("10.1038/nature14539")),
+  transf.bib_string.array_of_csl_tables(transf.doi.bibtex("10.1038/nature14539")),
   json.decode([[
     [
       {

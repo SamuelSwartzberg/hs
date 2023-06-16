@@ -4,7 +4,7 @@ NonlocalCitableObjectIdItemSpecifier = {
   properties = {
     getables = {
       ["bibtex-from-internet-as-table"] = function(self) 
-        return transf.bibtex_string.csl_table(self:get("bibtex-from-internet"))
+        return transf.bib_string.array_of_csl_tables(self:get("bibtex-from-internet"))
       end,
     },
     doThisables = {

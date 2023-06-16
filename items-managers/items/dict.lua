@@ -1,23 +1,7 @@
 
 
-TableSpecifier = {
-  type = "table",
-  properties = {
-    getables = {
-    },
-    doThisables = {
-    },
-  },
-
-  action_table = {}
-  
-}
-
---- @type BoundRootInitializeInterface
-dc = bindArg(RootInitializeInterface, TableSpecifier)
-
-NonEmptyTableSpecifier = {
-  type = "non-empty-table",
+DictSpecifier = {
+  type = "dict",
   properties = {
     getables = {
       ["to-string"] = bc(transf.stringable_value_dict.dict_entry_string_summary),
@@ -27,27 +11,32 @@ NonEmptyTableSpecifier = {
         buildChooser(
           transf.stringable_value_dict.chooser_item_list(self:get("c")),
           function(choice)
-            callback(choice.v)
+            callback(choice.v, choice.k)
           end,
           nil,
           { whole_chooser = { placeholderText = self:get("to-string") } }
         )
       end,
-      ["choose-key-act-on-value"] = function(self, callback)
+      ["choose-item-and-then-action"] = function(self)
+        self:doThis("choose-item", function(v, k)
+          v:doThis("choose-action")
+        end)
+      end,
+      ["choose-key"] = function(self, callback)
         buildChooser(
-          transf.stringable_value_dict.chooser_item_list(self:get("c")),
+          transf.stringable_value_dict.key_chooser_item_list(self:get("c")),
           function(choice)
-            callback(self:get("c")[choice.value])
+            callback(choice.v, choice.k)
           end,
           nil,
           { whole_chooser = { placeholderText = self:get("to-string") } }
         )
       end,
-      ["choose-value-act-on-key"] = function (self, callback)
+      ["choose-value"] = function (self, callback)
         buildChooser(
-          transf.stringable_value_dict.chooser_item_list(self:get("c")),
+          transf.stringable_value_dict.value_chooser_item_list(self:get("c")),
           function(choice)
-            callback(self:get("key", choice.value))
+            callback(choice.v, choice.k)
           end,
           nil,
           { whole_chooser = { placeholderText = self:get("to-string") } }
@@ -73,5 +62,5 @@ NonEmptyTableSpecifier = {
   }
   
 }
---- @type BoundNewDynamicContentsComponentInterface
-CreateNonEmptyTable = bindArg(NewDynamicContentsComponentInterface, NonEmptyTableSpecifier)
+--- @type BoundRootInitializeInterface
+dc = bindArg(RootInitializeInterface, DictSpecifier)
