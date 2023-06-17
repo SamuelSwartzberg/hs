@@ -24,6 +24,7 @@
 --- @field oauth2_url? string The URL to send the OAuth2 request to. If nil but required, tries to fetch it from a stored default for the api.
 --- @field oauth2_authorization_url? string The URL to send the OAuth2 authorization request to. If not specified, it will default to oauth2_url. If nil but required, tries to fetch it from a stored default for the api.
 --- @field non_json_response? boolean Indicates whether the response is not JSON. Some REST apis may return non-JSON responses in certain cases, this is used to handle those cases. Defaults to false. If using this, oauth2 token refresh with a refresh token will not work.
+--- @field accept_json_different_header? string Some data may be sent as JSON but not have the content type "application/json", for example vnd.citationstyles.csl+json. This is used to handle those cases.
 --- @field run_json_opts run_first_arg args to pass through to runJSON. Mainly used for testing.
 
 --- @param specifier? RESTApiSpecifier
@@ -249,7 +250,10 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if not specifier.non_json_response then
     push(curl_command, "-H")
-    push(curl_command, { value = "Accept: application/json", type = "quoted"})
+    push(curl_command, { 
+      value = "Accept: " .. (specifier.accept_json_different_header or "application/json"),
+      type = "quoted"}
+    )
   end
 
   if specifier.api_name then

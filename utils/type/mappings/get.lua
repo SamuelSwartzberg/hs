@@ -463,6 +463,10 @@ get = {
         sep
       )
     end,
+    find = find,
+    find_nocomment_noindent = function(arr, cond, opts)
+      return find(transf.string_array.nocomment_noindent_string_array(arr), cond, opts)
+    end,
 
   },
   array_of_string_arrays = {
@@ -644,13 +648,19 @@ get = {
       return glue(extlines, lines)
     end,
     contents_line_appended = function(path, line)
-      return dothis.plaintext_file.lines_appended(path, {line})
+      return dothis.plaintext_file.contents_lines_appended(path, {line})
     end,
     contents_lines_appended_to_string = function(path, lines)
-      return table.concat(dothis.plaintext_file.lines_appended(path, lines), "\n")
+      return table.concat(dothis.plaintext_file.contents_lines_appended(path, lines), "\n")
     end,
     contents_line_appended_to_string = function(path, line)
-      return dothis.plaintext_file.lines_appended_to_string(path, {line})
+      return dothis.plaintext_file.content_lines_appended_to_string(path, {line})
+    end,
+    find_line = function(path, cond, opts)
+      return find(transf.plaintext_file.lines(path), cond, opts)
+    end,
+    find_nocomment_noindent_content_lines = function(path, cond, opts)
+      return find(transf.plaintext_file.nocomment_noindent_content_lines(path), cond, opts)
     end,
 
   },
@@ -1032,16 +1042,4 @@ get = {
       return transf.dir.children_filenames_array("/Applications")
     end
   },
-  citable_object_id = {
-    ensure_local_bib_file = function(citable_object_id, type)
-      local local_bib_file = transf.citable_object_id.local_bib_file(citable_object_id)
-      if not is.path.exists(local_bib_file) then
-        error("TODO: I want to give the files a nice name.")
-        local online_bib = transf[type]online_bib(citable_object_id)
-        writeFile(local_bib_file, online_bib)
-      end
-      return local_bib_file
-    end,
-  }
-
 }

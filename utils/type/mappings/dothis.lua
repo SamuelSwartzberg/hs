@@ -512,6 +512,24 @@ dothis = {
       dothis.plaintext_file.write_lines(path, lines)
       return line
     end,
+    remove_line = function(path, line_number)
+      local lines = transf.plaintext_file.lines(path)
+      table.remove(lines, line_number)
+      dothis.plaintext_file.write_lines(path, lines)
+    end,
+    find_remove_line = function(path, cond, opts)
+      local lines = transf.plaintext_file.lines(path)
+      local index = get.string_array.find(lines, cond, {ret = "i"})
+      dothis.plaintext_file.remove_line(path, index)
+    end,
+    find_remove_nocomment_noindent_line = function(path, cond, opts)
+      local lines = transf.plaintext_file.lines(path)
+      local index = find(lines, function(line)
+        local nocomment_noindent = transf.line.nocomment_noindent(line)
+        return findsingle(nocomment_noindent, cond)
+      end, {ret = "i"})
+      dothis.plaintext_file.remove_line(path, index)
+    end,
 
   },
   plaintext_table_file = {
@@ -963,6 +981,88 @@ dothis = {
       dothis.env_string.write_env_and_check(
         transf.env_yaml_file_container.env_string(env_yaml_file_container)
       )
+    end,
+  },
+  citable_object_id = {
+    save_local_csl_file = function(citable_object_id, indication)
+      local csl_table = transf[indication].online_csl_table(citable_object_id)
+      writeFile(
+        env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table),
+        transf.not_userdata_or_function.json_string(csl_table)
+      )
+    end,
+  },
+  indicated_citable_object_id = {
+    edit_local_csl_file = function(indicated_citable_object_id)
+      dothis.path.open_app(
+        transf.indicated_citable_object_id.local_csl_file_path(indicated_citable_object_id),
+        "Visual Studio Code - Insiders"
+      )
+    end,
+    open_local_citable_object_file = function(indicated_citable_object_id)
+      dothis.path.open(
+        transf.indicated_citable_object_id.local_citable_object_file_path(indicated_citable_object_id)
+      )
+    end,
+
+  },
+  citations_file = {
+    write_bib = function(citations_file, path)
+      writeFile(
+        path,
+        transf.citations_file.bib_string(citations_file)
+      )
+    end,
+    add_indicated_citable_object_id = function(citations_file, indicated_citable_object_id)
+      dothis.plaintext_file.append_line(
+        citations_file,
+        transf.indicated_citable_object_id.citations_file_line(indicated_citable_object_id)
+      )
+    end,
+    remove_indicated_citable_object_id = function(citations_file, indicated_citable_object_id)
+      dothis.plaintext_file.find_remove_nocomment_noindent_line(
+        citations_file,
+        {_exactly = indicated_citable_object_id}
+      )
+    end,
+  },
+  latex_project_dir = {
+    build = function(latex_project_dir, do_after)
+      run(
+        "cd " .. latex_project_dir .. " && pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex",
+        do_after
+      )
+    end,
+    open_pdf = function(latex_project_dir)
+      dothis.path.open(
+        transf.latex_project_dir.main_pdf_file(latex_project_dir)
+      )
+    end,
+    build_and_open_pdf = function(latex_project_dir)
+      dothis.latex_project_dir.build(
+        latex_project_dir,
+        hs.fnutils.partial(dothis.latex_project_dir.open_pdf, latex_project_dir)
+      )
+    end,
+    write_bib = function(latex_project_dir)
+      dothis.citations_file.write_bib(
+        transf.latex_project_dir.citations_file(latex_project_dir),
+        transf.latex_project_dir.main_bib_file(latex_project_dir)
+      )
+    end,
+    add_indicated_citable_object_id = function(latex_project_dir, indicated_citable_object_id)
+      dothis.citations_file.add_indicated_citable_object_id(
+        transf.latex_project_dir.citations_file(latex_project_dir),
+        indicated_citable_object_id
+      )
+      dothis.latex_project_dir.write_bib(latex_project_dir)
+    end,
+    remove_indicated_citable_object_id = function(latex_project_dir, indicated_citable_object_id)
+      dothis.citations_file.remove_indicated_citable_object_id(
+        transf.latex_project_dir.citations_file(latex_project_dir),
+        indicated_citable_object_id
+      )
+      dothis.latex_project_dir.write_bib(latex_project_dir)
     end,
   }
 }

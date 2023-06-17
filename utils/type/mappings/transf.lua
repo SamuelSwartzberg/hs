@@ -893,6 +893,12 @@ transf = {
     content_lines = function(path)
       return transf.string.content_lines(transf.plaintext_file.contents(path))
     end,
+    noindent_content_lines = function(path)
+      return transf.string.noindent_content_lines(transf.plaintext_file.contents(path))
+    end,
+    nocomment_noindent_content_lines = function(path)
+      return transf.string.nocomment_noindent_content_lines(transf.plaintext_file.contents(path))
+    end,
     first_line = function(path)
       return transf.string.first_line(transf.plaintext_file.contents(path))
     end,
@@ -1928,7 +1934,15 @@ transf = {
 
 
     content_lines = function(str)
-      return memoize(filter)(transf.string.lines(str), true)
+      return transf.string_array.noemtpy_string_array(
+        transf.string.lines(str)
+      )
+    end,
+    noindent_content_lines = function(str)
+      return transf.string_array.noindent_string_array(transf.string.content_lines(str))
+    end,
+    nocomment_noindent_content_lines = function(str)
+      return transf.string_array.nocomment_noindent_string_array(transf.string.content_lines(str))
     end,
 
     first_line = function(str)
@@ -2080,6 +2094,20 @@ transf = {
           end
         )
       )
+    end,
+  },
+  line = {
+    noindent = function(str)
+      return eutf8.match(str, "^%s*(.*)$")
+    end,
+    nocomment = function(str)
+      return stringx.split(str, " # ")[1]
+    end,
+    nocomment_noindent = function(str)
+      return transf.line.noindent(transf.line.nocomment(str))
+    end,
+    comment = function(str)
+      return stringx.split(str, " # ")[2]
     end,
   },
   potentially_atpath = {
@@ -2569,6 +2597,35 @@ transf = {
         "/"
       )
     end,
+    noemtpy_string_array = function(arr)
+      return memoize(filter, refstore.params.memoize.opts.stringify_json)(transf.string.lines(arr), true)
+    end,
+    noindent_string_array = function(arr)
+      return hs.fnutils.imap(arr, transf.line.noindent)
+    end,
+    nocomment_line_filtered_string_array = function(arr)
+      return filter(
+        arr,
+        {_r = "^%s*#", _regex_engine = "eutf8", _invert = true}
+      )
+    end,
+    nocomment_string_array = function(arr)
+      return hs.fnutils.imap(
+        transf.string_array.nocomment_line_filtered_string_array(arr),
+        transf.line.nocomment
+      )
+    end,
+    nocomment_line_filtered_noindent_string_array = function(arr)
+      return transf.string_array.noindent_string_array(
+        transf.string_array.nocomment_line_filtered_string_array(arr)
+      )
+    end,
+    nocomment_noindent_string_array = function(arr)
+      return transf.string_array.noindent_string_array(
+        transf.string_array.nocomment_string_array(arr)
+      )
+    end,
+    
   },
   env_line_array = {
     env_string = function(arr)
@@ -2959,29 +3016,69 @@ transf = {
       return url
     end,
   },
-  doilike = {
-
-  },
-  resolver_doi_url = {
-
-  },
-  doi_doi_url = {
-
-  },
   doi = {
+    pure_doi = function(doilike)
+      local doi = transf.doi_urnlike.pure_doi(doilike)
+      doi = transf.doi_url.pure_doi(doi)
+      return doi
+    end,
+    doi_url = function(doilike)
+      local doi = transf.doi_urnlike.pure_doi(doilike)
+      doi = transf.pure_doi.doi_url(doi)
+      return doi
+    end,
+    doi_urnlike = function(doilike)
+      local doi = transf.doi_url.pure_doi(doilike)
+      doi = transf.pure_doi.doi_urnlike(doi)
+      return doi
+    end,
+    online_csl_table = function(doilike)
+      local doi = transf.doi_url.pure_doi(doilike)
+      return transf.pure_doi.online_csl_table(doi)
+    end,
+  },
+  doi_url = {
+    pure_doi = function(url)
+      return onig.match(url, mt._r.id.doi_prefix .. "(.+)/?$")
+    end,
+    doi_urnlike = function(url)
+      return transf.pure_doi.doi_urnlike(transf.doi_url.pure_doi(url))
+    end,
+  },
+  doi_urnlike = {
+    pure_doi = function(urnlike)
+      doi = urnlike:lower()
+      doi = mustNotStart(urnlike, "urn:")
+      doi = mustNotStart(urnlike, "doi:")
+      return doi
+    end,
+    doi_url = function(urnlike)
+      return transf.pure_doi.doi_url(transf.doi_urnlike.pure_doi(urnlike))
+    end,
+  },
+  pure_doi = {
     doi_url = function(doi)
       return replace(doi, to.resolved.doi)
+    end,
+    doi_urnlike = function(doi)
+      return "doi:" .. doi
     end,
     online_bib = function(doi)
       return run(
         "curl -LH Accept: application/x-bibtex" .. transf.string.single_quoted_escaped(
-          transf.doi.doi_url(doi)
+          transf.pure_doi.doi_url(doi)
         )
       )
     end,
-    local_bib_file = function(doi)
-      return transf.citable_object_id.local_bib_file(doi)
-    end
+    online_csl_table = function(doi)
+      return rest({
+        url = transf.pure_doi.doi_url(doi),
+        accept_json_different_header = "application/vnd.citationstyles.csl+json",
+      })
+    end,
+    indicated_citable_object_id = function(doi)
+      return "doi:" .. doi
+    end,
   },
   isbn = {
     online_bib = function(isbn)
@@ -2989,8 +3086,13 @@ transf = {
         "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " bibtex"
       )
     end,
-    local_bib_file = function(isbn)
-      return transf.citable_object_id.local_bib_file(isbn)
+    online_csl_table = function(isbn)
+      return run(
+        "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " csl"
+      )
+    end,
+    indicated_citable_object_id = function(isbn)
+      return "isbn:" .. isbn
     end,
   },
   isbn10 = {
@@ -3007,16 +3109,168 @@ transf = {
       )
     end,
   },
-  citable_object_id = {
-    local_bib_file = function(citable_object_id)
-      return get.dir.find_descendant_with_leaf_ending(env.MCITATIONS, citable_object_id)
+  indicated_citable_object_id = {
+    local_csl_file = function(id)
+      return transf.filename_safe_indicated_citable_object_id.local_csl_file(
+        transf.stirng.urlencoded(id)
+      )
     end,
-    
-    local_citable_object_file = function(citable_object_id)
-      return get.dir.find_descendant_with_leaf_ending(env.MPAPERS, citable_object_id)
+    local_csl_table = function(id)
+      return transf.filename_safe_indicated_citable_object_id.csl_table(
+        transf.stirng.urlencoded(id)
+      )
     end,
+    citable_object_id = function(id)
+      return onig.match(id, "^[^:]+:(.*)$")
+    end,
+    citable_object_indicator = function(id)
+      return stringy.split(id, ":")[1]
+    end,
+    online_csl_table = function(id)
+      return transf[
+        transf.indicated_citable_object_id.citable_object_indicator(id)
+      ].online_csl_table(
+        transf.indicated_citable_object_id.citable_object_id(id)
+      )
+    end,
+    local_citable_object_file = function(id)
+      return transf.filename_safe_indicated_citable_object_id.local_citable_object_file(
+        transf.stirng.urlencoded(id)
+      )
+    end,
+    citations_file_line = function(id)
+      return transf.csl_table.citations_file_line(
+        transf.indicated_citable_object_id.local_csl_table(id)
+      )
+    end
 
   },
+  filename_safe_indicated_citable_object_id = {
+    local_csl_file = function(id)
+      return get.dir.find_descendant_with_leaf_ending(env.MCITATIONS, id)
+    end,
+    csl_table = function(id)
+      return transf.json_file.table(
+        transf.filename_safe_indicated_citable_object_id.local_csl_file(id)
+      )
+    end,
+    local_citable_object_file = function(id)
+      return get.dir.find_descendant_with_leaf_ending(env.MPAPERS, id)
+    end,
+  },
+  citable_filename = {
+    filename_safe_indicated_citable_object_id = function(filename)
+      return stringx.split(filename, "!citid:")[2]
+    end,
+    indicated_citable_object_id = function(filename)
+      return transf.string.urldecoded(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
+    end,
+  },
+  citable_path = {
+    filename_safe_indicated_citable_object_id = function(path)
+      return transf.citable_filename.filename_safe_indicated_citable_object_id(
+        transf.path.filename(path)
+      )
+    end,
+    indicated_citable_object_id = function(path)
+      return transf.citable_filename.indicated_citable_object_id(
+        transf.path.filename(path)
+      )
+    end,
+  },
+  citable_object_file ={ -- file with a citable_filename containing the data (e.g. pdf) of a citable object
+
+  },
+  citations_file = { -- plaintext file containing one indicated_citable_object_id per line
+    indicated_citable_object_id_array = function(file)
+      return transf.plaintext_file.nocomment_noindent_content_lines(file)
+    end,
+    local_csl_table_array = function(file)
+      return transf.indicated_citable_object_id_array.local_csl_table_array(
+        transf.citations_file.indicated_citable_object_id_array(file)
+      )
+    end,
+    bib_string = function(file)
+      return transf.indicated_citable_object_id_array.bib_string(
+        transf.citations_file.local_csl_table_array(file)
+      )
+    end,
+    json_string = function(file)
+      return transf.indicated_citable_object_id_array.json_string(
+        transf.citations_file.local_csl_table_array(file)
+      )
+    end,
+  },
+  indicated_citable_object_id_array = {
+    local_csl_table_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.indicated_citable_object_id.local_csl_table
+      )
+    end,
+    bib_string = function(arr)
+      return transf.csl_table_array.bib_string(
+        transf.indicated_citable_object_id.local_csl_table_array(
+          arr
+        )
+      )
+    end,
+    json_string = function(arr)
+      return transf.csl_table_array.json_string(
+        transf.indicated_citable_object_id.local_csl_table_array(
+          arr
+        )
+      )
+    end,
+    citations_file_line_array = function(arr)
+      return hs.fnutils.imap(
+        transf.indicated_citable_object_id_array.local_csl_table_array(arr),
+        transf.csl_table.citations_file_line
+      )
+    end,
+    citations_file_string = function(arr)
+      return table.concat(
+        transf.indicated_citable_object_id_array.citations_file_line_array(arr), 
+        "\n"
+      )
+    end
+  },
+  latex_project_dir = {
+    citations_file = function(dir)
+      return transf.path.ending_with_slash(dir) .. "citations"
+    end,
+    main_tex_file = function(dir)
+      return transf.path.ending_with_slash(dir) .. "main.tex"
+    end,
+    main_pdf_file = function(dir)
+      return transf.path.ending_with_slash(dir) .. "main.pdf"
+    end,
+    main_bib_file = function(dir)
+      return transf.path.ending_with_slash(dir) .. "main.bib"
+    end,
+    citable_object_files = function(dir)
+      return transf.path.ending_with_slash(dir) .. "citable_objects"
+    end,
+    citable_object_notes = function(dir)
+      return transf.path.ending_with_slash(dir) .. "citable_objects_notes"
+    end,
+    indicated_citable_object_id_array_from_citations = function(dir)
+      return transf.citations_file.indicated_citable_object_id_array(
+        transf.latex_project_dir.citations_file(dir)
+      )
+    end,
+    local_csl_table_array_from_citations = function(dir)
+      return transf.citations_file.local_csl_table_array(
+        transf.latex_project_dir.citations_file(dir)
+      )
+    end,
+    bib_string_from_citations = function(dir)
+      return transf.citations_file.bib_string(
+        transf.latex_project_dir.citations_file(dir)
+      )
+    end,
+  },
+
   running_application = {
     main_window = function(app)
       return app:mainWindow()
@@ -3084,10 +3338,34 @@ transf = {
   },
   bib_string = {
     csl_table_array = function(str)
-      return runJSON("pandoc -f bibtex -t csljson" .. transf.string.here_string(str))
+      return runJSON("pandoc -f biblatex -t csljson" .. transf.string.here_string(str))
     end,
   },
   csl_table_array = {
+    bib_string_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.csl_table.bib_string
+      )
+    end,
+    bib_string = function(arr)
+      return table.concat(
+        transf.csl_table_array.bib_string_array(arr),
+        "\n"
+      )
+    end,
+    json_string = transf.not_userdata_or_function.json_string,
+    indicated_citable_object_id_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.csl_table.indicated_citable_object_id
+      )
+    end,
+    citations_file_string = function(arr)
+      return transf.indicated_citable_object_id_array.citations_file_string(
+        transf.csl_table_array.indicated_citable_object_id_array(arr)
+      )
+    end,
 
   },
   csl_table = {
@@ -3168,8 +3446,131 @@ transf = {
         { stop = 200 } -- max 255 chars filename and needs some room for the citatable object id
       )
     end,
-    url = function(csl)
-
+    volume = function(csl_table)
+      return csl_table.volume
+    end,
+    jssue = function(csl_table)
+      return csl_table.issue
+    end,
+    page = function(csl_table)
+      return csl_table.page
+    end,
+    title = function(csl_table)
+      return csl_table.title
+    end,
+    author = function(csl_table)
+      return csl_table.author
+    end,
+    type = function(csl_table)
+      return csl_table.type
+    end,
+    doi = function(csl_table)
+      return csl_table.doi
+    end,
+    isbn = function(csl_table)
+      return csl_table.isbn
+    end,
+    chapter = function(csl_table)
+      return csl_table.chapter
+    end,
+    isbn_part_identifier = function(csl_table)
+      local isbn_part_identifier = transf.csl_table.isbn(csl_table)
+      if csl_table.chapter then
+        isbn_part_identifier = isbn_part_identifier .. "::c=" .. csl_table.chapter
+      elseif csl_table.page then
+        isbn_part_identifier = isbn_part_identifier .. "::p=" .. csl_table.page
+      else
+        return nil
+      end
+      return isbn_part_identifier
+    end,
+    issn = function(csl_table)
+      return csl_table.issn
+    end,
+    issn_full_identifier = function(csl_table)
+      local issn_full_identifier = transf.csl_table.issn(csl_table)
+      if csl_table.volumen and csl_table.issue then
+        return issn_full_identifier .. "::" .. csl_table.volume .. "::" .. csl_table.issue
+      else
+        return nil
+      end
+    end,
+    pmid = function(csl_table)
+      return csl_table.pmid
+    end,
+    pmcid = function(csl_table)
+      return csl_table.pmcid
+    end,
+    url = function(csl_table)
+      return csl_table.url
+    end,
+    urlmd5 = function(csl_table)
+      return transf.not_userdata_or_function.md5(transf.csl_table.url(csl_table))
+    end,
+    accession = function(csl_table)
+      return csl_table.accession
+    end,
+    citable_object_id = function(csl_table)
+      if csl_table.doi then
+        return csl_table.doi
+      elseif csl_table.isbn and is.csl_table.whole_book(csl_table) then
+        return csl_table.isbn
+      elseif csl_table.isbn and not is.csl_table.whole_book(csl_table) then
+        return transf.csl_table.isbn_part_identifier(csl_table)
+      elseif csl_table.pmid then
+        return csl_table.pmid
+      elseif csl_table.pmcid then
+        return csl_table.pmcid
+      elseif csl_table.accession then
+        return csl_table.accession
+      elseif transf.csl_table.issn_full_identifier(csl_table) then
+        return transf.csl_table.issn_full_identifier(csl_table)
+      elseif csl_table.url then
+        return transf.csl_table.urlmd5(csl_table)
+      else
+        return nil
+      end
+    end,
+    indicated_citable_object_id = function(csl_table)
+      if csl_table.doi then
+        return "doi:" .. csl_table.doi
+      elseif csl_table.isbn and is.csl_table.whole_book(csl_table) then
+        return "isbn:" .. csl_table.isbn
+      elseif csl_table.isbn and not is.csl_table.whole_book(csl_table) then
+        return "isbn_part:" .. transf.csl_table.isbn_part_identifier(csl_table)
+      elseif csl_table.pmid then
+        return "pmid:" .. csl_table.pmid
+      elseif csl_table.pmcid then
+        return "pmcid:" .. csl_table.pmcid
+      elseif csl_table.accession then
+        return "accession:" .. csl_table.accession
+      elseif transf.csl_table.issn_full_identifier(csl_table) then
+        return "issn_full:" .. transf.csl_table.issn_full_identifier(csl_table)
+      elseif csl_table.url then
+        return "urlmd5:" .. transf.csl_table.urlmd5(csl_table)
+      else
+        return nil
+      end
+    end,
+    citations_file_line = function(csl_table)
+      return transf.csl_table.indicated_citable_object_id(csl_table) 
+      .. " # " .. get.csl_table_or_csl_table_array.raw_citations(csl_table, "apa-6th-edition")
+    end,
+    filename_safe_citable_object_id = function(csl_table)
+      return transf.string.urlencoded(transf.csl_table.citable_object_id(csl_table))
+    end,
+    filename_safe_indicated_citable_object_id = function(csl_table)
+      return transf.string.urlencoded(transf.csl_table.indicated_citable_object_id(csl_table))
+    end,
+    citable_filename = function(csl_table)
+      return 
+        transf.csl_table.filename(csl_table) ..
+        "!citid:" .. transf.csl_table.filename_safe_indicated_citable_object_id(csl_table)
+    end,
+    bib_string = function(csl_table)
+      return run(
+        "pandoc -f csljson -t biblatex" .. transf.string.here_string(transf.not_userdata_or_function.json_string(csl_table))
+      )
     end
   },
   csl_person = {

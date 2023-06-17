@@ -343,6 +343,17 @@ is = {
     default = function(audiodevice_specifier)
       return get.audiodevice.is_default(audiodevice_specifier.device, audiodevice_specifier.subtype)
     end,
+  },
+  csl_table = {
+    type_whole_book = function(csl_table)
+      return csl_table.type == "book" or csl_table.type == "monograph"
+    end,
+    type_book_chapter = function(csl_table)
+      return csl_table.type == "chapter"
+    end,
+    whole_book = function(csl_table)
+      return is.csl_table.type_whole_book(csl_table) and not csl_table.chapter and not csl_table.pages
+    end
   }
 
 }

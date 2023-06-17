@@ -1318,18 +1318,18 @@ assertMessage(
 )
 
 assertMessage(
-  transf.doi.doi_url("https://doi.org/10.1000/182"),
+  transf.pure_doi.doi_url("https://doi.org/10.1000/182"),
   "https://doi.org/10.1000/182"
 )
 
 assertMessage(
-  transf.doi.doi_url("10.1000/182"),
+  transf.pure_doi.doi_url("10.1000/182"),
   "https://doi.org/10.1000/182"
 )
 
 assert(
   stringy.startswith(
-    transf.doi.online_bib("10.1038/nature14539"),
+    transf.pure_doi.online_bib("10.1038/nature14539"),
     "@article{LeCun_2015,"
   )
 )
@@ -1347,7 +1347,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.bib_string.array_of_csl_tables(transf.doi.online_bib("10.1038/nature14539")),
+  transf.bib_string.array_of_csl_tables(transf.pure_doi.online_bib("10.1038/nature14539")),
   json.decode([[
     [
       {

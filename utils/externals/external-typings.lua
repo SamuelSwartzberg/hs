@@ -306,7 +306,7 @@
 --- @field some fun(table: table, fn: fun(elem: any): boolean): boolean
 --- @field split fun(string: string, separator: string, nMax?: integer, bPlain?: boolean): string[]
 --- @field cycle fun(table: table): (fun(): any)
---- @field partial fun(fn: fun(...): any, ...): (fun(...): any) essentially a `bind` function
+--- @field partial fun(fn: fun(...): (any), ...): (fun(...): any) essentially a `bind` function
 --- @field sequence fun(...): (fun(...): table)
 --- @field sortByKeys fun(table: table, fn?: fun(a: any, b: any): boolean): table
 --- @field sortByKeyValues fun(table: table, fn?: fun(a: any, b: any): boolean): table
