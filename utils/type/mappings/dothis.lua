@@ -435,6 +435,24 @@ dothis = {
     open_app = function(path, app, do_after)
       run("open -a " .. transf.string.single_quoted_escaped(app) .. " " .. transf.string.single_quoted_escaped(path), do_after)
     end,
+    write_relative_path_dict = function(path, relative_path_dict, extension)
+      dothis.dynamic_absolute_path_dict.write(
+        get.relative_path_dict.absolute_path_dict(relative_path_dict, path, extension)
+      )
+    end,
+    write_dynamic_path_dict = function(path, assoc_arr, extension)
+      dothis.path.write_relative_path_dict(
+        transf.assoc_arr.relative_path_dict(path), 
+        assoc_arr, 
+        extension
+      )
+    end,
+    write_dynamic_structure = function(path, name)
+      dothis.path.write_dynamic_path_dict(
+        path,
+        tblmap.dynamic_structure_name.dynamic_structure[name]
+      )
+    end
     
   },
   absolute_path = {
@@ -848,10 +866,19 @@ dothis = {
   absolute_path_dict = {
 
   },
+  dynamic_absolute_path_dict = {
+    write = function(dynamic_absolute_path_dict)
+      for absolute_path, contents in pairs(dynamic_absolute_path_dict) do
+        local fn = eutf8.match(contents, "^(%w-):")
+        local contents = eutf8.sub(contents, #fn + 2)
+        dothis.absolute_path[fn](absolute_path, contents)
+      end
+    end,
+  },
   absolute_path_string_dict = {
     write = function(absolute_path_string_dict)
       for absolute_path, contents in pairs(absolute_path_string_dict) do
-        dothis.absolute_path_string.write(absolute_path, contents)
+        dothis.absolute_path.write_file(absolute_path, contents)
       end
     end,
   },
@@ -1026,13 +1053,16 @@ dothis = {
       )
     end,
   },
-  latex_project_dir = {
-    build = function(latex_project_dir, do_after)
-      run(
-        "cd " .. latex_project_dir .. " && pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex",
+  project_dir = {
+    build = function(project_dir, project_type, do_after)
+      dothis.dir.do_in_path(
+        project_dir,
+        tblmap.project_type.build_command[project_type],
         do_after
       )
     end,
+  },
+  latex_project_dir = {      
     open_pdf = function(latex_project_dir)
       dothis.path.open(
         transf.latex_project_dir.main_pdf_file(latex_project_dir)

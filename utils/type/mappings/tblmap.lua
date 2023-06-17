@@ -420,6 +420,25 @@ tblmap = {
       x = 16,
     }
   },
+  dynamic_structure_name = {
+    dynamic_structure = {
+      latex = {
+        citations = "write_file:",
+        ["main.tex"] = "write_file:" ..readFile(le(comp.templates.latex_main)),
+        citable_objects = "create_path:"
+      }
+    }
+  },
+  project_type = {
+    build_command = {
+      latex =  "pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex",
+      npm = "npm run build",
+      cargo = "cargo build",
+    },
+    install_command = {
+      npm = "npm run install",
+    },
+  }
 }
 
 -- make sure to automatically normalize any input to tblmap

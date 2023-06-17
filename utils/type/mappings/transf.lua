@@ -2750,7 +2750,7 @@ transf = {
     fs_tag_string = function(t)
       return "%" .. table.concat(transf.assoc_arr.fs_tag_array(t), "%")
     end,
-    key_as_relative_path_dict = function(t)
+    relative_path_dict = function(t)
       return flatten(
         t,
         {

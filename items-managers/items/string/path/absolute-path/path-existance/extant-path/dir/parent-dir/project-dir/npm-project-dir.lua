@@ -2,23 +2,6 @@
 NpmProjectDirItemSpecifier = {
   type = "npm-project-dir",
   properties = {
-    getables = {
-      ["local-build-task"] = function()
-        return {
-          "npm",
-          "run",
-          "build",
-        }
-      end,
-      ["local-install-task"] = function()
-        return {
-          "npm",
-          "run",
-          "install",
-        }
-      end,
-      ["is-actually-project-dir"] = returnTrue
-    },
     doThisables = {
       ["bump-version"] = function(self, type)
         run({
