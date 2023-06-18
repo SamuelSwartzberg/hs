@@ -6,23 +6,6 @@ StringItemSpecifier = {
       ["is-path"] = bc(is.string.looks_like_path),
       ["is-printable-ascii-string-item"] = bc(is.string.printable_ascii),
       ["to-string"] = bc(transf.string.folded),
-      ["new-string-item-from-contents"] = function(self)
-        return self:doThis("str-item", {key = "c"})
-      end,
-      ["difference-from-prefix-or-self"] = function(self, prefix) 
-        return mustNotStart(self:get("c"), prefix)
-      end,
-      ["difference-from-prefix-or-nil"] = function(self, prefix)
-        if not stringy.startswith(self:get("c"), prefix) then return nil end
-        return eutf8.sub(self:get("c"), eutf8.len(prefix) + 1)
-      end,
-      ["difference-from-suffix-or-self"] = function(self, suffix) 
-        return mustNotEnd(self:get("c"), suffix)
-      end,
-      ["difference-from-suffix-or-nil"] = function(self, suffix)
-        if not self:get("ends-with", suffix) then return nil end
-        return eutf8.sub(self:get("c"), 1, eutf8.len(self:get("c")) - eutf8.len(suffix))
-      end,
       ["contained-unicode-prop-tables"] = function(self)
         return transf.table_array.item_array_of_item_tables(
           transf.string.unicode_prop_table_array(self:get("c"))
@@ -42,21 +25,8 @@ StringItemSpecifier = {
       ["tab-fill-with-items"] = function(self, sep)
         self:get("to-string-item-array", sep):doThis("tab-fill-with")
       end,
-      ["split-and-choose-action"] = function (self, sep)
-        self:get("to-string-item-array", sep)
-          :doThis("choose-action")
-      end,
       ["add-to-log"] = function(self, path)
         st(path):doThis("log-now", self:get("c"))
-      end,
-      ["write-to-file"] = function(self, path)
-        writeFile(path, self:get("c"))
-      end,
-      ["open-in-vscode"] = function(self)
-        open({contents = self:get("c")})
-      end,
-      ["open-contents-in-browser"] = function(self)
-        open({url = self:get("fold")})
       end,
       ["append-to-qf-file"] = function(self)
         st(env.MQF):get("descendant-file-only-string-item-array"):doThis("choose-item", function(path)

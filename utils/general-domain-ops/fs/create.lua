@@ -34,7 +34,6 @@ end
 --- @param fail? "error" | "nil" what to do if an error occurs. Defaults to "nil"
 --- @return string | nil 
 function writeFile(path, contents, condition, create_path, mode, fail)
-  path = path or env.TMPDIR .. "/" .. os.time() .. "-" .. rand({len = 8}) .. ".tmp"
   contents = defaultIfNil(contents, "")
   condition = defaultIfNil(condition, "any")
   create_path = defaultIfNil(create_path, true)

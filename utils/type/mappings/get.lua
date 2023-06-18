@@ -404,10 +404,15 @@ get = {
       else
         return list[mid + 1]
       end
-    end
-
-
-
+    end,
+    dict_by_array = function(arr, arr2)
+      return map(
+        arr,
+        arr2,
+        "k"
+      )
+    end,
+    
   },
   string = {
     split_single_char = stringy.split,
@@ -690,7 +695,14 @@ get = {
 
   },
   plaintext_table_file = {
-    
+    dict_of_dicts_by_first_element_and_array = function(plaintext_file, arr2)
+      local array_of_arrays = transf.plaintext_table_file.array_of_array_of_fields(plaintext_file)
+      return get.array_of_arrays.dict_of_dicts_by_first_element_and_array(array_of_arrays, arr2)
+    end,
+    dict_of_dicts_by_header_file = function(plaintext_file, header_file)
+      local array_of_arrays = transf.plaintext_table_file.array_of_array_of_fields(plaintext_file)
+      return get.array_of_arrays.dict_of_dicts_by_header_file(array_of_arrays, transf.plaintext_file.lines(header_file))
+    end,
   },
   timestamp_first_column_plaintext_table_file = {
     something_newer_than_timestamp = function(path, timestamp, assoc_arr)
@@ -848,9 +860,23 @@ get = {
     
   },
   logging_dir = {
-    log_for_date = function(path, date)
+    log_path_for_date = function(path, date)
       return transf.string.path_resolved(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"
-    end
+    end,
+    array_of_arrays_for_date = function(path, date)
+      return transf.plaintext_table_file.array_of_array_of_fields(
+        transf.logging_dir.log_path_for_date(path, date)
+      )
+    end,
+    time_dict_of_dicts_for_date = function(path, date)
+      return get.array_of_arrays.dict_of_dicts_by_first_element_and_array(
+        get.logging_dir.array_of_arrays_for_date(path, date),
+        transf.logging_dir.headers(path)
+      )
+    end,
+    entry_dict_for_date = function(path, date)
+      return get.logging_dir.time_dict_of_dicts_for_date(path, date)[transf.date.rfc3339like_time(date)]
+    end,
   },
   path_array = {
     filter_to_same_filename = function(path_array, filename)
@@ -1010,6 +1036,33 @@ get = {
   array_of_arrays = {
     column = array2d.column,
     row = array2d.row,
+    array_of_dicts_by_array = function(arr_of_arr, arr2)
+      return hs.fnutils.imap(
+        arr_of_arr,
+        bind(get.array.dict_by_array, {a_use, arr2})
+      )
+    end,
+    dict_of_arrays_by_first_element = function(arr_of_arr)
+      return map(
+        arr_of_arr,
+        transf.array.first_rest,
+        {"v", "kv"}
+      )
+    end,
+    dict_of_dicts_by_first_element_and_array = function(arr_of_arr, arr2)
+      return get.dict_of_arrays.dict_of_dicts_by_array(
+        get.array_of_arrays.dict_of_arrays_by_first_element(arr_of_arr),
+        arr2
+      )
+    end
+  },
+  dict_of_arrays = {
+    dict_of_dicts_by_array = function(dict_of_arr, arr2)
+      return hs.fnutils.map(
+        dict_of_arr,
+        bind(get.array.dict_by_array, {a_use, arr2})
+      )
+    end,
   },
   application_name = {
     in_tmp_dir = function(app_name, file)

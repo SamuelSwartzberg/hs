@@ -451,6 +451,17 @@ dothis = {
         get.string.search_engine_search_url(search_engine, str)
       )
     end,
+    write_to_temp_file = function(str)
+      local path = transf.string.in_tmp_dir(os.time(), "temp_file")
+      writeFile(path, str)
+      return path
+    end,
+    open_temp_file = function(str)
+      dothis.path.open_app(
+        transf.string.write_to_temp_file(str),
+        env.GUI_EDITOR
+      )
+    end,
 
   },
   path = {
@@ -907,7 +918,7 @@ dothis = {
     end,
     create_as_url_files = function(url_array, path)
       local abs_path_dict = get.url_array.absolute_path_dict_of_url_files(url_array, path)
-      dothis.absolute_path_string_dict.write(abs_path_dict)
+      dothis.absolute_path_string_value_dict.write(abs_path_dict)
     end,
     create_as_url_files_in_murls = function(url_array)
       local path = transf.extant_path.prompted_path_relative_to(env.MURLS)
@@ -940,9 +951,9 @@ dothis = {
       end
     end,
   },
-  absolute_path_string_dict = {
-    write = function(absolute_path_string_dict)
-      for absolute_path, contents in pairs(absolute_path_string_dict) do
+  absolute_path_string_value_dict = {
+    write = function(absolute_path_string_value_dict)
+      for absolute_path, contents in pairs(absolute_path_string_value_dict) do
         dothis.absolute_path.write_file(absolute_path, contents)
       end
     end,
@@ -1023,7 +1034,7 @@ dothis = {
     open_go_to = function(specifier)
       dothis.path.open_app(
         transf.path_with_intra_file_locator_specifier.path(specifier),
-        "Visual Studio Code - Insiders",
+        env.GUI_EDITOR,
         hs.fnutils.partial(dothis.path_with_intra_file_locator_specifier.go_to, specifier)
       )
     end
@@ -1088,7 +1099,7 @@ dothis = {
     edit_local_csl_file = function(indicated_citable_object_id)
       dothis.path.open_app(
         transf.indicated_citable_object_id.local_csl_file_path(indicated_citable_object_id),
-        "Visual Studio Code - Insiders"
+        env.GUI_EDITOR
       )
     end,
     open_local_citable_object_file = function(indicated_citable_object_id)

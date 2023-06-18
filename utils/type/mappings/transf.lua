@@ -278,7 +278,17 @@ transf = {
     end,
     length = function(arr)
       return #arr
-    end
+    end,
+    first_rest = function(arr)
+      return arr[1], slice(arr, 2)
+    end,
+    empty_string_value_dict = function(arr)
+      return map(
+        arr,
+        transf.any.self_and_empty_string,
+        {"v", "kv"}
+      )
+    end,
   },
   hole_y_arraylike = {
     array = function(tbl)
@@ -967,6 +977,7 @@ transf = {
     last_accessed = function(path)
       return get.string_or_number.number(readFile(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
     end,
+    --- gets the entries from a timestamp_first_column_plaintext_table_file that are newer than the timestamp stored in file storing the last backup time
     new_timestamp_table = function(path)
       local last_access = transf.timestamp_first_column_plaintext_table_file.last_accessed(path)
       local new_timestamp = os.time()
@@ -978,7 +989,34 @@ transf = {
     end,
 
   },
-
+  logging_dir = {
+    header_file = function(path)
+      return transf.path.ending_with_slash(path) .. "header"
+    end,
+    headers = function(path)
+      return transf.plaintext_file.nocomment_noindent_content_lines(
+        transf.logging_dir.header_file(path)
+      )
+    end,
+    header_empty_string_dict = function(path)
+      return transf.array.empty_string_value_dict(
+        transf.logging_dir.headers(path)
+      )
+    end,
+    header_empty_string_dict_with_timestamp = function(path)
+      local header_empty_string_dict = transf.logging_dir.header_empty_string_dict(path)
+      header_empty_string_dict.timestamp = ""
+      return header_empty_string_dict
+    end,
+    header_empty_string_dict_now = function(path)
+      local header_empty_string_dict = transf.logging_dir.header_empty_string_dict(path)
+      header_empty_string_dict.timestamp = os.time()
+      return header_empty_string_dict
+    end,
+    yaml_form = function(path)
+      return transf.table.yaml_string(transf.logging_dir.header_empty_string_dict(path))
+    end,
+  },
   newsboat_url_specifier = {
     newsboat_url_line = function(specifier)
       return ('%s\t"~%s"\t"_%s"'):format(
@@ -1040,10 +1078,13 @@ transf = {
       return get.date.date_range_specifier_of_lower_component(date, 15, "day")
     end,
     entry_in_diary = function(date)
-      return get.logging_dir.log_for_date(env.MENTRY_LOGS, date)
+      return get.logging_dir.log_path_for_date(env.MENTRY_LOGS, date)
     end,
     rfc3339like_dt = function(date)
       return get.date.formatted(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
+    end,
+    rfc3339like_time = function(date)
+      return get.date.formatted(date, tblmap.date_format_name.date_format["rfc3339-time"])
     end,
     timestamp_s = function(date)
       return transf.full_date_components.timestamp_s(
@@ -4045,6 +4086,9 @@ transf = {
           return transf.any.inspect_string(stringable)
         end
       end
+    end,
+    self_and_empty_string = function(any)
+      return any, ""
     end
   },
   mailto_url = {
