@@ -978,14 +978,14 @@ transf = {
       return get.string_or_number.number(readFile(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
     end,
     --- gets the entries from a timestamp_first_column_plaintext_table_file that are newer than the timestamp stored in file storing the last backup time
-    new_timestamp_table = function(path)
+    new_timestamp_key_array_value_dict = function(path)
       local last_access = transf.timestamp_first_column_plaintext_table_file.last_accessed(path)
       local new_timestamp = os.time()
-      local new_timestamp_table = get.timestamp_first_column_plaintext_table_file.timestamp_table_newer_than_timestamp(path, last_access)
-      if new_timestamp_table then
+      local new_timestamp_key_array_value_dict = get.timestamp_first_column_plaintext_table_file.timestamp_key_array_value_dict_newer_than_timestamp(path, last_access)
+      if new_timestamp_key_array_value_dict then
         writeFile(env.MLAST_BACKUP .. transf.path.filename(path), new_timestamp)
       end
-      return new_timestamp_table
+      return new_timestamp_key_array_value_dict
     end,
 
   },
@@ -1781,6 +1781,9 @@ transf = {
     end,
   },
   string = {
+    consonants = function(str)
+      error("todo")
+    end,
     evaled_lua = singleLe,
     evaled_bash = run,
     evaled_template = le,
@@ -3051,11 +3054,11 @@ transf = {
     end,
 
   },
-  timestamp_table = {
+  timestamp_key_array_value_dict = {
     --- transforms a timestamp-key orderedtable into a table of the structure [yyyy] = { [yyyy-mm] = { [yyyy-mm-dd] = { [hh:mm:ss, ...] } } }
     --- @param timestamp_key_table orderedtable
     --- @return { [string]: { [string]: { [string]: string[] } } }
-    ymd_table = function(timestamp_key_table)
+    ymd_nested_key_array_of_arrays_value_assoc_arr = function(timestamp_key_table)
       local year_month_day_time_table = {}
       for timestamp_str, fields in prs(timestamp_key_table,-1,1,-1) do 
         local timestamp = get.string_or_number.number(timestamp_str)
@@ -3073,7 +3076,7 @@ transf = {
     end
   },
   tachiyomi_json_table = {
-    timestamp_table = function(raw_backup)
+    timestamp_key_array_value_dict = function(raw_backup)
       -- data we care about is in the backupManga array in the json file
       -- each array element is a manga which has general metadata keys such as title, author, url, etc
       -- and a chapters array which has chapter metadata keys such as name, chapterNumber, url, etc

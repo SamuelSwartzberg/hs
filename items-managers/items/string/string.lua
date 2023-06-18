@@ -24,16 +24,7 @@ StringItemSpecifier = {
     doThisables = {
       ["tab-fill-with-items"] = function(self, sep)
         self:get("to-string-item-array", sep):doThis("tab-fill-with")
-      end,
-      ["add-to-log"] = function(self, path)
-        st(path):doThis("log-now", self:get("c"))
-      end,
-      ["append-to-qf-file"] = function(self)
-        st(env.MQF):get("descendant-file-only-string-item-array"):doThis("choose-item", function(path)
-          path:doThis("append-line-and-commit", self:get("fold"))
-        end)
-      end,
-      
+      end
     }
   },
   potential_interfaces = ovtable.init({
@@ -100,8 +91,7 @@ StringItemSpecifier = {
         key = "array",
         args = "events-matching-search"
       }
-    }
-  }, getChooseItemTable({
+    },
     {
       d = "binec",
       i = "🅱️2️⃣📦",
@@ -255,11 +245,26 @@ StringItemSpecifier = {
       text = "🌄📚 crsess.",
       dothis = dothis.url_array.create_as_session_in_msessions,
       filter = transf.string.url_array
-    }
-  }),
+    },
+  },
   hs.fnutils.imap(
     mt._list.search_engine_names,
     transf.search_engine.action_table_item
+  ),
+  hs.fnutils.imap(
+    transf.dir.descendants_array(env.MQF),
+    function(path)
+      return {
+        dothis = hs.fnutils.partial(
+          dothis.plaintext_file.append_line_and_commit,
+          path
+        ),
+        i = "📨",
+        d = transf.string.consonants(
+          transf.path.filename(path)
+        )
+      }
+    end
   ))
 }
 

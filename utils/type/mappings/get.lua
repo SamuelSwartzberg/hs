@@ -313,6 +313,36 @@ get = {
     end
     
   },
+  dict = {
+    array_by_array = function(dict, arr)
+      return map(
+        arr,
+        function(i, v)
+          return i, dict[v]
+        end,
+        "k"
+      )
+    end
+  },
+  dict_with_timestamp = {
+    array_by_array_with_timestamp_first = function(dict, arr)
+      arr = glue({"timestamp"}, arr)
+      return get.dict.array_by_array(dict, arr)
+    end,
+    timestamp_key_array_value_dict_by_array = function(dict, arr)
+      return {
+        [dict.timestamp] = get.dict.array_by_array(dict, arr)
+      }
+    end,
+  },
+  dict_of_dicts = {
+    dict_of_arrays_by_array = function(dict_of_dicts, arr)
+      return hs.fnutils.map(
+        dict_of_dicts,
+        bind(get.dict.array_by_array, {a_use, arr})
+      )
+    end
+  },
   relative_path_dict = {
     absolute_path_dict = function(relative_path_dict, starting_point, extension)
       return map(relative_path_dict, function(k)
@@ -743,7 +773,7 @@ get = {
     array_of_fields_newer_than_timestamp = function(path, timestamp)
       return transf.timestamp_first_column_plaintext_table_file.something_newer_than_timestamp(path, timestamp, false)
     end,
-    timestamp_table_newer_than_timestamp = function(path, timestamp)
+    timestamp_key_array_value_dict_newer_than_timestamp = function(path, timestamp)
       return transf.timestamp_first_column_plaintext_table_file.something_newer_than_timestamp(path, timestamp, true)
     end,
   },

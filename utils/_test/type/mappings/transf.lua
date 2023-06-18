@@ -1479,20 +1479,20 @@ local example_output = {
 
 -- test the function with the example table
 assertMessage(
-  transf.timestamp_table.ymd_table(example_table),
+  transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc_arr(example_table),
   example_output
 )
 
 -- test the function with an empty table
 assertMessage(
-  transf.timestamp_table.ymd_table(ovtable.new()),
+  transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc_arr(ovtable.new()),
   {}
 )
 
 
 -- test the function with a table containing a single element
 assertMessage(
-  transf.timestamp_table.ymd_table(ovtable.init({{key="1634366282", value={"event5"}}})),
+  transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc_arr(ovtable.init({{key="1634366282", value={"event5"}}})),
   {
     ["2021"] = {
       ["2021-10"] = {
@@ -1506,7 +1506,7 @@ assertMessage(
 
 -- test the function with a table containing elements from different years
 assertMessage(
-  transf.timestamp_table.ymd_table(ovtable.init({
+  transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc_arr(ovtable.init({
     {key="1634271457", value={"event1"}},
     {key="1634271469", value={"event2"}},
     {key="1641024841", value={"event4"}},
@@ -1533,7 +1533,7 @@ assertMessage(
 )
 -- test the function with a table containing elements from different months
 assertMessage(
-  transf.timestamp_table.ymd_table(ovtable.init({
+  transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc_arr(ovtable.init({
     {key="1633075200", value={"event1"}},
     {key="1635763200", value={"event2"}},
     {key="1638355200", value={"event3"}},
@@ -1573,7 +1573,7 @@ assertMessage(
 
 -- test the function with a table containing multiple events for the same timestamp
 assertMessage(
-  transf.timestamp_table.ymd_table(ovtable.init({
+  transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc_arr(ovtable.init({
     {key="1633075200", value={"event1", "event2", "event3"}},
     {key="1635763200", value={"event4"}},
     {key="1638355200", value={"event5"}},

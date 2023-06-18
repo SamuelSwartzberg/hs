@@ -16,15 +16,6 @@ PlaintextFileItemSpecifier = {
       ["is-newsboat-urls-file"] = bc(get.path.is_leaf, "urls"),
       ["is-md-file"] = bc(get.path.is_standartized_extension, "md")
     },
-    doThisables = {
-      ["append-line-and-commit"] = function(self, line)
-        dothis.plaintext_file.append_line(self:get("c"), line)
-        self:doThis("git-commit-self", ("Added line: %s to %s"):format(line, self:get("relative-path-from", self:get("git-root-dir"))))
-        self:doThis("git-push")
-      end,
-
-
-    }
   },
   potential_interfaces = ovtable.init({
     { key = "m3u-file", value = CreateM3uFileItem },
@@ -43,7 +34,7 @@ PlaintextFileItemSpecifier = {
     { 
       d = "cnt",
       i = "🎒",
-      getfn = transf.plaintext_file.len_contents
+      getfn = transf.plaintext_file.contents
     },{
       d = "cntchrs",
       i = "🎒🀇📏",
@@ -55,11 +46,11 @@ PlaintextFileItemSpecifier = {
     },{
       d = "cnthd",
       i = "🎒👆",
-      key = get.plaintext_file.head
+      key = get.plaintext_file.lines_head
     },{
       d = "cnttl",
       i = "🎒👇",
-      key = get.plaintext_file.tail
+      key = get.plaintext_file.lines_tail
     },
     {
       text = "👉🎒全⩶ ccntlns.",

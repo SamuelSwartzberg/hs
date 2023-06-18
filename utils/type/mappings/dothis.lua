@@ -558,6 +558,10 @@ dothis = {
     append_line = function(path, line)
       dothis.plaintext_file.append_lines(path, {line})
     end,
+    append_line_and_commit = function(path, line)
+      dothis.plaintext_file.append_line(path, line)
+      dothis.in_git_dir.commit_self(path, "Added line " .. line .. " to " .. get.absolute_path.relative_path_from(path, transf.in_git_dir.git_root_dir(path)))
+    end,
     write_lines = function(path, lines)
       writeFile(path, table.concat(lines, "\n"), nil, "w")
     end,
@@ -593,8 +597,8 @@ dothis = {
 
   },
   plaintext_table_file = {
-    append_arrays_of_fields = function(path, arrays_of_fields)
-      local lines = hs.fnutils.imap(arrays_of_fields, function (arr)
+    append_array_of_arrays_of_fields = function(path, array_of_arrays_of_fields)
+      local lines = hs.fnutils.imap(array_of_arrays_of_fields, function (arr)
         return table.concat(arr, transf.plaintext_table_file.field_separator())
       end)
       dothis.plaintext_file.append_lines(path, lines)
@@ -858,6 +862,13 @@ dothis = {
     add_self = function(path, do_after)
       dothis.extant_path.do_in_path(path, "git add" .. transf.string.single_quoted_escaped(path), do_after)
     end,
+    commit_self = function(path, message, do_after)
+      dothis.extant_path.do_in_path(
+        path, 
+        "git commit -m" .. transf.string.single_quoted_escaped(message or ("Programmatic commit of " .. path .. " at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        do_after
+      )
+    end,
     -- will also add untracked files
     add_all = function(path, do_after)
       dothis.extant_path.do_in_path(path, "git add -A", do_after)
@@ -868,7 +879,7 @@ dothis = {
     commit_staged = function(path, message, do_after)
       dothis.extant_path.do_in_path(
         path, 
-        "git commit -m" .. transf.string.single_quoted_escaped(message or ("Programmatic commit at " .. os.date("%Y-%m-%dT%H:%M:%S"))),
+        "git commit -m" .. transf.string.single_quoted_escaped(message or ("Programmatic commit of staged files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
       )
     end,
@@ -885,7 +896,7 @@ dothis = {
     commit_all_root_no_untracked = function(path, message, do_after)
       dothis.extant_path.do_in_path(
         transf.in_git_dir.git_root_dir(path), 
-        "git commit -am" .. transf.string.single_quoted_escaped(message or ("Programmatic commit at " .. os.date("%Y-%m-%dT%H:%M:%S"))),
+        "git commit -am" .. transf.string.single_quoted_escaped(message or ("Programmatic commit of all tracked files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
       )
     end
@@ -901,6 +912,44 @@ dothis = {
     create_log_entry = function(date, path, contents)
       error("todo")
     end
+  },
+  logging_dir = {
+    log_ymd_nested_key_array_of_arrays_value_assoc_arr = function(path, ymd_nested_key_array_of_arrays_value_assoc_arr)
+      local abs_path_dict = get.assoc_arr.absolute_path_dict(
+        ymd_nested_key_array_of_arrays_value_assoc_arr,
+        path,
+        ".csv"
+      )
+      for path, array_of_arrays in abs_path_dict do 
+        dothis.plaintext_table_file.append_array_of_arrays_of_fields(path, array_of_arrays)
+      end
+    end,
+    log_timestamp_key_array_value_dict = function(path, timestamp_key_array_value_dict)
+      dothis.logging_dir.log_ymd_nested_key_array_of_arrays_value_assoc_arr(
+        path,
+        transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc_arr(timestamp_key_array_value_dict)
+      )
+    end,
+    log_dict_with_timestamp = function(path, dict)
+      dothis.logging_dir.log_timestamp_key_array_value_dict(
+        path,
+        transf.dict_with_timestamp.timestamp_key_array_value_dict_by_array(dict, transf.logging_dir.headers(path))
+      )
+    end,
+    write_header_file = function(path, headers)
+      dothis.plaintext_file.write_lines(
+        transf.logging_dir.header_file(path),
+        headers
+      )
+    end
+  },
+  entry_logging_dir = {
+    log_string = function(path, str)
+      dothis.logging_dir.log_dict_with_timestamp(path, {
+        timestamp = os.time(),
+        entry = str
+      })
+    end,
   },
   string_array = {
     join_and_paste = function(array, sep)
