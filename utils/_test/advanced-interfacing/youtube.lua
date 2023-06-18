@@ -45,7 +45,7 @@ createYoutubePlaylist({
     "Test Playlist"
   )
 
-  addVidToPlaylist(
+  dothis.youtube_playlist_id.add_youtube_video_id(
     createdPlaylistId,
     "M7FIvfx5J10",
     0
@@ -67,7 +67,7 @@ createYoutubePlaylist({
     nil
   )
 
-  addVidsToPlaylist(
+  dothis.youtube_playlist_id.add_youtube_video_id_array(
     createdPlaylistId,
     {
       "V4DDt30Aat4",
@@ -107,7 +107,7 @@ createYoutubePlaylist({
         nil
       )
 
-      deleteYoutubePlaylist(createdPlaylistId)
+      dothis.youtube_playlist_id.delete(createdPlaylistId)
 
       local succ, res = pcall(rest,{
         api_name = "youtube",
@@ -157,7 +157,7 @@ createYoutubePlaylist({
           nil
         )
 
-        deleteYoutubePlaylist(id)
+        dothis.youtube_playlist_id.delete(id)
 
 
       end)

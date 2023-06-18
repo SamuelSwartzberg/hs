@@ -337,6 +337,7 @@ tblmap = {
       ["google-scholar"] = "https://scholar.google.com/scholar?q=%s",
       ["google-images"] = "https://www.google.com/search?tbm=isch&q=%s",
       ["google-maps"] = "https://www.google.com/maps/search/%s",
+      google = "https://www.google.com/search?q=%s",
       ["danbooru"] = "https://danbooru.donmai.us/posts?tags=%s",
       ["gelbooru"] = "https://gelbooru.com/index.php?page=post&s=list&tags=%s",
     },
@@ -356,6 +357,7 @@ tblmap = {
       ["google-scholar"] = "gs",
       ["google-images"] = "gi",
       ["google-maps"] = "gm",
+      google = "go",
       ["danbooru"] = "db",
       ["gelbooru"] = "gb",
     },
@@ -378,6 +380,7 @@ tblmap = {
       ["google-scholar"] = "🏳️‍🌈🎓",
       ["google-images"] = "🏳️‍🌈🖼",
       ["google-maps"] = "🏳️‍🌈🗺",
+      google = "🏳️‍🌈",
     },
     spaces_percent = {
       jisho = true,

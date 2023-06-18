@@ -55,7 +55,7 @@ YoutubePlayableItemItemSpecifier = {
         specifier.tag = glue(edited_tags, promptUserToAddNKeyValuePairs("tag"))
         specifier.path  = promptPipeline({
           {"dir", {prompt_args = {default = env.MAUDIOVISUAL}}},
-          {"string-path", {prompt_args = {message = "Subdirectory name", default = specifier.tag.srs or specifier.tag.tcrea }}},
+          {"string", {prompt_args = {message = "Subdirectory name", default = specifier.tag.srs or specifier.tag.tcrea }}},
         })
         specifier.extension = "m3u"
         writeFile(transf.path_leaf_parts.full_path(specifier), self:get("c"))

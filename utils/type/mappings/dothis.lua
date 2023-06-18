@@ -373,6 +373,16 @@ dothis = {
     download = function(url, target)
       run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
     end,
+    open = function(url, browser, do_after)
+      url = transf.url.ensure_scheme(url)
+      browser = browser or "Firefox"
+      if do_after then -- if we're opening an url, typically, we would exit immediately, negating the need for a callback. Therefore, we want to wait. The only easy way to do this is to use a completely different browser. 
+        run("open -a Safari -W" .. transf.string.single_quoted_escaped(url), do_after)
+        -- Annoyingly, due to a 15 (!) year old bug, Firefox will open the url as well, even if we specify a different browser. I've tried various fixes, but for now we'll just have to live with it and click the tab away manually.
+      else
+        run("open -a" .. transf.string.single_quoted_escaped(browser))
+      end
+    end,
   },
   booru_url = {
     add_to_local = function(url)
@@ -426,7 +436,22 @@ dothis = {
     paste_le = function(str)
       dothis.string.paste(le(str))
     end,
-    copy = hs.pasteboard.setContents
+    copy = hs.pasteboard.setContents,
+    fill_with_lines = function(str)
+      dothis.string_array.fill_with(transf.string.lines(str))
+    end,
+    fill_with_content_lines = function(path)
+      dothis.string_array.fill_with(transf.string.content_lines(path))
+    end,
+    fill_with_nocomment_noindent_content_lines = function(path)
+      dothis.string_array.fill_with(transf.string.nocomment_noindent_content_lines(path))
+    end,
+    search = function(str, search_engine)
+      dothis.url.open(
+        get.string.search_engine_search_url(search_engine, str)
+      )
+    end,
+
   },
   path = {
     open_default = function(path, do_after)
@@ -468,6 +493,18 @@ dothis = {
     create_path = function(path)
       createPath(path)
     end,
+    copy_single_into = function(path, tgt)
+      srctgt("copy", path, tgt, "any", true, false)
+    end,
+    copy_all_in_into = function(path, tgt)
+      srctgt("copy", path, tgt, "any", true, true)
+    end,
+    delete = function(path)
+      delete(path, "any", "delete", "any", "error")
+    end,
+    empty = function(path)
+      delete(path, "any", "empty", "any", "error")
+    end,
 
   },
   extant_path = {
@@ -480,12 +517,6 @@ dothis = {
       else
         dothis.dir.do_in_path(transf.path.parent_path(path), cmd, do_after)
       end
-    end,
-    delete = function(path)
-      delete(path, "any", "delete", "any", "error")
-    end,
-    empty = function(path)
-      delete(path, "any", "empty", "any", "error")
     end,
     
   },
@@ -658,7 +689,12 @@ dothis = {
     end,
     do_in_path = function(path, cmd, do_after)
       run("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd, do_after)
-    end
+    end,
+    delete_child_with_leaf_ending = function(path, ending)
+      dothis.absolute_path.delete(
+        get.dir.find_child_with_leaf_ending(path, ending)
+      )
+    end,
   },
   maildir_dir = {
     
@@ -862,6 +898,35 @@ dothis = {
     fill_with = function(array)
       dothis.string_array.join_and_paste(array, "\t")
     end
+  },
+  url_array = {
+    open_all = function(url_array)
+      for _, url in ipairs(url_array) do
+        dothis.url.open(url)
+      end
+    end,
+    create_as_url_files = function(url_array, path)
+      local abs_path_dict = get.url_array.absolute_path_dict_of_url_files(url_array, path)
+      dothis.absolute_path_string_dict.write(abs_path_dict)
+    end,
+    create_as_url_files_in_murls = function(url_array)
+      local path = transf.extant_path.prompted_path_relative_to(env.MURLS)
+      dothis.url_array.create_as_url_files(url_array, path)
+    end,
+    create_as_session = function(url_array, root)
+      local path = transf.extant_path.prompted_file_relative_to(root)
+      path = mustEnd(path, ".session")
+      dothis.absolute_path.write_file(
+        path,
+        transf.url_array.session_string(url_array)
+      )
+    end,
+    create_as_session_in_msessions = function(url_array)
+      dothis.url_array.create_as_session(url_array, env.MSESSIONS)
+    end,
+  },
+  html_url_array = {
+   
   },
   absolute_path_dict = {
 
@@ -1080,19 +1145,129 @@ dothis = {
         transf.latex_project_dir.main_bib_file(latex_project_dir)
       )
     end,
-    add_indicated_citable_object_id = function(latex_project_dir, indicated_citable_object_id)
+    add_local_citable_object_file = function(latex_project_dir, indicated_citable_object_id)
+      local local_citable_object_file = transf.indicated_citable_object_id.local_citable_object_file(indicated_citable_object_id)
+      dothis.absolute_path.copy_single_into(
+        transf.latex_project_dir.citable_object_files(latex_project_dir),
+        local_citable_object_file
+      )
+    end,
+    remove_local_citable_object_file = function(latex_project_dir, indicated_citable_object_id)
+      dothis.dir.delete_child_with_leaf_ending(
+        transf.latex_project_dir.citable_object_files(latex_project_dir),
+        indicated_citable_object_id
+      )
+    end,
+    add_local_citable_object_notes_file = function(latex_project_dir, indicated_citable_object_id)
+      local local_citable_object_notes_file = transf.indicated_citable_object_id.local_citable_object_notes_file(indicated_citable_object_id)
+      dothis.absolute_path.copy_single_into(
+        transf.latex_project_dir.citable_object_notes_files(latex_project_dir),
+        local_citable_object_notes_file
+      )
+    end,
+    remove_local_citable_object_notes_file = function(latex_project_dir, indicated_citable_object_id)
+      dothis.dir.delete_child_with_leaf_ending(
+        transf.latex_project_dir.citable_object_notes_files(latex_project_dir),
+        indicated_citable_object_id
+      )
+    end,
+    add_indicated_citable_object_id_raw = function(latex_project_dir, indicated_citable_object_id)
       dothis.citations_file.add_indicated_citable_object_id(
         transf.latex_project_dir.citations_file(latex_project_dir),
+        indicated_citable_object_id
+      )
+    end,
+    remove_indicated_citable_object_id_raw = function(latex_project_dir, indicated_citable_object_id)
+      dothis.citations_file.remove_indicated_citable_object_id(
+        transf.latex_project_dir.citations_file(latex_project_dir),
+        indicated_citable_object_id
+      )
+    end,
+    add_indicated_citable_object_id = function(latex_project_dir, indicated_citable_object_id)
+      dothis.latex_project_dir.add_local_citable_object_file(
+        latex_project_dir,
+        indicated_citable_object_id
+      )
+      dothis.latex_project_dir.add_local_citable_object_notes_file(
+        latex_project_dir,
+        indicated_citable_object_id
+      )
+      dothis.latex_project_dir.add_indicated_citable_object_id_raw(
+        latex_project_dir,
         indicated_citable_object_id
       )
       dothis.latex_project_dir.write_bib(latex_project_dir)
     end,
     remove_indicated_citable_object_id = function(latex_project_dir, indicated_citable_object_id)
-      dothis.citations_file.remove_indicated_citable_object_id(
-        transf.latex_project_dir.citations_file(latex_project_dir),
+      dothis.latex_project_dir.remove_local_citable_object_file(
+        latex_project_dir,
+        indicated_citable_object_id
+      )
+      dothis.latex_project_dir.remove_local_citable_object_notes_file(
+        latex_project_dir,
+        indicated_citable_object_id
+      )
+      dothis.latex_project_dir.remove_indicated_citable_object_id_raw(
+        latex_project_dir,
         indicated_citable_object_id
       )
       dothis.latex_project_dir.write_bib(latex_project_dir)
     end,
-  }
+  },
+  youtube_playlist_id = {
+    --- @param id string
+    --- @param do_after? fun(result: string): nil
+    delete = function(id, do_after)
+      rest({
+        api_name = "youtube",
+        endpoint = "playlists",
+        params = { id = id },
+        request_verb = "DELETE",
+      }, do_after)
+    end,
+    --- @param id string
+    --- @param video_id string
+    --- @param index? number
+    --- @param do_after? fun(): nil
+    add_youtube_video_id = function(id, video_id, index, do_after)
+      local req = {
+        api_name = "youtube",
+        endpoint = "playlistItems",
+        request_table = {
+          snippet = {
+            playlistId = id,
+            position = index,
+            resourceId = {
+              kind = "youtube#video",
+              videoId = video_id
+            }
+          }
+        },
+      }
+      if index then
+        req.request_table.snippet.position = index
+      end
+      rest(req, do_after)
+    end,
+    --- @param id string
+    --- @param video_ids string[]
+    --- @param do_after? fun(id: string): nil
+    add_youtube_video_id_array = function(id, video_ids, do_after)
+      local next_vid = sipairs(video_ids)
+      local add_next_vid
+      add_next_vid = function ()
+        local index, video_id = next_vid()
+        if index then
+          dothis.youtube_playlist_id.add_youtube_video_id(id, video_id, nil, add_next_vid)
+        else
+          if do_after then
+            do_after(id)
+          end
+        end
+      end
+      add_next_vid()
+    end
+    
+
+  },
 }

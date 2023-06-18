@@ -538,6 +538,10 @@ function parseGuessScheme(url)
   end
 end
 
+function urlparse(url)
+	return M.parse(url)
+end
+
 function isUrl(str)
   return parseGuessScheme(str) ~= nil
 end

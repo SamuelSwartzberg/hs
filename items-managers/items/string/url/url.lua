@@ -6,20 +6,6 @@ URLItemSpecifier = {
       ["parsed-url"] = function(self)
         return memoize(parseGuessScheme)(self:get("c"))
       end,
-      ["url-scheme"] = function(self) return self:get("parsed-url").scheme end,
-      ["url-host"] = function(self) return self:get("parsed-url").host end,
-      ["url-domain-and-tld"] = function(self) 
-        return string.match(self:get("url-host"), "(%w+%.%w+)$") end,
-      ["url-domain"] = function(self) 
-        return string.match(self:get("url-host"), "(%w+)%.%w+$") end,
-      ["url-tld"] = function(self)
-        return string.match(self:get("url-host"), "%w+%.(%w+)$") end,
-      ["url-path"] = function(self) return self:get("parsed-url").path end,
-      ["url-query"] = function(self) return self:get("parsed-url").query end,
-      ["url-fragment"] = function(self) return self:get("parsed-url").fragment end,
-      ["url-port"] = function(self) return self:get("parsed-url").port end,
-      ["url-user"] = function(self) return self:get("parsed-url").user end,
-      ["url-password"] = function(self) return self:get("parsed-url").password end,
       ["is-url-by-contenttype"] = function(self)
         return self:get("url-path") and is.path.has_extension(self:get("url-path"))
       end,
@@ -32,30 +18,9 @@ URLItemSpecifier = {
       ["is-url-by-scheme"] = function(self)
         return self:get("url-scheme")
       end,
-      ["by-selector"] = function(self, specifier)
-        return memoize(queryPage)(self:get("c"), specifier.selector, specifier.only_text)
-      end,
-      ["text-by-selector"] = function(self, selector)
-        return self:get("by-selector", {
-          selector = selector,
-          only_text = true
-        })
-      end,
-      ["html-title"] = function (self)
-        return stringy.split(self:get("text-by-selector", "title"), "\n")[1]
-      end,
       ["html-d"] = function (self)
         return self:get("text-by-selector", "meta[name=d]")
       end,
-      ["default-negotation-url-contents"] = function(self)
-        return transf.url.default_negotation_url_contents(self:get("c"))
-      end,
-      ["url-in-wayback-machine"] = function (self)
-        return transf.url.in_wayback_machine(self:get("c"))
-      end,
-      ["param-table"] = function(self)
-        return transf.url.param_table(self:get("c"))
-      end
       
     },
     doThisables = {

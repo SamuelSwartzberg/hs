@@ -217,13 +217,13 @@ InterfaceDefaultTemplate = {
             args[k] = v
           end
         end
+        action_item.filter = action_item.filter or st
         if action_item.dothis then
-          action_item.dothis(first_arg, table.unpack(args))
+          action_item.dothis(action_item.filter(first_arg), table.unpack(args))
         elseif action_item.key then
           self:doThis(action_item.key, table.unpack(args))
         else
           local res = action_item.getfn(first_arg, table.unpack(args))
-          action_item.filter = action_item.filter or st
           action_item.act = action_item.act or "ca"
           if action_item.act == "ca" then
             action_item.act = "choose-action"

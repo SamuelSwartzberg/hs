@@ -5,46 +5,19 @@ ArrayOfUrlsSpecifier = {
     getables = {
       ["is-array-of-urls-by-host"] = bind(isArrayOfInterfacesOfType, {a_use, "url-by-host" }),
     },
-    doThisables = {
-      ["create-session"] = function(self, session_name)
-        local path = st(env.MSESSIONS):get("related-path-with-subdirs-gui")
-        path:doThis('create-file-with-contents', {
-          contents = self:get("joined-string-contents", "\n"),
-          name = session_name
-        })
-      end,
-      ["create-all-as-urls"] = function(self)
-        local path = st(env.MURLS):get("related-path-with-subdirs-gui")
-        self:doThis("for-all", function(item)
-          path:doThis('create-file-with-contents', {
-            contents = item:get("c"),
-            name = item:get("html-title") .. ".url2"
-          })
-        end)
-      end,
-      ["open-all-in-browser"] = function(self)
-        self:doThis("for-all", function(item)
-          item:doThis("open-contents-in-browser")
-        end)
-      end
-    },
   },
   action_table = {
     {
       text = "🌄📚 crsess.",
-      key = "do-interactive",
-      args = {
-        key = "create-session",
-        thing = "session name"
-      }
+      dothis = dothis.url_array.create_as_session_in_msessions
     },
     {
       text = "🌐 br.",
-      key = "open-all-in-browser",
+      dothis = dothis.url_array.open_all
     },
     {
       text = "📌🔗 addurls.",
-      key = "create-all-as-urls",
+      dothis = dothis.url_array.create_as_url_files_in_murls
     }
   },
   potential_interfaces = ovtable.init({

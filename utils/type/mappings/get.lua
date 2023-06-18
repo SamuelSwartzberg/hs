@@ -412,6 +412,31 @@ get = {
   string = {
     split_single_char = stringy.split,
     split = stringx.split,
+    lines_tail = function(path, n)
+      return slice(transf.string.lines(path), -(n or 10))
+    end,
+    lines_head = function(path, n)
+      return slice(transf.string.lines(path), 1, n or 10)
+    end,
+    content_lines_tail = function(path, n)
+      return slice(transf.string.content_lines(path), -(n or 10))
+    end,
+    content_lines_head = function(path, n)
+      return slice(transf.string.content_lines(path), 1, n or 10)
+    end,
+    startswith = stringy.startswith,
+    endswith = stringy.endswith,
+    split2d = function(str, upper_sep, lower_sep)
+      local upper = transf.string.split(str, upper_sep)
+      return hs.fnutils.imap(upper, function(v)
+        return transf.string.split(v, lower_sep)
+      end)
+    end,
+    search_engine_search_url = function(str, search_engine)
+      return tblmap.search_engine.url[search_engine]:format(
+        transf.string.urlencoded_search(str, tblmap.search_engine.spaces_percent[search_engine])
+      )
+    end,
 
   },
   string_array = {
@@ -635,10 +660,10 @@ get = {
   },
   plaintext_file = {
     lines_tail = function(path, n)
-      return slice(transf.plaintext_file.lines(path), -(n or 10))
+      return get.string.lines_tail(transf.plaintext_file.contents(path), n)
     end,
     lines_head = function(path, n)
-      return slice(transf.plaintext_file.lines(path), 1, n or 10)
+      return get.string.lines_head(transf.plaintext_file.contents(path), n)
     end,
     nth_line = function(path, n)
       return transf.plaintext_file.lines(path)[n]
@@ -720,7 +745,39 @@ get = {
       return run(
         "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_function.json_here_string(csl_table)
       )
-    end
+    end,
+    
+  },
+  csl_table_array = {
+    
+  },
+  csl_table = {
+    key_date_parts_single_or_range = function(csl_table, key)
+      return csl_table[key]
+    end,
+    key_rf3339like_dt_or_range = function(csl_table, key)
+      return transf.date_parts_single_or_range.rf3339like_dt_or_range(
+        transf.csl_table.key_date_parts_single_or_range(csl_table, key)
+      )
+    end,
+    key_rfc3339like_dt_force_first = function(csl_table, key)
+      return transf.date_parts_single_or_range.rfc3339like_dt_force_first(
+        transf.csl_table.key_date_parts_single_or_range(csl_table, key)
+      )
+    end,
+    key_date_force_first = function(csl_table, key)
+      return transf.date_parts_single_or_range.date_force_first(
+        transf.csl_table.key_date_parts_single_or_range(csl_table, key)
+      )
+    end,
+    key_prefix_partial_date_components_force_first = function(csl_table, key)
+      return transf.date_parts_single_or_range.prefix_partial_date_components_force_first(
+        transf.csl_table.key_date_parts_single_or_range(csl_table, key)
+      )
+    end,
+    key_year_force_first = function(csl_table, key)
+      return transf.csl_table.key_prefix_partial_date_components_force_first(csl_table, key).year
+    end,
   },
   shellscript_file = {
     lint_table = function(path, severity)
@@ -1042,4 +1099,54 @@ get = {
       return transf.dir.children_filenames_array("/Applications")
     end
   },
+  url = {
+
+  },
+  html_string = {
+    html_query_selector_all = function(str, selector)
+      return memoize(run)(
+        "htmlq" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
+      )
+    end,
+    text_query_selector_all = function(str, selector)
+      return memoize(run)(
+        "htmlq --text" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
+      )
+    end,
+    attribute_query_selector_all = function(str, selector, attribute)
+      return memoize(run)(
+        "htmlq --attribute " .. transf.string.single_quoted_escaped(attribute) .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
+      )
+    end,
+    -- non-all seems to not be possible with htmlq. At least for html_, it would be possible if we parsed the html, but for text_, there seems to be no indication of when each result ends.
+  },
+  html_url = {
+    html_query_selector_all = function(url, selector)
+      return get.html_string.html_query_selector_all(
+        transf.html_url.html_string(url),
+        selector
+      )
+    end,
+    text_query_selector_all = function(url, selector)
+      return get.html_string.text_query_selector_all(
+        transf.html_url.html_string(url),
+        selector
+      )
+    end,
+    attribute_query_selector_all = function(url, selector, attribute)
+      return get.html_string.attribute_query_selector_all(
+        transf.html_url.html_string(url),
+        selector,
+        attribute
+      )
+    end,
+  },
+  url_array = {
+    absolute_path_dict_of_url_files = function(arr, root)
+      return get.relative_path_dict.absolute_path_dict(
+        transf.url_array.relative_path_dict_of_url_files(arr),
+        root
+      )
+    end,
+  }
 }

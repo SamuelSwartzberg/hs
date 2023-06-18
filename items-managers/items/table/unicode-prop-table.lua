@@ -3,5 +3,5 @@ UnicodePropTableSpecifier = {
   action_table = {}
   
 }
---- @type BoundNewDynamicContentsComponentInterface
-CreateUnicodePropTable = bindArg(NewDynamicContentsComponentInterface, UnicodePropTableSpecifier)
+--- @type BoundRootInitializeInterface
+CreateUnicodePropTable = bindArg(RootInitializeInterface, UnicodePropTableSpecifier)

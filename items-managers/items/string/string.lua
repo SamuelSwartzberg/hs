@@ -2,37 +2,12 @@ StringItemSpecifier = {
   type = "string",
   properties = {
     getables = {
-      ["stripped-contents"] = function(self)
-        return stringy.strip(self:get("c"))
-      end,
-      ["is-single-item-string-item"] = function(self) 
-        return (not (#self:get("c") < 2000)) or (not onig.find(self:get("c"), mt._r.whitespace.large)) 
-      end,
-      ["is-multiline-string-item"] = function(self) return stringy.find(self:get("c"), "\n") end,
-      ["is-might-be-json-item"] = function(self)
-        return  startsEndsWithFast(self:get("c"), "{", "}") or startsEndsWithFast(self:get("c"), "[", "]")
-      end,
-      ["to-string-array"] = function(self, sep) 
-        return ar(stringy.split(self:get("c"), sep)) 
-      end,
-      ["to-string-item-array"] = function(self, sep) return self:get("to-string-array", sep):get("to-string-item-array") end,
-      ["to-array-of-string-arrays"] = function(self, seps)
-        return self:get("to-string-array", seps.upper):get("map-to-new-array", 
-        function(line) 
-          return ar(stringy.split(line, seps.lower))
-        end)
-      end,
-      ["to-string"] = function(self)
-        return eutf8.gsub(self:get("c"), "\n", " ")
-      end,
+      ["is-url"] = bc(isUrl),
+      ["is-path"] = bc(is.string.looks_like_path),
+      ["is-printable-ascii-string-item"] = bc(is.string.printable_ascii),
+      ["to-string"] = bc(transf.string.folded),
       ["new-string-item-from-contents"] = function(self)
         return self:doThis("str-item", {key = "c"})
-      end,
-      ["starts-with"] = function(self, str)
-        return stringy.startswith(self:get("c"), str)
-      end,
-      ["ends-with"] = function(self, str)
-        return stringy.endswith(self:get("c"), str)
       end,
       ["difference-from-prefix-or-self"] = function(self, prefix) 
         return mustNotStart(self:get("c"), prefix)
@@ -61,78 +36,7 @@ StringItemSpecifier = {
       end,
       ["escape-lua-regex"] = function(self)
         return replace(self:get("c"), to.regex.lua_escaped)
-      end,
-      ["window-with-contents-as-title"] = function(self)
-        local res = hs.window.find(self:get("c"))
-        if type(res) == "table" then return res 
-        else return {res} end
-      end,
-      ["window-item-contents-as-title"] = function(self)
-        return map(self:get("windows-with-contents-as-title"), function(window)
-          return CreateWindowlikeItem(window)
-        end)
-      end,
-      ["evaluated-as-lua"] = function(self)
-        return singleLe(self:get("c"))
-      end,
-      ["evaluated-as-bash"] = function(self)
-        local parts = stringy.split(self:get("c"), " ")
-        return run(parts)
-      end,
-      ["fold"] = function(self)
-        return transf.string.folded(self:get("c"))
-      end,
-      ["template-evaluated-contents"] = function (self)
-        return le(self:get("c"))
-      end,
-      ["contents-romanized"] = function (self) return transf.string.romanized(self:get("c")) end,
-      ["contents-as-romanized-snake-case-string"] = function(self)
-        return transf.string.romanized_snake(self:get("c"))
-      end,
-      ["is-html-entity-encoded-string-item"] = function(self) 
-        return allOfFast(self:get("c"), mt._list.html_entity_indicator.encoded)
-      end,
-      ["is-html-entity-decoded-string-item"] = function(self)
-         return anyOfFast(self:get("c"), mt._list.html_entity_indicator.decoded)
-      end, -- 'decoded' = to be encoded
-      ["extract-utf8"] = function(self, pattern)
-        return iterToTbl({tolist=true, ret="v"},eutf8.gmatch(self:get("c"), pattern))
-      end,
-      ["extract-utf8-array"] = function(self, pattern)
-        return ar(self:get("extract-utf8", pattern))
-      end,
-      ["extract-onig"] = function(self, pattern)
-        return iterToTbl({tolist=true, ret="v"},onig.gmatch(self:get("c"), pattern))
-      end,
-      ["extract-onig-array"] = function(self, pattern)
-        return ar(self:get("extract-onig", pattern))
-      end,
-      ["extract-utf8-first"] = function(self, pattern)
-        local res = eutf8.match(self:get("c"), pattern)
-        return res
-      end,
-      ["extract-onig-first"] = function(self, pattern)
-        local res = onig.match(self:get("c"), pattern)
-        return res
-      end,
-      ["to-title-case"] = function(self)
-        return transf.string.title_case(self:get("c"))
-      end,
-      ["events-matching-search"] = function(self)
-        return get.khal.search_event_tables(self:get("fold"))
-      end,
-      ["envsubst"] = function(self)
-        return transf.string.envsubsted(self:get("c"))
-      end,
-      ["qr-utf8-image-bow"] = function(self)
-        return transf.string.qr_utf8_image_bow(self:get("c"))
-      end,
-      ["qr-utf8-image-wob"] = function(self)
-        return transf.string.qr_utf8_image_wob(self:get("c"))
-      end,
-      ["qr-png-path"] = function(self)
-        return transf.string.qr_png_in_cache(self:get("c"))
-      end,
+      end
     },
     doThisables = {
       ["tab-fill-with-items"] = function(self, sep)
@@ -142,22 +46,11 @@ StringItemSpecifier = {
         self:get("to-string-item-array", sep)
           :doThis("choose-action")
       end,
-      ["say"] = function(self, lang)
-        dothis.string.say(self:get("c"), lang)
-      end,
       ["add-to-log"] = function(self, path)
         st(path):doThis("log-now", self:get("c"))
       end,
       ["write-to-file"] = function(self, path)
         writeFile(path, self:get("c"))
-      end,
-      ["search-with"] = function(self, search_engine)
-        open(
-          string.format(
-            tblmap.search_engine.url[search_engine],
-            transf.string.urlencoded(self:get("fold"), tblmap.search_engine.spaces_percent[search_engine])
-          )
-        )
       end,
       ["open-in-vscode"] = function(self)
         open({contents = self:get("c")})
@@ -174,15 +67,9 @@ StringItemSpecifier = {
     }
   },
   potential_interfaces = ovtable.init({
-    { key = "single-item-string-item", value = CreateSingleItemStringItem },
-    { key = "multiline-string-item", value = CreateMultilineStringItem },
-    { key = "html-entity-encoded-string-item", value = CreateHTMLEntityEncodedStringItem },
-    { key = "html-entity-decoded-string-item", value = CreateHTMLEntityDecodedStringItem },
-    { key = "has-lowercase-string-item", value = CreateHasLowercaseStringItem },
-    { key = "has-uppercase-string-item", value = CreateHasUppercaseStringItem },
-    { key = "might-be-json-item", value = CreateMightBeJsonItem },
-    { key = "might-be-xml-item", value = CreateMightBeXmlItem },
-    { key = "might-be-bib-item", value = CreateMightBeBibItem },
+    { key = "url", value = CreateURLItem },
+    { key = "path", value = CreatePathItem },
+    { key = "printable-ascii-string-item", value = CreatePrintableAsciiStringItem },
   }),
   action_table = concat({
     {
@@ -376,6 +263,28 @@ StringItemSpecifier = {
       getfn = transf.word.term_syn_specifier_dict,
       filter = transf.term_syn_specifier_dict.term_syn_specifier_item_dict_item,
       act = "cia"
+    },{
+      d = "fld",
+      i = "🗺",
+      getfn = transf.string.folded
+    },{
+      d = "lnhd",
+      i = "⩶👆",
+      getfn = get.string.lines_head
+    },{
+      d = "lntl",
+      i = "⩶👇",
+      getfn = get.string.lines_tail
+    },
+    {
+      d = "ln",
+      i = "⩶",
+      getfn = get.string.lines
+    },
+    {
+      text = "🌄📚 crsess.",
+      dothis = dothis.url_array.create_as_session_in_msessions,
+      filter = transf.string.url_array
     }
   }),
   hs.fnutils.imap(

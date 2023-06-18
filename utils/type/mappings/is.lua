@@ -25,6 +25,15 @@ is = {
     int = function(str)
       return is.string.number(str) and is.number.int(get.string_or_number.number(str))
     end,
+    printable_ascii = function(str)
+      return onig.find(str, whole(mt._r.charset.printable_ascii))
+    end,
+    ascii = function(str)
+      return onig.find(str, whole(mt._r.charset.ascii))
+    end,
+    url = function(str)
+      return is.string.ascii(str) and is.ascii.url(str)
+    end,
   },
   ascii = {
     issn = function(str)
@@ -103,6 +112,7 @@ is = {
     potentially_indicated_decimal_string = function(str)
       return is.ascii.indicated_decimal_string(str) or is.ascii.decimal_string(str)
     end,
+    url = isUrl,
 
   },
   alphanum_minus = {
@@ -248,6 +258,9 @@ is = {
     end,
   },
   url = {
+    has_scheme = function(url)
+      return onig.match(url, mt._r.url.scheme) ~= nil
+    end,
     mailto_url = function(url)
       return stringy.startswith(url, "mailto:")
     end,

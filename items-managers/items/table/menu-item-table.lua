@@ -4,5 +4,5 @@ MenuItemTableSpecifier = {
 
 }
 
---- @type BoundNewDynamicContentsComponentInterface
-CreateMenuItemTable = bindArg(NewDynamicContentsComponentInterface, MenuItemTableSpecifier)
+--- @type BoundRootInitializeInterface
+CreateMenuItemTable = bindArg(RootInitializeInterface, MenuItemTableSpecifier)

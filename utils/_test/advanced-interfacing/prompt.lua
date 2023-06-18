@@ -504,39 +504,7 @@ assertMessage(
   env.DESKTOP
 )
 
-assertMessage(
-  doGui("\n", function ()
-    return prompt("string-path", env.DESKTOP)
-  end),
-  env.DESKTOP
-)
-
 local tmppath =  env.TMPDIR .. "/prompttest/".. os.time() .. ".txt"
-
-assertMessage(
-  doGui("\n", function ()
-    return prompt("string-filepath", tmppath)
-  end),
-  tmppath
-)
-
-assertMessage(
-  doGui(
-    function ()
-      hs.eventtap.keyStrokes("/illegal")
-      hs.eventtap.keyStroke({}, "return")
-      hs.timer.doAfter(0.001, function()
-        hs.eventtap.keyStrokes(tmppath .. "2")
-        hs.eventtap.keyStroke({}, "return")
-      end)
-    end,
-    function ()
-      return prompt("string-filepath", tmppath .. "1")
-    end
-  ),
-  tmppath .. "2"
-)
-
 
 else
   print("skipping...")

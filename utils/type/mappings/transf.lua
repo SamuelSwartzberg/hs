@@ -416,6 +416,17 @@ transf = {
       else
         return {path}
       end
+    end,
+    prompted_path_relative_to = function(path)
+      return promptPipeline({
+        {"dir", {prompt_args = {default = path}}},
+        {"string", {prompt_args = {message = "Subdirectory name"}}, "pipeline"}
+      }) --[[ @as string ]]
+    end,
+    prompted_file_relative_to = function(path)
+      local path = transf.extant_path.prompted_path_relative_to(path)
+      local filename = prompt("string", {prompt_args = {message = "file in " .. path}})
+      return path .. "/" .. filename
     end
   },
   path_in_home = {
@@ -1147,6 +1158,32 @@ transf = {
   rf3339like_dt_or_range = {
 
   },
+  basic_range_string = {
+    start_stop = function(str)
+      return stringy.split(str, "-")
+    end,
+    range_specifier = function(str)
+      local start, stop = transf.basic_range_string.start_stop(str)
+      return {
+        start = start,
+        stop = stop,
+        step = 1,
+      }
+    end,
+  },
+  single_value_or_basic_range_string = {
+    range_specifier = function(str)
+      if stringy.find(str, "-") then
+        return transf.basic_range_string.range_specifier(str)
+      else
+        return {
+          start = str,
+          stop = str,
+          step = 1,
+        }
+      end
+    end,
+  },
   -- range specifier: table of start, stop, step, unit?
   range_specifier = {
     seq = function(range)
@@ -1703,6 +1740,24 @@ transf = {
     end,
   },
   string = {
+    evaled_lua = singleLe,
+    evaled_bash = run,
+    evaled_template = le,
+    window_array = function(str)
+      local res = hs.window.find(str)
+      if type(res) == "table" then return res 
+      else return {res} end
+    end,
+    window_with_exact_title = function(str)
+      local window_arr = transf.string.window_array(str)
+      local window = hs.fnutils.find(
+        window_arr,
+        function(win)
+          return win:title() == str
+        end
+      )
+      return window
+    end,
     in_cache_dir = function(data, type)
       return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.string.safe_filename(data)
     end,
@@ -1815,6 +1870,11 @@ transf = {
       end
       return url
     end,
+    urlencoded_search = function(str, spaces_percent)
+      local folded = transf.string.folded(str)
+      return transf.string.urlencoded(folded, spaces_percent)
+    end,
+
     urldecoded = function(url)
       return replace(url, to.url.decoded)
     end,
@@ -2095,6 +2155,11 @@ transf = {
         )
       )
     end,
+    url_array = function(str)
+      return transf.string_array.filter_nocomment_noindent_to_url_array(
+        transf.string.lines(str)
+      )
+    end
   },
   line = {
     noindent = function(str)
@@ -2284,8 +2349,10 @@ transf = {
     action_table_item = function(search_engine)
       return {
         text = string.format("%s🔎 s%s.", tblmap.search_engine.i[search_engine], tblmap.search_engine.short[search_engine]),
-        key = "search-with",
-        args = search_engine
+        dothis = bind(
+          dothis.string.search,
+          {a_use, search_engine}
+        )
       }
     end,
   },
@@ -2625,6 +2692,14 @@ transf = {
         transf.string_array.nocomment_string_array(arr)
       )
     end,
+    filter_to_url_array = function(arr)
+      return hs.fnutils.filter(arr, is.string.url)
+    end,
+    filter_nocomment_noindent_to_url_array = function(arr)
+      return transf.string_array.filter_to_url_array(
+        transf.string_array.nocomment_noindent_string_array(arr)
+      )
+    end,
     
   },
   env_line_array = {
@@ -2638,6 +2713,40 @@ transf = {
   },
   array_of_string_arrays = {
 
+  },
+  url_array = {
+    url_potentially_with_title_comment_array = function(html_url_array)
+      return hs.fnutils.imap(
+        html_url_array,
+        transf.url.url_potentially_with_title_comment
+      )
+    end,
+    session_string = function(html_url_array)
+      return table.concat(
+        transf.url.url_potentially_with_title_comment_array(html_url_array),
+        "\n"
+      )
+    end,
+    relative_path_dict_of_url_files = function(url_array)
+      return map(
+        url_array,
+        function(url)
+          return 
+            transf.url.title_or_url_as_filename(url),
+            url
+        end,
+        {"v", "kv"}
+      )
+    end,
+  },
+  html_url_array = {
+    html_url_with_title_comment_array = function(html_url_array)
+      return hs.fnutils.imap(
+        html_url_array,
+        transf.html_url.html_url_with_title_comment
+      )
+    end,
+    
   },
   plaintext_file_array = {
     contents_array = function(arr)
@@ -3138,6 +3247,11 @@ transf = {
         transf.stirng.urlencoded(id)
       )
     end,
+    local_citable_object_notes_file = function(id)
+      return transf.filename_safe_indicated_citable_object_id.local_citable_object_notes_file(
+        transf.stirng.urlencoded(id)
+      )
+    end,
     citations_file_line = function(id)
       return transf.csl_table.citations_file_line(
         transf.indicated_citable_object_id.local_csl_table(id)
@@ -3156,6 +3270,9 @@ transf = {
     end,
     local_citable_object_file = function(id)
       return get.dir.find_descendant_with_leaf_ending(env.MPAPERS, id)
+    end,
+    local_citable_object_notes_file = function(id)
+      return get.dir.find_descendant_with_leaf_ending(env.MPAPERNOTES, id)
     end,
   },
   citable_filename = {
@@ -3340,6 +3457,11 @@ transf = {
     csl_table_array = function(str)
       return runJSON("pandoc -f biblatex -t csljson" .. transf.string.here_string(str))
     end,
+    urls = function(str)
+      return transf.csl_table_array.url_array(
+        transf.bib_string.csl_table_array(str)
+      )
+    end
   },
   csl_table_array = {
     bib_string_array = function(arr)
@@ -3366,7 +3488,19 @@ transf = {
         transf.csl_table_array.indicated_citable_object_id_array(arr)
       )
     end,
+    url_array = function(csl_table_array)
+      return hs.fnutils.imap(csl_table_array, transf.csl_table.url)
+    end,
 
+  },
+  csl_table_or_csl_table_array = {
+    url_array = function(csl_table_or_csl_table_array)
+      if isList(csl_table_or_csl_table_array) then
+        return transf.csl_table_array.url_array(csl_table_or_csl_table_array)
+      else
+        return {transf.csl_table.url(csl_table_or_csl_table_array)}
+      end
+    end,
   },
   csl_table = {
     main_title = function(csl_table)
@@ -3438,7 +3572,7 @@ transf = {
         table.concat(
           {
             transf.csl_table.authors_et_al_string(csl_table),
-            transf.csl_table.issued_year_force_first(csl_table),
+            get.csl_table.key_year_force_first(csl_table, "issued"),
             transf.csl_table.main_title_filenamized(csl_table)
           },
           "__"
@@ -3449,11 +3583,38 @@ transf = {
     volume = function(csl_table)
       return csl_table.volume
     end,
+    indicated_volume_string = function(csl_table)
+      local volume = transf.csl_table.volume(csl_table)
+      if volume then
+        return "vol. " .. volume
+      end
+    end,
     jssue = function(csl_table)
       return csl_table.issue
     end,
+    indicated_issue_string = function(csl_table)
+      local issue = transf.csl_table.issue(csl_table)
+      if issue then
+        return "no. " .. issue
+      end
+    end,
     page = function(csl_table)
       return csl_table.page
+    end,
+    page_range_specifier = function(csl_table)
+      return transf.single_value_or_basic_range_string.range_specifier(
+        transf.csl_table.page(csl_table)
+      )
+    end,
+    indicated_page_stirng = function(csl_table)
+      local page = transf.csl_table.page(csl_table)
+      if page then
+        if stringy.find(page, "-") then
+          return "pp. " .. page
+        else
+          return "p. " .. page
+        end
+      end
     end,
     title = function(csl_table)
       return csl_table.title
@@ -3473,6 +3634,12 @@ transf = {
     chapter = function(csl_table)
       return csl_table.chapter
     end,
+    publisher = function(csl_table)
+      return csl_table.publisher
+    end,
+    publisher_place = function(csl_table)
+      return csl_table["publisher-place"]
+    end,
     isbn_part_identifier = function(csl_table)
       local isbn_part_identifier = transf.csl_table.isbn(csl_table)
       if csl_table.chapter then
@@ -3485,7 +3652,7 @@ transf = {
       return isbn_part_identifier
     end,
     issn = function(csl_table)
-      return csl_table.issn
+      return csl_table.ISSN
     end,
     issn_full_identifier = function(csl_table)
       local issn_full_identifier = transf.csl_table.issn(csl_table)
@@ -3502,7 +3669,7 @@ transf = {
       return csl_table.pmcid
     end,
     url = function(csl_table)
-      return csl_table.url
+      return csl_table.URL
     end,
     urlmd5 = function(csl_table)
       return transf.not_userdata_or_function.md5(transf.csl_table.url(csl_table))
@@ -3554,7 +3721,7 @@ transf = {
     end,
     citations_file_line = function(csl_table)
       return transf.csl_table.indicated_citable_object_id(csl_table) 
-      .. " # " .. get.csl_table_or_csl_table_array.raw_citations(csl_table, "apa-6th-edition")
+      .. " # " .. transf.csl_table.apa_string(csl_table)
     end,
     filename_safe_citable_object_id = function(csl_table)
       return transf.string.urlencoded(transf.csl_table.citable_object_id(csl_table))
@@ -3571,7 +3738,10 @@ transf = {
       return run(
         "pandoc -f csljson -t biblatex" .. transf.string.here_string(transf.not_userdata_or_function.json_string(csl_table))
       )
-    end
+    end,
+    apa_string = function(csl_table)
+      return get.csl_table_or_csl_table_array.raw_citations(csl_table, "apa-6th-edition")
+    end,
   },
   csl_person = {
     family = function(csl_person)
@@ -3665,18 +3835,25 @@ transf = {
     end,
   },
   url = {
+    ensure_scheme = function(url)
+      if is.url.has_scheme(url) then
+        return url
+      else
+        return "https://" .. url
+      end
+    end,
     in_wayback_machine = function(url)
-      return "https://web.archive.org/web/*/" .. url
+      return "https://web.archive.org/web/*/" .. transf.url.ensure_scheme(url)
     end,
     default_negotiation_url_contents = function(url)
       return memoize(run, refstore.params.memoize.opts.invalidate_1_day_fs, "run")
           "curl -L" .. transf.string.single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
-      return transf.not_userdata_or_function.in_cache_dir(url, "url")
+      return transf.not_userdata_or_function.in_cache_dir(transf.url.ensure_scheme(url), "url")
     end,
     url_table = function(url)
-      return memoize(parseGuessScheme)(url)
+      return memoize(urlparse)(transf.url.ensure_scheme(url))
     end,
     scheme = function(url)
       return transf.url.url_table(url).scheme
@@ -3745,7 +3922,32 @@ transf = {
         remote_storage_url = url,
       }
     end,
+    url_potentially_with_title_comment = function(url)
+      local title = transf.html_url.title(url)
+      if title and title ~= "" then
+        return url .. " # " .. title
+      else
+        return url
+      end
+    end,
+    title_or_url_as_filename = function(url)
+      local title = transf.html_url.title(url)
+      if title and title ~= "" then
+        return transf.string.safe_filename(title) .. ".url2"
+      else
+        return transf.string.safe_filename(url) .. ".url2"
+      end
+    end,
 
+  },
+  html_url = {
+    html_string = transf.url.default_negotiation_url_contents, -- ideally we would reject non-html responses, but currently, that's too much work
+    title = function(url)
+      return get.html_url.text_query_selector_all(url, "title")
+    end,
+    html_url_with_title_comment = function(url)
+      return url .. " # " .. transf.html_url.title(url)
+    end
   },
   owner_item_url = {
     owner_item = function(url)

@@ -9,7 +9,7 @@ IsbnItemSpecifier = {
     }
   },
   potential_interfaces = ovtable.init({
-    { key = "citable-object-id", value = CreateCitableObjectIdItem },
+    { key = "citable-object-id", value = CreateIndicatedCitableObjectIdItem },
   }),
   action_table ={
     

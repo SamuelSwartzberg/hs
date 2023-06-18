@@ -9,7 +9,7 @@ UrlBase64ItemSpecifier = {
   },
   potential_interfaces = ovtable.init({
     { key = "base-64", value = CreateBase64Item },
-    { key = "citable-object-id", value = CreateCitableObjectIdItem },
+    { key = "citable-object-id", value = CreateIndicatedCitableObjectIdItem },
   }),
   action_table = {}
 

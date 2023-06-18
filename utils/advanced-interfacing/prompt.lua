@@ -104,9 +104,10 @@ end
 --- @field on_transformed_invalid? failure_action What to do if the transformed return value is invalid. May error, return nil, or reprompt. Default is "reprompt".
 --- @field final_postprocessor? fun(transformedReturn: any): any A function to run on the final transformed return value, after validation. Default is the identity function.
 
+--- Main function to handle prompts. Uses a given prompt_spec or defaults.
 --- With the default prompt_spec, we will error if cancelled, return nil if the raw return value is the equivalent of an empty value, and never reprompt.
 --- @param prompt_spec? PromptSpecifier
---- @return any
+--- @return any -- Returns the user's input as processed according to the prompt_spec, or the appropriate error or nil value.
 function promptNopolicy(prompt_spec)
 
   -- set defaults for all prompt_spec fields
@@ -198,14 +199,24 @@ end
 --- @alias promptIntMult fun(type: "int", prompt_spec?: PromptSpecifier, loop: "array"): integer[]|nil
 --- @alias promptNumber fun(type: "number", prompt_spec?: PromptSpecifier, loop: "pipeline" | nil): number|nil prompts for a string, transforms it to a number.
 --- @alias promptNumberMult fun(type: "number", prompt_spec?: PromptSpecifier, loop: "array"): number[]|nil
---- @alias promptString fun(type?: "string" | "string-path" | "string-filepath", prompt_spec?: PromptSpecifier | string, loop: "pipeline" | nil): string|nil prompts for a string, optionally validates it as a path or filepath. If prompt_spec is a string, it is used as the message for "string", and as the default value for "string-path" and "string-filepath".
---- @alias promptStringMult fun(type?: "string" | "string-path" | "string-filepath", prompt_spec?: PromptSpecifier | string, loop: "array"): string[]|nil
+--- @alias promptString fun(type?: "string", prompt_spec?: PromptSpecifier | string, loop: "pipeline" | nil): string|nil 
+--- @alias promptStringMult fun(type?: "string", prompt_spec?: PromptSpecifier | string, loop: "array"): string[]|nil
 --- @alias promptPath fun(type: "path" | "dir", prompt_spec?: PromptSpecifier | string, loop: "pipeline" | nil): string|string[]|nil
 --- @alias promptPathMult fun(type: "path" | "dir", prompt_spec?: PromptSpecifier | string, loop: "array"): string[]|nil
 --- @alias promptPair fun(type: "pair", prompt_spec?: PromptSpecifier, loop: "pipeline" | nil): string[]|nil
 --- @alias promptPairMult fun(type: "pair", prompt_spec?: PromptSpecifier, loop: "array"): string[][]|nil
 
 
+--- The `prompt` function is a versatile function used for handling various types of user inputs such as integers, strings, paths etc. 
+--- It handles validation, transformation and can also handle repeated prompts based on the prompt specifications.
+--- This function uses the `promptNopolicy` function to manage the prompt specifications.
+---
+--- @param ptype string -- The type of the prompt. Possible values are 'int', 'number', 'string', 'path', 'dir' or 'pair'.
+--- @param prompt_spec PromptSpecifier -- Specifications for the prompt.
+--- @param loop string -- Indicates the loop type. Possible values are 'array' or 'pipeline'. 
+--- If 'array' is provided, the prompt will repeat until a nil value is input, collecting all responses in an array.
+--- If 'pipeline' is provided, the prompt will repeat until an input matching the previous one is received, then it returns the processed value.
+--- @return any -- Returns the user's input processed according to the prompt specifications, or the appropriate error or nil value.
 --- @type promptInt | promptNumber | promptString | promptPath | promptPair | promptIntMult | promptNumberMult | promptStringMult | promptPathMult | promptPairMult
 function prompt(ptype, prompt_spec, loop)
   local non_table_prompt_spec
@@ -229,7 +240,7 @@ function prompt(ptype, prompt_spec, loop)
     if type(non_table_prompt_spec) == "string" then
       prompt_spec = { prompt_args = { message = non_table_prompt_spec } } -- prompt_spec shorthand when type is string: prompt_spec is the message
     end
-  elseif ptype == "string-path" or ptype == "string-filepath" or ptype == "path" or ptype == "dir" then
+  elseif ptype == "path" or ptype == "dir" then
     if type(non_table_prompt_spec) == "string" then
       prompt_spec = { prompt_args = { default = non_table_prompt_spec } } -- prompt_spec shorthand when type is string: prompt_spec is the default value
     end
@@ -243,22 +254,6 @@ function prompt(ptype, prompt_spec, loop)
       end
 
       prompt_spec.prompter = promptPathInner
-    elseif ptype == "string-path" then
-      prompt_spec.transformed_validator = function(x)
-        local res = (x ~= nil)
-        if res then
-          res = pcall(createPath, x, nil, "error")
-        end
-        return res
-      end
-    elseif ptype == "string-filepath" then
-      prompt_spec.transformed_validator = function(x)
-        local res = (x ~= nil)
-        if res then
-          res = pcall(writeFile, x, "", "not-exists", true, "w", "error")
-        end
-        return res
-      end
     end
   elseif ptype == "pair" then
     if type(non_table_prompt_spec) == "string" then
@@ -315,6 +310,14 @@ function prompt(ptype, prompt_spec, loop)
   end
 end
 
+
+--- The `promptPipeline` function is used to manage a series of prompts to the user, feeding the result of each prompt into the next. 
+--- It accepts an array where each element is another array containing three elements: 
+--- - a string representing the type of the prompt, 
+--- - a table of parameters for the prompt function,
+--- - a string representing the loop type.
+--- The function will return the result of the last prompt in the pipeline.
+--- @param prompt_pipeline any[][] -- array of { ptype, prompt_spec, loop } tuples
 function promptPipeline(prompt_pipeline)
   local res
   local first_prompt_spec = prompt_pipeline[1][2]

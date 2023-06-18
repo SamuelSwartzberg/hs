@@ -8,8 +8,8 @@ AddressTableSpecifier = {
 
 }
 
---- @type BoundNewDynamicContentsComponentInterface
-function CreateAddressTable(super)
-  return NewDynamicContentsComponentInterface(AddressTableSpecifier, super)
+--- @type BoundRootInitializeInterface
+function CreateAddressTable(contents)
+  return RootInitializeInterface(AddressTableSpecifier, contents)
 end
 
