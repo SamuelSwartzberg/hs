@@ -1025,6 +1025,22 @@ get = {
     end,
 
   },
+  timestamp_s = {
+    formatted = function(timestamp_s, format)
+      return get.date.formatted(
+        transf.timestamp_s.date(timestamp_s),
+        format
+      )
+    end,
+  },
+  timestamp_ms = {
+    formatted = function(timestamp_s, format)
+      return get.date.formatted(
+        transf.timestamp_s.date(timestamp_s),
+        format
+      )
+    end,
+  },
   date_components = {
     date_range_specifier = function(date_components, step, unit)
       return {
@@ -1234,6 +1250,20 @@ get = {
       return get.relative_path_dict.absolute_path_dict(
         transf.url_array.relative_path_dict_of_url_files(arr),
         root
+      )
+    end,
+  },
+  omegat_project_dir = {
+    source_files_extension = function(dir, ext)
+      return get.path_array.filter_to_same_extension(
+        transf.omegat_project_dir.source_files(dir),
+        ext
+      )
+    end,
+    target_files_extension = function(dir, ext)
+      return get.path_array.filter_to_same_extension(
+        transf.omegat_project_dir.source_files(dir),
+        ext
       )
     end,
   }

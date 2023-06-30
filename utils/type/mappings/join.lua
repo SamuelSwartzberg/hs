@@ -19,11 +19,6 @@ join = {
         end
         return "---\n" .. final_metadata .. "\n---\n" .. final_contents
       end,
-      email = function(str, tbl)
-        local header = transf.stringable_value_dict.email_header(tbl)
-        local mail = string.format("%s\n\n%s", header, str)
-        return mail
-      end
     },
   },
   mod_array = {

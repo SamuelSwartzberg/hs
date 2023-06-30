@@ -21,6 +21,7 @@ require("utils")
 
 
 comp = fsTree(env.MCOMPOSITE, "as-tree")
+fstblmap = fsTree(env.MDICTIONARIES .. "/mappings", "as-tree")
 
 require("items-managers")
 

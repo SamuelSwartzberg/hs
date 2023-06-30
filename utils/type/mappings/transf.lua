@@ -467,7 +467,12 @@ transf = {
     extant_path_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.exists)
     end,
-    
+    attachment_array = function(path_array)
+      return hs.fnutils.imap(path_array, transf.path.attachment)
+    end,
+    attachment_string = function(path_array)
+      return table.concat(transf.path_array.attachment_array(path_array), "\n")
+    end,
   },
   extant_path_array = {
     newest = function(path_array)
@@ -766,11 +771,24 @@ transf = {
         body = "\n\n" .. transf.string.email_quoted(specifier.body)
       }
     end,
-    draft_email_file = function(specifier)
+    email_string = function(specifier)
       specifier = copy(specifier)
       local body = specifier.body or ""
       specifier.body = nil
-      local mail = join.string.table.email(specifier, body)
+      local non_inline_attachments = specifier.non_inline_attachments
+      specifier.non_inline_attachments = nil
+      local header = transf.stringable_value_dict.email_header(specifier)
+      local mail = string.format("%s\n\n%s", header, body)
+      if non_inline_attachments then
+        mail = mail .. "\n" .. transf.path_array.attachment_string(non_inline_attachments)
+      end
+      return mail
+    end,
+
+    draft_email_file = function(specifier)
+      
+
+      local mail = join.string.table.email(body, specifier)
       local evaled_mail = le(mail)
       local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
       local outpath = temppath .. "_out"
@@ -1325,6 +1343,12 @@ transf = {
     iban_bic_bank_name_array = function(iban)
       return {iban, transf.iban.bic(iban), transf.iban.bank_name(iban)}
     end,
+    bank_details_string = function(iban)
+      return table.concat(
+        transf.iban.iban_bic_bank_name_array(iban),
+        "\n"
+      )
+    end,
     separated_iban = function(iban)
       return transf.cleaned_iban.separated_iban(transf.iban.cleaned_iban(iban))
     end,
@@ -1514,6 +1538,12 @@ transf = {
         transf.contact_table.bic(contact_table),
         transf.contact_table.bank_name(contact_table),
       }
+    end,
+    name_bank_details_string = function(contact_table)
+      return table.concat(
+        transf.contact_table.main_name_iban_bic_bank_name_array(contact_table),
+        "\n"
+      )
     end,
     vcard_type_phone_number_dict = function (contact_table)
       return contact_table.Phone
@@ -3452,6 +3482,119 @@ transf = {
         transf.latex_project_dir.citations_file(dir)
       )
     end,
+  },
+  omegat_project_dir = {
+    metadata_file = function(dir)
+      return transf.path.ending_with_slash(dir) .. "data.yaml"
+    end,
+    metadata = function(dir)
+      return transf.yaml_file.table(
+        transf.omegat_project_dir.metadata_file(dir)
+      )
+    end,
+    client_name = function(dir)
+      return transf.omegat_project_dir.metadata(dir).client
+    end,
+    client_contact_uuid = function(dir)
+      return fstblmap.client_name.contact_uuid(
+        transf.omegat_project_dir.client_name(dir)
+      )
+    end,
+    client_contact_table = function(dir)
+      return transf.uuid.contact_table(
+        transf.omegat_project_dir.client_contact_uuid(dir)
+      )
+    end,
+    client_main_name = function(dir)
+      return transf.contact_table.main_name(
+        transf.omegat_project_dir.client_contact_table(dir)
+      )
+    end,
+    rechnung = function(dir)
+      return transf.omegat_project_dir.metadata(dir).rechnung
+    end,
+    rechnung_number = function(dir)
+      return transf.omegat_project_dir.rechnung(dir).nr
+    end,
+    delivery_date = function(dir)
+      return transf.omegat_project_dir.rechnung(dir).delivery_date
+    end,
+    dictionary_dir = function(dir)
+      return transf.path.ending_with_slash(dir) .. "dictionary"
+    end,
+    glossary_dir = function(dir)
+      return transf.path.ending_with_slash(dir) .. "glossary"
+    end,
+    omegat_dir = function(dir)
+      return transf.path.ending_with_slash(dir) .. "omegat"
+    end,
+    source_dir = function(dir)
+      return transf.path.ending_with_slash(dir) .. "source"
+    end,
+    target_dir = function(dir)
+      return transf.path.ending_with_slash(dir) .. "target"
+    end,
+    tm_dir = function(dir)
+      return transf.path.ending_with_slash(dir) .. "tm"
+    end,
+    source_files = function(dir)
+      return transf.dir.children_array(
+        transf.omegat_project_dir.source_dir(dir)
+      )
+    end,
+    target_files = function(dir)
+      return transf.dir.children_array(
+        transf.omegat_project_dir.target_dir(dir)
+      )
+    end,
+    local_client_glossary_file = function(dir)
+      return transf.omegat_project_dir.glossary_dir(dir) .. "/" .. transf.omegat_project_dir.client_name(dir) .. ".txt"
+    end,
+    local_universal_glossary_file = function(dir)
+      return transf.omegat_project_dir.glossary_dir(dir) .. "/universal.txt"
+    end,
+    global_client_glossary_file = function(dir)
+      return transf.path.ending_with_slash(env.MGLOSSARIES) .. transf.omegat_project_dir.client_name(dir) .. ".txt"
+    end,
+    global_universal_glossary_file = function()
+      return transf.path.ending_with_slash(env.MGLOSSARIES) .. "universal.txt"
+    end,
+    local_resultant_tm = function(dir)
+      return transf.omegat_project_dir.tm_dir(dir) .. "/" .. transf.path.leaf(dir) .. "-omegat.tmx"
+    end,
+    global_client_tm_dir = function(dir)
+      return env.MTM_MEMORY .. transf.omegat_project_dir.client_name(dir)
+    end,
+    global_universal_tm_dir = function()
+      return env.MTM_MEMORY .. "universal"
+    end,
+    rechnung_filename = function(dir)
+      return get.timestamp_s.formatted(
+        os.time(),
+        tblmap.dt_component.rfc3339["day"]
+      ) .. "--" .. transf.omegat_project_dir.client_name(dir) .. "_" .. transf.omegat_project_dir.rechnung_number(dir)
+    end,
+    rechnung_pdf_path = function(dir)
+      return transf.path.ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".pdf"
+    end,
+    rechnung_md_path = function(dir)
+      return transf.path.ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".md"
+    end,
+    target_file_char_amount_array = function(dir)
+      return hs.fnutils.imap(
+        get.omegat_project_dir.target_files_extension(dir, "txt"),
+        transf.plaintext_file.chars
+      )
+    end,
+    rechnung_email_specifier = function(dir)
+      return {
+        body = le(comp.documents.translation.rechnung_email_de, dir),
+        non_inline_attachments = {
+          transf.omegat_project_dir.rechnung_pdf_path(dir)
+        }
+      }
+    end,
+
   },
 
   running_application = {
