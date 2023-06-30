@@ -373,16 +373,6 @@ dothis = {
     download = function(url, target)
       run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
     end,
-    open = function(url, browser, do_after)
-      url = transf.url.ensure_scheme(url)
-      browser = browser or "Firefox"
-      if do_after then -- if we're opening an url, typically, we would exit immediately, negating the need for a callback. Therefore, we want to wait. The only easy way to do this is to use a completely different browser. 
-        run("open -a Safari -W" .. transf.string.single_quoted_escaped(url), do_after)
-        -- Annoyingly, due to a 15 (!) year old bug, Firefox will open the url as well, even if we specify a different browser. I've tried various fixes, but for now we'll just have to live with it and click the tab away manually.
-      else
-        run("open -a" .. transf.string.single_quoted_escaped(browser))
-      end
-    end,
   },
   booru_url = {
     add_to_local = function(url)
@@ -417,6 +407,11 @@ dothis = {
         run("qrencode -l M -m 2 -t PNG -o" .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(data))
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
     end,
+    alert = function(str, opts)
+      opts = copy(opts) or {}
+      opts.duration = opts.duration or 10
+      return hs.alert.show(str, {textSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3}, opts.duration)
+    end,
     say = function(str, lang)
       lang = lang or "en"
       speak:voice(tblmap.lang.voice[lang]):speak(transf.string.folded(str))
@@ -447,7 +442,7 @@ dothis = {
       dothis.string_array.fill_with(transf.string.nocomment_noindent_content_lines(path))
     end,
     search = function(str, search_engine)
-      dothis.url.open(
+      dothis.string.open_browser(
         get.string.search_engine_search_url(search_engine, str)
       )
     end,
@@ -461,6 +456,25 @@ dothis = {
         transf.string.write_to_temp_file(str),
         env.GUI_EDITOR
       )
+    end,
+    open_browser = function(url, browser, do_after)
+      url = transf.url.ensure_scheme(url)
+      browser = browser or "Firefox"
+      if do_after then -- if we're opening an url, typically, we would exit immediately, negating the need for a callback. Therefore, we want to wait. The only easy way to do this is to use a completely different browser. 
+        run("open -a Safari -W" .. transf.string.single_quoted_escaped(url), do_after)
+        -- Annoyingly, due to a 15 (!) year old bug, Firefox will open the url as well, even if we specify a different browser. I've tried various fixes, but for now we'll just have to live with it and click the tab away manually.
+      else
+        run("open -a" .. transf.string.single_quoted_escaped(browser))
+      end
+    end,
+    open_ff = function(url)
+      dothis.string.open_browser(url, "Firefox")
+    end,
+    open_safari = function(url)
+      dothis.string.open_browser(url, "Safari")
+    end,
+    open_chrome = function(url)
+      dothis.string.open_browser(url, "Google Chrome")
     end,
 
   },
@@ -962,7 +976,7 @@ dothis = {
   url_array = {
     open_all = function(url_array)
       for _, url in ipairs(url_array) do
-        dothis.url.open(url)
+        dothis.string.open_browser(url)
       end
     end,
     create_as_url_files = function(url_array, path)

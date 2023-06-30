@@ -6,26 +6,7 @@ StringItemSpecifier = {
       ["is-path"] = bc(is.string.looks_like_path),
       ["is-printable-ascii-string-item"] = bc(is.string.printable_ascii),
       ["to-string"] = bc(transf.string.folded),
-      ["contained-unicode-prop-tables"] = function(self)
-        return transf.table_array.item_array_of_item_tables(
-          transf.string.unicode_prop_table_array(self:get("c"))
-        )
-      end,
-      ["encoded-as"] = function(self, enc)
-        return transf.string[enc](self:get("c"))
-      end,
-      ["escaped-general-regex"] = function(self)
-        return replace(self:get("c"), to.regex.general_escaped)
-      end,
-      ["escape-lua-regex"] = function(self)
-        return replace(self:get("c"), to.regex.lua_escaped)
-      end
     },
-    doThisables = {
-      ["tab-fill-with-items"] = function(self, sep)
-        self:get("to-string-item-array", sep):doThis("tab-fill-with")
-      end
-    }
   },
   potential_interfaces = ovtable.init({
     { key = "url", value = CreateURLItem },
@@ -41,22 +22,13 @@ StringItemSpecifier = {
       dothis = dothis.string.paste
     },{
       text = "👄🇺🇸 sayen.",
-      key = "say",
-      args = "en"
+      dothis = bind(dothis.string.say, {a_use, "en"})
     },{
       text = "👄🇯🇵 sayja.",
-      key = "say",
-      args = "ja"
-    }, {
-      text = "👉⽄👊 cspltact.",
-      key = "do-interactive",
-      args = {
-        key = "split-and-choose-action",
-        thing = "separator"
-      }
+      dothis = bind(dothis.string.say, {a_use, "ja"})
     }, {
       text = "📓🦄 logdia.",
-      key = "add-to-log",
+      dothis = dothis.entry_logging_dir.log_string,
       args = env.MENTRY_LOGS
     }, {
       text = "🌄✂️ crsnp.",
@@ -70,92 +42,85 @@ StringItemSpecifier = {
       }
     }, {
       text = "🔍 ql.",
-      dothis = alert
+      dothis = dothis.string.alert
     },{
-      text = "🧬 eval.",
-      key = "get-as-do",
-      args = "evaluated-as-lua"
-    }, {
       text = "🔷🈁 vscur.",
-      key = "open-in-vscode"
+      dothis = dothis.string.open_temp_file
     },{
-      text = "🌐 br.",
-      key = "open-contents-in-browser"
+      text = "🦊🌐 ffbr.",
+      dothis = dothis.string.open_ff
     },{
-      text = "📨 qf.",
-      key = "append-to-qf-file"
+      text = "🧭🌐 sfbr.",
+      dothis = dothis.string.open_safari,
+    },{
+      text = "🌈🌐 gcbr.",
+      dothis = dothis.string.open_chrome,
     }, {
       text = "👉🍾 cev.",
-      key = "choose-item-on-result-of-get",
-      args = {
-        key = "array",
-        args = "events-matching-search"
-      }
+      getfn = get.khal.search_event_tables
     },
     {
       d = "binec",
       i = "🅱️2️⃣📦",
-      key = "encoded-as",
-      args = "bits"
+      getfn = transf.string.bits
     }, {
       d = "hexec",
       i = "🅱️1️⃣6️⃣📦",
-      key = "encoded-as",
-      args = "hex"
+      getfn = transf.string.hex
     }, {
       d = "urlb64ec",
       i = "🔗🅱️6️⃣4️⃣📦",
-      key = "encoded-as",
-      args = "base64_url"
+      getfn = transf.string.base64_url
     }, {
       d = "genb64ec",
       i = "🤝🅱️6️⃣4️⃣📦",
-      key = "encoded-as",
-      args = "base64_gen"
+      getfn = transf.string.base64_gen
     }, {
       d = "crc32ec",
       i = "👴🏻🅱️3️⃣2️⃣📦",
-      key = "encoded-as",
-      args = "base32_crock"
+      getfn = transf.string.base32_crock
     }, {
       d = "gen32ec",
       i = "🤝🅱️3️⃣2️⃣📦",
-      key = "encoded-as",
-      args = "base32_gen"
+      getfn = transf.string.base32_gen
     }, {
       d = "escrgx",
       i = "🏃🏾‍♀️🧩",
-      key = "escaped-general-regex"
+      getfn = transf.string.escaped_general_regex
     }, {
       d = "escluargx",
       i = "🏃🏾‍♀️🔵🧩",
-      key = "escape-lua-regex"
+      getfn = transf.string.escaped_lua_regex
     }, {
       d = "eval",
       i = "🧬",
-      key = "evaluated-as-lua"
-    },
+      getfn = transf.string.evaled_lua
+    }, 
     {
       d = "tmpeval",
       i = "🕳🧬",
-      key = "template-evaluated-contents"
+      getfn = transf.string.evaled_template
     }, {
       d = "basheval",
       i = "🐚🧬",
-      key = "evaluated-as-bash"
+      getfn = transf.string.evaled_bash
     }, {
       d = "envsubst",
       i = "🌥🧬",
-      key = "envsubst"
+      getfn = transf.string.envsubsted
     }, {
       d = "rsnu",
       i = "🅰🐍🧗‍♀️",
-      key = "contents-as-romanized-snake-case-string"
+      getnf = transf.string.romanized_snake
     },
     {
-      d = "r",
+      d = "rdet",
       i = "🅰",
-      key = "contents-romanized"
+      getfn = transf.string.romanized_deterministic
+    },{
+      d = "rgpt",
+      i = "🅰",
+      getfn = transf.string.romanized_gpt
     },{
       d = "1stnum",
       i = "#️⃣",
@@ -164,19 +129,19 @@ StringItemSpecifier = {
     },{
       i = "📰",
       d = "ttlcs",
-      key = "to-title-case"
+      getfn = transf.string.title_case
     },{
       i = "🔳🏞🛣",
       d = "qrimgpth",
-      key = "qr-image-path"
+      getfn = transf.string.qr_png_in_cache
     },{
       i = "🔳🔡⬜️",
       d = "qrstrbow",
-      key = "qr-utf8-image-bow"
+      getfn = transf.string.qr_utf8_image_bow
     },{
       i = "🔳🔡⬛️", 
       d = "qrstrwob",
-      key = "qr-utf8-image-wob"
+      getfn = transf.string.qr_utf8_image_wob
     },{
       d = "al",
       i = "🪂",
@@ -230,16 +195,21 @@ StringItemSpecifier = {
     },{
       d = "lnhd",
       i = "⩶👆",
-      getfn = get.string.lines_head
+      getfn = get.string.lines_head,
+
     },{
       d = "lntl",
       i = "⩶👇",
-      getfn = get.string.lines_tail
+      getfn = get.string.lines_tail,
     },
     {
       d = "ln",
       i = "⩶",
-      getfn = get.string.lines
+      getfn = get.string.lines,
+    }, {
+      d = "spltarr",
+      i = "⽄,",
+      getfn = bind(get.string.split_single_char_stripped, {a_use, ","}),
     },
     {
       text = "🌄📚 crsess.",

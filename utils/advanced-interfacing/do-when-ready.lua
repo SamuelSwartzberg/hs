@@ -10,7 +10,7 @@ alert_hotkey =  hs.hotkey.bind({"cmd", "alt", "shift"}, "/", function()
     hs.alert.closeSpecific(current_alert)
   else
     hs.alert.closeSpecific(current_alert)
-    current_alert = alert("Waiting to proceed (" .. #do_queue .. " waiting in queue) ... (Press chord / to continue.)",  {duration = "indefinite"})
+    current_alert = dothis.string.alert("Waiting to proceed (" .. #do_queue .. " waiting in queue) ... (Press chord / to continue.)",  {duration = "indefinite"})
   end
 end)
 
@@ -25,7 +25,7 @@ function doWhenReady(fn, args)
     fn = fn, 
     args = args
   })
-  current_alert = alert("Waiting to proceed (" .. #do_queue .. " waiting in queue) ... (Press chord / to continue.)", {duration = "indefinite"})
+  current_alert = dothis.string.alert("Waiting to proceed (" .. #do_queue .. " waiting in queue) ... (Press chord / to continue.)", {duration = "indefinite"})
   ---@diagnostic disable-next-line: need-check-nil
   alert_hotkey:enable()
 end

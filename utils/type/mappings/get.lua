@@ -446,6 +446,11 @@ get = {
   },
   string = {
     split_single_char = stringy.split,
+    split_single_char_stripped = function(str, sep)
+      return transf.string_array.stripped_string_array(
+        transf.string.split_single_char(str, sep)
+      )
+    end,
     split = stringx.split,
     lines_tail = function(path, n)
       return slice(transf.string.lines(path), -(n or 10))

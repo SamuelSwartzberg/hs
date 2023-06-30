@@ -217,13 +217,24 @@ InterfaceDefaultTemplate = {
             args[k] = v
           end
         end
-        action_item.filter = action_item.filter or st
         if action_item.dothis then
+          action_item.filter = action_item.filter or st
           action_item.dothis(action_item.filter(first_arg), table.unpack(args))
         elseif action_item.key then
           self:doThis(action_item.key, table.unpack(args))
         else
           local res = action_item.getfn(first_arg, table.unpack(args))
+          if not action_item.filter then
+            if type(res) == "string" then
+              action_item.filter = st
+            elseif isListOrEmptyTable(res) then
+              action_item.filter = ar
+            elseif type(res) == "table" then
+              action_item.filter = dc 
+            elseif type(res) == "number" then
+              action_item.filter = nr 
+            end
+          end
           action_item.act = action_item.act or "ca"
           if action_item.act == "ca" then
             action_item.act = "choose-action"

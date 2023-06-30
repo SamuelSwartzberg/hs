@@ -347,7 +347,7 @@ assertMessage(
 )
 
 assertMessage(
-  transf.string.romanized("ねえ もう少しだけ で いい の"),
+  transf.string.romanized_deterministic("ねえ もう少しだけ で いい の"),
   "nee mou sukoshi dake de ii no"
 )
 

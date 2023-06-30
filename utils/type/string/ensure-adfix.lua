@@ -22,7 +22,7 @@ function ensureAdfix(in_str, in_adfix, presence, case_insensitive, adfix_type, s
     adfix = in_adfix
   end
   local flag = ternary(case_insensitive, "i", "")
-  local check_ad = ternary(regex, in_adfix, replace(in_adfix, to.regex.general_escaped)) -- which adfix to check for in regex
+  local check_ad = ternary(regex, in_adfix, transf.string.escaped_general_regex(in_adfix)) -- which adfix to check for in regex
   local position_check_func
   if adfix_type == "pre" then
     if regex then 

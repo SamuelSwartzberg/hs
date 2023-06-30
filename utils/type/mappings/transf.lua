@@ -156,6 +156,14 @@ transf = {
         .. transf.unicode_prop_table.unicode_character_name(unicode_prop_table)
     end,
   },
+  unicode_prop_table_array = {
+    unicode_prop_table_item_array = function(unicode_prop_table_array)
+      return hs.fnutils.imap(
+        unicode_prop_table_array,
+        CreateUnicodePropTable
+      )
+    end,
+  },
   number = {
     decimal_string = function(num)
       return tostring(num)
@@ -1787,6 +1795,12 @@ transf = {
     evaled_lua = singleLe,
     evaled_bash = run,
     evaled_template = le,
+    escaped_lua_regex = function(str)
+      return replace(str, to.regex.escaped_lua_regex)
+    end,
+    escaped_general_regex = function(str)
+      return replace(str, to.regex.escaped_general_regex)
+    end,
     window_array = function(str)
       local res = hs.window.find(str)
       if type(res) == "table" then return res 
@@ -1928,6 +1942,11 @@ transf = {
     unicode_prop_table_array = function(str)
       return memoize(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(str))
     end,
+    unicode_prop_table_item_array = function(str)
+      return transf.unicode_prop_table_array.unicode_prop_table_item_array(
+        transf.string.unicode_prop_table_array(str)
+      )
+    end,
     single_quoted_escaped = function(str)
       return " '" .. memoize(replace)(str, to.string.escaped_single_quote_safe) .. "'"
     end,
@@ -1959,7 +1978,7 @@ transf = {
         sep = removed,
       }, title_cased_words)
     end,
-    romanized = function(str)
+    romanized_deterministic = function(str)
       local raw_romanized = run(
         { "echo", "-n",  {value = str, type = "quoted"}, "|", "kakasi", "-iutf8", "-outf8", "-ka", "-Ea", "-Ka", "-Ha", "-Ja", "-s", "-ga" }
       )
@@ -1974,7 +1993,7 @@ transf = {
     end,
     romanized_snake = function(str)
       str = eutf8.gsub(str, "[%^']", "")
-      str = transf.string.romanized(str)
+      str = transf.string.romanized_deterministic(str)
       str = eutf8.lower(replace(str, to.case.snake))
       return str
     end,
@@ -2743,6 +2762,9 @@ transf = {
       return transf.string_array.filter_to_url_array(
         transf.string_array.nocomment_noindent_string_array(arr)
       )
+    end,
+    stripped_string_array = function(arr)
+      return hs.fnutils.imap(arr, stringy.strip)
     end,
     
   },

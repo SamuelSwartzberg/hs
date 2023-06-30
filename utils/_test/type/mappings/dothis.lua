@@ -118,7 +118,7 @@ hs.timer.doAfter(1, function ()
       assert(#baking_class_event == 1)
       assertMessage(baking_class_event[1].title, "Baking class test event")
       dothis.khal.edit_event("Baking class test event") -- user will be prompted to edit the event
-      alert("Edit the title of the event to 'Baking class test event edited'")
+      dothis.string.alert("Edit the title of the event to 'Baking class test event edited'")
       hs.timer.doAfter(60, function()
         local baking_class_event = get.khal.search_event_tables("Baking class test event edited")
         assert(#baking_class_event == 1)
@@ -147,7 +147,7 @@ hs.timer.doAfter(1, function ()
               dothis.khal.delete_event("testevent" .. tme)
               hs.timer.doAfter(1, function ()
                 error("TODO add_event_interactive")
-                alert("Just save the event and close the window")
+                dothis.string.alert("Just save the event and close the window")
                 dothis.khal.add_event_interactive({
                   calendar = "testcalendar",
                   location = "testlocation",
