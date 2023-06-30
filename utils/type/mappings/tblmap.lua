@@ -405,6 +405,7 @@ tblmap = {
       bitbucket = "bitbucket.org",
     },
     raw_indicator = {
+      
       github = "",
       gitlab = "raw/",
       bitbucket = "raw/",
@@ -449,6 +450,12 @@ tblmap = {
     install_command = {
       npm = "npm run install",
     },
+    project_materials_list = {
+      omegat = {
+        "tm",
+        "glossary"
+      }
+    }
   }
 }
 

@@ -25,6 +25,13 @@ refstore = {
         kv_to_list = {args = "kv", ret = "v", tolist = true}
       }
     },
+    gpt = {
+      opts = {
+        temperature_0 = {
+          temperature = 0
+        },
+      }
+    },
     memoize = {
       opts = {
         stringify_table_params = {
@@ -76,6 +83,9 @@ refstore = {
           mode = "fs",
           invalidation_mode = "invalidate",
           interval = 365 * 24 * 60 * 60
+        },
+        permanent_fs = {
+          mode = "fs",
         },
       }
     },

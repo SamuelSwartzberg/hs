@@ -1056,6 +1056,20 @@ dothis = {
         tblmap.mac_application_name.reload_full_action_path[application_name]
       )
     end,
+    open_recent = function(application_name, item)
+      dothis.mac_application_name.execute_full_action_path(
+        application_name,
+        append(
+          tblmap.mac_application_name.recent_full_action_path[application_name],
+          item
+        )
+      )
+    end,
+    focus_main_window = function(application_name)
+      dothis.running_application.focus_main_window(
+        transf.mac_application_name.running_application(application_name)
+      )
+    end,
   },
   firefox = {
     dump_state = function(do_after)
@@ -1117,6 +1131,9 @@ dothis = {
   running_application = {
     execute_full_action_path = function(running_application, full_action_path)
       running_application:selectMenuItem(full_action_path)
+    end,
+    focus_main_window = function(running_application)
+      transf.running_application.main_window(running_application):focus()
     end,
   },
   menu_item_table = {
@@ -1200,6 +1217,93 @@ dothis = {
         do_after
       )
     end,
+    pull_subtype_project_materials = function(project_dir, type, subtype)
+      srctgt("copy", 
+        get.project_dir.global_subtype_project_material_path(project_dir, type, subtype),
+        get.project_dir.local_subtype_project_material_path(project_dir, type, subtype),
+      "any", true, false, true)
+    end,
+    push_subtype_project_materials = function(project_dir, type, subtype)
+      srctgt("copy", 
+        get.project_dir.local_subtype_project_material_path(project_dir, type, subtype),
+        get.project_dir.global_subtype_project_material_path(project_dir, type, subtype),
+      "any", false, false, true)
+    end,
+    pull_universal_project_materials = function(project_dir, type)
+      srctgt("copy", 
+        get.project_dir.global_universal_project_material_path(project_dir, type),
+        get.project_dir.local_universal_project_material_path(project_dir, type),
+      "any", true, false, true)
+    end,
+    push_universal_project_materials = function(project_dir, type)
+      srctgt("copy", 
+        get.project_dir.local_universal_project_material_path(project_dir, type),
+        get.project_dir.global_universal_project_material_path(project_dir, type),
+      "any", false, false, true)
+    end,
+    pull_project_materials = function(project_dir, type, subtype)
+      dothis.project_dir.pull_universal_project_materials(project_dir, type)
+      dothis.project_dir.pull_subtype_project_materials(project_dir, type, subtype)
+    end,
+    push_project_materials = function(project_dir, type, subtype)
+      dothis.project_dir.push_universal_project_materials(project_dir, type)
+      dothis.project_dir.push_subtype_project_materials(project_dir, type, subtype)
+    end,
+  },
+  omegat_project_dir = {
+    pull_project_materials = function(omegat_project_dir)
+      for _, type in ipairs(tblmap.project_type.project_materials_list["omegat"]) do
+        dothis.project_dir.pull_project_materials(
+          omegat_project_dir,
+          type,
+          transf.omegat_project_dir.client_name(omegat_project_dir)
+        )
+      end
+    end,
+    push_project_materials = function(omegat_project_dir)
+      dothis.project_dir.push_project_materials(
+        omegat_project_dir,
+        "glossary",
+        transf.omegat_project_dir.client_name(omegat_project_dir)
+      )
+      srctgt("copy",
+        transf.omegat_project_dir.local_resultant_tm(omegat_project_dir),
+        get.project_dir.global_subtype_project_material_path(
+          omegat_project_dir,
+          "tm",
+          transf.omegat_project_dir.client_name(omegat_project_dir)
+        ),
+        "any", true, true)
+    end,
+    create_all_translated_documents = dothis.omegat.create_all_translated_documents,
+    create_current_translated_document = dothis.omegat.create_current_translated_document,
+    create_and_open_new_source_odt = function(omegat_project_dir, name) -- while we support any source file, if we manually create a file, it should be an odt
+      dothis.absolute_path.create_file(
+        transf.omegat_project_dir.source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
+      )
+      dothis.path.open(
+        transf.omegat_project_dir.source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
+      )
+    end,
+    open_project = function(omegat_project_dir)
+      local running_application = transf.mac_application_name.ensure_running_application("OmegaT")
+      dothis.mac_application_name.open_recent("OmegaT", omegat_project_dir)
+      dothis.running_application.focus_main_window(running_application)
+    end,
+    generate_target_txts = function(dir, do_after)
+      local generation_tasks = map(
+      transf.omegat_project_dir.target_files(dir),
+      function(file)
+        return file, "soffice --headless --convert-to txt:Text --outdir"..
+        transf.string.single_quoted_escaped(
+          transf.omegat_project_dir.target_txt_dir(dir)
+        ) ..
+        transf.string.single_quoted_escaped(file)
+      end,
+      {"v", "kv"}
+    )
+    runThreaded(generation_tasks, 1, do_after)
+    end
   },
   latex_project_dir = {      
     open_pdf = function(latex_project_dir)

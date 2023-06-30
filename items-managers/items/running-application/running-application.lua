@@ -31,13 +31,6 @@ RunningApplicationItemSpecifier = {
       end,
     },
     doThisables = {
-      ["select-menu-item"] = function(self, item_arr)
-        self:get("c"):selectMenuItem(item_arr)
-      end,
-      ["open-recent"] = function(self, recent_item)
-        local command = concat(self:get("open-recent-menu-command"), recent_item)
-        self:get("c"):selectMenuItem(command)
-      end,
       ["choose-menu-action"] = function(self)
         self:get("menu-item-array"):doThis("choose-item", function(item)
           item:doThis("exec")
@@ -48,15 +41,9 @@ RunningApplicationItemSpecifier = {
           self:doThis("load-session", item)
         end)
       end,
-      ["focus-main-window"] = function (self)
-        self:get("main-window"):focus()
-      end
-          
     }
   },
   potential_interfaces = ovtable.init({
-    { key = "omegat", value = CreateOmegatApplication },
-    { key = "libreoffice", value = CreateLibreofficeApplication },
     { key = "browser-application", value = CreateBrowserApplicationApplication },
   }),
   action_table = concat({

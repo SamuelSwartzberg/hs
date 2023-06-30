@@ -477,6 +477,12 @@ get = {
         transf.string.urlencoded_search(str, tblmap.search_engine.spaces_percent[search_engine])
       )
     end,
+    deterministic_gpt_transformation = function(str, query)
+      return memoize(gpt, refstore.params.memoize.opts.permanent_fs)(
+        query .. "\n\n" .. str,
+        refstore.params.gpt.opts.temperature_0
+      )
+    end,
 
   },
   string_array = {
@@ -1265,6 +1271,26 @@ get = {
         transf.omegat_project_dir.source_files(dir),
         ext
       )
+    end,
+  },
+  project_dir = {
+    local_project_material_path = function(dir, type)
+      return transf.path.ending_with_slash(dir) .. type .. "/"
+    end,
+    local_subtype_project_material_path = function(dir, type, subtype)
+      return get.project_dir.local_project_material_path(dir, type) .. subtype .. "/"
+    end,
+    local_universal_project_material_path = function(dir, type)
+      return get.project_dir.local_subtype_project_material_path(dir, type, "universal")
+    end,
+    global_project_material_path = function(dir, type)
+      return transf.path.ending_with_slash(env.MPROJECT_MATERIALS) .. type .. "/"
+    end,
+    global_subtype_project_material_path = function(dir, type, subtype)
+      return get.project_dir.global_project_material_path(dir, type) .. subtype .. "/"
+    end,
+    global_universal_project_material_path = function(dir, type)
+      return get.project_dir.global_subtype_project_material_path(dir, type, "universal")
     end,
   }
 }

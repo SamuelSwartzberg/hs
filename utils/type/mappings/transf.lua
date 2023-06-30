@@ -1616,8 +1616,13 @@ transf = {
     region = function(single_address_table)
       return single_address_table.Region
     end,
-    country = function(single_address_table)
+    country_identifier_string = function(single_address_table)
       return single_address_table.Country
+    end,
+    iso_3366_1_alpha_2 = function(single_address_table)
+      return transf.country_identifier_string.iso_3366_1_alpha_2(
+        transf.address_table.country_identifier_string(single_address_table)
+      )
     end,
     street = function(single_address_table)
       return single_address_table.Street
@@ -1633,7 +1638,7 @@ transf = {
     region_country_line = function(single_address_table)
       return 
         transf.address_table.region(single_address_table) .. ", " ..
-        transf.address_table.country(single_address_table)
+        transf.address_table.country_identifier(single_address_table)
     end,
     addressee_array = function(single_address_table)
       return transf.hole_y_arraylike.array({
@@ -1654,7 +1659,7 @@ transf = {
         transf.address_table.postal_code(single_address_table),
         transf.address_table.city(single_address_table),
         transf.address_table.region(single_address_table),
-        transf.address_table.country(single_address_table),
+        transf.address_table.country_identifier(single_address_table),
       })
     end,
     in_country_address_array = function(single_address_table)
@@ -2028,7 +2033,7 @@ transf = {
       return str
     end,
     romanized_gpt = function(str)
-      return gpt("Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)\n\nDictionary:\n\nこっち -> kocchi\n\nText:\n\n" .. str, {temperature = 0})
+      return get.string.deterministic_gpt_transformation(str, "Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)\n\nDictionary:\n\nこっち -> kocchi\n\nText:")
     end,
     tilde_resolved = function(path)
       if stringy.startswith(path, "~") then
@@ -2168,7 +2173,7 @@ transf = {
       return " <<EOF\n" .. str .. "\nEOF"
     end,
     rfc3339like = function(str)
-      return gpt("Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified.:\n\n" .. str, {temperature = 0})
+      return get.string.deterministic_gpt_transformation(str, "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified.")
     end,
     raw_contact = function(searchstr)
       return memoize(run)("khard show --format=yaml " .. searchstr, {catch = true} )
@@ -2215,13 +2220,13 @@ transf = {
       return transf.string.kana_inner("--extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.string.single_quoted_escaped(str))
     end,
     japanese_writing = function(str)
-      return gpt("You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:\n\n" .. str, {temperature = 0})
+      return get.string.deterministic_gpt_transformation(str, "You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:")
     end,
     kana_readings = function(str)
-      return gpt("Provide kana readings for: " .. str, {temperature = 0})
+      return get.string.deterministic_gpt_transformation(str, "Provide kana readings for:")
     end,
     ruby_annotated_kana = function(str)
-      return gpt("Add kana readings to this text as <ruby> annotations, including <rp> fallback: " .. str, {temperature = 0})
+      return get.string.deterministic_gpt_transformation(str, "Add kana readings to this text as <ruby> annotations, including <rp> fallback: ")
     end,
     --- @param str string
     --- @return hs.styledtext
@@ -3534,6 +3539,9 @@ transf = {
     target_dir = function(dir)
       return transf.path.ending_with_slash(dir) .. "target"
     end,
+    target_txt_dir = function(dir)
+      return transf.path.ending_with_slash(dir) .. "target_txt"
+    end,
     tm_dir = function(dir)
       return transf.path.ending_with_slash(dir) .. "tm"
     end,
@@ -3547,26 +3555,8 @@ transf = {
         transf.omegat_project_dir.target_dir(dir)
       )
     end,
-    local_client_glossary_file = function(dir)
-      return transf.omegat_project_dir.glossary_dir(dir) .. "/" .. transf.omegat_project_dir.client_name(dir) .. ".txt"
-    end,
-    local_universal_glossary_file = function(dir)
-      return transf.omegat_project_dir.glossary_dir(dir) .. "/universal.txt"
-    end,
-    global_client_glossary_file = function(dir)
-      return transf.path.ending_with_slash(env.MGLOSSARIES) .. transf.omegat_project_dir.client_name(dir) .. ".txt"
-    end,
-    global_universal_glossary_file = function()
-      return transf.path.ending_with_slash(env.MGLOSSARIES) .. "universal.txt"
-    end,
     local_resultant_tm = function(dir)
       return transf.omegat_project_dir.tm_dir(dir) .. "/" .. transf.path.leaf(dir) .. "-omegat.tmx"
-    end,
-    global_client_tm_dir = function(dir)
-      return env.MTM_MEMORY .. transf.omegat_project_dir.client_name(dir)
-    end,
-    global_universal_tm_dir = function()
-      return env.MTM_MEMORY .. "universal"
     end,
     rechnung_filename = function(dir)
       return get.timestamp_s.formatted(
@@ -3595,6 +3585,9 @@ transf = {
       }
     end,
 
+  },
+  project_dir = {
+    
   },
 
   running_application = {
@@ -3647,9 +3640,17 @@ transf = {
     running_application = function(app_name)
       return hs.application.get(app_name)
     end,
+    ensure_running_application = function(app_name)
+      local app = transf.mac_application_name.running_application(app_name)
+      if app == nil then
+        return hs.application.open(app_name, 5)
+      end
+      return app
+    end,
     menu_item_table_array = function(app_name)
       return transf.running_application.menu_item_table_array(transf.mac_application_name.running_application(app_name))
     end,
+    
   },
   chat_mac_application_name = {
     chat_storage_dir = function(app_name)
@@ -4416,6 +4417,19 @@ transf = {
       )
       local env_var_name_env_node_dict = concat(env_var_name_env_node_dict_array)
       return transf.env_var_name_env_node_dict.env_string(env_var_name_env_node_dict)
+    end,
+  },
+  country_identifier_string = {
+    iso_3366_1_alpha_2 = function(country_identifier)
+      local res = get.string.deterministic_gpt_transformation(
+        country_identifier, 
+        "Suppose the following identifies a country. Return its ISO 3166-1 Alpha-2 country code. If there is no sensible way to deduce the country, return \"NOT A COUNTRY\":"
+      )
+      if res == "NOT A COUNTRY" then
+        return nil
+      else
+        return res
+      end
     end,
   }
 }

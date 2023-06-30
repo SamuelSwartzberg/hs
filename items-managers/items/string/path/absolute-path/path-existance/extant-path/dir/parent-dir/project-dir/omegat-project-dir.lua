@@ -3,29 +3,9 @@ OmegatProjectDirItemSpecifier = {
   type = "omegat-project-dir",
   properties = {
     doThisables = {
-      ["create-and-open-new-source-odt"] = function(self, name)
-        local path = self:get("source-dir") .. "/" .. name .. ".odt"
-        open({path = path, app =  "LibreOffice"})
-      end,
-      ["open-project"] = function(self)
-        self:doThis("do-running-application-ensure", function(application)
-          application:doThis("open-recent", self:get("completely-resolved-path"))
-          application:doThis("focus-main-window")
-        end)
-      end,
       ["choose-and-open-odt"] = function(self, source_or_target)
         self:get(source_or_target .. "-files", "odt"):doThis("choose-item", function(file)
           file:doThis("open-with-application", "LibreOffice")
-        end)
-      end,
-      ["create-all-translated-documents"] = function(self)
-        self:doThis("do-running-application-ensure", function(app)
-          app:doThis("create-all-translated-documents")
-        end)
-      end,
-      ["create-current-translated-document"] = function(self)
-        self:doThis("do-running-application-ensure", function(app)
-          app:doThis("create-current-translated-document")
         end)
       end,
       ["refresh-open-target-odts"] = function(self) -- the purpose of this method is to refresh the open libreoffice windows that hold the generated documents after changes in omegat, allowing for manual 'hot reloading'
@@ -38,38 +18,6 @@ OmegatProjectDirItemSpecifier = {
           end
          
         end)
-      end,
-      ["pull-glossaries"] = function(self)
-        srctgt("copy", self:get("global-universal-glossary"), self:get("local-universal-glossary"))
-        srctgt("copy", self:get("global-client-glossary"), self:get("local-client-glossary"))
-      end,
-      ["push-glossaries"] = function(self)
-        srctgt("copy", self:get("local-universal-glossary"), self:get("global-universal-glossary"))
-        srctgt("copy", self:get("local-client-glossary"), self:get("global-client-glossary"))
-      end,
-      ["pull-tm"] = function(self)
-        srctgt("copy", self:get("global-universal-tm"), self:get("tm-dir"), "any", false, false, true)
-        srctgt("copy", self:get("global-client-tm"), self:get("tm-dir"), "any", false, false, true)
-      end,
-      ["push-tm"] = function(self)
-        srctgt("copy", self:get("local-resultant-tm"), self:get("global-client-tm"), "any", false, true)
-      end,
-      ["pull-omegat"] = function(self)
-        self:doThis("pull-glossaries")
-        self:doThis("pull-tm")
-      end,
-      ["push-omegat"] = function(self)
-        self:doThis("push-glossaries")
-        self:doThis("push-tm")
-      end,
-      ["generate-target-txts"] = function(self, do_after)
-        local generation_tasks = self:get("target-files-extension", "odt"):get("map", function(odt)
-          return "cd" ..
-          transf.string.single_quoted_escaped(pathSlice(odt:get("c"), ":-2", {rejoin_at_end=true})) ..
-          "&& soffice --headless --convert-to txt:Text" ..
-          transf.string.single_quoted_escaped(pathSlice(odt:get("c"), "-1:-1")[1])
-        end)
-        runThreaded(generation_tasks, 1, do_after)
       end,
       ["generate-raw-rechnung"] = function(self, do_after)
         self:doThis("generate-target-txts", function()

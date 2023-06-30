@@ -1,8 +1,8 @@
-
---- @param command_specifier_list { [string|number]: command_parts }
---- @param threads? integer
---- @param do_after? fun(command_results: { [string]: string })
---- @param catch? fun(command_results: { [string]: {exit_code: integer, std_err: string} })
+--- Executes multiple commands concurrently using a specified number of threads.
+--- @param command_specifier_list { [string|number]: command_parts } A table where the key is either a string or a number and the value is a table representing the command parts to be executed. The key is used to identify the command in the results table.
+--- @param threads? integer Optional. The maximum number of concurrent threads to be used for executing the commands. If not provided, defaults to 10.
+--- @param do_after? fun(command_results: { [string]: string }) Optional. A function to be executed after all commands have run successfully. The function takes a table where the key is the command key from the command_specifier_list and the value is the string result of the successful command execution.
+--- @param catch? fun(command_results: { [string]: {exit_code: integer, std_err: string} }) Optional. A function to handle any errors from the command execution. The function takes a table where the key is the command key from the command_specifier_list and the value is a table with the 'exit_code' and 'std_err' from the unsuccessful command execution.
 function runThreaded(command_specifier_list, threads, do_after, catch)
   local threads = threads or 10 -- sensible default
   local results = {}
