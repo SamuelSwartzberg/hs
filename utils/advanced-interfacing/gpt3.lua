@@ -1,7 +1,7 @@
---- @param text_content string
+--- @param msg string | { role: string, content: string }[]
 --- @param opts? { model?: string, max_tokens?: integer, temperature?: number, echo?: boolean, system_msg?: string } | fun(result: string): nil
 --- @param do_after? fun(result: string): nil
-function gpt(text_content, opts, do_after)
+function gpt(msg, opts, do_after)
   if type(opts) == "function" then
     do_after = opts
     opts = {}
@@ -22,10 +22,17 @@ function gpt(text_content, opts, do_after)
     content = opts.system_msg or "You are a helpful assistant being queried through an API. Your output will be parsed, so adhere to any instructions given as to the format or content of the output. Only output the result."
   })
 
-  table.insert(request.messages, {
-    role = "user",
-    content = text_content
-  })
+  if type(msg) == "string" then
+    table.insert(request.messages, {
+      role = "user",
+      content = msg
+    })
+  else
+    request.messages = glue(
+      request.messages,
+      msg
+    )
+  end
 
   local request_opts = {
     endpoint = endpoint,

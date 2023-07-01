@@ -265,6 +265,9 @@ get = {
     encrypted_data = function(contact_table, type)
       return get.pass.contact_json(type, contact_table.uid)
     end,
+    tax_number = function(contact_table, type)
+      return get.contact_table.encrypted_data(contact_table, "taxnr/" .. type)
+    end,
     email = function(contact_table, type)
       return transf.contact_table.vcard_type_email_dict(contact_table)[type]
     end,
@@ -477,12 +480,55 @@ get = {
         transf.string.urlencoded_search(str, tblmap.search_engine.spaces_percent[search_engine])
       )
     end,
-    deterministic_gpt_transformation = function(str, query)
-      return memoize(gpt, refstore.params.memoize.opts.permanent_fs)(
-        query .. "\n\n" .. str,
+    --- get a deterministic transformation of a string, either zero or few-shot
+    deterministic_gpt_transformation = function(str, query, shots)
+      local msgs = {
+        {
+          role = "user",
+          content = query
+        }, {
+          role = "user",
+          content = "If the input is already valid, echo the input."
+        }, {
+          role = "user",
+          content = "If you are unable to fulfill the request, return 'IMPOSSIBLE'."
+        }
+      }
+      if shots then
+        for _, shot in ipairs(shots) do
+          table.insert(msgs, {
+            role = "user",
+            content = shot[1]
+          })
+          table.insert(msgs, {
+            role = "assistant",
+            content = shot[2]
+          })
+        end
+      end
+      table.insert(msgs, {
+        role = "user",
+        content = str
+      })
+      local res = memoize(gpt, refstore.params.memoize.opts.permanent_fs)(
+        msgs,
         refstore.params.gpt.opts.temperature_0
       )
+      if res == "IMPOSSIBLE" then
+        return nil
+      else
+        return res
+      end
     end,
+    deterministic_gpt_json = function(str, query, keys, shots)
+      query = query .. "\nAlways return json." 
+      if keys then
+        query = query .. "\nValid keys are: " .. table.concat(keys, ", ")
+      end
+      local res = get.string.deterministic_gpt_transformation(str, query, shots)
+      return transf.json_string.not_userdata_or_function(res)
+    end
+      
 
   },
   string_array = {
@@ -1025,6 +1071,7 @@ get = {
         component
       )
     end,
+    --- accepts both format strings and format names
     formatted = function(date, format)
       local retrieved_format = tblmap.date_format_name.date_format[format]
       return date:fmt(retrieved_format or format)
@@ -1088,6 +1135,20 @@ get = {
     end,
     to_precision_date = function(date_components, component)
       return date(transf.full_date_components.to_precision_full_date_components(date_components, component))
+    end,
+  },
+  rfc3339like_dt = {
+    min_date_formatted = function(str, format)
+      return transf.date.formatted(
+        transf.rfc3339like_dt.min_date(str),
+        format
+      )
+    end,
+    max_date_formatted = function(str, format)
+      return transf.date.formatted(
+        transf.rfc3339like_dt.max_date(str),
+        format
+      )
     end,
   },
   array_of_arrays = {
@@ -1291,6 +1352,22 @@ get = {
     end,
     global_universal_project_material_path = function(dir, type)
       return get.project_dir.global_subtype_project_material_path(dir, type, "universal")
+    end,
+  },
+  iso_3366_1_alpha_2 = {
+    --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_full_name instead
+    full_name_in_language = function(code, language_identifier_string)
+      return get.string.deterministic_gpt_transformation(
+        "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
+        code
+      )
+    end,
+    --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_short_name instead
+    short_name_in_language = function(code, language_identifier_string)
+      return get.string.deterministic_gpt_transformation(
+        "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
+        code
+      )
     end,
   }
 }

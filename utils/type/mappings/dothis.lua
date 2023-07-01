@@ -181,7 +181,7 @@ dothis = {
       local do_after = event_table.do_after
       event_table.do_after = nil
       doWithTempFile({edit_before = true, contents = temp_file_contents, use_contents = true}, function(tmp_file)
-        local new_specifier = transf.yaml_string.table(tmp_file)
+        local new_specifier = transf.yaml_string.not_userdata_or_function(tmp_file)
         new_specifier.do_after = do_after
         dothis.khal.add_event_from_specifier(new_specifier)
       end)
@@ -502,12 +502,20 @@ dothis = {
         path,
         tblmap.dynamic_structure_name.dynamic_structure[name]
       )
-    end
-    
+    end,
   },
   absolute_path = {
     write_file = function(path, content)
       writeFile(path, content, "any", true)
+    end,
+    write_template = function(path, template_path)
+      dothis.absolute_path.write_file(
+        path,
+        le(
+          singleLe(template_path),
+          path
+        )
+      )
     end,
     create_file = function(path, contents)
       writeFile(path, contents, "not-exists", true)
@@ -530,7 +538,10 @@ dothis = {
     empty = function(path)
       delete(path, "any", "empty", "any", "error")
     end,
-
+    initialize_omegat_project = function (path)
+      dothis.path.write_dynamic_structure(path, "omegat")
+      dothis.omegat_project_dir.pull_project_materials(path)
+    end
   },
   extant_path = {
     make_executable = function(path)
@@ -1292,18 +1303,48 @@ dothis = {
     end,
     generate_target_txts = function(dir, do_after)
       local generation_tasks = map(
-      transf.omegat_project_dir.target_files(dir),
-      function(file)
-        return file, "soffice --headless --convert-to txt:Text --outdir"..
-        transf.string.single_quoted_escaped(
-          transf.omegat_project_dir.target_txt_dir(dir)
-        ) ..
-        transf.string.single_quoted_escaped(file)
-      end,
-      {"v", "kv"}
-    )
-    runThreaded(generation_tasks, 1, do_after)
-    end
+        transf.omegat_project_dir.target_files(dir),
+        function(file)
+          return file, "soffice --headless --convert-to txt:Text --outdir"..
+          transf.string.single_quoted_escaped(
+            transf.omegat_project_dir.target_txt_dir(dir)
+          ) ..
+          transf.string.single_quoted_escaped(file)
+        end,
+        {"v", "kv"}
+      )
+      runThreaded(generation_tasks, 1, do_after)
+    end,
+    generate_rechnung_md = function(omegat_project_dir)
+      writeFile(
+        transf.omegat_project_dir.rechnung_md_path(omegat_project_dir),
+        transf.omegat_project_dir.raw_rechnung(omegat_project_dir)
+      )
+    end,
+    generate_rechnung_pdf = function(omegat_project_dir, do_after)
+      dothis.pandoc.markdown_to(
+        transf.omegat_project_dir.rechnung_md_path(omegat_project_dir),
+        "pdf",
+        transf.omegat_project_dir.rechnung_pdf_path(omegat_project_dir),
+        do_after
+      )
+    end,
+    generate_rechnung = function(path, do_after)
+      dothis.omegat_project_dir.generate_target_txts(path, function()
+        dothis.omegat_project_dir.generate_rechnung_md(path)
+        dothis.omegat_project_dir.generate_rechnung_pdf(path, do_after)
+      end)
+    end,
+    finalize_rechnung = function(path)
+
+    end,
+    finalize_project = function(path)
+      dothis.omegat_project_dir.push_project_materials(path)
+      dothis.omegat_project_dir.file_rechnung(path)
+      dothis.omegat_project_dir.file_source_target(path)
+    end,
+
+      
   },
   latex_project_dir = {      
     open_pdf = function(latex_project_dir)

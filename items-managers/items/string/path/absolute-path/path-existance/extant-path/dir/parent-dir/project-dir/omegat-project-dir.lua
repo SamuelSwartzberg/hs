@@ -19,20 +19,6 @@ OmegatProjectDirItemSpecifier = {
          
         end)
       end,
-      ["generate-raw-rechnung"] = function(self, do_after)
-        self:doThis("generate-target-txts", function()
-          local d = self:get("data-object")
-          local interpolated = le(comp.documents.translation.rechnung_de, d)
-          writeFile(self:get("rechnung-raw-path"), interpolated)
-          do_after()
-        end)
-      end,
-      ["generate-rechnung"] = function(self)
-        self:doThis("generate-raw-rechnung", function()
-          dothis.pandoc.markdown_to(self:get("rechnung-raw-path"), "pdf")
-        end)
-        
-      end,
       ["send-rechnung-email"] = function(self)
         ar(
           get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, "from:" .. self:get("local-data-object").email)
@@ -83,26 +69,6 @@ OmegatProjectDirItemSpecifier = {
         self:doThis("send-rechnung-email")
         self:doThis("file-rechnung")
         self:doThis("file-source-and-target")
-      end,
-      ["create-default-data-yaml"] = function(self)
-        writeFile(self:get("local-data-object-path"), transf.table.yaml_string({
-          rechnung = {
-            nr = 1,
-            delivery_date = os.date("%d.%m.%Y")
-          },
-          client = "jetbelt",
-          email = "jetbelt@me.com"
-        }))
-      end,
-      ["specific-initialize"] = function(self)
-        self:doThis("create-default-data-yaml")
-        st(self:get("local-data-object-path")):doThis("edit-file-interactive", function()
-          self:doThis("pull-omegat")
-          self:doThis("do-interactive", {
-            thing = "Initial source document name",
-            key = "create-and-open-new-source-odt"
-          })
-        end)
       end,
 
     }

@@ -428,7 +428,7 @@ tblmap = {
     dynamic_structure = {
       latex = {
         citations = "write_file:",
-        ["main.tex"] = "write_file:" ..readFile(le(comp.templates.latex_main)),
+        ["main.tex"] = "write_template:comp.templates.latex_main",
         citable_objects = "create_path:"
       },
       omegat = {
@@ -438,6 +438,7 @@ tblmap = {
         source = "create_path:",
         target = "create_path:",
         tm = "create_path:",
+        ["data.yaml"] = "write_template:comp.templates.data_yaml"
       }
     }
   },

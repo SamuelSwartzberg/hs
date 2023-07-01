@@ -231,6 +231,13 @@ transf = {
     floor = math.floor,
     ceil = math.ceil,
   },
+  num_chars = {
+    normzeilen = function(num_chars)
+      return transf.number.int(
+        num_chars / 55
+      )
+    end,
+  },
   
   int = {
     length = function(int)
@@ -631,6 +638,12 @@ transf = {
     end,
     hooks = function(git_root_dir)
       return itemsInPath(transf.git_root_dir.hooks_dir(git_root_dir))
+    end,
+  },
+
+  github_username = {
+    github_url = function(github_username)
+      return "https://github.com/" .. github_username
     end,
   },
   
@@ -1040,7 +1053,7 @@ transf = {
       return header_empty_string_dict
     end,
     yaml_form = function(path)
-      return transf.table.yaml_string(transf.logging_dir.header_empty_string_dict(path))
+      return transf.not_userdata_or_string.yaml_string(transf.logging_dir.header_empty_string_dict(path))
     end,
   },
   newsboat_url_specifier = {
@@ -1193,6 +1206,37 @@ transf = {
     date_range_specifier = function(str)
       return transf.date_components.date_range_specifier(transf.rfc3339like_dt.date_components(str))
     end,
+    min_full_date_components = function(str)
+      return transf.date_components.min_full_date_components(
+        transf.rfc3339like_dt.date_components(str)
+      )
+    end,
+    max_full_date_components = function(str)
+      return transf.date_components.max_full_date_components(
+        transf.rfc3339like_dt.date_components(str)
+      )
+    end,
+    min_date = function(str)
+      return transf.full_date_components.date(
+        transf.rfc3339like_dt.min_full_date_components(str)
+      )
+    end,
+    max_date = function(str)
+      return transf.full_date_components.date(
+        transf.rfc3339like_dt.max_full_date_components(str)
+      )
+    end,
+    min_timestamp_s = function(str)
+      return transf.date.timestamp_s(
+        transf.rfc3339like_dt.min_date(str)
+      )
+    end,
+    max_timestamp_s = function(str)
+      return transf.date.timestamp_s(
+        transf.rfc3339like_dt.max_date(str)
+      )
+    end,
+    
 
   },
   full_rfc3339like_dt = {
@@ -1382,7 +1426,7 @@ transf = {
 
       -- The raw contact data, which is in yaml string format, is transformed into a table. 
       -- This is done because table format is easier to handle and manipulate in Lua.
-      local contact_table = transf.yaml_string.table(raw_contact)
+      local contact_table = transf.yaml_string.not_userdata_or_function(raw_contact)
 
       -- In the vCard standard, some properties can have vcard_types. 
       -- For example, a phone number can be 'work' or 'home'. 
@@ -1449,7 +1493,25 @@ transf = {
     organization = function(contact_table) return contact_table["Organization"] end,
     title = function(contact_table) return contact_table["Title"] end,
     role = function(contact_table) return contact_table["Role"] end,
-    homepage = function(contact_table) return contact_table["Webpage"] end,
+    homepage_raw = function(contact_table) return contact_table["Webpage"] end,
+    homepages = function(contact_table) 
+      if type(contact_table.homepage_raw) == "table" then
+        return contact_table.homepage_raw
+      else
+        return {contact_table.homepage_raw}
+      end
+    end,
+    github_username = function(contact_table)
+      return contact_table.Private["github-username"]
+    end,
+    github_url = function(contact_table)
+      return transf.github_username.github_url(
+        transf.contact_table.github_username(contact_table)
+      )
+    end,
+    translation_rate = function(contact_table)
+      return get.string_or_number.number(contact_table.Private["translation-rate"])
+    end,
     iban = function (contact_table)
       return get.contact_table.encrypted_data(contact_table, "iban")
     end,
@@ -1458,6 +1520,12 @@ transf = {
     end,
     bank_name = function (contact_table)
       return transf.iban.bank_name(transf.contact_table.iban(contact_table))
+    end,
+    bank_details_string = function (contact_table)
+      return transf.iban.bank_details_string(transf.contact_table.iban(contact_table))
+    end,
+    personal_tax_number = function (contact_table)
+      return get.contact_table.tax_number(contact_table, "personal")
     end,
     full_name_western_array = function(contact_table)
       return transf.hole_y_arraylike.array({ 
@@ -1593,6 +1661,11 @@ transf = {
     main_address_table = function (contact_table)
       return get.contact_table.address_table(contact_table, "pref") or transf.contact_table.address_table_array(contact_table)[1]
     end,
+    main_relevant_address_label = function (contact_table)
+      return transf.address_table.relevant_address_label(
+        transf.contact_table.main_address_table(contact_table)
+      )
+    end
 
   },
   vcard_type_dict = {
@@ -1662,6 +1735,13 @@ transf = {
         transf.address_table.country_identifier(single_address_table),
       })
     end,
+    relevant_location_array = function(single_address_table)
+      if transf.address_table.iso_3366_1_alpha_2(single_address_table) == "de" then
+        return transf.address_table.in_country_location_array(single_address_table)
+      else
+        return transf.address_table.international_location_array(single_address_table)
+      end
+    end,
     in_country_address_array = function(single_address_table)
       return glue(
         transf.address_table.addressee_array(single_address_table),
@@ -1673,6 +1753,13 @@ transf = {
         transf.address_table.addressee_array(single_address_table),
         transf.address_table.international_location_array(single_address_table)
       )
+    end,
+    relevant_address_array = function(single_address_table)
+      if transf.address_table.iso_3366_1_alpha_2(single_address_table) == "de" then
+        return transf.address_table.in_country_address_array(single_address_table)
+      else
+        return transf.address_table.international_address_array(single_address_table)
+      end
     end,
     in_country_address_label = function(single_address_table)
       return 
@@ -1686,6 +1773,13 @@ transf = {
         transf.address_table.street(single_address_table) .. "\n" ..
         transf.address_table.postal_code_city_line(single_address_table) .. "\n" ..
         transf.address_table.region_country_line(single_address_table)
+    end,
+    relevant_address_label = function(single_address_table)
+      if transf.address_table.iso_3366_1_alpha_2(single_address_table) == "de" then
+        return transf.address_table.in_country_address_label(single_address_table)
+      else
+        return transf.address_table.international_address_label(single_address_table)
+      end
     end,
 
   },
@@ -2033,7 +2127,9 @@ transf = {
       return str
     end,
     romanized_gpt = function(str)
-      return get.string.deterministic_gpt_transformation(str, "Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)\n\nDictionary:\n\nこっち -> kocchi\n\nText:")
+      return get.string.deterministic_gpt_transformation(str, "Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)", {
+        {"こっち", "kocchi"}
+      })
     end,
     tilde_resolved = function(path)
       if stringy.startswith(path, "~") then
@@ -2226,7 +2322,7 @@ transf = {
       return get.string.deterministic_gpt_transformation(str, "Provide kana readings for:")
     end,
     ruby_annotated_kana = function(str)
-      return get.string.deterministic_gpt_transformation(str, "Add kana readings to this text as <ruby> annotations, including <rp> fallback: ")
+      return get.string.deterministic_gpt_transformation(str, "Add kana readings to this text as <ruby> annotations, including <rp> fallback:")
     end,
     --- @param str string
     --- @return hs.styledtext
@@ -2305,22 +2401,40 @@ transf = {
       return run("pass otp otp/" .. item)
     end,
   },
+  cc_name = {
+    cc_number = function(cc_name)
+      return get.pass.value("cc/nr", cc_name)
+    end,
+    cc_expiry = function(cc_name)
+      return get.pass.value("cc/exp", cc_name)
+    end,
+  },
   yaml_string = {
-    table = function(str)
+    not_userdata_or_function = function(str)
       local res = yaml.load(str)
       null2nil(res)
       return res
-    end
+    end,
+    json_string = function(str)
+      return transf.not_userdata_or_function.json_string(
+        transf.yaml_string.not_userdata_or_function(str)
+      )
+    end,
   },
   json_string = {
-    not_userdata_or_function = json.decode
+    not_userdata_or_function = json.decode,
+    yaml_string = function(str)
+      return transf.not_userdata_or_function.yaml_string(
+        transf.json_string.not_userdata_or_function(str)
+      )
+    end,
   },
   toml_string = {
     table = toml.decode
   },
   yaml_file = {
-    table = function(path)
-      return transf.yaml_string.table(transf.plaintext_file.contents(path))
+    not_userdata_or_function = function(path)
+      return transf.yaml_string.not_userdata_or_function(transf.plaintext_file.contents(path))
     end
   },
   
@@ -2897,16 +3011,7 @@ transf = {
     last_value = function(t)
       return elemAt(t, len(t), "v")
     end,
-    --- wraps yaml.dump into a more intuitive form which always encodes a single document
-    --- @param tbl any
-    --- @return string
-    yaml_string = function(tbl)
-      local raw_yaml = yaml.dump({tbl})
-      local lines = stringy.split(raw_yaml, "\n")
-      return table.concat(lines, "\n", 2, #lines - 2)
-    end,
     toml_string = toml.encode,
-    --- allows for aligned values and comments, but may be less robust than transf.table.yaml_string, since I'm implementing it myself
     --- value and comment must be strings
     yaml_aligned = function(tbl)
       local value_table = map(
@@ -2924,7 +3029,7 @@ transf = {
       return table.concat(get.table.yaml_lines_aligned_with_predetermined_stops(tbl, keystop, valuestop, 0), "\n")
     end,
     yaml_metadata = function(t)
-      local string_contents = transf.table.yaml_string(t)
+      local string_contents = transf.not_userdata_or_string.yaml_string(t)
       return "---\n" .. string_contents .. "\n---\n"
     end,
     
@@ -3493,7 +3598,7 @@ transf = {
       return transf.path.ending_with_slash(dir) .. "data.yaml"
     end,
     metadata = function(dir)
-      return transf.yaml_file.table(
+      return transf.yaml_file.not_userdata_or_function(
         transf.omegat_project_dir.metadata_file(dir)
       )
     end,
@@ -3510,13 +3615,74 @@ transf = {
         transf.omegat_project_dir.client_contact_uuid(dir)
       )
     end,
+    -- this will often be unset, since I'll default to my uuid within creator_contact_uuid
+    creator_name = function(dir)
+      return transf.omegat_project_dir.metadata(dir).creator
+    end,
+    creator_contact_uuid = function(dir)
+      if transf.omegat_project_dir.creator_name(dir) then
+        return fstblmap.client_name.contact_uuid(
+          transf.omegat_project_dir.creator_name(dir)
+        )
+      else
+        return env.SELF_UUID
+      end
+    end,
     client_main_name = function(dir)
       return transf.contact_table.main_name(
         transf.omegat_project_dir.client_contact_table(dir)
       )
     end,
+    client_main_relevant_address_label = function(dir)
+      return transf.contact_table.main_relevant_address_label(
+        transf.omegat_project_dir.client_contact_table(dir)
+      )
+    end,
+    client_translation_rate = function(dir)
+      return transf.contact_table.translation_rate(
+        transf.omegat_project_dir.client_contact_table(dir)
+      )
+    end,
+    creator_main_name = function(dir)
+      return transf.contact_table.main_name(
+        transf.omegat_project_dir.creator_contact_table(dir)
+      )
+    end,
+    creator_main_relevant_address_label = function(dir)
+      return transf.contact_table.main_relevant_address_label(
+        transf.omegat_project_dir.creator_contact_table(dir)
+      )
+    end,
+    creator_translation_tax_number = function(dir)
+      return get.contact_table.tax_number(
+        transf.omegat_project_dir.creator_contact_table(dir),
+        "translation"
+      )
+    end,
+    creator_bank_details_string = function(dir)
+      return get.contact_table.bank_details_string(
+        transf.omegat_project_dir.creator_contact_table(dir)
+      )
+    end,
+    creator_translation_rate = function(dir)
+      return transf.contact_table.translation_rate(
+        transf.omegat_project_dir.creator_contact_table(dir)
+      )
+    end,
+    translation_rate = function(dir)
+      return 
+        transf.omegat_project_dir.metadata(dir).translation_rate 
+        or transf.omegat_project_dir.client_translation_rate(dir)
+        or transf.omegat_project_dir.creator_translation_rate(dir)
+    end,
     rechnung = function(dir)
       return transf.omegat_project_dir.metadata(dir).rechnung
+    end,
+    rechnung_id = function(dir)
+      return
+        date():fmt("%Y") .. "-" ..
+        transf.omegat_project_dir.client_name(dir):upper() .. "-" ..
+        transf.omegat_project_dir.rechnung_number(dir)
     end,
     rechnung_number = function(dir)
       return transf.omegat_project_dir.rechnung(dir).nr
@@ -3570,10 +3736,37 @@ transf = {
     rechnung_md_path = function(dir)
       return transf.path.ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".md"
     end,
-    target_file_char_amount_array = function(dir)
+    target_file_num_chars_array = function(dir)
       return hs.fnutils.imap(
-        get.omegat_project_dir.target_files_extension(dir, "txt"),
+        transf.dir.children_array(
+          transf.omegat_project_dir.target_txt_dir(dir)
+        ),
         transf.plaintext_file.chars
+      )
+    end,
+    translation_price_specifier_array = function(dir)
+      local num_chars_array = transf.omegat_project_dir.target_file_num_char_array(dir)
+      return hs.fnutils.imap(
+        num_chars_array,
+        function(num_chars)
+          local normzeilen = transf.num_chars.normzeilen(num_chars)
+          local rate = transf.omegat_project_dir.translation_rate(dir)
+          return {
+            price = rate *  normzeilen,
+            rate = rate,
+            normzeilen = normzeilen
+          }
+        end
+      )
+    end,
+    translation_price_specifier = function(dir)
+      return transf.translation_price_specifier_array.translation_price_specifier(
+        transf.omegat_project_dir.translation_price_specifier_array(dir)
+      )
+    end,
+    translation_price_block_german = function(dir)
+      return transf.translation_price_specifier.translation_price_block_german(
+        transf.omegat_project_dir.translation_price_specifier(dir)
       )
     end,
     rechnung_email_specifier = function(dir)
@@ -3584,6 +3777,44 @@ transf = {
         }
       }
     end,
+    raw_rechnung = function(dir)
+      return le(comp.documents.translation.rechnung_de, dir)
+    end,
+
+  },
+  translation_price_specifier_array = {
+    translation_price_specifier = function(arr)
+      return {
+        translation_price_specifier_array = arr,
+        total = hs.fnutils.reduce(
+          arr,
+          function(acc, v) return acc + v.price end,
+          0
+        )
+      }
+    end
+  },
+  translation_price_specifier = {
+    translation_price_block_german = function(spec)
+      return 
+        table.concat(
+          hs.fnutils.imap(
+            spec.translation_price_specifier_array,
+            function(v)
+              return ("%d Zeilen @ %.2f€ = %d€"):format(
+                v.normzeilen,
+                v.rate,
+                v.price
+              )
+            end
+          ),
+          "\n"
+        ) .. "\n" ..
+        ("Gesamt: %d€"):format(spec.total) .. "\n" ..
+        ("Rechnungsbetrag: %d€"):format(spec.total) 
+      end,
+  },
+  number_array = {
 
   },
   project_dir = {
@@ -4228,6 +4459,14 @@ transf = {
       return transf.string.single_quoted_escaped(json.encode(t))
     end,
     json_string = json.encode,
+    --- wraps yaml.dump into a more intuitive form which always encodes a single document
+    --- @param tbl any
+    --- @return string
+    yaml_string = function(tbl)
+      local raw_yaml = yaml.dump({tbl})
+      local lines = stringy.split(raw_yaml, "\n")
+      return table.concat(lines, "\n", 2, #lines - 2)
+    end,
     json_here_string = function(t)
       return transf.string.here_string(json.encode(t))
     end,
@@ -4413,7 +4652,7 @@ transf = {
       local yaml_files = get.path_array.filter_to_same_extension(files, "yaml")
       local env_var_name_env_node_dict_array = hs.fnutils.imap(
         yaml_files,
-        transf.yaml_file.table
+        transf.yaml_file.not_userdata_or_function
       )
       local env_var_name_env_node_dict = concat(env_var_name_env_node_dict_array)
       return transf.env_var_name_env_node_dict.env_string(env_var_name_env_node_dict)
@@ -4421,15 +4660,40 @@ transf = {
   },
   country_identifier_string = {
     iso_3366_1_alpha_2 = function(country_identifier)
-      local res = get.string.deterministic_gpt_transformation(
+      return get.string.deterministic_gpt_transformation(
         country_identifier, 
-        "Suppose the following identifies a country. Return its ISO 3166-1 Alpha-2 country code. If there is no sensible way to deduce the country, return \"NOT A COUNTRY\":"
+        "Suppose the following identifies a country. Return its ISO 3166-1 Alpha-2 country code."
+      ):lower()
+    end,
+  },
+  language_identifier_string = {
+    bcp_47_language_tag = function(country_identifier)
+      return get.string.deterministic_gpt_transformation(
+        country_identifier, 
+        "Suppose the following identifies a language or variety. Return its BCP 47 language tag. Be conservative and only add information that is present in the input, or is necessary to make it into a valid BCP 47 language tag."
       )
-      if res == "NOT A COUNTRY" then
-        return nil
-      else
-        return res
-      end
+    end,
+  },
+  bcp_47_language_tag = {
+    summary = function(bcp_47_language_tag)
+      return get.string.deterministic_gpt_transformation(
+        bcp_47_language_tag, 
+        "Suppose the following is a BCP 47 language tag. Return a natural language description of it."
+      )
+    end,
+  },
+  iso_3366_1_alpha_2 = {
+    iso_3366_1_full_name = function(iso_3366_1_alpha_2)
+      return get.string.deterministic_gpt_transformation(
+        iso_3366_1_alpha_2, 
+        "Get the ISO 3366-1 full name of the country identified by the following ISO 3366-1 Alpha-2 country code."
+      )
+    end,
+    iso_3366_1_short_name = function(iso_3366_1_alpha_2)
+      return get.string.deterministic_gpt_transformation(
+        iso_3366_1_alpha_2, 
+        "Get the ISO 3366-1 short name of the country identified by the following ISO 3366-1 Alpha-2 country code."
+      )
     end,
   }
 }
