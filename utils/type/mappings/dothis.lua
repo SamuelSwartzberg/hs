@@ -1113,6 +1113,55 @@ dothis = {
       )
     end,
   },
+  window = {
+    focus = function(window)
+      window:focus()
+    end,
+    close = function(window)
+      window:close()
+    end,
+    make_main = function(window)
+      window:becomeMain()
+    end,
+    set_hs_geometry_size_like = function(window, hs_geometry_size_like)
+      window:setSize(hs_geometry_size_like)
+    end,
+    set_hs_geometry_rect_like = function(window, hs_geometry_rect_like)
+      window:setFrame(hs_geometry_rect_like)
+    end,
+    set_hs_geometry_point_like_tl = function(window, hs_geometry_point_like_tl)
+      window:setTopLeft(hs_geometry_point_like_tl)
+    end,
+    set_relevant_grid = function(window, grid)
+      hs.grid.setGrid(grid, transf.window.screen(window))
+    end,
+    set_grid_cell = function(window, grid_cell)
+      hs.grid.set(window, grid_cell, transf.window.screen(window))
+    end,
+    do_with_window_as_main = function(window, do_with_window_as_main)
+      local application = transf.window.running_application(window)
+      local main_window = transf.running_application.main_window(application)
+      dothis.window.make_main(window)
+      do_with_window_as_main(application, window)
+      dothis.window.make_main(main_window)
+    end,
+  },
+  jxa_tab_specifier = {
+    make_main = function(jxa_tab_specifier)
+      getViaOSA("js", ("Application('%s').windows()[%d].activeTabIndex = %d"):format(
+        jxa_tab_specifier.application_name,
+        jxa_tab_specifier.window_index,
+        jxa_tab_specifier.tab_index
+      ))
+    end,
+    close = function(jxa_tab_specifier)
+      getViaOSA("js", ("Application('%s').windows()[%d].tabs()[%d].close()"):format(
+        jxa_tab_specifier.application_name,
+        jxa_tab_specifier.window_index,
+        jxa_tab_specifier.tab_index
+      ))
+    end,
+  },
   path_with_intra_file_locator_specifier = {
     go_to = function(specifier)
       doSeries(

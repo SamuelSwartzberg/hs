@@ -3851,6 +3851,173 @@ transf = {
       )
     end
   },
+  window = {
+    running_application = function(window)
+      return window:application()
+    end,
+    title = function(window)
+      return window:title()
+    end,
+    filtered_title = function(window)
+      return transf.window.title(window):gsub(" - " .. transf.window.mac_application_name(window), "")
+    end,
+    mac_application_name = function(window)
+      return transf.running_application.mac_application_name(
+        transf.window.running_application(window)
+      )
+    end,
+    screenshot_hs_image = function(window)
+      return window:snapshot()
+    end,
+    ax_uielement = function(window)
+      return hs.axuielement.windowElement(window)
+    end,
+    hs_geometry_rect = function(window)
+      return window:frame()
+    end,
+    hs_geometry_point_tl = function(window)
+      return window:topLeft()
+    end,
+    hs_geometry_point_tr = function(window)
+      local rect = transf.window.hs_geometry_rect(window)
+      rect.x = rect.x + rect.w -- move by width
+      return rect.topleft -- new top left is old top right
+    end,
+    hs_geometry_point_bl = function(window)
+      local rect = transf.window.hs_geometry_rect(window)
+      rect.y = rect.y + rect.h -- move by height
+      return rect.topleft -- new top left is old bottom left
+    end,
+    hs_geometry_point_br = function(window)
+      return transf.window.hs_geometry_rect(window).bottomright
+    end,
+    hs_geometry_size = function(window)
+      return window:size()
+    end,
+    hs_geometry_point_relative_center = function(window)
+      return transf.window.hs_geometry_size(window).center
+    end,
+    hs_geometry_point_c = function(window)
+      return transf.window.hs_geometry_rect(window).center
+    end,
+    summary = function(window)
+      return eutf8.format(
+        "%s (%s)",
+        transf.window.title(window),
+        transf.window.mac_application_name(window)
+      )
+    end,
+    hs_screen = function(window)
+      return window:screen()
+    end,
+    app_icon_hs_image = function(window)
+      return transf.running_application.icon_hs_image(
+        transf.window.running_application(window)
+      )
+    end,
+    jxa_window_index = function(window)
+      return getViaOSA("js", 
+        "Application('" .. transf.window.mac_application_name(window) .. "')" ..
+          ".windows().findIndex(" ..
+            "window => window.title() == '" .. transf.window.filtered_title(window) .. "'" ..
+          ")"
+      )
+    end,
+    jxa_window_specifier = function(window)
+      return {
+        application_name = transf.window.mac_application_name(window),
+        window_index = transf.window.jxa_window_index(window)
+      }
+    end,
+  },
+  jxa_window_specifier = {
+    title = function(window_spec)
+      return get.jxa_window_specifier.property(window_spec, "title")
+    end,
+    window = function(window_spec)
+      return get.running_application.window_by_title(
+        transf.jxa_window_specifier.title(window_spec) .. " - " .. 
+        window_spec.application_name
+      )
+    end,
+    filtered_title = function(window_spec)
+      return transf.window.filtered_title(
+        transf.jxa_window_specifier.window(window_spec)
+      )
+    end,
+  },
+  tabbable_jxa_window_specifier = {
+    amount_of_tabs = function(window_spec)
+      return getViaOSA("js", 
+        "Application('" .. window_spec.application_name .. "')" ..
+          ".windows().[" ..
+            window_spec.window_index ..
+          "].tabs().length"
+      )
+    end,
+    jxa_tab_specifier_array = function(window_spec)
+      local tab_spec_array = {}
+      for i = 0, transf.tabbable_jxa_window_specifier.amount_of_tabs(window_spec) - 1 do
+        table.insert(tab_spec_array, {
+          application_name = window_spec.application_name,
+          window_index = window_spec.window_index,
+          tab_index = i
+        })
+      end
+      return tab_spec_array
+    end,
+    active_tab_index = function(window_spec)
+      return getViaOSA("js", 
+        "Application('" .. window_spec.application_name .. "')" ..
+          ".windows().[" ..
+            window_spec.window_index ..
+          "].activeTabIndex()"
+      )
+    end,
+    active_jxa_tab_specifier = function(window_spec)
+      return get.jxa_window_specifier.jxa_tab_specifier(
+        window_spec,
+        transf.tabbable_jxa_window_specifier.active_tab_index(window_spec)
+      )
+    end,
+  },
+  browser_tabbable_jxa_window_specifier = {
+    url = function(window_spec)
+      return transf.browser_jxa_tab_specifier.url(
+        transf.tabbable_jxa_window_specifier.active_jxa_tab_specifier(window_spec)
+      )
+    end
+  },
+  jxa_tab_specifier = {
+    application_name = function(tab_spec)
+      return tab_spec.application_name
+    end,
+    running_application = function(tab_spec)
+      return transf.mac_application_name.running_application(
+        tab_spec.application_name
+      )
+    end,
+    window_index = function(tab_spec)
+      return tab_spec.window_index
+    end,
+    tab_index = function(tab_spec)
+      return tab_spec.tab_index
+    end,
+    title = function(tab_spec)
+      return get.jxa_tab_specifier.property(tab_spec, "title")
+    end,
+    jxa_window_specifier = function(tab_spec)
+      return {
+        application_name = tab_spec.application_name,
+        window_index = tab_spec.window_index
+      }
+    end,
+  },
+  browser_jxa_tab_specifier = {
+    url = function(tab_spec)
+      return get.jxa_tab_specifier.property(tab_spec, "url")
+    end,
+  },
   bundle_id = {
     icon_hs_image = function(bundle_id)
       return hs.image.imageFromAppBundle(bundle_id)

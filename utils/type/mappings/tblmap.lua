@@ -457,8 +457,33 @@ tblmap = {
         "glossary"
       }
     }
+  },
+  action_table_word = {
+    emoji = {
+      open = "🗄",
+      remove = "🗑",
+      delete = "🗑",
+      empty = "🗑🎒",
+      content = "🎒",
+      vscode = "🔷",
+      finder = "👤",
+      parent = "👩‍👧",
+      choose = "👉",
+      downloads = "📥",
+      zip = "🤐",
+      size = "📏",
+      libreoffice = "✳️📄",
+      source = "🌀",
+      target = "🎯",
+      create = "🌄",
+      all = "全",
+      translation = "🅰️🈴",
+      email = "📧",
+    }
   }
 }
+
+emj = tblmap.action_table_word.emoji
 
 -- make sure to automatically normalize any input to tblmap
 

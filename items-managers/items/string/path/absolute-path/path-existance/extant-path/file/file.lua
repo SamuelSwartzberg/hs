@@ -44,12 +44,18 @@ FileItemSpecifier = {
   }),
   action_table = {
     {
-      text = "🗑 rmfl.",
+      e = emj.remove,
       key = "rm-file",
     },
     {
-      text = "🗑🎒 empfl.",
+      i = emj.empty,
+      d = "empfl",
       key = "empty-file",
+    },
+    {
+      i = emj.open .. emj.libreoffice,
+      d = "oplbr",
+      dothis = bind(dothis.path.open_app, {a_use, "LibreOffice"})
     }
   }
 }

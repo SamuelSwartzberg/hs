@@ -14,7 +14,7 @@ function getStartingDelta(distance, factor_of_deceleration, steps)
   end
 end
 
---- @class deltaOpts: Options for controlling movement.
+--- @class deltaOpts Options for controlling movement.
 --- @field mode "scroll" | "move" sets the type of movement to perform. configures some other options, and is overridden by them if they are set.
 --- @field target_point hs_geometry_point_like | string: The target point for the movement. This can be an actual point or a string representing a point.
 --- @field factor_of_deceleration? number: Optional. Determines the deceleration of the movement. A value of 0 means instant teleportation, while 1 indicates linear movement. Default is 0.95.
@@ -48,11 +48,8 @@ function doDelta(specifier, do_after)
 
   if specifier.relative_to then
     if specifier.relative_to ~= "curpos" then
-      local front_window = CreateRunningApplicationItem(hs.application.frontmostApplication()):get("main-window-item")
-      specifier.target_point = front_window:get("point-with-offset-from", {
-        from = specifier.relative_to,
-        delta = specifier.target_point
-      })
+      local front_window = transf.running_application.main_window(hs.application.frontmostApplication())
+      specifier.target_point = get.window.hs_geometry_point_with_offset(front_window, specifier.relative_to, specifier.target_point)
     else
       specifier.target_point =  specifier.target_point + hs.mouse.absolutePosition()
     end

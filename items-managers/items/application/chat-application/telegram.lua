@@ -71,7 +71,7 @@ TelegramItemSpecifier = {
             window:doThis("focus")
             window:doThis("set-size", {w = 800, h = 1500})
             window:doThis("set-position", {x = 0, y = 0})
-            window:doThis("do-series", {
+            doSeries({
               "m30 65 %tl", ".",
               "m40 395 %tl", ".",
               "m0 -300 %c", ".",

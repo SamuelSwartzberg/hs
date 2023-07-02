@@ -1203,6 +1203,45 @@ get = {
       return app:findWindow(pattern)
     end,
   },
+  window = {
+    hs_geometry_point_with_offset = function(window, from, delta)
+      return transf.window[
+        "hs_geometry_point_" .. from
+      ]:move(delta)
+    end,
+  },
+  jxa_window_specifier = {
+    jxa_tab_specifier = function(window_specifier, tab_index)
+      return {
+        application_name = window_specifier.application_name,
+        window_index = window_specifier.window_index,
+        tab_index = tab_index
+      }
+    end,
+    property = function(window_specifier, property)
+      return getViaOSA("js", ("Application('%s').windows()[%d].%s()"):format(
+        window_specifier.application_name,
+        window_specifier.window_index,
+        property
+      ))
+    end,
+  },
+  jxa_tab_specifier = {
+    property = function(tab_specifier, property)
+      return getViaOSA("js", ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(
+        tab_specifier.application_name,
+        tab_specifier.window_index,
+        tab_specifier.tab_index,
+        property
+      ))
+    end,
+  },
+  --- point-implementing = can be treated as a hs.geometry.point = hs.geometry.point or hs.geometry.rect but not hs.geometry.size
+  hs_geometry_point_implementing = {
+    hs_geometry_point_implementing_with_offset = function(point, delta)
+      return point:move(delta)
+    end,
+  },
   event_table = {
     date_range_specifier = function(event_table, step, unit)
       return {

@@ -3,11 +3,6 @@ OmegatProjectDirItemSpecifier = {
   type = "omegat-project-dir",
   properties = {
     doThisables = {
-      ["choose-and-open-odt"] = function(self, source_or_target)
-        self:get(source_or_target .. "-files", "odt"):doThis("choose-item", function(file)
-          file:doThis("open-with-application", "LibreOffice")
-        end)
-      end,
       ["refresh-open-target-odts"] = function(self) -- the purpose of this method is to refresh the open libreoffice windows that hold the generated documents after changes in omegat, allowing for manual 'hot reloading'
         self:get("target-files-extension", "odt"):doThis("choose-item", function(file)
           local libreoffice_windows_with_file = file:get("window-items-of-app-path-leaf-as-title", 'LibreOffice') -- generally probably only one, but this is a list because we can't be sure
@@ -73,16 +68,20 @@ OmegatProjectDirItemSpecifier = {
 
     }
   },
-  action_table = concat({
+  action_table = {
     {
-      text = "👉🌀🗄 copsrc.",
-      key = "choose-and-open-odt",
-      args = "source"
+      i = emj.open .. emj.source,
+      d = "opsrc",
+      getfn = transf.omegat_project_dir.source_files,
+      filter = transf.string_array.item_array_of_string_items,
+      act = "cia"
     },
     {
-      text = "👉💥🗄 copstgt.",
-      key = "choose-and-open-odt",
-      args = "target"
+      i = emj.open .. emj.target,
+      d = "optgt",
+      getfn = transf.omegat_project_dir.target_files,
+      filter  = transf.string_array.item_array_of_string_items,
+      act = "cia"
     },
     {
       text = "♻️💥 reftgt.",
@@ -106,7 +105,7 @@ OmegatProjectDirItemSpecifier = {
       args = { key = "create-and-open-new-source-odt" }
     },
 
-  }, getChooseItemTable({}))
+  }
 }
 
 --- @type BoundNewDynamicContentsComponentInterface
