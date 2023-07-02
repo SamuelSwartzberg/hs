@@ -3,12 +3,6 @@ RunningApplicationItemSpecifier = {
   type = "running-application",
   properties = {
     getables = {
-      ["app-window-filter"] = function(self)
-        return hs.window.filter.new(nil):setAppFilter(self:get("c"))
-      end,
-      ["all-windows-by-filter"] = function(self) -- uses filters and therefore goes through spaces
-        return self:get("app-window-filter"):getWindows()
-      end,
       ["window-index"] = function(self, window)
         local windows = self:get("all-windows")
         return find(windows, function(w) 

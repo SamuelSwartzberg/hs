@@ -3828,8 +3828,19 @@ transf = {
     focused_window = function(app)
       return app:focusedWindow()
     end,
+    focused_window_jxa_window_specifier = function(app)
+      return transf.window.jxa_window_specifier(
+        transf.running_application.focused_window(app)
+      )
+    end,
     window_array = function(app)
       return app:allWindows()
+    end,
+    window_filter = function(app)
+      return hs.window.filter.new(nil):setAppFilter(app)
+    end,
+    window_array_via_window_filter = function(app)
+      return transf.running_application.window_filter(app):getWindows()
     end,
     mac_application_name = function(app)
       return app:name()
@@ -4027,6 +4038,13 @@ transf = {
     mac_application_name = function(dotapp_path)
       return transf.path.filename(dotapp_path)
     end
+  },
+  jxa_browser_tabbable_running_application = {
+    url = function(app)
+      return transf.browser_tabbable_jxa_window_specifier.url(
+        transf.running_application.focused_window_jxa_window_specifier(app)
+      )
+    end,
   },
   mac_application_name = {
     application_support_dir_path = function(app_name)
