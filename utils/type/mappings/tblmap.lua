@@ -107,21 +107,21 @@ tblmap = {
       min = "%Y-%m-%dT%H:%M",
       sec = "%Y-%m-%dT%H:%M:%SZ",
     },
-    max = {
+    max_date_component_value = {
       sec = 60,
       min = 60,
       hour = 24,
       day = 30,
       month = 12,
     },
-    min = {
+    min_date_component_value = {
       sec = 0,
       min = 0,
       hour = 0,
       day = 1,
       month = 1,
     },
-    index = {
+    date_component_index = {
       year = 1,
       month = 2,
       day = 3,
@@ -138,6 +138,16 @@ tblmap = {
       sec = "second",
     },
 
+  },
+  date_component_index = {
+    date_component_name = {
+      [1] = "year",
+      [2] = "month",
+      [3] = "day",
+      [4] = "hour",
+      [5] = "min",
+      [6] = "sec",
+    },
   },
   date_format_name = {
     date_format = {
@@ -162,14 +172,6 @@ tblmap = {
       [5] = "Friday",
       [6] = "Saturday",
       [7] = "Sunday"
-    },
-    date_component = {
-      [1] = "year",
-      [2] = "month",
-      [3] = "day",
-      [4] = "hour",
-      [5] = "min",
-      [6] = "sec",
     },
   },
   weekday_mon1_en = {

@@ -898,13 +898,13 @@ get = {
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
-    key_prefix_partial_date_components_force_first = function(csl_table, key)
-      return transf.date_parts_single_or_range.prefix_partial_date_components_force_first(
+    key_prefix_partial_date_component_name_value_dict_force_first = function(csl_table, key)
+      return transf.date_parts_single_or_range.prefix_partial_date_component_name_value_dict_force_first(
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
     key_year_force_first = function(csl_table, key)
-      return transf.csl_table.key_prefix_partial_date_components_force_first(csl_table, key).year
+      return transf.csl_table.key_prefix_partial_date_component_name_value_dict_force_first(csl_table, key).year
     end,
   },
   shellscript_file = {
@@ -1055,14 +1055,14 @@ get = {
       return "https://" .. host .. "/" .. owner_item .. "/" .. indicator .. branch .. "/" .. relative_path
     end,
   },
-  date_component = {
+  date_component_name = {
     next = function(component, n)
       n = n or 0
-      return get.array.next(mt._list.date.date_component_names, transf.date_component.index(component) + n)
+      return get.array.next(mt._list.date.date_component_names, transf.date_component_name.index(component) + n)
     end,
     previous = function(component, n)
       n = n or 0
-      return get.array.previous(mt._list.date.date_component_names, transf.date_component.index(component) - n)
+      return get.array.previous(mt._list.date.date_component_names, transf.date_component_name.index(component) - n)
     end,
   },
   date = {
@@ -1085,8 +1085,8 @@ get = {
       }
     end,
     date_range_specifier_of_lower_component = function(date, step, component)
-      return get.full_date_components.date_range_specifier_of_lower_component(
-        transf.date.full_date_components(date),
+      return get.full_date_component_name_value_dict.date_range_specifier_of_lower_component(
+        transf.date.full_date_component_name_value_dict(date),
         step,
         component
       )
@@ -1095,8 +1095,8 @@ get = {
       return get.date.date_range_specifier_of_lower_component(date, amount, "day")
     end,
     to_precision = function(date, component)
-      return get.full_date_components.to_precision_date(
-        transf.date.full_date_components(date),
+      return get.full_date_component_name_value_dict.to_precision_date(
+        transf.date.full_date_component_name_value_dict(date),
         component
       )
     end,
@@ -1123,11 +1123,11 @@ get = {
       )
     end,
   },
-  date_components = {
-    date_range_specifier = function(date_components, step, unit)
+  date_component_name_value_dict = {
+    date_range_specifier = function(date_component_name_value_dict, step, unit)
       return {
-        start = date(transf.date_components.min_full_date_components(date_components)),
-        stop = date(transf.date_components.max_full_date_components(date_components)),
+        start = date(transf.date_component_name_value_dict.min_full_date_component_name_value_dict(date_component_name_value_dict)),
+        stop = date(transf.date_component_name_value_dict.max_full_date_component_name_value_dict(date_component_name_value_dict)),
         step = step or 1,
         unit = unit or "min"
       }
@@ -1143,27 +1143,27 @@ get = {
       )
     end,
   },
-  full_date_components = {
-    prefix_partial_date_components = function(date_components, component)
+  full_date_component_name_value_dict = {
+    prefix_partial_date_component_name_value_dict = function(full_date_component_name_value_dict, component)
       return map(
-        transf.date_component.date_components_larger_or_same(component),
-        date_components
+        transf.date_component_name.date_component_name_value_dict_larger_or_same(component),
+        full_date_component_name_value_dict
       )
     end,
-    date_range_specifier_of_lower_component = function (date_components, step, component, additional_steps_down)
-      return get.date_components.date_range_specifier(
-        transf.full_date_components.prefix_partial_date_components(date_components, component),
+    date_range_specifier_of_lower_component = function (full_date_component_name_value_dict, step, component, additional_steps_down)
+      return get.date_component_name_value_dict.date_range_specifier(
+        transf.full_date_component_name_value_dict.prefix_partial_date_component_name_value_dict(full_date_component_name_value_dict, component),
         step,
-        get.date_component.next(component, additional_steps_down)
+        get.date_component_name.next(component, additional_steps_down)
       )      
     end,
-    to_precision_full_date_components = function(date_components, component)
-      return transf.date_components.min_full_date_components(
-        transf.full_date_components.prefix_partial_date_components(date_components, component)
+    to_precision_full_date_component_name_value_dict = function(full_date_component_name_value_dict, component)
+      return transf.full_date_component_name_value_dict.min_full_date_component_name_value_dict(
+        transf.full_date_component_name_value_dict.prefix_partial_date_component_name_value_dict(full_date_component_name_value_dict, component)
       )
     end,
-    to_precision_date = function(date_components, component)
-      return date(transf.full_date_components.to_precision_full_date_components(date_components, component))
+    to_precision_date = function(full_date_component_name_value_dict, component)
+      return date(transf.full_date_component_name_value_dict.to_precision_full_date_component_name_value_dict(full_date_component_name_value_dict, component))
     end,
   },
   rfc3339like_dt = {

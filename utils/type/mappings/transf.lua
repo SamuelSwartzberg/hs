@@ -1238,7 +1238,7 @@ transf = {
     weeknumber = function(date)
       return date:getisoweeknumber()
     end,
-    full_date_components = function(date)
+    full_date_component_name_value_dict = function(date)
       local tbl = glue(
         date:getdate(),
         date:gettime()
@@ -1262,8 +1262,8 @@ transf = {
       return get.date.formatted(date, tblmap.date_format_name.date_format["rfc3339-time"])
     end,
     timestamp_s = function(date)
-      return transf.full_date_components.timestamp_s(
-        transf.date.full_date_components(date)
+      return transf.full_date_component_name_value_dict.timestamp_s(
+        transf.date.full_date_component_name_value_dict(date)
       )
     end,
     timestamp_ms = function(date)
@@ -1287,79 +1287,79 @@ transf = {
       return date(timestamp / 1000)
     end
   },
-  date_component = {
-    date_component_list_larger_or_same = function(component)
+  date_component_name = {
+    date_component_name_list_larger_or_same = function(component)
       return slice(mt._list.date.date_component_names, 1, {_exactly = component})
     end,
-    date_component_list_same_or_smaller = function(component)
+    date_component_name_list_same_or_smaller = function(component)
       return slice(mt._list.date.date_component_names, {_exactly = component})
     end,
-    date_components_larger_all_same = function(component)
+    date_component_name_list_larger_all_same = function(component)
       return map(
-        transf.date_component.date_component_list_larger_or_same(component),
+        transf.date_component_name.date_component_name_list_larger_or_same(component),
         returnSame,
         {"v", "k"}
       )
     end,
     index = function(component)
-      return tblmap.date_component_name.index[component]
+      return tblmap.date_component_name.date_component_index[component]
     end,
     
   },
-  date_component_list = {
-    min_date_components = function(list)
+  date_component_name_list = {
+    min_date_component_name_value_dict = function(list)
       return map(
         list,
         function(component)
-          return component, tblmap.date_component_name.min[component]
+          return component, tblmap.date_component_name.min_date_component_value[component]
         end,
         {"v", "kv"}
       )
     end,
-    max_date_components = function(list)
+    max_date_component_name_value_dict = function(list)
       return map(
         list,
         function(component)
-          return component, tblmap.date_component_name.max[component]
+          return component, tblmap.date_component_name.max_date_component_value[component]
         end,
         {"v", "kv"}
       )
     end,
-    date_components_ordered_list = function(list)
-      return get.array.sorted(list, join.date_component.date_component.larger)
+    date_component_name_ordered_list = function(list)
+      return get.array.sorted(list, join.date_component_name.date_component_name.larger)
     end,
-    date_component_list_inverse = function(list)
+    date_component_name_list_inverse = function(list)
       return setDifference(mt._list.date.date_component_names, list)
     end
   },
   rfc3339like_dt = {
-    date_components = function(str)
+    date_component_name_value_dict = function(str)
       local comps = {onig.match(str, mt._r.date.rfc3339like_dt)}
       return map(mt._list.date.date_component_names, function(k, v)
         return v and get.string_or_number.number(comps[k]) or nil
       end, {"kv", "kv"})
     end,
     date_range_specifier = function(str)
-      return transf.date_components.date_range_specifier(transf.rfc3339like_dt.date_components(str))
+      return transf.date_component_name_value_dict.date_range_specifier(transf.rfc3339like_dt.date_component_name_value_dict(str))
     end,
-    min_full_date_components = function(str)
-      return transf.date_components.min_full_date_components(
-        transf.rfc3339like_dt.date_components(str)
+    min_full_date_component_name_value_dict = function(str)
+      return transf.date_component_name_value_dict.min_full_date_component_name_value_dict(
+        transf.rfc3339like_dt.date_component_name_value_dict(str)
       )
     end,
-    max_full_date_components = function(str)
-      return transf.date_components.max_full_date_components(
-        transf.rfc3339like_dt.date_components(str)
+    max_full_date_component_name_value_dict = function(str)
+      return transf.date_component_name_value_dict.max_full_date_component_name_value_dict(
+        transf.rfc3339like_dt.date_component_name_value_dict(str)
       )
     end,
     min_date = function(str)
-      return transf.full_date_components.date(
-        transf.rfc3339like_dt.min_full_date_components(str)
+      return transf.full_date_component_name_value_dict.date(
+        transf.rfc3339like_dt.min_full_date_component_name_value_dict(str)
       )
     end,
     max_date = function(str)
-      return transf.full_date_components.date(
-        transf.rfc3339like_dt.max_full_date_components(str)
+      return transf.full_date_component_name_value_dict.date(
+        transf.rfc3339like_dt.max_full_date_component_name_value_dict(str)
       )
     end,
     min_timestamp_s = function(str)
@@ -1377,8 +1377,8 @@ transf = {
   },
   full_rfc3339like_dt = {
     date = function(str)
-      transf.full_date_components.date(
-        transf.rfc3339like_dt.date_components(str)
+      transf.full_date_component_name_value_dict.date(
+        transf.rfc3339like_dt.date_component_name_value_dict(str)
       )
     end,
     timestamp_s = function(str)
@@ -1396,27 +1396,27 @@ transf = {
     start_rfc3339like_dt = function(str)
       return stringx.split(str, "_to_")[1]
     end,
-    start_date_components = function(str)
-      return transf.rfc3339like_dt.date_components(
+    start_date_component_name_value_dict = function(str)
+      return transf.rfc3339like_dt.date_component_name_value_dict(
         transf.rfc3339like_range.start_rfc3339like_dt(str)
       )
     end,
-    start_min_full_date_components = function(str)
-      return transf.date_components.min_full_date_components(
-        transf.rfc3339like_range.start_date_components(str)
+    start_min_full_date_component_name_value_dict = function(str)
+      return transf.date_component_name_value_dict.min_full_date_component_name_value_dict(
+        transf.rfc3339like_range.start_date_component_name_value_dict(str)
       )
     end,
     end_rfc3339like_dt = function(str)
       return stringx.split(str, "_to_")[2]
     end,
-    end_date_components = function(str)
-      return transf.rfc3339like_dt.date_components(
+    end_date_component_name_value_dict = function(str)
+      return transf.rfc3339like_dt.date_component_name_value_dict(
         transf.rfc3339like_range.end_rfc3339like_dt(str)
       )
     end,
-    end_max_full_date_components = function(str)
-      return transf.date_components.max_full_date_components(
-        transf.rfc3339like_range.end_date_components(str)
+    end_max_full_date_component_name_value_dict = function(str)
+      return transf.date_component_name_value_dict.max_full_date_component_name_value_dict(
+        transf.rfc3339like_range.end_date_component_name_value_dict(str)
       )
     end,
     date_range_specifier = function(str)
@@ -1473,61 +1473,61 @@ transf = {
     end,
 
   },
-  date_components = {
-    date_components_list_set = function(date_components)
-      return keys(date_components)
+  date_component_name_value_dict = {
+    date_component_name_list_set = function(date_component_name_value_dict)
+      return keys(date_component_name_value_dict)
     end,
-    date_components_list_not_set = function(date_components)
-      return transf.date_component_list.date_components_list_inverse(transf.date_components.date_components_list_set(date_components))
+    date_component_name_list_not_set = function(date_component_name_value_dict)
+      return transf.date_component_name_list.date_component_name_list_inverse(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
     end,
-    date_component_ordered_list_set = function(date_components)
-      return transf.date_component_list.date_components_ordered_list(transf.date_components.date_components_list_set(date_components))
+    date_component_ordered_list_set = function(date_component_name_value_dict)
+      return transf.date_component_name_list.date_component_name_ordered_list(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
     end,
-    date_component_ordered_list_not_set = function(date_components)
-      return transf.date_component_list.date_components_ordered_list(transf.date_components.date_components_list_not_set(date_components))
+    date_component_ordered_list_not_set = function(date_component_name_value_dict)
+      return transf.date_component_name_list.date_component_name_ordered_list(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
-    min_date_components_not_set = function(date_components)
-      return transf.date_component_list.min_date_components(transf.date_components.date_components_list_not_set(date_components))
+    min_date_component_name_value_dict_not_set = function(date_component_name_value_dict)
+      return transf.date_component_name_list.min_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
-    max_date_components_not_set = function(date_components)
-      return transf.date_component_list.max_date_components(transf.date_components.date_components_list_not_set(date_components))
+    max_date_component_name_value_dict_not_set = function(date_component_name_value_dict)
+      return transf.date_component_name_list.max_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
-    min_full_date_components = function(date_components)
+    min_full_date_component_name_value_dict = function(date_component_name_value_dict)
       return glue(
-        date_components,
-        transf.date_components.min_date_components_not_set(date_components)
+        date_component_name_value_dict,
+        transf.date_component_name_value_dict.min_date_component_name_value_dict_not_set(date_component_name_value_dict)
       )
     end,
-    max_full_date_components = function(date_components)
+    max_full_date_component_name_value_dict = function(date_component_name_value_dict)
       return glue(
-        date_components,
-        transf.date_components.max_date_components_not_set(date_components)
+        date_component_name_value_dict,
+        transf.date_component_name_value_dict.max_date_component_name_value_dict_not_set(date_component_name_value_dict)
       )
     end,
-    date_range_specifier = function(date_components)
-      return get.date_components.date_range_specifier(date_components, 1, "min")
+    date_range_specifier = function(date_component_name_value_dict)
+      return get.date_component_name_value_dict.date_range_specifier(date_component_name_value_dict, 1, "min")
     end,
 
   },
-  prefix_partial_date_components = {
+  prefix_partial_date_component_name_value_dict = {
     
   },
-  suffix_partial_date_components = {
+  suffix_partial_date_component_name_value_dict = {
 
   },
-  partial_date_components = {
+  partial_date_component_name_value_dict = {
 
   },
   -- date components are full if all components are set
-  full_date_components = {
-    date = function(date_components)
-      return date(date_components)
+  full_date_component_name_value_dict = {
+    date = function(full_date_component_name_value_dict)
+      return date(full_date_component_name_value_dict)
     end,
-    timestamp_s = function(date_components)
-      return os.time(date_components)
+    timestamp_s = function(full_date_component_name_value_dict)
+      return os.time(full_date_component_name_value_dict)
     end,
-    timestamp_ms = function(date_components)
-      return transf.date.timestamp_s(date_components) * 1000
+    timestamp_ms = function(full_date_component_name_value_dict)
+      return transf.date.timestamp_s(full_date_component_name_value_dict) * 1000
     end,
   },
   iban = {
@@ -4307,13 +4307,13 @@ transf = {
         transf.csl_table.issued_date_parts_single_or_range(csl_table)
       )
     end,
-    issued_prefix_partial_date_components_force_first = function(csl_table)
-      return transf.date_parts_single_or_range.prefix_partial_date_components_force_first(
+    issued_prefix_partial_date_component_name_value_dict_force_first = function(csl_table)
+      return transf.date_parts_single_or_range.prefix_partial_date_component_name_value_dict_force_first(
         transf.csl_table.issued_date_parts_single_or_range(csl_table)
       )
     end,
     issued_year_force_first = function(csl_table)
-      return transf.csl_table.issued_prefix_partial_date_components_force_first(csl_table).year
+      return transf.csl_table.issued_prefix_partial_date_component_name_value_dict_force_first(csl_table).year
     end,
     author_array = function(csl_table)
       return csl_table.author
@@ -4568,17 +4568,17 @@ transf = {
     rfc3339like_dt = function(date_parts)
       return table.concat(date_parts, "-")
     end,
-    prefix_partial_date_components = function(date_parts)
+    prefix_partial_date_component_name_value_dict = function(date_parts)
       return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
     end,
-    full_date_components = function(date_parts)
-      return transf.date_components.min_full_date_components(
-        transf.date_parts_single.prefix_partial_date_components(date_parts)
+    full_full_date_component_name_value_dict = function(date_parts)
+      return transf.date_component_name_value_dict.min_full_date_component_name_value_dict(
+        transf.date_parts_single.prefix_partial_date_component_name_value_dict(date_parts)
       )
     end,
     date = function(date_parts)
-      return transf.full_date_components.date(
-        transf.date_parts_single.full_date_components(date_parts)
+      return transf.full_date_component_name_value_dict.date(
+        transf.date_parts_single.full_full_date_component_name_value_dict(date_parts)
       )
     end,
   },
@@ -4588,8 +4588,8 @@ transf = {
     end,
     date_range_specifier = function(date_parts_range)
       return {
-        start = transf.date_parts_single.full_date_components(date_parts_range[1]),
-        stop = transf.date_parts_single.full_date_components(date_parts_range[2]),
+        start = transf.date_parts_single.full_full_date_component_name_value_dict(date_parts_range[1]),
+        stop = transf.date_parts_single.full_full_date_component_name_value_dict(date_parts_range[2]),
         step = 1,
         unit = "day"
       }
@@ -4607,11 +4607,11 @@ transf = {
     rf3339like_dt_force_first = function(date_parts)
       return transf.date_parts_single.rfc3339like_dt(date_parts[1])
     end,
-    prefix_partial_date_components_force_first = function(date_parts)
-      return transf.date_parts_single.prefix_partial_date_components(date_parts[1])
+    prefix_partial_date_component_name_value_dict_force_first = function(date_parts)
+      return transf.date_parts_single.prefix_partial_date_component_name_value_dict(date_parts[1])
     end,
-    full_date_components_force_first = function(date_parts)
-      return transf.date_parts_single.full_date_components(date_parts[1])
+    full_full_date_component_name_value_dict_force_first = function(date_parts)
+      return transf.date_parts_single.full_full_date_component_name_value_dict(date_parts[1])
     end,
     date_force_first = function(date_parts)
       return transf.date_parts_single.date(date_parts[1])

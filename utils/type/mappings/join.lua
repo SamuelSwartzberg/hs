@@ -46,10 +46,10 @@ join = {
       end
     }
   },
-  date_component = {
-    date_component = {
+  date_component_name = {
+    date_component_name = {
       larger = function(a, b)
-        return tblmap.date_component.index[a] > tblmap.date_component.index[b]
+        return tblmap.date_component_name.date_component_index[a] > tblmap.ddate_component_name.date_component_index[b]
       end
     }
   }
