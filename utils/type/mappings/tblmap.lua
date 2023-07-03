@@ -1,4 +1,5 @@
 
+
 tblmap = {
   whitespace = {
     escaped = {
@@ -82,7 +83,7 @@ tblmap = {
       month = 60 * 60 * 24 * 30,
       year = 60 * 60 * 24 * 365,
     },
-    format_part = {
+    rfc3339like_dt_format_part = {
       sec = "%S",
       min = "%M",
       hour = "%H",
@@ -91,13 +92,39 @@ tblmap = {
       month = "%m",
       year = "%Y",
     },
-    RFC3339_separator = {
+    rfc3339like_dt_string_format_part = {
+      sec = "%02d",
+      min = "%02d",
+      hour = "%02d",
+      day = "%02d",
+      week = "%02d",
+      month = "%02d",
+      year = "%04d",
+    },
+    rfc3339like_dt_string_format_part_fallback = {
+      sec = "??",
+      min = "??",
+      hour = "??",
+      day = "??",
+      week = "??",
+      month = "??",
+      year = "????",
+    },
+    rfc3339like_dt_separator = {
       year = "-",
       month = "-",
       day = "T",
       hour = ":",
       min = ":",
       sec = "Z",
+    },
+    prev_rfc3339like_dt_separator = {
+      year = nil,
+      month = "-",
+      day = "-",
+      hour = "T",
+      min = ":",
+      sec = ":",
     },
     rfc3339like_dt_format_string = {
       year = "%Y",

@@ -4,12 +4,12 @@ assertMessage(
 )
 
 assertMessage(
-  tblmap.date_component_name.format_part["sec"],
+  tblmap.date_component_name.rfc3339like_dt_format_part["sec"],
   "%S"
 )
 
 assertMessage(
-  tblmap.date_component_name.format_part["secs"],
+  tblmap.date_component_name.rfc3339like_dt_format_part["secs"],
   "%S"
 )
 

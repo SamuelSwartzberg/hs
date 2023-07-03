@@ -375,6 +375,9 @@ is = {
     b_larger = function(a, b)
       return a < b
     end,
+    equal = function(a, b)
+      return a == b
+    end,
   }
 
 }

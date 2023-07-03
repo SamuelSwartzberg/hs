@@ -3,12 +3,6 @@ ArrayOfDateRelatedItemsSpecifier = {
   type = "array-of-date-relateds",
   properties = {
     getables = {
-      ["smallest-date"] = function(self)
-        return self:get("min-contents")
-      end,
-      ["largest-date"] = function(self)
-        return self:get("max-contents")
-      end,
       ["smallest-largest-date"] = function(self)
         return {
           self:get("smallest-date"),

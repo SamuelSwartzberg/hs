@@ -78,32 +78,6 @@ end
 --- @param a any
 --- @param b any
 --- @return boolean
-function returnEqual(a, b)
-  return a == b
-end
-
---- @param a any
---- @param b any
---- @return boolean
-function is.a_and_b.a_larger(a, b)
-  return a > b
-end
-
---- @generic T, U
---- @param a T
---- @param b U
---- @return T | U
-function transf.a_and_b.larger(a, b)
-  if a > b then
-    return a
-  else
-    return b
-  end
-end
-
---- @param a any
---- @param b any
---- @return boolean
 function returnSmaller(a, b)
   return a < b
 end

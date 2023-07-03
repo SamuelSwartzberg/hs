@@ -991,7 +991,7 @@ get = {
       )
     end,
     entry_dict_for_date = function(path, date)
-      return get.logging_dir.time_dict_of_dicts_for_date(path, date)[transf.date.rfc3339like_time(date)]
+      return get.logging_dir.time_dict_of_dicts_for_date(path, date)[transf.date.full_rfc3339like_time(date)]
     end,
   },
   path_array = {
@@ -1105,6 +1105,9 @@ get = {
       local retrieved_format = tblmap.date_format_name.date_format[format]
       return date:fmt(retrieved_format or format)
     end,
+    rfc3339like_dt_of_precision = function(date, precision)
+      return get.date.formatted(date, tblmap.date_component_name.rfc3339like_dt_format_string[precision])
+    end,
 
   },
   timestamp_s = {
@@ -1120,6 +1123,20 @@ get = {
       return get.date.formatted(
         transf.timestamp_s.date(timestamp_s),
         format
+      )
+    end,
+  },
+  date_component_name_list = {
+    date_component_value_list = function(date_component_name_list, date_component_name_value_dict)
+      return map(
+        date_component_name_list,
+        date_component_name_value_dict
+      )
+    end,
+    date_component_value_ordered_list = function(date_component_name_list, date_component_name_value_dict)
+      return map(
+        transf.date_component_name_list.date_component_name_ordered_list(date_component_name_list),
+        date_component_name_value_dict
       )
     end,
   },
@@ -1444,6 +1461,22 @@ get = {
         return table.concat(arg, separator)
       else
         return arg
+      end
+    end,
+  },
+  table_and_table = {
+    larger_value_by_key = function(table1, table2, key)
+      if table1[key] > table2[key] then
+        return table1
+      else
+        return table2
+      end
+    end,
+    smaller_value_by_key = function(table1, table2, key)
+      if table1[key] < table2[key] then
+        return table1
+      else
+        return table2
       end
     end,
   }

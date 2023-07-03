@@ -80,12 +80,12 @@ assertMessage(
 )
 
 assertMessage(
-  returnEqual(1, 1),
+  is.a_and_b.equal(1, 1),
   true
 )
 
 assertMessage(
-  returnEqual(1, 2),
+  is.a_and_b.equal(1, 2),
   false
 )
 
@@ -95,7 +95,7 @@ assertMessage(
 )
 
 assertMessage(
-  returnSmaller(1, 2),
+  is.a_and_b.b_larger(1, 2),
   true
 )
 
