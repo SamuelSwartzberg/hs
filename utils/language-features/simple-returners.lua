@@ -85,7 +85,7 @@ end
 --- @param a any
 --- @param b any
 --- @return boolean
-function returnLarger(a, b)
+function is.a_and_b.a_larger(a, b)
   return a > b
 end
 
@@ -93,7 +93,7 @@ end
 --- @param a T
 --- @param b U
 --- @return T | U
-function returnLargerItem(a, b)
+function transf.a_and_b.larger(a, b)
   if a > b then
     return a
   else

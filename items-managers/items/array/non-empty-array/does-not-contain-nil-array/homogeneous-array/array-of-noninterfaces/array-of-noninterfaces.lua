@@ -27,7 +27,7 @@ ArrayOfNoninterfacesSpecifier = {
         return reduce(self:get("c"), returnSmaller)
       end,
       ["max"] = function(self)
-        return reduce(self:get("c"), returnLarger)
+        return reduce(self:get("c"), is.a_and_b.a_larger)
       end,
     },
     doThisables = {

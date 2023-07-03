@@ -1328,9 +1328,27 @@ transf = {
     date_component_name_ordered_list = function(list)
       return get.array.sorted(list, join.date_component_name.date_component_name.larger)
     end,
+    largest_date_component_name = function(list)
+      return transf.date_component_name_list.date_component_name_ordered_list(
+        list
+      )[1]
+    end,
+    smallest_date_component_name = function(list)
+      return transf.date_component_name_list.date_component_name_ordered_list(
+        list
+      )[#list]
+    end,
     date_component_name_list_inverse = function(list)
       return setDifference(mt._list.date.date_component_names, list)
     end
+  },
+  date_component_name_ordered_list = {
+    largest_date_component_name = function(list)
+      return list[1]
+    end,
+    smallest_date_component_name = function(list)
+      return list[#list]
+    end,
   },
   rfc3339like_dt = {
     date_component_name_value_dict = function(str)
@@ -1406,6 +1424,11 @@ transf = {
         transf.rfc3339like_range.start_date_component_name_value_dict(str)
       )
     end,
+    start_min_date = function(str)
+      return transf.full_date_component_name_value_dict.date(
+        transf.rfc3339like_range.start_min_full_date_component_name_value_dict(str)
+      )
+    end,
     end_rfc3339like_dt = function(str)
       return stringx.split(str, "_to_")[2]
     end,
@@ -1419,10 +1442,72 @@ transf = {
         transf.rfc3339like_range.end_date_component_name_value_dict(str)
       )
     end,
+    end_min_full_date_component_name_value_dict = function(str)
+      return transf.date_component_name_value_dict.min_full_date_component_name_value_dict(
+        transf.rfc3339like_range.end_date_component_name_value_dict(str)
+      )
+    end,
+    end_max_date = function(str)
+      return transf.full_date_component_name_value_dict.date(
+        transf.rfc3339like_range.end_max_full_date_component_name_value_dict(str)
+      )
+    end,
+    end_min_date = function(str)
+      return transf.full_date_component_name_value_dict.date(
+        transf.rfc3339like_range.end_min_full_date_component_name_value_dict(str)
+      )
+    end,
+    start_smallest_date_component_set = function(str)
+      return transf.date_component_name_value_dict.smallest_date_component_set(
+        transf.rfc3339like_range.start_date_component_name_value_dict(str)
+      )
+    end,
+    end_smallest_date_component_set = function(str)
+      return transf.date_component_name_value_dict.smallest_date_component_set(
+        transf.rfc3339like_range.end_date_component_name_value_dict(str)
+      )
+    end,
+    smallest_date_component_both_set = function(str)
+      return join.date_component_name.date_component_name.larger_date_component_name(
+        transf.rfc3339like_range.start_smallest_date_component_set(str),
+        transf.rfc3339like_range.end_smallest_date_component_set(str)
+      )
+    end,
     date_range_specifier = function(str)
+      return {
+        start = transf.rfc3339like_range.start_min_date(str),
+        stop = transf.rfc3339like_range.end_max_date(str),
+        step = 1,
+        unit = transf.rfc3339like_range.smallest_date_component_both_set(str)
+      }
+    end,
+    min_date = function(str)
+      return transf.rfc3339like_range.start_min_date(str)
+    end,
+    max_date = function(str)
+      return transf.rfc3339like_range.end_max_date(str)
     end,
   },
   rf3339like_dt_or_range = {
+    dt_or_range = function(str)
+      if stringy.find(str, "_to_") then
+        return "rfc3339like_range"
+      else
+        return "rfc3339like_dt"
+      end
+    end,
+    max_date = function(str)
+      return transf[
+        transf.rf3339like_dt_or_range.dt_or_range(str)
+      ].max_date(str)
+    end,
+    min_date = function(str)
+      return transf[
+        transf.rf3339like_dt_or_range.dt_or_range(str)
+      ].min_date(str)
+    end,
+  },
+  rf3339like_dt_or_range_array = {
 
   },
   basic_range_string = {
@@ -1460,6 +1545,14 @@ transf = {
       return range.stop - range.start
     end,
   },
+  range_specifier_array = {
+    earliest_start = function(range_specifier_array)
+      return reduce(
+        range_specifier_array,
+
+      )
+    end
+  },
   date_range_specifier = {
     --- we can reduce a range to a single rfc3339like_dt if the first n components are the same, and for those that differ, start is min[component] and stop is max[component]
     rf3339like_dt_or_range = function(date_range_specifier)
@@ -1485,6 +1578,18 @@ transf = {
     end,
     date_component_ordered_list_not_set = function(date_component_name_value_dict)
       return transf.date_component_name_list.date_component_name_ordered_list(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+    end,
+    largest_date_component_name_set = function(date_component_name_value_dict)
+      return transf.date_component_name_list.largest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+    end,
+    smallest_date_component_name_set = function(date_component_name_value_dict)
+      return transf.date_component_name_list.smallest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+    end,
+    largest_date_component_name_not_set = function(date_component_name_value_dict)
+      return transf.date_component_name_list.largest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+    end,
+    smallest_date_component_name_not_set = function(date_component_name_value_dict)
+      return transf.date_component_name_list.smallest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
     min_date_component_name_value_dict_not_set = function(date_component_name_value_dict)
       return transf.date_component_name_list.min_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
@@ -2419,7 +2524,7 @@ transf = {
     here_string = function(str)
       return " <<EOF\n" .. str .. "\nEOF"
     end,
-    rfc3339like = function(str)
+    rfc3339like_dt = function(str)
       return get.string.deterministic_gpt_transformation(str, "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified.")
     end,
     raw_contact = function(searchstr)
@@ -2889,6 +2994,15 @@ transf = {
       return transf.key_value.value_chooser_item(pair[1], pair[2])
     end,
   },
+  a_and_b = {
+    larger = function(a_and_b)
+      if a_and_b.a > a_and_b.b then
+        return a_and_b.a
+      else
+        return a_and_b.b
+      end
+    end,
+  },
   key_value = {
     pair = function(key, value)
       return {key, value}
@@ -2944,6 +3058,7 @@ transf = {
         v = value,
       }
     end,
+    
     
   },
   email = {

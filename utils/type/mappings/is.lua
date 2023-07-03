@@ -367,6 +367,14 @@ is = {
     whole_book = function(csl_table)
       return is.csl_table.type_whole_book(csl_table) and not csl_table.chapter and not csl_table.pages
     end
+  },
+  a_and_b = {
+    a_larger = function(a, b)
+      return a > b
+    end,
+    b_larger = function(a, b)
+      return a < b
+    end,
   }
 
 }

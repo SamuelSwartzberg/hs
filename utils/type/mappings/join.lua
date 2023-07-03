@@ -50,7 +50,14 @@ join = {
     date_component_name = {
       larger = function(a, b)
         return tblmap.date_component_name.date_component_index[a] > tblmap.ddate_component_name.date_component_index[b]
-      end
+      end,
+      larger_date_component_name = function(a, b)
+        if tblmap.date_component_name.date_component_index[a] > tblmap.date_component_name.date_component_index[b] then
+          return a
+        else
+          return b
+        end
+      end,
     }
   }
 }

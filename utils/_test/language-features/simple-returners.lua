@@ -90,7 +90,7 @@ assertMessage(
 )
 
 assertMessage(
-  returnLarger(1, 2),
+  is.a_and_b.a_larger(1, 2),
   false
 )
 
