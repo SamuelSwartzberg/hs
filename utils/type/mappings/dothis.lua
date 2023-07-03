@@ -442,7 +442,7 @@ dothis = {
       dothis.string_array.fill_with(transf.string.nocomment_noindent_content_lines(path))
     end,
     search = function(str, search_engine)
-      dothis.string.open_browser(
+      dothis.url_or_path.open_browser(
         get.string.search_engine_search_url(search_engine, str)
       )
     end,
@@ -457,6 +457,9 @@ dothis = {
         env.GUI_EDITOR
       )
     end,
+
+  },
+  url_or_path = {
     open_browser = function(url, browser, do_after)
       url = transf.url.ensure_scheme(url)
       browser = browser or "Firefox"
@@ -468,15 +471,14 @@ dothis = {
       end
     end,
     open_ff = function(url)
-      dothis.string.open_browser(url, "Firefox")
+      dothis.url_or_path.open_browser(url, "Firefox")
     end,
     open_safari = function(url)
-      dothis.string.open_browser(url, "Safari")
+      dothis.url_or_path.open_browser(url, "Safari")
     end,
     open_chrome = function(url)
-      dothis.string.open_browser(url, "Google Chrome")
+      dothis.url_or_path.open_browser(url, "Google Chrome")
     end,
-
   },
   path = {
     open_default = function(path, do_after)
@@ -629,6 +631,14 @@ dothis = {
       dothis.plaintext_file.append_lines(path, lines)
     end,
 
+  },
+  plaintext_url_or_path_file = {
+    open_all = function(path, browser)
+      hs.fnutils.ieach(
+        transf.plaintext_file.nocomment_noindent_content_lines(path),
+        bind(dothis.url_or_path.open_browser, {a_use, browser})
+      )
+    end,
   },
   email_file ={
     download_attachment = function(path, name, do_after)
@@ -987,7 +997,7 @@ dothis = {
   url_array = {
     open_all = function(url_array)
       for _, url in ipairs(url_array) do
-        dothis.string.open_browser(url)
+        dothis.url_or_path.open_browser(url)
       end
     end,
     create_as_url_files = function(url_array, path)

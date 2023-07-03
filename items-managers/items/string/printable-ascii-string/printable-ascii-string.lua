@@ -23,7 +23,7 @@ PrintableAsciiStringItemSpecifier = {
       end,
       ["is-digit-string"] = function(self) return onig.find(self:get("c"), "^-?[0-9a-fA-F]*[\\.,]?[0-9a-fA-F]+$") end,
       ["is-date-related-item"] = function(self) 
-        return memoize(onig.find)(self:get("c"), whole(mt._r.date.rfc3339))
+        return memoize(onig.find)(self:get("c"), whole(mt._r.date.rfc3339like_dt))
       end,
       ["is-dice-notation-item"] = function(self)
         return onig.match(self:get("c"), whole(mt._r.syntax.dice))

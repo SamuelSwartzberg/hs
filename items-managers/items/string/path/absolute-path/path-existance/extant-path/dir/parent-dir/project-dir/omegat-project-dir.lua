@@ -29,7 +29,7 @@ OmegatProjectDirItemSpecifier = {
                 )
             end)
           end)
-  
+   
       end,
       ["file-rechnung"] = function(self)
         local rechnung_target = get.dir.find_child(env.MDIARY .. "/moments/work", {_stop =  "translation"}) .. "/rechnungen"
@@ -43,7 +43,7 @@ OmegatProjectDirItemSpecifier = {
         for i, odt_pair in ipairs(odts) do 
           for j, odt in ipairs(odt_pair) do
             local client = self:get("local-data-object").client
-            local path = transf.path_leaf_parts.full_path({
+            local path = transf.path_leaf_parts.path({
               date = os.date(tblmap.dt_component.rfc3339["day"]),
               path = env.MDIARY .. "/i_made_this/translations/",
               ["general-name"] = pathSlice(odt:get("completely-resolved-path"), "-2:-2", { ext_sep = true })[1],

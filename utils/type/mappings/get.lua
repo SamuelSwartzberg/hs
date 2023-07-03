@@ -527,7 +527,19 @@ get = {
       end
       local res = get.string.deterministic_gpt_transformation(str, query, shots)
       return transf.json_string.not_userdata_or_function(res)
-    end
+    end,
+    window_array_by_pattern = function(str, app_name)
+      return get.running_application.window_array_by_pattern(
+        transf.mac_application_name.running_application(app_name),
+        str
+      )
+    end,
+    window_by_title = function(str, app_name)
+      return get.running_application.window_by_title(
+        transf.mac_application_name.running_application(app_name),
+        str
+      )
+    end,
       
 
   },
@@ -622,6 +634,12 @@ get = {
     end,
     is_leaf = function(path, leaf)
       return transf.path.leaf(path) == leaf
+    end,
+    window_with_leaf_as_title = function(path, app_name)
+      return get.string.window_by_title(
+        transf.path.leaf(path),
+        app_name
+      )
     end,
   },
   absolute_path = {
@@ -1199,7 +1217,7 @@ get = {
     window_by_title = function(app, title)
       return app:getWindow(title)
     end,
-    window_by_pattern = function(app, pattern)
+    window_array_by_pattern = function(app, pattern)
       return app:findWindow(pattern)
     end,
   },

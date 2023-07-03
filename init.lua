@@ -59,9 +59,13 @@ local keymap = {
   ["1"] = {
     explanation = "Command palette for frontmost app",
     fn = function() 
-      CreateRunningApplicationItem(
-        hs.application.frontmostApplication()
-      ):doThis("choose-menu-action")
+      ar(
+        transf.running_application.menu_item_table_item_array(
+          hs.application.frontmostApplication()
+        )
+      ):doThis("choose-item", function(item)
+        dothis.menu_item_table.execute(item:get("c"))
+      end)
     end,
   },
   a_use, {

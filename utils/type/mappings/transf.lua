@@ -327,6 +327,17 @@ transf = {
       return memoize(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(char))[1]
     end
   },
+  leaf = {
+    rf3339like_dt_or_range_general_name_fs_tag_string = function(leaf)
+      return onig.match(
+        leaf,
+        ("^(%s(?:_to_%s)?--)?([^%%]*)(%%.*)?$"):format(
+          mt._r.date.rfc3339like_dt,
+          mt._r.date.rfc3339like_dt
+        )
+      )
+    end,
+  },
   path = {
     attachment = function(path)
       local mimetype = mimetypes.guess(path) or "text/plain"
@@ -366,6 +377,19 @@ transf = {
     ancestor_array = function(path)
       return pathSlice(path, "1:-2", {entire_path_for_each = true})
     end,
+    path_leaf_parts = function(path)
+      local rf3339like_dt_or_range, general_name, fs_tag_string = transf.leaf.rf3339like_dt_or_range_general_name_fs_tag_string(transf.path.leaf(path))
+      return {
+        extension = transf.path.extension(path),
+        path = transf.path.parent_path(path),
+        rfc3339like_dt_or_range = rf3339like_dt_or_range,
+        general_name = general_name,
+        fs_tag_assoc = transf.fs_tag_string.fs_tag_assoc(fs_tag_string),
+      }
+    end,
+    window_array_with_leaf_as_title = function(path)
+      return transf.string.window_array_by_title(transf.path.leaf(path))
+    end
     
 
   },
@@ -648,30 +672,86 @@ transf = {
   },
   
   path_leaf_parts = {
-    general_name_string = function(path_leaf_parts)
-      if path_leaf_parts["general-name"] then 
-        return "--" .. path_leaf_parts["general-name"]
+    general_name_part = function(path_leaf_parts)
+      if path_leaf_parts.general_name then 
+        return "--" .. path_leaf_parts.general_name
       else
         return ""
       end
     end,
-    extension_string = function(path_leaf_parts)
-      if path_leaf_parts["extension"] then 
-        return "." .. path_leaf_parts["extension"]
+    extension_part = function(path_leaf_parts)
+      if path_leaf_parts.extension then 
+        return "." .. path_leaf_parts.extension
       else
         return ""
       end
     end,
-    date_string = function(path_leaf_parts)
-      return path_leaf_parts.date_or_date_range or ""
+    rf3339like_dt_or_range_part = function(path_leaf_parts)
+      return path_leaf_parts.rf3339like_dt_or_range or ""
     end,
-    full_path = function(path_leaf_parts)
+    path_part = function(path_leaf_parts)
       return transf.path.ending_with_slash(path_leaf_parts.path) 
-      .. transf.path_leaf_parts.date_string(path_leaf_parts)
-      .. transf.path_leaf_parts.general_name_string(path_leaf_parts)
-      .. transf.table.fs_tag_string(path_leaf_parts.tag)
-      .. transf.path_leaf_parts.extension_string(path_leaf_parts)
+    end,
+    fs_tag_assoc = function(path_leaf_parts)
+      return path_leaf_parts.fs_tag_assoc
+    end,
+    fs_tag_specifier_array = function(path_leaf_parts)
+      return transf.fs_tag_assoc.fs_tag_specifier_array(path_leaf_parts.fs_tag_assoc)
+    end,
+    fs_tag_string = function(path_leaf_parts)
+      return transf.fs_tag_assoc.fs_tag_string(path_leaf_parts.fs_tag_assoc)
+    end,
+    path = function(path_leaf_parts)
+      return transf.path.ending_with_slash(path_leaf_parts.path) 
+      .. transf.path_leaf_parts.rf3339like_dt_or_range_part(path_leaf_parts)
+      .. transf.path_leaf_parts.general_name_part(path_leaf_parts)
+      .. transf.path_leaf_parts.fs_tag_string(path_leaf_parts)
+      .. transf.path_leaf_parts.extension_part(path_leaf_parts)
     end
+  },
+  fs_tag_string = {
+    fs_tag_assoc = function(fs_tag_string)
+      local parts = stringy.split(
+        fs_tag_string:sub(2),
+        "%"
+      )
+      local assoc = { }
+      for i = 1, #parts do
+        local kvparts = stringy.split(
+          parts[i],
+          "="
+        )
+        local v = table.concat(kvparts, "=", 2)
+        local vparts = stringy.split(pavrts[i], ",")
+        if #vparts > 1 then v = vparts end
+        assoc[kvparts[1]] = v
+      end
+      return assoc
+    end,
+  },
+  fs_tag_assoc = {
+    fs_tag_specifier_array = function(t)
+      local arr = map(
+        t,
+        function(tag_key, tag_value)
+          if type(tag_value) == "table" then tag_value = table.concat(tag_value, ",") end
+          return string.format("%s-%s", tag_key, tag_value)
+        end,
+        {
+          args = "kv",
+          ret = "v",
+          tolist = true,
+        }
+      )
+      table.sort(arr)
+      return arr
+    end,
+    fs_tag_string = function(t)
+      return "%" .. table.concat(transf.assoc_arr.fs_tag_specifier_array(t), "%")
+    end,
+  },
+  path_leaf_parts_array = {
+
   },
   audio_file = {
     transcribed = function(path)
@@ -1028,6 +1108,12 @@ transf = {
     end,
 
   },
+  dated_children_dir = {
+
+  },
+  dated_named_item_dir = {
+
+  },
   logging_dir = {
     header_file = function(path)
       return transf.path.ending_with_slash(path) .. "header"
@@ -1055,6 +1141,12 @@ transf = {
     yaml_form = function(path)
       return transf.not_userdata_or_string.yaml_string(transf.logging_dir.header_empty_string_dict(path))
     end,
+  },
+  dated_named_item = {
+
+  },
+  dated_grouping_dir = {
+
   },
   newsboat_url_specifier = {
     newsboat_url_line = function(specifier)
@@ -1198,7 +1290,7 @@ transf = {
   },
   rfc3339like_dt = {
     date_components = function(str)
-      local comps = {onig.match(str, mt._r.date.rfc3339)}
+      local comps = {onig.match(str, mt._r.date.rfc3339like_dt)}
       return map(mt._list.date.dt_component_few_chars, function(k, v)
         return v and get.string_or_number.number(comps[k]) or nil
       end, {"kv", "kv"})
@@ -1930,20 +2022,15 @@ transf = {
     escaped_general_regex = function(str)
       return replace(str, to.regex.escaped_general_regex)
     end,
-    window_array = function(str)
+    window_array_by_pattern = function(str)
       local res = hs.window.find(str)
       if type(res) == "table" then return res 
       else return {res} end
     end,
-    window_with_exact_title = function(str)
-      local window_arr = transf.string.window_array(str)
-      local window = hs.fnutils.find(
-        window_arr,
-        function(win)
-          return win:title() == str
-        end
-      )
-      return window
+    window_array_by_title = function(str)
+      local res = hs.window.get(str)
+      if type(res) == "table" then return res 
+      else return {res} end
     end,
     in_cache_dir = function(data, type)
       return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.string.safe_filename(data)
@@ -2963,6 +3050,9 @@ transf = {
     end,
     
   },
+  plaintext_url_or_path_file = {
+
+  },
   plaintext_file_array = {
     contents_array = function(arr)
       return hs.fnutils.imap(arr, transf.plaintext_file.contents)
@@ -3046,25 +3136,6 @@ transf = {
     
   },
   assoc_arr = {
-    fs_tag_array = function(t)
-      local arr = map(
-        t,
-        function(tag_key, tag_value)
-          if type(tag_value) == "table" then tag_value = table.concat(tag_value, ",") end
-          return string.format("%s-%s", tag_key, tag_value)
-        end,
-        {
-          args = "kv",
-          ret = "v",
-          tolist = true,
-        }
-      )
-      table.sort(arr)
-      return arr
-    end,
-    fs_tag_string = function(t)
-      return "%" .. table.concat(transf.assoc_arr.fs_tag_array(t), "%")
-    end,
     relative_path_dict = function(t)
       return flatten(
         t,
@@ -3856,6 +3927,12 @@ transf = {
       end
       return filtered
     end,
+    menu_item_table_item_array = function(app)
+      return hs.fnutils.imap(
+        transf.running_application.menu_item_table_array(app),
+        CreateMenuItemTable
+      )
+    end,
     icon_hs_image = function(app)
       return transf.bundle_id.icon_hs_image(
         transf.running_application.bundle_id(app)
@@ -3926,6 +4003,17 @@ transf = {
         transf.window.running_application(window)
       )
     end,
+    native_window_index = function(window)
+      local running_application = transf.window.running_application(window)
+      local window_array = transf.running_application.window_array(running_application)
+      return find(
+        window_array,
+        function(v)
+          return v:id() == window:id()
+        end,
+        {"v", "k"}
+      )
+    end,
     jxa_window_index = function(window)
       return getViaOSA("js", 
         "Application('" .. transf.window.mac_application_name(window) .. "')" ..
@@ -3939,6 +4027,11 @@ transf = {
         application_name = transf.window.mac_application_name(window),
         window_index = transf.window.jxa_window_index(window)
       }
+    end,
+  },
+  window_filter = {
+    window_array = function(window_filter)
+      return window_filter:getWindows()
     end,
   },
   jxa_window_specifier = {

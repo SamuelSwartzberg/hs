@@ -45,16 +45,16 @@ StringItemSpecifier = {
       dothis = dothis.string.alert
     },{
       text = "🔷🈁 vscur.",
-      dothis = dothis.string.open_temp_file
+      dothis = dothis.url_or_path.open_temp_file
     },{
       text = "🦊🌐 ffbr.",
-      dothis = dothis.string.open_ff
+      dothis = dothis.url_or_path.open_ff
     },{
       text = "🧭🌐 sfbr.",
-      dothis = dothis.string.open_safari,
+      dothis = dothis.url_or_path.open_safari,
     },{
       text = "🌈🌐 gcbr.",
-      dothis = dothis.string.open_chrome,
+      dothis = dothis.url_or_path.open_chrome,
     }, {
       text = "👉🍾 cev.",
       getfn = get.khal.search_event_tables
