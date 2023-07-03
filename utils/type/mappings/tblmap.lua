@@ -72,10 +72,10 @@ tblmap = {
     },
   },
   
-  dt_component = {
+  date_component_name = {
     seconds = {
-      second = 1,
-      minute = 60,
+      sec = 1,
+      min = 60,
       hour = 60 * 60,
       day = 60 * 60 * 24,
       week = 60 * 60 * 24 * 7,
@@ -83,8 +83,8 @@ tblmap = {
       year = 60 * 60 * 24 * 365,
     },
     format_part = {
-      second = "%S",
-      minute = "%M",
+      sec = "%S",
+      min = "%M",
       hour = "%H",
       day = "%d",
       week = "%W",
@@ -96,47 +96,47 @@ tblmap = {
       month = "-",
       day = "T",
       hour = ":",
-      minute = ":",
-      second = "Z",
+      min = ":",
+      sec = "Z",
     },
-    rfc3339 = {
+    rfc3339like_dt_format_string = {
       year = "%Y",
       month = "%Y-%m",
       day = "%Y-%m-%d",
       hour = "%Y-%m-%dT%H",
-      minute = "%Y-%m-%dT%H:%M",
-      second = "%Y-%m-%dT%H:%M:%SZ",
+      min = "%Y-%m-%dT%H:%M",
+      sec = "%Y-%m-%dT%H:%M:%SZ",
     },
     max = {
-      second = 60,
-      minute = 60,
+      sec = 60,
+      min = 60,
       hour = 24,
       day = 30,
       month = 12,
     },
     min = {
-      second = 0,
-      minute = 0,
+      sec = 0,
+      min = 0,
       hour = 0,
       day = 1,
       month = 1,
-    },
-    few_char_name = {
-      second = "sec",
-      minute = "min",
-      hour = "hour",
-      day = "day",
-      month = "month",
-      year = "year",
     },
     index = {
       year = 1,
       month = 2,
       day = 3,
       hour = 4,
-      minute = 5,
-      second = 6,
-    }
+      min = 5,
+      sec = 6,
+    },
+    date_component_name_long = {
+      year = "year",
+      month = "month",
+      day = "day",
+      hour = "hour",
+      min = "minute",
+      sec = "second",
+    },
 
   },
   date_format_name = {
@@ -168,8 +168,8 @@ tblmap = {
       [2] = "month",
       [3] = "day",
       [4] = "hour",
-      [5] = "minute",
-      [6] = "second",
+      [5] = "min",
+      [6] = "sec",
     },
   },
   weekday_mon1_en = {

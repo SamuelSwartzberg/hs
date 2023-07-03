@@ -37,7 +37,7 @@ ArrayOfDateRelatedItemsSpecifier = {
         local dates = {}
         local current = smallest
         while current <= largest do
-          dates[#dates+1] = current:fmr(tblmap.dt_component.rfc3339[component])
+          dates[#dates+1] = current:fmr(tblmap.date_component_name.rfc3339like_dt_format_string[component])
           current["add" .. component .. "s"](current, 1)
         end
         return dates

@@ -1,15 +1,15 @@
 assertMessage(
-  normalize.dt_component["secs"],
-  "second"
+  normalize.date_component_name["secs"],
+  "sec"
 )
 
 assertMessage(
-  tblmap.dt_component.format_part["second"],
+  tblmap.date_component_name.format_part["sec"],
   "%S"
 )
 
 assertMessage(
-  tblmap.dt_component.format_part["secs"],
+  tblmap.date_component_name.format_part["secs"],
   "%S"
 )
 

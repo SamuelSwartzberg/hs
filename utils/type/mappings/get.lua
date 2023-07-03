@@ -455,6 +455,9 @@ get = {
       )
     end,
     split = stringx.split,
+    split_unpacked = function(str, sep, n)
+      return table.unpack(transf.string.split(str, sep, n))
+    end,
     lines_tail = function(path, n)
       return slice(transf.string.lines(path), -(n or 10))
     end,
@@ -606,6 +609,14 @@ get = {
       return table.concat(get.array_of_string_arrays.array_of_string_records(arr, field_sep), record_sep)
     end,
     
+  },
+  path_leaf_parts = {
+    tag_value = function(parts, key)
+      return transf.path_leaf_parts.fs_tag_assoc(parts)[key]
+    end,
+    tag_raw_value = function(parts, key)
+      return transf.path_leaf_parts.fs_tag_string_dict(parts)[key]
+    end,
   },
   path = {
     usable_as_filetype = function(path, filetype)
@@ -1047,23 +1058,23 @@ get = {
   date_component = {
     next = function(component, n)
       n = n or 0
-      return get.array.next(mt._list.date.dt_component, transf.date_component.index(component) + n)
+      return get.array.next(mt._list.date.date_component_names, transf.date_component.index(component) + n)
     end,
     previous = function(component, n)
       n = n or 0
-      return get.array.previous(mt._list.date.dt_component, transf.date_component.index(component) - n)
+      return get.array.previous(mt._list.date.date_component_names, transf.date_component.index(component) - n)
     end,
   },
   date = {
     with_added = function(date, amount, component)
       local dtcp = date:copy()
-      return dtcp["add" .. normalize.dt_component[component] .. "s"](dtcp, amount)
+      return dtcp["add" .. tblmap.date_component_name.date_component_name_long[component] .. "s"](dtcp, amount)
     end,
     with_subtracted = function(date, amount, component)
       return get.date.with_added(date, -amount, component)
     end,
     component_value = function(date, component)
-      return date["get" .. normalize.dt_component[component]](date)
+      return date["get" .. tblmap.date_component_name.date_component_name_long[component]](date)
     end,
     surrounding_date_range_specifier = function(date, amount, step, unit)
       return {
@@ -1118,7 +1129,7 @@ get = {
         start = date(transf.date_components.min_full_date_components(date_components)),
         stop = date(transf.date_components.max_full_date_components(date_components)),
         step = step or 1,
-        unit = unit or "minute"
+        unit = unit or "min"
       }
     end,
   },
@@ -1266,7 +1277,7 @@ get = {
         start = transf.event_table.start_date(event_table),
         stop = transf.event_table.end_date(event_table),
         step = step or 1,
-        unit = unit or "minute"
+        unit = unit or "min"
       }
     end,
   },
@@ -1425,6 +1436,15 @@ get = {
         "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
         code
       )
+    end,
+  },
+  any = {
+    join_if_array = function(arg, separator)
+      if isListOrEmptyTable(arg) then
+        return table.concat(arg, separator)
+      else
+        return arg
+      end
     end,
   }
 }

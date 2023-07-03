@@ -695,11 +695,17 @@ transf = {
     fs_tag_assoc = function(path_leaf_parts)
       return path_leaf_parts.fs_tag_assoc
     end,
-    fs_tag_specifier_array = function(path_leaf_parts)
-      return transf.fs_tag_assoc.fs_tag_specifier_array(path_leaf_parts.fs_tag_assoc)
+    fs_tag_string_dict = function(path_leaf_parts)
+      return transf.fs_tag_assoc.fs_tag_string_dict(path_leaf_parts.fs_tag_assoc)
+    end,
+    fs_tag_string_part_array = function(path_leaf_parts)
+      return transf.fs_tag_assoc.fs_tag_string_part_array(path_leaf_parts.fs_tag_assoc)
     end,
     fs_tag_string = function(path_leaf_parts)
       return transf.fs_tag_assoc.fs_tag_string(path_leaf_parts.fs_tag_assoc)
+    end,
+    fs_tag_keys = function(path_leaf_parts)
+      return keys(path_leaf_parts.fs_tag_assoc)
     end,
     path = function(path_leaf_parts)
       return transf.path.ending_with_slash(path_leaf_parts.path) 
@@ -710,44 +716,82 @@ transf = {
     end
   },
   fs_tag_string = {
-    fs_tag_assoc = function(fs_tag_string)
-      local parts = stringy.split(
+    fs_tag_string_part_array = function(fs_tag_string)
+      return stringy.split(
         fs_tag_string:sub(2),
         "%"
       )
-      local assoc = { }
-      for i = 1, #parts do
-        local kvparts = stringy.split(
-          parts[i],
-          "="
-        )
-        local v = table.concat(kvparts, "=", 2)
-        local vparts = stringy.split(pavrts[i], ",")
-        if #vparts > 1 then v = vparts end
-        assoc[kvparts[1]] = v
-      end
-      return assoc
+    end,
+    fs_tag_string_dict = function(fs_tag_string)
+      return map(
+        transf.fs_tag_string.fs_tag_string_part_array(fs_tag_string),
+        bind(get.string.split_unpacked, {a_use, "-", 2}),
+        {"v", "kv"}
+      )
+    end,
+    fs_tag_assoc = function(fs_tag_string)
+      transf.fs_tag_string_dict.fs_tag_assoc(
+        transf.fs_tag_string.fs_tag_string_dict(fs_tag_string)
+      )
     end,
   },
-  fs_tag_assoc = {
-    fs_tag_specifier_array = function(t)
-      local arr = map(
-        t,
-        function(tag_key, tag_value)
-          if type(tag_value) == "table" then tag_value = table.concat(tag_value, ",") end
-          return string.format("%s-%s", tag_key, tag_value)
-        end,
+  fs_tag_string_part_array = {
+    fs_tag_string_dict = function(fs_tag_string_part_array)
+      return map(
+        fs_tag_string_part_array,
+        bind(get.string.split_unpacked, {a_use, "-", 2}),
+        {"v", "kv"}
+      )
+    end,
+    fs_tag_assoc = function(fs_tag_string_part_array)
+      transf.fs_tag_string_dict.fs_tag_assoc(
+        transf.fs_tag_string_part_array.fs_tag_string_dict(fs_tag_string_part_array)
+      )
+    end,
+    fs_tag_string = function(fs_tag_string_part_array)
+      return "%" .. table.concat(fs_tag_string_part_array, "%")
+    end,
+  },
+  fs_tag_string_dict = {
+    fs_tag_assoc = function(dict)
+      return hs.fnutils.map(
+        dict,
+        bind(stringy.split, {a_use, ","})
+      )
+    end,
+    fs_tag_string_part_array = function(dict)
+      return map(
+        dict,
+        {_f = "%s-%s"},
         {
           args = "kv",
           ret = "v",
           tolist = true,
         }
       )
-      table.sort(arr)
-      return arr
     end,
-    fs_tag_string = function(t)
-      return "%" .. table.concat(transf.assoc_arr.fs_tag_specifier_array(t), "%")
+    fs_tag_string = function(dict)
+      return transf.fs_tag_string_part_array.fs_tag_string(
+        transf.fs_tag_string_dict.fs_tag_string_part_array(dict)
+      )
+    end,
+  },
+  fs_tag_assoc = {
+    fs_tag_string_dict = function(fs_tag_assoc)
+      return hs.fnutils.map(
+        fs_tag_assoc,
+        transf.any.join_if_array
+      )
+    end,
+    fs_tag_string_part_array = function(fs_tag_assoc)
+      return transf.fs_tag_string_dict.fs_tag_string_part_array(
+        transf.fs_tag_assoc.fs_tag_string_dict(fs_tag_assoc)
+      )
+    end,
+    fs_tag_string = function(fs_tag_assoc)
+      return transf.fs_tag_string_part_array.fs_tag_string(
+        transf.fs_tag_assoc.fs_tag_string_part_array(fs_tag_assoc)
+      )
     end,
   },
   path_leaf_parts_array = {
@@ -1245,10 +1289,10 @@ transf = {
   },
   date_component = {
     date_component_list_larger_or_same = function(component)
-      return slice(mt._list.date.dt_component, 1, {_exactly = component})
+      return slice(mt._list.date.date_component_names, 1, {_exactly = component})
     end,
     date_component_list_same_or_smaller = function(component)
-      return slice(mt._list.date.dt_component, {_exactly = component})
+      return slice(mt._list.date.date_component_names, {_exactly = component})
     end,
     date_components_larger_all_same = function(component)
       return map(
@@ -1258,7 +1302,7 @@ transf = {
       )
     end,
     index = function(component)
-      return tblmap.dt_component.index[component]
+      return tblmap.date_component_name.index[component]
     end,
     
   },
@@ -1267,7 +1311,7 @@ transf = {
       return map(
         list,
         function(component)
-          return component, tblmap.dt_component.min[component]
+          return component, tblmap.date_component_name.min[component]
         end,
         {"v", "kv"}
       )
@@ -1276,7 +1320,7 @@ transf = {
       return map(
         list,
         function(component)
-          return component, tblmap.dt_component.max[component]
+          return component, tblmap.date_component_name.max[component]
         end,
         {"v", "kv"}
       )
@@ -1285,13 +1329,13 @@ transf = {
       return get.array.sorted(list, join.date_component.date_component.larger)
     end,
     date_component_list_inverse = function(list)
-      return setDifference(mt._list.date.dt_component_few_chars, list)
+      return setDifference(mt._list.date.date_component_names, list)
     end
   },
   rfc3339like_dt = {
     date_components = function(str)
       local comps = {onig.match(str, mt._r.date.rfc3339like_dt)}
-      return map(mt._list.date.dt_component_few_chars, function(k, v)
+      return map(mt._list.date.date_component_names, function(k, v)
         return v and get.string_or_number.number(comps[k]) or nil
       end, {"kv", "kv"})
     end,
@@ -1352,8 +1396,28 @@ transf = {
     start_rfc3339like_dt = function(str)
       return stringx.split(str, "_to_")[1]
     end,
+    start_date_components = function(str)
+      return transf.rfc3339like_dt.date_components(
+        transf.rfc3339like_range.start_rfc3339like_dt(str)
+      )
+    end,
+    start_min_full_date_components = function(str)
+      return transf.date_components.min_full_date_components(
+        transf.rfc3339like_range.start_date_components(str)
+      )
+    end,
     end_rfc3339like_dt = function(str)
       return stringx.split(str, "_to_")[2]
+    end,
+    end_date_components = function(str)
+      return transf.rfc3339like_dt.date_components(
+        transf.rfc3339like_range.end_rfc3339like_dt(str)
+      )
+    end,
+    end_max_full_date_components = function(str)
+      return transf.date_components.max_full_date_components(
+        transf.rfc3339like_range.end_date_components(str)
+      )
     end,
     date_range_specifier = function(str)
     end,
@@ -1441,7 +1505,7 @@ transf = {
       )
     end,
     date_range_specifier = function(date_components)
-      return get.date_components.date_range_specifier(date_components, 1, "minute")
+      return get.date_components.date_range_specifier(date_components, 1, "min")
     end,
 
   },
@@ -3798,7 +3862,7 @@ transf = {
     rechnung_filename = function(dir)
       return get.timestamp_s.formatted(
         os.time(),
-        tblmap.dt_component.rfc3339["day"]
+        tblmap.date_component_name.rfc3339like_dt_format_string["day"]
       ) .. "--" .. transf.omegat_project_dir.client_name(dir) .. "_" .. transf.omegat_project_dir.rechnung_number(dir)
     end,
     rechnung_pdf_path = function(dir)

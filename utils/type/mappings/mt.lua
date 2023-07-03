@@ -210,8 +210,8 @@ mt = {
       decoded = {"\"", "'", "<", ">", "&"}
     },
     date = {
-      dt_component_few_chars = {"year", "month", "day", "hour", "min", "sec"},
-      dt_component = {"year", "month", "day", "hour", "minute", "second"},
+      date_component_names = {"year", "month", "day", "hour", "min", "sec"},
+      date_component_names_long = {"year", "month", "day", "hour", "minute", "second"},
       long_dt_seps = {" at "}
     },
     addr_key = {"Formatted name", "First name", "Last name", "Street", "Code", "City", "Region", "Country", "Box", "Extended"},
