@@ -883,8 +883,8 @@ get = {
     key_date_parts_single_or_range = function(csl_table, key)
       return csl_table[key]
     end,
-    key_rf3339like_dt_or_range = function(csl_table, key)
-      return transf.date_parts_single_or_range.rf3339like_dt_or_range(
+    key_rf3339like_dt_or_interval = function(csl_table, key)
+      return transf.date_parts_single_or_range.rf3339like_dt_or_interval(
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
