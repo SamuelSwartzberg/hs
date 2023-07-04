@@ -1522,82 +1522,85 @@ transf = {
   rf3339like_dt_or_range_array = {
 
   },
-  basic_range_string = {
+  basic_interval_string = {
     start_stop = function(str)
       return stringy.split(str, "-")
     end,
-    range_specifier = function(str)
-      local start, stop = transf.basic_range_string.start_stop(str)
+    interval_specifier = function(str)
+      local start, stop = transf.basic_interval_string.start_stop(str)
       return {
         start = start,
         stop = stop,
-        step = 1,
       }
     end,
   },
-  single_value_or_basic_range_string = {
-    range_specifier = function(str)
+  single_value_or_basic_interval_string = {
+    interval_specifier = function(str)
       if stringy.find(str, "-") then
-        return transf.basic_range_string.range_specifier(str)
+        return transf.basic_interval_string.interval_specifier(str)
       else
         return {
           start = str,
           stop = str,
-          step = 1,
         }
       end
     end,
   },
-  -- range specifier: table of start, stop, step, unit?
-  range_specifier = {
-    seq = function(range)
-      return seq(range.start, range.stop, range.step, range.unit)
-    end,
+  --- interval specifier: table of start, stop
+  --- both inclusive
+  interval_specifier = {
     diff = function(range)
       return range.stop - range.start
     end,
   },
-  range_specifier_array = {
-    earliest_start = function(range_specifier_array)
+  --- sequence specifier: table of start, stop, step, unit?
+  --- sequence specifiers can use all methods of interval specifiers 
+  sequence_specifier = {
+    seq = function(range)
+      return seq(range.start, range.stop, range.step, range.unit)
+    end,
+    interval_specifier = function(range)
+      return {
+        start = range.start,
+        stop = range.stop,
+      }
+    end,
+  },
+  interval_specifier_array = {
+    earliest_start = function(interval_specifier_array)
       return reduce(
-        range_specifier_array,
+        interval_specifier_array,
         bind(get.table_and_table.smaller_value_by_key, {a_use, a_use, "start"})
       )
     end,
-    latest_start = function(range_specifier_array)
+    latest_start = function(interval_specifier_array)
       return reduce(
-        range_specifier_array,
+        interval_specifier_array,
         bind(get.table_and_table.larger_value_by_key, {a_use, a_use, "start"})
       )
     end,
-    latest_stop = function(range_specifier_array)
+    latest_stop = function(interval_specifier_array)
       return reduce(
-        range_specifier_array,
+        interval_specifier_array,
         bind(get.table_and_table.larger_value_by_key, {a_use, a_use, "stop"})
       )
     end,
-    earliest_stop = function(range_specifier_array)
+    earliest_stop = function(interval_specifier_array)
       return reduce(
-        range_specifier_array,
+        interval_specifier_array,
         bind(get.table_and_table.smaller_value_by_key, {a_use, a_use, "stop"})
       )
     end,
-  },
-  homogeneous_step_unit_range_specifier_array = {
-    intersection_range_specifier = function(range_specifier_array)
+    intersection_interval_specifier = function(interval_specifier_array)
       return {
-        start = transf.range_specifier_array.latest_start(range_specifier_array),
-        stop = transf.range_specifier_array.earliest_stop(range_specifier_array),
-        step = range_specifier_array[1].step,
-        unit = range_specifier_array[1].unit,
+        start = transf.interval_specifier_array.latest_start(interval_specifier_array),
+        stop = transf.interval_specifier_array.earliest_stop(interval_specifier_array),
       }
     end,
-    union_range_specifier = function(range_specifier_array)
+    union_interval_specifier = function(interval_specifier_array)
       return {
-        start = transf.range_specifier_array.earliest_start(range_specifier_array),
-        stop = transf.range_specifier_array.latest_stop(range_specifier_array),
-        step = range_specifier_array[1].step,
-        unit = range_specifier_array[1].unit,
+        start = transf.interval_specifier_array.earliest_start(interval_specifier_array),
+        stop = transf.interval_specifier_array.latest_stop(interval_specifier_array),
       }
     end,
   },
@@ -4758,7 +4761,7 @@ transf = {
       return csl_table.page
     end,
     page_range_specifier = function(csl_table)
-      return transf.single_value_or_basic_range_string.range_specifier(
+      return transf.single_value_or_basic_interval_string.interval_specifier(
         transf.csl_table.page(csl_table)
       )
     end,

@@ -1150,6 +1150,19 @@ get = {
       }
     end,
   },
+  interval_specifier = {
+    sequence_specifier = function(interval_specifier, step, unit)
+      return {
+        start = transf.interval_specifier.start(interval_specifier),
+        stop = transf.interval_specifier.stop(interval_specifier),
+        step = step or 1,
+        unit = unit
+      }
+    end
+  },
+  sequence_specifier = {
+
+  },
   date_range_specifier = {
     event_tables_within_range = function(date_range_specifier, specifier, include, exclude)
       specifier = glue(transf.date_range_specifier.event_table(date_range_specifier), specifier)
