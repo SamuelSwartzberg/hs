@@ -1076,7 +1076,7 @@ get = {
     component_value = function(date, component)
       return date["get" .. tblmap.date_component_name.date_component_name_long[component]](date)
     end,
-    surrounding_date_range_specifier = function(date, amount, step, unit)
+    surrounding_date_sequence_specifier = function(date, amount, step, unit)
       return {
         start = get.date.with_subtracted(date, amount, step),
         stop = get.date.with_added(date, amount, step),
@@ -1084,15 +1084,15 @@ get = {
         unit = unit,
       }
     end,
-    date_range_specifier_of_lower_component = function(date, step, component)
-      return get.full_date_component_name_value_dict.date_range_specifier_of_lower_component(
+    date_sequence_specifier_of_lower_component = function(date, step, component)
+      return get.full_date_component_name_value_dict.date_sequence_specifier_of_lower_component(
         transf.date.full_date_component_name_value_dict(date),
         step,
         component
       )
     end,
-    hours_date_range_specifier = function(date, amount)
-      return get.date.date_range_specifier_of_lower_component(date, amount, "day")
+    hours_date_sequence_specifier = function(date, amount)
+      return get.date.date_sequence_specifier_of_lower_component(date, amount, "day")
     end,
     to_precision = function(date, component)
       return get.full_date_component_name_value_dict.to_precision_date(
@@ -1141,12 +1141,12 @@ get = {
     end,
   },
   date_component_name_value_dict = {
-    date_range_specifier = function(date_component_name_value_dict, step, unit)
+    date_sequence_specifier = function(date_component_name_value_dict, step, unit)
       return {
         start = date(transf.date_component_name_value_dict.min_full_date_component_name_value_dict(date_component_name_value_dict)),
         stop = date(transf.date_component_name_value_dict.max_full_date_component_name_value_dict(date_component_name_value_dict)),
         step = step or 1,
-        unit = unit or "min"
+        unit = unit or "sec"
       }
     end,
   },
@@ -1163,9 +1163,9 @@ get = {
   sequence_specifier = {
 
   },
-  date_range_specifier = {
-    event_tables_within_range = function(date_range_specifier, specifier, include, exclude)
-      specifier = glue(transf.date_range_specifier.event_table(date_range_specifier), specifier)
+  date_interval_specifier = {
+    event_tables_within_range = function(date_interval_specifier, specifier, include, exclude)
+      specifier = glue(transf.date_interval_specifier.event_table(date_interval_specifier), specifier)
       return get.khal.list_event_tables(
         specifier,
         include,
@@ -1180,8 +1180,8 @@ get = {
         full_date_component_name_value_dict
       )
     end,
-    date_range_specifier_of_lower_component = function (full_date_component_name_value_dict, step, component, additional_steps_down)
-      return get.date_component_name_value_dict.date_range_specifier(
+    date_sequence_specifier_of_lower_component = function (full_date_component_name_value_dict, step, component, additional_steps_down)
+      return get.date_component_name_value_dict.date_sequence_specifier(
         transf.full_date_component_name_value_dict.prefix_partial_date_component_name_value_dict(full_date_component_name_value_dict, component),
         step,
         get.date_component_name.next(component, additional_steps_down)
@@ -1302,12 +1302,12 @@ get = {
     end,
   },
   event_table = {
-    date_range_specifier = function(event_table, step, unit)
+    date_sequence_specifier = function(event_table, step, unit)
       return {
         start = transf.event_table.start_date(event_table),
         stop = transf.event_table.end_date(event_table),
         step = step or 1,
-        unit = unit or "min"
+        unit = unit or "sec"
       }
     end,
   },

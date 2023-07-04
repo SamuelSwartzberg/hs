@@ -1246,11 +1246,11 @@ transf = {
       tbl.ticks = nil
       return tbl
     end,
-    quarter_hours_date_range_specifier = function(date)
-      return get.date.date_range_specifier_of_lower_component(date, 15, "hour")
+    quarter_hours_date_sequence_specifier = function(date)
+      return get.date.date_sequence_specifier_of_lower_component(date, 15, "hour")
     end,
-    quarter_hours_of_day_date_range_specifier = function(date)
-      return get.date.date_range_specifier_of_lower_component(date, 15, "day")
+    quarter_hours_of_day_date_sequence_specifier = function(date)
+      return get.date.date_sequence_specifier_of_lower_component(date, 15, "day")
     end,
     entry_in_diary = function(date)
       return get.logging_dir.log_path_for_date(env.MENTRY_LOGS, date)
@@ -1369,8 +1369,8 @@ transf = {
         return v and get.string_or_number.number(comps[k]) or nil
       end, {"kv", "kv"})
     end,
-    date_range_specifier = function(str)
-      return transf.date_component_name_value_dict.date_range_specifier(transf.rfc3339like_dt.date_component_name_value_dict(str))
+    date_interval_specifier = function(str)
+      return transf.date_component_name_value_dict.date_interval_specifier(transf.rfc3339like_dt.date_component_name_value_dict(str))
     end,
     min_full_date_component_name_value_dict = function(str)
       return transf.date_component_name_value_dict.min_full_date_component_name_value_dict(
@@ -1485,7 +1485,13 @@ transf = {
         transf.rfc3339like_range.end_smallest_date_component_set(str)
       )
     end,
-    date_range_specifier = function(str)
+    date_interval_specifier = function(str)
+      return {
+        start = transf.rfc3339like_range.start_min_date(str),
+        stop = transf.rfc3339like_range.end_max_date(str),
+      }
+    end,
+    date_sequence_specifier = function(str)
       return {
         start = transf.rfc3339like_range.start_min_date(str),
         stop = transf.rfc3339like_range.end_max_date(str),
@@ -1604,80 +1610,81 @@ transf = {
       }
     end,
   },
-  date_range_specifier = {
-    start_full_rfc3339like_dt = function(date_range_specifier)
-      return transf.date.full_rfc3339like_dt(date_range_specifier.start)
-    end,
-    end_full_rfc3339like_dt = function(date_range_specifier)
-      return transf.date.full_rfc3339like_dt(date_range_specifier.stop)
-    end,
-    start_rfc3339like_dt_of_unit_precision = function(date_range_specifier)
+  date_sequence_specifier = {
+    start_rfc3339like_dt_of_unit_precision = function(date_sequence_specifier)
       return get.date.rfc3339like_dt_of_precision(
-        date_range_specifier.start,
-        date_range_specifier.unit
+        date_sequence_specifier.start,
+        date_sequence_specifier.unit
       )
     end,
-    end_rfc3339like_dt_of_unit_precision = function(date_range_specifier)
+    end_rfc3339like_dt_of_unit_precision = function(date_sequence_specifier)
       return get.date.rfc3339like_dt_of_precision(
-        date_range_specifier.stop,
-        date_range_specifier.unit
+        date_sequence_specifier.stop,
+        date_sequence_specifier.unit
       )
     end,
-    rfc3339like_range_of_unit_precision = function(date_range_specifier)
+    rfc3339like_range_of_unit_precision = function(date_sequence_specifier)
       return 
-        transf.date_range_specifier.start_rfc3339like_dt_of_unit_precision(date_range_specifier) .. 
+        transf.date_sequence_specifier.start_rfc3339like_dt_of_unit_precision(date_sequence_specifier) .. 
         "_to_" ..
-        transf.date_range_specifier.end_rfc3339like_dt_of_unit_precision(date_range_specifier)
+        transf.date_sequence_specifier.end_rfc3339like_dt_of_unit_precision(date_sequence_specifier)
     end,
-    start_full_date_component_name_value_dict = function(date_range_specifier)
-      return transf.date.full_date_component_name_value_dict(date_range_specifier.start)
+  },
+  date_interval_specifier = {
+    start_full_rfc3339like_dt = function(date_interval_specifier)
+      return transf.date.full_rfc3339like_dt(date_interval_specifier.start)
     end,
-    end_full_date_component_name_value_dict = function(date_range_specifier)
-      return transf.date.full_date_component_name_value_dict(date_range_specifier.stop)
+    end_full_rfc3339like_dt = function(date_interval_specifier)
+      return transf.date.full_rfc3339like_dt(date_interval_specifier.stop)
     end,
-    start_prefix_date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value = function(date_range_specifier)
+    start_full_date_component_name_value_dict = function(date_interval_specifier)
+      return transf.date.full_date_component_name_value_dict(date_interval_specifier.start)
+    end,
+    end_full_date_component_name_value_dict = function(date_interval_specifier)
+      return transf.date.full_date_component_name_value_dict(date_interval_specifier.stop)
+    end,
+    start_prefix_date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
       return transf.date_component_name_value_dict.prefix_date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value(
-        transf.date_range_specifier.start_full_date_component_name_value_dict(date_range_specifier)
+        transf.date_interval_specifier.start_full_date_component_name_value_dict(date_interval_specifier)
       )
     end,
-    end_prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_range_specifier)
+    end_prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
       return transf.date_component_name_value_dict.prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value(
-        transf.date_range_specifier.end_full_date_component_name_value_dict(date_range_specifier)
+        transf.date_interval_specifier.end_full_date_component_name_value_dict(date_interval_specifier)
       )
     end,
-    start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value = function(date_range_specifier)
+    start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
       return transf.date_component_name_value_dict.rfc3339like_dt(
-        transf.date_range_specifier.start_prefix_date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value(date_range_specifier)
+        transf.date_interval_specifier.start_prefix_date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
       )
     end,
-    end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value = function(date_range_specifier)
+    end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
       return transf.date_component_name_value_dict.rfc3339like_dt(
-        transf.date_range_specifier.end_prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value(date_range_specifier)
+        transf.date_interval_specifier.end_prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
       )
     end,
-    rfc3339like_dt = function(date_range_specifier)
-      local start_rfc3339like_dt = transf.date_range_specifier.start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value(date_range_specifier)
-      local end_rfc3339like_dt = transf.date_range_specifier.end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value(date_range_specifier)
+    rfc3339like_dt = function(date_interval_specifier)
+      local start_rfc3339like_dt = transf.date_interval_specifier.start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
+      local end_rfc3339like_dt = transf.date_interval_specifier.end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
       if start_rfc3339like_dt == end_rfc3339like_dt then
         return start_rfc3339like_dt
       end
     end,
-    rfc3339like_range_where_date_component_value_is_not_max_date_component_value = function(date_range_specifier)
-      local start_rfc3339like_dt = transf.date_range_specifier.start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value(date_range_specifier)
-      local end_rfc3339like_dt = transf.date_range_specifier.end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value(date_range_specifier)
+    rfc3339like_range_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
+      local start_rfc3339like_dt = transf.date_interval_specifier.start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
+      local end_rfc3339like_dt = transf.date_interval_specifier.end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
       return start_rfc3339like_dt .. "_to_" .. end_rfc3339like_dt
     end,
-    rf3339like_dt_or_range = function(date_range_specifier)
-      local rfc3339like_dt = transf.date_range_specifier.rfc3339like_dt(date_range_specifier)
-      return rfc3339like_dt or transf.date_range_specifier.rfc3339like_range_where_date_component_value_is_not_max_date_component_value(date_range_specifier)
+    rf3339like_dt_or_range = function(date_interval_specifier)
+      local rfc3339like_dt = transf.date_interval_specifier.rfc3339like_dt(date_interval_specifier)
+      return rfc3339like_dt or transf.date_interval_specifier.rfc3339like_range_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
     end,
-    event_table = function(date_range_specifier)
+    event_table = function(date_interval_specifier)
       return {
-        start = transf.date.full_rfc3339like_dt(date_range_specifier.start),
-        ["end"] = transf.date.full_rfc3339like_dt(date_range_specifier.stop),
+        start = transf.date.full_rfc3339like_dt(date_interval_specifier.start),
+        ["end"] = transf.date.full_rfc3339like_dt(date_interval_specifier.stop),
       }
     end,
-
   },
   date_component_name_value_dict = {
     date_component_name_list_set = function(date_component_name_value_dict)
@@ -1737,8 +1744,11 @@ transf = {
         transf.date_component_name_value_dict.max_date_component_name_value_dict_not_set(date_component_name_value_dict)
       )
     end,
-    date_range_specifier = function(date_component_name_value_dict)
-      return get.date_component_name_value_dict.date_range_specifier(date_component_name_value_dict, 1, "min")
+    date_interval_specifier = function(date_component_name_value_dict)
+      return {
+        start = date(transf.date_component_name_value_dict.min_full_date_component_name_value_dict(date_component_name_value_dict)),
+        stop = date(transf.date_component_name_value_dict.max_full_date_component_name_value_dict(date_component_name_value_dict))
+      }
     end, 
     prefix_date_component_name_value_dict = function(date_component_name_value_dict)
       local res = {}
@@ -3060,8 +3070,11 @@ transf = {
     end_date = function(event_table)
       return transf.full_rfc3339like_dt.date(event_table["end"])
     end,
-    date_range_specifier = function(event_table)
-      return get.event_table.date_range_specifier(event_table)
+    date_interval_specifier = function(event_table)
+      return {
+        start = transf.event_table.start_date(event_table),
+        ["end"] = transf.event_table.end_date(event_table),
+      }
     end,
   },
   search_engine = {
@@ -4760,9 +4773,15 @@ transf = {
     page = function(csl_table)
       return csl_table.page
     end,
-    page_range_specifier = function(csl_table)
+    page_interal_specifier = function(csl_table)
       return transf.single_value_or_basic_interval_string.interval_specifier(
         transf.csl_table.page(csl_table)
+      )
+    end,
+    page_sequence_specifier = function(csl_table)
+      return get.interval_specifier.sequence_specifier(
+        transf.csl_table.page_interal_specifier(csl_table),
+        1 -- afaik there is never a case where pages don't increase by 1 (there is no notation that says 'every other page', for example)
       )
     end,
     indicated_page_stirng = function(csl_table)
@@ -4962,12 +4981,10 @@ transf = {
     rfc3339like_range = function(date_parts_range)
       return transf.date_parts.rfc3339like_dt(date_parts_range[1]) .. "_to_" .. transf.date_parts.rfc3339like_dt(date_parts_range[2])
     end,
-    date_range_specifier = function(date_parts_range)
+    date_interval_specifier = function(date_parts_range)
       return {
         start = transf.date_parts_single.full_full_date_component_name_value_dict(date_parts_range[1]),
-        stop = transf.date_parts_single.full_full_date_component_name_value_dict(date_parts_range[2]),
-        step = 1,
-        unit = "day"
+        stop = transf.date_parts_single.full_full_date_component_name_value_dict(date_parts_range[2])
       }
     end
   },
