@@ -2,12 +2,6 @@ ArrayOfNoninterfacesSpecifier = {
   type = "array-of-noninterfaces",
   properties = {
     getables = {
-      ["is-array-of-strings"] = function (self)
-        return self:get("all-pass", function(item) return type(item) == "string" end)
-      end,
-      ["map-elems-to-string"] = function(self)
-        return self:get("map", function(item) return tostring(item) end)
-      end,
       ["chooser-list-of-noninterfaces"] = function(self) 
         return self:get("map", function(item) 
           local formatted_item = self:get("format-noninterface-item-for-chooser", item) or item
@@ -21,14 +15,7 @@ ArrayOfNoninterfacesSpecifier = {
           }
         end) 
       end,
-      ["sorted-to-new-array-default"] = function(self) return self:get("sorted-to-new-array") end,
       ["chooser-list-of-all"] = function(self) return self:get("chooser-list-of-noninterfaces") end,
-      ["min"] = function(self)
-        return reduce(self:get("c"), returnSmaller)
-      end,
-      ["max"] = function(self)
-        return reduce(self:get("c"), is.a_and_b.a_larger)
-      end,
     },
     doThisables = {
       ["choose-noninterface-item"] = function(self, callback_after)

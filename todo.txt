@@ -25,6 +25,9 @@ post 'lua is working':
     - regular blood test?
     - family health data
   - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them -> Perhaps better: cache MAUDIOVISUAL urls, allow playing of those local files as dropin (however, we also query a lot from yt, so we need to cache that - ideally permanently). However: Cache should be conceptualized as temporary, but this cache as permanent. So we need some solution to say 'don't delete this cache', or a different kind of cache.
+  - srctgt is a little meh atm
+    - etcconfig: link files individually, rather than whole dirs
+    - etcconfig: requires sudo ability
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
   - jcw/jcwserve in string menu?
   - danbooru search links need their query to count as 'seen' for other queries

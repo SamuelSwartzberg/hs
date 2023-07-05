@@ -2,35 +2,16 @@ HomogeneousArraySpecifier = {
   type = "homogeneous-array",
   properties = {
     getables = {
-      ["is-array-of-interfaces"] = function(self)
-        return self:get("first").is_interface == true
-      end,
-      ["is-array-of-noninterfaces"] = function(self)
-        return not self:get("first").is_interface
-      end,
-      ["to-string"] = function(self)
-        return "array: " .. table.concat(
-          self:get("map-elems-to-string"),
-          ", "
-        )
-      end,
-      ["to-string-multiline"] = function(self)
-        return table.concat(
-          self:get("map-elems-to-string"),
-          "\n"
-        )
-      end
-
+      ["is-array-of-interfaces"] = bc(is.array.array_of_interfaces),
+      ["is-array-of-noninterfaces"] = bc(is.array.not_array_of_interfaces),
+      ["to-string"] = bc(transf.array.summary),
     },
-    doThisables = {}
   },
   potential_interfaces = ovtable.init({
     { key = "array-of-interfaces", value = CreateArrayOfInterfaces },
     { key = "array-of-noninterfaces", value = CreateArrayOfNoninterfaces },
   }),
-  action_table = concat({
-      
-  }, getChooseItemTable({
+  action_table = {
     {
       d = "tstr",
       i = "💻🔡",
@@ -41,7 +22,7 @@ HomogeneousArraySpecifier = {
       i = "💻🔡📜",
       key = "to-string-multiline",
     },
-  })),
+  },
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

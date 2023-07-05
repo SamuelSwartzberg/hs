@@ -386,10 +386,10 @@ get = {
       return get.array.none_pass(arr, cond)
     end,
     head = function(arr, n)
-      return slice(arr, 1, n)
+      return slice(arr, 1, n or 10)
     end,
     tail = function(arr, n)
-      return slice(arr, -n)
+      return slice(arr, -(n or 10))
     end,
     nth_element = function(arr, n)
       return arr[n]
@@ -410,6 +410,12 @@ get = {
       local new_list = copy(list, false)
       table.sort(new_list, comp)
       return new_list
+    end,
+    min = function(list, comp)
+      return get.array.sorted(list, comp)[1]
+    end,
+    max = function(list, comp)
+      return get.array.sorted(list, comp)[#list]
     end,
     revsorted = function(arr, comp)
       return rev(get.array.sorted(arr, comp))
@@ -610,12 +616,12 @@ get = {
     end,
     
   },
-  path_leaf_parts = {
+  path_leaf_specifier = {
     tag_value = function(parts, key)
-      return transf.path_leaf_parts.fs_tag_assoc(parts)[key]
+      return transf.path_leaf_specifier.fs_tag_assoc(parts)[key]
     end,
     tag_raw_value = function(parts, key)
-      return transf.path_leaf_parts.fs_tag_string_dict(parts)[key]
+      return transf.path_leaf_specifier.fs_tag_string_dict(parts)[key]
     end,
   },
   path = {
@@ -1158,7 +1164,19 @@ get = {
         step = step or 1,
         unit = unit
       }
-    end
+    end,
+    array = function(interval_specifier, step, unit)
+      return transf.sequence_specifier.array(
+        get.interval_specifier.sequence_specifier(interval_specifier, step, unit)
+      )
+    end,
+    is_in = function(interval_specifier, element)
+      return interval_specifier.start <= element and element <= interval_specifier.stop
+    end,
+    is_contained_in = function(interval_specifier, other_interval_specifier)
+      return get.interval_specifier.is_in(other_interval_specifier, interval_specifier.start) and
+        get.interval_specifier.is_in(other_interval_specifier, interval_specifier.stop)
+    end,
   },
   sequence_specifier = {
 
@@ -1478,14 +1496,14 @@ get = {
     end,
   },
   table_and_table = {
-    larger_value_by_key = function(table1, table2, key)
+    larger_table_by_key = function(table1, table2, key)
       if table1[key] > table2[key] then
         return table1
       else
         return table2
       end
     end,
-    smaller_value_by_key = function(table1, table2, key)
+    smaller_table_by_key = function(table1, table2, key)
       if table1[key] < table2[key] then
         return table1
       else

@@ -304,6 +304,25 @@ transf = {
         {"v", "kv"}
       )
     end,
+    string_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.any.string
+      )
+    end,
+    contents_summary = function(arr)
+      return table.concat(
+        slice(transf.array.string_array(arr), {
+          start = 1,
+          stop = 5,
+          sliced_indicator = "…",
+        }),
+        ", "
+      )
+    end,
+    summary = function(arr)
+      return "array ("..#arr.."):" .. transf.array.contents_summary(arr)
+    end,
   },
   hole_y_arraylike = {
     array = function(tbl)
@@ -377,7 +396,7 @@ transf = {
     ancestor_array = function(path)
       return pathSlice(path, "1:-2", {entire_path_for_each = true})
     end,
-    path_leaf_parts = function(path)
+    path_leaf_specifier = function(path)
       local rf3339like_dt_or_interval, general_name, fs_tag_string = transf.leaf.rf3339like_dt_or_interval_general_name_fs_tag_string(transf.path.leaf(path))
       return {
         extension = transf.path.extension(path),
@@ -671,48 +690,51 @@ transf = {
     end,
   },
   
-  path_leaf_parts = {
-    general_name_part = function(path_leaf_parts)
-      if path_leaf_parts.general_name then 
-        return "--" .. path_leaf_parts.general_name
+  path_leaf_specifier = {
+    general_name_part = function(path_leaf_specifier)
+      if path_leaf_specifier.general_name then 
+        return "--" .. path_leaf_specifier.general_name
       else
         return ""
       end
     end,
-    extension_part = function(path_leaf_parts)
-      if path_leaf_parts.extension then 
-        return "." .. path_leaf_parts.extension
+    extension_part = function(path_leaf_specifier)
+      if path_leaf_specifier.extension then 
+        return "." .. path_leaf_specifier.extension
       else
         return ""
       end
     end,
-    rf3339like_dt_or_interval_part = function(path_leaf_parts)
-      return path_leaf_parts.rf3339like_dt_or_interval or ""
+    rf3339like_dt_or_interval_part = function(path_leaf_specifier)
+      return path_leaf_specifier.rf3339like_dt_or_interval or ""
     end,
-    path_part = function(path_leaf_parts)
-      return transf.path.ending_with_slash(path_leaf_parts.path) 
+    date_interval_specifier = function(path_leaf_specifier)
+      return transf.rf3339like_dt_or_interval.date_interval_specifier(path_leaf_specifier.rf3339like_dt_or_interval)
     end,
-    fs_tag_assoc = function(path_leaf_parts)
-      return path_leaf_parts.fs_tag_assoc
+    path_part = function(path_leaf_specifier)
+      return transf.path.ending_with_slash(path_leaf_specifier.path) 
     end,
-    fs_tag_string_dict = function(path_leaf_parts)
-      return transf.fs_tag_assoc.fs_tag_string_dict(path_leaf_parts.fs_tag_assoc)
+    fs_tag_assoc = function(path_leaf_specifier)
+      return path_leaf_specifier.fs_tag_assoc
     end,
-    fs_tag_string_part_array = function(path_leaf_parts)
-      return transf.fs_tag_assoc.fs_tag_string_part_array(path_leaf_parts.fs_tag_assoc)
+    fs_tag_string_dict = function(path_leaf_specifier)
+      return transf.fs_tag_assoc.fs_tag_string_dict(path_leaf_specifier.fs_tag_assoc)
     end,
-    fs_tag_string = function(path_leaf_parts)
-      return transf.fs_tag_assoc.fs_tag_string(path_leaf_parts.fs_tag_assoc)
+    fs_tag_string_part_array = function(path_leaf_specifier)
+      return transf.fs_tag_assoc.fs_tag_string_part_array(path_leaf_specifier.fs_tag_assoc)
     end,
-    fs_tag_keys = function(path_leaf_parts)
-      return keys(path_leaf_parts.fs_tag_assoc)
+    fs_tag_string = function(path_leaf_specifier)
+      return transf.fs_tag_assoc.fs_tag_string(path_leaf_specifier.fs_tag_assoc)
     end,
-    path = function(path_leaf_parts)
-      return transf.path.ending_with_slash(path_leaf_parts.path) 
-      .. transf.path_leaf_parts.rf3339like_dt_or_interval_part(path_leaf_parts)
-      .. transf.path_leaf_parts.general_name_part(path_leaf_parts)
-      .. transf.path_leaf_parts.fs_tag_string(path_leaf_parts)
-      .. transf.path_leaf_parts.extension_part(path_leaf_parts)
+    fs_tag_keys = function(path_leaf_specifier)
+      return keys(path_leaf_specifier.fs_tag_assoc)
+    end,
+    path = function(path_leaf_specifier)
+      return transf.path.ending_with_slash(path_leaf_specifier.path) 
+      .. transf.path_leaf_specifier.rf3339like_dt_or_interval_part(path_leaf_specifier)
+      .. transf.path_leaf_specifier.general_name_part(path_leaf_specifier)
+      .. transf.path_leaf_specifier.fs_tag_string(path_leaf_specifier)
+      .. transf.path_leaf_specifier.extension_part(path_leaf_specifier)
     end
   },
   fs_tag_string = {
@@ -794,8 +816,38 @@ transf = {
       )
     end,
   },
-  path_leaf_parts_array = {
-
+  path_leaf_specifier_array = {
+    path_leaf_specifier_date_interval_specifier_dict = function(arr)
+      return map(
+        arr,
+        function(path_leaf_specifier)
+          return 
+            path_leaf_specifier,
+            transf.path_leaf_specifier.date_interval_specifier(
+              path_leaf_specifier
+            )
+        end,
+        {"k", "kv"}
+      )
+    end,
+    date_interval_specifier_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.path_leaf_specifier.date_interval_specifier
+      )
+    end,
+    interval_specifier_with_earliest_start = function(arr)
+      return transf.interval_specifier_array.interval_specifier_with_earliest_start(
+        transf.path_leaf_specifier_array.date_interval_specifier_array(arr)
+      )
+    end,
+    path_leaf_specifier_with_earliest_start = function(arr)
+      return find(
+        transf.path_leaf_specifier_array.path_leaf_specifier_date_interval_specifier_dict(arr),
+        {_exactly = transf.path_leaf_specifier_array.interval_specifier_with_earliest_start(arr)},
+        {"k", "v"}
+      )
+    end,
   },
   audio_file = {
     transcribed = function(path)
@@ -1507,7 +1559,7 @@ transf = {
     end,
   },
   rf3339like_dt_or_interval = {
-    dt_or_interal = function(str)
+    dt_or_interval = function(str)
       if stringy.find(str, "_to_") then
         return "rfc3339like_interval"
       else
@@ -1516,17 +1568,24 @@ transf = {
     end,
     max_date = function(str)
       return transf[
-        transf.rf3339like_dt_or_interval.dt_or_interal(str)
+        transf.rf3339like_dt_or_interval.dt_or_interval(str)
       ].max_date(str)
     end,
     min_date = function(str)
       return transf[
-        transf.rf3339like_dt_or_interval.dt_or_interal(str)
+        transf.rf3339like_dt_or_interval.dt_or_interval(str)
       ].min_date(str)
+    end,
+    date_interval_specifier = function(str)
+      return transf[
+        transf.rf3339like_dt_or_interval.dt_or_interval(str)
+      ].date_interval_specifier(str)
     end,
   },
   rf3339like_dt_or_interval_array = {
-
+    date_interval_specifier_array = function(rf3339like_dt_or_interval_array)
+      return hs.fnutils.imap(rf3339like_dt_or_interval_array, transf.rf3339like_dt_or_interval.date_interval_specifier)
+    end,
   },
   basic_interval_string = {
     start_stop = function(str)
@@ -1562,7 +1621,7 @@ transf = {
   --- sequence specifier: table of start, stop, step, unit?
   --- sequence specifiers can use all methods of interval specifiers 
   sequence_specifier = {
-    seq = function(sequence)
+    array = function(sequence)
       return seq(sequence.start, sequence.stop, sequence.step, sequence.unit)
     end,
     interval_specifier = function(sequence)
@@ -1573,29 +1632,49 @@ transf = {
     end,
   },
   interval_specifier_array = {
-    earliest_start = function(interval_specifier_array)
+    interval_specifier_with_earliest_start = function(interval_specifier_array)
       return reduce(
         interval_specifier_array,
-        bind(get.table_and_table.smaller_value_by_key, {a_use, a_use, "start"})
+        bind(get.table_and_table.smaller_table_by_key, {a_use, a_use, "start"})
+      )
+    end,
+    earliest_start = function(interval_specifier_array)
+      return transf.interval_specifier_array.interval_specifier_with_earliest_start(
+          interval_specifier_array
+        ).start
+    end,
+    interval_specifier_with_latest_start = function(interval_specifier_array)
+      return reduce(
+        interval_specifier_array,
+        bind(get.table_and_table.larger_table_by_key, {a_use, a_use, "start"})
       )
     end,
     latest_start = function(interval_specifier_array)
+      return transf.interval_specifier_array.interval_specifier_with_latest_start(
+          interval_specifier_array
+        ).start
+    end,
+    interval_specifier_with_latest_stop = function(interval_specifier_array)
       return reduce(
         interval_specifier_array,
-        bind(get.table_and_table.larger_value_by_key, {a_use, a_use, "start"})
+        bind(get.table_and_table.larger_table_by_key, {a_use, a_use, "stop"})
       )
     end,
     latest_stop = function(interval_specifier_array)
+      return transf.interval_specifier_array.interval_specifier_with_latest_stop(
+          interval_specifier_array
+        ).stop
+    end,
+    interval_specifier_with_earliest_stop = function(interval_specifier_array)
       return reduce(
         interval_specifier_array,
-        bind(get.table_and_table.larger_value_by_key, {a_use, a_use, "stop"})
+        bind(get.table_and_table.smaller_table_by_key, {a_use, a_use, "stop"})
       )
     end,
     earliest_stop = function(interval_specifier_array)
-      return reduce(
-        interval_specifier_array,
-        bind(get.table_and_table.smaller_value_by_key, {a_use, a_use, "stop"})
-      )
+      return transf.interval_specifier_array.interval_specifier_with_earliest_stop(
+          interval_specifier_array
+        ).stop
     end,
     intersection_interval_specifier = function(interval_specifier_array)
       return {

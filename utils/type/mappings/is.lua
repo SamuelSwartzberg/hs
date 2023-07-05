@@ -327,6 +327,20 @@ is = {
     float = function(val)
       return is.any.number(val) and is.number.float(val)
     end,
+    string = function(val)
+      return type(val) == "string"
+    end,
+    table = function(val)
+      return type(val) == "table"
+    end,
+    is_interface = function(val)
+      return 
+        is.any.table(val) and
+        is.table.interface(val)
+    end,
+    is_not_interface = function(val)
+      return not is.any.is_interface(val)
+    end,
   },
   pass_name = {
     password = function(name)
@@ -378,6 +392,27 @@ is = {
     equal = function(a, b)
       return a == b
     end,
-  }
-
+  },
+  table = {
+    interface = function(table)
+      return table.is_interface == true
+    end,
+  },
+  array = {
+    string_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.any.string
+      )
+    end,
+    array_of_interfaces = function(array)
+      return get.array.all_pass(
+        array,
+        is.any.is_interface
+      )
+    end,
+    not_array_of_interfaces = function(array)
+      return not is.array.array_of_interfaces(array)
+    end,
+  },
 }
