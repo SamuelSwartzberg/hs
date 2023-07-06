@@ -176,7 +176,7 @@ end
 --- @return nil
 function doInput(series_specifier, do_after)
   local parsed_series_specifier = {}
-  do_after = do_after  or returnNil -- dummy function b/c the timer functions require a function
+  do_after = do_after  or transf['nil']['nil'] -- dummy function b/c the timer functions require a function
   if type(series_specifier) == "string" then
     parsed_series_specifier = parseSeriesSpecifier(series_specifier)
   elseif type(series_specifier) == "table" then

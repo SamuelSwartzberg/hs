@@ -178,21 +178,21 @@ assertMessage(
 
 local ovtable_manual = ovtable.new()
 
-ovtable_manual["foo"] = returnAdd1
-ovtable_manual["bar"] = returnEmptyString
+ovtable_manual["foo"] = transf.number.with_1_added
+ovtable_manual["bar"] = transf['nil'].empty_string
 
 assertMessage(
   ovtable.init({
-    { "foo", returnAdd1 },
-    { "bar", returnEmptyString }
+    { "foo", transf.number.with_1_added },
+    { "bar", transf['nil'].empty_string }
   }),
   ovtable_manual
 )
 
 assertMessage(
   ovtable.init({
-    { key = "foo", value = returnAdd1 },
-    { key = "bar", value = returnEmptyString },
+    { key = "foo", value = transf.number.with_1_added },
+    { key = "bar", value = transf['nil'].empty_string },
   }),
   ovtable_manual
 )

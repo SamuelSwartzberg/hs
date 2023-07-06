@@ -230,6 +230,12 @@ transf = {
     end,
     floor = math.floor,
     ceil = math.ceil,
+    with_1_added = function(num)
+      return num + 1
+    end,
+    with_1_subtracted = function(num)
+      return num - 1
+    end,
   },
   num_chars = {
     normzeilen = function(num_chars)
@@ -311,17 +317,15 @@ transf = {
       )
     end,
     contents_summary = function(arr)
-      return table.concat(
-        slice(transf.array.string_array(arr), {
-          start = 1,
-          stop = 5,
-          sliced_indicator = "…",
-        }),
-        ", "
+      return transf.string_array.contents_summary(
+        transf.array.string_array(arr)
       )
     end,
     summary = function(arr)
       return "array ("..#arr.."):" .. transf.array.contents_summary(arr)
+    end,
+    multiline_string = function(arr)
+      return transf.string_array.multiline_string(transf.array.string_array(arr))
     end,
   },
   hole_y_arraylike = {
@@ -966,7 +970,7 @@ transf = {
       specifier.body = nil
       local non_inline_attachments = specifier.non_inline_attachments
       specifier.non_inline_attachments = nil
-      local header = transf.stringable_value_dict.email_header(specifier)
+      local header = transf.dict.email_header(specifier)
       local mail = string.format("%s\n\n%s", header, body)
       if non_inline_attachments then
         mail = mail .. "\n" .. transf.path_array.attachment_string(non_inline_attachments)
@@ -1349,7 +1353,7 @@ transf = {
     date_component_name_list_larger_all_same = function(component)
       return map(
         transf.date_component_name.date_component_name_list_larger_or_same(component),
-        returnSame,
+        transf.any.same,
         {"v", "k"}
       )
     end,
@@ -3355,6 +3359,20 @@ transf = {
         return b
       end
     end,
+    boolean_and = function(a, b)
+      return a and b
+    end,
+    boolean_or = function(a, b)
+      return a or b
+    end,
+    string_a_and_b = function(a, b)
+      return transf.any.string(a) .. transf.any.string(b)
+    end,
+  },
+  number_a_and_b ={
+    sum = function(a, b)
+      return a + b
+    end,
   },
   key_value = {
     pair = function(key, value)
@@ -3534,6 +3552,19 @@ transf = {
     stripped_string_array = function(arr)
       return hs.fnutils.imap(arr, stringy.strip)
     end,
+    multiline_string = function(arr)
+      return table.concat(arr, "\n")
+    end,
+    contents_summary = function(arr)
+      return table.concat(
+        slice(arr, {
+          start = 1,
+          stop = 10,
+          sliced_indicator = "…",
+        }),
+        ", "
+      )
+    end,
     
   },
   env_line_array = {
@@ -3664,7 +3695,10 @@ transf = {
     end,
     value_set = function(t)
       return toSet(values(t))
-    end
+    end,
+    n_anys = function(t)
+      return table.unpack(t)
+    end,
     
   },
   assoc_arr = {
@@ -3694,37 +3728,21 @@ transf = {
     end,
   },
   dict = {
-    dict_of_dicts_by_space = function(tbl)
-      local res = {}
-      for k, v in fastpairs(tbl) do
-        local key_parts = stringy.split(k, " ")
-        local label = key_parts[1]
-        local key = key_parts[2]
-        if not key then
-          res[label] = v
-        else
-          res[label] = res[label] or {}
-          res[label][key] = v
-        end
-      end
-      return res
-    end,
     pair_array = function(t)
       return map(
         t,
-        function(k, v)
-          return {k, v}
-        end,
+        transf.key_value.pair,
         refstore.params.map.opts.kv_to_list
       )
     end,
-  },
-  stringable_value_dict = {
+    length = function(t)
+      return #transf.dict.pair_array(t)
+    end,
     url_param_array = function(t)
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.url_param)
     end,
     url_params = function(t)
-      return table.concat(transf.stringable_value_dict.url_param_array(t), "&")
+      return table.concat(transf.dict.url_param_array(t), "&")
     end,
     --- @param t { [string]: string }
     --- @return string
@@ -3752,7 +3770,7 @@ transf = {
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.ini_line)
     end,
     ini_string = function(t)
-      return table.concat(transf.stringable_value_dict.ini_line_array(t), "\n")
+      return table.concat(transf.dict.ini_line_array(t), "\n")
     end,
     envlike_line_array = function(t)
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.envlike_line)
@@ -3760,14 +3778,19 @@ transf = {
     dict_entry_string_array = function(t)
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.dict_entry_string)
     end,
-    dict_entry_string_summary = function(t)
-      return "dict: " .. table.concat(transf.stringable_value_dict.dict_entry_string_array(t), ", ")
+    contents_summary = function(t)
+      return transf.string_array.contents_summary(
+        transf.dict.dict_entry_string_array(t)
+      )
     end,
-    dict_entry_string_detailed = function(t)
-      return table.concat(transf.stringable_value_dict.dict_entry_string_array(t), "\n")
+    summary = function(t)
+      return "dict (" .. transf.dict.length(t) .. "): " .. transf.dict.contents_summary(t)
+    end,
+    dict_entry_multiline_string = function(t)
+      return table.concat(transf.dict.dict_entry_string_array(t), "\n")
     end,
     envlike_string = function(t)
-      return table.concat(transf.stringable_value_dict.envlike_line_array(t), "\n")
+      return table.concat(transf.dict.envlike_line_array(t), "\n")
     end,
     chooser_item_list = function(t)
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.chooser_item)
@@ -3778,6 +3801,29 @@ transf = {
     key_chooser_item_list = function(t)
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.key_chooser_item)
     end,
+  },
+  string_value_dict = {
+
+  },
+  string_key_dict = {
+    string_key_dict_of_string_key_dicts_or_prev_values_by_space = function(tbl)
+      local res = {}
+      for k, v in fastpairs(tbl) do
+        local key_parts = stringy.split(k, " ")
+        local label = key_parts[1]
+        local key = key_parts[2]
+        if not key then
+          res[label] = v
+        else
+          res[label] = res[label] or {}
+          res[label][key] = v
+        end
+      end
+      return res
+    end,
+  },
+  string_key_value_dict = {
+
   },
   pair_array = {
     dict = function(arr)
@@ -3802,7 +3848,7 @@ transf = {
       return table.concat(map(
         t,
         function(k,v)
-          return "[" .. k .. "]\n" .. transf.stringable_value_dict.ini_string(v)
+          return "[" .. k .. "]\n" .. transf.dict.ini_string(v)
         end
       ), "\n\n")
     end,
@@ -3926,7 +3972,7 @@ transf = {
       end     
       if comps.params then
         if type(comps.params) == "table" then
-          url = url .. "?" .. transf.stringable_value_dict.url_params(comps.params)
+          url = url .. "?" .. transf.dict.url_params(comps.params)
         else
           url = url .. mustStart(comps.params, "?")
         end
@@ -5311,7 +5357,28 @@ transf = {
     end,
     self_and_empty_string = function(any)
       return any, ""
+    end,
+    self = function(any)
+      return any
+    end,
+    boolean = function(any)
+      return not not any
+    end,
+    n_anys_if_table = function(any)
+      if type(any) == "table" then
+        return table.unpack(any)
+      else
+        return any
+      end
+    end,
+    applicable_thing_name_assoc = function(any)
+
     end
+  },
+  n_anys = {
+    array = function(...)
+      return {...}
+    end,
   },
   mailto_url = {
    
@@ -5509,5 +5576,44 @@ transf = {
         "Get the ISO 3366-1 short name of the country identified by the following ISO 3366-1 Alpha-2 country code."
       )
     end,
+  },
+  boolean = {
+    negated = function(boolean)
+      return not boolean
+    end,
+  },
+  ["nil"] = {
+    ["true"] = function()
+      return true
+    end,
+    ["false"] = function()
+      return false
+    end,
+    ["nil"] = function()
+      return nil
+    end,
+    empty_string = function()
+      return ""
+    end,
+    empty_table = function()
+      return {}
+    end,
+    zero = function()
+      return 0
+    end,
+    one = function()
+      return 1
+    end,
+  },
+  action_specifier = {
+
+  },
+  action_specifier_array = {
+    chooser_item_specifier_array = function(action_specifier_array)
+
+    end,
+  },
+  thing_name = {
+    
   }
 }

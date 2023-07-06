@@ -1,30 +1,30 @@
 assertMessage(
-  bind(returnPack, "foo")("bar"),
+  bind(transf.n_anys.array, "foo")("bar"),
   {"foo", "bar"}
 )
 assertMessage(
-  bind(returnPack, {"foo"})("bar"),
-  {"foo", "bar"}
-)
-
-assertMessage(
-  bind(returnPack, {"foo"})("bar"),
+  bind(transf.n_anys.array, {"foo"})("bar"),
   {"foo", "bar"}
 )
 
 assertMessage(
-  bind(returnPack, {"foo", "bar"})("baz"),
+  bind(transf.n_anys.array, {"foo"})("bar"),
+  {"foo", "bar"}
+)
+
+assertMessage(
+  bind(transf.n_anys.array, {"foo", "bar"})("baz"),
   {"foo", "bar", "baz"}
 )
 
 
 assertMessage(
-  bind(returnPack, {a_use, "foo", "bar"})("baz"),
+  bind(transf.n_anys.array, {a_use, "foo", "bar"})("baz"),
   {"baz", "foo", "bar"}
 )
 
 assertMessage(
-  bind(returnPack, {"foo", a_use, "qux"})("baz"),
+  bind(transf.n_anys.array, {"foo", a_use, "qux"})("baz"),
   {"foo", "baz", "qux"}
 )
 
@@ -34,16 +34,16 @@ assertMessage(
 )
 
 assertMessage(
-  bind(returnPack, {}, 1)("foo", "bar"),
+  bind(transf.n_anys.array, {}, 1)("foo", "bar"),
   {"bar"}
 )
 
 assertMessage(
-  bind(returnPack, {}, {1, 2})("foo", "bar"),
+  bind(transf.n_anys.array, {}, {1, 2})("foo", "bar"),
   {}
 )
 
 assertMessage(
-  bind(returnPack, {"baz"}, {1, 2})("foo", "bar", "moo"),
+  bind(transf.n_anys.array, {"baz"}, {1, 2})("foo", "bar", "moo"),
   {"baz", "moo"}
 )

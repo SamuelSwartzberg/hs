@@ -1,14 +1,14 @@
 assertMessage(
-  wdefarg(returnSame, 1)(2),
+  wdefarg(transf.any.same, 1)(2),
   2
 )
 
 assertMessage(
-  wdefarg(returnSame, 1)(),
+  wdefarg(transf.any.same, 1)(),
   {1}
 )
 
 assertMessage(
-  wdefarg(returnSame, {2, 3})(),
+  wdefarg(transf.any.same, {2, 3})(),
   {2, 3}
 )

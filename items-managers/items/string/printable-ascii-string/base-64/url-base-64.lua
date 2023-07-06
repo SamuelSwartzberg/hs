@@ -3,8 +3,8 @@ UrlBase64ItemSpecifier = {
   type = "url-base64",
   properties = {
     getables = {
-      ["is-base-64"] = returnTrue,
-      ["is-citable-object-id"] = returnTrue
+      ["is-base-64"] = transf["nil"]["true"],
+      ["is-citable-object-id"] = transf["nil"]["true"]
     }
   },
   potential_interfaces = ovtable.init({

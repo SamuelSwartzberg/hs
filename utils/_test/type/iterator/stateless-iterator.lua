@@ -672,7 +672,7 @@ assertMessage(
 
 local tbl_w_var_values = {
   a = true,
-  b = returnNil,
+  b = transf['nil']['nil'],
   c = 1,
   d = "string",
 }
@@ -694,7 +694,7 @@ assertMessage(
 
 local ovtable_w_var_values = ovtable.init({
   { key = "a", value = true },
-  { key = "b", value = returnNil },
+  { key = "b", value = transf['nil']['nil'] },
   { key = "c", value = 1 },
   { key = "d", value = "string" },
 })
@@ -708,7 +708,7 @@ for k, v in fastpairs(ovtable_w_var_values) do
     assertMessage(v, true)
   elseif manual_counter == 2 then
     assertMessage(k, "b")
-    assertMessage(v, returnNil)
+    assertMessage(v, transf['nil']['nil'])
   elseif manual_counter == 3 then
     assertMessage(k, "c")
     assertMessage(v, 1)
@@ -727,7 +727,7 @@ assertMessage(
 
 local list_w_var_values = {
   true,
-  returnNil,
+  transf['nil']['nil'],
   1,
   "string",
 }
@@ -742,7 +742,7 @@ for k, v in fastpairs(list_w_var_values) do
     assertMessage(v, true)
   elseif manual_counter == 2 then
     assertMessage(k, 2)
-    assertMessage(v, returnNil)
+    assertMessage(v, transf['nil']['nil'])
   elseif manual_counter == 3 then
     assertMessage(k, 3)
     assertMessage(v, 1)

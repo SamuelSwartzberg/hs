@@ -8,7 +8,7 @@ function CreateStreamItem(specified_contents)
     
     properties = {
       getables = {
-        ["is-control"] = returnTrue,
+        ["is-control"] = transf["nil"]["true"],
         --- @return "booting" | "active" | "ended"
         ["state"] = function(self) 
           return self:get("c").state

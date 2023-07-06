@@ -128,7 +128,7 @@ function getIsLeaf(treat_as_leaf)
   elseif treat_as_leaf == "list" then
     return isListOrEmptyTable
   elseif treat_as_leaf == false then
-    return returnFalse
+    return transf["nil"]["false"]
   else
     error("flatten: invalid value for treat_as_leaf: " .. tostring(treat_as_leaf))
   end

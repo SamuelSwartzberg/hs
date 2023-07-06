@@ -4,12 +4,12 @@ DictSpecifier = {
   type = "dict",
   properties = {
     getables = {
-      ["to-string"] = bc(transf.stringable_value_dict.dict_entry_string_summary),
+      ["to-string"] = bc(transf.dict.summary),
     },
     doThisables = {
       ["choose-item"] = function(self, callback)
         buildChooser(
-          transf.stringable_value_dict.chooser_item_list(self:get("c")),
+          transf.dict.chooser_item_list(self:get("c")),
           function(choice)
             callback(choice.v, choice.k)
           end,
@@ -24,7 +24,7 @@ DictSpecifier = {
       end,
       ["choose-key"] = function(self, callback)
         buildChooser(
-          transf.stringable_value_dict.key_chooser_item_list(self:get("c")),
+          transf.dict.key_chooser_item_list(self:get("c")),
           function(choice)
             callback(choice.v, choice.k)
           end,
@@ -34,7 +34,7 @@ DictSpecifier = {
       end,
       ["choose-value"] = function (self, callback)
         buildChooser(
-          transf.stringable_value_dict.value_chooser_item_list(self:get("c")),
+          transf.dict.value_chooser_item_list(self:get("c")),
           function(choice)
             callback(choice.v, choice.k)
           end,
@@ -50,14 +50,14 @@ DictSpecifier = {
       key = "choose-item-and-then-action"
     },
     {
-      d = "tstr",
-      i = "💻🔡",
-      key = "to-string",
+      d = "smm",
+      i = emj.summary,
+      getfn = transf.dict.summary
     },
     {
-      d = "tstrml",
-      i = "💻🔡📜",
-      key = "to-string-multiline",
+      d = "mlstr",
+      i = emj.multiline_string,
+      getfn = transf.dict.dict_entry_multiline_string
     },
   }
   

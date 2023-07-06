@@ -1549,6 +1549,18 @@ dothis = {
 
   },
   array = {
+
+  },
+  action_specifier = {
+
+  },
+  action_specifier_array = {
+
+  },
+  chooser_item_specifier_array = {
+
+  },
+  thing_name = {
     
   }
 }

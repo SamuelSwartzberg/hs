@@ -1494,6 +1494,33 @@ get = {
         return arg
       end
     end,
+    array_repeated = function(arg, times)
+      local result = {}
+      for i = 1, times do
+        table.insert(result, arg)
+      end
+      return result
+    end,
+    repeated = function(arr, times)
+      return table.unpack(get.any.array_repeated(arr, times))
+    end,
+    applicable_thing_name_hierarchy = function(any, local_thing_name_hierarchy, parent)
+      local_thing_name_hierarchy = local_thing_name_hierarchy or copy(thing_name_hierarchy, true)
+      parent = parent or "any"
+      local res = {}
+      for thing_name, child_thing_name_hierarchy_or_leaf_indication_string in pairs(thing_name_hierarchy) do
+        local passes = is[parent][thing_name](any)
+        if passes then
+          if type(child_thing_name_hierarchy_or_leaf_indication_string) == "table" then
+            res[thing_name] = get.any.applicable_thing_name_hierarchy(any, child_thing_name_hierarchy_or_leaf_indication_string, thing_name)
+          else
+            res[thing_name] = child_thing_name_hierarchy_or_leaf_indication_string
+          end
+
+
+
+      
+    end
   },
   table_and_table = {
     larger_table_by_key = function(table1, table2, key)

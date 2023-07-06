@@ -8,7 +8,7 @@ ManagedClipboardArraySpecifier = {
           sliced_indicator = "..."
         })
       end,
-      ["has-custom-create-logic"] = returnTrue
+      ["has-custom-create-logic"] = transf["nil"]["true"]
     },
     doThisables = {
       ["use-custom-create-logic"] = function(self, args)

@@ -33,7 +33,7 @@ PlaintextDictionaryFileItemSpecifier = {
     {
       text = "👉#️⃣💎 ctbl.",
       filter = dc,
-      getfn = returnSame,
+      getfn = transf.any.same,
       get = "parse-to-lua-table"
 
     }

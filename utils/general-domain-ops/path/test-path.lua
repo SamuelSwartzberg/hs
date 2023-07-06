@@ -95,5 +95,5 @@ function testPath(path, opts)
     end
   end
 
-  return reduce(results, returnAnd)
+  return reduce(results, transf.a_and_b.boolean_and)
 end

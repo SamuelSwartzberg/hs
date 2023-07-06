@@ -1,61 +1,61 @@
 assertMessage(
-  returnTrue(),
+  transf["nil"]["true"](),
   true
 )
 
 assertMessage(
-  returnFalse(),
+  transf["nil"]["false"](),
   false
 )
 
 assertMessage(
-  returnNot(true),
+  transf.boolean.negated(true),
   false
 )
 
 assertMessage(
-  returnBool("foo"),
+  transf.any.boolean("foo"),
   true
 )
 
 assertMessage(
-  returnBool(nil),
+  transf.any.boolean(nil),
   false
 )
 
 assertMessage(
-  returnNil(),
+  transf['nil']['nil'](),
   nil
 )
 
 assertMessage(
-  returnEmptyString(),
+  transf['nil'].empty_string(),
   ""
 )
 
 
 assertMessage(
-  returnEmptyTable(),
+  transf['nil'].empty_table(),
   {}
 )
 
 assertMessage(
-  returnZero(),
+  transf['nil'].zero(),
   0
 )
 
 assertMessage(
-  returnOne(),
+  transf['nil'].one(),
   1
 )
 
 assertMessage(
-  returnSame(1),
+  transf.any.same(1),
   1
 )
 
 assertMessage(
-  returnSame("foo"),
+  transf.any.same("foo"),
   "foo"
 )
 
@@ -65,12 +65,12 @@ assertMessage(
 )
 
 assertMessage(
-  select(4, returnSameNTimes("foo", 5)),
+  select(4, get.any.repeated("foo", 5)),
   "foo"
 )
 
 assertMessage(
-  select(6, returnSameNTimes("foo", 5)),
+  select(6, get.any.repeated("foo", 5)),
   nil
 )
 
@@ -100,7 +100,7 @@ assertMessage(
 )
 
 assertMessage(
-  returnLast({1, 2, 3}),
+  transf.array.last({1, 2, 3}),
   3
 )
 
@@ -115,17 +115,17 @@ assertMessage(
 )
 
 assertMessage(
-  returnAnd(true, true),
+  transf.a_and_b.boolean_and(true, true),
   true
 )
 
 assertMessage(
-  returnAnd(true, false),
+  transf.a_and_b.boolean_and(true, false),
   false
 )
 
 assertMessage(
-  returnOr(true, false),
+  transf.a_and_b.boolean_or(true, false),
   true
 )
 
@@ -140,7 +140,7 @@ assertMessage(
 )
 
 assertMessage(
-  returnPack(1, 2, 3),
+  transf.n_anys.array(1, 2, 3),
   {1, 2, 3}
 )
 

@@ -29,7 +29,7 @@ function elemAt(thing, ind, ret, precalc_keys)
         end
       else
         local tblkeys = precalc_keys or keys(thing)
-        table.sort(tblkeys, returnStringEquivOrder)
+        table.sort(tblkeys, is.a_and_b.b_larger_as_string)
         local key = tblkeys[ind]
         local value = thing[key]
         if ret == "kv" then

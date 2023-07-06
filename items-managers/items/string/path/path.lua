@@ -7,7 +7,7 @@ PathItemSpecifier = {
         return stringy.startswith(self:get("c"), "/") or stringy.startswith(self:get("c"), "~")
       end,
       ["is-relative-path"] = function(self) return not self:get("is-absolute-path") end,
-      ["is-path-leaf"] = returnTrue,
+      ["is-path-leaf"] = transf["nil"]["true"],
       ["is-in-path"] = function(self, path) return stringy.startswith(self:get("resolved-path"), path) end,
       ["resolved-path"] = function(self)
         return transf.string.path_resolved(self:get("c"))

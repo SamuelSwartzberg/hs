@@ -389,6 +389,12 @@ is = {
     b_larger = function(a, b)
       return a < b
     end,
+    a_larger_as_string = function(a, b)
+      return tostring(a) > tostring(b)
+    end,
+    b_larger_as_string = function(a, b)
+      return tostring(a) < tostring(b)
+    end,
     equal = function(a, b)
       return a == b
     end,

@@ -3,7 +3,7 @@ GeneralBase32ItemSpecifier = {
   type = "general-base32",
   properties = {
     getables = {
-      ["is-base-32"] = returnTrue,
+      ["is-base-32"] = transf["nil"]["true"],
     }
   },
   potential_interfaces = ovtable.init({

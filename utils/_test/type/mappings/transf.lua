@@ -357,7 +357,7 @@ assertMessage(
 )
 
 assertMessageAny(
-  transf.stringable_value_dict.url_params({foo = "bar", baz = "quux"}),
+  transf.dict.url_params({foo = "bar", baz = "quux"}),
   {
     "baz=quux&foo=bar",
     "foo=bar&baz=quux"
@@ -365,7 +365,7 @@ assertMessageAny(
 )
 
 assertMessageAny(
-  transf.stringable_value_dict.url_params({
+  transf.dict.url_params({
     foo="I am a cat", 
     bar="吾輩は猫である"
   }),
@@ -429,7 +429,7 @@ assertMessageAny(
 )
 
 assertMessageAny(
-  transf.stringable_value_dict.curl_form_field_list({ foo = "bar", lol = "what"}),
+  transf.dict.curl_form_field_list({ foo = "bar", lol = "what"}),
   {
     { "-F", {value = "foo=bar", type = "quoted"}, "-F",{ value = "lol=what", type = "quoted"}},
     { "-F", {value = "lol=what", type = "quoted"}, "-F",{ value = "foo=bar", type = "quoted"}}
@@ -437,7 +437,7 @@ assertMessageAny(
 )
 
 assertMessageAny(
-  transf.stringable_value_dict.curl_form_field_list({ foo = "bar", lol = "1"}),
+  transf.dict.curl_form_field_list({ foo = "bar", lol = "1"}),
   {
     { "-F", {value = "foo=bar", type = "quoted"}, "-F",{ value = "lol=1", type = "quoted"}},
     { "-F", {value = "lol=1", type = "quoted"}, "-F",{ value = "foo=bar", type = "quoted"}}
@@ -445,7 +445,7 @@ assertMessageAny(
 )
 
 assertMessageAny(
-  transf.stringable_value_dict.curl_form_field_list({ foo = "bar", lol = "@~/foo.txt"}),
+  transf.dict.curl_form_field_list({ foo = "bar", lol = "@~/foo.txt"}),
   {
     { "-F", {value = "foo=bar", type = "quoted"}, "-F",{ value = "lol=@" .. env.HOME .. "/foo.txt", type = "quoted"}},
     { "-F", {value = "lol=@" .. env.HOME .. "/foo.txt", type = "quoted"}, "-F",{ value = "foo=bar", type = "quoted"}}

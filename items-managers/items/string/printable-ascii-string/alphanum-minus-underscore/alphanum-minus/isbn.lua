@@ -5,7 +5,7 @@ IsbnItemSpecifier = {
   type = "isbn",
   properties = {
     getables = {
-      ["is-citable-object-id"] = returnTrue,
+      ["is-citable-object-id"] = transf["nil"]["true"],
     }
   },
   potential_interfaces = ovtable.init({

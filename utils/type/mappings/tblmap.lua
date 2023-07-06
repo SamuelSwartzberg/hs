@@ -508,6 +508,9 @@ tblmap = {
       all = "全",
       translation = "🅰️🈴",
       email = "📧",
+      string = "💻🔡",
+      multiline_string = "💻🔡📜",
+      summary = "📚💬",
     }
   }
 }

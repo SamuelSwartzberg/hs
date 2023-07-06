@@ -59,9 +59,6 @@ ArrayOfInterfacesSpecifier = {
           return item:get("is-" .. type)
         end)
       end,
-      ["min-contents"] = function(self)
-        return reduce(self:get("map", function(item) return item:get("c") end), returnSmaller)
-      end,
       ["min-contents-item"] = function(self)
         local target
         for i, item in ipairs(self:get("c")) do

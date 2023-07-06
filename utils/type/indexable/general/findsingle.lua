@@ -88,9 +88,9 @@ function findsingle(item, conditions, opts)
 
       local bool 
       if condition._invert then
-        bool = returnNot
+        bool = transf.boolean.negated
       else
-        bool = returnBool
+        bool = transf.any.boolean
       end
 
       -- easier to wrap here than to keep passing in the bool function

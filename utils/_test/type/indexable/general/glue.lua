@@ -172,17 +172,17 @@ local glue_ovtable_to_nil = glue(
     a = nil,
     b = "foo",
     c = {
-      d = returnTrue
+      d = transf["nil"]["true"]
     }
   },
   {
     e = "bar",
     a = ovtable.init({
       {k = "f", v = 1},
-      {k = "g", v = returnAdd1},
+      {k = "g", v = transf.number.with_1_added},
     }),
     c = {
-      a = returnFalse
+      a = transf["nil"]["false"]
     }
   }
 )
@@ -192,7 +192,7 @@ assertMessage(glue_ovtable_to_nil, glue_ovtable_to_nil)
 
 ovtable.init({
   {k = "f", v = 1},
-  {k = "g", v = returnAdd1},
+  {k = "g", v = transf.number.with_1_added},
 })
 
 assertMessage(
@@ -200,12 +200,12 @@ assertMessage(
   {
     a = ovtable.init({
       {k = "f", v = 1},
-      {k = "g", v = returnAdd1},
+      {k = "g", v = transf.number.with_1_added},
     }),
     b = "foo",
     c = {
-      a = returnFalse,
-      d = returnTrue,
+      a = transf["nil"]["false"],
+      d = transf["nil"]["true"],
     },
     e = "bar",
   }

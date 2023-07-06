@@ -46,12 +46,12 @@ assertMessage(
 )
 
 assertMessage(
-  map({ 1, 2, 3 }, returnAdd1),
+  map({ 1, 2, 3 }, transf.number.with_1_added),
   { 2, 3, 4 }
 )
 
 assertMessage(
-  map({ a = 1, b = 2, c = 3 }, returnAdd1),
+  map({ a = 1, b = 2, c = 3 }, transf.number.with_1_added),
   { a = 2, b = 3, c = 4 }
 )
 
@@ -66,7 +66,7 @@ assertMessage(
 )
 
 assertMessage(
-  map({ 1, 2, 3, 4, 5 }, returnAdd1,  { start = 2, stop = 4 }),
+  map({ 1, 2, 3, 4, 5 }, transf.number.with_1_added,  { start = 2, stop = 4 }),
   { nil, 3, 4, 5 }
 )
 
@@ -79,7 +79,7 @@ ov1_5.d = 4
 ov1_5.e = 5
 
 assertMessage(
-  map(ov1_5, returnAdd1,  { start = 2, stop = 4 }),
+  map(ov1_5, transf.number.with_1_added,  { start = 2, stop = 4 }),
   { 
     b = 3,
     c = 4,
@@ -88,7 +88,7 @@ assertMessage(
 )
 
 assertMessage(
-  map(ov1_5, returnAdd1,  { start = 2, stop = 4, last = true }),
+  map(ov1_5, transf.number.with_1_added,  { start = 2, stop = 4, last = true }),
   { 
     d = 5,
     c = 4,
@@ -234,7 +234,7 @@ assertMessage(
 
 
 assertMessage(
-  map({ {1}, {2}, {3}}, returnSame, {
+  map({ {1}, {2}, {3}}, transf.any.same, {
     flatten = true,
     tolist = true
   }),
@@ -242,7 +242,7 @@ assertMessage(
 )
 
 assertMessage(
-  map({ {1}, {2}, {3}}, returnSame, {
+  map({ {1}, {2}, {3}}, transf.any.same, {
     flatten = true,
   }),
   {3} -- without tolist, this is the intended behavior, but it's not very intuitive. Consider changing this.
@@ -274,7 +274,7 @@ assertMessage(
 )
 
 assertMessage(
-  map({ a = 1, b = 2, c = 3 }, returnSame, { tolist = true }),
+  map({ a = 1, b = 2, c = 3 }, transf.any.same, { tolist = true }),
   { 1, 2, 3 }
 )
 
@@ -283,7 +283,7 @@ tmpovtable.a = 1
 tmpovtable.b = 2
 tmpovtable.c = 3
 
-local mappedtable = map(tmpovtable, returnSame, { output = "table" })
+local mappedtable = map(tmpovtable, transf.any.same, { output = "table" })
 
 assertMessage(
   mappedtable.isovtable,
@@ -316,7 +316,7 @@ assertMessage(
     b = {
       c = 2,
     }
-  }, returnAdd1, { recurse = true }),
+  }, transf.number.with_1_added, { recurse = true }),
   {
     a = 2,
     b = {
@@ -330,7 +330,7 @@ local succ, res = pcall(map, {
   b = {
     c = 2,
   }
-}, returnAdd1, { recurse = false }) -- this should error, because it's trying to add 1 to a table
+}, transf.number.with_1_added, { recurse = false }) -- this should error, because it's trying to add 1 to a table
 
 assertMessage(succ, false)
 
@@ -339,7 +339,7 @@ local succ, res =  pcall(map, {
   b = {
     c = 2,
   }
-}, returnAdd1) -- this should error, because it's trying to add 1 to a table (recurse is false by default)
+}, transf.number.with_1_added) -- this should error, because it's trying to add 1 to a table (recurse is false by default)
 
 assertMessage(succ, false)
 
@@ -356,7 +356,7 @@ local simple_tbl_copy = copy(simple_tbl)
 assertMessage(simple_tbl, simple_tbl_copy)
 
 assertMessage(
-  map(simple_tbl, returnSame),
+  map(simple_tbl, transf.any.same),
   simple_tbl
 )
 
@@ -383,7 +383,7 @@ local nested_tbl_copy = copy(nested_tbl, true)
 assertMessage(nested_tbl, nested_tbl_copy)
 
 assertMessage(
-  map(nested_tbl, returnSame, { recurse = true }),
+  map(nested_tbl, transf.any.same, { recurse = true }),
   nested_tbl
 )
 
@@ -405,12 +405,12 @@ local tbl_w_nested_ovtable_simple_copy = copy(tbl_w_nested_ovtable_simple)
 assertMessage(tbl_w_nested_ovtable_simple, tbl_w_nested_ovtable_simple_copy)
 
 assertMessage(
-  map(tbl_w_nested_ovtable_simple, returnSame, { recurse = true }),
+  map(tbl_w_nested_ovtable_simple, transf.any.same, { recurse = true }),
   tbl_w_nested_ovtable_simple
 )
 
 assertMessage(
-  map(tbl_w_nested_ovtable_simple_copy, returnSame, { recurse = true }),
+  map(tbl_w_nested_ovtable_simple_copy, transf.any.same, { recurse = true }),
   tbl_w_nested_ovtable_simple_copy
 )
 
@@ -432,7 +432,7 @@ local tbl_w_nested_ovtable_simple_copy_2 = copy(tbl_w_nested_ovtable_simple_2)
 assertMessage(tbl_w_nested_ovtable_simple_2, tbl_w_nested_ovtable_simple_copy_2)
 
 assertMessage(
-  map(tbl_w_nested_ovtable_simple_2, returnSame, { recurse = false }),
+  map(tbl_w_nested_ovtable_simple_2, transf.any.same, { recurse = false }),
   tbl_w_nested_ovtable_simple_2
 )
 
@@ -496,7 +496,7 @@ assertMessage(
 
 local tbl_w_nested_ovtable_simple_3 = {
   d = ovtable.init({
-    { "a", returnAdd1 },
+    { "a", transf.number.with_1_added },
   })
 }
 
@@ -505,7 +505,7 @@ local tbl_w_nested_ovtable_simple_3_copy = copy(tbl_w_nested_ovtable_simple_3)
 assertMessage(tbl_w_nested_ovtable_simple_3, tbl_w_nested_ovtable_simple_3_copy)
 
 assertMessage(
-  map(tbl_w_nested_ovtable_simple_3, returnSame),
+  map(tbl_w_nested_ovtable_simple_3, transf.any.same),
   tbl_w_nested_ovtable_simple_3
 )
 
@@ -526,7 +526,7 @@ local tbl_w_nested_ovtable = {
     }
   },
   d = ovtable.init({
-    { "a", returnAdd1 },
+    { "a", transf.number.with_1_added },
     { "b", false }
   })
 }
@@ -537,7 +537,7 @@ local tbl_w_nested_ovtable_copy = copy(tbl_w_nested_ovtable)
 assertMessage(tbl_w_nested_ovtable, tbl_w_nested_ovtable_copy)
 
 assertMessage(
-  map(tbl_w_nested_ovtable, returnSame),
+  map(tbl_w_nested_ovtable, transf.any.same),
   tbl_w_nested_ovtable
 )
 
@@ -550,7 +550,7 @@ local table_will_self_ref = {}
 
 table_will_self_ref.self = table_will_self_ref
 
-local recmap_of_table_will_self_ref = map(table_will_self_ref, returnSame, { recurse = true })
+local recmap_of_table_will_self_ref = map(table_will_self_ref, transf.any.same, { recurse = true })
 
 assertMessage(
   recmap_of_table_will_self_ref.self,
@@ -567,7 +567,7 @@ local mult_self_ref = {}
 mult_self_ref.a = mult_self_ref
 mult_self_ref.b = mult_self_ref
 
-local recmap_of_mult_self_ref = map(mult_self_ref, returnSame, { recurse = true })
+local recmap_of_mult_self_ref = map(mult_self_ref, transf.any.same, { recurse = true })
 
 assertMessage(
   recmap_of_mult_self_ref.a,
@@ -596,7 +596,7 @@ deep_self_ref.a.b = {}
 
 deep_self_ref.a.b.c = deep_self_ref
 
-local recmap_of_deep_self_ref = map(deep_self_ref, returnSame, { recurse = true })
+local recmap_of_deep_self_ref = map(deep_self_ref, transf.any.same, { recurse = true })
 
 assertMessage(
   recmap_of_deep_self_ref.a.b.c,

@@ -476,7 +476,7 @@ local test_table_2 = copy(example_table)
 local test_table_3 = copy(example_table)
 
 local res1 = memoize(
-  returnSame,
+  transf.any.same,
   refstore.params.memoize.opts.stringify_json
 )(
   test_table_1
@@ -492,7 +492,7 @@ assertMessage(
 res1.c = "c"
 
 local res2 = memoize(
-  returnSame,
+  transf.any.same,
   refstore.params.memoize.opts.stringify_json
 )(
   test_table_2
@@ -508,7 +508,7 @@ assertMessage(
 res2.c = "c"
 
 local res3 = memoize(
-  returnSame,
+  transf.any.same,
   refstore.params.memoize.opts.stringify_json
 )(
   test_table_3

@@ -8,7 +8,7 @@ PathInterfaceItemSpecifier = {
       ["is-extant-path"] = bc(is.path.exists),
       ["is-non-extant-path"] = bc(is.path.does_not_exist),
       ["is-volume"] = bc(is.path.volume),
-      ["is-path-by-start"] = returnTrue,
+      ["is-path-by-start"] = transf["nil"]["true"],
       ["relative-path-from"] = function(self, starting_point)
         starting_point = starting_point or env.HOME
         return self:get("difference-from-prefix-or-nil", mustEnd(starting_point, "/"))

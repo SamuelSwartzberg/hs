@@ -3,7 +3,7 @@ GeneralBase64ItemSpecifier = {
   type = "general-base64",
   properties = {
     getables = {
-      ["is-base-64"] = returnTrue,
+      ["is-base-64"] = transf["nil"]["true"],
     }
   },
   potential_interfaces = ovtable.init({

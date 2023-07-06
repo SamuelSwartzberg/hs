@@ -155,7 +155,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
       if specifier.token == nil then -- initial token request
         local original_do_after = do_after
         if not original_do_after then
-          do_after = returnNil
+          do_after = transf['nil']['nil']
         end
         if refresh_token then
           do_refresh_token()
@@ -322,7 +322,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
         request_string = json.encode(specifier.request_table)
         content_type = "application/json"
       elseif specifier.request_table_type == "form-urlencoded" then
-        request_string = transf.stringable_value_dict.url_params(specifier.request_table)
+        request_string = transf.dict.url_params(specifier.request_table)
         content_type = "application/x-www-form-urlencoded"
       end
       push(curl_command, "-d")
@@ -331,7 +331,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
       )
     else
       content_type = "multipart/form-data"
-      local form_field_args = transf.stringable_value_dict.curl_form_field_list(specifier.request_table)
+      local form_field_args = transf.dict.curl_form_field_list(specifier.request_table)
       curl_command = concat(
         curl_command,
         form_field_args

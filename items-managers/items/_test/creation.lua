@@ -976,7 +976,7 @@ local item_creation_map = {
   [CreateTimerItem] = {
     {
       value = {
-        fn = returnNil,
+        fn = transf['nil']['nil'],
       },
       must_be = {"timer"}
     }

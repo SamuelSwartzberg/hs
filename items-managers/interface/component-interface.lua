@@ -269,7 +269,6 @@ InterfaceDefaultTemplate = {
     end
     return nil
   end,
-  get_all = bind(getOrDoAll, {a_use, "get"}),
   doThis = function(self, key, value, not_recursive_children, not_recursive_super, previous_lower_node_id)
     if self.properties.doThisables[key] then
       self.properties.doThisables[key](self, value)
