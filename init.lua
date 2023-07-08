@@ -31,7 +31,7 @@ projectDirsArray = ar(itemsInPath({path = env.ME, recursion = 2, include_files =
 envTable = dc(env)
 compTable = dc(flatten(comp, {
   mode = "path-assoc",
-  val = "plain",
+  val = "plain-value",
   join_path = ".",
   treat_as_leaf = "list",
 }))

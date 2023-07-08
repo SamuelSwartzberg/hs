@@ -16,10 +16,7 @@ WhisperFileItemSpecifier = {
     {
       i = "🗣️➡️📝",
       d = "trsc",
-      filter = st,
-      get = "c",
       getfn = transf.audio_file.transcribed,
-      key = "transcribed"
     }
   },
 }

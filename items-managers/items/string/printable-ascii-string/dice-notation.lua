@@ -6,7 +6,6 @@ DiceNotationItemSpecifier = {
       i = "🎲",
       d = "rll",
       getfn = transf.dice_notation.result,
-      filter = nr
     }
   }
   ,

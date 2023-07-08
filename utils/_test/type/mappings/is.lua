@@ -196,15 +196,15 @@ assert(
 )
 
 -- Test is.string.looks_like_path
-assertMessage(is.string.looks_like_path("test/path"), true)
-assertMessage(is.string.looks_like_path("test/path/"), true)
-assertMessage(is.string.looks_like_path("/test/path"), true)
-assertMessage(is.string.looks_like_path("  test/path"), false)
-assertMessage(is.string.looks_like_path("test/path  "), false)
-assertMessage(is.string.looks_like_path("test\n/path"), false)
-assertMessage(is.string.looks_like_path("test\t/path"), false)
-assertMessage(is.string.looks_like_path("test\r/path"), false)
-assertMessage(is.string.looks_like_path("test\f/path"), false)
+assertMessage(is.string.path("test/path"), true)
+assertMessage(is.string.path("test/path/"), true)
+assertMessage(is.string.path("/test/path"), true)
+assertMessage(is.string.path("  test/path"), false)
+assertMessage(is.string.path("test/path  "), false)
+assertMessage(is.string.path("test\n/path"), false)
+assertMessage(is.string.path("test\t/path"), false)
+assertMessage(is.string.path("test\r/path"), false)
+assertMessage(is.string.path("test\f/path"), false)
 
 -- Test is.path.remote
 assertMessage(is.path.remote("http://example.com/test.git"), true)

@@ -441,7 +441,7 @@ assertMessage(
     f = 4
   }, {
     mode = "path-assoc",
-    val = "plain",
+    val = "plain-value",
     join_path = ".",
     treat_as_leaf = false,
   }),

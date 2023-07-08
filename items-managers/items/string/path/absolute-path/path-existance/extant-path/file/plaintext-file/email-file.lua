@@ -28,7 +28,6 @@ EmailFileItemSpecifier = {
     },{
       text = "👉📬 cemladdr.",
       getfn = get.email_file.addresses,
-      filter = ar,
       act = "cia"
     },
     {

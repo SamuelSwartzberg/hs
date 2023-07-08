@@ -180,19 +180,15 @@ ExtantPathItemSpecifier = {
       args = {thing = "file name", key = "create-sibling-file-and-choose-action"}
     }, {
       text = "👉✏️🕚 cmdt.",
-      filter = dat,
       getfn = transf.path.m_date
     }, {
       text = "🫳🕚 cadt.",
-      filter = dat,
       getfn = transf.path.a_date
     },{
       text = "👩🏽‍💻🕚 ccdt.",
-      filter = dat,
       getfn = transf.path.c_date
     },{
       text = "🌄🕚 ccrdt.",
-      filter = dat,
       getfn = transf.path.cr_date
     },
     {

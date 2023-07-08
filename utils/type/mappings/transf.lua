@@ -327,6 +327,26 @@ transf = {
     multiline_string = function(arr)
       return transf.string_array.multiline_string(transf.array.string_array(arr))
     end,
+    item_chooser_item_specifier_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.any.item_chooser_item_specifier
+      )
+    end,
+    item_with_index_chooser_item_specifier_array = function(arr)
+      return transf.assoc_arr_array.assoc_arr_with_index_as_key_array(
+        transf.array.item_chooser_item_specifier_array(arr)
+      )
+    end,
+    hschooser_specifier = function(arr)
+      return {
+        chooser_item_specifier_array = transf.array.item_with_index_chooser_item_specifier_array(arr),
+        placeholder_text = transf.array.summary(arr),
+      }
+    end,
+    choosing_hschooser_specifier = function(arr)
+      return get.hschooser_specifier.choosing_hschooser_specifier(transf.array.hschooser_specifier(arr), "index", arr)
+    end,
   },
   hole_y_arraylike = {
     array = function(tbl)
@@ -338,6 +358,15 @@ transf = {
       end
       return new_tbl
     end
+  },
+  assoc_arr_array = {
+    assoc_arr_with_index_as_key_array = function(arr)
+      local res = copy(arr, true)
+      for i, v in ipairs(arr) do
+        v.index = i
+      end
+      return res
+    end,
   },
   char = {
     hex = function(char)
@@ -3268,16 +3297,6 @@ transf = {
       return items
     end,
   },
-  term_syn_specifier_dict = {
-    term_syn_specifier_item_dict_item = function(dict)
-      return dc(
-        hs.fnutils.map(
-          dict,
-          CreateSynSpecifier
-        )
-      )
-    end
-  },
   syn_specifier = {
     synoynms_array = function (syn_specifier)
       return syn_specifier.synonyms
@@ -3487,12 +3506,6 @@ transf = {
     end
   },
   string_array = {
-    item_array_of_string_items = function(arr)
-      return ar(hs.fnutils.imap(
-        arr,
-        st
-      ))
-    end,
     repeated_option_string = function(arr, opt)
       return table.concat(
         hs.fnutils.imap(
@@ -3709,6 +3722,18 @@ transf = {
           treat_as_leaf = "list",
           mode = "path-assoc",
           join_path = "/"
+        }
+      )
+    end,
+    nested_key_to_array = function(t)
+      return flatten(
+        t,
+        {
+          treat_as_leaf = "list",
+          val = "plain-key",
+          mode="list",
+          add_nonleaf = true,
+
         }
       )
     end,
@@ -5371,9 +5396,47 @@ transf = {
         return any
       end
     end,
-    applicable_thing_name_assoc = function(any)
-
-    end
+    applicable_thing_name_hierarchy = function(any)
+      return get.any.applicable_thing_name_hierarchy(any)
+    end,
+    applicable_thing_name_array = function(any)
+      return transf.thing_name_hierarchy.thing_name_array(transf.any.applicable_thing_name_hierarchy(any))
+    end,
+    applicable_action_specifier_array = function(any)
+      return transf.thing_name_array.action_specifier_array(transf.any.applicable_thing_name_array(any))
+    end,
+    applicable_action_chooser_item_specifier_array = function(any)
+      return transf.action_specifier_array.action_chooser_item_specifier_array(transf.any.applicable_action_specifier_array(any))
+    end,
+    applicable_action_with_index_chooser_item_specifier_array = function(any)
+      return transf.assoc_arr_array.assoc_arr_with_index_as_key_array(transf.any.applicable_action_chooser_item_specifier_array(any))
+    end,
+    placeholder_text = function(any)
+      return "Choose action on: " .. get.thing_name_array.chooser_text(transf.any.applicable_thing_name_array(any), any)
+    end,
+    hschooser_specifier = function(any)
+      return {
+        chooser_item_specifier_array = transf.any.applicable_action_with_index_chooser_item_specifier_array(any),
+        placeholder_text = transf.any.placeholder_text(any),
+      }
+    end,
+    choosing_hschooser_specifier = function(any)
+      return get.hschooser_specifier.choosing_hschooser_specifier(transf.any.hschooser_specifier(any), "index", any)
+    end,
+    any_and_applicable_thing_name_array_specifier = function(any)
+      return {
+        any = any,
+        applicable_thing_name_array = transf.any.applicable_thing_name_array(any)
+      }
+    end,
+    item_chooser_item_specifier = function(any)
+      local applicable_thing_name_array = transf.any.applicable_thing_name_array(any)
+      return {
+        text = transf.string.with_styled_start_end_markers(get.thing_name_array.chooser_text(applicable_thing_name_array, any)),
+        subText = get.thing_name_array.chooser_subtext(applicable_thing_name_array, any),
+        image = get.thing_name_array.chooser_image(applicable_thing_name_array, any),
+      }
+    end,
   },
   n_anys = {
     array = function(...)
@@ -5606,14 +5669,118 @@ transf = {
     end,
   },
   action_specifier = {
-
+    action_chooser_item_specifier = function(action_specifier)
+      if action_specifier.text then error("old action_specifier format, contains action_specifier.text") end
+      local cspec = {
+        e = action_specifier.e,
+        d = action_specifier.d,
+      }
+      if action_specifier.dothis == nil or action_specifier.dothis == dothis.array.choose_item then
+        cspec.e = mustStart(cspec.e, "👉")
+        cspec.d = mustStart(cspec.d, "ci")
+      elseif action_specifier.dothis == dothis.any.choose_action then
+        cspec.e = mustStart(cspec.e, "👉👊")
+        cspec.d = mustStart(cspec.d, "c")
+      end
+      cspec.d = mustEnd(cspec.d, ".")
+      return {text = transf.chooser_item_text_specifier.string(cspec)}
+    end
+  },
+  chooser_item_text_specifier = {
+    string = function(chooser_item_text_specifier)
+      return chooser_item_text_specifier.e .. " " .. chooser_item_text_specifier.d
+    end,
   },
   action_specifier_array = {
-    chooser_item_specifier_array = function(action_specifier_array)
+    action_chooser_item_specifier_array = function(action_specifier_array)
+      return hs.fnutils.imap(
+        action_specifier_array,
+        transf.action_specifier.action_chooser_item_specifier
+      )
+    end,
+    action_with_index_choose_item_specifier_array = function(action_specifier_array)
+      return transf.assoc_arr_array.assoc_arr_with_index_as_key_array(
+        transf.action_specifier.action_chooser_item_specifier_array(action_specifier_array)
+      )
+    end,
+  },
+  hschooser_speciifer = {
 
+  },
+  choosing_hschooser_specifier = {
+    hschooser_speciifer = function(choosing_hschooser_specifier)
+      return choosing_hschooser_specifier.hschooser_speciifer
     end,
   },
   thing_name = {
-    
+
+  },
+  thing_name_hierarchy = {
+    thing_name_array = function(thing_name_hierarchy)
+      return transf.assoc_arr.nested_key_to_array(thing_name_hierarchy)
+    end
+  },
+  thing_name_array = {
+    array_of_action_specifier_arrays = function(thing_name_array)
+      return map(
+        thing_name_array,
+        tblmap.thing_name.action_specifier_array,
+        {tolist=true}
+      )
+    end,
+    action_specifier_array = function(thing_name_array)
+      return concat(
+        transf.thing_name_array.array_of_action_specifier_arrays(thing_name_array)
+      )
+    end,
+    chooser_image_retriever_specifier_array = function(thing_name_array)
+      return hs.fnutils.imap(
+        thing_name_array,
+        function(thing_name)
+          local spec = copy(tblmap.thing_name.chooser_image_partial_retriever_specifier)
+          spec.thing_name = thing_name
+          spec.precedence = spec.precedence or 1
+          return spec
+        end
+      )
+    end,
+    chooser_text_retriever_specifier_array = function(thing_name_array)
+      return map(
+        thing_name_array,
+        function(thing_name)
+          local spec = copy(tblmap.thing_name.chooser_text_partial_retriever_specifier)
+          spec.thing_name = thing_name
+          spec.precedence = spec.precedence or 1
+          return spec
+        end
+      )
+    end,
+    chooser_subtext_retriever_specifier_array = function(thing_name_array)
+      return map(
+        thing_name_array,
+        function(thing_name)
+          local spec = copy(tblmap.thing_name.chooser_subtext_partial_retriever_specifier)
+          spec.thing_name = thing_name
+          spec.precedence = spec.precedence or 1
+          return spec
+        end
+      )
+    end,
+  },
+  retriever_specifier = {
+
+  },
+  retriever_specifier_array = {
+    highest_precedence_retriever_specifier = function(retriever_specifier_array)
+      return reduce(
+        retriever_specifier_array,
+        bind(get.table_and_table.larger_table_by_key {a_use, a_use, "precedence"})
+      )
+    end,
+    precedence_ordered_retriever_specifier_array = function(retriever_specifier_array)
+      return get.array.sorted(
+        retriever_specifier_array,
+        bind(get.table_and_table.larger_table_by_key) {a_use, a_use, "precedence"})
+    end
   }
 }

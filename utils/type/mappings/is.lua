@@ -12,7 +12,7 @@ is = {
       local digit_non_digit_ratio = amount_of_digits / amount_of_non_digits
       return digit_non_digit_ratio > 0.5
     end,
-    looks_like_path = function(str)
+    path = function(str)
       return 
         str:find("/") ~= nil
         and str:find("[\n\t\r\f]") == nil

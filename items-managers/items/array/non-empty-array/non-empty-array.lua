@@ -53,12 +53,10 @@ NonEmptyArraySpecifier = {
     },{
       text = "👉👆 chd.",
       getfn = get.array.head,
-      get = "c",
       
     },{
       text = "👉👇 ctl.",
       getfn = get.array.tail,
-      get = "c",
     },{
       text = "👉#️⃣ cln.",
       key = "choose-action-on-string-item-result-of-get",

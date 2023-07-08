@@ -32,9 +32,7 @@ PlaintextDictionaryFileItemSpecifier = {
   action_table = {
     {
       text = "👉#️⃣💎 ctbl.",
-      filter = dc,
-      getfn = transf.any.same,
-      get = "parse-to-lua-table"
+      get = "parse-to-lua-table" -- TODO `get` no longer exists in action_tables (now action_specifier_array anyway)
 
     }
   }

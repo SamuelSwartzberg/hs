@@ -549,8 +549,45 @@ get = {
         str
       )
     end,
-      
-
+    styledtext = function(str, styledtext_attributes_specifier)
+      return hs.styledtext.new(str, styledtext_attributes_specifier)
+    end,
+  },
+  string_or_styledtext = {
+    styledtext_ignore_styled = function(str, styledtext_attributes_specifier)
+      if type(str) == "string" then
+        return hs.styledtext.new(str, styledtext_attributes_specifier)
+      else
+        return str
+      end
+    end,
+    styledtext_merge = function(str, styledtext_attributes_specifier)
+      if type(str) == "string" then
+        return hs.styledtext.new(str, styledtext_attributes_specifier)
+      else
+        return transf.styledtext.styledtext_merge(str, styledtext_attributes_specifier)
+      end
+    end,
+  },
+  styledtext = {
+    styledtext_merge = function(styledtext, styledtext_attributes_specifier)
+      local existing_style = styledtext:asTable()
+      local text_string = slice(existing_style, 1, 1)[1]
+      local style = slice(existing_style, 2, #existing_style)
+      local new_styledtext = hs.styledtext.new(text_string, styledtext_attributes_specifier)
+      for _, v in ipairs(style) do
+        new_styledtext = new_styledtext:setStyle(v.styledtext_attributes_specifier, v.starts, v.ends)
+      end
+      return new_styledtext
+    end
+  },
+  string_or_styledtext_array = {
+    styledtext_array_merge = function(arr, styledtext_attributes_specifier)
+      return hs.fnutils.imap(
+        arr,
+        bind(get.string_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
+      )
+    end,
   },
   string_array = {
     join = function(arr, sep)
@@ -1516,10 +1553,9 @@ get = {
           else
             res[thing_name] = child_thing_name_hierarchy_or_leaf_indication_string
           end
-
-
-
-      
+        end
+      end
+      return res
     end
   },
   table_and_table = {
@@ -1537,5 +1573,95 @@ get = {
         return table2
       end
     end,
-  }
+  },
+  retriever_specifier = {
+    result = function(retriever_specifier, value)
+      return transf[
+        retriever_specifier.thing_name
+      ][
+        retriever_specifier.target
+      ](value)
+    end,
+  },
+  retriever_specifier_array = {
+    result_highest_precedence = function(arr, value)
+      return get.retriever_specifier.result(
+        transf.retriever_specifier_array.highest_precedence_retriever_specifier(arr),
+        value
+      )
+    end,
+    result_array = function(arr, value)
+      return hs.fnutils.imap(
+        arr, 
+        bind(get.retriever_specifier.result, {a_use, value})
+      )
+    end,
+    result_joined = function(arr, value)
+      return table.concat(
+        get.retriever_specifier.result_array(arr, value),
+        " | "
+      )
+    end,
+  },
+  thing_name_array = {
+    chooser_text = function(arr, value)
+      return get.retriever_specifier_array.result_highest_precedence(
+        transf.thing_name_array.chooser_text_retriever_specifier_array(arr),
+        value
+      )
+    end,
+    chooser_image = function(arr, value)
+      return get.retriever_specifier_array.result_highest_precedence(
+        transf.thing_name_array.chooser_image_retriever_specifier_array(arr),
+        value
+      )
+    end,
+    chooser_subtext = function(arr, value)
+      return get.retriever_specifier_array.result_joined(
+        transf.thing_name_array.chooser_subtext_retriever_specifier_array(arr),
+        value
+      )
+    end,
+  },
+  hschooser_specifier = {
+    partial_hschooser = function(spec, callback)
+      return hs.chooser.new(function(chosen_chooser_item)
+        if chosen_chooser_item then
+          callback(chosen_chooser_item)
+        else
+          print("No item chosen, doing nothing")
+        end
+      end)
+    end,
+    choosing_hschooser_specifier = function(spec, key_name, tbl)
+      return {
+        hschooser_specifier = spec, 
+        key_name = key_name,
+        tbl = tbl,
+      }
+    end,
+  },
+  chooser_item_specifier_array = {
+    styled_chooser_item_specifier_array = function(arr, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict)
+      local res = copy(arr)
+      for i, chooser_item_specifier in ipairs(res) do
+        local text_styledtext_attribute_specifier = concat( {
+          font = {size = 14 },
+          color = { red = 0, green = 0, blue = 0, alpha = 0.7 },
+        }, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict.styledtext_attribute_specifier.text)
+        local subtext_styledtext_attribute_specifier = concat( {
+          font = {size = 12 },
+          color = { red = 0, green = 0, blue = 0, alpha = 0.5 },
+        }, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict.styledtext_attribute_specifier.subtext)
+        res[i].text = get.string_or_styledtext.styledtext_merge(
+          chooser_item_specifier.text,
+          text_styledtext_attribute_specifier
+        )
+        res[i].subText = get.string_or_styledtext.styledtext_merge(
+          chooser_item_specifier.subText,
+          subtext_styledtext_attribute_specifier
+        )
+      end
+    end
+  },
 }

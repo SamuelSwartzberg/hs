@@ -457,6 +457,11 @@ dothis = {
         env.GUI_EDITOR
       )
     end,
+    create_url_array_as_session_in_msessions = function(str)
+      dothis.url_array.create_as_session_in_msessions(
+        transf.string.url_array(str)
+      )
+    end
 
   },
   url_or_path = {
@@ -1549,10 +1554,39 @@ dothis = {
 
   },
   array = {
-
+    choose_item = function(array, callback)
+      dothis.choosing_hschooser_specifier.choose_identified_item(
+        transf.array.choosing_hschooser_specifier(array),
+        callback
+      )
+    end,
+    choose_item_and_action = function(array)
+      dothis.array.choose_item(array, dothis.any.choose_action)
+    end,
   },
   action_specifier = {
+    execute = function(spec, target)
+      local args = {}
+      if not isListOrEmptyTable(spec.args) then
+        args = {spec.args}
+      end
+      for k, v in pairs(spec.args) do
+        if args.isprompttbl then
+          args[k] = map(v, {_pm = false}, {tolist = true})[1]
+        else
+          args[k] = v
+        end
+      end
+      
+      local doargs = args
+      if spec.getfn then
+        target = spec.getfn(target, table.unpack(args))
+        doargs = {}
+      end
 
+      spec.dothis = spec.dothis or dothis.any.choose_action
+      spec.dothis(target, table.unpack(doargs))
+  end
   },
   action_specifier_array = {
 
@@ -1562,5 +1596,58 @@ dothis = {
   },
   thing_name = {
     
+  },
+  hschooser_specifier = {
+    choose = function(spec, callback)
+      local hschooser = get.hschooser_specifier.partial_hschooser(spec, callback)
+      hschooser:rows(spec.rows or 30)
+      for k, v in pairs(spec.whole_chooser_style_keys) do
+        hschooser[k](hschooser, v)
+      end
+      local choices = get.chooser_item_specifier_array.styled_chooser_item_specifier_array(
+        spec.chooser_item_specifier_array,
+        spec.chooser_item_specifier_text_key_styledtext_attributes_specifier_dict
+      )
+      hschooser:placeholderText(spec.placeholder_text)
+      hschooser:choices(choices)
+      hschooser:show()
+      if spec.inital_selected then
+        hschooser:selectedRow(spec.inital_selected)
+      end
+    end,
+    choose_get_key = function(spec, key_name, callback)
+      dothis.hschooser_specifier.choose(spec, function(result)
+        callback(result[key_name])
+      end)
+    end,
+    choose_identified_item = function(spec, key_name, tbl, callback)
+      dothis.hschooser_specifier.choose_get_key(spec, key_name, function(key)
+        callback(tbl[key])
+      end)
+    end,
+  },
+  choosing_hschooser_specifier = {
+    choose_identified_item = function(spec, callback)
+      dothis.hschooser_specifier.choose_identified_item(
+        spec.hschooser_specifier,
+        spec.key_name,
+        spec.tbl,
+        callback
+      )
+    end,
+  },
+  any = {
+    choose_action_specifier = function(any, callback)
+      dothis.choosing_hschooser_specifier.choose_identified_item(
+        transf.any.choosing_hschooser_specifier(any),
+        callback
+      )
+    end,
+    choose_action = function(any)
+      dothis.any.choose_action_specifier(
+        any, 
+        bind(dothis.action_specifier.execute, {a_use, any})
+      )
+    end,
   }
 }

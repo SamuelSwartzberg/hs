@@ -2,9 +2,6 @@ StringItemSpecifier = {
   type = "string",
   properties = {
     getables = {
-      ["is-url"] = bc(isUrl),
-      ["is-path"] = bc(is.string.looks_like_path),
-      ["is-printable-ascii-string-item"] = bc(is.string.printable_ascii),
       ["to-string"] = bc(transf.string.folded),
     },
   },
@@ -182,12 +179,11 @@ StringItemSpecifier = {
     },{
       text = "👉📚 csynav.",
       getfn = transf.word.synonym_string_array,
-      filter = ar
+      dothis = dothis.array.choose_item_and_action
     },{
       text = "👉📚 csynth.",
       getfn = transf.word.term_syn_specifier_dict,
-      filter = transf.term_syn_specifier_dict.term_syn_specifier_item_dict_item,
-      act = "cia"
+      dothis = dothis.array.choose_item_and_action
     },{
       d = "fld",
       i = "🗺",
@@ -213,8 +209,7 @@ StringItemSpecifier = {
     },
     {
       text = "🌄📚 crsess.",
-      dothis = dothis.url_array.create_as_session_in_msessions,
-      filter = transf.string.url_array
+      dothis = dothis.string.create_as_session_in_msessions,
     },
   },
   hs.fnutils.imap(

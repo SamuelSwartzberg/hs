@@ -5,7 +5,6 @@ PackageManagerItemSpecifier = {
    {
       text = "📦 lpkg.",
       getfn = get.upkg.list,
-      filter = ar
     }
   }
 }

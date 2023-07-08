@@ -512,6 +512,20 @@ tblmap = {
       multiline_string = "💻🔡📜",
       summary = "📚💬",
     }
+  },
+  thing_name = {
+    action_specifier_array = {
+
+    },
+    chooser_image_partial_retriever_specifier = {
+
+    },
+    chooser_text_partial_retriever_specifier = {
+
+    },
+    chooser_subtext_partial_retriever_specifier = {
+
+    },
   }
 }
 

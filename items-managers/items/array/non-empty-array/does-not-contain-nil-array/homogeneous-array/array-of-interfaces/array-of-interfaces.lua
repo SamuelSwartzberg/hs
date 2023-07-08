@@ -2,7 +2,7 @@ ArrayOfInterfacesSpecifier = {
   type = "array-of-interfaces",
   properties = {
     getables = {
-      ["all-queriable-properties"] = function(self) 
+      ["all-queriable-properties"] = function(self)
         return self:get("first"):get("all-queriable-properties")
       end,
       ["all-queriable-properties-to-string-array"] = function(self)
@@ -14,24 +14,10 @@ ArrayOfInterfacesSpecifier = {
       ["all-possible-values-to-string-array"] = function(self, key)
         return ar(self:get("all-possible-values", key))
       end,
-      ["item-by-id"] = function (self, id)
+      ["item-by-id"] = function(self, id)
         return self:get("find", function(item) return item:get("id") == id end)
       end,
-      ["chooser-list-of-all-queriable-properties"] = function(self)
-        local chooser_list = {}
-        local all_queriable_properties = self:get("all-querable-properties")
-        for action, keys in pairs(all_queriable_properties) do
-          for key, _ in pairs(keys) do
-            chooser_list[#chooser_list + 1] = {
-              text = string.format("%s: %s", action, key),
-              ["action"] = action,
-              key = key
-            }
-          end
-        end
-        return chooser_list
-      end,
-      ["types-of-homogeneous-array-elements"] = function(self) 
+      ["types-of-homogeneous-array-elements"] = function(self)
         return self:get("first"):get("types-of-all-valid-interfaces")
       end,
       ["map-elems-to-string"] = function(self)
@@ -43,17 +29,11 @@ ArrayOfInterfacesSpecifier = {
         end)
       end,
       ["sorted-to-new-array-default"] = function(self) return self:get("sorted-to-string-to-new-array") end,
-      ["is-array-of-arrays"] = bind(isArrayOfInterfacesOfType, {a_use, "array" }),
+      ["is-array-of-arrays"] = bind(isArrayOfInterfacesOfType, { a_use, "array" }),
       ["is-array-of-non-array-interfaces"] = function(self)
         return not self:get("is-array-of-arrays")
       end,
       ["is-managed-array"] = function(self) return not not self.properties.doThisables.create end,
-      ["chooser-list-of-interfaces"] = function(self)
-        return self:get("map", function(item) 
-          return item:get("chooser-list-entry") 
-        end) 
-      end,
-      ["chooser-list-of-all"] = function(self) return self:get("chooser-list-of-interfaces") end,
       ["filter-to-array-of-type"] = function(self, type)
         return self:get("filter-to-new-array", function(item)
           return item:get("is-" .. type)
@@ -80,7 +60,7 @@ ArrayOfInterfacesSpecifier = {
         end
         return target
       end,
-      ["median-contents"] = function (self)
+      ["median-contents"] = function(self)
         return get.array.median(self:get("map", function(item) return item:get("c") end))
       end,
       ["find-contents"] = function(self, contents)
@@ -118,28 +98,6 @@ ArrayOfInterfacesSpecifier = {
           item:doThis(do_specifier.key, do_specifier.args)
         end
       end,
-      ["choose-interface-item"] = function(self, callback_after)
-        buildChooser(
-          self:get("chooser-list-of-interfaces"),
-          function(chosen_item)
-            local item = self:get("item-by-id", chosen_item.id)
-            callback_after(item)
-          end,
-          nil,
-          { whole_chooser = { placeholderText = self:get("to-string") } }
-        )
-      end,
-      ["choose-item"] = function(self, callback_after)
-        buildChooser(
-          self:get("chooser-list-of-all"),
-          function(chosen_item)
-            local item = self:get("item-by-id", chosen_item.id)
-            callback_after(item)
-          end,
-          nil,
-          { whole_chooser = { placeholderText = self:get("to-string") } }
-        )
-      end,
       ["choose-item-and-do"] = function(self, key)
         self:doThis("choose-item", function(item)
           item:doThis(key)
@@ -151,9 +109,9 @@ ArrayOfInterfacesSpecifier = {
     },
   },
   potential_interfaces = ovtable.init({
-    { key = "array-of-arrays", value = CreateArrayOfArrays },
+    { key = "array-of-arrays",               value = CreateArrayOfArrays },
     { key = "array-of-non-array-interfaces", value = CreateArrayOfNonArrayInterfaces },
-    { key = "managed-array", value = CreateManagedArray },
+    { key = "managed-array",                 value = CreateManagedArray },
   }),
   action_table = {
     {
@@ -166,9 +124,9 @@ ArrayOfInterfacesSpecifier = {
       key = "choose-action-on-result-of-get",
       args = { key = "last" },
     }
-  
+
   }
-  
+
 }
 --- @type BoundNewDynamicContentsComponentInterface
 CreateArrayOfInterfaces = bindArg(NewDynamicContentsComponentInterface, ArrayOfInterfacesSpecifier)

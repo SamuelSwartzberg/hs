@@ -16,7 +16,7 @@ SynSpecifierSpecifier = {
       i = "📚☯️",
       d = "ant",
       getnf = transf.syn_specifier.antonyms_array,
-      act = "ci"
+      act = dothis.array.choose_item
     },{
       i = "📚🟰",
       d = "syn",

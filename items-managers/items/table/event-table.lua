@@ -10,11 +10,9 @@ EventTableSpecifier = {
     { 
       text = "👉🎬📅 cst.",
       getfn = transf.event_table.start_date,
-      filter = dat
     },{
       text = "👉🏁📅 ced.",
       getfn = transf.event_table.end_date,
-      filter = dat
     },{
       text = "🗑 rmev.",
       dothis = dothis.event_table.delete

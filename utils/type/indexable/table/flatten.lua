@@ -13,7 +13,7 @@
 --- @field treat_as_leaf? "assoc" | "list" | boolean Defines what type of value should be treated as a leaf node during the flatten operation, besides all primitive values. Default is "assoc".
 --- @field add_nonleaf? boolean If true, the function will add non-leaf nodes to the output table. Default is false.
 --- @field mode? "list" | "path-assoc" | "assoc" Defines how the output should be structured. "list" for a flat list, "path-assoc" for an associative array with paths as keys, "assoc" for a generic associative array. Default is "list".
---- @field val? boolean | "plain" | "path" | "depth" | "key" | "keystop" | "valuestop" | flattenItemsArr | flattenItems Defines what values to include in the flattened result. Default is "plain", which means the value of the original table will be included in the flattened result.
+--- @field val? boolean | "plain-value" | "plain-key" | "path" | "depth" | "key" | "keystop" | "valuestop" | flattenItemsArr | flattenItems Defines what values to include in the flattened result. Default is "plain-value", which means the value of the original table will be included in the flattened result.
 --- @field join_path? string The string used to join path segments when constructing the string path. Relevant only if the mode is "path-assoc" or if the val includes "path". Default is nil.
 --- @field recurse? boolean | integer Defines how deep the recursion should go when flattening. False means no recursion, true means infinite recursion, and an integer means recursion up to that depth. Default is true.
 --- @field path? any[]
@@ -36,7 +36,7 @@ function flatten(tbl, opts, visited)
   opts.treat_as_leaf = defaultIfNil(opts.treat_as_leaf, "assoc")
   opts.add_nonleaf = defaultIfNil(opts.add_nonleaf, false)
   opts.mode = defaultIfNil(opts.mode, "list")
-  opts.val = defaultIfNil(opts.val, "plain")
+  opts.val = defaultIfNil(opts.val, "plain-value")
   opts.recurse = defaultIfNil(opts.recurse, true)
   opts.path = defaultIfNil(opts.path, {})
   if opts.depth == nil then opts.depth = 0 
@@ -58,7 +58,7 @@ function flatten(tbl, opts, visited)
     end
     opts.val = newval
   elseif type(opts.val) == "string" then
-    if opts.val == "plain" then
+    if opts.val == "plain-value" then
       -- no-op
     else
       local key = opts.val
@@ -71,7 +71,7 @@ function flatten(tbl, opts, visited)
   local path_in_res, res_should_be_plain
   if opts.join_path or opts.mode == "path-assoc" then
     path_in_res = opts.val.path -- whether the path is supposed to be in the result,
-    if opts.val == "plain" then 
+    if opts.val == "plain-value" then 
       res_should_be_plain = true
       opts.val = {} 
     end
@@ -97,8 +97,10 @@ function flatten(tbl, opts, visited)
   end
 
   local function valAddfunc(tbl, v, k)
-    if opts.val == "plain" then
+    if opts.val == "plain-value" then
       addfunc(tbl, v, k)
+    elseif opts.val == "plain-key" then
+      addfunc(tbl, k, k)
     else
       local newitem = {}
       if opts.val.value then newitem.value = v end
