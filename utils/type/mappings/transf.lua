@@ -3296,6 +3296,9 @@ transf = {
       end)
       return items
     end,
+    long_flag = function(word)
+      return "--" .. word
+    end,
   },
   syn_specifier = {
     synoynms_array = function (syn_specifier)
@@ -3515,6 +3518,18 @@ transf = {
           end
         ),
         ""
+      )
+    end,
+    single_quoted_escaped_string_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.string.single_quoted_escaped
+      )
+    end,
+    single_quoted_escaped_string = function(arr)
+      return table.concat(
+        transf.string_array.single_quoted_escaped_string_array(arr),
+        " "
       )
     end,
     action_path_string = function(arr)
@@ -3826,6 +3841,15 @@ transf = {
     key_chooser_item_list = function(t)
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.key_chooser_item)
     end,
+    truthy_value_dict = function(t)
+      return filter(
+        t,
+        transf.any.boolean
+      )
+    end,
+    truthy_value_key_array = function(t)
+      return keys(transf.dict.truthy_value_dict(t))
+    end,
   },
   string_value_dict = {
 
@@ -3849,6 +3873,17 @@ transf = {
   },
   string_key_value_dict = {
 
+  },
+  string_boolean_dict = {
+    truthy_long_flag_array = function(dict)
+      return hs.fnutils.imap(
+        transf.dict.truthy_value_key_array(dict),
+        transf.word.long_flag
+      )
+    end,
+    truthy_long_flag_string = function(dict)
+      return table.concat(transf.dict.truthy_long_flag_array(dict), " ")
+    end,
   },
   pair_array = {
     dict = function(arr)
@@ -5412,7 +5447,10 @@ transf = {
       return transf.assoc_arr_array.assoc_arr_with_index_as_key_array(transf.any.applicable_action_chooser_item_specifier_array(any))
     end,
     placeholder_text = function(any)
-      return "Choose action on: " .. get.thing_name_array.chooser_text(transf.any.applicable_thing_name_array(any), any)
+      return "Choose action on: " .. (
+        get.thing_name_array.placeholder_text(transf.any.applicable_thing_name_array(any), any) or
+        get.thing_name_array.chooser_text(transf.any.applicable_thing_name_array(any), any)
+      )
     end,
     hschooser_specifier = function(any)
       return {
@@ -5755,6 +5793,17 @@ transf = {
         end
       )
     end,
+    placeholder_text_retriever_specifier_array = function(thing_name_array)
+      return map(
+        thing_name_array,
+        function(thing_name)
+          local spec = copy(tblmap.thing_name.placeholder_text_partial_retriever_specifier)
+          spec.thing_name = thing_name
+          spec.precedence = spec.precedence or 1
+          return spec
+        end
+      )
+    end,
     chooser_subtext_retriever_specifier_array = function(thing_name_array)
       return map(
         thing_name_array,
@@ -5782,5 +5831,99 @@ transf = {
         retriever_specifier_array,
         bind(get.table_and_table.larger_table_by_key) {a_use, a_use, "precedence"})
     end
+  },
+  ipc_socket_id = {
+    ipc_socket_path = function(ipc_socket_id)
+      return "/tmp/sockets/" .. ipc_socket_id
+    end,
+  },
+  mpv_ipc_socket_id = {
+    alive = function(mpv_ipc_socket_id)
+      return get.ipc_socket_id.response_table_or_nil(mpv_ipc_socket_id, {
+        command = {"get_property", "pid"}
+      }) ~= nil
+    end,
+    current_url = function (mpv_ipc_socket_id)
+      return get.mpv_ipc_socket_id.get_string(mpv_ipc_socket_id, "stream-open-filename")
+    end,
+    title = function(mpv_ipc_socket_id)
+      return get.mpv_ipc_socket_id.get_string(mpv_ipc_socket_id, "media-title")
+    end,
+    play_time_seconds_int = function(mpv_ipc_socket_id)
+      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "time-pos")
+    end,
+    duration_seconds_int = function(mpv_ipc_socket_id)
+      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "duration")
+    end,
+    playback_progress_percent_int = function(mpv_ipc_socket_id)
+      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "percent-pos")
+    end,
+    playback_progress_string = function(mpv_ipc_socket_id)
+      return string.format(
+        "(%i/%is - %s%%)",
+        get.mpv_ipc_socket_id.play_time_seconds_int(mpv_ipc_socket_id) or -1,
+        get.mpv_ipc_socket_id.duration_seconds_int(mpv_ipc_socket_id) or -1,
+        get.mpv_ipc_socket_id.playback_progress_percent_int(mpv_ipc_socket_id) or -1
+      )
+    end,
+    playlist_position_int = function(mpv_ipc_socket_id)
+      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "playlist-pos")
+    end,
+    playlist_length_int = function(mpv_ipc_socket_id)
+      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "playlist-count")
+    end,
+    playlist_progress_string = function(mpv_ipc_socket_id)
+      return string.format(
+        "[%i/%i]",
+        get.mpv_ipc_socket_id.playlist_position_int(mpv_ipc_socket_id) or -1,
+        get.mpv_ipc_socket_id.playlist_length_int(mpv_ipc_socket_id) or -1
+      )
+    end,
+    summary_line_basics = function(mpv_ipc_socket_id)
+      return string.format(
+        "%s %s %s",
+        transf.mpv_ipc_socket_id.playback_progress_string(mpv_ipc_socket_id),
+        transf.mpv_ipc_socket_id.playlist_progress_string(mpv_ipc_socket_id),
+        get.mpv_ipc_socket_id.title(mpv_ipc_socket_id) or "<no title>"
+      )
+    end,
+    summary_line_emoji = function(mpv_ipc_socket_id)
+      return table.concat(
+        hs.fnutils.imap(
+          {"pause", "loop", "shuffle", "video"},
+          hs.fnutils.partial(get.mpv_ipc_socket_id.get_boolean_emoji, mpv_ipc_socket_id)
+        ),
+        ""
+      )
+    end,
+    summary_line = function(mpv_ipc_socket_id)
+      return string.format(
+        "%s %s",
+        transf.mpv_ipc_socket_id.summary_line_emoji(mpv_ipc_socket_id),
+        transf.mpv_ipc_socket_id.summary_line_basics(mpv_ipc_socket_id)
+      )
+    end,
+        
+  },
+  stream_creation_specifier = {
+    flags_with_default = function(stream_creation_specifier)
+      return concat(
+        {
+          ["loop-playlist"] = false,
+          shuffle = false,
+          pause = false,
+          ["no-video"] = false,
+        },
+        stream_creation_specifier.flags 
+      )
+    end,
+    flags_string = function(stream_creation_specifier)
+      return transf.string_boolean_dict.truthy_long_flag_string(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
+    end,
+  },
+  stream_specifier = {
+    stream_state = function(stream_specifier)
+      return stream_specifier.state
+    end,
   }
 }

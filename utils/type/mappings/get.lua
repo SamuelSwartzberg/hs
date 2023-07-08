@@ -1610,6 +1610,12 @@ get = {
         value
       )
     end,
+    placeholder_text = function(arr, value)
+      return get.retriever_specifier_array.result_highest_precedence(
+        transf.thing_name_array.placeholder_text_retriever_specifier_array(arr),
+        value
+      )
+    end,
     chooser_image = function(arr, value)
       return get.retriever_specifier_array.result_highest_precedence(
         transf.thing_name_array.chooser_image_retriever_specifier_array(arr),
@@ -1663,5 +1669,40 @@ get = {
         )
       end
     end
+  },
+  ipc_socket_id = {
+    response_table_or_nil = function(ipc_socket_id, request_table)
+        
+      local succ, res = pcall(runJSON, {
+        args = 
+          "echo '" .. json.encode(request_table) .. "' | /opt/homebrew/bin/socat UNIX-CONNECT:" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " STDIO"
+        ,
+        key_that_contains_payload = "data"
+      })
+
+      if succ then
+        return res
+      else
+        return nil
+      end
+
+    end
+  },
+  mpv_ipc_socket_id = {
+    get_string = function(id, key)
+      return get.ipc_socket_id.response_table_or_nil(id, {
+        command = { "get_property", key }
+      } )
+    end,
+    get_int = function(id, key)
+      return get.string_or_number.int(
+        get.mpv_ipc_socket_id.get_string(id, key)
+      )
+    end,
+    get_boolean_emoji = function(id, key)
+      local res = get.mpv_ipc_socket_id.get_string(id, key)
+      if res then return tblmap.stream_attribute.true_emoji[key]
+      else return tblmap.stream_attribute.false_emoji[key] end
+    end,
   },
 }

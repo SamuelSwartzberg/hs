@@ -26,27 +26,6 @@ PathInMaudiovisualItemSpecifier = {
           :get("media-urls-string-item-array")
           :doThis("to-stream", specifier)
       end,
-      ["do-unavailable-urls"] = function(self, do_after)
-        local urls = self:get("media-urls-array"):get("c")
-        runThreaded(map(urls, function(url)
-          return url, {"youtube-dl", "--get-title", "--flat-playlist", { value = url, type = "quoted" }}
-        end, {"k", "kv"}), 10, nil, function (command_results)
-          for url, result in fastpairs(command_results) do
-            local err_lines = stringy.split(result.std_err, "\n")
-            local is_unavailable = find(err_lines, function(line)
-              return stringy.startswith(line, "ERROR: Private video")
-            end)
-            if is_unavailable then
-              do_after(url)
-            end
-          end
-        end)
-      end,
-      ["qf-unavailable-urls"] = function (self)
-        self:doThis("do-unavailable-urls", function(url)
-          writeFile(env.MQFMUSIC, url .. " (unavailable)\n", "exists", false, "a")
-        end)
-      end
     }
   },
   

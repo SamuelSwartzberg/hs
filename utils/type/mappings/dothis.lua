@@ -1649,5 +1649,28 @@ dothis = {
         bind(dothis.action_specifier.execute, {a_use, any})
       )
     end,
-  }
+  },
+  mpv_ipc_socket_id = {
+    set = function(id, key, ...)
+      get.ipc_socket_id.response_table_or_nil(id, { command = { "set_property", key, ... } })
+    end,
+    cycle = function(id, key)
+      get.ipc_socket_id.response_table_or_nil(id, { command = { "cycle", key } })
+    end,
+    exec = function(id, ...)
+      get.ipc_socket_id.response_table_or_nil(id, { command = { ... } })
+    end,
+  },
+  stream_creation_specifier = {
+    create = function(spec)
+      local ipc_socket_id = os.time() .. "-" .. math.random(1000000)
+      run("mpv " .. transf.stream_creation_specifier.flags_string(spec.flags) .. 
+        " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.string_array.single_quoted_escaped_string(spec.urls))
+      return {
+        ipc_socket_id = ipc_socket_id,
+        stream_creation_specifier = spec,
+        state = "booting"
+      }
+    end,
+  },
 }

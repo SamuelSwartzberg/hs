@@ -341,6 +341,9 @@ is = {
     is_not_interface = function(val)
       return not is.any.is_interface(val)
     end,
+    stream_specifier = function(val)
+      return is.any.table(val) and is.table.stream_specifier(val)
+    end,
   },
   pass_name = {
     password = function(name)
@@ -400,8 +403,9 @@ is = {
     end,
   },
   table = {
-    interface = function(table)
-      return table.is_interface == true
+    stream_specifier = function(table)
+      return
+        table.ipc_socket_id and table.stream_creation_specifier
     end,
   },
   array = {

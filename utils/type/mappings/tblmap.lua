@@ -513,6 +513,16 @@ tblmap = {
       summary = "📚💬",
     }
   },
+  stream_attribute = {
+    true_emoji = {
+      loop = "🔂",
+      shuffle = "🔀",
+    },
+    false_emoji =  {
+      video = "🙈",
+      pause = "▶️",
+    }
+  },
   thing_name = {
     action_specifier_array = {
 
@@ -521,11 +531,34 @@ tblmap = {
 
     },
     chooser_text_partial_retriever_specifier = {
-
+      stream_specifier = {
+        thing_name = "summary_line"
+      }
     },
     chooser_subtext_partial_retriever_specifier = {
 
     },
+    placeholder_text_partial_retriever_specifier = {
+      
+    },
+  },
+  state_type = {
+    state_transition_table = {
+      stream_state = {
+        booting = {
+          [true] = 'active',
+          [false] = 'booting'
+        },
+        active = {
+          [true] = 'active',
+          [false] = 'ended'
+        },
+        ended = {
+          [true] = 'ended',
+          [false] = 'ended'
+        }
+      }
+    }
   }
 }
 

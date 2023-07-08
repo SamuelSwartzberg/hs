@@ -1,83 +1,12 @@
 --- @type BoundRootInitializeInterface
 function CreateStreamItem(specified_contents)
   local interface_specifier = {
-    potential_interfaces = ovtable.init({
-      {key = "control", value = CreateStreamControlItem},
-    }),
-    type = "stream",
     
     properties = {
       getables = {
-        ["is-control"] = transf["nil"]["true"],
-        --- @return "booting" | "active" | "ended"
         ["state"] = function(self) 
           return self:get("c").state
         end,
-        ["initial-flag"] = function(self, flag)
-          return self:get("c").initial_flags[flag]
-        end,
-        ["initial-data"] = function(self, key)
-          return self:get("c").initial_data[key]
-        end,
-        ["initial-stream-config"] = function(self, key)
-          return self:get("c").initial_stream_config[key]
-        end,
-        ["initial-urls-to-string-item-array"] = function(self)
-          return ar(self:get("initial-data", "urls"))
-        end,
-        ["summary-line-plain"] = function(self)
-          return string.format(
-            "%s %s %s",
-            self:get("playback-progress") or "No progress",
-            self:get("playlist-progress") or "No playlist progress",
-            self:get("key", "media-title") or "No title"
-          )
-        end,
-        ["to-string"] = function(self)
-          return self:get("summary-line-plain")
-        end,
-        ["summary-line"] = function(self)
-          if  self:get("state") == "booting" then
-            return "Booting..."
-          else
-            local line = ""
-            line = line .. self:get("emoji-for-control-boolean-getable", "pause")
-            line = line .. self:get("emoji-for-control-boolean-getable", "loop")
-            line = line .. self:get("emoji-for-control-boolean-getable", "shuffle") 
-            line = line .. self:get("emoji-for-control-boolean-getable", "video") .. ""
-    
-            line = line .. self:get("summary-line-plain")
-            return line
-          end
-        end,
-        ["to-initial-args"] = function(self)
-          local args = {}
-          for key, value in fastpairs(self:get("c").initial_flags) do
-            if value then
-              table.insert(args, "--" .. key)
-            end
-          end
-          args[#args + 1] = "--msg-level=all=warn"
-          args[#args + 1] = "--input-ipc-server=" .. self:get("initial-stream-config", "socket")
-          args[#args + 1] = "--start=" .. self:get("initial-stream-config", "start")
-          -- args[#args + 1] = "--keep-open"
-          return args
-        end,
-        ["urls-as-command-parts"] = function(self)
-          return self:get("initial-data", "urls"):get("map",
-            function(url_item)
-              return { value = url_item:get("c"), type = "quoted" }
-            end
-          )
-        end,
-        ["command-parts"] = function(self)
-          return concat(
-            "mpv",
-            self:get("to-initial-args"),
-            self:get("urls-as-command-parts")
-          )
-        end,
-        ["chooser-text"] = function(self) return self:get("summary-line") end,
         ["chooser-subtext-part"] = function(self) 
           local path = self:get("initial-data", "path")
           if path then 
@@ -202,12 +131,7 @@ function CreateStreamItem(specified_contents)
 
   local contents = concat(
     {
-      initial_flags = {
-        ["loop-playlist"] = false,
-        shuffle = false,
-        pause = false,
-        ["no-video"] = false,
-      },
+      initial_flags = ,
       initial_stream_config = {
         start = 0,
       },
@@ -216,9 +140,64 @@ function CreateStreamItem(specified_contents)
     specified_contents
   )
 
-  local interface = RootInitializeInterface(interface_specifier, contents)
-
   interface:get("c").initial_stream_config.socket = interface:get("socket")
   interface:get("c")["task"] = run(interface:get("command-parts"), true)
   return interface
 end
+
+StreamControlItemSpecifier = {
+  type = "stream-control",
+  properties = {
+    getables = {
+      ["emoji-for-control-boolean-getable"] = function(self, key)
+        local true_getable_map = {
+          loop = "🔂",
+          shuffle = "🔀",
+        }
+        local false_getable_map =
+        local res
+        if self:get("key", key) then 
+          res = true_getable_map[key]
+        else
+          res = false_getable_map[key]
+        end
+        return res or ""
+      end,
+    },
+
+    doThisables = {
+      ["restart-complete"] = function(self)
+        self:doThis("playlist-first")
+        self:doThis("restart-current")
+      end,
+      ["set-time-relative"] = function(self, value)
+        self:doThis("set", {key =  "time-pos", args = self:get("as-int", "time-pos") + value})
+      end,
+      ["set-percent-relative"] = function(self, value)
+        self:doThis("set", {key =  "percent-pos", args = self:get("as-int", "percent-pos") + value})
+      end,
+      ["playlist-first"] = function(self) self:doThis("set", {key =  "playlist-pos", args = 0}) end,
+      ["playlist-last"] = function(self) self:doThis("set", {key =  "playlist-pos", args = self:get("key", "playlist-count")}) end,
+      ["restart-current"] = function(self) self:doThis("set", {key =  "time-pos", args = 0}) end,
+      ["cycle-inf-no"] = function(self, prop)
+        self:doThis("set", {key =  prop, args = InfNo:inv(self:get("key", prop))})
+      end,
+      ["loop-playlist"] = function (self)
+        self:doThis("cycle-inf-no", "loop-playlist")
+      end,
+      ["loop"] = function (self)
+        self:doThis("cycle-inf-no", "loop-file")
+      end,
+      ["copy-current-url"] = function(self) hs.pasteboard.setContents("https://youtube.com/" .. self:get("key", "filename")) end,
+      ["open-current-url-in-browser"] = function(self) hs.urlevent.openURL("https://youtube.com/" .. self:get("key", "filename")) end,
+      ["chapter-next"] = function(self) self:doThis("set", {key =  "chapter", args = self:get("as-int", "chapter") + 1}) end,
+      ["chapter-prev"] = function(self) self:doThis("set", {key =  "chapter", args = self:get("as-int", "chapter") - 1}) end
+    }
+  },
+  potential_interfaces = ovtable.init({
+    { key = "mpv-inner", value = GetMPVInterfaceInner}
+  }),
+}
+
+--- @type BoundNewDynamicContentsComponentInterface
+CreateStreamControlItem = bindArg(NewDynamicContentsComponentInterface, StreamControlItemSpecifier)
