@@ -4,10 +4,10 @@
 --- @return integer
 function getIndex(thing, k, manual_counter)
   if type(thing) == "table" then
-    if thing.keyindex then
+    if thing.keyindex then -- ovtable
       return thing:keyindex(k) --[[ @as integer ]]
     else
-      if not isListOrEmptyTable(thing) and manual_counter then
+      if not is.table.array(thing) and manual_counter then
         return manual_counter
       else
         return k --[[ @as integer ]]

@@ -51,7 +51,7 @@ function flatten(tbl, opts, visited)
       depth = opts.val,
       value = opts.val
     }
-  elseif isListOrEmptyTable(opts.val) then
+  elseif is.any.array(opts.val) then
     local newval = {}
     for _, v in ipairs(opts.val) do
       newval[v] = true

@@ -17,7 +17,7 @@ function benchmarkFunctions(specifier, args, iters)
     local start = os.clock()
     if type(func_specifier) == "function" then
       func_specifier = { func = func_specifier }
-    elseif isList(func_specifier) then
+    elseif is.any.array(func_specifier) then
       func_specifier = {
         func = func_specifier[1],
         name = func_specifier[2],

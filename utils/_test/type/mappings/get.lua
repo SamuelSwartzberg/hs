@@ -196,7 +196,7 @@ assert(
 
 local khal_calendars = get.khal.all_calendars()
 
-assert( isList(khal_calendars))
+assert( is.any.non_empty_table_array(khal_calendars))
 
 assert(
   not find(
@@ -207,7 +207,7 @@ assert(
 
 local writeable_calendars = get.khal.writeable_calendars()
 
-assert( isList(writeable_calendars))
+assert( is.any.non_empty_table_array(writeable_calendars))
 
 assert(
   not find(

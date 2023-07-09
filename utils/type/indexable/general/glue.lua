@@ -16,8 +16,8 @@ function recursiveMerge(base, addition, opts)
   for k, v in fastpairs(addition) do
     if 
       not no_recurse and
-      type(v) == "table" and not isList(v) and
-      type(base[k]) == "table" and not isList(base[k])
+      type(v) == "table" and not is.table.array(v) and
+      type(base[k]) == "table" and not is.table.array(base[k])
     then --recurse
       base[k] = recursiveMerge(base[k], v, opts)
     else -- we can't recurse, just simply add as a k-v pair
@@ -47,9 +47,9 @@ function glue(base, addition, opts)
     return addition
   elseif type(addition) == "table" then
       
-    if isEmptyTable(addition) then
+    if is.any.empty_table(addition) then
       return base -- appending an empty table to anything is a no-op
-    elseif isUndeterminableTable(base) then
+    elseif is.table.empty_unspecified_table(base) then
       return addition
     else
       if isList(addition) then

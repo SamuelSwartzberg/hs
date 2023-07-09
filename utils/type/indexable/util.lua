@@ -21,7 +21,7 @@ function defaultOpts(opts, retdefault)
     else
       opts = {args = opts, ret = opts}
     end
-  elseif isListOrEmptyTable(opts) then
+  elseif is.any.array(opts) then
     opts = {args = opts[1] or {"v"}, ret = opts[2] or retdefault or {"v"}}
   else
     opts = copy(opts) or {}
@@ -75,7 +75,7 @@ end
 function getEmptyResult(thing, opts)
   opts = opts or {}
   if opts.tolist  then -- manual case 1
-    return list({})
+    return array({})
   elseif opts.output == "table" then -- manual case 2
     return assoc({})
   elseif opts.output == "ovtable" then -- manual case 2
@@ -85,14 +85,14 @@ function getEmptyResult(thing, opts)
   elseif type(thing) == "table" then -- inferred case 3
     if thing.isovtable then -- explicit case 1 of inferred case 3
       return ovtable.new()
-    elseif thing.islist then -- explicit case 2 of inferred case 3
-      return list({})
+    elseif thing.isarr then -- explicit case 2 of inferred case 3
+      return array({})
     elseif thing.isassoc then -- explicit case 3 of inferred case 3
       return assoc({})
-    elseif isEmptyTable(thing) then -- if it's empty, and we haven't explicitly specified a type, we can't assume anything, so we'll just return an empty table
+    elseif is.table.empty_table(thing) then -- if it's empty, and we haven't explicitly specified a type, we can't assume anything, so we'll just return an empty table
       return {}
-    elseif isList(thing) then
-      return list({})
+    elseif is.table.non_empty_table_arraylike_by_keys(thing) then
+      return array({})
     else
       return assoc({})
     end

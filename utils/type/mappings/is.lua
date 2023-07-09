@@ -69,7 +69,7 @@ is = {
     indicated_digit_string = function(str)
       return 
         stringy.startswith(str, "0") and
-        listContains(keys(tblmap.base_letter.base), str:sub(2, 2)) and
+        get.array.contains(keys(tblmap.base_letter.base), str:sub(2, 2)) and
         is.ascii.digit_string(str:sub(3))
     end,
     potentially_indicated_digit_string = function(str)
@@ -129,7 +129,7 @@ is = {
   },
   youtube_video_id = {
     extant = function(id)
-      return listContains(mt._list.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
+      return get.array.contains(mt._list.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
     end,
     private = function(id)
       return transf.youtube_video_id.privacy_status(id) == "private"
@@ -333,6 +333,15 @@ is = {
     table = function(val)
       return type(val) == "table"
     end,
+    arraylike = function(val)
+      return is.any.table(val) and is.table.arraylike(val)
+    end,
+    array = function(val)
+      return is.any.table(val) and is.table.arraylike(val) and is.arraylike.array(val)
+    end,
+    non_empty_table_array = function(val)
+      return is.any.table(val) and is.table.non_empty_table(val) and is.table.arraylike(val) and is.arraylike.array(val)
+    end,
     is_interface = function(val)
       return 
         is.any.table(val) and
@@ -343,6 +352,9 @@ is = {
     end,
     stream_specifier = function(val)
       return is.any.table(val) and is.table.stream_specifier(val)
+    end,
+    empty_table = function(val)
+      return is.any.table(val) and is.table.empty_Table(val)
     end,
   },
   pass_name = {
@@ -403,12 +415,73 @@ is = {
     end,
   },
   table = {
-    stream_specifier = function(table)
+    stream_specifier = function(t)
       return
-        table.ipc_socket_id and table.stream_creation_specifier
+        t.ipc_socket_id and t.stream_creation_specifier
+    end,
+    empty_table = function(t)
+      for k, v in pairs(t) do
+        return false
+      end
+      return true
+    end,
+    non_empty_table = function(t)
+      return not is.table.empty_table(t)
+    end,
+    arraylike_by_keys = function(t)
+      for k, v in pairs(t) do
+        if type(k) ~= "number" then return false end
+      end
+      return true
+    end,
+    non_empty_table_arraylike_by_keys = function(t)
+      return is.table.non_empty_table(t) and is.table.arraylike_by_keys(t)
+    end,
+    arraylike = function(t)
+      if t.isarr then return true end -- signal value to indicate that this is a list
+      if t.isassoc then return false end -- signal value to indicate that this is an assoc table
+      if t.isovtable then return false end
+      return is.table.arraylike_by_keys(t)
+    end,
+    non_arraylike = function(t)
+      return not is.table.arraylike(t)
+    end,
+    array = function (t)
+      return is.table.arraylike(t) and is.arraylike.array(t)
+    end,
+    hole_y_arraylike = function (t)
+      return is.table.arraylike(t) and is.arraylike.hole_y_arraylike(t)
+    end,
+    empty_unspecified_table = function(t)
+      if t.isovtable then return false end
+      if t.isarr then return false end
+      if t.isassoc then return false end
+      return is.any.empty_table(t)
+    end
+  },
+  arraylike = {
+    --- an empty arraylike is never a hole_y_arraylike and always an array
+    hole_y_arraylike = function(arraylike)
+      if #arraylike == 0 then return false end
+      for i = 1, #arraylike do
+        if arraylike[i] == nil then return true end
+      end
+      return false
+    end,
+    array = function(arraylike)
+      return not is.arraylike.hole_y_arraylike(arraylike)
     end,
   },
+  hole_y_arraylike = {
+
+  },
   array = {
+    empty_table_array = function(array)
+      return #array == 0
+    end,
+    non_empty_table_array = function(array)
+      return #array > 0
+    end,
     string_array = function(array)
       return get.array.all_pass(
         array,
@@ -424,5 +497,20 @@ is = {
     not_array_of_interfaces = function(array)
       return not is.array.array_of_interfaces(array)
     end,
+    pair = function(array)
+      return #array == 2
+    end,
   },
+  mpv_ipc_socket_id = {
+    alive = function(mpv_ipc_socket_id)
+      return get.ipc_socket_id.response_table_or_nil(mpv_ipc_socket_id, {
+        command = {"get_property", "pid"}
+      }) ~= nil
+    end,
+  },
+  stream_specifier = {
+    alive = function(stream_specifier)
+      return is.mpv_ipc_socket_id.alive(stream_specifier.ipc_socket_id)
+    end,
+  }
 }

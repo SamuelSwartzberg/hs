@@ -118,7 +118,7 @@ function replace(thing, opts, globalopts)
             parts[1] = assoc({})
           end
         else
-          parts[1] = list({})
+          parts[1] = array({})
         end
       end
     end

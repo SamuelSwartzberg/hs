@@ -19,52 +19,52 @@ assertMessage(
 )
 
 assertMessage(
-  isEmptyTable({ a = 1 }),
+  is.any.empty_table({ a = 1 }),
   false
 )
 
 assertMessage(
-  isEmptyTable({ 1, 2, 3 }),
+  is.any.empty_table({ 1, 2, 3 }),
   false
 )
 
 assertMessage(
-  isEmptyTable({}),
+  is.any.empty_table({}),
   true
 )
 
 assertMessage(
-  isEmptyTable(list({})),
+  is.any.empty_table(array({})),
   true
 )
 
 assertMessage(
-  isEmptyTable(assoc({})),
+  is.any.empty_table(assoc({})),
   true
 )
 
 assertMessage(
-  isUndeterminableTable({ a = 1 }),
+  is.table.empty_unspecified_table({ a = 1 }),
   false
 )
 
 assertMessage(
-  isUndeterminableTable({ 1, 2, 3 }),
+  is.table.empty_unspecified_table({ 1, 2, 3 }),
   false
 )
 
 assertMessage(
-  isUndeterminableTable({}),
+  is.table.empty_unspecified_table({}),
   true
 )
 
 assertMessage(
-  isUndeterminableTable(list({})),
+  is.table.empty_unspecified_table(array({})),
   false
 )
 
 assertMessage(
-  isUndeterminableTable(assoc({})),
+  is.table.empty_unspecified_table(assoc({})),
   false
 )
 
@@ -109,71 +109,71 @@ assertMessage(
 )
 
 assertMessage(
-  isListOrEmptyTable(list({})),
+  isListOrEmptyTable(array({})),
   true
 )
 
 assertMessage(
-  isList(list({})),
+  isList(array({})),
   true
 )
 
 assertMessage(
-  isSparseList({ 1, 2, 3 }),
+  is.arraylike.hole_y_arraylike({ 1, 2, 3 }),
   false
 )
 
 assertMessage(
-  isSparseList({ 1, 2, nil, 3 }),
+  is.arraylike.hole_y_arraylike({ 1, 2, nil, 3 }),
   true
 )
 
 assertMessage(
-  isSparseList({ 1, 2, nil, 3, nil }),
+  is.arraylike.hole_y_arraylike({ 1, 2, nil, 3, nil }),
   true
 )
 
 assertMessage(
-  hasKey({ a = 1 }, "a"),
+  get.any.has_key({ a = 1 }, "a"),
   true
 )
 
 assertMessage(
-  hasKey({ a = 1 }, "b"),
+  get.any.has_key({ a = 1 }, "b"),
   false
 )
 
 assertMessage(
-  hasKey("not a table", "a"),
+  get.any.has_key("not a table", "a"),
   false
 )
 
 assertMessage(
-  listContains({ 1, 2, 3 }, 1),
+  get.array.contains({ 1, 2, 3 }, 1),
   true
 )
 
 assertMessage(
-  listContains({ 1, 2, 3 }, 4),
+  get.array.contains({ 1, 2, 3 }, 4),
   false
 )
 
 assertMessage(
-  listContains("not a table", 1),
+  get.array.contains("not a table", 1),
   false
 )
 
 assertMessage(
-  listContains({ 1, 2, 3 }, "1"),
+  get.array.contains({ 1, 2, 3 }, "1"),
   false
 )
 
 assertMessage(
-  listContains({ 1, 2, 3 }, nil),
+  get.array.contains({ 1, 2, 3 }, nil),
   false
 )
 
 assertMessage(
-  listContains({ 1, {}, 3 }, {}),
+  get.array.contains({ 1, {}, 3 }, {}),
   false
 )

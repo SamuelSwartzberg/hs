@@ -17,7 +17,7 @@ function append(base, addition, opts)
   elseif type(base) == "table" then
     local new_thing = copy(base) 
     if addition == nil then return new_thing end
-    if isListOrEmptyTable(base) and not opts.aspair then
+    if is.table.array(base) and not opts.aspair then
       new_thing[#new_thing + 1] = addition
       return new_thing
     else

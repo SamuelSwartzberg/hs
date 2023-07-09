@@ -313,7 +313,10 @@ get = {
       end
       
       return lines
-    end
+    end,
+    has_key = function(table, key)
+      return table[key] ~= nil
+    end,
     
   },
   dict = {
@@ -451,6 +454,12 @@ get = {
         "k"
       )
     end,
+    contains = function(arr, v)
+      for _, v2 in ipairs(arr) do
+        if v2 == v then return true end
+      end
+      return false
+    end
     
   },
   string = {
@@ -972,7 +981,7 @@ get = {
       return eutf8.sub(prefixed_header, #header + 2) -- +2 for the colon and the space
     end,
     addresses = function(path, header, only)
-      if not listContains(mt._list.email_headers_containin_emails, header) then
+      if not get.array.contains(mt._list.email_headers_containin_emails, header) then
         error("Header can't contain email addresses")
       end
       only = defaultIfNil(only, true)
@@ -1525,7 +1534,7 @@ get = {
   },
   any = {
     join_if_array = function(arg, separator)
-      if isListOrEmptyTable(arg) then
+      if is.any.array(arg) then
         return table.concat(arg, separator)
       else
         return arg
@@ -1556,6 +1565,9 @@ get = {
         end
       end
       return res
+    end,
+    has_key = function(any, key)
+      return is.any.table(any) and get.table.has_key(any, key)
     end
   },
   table_and_table = {

@@ -206,8 +206,8 @@ assertMessage(
 -- indices that are out of bounds for tables, strings, and assoc arrs, empty inputs
 
 assertMessage(
-  slice(list({}), 500, 1),
-  list({})
+  slice(array({}), 500, 1),
+  array({})
 )
 
 assertMessage(
@@ -221,13 +221,13 @@ assertMessage(
 )
 
 assertMessage(
-  slice(list({}), 1, 500),
-  list({})
+  slice(array({}), 1, 500),
+  array({})
 )
 
 assertMessage(
-  slice(list({}), 1, 500, 8),
-  list({})
+  slice(array({}), 1, 500, 8),
+  array({})
 )
 
 assertMessage(

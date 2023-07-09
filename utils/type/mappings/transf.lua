@@ -350,7 +350,7 @@ transf = {
   },
   hole_y_arraylike = {
     array = function(tbl)
-      local new_tbl = list({})
+      local new_tbl = array({})
       for i = 1, #tbl do
         if tbl[i] ~= nil then
           new_tbl[#new_tbl + 1] = tbl[i]
@@ -671,7 +671,7 @@ transf = {
       return transf.url.sld(transf.in_git_dir.remote_url(path))
     end,
     remote_type = function(path)
-      if listContains(mt._list.remote_types, transf.in_git_dir.remote_sld(path)) then
+      if get.array.contains(mt._list.remote_types, transf.in_git_dir.remote_sld(path)) then
         return transf.in_git_dir.remote_sld(path)
       else
         return tblmap.host.remote_type[transf.in_git_dir.remote_host(path)] -- we'll hardcode known hosts there
@@ -5838,11 +5838,6 @@ transf = {
     end,
   },
   mpv_ipc_socket_id = {
-    alive = function(mpv_ipc_socket_id)
-      return get.ipc_socket_id.response_table_or_nil(mpv_ipc_socket_id, {
-        command = {"get_property", "pid"}
-      }) ~= nil
-    end,
     current_url = function (mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.get_string(mpv_ipc_socket_id, "stream-open-filename")
     end,
@@ -5924,6 +5919,9 @@ transf = {
   stream_specifier = {
     stream_state = function(stream_specifier)
       return stream_specifier.state
+    end,
+    transitioned_stream_state = function(stream_specifier)
+      return tblmap.state_type.state_transition_table.stream_state[transf.stream_specifier.stream_state(stream_specifier)][is.stream_specifier.alive(stream_specifier)]
     end,
   }
 }

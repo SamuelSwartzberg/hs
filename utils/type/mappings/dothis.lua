@@ -386,8 +386,8 @@ dothis = {
   },
   table = {
     write_ics_file = function(tbl, path)
-      local tmpdir_json_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".json"
-      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
+      local tmpdir_json_path = transf.not_userdata_or_function.in_tmp_dir(arr) .. ".json"
+      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(arr) .. ".ics"
       writeFile(tmpdir_json_path, json.encode(tbl))
       run({
         "ical2json",
@@ -1567,7 +1567,7 @@ dothis = {
   action_specifier = {
     execute = function(spec, target)
       local args = {}
-      if not isListOrEmptyTable(spec.args) then
+      if not is.any.array(spec.args) then
         args = {spec.args}
       end
       for k, v in pairs(spec.args) do
@@ -1673,4 +1673,14 @@ dothis = {
       }
     end,
   },
+  stream_specifier = {
+    set_state_transitioned_state = function(spec)
+      spec.state = transf.stream_specifier.transitioned_stream_state(spec)
+    end,
+  },
+  stream_specifier_array = {
+    set_state_transitioned_state_all = function(array)
+      hs.fnutils.ieach(array, dothis.stream_specifier.set_state_transitioned_state)
+    end,
+  }
 }

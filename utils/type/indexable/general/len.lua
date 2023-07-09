@@ -7,7 +7,7 @@ function len(thing)
   elseif type(thing) == "table" then
     if thing.isovtable then
       return thing:len()
-    elseif isEmptyTable(thing) then
+    elseif is.any.empty_table(thing) then
       return 0
     elseif isList(thing) then
       local largestkey = 0

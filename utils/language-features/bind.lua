@@ -8,10 +8,10 @@ a_use = math.random(999999999)
 function bind(func, arg_spec, ignore_spec)
 
   -- handle shorthand
-  if not isListOrEmptyTable(arg_spec) then
+  if not is.any.array(arg_spec) then
     arg_spec = { arg_spec }
   end
-  if not isListOrEmptyTable(ignore_spec) then
+  if not is.any.array(ignore_spec) then
     ignore_spec = { ignore_spec }
   end
   

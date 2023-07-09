@@ -10,7 +10,7 @@ function createDeterminantMetatableCreator(key)
   end
 end
 
-list = createDeterminantMetatableCreator("list")
+array = createDeterminantMetatableCreator("list")
 assoc = createDeterminantMetatableCreator("assoc")
 
 pt = createDeterminantMetatableCreator("prompttbl")

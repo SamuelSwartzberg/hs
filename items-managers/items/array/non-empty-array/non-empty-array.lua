@@ -4,9 +4,8 @@ NonEmptyArraySpecifier = {
   type = "non-empty-array",
   properties = {
     getables = {
-      ["is-pair"] = function(self) return self:get("length") == 2 end,
-      ["is-contains-nil-array"] = bc(isSparseList),
-      ["is-does-not-contain-nil-array"] = function(self) return not isSparseList(self:get("c")) end,
+      ["is-contains-nil-array"] = bc(is.arraylike.hole_y_arraylike),
+      ["is-does-not-contain-nil-array"] = function(self) return not is.arraylike.hole_y_arraylike(self:get("c")) end,
       ["remove-by-index"] = function(self, index) -- semantically a doThisable, but doThisables are not allowed to return values
         if index and self:get("c")[index] then
           return table.remove(self:get("c"), index)

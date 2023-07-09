@@ -13,7 +13,7 @@ function elemAt(thing, ind, ret, precalc_keys)
       return value
     end
   elseif type(thing) == "table" then
-    if isListOrEmptyTable(thing) then
+    if is.table.array(thing) then
       local value = thing[ind]
       if ret == "kv" then
         return ind, value

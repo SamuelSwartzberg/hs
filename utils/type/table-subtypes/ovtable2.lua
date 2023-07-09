@@ -94,8 +94,8 @@ function pkg.init(all_elems)
 
   for i, spec in ipairs(all_elems) do
     -- Check if the key-value pair is specified as `{key, value}` or `{k = key, v = value}` / `{key = key, value = value}`.
-    if isList(spec) then
-      if #spec == 2 then
+    if is.any.array(spec) then
+      if is.array.pair(spec) then
         t[spec[1]] = spec[2]
       else
         error("invalid key-value pair, doesn't have len 2 " .. hs.inspect(spec))

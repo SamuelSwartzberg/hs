@@ -63,7 +63,7 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
     path = transf.string.path_resolved(path, true)
     if path == "" then path = "/" end
     opts.validator = opts.validator or function(file_name)
-      return not listContains(mt._list.useless_files, file_name)
+      return not get.array.contains(mt._list.useless_files, file_name)
     end
     opts.recursion = defaultIfNil(opts.recursion, false)
     opts.include_dirs = defaultIfNil(opts.include_dirs, true)
@@ -76,7 +76,7 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
   if opts.follow_links then
     seen_paths = seen_paths or {}
     local links_resolved_path = hs.fs.pathToAbsolute(path)
-    if listContains(seen_paths, links_resolved_path) then
+    if get.array.contains(seen_paths, links_resolved_path) then
       return {}
     else
       push(seen_paths, links_resolved_path)

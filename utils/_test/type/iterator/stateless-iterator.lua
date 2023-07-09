@@ -654,7 +654,7 @@ assertMessage(
 )
 
 assertMessage(
-  iterToTbl(prs({a = "a", b = "b", c = "c"})).islist,
+  iterToTbl(prs({a = "a", b = "b", c = "c"})).isarr,
   nil
 )
 

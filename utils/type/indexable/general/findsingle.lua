@@ -64,7 +64,7 @@ function findsingle(item, conditions, opts)
     potentially_sliced_item = slice(item, start) 
   end
 
-  if not isListOrEmptyTable(conditions) then
+  if not is.any.array(conditions) then
     conditions = {conditions}
   end
 

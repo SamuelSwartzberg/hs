@@ -40,7 +40,7 @@ end
 --- @param b any
 --- @param msg? string
 function assertMessage(a, b, msg)
-  if isListOrEmptyTable(a) and isListOrEmptyTable(b) then 
+  if is.any.array(a) and is.any.array(b) then 
     if #a ~= #b then
       error(("Expected %s to contain exactly %s, but it does not, because it has %s elements."):format(hsInspectCleaned(a, 5), hsInspectCleaned(b, 5), #a))
     end
