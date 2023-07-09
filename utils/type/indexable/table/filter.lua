@@ -11,7 +11,7 @@ function filter(tbl, cond, opts)
 
   -- defaults for all args
 
-  cond = defaultIfNil(cond, false)
+  cond = get.any.default_if_nil(cond, false)
   opts = defaultOpts(opts, {"k", "v"})
   tbl = getDefaultInput(tbl)
 

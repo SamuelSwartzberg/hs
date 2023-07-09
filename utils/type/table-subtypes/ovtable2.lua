@@ -102,7 +102,7 @@ function pkg.init(all_elems)
       end
     else
       -- Use the `defaultIfNil` function to retrieve the key-value pair from the `spec` assoc arr.
-      t[defaultIfNil(spec.k, spec.key)] = defaultIfNil(spec.v, spec.value)
+      t[get.any.default_if_nil(spec.k, spec.key)] = get.any.default_if_nil(spec.v, spec.value)
       if spec.k == nil and spec.key == nil then
         error("invalid key-value pair, doesn't have key " .. hs.inspect(spec))
       elseif spec.v == nil and spec.value == nil then

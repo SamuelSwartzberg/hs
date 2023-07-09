@@ -6,8 +6,8 @@
 --- @param addition any
 --- @param opts glueOpts
 function recursiveMerge(base, addition, opts)
-  opts.depth = crementIfNumber(opts.depth, "in")
-  opts.recurse = defaultIfNil(opts.recurse, true)
+  opts.depth = transf.any.with_1_added_if_number(opts.depth)
+  opts.recurse = get.any.default_if_nil(opts.recurse, true)
   local no_recurse = not opts.recurse 
     or (
       type(opts.recurse) == "number" and 

@@ -58,13 +58,13 @@ function promptPathInner(prompt_args)
     -- set up default values, make sure message and default are strings
 
   prompt_args                        = prompt_args or {}
-  prompt_args.message                = defaultIfNil(transf.not_nil.string(prompt_args.message), "Choose a file or folder.")
-  prompt_args.default                = defaultIfNil(transf.not_nil.string(prompt_args.default), env.HOME)
-  prompt_args.can_choose_files       = defaultIfNil(prompt_args.can_choose_files, true)
-  prompt_args.can_choose_directories = defaultIfNil(prompt_args.can_choose_directories, true)
-  prompt_args.allows_loop_selection  = defaultIfNil(prompt_args.allows_loop_selection, false)
-  prompt_args.allowed_file_types     = defaultIfNil(prompt_args.allowed_file_types, {})
-  prompt_args.resolves_aliases       = defaultIfNil(prompt_args.resolves_aliases, true)
+  prompt_args.message                = get.any.default_if_nil(transf.not_nil.string(prompt_args.message), "Choose a file or folder.")
+  prompt_args.default                = get.any.default_if_nil(transf.not_nil.string(prompt_args.default), env.HOME)
+  prompt_args.can_choose_files       = get.any.default_if_nil(prompt_args.can_choose_files, true)
+  prompt_args.can_choose_directories = get.any.default_if_nil(prompt_args.can_choose_directories, true)
+  prompt_args.allows_loop_selection  = get.any.default_if_nil(prompt_args.allows_loop_selection, false)
+  prompt_args.allowed_file_types     = get.any.default_if_nil(prompt_args.allowed_file_types, {})
+  prompt_args.resolves_aliases       = get.any.default_if_nil(prompt_args.resolves_aliases, true)
 
   prompt_args.default = transf.string.path_resolved(prompt_args.default, true) -- resolve the path ourself, to be sure & remain in control
 
@@ -111,7 +111,7 @@ end
 function promptNopolicy(prompt_spec)
 
   -- set defaults for all prompt_spec fields
-  prompt_spec = copy(prompt_spec) or {}
+  prompt_spec = get.table.copy(prompt_spec) or {}
   prompt_spec.prompter = prompt_spec.prompter or promptStringInner
   prompt_spec.transformer = prompt_spec.transformer or function(x) return x end
   prompt_spec.raw_validator = prompt_spec.raw_validator or function(x) return x ~= nil end
@@ -221,7 +221,7 @@ end
 function prompt(ptype, prompt_spec, loop)
   local non_table_prompt_spec
   if type(prompt_spec) == "table" then
-    prompt_spec = copy(prompt_spec)
+    prompt_spec = get.table.copy(prompt_spec)
   elseif prompt_spec ~= nil then
     non_table_prompt_spec = prompt_spec
     prompt_spec = {}

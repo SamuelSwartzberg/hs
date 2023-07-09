@@ -7,7 +7,7 @@
 --- @param opts? prefixOpts
 --- @return T
 function longestCommonPrefix(list, opts)
-  opts = copy(opts) or {}
+  opts = get.table.copy(opts) or {}
   if opts.rev then
     list = map(list, rev)
   end

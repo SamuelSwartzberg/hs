@@ -28,20 +28,20 @@
 function flatten(tbl, opts, visited)
 
   if not opts then opts = {} 
-  else opts = copy(opts) end
-  visited = defaultIfNil(visited, {})
+  else opts = get.table.copy(opts) end
+  visited = get.any.default_if_nil(visited, {})
 
   -- set defaults
 
-  opts.treat_as_leaf = defaultIfNil(opts.treat_as_leaf, "assoc")
-  opts.add_nonleaf = defaultIfNil(opts.add_nonleaf, false)
-  opts.mode = defaultIfNil(opts.mode, "list")
-  opts.val = defaultIfNil(opts.val, "plain-value")
-  opts.recurse = defaultIfNil(opts.recurse, true)
-  opts.path = defaultIfNil(opts.path, {})
+  opts.treat_as_leaf = get.any.default_if_nil(opts.treat_as_leaf, "assoc")
+  opts.add_nonleaf = get.any.default_if_nil(opts.add_nonleaf, false)
+  opts.mode = get.any.default_if_nil(opts.mode, "list")
+  opts.val = get.any.default_if_nil(opts.val, "plain-value")
+  opts.recurse = get.any.default_if_nil(opts.recurse, true)
+  opts.path = get.any.default_if_nil(opts.path, {})
   if opts.depth == nil then opts.depth = 0 
   else opts.depth = opts.depth + 1 end
-  opts.indentation = defaultIfNil(opts.indentation, 2)
+  opts.indentation = get.any.default_if_nil(opts.indentation, 2)
 
   -- process incl shorthand
 
@@ -128,7 +128,7 @@ function flatten(tbl, opts, visited)
         if opts.add_nonleaf then
           valAddfunc(res, v, k)
         end
-        local newopts = copy(opts)
+        local newopts = get.table.copy(opts)
         newopts.path = concat(opts.path, k)
         local subres
         if visited[tostring(v)] then

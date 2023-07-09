@@ -15,7 +15,7 @@ function append(base, addition, opts)
     if not addition then return base end
     return base .. addition
   elseif type(base) == "table" then
-    local new_thing = copy(base) 
+    local new_thing = get.table.copy(base) 
     if addition == nil then return new_thing end
     if is.table.array(base) and not opts.aspair then
       new_thing[#new_thing + 1] = addition

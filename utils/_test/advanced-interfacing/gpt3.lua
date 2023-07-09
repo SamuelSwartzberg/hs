@@ -13,7 +13,7 @@ if mode == "full-test" then -- testing costs api requests and therefore money!
       max_tokens = 2
     },
     function (response)
-      assertMessage(isClose(#response, 8, 7), true) -- 1 token ≈ 4 chars -> test if within 7 chars of that value
+      assertMessage(get.two_comparables.is_close(#response, 8, 7), true) -- 1 token ≈ 4 chars -> test if within 7 chars of that value
     end
   )
 

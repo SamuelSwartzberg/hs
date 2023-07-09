@@ -26,7 +26,7 @@ assert(
 assert(
   not find(
     get.mullvad.flat_relay_array(),
-    { _r = whole(mt._r.id.relay_identifier), _invert = true }
+    { _r = transf.string.whole_regex(mt._r.id.relay_identifier), _invert = true }
   )
 )
 
@@ -41,7 +41,7 @@ assert(
 assert(
   not find(
     get.khard.all_contact_uids(),
-    { _r = whole(mt._r.id.contact_uid), _invert = true }
+    { _r = transf.string.whole_regex(mt._r.id.contact_uid), _invert = true }
   )
 )
 
@@ -54,7 +54,7 @@ local all_contact_uuids_remapped = map(
 assert(
   not find(
     all_contact_uuids_remapped,
-    { _r = whole(mt._r.id.contact_uid), _invert = true }
+    { _r = transf.string.whole_regex(mt._r.id.contact_uid), _invert = true }
   )
 )
 

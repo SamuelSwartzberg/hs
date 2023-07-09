@@ -52,7 +52,7 @@ end
 --- @return boolean
 function findsingle(item, conditions, opts)
   item = item or ""
-  conditions = defaultIfNil(conditions, true)
+  conditions = get.any.default_if_nil(conditions, true)
   opts = defaultOpts(opts, "boolean")
 
   if opts.tostring then item = tostring(item) end

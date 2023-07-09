@@ -1,55 +1,55 @@
 assertMessage(
-  clamp(4, 2, 6),
+  get.comparable.clamp(4, 2, 6),
   4
 )
 
 assertMessage(
-  clamp(1, 2, 6),
+  get.comparable.clamp(1, 2, 6),
   2
 )
 
 assertMessage(
-  clamp(7, 2, 6),
+  get.comparable.clamp(7, 2, 6),
   6
 )
 
 assertMessage(
-  clamp("d", "b", "f"),
+  get.comparable.clamp("d", "b", "f"),
   "d"
 )
 
 assertMessage(
-  clamp("a", "b", "f"),
+  get.comparable.clamp("a", "b", "f"),
   "b"
 )
 
 assertMessage(
-  clamp("g", "b", "f"),
+  get.comparable.clamp("g", "b", "f"),
   "f"
 )
 
 assertMessage(
-  clamp("ee", "b", "f"),
+  get.comparable.clamp("ee", "b", "f"),
   "ee"
 )
 
 assertMessage(
-  clamp("aa", "b", "f"),
+  get.comparable.clamp("aa", "b", "f"),
   "b"
 )
 
 assertMessage(
-  clamp(hs.geometry.point(4, 4), hs.geometry.point(2, 2), hs.geometry.point(6, 6)),
+  get.comparable.clamp(hs.geometry.point(4, 4), hs.geometry.point(2, 2), hs.geometry.point(6, 6)),
   hs.geometry.point(4, 4)
 )
 
 assertMessage(
-  clamp(hs.geometry.point(1, 1), hs.geometry.point(2, 2), hs.geometry.point(6, 6)),
+  get.comparable.clamp(hs.geometry.point(1, 1), hs.geometry.point(2, 2), hs.geometry.point(6, 6)),
   hs.geometry.point(2, 2)
 )
 
 assertMessage(
-  clamp(hs.geometry.point(7, 7), hs.geometry.point(2, 2), hs.geometry.point(6, 6)),
+  get.comparable.clamp(hs.geometry.point(7, 7), hs.geometry.point(2, 2), hs.geometry.point(6, 6)),
   hs.geometry.point(6, 6)
 )
 
@@ -60,67 +60,67 @@ local two_days_from_now = date():adddays(2)
 
 local now = date()
 
-clamp(now, two_days_ago, two_days_from_now)
+get.comparable.clamp(now, two_days_ago, two_days_from_now)
 
 assertMessage(
-  clamp(now, two_days_ago, two_days_from_now),
+  get.comparable.clamp(now, two_days_ago, two_days_from_now),
   now
 )
 
 
 
 assertMessage(
-  clamp(three_days_ago, two_days_ago, two_days_from_now),
+  get.comparable.clamp(three_days_ago, two_days_ago, two_days_from_now),
   two_days_ago
 )
 
 assertMessage(
-  clamp(three_days_from_now, two_days_ago, two_days_from_now),
+  get.comparable.clamp(three_days_from_now, two_days_ago, two_days_from_now),
   two_days_from_now
 )
 
 assertMessage(
-  isClose(1, 2, 0.99),
+  get.two_comparables.is_close(1, 2, 0.99),
   false
 )
 
 assertMessage(
-  isClose(1, 2, 1.01),
+  get.two_comparables.is_close(1, 2, 1.01),
   true
 )
 
 assertMessage(
-  isClose(hs.geometry.point(1, 1), hs.geometry.point(2, 2), hs.geometry.point(0.99, 0.99)),
+  get.two_comparables.is_close(hs.geometry.point(1, 1), hs.geometry.point(2, 2), hs.geometry.point(0.99, 0.99)),
   false
 )
 
 assertMessage(
-  isClose(hs.geometry.point(1, 1), hs.geometry.point(2, 2), hs.geometry.point(1.01, 1.01)),
+  get.two_comparables.is_close(hs.geometry.point(1, 1), hs.geometry.point(2, 2), hs.geometry.point(1.01, 1.01)),
   true
 )
 
 assertMessage(
-  seq(1, 5),
+  transf.start_stop_step_unit.array(1, 5),
   {1, 2, 3, 4, 5}
 )
 
 assertMessage(
-  seq(1, 5, 2),
+  transf.start_stop_step_unit.array(1, 5, 2),
   {1, 3, 5}
 )
 
 assertMessage(
-  seq("a", "e"),
+  transf.start_stop_step_unit.array("a", "e"),
   {"a", "b", "c", "d", "e"}
 )
 
 assertMessage(
-  seq("a", "e", 2),
+  transf.start_stop_step_unit.array("a", "e", 2),
   {"a", "c", "e"}
 )
 
 assertMessage(
-  seq(
+  transf.start_stop_step_unit.array(
     hs.geometry.point(1, 1),
     hs.geometry.point(5, 5)
   ),
@@ -134,7 +134,7 @@ assertMessage(
 )
 
 assertMessage(
-  seq(
+  transf.start_stop_step_unit.array(
     hs.geometry.point(1, 1),
     hs.geometry.point(5, 5),
     hs.geometry.point(2, 2)
@@ -149,7 +149,7 @@ assertMessage(
 local test_date = date("2013-02-03T09:56:22Z")
 
 assertMessage(
-  seq(test_date:copy():adddays(-3), test_date:copy():adddays(3)),
+  transf.start_stop_step_unit.array(test_date:copy():adddays(-3), test_date:copy():adddays(3)),
   {
     date("2013-01-31T09:56:22Z"),
     date("2013-02-01T09:56:22Z"),
@@ -162,7 +162,7 @@ assertMessage(
 )
 
 assertMessage(
-  seq(test_date:copy():addhours(-5), test_date:copy():addhours(4), 2, "hours"),
+  transf.start_stop_step_unit.array(test_date:copy():addhours(-5), test_date:copy():addhours(4), 2, "hours"),
   {
     date("2013-02-03T04:56:22Z"),
     date("2013-02-03T06:56:22Z"),

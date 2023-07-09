@@ -21,7 +21,7 @@ function syncHomeRelativePath(path, push_or_pull, action, sync)
   else
     error("push_or_pull must be 'push' or 'pull'", 0)
   end
-  action = defaultIfNil(action, "copy")
+  action = get.any.default_if_nil(action, "copy")
   run({
     "rclone",
     action,

@@ -301,12 +301,12 @@ local tblwithduplicatevalues = {
 }
 
 assertMessage(
-  map(tblwithduplicatevalues, returnAny, { args = "kv", ret = "vk" }),
+  map(tblwithduplicatevalues, transf.n_anys.n_anys, { args = "kv", ret = "vk" }),
   { a = "d" , b = "e", c = "f" }
 )
 
 assertMessage(
-  map(tblwithduplicatevalues, returnAny, { args = "kv", ret = "vk",  nooverwrite = true }),
+  map(tblwithduplicatevalues, transf.n_anys.n_anys, { args = "kv", ret = "vk",  nooverwrite = true }),
   { a = "a", b = "b", c = "c" }
 )
 
@@ -351,7 +351,7 @@ local simple_tbl = {
   c = 3
 }
 
-local simple_tbl_copy = copy(simple_tbl)
+local simple_tbl_copy = get.table.copy(simple_tbl)
 
 assertMessage(simple_tbl, simple_tbl_copy)
 
@@ -378,7 +378,7 @@ local nested_tbl = {
   }
 }
 
-local nested_tbl_copy = copy(nested_tbl, true)
+local nested_tbl_copy = get.table.copy(nested_tbl, true)
 
 assertMessage(nested_tbl, nested_tbl_copy)
 
@@ -400,7 +400,7 @@ local tbl_w_nested_ovtable_simple = {
   })
 }
 
-local tbl_w_nested_ovtable_simple_copy = copy(tbl_w_nested_ovtable_simple)
+local tbl_w_nested_ovtable_simple_copy = get.table.copy(tbl_w_nested_ovtable_simple)
 
 assertMessage(tbl_w_nested_ovtable_simple, tbl_w_nested_ovtable_simple_copy)
 
@@ -427,7 +427,7 @@ local tbl_w_nested_ovtable_simple_2 = {
   })
 }
 
-local tbl_w_nested_ovtable_simple_copy_2 = copy(tbl_w_nested_ovtable_simple_2)
+local tbl_w_nested_ovtable_simple_copy_2 = get.table.copy(tbl_w_nested_ovtable_simple_2)
 
 assertMessage(tbl_w_nested_ovtable_simple_2, tbl_w_nested_ovtable_simple_copy_2)
 
@@ -447,7 +447,7 @@ local tbl_w_nested_ovtable_simple_2_again = {
   })
 }
 
-local tbl_w_nested_ovtable_simple_copy_2_again = copy(tbl_w_nested_ovtable_simple_2_again)
+local tbl_w_nested_ovtable_simple_copy_2_again = get.table.copy(tbl_w_nested_ovtable_simple_2_again)
 
 assertMessage(tbl_w_nested_ovtable_simple_2_again, tbl_w_nested_ovtable_simple_copy_2_again)
 
@@ -473,7 +473,7 @@ local tbl_w_nested_ovtable_simple_2_again_2 = {
   })
 }
 
-local tbl_w_nested_ovtable_simple_copy_2_again_2 = copy(tbl_w_nested_ovtable_simple_2_again_2)
+local tbl_w_nested_ovtable_simple_copy_2_again_2 = get.table.copy(tbl_w_nested_ovtable_simple_2_again_2)
 
 assertMessage(tbl_w_nested_ovtable_simple_2_again_2, tbl_w_nested_ovtable_simple_copy_2_again_2)
 
@@ -500,7 +500,7 @@ local tbl_w_nested_ovtable_simple_3 = {
   })
 }
 
-local tbl_w_nested_ovtable_simple_3_copy = copy(tbl_w_nested_ovtable_simple_3)
+local tbl_w_nested_ovtable_simple_3_copy = get.table.copy(tbl_w_nested_ovtable_simple_3)
 
 assertMessage(tbl_w_nested_ovtable_simple_3, tbl_w_nested_ovtable_simple_3_copy)
 
@@ -531,7 +531,7 @@ local tbl_w_nested_ovtable = {
   })
 }
 
-local tbl_w_nested_ovtable_copy = copy(tbl_w_nested_ovtable)
+local tbl_w_nested_ovtable_copy = get.table.copy(tbl_w_nested_ovtable)
 
 
 assertMessage(tbl_w_nested_ovtable, tbl_w_nested_ovtable_copy)
@@ -614,7 +614,7 @@ deep_child_ref.a = {}
 deep_child_ref.a.b = {}
 deep_child_ref.a.b.c = deep_child_ref.a
 
-local deep_copy_of_deep_child_ref = copy(deep_child_ref, true)
+local deep_copy_of_deep_child_ref = get.table.copy(deep_child_ref, true)
 
 assertMessage(
   deep_copy_of_deep_child_ref.a.b.c,

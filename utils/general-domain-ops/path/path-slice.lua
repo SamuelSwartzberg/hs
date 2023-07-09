@@ -22,7 +22,7 @@ function pathSlice(path, spec, opts)
   -- set defaults
 
   spec = spec or { start = -1, stop = -1}
-  opts = copy(opts) or {}
+  opts = get.table.copy(opts) or {}
 
   -- set special state booleans
 
@@ -69,7 +69,7 @@ function pathSlice(path, spec, opts)
     elseif not stringy.find(leaf, ".") then
       without_extension = leaf
     else -- in case of multiple dots, everything after the last dot is considered the extension
-      without_extension, extension = eutf8.match(leaf, whole(mt._r_lua.without_extension_and_extension))
+      without_extension, extension = eutf8.match(leaf, transf.string.whole_regex(mt._r_lua.without_extension_and_extension))
     end
 
     if opts.standartize_ext then

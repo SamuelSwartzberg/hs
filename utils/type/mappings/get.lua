@@ -20,6 +20,8 @@ get = {
       )
     end,
   },
+  int = {
+  },
   mullvad = {
     status = function()
       return run("mullvad status")
@@ -314,8 +316,37 @@ get = {
       
       return lines
     end,
-    has_key = function(table, key)
-      return table[key] ~= nil
+    has_key = function(t, key)
+      return t[key] ~= nil
+    end,
+    --- Copy a table, optionally deep, return other types as-is.  
+    --- Ensures that changes to the copy do not affect the original.  
+    --- Handles self-referential tables.
+    copy = function(t, deeop, copied_tables)
+      if type(t) ~= "table" then return t end -- non-tables don't need to be copied
+      deep = get.any.default_if_nil(deep, true)
+      copied_tables = get.any.default_if_nil(copied_tables, {})
+      if not t then return t end
+      local new
+      if t.isovtable then -- orderedtable
+        new = ovtable.new()
+      else
+        new = {}
+      end
+      copied_tables[tostring(t)] = new
+      for k, v in transf.table.pair_stateless_iter(t) do
+        if type(v) == "table" and deep then
+          if copied_tables[tostring(v)] then -- we've already copied this table, so just reference it
+            new[k] = copied_tables[tostring(v)]
+          else -- we haven't copied this table yet, so copy it and reference it
+            new[k] = get.table.copy(v, deep, copied_tables)
+          end
+        else
+          new[k] = v
+        end
+      end
+      setmetatable(new, getmetatable(t)) -- I don't I currently have any metatables where data is stored and thus copy(getmetatable(t)) would be necessary, but this comment is here so that I remember to add it if I ever do
+      return new
     end,
     
   },
@@ -410,7 +441,7 @@ get = {
       return arr[(n - 2) % #arr + 1]
     end,
     sorted = function(list, comp)
-      local new_list = copy(list, false)
+      local new_list = get.table.copy(list, false)
       table.sort(new_list, comp)
       return new_list
     end,
@@ -430,7 +461,7 @@ get = {
     --- @return T
     median = function (list, comp, if_even)
       if_even = if_even or "lower"
-      list = copy(list, false) -- don't modify the original list
+      list = get.table.copy(list, false) -- don't modify the original list
       table.sort(list, comp)
       local mid = math.floor(#list / 2)
       if #list % 2 == 0 then
@@ -568,6 +599,27 @@ get = {
     end,
     styledtext = function(str, styledtext_attributes_specifier)
       return hs.styledtext.new(str, styledtext_attributes_specifier)
+    end,
+    contains_any = function(str, anyof)
+      for i = 1, #anyof do
+        local res = stringy.find(str, anyof[i])
+        if res then
+          return true
+        end
+      end
+      return false
+    end,
+    contains_all = function(str, allof)
+      for i = 1, #allof do
+        local res = stringy.find(str, allof[i])
+        if not res then
+          return false
+        end
+      end
+      return true
+    end,
+    starts_ends = function(str, start, ends)
+      return transf.string.startswith(str, start) and transf.string.endswith(str, ends)
     end,
   },
   string_or_styledtext = {
@@ -992,7 +1044,7 @@ get = {
       if not get.array.contains(mt._list.email_headers_containin_emails, header) then
         error("Header can't contain email addresses")
       end
-      only = defaultIfNil(only, true)
+      only = get.any.default_if_nil(only, true)
       local headerpart
       if header then
         headerpart = "-h" .. transf.string.single_quoted_escaped(header)
@@ -1559,7 +1611,7 @@ get = {
       return table.unpack(get.any.array_repeated(arr, times))
     end,
     applicable_thing_name_hierarchy = function(any, local_thing_name_hierarchy, parent)
-      local_thing_name_hierarchy = local_thing_name_hierarchy or copy(thing_name_hierarchy, true)
+      local_thing_name_hierarchy = local_thing_name_hierarchy or get.table.copy(thing_name_hierarchy, true)
       parent = parent or "any"
       local res = {}
       for thing_name, child_thing_name_hierarchy_or_leaf_indication_string in transf.native_table.key_value_stateless_iter(thing_name_hierarchy) do
@@ -1576,7 +1628,14 @@ get = {
     end,
     has_key = function(any, key)
       return is.any.table(any) and get.table.has_key(any, key)
-    end
+    end,
+    default_if_nil = function(any, default)
+      if any == nil then
+        return default
+      else
+        return any
+      end
+    end,
   },
   table_and_table = {
     larger_table_by_key = function(table1, table2, key)
@@ -1669,7 +1728,7 @@ get = {
   },
   chooser_item_specifier_array = {
     styled_chooser_item_specifier_array = function(arr, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict)
-      local res = copy(arr)
+      local res = get.table.copy(arr)
       for i, chooser_item_specifier in transf.array.index_value_stateless_iter(res) do
         local text_styledtext_attribute_specifier = concat( {
           font = {size = 14 },
@@ -1834,7 +1893,7 @@ get = {
       end
     end
   },
-  a_and_b_stateful_generator = {
+  two_anys_stateful_generator = {
     assoc_arr = function(gen, ...)
       local res = {}
       local iter = gen(...)
@@ -1861,5 +1920,66 @@ get = {
       end
       return res
     end
+  },
+  binary_specifier = {
+    string = function(binary_specifier, bool)
+      if bool then
+        return binary_specifier.vt
+      else
+        return binary_specifier.vf
+      end
+    end,
+    boolean = function(binary_specifier, str)
+      if str == binary_specifier.vt then
+        return true
+      elseif str == binary_specifier.vf then
+        return false
+      else
+        error("invalid argument")
+      end
+    end,
+    inverted_string = function(binary_specifier, bool)
+      return get.binary_specifier.string(binary_specifier, not bool)
+    end,
+    inverted_boolean = function(binary_specifier, str)
+      if str == binary_specifier.vt then
+        return false
+      elseif str == binary_specifier.vf then
+        return true
+      else
+        error("invalid argument")
+      end
+    end,
+    inverted = function(binary_specifier, str_or_bool)
+      if type(str_or_bool) == "string" then
+        return get.binary_specifier.inverted_string(binary_specifier, str_or_bool)
+      else
+        return get.binary_specifier.inverted_boolean(binary_specifier, str_or_bool)
+      end
+    end
+  },
+  two_numbers = {
+    sum_modulo_n = function(a, b, n)
+      return (a + b) % n
+    end,
+    difference_modulo_n = function(a, b, n)
+      return (a - b) % n
+    end,
+  },
+  comparable = {
+    clamped = function(comparable, min, max)
+      if comparable < min then
+        return min
+      elseif comparable > max then
+        return max
+      else
+        return comparable
+      end
+    end,
+  },
+  two_comparables = {
+    is_close = function(a, b, distance)
+      return math.abs(a - b) < distance
+    end,
   }
 }

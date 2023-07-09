@@ -49,7 +49,7 @@ local gen_cache_methods = {
         node.children[param] = node.children[param] or {}
         node = node.children[param]
       end
-      node.results = copy(result, true)
+      node.results = get.table.copy(result, true)
     end,
     get = function(fnid, opts_as_str, params, opts)
       memstore[fnid] = memstore[fnid] or {}
@@ -70,7 +70,7 @@ local gen_cache_methods = {
         node = node.children and node.children[param]
         if not node then return nil end
       end
-      return copy(node.results, true)
+      return get.table.copy(node.results, true)
     end,
     reset = function(fnid, opts_as_str)
       memstore[fnid] = memstore[fnid] or {}
@@ -118,7 +118,7 @@ end
 --- @field stringify_table_params? boolean whether to stringify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to stringify the params to use them as a path
 --- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be stringified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
 
-local identifier = createIdentifier()
+local identifier = transf["nil"].identifier_function()
 
 --- memoize a function if it's not already memoized, or return the memoized version if it is
 --- @generic I, O
@@ -148,12 +148,12 @@ function memoize(fn, opts, funcname)
   local opts_as_str = opts_as_str_or_nil or "noopts"
 
   --- set default options
-  opts = copy(opts) or {}
+  opts = get.table.copy(opts) or {}
   opts.mode = opts.mode or "mem"
-  opts.is_async = defaultIfNil(opts.is_async, false)
+  opts.is_async = get.any.default_if_nil(opts.is_async, false)
   opts.invalidation_mode = opts.invalidation_mode or "none"
   opts.interval = opts.interval or 0
-  opts.stringify_table_params = defaultIfNil(opts.stringify_table_params, false)
+  opts.stringify_table_params = get.any.default_if_nil(opts.stringify_table_params, false)
   opts.table_param_subset = opts.table_param_subset or "json"
 
   if opts.mode == "fs" and not funcname then

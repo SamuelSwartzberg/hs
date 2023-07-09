@@ -8,7 +8,7 @@ env = {
   HOME = "/Users/sam"
 }
 
-local poisonable1 = returnPoisonable()
+local poisonable1 = transf["nil"].poisonable()
 
 assertMessage(
   memoize(poisonable1)(1, 2, 3),
@@ -27,7 +27,7 @@ assertMessage(
   false
 )
 
-local poisonable2 = returnPoisonable()
+local poisonable2 = transf["nil"].poisonable()
 
 assertMessage(
   memoize(poisonable2, {
@@ -42,7 +42,7 @@ assertMessage(
   })(1, 2, 3),
   {1, 2, 3}
 )
-local poisonable3 = returnPoisonable()
+local poisonable3 = transf["nil"].poisonable()
 
 assertMessage(
   memoize(poisonable3, {
@@ -79,7 +79,7 @@ async_poisonable_memoized(1, function(result)
   assertMessage(result, 1)
 end)
 
-local poisonable4 = returnPoisonable()
+local poisonable4 = transf["nil"].poisonable()
 
 assertMessage(
   memoize(poisonable4, {
@@ -103,7 +103,7 @@ local succ, res = pcall(
 
 assertMessage(succ, false)
 
-local poisonable5 = returnPoisonable()
+local poisonable5 = transf["nil"].poisonable()
 
 local memoizedPoisonable5, timer = memoize(poisonable5, {
   mode = "mem",
@@ -135,7 +135,7 @@ hs.timer.doAfter(1, function()
 end)
 
 
-local poisonable6 = returnPoisonable()
+local poisonable6 = transf["nil"].poisonable()
 
 local memoizedPoisonable6 = memoize(poisonable6, {stringify_table_params = true})
 
@@ -156,7 +156,7 @@ local succ, res = pcall(
 
 assertMessage(succ, false)
 
-local poisonable7 = returnPoisonable()
+local poisonable7 = transf["nil"].poisonable()
 
 local memoizedPoisonable7 = memoize(poisonable7,  {stringify_table_params = true})
 
@@ -177,7 +177,7 @@ local succ, res = pcall(
 
 assertMessage(succ, false)
 
-local poisonable8 = returnPoisonable()
+local poisonable8 = transf["nil"].poisonable()
 
 local memoizedPoisonable8 = memoize(poisonable8, {stringify_table_params = true, table_param_subset = "no-fn-userdata-loops"})
 
@@ -237,9 +237,9 @@ assertMessage(succ, false)
 
 --- shallow table
   
-local poisonable9_1 = returnPoisonable()
-local poisonable9_2 = returnPoisonable()
-local poisonable9_3 = returnPoisonable()
+local poisonable9_1 = transf["nil"].poisonable()
+local poisonable9_2 = transf["nil"].poisonable()
+local poisonable9_3 = transf["nil"].poisonable()
 
 local tbl_w_keys = {
   a = "a",
@@ -282,9 +282,9 @@ end
 
 --- nested table
 
-local poisonable10_1 = returnPoisonable()
-local poisonable10_2 = returnPoisonable()
-local poisonable10_3 = returnPoisonable()
+local poisonable10_1 = transf["nil"].poisonable()
+local poisonable10_2 = transf["nil"].poisonable()
+local poisonable10_3 = transf["nil"].poisonable()
 
 local tbl_w_keys = {
   a = "a",
@@ -332,9 +332,9 @@ end
 
 --- numerical values
 
-local poisonable11_1 = returnPoisonable()
-local poisonable11_2 = returnPoisonable()
-local poisonable11_3 = returnPoisonable()
+local poisonable11_1 = transf["nil"].poisonable()
+local poisonable11_2 = transf["nil"].poisonable()
+local poisonable11_3 = transf["nil"].poisonable()
 
 local tbl_w_keys = {
   a = 1,
@@ -375,7 +375,7 @@ end
 
 --- function values ("any" only)
 
-local poisonable12_1 = returnPoisonable()
+local poisonable12_1 = transf["nil"].poisonable()
 
 local tbl_w_keys = {
   a = function() end,
@@ -400,7 +400,7 @@ end
 
 --- nested function values ("any" only)
 
-local poisonable13_1 = returnPoisonable()
+local poisonable13_1 = transf["nil"].poisonable()
 
 local tbl_w_keys = {
   a = function() end,
@@ -432,7 +432,7 @@ end
 
 --- self-referential table ("any" only)
 
-local poisonable14_1 = returnPoisonable()
+local poisonable14_1 = transf["nil"].poisonable()
 
 local tbl_w_keys = {
   a = "a",
@@ -471,9 +471,9 @@ local example_table = {
   b = "b",
 }
 
-local test_table_1 = copy(example_table)
-local test_table_2 = copy(example_table)
-local test_table_3 = copy(example_table)
+local test_table_1 = get.table.copy(example_table)
+local test_table_2 = get.table.copy(example_table)
+local test_table_3 = get.table.copy(example_table)
 
 local res1 = memoize(
   transf.any.same,
@@ -522,7 +522,7 @@ assertMessage(
 
 -- purge cache for single function (mem)
 
-local poisonable15 = returnPoisonable()
+local poisonable15 = transf["nil"].poisonable()
 
 assertMessage(
   memoize(poisonable15)(1, 2, 3),
@@ -544,7 +544,7 @@ assert(not succ)
 
 -- purge cache for single function (fs)
 
-local poisonable16 = returnPoisonable()
+local poisonable16 = transf["nil"].poisonable()
 
 assertMessage(
   memoize(poisonable16, {mode = "fs"}, "poisonable16")(1, 2, 3),

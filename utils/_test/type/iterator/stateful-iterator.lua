@@ -7,7 +7,7 @@ local testtbl = {
 
 
 assertMessage(
-  get.a_and_b_stateful_generator.assoc_arr(sprs, testtbl),
+  get.two_anys_stateful_generator.assoc_arr(sprs, testtbl),
   testtbl
 )
 

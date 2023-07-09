@@ -3,8 +3,8 @@ local shape1 = {
   ["[string]"] = "function"
 }
 
-local shape2 = copy(shape1)
-local shape3 = copy(shape1)
+local shape2 = get.table.copy(shape1)
+local shape3 = get.table.copy(shape1)
 
 local thing1 = {
   foo = function() end
@@ -54,8 +54,8 @@ local shape4 = {
   ["[number]"] = "number"
 }
 
-local shape5 = copy(shape4)
-local shape6 = copy(shape4)
+local shape5 = get.table.copy(shape4)
+local shape6 = get.table.copy(shape4)
 
 local thing4 = {
   foo = "bar",
@@ -107,7 +107,7 @@ local shape7 = {
   foo = "boolean"
 }
 
-local shape8 = copy(shape7)
+local shape8 = get.table.copy(shape7)
 
 local thing7 = {
   foo = "bar",

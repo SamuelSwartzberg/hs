@@ -9,31 +9,11 @@ assertMessage(
 )
 
 assertMessage(
-  subtractionRingModuloN(1, 5, 4),
+  get.two_numbers.difference_modulo_n(1, 5, 4),
   0
 )
 
 assertMessage(
-  crementIfNumber(1, "de"),
-  0
-)
-
-assertMessage(
-  crementIfNumber("1", "de"),
-  "1"
-)
-
-assertMessage(
-  crementIfNumber(1, "in"),
-  2
-)
-
-assertMessage(
-  crementIfNumber("1", "in"),
-  "1"
-)
-
-assertMessage(
-  isEven(2),
+  is.number.even(2),
   true
 )

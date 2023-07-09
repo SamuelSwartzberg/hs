@@ -60,7 +60,7 @@ assertMessage(
 )
 
 assertMessage(
-  select(2, returnAny(1, 2, 3)),
+  select(2, transf.n_anys.n_anys(1, 2, 3)),
   2
 )
 
@@ -75,27 +75,27 @@ assertMessage(
 )
 
 assertMessage(
-  returnNumArgs(1, 2, 3),
+  transf.n_anys.amount(1, 2, 3),
   3
 )
 
 assertMessage(
-  is.a_and_b.equal(1, 1),
+  is.two_comparables.equal(1, 1),
   true
 )
 
 assertMessage(
-  is.a_and_b.equal(1, 2),
+  is.two_comparables.equal(1, 2),
   false
 )
 
 assertMessage(
-  is.a_and_b.a_larger(1, 2),
+  is.two_anys.a_larger(1, 2),
   false
 )
 
 assertMessage(
-  is.a_and_b.b_larger(1, 2),
+  is.two_anys.b_larger(1, 2),
   true
 )
 
@@ -105,32 +105,32 @@ assertMessage(
 )
 
 assertMessage(
-  returnEmpty({1, 2, 3}),
+  transf.indexable.unspecified_equivalent_empty_indexable({1, 2, 3}),
   {}
 )
 
 assertMessage(
-  returnEmpty("fooo"),
+  transf.indexable.unspecified_equivalent_empty_indexable("fooo"),
   ""
 )
 
 assertMessage(
-  transf.a_and_b.boolean_and(true, true),
+  transf.two_anys.boolean_and(true, true),
   true
 )
 
 assertMessage(
-  transf.a_and_b.boolean_and(true, false),
+  transf.two_anys.boolean_and(true, false),
   false
 )
 
 assertMessage(
-  transf.a_and_b.boolean_or(true, false),
+  transf.two_anys.boolean_or(true, false),
   true
 )
 
 assertMessage(
-  whole("foo"),
+  transf.string.whole_regex("foo"),
   "^foo$"
 )
 

@@ -26,10 +26,10 @@ is = {
       return is.string.number(str) and is.number.int(get.string_or_number.number(str))
     end,
     printable_ascii = function(str)
-      return onig.find(str, whole(mt._r.charset.printable_ascii))
+      return onig.find(str, transf.string.whole_regex(mt._r.charset.printable_ascii))
     end,
     ascii = function(str)
-      return onig.find(str, whole(mt._r.charset.ascii))
+      return onig.find(str, transf.string.whole_regex(mt._r.charset.ascii))
     end,
     url = function(str)
       return is.string.ascii(str) and is.ascii.url(str)
@@ -37,25 +37,25 @@ is = {
   },
   ascii = {
     issn = function(str)
-      return onig.find(str, whole(mt._r.id.issn))
+      return onig.find(str, transf.string.whole_regex(mt._r.id.issn))
     end,
     uuid = function(str)
-      return onig.find(str, whole(mt._r.id.uuid), 1, "i")
+      return onig.find(str, transf.string.whole_regex(mt._r.id.uuid), 1, "i")
     end,
     relay_identifier = function(str)
-      return onig.find(str, whole(mt._r.id.relay_identifier))
+      return onig.find(str, transf.string.whole_regex(mt._r.id.relay_identifier))
     end,
     base32_gen = function(str)
-      return onig.find(str, whole(mt._r.id.b32.gen))
+      return onig.find(str, transf.string.whole_regex(mt._r.id.b32.gen))
     end,
     base32_crockford = function(str)
-      return onig.find(str, whole(mt._r.id.b32.crockford))
+      return onig.find(str, transf.string.whole_regex(mt._r.id.b32.crockford))
     end,
     base64_gen = function(str)
-      return onig.find(str, whole(mt._r.id.b64.gen))
+      return onig.find(str, transf.string.whole_regex(mt._r.id.b64.gen))
     end,
     base64_url = function(str)
-      return onig.find(str, whole(mt._r.id.b64.url))
+      return onig.find(str, transf.string.whole_regex(mt._r.id.b64.url))
     end,
     base32 = function(str)
       return is.ascii.base32_gen(str) or is.ascii.base32_crockford(str)
@@ -117,7 +117,7 @@ is = {
   },
   alphanum_minus = {
     isbn = function(str)
-      return onig.find(transf.alphanum_minus.alphanum(str), whole(mt._r.id.isbn))
+      return onig.find(transf.alphanum_minus.alphanum(str), transf.string.whole_regex(mt._r.id.isbn))
     end,
     
   },
@@ -305,8 +305,14 @@ is = {
     float = function(num)
       return not is.number.int(num)
     end,
+    even = function(num)
+      return num % 2 == 0
+    end,
   },
   int = {
+    even = function(num)
+      return num % 2 == 0
+    end,
   },
   any = {
     component_interface = function(val)
@@ -400,7 +406,7 @@ is = {
       return is.csl_table.type_whole_book(csl_table) and not csl_table.chapter and not csl_table.pages
     end
   },
-  a_and_b = {
+  two_anys = {
     a_larger = function(a, b)
       return a > b
     end,

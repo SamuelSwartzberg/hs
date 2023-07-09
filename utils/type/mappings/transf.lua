@@ -269,6 +269,15 @@ transf = {
     neg_int = function(int)
       return -math.abs(int)
     end,
+    random_int_of_length = function(int)
+      return math.random(
+        transf.pos_int.smallest_int_of_length(int),
+        transf.pos_int.largest_int_of_length(int)
+      )
+    end,
+    random_base64_gen_of_length = function(int)
+      return run("openssl rand -base64 " .. tostring(int))
+    end,
   },
   pos_int = {
     largest_int_of_length = function(int)
@@ -385,7 +394,7 @@ transf = {
   },
   assoc_arr_array = {
     assoc_arr_with_index_as_key_array = function(arr)
-      local res = copy(arr, true)
+      local res = get.table.copy(arr, true)
       for i, v in transf.array.index_value_stateless_iter(arr) do
         v.index = i
       end
@@ -1018,7 +1027,7 @@ transf = {
       }
     end,
     email_string = function(specifier)
-      specifier = copy(specifier)
+      specifier = get.table.copy(specifier)
       local body = specifier.body or ""
       specifier.body = nil
       local non_inline_attachments = specifier.non_inline_attachments
@@ -1675,11 +1684,21 @@ transf = {
       return interval.stop - interval.start
     end,
   },
+  int_interval_specifier = {
+    random = function(interval)
+      return math.random(interval.start, interval.stop)
+    end,
+  },
+  float_interval_specifier = {
+    random = function(interval)
+      return math.random() * (interval.stop - interval.start) + interval.start
+    end,
+  },
   --- sequence specifier: table of start, stop, step, unit?
   --- sequence specifiers can use all methods of interval specifiers 
   sequence_specifier = {
     array = function(sequence)
-      return seq(sequence.start, sequence.stop, sequence.step, sequence.unit)
+      return transf.start_stop_step_unit.array(sequence.start, sequence.stop, sequence.step, sequence.unit)
     end,
     interval_specifier = function(sequence)
       return {
@@ -1909,7 +1928,7 @@ transf = {
     --- i.e. { month = 02, hour = 12 } will return { "year", "month", "day", "hour" }
     --- this should be equal to prefix_date_component_name_ordered_list_set if date_component_name_value_dict is a prefix_date_component_name_value_dict since prefix_ is defined as having no nil values before potential trailing nil values
     prefix_date_component_name_ordered_list_no_trailing_nil = function(date_component_name_value_dict)
-      local ol = copy(mt._list.date.date_component_names)
+      local ol = get.table.copy(mt._list.date.date_component_names)
       while(date_component_name_value_dict[
         ol[#ol]
       ] == nil) do
@@ -3006,7 +3025,10 @@ transf = {
       return transf.string_array.filter_nocomment_noindent_to_url_array(
         transf.string.lines(str)
       )
-    end
+    end,
+    whole_regex = function(str)
+      return "^" .. str .. "$"
+    end,
   },
   line = {
     noindent = function(str)
@@ -3387,10 +3409,21 @@ transf = {
       return transf.key_value.value_chooser_item(pair[1], pair[2])
     end,
     larger = function(pair)
-      return transf.a_and_b.larger(pair[1], pair[2])
+      return transf.two_comparables.larger(pair[1], pair[2])
     end,
   },
-  a_and_b = {
+  two_anys = {
+    boolean_and = function(a, b)
+      return a and b
+    end,
+    boolean_or = function(a, b)
+      return a or b
+    end,
+    string_two_anys = function(a, b)
+      return transf.any.string(a), transf.any.string(b)
+    end,
+  },
+  two_comparables = {
     larger = function(a, b)
       if a > b then
         return a
@@ -3408,22 +3441,13 @@ transf = {
     equal = function(a, b)
       return a == b
     end,
-    boolean_and = function(a, b)
-      return a and b
-    end,
-    boolean_or = function(a, b)
-      return a or b
-    end,
-    string_a_and_b = function(a, b)
-      return transf.any.string(a) .. transf.any.string(b)
-    end,
   },
-  number_a_and_b ={
+  two_numbers ={
     sum = function(a, b)
       return a + b
     end,
   },
-  -- TODO: many things in key_value should be in a_and_b, since key_value is a special case of a_and_b where they are semantically keys and values of a table
+  -- TODO: many things in key_value should be in two_anys, since key_value is a special case of two_anys where they are semantically keys and values of a table
   key_value = {
     pair = function(key, value)
       return {key, value}
@@ -5539,10 +5563,30 @@ transf = {
         image = get.thing_name_array.chooser_image(applicable_thing_name_array, any),
       }
     end,
+    with_1_added_if_number = function(any)
+      if type(any) == "number" then
+        return any + 1
+      else
+        return any
+      end
+    end,
+    with_1_subtracted_if_number = function(any)
+      if type(any) == "number" then
+        return any - 1
+      else
+        return any
+      end
+    end,
   },
   n_anys = {
     array = function(...)
       return {...}
+    end,
+    n_anys = function(...)
+      return ...
+    end,
+    amount = function(...)
+      return #{...}
     end,
   },
   mailto_url = {
@@ -5769,6 +5813,38 @@ transf = {
     one = function()
       return 1
     end,
+    poisonable = function()
+      local dirty = false
+      local returnfn
+      returnfn = function(...)
+        if dirty then
+          error("poisoned " .. tostring(returnfn))
+        end
+        dirty = true
+        return {...}
+      end
+      return returnfn
+    end,
+    --- Create a function that returns a unique identifier for a given object.
+    --- @return fun(any): number
+    identifier_function = function()
+      local fn_id_map = setmetatable({}, {__mode = "k"}) -- weak keys to allow garbage collection
+      local next_id = 0
+
+      local function getIdentifier(thing)
+        local id = fn_id_map[thing]
+        if id == nil then
+          next_id = next_id + 1
+          id = "thing " .. next_id
+          fn_id_map[thing] = id
+        end
+        return id
+      end
+
+      return getIdentifier
+    end
+
+
   },
   action_specifier = {
     action_chooser_item_specifier = function(action_specifier)
@@ -5839,7 +5915,7 @@ transf = {
       return hs.fnutils.imap(
         thing_name_array,
         function(thing_name)
-          local spec = copy(tblmap.thing_name.chooser_image_partial_retriever_specifier)
+          local spec = get.table.copy(tblmap.thing_name.chooser_image_partial_retriever_specifier)
           spec.thing_name = thing_name
           spec.precedence = spec.precedence or 1
           return spec
@@ -5850,7 +5926,7 @@ transf = {
       return map(
         thing_name_array,
         function(thing_name)
-          local spec = copy(tblmap.thing_name.chooser_text_partial_retriever_specifier)
+          local spec = get.table.copy(tblmap.thing_name.chooser_text_partial_retriever_specifier)
           spec.thing_name = thing_name
           spec.precedence = spec.precedence or 1
           return spec
@@ -5861,7 +5937,7 @@ transf = {
       return map(
         thing_name_array,
         function(thing_name)
-          local spec = copy(tblmap.thing_name.placeholder_text_partial_retriever_specifier)
+          local spec = get.table.copy(tblmap.thing_name.placeholder_text_partial_retriever_specifier)
           spec.thing_name = thing_name
           spec.precedence = spec.precedence or 1
           return spec
@@ -5872,7 +5948,7 @@ transf = {
       return map(
         thing_name_array,
         function(thing_name)
-          local spec = copy(tblmap.thing_name.chooser_subtext_partial_retriever_specifier)
+          local spec = get.table.copy(tblmap.thing_name.chooser_subtext_partial_retriever_specifier)
           spec.thing_name = thing_name
           spec.precedence = spec.precedence or 1
           return spec
@@ -6003,6 +6079,13 @@ transf = {
       end
       return t
     end,
+    unspecified_equivalent_empty_indexable = function(indexable)
+      if is.any.string(indexable) then
+        return ""
+      else
+        return {}
+      end
+    end,
   },
   array_and_array = {
     union_set = function(arr1, arr2)
@@ -6062,5 +6145,70 @@ transf = {
     equals = function(set1, set2)
       return transf.set_and_set.is_subset(set1, set2) and transf.set_and_set.is_superset(set1, set2)
     end,
+  },
+  cronspec_string = {
+    next_timestamp_s_string = function(cronspec_string)
+      return run("ncron" .. transf.string.single_quoted_escaped(cronspec_string))
+    end,
+    next_timestamp_s = function(cronspec_string)
+      return get.string_or_number.number(transf.cronspec_string.next_timestamp_s_string(cronspec_string))
+    end,
+  },
+  start_stop_step_unit = {
+    array = function(start, stop, step, unit)
+      start = get.any.default_if_nil(start, 1)
+    
+      local mode
+      if type(start) == "number" then
+        mode = "number"
+      elseif type(start) == "table" then
+        if start.adddays then
+          mode = "date"
+        elseif start.xy then
+          mode = "point"
+        end
+      elseif type(start) == "string" then
+        mode = "string"
+      end
+    
+      local addmethod = function(a, b) 
+        return a + b 
+      end
+    
+      if mode == "number" then
+        stop = get.any.default_if_nil(stop, 10)
+        step = get.any.default_if_nil(step, 1)
+      elseif mode == "date" then
+        if start then start = start:copy() else start = date() end
+        if stop then stop = stop:copy() else stop = date():addays(10) end
+        step = get.any.default_if_nil(step, 1)
+        unit = get.any.default_if_nil(unit, "days")
+        addmethod = function(a, b) 
+          local a_copy = a:copy()
+          return a_copy["add" .. unit](a_copy, b) 
+        end
+      elseif mode == "point" then
+        start = get.any.default_if_nil(start, hs.geometry.point(0, 0))
+        stop = get.any.default_if_nil(stop, hs.geometry.point(10, 10))
+        step = get.any.default_if_nil(step, hs.geometry.point(1, 1))
+      elseif mode == "string" then
+        start = get.any.default_if_nil(start, "a")
+        stop = get.any.default_if_nil(stop, "z")
+        step = get.any.default_if_nil(step, 1)
+        addmethod = function(a, b)
+          return string.char(string.byte(a) + b)
+        end
+      end
+    
+      local range = {}
+      local current = start
+      while current <= stop do
+        table.insert(range, current)
+        current = addmethod(current, step)
+      end
+    
+      return range
+    end
+    
   }
 }

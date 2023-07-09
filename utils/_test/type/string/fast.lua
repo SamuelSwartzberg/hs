@@ -1,40 +1,40 @@
 assert(
-  anyOfFast(
+  get.string.contains_any(
     "lollololol",
     {"!", "d"}
   ) == false
 )
 
 assert(
-  anyOfFast(
+  get.string.contains_any(
     "lollololol",
     {"!", "d", "l"}
   ) == true
 )
 
 assert(
-  allOfFast(
+  get.string.contains_all(
     "lollololol",
     {"!", "d"}
   ) == false
 )
 
 assert(
-  allOfFast(
+  get.string.contains_all(
     "lollololol",
     {"!", "d", "l"}
   ) == false
 )
 
 assert(
-  allOfFast(
+  get.string.contains_all(
     "lollololol",
     {"l", "o"}
   ) == true
 )
 
 assert(
-  startsEndsWithFast(
+  get.string.starts_ends(
     "I hold these truths to be self-evident.",
     "C",
     "r"
@@ -42,7 +42,7 @@ assert(
 )
 
 assert(
-  startsEndsWithFast(
+  get.string.starts_ends(
     "I hold these truths to be self-evident.",
     "I",
     "r"
@@ -50,7 +50,7 @@ assert(
 )
 
 assert(
-  startsEndsWithFast(
+  get.string.starts_ends(
     "I hold these truths to be self-evident.",
     "I",
     "."

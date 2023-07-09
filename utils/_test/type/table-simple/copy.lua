@@ -2,34 +2,34 @@
 local simple_list = { 1, 2, 3, 4, 5 }
 
 assertMessage(
-  copy(simple_list),
+  get.table.copy(simple_list),
   simple_list
 )
 
 assertMessage(
-  copy(simple_list) == simple_list,
+  get.table.copy(simple_list) == simple_list,
   false
 )
 
 assertMessage(
-  copy(simple_list, true),
+  get.table.copy(simple_list, true),
   simple_list
 )
 
 local simple_assoc = { a = 1, b = 2, c = 3, d = 4, e = 5 }
 
 assertMessage(
-  copy(simple_assoc, false),
+  get.table.copy(simple_assoc, false),
   simple_assoc
 )
 
 assertMessage(
-  copy(simple_assoc) == simple_assoc,
+  get.table.copy(simple_assoc) == simple_assoc,
   false
 )
 
 assertMessage(
-  copy(simple_assoc, true),
+  get.table.copy(simple_assoc, true),
   simple_assoc
 )
 
@@ -42,27 +42,27 @@ local simple_ovtable = ovtable.init({
 })
 
 assertMessage(
-  copy(simple_ovtable, false),
+  get.table.copy(simple_ovtable, false),
   simple_ovtable
 )
 
 assertMessage(
-  copy(simple_ovtable) == simple_ovtable,
+  get.table.copy(simple_ovtable) == simple_ovtable,
   false
 )
 
 assertMessage(
-  copy(simple_ovtable, true),
+  get.table.copy(simple_ovtable, true),
   simple_ovtable
 )
 
 assertMessage(
-  copy(simple_ovtable, false).isovtable,
+  get.table.copy(simple_ovtable, false).isovtable,
   true
 )
 
 assertMessage(
-  copy(simple_ovtable, true).isovtable,
+  get.table.copy(simple_ovtable, true).isovtable,
   true
 )
 
@@ -70,7 +70,7 @@ local minimal_ovtable = ovtable.init({
   {"a", 1},
 })
 
-local minimal_ovtable_copy = copy(minimal_ovtable)
+local minimal_ovtable_copy = get.table.copy(minimal_ovtable)
 
 assertMessage(
   minimal_ovtable,
@@ -93,7 +93,7 @@ local tbl_w_ovtable = {
   }),
 }
 
-local tbl_w_ovtable_copy = copy(tbl_w_ovtable)
+local tbl_w_ovtable_copy = get.table.copy(tbl_w_ovtable)
 
 assertMessage(
   tbl_w_ovtable,
@@ -122,9 +122,9 @@ assertMessage(
 
 local simple_list_of_lists = { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} }
 
-local shallowcopy_list_of_lists = copy(simple_list_of_lists, false)
+local shallowcopy_list_of_lists = get.table.copy(simple_list_of_lists, false)
 
-local deepcopy_list_of_lists = copy(simple_list_of_lists, true)
+local deepcopy_list_of_lists = get.table.copy(simple_list_of_lists, true)
 
 assertMessage(
   shallowcopy_list_of_lists,
@@ -155,8 +155,8 @@ end
 
 local simple_assoc_of_assocs = { a = { i = 1, ii = 2, iii = 3 }, b = { i = 4, ii = 5, iii = 6 }, c = { i = 7, ii = 8, iii = 9 } }
 
-local shallowcopy_assoc_of_assocs = copy(simple_assoc_of_assocs, false)
-local deepcopy_assoc_of_assocs = copy(simple_assoc_of_assocs, true)
+local shallowcopy_assoc_of_assocs = get.table.copy(simple_assoc_of_assocs, false)
+local deepcopy_assoc_of_assocs = get.table.copy(simple_assoc_of_assocs, true)
 
 assertMessage(
   shallowcopy_assoc_of_assocs,
@@ -199,8 +199,8 @@ local ovtable_of_mixed_ovtable_assoc_arrs = ovtable.init({
   })}
 })
 
-local shallowcopy_ovtable_of_mixed_ovtable_assoc_arrs = copy(ovtable_of_mixed_ovtable_assoc_arrs, false)
-local deepcopy_ovtable_of_mixed_ovtable_assoc_arrs = copy(ovtable_of_mixed_ovtable_assoc_arrs, true)
+local shallowcopy_ovtable_of_mixed_ovtable_assoc_arrs = get.table.copy(ovtable_of_mixed_ovtable_assoc_arrs, false)
+local deepcopy_ovtable_of_mixed_ovtable_assoc_arrs = get.table.copy(ovtable_of_mixed_ovtable_assoc_arrs, true)
 
 assertMessage(
   shallowcopy_ovtable_of_mixed_ovtable_assoc_arrs,
@@ -251,7 +251,7 @@ local table_will_self_ref = {}
 
 table_will_self_ref.self = table_will_self_ref
 
-local deep_copy_of_table_will_self_ref = copy(table_will_self_ref, true)
+local deep_copy_of_table_will_self_ref = get.table.copy(table_will_self_ref, true)
 
 assertMessage(
   deep_copy_of_table_will_self_ref.self,
@@ -268,7 +268,7 @@ local mult_self_ref = {}
 mult_self_ref.a = mult_self_ref
 mult_self_ref.b = mult_self_ref
 
-local deep_copy_of_mult_self_ref = copy(mult_self_ref, true)
+local deep_copy_of_mult_self_ref = get.table.copy(mult_self_ref, true)
 
 assertMessage(
   deep_copy_of_mult_self_ref.a,
@@ -297,7 +297,7 @@ deep_self_ref.a.b = {}
 
 deep_self_ref.a.b.c = deep_self_ref
 
-local deep_copy_of_deep_self_ref = copy(deep_self_ref, true)
+local deep_copy_of_deep_self_ref = get.table.copy(deep_self_ref, true)
 
 assertMessage(
   deep_copy_of_deep_self_ref.a.b.c,
@@ -315,7 +315,7 @@ deep_child_ref.a = {}
 deep_child_ref.a.b = {}
 deep_child_ref.a.b.c = deep_child_ref.a
 
-local deep_copy_of_deep_child_ref = copy(deep_child_ref, true)
+local deep_copy_of_deep_child_ref = get.table.copy(deep_child_ref, true)
 
 assertMessage(
   deep_copy_of_deep_child_ref.a.b.c,
@@ -328,7 +328,7 @@ assertMessage(
 )
 
 assertMessage(
-  copy({
+  get.table.copy({
     foo = "bar"
   }, true),
   {
@@ -338,7 +338,7 @@ assertMessage(
 
 
 assertMessage(
-  copy({
+  get.table.copy({
     foo = "bar"
   }),
   {
@@ -352,7 +352,7 @@ local mutation_test_tbl_1 = {
   foo = "bar"
 }
 
-local mutation_test_tbl_2 = copy(mutation_test_tbl_1, false)
+local mutation_test_tbl_2 = get.table.copy(mutation_test_tbl_1, false)
 
 mutation_test_tbl_1.foo = "changed"
 
@@ -373,7 +373,7 @@ local mutation_test_tbl_3 = {
   }
 }
 
-local mutation_test_tbl_4 = copy(mutation_test_tbl_3, false)
+local mutation_test_tbl_4 = get.table.copy(mutation_test_tbl_3, false)
 
 
 mutation_test_tbl_3.deep.pink = "floyd changed"
@@ -395,7 +395,7 @@ local mutation_test_tbl_5 = {
   }
 }
 
-local mutation_test_tbl_6 = copy(mutation_test_tbl_5, true)
+local mutation_test_tbl_6 = get.table.copy(mutation_test_tbl_5, true)
 
 mutation_test_tbl_5.deep.pink = "floyd changed"
 

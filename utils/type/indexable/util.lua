@@ -24,7 +24,7 @@ function defaultOpts(opts, retdefault)
   elseif is.any.array(opts) then
     opts = {args = opts[1] or {"v"}, ret = opts[2] or retdefault or {"v"}}
   else
-    opts = copy(opts) or {}
+    opts = get.table.copy(opts) or {}
     opts.args = opts.args or {"v"}
     opts.ret = opts.ret or retdefault or {"v"}
   end
@@ -151,7 +151,7 @@ function addToRes(itemres,res,opts,k,v)
 
   if opts.flatten and type(newval) == "table" then
     for resk, resv in transf.table.pair_stateless_iter(newval) do
-      local optcopy = copy(opts)
+      local optcopy = get.table.copy(opts)
       optcopy.ret = {"k", "v"}
       addToRes({resk, resv}, res, optcopy)
       

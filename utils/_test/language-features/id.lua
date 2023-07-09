@@ -1,4 +1,4 @@
-local identifier = createIdentifier()
+local identifier = transf["nil"].identifier_function()
 
 local identifier_of_string = identifier("foo")
 local temp_table = {}

@@ -36,11 +36,11 @@ function doDelta(specifier, do_after)
   specifier.target_point = specifier.target_point or { x = 0, y = 0}
   specifier.factor_of_deceleration = specifier.factor_of_deceleration or 0.95
 ---@diagnostic disable-next-line: assign-type-mismatch
-  specifier.duration = specifier.duration or rand({low=0.1, high=0.3})
+  specifier.duration = specifier.duration or transf.float_interval_specifier.random({start=0.1, stop=0.3})
   specifier.jitter_factor = specifier.jitter_factor or 0.1
 
   if type(specifier.target_point) == "string" then
-    local x, y = onig.match(specifier.target_point, whole(mt._r.syntax.point))
+    local x, y = onig.match(specifier.target_point, transf.string.whole_regex(mt._r.syntax.point))
     specifier.target_point = hs.geometry.point(get.string_or_number.number(x), get.string_or_number.number(y))
   elseif type(specifier.target_point) == "table" and not specifier.target_point.type then 
     specifier.target_point = hs.geometry.new(specifier.target_point)
@@ -228,7 +228,7 @@ function doSeries(specifier, do_after)
     error("doSeries: specifier must be a string, list, or table")
   end
 
-  specifier.wait_time = specifier.wait_time or rand({low=0.10, high=0.12}) --[[ @as number ]]
+  specifier.wait_time = specifier.wait_time or transf.float_interval_specifier.random({start=0.10, stop=0.12}) --[[ @as number ]]
 
   if #specifier.specifier_list == 0 then
     if do_after then

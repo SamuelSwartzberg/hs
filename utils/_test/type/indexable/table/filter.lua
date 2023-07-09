@@ -14,12 +14,12 @@ assertMessage(
 )
 
 assertMessage(
-  filter(a_to_t, isEven, {args = "k", tolist = true}),
+  filter(a_to_t, is.number.even, {args = "k", tolist = true}),
   { "b", "d", "f", "h", "j", "l", "n", "p", "r", "t" }
 )
 
 assertMessage(
-  filter(a_to_t, isEven, {"k"}),
+  filter(a_to_t, is.number.even, {"k"}),
   {
     [2] = "b",
     [4] = "d",
@@ -42,7 +42,7 @@ sometable.d = 4
 sometable.e = 5
 
 assertMessage(
-  filter(sometable, isEven),
+  filter(sometable, is.number.even),
   {
     b = 2,
     d = 4
@@ -50,14 +50,14 @@ assertMessage(
 )
 
 assertMessage(
-  filter(sometable, isEven, {
+  filter(sometable, is.number.even, {
     tolist = true
   }),
   { 2, 4 }
 )
 
 assertMessage(
-  filter(sometable, isEven, {
+  filter(sometable, is.number.even, {
     tolist = true,
     last = true
   }),
@@ -65,7 +65,7 @@ assertMessage(
 )
 
 assertMessage(
-  filter(sometable, isEven, {
+  filter(sometable, is.number.even, {
     tolist = true,
     last = true,
     start = 3
@@ -74,7 +74,7 @@ assertMessage(
 )
 
 assertMessage(
-  filter(sometable, isEven, {
+  filter(sometable, is.number.even, {
     tolist = true,
     last = true,
     stop = 3
@@ -82,7 +82,7 @@ assertMessage(
   { 2 }
 )
 
-local noov_filtered = filter(sometable, isEven, {
+local noov_filtered = filter(sometable, is.number.even, {
   output = "table"
 })
 

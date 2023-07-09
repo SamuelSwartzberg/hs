@@ -13,11 +13,11 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   -- set defaults
 
-  condition = defaultIfNil(condition, "any")
-  create_path = defaultIfNil(create_path, true)
-  into = defaultIfNil(into, false)
-  all_in = defaultIfNil(all_in, false)
-  target = defaultIfNil(target, source .. "." .. action)
+  condition = get.any.default_if_nil(condition, "any")
+  create_path = get.any.default_if_nil(create_path, true)
+  into = get.any.default_if_nil(into, false)
+  all_in = get.any.default_if_nil(all_in, false)
+  target = get.any.default_if_nil(target, source .. "." .. action)
 
   local source_is_url = isUrl(source)
 
@@ -146,7 +146,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
       elseif action == "link" then
         error("linking remote files is not supported (not supported by rclone and also not really sensible)")
       elseif action == "zip" then
-        tmptarget = env.TMPDIR .. "/" .. os.time() .. "-" .. rand({len = 8}) .. ".zip"
+        tmptarget = env.TMPDIR .. "/" .. os.time() .. "-" .. transf.int.random_int_of_length(8) .. ".zip"
         run({
           "zip",
           "-r",

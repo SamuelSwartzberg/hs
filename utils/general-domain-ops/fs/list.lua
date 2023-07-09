@@ -40,7 +40,7 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
       path = opts
       opts = {}
     elseif type (opts) == "table" then
-      opts = copy(opts)
+      opts = get.table.copy(opts)
       path = opts.path
     elseif opts == nil then
       opts = {}
@@ -65,10 +65,10 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
     opts.validator = opts.validator or function(file_name)
       return not get.array.contains(mt._list.useless_files, file_name)
     end
-    opts.recursion = defaultIfNil(opts.recursion, false)
-    opts.include_dirs = defaultIfNil(opts.include_dirs, true)
-    opts.include_files = defaultIfNil(opts.include_files, true)
-    opts.follow_links = defaultIfNil(opts.follow_links, false)
+    opts.recursion = get.any.default_if_nil(opts.recursion, false)
+    opts.include_dirs = get.any.default_if_nil(opts.include_dirs, true)
+    opts.include_files = get.any.default_if_nil(opts.include_files, true)
+    opts.follow_links = get.any.default_if_nil(opts.follow_links, false)
   end
 
   path = mustEnd(path, "/")
@@ -134,7 +134,7 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
   if opts.slice_results then
     files = map(files, function(path)
       opts.slice_results_opts = opts.slice_results_opts or {}
-      opts.slice_results_opts.rejoin_at_end = defaultIfNil(opts.slice_results_opts.rejoin_at_end, true) -- default to rejoining the path, since more often than not we don't want to get a table of tables when listing paths
+      opts.slice_results_opts.rejoin_at_end = get.any.default_if_nil(opts.slice_results_opts.rejoin_at_end, true) -- default to rejoining the path, since more often than not we don't want to get a table of tables when listing paths
       return pathSlice(path, opts.slice_results, opts.slice_results_opts)
     end)
   end

@@ -11,10 +11,10 @@ function splice(thing1, thing2, opts)
   if type(opts) == "number" then
     opts = {start = opts}
   else
-    opts = copy(opts) or {}
+    opts = get.table.copy(opts) or {}
   end
   opts.start = opts.start or 1
-  opts.overwrite = defaultIfNil(opts.overwrite, false)
+  opts.overwrite = get.any.default_if_nil(opts.overwrite, false)
   local res = {}
   local before = slice(thing1, 1, opts.start - 1)
   if opts.overwrite then

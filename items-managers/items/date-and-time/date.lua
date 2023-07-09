@@ -19,9 +19,9 @@ DateSpecifier = {
         local weekday_number = self:get("weekday-number-start-0")
         local nearest_day_offset
         if specifier.direction == "+" then
-          nearest_day_offset = subtractionRingModuloN(weekday_number, specifier.weekday, 7)
+          nearest_day_offset = get.two_numbers.difference_modulo_n(weekday_number, specifier.weekday, 7)
         elseif specifier.direction == "-" then
-          nearest_day_offset = -subtractionRingModuloN(specifier.weekday, weekday_number, 7)
+          nearest_day_offset = -get.two_numbers.difference_modulo_n(specifier.weekday, weekday_number, 7)
         else
           error("Invalid direction: " .. specifier.direction)
         end

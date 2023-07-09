@@ -9,17 +9,17 @@ assertMessage(
 )
 
 assertMessage(
-  defaultIfNil(1, 2),
+  get.any.default_if_nil(1, 2),
   1
 )
 
 assertMessage(
-  defaultIfNil(nil, 2),
+  get.any.default_if_nil(nil, 2),
   2
 )
 
 assertMessage(
-  defaultIfNil(false, 2),
+  get.any.default_if_nil(false, 2),
   false
 )
 

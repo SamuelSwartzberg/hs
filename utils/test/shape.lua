@@ -1,5 +1,5 @@
 local types = { "string", "number", "boolean", "table", "function", "nil", "thread", "userdata" }
-local types_w_any = copy(types, false)
+local types_w_any = get.table.copy(types, false)
 table.insert(types_w_any, "any")
 
 --- @alias shape_table { [string]: string|shape_table }
@@ -14,7 +14,7 @@ function resolveTypeMatchingToKeys(test_tbl, shape)
       for k, _ in transf.table.pair_stateless_iter(test_tbl) do -- for each key in test_tbl
         if type(k) == typ or typ == "any" then -- if the test_tbl key is of the type we want
           if not shape[k] then -- and if the test_tbl key is not explicitly specified in the shape already
-            shape[k] = copy(shape["[" .. typ .. "]"])  -- then add a copy of the type we want to the shape
+            shape[k] = get.table.copy(shape["[" .. typ .. "]"])  -- then add a copy of the type we want to the shape
           end
         end
       end

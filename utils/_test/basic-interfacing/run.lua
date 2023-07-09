@@ -50,11 +50,11 @@ assertMessage(
   buildInnerCommand({
     "echo",
     {
-      value = "seq 1 10",
+      value = "transf.start_stop_step_unit.array 1 10",
       type = "interpolated"
     }
   }),
-  'echo "$(seq 1 10)"'
+  'echo "$(transf.start_stop_step_unit.array 1 10)"'
 )
 
 -- quoted parts in interpolated parts

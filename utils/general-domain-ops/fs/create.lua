@@ -34,12 +34,12 @@ end
 --- @param fail? "error" | "nil" what to do if an error occurs. Defaults to "nil"
 --- @return string | nil 
 function writeFile(path, contents, condition, create_path, mode, fail)
-  contents = defaultIfNil(contents, "")
-  condition = defaultIfNil(condition, "any")
-  create_path = defaultIfNil(create_path, true)
-  mode = defaultIfNil(mode, "w")
+  contents = get.any.default_if_nil(contents, "")
+  condition = get.any.default_if_nil(condition, "any")
+  create_path = get.any.default_if_nil(create_path, true)
+  mode = get.any.default_if_nil(mode, "w")
   path = transf.string.path_resolved(path, true)
-  fail = defaultIfNil(fail, "nil")
+  fail = get.any.default_if_nil(fail, "nil")
 
   local path_is_remote = is.path.remote(path)
 

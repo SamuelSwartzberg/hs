@@ -10,7 +10,7 @@ function reduce(tbl, reducer, opts)
 
   -- defaults for all args
 
-  reducer = reducer or transf.a_and_b.larger
+  reducer = reducer or transf.two_comparables.larger
   opts = defaultOpts(opts)
   tbl = getDefaultInput(tbl)
 

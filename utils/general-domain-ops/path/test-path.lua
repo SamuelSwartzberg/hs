@@ -18,7 +18,7 @@ function testPath(path, opts)
   elseif type(opts) == "string" then
     opts = {dirness = opts} 
   else
-    opts = copy(opts)
+    opts = get.table.copy(opts)
   end
   path = path or env.HOME
   path = transf.string.path_resolved(path, true)
@@ -95,5 +95,5 @@ function testPath(path, opts)
     end
   end
 
-  return reduce(results, transf.a_and_b.boolean_and)
+  return reduce(results, transf.two_anys.boolean_and)
 end

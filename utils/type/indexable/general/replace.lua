@@ -20,7 +20,7 @@
 --- @return T
 function replace(thing, opts, globalopts)
   if opts == nil then return thing end
-  opts = copy(opts) or {}
+  opts = get.table.copy(opts) or {}
   if not is.any.array(opts) then opts = {opts} end
 
   --- allow for tr-like operation with two lists
@@ -44,22 +44,22 @@ function replace(thing, opts, globalopts)
 
   globalopts = globalopts or {}
   local mode, args, ret, cond, proc, findopts, limit = globalopts.mode, globalopts.args, globalopts.ret, globalopts.cond, globalopts.proc, globalopts.findopts, globalopts.limit
-  mode = defaultIfNil(mode, "replace")
-  cond = defaultIfNil(cond, "\"")
-  proc = defaultIfNil(proc, "\\")
+  mode = get.any.default_if_nil(mode, "replace")
+  cond = get.any.default_if_nil(cond, "\"")
+  proc = get.any.default_if_nil(proc, "\\")
 
   local res = thing
   for _, opt in transf.array.index_value_stateless_iter(opts) do
     if is.any.pair(opt) then
       opt = {cond = opt[1], proc = opt[2]}
     end
-    matchall = defaultIfNil(opt.matchall, matchall)
-    mode = defaultIfNil(opt.mode, mode)
-    args = defaultIfNil(opt.args, args)
-    ret = defaultIfNil(opt.ret, ret)
-    cond = defaultIfNil(opt.cond, cond)
-    proc = defaultIfNil(opt.proc, proc)
-    limit = defaultIfNil(opt.limit, limit)
+    matchall = get.any.default_if_nil(opt.matchall, matchall)
+    mode = get.any.default_if_nil(opt.mode, mode)
+    args = get.any.default_if_nil(opt.args, args)
+    ret = get.any.default_if_nil(opt.ret, ret)
+    cond = get.any.default_if_nil(opt.cond, cond)
+    proc = get.any.default_if_nil(opt.proc, proc)
+    limit = get.any.default_if_nil(opt.limit, limit)
 
   
     if not opt.cond and type(proc) == "table" and not is.table.array(proc) then

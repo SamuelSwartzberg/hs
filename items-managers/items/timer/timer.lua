@@ -18,7 +18,7 @@ TimerItemSpecifier = {
         return self:get("c").timer
       end,
       ["calculate-next-firing"] = function(self)
-        return memoize(getCronNextTime)(self:get("interval"))
+        return memoize(transf.cronspec_string.next_timestamp_s)(self:get("interval"))
       end,
       ["low-impact"] = function(self)
         return self:get("c").low_impact

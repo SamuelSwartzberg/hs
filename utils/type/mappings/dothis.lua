@@ -408,7 +408,7 @@ dothis = {
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
     end,
     alert = function(str, opts)
-      opts = copy(opts) or {}
+      opts = get.table.copy(opts) or {}
       opts.duration = opts.duration or 10
       return hs.alert.show(str, {textSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3}, opts.duration)
     end,

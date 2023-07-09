@@ -10,7 +10,7 @@
 --- @param opts? splitOpts
 --- @return T[], T[]?
 function split(thing, sep, opts)
-  opts = copy(opts) or {}
+  opts = get.table.copy(opts) or {}
   local splintervals = find(
     thing,
     sep,

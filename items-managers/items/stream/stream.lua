@@ -180,7 +180,7 @@ StreamControlItemSpecifier = {
       ["playlist-last"] = function(self) self:doThis("set", {key =  "playlist-pos", args = self:get("key", "playlist-count")}) end,
       ["restart-current"] = function(self) self:doThis("set", {key =  "time-pos", args = 0}) end,
       ["cycle-inf-no"] = function(self, prop)
-        self:doThis("set", {key =  prop, args = InfNo:inv(self:get("key", prop))})
+        self:doThis("set", {key =  prop, args = get.binary_specifier.inverted(tblmap.binary_specifier_name.binary_specifier["inf_no"], self:get("key", prop))})
       end,
       ["loop-playlist"] = function (self)
         self:doThis("cycle-inf-no", "loop-playlist")

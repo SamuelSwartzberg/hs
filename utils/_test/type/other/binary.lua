@@ -1,64 +1,64 @@
 assertMessage(
-  InfNo:get(true),
+  get.binary_specifier.string(tblmap.binary_specifier_name.binary_specifier.inf_no, true),
   "inf"
 )
 
 assertMessage(
-  InfNo:get(false),
+  get.binary_specifier.string(tblmap.binary_specifier_name.binary_specifier.inf_no, false),
   "no"
 )
 
 assertMessage(
-  InfNo:getBool("inf"),
+  get.binary_specifier.boolean(tblmap.binary_specifier_name.binary_specifier.inf_no, "inf"),
   true
 )
 
 assertMessage(
-  InfNo:getBool("no"),
+  get.binary_specifier.boolean(tblmap.binary_specifier_name.binary_specifier.inf_no, "no"),
   false
 )
 
 assertMessage(
-  pcall(InfNo.getBool, InfNo, "foo"),
+  pcall(get.binary_specifier.boolean, tblmap.binary_specifier_name.binary_specifier.inf_no, "foo"),
   false
 )
 
 assertMessage(
-  InfNo:invBool(true),
+  get.binary_specifier.inverted_string(tblmap.binary_specifier_name.binary_specifier.inf_no, true),
   "no"
 )
 
 assertMessage(
-  InfNo:invBool(false),
+  get.binary_specifier.inverted_string(tblmap.binary_specifier_name.binary_specifier.inf_no, false),
   "inf"
 )
 
 assertMessage(
-  InfNo:invV("inf"),
+  get.binary_specifier.inverted(tblmap.binary_specifier_name.binary_specifier.inf_no, "inf"),
   "no"
 )
 
 assertMessage(
-  InfNo:invV("no"),
+  get.binary_specifier.inverted(tblmap.binary_specifier_name.binary_specifier.inf_no, "no"),
   "inf"
 )
 
 assertMessage(
-  InfNo:inv("inf"),
+  get.binary_specifier.inverted(tblmap.binary_specifier_name.binary_specifier.inf_no, "inf"),
   "no"
 )
 
 assertMessage(
-  InfNo:inv("no"),
+  get.binary_specifier.inverted(tblmap.binary_specifier_name.binary_specifier.inf_no, "no"),
   "inf"
 )
 
 assertMessage(
-  InfNo:inv(true),
+  get.binary_specifier.inverted(tblmap.binary_specifier_name.binary_specifier.inf_no, true),
   "no"
 )
 
 assertMessage(
-  InfNo:inv(false),
+  get.binary_specifier.inverted(tblmap.binary_specifier_name.binary_specifier.inf_no, false),
   "inf"
 )

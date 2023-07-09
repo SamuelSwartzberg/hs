@@ -9,10 +9,10 @@ function delete(path, thing, action, onlyif, fail)
 
   -- set defaults
 
-  thing = defaultIfNil(thing, "any")
-  action = defaultIfNil(action, "delete")
-  onlyif = defaultIfNil(onlyif, "any")
-  fail = defaultIfNil(fail, "nil")
+  thing = get.any.default_if_nil(thing, "any")
+  action = get.any.default_if_nil(action, "delete")
+  onlyif = get.any.default_if_nil(onlyif, "any")
+  fail = get.any.default_if_nil(fail, "nil")
 
   -- resolve path
 

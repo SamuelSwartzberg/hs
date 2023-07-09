@@ -29,7 +29,7 @@ function slice(thing, start_or_spec, stop, step)
   -- parse the slice spec if it's a string or table
 
   if type(start_or_spec) == "table" then
-    spec = copy(start_or_spec, false)
+    spec = get.table.copy(start_or_spec, false)
   elseif type(start_or_spec) == "string" then
     local stripped_str = stringy.strip(start_or_spec)
     local start_str, stop_str, step_str = onig.match(
@@ -79,8 +79,8 @@ function slice(thing, start_or_spec, stop, step)
 
   -- clamp indices to ensure we don't go out of bounds (+/-1 because we want over/underindexing to produce an empty thing, not the last element)
 
-  spec.start = clamp(spec.start, 1, len(thing) + 1)
-  spec.stop = clamp(spec.stop, 1-1, len(thing))
+  spec.start = get.comparable.clamp(spec.start, 1, len(thing) + 1)
+  spec.stop = get.comparable.clamp(spec.stop, 1-1, len(thing))
 
   -- handle cases where users have passed conditions that will result in an infinite loop
   -- currently: return empty thing
@@ -103,12 +103,12 @@ function slice(thing, start_or_spec, stop, step)
   end
 
   if spec.fill then
-    local prepend = returnEmpty(thing)
+    local prepend = transf.indexable.unspecified_equivalent_empty_indexable(thing)
     for i = 1, spec.start - 1 do
       prepend = append(prepend, spec.fill)
     end
 
-    local postpend = returnEmpty(thing)
+    local postpend = transf.indexable.unspecified_equivalent_empty_indexable(thing)
     for i = spec.stop + 1, len(thing) do
       postpend = append(postpend, spec.fill)
     end

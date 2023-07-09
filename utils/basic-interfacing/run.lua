@@ -66,7 +66,7 @@ function run(opts, and_then, ...)
   end
   local cmd = "cd && source \"$HOME/.target/envfile\" && " .. buildInnerCommand(opts.args)
 
-  opts.dont_clean_output = defaultIfNil(opts.dont_clean_output, false)
+  opts.dont_clean_output = get.any.default_if_nil(opts.dont_clean_output, false)
   
   local catch = function(exit_code, std_err)
     local should_run_default_catch = true
@@ -83,7 +83,7 @@ function run(opts, and_then, ...)
     end
   end
 
-  opts.run_immediately = defaultIfNil(opts.run_immediately, true)
+  opts.run_immediately = get.any.default_if_nil(opts.run_immediately, true)
   opts.and_then = opts.and_then or and_then
   if opts.and_then and not opts.force_sync then
     if opts.and_then == true then -- in this case, we're only using and_then to indicate that we want to run the task asyncly

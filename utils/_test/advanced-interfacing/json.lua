@@ -218,7 +218,7 @@ local uuid_response = rest({
 local actual_uuid = json.decode(uuid_response).uuid
 
 assert(
-  onig.match(actual_uuid, whole(mt._r.id.uuid))
+  onig.match(actual_uuid, transf.string.whole_regex(mt._r.id.uuid))
 )
 
 -- get auth token

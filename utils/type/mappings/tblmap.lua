@@ -559,6 +559,14 @@ tblmap = {
         }
       }
     }
+  },
+  binary_specifier_name = {
+    binary_specifier = {
+      inf_no = {
+        vt = "inf",
+        vf = "no"
+      }
+    }
   }
 }
 
