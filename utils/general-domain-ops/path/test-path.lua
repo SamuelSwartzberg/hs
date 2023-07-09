@@ -46,7 +46,7 @@ function testPath(path, opts)
     exists = pcall(run,{"rclone", "ls", {value = path, type = "quoted"}})
   end
 
-  push(results, exists == opts.exists)
+  dothis.array.push(results, exists == opts.exists)
 
   if exists and opts.exists then -- if the path exists and we want it to exist, test the dirness and contents
 
@@ -65,7 +65,7 @@ function testPath(path, opts)
     end
 
     if opts.dirness ~= nil then
-      push(results, dirness == (opts.dirness == "dir"))
+      dothis.array.push(results, dirness == (opts.dirness == "dir"))
       if results[#results] == false then -- return early if the dirness test fails. This may be removed at some point if I allow for 'or'-logic at some point
         return false
       end
@@ -84,13 +84,13 @@ function testPath(path, opts)
       -- test contents
       if type(opts.contents) == "boolean" then -- boolean case: test whether the contents are nil or not
         if dirness then
-          push(results, opts.contents == (#contents > 0))
+          dothis.array.push(results, opts.contents == (#contents > 0))
         else
           local isempty = contents == nil or contents == ""
-          push(results, opts.contents == (not isempty))
+          dothis.array.push(results, opts.contents == (not isempty))
         end
       else
-        push(results, find(contents, opts.contents))
+        dothis.array.push(results, find(contents, opts.contents))
       end
     end
   end

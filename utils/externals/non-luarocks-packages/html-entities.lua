@@ -2300,7 +2300,7 @@ function htmlEntities.filter(input, table)
     return false
   end
   local output = input
-  for s, v in pairs(table) do
+  for s, v in transf.native_table.key_value_stateless_iter(table) do
     output = output:gsub(s, v)
   end
   return output
@@ -2321,7 +2321,7 @@ function htmlEntities.ASCII_HEX(input)
       --> FIX UTF8 for Lua 5.2 and 5.1 https://stackoverflow.com/a/26052539
       local bytemarkers = { { 0x7FF, 192 }, { 0xFFFF, 224 }, { 0x1FFFFF, 240 } }
       local charbytes = {}
-      for bytes, vals in ipairs(bytemarkers) do
+      for bytes, vals in transf.array.index_value_stateless_iter(bytemarkers) do
         if input <= vals[1] then
           for b = bytes + 1, 2, -1 do
             local mod = input % 64

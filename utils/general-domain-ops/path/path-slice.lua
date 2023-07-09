@@ -50,14 +50,14 @@ function pathSlice(path, spec, opts)
       table.remove(raw_path_components, 1) -- remove the empty string at the beginning
     end
     if ended_with_slash then
-      pop(raw_path_components) -- remove the empty string at the end
+      dothis.array.pop(raw_path_components) -- remove the empty string at the end
     end
   end
 
   -- handle special case of also slicing the extension
   -- both relevant if we want to actually separate the extension or if we want to standartize it
   if (opts.ext_sep or opts.standartize_ext) and not path_is_empty then
-    local leaf = pop(raw_path_components)
+    local leaf = dothis.array.pop(raw_path_components)
     local without_extension = ""
     local extension = ""
     if leaf == "" then
@@ -77,10 +77,10 @@ function pathSlice(path, spec, opts)
     end
 
     if opts.ext_sep then
-      push(raw_path_components, without_extension)
-      push(raw_path_components, extension)
+      dothis.array.push(raw_path_components, without_extension)
+      dothis.array.push(raw_path_components, extension)
     else
-      push(raw_path_components, without_extension .. "." .. extension)
+      dothis.array.push(raw_path_components, without_extension .. "." .. extension)
     end
   end
 
@@ -102,9 +102,9 @@ function pathSlice(path, spec, opts)
       table.insert(res, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
     end
     if opts.ext_sep then -- if we separated the path into filename and extension, we need to rejoin them
-      local extension = pop(res)
+      local extension = dothis.array.pop(res)
       if not extension then return "" end
-      local without_extension = pop(res)
+      local without_extension = dothis.array.pop(res)
       if without_extension == nil then -- in this case, we sliced everything but the last element
         return extension
       else
@@ -125,8 +125,8 @@ function pathSlice(path, spec, opts)
     end
   elseif opts.entire_path_for_each then
     if opts.ext_sep then error("Getting entire path for each component when treating filename and extension as separate components is difficult and thus currently not supported") end
-    for i, v in ipairs(res) do
-      for rawi, rawv in ipairs(raw_path_components) do
+    for i, v in transf.array.index_value_stateless_iter(res) do
+      for rawi, rawv in transf.array.index_value_stateless_iter(raw_path_components) do
         if rawv == v then
           local relevant_path_components = slice(raw_path_components, { start = 1, stop = rawi })
           if started_with_slash then

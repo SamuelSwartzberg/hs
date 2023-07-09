@@ -12,7 +12,7 @@ CreatableItemSpecifier = {
       ["specid"] = function(self)
         local spec = self:get("specifier")
         local filteredSpec = {}
-        for k,v in pairs(spec) do
+        for k,v in transf.native_table.key_value_stateless_iter(spec) do
           if type(v) ~= "userdata" and type(v) ~= "function" then
             filteredSpec[k] = v
           end

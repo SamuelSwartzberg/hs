@@ -5,7 +5,7 @@ SystemSpecifier = {
     getables = {
       ["all-non-root-volumes-string-array"] = function()
         local volume_arr = ar(filter(
-          keys(hs.fs.volume.allVolumes()),
+          transf.native_table_or_nil.key_array(hs.fs.volume.allVolumes()),
           {
             _exactly = "/",
             _invert = true
@@ -22,7 +22,7 @@ SystemSpecifier = {
       end,
       ["all-devices-of-type-audiodevice-array"] = function(self, subtype)
         return ar(map(
-          values(
+          transf.native_table_or_nil.value_array(
             hs.audiodevice["all" .. replace(subtype, to.case.capitalized) .. "Devices"]()
           ),
           bind(CreateAudiodeviceSpecifierItem, {a_use, subtype })

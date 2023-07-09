@@ -69,7 +69,7 @@ is = {
     indicated_digit_string = function(str)
       return 
         stringy.startswith(str, "0") and
-        get.array.contains(keys(tblmap.base_letter.base), str:sub(2, 2)) and
+        get.array.contains(transf.native_table_or_nil.key_array(tblmap.base_letter.base), str:sub(2, 2)) and
         is.ascii.digit_string(str:sub(3))
     end,
     potentially_indicated_digit_string = function(str)
@@ -339,6 +339,9 @@ is = {
     array = function(val)
       return is.any.table(val) and is.table.arraylike(val) and is.arraylike.array(val)
     end,
+    pair = function(val)
+      return is.any.array(val) and is.array.pair(val)
+    end,
     non_empty_table_array = function(val)
       return is.any.table(val) and is.table.non_empty_table(val) and is.table.arraylike(val) and is.arraylike.array(val)
     end,
@@ -419,8 +422,11 @@ is = {
       return
         t.ipc_socket_id and t.stream_creation_specifier
     end,
+    native_table = function(t)
+      return not t.isovtable
+    end,
     empty_table = function(t)
-      for k, v in pairs(t) do
+      for k, v in transf.native_table.key_value_stateless_iter(t) do
         return false
       end
       return true
@@ -429,7 +435,7 @@ is = {
       return not is.table.empty_table(t)
     end,
     arraylike_by_keys = function(t)
-      for k, v in pairs(t) do
+      for k, v in transf.native_table.key_value_stateless_iter(t) do
         if type(k) ~= "number" then return false end
       end
       return true
@@ -471,6 +477,9 @@ is = {
     array = function(arraylike)
       return not is.arraylike.hole_y_arraylike(arraylike)
     end,
+  },
+  assoclike = {
+
   },
   hole_y_arraylike = {
 

@@ -15,7 +15,7 @@ transf = {
   },
   potentially_indicated_digit_string = {
     digit_string = function(indicated_number)
-      return onig.match(indicated_number, "^(?:0[" .. table.concat(keys(tblmap.base_letter.base), "") .. "])?(.+)$")
+      return onig.match(indicated_number, "^(?:0[" .. table.concat(transf.native_table_or_nil.key_array(tblmap.base_letter.base), "") .. "])?(.+)$")
     end,
   },
   digit_string = {
@@ -347,6 +347,30 @@ transf = {
     choosing_hschooser_specifier = function(arr)
       return get.hschooser_specifier.choosing_hschooser_specifier(transf.array.hschooser_specifier(arr), "index", arr)
     end,
+    index_value_stateless_iter = ipairs,
+    value_boolean_dict = function(arr)
+      return map(arr, function(v) return v, true end, { args = "v", ret = "kv", nooverwrite = true })
+    end,
+    set = function(arr)
+      return transf.native_table_or_nil.key_array(
+        transf.array.value_boolean_dict(arr)
+      )
+    end,
+    permutation_array = function(arr)
+      if #arr == 0 then
+        return {{}}
+      else
+        return get.any_stateful_generator.array(combine.permute, arr)
+      end
+    end,
+    powerset = function(arr)
+      if #arr == 0 then
+        return {{}}
+      else
+        local output = concat( get.any_stateful_generator.array(combine.powerset, arr), {{}} )
+        return output
+      end
+    end
   },
   hole_y_arraylike = {
     array = function(tbl)
@@ -362,7 +386,7 @@ transf = {
   assoc_arr_array = {
     assoc_arr_with_index_as_key_array = function(arr)
       local res = copy(arr, true)
-      for i, v in ipairs(arr) do
+      for i, v in transf.array.index_value_stateless_iter(arr) do
         v.index = i
       end
       return res
@@ -448,12 +472,12 @@ transf = {
   path_with_intra_file_locator = {
     path_with_intra_file_locator_specifier = function(path)
       local parts = stringy.split(path, ":")
-      local final_part = pop(parts)
+      local final_part = dothis.array.pop(parts)
       local specifier = {}
       if is.string.number(parts[#parts]) then
         specifier = {
           column = final_part,
-          line = pop(parts),
+          line = dothis.array.pop(parts),
           path = table.concat(parts, ":")
         }
       else
@@ -541,11 +565,11 @@ transf = {
     end,
     filenames_array = function(path_array)
       local filenames = hs.fnutils.imap(path_array, transf.path.filename)
-      return toSet(filenames)
+      return transf.array.set(filenames)
     end,
     extensions_array = function(path_array)
       local extensions = hs.fnutils.imap(path_array, transf.path.extension)
-      return toSet(extensions)
+      return transf.array.set(extensions)
     end,
     extant_path_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.exists)
@@ -760,7 +784,7 @@ transf = {
       return transf.fs_tag_assoc.fs_tag_string(path_leaf_specifier.fs_tag_assoc)
     end,
     fs_tag_keys = function(path_leaf_specifier)
-      return keys(path_leaf_specifier.fs_tag_assoc)
+      return transf.native_table_or_nil.key_array(path_leaf_specifier.fs_tag_assoc)
     end,
     path = function(path_leaf_specifier)
       return transf.path.ending_with_slash(path_leaf_specifier.path) 
@@ -1095,22 +1119,22 @@ transf = {
         }
       end)
     end,
-    dependency_ordered_key_value_pair_array = function(dict)
-      return transf.key_value_and_dependency_dict.dependency_ordered_key_value_pair_array(
+    dependency_ordered_key_value_array = function(dict)
+      return transf.key_value_and_dependency_dict.dependency_ordered_key_value_array(
         transf.key_value_and_dependency_dict.key_value_and_dependency_dict(dict)
       )
     end,
     env_string = function(dict)
       transf.env_line_array.env_string(
         transf.pair_array.env_line_array(
-          transf.env_var_name_value_dict.dependency_ordered_key_value_pair_array(dict)
+          transf.env_var_name_value_dict.dependency_ordered_key_value_array(dict)
         )
       )
     end
 
   },
   key_value_and_dependency_dict = {
-    dependency_ordered_key_value_pair_array = function(dict)local result = {}  -- Table to store the sorted keys
+    dependency_ordered_key_value_array = function(dict)local result = {}  -- Table to store the sorted keys
       local visited = {}  -- Table to keep track of visited keys
       local temp_stack = {}  -- Table to detect cyclic dependencies
   
@@ -1124,7 +1148,7 @@ transf = {
               temp_stack[key] = true  -- Add key to temporary stack to detect cyclic dependencies
   
               -- Traverse dependencies recursively
-              for _, dep in ipairs(dict[key]['dependencies']) do
+              for _, dep in transf.array.index_value_stateless_iter(dict[key]['dependencies']) do
                   dfs(dep)
               end
   
@@ -1135,7 +1159,7 @@ transf = {
       end
   
       -- Perform DFS traversal for each key in the graph
-      for key, _ in pairs(dict) do
+      for key, _ in transf.native_table.key_value_stateless_iter(dict) do
           dfs(key)
       end
   
@@ -1424,7 +1448,7 @@ transf = {
       )[#list]
     end,
     date_component_name_list_inverse = function(list)
-      return setDifference(mt._list.date.date_component_names, list)
+      return transf.array_and_array.difference_set(mt._list.date.date_component_names, list)
     end,
     rfc3339like_dt_separator_list  = function(list)
       return map(
@@ -1800,10 +1824,10 @@ transf = {
   },
   date_component_name_value_dict = {
     date_component_name_list_set = function(date_component_name_value_dict)
-      return keys(date_component_name_value_dict)
+      return transf.native_table_or_nil.key_array(date_component_name_value_dict)
     end,
     date_component_value_list_set = function(date_component_name_value_dict)
-      return values(date_component_name_value_dict)
+      return transf.native_table_or_nil.value_array(date_component_name_value_dict)
     end,
     date_component_name_list_not_set = function(date_component_name_value_dict)
       return transf.date_component_name_list.date_component_name_list_inverse(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
@@ -1864,7 +1888,7 @@ transf = {
     end, 
     prefix_date_component_name_value_dict = function(date_component_name_value_dict)
       local res = {}
-      for _, date_component_name in ipairs(mt._list.date.date_component_names) do
+      for _, date_component_name in transf.array.index_value_stateless_iter(mt._list.date.date_component_names) do
         if date_component_name_value_dict[date_component_name] == nil then
           return res
         end
@@ -2065,12 +2089,12 @@ transf = {
       -- In the vCard standard, some properties can have vcard_types. 
       -- For example, a phone number can be 'work' or 'home'. 
       -- Here, we're iterating over the keys in the contact data that have associated vcard_types.
-      for _, vcard_key in ipairs(mt._list.vcard.keys_with_vcard_type) do
+      for _, vcard_key in transf.array.index_value_stateless_iter(mt._list.vcard.keys_with_vcard_type) do
       
           -- We iterate over each of these keys. Each key can have multiple vcard_types, 
           -- which we get as a comma-separated string (type_list). 
           -- We also get the corresponding value for these vcard_types.
-          for type_list, value in ipairs(contact_table[vcard_key]) do
+          for type_list, value in transf.array.index_value_stateless_iter(contact_table[vcard_key]) do
           
               -- We split the type_list into individual vcard_types. This is done because 
               -- each vcard_type might need to be processed independently in the future. 
@@ -2080,7 +2104,7 @@ transf = {
               -- For each vcard_type, we create a new key-value pair in the contact_table. 
               -- This way, we can access the value directly by vcard_type, 
               -- without needing to parse the type_list each time.
-              for _, vcard_type in ipairs(vcard_types) do
+              for _, vcard_type in transf.array.index_value_stateless_iter(vcard_types) do
                   contact_table[vcard_key][vcard_type] = value
               end
           end
@@ -2091,7 +2115,7 @@ transf = {
       -- This 'contact' field holds the complete contact information.
       -- This could be useful in scenarios where address tables are processed individually,
       -- and there's a need to reference back to the full contact details.
-      for _, address_table in ipairs(contact_table["Addresses"]) do
+      for _, address_table in transf.array.index_value_stateless_iter(contact_table["Addresses"]) do
           address_table.contact = contact_table
       end
       
@@ -2304,7 +2328,7 @@ transf = {
   },
   vcard_type_dict = {
     vcard_types = function (vcard_type_dict)
-      return keys(vcard_type_dict)
+      return transf.native_table_or_nil.key_array(vcard_type_dict)
     end
   },
   vcard_type_address_table_dict = {
@@ -2863,7 +2887,7 @@ transf = {
       local reduced_components = {}
       local started_with_slash = stringy.startswith(path, "/")
       local components_are_all_dotdot = false
-      for _, component in ipairs(components) do
+      for _, component in transf.array.index_value_stateless_iter(components) do
         if component == ".." then
           if #reduced_components > 0 and not components_are_all_dotdot then
             table.remove(reduced_components)
@@ -2911,7 +2935,7 @@ transf = {
     event_table = function(str)
       local components = stringx.split(str, mt._contains.unique_field_separator)
       local parsed = ovtable.new()
-      for i, component in ipairs(components) do
+      for i, component in transf.array.index_value_stateless_iter(components) do
         local key = mt._list.khal.parseable_format_components[i]
         if key == "alarms" then
           parsed[key] = stringy.split(component, ",")
@@ -3117,10 +3141,10 @@ transf = {
   event_table = {
     calendar_template = function(event_table)
       local template = get.khal.calendar_template_empty()
-      for key, value in fastpairs(event_table) do
+      for key, value in transf.table.pair_stateless_iter(event_table) do
         if template[key] then
           if key == "repeat" then
-            for subkey, subvalue in fastpairs(value) do
+            for subkey, subvalue in transf.table.pair_stateless_iter(value) do
               template[key][subkey].value = subvalue
             end
           else
@@ -3210,7 +3234,7 @@ transf = {
       local raw_countries = stringx.split(raw, "\n\n") -- stringy does not support splitting by multiple characters
       raw_countries = filter(raw_countries, true)
       local countries = {}
-      for _, raw_country in ipairs(raw_countries) do
+      for _, raw_country in transf.array.index_value_stateless_iter(raw_countries) do
         local raw_country_lines = stringy.split(raw_country, "\n")
         raw_country_lines = filter(raw_country_lines, true)
         local country_header = raw_country_lines[1]
@@ -3219,10 +3243,10 @@ transf = {
         local payload_lines = slice(raw_country_lines, 2, -1)
         countries[country_code] = {}
         local city_code
-        for _, payload_line in ipairs(payload_lines) do
+        for _, payload_line in transf.array.index_value_stateless_iter(payload_lines) do
           if stringy.startswith(payload_line, "\t\t") then -- line specifying a single relay
             local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
-            push(countries[country_code][city_code], relay_code)
+            dothis.array.push(countries[country_code][city_code], relay_code)
           elseif stringy.startswith(payload_line, "\t") then -- line specifying an entire city
             city_code = slice(payload_line, "(", ")") -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
             countries[country_code][city_code] = {}
@@ -3381,6 +3405,9 @@ transf = {
         return b
       end
     end,
+    equal = function(a, b)
+      return a == b
+    end,
     boolean_and = function(a, b)
       return a and b
     end,
@@ -3396,6 +3423,7 @@ transf = {
       return a + b
     end,
   },
+  -- TODO: many things in key_value should be in a_and_b, since key_value is a special case of a_and_b where they are semantically keys and values of a table
   key_value = {
     pair = function(key, value)
       return {key, value}
@@ -3679,12 +3707,48 @@ transf = {
       )
     end,
   },
+  native_table_or_nil = {
+    key_array = function(t)
+      if t == nil then return {} end
+      return transf.native_table.key_array(t)
+    end,
+    value_array = function(t)
+      if t == nil then return {} end
+      return transf.native_table.value_array(t)
+    end
+  },
+  native_table = {
+    key_array = function(t)
+      local res = {}
+      for k, _ in transf.native_table.key_value_stateless_iter(t) do
+        res[#res + 1] = k
+      end
+      return res
+    end,
+    value_array = function(t)
+      local res = {}
+      for _, v in transf.native_table.key_value_stateless_iter(t) do
+        res[#res + 1] = v
+      end
+      return res
+    end,
+    key_value_stateless_iter = pairs,
+    key_value_stateful_iter = get.stateless_generator.stateful_generator(transf.native_table.key_value_stateless_iter)
+  },
   table = {
     first_key = function(t)
       return elemAt(t, 1, "k")
     end,
     first_value = function(t)
       return elemAt(t, 1, "v")
+    end,
+    --- @return function, table?, any?
+    pair_stateless_iter = function(t)
+      if t.isovtable then
+        return t:pairs()
+      else
+        return transf.native_table.key_value_stateless_iter(t)
+      end
     end,
     last_key = function(t)
       return elemAt(t, len(t), "k")
@@ -3722,7 +3786,7 @@ transf = {
       return contents
     end,
     value_set = function(t)
-      return toSet(values(t))
+      return transf.array.set(transf.native_table_or_nil.value_array(t))
     end,
     n_anys = function(t)
       return table.unpack(t)
@@ -3789,14 +3853,14 @@ transf = {
     email_header = function(t)
       local header_lines = {}
       local initial_headers = mt._list.initial_headers
-      for _, header_name in ipairs(initial_headers) do
+      for _, header_name in transf.array.index_value_stateless_iter(initial_headers) do
         local header_value = t[header_name]
         if header_value then
           table.insert(header_lines, transf.pair.email_header({header_name, header_value}))
           t[header_name] = nil
         end
       end
-      for key, value in prs(t) do
+      for key, value in get.indexable.key_value_stateless_iter(t) do
         table.insert(header_lines, transf.pair.email_header({key, value}))
       end
       return table.concat(header_lines, "\n")
@@ -3848,7 +3912,7 @@ transf = {
       )
     end,
     truthy_value_key_array = function(t)
-      return keys(transf.dict.truthy_value_dict(t))
+      return transf.native_table_or_nil.key_array(transf.dict.truthy_value_dict(t))
     end,
   },
   string_value_dict = {
@@ -3857,7 +3921,7 @@ transf = {
   string_key_dict = {
     string_key_dict_of_string_key_dicts_or_prev_values_by_space = function(tbl)
       local res = {}
-      for k, v in fastpairs(tbl) do
+      for k, v in transf.table.pair_stateless_iter(tbl) do
         local key_parts = stringy.split(k, " ")
         local label = key_parts[1]
         local key = key_parts[2]
@@ -3888,7 +3952,7 @@ transf = {
   pair_array = {
     dict = function(arr)
       local res = {}
-      for _, pair in ipairs(arr) do
+      for _, pair in transf.array.index_value_stateless_iter(arr) do
         res[pair[1]] = pair[2]
       end
       return res
@@ -3916,8 +3980,8 @@ transf = {
   dict_of_dicts = {
     dict_by_space = function(dict_of_dicts)
       local res = {}
-      for label, dict in fastpairs(dict_of_dicts) do
-        for k, v in fastpairs(dict) do
+      for label, dict in transf.table.pair_stateless_iter(dict_of_dicts) do
+        for k, v in transf.table.pair_stateless_iter(dict) do
           res[label .. " " .. k] = v
         end
       end
@@ -3931,7 +3995,7 @@ transf = {
     --- @return { [string]: { [string]: { [string]: string[] } } }
     ymd_nested_key_array_of_arrays_value_assoc_arr = function(timestamp_key_table)
       local year_month_day_time_table = {}
-      for timestamp_str, fields in prs(timestamp_key_table,-1,1,-1) do 
+      for timestamp_str, fields in get.indexable.key_value_stateless_iter(timestamp_key_table,-1,1,-1) do 
         local timestamp = get.string_or_number.number(timestamp_str)
         local year = os.date("%Y", timestamp)
         local year_month = os.date("%Y-%m", timestamp)
@@ -3959,14 +4023,14 @@ transf = {
       local manga = raw_backup.backupManga
       local manga_url, manga_title = manga.url, manga.title
       local chapter_map = {}
-      for _, chapter in ipairs(manga.chapters) do
+      for _, chapter in transf.array.index_value_stateless_iter(manga.chapters) do
         chapter_map[chapter.url] = {
           chapterNumber = chapter.chapterNumber,
           name = chapter.name
         }
       end
       local history_list = {}
-      for _, hist_item in ipairs(manga.history) do
+      for _, hist_item in transf.array.index_value_stateless_iter(manga.history) do
         local chapter = chapter_map[hist_item.url]
         history_list[hist_item.lastRead / 1000] = {
           manga_url,
@@ -4560,7 +4624,7 @@ transf = {
     menu_item_table_array = function(app)
       local flattened = listWithChildrenKeyToListIncludingPath(app:getMenuItems(), {}, { title_key_name = "AXTitle", children_key_name = "AXChildren", levels_of_nesting_to_skip = 1 })
       local filtered = filter(flattened, function (v) return v.AXTitle ~= "" end)
-      for k, v in pairs(filtered) do
+      for k, v in transf.native_table.key_value_stateless_iter(filtered) do
         v.application = app
       end
       return filtered
@@ -4852,7 +4916,7 @@ transf = {
   },
   csl_table_or_csl_table_array = {
     url_array = function(csl_table_or_csl_table_array)
-      if isList(csl_table_or_csl_table_array) then
+      if is.any.array(csl_table_or_csl_table_array) then
         return transf.csl_table_array.url_array(csl_table_or_csl_table_array)
       else
         return {transf.csl_table.url(csl_table_or_csl_table_array)}
@@ -5254,7 +5318,7 @@ transf = {
       local url_parts = stringy.split(url, "?")
       if #url_parts > 1 then
         local param_parts = stringy.split(url_parts[2], "&")
-        for _, param_part in ipairs(param_parts) do
+        for _, param_part in transf.array.index_value_stateless_iter(param_parts) do
           local param_parts = stringy.split(param_part, "=")
           local key = param_parts[1]
           local value = param_parts[2]
@@ -5526,7 +5590,7 @@ transf = {
     header_part = function(data_url) -- the non-data part will either be separated from the rest of the url by `;,` or `;base64,`, so we need to split on `,`, then find the first part that ends `;` or `base64;`, and then join and return all parts before that part
       local parts = stringy.split(transf.url.no_scheme(data_url), ",")
       local non_data_part = ""
-      for _, part in ipairs(parts) do
+      for _, part in transf.array.index_value_stateless_iter(parts) do
         non_data_part = non_data_part .. part
         if stringy.endswith(part, ";") or stringy.endswith(part, "base64;") then
           break
@@ -5922,6 +5986,81 @@ transf = {
     end,
     transitioned_stream_state = function(stream_specifier)
       return tblmap.state_type.state_transition_table.stream_state[transf.stream_specifier.stream_state(stream_specifier)][is.stream_specifier.alive(stream_specifier)]
+    end,
+  },
+  indexable = {
+    key_array = function(indexable)
+      local t = {}
+      for k, _ in get.indexable.key_value_stateless_iter(indexable) do
+        t[#t + 1] = k
+      end
+      return t
+    end,
+    value_array = function(indexable)
+      local t = {}
+      for _, v in get.indexable.key_value_stateless_iter(indexable) do
+        t[#t + 1] = v
+      end
+      return t
+    end,
+  },
+  array_and_array = {
+    union_set = function(arr1, arr2)
+      local new_arr = glue(arr1, arr2)
+      return transf.array.set(new_arr)
+    end,
+    intersection_set = function(arr1, arr2)
+      local new_arr = {}
+      for _, v in transf.array.index_value_stateless_iter(arr1) do
+        if get.array.contains(arr2, v) then
+          new_arr[#new_arr + 1] = v
+        end
+      end
+      return transf.array.set(new_arr)
+    end,
+    difference_set = function(arr1, arr2)
+      local new_arr = {}
+      for _, v in transf.array.index_value_stateless_iter(arr1) do
+        if not get.array.contains(arr2, v) then
+          new_arr[#new_arr + 1] = v
+        end
+      end
+      return transf.array.set(new_arr)
+    end,
+    symmetric_difference_set = function(arr1, arr2)
+      local new_arr = {}
+      for _, v in transf.array.index_value_stateless_iter(arr1) do
+        if not get.array.contains(arr2, v) then
+          new_arr[#new_arr + 1] = v
+        end
+      end
+      for _, v in transf.array.index_value_stateless_iter(arr2) do
+        if not get.array.contains(arr1, v) then
+          new_arr[#new_arr + 1] = v
+        end
+      end
+      return transf.array.set(new_arr)
+    end,
+  },
+  set_and_set = {
+    union_set = function(set1, set2)
+      return transf.array_and_array.union_set(set1, set2)
+    end,
+    intersection_set = function(set1, set2)
+      return transf.array_and_array.intersection_set(set1, set2)
+    end,
+    is_subset = function(set1, set2)
+      for _, v in transf.array.index_value_stateless_iter(set1) do
+        if not get.array.contains(set2, v) then
+          return false
+        end
+      end
+    end,
+    is_superset = function(set1, set2)
+      return transf.array_and_array.is_subset(set2, set1)
+    end,
+    equals = function(set1, set2)
+      return transf.set_and_set.is_subset(set1, set2) and transf.set_and_set.is_superset(set1, set2)
     end,
   }
 }

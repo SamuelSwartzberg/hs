@@ -143,19 +143,19 @@ dothis = {
       )
 
       if specifier.start then
-        push(command, specifier.start)
+        dothis.array.push(command, specifier.start)
       end
 
       if specifier["end"] then
-        push(command, specifier["end"])
+        dothis.array.push(command, specifier["end"])
       end
 
       if specifier.timezone then
-        push(command, specifier.timezone)
+        dothis.array.push(command, specifier.timezone)
       end
 
       if specifier.title then
-        push(command, specifier.title)
+        dothis.array.push(command, specifier.title)
       end
 
       if specifier.description then
@@ -419,7 +419,7 @@ dothis = {
     paste = function(str)
       local lines = stringy.split(str, "\n")
       local is_first_line = true
-      for _, line in ipairs(lines) do
+      for _, line in transf.array.index_value_stateless_iter(lines) do
         if is_first_line then
           is_first_line = false
         else
@@ -874,13 +874,13 @@ dothis = {
     end,
     link_all_hooks = function(path, type)
       local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
-      for _, hook in ipairs(get.dir.files(source_hooks)) do
+      for _, hook in transf.array.index_value_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.link_hook(path, type, hook)
       end
     end,
     copy_all_hooks = function(path, type)
       local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
-      for _, hook in ipairs(get.dir.files(source_hooks)) do
+      for _, hook in transf.array.index_value_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.copy_hook(path, type, hook)
       end
     end,
@@ -943,7 +943,7 @@ dothis = {
   },
   in_git_dir_array = {
     pull_all = function(paths)
-      for _, path in ipairs(paths) do
+      for _, path in transf.array.index_value_stateless_iter(paths) do
         dothis.in_git_dir.pull(path)
       end
     end,
@@ -1001,7 +1001,7 @@ dothis = {
   },
   url_array = {
     open_all = function(url_array)
-      for _, url in ipairs(url_array) do
+      for _, url in transf.array.index_value_stateless_iter(url_array) do
         dothis.url_or_path.open_browser(url)
       end
     end,
@@ -1033,7 +1033,7 @@ dothis = {
   },
   dynamic_absolute_path_dict = {
     write = function(dynamic_absolute_path_dict)
-      for absolute_path, contents in pairs(dynamic_absolute_path_dict) do
+      for absolute_path, contents in transf.native_table.key_value_stateless_iter(dynamic_absolute_path_dict) do
         local fn = eutf8.match(contents, "^(%w-):")
         local contents = eutf8.sub(contents, #fn + 2)
         dothis.absolute_path[fn](absolute_path, contents)
@@ -1042,7 +1042,7 @@ dothis = {
   },
   absolute_path_string_value_dict = {
     write = function(absolute_path_string_value_dict)
-      for absolute_path, contents in pairs(absolute_path_string_value_dict) do
+      for absolute_path, contents in transf.native_table.key_value_stateless_iter(absolute_path_string_value_dict) do
         dothis.absolute_path.write_file(absolute_path, contents)
       end
     end,
@@ -1327,7 +1327,7 @@ dothis = {
   },
   omegat_project_dir = {
     pull_project_materials = function(omegat_project_dir)
-      for _, type in ipairs(tblmap.project_type.project_materials_list["omegat"]) do
+      for _, type in transf.array.index_value_stateless_iter(tblmap.project_type.project_materials_list["omegat"]) do
         dothis.project_dir.pull_project_materials(
           omegat_project_dir,
           type,
@@ -1563,6 +1563,15 @@ dothis = {
     choose_item_and_action = function(array)
       dothis.array.choose_item(array, dothis.any.choose_action)
     end,
+    pop = function(array)
+      local last = array[#array]
+      array[#array] = nil
+      return last
+    end,
+    push = function(array, item)
+      array[#array + 1] = item
+      return true
+    end,
   },
   action_specifier = {
     execute = function(spec, target)
@@ -1570,7 +1579,7 @@ dothis = {
       if not is.any.array(spec.args) then
         args = {spec.args}
       end
-      for k, v in pairs(spec.args) do
+      for k, v in transf.native_table.key_value_stateless_iter(spec.args) do
         if args.isprompttbl then
           args[k] = map(v, {_pm = false}, {tolist = true})[1]
         else
@@ -1601,7 +1610,7 @@ dothis = {
     choose = function(spec, callback)
       local hschooser = get.hschooser_specifier.partial_hschooser(spec, callback)
       hschooser:rows(spec.rows or 30)
-      for k, v in pairs(spec.whole_chooser_style_keys) do
+      for k, v in transf.native_table.key_value_stateless_iter(spec.whole_chooser_style_keys) do
         hschooser[k](hschooser, v)
       end
       local choices = get.chooser_item_specifier_array.styled_chooser_item_specifier_array(

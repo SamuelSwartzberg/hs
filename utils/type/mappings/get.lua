@@ -150,15 +150,15 @@ get = {
         get.khal.basic_command_parts(include, exclude),
       }
       if specifier.once then
-        push(command, "--once")
+        dothis.array.push(command, "--once")
       end
       if specifier.notstarted then
-        push(command, "--notstarted")
+        dothis.array.push(command, "--notstarted")
       end
       specifier.start = specifier.start or "today"
       specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
-      push(command, { value = specifier.start, type = "quoted" })
-      push(command, { value = specifier["end"], type = "quoted" })
+      dothis.array.push(command, { value = specifier.start, type = "quoted" })
+      dothis.array.push(command, { value = specifier["end"], type = "quoted" })
       return transf.multiline_string.array_of_event_tables(run(table.concat(command, " "), true))
     end,
     calendar_template_empty = function()
@@ -286,12 +286,12 @@ get = {
     ---@return string[]
     yaml_lines_aligned_with_predetermined_stops = function(table, keystop, valuestop, depth)
       local lines = {}
-      for value_k, value_v in fastpairs(table) do
+      for value_k, value_v in transf.table.pair_stateless_iter(table) do
         local pre_padding_length = depth * 2
         local key_length = #value_k
         local key_padding_length = keystop - (key_length + pre_padding_length)
         if type(value_v) == "table" and not (value_v.value or value_v.comment) then 
-          push(lines, string.rep(" ", depth * 2) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " ")
+          dothis.array.push(lines, string.rep(" ", depth * 2) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " ")
           lines = concat(lines, get.table.yaml_lines_aligned_with_predetermined_stops(value_v, keystop, valuestop, depth + 1))
         elseif type(value_v) == "table" and (value_v.value or value_v.comment) then 
           local key_part = string.rep(" ", pre_padding_length) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " "
@@ -306,7 +306,7 @@ get = {
             local value_padding_length = valuestop - value_length
             comment_part = string.rep(" ", value_padding_length) .. " # " .. value_v.comment
           end
-          push(lines, key_part .. value_part .. comment_part)
+          dothis.array.push(lines, key_part .. value_part .. comment_part)
         else
           -- do nothing
         end
@@ -455,10 +455,18 @@ get = {
       )
     end,
     contains = function(arr, v)
-      for _, v2 in ipairs(arr) do
+      for _, v2 in transf.array.index_value_stateless_iter(arr) do
         if v2 == v then return true end
       end
       return false
+    end,
+    combination_array = function(arr, k)
+      k = k or #arr
+      if k == 0 or #arr == 0 then
+        return {{}}
+      else 
+        return get.any_stateful_generator.array(combine.combn, arr, k)
+      end
     end
     
   },
@@ -513,7 +521,7 @@ get = {
         }
       }
       if shots then
-        for _, shot in ipairs(shots) do
+        for _, shot in transf.array.index_value_stateless_iter(shots) do
           table.insert(msgs, {
             role = "user",
             content = shot[1]
@@ -584,7 +592,7 @@ get = {
       local text_string = slice(existing_style, 1, 1)[1]
       local style = slice(existing_style, 2, #existing_style)
       local new_styledtext = hs.styledtext.new(text_string, styledtext_attributes_specifier)
-      for _, v in ipairs(style) do
+      for _, v in transf.array.index_value_stateless_iter(style) do
         new_styledtext = new_styledtext:setStyle(v.styledtext_attributes_specifier, v.starts, v.ends)
       end
       return new_styledtext
@@ -992,7 +1000,7 @@ get = {
         headerpart = ""
       end
       local res = run("maddr " .. (only and "-a" or "")  .. headerpart .. transf.string.single_quoted_escaped(path))
-      return toSet(transf.string.lines(res))
+      return transf.array.set(transf.string.lines(res))
     end,
     displayname_addresses_dict_of_dicts = function(path, header)
       local w_displaynames = transf.email_file.addresses(path, header, false)
@@ -1392,7 +1400,7 @@ get = {
           [key] = value
         }
         if node.aliases then
-          for _, alias in ipairs(node.aliases) do
+          for _, alias in transf.array.index_value_stateless_iter(node.aliases) do
             values[alias] = value
           end
         end
@@ -1416,7 +1424,7 @@ get = {
     env_var_name_value_dict = function(dict, prev_key)
       if prev_key then prev_key = prev_key .. "/" else prev_key = "" end
       local values = {}
-      for key, value in pairs(dict) do
+      for key, value in transf.native_table.key_value_stateless_iter(dict) do
         if type(value) == "string" then
           values[key] = prev_key .. value
         else
@@ -1554,7 +1562,7 @@ get = {
       local_thing_name_hierarchy = local_thing_name_hierarchy or copy(thing_name_hierarchy, true)
       parent = parent or "any"
       local res = {}
-      for thing_name, child_thing_name_hierarchy_or_leaf_indication_string in pairs(thing_name_hierarchy) do
+      for thing_name, child_thing_name_hierarchy_or_leaf_indication_string in transf.native_table.key_value_stateless_iter(thing_name_hierarchy) do
         local passes = is[parent][thing_name](any)
         if passes then
           if type(child_thing_name_hierarchy_or_leaf_indication_string) == "table" then
@@ -1662,7 +1670,7 @@ get = {
   chooser_item_specifier_array = {
     styled_chooser_item_specifier_array = function(arr, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict)
       local res = copy(arr)
-      for i, chooser_item_specifier in ipairs(res) do
+      for i, chooser_item_specifier in transf.array.index_value_stateless_iter(res) do
         local text_styledtext_attribute_specifier = concat( {
           font = {size = 14 },
           color = { red = 0, green = 0, blue = 0, alpha = 0.7 },
@@ -1717,4 +1725,141 @@ get = {
       else return tblmap.stream_attribute.false_emoji[key] end
     end,
   },
+  indexable = {
+    --- pairs dropin replacement that is ordered by default, supports start/stop/step and works with any indexable
+    --- difference from iprs is that it returns the key instead of the index
+    --- in case of a list/string, the key is the index, so it's the same as iprs
+    --- guarantees the same order every time, thus may have a different order than pairs
+    --- @param thing indexable
+    --- @param start? integer
+    --- @param stop? integer
+    --- @param step? integer
+    --- @param limit? integer
+    --- @return function, indexable, integer
+    key_value_stateless_iter = function(thing, start, stop, step, limit)
+      local tblkeys = transf.native_table_or_nil.key_array(thing)
+      local iter, tbl, idx = get.indexable.index_value_stateless_iter(thing, start, stop, step, limit, tblkeys)
+      return function(tbl)
+        local i, v = iter(tbl, idx)
+        if i then
+          idx = i
+          return elemAt(thing, i, "kv", tblkeys)
+        end
+      end, tbl, idx
+    end,
+    --- @param thing indexable
+    --- @param start? integer
+    --- @param stop? integer
+    --- @param step? integer
+    --- @param limit? integer
+    --- @return function, indexable, integer
+    reversed_key_value_stateless_iter = function(thing, start, stop, step, limit)
+      return get.indexable.key_value_stateless_iter(thing, start, stop, step and -math.abs(step) or -1, limit)
+    end,
+    --- ipairs dropin replacement that supports start/stop/step and works with any indexable
+    --- slow though
+    --- guarantees the same order every time, and typically also the same order as ipairs (though this is not guaranteed)
+    --- @param indexable indexable
+    --- @param start? integer
+    --- @param stop? integer
+    --- @param step? integer
+    --- @param limit? integer limit the number of iterations, regardless of the index
+    --- @param precalc_keys? any[] precalculated keys 
+    --- @return function, indexable, integer
+    index_value_stateless_iter = function(indexable, start, stop, step, limit, precalc_keys)
+      local len_thing = len(indexable)
+      if len_thing == 0 then
+        return function() end, indexable, 0
+      end
+      start = start or 1 -- default to first elem
+      if start < 0 then -- if negative, count from the end
+        start = len_thing + start + 1 -- e.g. 8 + -1 + 1 = 8 -> last elem
+      end
+      stop = stop or len_thing -- default to last elem
+      if stop < 0 then -- if negative, count from the end
+        stop = len_thing + stop + 1
+      end
+      step = step or 1
+      limit = limit or math.huge
+      local iters = 0
+      if (start - stop) * (step/math.abs(step)) > 0 then
+        start, stop = stop, start -- swap if they're in the wrong order
+      end
+      local tblkeys = precalc_keys or transf.native_table_or_nil.key_array(indexable)
+      return function(thing, i)
+        i = i + step
+        iters = iters + 1
+        if 
+          ((step > 0 and i <= stop) or
+          (step < 0 and i >= stop)) and
+          iters <= limit
+        then
+          return i, elemAt(thing, i, nil, tblkeys)
+        end
+      end, indexable, start - step
+    end,
+    --- @param thing indexable
+    --- @param start? integer
+    --- @param stop? integer
+    --- @param step? integer
+    --- @param limit? integer
+    --- @return function, indexable, integer
+    reversed_index_value_stateless_iter = function(thing, start, stop, step, limit)
+      return get.indexable.index_value_stateless_iter(thing, start, stop, step and -math.abs(step) or -1, limit)
+    end,
+
+  },
+  stateless_generator = {
+    --- stateful generator will create iterators that return values until they are over, at which point they return nil once, and then error on subsequent calls
+    --- @generic T, U, V, W
+    --- @param gen fun(...: `W`): fun(state: `T`, control_var: `U`): (...: `V`), T, U
+    --- @param start_res_at? integer
+    --- @param end_res_at? integer
+    --- @return fun(...: W): fun(): V | nil
+    stateful_generator = function(gen, start_res_at, end_res_at)
+      start_res_at = start_res_at or 1
+      end_res_at = end_res_at or nil
+      return function(...)
+        local stateless_next, state, initial_val = gen(...)
+        local control_var = initial_val
+        return function()
+          local res = {stateless_next(state, control_var)}
+          control_var = res[1]
+          if control_var == nil then
+            return nil
+          else
+            return table.unpack(res, start_res_at, end_res_at)
+          end
+        end
+      end
+    end
+  },
+  a_and_b_stateful_generator = {
+    assoc_arr = function(gen, ...)
+      local res = {}
+      local iter = gen(...)
+      while true do
+        local val = {iter()}
+        if #val == 0 then
+          break
+        end
+        res[val[1]] = val[2]
+      end
+      return res
+    end
+  },
+  any_stateful_generator = {
+    array = function(gen, ...)
+      local res = {}
+      local iter = gen(...)
+      while true do
+        local val = {iter()}
+        if #val == 0 then
+          break
+        end
+        table.insert(res, val)
+      end
+      return res
+    end
+  }
 }

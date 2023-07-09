@@ -13,7 +13,7 @@ function recursiveMerge(base, addition, opts)
       type(opts.recurse) == "number" and 
       (opts.recurse < opts.depth)
     )
-  for k, v in fastpairs(addition) do
+  for k, v in transf.table.pair_stateless_iter(addition) do
     if 
       not no_recurse and
       type(v) == "table" and not is.table.array(v) and
@@ -52,16 +52,16 @@ function glue(base, addition, opts)
     elseif is.table.empty_unspecified_table(base) then
       return addition
     else
-      if isList(addition) then
-        if isList(base) then -- glue(list, list2)
-          for _, v in ipairs(addition) do
+      if is.table.array(addition) then
+        if is.any.array(base) then -- glue(list, list2)
+          for _, v in transf.array.index_value_stateless_iter(addition) do
             base = append(base, v, opts)
           end
         else -- glue(assocarr, list)
           base = append(base, addition, opts) 
         end
       else
-        if isList(base) then -- glue(list, assocarr) if the base is a list, and we're gluing an assoc arr, we're just gonna treat it as a value to append
+        if is.any.array(base) then -- glue(list, assocarr) if the base is a list, and we're gluing an assoc arr, we're just gonna treat it as a value to append
           base = append(base, addition, opts)
         else -- glue(assocarr, assocarr2)
           base = recursiveMerge(base, addition, opts)

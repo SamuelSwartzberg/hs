@@ -169,7 +169,7 @@ assertMessage(
 
 
 assertMessage(
-  map(powerset({1, 2, 3}), function(x) return multiply(x, 2) end),
+  map(transf.array.powerset({1, 2, 3}), function(x) return multiply(x, 2) end),
   {
     {},
     {1, 1},

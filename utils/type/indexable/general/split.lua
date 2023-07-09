@@ -30,7 +30,7 @@ function split(thing, sep, opts)
   local res = {}
   local removed = {}
   local lastend = 1
-  for _, pair in ipairs(splintervals) do
+  for _, pair in transf.array.index_value_stateless_iter(splintervals) do
     local start, match = table.unpack(pair)
     local matchlength 
     if type(thing) == "string" then -- we're splitting a string, so splitter can have variable length in relation to the thing
@@ -43,19 +43,19 @@ function split(thing, sep, opts)
       sliceend = sliceend + matchlength
     end
     local fragment = slice(thing, lastend, sliceend)
-    push(res, fragment)
+    dothis.array.push(res, fragment)
     local stop = start + matchlength - 1
     lastend = stop + 1
     if opts.mode == "before" then
       lastend = lastend - matchlength
     end
     if opts.mode == "remove" then
-      push(removed,  slice(thing, start, stop))
+      dothis.array.push(removed,  slice(thing, start, stop))
     end
   end
 
   local lastfragment = slice(thing, lastend)
-  push(res, lastfragment) 
+  dothis.array.push(res, lastfragment) 
 
   return res, removed
 end

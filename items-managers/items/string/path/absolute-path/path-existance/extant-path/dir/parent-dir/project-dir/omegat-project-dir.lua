@@ -6,7 +6,7 @@ OmegatProjectDirItemSpecifier = {
       ["refresh-open-target-odts"] = function(self) -- the purpose of this method is to refresh the open libreoffice windows that hold the generated documents after changes in omegat, allowing for manual 'hot reloading'
         self:get("target-files-extension", "odt"):doThis("choose-item", function(file)
           local libreoffice_windows_with_file = file:get("window-items-of-app-path-leaf-as-title", 'LibreOffice') -- generally probably only one, but this is a list because we can't be sure
-          for _, window in ipairs(libreoffice_windows_with_file) do
+          for _, window in transf.array.index_value_stateless_iter(libreoffice_windows_with_file) do
             window:doThis("do-on-application-w-window-as-main", function(application)
               application:doThis("reload")
             end)
@@ -40,8 +40,8 @@ OmegatProjectDirItemSpecifier = {
         local source_odts = self:get("source-files-extension", "odt"):get("c")
         local target_odts = self:get("target-files-extension", "odt"):get("c")
         local odts = tablex.zip(source_odts, target_odts)
-        for i, odt_pair in ipairs(odts) do 
-          for j, odt in ipairs(odt_pair) do
+        for i, odt_pair in transf.array.index_value_stateless_iter(odts) do 
+          for j, odt in transf.array.index_value_stateless_iter(odt_pair) do
             local client = self:get("local-data-object").client
             local path = transf.path_leaf_specifier.path({
               date = os.date(tblmap.date_component_name.rfc3339like_dt_format_string["day"]),

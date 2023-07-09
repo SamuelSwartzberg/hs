@@ -249,8 +249,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
   }
 
   if not specifier.non_json_response then
-    push(curl_command, "-H")
-    push(curl_command, { 
+    dothis.array.push(curl_command, "-H")
+    dothis.array.push(curl_command, { 
       value = "Accept: " .. (specifier.accept_json_different_header or "application/json"),
       type = "quoted"}
     )
@@ -271,15 +271,15 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if specifier.token_where == "header" or specifier.token_where == "both" then
     local auth_header = specifier.auth_header .. mustEnd(specifier.auth_process or "Bearer", " ")
-    push(curl_command, "-H")
-    push(curl_command, 
+    dothis.array.push(curl_command, "-H")
+    dothis.array.push(curl_command, 
       { value =  auth_header .. specifier.token, type = "quoted"})
   end
 
   if specifier.username_pw_where == "header" or specifier.username_pw_where == "both" then
     local auth_header = specifier.auth_header .. mustEnd(specifier.auth_process or "Basic", " ")
-    push(curl_command, "-H")
-    push(curl_command, 
+    dothis.array.push(curl_command, "-H")
+    dothis.array.push(curl_command, 
       { value =  auth_header .. transf.string.base64_url(specifier.username .. ":" .. specifier.password), type = "quoted"})
   end
 
@@ -289,8 +289,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if specifier.request_verb then
     specifier.request_verb = specifier.request_verb:upper()
-    push(curl_command, "--request")
-    push(curl_command, 
+    dothis.array.push(curl_command, "--request")
+    dothis.array.push(curl_command, 
       { value = specifier.request_verb, type = "quoted"}
     )
   end
@@ -301,12 +301,12 @@ function rest(specifier, do_after, have_tried_access_refresh)
     and not specifier.request_table
     and tblmap.api_name.empty_post_body[specifier.api_name]
   then
-    push(curl_command, "-d")
-    push(curl_command, 
+    dothis.array.push(curl_command, "-d")
+    dothis.array.push(curl_command, 
       { value = tblmap.api_name.empty_post_body[specifier.api_name], type = "quoted"}
     )
-    push(curl_command, "-H")
-    push(curl_command, 
+    dothis.array.push(curl_command, "-H")
+    dothis.array.push(curl_command, 
     { value = "Content-Type: " .. tblmap.api_name.empty_post_body_content_type[specifier.api_name], type = "quoted"}
   )
   end
@@ -325,8 +325,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
         request_string = transf.dict.url_params(specifier.request_table)
         content_type = "application/x-www-form-urlencoded"
       end
-      push(curl_command, "-d")
-      push(curl_command, 
+      dothis.array.push(curl_command, "-d")
+      dothis.array.push(curl_command, 
         { value = request_string, type = "quoted"}
       )
     else
@@ -338,8 +338,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
       )
     end
     
-    push(curl_command, "-H")
-    push(curl_command, 
+    dothis.array.push(curl_command, "-H")
+    dothis.array.push(curl_command, 
       { value = "Content-Type: " .. content_type, type = "quoted"}
     )
   

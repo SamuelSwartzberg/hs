@@ -53,7 +53,7 @@ function flatten(tbl, opts, visited)
     }
   elseif is.any.array(opts.val) then
     local newval = {}
-    for _, v in ipairs(opts.val) do
+    for _, v in transf.array.index_value_stateless_iter(opts.val) do
       newval[v] = true
     end
     opts.val = newval
@@ -85,7 +85,7 @@ function flatten(tbl, opts, visited)
 
   local addfunc
   if opts.mode == "list" or opts.mode == "path-assoc" then
-    addfunc = push
+    addfunc = dothis.array.push
   elseif opts.mode == "assoc" then
     addfunc = function(tbl, item, key) 
       if not opts.nooverwrite or not tbl[key] then
@@ -120,7 +120,7 @@ function flatten(tbl, opts, visited)
   local res = getEmptyResult(tbl, opts)
   visited[tostring(tbl)] = res
 
-  for k, v in prs(tbl) do
+  for k, v in get.indexable.key_value_stateless_iter(tbl) do
     if type(v) ~= "table" or isLeaf(v) then
       valAddfunc(res, v, k)
     else
@@ -136,7 +136,7 @@ function flatten(tbl, opts, visited)
         else
           subres = flatten(v, newopts, visited)
         end
-        for subk, subv in prs(subres) do
+        for subk, subv in get.indexable.key_value_stateless_iter(subres) do
           addfunc(res, subv, subk)
         end
       else
@@ -146,14 +146,14 @@ function flatten(tbl, opts, visited)
   end
 
   if opts.join_path and opts.depth == 0 then
-    for k, v in prs(res) do
+    for k, v in get.indexable.key_value_stateless_iter(res) do
       v.path = table.concat(v.path, opts.join_path)
     end
   end
   
   if opts.mode == "path-assoc" and opts.depth == 0 then
     local newres = {}
-    for k, v in ipairs(res) do
+    for k, v in transf.array.index_value_stateless_iter(res) do
       local val
       if res_should_be_plain then
         val = v.value

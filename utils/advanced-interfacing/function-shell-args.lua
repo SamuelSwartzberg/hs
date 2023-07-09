@@ -17,7 +17,7 @@ function shellLikeArgsToOpts(opts)
   opts_list = filter(opts_list, false)
   local prev_opt_was_key = false
   local prev_opt_key = nil
-  for _, opt_part in ipairs(opts_list) do
+  for _, opt_part in transf.array.index_value_stateless_iter(opts_list) do
     if stringy.startswith(opt_part, "-") then
       if prev_opt_was_key then
         opts_tbl[prev_opt_key] = true

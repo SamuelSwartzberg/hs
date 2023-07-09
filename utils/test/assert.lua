@@ -6,7 +6,7 @@
 --- @param value any
 --- @return boolean
 function valuesContainShape(tbl, value)
-  for _, v in wdefarg(fastpairs)(tbl) do
+  for _, v in wdefarg(transf.table.pair_stateless_iter)(tbl) do
     if hsInspectCleaned(v, 5) == hsInspectCleaned(value, 5) then return true end
   end
   return false
@@ -16,7 +16,7 @@ end
 --- @param values any[]
 --- @return nil
 function assertValuesContain(a, values)
-  for _, value in ipairs(values) do
+  for _, value in transf.array.index_value_stateless_iter(values) do
     assert(
     valuesContainShape(a, value),
     ("Expected \n%s\n to contain \n%s\n\nAll required values:\n%s"):format(hsInspectCleaned(a, 5), hsInspectCleaned(value, 5), hsInspectCleaned(values, 5))
@@ -28,7 +28,7 @@ end
 --- @param values any[]
 --- @return nil
 function assertValuesNotContain(a, values)
-  for _, value in ipairs(values) do
+  for _, value in transf.array.index_value_stateless_iter(values) do
     assert(
     not valuesContainShape(a, value),
     ("Expected %s to not contain %s, but it does."):format(hsInspectCleaned(a, 5), hsInspectCleaned(value, 5))
@@ -58,7 +58,7 @@ end
 --- @param msg? string
 function assertMessageAny(a, b, msg)
   local succ, res
-  for _, possibility in ipairs(b) do
+  for _, possibility in transf.array.index_value_stateless_iter(b) do
     succ, res = pcall(assertMessage, a, possibility, msg)
     if succ then return end
   end

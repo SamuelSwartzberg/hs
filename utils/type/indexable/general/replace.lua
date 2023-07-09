@@ -21,15 +21,15 @@
 function replace(thing, opts, globalopts)
   if opts == nil then return thing end
   opts = copy(opts) or {}
-  if not isListOrEmptyTable(opts) then opts = {opts} end
+  if not is.any.array(opts) then opts = {opts} end
 
   --- allow for tr-like operation with two lists
-  if #opts == 2 and isListOrEmptyTable(opts[1]) and isListOrEmptyTable(opts[2]) then
+  if #opts == 2 and is.any.array(opts[1]) and is.any.array(opts[2]) then
     local resolvedopts = {}
     local lastproc
     for i = 1, #opts[1], 1 do
       lastproc = opts[2][i] or lastproc
-      push(resolvedopts, {cond = opts[1][i], proc = lastproc})
+      dothis.array.push(resolvedopts, {cond = opts[1][i], proc = lastproc})
     end
     opts = resolvedopts
   end
@@ -49,8 +49,8 @@ function replace(thing, opts, globalopts)
   proc = defaultIfNil(proc, "\\")
 
   local res = thing
-  for _, opt in ipairs(opts) do
-    if isListOrEmptyTable(opt) and #opt == 2 then
+  for _, opt in transf.array.index_value_stateless_iter(opts) do
+    if is.any.pair(opt) then
       opt = {cond = opt[1], proc = opt[2]}
     end
     matchall = defaultIfNil(opt.matchall, matchall)
@@ -62,8 +62,8 @@ function replace(thing, opts, globalopts)
     limit = defaultIfNil(opt.limit, limit)
 
   
-    if not opt.cond and type(proc) == "table" and not isListOrEmptyTable(proc) then
-      cond = {_list = keys(proc)} -- if no condition is specified, use the keys of the processor table as the condition
+    if not opt.cond and type(proc) == "table" and not is.table.array(proc) then
+      cond = {_list = transf.native_table_or_nil.key_array(proc)} -- if no condition is specified, use the keys of the processor table as the condition
     end
   
     local splitopts = {
@@ -76,7 +76,7 @@ function replace(thing, opts, globalopts)
     end
     local parts, removed = split(res, cond, splitopts)
     removed = map(removed, function(mapv)
-      if isListOrEmptyTable(mapv) and #mapv == 1 then
+      if is.any.array(mapv) and #mapv == 1 then
         mapv = mapv[1]
       end
       return false, mapv
@@ -84,8 +84,8 @@ function replace(thing, opts, globalopts)
     local sep
     if mode == "replace" then -- we actually have to process the removed items to get the new items
       if
-        not (isListOrEmptyTable(proc) or type(proc) == "string")  -- proc must be processed by map
-        or (type(thing) == "table" and not isListOrEmptyTable(thing))  -- thing must be processed by map
+        not (is.any.array(proc) or type(proc) == "string")  -- proc must be processed by map
+        or (type(thing) == "table" and not is.any.array(thing))  -- thing must be processed by map
       then
         sep = map(
           removed,
@@ -106,12 +106,12 @@ function replace(thing, opts, globalopts)
     end
 
 
-    local needs_type_added = #parts == 0 or (isListOrEmptyTable(parts[1]) and #parts[1] == 0)
+    local needs_type_added = #parts == 0 or (is.any.array(parts[1]) and #parts[1] == 0)
 
     -- if there is no first element, or the first element is an empty list, then we need to add a type to the first element, since concat infers how it should concat based on the first element
     if needs_type_added then
       if type(thing) == "table" then
-        if not isListOrEmptyTable(thing) then
+        if not is.table.array(thing) then
           if thing.isovtable then
             parts[1] = ovtable.new() -- due to the check above, we know that we're not overwriting any information. Same for below
           else

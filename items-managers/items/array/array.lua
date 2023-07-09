@@ -4,7 +4,7 @@ ArraySpecifier = {
   type = "array",
   properties = {
     getables = {
-      ["length"] = function(self) return #values(self:get("c")) end,
+      ["length"] = function(self) return #transf.native_table_or_nil.value_array(self:get("c")) end,
       ["is-empty-array"] = function(self) return self:get("length") == 0 end,
       ["is-non-empty-array"] = function(self) return self:get("length") > 0 end,
     },

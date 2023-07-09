@@ -48,7 +48,7 @@ function processCronlikeContents(rawcnt, fn)
   for line in stringx.transf.string.lines(contents) do
     line = stringy.strip(line)
     if not stringy.startswith(line, "#") and #line > 0 then -- allow for simple comments
-      push(specs, processCronlikeLine(line, fn))
+      dothis.array.push(specs, processCronlikeLine(line, fn))
     end
   end
   return specs
@@ -76,10 +76,10 @@ end
 
 --- @param path string
 function processSetupDirectivesInFiles(path)
-  for _, child in ipairs(itemsInPath({path = path, include_dirs = false})) do
+  for _, child in transf.array.index_value_stateless_iter(itemsInPath({path = path, include_dirs = false})) do
     local cronlikeSpecs = processCronlikeFile(child)
     
-    for _, spec in ipairs(cronlikeSpecs) do
+    for _, spec in transf.array.index_value_stateless_iter(cronlikeSpecs) do
       if spec.conditionType == "startup" then
         _G[spec.fn](table.unpack(spec.args))
       elseif spec.conditionType == "timer" then

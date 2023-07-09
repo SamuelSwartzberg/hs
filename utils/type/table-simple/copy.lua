@@ -17,7 +17,7 @@ function copy(t, deep, copied_tables)
     new = {}
   end
   copied_tables[tostring(t)] = new
-  for k, v in fastpairs(t) do
+  for k, v in transf.table.pair_stateless_iter(t) do
     if type(v) == "table" and deep then
       if copied_tables[tostring(v)] then -- we've already copied this table, so just reference it
         new[k] = copied_tables[tostring(v)]

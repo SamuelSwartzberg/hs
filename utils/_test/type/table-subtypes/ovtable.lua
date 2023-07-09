@@ -18,7 +18,7 @@ local test_nonov_list = {
 
 local iters = 0
 
-for k, v in prs(test_ovtable) do
+for k, v in get.indexable.key_value_stateless_iter(test_ovtable) do
   iters = iters + 1
   assertMessage(
     v == test_nonov_assoc_arr[k],
@@ -38,7 +38,7 @@ assertMessage(
 
 local iters = 0
 
-for i, v in iprs(test_ovtable) do
+for i, v in get.indexable.index_value_stateless_iter(test_ovtable) do
 
   iters = iters + 1
   assertMessage(
@@ -78,13 +78,13 @@ assertMessage(
 )
 
 assertMessage(
-  keys(test_ovtable),
-  keys(test_nonov_assoc_arr)
+  transf.native_table_or_nil.key_array(test_ovtable),
+  transf.native_table_or_nil.key_array(test_nonov_assoc_arr)
 )
 
 assertMessage(
-  values(test_ovtable),
-  values(test_nonov_assoc_arr)
+  transf.native_table_or_nil.value_array(test_ovtable),
+  transf.native_table_or_nil.value_array(test_nonov_assoc_arr)
 )
 
 test_ovtable["IV"] = "four"
@@ -102,14 +102,14 @@ local test_nonov_list_new = {
 }
 
 assertMessage(
-  values(test_ovtable),
+  transf.native_table_or_nil.value_array(test_ovtable),
   test_nonov_list_new
 )
 
 test_ovtable["IV"] = nil 
 
 assertMessage(
-  values(test_ovtable),
+  transf.native_table_or_nil.value_array(test_ovtable),
   test_nonov_list
 )
 
@@ -131,7 +131,7 @@ local reverse_test_ovtable = ovtable.init({
 
 local indexer = 1
 
-for k, v in revprs(ovtable) do
+for k, v in get.indexable.reversed_key_value_stateless_iter(ovtable) do
   assertMessage(
     reverse_test_ovtable:keyindex(k),
     indexer

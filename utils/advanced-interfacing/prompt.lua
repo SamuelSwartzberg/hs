@@ -77,7 +77,7 @@ function promptPathInner(prompt_args)
   if rawReturn == nil then
     return nil, false
   end
-  local listReturn = values(rawReturn)
+  local listReturn = transf.native_table_or_nil.value_array(rawReturn)
   if #listReturn == 0 then
     return nil, true
   end
@@ -326,7 +326,7 @@ function promptPipeline(prompt_pipeline)
   else
     res = first_prompt_spec
   end
-  for _, args in ipairs(prompt_pipeline) do
+  for _, args in transf.array.index_value_stateless_iter(prompt_pipeline) do
     local prompt_spec = args[2]
     local new_prompt_spec
     if type(prompt_spec) == "table" then

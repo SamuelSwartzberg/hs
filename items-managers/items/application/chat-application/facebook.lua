@@ -24,9 +24,9 @@ FacebookItemSpecifier = {
       ["msg-raw-attachments"] = function(self, msg)
         local raw_attachments = {}
 
-        for _, attachment_type in ipairs({"photos", "videos", "files", "audio_files", "gifs", "share", "sticker", "animated_image_attachments"}) do
+        for _, attachment_type in transf.array.index_value_stateless_iter({"photos", "videos", "files", "audio_files", "gifs", "share", "sticker", "animated_image_attachments"}) do
           if msg[attachment_type] then
-            for _, attachment in ipairs(msg[attachment_type]) do
+            for _, attachment in transf.array.index_value_stateless_iter(msg[attachment_type]) do
               local attachment_leaf = pathSlice(attachment.uri, "-1:-1")[1]
               local attachment_path = self:get("media-dir-for-chat", msg.chat_obj) .. "/" .. attachment_leaf
               table.insert(raw_attachments, attachment_path)
@@ -40,10 +40,10 @@ FacebookItemSpecifier = {
         local raw_reactions = {}
         if msg["reactions"] then
           local reaction_tally = {}
-          for _, reaction in ipairs(msg["reactions"]) do
+          for _, reaction in transf.array.index_value_stateless_iter(msg["reactions"]) do
             reaction_tally[reaction.reaction] = (reaction_tally[reaction.reaction] or 0) + 1
           end
-          for reaction, count in pairs(reaction_tally) do
+          for reaction, count in transf.native_table.key_value_stateless_iter(reaction_tally) do
             table.insert(raw_reactions, ("%s (%d)"):format(reaction, count))
           end
         end

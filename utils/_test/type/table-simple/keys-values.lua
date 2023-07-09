@@ -5,12 +5,12 @@ local test_tbl = {
 }
 
 assertMessage(
-  ks(test_tbl),
+  transf.indexable.key_array(test_tbl),
   {"a", "b", "c"}
 )
 
 assertMessage(
-  vls(test_tbl),
+  transf.indexable.value_array(test_tbl),
   {"I", "II", "III"}
 )
 
@@ -21,12 +21,12 @@ local test_arr = {
 }
 
 assertMessage(
-  ks(test_arr),
+  transf.indexable.key_array(test_arr),
   {1, 2, 3}
 )
 
 assertMessage(
-  vls(test_arr),
+  transf.indexable.value_array(test_arr),
   {"I", "II", "III"}
 )
 
@@ -37,11 +37,11 @@ local test_ovtable = ovtable.init({
 })
 
 assertMessage(
-  ks(test_ovtable),
+  transf.indexable.key_array(test_ovtable),
   {"one", "two", "three"}
 )
 
 assertMessage(
-  vls(test_ovtable),
+  transf.indexable.value_array(test_ovtable),
   {"I", "II", "III"}
 )

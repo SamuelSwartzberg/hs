@@ -13,7 +13,7 @@ function benchmarkFunctions(specifier, args, iters)
     specifier = { funcs = specifier }
   end
   specifier.iterations = specifier.iterations or iters or 100
-  for _, func_specifier in ipairs(specifier.funcs) do
+  for _, func_specifier in transf.array.index_value_stateless_iter(specifier.funcs) do
     local start = os.clock()
     if type(func_specifier) == "function" then
       func_specifier = { func = func_specifier }

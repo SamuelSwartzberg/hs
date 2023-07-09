@@ -21,7 +21,7 @@ function doWhenReady(fn, args)
     hs.alert.closeSpecific(current_alert)
   end
   
-  push(do_queue, {
+  dothis.array.push(do_queue, {
     fn = fn, 
     args = args
   })

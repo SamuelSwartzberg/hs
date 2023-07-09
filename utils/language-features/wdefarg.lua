@@ -2,7 +2,7 @@
 --- @param default? any
 function wdefarg(fn, default)
   if not default then default = {} end
-  if not isListOrEmptyTable(default) or #default <= 1 then
+  if not is.any.array(default) or #default <= 1 then
     default = {default}
   end
   return function(...)

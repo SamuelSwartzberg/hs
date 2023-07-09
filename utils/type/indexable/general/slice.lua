@@ -54,7 +54,7 @@ function slice(thing, start_or_spec, stop, step)
     spec.stop = find(thing, spec.stop, {ret = "i", start = spec.start, last = spec.last_stop})
   end
 
-  local is_assoc = type(thing) == "table" and not isListOrEmptyTable(thing)
+  local is_assoc = type(thing) == "table" and not is.table.array(thing)
 
 
 
@@ -118,7 +118,7 @@ function slice(thing, start_or_spec, stop, step)
 
   if spec.sliced_indicator then
     if spec.start > 1 then
-      if isListOrEmptyTable(new_thing) and not isListOrEmptyTable(spec.sliced_indicator) then
+      if is.any.array(new_thing) and not is.any.array(spec.sliced_indicator) then
         new_thing = concat({spec.sliced_indicator}, new_thing)
       else
         new_thing = concat(spec.sliced_indicator, new_thing)

@@ -59,7 +59,7 @@ function open(opts, do_after)
   end
 
   table.insert(app_args, 1, "open")
-  push(app_args, { value = path, type = "quoted" })
+  dothis.array.push(app_args, { value = path, type = "quoted" })
 
   run(app_args, do_after or true)
 end

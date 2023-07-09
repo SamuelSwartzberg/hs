@@ -4,7 +4,7 @@
 
 function getSep(opts,i, isfinal)
   if opts.sep then
-    if isListOrEmptyTable(opts.sep) then
+    if is.any.array(opts.sep) then
       return opts.sep[i]
     elseif not isfinal then -- separators that are the same for all elements don't get added to the final element (since there's no way to manually control them)
       if type(opts.sep) == "table" and opts.sep._contains then -- since we can split by a conditionSpec, we want to be able to use a conditionSpec as a separator to rejoin. However, _contains is the only value of a conditionSpec where we can be sure that using it as a separator will recreate the original list (all others are not reversible)
@@ -35,7 +35,7 @@ function concat(opts, ...)
     opts = {}
   end
 
-  if #inputs == 1 and isListOrEmptyTable(inputs[1]) then -- was called with a single list instead of varargs, but we can handle that
+  if #inputs == 1 and is.any.array(inputs[1]) then -- was called with a single list instead of varargs, but we can handle that
     inputs = inputs[1]
   end
 
@@ -44,7 +44,7 @@ function concat(opts, ...)
   local sep, index
 
   -- now do the rest of the loop
-  for i, input in ipairs(inputs) do
+  for i, input in transf.array.index_value_stateless_iter(inputs) do
     index = i
     sep = getSep(opts,i)
     if sep then

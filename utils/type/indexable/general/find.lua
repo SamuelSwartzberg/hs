@@ -28,14 +28,14 @@ function find(indexable, cond, opts)
         if opts.ret == "boolean" then
           retres = true
         else
-          for _, retarg in ipairs(opts.ret) do 
-            push(retres, retriever[retarg])
+          for _, retarg in transf.array.index_value_stateless_iter(opts.ret) do 
+            dothis.array.push(retres, retriever[retarg])
           end
         end
         if opts.findall then
           if #retres == 1 then retres = retres[1] end
           if not finalres then finalres = {} end
-          push(finalres, retres)
+          dothis.array.push(finalres, retres)
         else
           return returnUnpackIfTable(retres)
         end
@@ -60,8 +60,8 @@ function find(indexable, cond, opts)
         v = matchvalue,
         i = getIndex(indexable, matchkey)
       }
-      for _, retarg in ipairs(opts.ret) do 
-        push(res, retriever[retarg])
+      for _, retarg in transf.array.index_value_stateless_iter(opts.ret) do 
+        dothis.array.push(res, retriever[retarg])
       end
       if opts.findall then
         if matchkey == -1 then break end

@@ -1,5 +1,5 @@
 assertMessage(
-  #keys(chunk({ 
+  #transf.native_table_or_nil.key_array(chunk({ 
     a = 1,
     b = 2,
     c = 3,
@@ -12,7 +12,7 @@ assertMessage(
 )
 
 assertMessage(
-  #keys(chunk({ 
+  #transf.native_table_or_nil.key_array(chunk({ 
     a = 1,
     b = 2,
     c = 3,
@@ -25,7 +25,7 @@ assertMessage(
 )
 
 assertMessage(
-  #keys(chunk({ 
+  #transf.native_table_or_nil.key_array(chunk({ 
     a = 1,
     b = 2,
     c = 3,
@@ -38,7 +38,7 @@ assertMessage(
 )
 
 assertMessage(
-  #keys(chunk({ 
+  #transf.native_table_or_nil.key_array(chunk({ 
     a = 1,
     b = 2,
     c = 3,
@@ -51,7 +51,7 @@ assertMessage(
 )
 
 assertMessage(
-  #keys(chunk({ 
+  #transf.native_table_or_nil.key_array(chunk({ 
     a = 1,
     b = 2,
     c = 3,

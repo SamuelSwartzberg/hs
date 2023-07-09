@@ -27,7 +27,7 @@ relative_require = orig_relative_require
 
 if mode == "full-test" then
   print("The following tests are manual tests. Please run them manually by calling manual_tests.<test_name>():")
-  for k, v in pairs(manual_tests) do
+  for k, v in transf.native_table.key_value_stateless_iter(manual_tests) do
     print(k)
   end
 end

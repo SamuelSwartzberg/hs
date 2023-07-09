@@ -92,7 +92,7 @@ function pkg.init(all_elems)
   local t = pkg.new()
   -- Add each key-value pair in the list
 
-  for i, spec in ipairs(all_elems) do
+  for i, spec in transf.array.index_value_stateless_iter(all_elems) do
     -- Check if the key-value pair is specified as `{key, value}` or `{k = key, v = value}` / `{key = key, value = value}`.
     if is.any.array(spec) then
       if is.array.pair(spec) then

@@ -4,7 +4,7 @@
 --- @param and_then? fun(std_out: table): (any) | boolean 
 --- @return any
 function runJSON(opts, and_then)
-  if type(opts) ~= "table" or isListOrEmptyTable(opts) then
+  if type(opts) ~= "table" or is.table.array(opts) then
     opts = {
       args = opts
     }

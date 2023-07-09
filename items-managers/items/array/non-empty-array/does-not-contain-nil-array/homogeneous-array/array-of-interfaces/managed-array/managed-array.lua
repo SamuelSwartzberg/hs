@@ -17,7 +17,7 @@ ManagedArraySpecifier = {
     },
     doThisables = {
       ["add-to-end"] = function(self, item)
-        push(self:get("c"), item)
+        dothis.array.push(self:get("c"), item)
         self:doThis("update-interface-if-necessary", item)
       end,
       ["add-to-front"] = function(self, item)
@@ -33,7 +33,7 @@ ManagedArraySpecifier = {
         return self:get("remove-by-index", index)
       end,
       ["filter-in-place-valid"] = function(self)
-        for i, item in ipairs(self:get("c")) do
+        for i, item in transf.array.index_value_stateless_iter(self:get("c")) do
           if not item:get("is-valid") then
             self:get("remove-by-index", i)
           end
@@ -53,7 +53,7 @@ ManagedArraySpecifier = {
         end  
       end,
       ["create-all"] = function(self, specifiers)
-        for key, specifier in fastpairs(specifiers) do
+        for key, specifier in transf.table.pair_stateless_iter(specifiers) do
           if not specifier.speckey then
             specifier.speckey = key
           end

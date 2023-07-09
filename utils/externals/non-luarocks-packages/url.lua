@@ -163,14 +163,14 @@ function M.buildQuery(tab, sep, key)
 		sep = M.options.separator or '&'
 	end
 	local keys = {}
-	for k in pairs(tab) do
+	for k in transf.native_table.key_value_stateless_iter(tab) do
 		keys[#keys+1] = k
 	end
 	table.sort(keys, function (a, b)
   		local function padnum(n, rest) return ("%03d"..rest):format(get.string_or_number.number(n)) end
   		return tostring(a):gsub("(%d+)(%.)",padnum) < tostring(b):gsub("(%d+)(%.)",padnum)
 	end)
-	for _,name in ipairs(keys) do
+	for _,name in transf.array.index_value_stateless_iter(keys) do
 		local value = tab[name]
 		name = encode(tostring(name), {["-"] = true, ["_"] = true, ["."] = true})
 		if key then
@@ -238,7 +238,7 @@ function M.parseQuery(str, sep)
 		end
 
 		local t = values[key]
-		for i,k in ipairs(keys) do
+		for i,k in transf.array.index_value_stateless_iter(keys) do
 			if type(t) ~= 'table' then
 				t = {}
 			end
@@ -297,7 +297,7 @@ function M:setAuthority(authority)
 		-- ipv4
 		local chunks = { str:match("^(%d+)%.(%d+)%.(%d+)%.(%d+)$") }
 		if #chunks == 4 then
-			for _, v in pairs(chunks) do
+			for _, v in transf.native_table.key_value_stateless_iter(chunks) do
 				if get.string_or_number.number(v) > 255 then
 					return false
 				end
@@ -308,7 +308,7 @@ function M:setAuthority(authority)
 		local chunks = { str:match("^%["..(("([a-fA-F0-9]*):"):rep(8):gsub(":$","%%]$"))) }
 		if #chunks == 8 or #chunks < 8 and
 			str:match('::') and not str:gsub("::", "", 1):match('::') then
-			for _,v in pairs(chunks) do
+			for _,v in transf.native_table.key_value_stateless_iter(chunks) do
 				if #v > 0 and get.string_or_number.number(v, 16) > 65535 then
 					return false
 				end
@@ -416,7 +416,7 @@ function M.removeDotSegments(path)
 	local new = {}
 	local j = 0
 
-	for i,c in ipairs(fields) do
+	for i,c in transf.array.index_value_stateless_iter(fields) do
 		if c == '..' then
 			if j > 0 then
 				j = j - 1

@@ -5,7 +5,7 @@ local emptyTbl = {}
 -- Test iprs
 -- Test default
 local manual_counter = 0
-for i, v in iprs(tbl) do
+for i, v in get.indexable.index_value_stateless_iter(tbl) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(i, 1)
@@ -32,13 +32,13 @@ assertMessage(
 )
 
 -- Test empty table
-for i, v in iprs(emptyTbl) do
+for i, v in get.indexable.index_value_stateless_iter(emptyTbl) do
   error("Should not iterate")
 end
 
 -- Test start and stop
 local manual_counter = 0
-for i, v in iprs(tbl, 2, 4) do
+for i, v in get.indexable.index_value_stateless_iter(tbl, 2, 4) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(i, 2)
@@ -62,7 +62,7 @@ assertMessage(
 -- Test step
 
 local manual_counter = 0
-for i, v in iprs(tbl, 1, 5, 2) do
+for i, v in get.indexable.index_value_stateless_iter(tbl, 1, 5, 2) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(i, 1)
@@ -86,7 +86,7 @@ assertMessage(
 -- Test negative step
 
 local manual_counter = 0
-for i, v in iprs(tbl, 5, 1, -2) do
+for i, v in get.indexable.index_value_stateless_iter(tbl, 5, 1, -2) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(i, 5)
@@ -112,7 +112,7 @@ assertMessage(
 local assocArr = {a = 10, b = 20, c = 30, d = 40, e = 50}
 
 local manual_counter = 0
-for i, v in iprs(assocArr) do
+for i, v in get.indexable.index_value_stateless_iter(assocArr) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(i, 1)
@@ -143,7 +143,7 @@ assertMessage(
 
 local manual_counter = 0
 
-for i, v in iprs(assocArr, 1, 3, -2) do
+for i, v in get.indexable.index_value_stateless_iter(assocArr, 1, 3, -2) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(i, 3)
@@ -172,7 +172,7 @@ local test_ovtable = ovtable.init({
 })
 
 local manual_counter = 0
-for i, v in iprs(test_ovtable) do
+for i, v in get.indexable.index_value_stateless_iter(test_ovtable) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(i, 1)
@@ -202,7 +202,7 @@ assertMessage(
 -- Test iprs on ovtable with start, stop, and negative step
 
 local manual_counter = 0
-for i, v in iprs(test_ovtable, 1, 3, -2) do
+for i, v in get.indexable.index_value_stateless_iter(test_ovtable, 1, 3, -2) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(i, 3)
@@ -254,7 +254,7 @@ assertMessage(
 -- test default on list
 
 local manual_counter = 0
-for k, v in prs(tbl) do
+for k, v in get.indexable.key_value_stateless_iter(tbl) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, 1)
@@ -284,7 +284,7 @@ assertMessage(
 -- test default on assoc arr
 
 local manual_counter = 0
-for k, v in prs(assocArr) do
+for k, v in get.indexable.key_value_stateless_iter(assocArr) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -314,7 +314,7 @@ assertMessage(
 -- test default on ovtable
 
 local manual_counter = 0
-for k, v in prs(test_ovtable) do
+for k, v in get.indexable.key_value_stateless_iter(test_ovtable) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "e")
@@ -344,7 +344,7 @@ assertMessage(
 -- test pairs with start, stop, and negative step on assoc arr
 
 local manual_counter = 0
-for k, v in prs(assocArr, 1, 3, -2) do
+for k, v in get.indexable.key_value_stateless_iter(assocArr, 1, 3, -2) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "c")
@@ -363,7 +363,7 @@ assertMessage(
 )
 
 local manual_counter = 0
-for k, v in prs(assocArr, 1, -3) do
+for k, v in get.indexable.key_value_stateless_iter(assocArr, 1, -3) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -387,7 +387,7 @@ assertMessage(
 -- test pairs with negative step on ovtable
 
 local manual_counter = 0
-for k, v in prs(test_ovtable, 1, 5, -2) do
+for k, v in get.indexable.key_value_stateless_iter(test_ovtable, 1, 5, -2) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -409,7 +409,7 @@ assertMessage(
 )
 
 local manual_counter = 0
-for k, v in prs(test_ovtable, 1, 5, -1) do
+for k, v in get.indexable.key_value_stateless_iter(test_ovtable, 1, 5, -1) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -437,7 +437,7 @@ assertMessage(
 )
 
 local manual_counter = 0
-for k, v in prs(test_ovtable, 1, -1, -1) do
+for k, v in get.indexable.key_value_stateless_iter(test_ovtable, 1, -1, -1) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -467,7 +467,7 @@ assertMessage(
 -- test that revpairs with positive step is equivalent to pairs with negative step
 
 local manual_counter = 0
-for k, v in revprs(test_ovtable, 1, 5, 2) do
+for k, v in get.indexable.reversed_key_value_stateless_iter(test_ovtable, 1, 5, 2) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -490,7 +490,7 @@ assertMessage(
 
 -- test that limit works 
 local manual_counter = 0
-for  k, v in revprs(test_ovtable, 1, 5, 2, 2) do
+for  k, v in get.indexable.reversed_key_value_stateless_iter(test_ovtable, 1, 5, 2, 2) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -513,7 +513,7 @@ assertMessage(
 local mixed_table = { 1, 2, 3, a = 4, b = 5, c = 6 }
 local manual_counter = 0
 
-for k, v in iprs(mixed_table) do
+for k, v in get.indexable.index_value_stateless_iter(mixed_table) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, 1)
@@ -547,7 +547,7 @@ assertMessage(
 
 local manual_counter = 0
 
-for k, v in prs(mixed_table) do
+for k, v in get.indexable.key_value_stateless_iter(mixed_table) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, 1)
@@ -585,7 +585,7 @@ local ovtable_w_pairs = ovtable.init({
 
 local manual_counter = 0
 
-for k, v in prs(ovtable_w_pairs) do
+for k, v in get.indexable.key_value_stateless_iter(ovtable_w_pairs) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -613,7 +613,7 @@ local ovtable_w_function_values = ovtable.init({
 })
 
 local manual_counter = 0
-for k, v in prs(ovtable_w_function_values) do 
+for k, v in get.indexable.key_value_stateless_iter(ovtable_w_function_values) do 
   local val = v()
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
@@ -649,22 +649,22 @@ assertMessage(
 )
 
 assertMessage(
-  iterToTbl({noovtable=true},iprs({"a", "b", "c"})),
+  iterToTbl({noovtable=true},get.indexable.index_value_stateless_iter({"a", "b", "c"})),
   { "a", "b", "c" }
 )
 
 assertMessage(
-  iterToTbl(prs({a = "a", b = "b", c = "c"})).isarr,
+  iterToTbl(get.indexable.key_value_stateless_iter({a = "a", b = "b", c = "c"})).isarr,
   nil
 )
 
 assertMessage(
-  iterToTbl(prs({"a", "b", "c"})).isassoc,
+  iterToTbl(get.indexable.key_value_stateless_iter({"a", "b", "c"})).isassoc,
   nil
 )
 
 assertMessage(
-  iterToTbl(prs({a = "a", b = "b", c = "c"})),
+  iterToTbl(get.indexable.key_value_stateless_iter({a = "a", b = "b", c = "c"})),
   { a = "a", b = "b", c = "c" }
 )
 
@@ -679,7 +679,7 @@ local tbl_w_var_values = {
 
 local manual_counter = 0
 
-for k, v in fastpairs(tbl_w_var_values) do
+for k, v in transf.table.pair_stateless_iter(tbl_w_var_values) do
   manual_counter = manual_counter + 1
   -- fastpairs does not guarantee order
   if manual_counter == 5 then
@@ -701,7 +701,7 @@ local ovtable_w_var_values = ovtable.init({
 
 local manual_counter = 0
 
-for k, v in fastpairs(ovtable_w_var_values) do
+for k, v in transf.table.pair_stateless_iter(ovtable_w_var_values) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -735,7 +735,7 @@ local list_w_var_values = {
 
 local manual_counter = 0
 
-for k, v in fastpairs(list_w_var_values) do
+for k, v in transf.table.pair_stateless_iter(list_w_var_values) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, 1)

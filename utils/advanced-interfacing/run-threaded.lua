@@ -11,7 +11,7 @@ function runThreaded(command_specifier_list, threads, do_after, catch)
   local function runNextChunk()
     local _, chunk = next_pair()
     if chunk then
-      for command_id, command_parts in fastpairs(chunk) do
+      for command_id, command_parts in transf.table.pair_stateless_iter(chunk) do
         local task = run({
           args = command_parts,
           catch = function(exit_code, std_err)
@@ -21,7 +21,7 @@ function runThreaded(command_specifier_list, threads, do_after, catch)
             }
           end,
           finally = function()
-            if #values(results) == #values(command_specifier_list) then
+            if #transf.native_table_or_nil.value_array(results) == #transf.native_table_or_nil.value_array(command_specifier_list) then
               runNextChunk()
             end
           end

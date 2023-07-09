@@ -70,7 +70,7 @@ function findsingle(item, conditions, opts)
 
   local results = {}
 
-  for _, condition in ipairs(conditions) do 
+  for _, condition in transf.array.index_value_stateless_iter(conditions) do 
     -- process shorthand conditions into full conditions
 
     if type(condition) == "boolean" then
@@ -141,21 +141,21 @@ function findsingle(item, conditions, opts)
                 match = match and #matched == #potentially_sliced_item
               end
             end
-            push(results, getres(match, mstart, matched))
+            dothis.array.push(results, getres(match, mstart, matched))
           end
           if condition._start ~= nil then -- starts with
             local match = stringy.startswith(potentially_sliced_item_maybe_nocase, lowerIfNecessary(condition._start))
             if condition._only_if_all then
               match = match and #condition._start == #potentially_sliced_item
             end
-            push(results, getres(match, start, condition._start))
+            dothis.array.push(results, getres(match, start, condition._start))
           end
           if condition._stop ~= nil then -- ends with
             local match = stringy.endswith(potentially_sliced_item_maybe_nocase, lowerIfNecessary(condition._stop))
             if condition._only_if_all then
               match = match and #condition._stop == #potentially_sliced_item
             end
-            push(results, getres(match, #potentially_sliced_item - #condition._stop + 1, condition._stop))
+            dothis.array.push(results, getres(match, #potentially_sliced_item - #condition._stop + 1, condition._stop))
           end
           found_other_use_for_table = true
         end
@@ -166,19 +166,19 @@ function findsingle(item, conditions, opts)
         
         local succ, rs = pcall(function() return #potentially_sliced_item == 0 end) -- pcall because # errors on failure
         local isempty = succ and rs
-        push(results, getres( isempty == condition._empty, start, potentially_sliced_item))
+        dothis.array.push(results, getres( isempty == condition._empty, start, potentially_sliced_item))
         found_other_use_for_table = true
       end
       if condition._type ~= nil then -- type
         local match = type(potentially_sliced_item) == condition._type
         -- _only_if_all guaranteed to be true here if match is, so no check needed
-        push(results, getres(match, start, potentially_sliced_item))
+        dothis.array.push(results, getres(match, start, potentially_sliced_item))
         found_other_use_for_table = true
       end
       if condition._exactly ~= nil then -- exactly
         local match = potentially_sliced_item_maybe_nocase == lowerIfNecessary(condition._exactly)
         -- _only_if_all guaranteed to be true here if match is, so no check needed
-        push(results, getres(match, start, potentially_sliced_item))
+        dothis.array.push(results, getres(match, start, potentially_sliced_item))
         found_other_use_for_table = true
       end
       if condition._contains ~= nil then -- contains
@@ -190,22 +190,22 @@ function findsingle(item, conditions, opts)
         if condition._only_if_all then
           match = match and #potentially_sliced_item_maybe_nocase == #condition._contains
         end
-        push(results, getres(match, mstart, condition._contains))
+        dothis.array.push(results, getres(match, mstart, condition._contains))
         found_other_use_for_table = true
       end
 
       if condition._list ~= nil or not found_other_use_for_table then
         local list = condition._list or condition
         local match = false
-        for _, listitem in ipairs(list) do
+        for _, listitem in transf.array.index_value_stateless_iter(list) do
           match = potentially_sliced_item_maybe_nocase == lowerIfNecessary(listitem) -- counts as a match if any of the list items is equal to the item
           if match then
-            push(results, getres(match, start, potentially_sliced_item))
+            dothis.array.push(results, getres(match, start, potentially_sliced_item))
             break
           end
         end
         if not match then
-          push(results, getres(match, -1, false))
+          dothis.array.push(results, getres(match, -1, false))
         end
       end
     -- condition is a function, so we only need to call it, and get the result
@@ -220,7 +220,7 @@ function findsingle(item, conditions, opts)
           v = false
         end
       end
-      push(results, gen_getres(not not (k and k ~= -1), k, v))
+      dothis.array.push(results, gen_getres(not not (k and k ~= -1), k, v))
     end
   end
 
@@ -254,8 +254,8 @@ function findsingle(item, conditions, opts)
     return res.match
   else
     local finalresults = {}
-    for _, retarg in ipairs(opts.ret) do
-      push(finalresults, res[retarg])
+    for _, retarg in transf.array.index_value_stateless_iter(opts.ret) do
+      dothis.array.push(finalresults, res[retarg])
     end
     return table.unpack(finalresults)
   end

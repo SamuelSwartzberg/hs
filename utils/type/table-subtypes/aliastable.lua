@@ -22,14 +22,14 @@ local function createAliasMetatable(get_longer_shorter_thing)
           if not (#longer_parts == #shorter_parts) then
             return false
           end
-          for i, key_part in ipairs(shorter_parts) do
+          for i, key_part in transf.array.index_value_stateless_iter(shorter_parts) do
             if not stringy.startswith(longer_parts[i], key_part) then
               return false
             end
           end
           return true
         end
-        for tk, tv in pairs(t) do
+        for tk, tv in transf.native_table.key_value_stateless_iter(t) do
           if matches(tk) then
             key = tk
             break

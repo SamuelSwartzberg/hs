@@ -48,7 +48,7 @@ end
 --- @param opts table
 --- @return function
 function getIterator(opts)
-  return wdefarg(function(tbl) return prs(tbl, opts.start, opts.stop, opts.last and -1 or 1) end, opts.limit)
+  return wdefarg(function(tbl) return get.indexable.key_value_stateless_iter(tbl, opts.start, opts.stop, opts.last and -1 or 1) end, opts.limit)
 end
 
 --- @alias retriever {k: any, v: any, i: integer}
@@ -106,7 +106,7 @@ end
 --- @return any
 function getArgs(retriever, opts)
   local args = {}
-  for _, arg in ipairs(opts.args) do
+  for _, arg in transf.array.index_value_stateless_iter(opts.args) do
     table.insert(args, retriever[arg])
   end
   return args
@@ -124,9 +124,9 @@ end
 
 function getIsLeaf(treat_as_leaf)
   if treat_as_leaf == "assoc" then
-    return function(v) return not isListOrEmptyTable(v) end
+    return function(v) return not is.any.array(v) end
   elseif treat_as_leaf == "list" then
-    return isListOrEmptyTable
+    return is.any.array
   elseif treat_as_leaf == false then
     return transf["nil"]["false"]
   else
@@ -137,7 +137,7 @@ end
 --- @param itemres any[] really should be [any, any], but lua type annotations don't support that
 function addToRes(itemres,res,opts,k,v)
   local mapped_useas = {}
-  for index, ret in ipairs(opts.ret) do
+  for index, ret in transf.array.index_value_stateless_iter(opts.ret) do
     mapped_useas[ret] = index
   end
 
@@ -150,7 +150,7 @@ function addToRes(itemres,res,opts,k,v)
   -- explanation: We want to be able to return nil in our processor (that feeds into itemres) and have that be the key/value in the result, so that we can delete things via map() and similar funcs. But we also want to be able to specify that we want to use the original key/value in the result.
 
   if opts.flatten and type(newval) == "table" then
-    for resk, resv in fastpairs(newval) do
+    for resk, resv in transf.table.pair_stateless_iter(newval) do
       local optcopy = copy(opts)
       optcopy.ret = {"k", "v"}
       addToRes({resk, resv}, res, optcopy)

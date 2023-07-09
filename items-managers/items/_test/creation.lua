@@ -1016,9 +1016,9 @@ local item_creation_map = {
 
 local iters = 0
 
-for create_function, test_specifers in fastpairs(item_creation_map) do
+for create_function, test_specifers in transf.table.pair_stateless_iter(item_creation_map) do
   print("Testing create function: " .. tostring(create_function))
-  for _, test_specifier in iprs(test_specifers) do
+  for _, test_specifier in get.indexable.index_value_stateless_iter(test_specifers) do
     iters = iters + 1
     if iters > 5 then error("Temp stop" ) end
     print("Testing test specifier: " .. hs.inspect(test_specifier, {depth=3}))
@@ -1039,7 +1039,7 @@ for create_function, test_specifers in fastpairs(item_creation_map) do
     else
       item = test_specifier.local_create_function()
     end
-    for _, must_be in wdefarg(iprs)(test_specifier.must_be) do
+    for _, must_be in wdefarg(get.indexable.index_value_stateless_iter)(test_specifier.must_be) do
       if not find(item:get_all("type"), {_exactly = must_be}, "boolean") then
         local errstr = 
           "Item did not have all required types.\n" ..
@@ -1049,7 +1049,7 @@ for create_function, test_specifers in fastpairs(item_creation_map) do
         error(errstr)
       end
     end
-    for _, must_not_be in wdefarg(iprs)(test_specifier.must_not_be) do
+    for _, must_not_be in wdefarg(get.indexable.index_value_stateless_iter)(test_specifier.must_not_be) do
       if find(item:get_all("type"),  {_exactly = must_not_be}, "boolean") then
         local errstr = 
           "Item had a type it shouldn't.\n" ..
@@ -1063,7 +1063,7 @@ for create_function, test_specifers in fastpairs(item_creation_map) do
       test_specifier.use_test(item)
     end
     if test_specifier.get_asserts then
-      for _, assert in iprs(test_specifier.get_asserts) do
+      for _, assert in get.indexable.index_value_stateless_iter(test_specifier.get_asserts) do
         assertMessage(item:get(assert[1], assert[3]), assert[2])
       end
     end

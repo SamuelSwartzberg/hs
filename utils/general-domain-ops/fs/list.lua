@@ -79,7 +79,7 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
     if get.array.contains(seen_paths, links_resolved_path) then
       return {}
     else
-      push(seen_paths, links_resolved_path)
+      dothis.array.push(seen_paths, links_resolved_path)
     end
   end
 
@@ -115,7 +115,7 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
         if shouldRecurse then
           depth = depth or 0
           local sub_files = itemsInPath(opts, file_path, true, depth + 1, seen_paths)
-          for _, sub_file in ipairs(sub_files) do
+          for _, sub_file in transf.array.index_value_stateless_iter(sub_files) do
             files[#files + 1] = sub_file
           end
         end
@@ -155,10 +155,10 @@ function getItemsForAllLevelsInSlice(path, slice_spec, opts)
   local path = transf.string.path_resolved(path, true)
   local levels = memoize(pathSlice, refstore.params.memoize.opts.stringify_json)(path, slice_spec, { entire_path_for_each = true })
   local reslist = {}
-  for _, level in ipairs(levels) do
+  for _, level in transf.array.index_value_stateless_iter(levels) do
     opts.path = level -- this modifies the opts table, but that's fine, since it gets copied in itemsInPath
     local items = itemsInPath(opts)
-    push(reslist, items)
+    dothis.array.push(reslist, items)
   end
   return memoize(concat, refstore.params.memoize.opts.stringify_json)(reslist)
 end

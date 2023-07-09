@@ -28,7 +28,7 @@ SignalItemSpecifier = {
       ["msg-raw-attachments"] = function(self, msg)
         if msg.attachments then
           local attachments = {}
-          for _, att in ipairs(msg.attachments) do
+          for _, att in transf.array.index_value_stateless_iter(msg.attachments) do
             local actual_attachment_path = msg.media_map[att.contentType][att.size]
             if not actual_attachment_path then
               print(("No attachment of type %s and size %s found for message %s"):format(att.contentType, att.size, msg.id))
@@ -42,7 +42,7 @@ SignalItemSpecifier = {
       ["msg-raw-reactions"] = function(self, msg)
         if msg.reactions then
           local reactions = {}
-          for _, react in ipairs(msg.reactions) do
+          for _, react in transf.array.index_value_stateless_iter(msg.reactions) do
             table.insert(reactions, react.emoji .. " (1)")
           end
           return reactions

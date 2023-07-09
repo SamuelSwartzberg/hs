@@ -1,11 +1,11 @@
 
 assertMessage(
-  toSet({1,1,1,2,3,3}),
+  transf.array.set({1,1,1,2,3,3}),
   {1,2,3}
 )
 
 assertMessage(
-  combinations({1, 2, 3}, 2),
+  get.array.combination_array({1, 2, 3}, 2),
   {
     {2, 1},
     {3, 1},
@@ -14,14 +14,14 @@ assertMessage(
 )
 
 assertMessage(
-  combinations({1, 2, 3}, 3),
+  get.array.combination_array({1, 2, 3}, 3),
   {
     {3, 2, 1}
   }
 )
 
 assertMessage(
-  combinations({1, 2, 3}, 1),
+  get.array.combination_array({1, 2, 3}, 1),
   {
     {1},
     {2},
@@ -30,7 +30,7 @@ assertMessage(
 )
 
 assertMessage(
-  permutations({1, 2, 3}),
+  transf.array.permutation_array({1, 2, 3}),
   {
     {1, 2, 3},
     {1, 3, 2},
@@ -42,7 +42,7 @@ assertMessage(
 )
 
 assertMessage(
-  powerset({1, 2, 3}),
+  transf.array.powerset({1, 2, 3}),
   {
     {},
     {1},

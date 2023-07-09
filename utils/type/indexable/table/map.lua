@@ -63,7 +63,7 @@ function map(tbl, f, opts, visited)
           f = function(arg)
             if type(arg) == "table" then
               local res = {}
-              for _, k in ipairs(proc._k) do
+              for _, k in transf.array.index_value_stateless_iter(proc._k) do
                 table.insert(res, arg[k])
               end
               return res

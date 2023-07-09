@@ -220,7 +220,7 @@ end
 function doSeries(specifier, do_after)
   if type(specifier) == "string" then
     specifier = {specifier_list = stringy.split(specifier, ",")}
-  elseif isListOrEmptyTable(specifier) then
+  elseif is.any.array(specifier) then
     specifier = {specifier_list = specifier}
   elseif type(specifier) == "table" then
     -- do nothing, it's already a series_specifier

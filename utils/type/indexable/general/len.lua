@@ -9,9 +9,9 @@ function len(thing)
       return thing:len()
     elseif is.any.empty_table(thing) then
       return 0
-    elseif isList(thing) then
+    elseif is.any.array(thing) then
       local largestkey = 0
-      for k, v in pairs(thing) do
+      for k, v in transf.native_table.key_value_stateless_iter(thing) do
         if type(k) == "number" and k > largestkey then
           largestkey = k
         end
@@ -19,7 +19,7 @@ function len(thing)
       return largestkey
     else
       local len = 0
-      for k, v in pairs(thing) do
+      for k, v in transf.native_table.key_value_stateless_iter(thing) do
         len = len + 1
       end
       return len

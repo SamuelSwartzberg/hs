@@ -19,7 +19,7 @@ ChatApplicationItemSpecifier = {
       ["assemble-messages"] = function(self, chat_obj)
         local messages = {}
         local last_backup = self:get("last-backup", self:get("chat-id", chat_obj))
-        for _, msg in ipairs(self:get("raw-messages", chat_obj)) do
+        for _, msg in transf.array.index_value_stateless_iter(self:get("raw-messages", chat_obj)) do
           local msg_timestamp = get.string_or_number.number(self:get("msg-timestamp", msg))
           if msg_timestamp > last_backup then
             local msg_author = self:get("msg-author", msg)

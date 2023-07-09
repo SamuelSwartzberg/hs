@@ -28,7 +28,7 @@ function elemAt(thing, ind, ret, precalc_keys)
           return thing:getindex(ind)
         end
       else
-        local tblkeys = precalc_keys or keys(thing)
+        local tblkeys = precalc_keys or transf.native_table_or_nil.key_array(thing)
         table.sort(tblkeys, is.a_and_b.b_larger_as_string)
         local key = tblkeys[ind]
         local value = thing[key]

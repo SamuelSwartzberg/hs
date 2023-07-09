@@ -10,7 +10,7 @@ function fsTree(path, do_files, tree_files)
   tree_files = tree_files or {"json", "yaml"}
   local res = {}
   path = mustEnd(path, "/")
-  for _,full_path in ipairs(itemsInPath(path)) do
+  for _,full_path in transf.array.index_value_stateless_iter(itemsInPath(path)) do
     local file = pathSlice(full_path, "-1:-1")[1]
     if testPath(full_path, "dir") then 
       res[file] = fsTree(full_path, do_files, tree_files)
@@ -18,7 +18,7 @@ function fsTree(path, do_files, tree_files)
       if do_files == "read" then 
         res[file] = readFile(full_path)
       elseif do_files == "append" then
-        push(res, full_path)
+        dothis.array.push(res, full_path)
       elseif do_files == "as-tree" then
         local nodename = pathSlice(file, "-2:-2", { ext_sep = true })[1]
         if stringy.endswith(file, ".yaml") and find(tree_files, "yaml") then

@@ -1,6 +1,6 @@
 local abc  = { "a", "b", "c" }
 
-push(abc, "d")
+dothis.array.push(abc, "d")
 
 assertMessage(
   abc,
@@ -8,7 +8,7 @@ assertMessage(
 )
 
 assertMessage(
-  pop(abc),
+  dothis.array.pop(abc),
   "d"
 )
 

@@ -9,7 +9,7 @@ ArrayOfInterfacesSpecifier = {
         return ar(self:get("all-queriable-properties"))
       end,
       ["all-possible-values"] = function(self, key)
-        return toSet(self:get("map", function(item) return item:get(key) end))
+        return transf.array.set(self:get("map", function(item) return item:get(key) end))
       end,
       ["all-possible-values-to-string-array"] = function(self, key)
         return ar(self:get("all-possible-values", key))
@@ -41,7 +41,7 @@ ArrayOfInterfacesSpecifier = {
       end,
       ["min-contents-item"] = function(self)
         local target
-        for i, item in ipairs(self:get("c")) do
+        for i, item in transf.array.index_value_stateless_iter(self:get("c")) do
           if not target or item:get("c") < target:get("c") then
             target = item
           end
@@ -53,7 +53,7 @@ ArrayOfInterfacesSpecifier = {
       end,
       ["max-contents-item"] = function(self)
         local target
-        for i, item in ipairs(self:get("c")) do
+        for i, item in transf.array.index_value_stateless_iter(self:get("c")) do
           if not target or item:get("c") > target:get("c") then
             target = item
           end
@@ -89,12 +89,12 @@ ArrayOfInterfacesSpecifier = {
         end)
       end,
       ["set-all"] = function(self, do_specifier)
-        for i, item in ipairs(self:get("c")) do
+        for i, item in transf.array.index_value_stateless_iter(self:get("c")) do
           item:set(item, do_specifier.key, do_specifier.value)
         end
       end,
       ["do-all"] = function(self, do_specifier)
-        for i, item in ipairs(self:get("c")) do
+        for i, item in transf.array.index_value_stateless_iter(self:get("c")) do
           item:doThis(do_specifier.key, do_specifier.args)
         end
       end,

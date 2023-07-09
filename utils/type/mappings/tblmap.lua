@@ -566,9 +566,9 @@ emj = tblmap.action_table_word.emoji
 
 -- make sure to automatically normalize any input to tblmap
 
-for k, v in pairs(tblmap) do
+for k, v in transf.native_table.key_value_stateless_iter(tblmap) do
   local thing_to_normalize = k 
-  for k2, v2 in pairs(v) do
+  for k2, v2 in transf.native_table.key_value_stateless_iter(v) do
     setmetatable(
       v2,
       {

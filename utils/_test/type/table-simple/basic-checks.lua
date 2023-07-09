@@ -1,5 +1,5 @@
 assertMessage(
-  isListOrEmptyTable({ a = 1 }),
+  is.table.array({ a = 1 }),
   false
 )
 
@@ -9,7 +9,7 @@ assertMessage(
 )
 
 assertMessage(
-  isListOrEmptyTable({}),
+  is.table.array({}),
   true
 )
 
@@ -69,7 +69,7 @@ assertMessage(
 )
 
 assertMessage(
-  isListOrEmptyTable({ 1, 2, 3 }),
+  is.any.array({ 1, 2, 3 }),
   true
 )
 
@@ -79,7 +79,7 @@ assertMessage(
 )
 
 assertMessage(
-  isListOrEmptyTable(ovtable.new()),
+  is.any.array(ovtable.new()),
   false
 )
 
@@ -89,7 +89,7 @@ assertMessage(
 )
 
 assertMessage(
-  isListOrEmptyTable("not a table"),
+  is.any.array("not a table"),
   false
 )
 
@@ -99,7 +99,7 @@ assertMessage(
 )
 
 assertMessage(
-  isListOrEmptyTable(assoc({})),
+  is.any.array(assoc({})),
   false
 )
 
@@ -109,7 +109,7 @@ assertMessage(
 )
 
 assertMessage(
-  isListOrEmptyTable(array({})),
+  is.any.array(array({})),
   true
 )
 

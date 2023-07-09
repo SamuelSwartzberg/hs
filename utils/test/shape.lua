@@ -9,9 +9,9 @@ table.insert(types_w_any, "any")
 --- @param shape shape_table
 --- @return nil
 function resolveTypeMatchingToKeys(test_tbl, shape)
-  for _, typ in ipairs(types_w_any) do -- for any possible type
+  for _, typ in transf.array.index_value_stateless_iter(types_w_any) do -- for any possible type
     if shape["[" .. typ .. "]"] then -- if shape has a key "[<type>|any]", then this is the type we want for any key (of type|any) not explicitly specified in the shape
-      for k, _ in fastpairs(test_tbl) do -- for each key in test_tbl
+      for k, _ in transf.table.pair_stateless_iter(test_tbl) do -- for each key in test_tbl
         if type(k) == typ or typ == "any" then -- if the test_tbl key is of the type we want
           if not shape[k] then -- and if the test_tbl key is not explicitly specified in the shape already
             shape[k] = copy(shape["[" .. typ .. "]"])  -- then add a copy of the type we want to the shape
@@ -44,7 +44,7 @@ function shapeMatchesInner(test_tbl, shape, path)
   if not shape then error("shape expected", 0) end
   resolveTypeMatchingToKeys(test_tbl, shape)
   local recollected_optional_keys = {}
-  for k, v in prs(shape, nil, nil, -1) do -- reverse order, so that if we remove a key, we don't interfere with the iteration. This would not be necessary if we using `pairs`, which is unordered, but prs uses a key order for internal ordering, where deleting a key will break the iteration completely if it comes after the current key. I *think* reverse order is the best way to go here, but if I encounter more bugs, I'll have to rethink this.
+  for k, v in get.indexable.key_value_stateless_iter(shape, nil, nil, -1) do -- reverse order, so that if we remove a key, we don't interfere with the iteration. This would not be necessary if we using `pairs`, which is unordered, but prs uses a key order for internal ordering, where deleting a key will break the iteration completely if it comes after the current key. I *think* reverse order is the best way to go here, but if I encounter more bugs, I'll have to rethink this.
     local is_optional = stringy.endswith(k, "?")
     if is_optional then
       local old_k = k
@@ -76,10 +76,10 @@ function shapeMatchesInner(test_tbl, shape, path)
       error(("Unexpected value in shape: %s"):format(v), 0)
     end
   end
-  for k, v in fastpairs(recollected_optional_keys) do
+  for k, v in transf.table.pair_stateless_iter(recollected_optional_keys) do
     shape[k] = v
   end
-  for k, v in fastpairs(test_tbl) do
+  for k, v in transf.table.pair_stateless_iter(test_tbl) do
     if not shape[k] then 
       error(("Key %s is in %s but not in shape"):format(k, path), 0) 
     end

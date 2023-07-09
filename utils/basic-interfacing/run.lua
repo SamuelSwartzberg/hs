@@ -9,7 +9,7 @@ function buildInnerCommand(command_parts)
     return command_parts
   end
   command_parts = transf.hole_y_arraylike.array(command_parts) -- this allows us to have optional args simply by having them be nil
-  for _, command_part in ipairs(command_parts) do
+  for _, command_part in transf.array.index_value_stateless_iter(command_parts) do
     if type(command_part) == "string" then -- simply concat the command_part
       command = command .. " " .. command_part
     elseif type(command_part) == "table" then -- command_part needs to be calculated
@@ -60,7 +60,7 @@ function run(opts, and_then, ...)
   if not opts then
     error("No args provided")
   else
-    if (type(opts) ~= "table") or isListOrEmptyTable(opts, true) then -- handle shorthand
+    if (type(opts) ~= "table") or is.table.arraylike(opts) then -- handle shorthand
       opts = {args = opts}
     end
   end
