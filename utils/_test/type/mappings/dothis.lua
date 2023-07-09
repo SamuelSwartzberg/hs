@@ -219,7 +219,7 @@ dothis.pandoc.markdown_to(test_md_file, "html", nil, function(res)
 
   -- Check if escaped characters are correctly converted
   assert(stringy.find(res, '&lt;literal spans&gt;'))
-  assert(stringy.find(res, '*literal asterisks*'))
+  assert(stringy.find(res, '*literal asteritransf.indexable.key_stateful_iter*'))
 
   -- Check if raw code block is correctly converted
   assert(stringy.find(res, '<pre><code>function hello(name)'))

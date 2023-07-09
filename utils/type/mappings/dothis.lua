@@ -1366,7 +1366,7 @@ dothis = {
       dothis.running_application.focus_main_window(running_application)
     end,
     generate_target_txts = function(dir, do_after)
-      local generation_tasks = map(
+      local generation_tatransf.indexable.key_stateful_iter = map(
         transf.omegat_project_dir.target_files(dir),
         function(file)
           return file, "soffice --headless --convert-to txt:Text --outdir"..
@@ -1377,7 +1377,7 @@ dothis = {
         end,
         {"v", "kv"}
       )
-      runThreaded(generation_tasks, 1, do_after)
+      runThreaded(generation_tatransf.indexable.key_stateful_iter, 1, do_after)
     end,
     generate_rechnung_md = function(omegat_project_dir)
       writeFile(
@@ -1536,7 +1536,7 @@ dothis = {
     --- @param video_ids string[]
     --- @param do_after? fun(id: string): nil
     add_youtube_video_id_array = function(id, video_ids, do_after)
-      local next_vid = sipairs(video_ids)
+      local next_vid = transf.array.index_value_stateful_iter(video_ids)
       local add_next_vid
       add_next_vid = function ()
         local index, video_id = next_vid()

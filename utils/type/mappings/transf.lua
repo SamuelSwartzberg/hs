@@ -357,6 +357,7 @@ transf = {
       return get.hschooser_specifier.choosing_hschooser_specifier(transf.array.hschooser_specifier(arr), "index", arr)
     end,
     index_value_stateless_iter = ipairs,
+    index_value_stateful_iter = get.stateless_generator.stateful_generator(transf.array.index_value_stateless_iter),
     value_boolean_dict = function(arr)
       return map(arr, function(v) return v, true end, { args = "v", ret = "kv", nooverwrite = true })
     end,
@@ -6086,6 +6087,11 @@ transf = {
         return {}
       end
     end,
+    key_value_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter),
+    key_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter, 1, 1),
+    value_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter, 2, 2),
+    index_value_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.index_value_stateless_iter),
+    index_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.index_value_stateless_iter, 1, 1),
   },
   array_and_array = {
     union_set = function(arr1, arr2)

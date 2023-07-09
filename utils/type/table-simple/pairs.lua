@@ -1,8 +1,0 @@
-siprs = get.stateless_generator.stateful_generator(get.indexable.index_value_stateless_iter)
-sipairs = get.stateless_generator.stateful_generator(transf.array.index_value_stateless_iter)
-siks = get.stateless_generator.stateful_generator(get.indexable.index_value_stateless_iter, 1, 1)
-sivls = get.stateless_generator.stateful_generator(get.indexable.index_value_stateless_iter, 2, 2)
-sprs = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter)
-spairs = get.stateless_generator.stateful_generator(transf.native_table.key_value_stateless_iter)
-sks = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter, 1, 1)
-svls = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter, 2, 2)

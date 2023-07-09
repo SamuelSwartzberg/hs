@@ -7,7 +7,7 @@ function runThreaded(command_specifier_list, threads, do_after, catch)
   local threads = threads or 10 -- sensible default
   local results = {}
   local chunked_table = chunk(command_specifier_list, threads)
-  local next_pair = siprs(chunked_table)
+  local next_pair = transf.indexable.index_value_stateful_iter(chunked_table)
   local function runNextChunk()
     local _, chunk = next_pair()
     if chunk then

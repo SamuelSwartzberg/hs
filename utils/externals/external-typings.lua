@@ -687,7 +687,7 @@ speak = hs.speech.new()
 --- @class hs.eventtap.event
 --- @field types hs.eventtap.event.types
 --- @field properties table
---- @field rawFlagMasks table
+--- @field rawFlagMatransf.indexable.key_stateful_iter table
 --- @field newKeyEventSequence fun(modifiers: string[], character): table
 --- @field newEvent fun(): hs.eventtap.event.event
 --- @field newEventFromData fun(data: string): hs.eventtap.event.event

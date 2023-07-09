@@ -1,4 +1,4 @@
---- mainly to hold on to tasks so they don't get garbage collected, and potentially to do things like restart/cancel/whatever
+--- mainly to hold on to tatransf.indexable.key_stateful_iter so they don't get garbage collected, and potentially to do things like restart/cancel/whatever
 
 --- @type ItemSpecifier
 TaskItemSpecifier = {

@@ -24,7 +24,7 @@ local function listRemoteDir(listerpath)
   else
     items = {}
   end
-  return svls(items)
+  return transf.indexable.value_stateful_iter(items)
 end
 
 --- Returns a table of all things in a directory

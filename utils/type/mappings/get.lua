@@ -1867,6 +1867,7 @@ get = {
       return get.indexable.index_value_stateless_iter(thing, start, stop, step and -math.abs(step) or -1, limit)
     end,
 
+
   },
   stateless_generator = {
     --- stateful generator will create iterators that return values until they are over, at which point they return nil once, and then error on subsequent calls
