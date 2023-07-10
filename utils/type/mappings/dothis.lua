@@ -512,7 +512,13 @@ dothis = {
     end,
     serve = function(path, port)
       port = port or env.FS_HTTP_SERVER_PORT
-      -- TODO
+      dothis.created_item_specifier_array.create_or_recreate(
+        task_created_item_specifier_array,
+        {
+          type = "task",
+          args = "http-server -a 127.0.0.1 -p '" .. port .. "' -c-1 '" .. path .. "'"
+        }
+      )
     end
   },
   absolute_path = {
@@ -841,6 +847,11 @@ dothis = {
     activate = function(source_id)
       hs.keycodes.currentSourceID(source_id)
       hs.alert.show(transf.source_id.language(source_id))
+    end,
+    activate_next = function(source_id)
+      dothis.source_id.activate(
+        transf.source_id.next_to_be_activated(source_id)
+      )
     end,
   },
   ics_file = {
@@ -1576,6 +1587,49 @@ dothis = {
       array[#array + 1] = item
       return true
     end,
+    shift = function(array)
+      local first = array[1]
+      table.remove(array, 1)
+      return first
+    end,
+    unshift = function(array, item)
+      table.insert(array, 1, item)
+      return true
+    end,
+    to_empty_table = function(array)
+      for i, v in transf.array.index_value_stateless_iter(array) do
+        array[i] = nil
+      end
+    end,
+    sort = table.sort,
+    shuffle = bind(table.sort, {a_use, transf["nil"].random_boolean}),
+    remove_by_index = table.remove,
+    revove_by_item = function(array, item)
+    end,
+    insert_at_index = table.insert,
+    move_to_index_by_item = function(array, item, index)
+      local source_index = get.indexable.index_by_item(array, item)
+      if source_index then
+        local item = dothis.array.remove_by_index(array, source_index)
+        dothis.array.insert_at_index(array, index, item)
+      end
+    end,
+    move_to_front_by_item = function(array, item)
+      dothis.array.move_to_index_by_item(array, item, 1)
+    end,
+    move_to_end_by_item = function(array, item)
+      dothis.array.move_to_index_by_item(array, item, #array)
+    end,
+    filter_in_place = function(array, filterfn)
+      local i = 1
+      while i <= #array do
+        if not filterfn(array[i]) then
+          table.remove(array, i)
+        else
+          i = i + 1
+        end
+      end
+    end,
   },
   action_specifier = {
     execute = function(spec, target)
@@ -1677,7 +1731,7 @@ dothis = {
   stream_creation_specifier = {
     create_inner_item = function(spec)
       local ipc_socket_id = os.time() .. "-" .. math.random(1000000)
-      run("mpv " .. transf.stream_creation_specifier.flags_string(spec.flags) .. 
+      run("mpv " .. transf.stream_creation_specifier.flags_string(spec) .. 
         " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.string_array.single_quoted_escaped_string(spec.urls))
       return {
         ipc_socket_id = ipc_socket_id,
@@ -1685,11 +1739,36 @@ dothis = {
       }
     end,
   },
+  hotkey_creation_specifier = {
+    create_inner_item = function(spec)
+      local hotkey = hs.hotkey.new(
+        spec.modifiers or {"cmd", "shift", "alt"},
+        spec.key, 
+        spec.fn
+      )
+      hotkey:enable()
+      return hotkey
+    end,
+  },
+  watcher_creation_specifier = {
+    create_inner_item = function(spec)
+      local watcher = transf.watcher_creation_specifier.hswatcher_creation_fn(spec)(spec.fn)
+      watcher:start()
+      return watcher
+    end,
+  },
+  task_creation_specifier = {
+    create_inner_item = function(spec)
+      return run(
+        spec.opts
+      )
+    end,
+  },
   creation_specifier = {
     create = function(spec)
       return {
         inner_item = dothis[
-          transf.creation_specifier.creation_specifier_type(spec)
+          transf.creation_specifier.creation_specifier_type(spec) .. "_creation_specifier"
         ].create_inner_item(spec),
         creation_specifier = spec,
       }
@@ -1705,38 +1784,62 @@ dothis = {
       spec.creation_specifier.fn()
     end,
   },
-  task_creation_specifier = {
-    start = function(spec)
-      spec.inner_item:start()
-    end,
+  task_created_item_specifier = {
     pause = function(spec)
       spec.inner_item:pause()
     end,
     resume = function(spec)
       spec.inner_item:resume()
     end,
-    stop = function(spec)
+  },
+  hotkey_created_item_specifier = {
+    pause = function(spec)
+      spec.inner_item:disable()
+    end,
+    resume = function(spec)
+      spec.inner_item:enable()
+    end,
+  },
+  watcher_created_item_specifier = {
+    pause = function(spec)
       spec.inner_item:stop()
+    end,
+    resume = function(spec)
+      spec.inner_item:start()
     end,
   },
   created_item_specifier_array = {
-    create_or_recreate = function(arr, creation_specifier)
+    get_or_create = function(arr, creation_specifier)
       local created_item_specifier = get.created_item_specifier_array.find_created_item_specifier_with_creation_specifier(arr, creation_specifier)
       if created_item_specifier then
-        return dothis.created_item_specifier.recreate(created_item_specifier)
+        return created_item_specifier
       else
-        return dothis.created_item_specifier.create(creation_specifier)
+        return dothis.created_item_specifier.create(creation_specifier), true
       end
+    end,
+    create_or_recreate = function(arr, creation_specifier)
+      local res, new = dothis.created_item_specifier_array.get_or_create(arr, creation_specifier)
+      if not new then
+        res = dothis.created_item_specifier.recreate(res)
+      end
+      return res
     end,
   },
   stream_created_item_specifier = {
     set_state_transitioned_state = function(spec)
-      spec.state = transf.stream_created_item_specifier.transitioned_stream_state(spec)
+      spec.inner_item.state = transf.stream_created_item_specifier.transitioned_stream_state(spec)
     end,
   },
   stream_created_item_specifier_array = {
     set_state_transitioned_state_all = function(array)
       hs.fnutils.ieach(array, dothis.stream_created_item_specifier.set_state_transitioned_state)
+    end,
+    filter_in_place_valid = function(array)
+      dothis.array.filter_in_place(array, transf.stream_created_item_specifier.is_valid)
+    end,
+    maintain_state = function(array)
+      dothis.stream_created_item_specifier_array.set_state_transitioned_state_all(array)
+      dothis.stream_created_item_specifier_array.filter_in_place_valid(array)
     end,
   }
 }

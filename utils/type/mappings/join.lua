@@ -21,43 +21,4 @@ join = {
       end,
     },
   },
-  mod_array = {
-    key = {
-      --- mods + key to the kind of string you'd see in a hotkey hint in a macos menu
-      --- @param mods string[]
-      --- @param key string
-      --- @return string | nil
-      shortcut_string = function(mods, key)
-        local modstr = stringx.join("", map(mods, tblmap.mod.mod_symbol))
-        if modstr == "" then
-          return key
-        else
-          return modstr .. " " .. key
-        end
-      end,
-      shortcut_array = function(mods, key)
-        return glue(mods, key)
-      end,
-      shortcut_specifier = function(mods, key)
-        return {
-          mods = mods,
-          key = key
-        }
-      end
-    }
-  },
-  date_component_name = {
-    date_component_name = {
-      larger = function(a, b)
-        return tblmap.date_component_name.date_component_index[a] > tblmap.ddate_component_name.date_component_index[b]
-      end,
-      larger_date_component_name = function(a, b)
-        if tblmap.date_component_name.date_component_index[a] > tblmap.date_component_name.date_component_index[b] then
-          return a
-        else
-          return b
-        end
-      end,
-    }
-  }
 }

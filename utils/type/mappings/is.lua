@@ -526,7 +526,10 @@ is = {
   created_item_specifier = {
     stream_created_item_specifier = function(t)
       return
-        t.inner_item.ipc_socket_id
+        t.inner_item.ipc_socket_id ~= nil
+    end,
+    fireable_created_item_specifier = function(t)
+      return t.creation_specifier.fn ~= nil
     end,
   },
   stream_created_item_specifier = {

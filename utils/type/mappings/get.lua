@@ -431,11 +431,27 @@ get = {
     nth_element = function(arr, n)
       return arr[n]
     end,
-    next = function(arr, n)
+    next_by_index = function(arr, n)
       return arr[n + 1]
     end,
-    next_wrapping = function(arr, n)
+    next_by_index_wrapping = function(arr, n)
       return arr[(n % #arr) + 1]
+    end,
+    next_by_item = function(arr, item)
+      local index = get.indexable.index_by_item(arr, item)
+      return get.array.next_by_index(arr, index)
+    end,
+    next_by_item_wrapping = function(arr, item)
+      local index = get.indexable.index_by_item(arr, item)
+      return get.array.next_by_index_wrapping(arr, index)
+    end,
+    next_by_fn = function(arr, fn)
+      local index = find(arr, fn, {"i"})
+      return get.array.next_by_index(arr, index)
+    end,
+    next_by_fn_wrapping = function(arr, fn)
+      local index = find(arr, fn, {"i"})
+      return get.array.next_by_index_wrapping(arr, index)
     end,
     previous = function(arr, n)
       return arr[n - 1]
@@ -501,7 +517,7 @@ get = {
       else 
         return get.any_stateful_generator.array(combine.combn, arr, k)
       end
-    end
+    end,
     
   },
   string = {
@@ -1173,7 +1189,7 @@ get = {
   date_component_name = {
     next = function(component, n)
       n = n or 0
-      return get.array.next(mt._list.date.date_component_names, transf.date_component_name.index(component) + n)
+      return get.array.next_by_index(mt._list.date.date_component_names, transf.date_component_name.index(component) + n)
     end,
     previous = function(component, n)
       n = n or 0
@@ -1877,6 +1893,13 @@ get = {
     reversed_index_value_stateless_iter = function(thing, start, stop, step, limit)
       return get.indexable.index_value_stateless_iter(thing, start, stop, step and -math.abs(step) or -1, limit)
     end,
+    index_by_item = function(arr, item)
+      return find(
+        arr,
+        {_exactly = item},
+        {"i"}
+      )
+    end,
 
 
   },
@@ -2007,5 +2030,7 @@ get = {
     
       return res
     end
+  }, 
+  stream_creation_specifier = {
   }
 }

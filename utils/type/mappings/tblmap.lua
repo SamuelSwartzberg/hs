@@ -567,6 +567,22 @@ tblmap = {
         vf = "no"
       }
     }
+  },
+  stream_creation_specifier_flag_profile_name ={
+    stream_creation_specifier_flag_profile = {
+      foreground = {
+        ["loop-playlist"] = false,
+        shuffle = false,
+        pause = false,
+        ["no-video"] = false,
+      },
+      background = {
+        ["loop-playlist"] = true,
+        shuffle = true,
+        pause = true,
+        ["no-video"] = true,
+      }
+    }
   }
 }
 

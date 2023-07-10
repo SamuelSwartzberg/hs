@@ -1445,7 +1445,7 @@ transf = {
       )
     end,
     date_component_name_ordered_list = function(list)
-      return get.array.sorted(list, join.date_component_name.date_component_name.larger)
+      return get.array.sorted(list, transf.two_date_component_names.larger)
     end,
     largest_date_component_name = function(list)
       return transf.date_component_name_list.date_component_name_ordered_list(
@@ -1599,7 +1599,7 @@ transf = {
       )
     end,
     smallest_date_component_both_set = function(str)
-      return join.date_component_name.date_component_name.larger_date_component_name(
+      return transf.two_date_component_names.larger_date_component_name(
         transf.rfc3339like_interval.start_smallest_date_component_set(str),
         transf.rfc3339like_interval.end_smallest_date_component_set(str)
       )
@@ -3446,6 +3446,18 @@ transf = {
   two_numbers ={
     sum = function(a, b)
       return a + b
+    end,
+  },
+  two_date_component_names = {
+    larger = function(a, b)
+      return tblmap.date_component_name.date_component_index[a] > tblmap.ddate_component_name.date_component_index[b]
+    end,
+    larger_date_component_name = function(a, b)
+      if tblmap.date_component_name.date_component_index[a] > tblmap.date_component_name.date_component_index[b] then
+        return a
+      else
+        return b
+      end
     end,
   },
   -- TODO: many things in key_value should be in two_anys, since key_value is a special case of two_anys where they are semantically keys and values of a table
@@ -5664,6 +5676,11 @@ transf = {
       return slice(stringy.split(source_id, "."), -1, -1)[1]
     end,
   },
+  source_id_array = {
+    next_to_be_activated = function(source_id_array)
+      return get.array.next_by_fn_wrapping(source_id_array, is.source_id.active)
+    end,
+  },
   -- for future reference, since I'll forget: mod is a hypernym of mod_name, mod_symbol, and mod_char. Via the implementation in `normalize` we can be sure that no matter what we provide when we use tblmap, we will get the desired thing back.
   menu_item_table = {
     mod_name_array = function(menu_item_table)
@@ -5676,10 +5693,10 @@ transf = {
       return menu_item_table.AXMenuItemCmdChar
     end,
     shortcut_string = function(menu_item_table)
-      return join.mod_array.key.shortcut_string(
-        transf.menu_item_table.mod_name_array(menu_item_table),
-        transf.menu_item_table.hotkey(menu_item_table)
-      )
+      return transf.shortcut_specifier.shortcut_string({
+        mod_array = transf.menu_item_table.mod_name_array(menu_item_table),
+        key = transf.menu_item_table.hotkey(menu_item_table)
+      } )
     end,
     title = function(menu_item_table)
       return menu_item_table.AXTitle
@@ -5711,6 +5728,29 @@ transf = {
     mod_name_array = function(mod_array)
       return memoize(map, refstore.params.memoize.opts.stringify_json)(mod_array, transf.mod.mod_name)
     end,
+  },
+  shortcut_specifier = {
+    mod_array = function(shortcut_specifier)
+      return shortcut_specifier.mod_array
+    end,
+    key = function(shortcut_specifier)
+      return shortcut_specifier.key
+    end,
+    shortcut_array = function(shortcut_specifier)
+      return glue(
+        shortcut_specifier.mod_array,
+        shortcut_specifier.key
+      )
+    end,
+    shortcut_string = function(shortcut_specifier)
+      local modstr = stringx.join("", map(shortcut_specifier.mod_array, tblmap.mod.mod_symbol))
+      if modstr == "" then
+        return shortcut_specifier.key
+      else
+        return modstr .. " " .. shortcut_specifier.key
+      end
+    end,
+
   },
   audiodevice_specifier = {
     audiodevice = function(audiodevice_specifier)
@@ -5843,7 +5883,10 @@ transf = {
       end
 
       return getIdentifier
-    end
+    end,
+    random_boolean = function()
+      return math.random() < 0.5
+    end,
 
 
   },
@@ -6044,13 +6087,8 @@ transf = {
   stream_creation_specifier = {
     flags_with_default = function(stream_creation_specifier)
       return concat(
-        {
-          ["loop-playlist"] = false,
-          shuffle = false,
-          pause = false,
-          ["no-video"] = false,
-        },
-        stream_creation_specifier.inner_specifier.flags 
+        tblmap.stream_creation_specifier_flag_profile_name.stream_creation_specifier_flag_profile[stream_creation_specifier.flag_profile_name or "foreground"],
+        stream_creation_specifier.flags 
       )
     end,
     flags_string = function(stream_creation_specifier)
@@ -6063,6 +6101,71 @@ transf = {
     end,
     transitioned_stream_state = function(stream_created_item_specifier)
       return tblmap.state_type.state_transition_table.stream_state[transf.stream_created_item_specifier.stream_state(stream_created_item_specifier)][is.stream_created_item_specifier.alive(stream_created_item_specifier)]
+    end,
+    is_valid = function(stream_created_item_specifier)
+      return stream_created_item_specifier.inner_item.state ~= "ended"
+    end,
+  },
+  hotkey_created_item_specifier = {
+    hshotkey = function(hotkey_created_item_specifier)
+      return hotkey_created_item_specifier.inner_item
+    end,
+    explanation = function(hotkey_created_item_specifier)
+      return hotkey_created_item_specifier.creation_specifier.explanation
+    end,
+    mnemonic = function(hotkey_created_item_specifier)
+      return hotkey_created_item_specifier.creation_specifier.mnemonic
+    end,
+    mnemonic_string = function(hotkey_created_item_specifier)
+      return transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier) and string.format("[%s] ", transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier)) or ""
+    end,
+    shortcut_specifier = function(hotkey_created_item_specifier)
+      return hotkey_created_item_specifier.creation_specifier.shortcut_specifier
+    end,
+    shortcut_string = function(hotkey_created_item_specifier)
+      return transf.shortcut_specifier.shortcut_string(transf.hotkey_created_item_specifier.shortcut_specifier(hotkey_created_item_specifier))
+    end,
+    mod_array = function(hotkey_created_item_specifier)
+      return hotkey_created_item_specifier.creation_specifier.shortcut_specifier.mod_array
+    end,
+    key = function(hotkey_created_item_specifier)
+      return hotkey_created_item_specifier.creation_specifier.shortcut_specifier.key
+    end,
+    fn = function(hotkey_created_item_specifier)
+      return hotkey_created_item_specifier.creation_specifier.fn
+    end,
+    summary = function(hotkey_created_item_specifier)
+      return string.format(
+        "%s%s: %s",
+        transf.hotkey_created_item_specifier.shortcut_string(hotkey_created_item_specifier),
+        transf.hotkey_created_item_specifier.mnemonic_string(hotkey_created_item_specifier),
+        transf.hotkey_created_item_specifier.explanation(hotkey_created_item_specifier)
+      )
+    end,
+
+  },
+  watcher_created_item_specifier = {
+    fn = function(watcher_created_item_specifier)
+      return watcher_created_item_specifier.creation_specifier.fn
+    end,
+    watcher_type = function(watcher_created_item_specifier)
+      return watcher_created_item_specifier.creation_specifier.watcher_type
+    end,
+    hswatcher = function(watcher_created_item_specifier)
+      return watcher_created_item_specifier.inner_item
+    end,
+    running = function(watcher_created_item_specifier)
+      return watcher_created_item_specifier.inner_item:running()
+    end,
+  },
+  watcher_creation_specifier = {
+    watcher_type = function(watcher_creation_specifier)
+      return watcher_creation_specifier.watcher_type
+    end,
+    hswatcher_creation_fn = function(watcher_creation_specifier)
+      return hs[
+        transf.watcher_creation_specifier.watcher_type(watcher_creation_specifier)
+      ].watcher.new
     end,
   },
   creation_specifier = {
@@ -6246,6 +6349,4 @@ transf = {
       return table.unpack(component_array)
     end
   },
-  -- a creatable i
-  creatable_specifier
 }
