@@ -359,8 +359,8 @@ is = {
     is_not_interface = function(val)
       return not is.any.is_interface(val)
     end,
-    stream_specifier = function(val)
-      return is.any.table(val) and is.table.stream_specifier(val)
+    stream_created_item_specifier = function(val)
+      return is.any.table(val) and is.table.stream_created_item_specifier(val)
     end,
     empty_table = function(val)
       return is.any.table(val) and is.table.empty_Table(val)
@@ -424,9 +424,9 @@ is = {
     end,
   },
   table = {
-    stream_specifier = function(t)
+    created_item_specifier = function(t)
       return
-        t.ipc_socket_id and t.stream_creation_specifier
+        t.created_item and t.creation_specifier
     end,
     native_table = function(t)
       return not t.isovtable
@@ -523,9 +523,15 @@ is = {
       }) ~= nil
     end,
   },
-  stream_specifier = {
-    alive = function(stream_specifier)
-      return is.mpv_ipc_socket_id.alive(stream_specifier.ipc_socket_id)
+  created_item_specifier = {
+    stream_created_item_specifier = function(t)
+      return
+        t.inner_item.ipc_socket_id
+    end,
+  },
+  stream_created_item_specifier = {
+    alive = function(stream_created_item_specifier)
+      return is.mpv_ipc_socket_id.alive(stream_created_item_specifier.inner_item.ipc_socket_id)
     end,
   }
 }

@@ -531,7 +531,7 @@ tblmap = {
 
     },
     chooser_text_partial_retriever_specifier = {
-      stream_specifier = {
+      stream_created_item_specifier = {
         thing_name = "summary_line"
       }
     },

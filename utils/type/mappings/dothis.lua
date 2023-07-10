@@ -510,6 +510,10 @@ dothis = {
         tblmap.dynamic_structure_name.dynamic_structure[name]
       )
     end,
+    serve = function(path, port)
+      port = port or env.FS_HTTP_SERVER_PORT
+      -- TODO
+    end
   },
   absolute_path = {
     write_file = function(path, content)
@@ -1366,7 +1370,7 @@ dothis = {
       dothis.running_application.focus_main_window(running_application)
     end,
     generate_target_txts = function(dir, do_after)
-      local generation_tatransf.indexable.key_stateful_iter = map(
+      local generation_tasks = map(
         transf.omegat_project_dir.target_files(dir),
         function(file)
           return file, "soffice --headless --convert-to txt:Text --outdir"..
@@ -1377,7 +1381,7 @@ dothis = {
         end,
         {"v", "kv"}
       )
-      runThreaded(generation_tatransf.indexable.key_stateful_iter, 1, do_after)
+      runThreaded(generation_tasks, 1, do_after)
     end,
     generate_rechnung_md = function(omegat_project_dir)
       writeFile(
@@ -1671,25 +1675,68 @@ dothis = {
     end,
   },
   stream_creation_specifier = {
-    create = function(spec)
+    create_inner_item = function(spec)
       local ipc_socket_id = os.time() .. "-" .. math.random(1000000)
       run("mpv " .. transf.stream_creation_specifier.flags_string(spec.flags) .. 
         " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.string_array.single_quoted_escaped_string(spec.urls))
       return {
         ipc_socket_id = ipc_socket_id,
-        stream_creation_specifier = spec,
         state = "booting"
       }
     end,
   },
-  stream_specifier = {
-    set_state_transitioned_state = function(spec)
-      spec.state = transf.stream_specifier.transitioned_stream_state(spec)
+  creation_specifier = {
+    create = function(spec)
+      return {
+        inner_item = dothis[
+          transf.creation_specifier.creation_specifier_type(spec)
+        ].create_inner_item(spec),
+        creation_specifier = spec,
+      }
     end,
   },
-  stream_specifier_array = {
+  created_item_specifier = {
+    recreate = function(spec)
+      return dothis.creation_specifier.create(spec.creation_specifier)
+    end,
+  },
+  fireable_created_item_specifier = {
+    fire = function(spec)
+      spec.creation_specifier.fn()
+    end,
+  },
+  task_creation_specifier = {
+    start = function(spec)
+      spec.inner_item:start()
+    end,
+    pause = function(spec)
+      spec.inner_item:pause()
+    end,
+    resume = function(spec)
+      spec.inner_item:resume()
+    end,
+    stop = function(spec)
+      spec.inner_item:stop()
+    end,
+  },
+  created_item_specifier_array = {
+    create_or_recreate = function(arr, creation_specifier)
+      local created_item_specifier = get.created_item_specifier_array.find_created_item_specifier_with_creation_specifier(arr, creation_specifier)
+      if created_item_specifier then
+        return dothis.created_item_specifier.recreate(created_item_specifier)
+      else
+        return dothis.created_item_specifier.create(creation_specifier)
+      end
+    end,
+  },
+  stream_created_item_specifier = {
+    set_state_transitioned_state = function(spec)
+      spec.state = transf.stream_created_item_specifier.transitioned_stream_state(spec)
+    end,
+  },
+  stream_created_item_specifier_array = {
     set_state_transitioned_state_all = function(array)
-      hs.fnutils.ieach(array, dothis.stream_specifier.set_state_transitioned_state)
+      hs.fnutils.ieach(array, dothis.stream_created_item_specifier.set_state_transitioned_state)
     end,
   }
 }

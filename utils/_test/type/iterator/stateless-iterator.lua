@@ -635,36 +635,36 @@ assertMessage(
   3
 )
 
--- test iterToTbl
+-- test get.stateless_iter_component_array.table
 
 
 assertMessage(
-  iterToTbl({tolist=true, ret="v"},string.gmatch("abc", ".")),
+  get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(string.gmatch("abc", ".")), {tolist=true, ret="v"}),
   { "a", "b", "c" }
 )
 
 assertMessage(
-  iterToTbl({tolist=true, ret="v"},string.gmatch("abc", "d")),
+  get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(string.gmatch("abc", "d")),{tolist=true, ret="v"}),
   {}
 )
 
 assertMessage(
-  iterToTbl({noovtable=true},get.indexable.index_value_stateless_iter({"a", "b", "c"})),
+  get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.index_value_stateless_iter({"a", "b", "c"})), {noovtable=true}),
   { "a", "b", "c" }
 )
 
 assertMessage(
-  iterToTbl(get.indexable.key_value_stateless_iter({a = "a", b = "b", c = "c"})).isarr,
+  get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.key_value_stateless_iter({a = "a", b = "b", c = "c"}))).isarr,
   nil
 )
 
 assertMessage(
-  iterToTbl(get.indexable.key_value_stateless_iter({"a", "b", "c"})).isassoc,
+  get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.key_value_stateless_iter({"a", "b", "c"}))).isassoc,
   nil
 )
 
 assertMessage(
-  iterToTbl(get.indexable.key_value_stateless_iter({a = "a", b = "b", c = "c"})),
+  get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.key_value_stateless_iter({a = "a", b = "b", c = "c"}))),
   { a = "a", b = "b", c = "c" }
 )
 

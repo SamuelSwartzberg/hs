@@ -7,9 +7,9 @@ function rev(thing)
     return eutf8.reverse(thing)
   elseif type(thing) == "table" then
     if not thing.isovtable then
-      return iterToTbl(get.indexable.reversed_key_value_stateless_iter(thing))
+      return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(thing)))
     else
-      return iterToTbl(get.indexable.reversed_key_value_stateless_iter(thing), {toovtable = true});
+      return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(thing)), {toovtable = true});
     end
   else
     error("rev only works on strings, lists, and tables. got " .. type(thing) .. " when processing:\n\n" .. json.encode(thing))

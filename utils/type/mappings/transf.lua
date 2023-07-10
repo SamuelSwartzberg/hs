@@ -1125,7 +1125,7 @@ transf = {
       return hs.fnutils.imap(dict, function(value)
         return {
           value = value,
-          dependencies = iterToTbl({tolist=true, ret="v"},eutf8.gmatch(value, "%$([A-Z0-9_]+)"))
+          dependencies = get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(eutf8.gmatch(value, "%$([A-Z0-9_]+)")), {tolist=true, ret="v"})
         }
       end)
     end,
@@ -6050,20 +6050,39 @@ transf = {
           pause = false,
           ["no-video"] = false,
         },
-        stream_creation_specifier.flags 
+        stream_creation_specifier.inner_specifier.flags 
       )
     end,
     flags_string = function(stream_creation_specifier)
       return transf.string_boolean_dict.truthy_long_flag_string(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
     end,
   },
-  stream_specifier = {
-    stream_state = function(stream_specifier)
-      return stream_specifier.state
+  stream_created_item_specifier = {
+    stream_state = function(stream_created_item_specifier)
+      return stream_created_item_specifier.inner_item.state
     end,
-    transitioned_stream_state = function(stream_specifier)
-      return tblmap.state_type.state_transition_table.stream_state[transf.stream_specifier.stream_state(stream_specifier)][is.stream_specifier.alive(stream_specifier)]
+    transitioned_stream_state = function(stream_created_item_specifier)
+      return tblmap.state_type.state_transition_table.stream_state[transf.stream_created_item_specifier.stream_state(stream_created_item_specifier)][is.stream_created_item_specifier.alive(stream_created_item_specifier)]
     end,
+  },
+  creation_specifier = {
+    creation_specifier_type = function(spec)
+      return spec.type
+    end,
+  },
+  created_item_specifier = {
+    creation_specifier = function(created_item_specifier)
+      return created_item_specifier.creation_specifier
+    end,
+    inner_item = function(created_item_specifier)
+      return created_item_specifier.inner_item
+    end,
+    creation_specifier_type = function(created_item_specifier)
+      return transf.creation_specifier.creation_specifier_type(created_item_specifier.creation_specifier)
+    end,
+  },
+  created_item_specifier_array = {
+    
   },
   indexable = {
     key_array = function(indexable)
@@ -6216,5 +6235,17 @@ transf = {
       return range
     end
     
-  }
+  },
+  stateless_iter = {
+    stateless_iter_component_array = function(...)
+      return {...}
+    end
+  },
+  stateless_iter_component_array = {
+    stateless_iter = function(component_array)
+      return table.unpack(component_array)
+    end
+  },
+  -- a creatable i
+  creatable_specifier
 }

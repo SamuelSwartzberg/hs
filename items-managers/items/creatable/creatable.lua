@@ -3,12 +3,6 @@ CreatableItemSpecifier = {
   type = "creatable",
   properties = {
     getables = {
-      ["specifier"] = function(self)
-        return self:get("c").specifier
-      end,
-      ["hscreatable"] = function (self)
-        return self:get("c").hscreatable
-      end,
       ["specid"] = function(self)
         local spec = self:get("specifier")
         local filteredSpec = {}
@@ -19,30 +13,12 @@ CreatableItemSpecifier = {
         end
         return json.encode(filteredSpec)
       end,
-      ["type"] = function(self)
-        return self:get("specifier").type
-      end,
-      
-      ["is-task"] = function(self)
-        return self:get("type") == "task"
-      end,
       ["is-fireable"] = function(self)
         return self:get("specifier").fn ~= nil
       end,
       
     },
     doThisables = {
-      ["recreate"] = function (self)
-        self:doThis("stop")
-        self:doThis("create-and-run")
-      end,
-      ["create-and-start"] = function(self)
-        self:doThis("create")
-        self:doThis("start")
-      end,
-      ["create"] = function(self)
-        self:get("c").hscreatable = self:get("created")
-      end,
     }
   },
   potential_interfaces = ovtable.init({

@@ -348,6 +348,9 @@ get = {
       setmetatable(new, getmetatable(t)) -- I don't I currently have any metatables where data is stored and thus copy(getmetatable(t)) would be necessary, but this comment is here so that I remember to add it if I ever do
       return new
     end,
+    key_value_equals = function(t, key, value)
+      return t[key] == value
+    end
     
   },
   dict = {
@@ -1784,6 +1787,14 @@ get = {
       else return tblmap.stream_attribute.false_emoji[key] end
     end,
   },
+  created_item_specifier_array = {
+    find_created_item_specifier_with_creation_specifier = function(arr, creation_specifier)
+      return hs.fnutils.find(
+        arr,
+        bind(get.table.key_value_equals, {a_use, "creation_specifier", creation_specifier})
+      )
+    end,
+  },
   indexable = {
     --- pairs dropin replacement that is ordered by default, supports start/stop/step and works with any indexable
     --- difference from iprs is that it returns the key instead of the index
@@ -1982,5 +1993,19 @@ get = {
     is_close = function(a, b, distance)
       return math.abs(a - b) < distance
     end,
+  },
+  stateless_iter_component_array = {
+    table = function(stateless_iter_component_array, opts)
+      opts = defaultOpts(opts, "kv")
+    
+      local res = getEmptyResult({}, opts)
+    
+      for a1, a2, a3, a4, a5, a6, a7, a8, a9 in transf.stateless_iter_component_array.stateless_iter(stateless_iter_component_array) do
+        local as = {a1, a2, a3, a4, a5, a6, a7, a8, a9}
+        addToRes(as, res, opts, nil, nil)
+      end
+    
+      return res
+    end
   }
 }
