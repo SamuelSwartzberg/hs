@@ -1,6 +1,7 @@
 --- @alias relay_table { [string]: { [string]: string[] } }
 
-
+--- maps one thing_name to another thing_name
+--- so transf.<thing_name1>.<thing_name2>(<thing1>) -> <thing2>
 transf = {
   hex_string = { -- a hex string
     char = function(hex)
@@ -6023,19 +6024,19 @@ transf = {
   },
   mpv_ipc_socket_id = {
     current_url = function (mpv_ipc_socket_id)
-      return get.mpv_ipc_socket_id.get_string(mpv_ipc_socket_id, "stream-open-filename")
+      return get.mpv_ipc_socket_id.string(mpv_ipc_socket_id, "stream-open-filename")
     end,
     title = function(mpv_ipc_socket_id)
-      return get.mpv_ipc_socket_id.get_string(mpv_ipc_socket_id, "media-title")
+      return get.mpv_ipc_socket_id.string(mpv_ipc_socket_id, "media-title")
     end,
     play_time_seconds_int = function(mpv_ipc_socket_id)
-      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "time-pos")
+      return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "time-pos")
     end,
     duration_seconds_int = function(mpv_ipc_socket_id)
-      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "duration")
+      return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "duration")
     end,
     playback_progress_percent_int = function(mpv_ipc_socket_id)
-      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "percent-pos")
+      return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "percent-pos")
     end,
     playback_progress_string = function(mpv_ipc_socket_id)
       return string.format(
@@ -6046,10 +6047,10 @@ transf = {
       )
     end,
     playlist_position_int = function(mpv_ipc_socket_id)
-      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "playlist-pos")
+      return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "playlist-pos")
     end,
     playlist_length_int = function(mpv_ipc_socket_id)
-      return get.mpv_ipc_socket_id.get_int(mpv_ipc_socket_id, "playlist-count")
+      return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "playlist-count")
     end,
     playlist_progress_string = function(mpv_ipc_socket_id)
       return string.format(
@@ -6070,7 +6071,7 @@ transf = {
       return table.concat(
         hs.fnutils.imap(
           {"pause", "loop", "shuffle", "video"},
-          hs.fnutils.partial(get.mpv_ipc_socket_id.get_boolean_emoji, mpv_ipc_socket_id)
+          hs.fnutils.partial(get.mpv_ipc_socket_id.boolean_emoji, mpv_ipc_socket_id)
         ),
         ""
       )
@@ -6094,6 +6095,9 @@ transf = {
     flags_string = function(stream_creation_specifier)
       return transf.string_boolean_dict.truthy_long_flag_string(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
     end,
+    source_path = function(stream_created_item_specifier)
+      return stream_created_item_specifier.source_path
+    end,
   },
   stream_created_item_specifier = {
     stream_state = function(stream_created_item_specifier)
@@ -6105,6 +6109,13 @@ transf = {
     is_valid = function(stream_created_item_specifier)
       return stream_created_item_specifier.inner_item.state ~= "ended"
     end,
+    source_path = function(stream_created_item_specifier)
+      return transf.stream_creation_specifier.source_path(stream_created_item_specifier.creation_specifier)
+    end,
+    summary_line = function(stream_created_item_specifier)
+      return transf.mpv_ipc_socket_id.summary_line(stream_created_item_specifier.mpv_ipc_socket_id)
+    end,
+
   },
   hotkey_created_item_specifier = {
     hshotkey = function(hotkey_created_item_specifier)

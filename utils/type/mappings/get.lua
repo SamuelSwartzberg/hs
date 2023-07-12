@@ -1787,18 +1787,18 @@ get = {
     end
   },
   mpv_ipc_socket_id = {
-    get_string = function(id, key)
+    string = function(id, key)
       return get.ipc_socket_id.response_table_or_nil(id, {
         command = { "get_property", key }
       } )
     end,
-    get_int = function(id, key)
+    int = function(id, key)
       return get.string_or_number.int(
-        get.mpv_ipc_socket_id.get_string(id, key)
+        get.mpv_ipc_socket_id.string(id, key)
       )
     end,
-    get_boolean_emoji = function(id, key)
-      local res = get.mpv_ipc_socket_id.get_string(id, key)
+    boolean_emoji = function(id, key)
+      local res = get.mpv_ipc_socket_id.string(id, key)
       if res then return tblmap.stream_attribute.true_emoji[key]
       else return tblmap.stream_attribute.false_emoji[key] end
     end,

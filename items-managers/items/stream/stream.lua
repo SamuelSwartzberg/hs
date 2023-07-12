@@ -1,40 +1,6 @@
 --- @type BoundRootInitializeInterface
 function CreateStreamItem(specified_contents)
   local interface_specifier = {
-    
-    properties = {
-      getables = {
-        ["state"] = function(self) 
-          return self:get("c").state
-        end,
-        ["chooser-subtext-part"] = function(self) 
-          local path = self:get("initial-data", "path")
-          if path then 
-            return self:get("initial-data", "path"):get("to-string") 
-          else
-            return nil
-          end
-        end,
-        ["is-valid"] = function(self)
-          return not (self:get("state") == "ended")
-        end,
-      },
-      doThisables = {
-        ["update"] = function(self)
-          if self:get("state") == "booting" then
-            if self:get("alive") then
-              self:get("c").state = "active"
-            end
-          elseif self:get("state") == "active" then
-            if not self:get("alive") then
-              self:get("c").state = "ended"
-            end
-          end
-          -- no update for ended
-        end,
-      }
-    },
-
     action_table = { {
       text = "⏯ tgl.",
       key = "cycle",
@@ -170,24 +136,7 @@ StreamControlItemSpecifier = {
         self:doThis("playlist-first")
         self:doThis("restart-current")
       end,
-      ["set-time-relative"] = function(self, value)
-        self:doThis("set", {key =  "time-pos", args = self:get("as-int", "time-pos") + value})
-      end,
-      ["set-percent-relative"] = function(self, value)
-        self:doThis("set", {key =  "percent-pos", args = self:get("as-int", "percent-pos") + value})
-      end,
-      ["playlist-first"] = function(self) self:doThis("set", {key =  "playlist-pos", args = 0}) end,
-      ["playlist-last"] = function(self) self:doThis("set", {key =  "playlist-pos", args = self:get("key", "playlist-count")}) end,
       ["restart-current"] = function(self) self:doThis("set", {key =  "time-pos", args = 0}) end,
-      ["cycle-inf-no"] = function(self, prop)
-        self:doThis("set", {key =  prop, args = get.binary_specifier.inverted(tblmap.binary_specifier_name.binary_specifier["inf_no"], self:get("key", prop))})
-      end,
-      ["loop-playlist"] = function (self)
-        self:doThis("cycle-inf-no", "loop-playlist")
-      end,
-      ["loop"] = function (self)
-        self:doThis("cycle-inf-no", "loop-file")
-      end,
       ["copy-current-url"] = function(self) hs.pasteboard.setContents("https://youtube.com/" .. self:get("key", "filename")) end,
       ["open-current-url-in-browser"] = function(self) hs.urlevent.openURL("https://youtube.com/" .. self:get("key", "filename")) end,
       ["chapter-next"] = function(self) self:doThis("set", {key =  "chapter", args = self:get("as-int", "chapter") + 1}) end,

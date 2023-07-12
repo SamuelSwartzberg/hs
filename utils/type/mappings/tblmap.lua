@@ -511,6 +511,19 @@ tblmap = {
       string = "💻🔡",
       multiline_string = "💻🔡📜",
       summary = "📚💬",
+      wind_backwards = "⏪",
+      wind_forwards = "⏩",
+      sixty = "6️⃣0️⃣",
+      fifteen = "1️⃣5️⃣",
+      chapter_backwards = "↖️",
+      chapter_forwards = "↗️",
+      item_backwards = "⬅️",
+      item_forwards = "➡️",
+      item_start = "⏮",
+      item_stop = "⏭",
+      toggle_pause = "⏯",
+      stop = "⏹",
+      loop = "🔁",
     }
   },
   stream_attribute = {
@@ -536,7 +549,9 @@ tblmap = {
       }
     },
     chooser_subtext_partial_retriever_specifier = {
-
+      stream_created_item_specifier = {
+        thing_name = "source_path"
+      }
     },
     placeholder_text_partial_retriever_specifier = {
       

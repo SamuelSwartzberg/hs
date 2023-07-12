@@ -1724,8 +1724,42 @@ dothis = {
     cycle = function(id, key)
       get.ipc_socket_id.response_table_or_nil(id, { command = { "cycle", key } })
     end,
+    cycle_inf_no = function(id, key)
+      dothis.mpv_ipc_socket_id.set(
+        id, 
+        key,
+        get.binary_specifier.inverted(
+          tblmap.binary_specifier_name.binary_specifier["inf_no"],
+          get.mpv_ipc_socket_id.string(id, key)
+        )
+      )
+    end,
+    cycle_loop_playlist = function(id)
+      dothis.mpv_ipc_socket_id.cycle_inf_no(id, "loop-playlist")
+    end,
+    cycle_loop_playback = function(id)
+      dothis.mpv_ipc_socket_id.cycle_inf_no(id, "loop-file")
+    end,
     exec = function(id, ...)
       get.ipc_socket_id.response_table_or_nil(id, { command = { ... } })
+    end,
+    set_playlist_index = function(id, index)
+      dothis.mpv_ipc_socket_id.set(id, "playlist-pos", index)
+    end,
+    set_playlist_first = function(id)
+      dothis.mpv_ipc_socket_id.set(id, "playlist-pos", 0)
+    end,
+    set_playlist_last = function(id)
+      dothis.mpv_ipc_socket_id.set(id, "playlist-pos", transf.mpv_ipc_socket_id.playlist_length_int(id))
+    end,
+    set_playback_progress_seconds = function(id, seconds)
+      dothis.mpv_ipc_socket_id.set(id, "time-pos", seconds)
+    end,
+    set_playback_progress_percent = function(id, percent)
+      dothis.mpv_ipc_socket_id.set(id, "percent-pos", percent)
+    end,
+    set_playback_progress_0 = function(id)
+      dothis.mpv_ipc_socket_id.set_playback_progress_seconds(id, 0)
     end,
   },
   stream_creation_specifier = {
