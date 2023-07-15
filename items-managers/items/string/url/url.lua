@@ -59,7 +59,7 @@ URLItemSpecifier = {
         })
         khal_config:doThis("append-file-contents", "\n\n" .. khal_data)
         vdirsyncer_config:doThis("append-file-contents", "\n\n" .. transf.vdirsyncer_pair_specifier.ini_string(vdirsyncer_pair_specifier))
-        createPath(path)
+        dothis.absolute_path.create_dir(path)
         run({
           "vdirsyncer",
           "discover",

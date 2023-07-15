@@ -23,7 +23,7 @@ function split(thing, sep, opts)
 
   opts.mode = opts.mode or "remove"
 
-  if len(splintervals) == 0 then
+  if transf.indexable.length(splintervals) == 0 then
     return {thing}
   end
 
@@ -34,7 +34,7 @@ function split(thing, sep, opts)
     local start, match = table.unpack(pair)
     local matchlength 
     if type(thing) == "string" then -- we're splitting a string, so splitter can have variable length in relation to the thing
-      matchlength = len(match)
+      matchlength = transf.indexable.length(match)
     else
       matchlength = 1
     end

@@ -18,7 +18,7 @@ function splice(thing1, thing2, opts)
   local res = {}
   local before = slice(thing1, 1, opts.start - 1)
   if opts.overwrite then
-    local after = slice(thing1, opts.start + len(thing2))
+    local after = slice(thing1, opts.start + transf.indexable.length(thing2))
     res = concat(before, thing2, after)
   else
     local after = slice(thing1, opts.start)

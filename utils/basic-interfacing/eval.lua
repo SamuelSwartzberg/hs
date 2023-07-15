@@ -30,9 +30,9 @@ end
 function le(template, d)
   if type(d) == "string" then
     if stringy.endswith(d, ".yaml") then
-      d = yaml.load(readFile(d, "error"))
+      d = yaml.load(transf.file.contents(d, "error"))
     elseif stringy.endswith(d, ".json") then
-      d = json.decode(readFile(d, "error"))
+      d = json.decode(transf.file.contents(d, "error"))
     else
       error("Unknown file type.")
     end

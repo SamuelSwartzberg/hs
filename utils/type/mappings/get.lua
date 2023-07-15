@@ -218,39 +218,28 @@ get = {
     end
   },
   pandoc = {
-    full_md_extension_set = function()
-      return flatten(
-        mt._list.markdown_extensions,
-        { mode="list"}
-      )
-    end
+    full_md_extension_set = 
   }, 
-  pass = {
-    value = function(type, item)
+  pass_item_name = {
+    value = function(item, type)
       return memoize(run, refstore.params.memoize.opts.invalidate_1_day)("pass show " .. type .. "/" .. item)
     end,
-    path = function(type, item, ext)
+    path = function(item, type, ext)
       return env.PASSWORD_STORE_DIR .. "/" .. type .. "/" .. item .. "." .. (ext or "gpg")
     end,
-    exists = function(type, item, ext)
-      return testPath(get.pass.path(type, item, ext))
+    exists_as = function(item, type, ext)
+      return testPath(get.pass_item_name.path(item, type, ext))
     end,
-    json = function(type, item)
+    json = function(item, type)
       return runJSON("pass show " .. type .. "/" .. item)
     end,
-    contact_json = function(type, item)
-      return get.pass.json("contacts/" .. type, item)
+    contact_json = function(item, type)
+      return get.pass_item_name.json(item, "contacts/" .. type)
     end,
     
   },
-  sox = {
-    is_recording = function()
-      local succ, res = pcall(run, "pgrep -x rec")
-      return succ
-    end,
-  },
-  audiodevice_system = {
-    default = function(type)
+  ["nil"] = {
+    default_audiodevice = function(type)
       return hs.audiodevice["default" .. transf.word.capitalized(type) .. "Device"]()
     end,
   },
@@ -259,13 +248,13 @@ get = {
   },
   audiodevice = {
     is_default = function (device, type)
-      return device == get.audiodevice_system.default(type)
+      return device == get["nil"].default_audiodevice(type)
     end,
     
   },
   contact_table = {
     encrypted_data = function(contact_table, type)
-      return get.pass.contact_json(type, contact_table.uid)
+      return get.pass_item_name.contact_json(contact_table.uid, type)
     end,
     tax_number = function(contact_table, type)
       return get.contact_table.encrypted_data(contact_table, "taxnr/" .. type)
@@ -362,7 +351,8 @@ get = {
         end,
         "k"
       )
-    end
+    end,
+
   },
   dict_with_timestamp = {
     array_by_array_with_timestamp_first = function(dict, arr)
@@ -402,6 +392,17 @@ get = {
     end,
     first_matching_value_for_keys= function(t, keys)
       return find(t, {_list = keys}, {"k", "v"})
+    end,
+  },
+  table_of_assoc_arrs = {
+    array_of_assoc_arrs = function(assoc_arr, key)
+      local res = {}
+      for k, v in transf.table.pair_stateless_iter(assoc_arr) do
+        local copied = get.table.copy(v, true)
+        copied[key] = k
+        dothis.array.push(res, copied)
+      end
+      return res
     end,
   },
   array = {
@@ -517,6 +518,36 @@ get = {
       else 
         return get.any_stateful_generator.array(combine.combn, arr, k)
       end
+    end,
+    raw_item_chooser_item_specifier_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.any.item_chooser_item_specifier
+      )
+    end,
+    item_chooser_item_specifier_array = function(arr, target_item_chooser_item_specifier_name)
+      if target_item_chooser_item_specifier_name then
+        return hs.fnutils.imap(
+          get.array.raw_item_chooser_item_specifier_array(arr),
+          transf.item_chooser_item_specifier[target_item_chooser_item_specifier_name .. "_item_chooser_item_specifier"]
+        )
+      else
+        return get.array.raw_item_chooser_item_specifier_array(arr)
+      end
+    end,
+    item_with_index_chooser_item_specifier_array = function(arr, target_item_chooser_item_specifier_name)
+      return transf.assoc_arr_array.assoc_arr_with_index_as_key_array(
+        get.array.item_chooser_item_specifier_array(arr, target_item_chooser_item_specifier_name)
+      )
+    end,
+    hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
+      return {
+        chooser_item_specifier_array = get.array.item_with_index_chooser_item_specifier_array(arr, target_item_chooser_item_specifier_name),
+        placeholder_text = transf.array.summary(arr),
+      }
+    end,
+    choosing_hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
+      return get.hschooser_specifier.choosing_hschooser_specifier(transf.array.hschooser_specifier(arr, target_item_chooser_item_specifier_name), "index", arr)
     end,
     
   },
@@ -790,12 +821,6 @@ get = {
     end,
   },
   extant_path = {
-    attr = function(path, attr)
-      return hs.fs.attributes(transf.string.path_resolved(path, true))[attr]
-    end,
-    date_attr = function(path, attr) -- attr must be one of "access", "modification", "change", "creation"
-      return date(get.extant_path.attr(path, attr))
-    end,
     find_self_or_ancestor = function(path, fn)
       local ancestor = path
       while ancestor ~= "/" or ancestor ~= "" do
@@ -811,7 +836,7 @@ get = {
     end,
     find_self_or_ancestor_siblings = function(path, cond, opts)
       return get.extant_path.find_self_or_ancestor(path, function(x)
-        return find(transf.dir.children_array(transf.path.parent_path(x)), cond, opts)
+        return find(transf.dir.children_absolute_path_array(transf.path.parent_path(x)), cond, opts)
       end)
     end,
     cmd_output_from_path = function(path, cmd)
@@ -821,54 +846,58 @@ get = {
         return get.dir.cmd_output_from_path(transf.path.parent_path(path), cmd)
       end
     end,
-
-    
-
+    find_descendant = function(dir, cond, opts)
+      return find(transf.extant_path.descendants_absolute_path_array(dir), cond, opts)
+    end,
+    find_descendant_ending_with = function(dir, ending)
+      return get.path_array.find_ending_with(transf.extant_path.descendants_absolute_path_array(dir), ending)
+    end,
+    find_leaf_of_descendant = function(dir, filename)
+      return get.path_array.find_leaf(transf.extant_path.descendants_absolute_path_array(dir), filename)
+    end,
+    find_extension_of_descendant = function(dir, extension)
+      return get.path_array.find_extension(transf.extant_path.descendants_absolute_path_array(dir), extension)
+    end,
+    find_descendant_with_leaf = function(dir, leaf)
+      return get.path_array.find_path_with_leaf(transf.extant_path.descendants_absolute_path_array(dir), leaf)
+    end,
+    find_descendant_with_extension = function(dir, extension)
+      return get.path_array.find_path_with_extension(transf.extant_path.descendants_absolute_path_array(dir), extension)
+    end,
+    find_descendant_with_leaf_ending = function(dir, leaf_ending)
+      return get.path_array.find_path_with_leaf_ending(transf.extant_path.descendants_absolute_path_array(dir), leaf_ending)
+    end,
+    find_descendant_with_filename = function(dir, filename)
+      return get.path_array.find_path_with_filename(transf.extant_path.descendants_absolute_path_array(dir), filename)
+    end,
+  },
+  local_extant_path = {
+    attr = function(path, attr)
+      return hs.fs.attributes(transf.string.path_resolved(path, true))[attr]
+    end,
   },
   dir = {
     find_child = function(dir, cond, opts)
-      return find(transf.dir.children_array(dir), cond, opts)
+      return find(transf.dir.children_absolute_path_array(dir), cond, opts)
     end,
     find_child_ending_with = function(dir, ending)
-      return get.path_array.find_ending_with(transf.dir.children_array(dir), ending)
+      return get.path_array.find_ending_with(transf.dir.children_absolute_path_array(dir), ending)
     end,
     find_leaf_of_child = function(dir, filename)
-      return get.path_array.find_leaf(transf.dir.children_array(dir), filename)
+      return get.path_array.find_leaf(transf.dir.children_absolute_path_array(dir), filename)
     end,
     find_extension_of_child = function(dir, extension)
-      return get.path_array.find_extension(transf.dir.children_array(dir), extension)
+      return get.path_array.find_extension(transf.dir.children_absolute_path_array(dir), extension)
     end,
     find_child_with_leaf = function(dir, leaf)
-      return get.path_array.find_path_with_leaf(transf.dir.children_array(dir), leaf)
+      return get.path_array.find_path_with_leaf(transf.dir.children_absolute_path_array(dir), leaf)
     end,
     find_child_with_extension = function(dir, extension)
-      return get.path_array.find_path_with_extension(transf.dir.children_array(dir), extension)
+      return get.path_array.find_path_with_extension(transf.dir.children_absolute_path_array(dir), extension)
     end,
     find_child_with_leaf_ending = function(dir, leaf_ending)
-      return get.path_array.find_path_with_leaf_ending(transf.dir.children_array(dir), leaf_ending)
+      return get.path_array.find_path_with_leaf_ending(transf.dir.children_absolute_path_array(dir), leaf_ending)
     end,
-    find_descendant = function(dir, cond, opts)
-      return find(transf.dir.descendants_array(dir), cond, opts)
-    end,
-    find_descendant_ending_with = function(dir, ending)
-      return get.path_array.find_ending_with(transf.dir.descendants_array(dir), ending)
-    end,
-    find_leaf_of_descendant = function(dir, filename)
-      return get.path_array.find_leaf(transf.dir.descendants_array(dir), filename)
-    end,
-    find_extension_of_descendant = function(dir, extension)
-      return get.path_array.find_extension(transf.dir.descendants_array(dir), extension)
-    end,
-    find_descendant_with_leaf = function(dir, leaf)
-      return get.path_array.find_path_with_leaf(transf.dir.descendants_array(dir), leaf)
-    end,
-    find_descendant_with_extension = function(dir, extension)
-      return get.path_array.find_path_with_extension(transf.dir.descendants_array(dir), extension)
-    end,
-    find_descendant_with_leaf_ending = function(dir, leaf_ending)
-      return get.path_array.find_path_with_leaf_ending(transf.dir.descendants_array(dir), leaf_ending)
-    end,
-
     cmd_output_from_path = function(path, cmd)
       return run("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd)
     end
@@ -1103,6 +1132,9 @@ get = {
     end
 
   },
+  alphanum_minus_underscore = {
+    
+  },
   email_specifier = {
     
   },
@@ -1168,6 +1200,11 @@ get = {
     find_path_with_leaf_ending = function(path_array, leaf_ending)
       return hs.fnutils.find(path_array, function(path)
         return stringy.endswith(get.path.leaf(path), leaf_ending)
+      end)
+    end,
+    find_path_with_filename = function(path_array, filename)
+      return hs.fnutils.find(path_array, function(path)
+        return get.path.filename(path) == filename
       end)
     end,
   },
@@ -1505,11 +1542,6 @@ get = {
       end
       return values
     end,
-  },
-  system = {
-    all_applications = function()
-      return transf.dir.children_filenames_array("/Applications")
-    end
   },
   url = {
 
@@ -1853,7 +1885,7 @@ get = {
     --- @param precalc_keys? any[] precalculated keys 
     --- @return function, indexable, integer
     index_value_stateless_iter = function(indexable, start, stop, step, limit, precalc_keys)
-      local len_thing = len(indexable)
+      local len_thing = transf.indexable.length(indexable)
       if len_thing == 0 then
         return function() end, indexable, 0
       end
@@ -2032,5 +2064,5 @@ get = {
     end
   }, 
   stream_creation_specifier = {
-  }
+  },
 }

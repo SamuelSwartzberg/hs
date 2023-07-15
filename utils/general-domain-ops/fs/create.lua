@@ -1,31 +1,3 @@
---- @param path string
---- @param slice? sliceSpecLike how to slice the path before creating it
---- @param fail? "error" | "nil" what to do if an error occurs. Defaults to "nil"
-function createPath(path, slice, fail)
-  path = transf.string.path_resolved(path, true)
-  local resolved_path = path
-  if slice then
-    local sliced =  pathSlice(path, slice, {rejoin_at_end = true})
-    --- @cast sliced string
-    resolved_path = sliced
-  end
-  local remote = is.path.remote(resolved_path)
-  local succ, res = pcall(function()
-    if not remote then
-      run({"mkdir -p '" .. resolved_path .. "'"})
-    else
-      run({"rclone", "mkdir", {value = resolved_path, type = "quoted"}})
-    end
-  end)
-  if not succ then
-    if fail == "error" then
-      error(res)
-    else
-      return nil
-    end
-  end
-end
-
 --- @param path? string
 --- @param contents? string what to write to the file, if anything. Defaults to an empty string.
 --- @param condition? "exists" | "not-exists" | "any" under what conditions to write the file. Defaults to "any"
@@ -41,13 +13,13 @@ function writeFile(path, contents, condition, create_path, mode, fail)
   path = transf.string.path_resolved(path, true)
   fail = get.any.default_if_nil(fail, "nil")
 
-  local path_is_remote = is.path.remote(path)
+  local path_is_remote = is.path.remote_path(path)
 
   local parent_path = pathSlice(path, {start = 1, stop = -2}, {rejoin_at_end = true})
 
   if not testPath(parent_path) then -- if the parent path doesn't exist, we won't be able to write to the file
     if create_path then -- if we're allowed to create the parent path, do so
-      createPath(parent_path)
+      dothis.absolute_path.create_dir(parent_path)
     else -- otherwise, fail by returning nil
       if fail == "error" then
         error(("Failed to write file %s: parent path %s does not exist"):format(path, parent_path))
@@ -113,7 +85,7 @@ function writeFile(path, contents, condition, create_path, mode, fail)
       {value = temppath, type = "quoted"},
       {value = path, type = "quoted"},
     })
-    delete(temppath)
+    dothis.absolute_path.delete
   end
   return path
 end

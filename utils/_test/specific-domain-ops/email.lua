@@ -64,7 +64,7 @@ Find attached the file you didn't ask for.
 {{[transf.path.attachment("/Library/User Pictures/Flowers/Dahlia.tif")]}}
 
 Cheers!]],  nil, function(mail)
-  local contents = readFile(mail)
+  local contents = transf.file.contents(mail)
   assert(
     stringy.startswith(
       contents, 

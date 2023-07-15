@@ -13,12 +13,6 @@
 --- @return string[] | string
 function pathSlice(path, spec, opts)
 
-  -- check path type
-
-  if type(path) ~= "string" then
-    error("pathSlice: path must be a string. Was " .. type(path))
-  end
-
   -- set defaults
 
   spec = spec or { start = -1, stop = -1}

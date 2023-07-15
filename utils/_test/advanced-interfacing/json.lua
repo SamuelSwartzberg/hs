@@ -433,7 +433,7 @@ local correct_token_res = rest({
     login = "reirui"
   },
   token_where = "param",
-  token = readFile(env.MAPI .. "/danbooru/key")
+  token = transf.file.contents(env.MAPI .. "/danbooru/key")
 })
 
 assertMessage(
@@ -463,7 +463,7 @@ correct_token_res = rest({
   },
   api_name = "wronglol",
   token_where = "param",
-  token = readFile(env.MAPI .. "/danbooru/key"),
+  token = transf.file.contents(env.MAPI .. "/danbooru/key"),
 })
 
 assertMessage( 
@@ -515,12 +515,12 @@ local token_res = rest({
 
 assertMessage(
   token_res.headers.Authorization,
-  "Bearer " .. readFile(env.MAPI .. "/httpbin/key")
+  "Bearer " .. transf.file.contents(env.MAPI .. "/httpbin/key")
 )
 
 assertMessage(
   token_res.args.api_key,
-  readFile(env.MAPI .. "/httpbin/key")
+  transf.file.contents(env.MAPI .. "/httpbin/key")
 )
 
 -- token in both header and param, auto retrieval of host
@@ -533,12 +533,12 @@ local token_res = rest({
 
 assertMessage(
   token_res.headers.Authorization,
-  "Bearer " .. readFile(env.MAPI .. "/httpbin/key")
+  "Bearer " .. transf.file.contents(env.MAPI .. "/httpbin/key")
 )
 
 assertMessage(
   token_res.args.api_key,
-  readFile(env.MAPI .. "/httpbin/key")
+  transf.file.contents(env.MAPI .. "/httpbin/key")
 )
 
 
@@ -554,12 +554,12 @@ local token_res = rest({
 
 assertMessage(
   token_res.headers.Authorization,
-  "Bearer " .. readFile(env.MAPI .. "/httpbin/key")
+  "Bearer " .. transf.file.contents(env.MAPI .. "/httpbin/key")
 )
 
 assertMessage(
   token_res.args.apikey,
-  readFile(env.MAPI .. "/httpbin/key")
+  transf.file.contents(env.MAPI .. "/httpbin/key")
 )
 
 -- username and password in both header and param
@@ -621,20 +621,20 @@ hs.timer.doAfter(1, function()
 
   -- test that the local server run by the oauth2callback script is running
 
-  delete(env.MAPI .. "/oauth2callbacktest/authorization_code")
+  dothis.absolute_path.delete
 
   run("curl \"http://127.0.0.1:8412/?api_name=oauth2callbacktest&code=1234\"")
 
   assertMessage(
-    readFile(env.MAPI .. "/oauth2callbacktest/authorization_code"),
+    transf.file.contents(env.MAPI .. "/oauth2callbacktest/authorization_code"),
     "1234"
   )
 
   -- initial: neither refresh nor access token exists
 
-  delete(env.MAPI .. "/dropbox/access_token")
-  delete(env.MAPI .. "/dropbox/refresh_token")
-  delete(env.MAPI .. "/dropbox/authorization_code")
+  dothis.absolute_path.delete
+  dothis.absolute_path.delete
+  dothis.absolute_path.delete
 
   local time_pre_auth = os.time()
 
@@ -653,7 +653,7 @@ hs.timer.doAfter(1, function()
 
     -- access token exists
 
-    assert(#readFile(env.MAPI .. "/dropbox/access_token") > 0)
+    assert(#transf.file.contents(env.MAPI .. "/dropbox/access_token") > 0)
 
     rest(dropbox_request, function (response)
   

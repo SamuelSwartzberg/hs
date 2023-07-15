@@ -122,7 +122,7 @@ DirItemSpecifier = {
       end,
       ["create-empty-dir-in-dir"] = function(self, name)
         local path = self:get("path-ensure-final-slash") .. name
-        createPath(path)
+        dothis.absolute_path.create_dir(path)
       end,
       ["create-child-as-project-dir"] = function(self, specifier)
         self:doThis("create-empty-dir-in-dir", specifier.name)
@@ -168,10 +168,10 @@ DirItemSpecifier = {
         self:doThis("create-empty-file-in-dir", ".gitignore")
       end,
       ["rm-dir"] = function(self)
-        delete(self:get("c"), "dir")
+        dothis.absolute_path.delete(self:get("c")))
       end,
       ["empty-dir"] = function(self)
-        delete(self:get("c"), "dir", "empty")
+        dothis.absolute_path.empty_dir(self:get("c"))
       end,
       ["choose-descendant"] = function(self)
         self:get("descendant-string-array"):doThis("choose-item-and-then-action")
@@ -188,7 +188,7 @@ DirItemSpecifier = {
       ["send-in-email"] = function(self, do_after)
         local temp_file = writeFile(nil, "")
         srctgt("zip", self:get("c"), temp_file)
-        delete(temp_file)
+        dothis.absolute_path.delete
         if do_after then
           do_after()
         end
@@ -200,7 +200,7 @@ DirItemSpecifier = {
       end,
       ["create-child-dir-and-choose-action"] = function(self, dirname)
         local path = self:get("completely-resolved-path") .. "/" .. dirname
-        createPath(path)
+        dothis.absolute_path.create_dir(path)
         st(path):doThis("choose-action")
       end,
       ["create-descendant-file-and-choose-action"] = function(self, filename)

@@ -11,7 +11,7 @@ function chunk(thing, n)
     end, 
     { mode = "after" , findopts = { args = "i"} }
   )
-  if len(chunks[#chunks]) == 0 then -- if the last chunk is empty, remove it
+  if transf.indexable.length(chunks[#chunks]) == 0 then -- if the last chunk is empty, remove it
     chunks[#chunks] = nil
   end
   return chunks

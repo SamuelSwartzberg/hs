@@ -14,17 +14,17 @@ manual_tests.do_when_ready = function()
   -- check that files have not been written yet
   
   assertMessage(
-    readFile(temp_file_1, "nil"),
+    transf.file.contents(temp_file_1, "nil"),
     nil 
   )
   
   assertMessage(
-    readFile(temp_file_2, "nil"),
+    transf.file.contents(temp_file_2, "nil"),
     nil 
   )
   
   assertMessage(
-    readFile(temp_file_3, "nil"),
+    transf.file.contents(temp_file_3, "nil"),
     nil
   )
   
@@ -33,12 +33,12 @@ manual_tests.do_when_ready = function()
   
   hs.timer.doAfter(1, function ()
     assertMessage(
-      readFile(temp_file_1, "error"),
+      transf.file.contents(temp_file_1, "error"),
       "Hello World!"
     )
   
     assertMessage(
-      readFile(temp_file_3, "nil"),
+      transf.file.contents(temp_file_3, "nil"),
       nil
     )
   
@@ -47,12 +47,12 @@ manual_tests.do_when_ready = function()
     hs.timer.doAfter(1, function ()
       
       assertMessage(
-        readFile(temp_file_2, "error"),
+        transf.file.contents(temp_file_2, "error"),
         "Hello World!"
       )
   
       assertMessage(
-        readFile(temp_file_3, "error"),
+        transf.file.contents(temp_file_3, "error"),
         "Hello World!"
       )
   

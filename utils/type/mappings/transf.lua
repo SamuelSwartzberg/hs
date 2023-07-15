@@ -337,26 +337,7 @@ transf = {
     multiline_string = function(arr)
       return transf.string_array.multiline_string(transf.array.string_array(arr))
     end,
-    item_chooser_item_specifier_array = function(arr)
-      return hs.fnutils.imap(
-        arr,
-        transf.any.item_chooser_item_specifier
-      )
-    end,
-    item_with_index_chooser_item_specifier_array = function(arr)
-      return transf.assoc_arr_array.assoc_arr_with_index_as_key_array(
-        transf.array.item_chooser_item_specifier_array(arr)
-      )
-    end,
-    hschooser_specifier = function(arr)
-      return {
-        chooser_item_specifier_array = transf.array.item_with_index_chooser_item_specifier_array(arr),
-        placeholder_text = transf.array.summary(arr),
-      }
-    end,
-    choosing_hschooser_specifier = function(arr)
-      return get.hschooser_specifier.choosing_hschooser_specifier(transf.array.hschooser_specifier(arr), "index", arr)
-    end,
+    
     index_value_stateless_iter = ipairs,
     index_value_stateful_iter = get.stateless_generator.stateful_generator(transf.array.index_value_stateless_iter),
     value_boolean_dict = function(arr)
@@ -476,7 +457,14 @@ transf = {
     end,
     window_array_with_leaf_as_title = function(path)
       return transf.string.window_array_by_title(transf.path.leaf(path))
-    end
+    end,
+    local_or_remote_string = function(path)
+      if is.path.remote_path(path) then
+        return "remote"
+      else
+        return "local"
+      end
+    end,
     
 
   },
@@ -485,7 +473,7 @@ transf = {
       local parts = stringy.split(path, ":")
       local final_part = dothis.array.pop(parts)
       local specifier = {}
-      if is.string.number(parts[#parts]) then
+      if is.string.number_string(parts[#parts]) then
         specifier = {
           column = final_part,
           line = dothis.array.pop(parts),
@@ -522,36 +510,53 @@ transf = {
     end,
      
   },
+  remote_path = {
+
+  },
   absolute_path = {
     file_url = function(path)
-      return "file://" .. path
+      return "file://" .. transf.absolute_path.local_absolute_path(path)
+    end,
+  },
+  local_tilde_absolute_path = {
+    local_true_absolute_path = function(path)
+      return env.HOME .. eutf8.sub(path, 2)
+    end,
+  },
+  local_absolute_path = {
+    local_true_absolute_path = function(path)
+      if stringy.startswith(path, "~") then
+        return transf.local_tilde_absolute_path.local_true_absolute_path(path)
+      else
+        return path
+      end
     end,
   },
   extant_path = {
-    size = function(path)
-      return get.extant_path.attr(path, "size")
+    sibling_absolute_path_array = function(path)
+      return transf.dir.children_absolute_path_array(transf.path.parent_path(path))
     end,
-    m_date = function(path)
-      return get.extant_path.date_attr(path, "modification")
+    descendants_absolute_path_array = function(dir)
+      return itemsInPath({
+        path = dir,
+        recursive = true,
+      })
     end,
-    c_date = function(path)
-      return get.extant_path.date_attr(path, "change")
+    descendant_file_array = function(dir)
+      return itemsInPath({
+        path = dir,
+        recursive = true,
+        include_dirs = false,
+      })
     end,
-    a_date = function(path)
-      return get.extant_path.date_attr(path, "access")
+    descendants_leaves_array = function(dir)
+      return transf.path_array.leaves_array(transf.extant_path.descendants_absolute_path_array(dir))
     end,
-    cr_date = function(path)
-      return get.extant_path.date_attr(path, "creation")
+    descendants_filenames_array = function(dir)
+      return transf.path_array.filenames_array(transf.extant_path.descendants_absolute_path_array(dir))
     end,
-    sibling_array = function(path)
-      return transf.dir.children_array(transf.path.parent_path(path))
-    end,
-    contained_files_array = function(path)
-      if is.path.dir(path) then
-        return transf.dir.descendant_file_array(path)
-      else
-        return {path}
-      end
+    descendants_extensions_array = function(dir)
+      return transf.path_array.extensions_array(transf.extant_path.descendants_absolute_path_array(dir))
     end,
     prompted_path_relative_to = function(path)
       return promptPipeline({
@@ -564,6 +569,41 @@ transf = {
       local filename = prompt("string", {prompt_args = {message = "file in " .. path}})
       return path .. "/" .. filename
     end
+  },
+  local_extant_path = {
+    size = function(path)
+      return get.extant_path.attr(path, "size")
+    end,
+    m_timestamp_s = function(path)
+      return get.extant_path.attr(path, "modification")
+    end,
+    m_date = function(path)
+      return transf.timestamp_s.date(transf.extant_path.m_timestamp_s(path))
+    end,
+    cr_timestamp_s = function(path)
+      return get.extant_path.attr(path, "creation")
+    end,
+    
+    cr_date = function(path)
+      return transf.timestamp_s.date(transf.extant_path.cr_timestamp_s(path))
+    end,
+    
+    c_timestamp_s = function(path)
+      return get.extant_path.attr(path, "change")
+    end,
+    
+    c_date = function(path)
+      return transf.timestamp_s.date(transf.extant_path.c_timestamp_s(path))
+    end,
+    
+    a_timestamp_s = function(path)
+      return get.extant_path.attr(path, "access")
+    end,
+    
+    a_date = function(path)
+      return transf.timestamp_s.date(transf.extant_path.a_timestamp_s(path))
+    end,
+    
   },
   path_in_home = {
     local_http_server_url = function(path)
@@ -583,7 +623,7 @@ transf = {
       return transf.array.set(extensions)
     end,
     extant_path_array = function(path_array)
-      return hs.fnutils.ifilter(path_array, is.path.exists)
+      return hs.fnutils.ifilter(path_array, is.path.extant_path)
     end,
     attachment_array = function(path_array)
       return hs.fnutils.imap(path_array, transf.path.attachment)
@@ -605,10 +645,10 @@ transf = {
     filter_git_root_dir_array = function(path_array)
       return transf.dir_array.filter_git_root_dir_array(transf.extant_path_array.filter_dir_array(path_array))
     end,
-    contained_files_array = function(path_array)
+    descendant_file_array = function(path_array)
       return map(
         path_array,
-        transf.extant_path.contained_files_array,
+        transf.extant_path.descendant_file_array,
         {flatten = true}
       )
     end,
@@ -618,49 +658,77 @@ transf = {
       return hs.fnutils.ifilter(path_array, is.dir.git_root_dir)
     end,
   },
+  remote_absolute_path = {
+    contained_absolute_path_array = function(remote_absolute_path)
+      local output = run({
+        args = {"rclone", "lsf", {value = remote_absolute_path, type = "quoted"}},
+        catch = function() return nil end,
+      }) 
+      if output then
+        items = transf.string.lines(output)
+        items = memoize(filter, refstore.params.memoize.opts.stringify_json)(items, false)
+        items = memoize(map, refstore.params.memoize.opts.stringify_json)(
+          items,
+          transf.path.no_leading_following_slash_or_whitespace
+        )
+      else
+        items = {}
+      end
+      return transf.indexable.value_stateful_iter(items)
+    end
+  },
+  local_file = {
+    contents = function(path)
+      local file = io.open(path, "r")
+      if file ~= nil then
+        local contents = file:read("*a")
+        io.close(file)
+        return contents
+      else
+        error("Couldn't read file at " .. path .. "!")
+      end
+    end,
+  },
+  labelled_remote_file = {
+    contents = function(path)
+      return run("rclone cat" .. transf.string.single_quoted_escaped(path))
+    end,
+  },
+  remote_file = {
+    contents = function(path)
+      return transf.labelled_remote_file.contents(path)
+    end,
+  },
+  file = {
+    contents = function(path)
+      if is.path.remote_path(path) then
+        return transf.remote_file.contents(path)
+      else
+        return transf.local_file.contents(path)
+      end
+    end,
+  },
   dir = {
-    children_array = function(dir)
+    children_absolute_path_array = function(dir)
       return itemsInPath(dir)
     end,
     children_leaves_array = function(dir)
-      return transf.path_array.leaves_array(transf.dir.children_array(dir))
+      return transf.path_array.leaves_array(transf.dir.children_absolute_path_array(dir))
     end,
     children_filenames_array = function(dir)
-      return transf.path_array.filenames_array(transf.dir.children_array(dir))
+      return transf.path_array.filenames_array(transf.dir.children_absolute_path_array(dir))
     end,
     children_extensions_array = function(dir)
-      return transf.path_array.extensions_array(transf.dir.children_array(dir))
+      return transf.path_array.extensions_array(transf.dir.children_absolute_path_array(dir))
     end,
     newest_child = function(dir)
-      return transf.extant_path_array.newest(transf.dir.children_array(dir))
+      return transf.extant_path_array.newest(transf.dir.children_absolute_path_array(dir))
     end,
-    descendants_array = function(dir)
-      return itemsInPath({
-        path = dir,
-        recursive = true,
-      })
-    end,
-    descendant_file_array = function(dir)
-      return itemsInPath({
-        path = dir,
-        recursive = true,
-        include_dirs = false,
-      })
-    end,
-    descendants_leaves_array = function(dir)
-      return transf.path_array.leaves_array(transf.dir.descendants_array(dir))
-    end,
-    descendants_filenames_array = function(dir)
-      return transf.path_array.filenames_array(transf.dir.descendants_array(dir))
-    end,
-    descendants_extensions_array = function(dir)
-      return transf.path_array.extensions_array(transf.dir.descendants_array(dir))
-    end,
-    grandchildren_array = function(dir)
-      return map(transf.dir.children_array(dir), transf.dir.children_array, { flatten = true })
+    grandchildren_absolute_path_array = function(dir)
+      return map(transf.dir.children_absolute_path_array(dir), transf.dir.children_absolute_path_array, { flatten = true })
     end,
     git_root_dir_descendants = function(dir)
-      return transf.dir_array.filter_git_root_dir_array(transf.dir.descendants_array(dir))
+      return transf.dir_array.filter_git_root_dir_array(transf.extant_path.descendants_absolute_path_array(dir))
     end,
 
   },
@@ -1050,7 +1118,7 @@ transf = {
       local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
       local outpath = temppath .. "_out"
       run("mmime < " .. transf.string.single_quoted_escaped(temppath) .. " > " .. transf.string.single_quoted_escaped(outpath))
-      delete(temppath)
+      dothis.absolute_path.delete
       return outpath
     end
   },
@@ -1086,26 +1154,26 @@ transf = {
       local temppath = transf.string.in_tmp_dir(transf.path.filename(path) .. ".ics")
       srctgt("copy", path, temppath)
       dothis.ics_file.generate_json_file(temppath)
-      local jsonpath = readFile(get.path.with_different_extension(temppath, "json"))
-      local res = json.decode(readFile(jsonpath))
-      delete(jsonpath)
-      delete(temppath)
+      local jsonpath = transf.file.contents(get.path.with_different_extension(temppath, "json"))
+      local res = json.decode(transf.file.contents(jsonpath))
+      dothis.absolute_path.delete
+      dothis.absolute_path.delete
       return res
     end,
   },
   json_file = {
     table = function(path)
-      return transf.not_userdata_or_function.table(readFile(path))
+      return transf.not_userdata_or_function.table(transf.file.contents(path))
     end,
   },
   ini_file = {
     table = function(path)
-      return transf.ini_string.table(readFile(path))
+      return transf.ini_string.table(transf.file.contents(path))
     end,
   },
   toml_file = {
     table = function(path)
-      return transf.toml_string.table(readFile(path))
+      return transf.toml_string.table(transf.file.contents(path))
     end,
   },
   xml_file = {
@@ -1189,7 +1257,7 @@ transf = {
 
   plaintext_file = {
     contents = function(path)
-      return readFile(path)
+      return transf.file.contents(path)
     end,
     lines = function(path)
       return transf.string.lines(transf.plaintext_file.contents(path))
@@ -1258,7 +1326,7 @@ transf = {
   },
   timestamp_first_column_plaintext_table_file = {
     last_accessed = function(path)
-      return get.string_or_number.number(readFile(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
+      return get.string_or_number.number(transf.file.contents(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
     end,
     --- gets the entries from a timestamp_first_column_plaintext_table_file that are newer than the timestamp stored in file storing the last backup time
     new_timestamp_key_array_value_dict = function(path)
@@ -1266,7 +1334,7 @@ transf = {
       local new_timestamp = os.time()
       local new_timestamp_key_array_value_dict = get.timestamp_first_column_plaintext_table_file.timestamp_key_array_value_dict_newer_than_timestamp(path, last_access)
       if new_timestamp_key_array_value_dict then
-        writeFile(env.MLAST_BACKUP .. transf.path.filename(path), new_timestamp)
+        dothis.absolute_path.write_file(env.MLAST_BACKUP .. transf.path.filename(path), new_timestamp)
       end
       return new_timestamp_key_array_value_dict
     end,
@@ -2805,13 +2873,6 @@ transf = {
         {"こっち", "kocchi"}
       })
     end,
-    tilde_resolved = function(path)
-      if stringy.startswith(path, "~") then
-        return env.HOME .. eutf8.sub(path, 2)
-      else
-        return path
-      end
-    end,
     folded = function(str)
       return eutf8.gsub(str, "\n", " ")
     end,
@@ -2898,46 +2959,6 @@ transf = {
     end,
     one_final_newline = function(str)
       return eutf8.gsub(str, "\n+$", "\n")
-    end,
-    
-    path_resolved = function(path, resolve_tilde)
-      if resolve_tilde then
-        path = transf.string.tilde_resolved(path)
-      end
-      local components = pathSlice(path, ":")
-      local reduced_components = {}
-      local started_with_slash = stringy.startswith(path, "/")
-      local components_are_all_dotdot = false
-      for _, component in transf.array.index_value_stateless_iter(components) do
-        if component == ".." then
-          if #reduced_components > 0 and not components_are_all_dotdot then
-            table.remove(reduced_components)
-          else -- we can't go higher up
-            if started_with_slash then
-              -- no-op: we're already at the root, so we treat this similarly to '.', which is a no-op. This is consistent with the behavior of cd/ls in bash
-            else
-              table.insert(reduced_components, "..") -- the path was a relative path, and we've arrived at the root of the relative path. We have no further information about what is above the root of the relative path, so we have no choice but to leave this component unresolved
-              components_are_all_dotdot = true
-            end
-             
-          end
-        else
-          components_are_all_dotdot = false
-          if component ~= "." then
-            table.insert(reduced_components, component)
-          end
-        end
-      end
-      local new_path = table.concat(reduced_components, "/")
-      if started_with_slash then
-        return "/" .. new_path
-      else
-        if #new_path == 0 then
-          return "."
-        else
-          return new_path
-        end
-      end
     end,
     here_string = function(str)
       return " <<EOF\n" .. str .. "\nEOF"
@@ -3061,29 +3082,61 @@ transf = {
       return eutf8.gsub(str, "-", "")
     end,
   },
-  pass_name = {
-    password = function(pass_name)
-      return get.pass.value("passw", pass_name)
+  pass_item_name = {
+    password = function(pass_item_name)
+      return get.pass_item_name.value(pass_item_name, "passw")
     end,
-    recovery = function(pass_name)
-      return get.pass.value("recovery", pass_name)
+    password_absolute_path = function(pass_item_name)
+      return get.pass_item_name.path(pass_item_name, "passw")
     end,
-    security_question = function(pass_name)
-      return get.pass.value("security_question", pass_name)
+    recovery_key = function(pass_item_name)
+      return get.pass_item_name.value(pass_item_name, "recovery")
     end,
-    username = function(pass_name)
-      return transf.plaintext_file.no_final_newlines(st(env.MPASSUSERNAME .. "/" .. pass_name .. ".txt") or env.MAIN_EMAIL)
+    recovery_key_absolute_path = function(pass_item_name)
+      return get.pass_item_name.path(pass_item_name, "recovery")
+    end,
+    security_question = function(pass_item_name)
+      return get.pass_item_name.value(pass_item_name, "security_question")
+    end,
+    security_question_absolute_path = function(pass_item_name)
+      return get.pass_item_name.path(pass_item_name, "security_question")
+    end,
+    username_or_default = function(pass_item_name)
+      return transf.pass_item_name.username(pass_item_name) or env.MAIN_EMAIL
+    end,
+    username = function(pass_item_name)
+      return transf.plaintext_file.no_final_newlines(env.MPASSUSERNAME .. "/" .. pass_item_name .. ".txt")
+    end,
+    username_absolute_path = function(pass_item_name)
+      return env.MPASSUSERNAME .. "/" .. pass_item_name .. ".txt"
     end,
     otp = function(item)
       return run("pass otp otp/" .. item)
     end,
+    otp_absolute_path = function(item)
+      return "otp/" .. item
+    end,
   },
   cc_name = {
     cc_number = function(cc_name)
-      return get.pass.value("cc/nr", cc_name)
+      return get.pass_item_name.value(cc_name, "cc/nr")
     end,
     cc_expiry = function(cc_name)
-      return get.pass.value("cc/exp", cc_name)
+      return get.pass_item_name.value(cc_name, "cc/exp")
+    end,
+  },
+  styledtext = {
+    string = function(st)
+      return st:getString()
+    end,
+  },
+  styledtext_or_string = {
+    string = function(st_or_str)
+      if type(st_or_str) == "string" then
+        return st_or_str
+      else
+        return transf.styledtext.string(st_or_str)
+      end
     end,
   },
   yaml_string = {
@@ -3240,7 +3293,8 @@ transf = {
   search_engine = {
     action_table_item = function(search_engine)
       return {
-        text = string.format("%s🔎 s%s.", tblmap.search_engine.i[search_engine], tblmap.search_engine.short[search_engine]),
+        i = emj.search .. emj[search_engine],
+        d = dsc.search .. dsc[search_engine],
         dothis = bind(
           dothis.string.search,
           {a_use, search_engine}
@@ -3789,10 +3843,10 @@ transf = {
       end
     end,
     last_key = function(t)
-      return elemAt(t, len(t), "k")
+      return elemAt(t, transf.indexable.length(t), "k")
     end,
     last_value = function(t)
-      return elemAt(t, len(t), "v")
+      return elemAt(t, transf.indexable.length(t), "v")
     end,
     toml_string = toml.encode,
     --- value and comment must be strings
@@ -3819,8 +3873,8 @@ transf = {
     ics_string = function(t)
       local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
       dothis.table.write_ics_file(t, tmpdir_ics_path)
-      local contents = readFile(tmpdir_ics_path)
-      delete(tmpdir_ics_path)
+      local contents = transf.file.contents(tmpdir_ics_path)
+      dothis.absolute_path.delete
       return contents
     end,
     value_set = function(t)
@@ -4278,7 +4332,7 @@ transf = {
   },
   filename_safe_indicated_citable_object_id = {
     local_csl_file = function(id)
-      return get.dir.find_descendant_with_leaf_ending(env.MCITATIONS, id)
+      return get.extant_path.find_descendant_with_leaf_ending(env.MCITATIONS, id)
     end,
     csl_table = function(id)
       return transf.json_file.table(
@@ -4286,10 +4340,10 @@ transf = {
       )
     end,
     local_citable_object_file = function(id)
-      return get.dir.find_descendant_with_leaf_ending(env.MPAPERS, id)
+      return get.extant_path.find_descendant_with_leaf_ending(env.MPAPERS, id)
     end,
     local_citable_object_notes_file = function(id)
-      return get.dir.find_descendant_with_leaf_ending(env.MPAPERNOTES, id)
+      return get.extant_path.find_descendant_with_leaf_ending(env.MPAPERNOTES, id)
     end,
   },
   citable_filename = {
@@ -4523,12 +4577,12 @@ transf = {
       return transf.path.ending_with_slash(dir) .. "tm"
     end,
     source_files = function(dir)
-      return transf.dir.children_array(
+      return transf.dir.children_absolute_path_array(
         transf.omegat_project_dir.source_dir(dir)
       )
     end,
     target_files = function(dir)
-      return transf.dir.children_array(
+      return transf.dir.children_absolute_path_array(
         transf.omegat_project_dir.target_dir(dir)
       )
     end,
@@ -4549,7 +4603,7 @@ transf = {
     end,
     target_file_num_chars_array = function(dir)
       return hs.fnutils.imap(
-        transf.dir.children_array(
+        transf.dir.children_absolute_path_array(
           transf.omegat_project_dir.target_txt_dir(dir)
         ),
         transf.plaintext_file.chars
@@ -5592,6 +5646,20 @@ transf = {
       end
     end,
   },
+  item_chooser_item_specifier = {
+    truncated_text_item_chooser_item_specifier = function(item_chooser_item_specifier)
+      local copied_spec = get.table.copy(item_chooser_item_specifier)
+      local rawstr =  transf.styledtext.string(
+        copied_spec.text
+      )
+      local truncated = slice(rawstr, {
+        stop = 250,
+        sliced_indicator = "..."
+      })
+      copied_spec.text = transf.string.with_styled_start_end_markers(truncated)
+      return copied_spec
+    end
+  },
   n_anys = {
     array = function(...)
       return {...}
@@ -5601,6 +5669,30 @@ transf = {
     end,
     amount = function(...)
       return #{...}
+    end,
+  },
+  n_boolean_functions = {
+    and_boolean_function = function(...)
+      local functions = {...}
+      return function(arg)
+        for _, fn in transf.array.index_value_stateless_iter(functions) do
+          if not fn(arg) then
+            return false
+          end
+        end
+        return true
+      end
+    end,
+    or_boolean_function = function(...)
+      local functions = {...}
+      return function(arg)
+        for _, fn in transf.array.index_value_stateless_iter(functions) do
+          if fn(arg) then
+            return true
+          end
+        end
+        return false
+      end
     end,
   },
   mailto_url = {
@@ -5780,7 +5872,7 @@ transf = {
   },
   env_yaml_file_container = {
     env_string = function(env_yaml_file_container)
-      local files = transf.dir.descendant_file_array(env_yaml_file_container)
+      local files = transf.extant_path.descendant_file_array(env_yaml_file_container)
       local yaml_files = get.path_array.filter_to_same_extension(files, "yaml")
       local env_var_name_env_node_dict_array = hs.fnutils.imap(
         yaml_files,
@@ -5888,6 +5980,19 @@ transf = {
     random_boolean = function()
       return math.random() < 0.5
     end,
+    all_applications = function()
+      return transf.dir.children_filenames_array("/Applications")
+    end,
+    sox_is_recording = function()
+      local succ, res = pcall(run, "pgrep -x rec")
+      return succ
+    end,
+    pandoc_full_md_extension_set = function()
+      return flatten(
+        mt._list.markdown_extensions,
+        { mode="list"}
+      )
+    end
 
 
   },
@@ -6029,24 +6134,27 @@ transf = {
     title = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.string(mpv_ipc_socket_id, "media-title")
     end,
-    play_time_seconds_int = function(mpv_ipc_socket_id)
+    playback_seconds_int = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "time-pos")
     end,
     duration_seconds_int = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "duration")
     end,
-    playback_progress_percent_int = function(mpv_ipc_socket_id)
+    playback_percent_int = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "percent-pos")
     end,
-    playback_progress_string = function(mpv_ipc_socket_id)
+    chapter_int = function(mpv_ipc_socket_id)
+      return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "chapter")
+    end,
+    playback_string = function(mpv_ipc_socket_id)
       return string.format(
         "(%i/%is - %s%%)",
         get.mpv_ipc_socket_id.play_time_seconds_int(mpv_ipc_socket_id) or -1,
         get.mpv_ipc_socket_id.duration_seconds_int(mpv_ipc_socket_id) or -1,
-        get.mpv_ipc_socket_id.playback_progress_percent_int(mpv_ipc_socket_id) or -1
+        get.mpv_ipc_socket_id.playback_percent_int(mpv_ipc_socket_id) or -1
       )
     end,
-    playlist_position_int = function(mpv_ipc_socket_id)
+    playlist_index_int = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "playlist-pos")
     end,
     playlist_length_int = function(mpv_ipc_socket_id)
@@ -6062,7 +6170,7 @@ transf = {
     summary_line_basics = function(mpv_ipc_socket_id)
       return string.format(
         "%s %s %s",
-        transf.mpv_ipc_socket_id.playback_progress_string(mpv_ipc_socket_id),
+        transf.mpv_ipc_socket_id.playback_string(mpv_ipc_socket_id),
         transf.mpv_ipc_socket_id.playlist_progress_string(mpv_ipc_socket_id),
         get.mpv_ipc_socket_id.title(mpv_ipc_socket_id) or "<no title>"
       )
@@ -6081,6 +6189,11 @@ transf = {
         "%s %s",
         transf.mpv_ipc_socket_id.summary_line_emoji(mpv_ipc_socket_id),
         transf.mpv_ipc_socket_id.summary_line_basics(mpv_ipc_socket_id)
+      )
+    end,
+    is_running = function(mpv_ipc_socket_id)
+      return transf.any.boolean(
+        get.mpv_ipc_socket_id.string(mpv_ipc_socket_id, "pause")
       )
     end,
         
@@ -6114,6 +6227,18 @@ transf = {
     end,
     summary_line = function(stream_created_item_specifier)
       return transf.mpv_ipc_socket_id.summary_line(stream_created_item_specifier.mpv_ipc_socket_id)
+    end,
+    title = function(stream_created_item_specifier)
+      return get.mpv_ipc_socket_id.title(stream_created_item_specifier.mpv_ipc_socket_id)
+    end,
+    current_url = function(stream_created_item_specifier)
+      return get.mpv_ipc_socket_id.current_url(stream_created_item_specifier.mpv_ipc_socket_id)
+    end,
+    creation_urls = function(stream_created_item_specifier)
+      return stream_created_item_specifier.creation_specifier.urls
+    end,
+    is_running = function(stream_created_item_specifier)
+      return transf.mpv_ipc_socket_id.is_running(stream_created_item_specifier.mpv_ipc_socket_id)
     end,
 
   },
@@ -6198,7 +6323,40 @@ transf = {
   created_item_specifier_array = {
     
   },
+  stream_created_item_specifier_array = {
+    first_running = function(stream_created_item_specifier_array)
+      return hs.fnutils.find(
+        stream_created_item_specifier_array,
+        transf.stream_created_item_specifier.is_running
+      )
+    end,
+  },
   indexable = {
+    length = function(indexable)
+      if type(indexable) == "string" then
+        return eutf8.len(indexable)
+      elseif type(indexable) == "table" then
+        if indexable.isovtable then
+          return indexable:len()
+        elseif is.any.empty_table(indexable) then
+          return 0
+        elseif is.any.array(indexable) then
+          local largestkey = 0
+          for k, v in transf.native_table.key_value_stateless_iter(indexable) do
+            if type(k) == "number" and k > largestkey then
+              largestkey = k
+            end
+          end
+          return largestkey
+        else
+          local len = 0
+          for k, v in transf.native_table.key_value_stateless_iter(indexable) do
+            len = len + 1
+          end
+          return len
+        end
+      end
+    end,
     key_array = function(indexable)
       local t = {}
       for k, _ in get.indexable.key_value_stateless_iter(indexable) do
@@ -6225,6 +6383,32 @@ transf = {
     value_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter, 2, 2),
     index_value_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.index_value_stateless_iter),
     index_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.index_value_stateless_iter, 1, 1),
+  },
+  indexable_array = {
+    longest_common_prefix_indexable = function(arr)
+      return reduce(arr, function(acc, thing)
+        local isstring =type(thing) == "string"
+        local last_matching_index = 0
+        for i = 1, transf.indexable.length(thing) do
+          if elemAt(thing, i) == elemAt(acc, i) then
+            last_matching_index = i
+          else
+            break
+          end
+        end
+    
+        return slice(acc, 1, last_matching_index) or ( isstring and "" or {} )
+      end)
+    end,
+    reverse_mapped = function(arr)
+      return map(arr, rev)
+    end,
+    longest_common_suffix_indexable_array = function(arr)
+      local reversed_res = transf.indexable_array.longest_common_prefix_indexable(
+        transf.indexable_array.reverse_mapped(arr)
+      )
+      return rev(reversed_res)
+    end,
   },
   array_and_array = {
     union_set = function(arr1, arr2)

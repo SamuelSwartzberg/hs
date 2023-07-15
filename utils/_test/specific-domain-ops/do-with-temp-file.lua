@@ -1,7 +1,7 @@
 -- Test 1: Check if the temporary file is created with a random name when no path is provided
 local test1FileContents = "Test file contents"
 doWithTempFile({ contents = test1FileContents }, function(tmp_file)
-  local fileContents = readFile(tmp_file)
+  local fileContents = transf.file.contents(tmp_file)
   assertMessage(fileContents, test1FileContents)
 end)
 
@@ -9,7 +9,7 @@ end)
 local test2FileName = env.TMPDIR .. "/temp_" .. tostring(os.time()) .. ".txt"
 local test2FileContents = "Test 2 file contents"
 doWithTempFile({ path = test2FileName, contents = test2FileContents }, function(tmp_file)
-  local fileContents = readFile(tmp_file)
+  local fileContents = transf.file.contents(tmp_file)
   assertMessage(fileContents, test2FileContents)
 end)
 

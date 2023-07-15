@@ -55,7 +55,7 @@ end
 dothis.upkg.remove("test", "test-pkg-001")
 dothis.upkg.remove("test", "test-pkg-002")
 dothis.upkg.remove("test", "test-pkg-003")
-delete(env.MDEPENDENCIES .. "/test")
+dothis.absolute_path.delete
 
 dothis.upkg.install("test", "test-pkg-001")
 dothis.upkg.install("test", "test-pkg-002")
@@ -296,16 +296,16 @@ dothis.pandoc.markdown_to(test_md_file, "html", nil, function(res)
   -- Check if link attributes are correctly converted
   assert(stringy.find(res, '<a href="https://google.com/" title="Google" class="linkclass">Link with title attribute</a>'))
 
-  delete(env.MMOCK .. "/files/plaintext/md/full_pandoc.html")
+  dothis.absolute_path.delete
 end)
 
-if get.pass.value("passw", "testotp") then
+if get.pass_item_name.value("testotp", "passw") then
   dothis.pass.delete_otp("testotp")
 end
-dothis.pass.add_otp_url(readFile(env.MMOCK .. "/strings/urls/otpauth/basic"), "testotp")
+dothis.pass.add_otp_url(transf.file.contents(env.MMOCK .. "/strings/urls/otpauth/basic"), "testotp")
 hs.timer.doAfter(1, function()
   assert(
-    get.string_or_number.int(get.pass.otp("testotp")) > 0
+    get.string_or_number.int(get.pass_item_name.otp("testotp")) > 0
   )
   dothis.pass.delete_otp("testotp")
 end)
@@ -336,7 +336,7 @@ local tgt = env.TMPDIR .. "/helloworld-" .. os.time() .. ".txt"
 dothis.url.download(transf.absolute_path.file_url(env.MMOCK .. "/files/plaintext/txt/helloworld.txt"), tgt)
 
 assert(
-  readFile(tgt) == "Hello World!"
+  transf.file.contents(tgt) == "Hello World!"
 )
 
 local yaml_contact_by_uuid = transf.uuid.contact_table("a615b162-a203-4a24-a392-87ba3a7ca80c")

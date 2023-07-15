@@ -70,7 +70,7 @@ function processCronlikeFile(filename)
     ),
     to.case.notcapitalized
   )
-  return processCronlikeContents(readFile(filename), command)
+  return processCronlikeContents(transf.file.contents(filename), command)
 end
 
 

@@ -618,7 +618,7 @@ do
 end
 
 
-local relay_table = transf.multiline_string.relay_table(readFile(env.MMOCK .. "/output/shell-command/mullvad_relay_list"))
+local relay_table = transf.multiline_string.relay_table(transf.file.contents(env.MMOCK .. "/output/shell-command/mullvad_relay_list"))
 
 assert(type(relay_table) == "table")
 assert(type(relay_table["au"]) == "table") -- early entry (australia)

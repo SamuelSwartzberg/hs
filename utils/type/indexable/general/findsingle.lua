@@ -60,7 +60,7 @@ function findsingle(item, conditions, opts)
   local start = opts.start or 1
   local potentially_sliced_item = item
   if start > 1 then 
-    start = math.min(start, len(item) + 1)
+    start = math.min(start, transf.indexable.length(item) + 1)
     potentially_sliced_item = slice(item, start) 
   end
 

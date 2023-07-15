@@ -66,21 +66,21 @@ function slice(thing, start_or_spec, stop, step)
 
   if not spec.step then spec.step = 1 end
   if not spec.start then spec.start = 1 end
-  if not spec.stop then spec.stop = len(thing) end
+  if not spec.stop then spec.stop = transf.indexable.length(thing) end
 
   -- resolve negative indices
 
   if spec.start < 0 then
-    spec.start = len(thing) + spec.start + 1
+    spec.start = transf.indexable.length(thing) + spec.start + 1
   end
   if spec.stop < 0 then
-    spec.stop = len(thing) + spec.stop + 1
+    spec.stop = transf.indexable.length(thing) + spec.stop + 1
   end
 
   -- clamp indices to ensure we don't go out of bounds (+/-1 because we want over/underindexing to produce an empty thing, not the last element)
 
-  spec.start = get.comparable.clamp(spec.start, 1, len(thing) + 1)
-  spec.stop = get.comparable.clamp(spec.stop, 1-1, len(thing))
+  spec.start = get.comparable.clamp(spec.start, 1, transf.indexable.length(thing) + 1)
+  spec.stop = get.comparable.clamp(spec.stop, 1-1, transf.indexable.length(thing))
 
   -- handle cases where users have passed conditions that will result in an infinite loop
   -- currently: return empty thing
@@ -109,7 +109,7 @@ function slice(thing, start_or_spec, stop, step)
     end
 
     local postpend = transf.indexable.unspecified_equivalent_empty_indexable(thing)
-    for i = spec.stop + 1, len(thing) do
+    for i = spec.stop + 1, transf.indexable.length(thing) do
       postpend = append(postpend, spec.fill)
     end
 
@@ -124,7 +124,7 @@ function slice(thing, start_or_spec, stop, step)
         new_thing = concat(spec.sliced_indicator, new_thing)
       end
     end
-    if spec.stop < len(thing) then
+    if spec.stop < transf.indexable.length(thing) then
       new_thing = concat(new_thing, spec.sliced_indicator)
     end
   end

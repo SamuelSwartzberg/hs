@@ -13,7 +13,7 @@ function doWithTempFile(opts, do_this)
 
   local arg
   if opts.use_contents then
-    arg = readFile(tmp_file, "nil")
+    arg = transf.file.contents(tmp_file, "nil")
   else
     arg = tmp_file
   end
@@ -27,14 +27,14 @@ function doWithTempFile(opts, do_this)
         {value = tmp_file, type = "quoted"},
       },
       finally = function()
-        delete(tmp_file)
+        dothis.absolute_path.delete
       end
     }, function()
       do_this(arg)
     end)
   else
     do_this(arg)
-    delete(tmp_file)
+    dothis.absolute_path.delete
   end
 end
 

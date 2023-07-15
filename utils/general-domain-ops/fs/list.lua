@@ -9,24 +9,6 @@
 --- @field validator_result? fun(path: string): boolean An additional validation function that runs as an additional filter on each result. default is no additional validation
 --- @field follow_links? boolean Whether to follow symlinks. Default false
 
-local function listRemoteDir(listerpath)
-  local output = run({
-    args = {"rclone", "lsf", {value = listerpath, type = "quoted"}},
-    catch = function() return nil end,
-  }) 
-  if output then
-    items = transf.string.lines(output)
-    items = memoize(filter, refstore.params.memoize.opts.stringify_json)(items, false)
-    items = memoize(map, refstore.params.memoize.opts.stringify_json)(
-      items,
-      transf.path.no_leading_following_slash_or_whitespace
-    )
-  else
-    items = {}
-  end
-  return transf.indexable.value_stateful_iter(items)
-end
-
 --- Returns a table of all things in a directory
 --- @param opts itemsInPathOpts | string
 --- @param path? string Internal use only. The path to the directory during recursion
@@ -83,13 +65,13 @@ function itemsInPath(opts, path, is_recursive_call, depth, seen_paths)
     end
   end
 
-  local remote = is.path.remote(path)
+  local remote = is.path.remote_path(path)
 
   local lister
   if not remote then
     lister = hs.fs.dir
   else
-    lister = listRemoteDir
+    lister = transf.remote_absolute_path.contained_absolute_path_array
   end
 
   for file_name in lister(path) do

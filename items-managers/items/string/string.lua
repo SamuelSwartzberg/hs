@@ -42,16 +42,16 @@ StringItemSpecifier = {
       dothis = dothis.string.alert
     },{
       text = "🔷🈁 vscur.",
-      dothis = dothis.url_or_path.open_temp_file
+      dothis = dothis.url_or_local_path.open_temp_file
     },{
       text = "🦊🌐 ffbr.",
-      dothis = dothis.url_or_path.open_ff
+      dothis = dothis.url_or_local_path.open_ff
     },{
       text = "🧭🌐 sfbr.",
-      dothis = dothis.url_or_path.open_safari,
+      dothis = dothis.url_or_local_path.open_safari,
     },{
       text = "🌈🌐 gcbr.",
-      dothis = dothis.url_or_path.open_chrome,
+      dothis = dothis.url_or_local_path.open_chrome,
     }, {
       text = "👉🍾 cev.",
       getfn = get.khal.search_event_tables
@@ -217,7 +217,7 @@ StringItemSpecifier = {
     transf.search_engine.action_table_item
   ),
   hs.fnutils.imap(
-    transf.dir.descendants_array(env.MQF),
+    transf.extant_path.descendants_absolute_path_array(env.MQF),
     function(path)
       return {
         dothis = hs.fnutils.partial(

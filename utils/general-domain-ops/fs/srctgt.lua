@@ -40,8 +40,8 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   -- check if path is remote, customize things accordingly
 
-  local source_is_remote = is.path.remote(source)
-  local target_is_remote = is.path.remote(target)
+  local source_is_remote = is.path.remote_path(source)
+  local target_is_remote = is.path.remote_path(target)
   local has_remote_path = source_is_remote or target_is_remote
 
   -- resolve relative_to
@@ -53,7 +53,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
         root = relative_to,
       },
       t = {
-        prefix = is.path.remote(target) and "hsftp:" or nil
+        prefix = is.path.remote_path(target) and "hsftp:" or nil
       }
     })
   end
@@ -62,9 +62,9 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   if create_path then
     if testPath(target, "dir") or into then
-      createPath(target)
+      dothis.absolute_path.create_dir(target)
     else
-      createPath(target, "1:-2")
+      dothis.absolute_path.create_dir(target, "1:-2")
     end
   end
 
@@ -87,7 +87,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
       error("target must be a directory if into is true. Target: " .. target)
     end
     target = target .. "/" .. pathSlice(source, "-1:-1")[1]
-    createPath(target, "1:-2")
+    dothis.absolute_path.create_dir(target, "1:-2")
   end
 
   -- prepare a list of sources to action, or a 'list' of one if not all_in
@@ -106,7 +106,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
     -- this does mean that this doesn't play nice with the `into` option, but I don't think that's a problem
     if all_in then
       final_target = target .. "/" .. pathSlice(final_source, "-1:-1")[1]
-      createPath(final_target, "1:-2")
+      dothis.absolute_path.create_dir(final_target, "1:-2")
     end
 
     if not has_remote_path then 
@@ -166,6 +166,6 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   if tmptarget then
     srctgt("copy", tmptarget, final_target)
-    delete(tmptarget)
+    dothis.absolute_path.delete
   end
 end

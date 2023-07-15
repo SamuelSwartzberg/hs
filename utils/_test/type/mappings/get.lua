@@ -277,46 +277,46 @@ assertMessage(
 )
 
 assertValuesContain(
-  get.pandoc.full_md_extension_set(),
+  transf["nil"].full_md_extension_set(),
   {"citations", "definition_lists", "fenced_code_blocks", "footnotes"} -- sample of extensions that should be present
 )
 
 dothis.pass.add_item("basic_test_data", "test", "basic_test")
-dothis.pass.add_json({foo = "bar"}, "test", "json_test")
-dothis.pass.add_password("password", "test_password_name")
+dothis.alphanum_minus_underscore.set_pass_json("json_test", "test", {foo = "bar"})
+dothis.alphanum_minus_underscore.add_passw_pass_item_name("password", "test_password_name")
 dothis.pass.add_contact_data(1, "contact_test_type", "contact_test")
 
 assertMessage(
-  get.pass.value("test", "basic_test"),
+  get.pass_item_name.value("basic_test", "test"),
   "basic_test_data"
 )
 
 assertMessage(
-  get.pass.json("test", "json_test"),
+  get.pass_item_name.json("json_test", "test"),
   {foo = "bar"}
 )
 
 assertMessage(
-  get.pass.contact_json("contact_test_type", "contact_test"),
+  get.pass_item_name.contact_json("contact_test", "contact_test_type"),
   1
 )
 
-dothis.pass.edit("basic_test_data_edited", "test", "basic_test")
+dothis.pass_item_name.replace("basic_test", "test", "basic_test_data_edited")
 
 assertMessage(
-  get.pass.value("test", "basic_test"),
+  get.pass_item_name.value("basic_test", "test"),
   "basic_test_data_edited"
 )
 
-dothis.pass.rename("passw", "test_password_name", "test_password_name2")
+dothis.pass_item_name.rename("test_password_name","passw", "test_password_name2")
 
 assertMessage(
-  get.pass.password("test_password_name"),
+  get.pass_item_name.password("test_password_name"),
   nil
 )
 
 assertMessage(
-  get.pass.password("test_password_name2"),
+  get.pass_item_name.password("test_password_name2"),
   "password"
 )
 
@@ -325,12 +325,12 @@ dothis.pass.delete("test", "basic_test")
 dothis.pass.delete("test", "json_test")
 dothis.pass.delete("contacts/contact_test_type", "contact_test")
 
-local current_default_audio_output = get.audiodevice_system.default("output")
+local current_default_audio_output = get["nil"].default_audiodevice("output")
 local built_in_output = hs.audiodevice.findDeviceByName("Built-in Output")
 
 dothis.audiodevice.set_default("Built-in Output", "output")
 
-local now_default_audio_output = get.audiodevice_system.default("output")
+local now_default_audio_output = get["nil"].default_audiodevice("output")
 
 assertMessage(
   get.audiodevice.name(now_default_audio_output),

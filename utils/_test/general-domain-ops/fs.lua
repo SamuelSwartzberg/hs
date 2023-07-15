@@ -1,16 +1,16 @@
 if mode == "full-test" then
 
-delete(env.HSFTP_TMPDIR .. "/foo/")
+dothis.absolute_path.delete
 
 
 
 assertMessage(
-  is.path.remote("/Applications"),
+  is.path.remote_path("/Applications"),
   false
 )
 
 assertMessage(
-  is.path.remote("foo:/bar"),
+  is.path.remote_path("foo:/bar"),
   true
 )
 
@@ -21,7 +21,7 @@ assertMessage(
 
 local remote_dir_path = env.HSFTP_TMPDIR .. "/foo/bar"
 
-createPath(remote_dir_path)
+dothis.absolute_path.create_dir(remote_dir_path)
 
 assertMessage(
   testPath(remote_dir_path),
@@ -65,7 +65,7 @@ local remote_file_path = env.HSFTP_TMPDIR .. "/foo/bar/baz.txt"
 writeFile(remote_file_path, "hello world", "any", true)
 
 assertMessage(
-  readFile(remote_file_path),
+  transf.file.contents(remote_file_path),
   "hello world"
 )
 
@@ -90,7 +90,7 @@ assertMessage(
   true
 )
 
-delete(remote_file_path)
+dothis.absolute_path.delete
 
 
 assertMessage(
@@ -173,7 +173,7 @@ assertValuesContain(
   { env.TMPDIR .. "/ff/rr/bb.txt" }
 )
 
-delete(env.TMPDIR .. "/ff")
+dothis.absolute_path.delete
 
 --- same but remote
 
@@ -219,7 +219,7 @@ assertValuesContain(
   {env.HSFTP_TMPDIR .. "/foo/test1.txt"}
 )
 
-delete(env.HSFTP_TMPDIR .. "/foo", "dir", "empty")
+dothis.absolute_path.empty_dir(env.HSFTP_TMPDIR .. "/foo")
 
 assertMessage(
   itemsInPath({path = env.HSFTP_TMPDIR .. "/foo", recursion = true}),
@@ -248,20 +248,20 @@ assertMessage(
 
 local unique_temp_file = writeFile(nil, "foo")
 assertMessage(
-  readFile(unique_temp_file),
+  transf.file.contents(unique_temp_file),
   "foo"
 )
 
-delete(unique_temp_file)
+dothis.absolute_path.delete
 
 assertMessage(
-  readFile(unique_temp_file),
+  transf.file.contents(unique_temp_file),
   nil
 )
 
 doWithTempFile({contents = "foo"}, function(tmp_file)
   assertMessage(
-    readFile(tmp_file),
+    transf.file.contents(tmp_file),
     "foo"
   )
 end)
@@ -286,52 +286,52 @@ local temp_file_1_path = env.TMPDIR .. "/temp_file_lua_test_" .. os.time() .. ".
 writeFile(temp_file_1_path, "foo", "any", false, "w")
 
 assertMessage(
-  readFile(temp_file_1_path),
+  transf.file.contents(temp_file_1_path),
   "foo"
 )
 
 writeFile(temp_file_1_path, "bar", "any", false, "w")
 
 assertMessage(
-  readFile(temp_file_1_path),
+  transf.file.contents(temp_file_1_path),
   "bar"
 )
 
 writeFile(temp_file_1_path, "baz", "any", false, "a")
 
 assertMessage(
-  readFile(temp_file_1_path),
+  transf.file.contents(temp_file_1_path),
   "barbaz"
 )
 
 writeFile(temp_file_1_path, "qux", "not-exists", false, "w")
 
 assertMessage(
-  readFile(temp_file_1_path),
+  transf.file.contents(temp_file_1_path),
   "barbaz"
 )
 
-delete(temp_file_1_path)
+dothis.absolute_path.delete
 
 writeFile(temp_file_1_path, "qux", "not-exists", false, "w")
 
 assertMessage(
-  readFile(temp_file_1_path),
+  transf.file.contents(temp_file_1_path),
   "qux"
 )
 
 writeFile(temp_file_1_path, "moop", "exists", false, "w")
 
 assertMessage(
-  readFile(temp_file_1_path),
+  transf.file.contents(temp_file_1_path),
   "moop"
 )
 
-delete(temp_file_1_path)
+dothis.absolute_path.delete
 writeFile(temp_file_1_path, "moop", "exists", false, "w")
 
 assertMessage(
-  readFile(temp_file_1_path),
+  transf.file.contents(temp_file_1_path),
   nil
 )
 
@@ -341,28 +341,28 @@ local temp_file_2_path = env.TMPDIR .. "/temp_file_lua_test_" .. os.time() .. "/
 writeFile(temp_file_2_path, "meip", "any", false, "w")
 
 assertMessage(
-  readFile(temp_file_2_path),
+  transf.file.contents(temp_file_2_path),
   nil
 )
 
 writeFile(temp_file_2_path, "meip", "any", true, "w")
 
 assertMessage(
-  readFile(temp_file_2_path),
+  transf.file.contents(temp_file_2_path),
   "meip"
 )
 
-delete(temp_file_2_path, "dir")
+dothis.absolute_path.delete(temp_file_2_path))
 
 assertMessage(
-  readFile(temp_file_2_path),
+  transf.file.contents(temp_file_2_path),
   "meip"
 )
 
 delete(temp_file_2_path, "file")
 
 assertMessage(
-  readFile(temp_file_2_path),
+  transf.file.contents(temp_file_2_path),
   nil
 )
 
@@ -374,51 +374,51 @@ writeFile(temp_file_3_path_ping, "lorem ipsum")
 srctgt("copy", temp_file_3_path_ping, temp_file_3_path_pong)
 
 assertMessage(
-  readFile(temp_file_3_path_pong),
+  transf.file.contents(temp_file_3_path_pong),
   "lorem ipsum"
 )
 
-delete(temp_file_3_path_ping)
+dothis.absolute_path.delete
 
 srctgt("move", temp_file_3_path_pong, temp_file_3_path_ping)
 
 assertMessage(
-  readFile(temp_file_3_path_ping),
+  transf.file.contents(temp_file_3_path_ping),
   "lorem ipsum"
 )
 
 assertMessage(
-  readFile(temp_file_3_path_pong),
+  transf.file.contents(temp_file_3_path_pong),
   nil
 )
 
 srctgt("link", temp_file_3_path_ping, temp_file_3_path_pong)
 
 assertMessage(
-  readFile(temp_file_3_path_pong),
+  transf.file.contents(temp_file_3_path_pong),
   "lorem ipsum"
 )
 
 assertMessage(
-  readFile(temp_file_3_path_ping),
+  transf.file.contents(temp_file_3_path_ping),
   "lorem ipsum"
 )
 
-delete(temp_file_3_path_pong)
+dothis.absolute_path.delete
 
 local temp_subdir_1_path = env.TMPDIR .. "/temp_subdir_lua_test_" .. os.time() .. "/"
 local ping_in_subdir_1_path = temp_subdir_1_path .. pathSlice(temp_file_3_path_ping, "-1:-1")[1]
 
-createPath(temp_subdir_1_path)
+dothis.absolute_path.create_dir(temp_subdir_1_path)
 
 srctgt("copy", temp_file_3_path_ping, temp_subdir_1_path, "any", false, true)
 
 assertMessage(
-  readFile(ping_in_subdir_1_path),
+  transf.file.contents(ping_in_subdir_1_path),
   "lorem ipsum"
 )
 
-delete(temp_subdir_1_path)
+dothis.absolute_path.delete
 
 assertMessage(
   testPath(temp_subdir_1_path),
@@ -428,7 +428,7 @@ assertMessage(
 srctgt("link", temp_file_3_path_ping, ping_in_subdir_1_path, "any", true)
 
 assertMessage(
-  readFile(ping_in_subdir_1_path),
+  transf.file.contents(ping_in_subdir_1_path),
   "lorem ipsum"
 )
 
@@ -439,7 +439,7 @@ assertMessage(
   false
 )
 
-delete(temp_subdir_1_path, "any", "empty")
+dothis.absolute_path.delete_if_empty(temp_subdir_1_path)
 
 assertMessage(
   testPath(temp_subdir_1_path, { exists = true, contents = false }),
@@ -460,7 +460,7 @@ srctgt("link", temp_subdir_1_path, temp_subdir_1_path .. "subdir", "not-exists",
 
 for _, n in transf.array.index_value_stateless_iter(transf.start_stop_step_unit.array(1, 4)) do
   assertMessage(
-    readFile( temp_subdir_1_path .. "subdir/file_" .. n .. ".txt" ),
+    transf.file.contents( temp_subdir_1_path .. "subdir/file_" .. n .. ".txt" ),
     "lorem ipsum " .. n
   )
 end
@@ -470,21 +470,21 @@ local remote_writing_file = env.HSFTP_TMPDIR .. "/foo/meep.txt"
 writeFile(remote_writing_file, "bar", "exists", false, "w")
 
 assertMessage(
-  readFile(remote_writing_file),
+  transf.file.contents(remote_writing_file),
   nil
 )
 
 writeFile(remote_writing_file, "bar", "not-exists", false, "w")
 
 assertMessage(
-  readFile(remote_writing_file),
+  transf.file.contents(remote_writing_file),
   "bar"
 )
 
 writeFile(remote_writing_file, "baz", "any", false, "a")
 
 assertMessage(
-  readFile(remote_writing_file),
+  transf.file.contents(remote_writing_file),
   "barbaz"
 )
 
@@ -493,14 +493,14 @@ local local_file = writeFile(nil, "local-origin content")
 srctgt("copy", local_file, remote_writing_file, "not-exists")
 
 assertMessage(
-  readFile(remote_writing_file),
+  transf.file.contents(remote_writing_file),
   "barbaz"
 )
 
 srctgt("copy", local_file, remote_writing_file, "exists")
 
 assertMessage(
-  readFile(remote_writing_file),
+  transf.file.contents(remote_writing_file),
   "local-origin content"
 )
 
@@ -508,19 +508,19 @@ writeFile(local_file, "local-origin content 2")
 srctgt("move", local_file, remote_writing_file, "any")
 
 assertMessage(
-  readFile(remote_writing_file),
+  transf.file.contents(remote_writing_file),
   "local-origin content 2"
 )
 
 assertMessage(
-  readFile(local_file),
+  transf.file.contents(local_file),
   nil
 )
 
 srctgt("copy", remote_writing_file, env.TMPDIR, "any", false, true)
 
 assertMessage(
-  readFile(env.TMPDIR .. "/meep.txt"),
+  transf.file.contents(env.TMPDIR .. "/meep.txt"),
   "local-origin content 2"
 )
 
@@ -532,19 +532,19 @@ writeFile(tmpdirdir .. "/keiko.txt", "keiko")
 srctgt("move", tmpdirdir, env.HSFTP_TMPDIR, "any", false, false, true)
 
 assertMessage(
-  readFile(env.HSFTP_TMPDIR .. "/natsume.txt"),
+  transf.file.contents(env.HSFTP_TMPDIR .. "/natsume.txt"),
   "natsume"
 )
 
 assertMessage(
-  readFile(env.HSFTP_TMPDIR .. "/keiko.txt"),
+  transf.file.contents(env.HSFTP_TMPDIR .. "/keiko.txt"),
   "keiko"
 )
 
-delete(env.HSFTP_TMPDIR .. "/natsume.txt")
-delete(env.HSFTP_TMPDIR .. "/keiko.txt")
+dothis.absolute_path.delete
+dothis.absolute_path.delete
 
-createPath(
+dothis.absolute_path.create_dir(
   env.TMPDIR .. "/" .. os.time() .. "/foo/bar/baz",
   ":-4"
 )
@@ -563,7 +563,7 @@ assertMessage(
 writeFile(env.TMPDIR .. "/delete-if-notempty/" .. os.time() .. ".txt", "lorem ipsum", "any", true)
 
 
-delete(env.TMPDIR .. "/delete-if-notempty", "any", "delete", "empty")
+dothis.absolute_path.delete_if_empty(env.TMPDIR .. "/delete-if-notempty")
 
 assertMessage(
   testPath(env.TMPDIR .. "/delete-if-notempty"),
@@ -578,7 +578,7 @@ assertMessage(
 )
 
 local succ, res = pcall(
-  readFile,
+  transf.file.contents,
   "/this/path/does/not/exist",
   "nil"
 )
@@ -594,7 +594,7 @@ assertMessage(
 )
 
 local succ, res = pcall(
-  readFile,
+  transf.file.contents,
   "/this/path/does/not/exist",
   "error"
 )
@@ -645,7 +645,7 @@ local fstree_test_dir = env.TMPDIR .. "/fstree-" .. os.time() .. "/"
 
 writeFile(fstree_test_dir .. "foo.txt", "gg ez", "any", true)
 writeFile(fstree_test_dir .. "abee.json", "{\"a\": \"b\"}", "any", true)
-createPath(fstree_test_dir .. "bar/baz")
+dothis.absolute_path.create_dir(fstree_test_dir .. "bar/baz")
 writeFile(fstree_test_dir .. "bar/rei.yaml", "kore: ha\nchoco: desu\n", "any", true)
 writeFile(fstree_test_dir .. "bar/murloc.txt", "mrgl mrgl", "any", true)
 
@@ -703,10 +703,10 @@ assertMessage(
   }
 )
 
-delete(fstree_test_dir .. "bar/baz")
+dothis.absolute_path.delete
 srctgt("move", fstree_test_dir .. "foo.txt", fstree_test_dir .. "inner", nil, true, true)
 srctgt("move", fstree_test_dir .. "abee.json", fstree_test_dir .. "inner", nil, true, true)
-createPath(fstree_test_dir .. "sore/are")
+dothis.absolute_path.create_dir(fstree_test_dir .. "sore/are")
 
 assertMessage(
   fsTree(fstree_test_dir, "append"),
@@ -840,11 +840,11 @@ assertMessage(
 
 -- test new fail parameter of createPath
 
-local create_res = createPath("/foo", nil, "nil")
+local create_res = dothis.absolute_path.create_dir("/foo", nil, "nil")
 
 assert(create_res == nil)
 
-local succ, res = pcall(createPath, "/foo", nil, "error")
+local succ, res = pcall(dothis.absolute_path.create_dir, "/foo", nil, "error")
 
 assert(not succ)
 
@@ -856,13 +856,13 @@ local url_tgt_dir = env.TMPDIR .. "/helloworld-" .. os.time() .. "/"
 srctgt("copy", env.MMOCK .. "/files/plaintext/txt/helloworld.txt", url_tgt_path)
 
 assertMessage(
-  readFile(url_tgt_path),
+  transf.file.contents(url_tgt_path),
   "Hello World!"
 )
 
 srctgt("copy", env.MMOCK .. "/files/plaintext/txt/helloworld.txt", url_tgt_dir, true, true)
 
 assertMessage(
-  readFile(url_tgt_dir .. "helloworld.txt"),
+  transf.file.contents(url_tgt_dir .. "helloworld.txt"),
   "Hello World!"
 )

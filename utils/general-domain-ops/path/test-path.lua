@@ -22,7 +22,7 @@ function testPath(path, opts)
   end
   path = path or env.HOME
   path = transf.string.path_resolved(path, true)
-  local remote = is.path.remote(path)
+  local remote = is.path.remote_path(path)
 
   local results = {}
 
@@ -57,10 +57,7 @@ function testPath(path, opts)
     if not remote then
       dirness = not not hs.fs.chdir(path)
     else 
-      dirness = pcall(runJSON,{
-        args = {"rclone", "lsjson", "--stat", {value = path, type = "quoted"}},
-        key_that_contains_payload = "IsDir"
-      })
+      dirness = 
 
     end
 
@@ -77,7 +74,7 @@ function testPath(path, opts)
       if dirness then 
         contents = itemsInPath(path)
       else
-        contents = readFile(path, "nil")
+        contents = transf.file.contents(path, "nil")
       end
 
 

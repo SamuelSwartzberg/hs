@@ -72,7 +72,7 @@ local item_creation_map = {
       value = TMPDIR_NOW .. "foo.txt",
       must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file" },
       posttest = function()
-        delete(TMPDIR_NOW .. "foo.txt")
+        dothis.absolute_path.delete
       end
     },
     {
@@ -90,7 +90,7 @@ local item_creation_map = {
       value = env.SCREENSHOTS .. "/" .. testtime .. ".png",
       must_be = { "string", "single-item-string", "path", "absolute-path", "true-absolute-path", "extant-path", "file", "path-in-home", "path-in-screenshots" },
       posttest = function()
-        delete(env.SCREENSHOTS .. "/" .. testtime .. ".png")
+        dothis.absolute_path.delete
       end
     },
     {

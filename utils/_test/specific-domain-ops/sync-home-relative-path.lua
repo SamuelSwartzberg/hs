@@ -11,11 +11,11 @@ do
 
   syncHomeRelativePath(".tmp" .. dirname, "push", nil, true) -- 3rd param should default to "copy"
 
-  local remoteFileContents = readFile(remoteFile, "error")
+  local remoteFileContents = transf.file.contents(remoteFile, "error")
   assertMessage(remoteFileContents, "This is a test file.")
 
-  delete(localPath, "dir", "delete", "any")
-  delete(remotePath, "dir", "delete", "any")
+  dothis.absolute_path.delete_dir
+  dothis.absolute_path.delete_dir
 end
 
 -- Test 2: Pull remote file to local
@@ -29,11 +29,11 @@ do
   writeFile(remoteFile, "This is another test file.", true)
   syncHomeRelativePath(".tmp" .. dirname, "pull", "copy", true)
 
-  local localFileContents = readFile(localFile, "error")
+  local localFileContents = transf.file.contents(localFile, "error")
   assertMessage(localFileContents, "This is another test file.")
 
-  delete(localPath, "dir", "delete", "any")
-  delete(remotePath, "dir", "delete", "any")
+  dothis.absolute_path.delete_dir
+  dothis.absolute_path.delete_dir
 end
 
 -- Test 3: Push local directory to remote using "move" action
@@ -47,12 +47,12 @@ do
   writeFile(localFile, "This is a test file for move action.", true)
   syncHomeRelativePath(".tmp" .. dirname, "push", "move", true)
 
-  local remoteFileContents = readFile(remoteFile, "error")
+  local remoteFileContents = transf.file.contents(remoteFile, "error")
   assertMessage(remoteFileContents, "This is a test file for move action.")
   assertMessage(testPath(localFile), false)
 
-  delete(localPath, "dir", "delete", "any")
-  delete(remotePath, "dir", "delete", "any")
+  dothis.absolute_path.delete_dir
+  dothis.absolute_path.delete_dir
 end
 
 -- Test 4: Invalid push_or_pull parameter

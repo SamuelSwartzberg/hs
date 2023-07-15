@@ -59,7 +59,7 @@ FacebookItemSpecifier = {
         return nil -- facebook doesn't include this in the export
       end,
       ["chat-obj"] = function(self, chat_dir)
-        local chat_obj = json.decode(readFile(env.chat_dir .. "/messages_1.json"))
+        local chat_obj = json.decode(transf.file.contents(env.chat_dir .. "/messages_1.json"))
         chat_obj.found_in = chat_dir
         return chat_obj
       end,
@@ -108,7 +108,7 @@ FacebookItemSpecifier = {
       ["preprocess-backup-files"] = function()
         for _, subdir in itemsInPath({path = env.TMP_FACEBOOK_EXPORT_PARENT, include_files = false}) do
           if not find({"photos", "stickers_used"}, pathSlice(subdir, "-1:-1"))[1] then
-            srctgt("move", subdir, env.MCHATS_GLOBAL_FACEBOOK_MEDIA, "any", true, false, true) delete(subdir, "dir")
+            srctgt("move", subdir, env.MCHATS_GLOBAL_FACEBOOK_MEDIA, "any", true, false, true) dothis.absolute_path.delete(subdir))
           end
         end
       end,
@@ -120,7 +120,7 @@ FacebookItemSpecifier = {
       ["pre-process-chat-messages-hook"] = function (self, chat_obj)
         for _, subdir in itemsInPath({ path = env.TMP_FACEBOOK_EXPORT_CHATS .. "/" .. chat_obj.found_in, include_files = false }) do
           srctgt("move", subdir,  env.MCHATS_FACEBOOK_MEDIA .. "/" .. self:get("convo-id", chat_obj), "any", true, false, true)
-          delete(subdir, "dir")
+          dothis.absolute_path.delete(subdir))
         end
       end,
     }

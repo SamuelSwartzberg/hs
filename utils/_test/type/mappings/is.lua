@@ -84,19 +84,19 @@ assert(
 )
 
 assert(
-  is.path.playable_file("/foo/example.mp3")
+  is.file.playable_file("/foo/example.mp3")
 )
 
 assert(
-  is.path.playable_file("/foo/example.wav")
+  is.file.playable_file("/foo/example.wav")
 )
 
 assert(
-  is.path.playable_file("example.mov")
+  is.file.playable_file("example.mov")
 )
 
 assert(
-  not is.path.playable_file("example")
+  not is.file.playable_file("example")
 )
 
 assert(
@@ -207,13 +207,13 @@ assertMessage(is.string.path("test\r/path"), false)
 assertMessage(is.string.path("test\f/path"), false)
 
 -- Test is.path.remote
-assertMessage(is.path.remote("http://example.com/test.git"), true)
-assertMessage(is.path.remote("https://example.com/test.git"), true)
-assertMessage(is.path.remote("git@example.com:test.git"), true)
-assertMessage(is.path.remote("ftp://example.com/test.git"), true)
-assertMessage(is.path.remote("test.git"), false)
-assertMessage(is.path.remote("example.com/test.git"), false)
-assertMessage(is.path.remote("test/path/test.git"), false)
+assertMessage(is.path.remote_path("http://example.com/test.git"), true)
+assertMessage(is.path.remote_path("https://example.com/test.git"), true)
+assertMessage(is.path.remote_path("git@example.com:test.git"), true)
+assertMessage(is.path.remote_path("ftp://example.com/test.git"), true)
+assertMessage(is.path.remote_path("test.git"), false)
+assertMessage(is.path.remote_path("example.com/test.git"), false)
+assertMessage(is.path.remote_path("test/path/test.git"), false)
 
 -- Test is.path.git_root_dir
 assertMessage(is.path.git_root_dir(env.MENV), true)

@@ -12,7 +12,6 @@ PlaintextFileItemSpecifier = {
       ["is-executable-code-file"] = transf["nil"]["true"], -- determining whether a file is executable code is difficult, as there are so many programming languages and extensions, so I'm just gonna assert it's true and not implement any polymorphic behavior in executable-code-file
       ["is-gitignore-file"] = bc(get.path.is_filename, ".gitignore"),
       ["is-log-file"] = bc(get.path.is_extension, "log"),
-      ["is-email-file"] = bc(is.path.email_file),
       ["is-newsboat-urls-file"] = bc(get.path.is_leaf, "urls"),
       ["is-md-file"] = bc(get.path.is_standartized_extension, "md")
     },

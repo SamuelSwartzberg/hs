@@ -79,7 +79,7 @@ DiscordItemSpecifier = {
     },
     doThisables = {
       ["generate-backup"] = function(self, do_after)
-        delete(env.TMP_DISCORD_EXPORT_PARENT, "dir", "empty")
+        dothis.absolute_path.empty_dir(env.TMP_DISCORD_EXPORT_PARENT)
         run( { 
           "dscexport",
           "exportdm",

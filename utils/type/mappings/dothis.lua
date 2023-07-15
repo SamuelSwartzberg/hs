@@ -215,11 +215,11 @@ dothis = {
   pandoc = {
     markdown_to = function(source, format, metadata, do_after)
       local source, target = resolve({s = {path = source}, t = {suffix = "." .. tblmap.pandoc_format.extension[format]}})
-      local rawsource = readFile(source)
+      local rawsource = transf.file.contents(source)
       local processedsource = join.string.table.with_yaml_metadata(rawsource, metadata)
       rawsource = eutf8.gsub(rawsource, "\n +\n", "\n&nbsp;\n")
       local temp_path = source .. ".tmp"
-      writeFile(temp_path, processedsource) 
+      dothis.absolute_path.write_file(temp_path, processedsource) 
       local command_parts = {
         "pandoc",
       }
@@ -234,7 +234,7 @@ dothis = {
       table.insert(command_parts, "-o")
       table.insert(command_parts, {value = target, type ="quoted"})
       run(command_parts, function ()
-        delete(temp_path)
+        dothis.absolute_path.delete(temp_path)
         if do_after then
           do_after(target)
         end
@@ -259,35 +259,39 @@ dothis = {
     add_item = function(data, type, name)
       run("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name, true)
     end,
-    add_json = function(data, type, name)
-      dothis.pass.add_item(json.encode(data), type, name)
-    end,
     add_contact_data = function(data, type, uid)
       type = "contacts/" .. type
-      dothis.pass.add_json(data, type, uid)
-    end,
-    add_password = function(password, name)
-      dothis.pass.add_item(password, "passw", name)
-    end,
+      dothis.alphanum_minus_underscore.set_pass_json(data, type, uid)
+    end,      
     delete = function(type, name)
       run("pass rm " .. type .. "/" .. name, true)
-    end,
-    rename = function(type, old_name, new_name)
-      run("pass mv " .. type .. "/" .. old_name .. " " .. type .. "/" .. new_name, true)
-    end,
-    edit = function(data, type, name)
+    end, 
+  },
+  pass_item_name = {
+    replace = function(name, type, data)
       run("pass rm " .. type .. "/" .. name, function()
         dothis.pass.add_item(data, type, name)
       end)
     end,
+    rename = function(name, type, new_name)
+      run("pass mv " .. type .. "/" .. name .. " " .. type .. "/" .. new_name, true)
+    end,
   },
-  pass_name = {
+  login_pass_item_name = {
     fill = function(name)
       dothis.string_array.fill_with({
-        transf.pass_name.username(name),
-        transf.pass_name.password(name),
+        transf.pass_item_name.username_or_default(name),
+        transf.pass_item_name.password(name),
       })
-    end
+    end,
+  },
+  alphanum_minus_underscore = {
+    add_pass_item_name_with_json = function(name, type, data)
+      dothis.pass.add_item(json.encode(data), type, name)
+    end,
+    add_passw_pass_item_name = function(name, password)
+      dothis.pass.add_item(password, "passw", name)
+    end,
   },
   contact_table = {
     add_iban = function(contact_table, iban)
@@ -347,7 +351,7 @@ dothis = {
       run("killall rec", do_after)
     end,
     rec_toggle_cache = function(do_after)
-      if get.sox.is_recording() then
+      if transf["nil"].sox_is_recording() then
         dothis.sox.rec_stop()
       else
         dothis.sox.rec_start_cache(do_after)
@@ -394,10 +398,10 @@ dothis = {
         "-r",
         { value = tmpdir_ics_path, type = "quoted" }
       })
-      delete(tmpdir_json_path)
+      dothis.absolute_path.delete(tmpdir_json_path)
       if path then
         srctgt("move", tmpdir_ics_path, path)
-        delete(tmpdir_ics_path)
+        dothis.absolute_path.delete(tmpdir_ics_path)
       end
     end
   },
@@ -442,17 +446,17 @@ dothis = {
       dothis.string_array.fill_with(transf.string.nocomment_noindent_content_lines(path))
     end,
     search = function(str, search_engine)
-      dothis.url_or_path.open_browser(
+      dothis.url_or_local_path.open_browser(
         get.string.search_engine_search_url(search_engine, str)
       )
     end,
     write_to_temp_file = function(str)
       local path = transf.string.in_tmp_dir(os.time(), "temp_file")
-      writeFile(path, str)
+      dothis.absolute_path.write_file(path, str)
       return path
     end,
     open_temp_file = function(str)
-      dothis.path.open_app(
+      dothis.local_path.open_app(
         transf.string.write_to_temp_file(str),
         env.GUI_EDITOR
       )
@@ -464,7 +468,7 @@ dothis = {
     end
 
   },
-  url_or_path = {
+  url_or_local_path = {
     open_browser = function(url, browser, do_after)
       url = transf.url.ensure_scheme(url)
       browser = browser or "Firefox"
@@ -476,16 +480,16 @@ dothis = {
       end
     end,
     open_ff = function(url)
-      dothis.url_or_path.open_browser(url, "Firefox")
+      dothis.url_or_local_path.open_browser(url, "Firefox")
     end,
     open_safari = function(url)
-      dothis.url_or_path.open_browser(url, "Safari")
+      dothis.url_or_local_path.open_browser(url, "Safari")
     end,
     open_chrome = function(url)
-      dothis.url_or_path.open_browser(url, "Google Chrome")
+      dothis.url_or_local_path.open_browser(url, "Google Chrome")
     end,
   },
-  path = {
+  local_path = {
     open_default = function(path, do_after)
       run("open " .. transf.string.single_quoted_escaped(path), do_after)
     end,
@@ -498,14 +502,14 @@ dothis = {
       )
     end,
     write_dynamic_path_dict = function(path, assoc_arr, extension)
-      dothis.path.write_relative_path_dict(
+      dothis.local_path.write_relative_path_dict(
         transf.assoc_arr.relative_path_dict(path), 
         assoc_arr, 
         extension
       )
     end,
     write_dynamic_structure = function(path, name)
-      dothis.path.write_dynamic_path_dict(
+      dothis.local_path.write_dynamic_path_dict(
         path,
         tblmap.dynamic_structure_name.dynamic_structure[name]
       )
@@ -522,9 +526,6 @@ dothis = {
     end
   },
   absolute_path = {
-    write_file = function(path, content)
-      writeFile(path, content, "any", true)
-    end,
     write_template = function(path, template_path)
       dothis.absolute_path.write_file(
         path,
@@ -534,14 +535,12 @@ dothis = {
         )
       )
     end,
-    create_file = function(path, contents)
-      writeFile(path, contents, "not-exists", true)
-    end,
-    replace_file = function(path, contents)
-      writeFile(path, contents, "exists", true)
-    end,
-    create_path = function(path)
-      createPath(path)
+    create_dir = function(path)
+      if is.path.remote_path(path) then
+        dothis.remote_absolute_path.create_dir(path)
+      else
+        dothis.local_absolute_path.create_dir(path)
+      end
     end,
     copy_single_into = function(path, tgt)
       srctgt("copy", path, tgt, "any", true, false)
@@ -550,17 +549,108 @@ dothis = {
       srctgt("copy", path, tgt, "any", true, true)
     end,
     delete = function(path)
-      delete(path, "any", "delete", "any", "error")
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.delete(path)
+      end
     end,
     empty = function(path)
-      delete(path, "any", "empty", "any", "error")
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.empty(path)
+      end
+    end,
+    delete_dir = function(path)
+      if is.path.extant_path(path) then
+        dothis.extant_path.delete_dir(path)
+      end
+    end,
+    empty_dir = function(path)
+      if is.path.extant_path(path) then
+        dothis.extant_path.empty_dir(path)
+      end
+    end,
+    delete_file = function(path)
+      if is.path.extant_path(path) then
+        dothis.extant_path.delete_file(path)
+      end
+    end,
+    empty_file = function(path)
+      if is.path.extant_path(path) then
+        dothis.extant_path.empty_file(path)
+      end
+    end,
+    delete_if_empty = function(path)
+      if is.path.extant_path(path) then
+        dothis.extant_path.delete_if_empty(path)
+      end
+    end,
+    delete_file_if_empty = function(path)
+      if is.path.extant_path(path) then
+        dothis.extant_path.delete_file_if_empty(path)
+      end
+    end,
+    delete_dir_if_empty = function(path)
+      if is.path.extant_path(path) then
+        dothis.extant_path.delete_dir_if_empty(path)
+      end
     end,
     initialize_omegat_project = function (path)
-      dothis.path.write_dynamic_structure(path, "omegat")
+      dothis.local_path.write_dynamic_structure(path, "omegat")
       dothis.omegat_project_dir.pull_project_materials(path)
-    end
+    end,
+    write_file = function(path, contents)
+      dothis.absolute_path.create_dir(
+        transf.path.parent_path(path)
+      )
+      dothis.file.write_file(path, contents)
+    end,
+    append_or_write_file = function(path, contents)
+      dothis.absolute_path.create_dir(
+        transf.path.parent_path(path)
+      )
+      dothis.file.append_file(path, contents)
+    end,
+    append_file = function(path, contents)
+      if is.absolute_path.file(path) then
+        dothis.absolute_path.create_dir(
+          transf.path.parent_path(path)
+        )
+        dothis.file.append_file(path, contents)
+      end
+    end,
+    create_file = function(path, contents)
+      if is.absolute_path.nonextant_path(path) then
+        dothis.absolute_path.create_dir(
+          transf.path.parent_path(path)
+        )
+        dothis.file.write_file(path, contents)
+      end
+    end,
+    replace_file = function(path, contents)
+      if is.absolute_path.file(path) then
+        dothis.absolute_path.create_dir(
+          transf.path.parent_path(path)
+        )
+        dothis.file.write_file(path, contents)
+      end
+    end,
   },
-  extant_path = {
+  local_absolute_path = {
+    create_dir = function(path)
+      run("mkdir -p " .. transf.string.single_quoted_escaped(path))
+    end,
+
+  },
+  labelled_remote_absolute_path = {
+    create_dir = function(path)
+      run("rclone mkdir " .. transf.string.single_quoted_escaped(path))
+    end,
+  }, 
+  remote_absolute_path = {
+    create_path = function(path)
+      dothis.labelled_remote_absolute_path.create_dir(path)
+    end,
+  },
+  local_extant_path = {
     make_executable = function(path)
       run("chmod +x " .. transf.string.single_quoted_escaped(path))
     end,
@@ -571,12 +661,148 @@ dothis = {
         dothis.dir.do_in_path(transf.path.parent_path(path), cmd, do_after)
       end
     end,
+    delete = os.remove
     
+  },
+  labelled_remote_file = {
+    write_file = function(path, contents)
+      local temp_file = transf.string.in_tmp_dir(path, "labelled_remote_temp_file")
+      dothis.local_extant_path.write_file(temp_file, contents)
+      run("rclone copyto" .. transf.string.single_quoted_escaped(temp_file) .. " " .. transf.string.single_quoted_escaped(path))
+      dothis.absolute_path.delete(temp_file)
+    end,
+    append_file = function(path, contents)
+      local temp_file = transf.string.in_tmp_dir(path, "labelled_remote_temp_file")
+      dothis.local_extant_path.append_file(temp_file, contents)
+      dothis.labelled_remote_file.write_file(path, transf.local_file.contents(temp_file))
+    end,
+  },
+  labelled_remote_dir = {
+    empty_dir = function(path)
+      dothis.labelled_remote_dir.delete_dir(path)
+      dothis.labelled_remote_absolute_path.create_dir(path)
+    end,
+    delete_dir = function(path)
+      run("rclone purge " .. transf.string.single_quoted_escaped(path))
+    end,
+  },
+  remote_file = {
+    write_file = function(path, contents)
+      dothis.labelled_remote_file.write_file(path, contents)
+    end,
+    append_file = function(path, contents)
+      dothis.labelled_remote_file.append_file(path, contents)
+    end,
+  },
+  remote_dir =  {
+    empty_dir = function(path)
+      dothis.labelled_remote_dir.empty_dir(path)
+    end,
+    delete_dir = function(path)
+      dothis.labelled_remote_dir.delete_dir(path)
+    end,
+  },
+  local_file = {
+    write_file = function(path, contents)
+      local file = io.open(path, "w")
+      file:write(contents)
+      file:close()
+    end,
+    append_file = function(path, contents)
+      local file = io.open(path, "a")
+      file:write(contents)
+      file:close()
+    end,
+  },
+  local_dir = {
+    empty_dir = function(path)
+      run("rm -rf " .. transf.string.single_quoted_escaped(
+        transf.path.ending_with_slash(path) .. "*"
+      ) .. "/*")
+    end,
+  },
+  extant_path = {
+    empty = function(path)
+      if is.extant_path.dir(path) then
+        dothis.dir.empty_dir(path)
+      elseif is.extant_path.file(path) then
+        dothis.file.empty_file(path)
+      end
+    end,
+    delete = function(path)
+      if is.extant_path.dir(path) then
+        dothis.dir.delete_dir(path)
+      elseif is.extant_path.file(path) then
+        dothis.file.delete_file(path)
+      end
+    end,
+    delete_if_empty = function(path)
+      if is.extant_path.empty_path(path) then
+        dothis.extant_path.delete(path)
+      end
+    end,
+    empty_file = function(path)
+      if is.extant_path.file(path) then
+        dothis.file.empty_file(path)
+      end
+    end,
+    delete_file = function(path)
+      if is.extant_path.file(path) then
+        dothis.file.delete_file(path)
+      end
+    end,
+    delete_file_if_empty = function(path)
+      if is.extant_path.file(path) then
+        dothis.file.delete_file_if_empty(path)
+      end
+    end,
+    delete_dir = function(path)
+      if is.extant_path.dir(path) then
+        dothis.dir.delete_dir(path)
+      end
+    end,
+    delete_dir_if_empty = function(path)
+      if is.extant_path.dir(path) then
+        dothis.dir.delete_dir_if_empty(path)
+      end
+    end,
+    empty_dir = function(path)
+      if is.extant_path.dir(path) then
+        dothis.dir.empty_dir(path)
+      end
+    end,
   },
   file = {
     do_in_path = function(path, cmd, do_after)
       run("cd " .. transf.string.single_quoted_escaped(transf.path.parent_path(path)) .. " && " .. cmd, do_after)
-    end
+    end,
+    write_file = function(path, contents)
+      dothis[
+        transf.path.local_or_remote_string(path) .. "_extant_path"
+      ].write_file(path, contents)
+    end,
+    append_file = function(path, contents)
+      dothis[
+        transf.path.local_or_remote_string(path) .. "_extant_path"
+      ].append_file(path, contents)
+    end,
+    replace_file = function(path, contents)
+      dothis.file.write_file(path, contents) -- if the file already exists, replacing is the same as writing
+    end,
+    empty_file = function(path)
+      dothis.file.write_file(path, "")
+    end,
+    delete_file = function(path)
+      dothis[
+        transf.path.local_or_remote_string(path) .. "_extant_path"
+      ].delete_file(path)
+    end,
+    delete_file_if_empty = function(path)
+      if is.file.empty_file(path) then
+        dothis.file.delete_file(path)
+      end
+    end,
+
   },
   audio_file = {
     play = function(path, do_after)
@@ -587,15 +813,9 @@ dothis = {
 
   },
   plaintext_file = {
-    append_contents = function(path, str)
-      writeFile(path, str, "exists", "a")
-    end,
-    replace_contents = function(path, str)
-      writeFile(path, str, "exists", "w")
-    end,
     append_lines = function(path, lines)
       local contents = transf.plaintext_file.one_final_newline(path)
-      writeFile(path, contents .. table.concat(lines, "\n"), "exists", "w")
+      dothis.absolute_path.replace_file(path, contents .. table.concat(lines, "\n"))
     end,
     append_line = function(path, line)
       dothis.plaintext_file.append_lines(path, {line})
@@ -605,7 +825,7 @@ dothis = {
       dothis.in_git_dir.commit_self(path, "Added line " .. line .. " to " .. get.absolute_path.relative_path_from(path, transf.in_git_dir.git_root_dir(path)))
     end,
     write_lines = function(path, lines)
-      writeFile(path, table.concat(lines, "\n"), nil, "w")
+      dothis.absolute_path.replace_file(path, table.concat(lines, "\n"))
     end,
     set_line = function(path, line, line_number)
       local lines = transf.plaintext_file.lines(path)
@@ -651,7 +871,7 @@ dothis = {
     open_all = function(path, browser)
       hs.fnutils.ieach(
         transf.plaintext_file.nocomment_noindent_content_lines(path),
-        bind(dothis.url_or_path.open_browser, {a_use, browser})
+        bind(dothis.url_or_local_path.open_browser, {a_use, browser})
       )
     end,
   },
@@ -680,10 +900,10 @@ dothis = {
           { value = path, type = "quoted" },
         },
         catch = function()
-          writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), readFile(path, "error"))
+          writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.contents(path, "error"))
         end,
         finally = function()
-          delete(path)
+          dothis.absolute_path.delete(path)
         end,
       }, 
       {
@@ -700,7 +920,7 @@ dothis = {
         "-c",
         { value = env.MBSYNC_ARCHIVE, type = "quoted" },
       }, function()
-        delete(path)
+        dothis.absolute_path.delete(path)
         if do_after then
           do_after()
         end
@@ -711,7 +931,7 @@ dothis = {
         path = path,
         edit_before = true,
       }, function(path)
-        writeFile(path, le(readFile(path))) -- re-eval
+        dothis.absolute_path.write_file(path, le(transf.file.contents(path))) -- re-eval
         dothis.email_file.send(path, do_after)
       end)
     end,
@@ -759,6 +979,21 @@ dothis = {
       dothis.absolute_path.delete(
         get.dir.find_child_with_leaf_ending(path, ending)
       )
+    end,
+    empty_dir = function(path)
+      dothis[
+        transf.path.local_or_remote_string(path) .. "_extant_path"
+      ].empty_dir(path)
+    end,
+    delete_dir = function(path)
+      dothis[
+        transf.path.local_or_remote_string(path) .. "_extant_path"
+      ].delete_dir(path)
+    end,
+    delete_dir_if_empty = function(path)
+      if is.dir.empty_dir(path) then
+        dothis.dir.delete_dir(path)
+      end
     end,
   },
   maildir_dir = {
@@ -843,6 +1078,14 @@ dothis = {
       dothis.audiodevice.set_default(device, "output")
     end,
   },
+  audiodevice_array = {
+    choose_item_and_set_default = function(array)
+      dothis.array.choose_item(
+        array,
+        dothis.audiodevice_specifier.set_default
+      )
+    end,
+  },
   source_id = {
     activate = function(source_id)
       hs.keycodes.currentSourceID(source_id)
@@ -873,18 +1116,18 @@ dothis = {
     add_hook = function(path, hook_path, name)
       name = name or transf.path.filename(hook_path)
       srctgt("copy", hook_path, get.git_root_dir.hook_path(path, name))
-      dothis.extant_path.make_executable(get.git_root_dir.hook_path(path, name))
+      dothis.local_extant_path.make_executable(get.git_root_dir.hook_path(path, name))
     end,
     copy_hook = function(path, type, name)
       type = type or "default"
       local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
-      dothis.extant_path.make_executable(source_hook)
+      dothis.local_extant_path.make_executable(source_hook)
       srctgt("copy", source_hook, get.git_root_dir.hook_path(path, name))
     end,
     link_hook = function(path, type, name)
       type = type or "default"
       local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
-      dothis.extant_path.make_executable(source_hook)
+      dothis.local_extant_path.make_executable(source_hook)
       srctgt("link", source_hook, get.git_root_dir.hook_path(path, name))
     end,
     link_all_hooks = function(path, type)
@@ -906,19 +1149,19 @@ dothis = {
   },
   in_git_dir = {
     pull = function(path)
-      dothis.extant_path.do_in_path(path, "git pull")
+      dothis.local_extant_path.do_in_path(path, "git pull")
     end,
     push = function(path)
-      dothis.extant_path.do_in_path(path, "git push")
+      dothis.local_extant_path.do_in_path(path, "git push")
     end,
     fetch = function(path)
-      dothis.extant_path.do_in_path(path, "git fetch")
+      dothis.local_extant_path.do_in_path(path, "git fetch")
     end,
     add_self = function(path, do_after)
-      dothis.extant_path.do_in_path(path, "git add" .. transf.string.single_quoted_escaped(path), do_after)
+      dothis.local_extant_path.do_in_path(path, "git add" .. transf.string.single_quoted_escaped(path), do_after)
     end,
     commit_self = function(path, message, do_after)
-      dothis.extant_path.do_in_path(
+      dothis.local_extant_path.do_in_path(
         path, 
         "git commit -m" .. transf.string.single_quoted_escaped(message or ("Programmatic commit of " .. path .. " at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
@@ -926,13 +1169,13 @@ dothis = {
     end,
     -- will also add untracked files
     add_all = function(path, do_after)
-      dothis.extant_path.do_in_path(path, "git add -A", do_after)
+      dothis.local_extant_path.do_in_path(path, "git add -A", do_after)
     end,
     add_all_root = function(path, do_after)
       dothis.in_git_dir.add_all(transf.in_git_dir.git_root_dir(path), do_after)
     end,
     commit_staged = function(path, message, do_after)
-      dothis.extant_path.do_in_path(
+      dothis.local_extant_path.do_in_path(
         path, 
         "git commit -m" .. transf.string.single_quoted_escaped(message or ("Programmatic commit of staged files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
@@ -949,7 +1192,7 @@ dothis = {
       end)
     end,
     commit_all_root_no_untracked = function(path, message, do_after)
-      dothis.extant_path.do_in_path(
+      dothis.local_extant_path.do_in_path(
         transf.in_git_dir.git_root_dir(path), 
         "git commit -am" .. transf.string.single_quoted_escaped(message or ("Programmatic commit of all tracked files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
@@ -1017,7 +1260,7 @@ dothis = {
   url_array = {
     open_all = function(url_array)
       for _, url in transf.array.index_value_stateless_iter(url_array) do
-        dothis.url_or_path.open_browser(url)
+        dothis.url_or_local_path.open_browser(url)
       end
     end,
     create_as_url_files = function(url_array, path)
@@ -1199,7 +1442,7 @@ dothis = {
       )
     end,
     open_go_to = function(specifier)
-      dothis.path.open_app(
+      dothis.local_path.open_app(
         transf.path_with_intra_file_locator_specifier.path(specifier),
         env.GUI_EDITOR,
         hs.fnutils.partial(dothis.path_with_intra_file_locator_specifier.go_to, specifier)
@@ -1236,7 +1479,7 @@ dothis = {
   },
   env_string = {
     write_and_check = function(str, path)
-      writeFile(path, str)
+      dothis.absolute_path.write_file(path, str)
       local errors = transf.shellscript_file.gcc_string_errors(path)
       if errors then
         error("env file " .. path .. " has errors:\n" .. errors)
@@ -1259,7 +1502,7 @@ dothis = {
   citable_object_id = {
     save_local_csl_file = function(citable_object_id, indication)
       local csl_table = transf[indication].online_csl_table(citable_object_id)
-      writeFile(
+      dothis.absolute_path.write_file(
         env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table),
         transf.not_userdata_or_function.json_string(csl_table)
       )
@@ -1267,13 +1510,13 @@ dothis = {
   },
   indicated_citable_object_id = {
     edit_local_csl_file = function(indicated_citable_object_id)
-      dothis.path.open_app(
+      dothis.local_path.open_app(
         transf.indicated_citable_object_id.local_csl_file_path(indicated_citable_object_id),
         env.GUI_EDITOR
       )
     end,
     open_local_citable_object_file = function(indicated_citable_object_id)
-      dothis.path.open(
+      dothis.local_path.open(
         transf.indicated_citable_object_id.local_citable_object_file_path(indicated_citable_object_id)
       )
     end,
@@ -1281,7 +1524,7 @@ dothis = {
   },
   citations_file = {
     write_bib = function(citations_file, path)
-      writeFile(
+      dothis.absolute_path.write_file(
         path,
         transf.citations_file.bib_string(citations_file)
       )
@@ -1371,7 +1614,7 @@ dothis = {
       dothis.absolute_path.create_file(
         transf.omegat_project_dir.source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
       )
-      dothis.path.open(
+      dothis.local_path.open(
         transf.omegat_project_dir.source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
       )
     end,
@@ -1395,7 +1638,7 @@ dothis = {
       runThreaded(generation_tasks, 1, do_after)
     end,
     generate_rechnung_md = function(omegat_project_dir)
-      writeFile(
+      dothis.absolute_path.write_file(
         transf.omegat_project_dir.rechnung_md_path(omegat_project_dir),
         transf.omegat_project_dir.raw_rechnung(omegat_project_dir)
       )
@@ -1427,7 +1670,7 @@ dothis = {
   },
   latex_project_dir = {      
     open_pdf = function(latex_project_dir)
-      dothis.path.open(
+      dothis.local_path.open(
         transf.latex_project_dir.main_pdf_file(latex_project_dir)
       )
     end,
@@ -1569,14 +1812,17 @@ dothis = {
 
   },
   array = {
-    choose_item = function(array, callback)
+    choose_item = function(array, callback, target_item_chooser_item_specifier_name)
       dothis.choosing_hschooser_specifier.choose_identified_item(
-        transf.array.choosing_hschooser_specifier(array),
+        get.array.choosing_hschooser_specifier(array, target_item_chooser_item_specifier_name),
         callback
       )
     end,
     choose_item_and_action = function(array)
       dothis.array.choose_item(array, dothis.any.choose_action)
+    end,
+    choose_item_truncated = function(array, callback)
+      dothis.array.choose_item(array, callback, "truncated_text")
     end,
     pop = function(array)
       local last = array[#array]
@@ -1605,17 +1851,32 @@ dothis = {
     shuffle = bind(table.sort, {a_use, transf["nil"].random_boolean}),
     remove_by_index = table.remove,
     revove_by_item = function(array, item)
+      local index = get.indexable.index_by_item(array, item)
+      if index then
+        dothis.array.remove_by_index(array, index)
+      end
     end,
     insert_at_index = table.insert,
+    move_to_index_by_index = function(array, source_index, target_index)
+      local item = dothis.array.remove_by_index(array, source_index)
+      dothis.array.insert_at_index(array, target_index, item)
+    end,
     move_to_index_by_item = function(array, item, index)
       local source_index = get.indexable.index_by_item(array, item)
       if source_index then
-        local item = dothis.array.remove_by_index(array, source_index)
-        dothis.array.insert_at_index(array, index, item)
+        dothis.array.move_to_index_by_index(array, source_index, index)
       end
     end,
     move_to_front_by_item = function(array, item)
       dothis.array.move_to_index_by_item(array, item, 1)
+    end,
+    move_to_front_or_unshift = function(array, item)
+      local index = get.indexable.index_by_item(array, item)
+      if index then
+        dothis.array.move_to_index_by_index(array, index, 1)
+      else
+        dothis.array.unshift(array, item)
+      end
     end,
     move_to_end_by_item = function(array, item)
       dothis.array.move_to_index_by_item(array, item, #array)
@@ -1740,8 +2001,17 @@ dothis = {
     cycle_loop_playback = function(id)
       dothis.mpv_ipc_socket_id.cycle_inf_no(id, "loop-file")
     end,
+    cycle_pause = function(id)
+      dothis.mpv_ipc_socket_id.cycle(id, "pause")
+    end,
+    cycle_shuffle = function(id)
+      dothis.mpv_ipc_socket_id.cycle_inf_no(id, "shuffle")
+    end,
     exec = function(id, ...)
       get.ipc_socket_id.response_table_or_nil(id, { command = { ... } })
+    end,
+    stop = function(id)
+      dothis.mpv_ipc_socket_id.exec(id, "stop")
     end,
     set_playlist_index = function(id, index)
       dothis.mpv_ipc_socket_id.set(id, "playlist-pos", index)
@@ -1752,14 +2022,51 @@ dothis = {
     set_playlist_last = function(id)
       dothis.mpv_ipc_socket_id.set(id, "playlist-pos", transf.mpv_ipc_socket_id.playlist_length_int(id))
     end,
-    set_playback_progress_seconds = function(id, seconds)
+    set_playback_seconds = function(id, seconds)
       dothis.mpv_ipc_socket_id.set(id, "time-pos", seconds)
     end,
-    set_playback_progress_percent = function(id, percent)
+    set_playback_percent = function(id, percent)
       dothis.mpv_ipc_socket_id.set(id, "percent-pos", percent)
     end,
-    set_playback_progress_0 = function(id)
-      dothis.mpv_ipc_socket_id.set_playback_progress_seconds(id, 0)
+    set_playback_first = function(id)
+      dothis.mpv_ipc_socket_id.set_playback_seconds(id, 0)
+    end,
+    set_playback_seconds_relative = function(id, seconds)
+      dothis.mpv_ipc_socket_id.set_playback_seconds(
+        id,
+        transf.mpv_ipc_socket_id.playback_seconds_int(id) + seconds
+      )
+    end,
+    set_chapter = function(id, chapter)
+      dothis.mpv_ipc_socket_id.set(id, "chapter", chapter)
+    end,
+    chapter_backwards = function(id)
+      dothis.mpv_ipc_socket_id.set_chapter(
+        id,
+        transf.ipc_socket_id.chapter_int(id) - 1
+      )
+    end,
+    chapter_forwards = function(id)
+      dothis.mpv_ipc_socket_id.set_chapter(
+        id,
+        transf.ipc_socket_id.chapter_int(id) + 1
+      )
+    end,
+    playlist_backwards = function(id)
+      dothis.mpv_ipc_socket_id.set_playlist_index(
+        id,
+        transf.ipc_socket_id.playlist_index_int(id) - 1
+      )
+    end,
+    playlist_forwards = function(id)
+      dothis.mpv_ipc_socket_id.set_playlist_index(
+        id,
+        transf.ipc_socket_id.playlist_index_int(id) + 1
+      )
+    end,
+    restart = function(id)
+      dothis.mpv_ipc_socket_id.set_playlist_first(id)
+      dothis.mpv_ipc_socket_id.set_playback_first(id)
     end,
   },
   stream_creation_specifier = {
@@ -1858,10 +2165,81 @@ dothis = {
       end
       return res
     end,
+    create_or_recreate_all = function (arr, creation_specifier_arr)
+      hs.fnutils.each(creation_specifier_arr, function(creation_specifier)
+        dothis.created_item_specifier_array.create_or_recreate(arr, creation_specifier)
+      end)
+    end
+  },
+  hotkey_created_item_specifier_array = {
+    create_or_recreate_all = function (arr, key_partial_creation_specifier_dict)
+      local creation_specifier_arr = get.table_of_assoc_arrs.array_of_assoc_arrs(key_partial_creation_specifier_dict, "key")
+      dothis.created_item_specifier_array.create_or_recreate_all(
+        arr,
+        creation_specifier_arr
+      )
+    end
   },
   stream_created_item_specifier = {
     set_state_transitioned_state = function(spec)
       spec.inner_item.state = transf.stream_created_item_specifier.transitioned_stream_state(spec)
+    end,
+    cycle_loop_playlist = function(spec)
+      return dothis.mpv_ipc_socket_id.cycle_loop_playlist(spec.inner_item.ipc_socket_id)
+    end,
+    cycle_loop_playback = function(spec)
+      return dothis.mpv_ipc_socket_id.cycle_loop_playback(spec.inner_item.ipc_socket_id)
+    end,
+    exec = function(spec, ...)
+      return dothis.mpv_ipc_socket_id.exec(spec.inner_item.ipc_socket_id, ...)
+    end,
+    set_playlist_index = function(spec, index)
+      return dothis.mpv_ipc_socket_id.set_playlist_index(spec.inner_item.ipc_socket_id, index)
+    end,
+    set_playlist_first = function(spec)
+      return dothis.mpv_ipc_socket_id.set_playlist_first(spec.inner_item.ipc_socket_id)
+    end,
+    set_playlist_last = function(spec)
+      return dothis.mpv_ipc_socket_id.set_playlist_last(spec.inner_item.ipc_socket_id)
+    end,
+    set_playback_seconds = function(spec, seconds)
+      return dothis.mpv_ipc_socket_id.set_playback_seconds(spec.inner_item.ipc_socket_id, seconds)
+    end,
+    set_playback_percent = function(spec, percent)
+      return dothis.mpv_ipc_socket_id.set_playback_percent(spec.inner_item.ipc_socket_id, percent)
+    end,
+    set_playback_seconds_relative = function(spec, seconds)
+      return dothis.mpv_ipc_socket_id.set_playback_seconds_relative(spec.inner_item.ipc_socket_id, seconds)
+    end,
+    set_playback_first = function(spec)
+      return dothis.mpv_ipc_socket_id.set_playback_first(spec.inner_item.ipc_socket_id)
+    end,
+    set_chapter = function(spec, chapter)
+      return dothis.mpv_ipc_socket_id.set_chapter(spec.inner_item.ipc_socket_id, chapter)
+    end,
+    chapter_backwards = function(spec)
+      return dothis.mpv_ipc_socket_id.chapter_backwards(spec.inner_item.ipc_socket_id)
+    end,
+    chapter_forwards = function(spec)
+      return dothis.mpv_ipc_socket_id.chapter_forwards(spec.inner_item.ipc_socket_id)
+    end,
+    restart = function(spec)
+      return dothis.mpv_ipc_socket_id.restart(spec.inner_item.ipc_socket_id)
+    end,
+    cycle_pause = function(spec)
+      return dothis.mpv_ipc_socket_id.cycle_pause(spec.creation_specifier.ipc_socket_id)
+    end,
+    stop = function(spec)
+      return dothis.mpv_ipc_socket_id.stop(spec.creation_specifier.ipc_socket_id)
+    end,
+    playlist_backwards = function(spec)
+      return dothis.mpv_ipc_socket_id.playlist_backwards(spec.creation_specifier.ipc_socket_id)
+    end,
+    playlist_forwards = function(spec)
+      return dothis.mpv_ipc_socket_id.playlist_forwards(spec.creation_specifier.ipc_socket_id)
+    end,
+    cycle_shuffle = function(spec)
+      return dothis.mpv_ipc_socket_id.cycle_shuffle(spec.creation_specifier.ipc_socket_id)
     end,
   },
   stream_created_item_specifier_array = {
@@ -1875,5 +2253,20 @@ dothis = {
       dothis.stream_created_item_specifier_array.set_state_transitioned_state_all(array)
       dothis.stream_created_item_specifier_array.filter_in_place_valid(array)
     end,
+
+  },
+  creation_specifier_array  = {
+    create = function(arr, spec)
+      dothis.array.push(arr, dothis.creation_specifier.create(spec))
+    end,
+  },
+  stream_creation_specifier_array = {
+    create_background_stream = function(arr, spec)
+      local copied_spec = get.table.copy(spec)
+      copied_spec.flag_profile_name = "background"
+      copied_spec.type = "stream"
+      dothis.creation_specifier_array.create(arr, copied_spec)
+    end,
+    create_background_streams = nil -- TODO
   }
 }

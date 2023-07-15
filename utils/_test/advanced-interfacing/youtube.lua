@@ -1,11 +1,11 @@
 -- access and refresh tokens should already exist here, since we ran the oauth2 flow in the previous test, and don't want to test it here
 if mode == "full-test" then
 assert(
-  readFile(env.MAPI .. "/google/access_token") ~= ""
+  transf.file.contents(env.MAPI .. "/google/access_token") ~= ""
 )
 
 assert(
-  readFile(env.MAPI .. "/google/refresh_token") ~= ""
+  transf.file.contents(env.MAPI .. "/google/refresh_token") ~= ""
 )
 
 local playlistItems = rest({

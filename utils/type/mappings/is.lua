@@ -19,11 +19,11 @@ is = {
         and str:find("^%s") == nil
         and str:find("%s$") == nil
     end,
-    number = function(str)
+    number_string = function(str)
       return get.string_or_number.number(str) ~= nil
     end,
-    int = function(str)
-      return is.string.number(str) and is.number.int(get.string_or_number.number(str))
+    int_string = function(str)
+      return is.string.number_string(str) and is.number.int(get.string_or_number.number(str))
     end,
     printable_ascii = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.charset.printable_ascii))
@@ -141,25 +141,18 @@ is = {
     end,
   },
   path = {
-    
-    playable_file = function (path)
-      return get.path.usable_as_filetype(path, "audio") or get.path.usable_as_filetype(path, "video")
-    end,
-    shellscript_file = function(path)
-      return testPath(path, {
-        contents = { _r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" }
-      }) or get.path.usable_as_filetype(path, "shell-script")
-    end,
     has_extension = function(path)
       return transf.path.extension(path) ~= ""
     end,
-    remote = function(path)
-      return not not path:find("^[^/:]-:") 
+    remote_path = function(path)
+      return is.remote_path.labelled_remote_path(path) -- future: or is.remote_path.url_remote_path(path)
     end,
-    dir = bind(testPath, {a_use, "dir"}),
-    file = bind(testPath, {a_use, "not-dir"}),
-    exists = bind(testPath, {a_use, true}),
-    does_not_exist = bind(testPath, {a_use, false}),
+    local_path = function(path)
+      return not is.path.remote_path(path)
+    end,
+    absolute_path = function(path)
+      return is.path.local_absolute_path(path) or is.path.remote_absolute_path(path)
+    end,
     empty_dir = function(path)
       return testPath(path, {
         dirness = "dir",
@@ -172,30 +165,100 @@ is = {
         contents = true
       })
     end,
-    tilde_absolute_path = function(path)
-      return stringy.startswith(path, "~/")
-    end,
-    true_absolute_path = function(path)
-      return stringy.startswith(path, "/")
-    end,
-    absolute_path = function(path)
-      return is.path.tilde_absolute_path(path) or is.path.true_absolute_path(path)
-    end,
     volume = function(path)
       return stringy.startswith(path, "/Volumes/")
-    end,
-    email_file = function(path)
-     return 
-      get.path.is_extension(path, "eml") or 
-      transf.path.parent_leaf(path) == "new" or
-      transf.path.parent_leaf(path == "cur")
     end,
     path_with_intra_file_locator = function(path)
       return eutf8.find(transf.path.leaf(path), ":%d+$") ~= nil
     end,
   },
+  remote_path = {
+    labelled_remote_path = function(path)
+      return not not path:find("^[^/:]-:/") 
+    end,
+    -- url_remote_path = is.string.url,
+    remote_absolute_path = transf["nil"]["true"] -- remote paths are always absolute
+  },
+  remote_absolute_path = {
+    remote_extant_path = function(path)
+      return is.labelled_remote_absolute_path.labelled_remote_extant_path(path)
+    end,
+  },
+  labelled_remote_absolute_path = {
+    labelled_remote_extant_path = function(path)
+      return pcall(run, "rclone ls " .. transf.string.single_quoted_escaped(path))
+    end,
+  },
+  remote_extant_path = {
+    remote_dir = function(path)
+      return is.labelled_remote_extant_path.labelled_remote_dir(path)
+    end,
+    remote_file = function(path)
+      return not is.path.remote_dir(path)
+    end,
+  },
+  labelled_remote_extant_path = {
+    labelled_remote_dir = function(path)
+      return pcall(runJSON,{
+        args = {"rclone", "lsjson", "--stat", {value = path, type = "quoted"}},
+        key_that_contains_payload = "IsDir"
+      })
+    end,
+    labelled_remote_file = function(path)
+      return not is.path.labelled_remote_dir(path)
+    end,
+  },
+  local_path = {
+    local_tilde_absolute_path = function(path)
+      return stringy.startswith(path, "~/")
+    end,
+    local_true_absolute_path = function(path)
+      return stringy.startswith(path, "/")
+    end,
+    local_absolute_path = function(path)
+      return is.path.local_tilde_absolute_path(path) or is.path.local_true_absolute_path(path)
+    end,
+  },
+  local_absolute_path = {
+    local_extant_path = function(path)
+      local file = io.open(path, "r")
+      pcall(io.close, file)
+      return file ~= nil
+    end,
+    local_nonextant_path = function(path)
+      return not is.path.local_extant_path(path)
+    end,
+  },
+  local_extant_path = {
+    local_dir = function(path)
+      return not not hs.fs.chdir(path)
+    end,
+    local_file = function(path)
+      return not is.path.local_dir(path)
+    end,
+  },
+  absolute_path = {
+    extant_path = function(path)
+      return is.remote_absolute_path.remote_extant_path(path) or is.local_absolute_path.local_extant_path(path)
+    end,
+    nonextant_path = function(path)
+      return not is.path.extant_path(path)
+    end,
+    dir = function(path)
+      return is.absolute_path.file(path) and is.extant_path.dir(path)
+    end,
+    file = function(path)
+      return is.absolute_path.file(path) and is.extant_path.file(path)
+    end,
+  
+  },
   extant_path = {
-    
+    dir = function(path)
+      return is.remote_extant_path.remote_dir(path) or is.local_extant_path.local_dir(path)
+    end,
+    file = function(path)
+      return not is.path.extant_dir(path)
+    end,
   },
   dir = {
     git_root_dir = function(path)
@@ -207,7 +270,7 @@ is = {
     
     grandparent_dir = function (path)
       return get.array.some_pass(
-        transf.dir.children_array(path),
+        transf.dir.children_absolute_path_array(path),
         is.path.dir
       )
     end
@@ -219,6 +282,25 @@ is = {
     has_unpushed_commits = function(path)
       return #transf.in_git_dir.unpushed_commit_hash_list(path) > 0
     end,
+  },
+  file = {
+    plaintext_file = function(path)
+      error("TODO")
+    end,
+    playable_file = function (path)
+      return get.path.usable_as_filetype(path, "audio") or get.path.usable_as_filetype(path, "video")
+    end,
+    shellscript_file = function(path)
+      return testPath(path, {
+        contents = { _r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" }
+      }) or get.path.usable_as_filetype(path, "shell-script")
+    end,
+    email_file = function(path)
+      return 
+       get.path.is_extension(path, "eml") or 
+       transf.path.parent_leaf(path) == "new" or
+       transf.path.parent_leaf(path == "cur")
+     end,
   },
   shellscript_file = {
     errors = function(path)
@@ -255,6 +337,9 @@ is = {
     end,
     youtube_channel_id = function(str)
       return stringy.startswith(str, "UC") and #str == 24
+    end,
+    pass_item_name = function(str)
+      return get.extant_path.find_descendant_with_filename(env.MPASS, str)
     end,
   },
   url = {
@@ -366,21 +451,29 @@ is = {
       return is.any.table(val) and is.table.empty_Table(val)
     end,
   },
-  pass_name = {
-    password = function(name)
-      return get.pass.exists("passw", name)
+  pass_item_name = {
+    passw_pass_item_name = function(name)
+      return get.pass_item_name.exists_as(name, "passw")
     end,
-    username = function(name)
-      return get.pass.exists("username", name, "txt")
+    username_pass_item_name = function(name)
+      return get.pass_item_name.exists_as(name, "username", "txt")
     end,
-    recovery = function(name)
-      return get.pass.exists("recovery", name)
+    recovery_pass_item_name = function(name)
+      return get.pass_item_name.exists_as(name, "recovery")
     end,
-    otp = function(name)
-      return get.pass.exists("otp", name)
+    otp_pass_item_name = function(name)
+      return get.pass_item_name.exists_as(name, "otp")
     end,
-    security_question = function(name)
-      return get.pass.exists("secq", name)
+    secq_pass_item_name = function(name)
+      return get.pass_item_name.exists_as(name, "secq")
+    end,
+    login_pass_item_name = function(name)
+      return 
+        is.pass_item_name.passw_pass_item_name(name) or
+        is.pass_item_name.username_pass_item_name(name) or
+        is.pass_item_name.recovery_pass_item_name(name) or
+        is.pass_item_name.otp_pass_item_name(name) or
+        is.pass_item_name.secq_pass_item_name(name)
     end,
 
 
@@ -427,6 +520,9 @@ is = {
     created_item_specifier = function(t)
       return
         t.created_item and t.creation_specifier
+    end,
+    date = function(t)
+      return type(t.addyears) == "function" -- arbitrary prop of date object
     end,
     native_table = function(t)
       return not t.isovtable
@@ -503,17 +599,71 @@ is = {
         is.any.string
       )
     end,
-    array_of_interfaces = function(array)
+    array_of_arrays = function(array)
       return get.array.all_pass(
         array,
-        is.any.is_interface
+        is.any.array
       )
-    end,
-    not_array_of_interfaces = function(array)
-      return not is.array.array_of_interfaces(array)
     end,
     pair = function(array)
       return #array == 2
+    end,
+  },
+  string_array = {
+    path_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.string.path
+      )
+    end,
+  },
+  path_array = {
+    absolute_path_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.path.absolute_path
+      )
+    end,
+  },
+  absolute_path_array = {
+    extant_path_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.absolute_path.file
+      )
+    end,
+  },
+  extant_path_array = {
+    dir_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.extant_path.dir
+      )
+    end,
+    file_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.extant_path.file
+      )
+    end,
+  },
+  dir_array = {
+    git_root_dir_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.dir.git_root_dir
+      )
+    end,
+  },
+  git_root_dir_array = {
+
+  },
+  file_array = {
+    plaintext_file_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.file.plaintext_file
+      )
     end,
   },
   mpv_ipc_socket_id = {

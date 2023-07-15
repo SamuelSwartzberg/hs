@@ -257,7 +257,7 @@ local file = env.TMPDIR .. "/async_test/" .. os.time()
 local runres = run("echo -n 'hello world' > " .. file, true)
 
 hs.timer.doAfter(1, function()
-  assertMessage(readFile(file, "error"), "hello world")
+  assertMessage(transf.file.contents(file, "error"), "hello world")
 end)
 
 -- async with callback

@@ -7,7 +7,7 @@ BinaryFileItemSpecifier = {
         return get.path.usable_as_filetype(self:get("c"), "db")
       end,
       ["is-playable-file"] = function (self)
-        return is.path.playable_file(self:get("c"))
+        return is.file.playable_file(self:get("c"))
       end
     },
     doThisables = {

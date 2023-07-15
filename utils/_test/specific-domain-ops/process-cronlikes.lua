@@ -123,4 +123,4 @@ assertMessage(
   }
 )
 
-delete(tmp_file_path)
+dothis.absolute_path.delete

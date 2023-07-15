@@ -73,14 +73,14 @@ SignalItemSpecifier = {
       --- @param self ItemSpecifier
       --- @param do_after function
       ["generate-backup"] = function(self, do_after)
-        delete(env.TMP_SIGNAL_EXPORT_PARENT, "dir", "empty")
+        dothis.absolute_path.empty_dir(env.TMP_SIGNAL_EXPORT_PARENT)
         run({
           "sigtop",
           "export-messages",
           "-f", "json",
           { value = "$TMP_SIGNAL_EXPORT_PARENT", type = "quoted" }
         },  function()
-          delete(env.TMP_SIGNAL_EXPORT_MEDIA_PARENT, "dir", "empty")
+          dothis.absolute_path.empty_dir(env.TMP_SIGNAL_EXPORT_MEDIA_PARENT)
           run(
             { 
               args = {

@@ -87,17 +87,17 @@ local gen_cache_methods = {
     end,
     get = function(fnid, opts_as_str, params, opts)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, params)
-      local raw_cnt = readFile(cache_path)
+      local raw_cnt = transf.file.contents(cache_path)
       if not raw_cnt then return nil end
       return json.decode(raw_cnt)
     end,
     reset = function(fnid, opts_as_str)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str)
-      delete(cache_path)
+      dothis.absolute_path.delete
     end,
     get_created_time = function(fnid, opts_as_str)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
-      return get.string_or_number.number(readFile(cache_path)) or os.time() -- if the file doesn't exist, return the current time
+      return get.string_or_number.number(transf.file.contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
     end,
     set_created_time = function(fnid, opts_as_str, created_time)
       writeFile(getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~"), tostring(created_time), "any", true)
@@ -245,14 +245,14 @@ function purgeCache(fn_or_fnid, mode)
   mode = mode or "fs"
   if fn_or_fnid then
     if mode == "fs" then
-      delete(env.XDG_CACHE_HOME .. "/fsmemoize/" .. fn_or_fnid)
+      dothis.absolute_path.delete
     else
       local fnid = identifier(fn_or_fnid)
       memstore[fnid] = nil
     end
   else
     if mode == "fs" then
-      delete(env.XDG_CACHE_HOME .. "/fsmemoize", "dir", "empty")
+      dothis.absolute_path.empty_dir(env.XDG_CACHE_HOME .. "/fsmemoize")
     else
       memstore = {}
     end
