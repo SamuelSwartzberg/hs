@@ -407,7 +407,7 @@ dothis = {
   },
   string = {
     generate_qr_png = function(data, path)
-      if not testPath(path) then
+      if not is.path.extant_path(path) then
         run("qrencode -l M -m 2 -t PNG -o" .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(data))
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
     end,
@@ -1273,7 +1273,7 @@ dothis = {
     end,
     create_as_session = function(url_array, root)
       local path = transf.extant_path.prompted_file_relative_to(root)
-      path = mustEnd(path, ".session")
+      path = get.string.with_suffix_string(path, ".session")
       dothis.absolute_path.write_file(
         path,
         transf.url_array.session_string(url_array)

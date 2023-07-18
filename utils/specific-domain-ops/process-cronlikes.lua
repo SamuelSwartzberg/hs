@@ -57,7 +57,7 @@ end
 --- @param filename string
 --- @return cronlikeSpec[]
 function processCronlikeFile(filename)
-  local basename = pathSlice(filename, "-1:-1")[1]
+  local basename = transf.path.leaf(filename)
   local command = replace(
     table.concat(
       map(

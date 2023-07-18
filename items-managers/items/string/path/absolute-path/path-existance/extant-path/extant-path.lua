@@ -6,22 +6,12 @@ ExtantPathItemSpecifier = {
       -- ["is-category-date-dir-structure-contained-item"] = function(self)
       --   return stringy.startswith(self:get("completely-resolved-path"), env.MDIARY) -- currently the only category-date-dir-structure-root is env.MDIARY, and this check is far cheaper then the alternative, so we'll use it for now
       -- end, 
-      ["is-dir"] = function(self) return testPath(self:get("c"), "dir") end,
-      ["is-file"] = function(self) return not self:get("is-dir") end, 
       ["is-dated-extant-path"] = function(self) 
-        local path_leaf = pathSlice(self:get("completely-resolved-path", "-1:-1"))[1]
+        local path_leaf = transf.path.leaf(self:get("completely-resolved-path")[1])
         return 
           path_leaf:match("^(.-)%-%-") 
           or path_leaf:match("^(%d[^%%]+)") 
       end, 
-      ["is-in-git-dir-path"] = function(self) 
-        return find(
-          getItemsForAllLevelsInSlice(self:get("c"), "1:-1", { include_files = false }),
-          function(item)
-            return stringy.endswith(item, ".git")
-          end
-        )
-      end,
     },
     doThisables = {
       ["cd-and-run-this-task"] = function(self, task)

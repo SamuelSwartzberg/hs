@@ -2,24 +2,6 @@
 
 refstore = {
   params = {
-    path_slice = {
-      opts = {
-        ext_sep = {
-          ext_sep = true
-        },
-        rejoin_at_end = {
-          rejoin_at_end = true
-        },
-        sep_rejoin = {
-          ext_sep = true,
-          rejoin_at_end = true
-        },
-        sep_standartize = {
-          ext_sep = true,
-          standartize_ext = true
-        },
-      }
-    },
     map = {
       opts = {
         kv_to_list = {args = "kv", ret = "v", tolist = true}

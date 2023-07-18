@@ -66,7 +66,7 @@ function promptPathInner(prompt_args)
   prompt_args.allowed_file_types     = get.any.default_if_nil(prompt_args.allowed_file_types, {})
   prompt_args.resolves_aliases       = get.any.default_if_nil(prompt_args.resolves_aliases, true)
 
-  prompt_args.default = transf.string.path_resolved(prompt_args.default, true) -- resolve the path ourself, to be sure & remain in control
+  prompt_args.default = hs.fs.pathToAbsolute(prompt_args.default, true) -- resolve the path ourself, to be sure & remain in control
 
   -- show prompt
 

@@ -48,36 +48,6 @@ function pathSlice(path, spec, opts)
     end
   end
 
-  -- handle special case of also slicing the extension
-  -- both relevant if we want to actually separate the extension or if we want to standartize it
-  if (opts.ext_sep or opts.standartize_ext) and not path_is_empty then
-    local leaf = dothis.array.pop(raw_path_components)
-    local without_extension = ""
-    local extension = ""
-    if leaf == "" then
-      -- already both empty, nothing to do
-    elseif stringy.startswith(leaf, ".") then -- dotfile
-      without_extension = leaf
-    elseif stringy.endswith(leaf, ".") then -- file that ends with a dot, does not count as having an extension
-      without_extension = leaf
-    elseif not stringy.find(leaf, ".") then
-      without_extension = leaf
-    else -- in case of multiple dots, everything after the last dot is considered the extension
-      without_extension, extension = eutf8.match(leaf, transf.string.whole_regex(mt._r_lua.without_extension_and_extension))
-    end
-
-    if opts.standartize_ext then
-      extension = normalize.extension[extension] or extension
-    end
-
-    if opts.ext_sep then
-      dothis.array.push(raw_path_components, without_extension)
-      dothis.array.push(raw_path_components, extension)
-    else
-      dothis.array.push(raw_path_components, without_extension .. "." .. extension)
-    end
-  end
-
   -- slice
 
   local res, eff_slice_spec =  memoize(
@@ -119,19 +89,7 @@ function pathSlice(path, spec, opts)
     end
   elseif opts.entire_path_for_each then
     if opts.ext_sep then error("Getting entire path for each component when treating filename and extension as separate components is difficult and thus currently not supported") end
-    for i, v in transf.array.index_value_stateless_iter(res) do
-      for rawi, rawv in transf.array.index_value_stateless_iter(raw_path_components) do
-        if rawv == v then
-          local relevant_path_components = slice(raw_path_components, { start = 1, stop = rawi })
-          if started_with_slash then
-            table.insert(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
-          end
-          res[i] = table.concat(relevant_path_components, "/")
-          break
-        end
-      end
-    end
-    return res
+    
   else
     return res
   end

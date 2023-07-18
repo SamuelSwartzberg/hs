@@ -10,14 +10,14 @@ function writeFile(path, contents, condition, create_path, mode, fail)
   condition = get.any.default_if_nil(condition, "any")
   create_path = get.any.default_if_nil(create_path, true)
   mode = get.any.default_if_nil(mode, "w")
-  path = transf.string.path_resolved(path, true)
+  path = hs.fs.pathToAbsolute(path, true)
   fail = get.any.default_if_nil(fail, "nil")
 
   local path_is_remote = is.path.remote_path(path)
 
-  local parent_path = pathSlice(path, {start = 1, stop = -2}, {rejoin_at_end = true})
+  local parent_path = 
 
-  if not testPath(parent_path) then -- if the parent path doesn't exist, we won't be able to write to the file
+  if not is.path.extant_path(parent_path) then -- if the parent path doesn't exist, we won't be able to write to the file
     if create_path then -- if we're allowed to create the parent path, do so
       dothis.absolute_path.create_dir(parent_path)
     else -- otherwise, fail by returning nil
@@ -33,7 +33,7 @@ function writeFile(path, contents, condition, create_path, mode, fail)
 
   -- check if existance matches condition, and if not fail by returning nil
 
-  local path_exists = testPath(path)
+  local path_exists = is.path.extant_path(path)
   if path_exists then
     if condition == "not-exists" then
       if fail == "error" then

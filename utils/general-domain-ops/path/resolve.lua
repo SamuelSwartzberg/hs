@@ -52,29 +52,29 @@ function resolve(opts)
   -- clean paths
 
   if opts.s.path then
-    opts.s.path = mustNotStart(opts.s.path, opts.s.prefix)
-    opts.s.path = mustNotEnd(opts.s.path, opts.s.suffix)
+    opts.s.path = get.string.no_prefix_string(opts.s.path, opts.s.prefix)
+    opts.s.path = get.string.no_suffix_string(opts.s.path, opts.s.suffix)
   end
 
   if opts.t.path then
-    opts.t.path = mustNotStart(opts.t.path, opts.t.prefix)
-    opts.t.path = mustNotEnd(opts.t.path, opts.t.suffix)
+    opts.t.path = get.string.no_prefix_string(opts.t.path, opts.t.prefix)
+    opts.t.path = get.string.no_suffix_string(opts.t.path, opts.t.suffix)
   end
 
   -- clean roots
 
   if opts.s.root and opts.s.root ~= "" then
-    opts.s.root = mustEnd(opts.s.root, "/")
+    opts.s.root = get.string.with_suffix_string(opts.s.root, "/")
   end
 
   if opts.t.root and opts.t.root ~= "" then
-    opts.t.root = mustEnd(opts.t.root, "/")
+    opts.t.root = get.string.with_suffix_string(opts.t.root, "/")
   end
 
   -- init source vars
 
-  local source_relative_path = mustNotStart(opts.s.path, opts.s.root)
-  source_relative_path = mustNotStart(source_relative_path, "/")
+  local source_relative_path = get.string.no_prefix_string(opts.s.path, opts.s.root)
+  source_relative_path = get.string.no_prefix_string(source_relative_path, "/")
   source = opts.s.root .. source_relative_path
 
   if not opts.t.path then -- use at least relative path from source 
@@ -84,8 +84,8 @@ function resolve(opts)
       target = opts.t.root .. source_relative_path
     end
   else -- use at least relative path from target 
-    local target_relative_path = mustNotStart(opts.t.path, opts.t.root or "")
-    target_relative_path = mustNotStart(target_relative_path, "/")
+    local target_relative_path = get.string.no_prefix_string(opts.t.path, opts.t.root or "")
+    target_relative_path = get.string.no_prefix_string(target_relative_path, "/")
     if opts.t.root then -- use relative path and root from target
       target = opts.t.root .. target_relative_path
     else -- use relative path from target and root from source
@@ -95,10 +95,10 @@ function resolve(opts)
 
   -- readd prefixes and suffixes to results
 
-  source = mustStart(source, opts.s.prefix)
-  source = mustEnd(source, opts.s.suffix)
-  target = mustStart(target, opts.t.prefix)
-  target = mustEnd(target, opts.t.suffix)
+  source = get.string.with_prefix_string(source, opts.s.prefix)
+  source = get.string.with_suffix_string(source, opts.s.suffix)
+  target = get.string.with_prefix_string(target, opts.t.prefix)
+  target = get.string.with_suffix_string(target, opts.t.suffix)
 
   return source, target
 end

@@ -49,7 +49,7 @@ do
 
   local remoteFileContents = transf.file.contents(remoteFile, "error")
   assertMessage(remoteFileContents, "This is a test file for move action.")
-  assertMessage(testPath(localFile), false)
+  assertMessage(is.path.extant_path(localFile), false)
 
   dothis.absolute_path.delete_dir
   dothis.absolute_path.delete_dir

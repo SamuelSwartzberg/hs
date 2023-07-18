@@ -129,7 +129,7 @@ get = {
     parseable_format_specifier = function()
       return table.concat(
         map(
-          mt._list.khal.parseable_format_components,
+          mt._list.khal.parseable_format_component_array,
           {_f ="{%s}"}
         ), mt._contains.unique_field_separator
       ) .. mt._contains.unique_record_separator
@@ -217,9 +217,6 @@ get = {
       return CALENDAR_TEMPLATE_SPECIFIER
     end
   },
-  pandoc = {
-    full_md_extension_set = 
-  }, 
   pass_item_name = {
     value = function(item, type)
       return memoize(run, refstore.params.memoize.opts.invalidate_1_day)("pass show " .. type .. "/" .. item)
@@ -228,7 +225,7 @@ get = {
       return env.PASSWORD_STORE_DIR .. "/" .. type .. "/" .. item .. "." .. (ext or "gpg")
     end,
     exists_as = function(item, type, ext)
-      return testPath(get.pass_item_name.path(item, type, ext))
+      return is.absolute_path.extant_path(get.pass_item_name.path(item, type, ext))
     end,
     json = function(item, type)
       return runJSON("pass show " .. type .. "/" .. item)
@@ -671,6 +668,36 @@ get = {
     starts_ends = function(str, start, ends)
       return transf.string.startswith(str, start) and transf.string.endswith(str, ends)
     end,
+    no_prefix_string = function(str, prefix)
+      if stringy.startswith(str, prefix) then
+        return str:sub(#prefix + 1)
+      else
+        return str
+      end
+    end,
+    no_suffix_string = function(str, suffix)
+      if stringy.endswith(str, suffix) then
+        return str:sub(1, #str - #suffix)
+      else
+        return str
+      end
+    end,
+    with_prefix_string = function(str, prefix)
+      if stringy.startswith(str, prefix) then
+        return str
+      else
+        return prefix .. str
+      end
+    end,
+    with_suffix_string = function(str, suffix)
+      if stringy.endswith(str, suffix) then
+        return str
+      else
+        return str .. suffix
+      end
+    end,
+
+
   },
   string_or_styledtext = {
     styledtext_ignore_styled = function(str, styledtext_attributes_specifier)
@@ -782,7 +809,7 @@ get = {
   },
   path = {
     usable_as_filetype = function(path, filetype)
-      path = transf.string.path_resolved(path)
+      path = hs.fs.pathToAbsolute(path)
       local extension = pathSlice(path, "-1:-1", { ext_sep = true, standartize_ext = true })[1]
       if find(mt._list.filetype[filetype], extension) then
         return true
@@ -800,7 +827,7 @@ get = {
       return transf.path.extension(path) == ext
     end,
     is_standartized_extension = function(path, ext)
-      return transf.path.standartized_extension(path) == ext
+      return transf.path.normalized_extension(path) == ext
     end,
     is_filename = function(path, filename)
       return transf.path.filename(path) == filename
@@ -814,13 +841,150 @@ get = {
         app_name
       )
     end,
+    sliced_path_component_array = function(path, spec)
+      local path_component_array = transf.path.path_component_array(path)
+      return slice(path_component_array, spec)
+    end,
+    sliced_path_segment_array = function(path, spec)
+      local path_segment_array = transf.path.path_segment_array(path)
+      return slice(path_segment_array, spec)
+    end,
+    path_from_sliced_path_component_array = function(path, spec)
+      local sliced_path_component_array = transf.path.sliced_path_component_array(path, spec)
+      dothis.array.push(sliced_path_component_array, "")
+      return table.concat(sliced_path_component_array, "/")
+    end,
+    path_from_sliced_path_segment_array = function(path, spec)
+      local sliced_path_segment_array = transf.path.sliced_path_segment_array(path, spec)
+      dothis.array.push(sliced_path_segment_array, "")
+      local extension = dothis.array.pop(sliced_path_segment_array)
+      local filename = dothis.array.pop(sliced_path_segment_array)
+      local leaf
+      if extension == "" then
+        leaf = filename
+      else
+        leaf = filename .. "." .. extension
+      end
+      if #sliced_path_segment_array == 0 then
+        return leaf
+      else
+        return table.concat(sliced_path_segment_array, "/") .. "/" .. leaf
+      end
+    end,
+    path_array_from_sliced_path_component_array = function(path, spec)
+      local sliced_path_component_array = transf.path.sliced_path_component_array(path, spec)
+      local whole_path_component_array = transf.path.path_component_array(path)
+      local res = {}
+      local started_with_slash = stringy.startswith(path, "/")
+      
+      -- Create a map for quick lookup of the index of each path component
+      local path_component_index_map = {}
+      for rawi, rawv in transf.array.index_value_stateless_iter(whole_path_component_array) do
+        path_component_index_map[rawv] = rawi
+      end
+      
+      for i, v in transf.array.index_value_stateless_iter(sliced_path_component_array) do
+        -- Use the map to find the index of the current path component
+        local rawi = path_component_index_map[v]
+        if rawi then
+          local relevant_path_components = slice(whole_path_component_array, { start = 1, stop = rawi })
+          if started_with_slash then
+            table.insert(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
+          end
+          res[i] = table.concat(relevant_path_components, "/")
+        end
+      end
+      
+      return res
+    end
   },
   absolute_path = {
     relative_path_from = function(path, starting_point)
-      return mustNotStart(path, mustEnd(starting_point, "/"))
+      return get.string.no_prefix_string(path, get.string.with_suffix_string(starting_point, "/"))
     end,
   },
   extant_path = {
+    --- @class itemsInPathOpts
+    --- @field recursion? boolean | integer Whether to recurse into subdirectories, and how much. Default false (no recursion)
+    --- @field include_dirs? boolean Whether to include directories in the returned table. Default true
+    --- @field include_files? boolean Whether to include files in the returned table. Default true
+    --- @field follow_links? boolean Whether to follow symlinks. Default false
+
+    --- @param path string
+    --- @param opts? itemsInPathOpts
+    --- @param is_recursive_call? boolean Whether this is a recursive call. Allows us to avoid some duplicate work.
+    --- @param depth? integer Internal use only. The current depth of recursion.  
+    --- @param seen_paths? string[] Internal use only. A table of paths we have already seen. Used to avoid infinite recursion
+    --- @return string[] #A table of all things in the directory
+    absolute_path_array = function(path, opts, is_recursive_call, depth, seen_paths)
+      if is.absolute_path.file(path) then 
+        if not opts or opts.include_files then
+          return {path}
+        else
+          return {}
+        end
+      end
+    
+      local extant_paths = {}
+      if not is_recursive_call then 
+        if opts == nil then
+          opts = {}
+        end
+        opts.recursion = get.any.default_if_nil(opts.recursion, false)
+        opts.include_dirs = get.any.default_if_nil(opts.include_dirs, true)
+        opts.include_files = get.any.default_if_nil(opts.include_files, true)
+        opts.follow_links = get.any.default_if_nil(opts.follow_links, false)
+      end
+    
+      path = transf.path.ending_with_slash(path)
+    
+      if opts.follow_links then
+        seen_paths = seen_paths or {}
+        local links_resolved_path = hs.fs.pathToAbsolute(path)
+        if get.array.contains(seen_paths, links_resolved_path) then
+          return {}
+        else
+          dothis.array.push(seen_paths, links_resolved_path)
+        end
+      end
+    
+      for file_name in transf.dir.children_absolute_path_value_stateful_iter(path) do
+        if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" then
+          local file_path = path .. get.string.no_suffix_string(file_name, "/")
+          if is.extant_path.dir(file_name) then 
+            if opts.include_dirs then
+              extant_paths[#extant_paths + 1] = file_path
+            end
+            local shouldRecurse = opts.recursion
+            if type(opts.recursion) == "number" then
+              if depth and depth >= opts.recursion then
+                shouldRecurse = false
+              end
+            end
+            if 
+              not opts.follow_links
+              and hs.fs.symlinkAttributes(file_path, "mode") == "link" 
+            then
+              shouldRecurse = false
+            end
+              
+            if shouldRecurse then
+              depth = depth or 0
+              local sub_files = get.extant_path.absolute_path_array(file_path, opts, true, depth + 1, seen_paths)
+              for _, sub_file in transf.array.index_value_stateless_iter(sub_files) do
+                extant_paths[#extant_paths + 1] = sub_file
+              end
+            end
+          else
+            if opts.include_files then
+              extant_paths[#extant_paths + 1] = file_path
+            end
+          end
+        end
+      end
+    
+      return extant_paths
+    end,
     find_self_or_ancestor = function(path, fn)
       local ancestor = path
       while ancestor ~= "/" or ancestor ~= "" do
@@ -837,6 +1001,11 @@ get = {
     find_self_or_ancestor_siblings = function(path, cond, opts)
       return get.extant_path.find_self_or_ancestor(path, function(x)
         return find(transf.dir.children_absolute_path_array(transf.path.parent_path(x)), cond, opts)
+      end)
+    end,
+    find_self_or_ancestor_sibling_with_leaf = function(path, leaf)
+      return get.extant_path.find_self_or_ancestor_siblings(path, function(x)
+        return transf.path.leaf(x) == leaf
       end)
     end,
     cmd_output_from_path = function(path, cmd)
@@ -873,7 +1042,7 @@ get = {
   },
   local_extant_path = {
     attr = function(path, attr)
-      return hs.fs.attributes(transf.string.path_resolved(path, true))[attr]
+      return hs.fs.attributes(hs.fs.pathToAbsolute(path, true))[attr]
     end,
   },
   dir = {
@@ -939,6 +1108,11 @@ get = {
       )
     end,
   },
+  file = {
+    find_contents = function(path, cond, opts)
+      return find(transf.plaintext_file.contents(path), cond, opts)
+    end,
+  },
   plaintext_file = {
     lines_tail = function(path, n)
       return get.string.lines_tail(transf.plaintext_file.contents(path), n)
@@ -968,7 +1142,6 @@ get = {
     find_nocomment_noindent_content_lines = function(path, cond, opts)
       return find(transf.plaintext_file.nocomment_noindent_content_lines(path), cond, opts)
     end,
-
   },
   plaintext_table_file = {
     dict_of_dicts_by_first_element_and_array = function(plaintext_file, arr2)
@@ -1140,7 +1313,7 @@ get = {
   },
   logging_dir = {
     log_path_for_date = function(path, date)
-      return transf.string.path_resolved(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"
+      return hs.fs.pathToAbsolute(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"
     end,
     array_of_arrays_for_date = function(path, date)
       return transf.plaintext_table_file.array_of_array_of_fields(

@@ -14,6 +14,34 @@ thing_name_hierarchy = {
           login_pass_item_name = "leaf"
         }
       }
+    },
+    path = {
+      absolute_path = {
+        extant_path = {
+          dir = {
+            empty_dir = "leaf",
+            nonempty_dir = {
+              grandparent_dir = "leaf",
+            }
+          },
+          file = {
+            empty_file = "leaf",
+            nonempty_file = "leaf"
+          }
+        }
+      },
+      path_with_intra_file_locator = "leaf",
+      volume = "leaf"
+    },
+    local_path = {
+      local_absolute_path = {
+        local_extant_path = {
+          local_dir = {
+            local_empty_dir = "leaf",
+            local_nonempty_dir = "leaf"
+          }
+        }
+      },
     }
   },
   table = {

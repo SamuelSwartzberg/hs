@@ -15,122 +15,122 @@ assertMessage(
 )
 
 assertMessage(
-  transf.string.path_resolved("~/foo/bar", true),
+  hs.fs.pathToAbsolute("~/foo/bar", true),
   env.HOME .. "/foo/bar"
 )
 
 assertMessage(
-  transf.string.path_resolved("~/foo/bar", false),
+  hs.fs.pathToAbsolute("~/foo/bar", false),
   "~/foo/bar"
 )
 
 assertMessage(
-  transf.string.path_resolved("/usr/./bin"),
+  hs.fs.pathToAbsolute("/usr/./bin"),
   "/usr/bin"
 )
 
 assertMessage(
-  transf.string.path_resolved("/usr/././bin"),
+  hs.fs.pathToAbsolute("/usr/././bin"),
   "/usr/bin"
 )
 
 assertMessage(
-  transf.string.path_resolved("/usr/../bin"),
+  hs.fs.pathToAbsolute("/usr/../bin"),
   "/bin"
 )
 
 assertMessage(
-  transf.string.path_resolved("/usr/../../bin"),
+  hs.fs.pathToAbsolute("/usr/../../bin"),
   "/bin"
 )
 
 assertMessage(
-  transf.string.path_resolved("/usr/bin/../.."),
+  hs.fs.pathToAbsolute("/usr/bin/../.."),
   "/"
 )
 
 assertMessage(
-  transf.string.path_resolved("/usr/bin/././"),
+  hs.fs.pathToAbsolute("/usr/bin/././"),
   "/usr/bin"
 )
 
 assertMessage(
-  transf.string.path_resolved("/./foo"),
+  hs.fs.pathToAbsolute("/./foo"),
   "/foo"
 )
 
 assertMessage(
-  transf.string.path_resolved("/././usr/bin"),
+  hs.fs.pathToAbsolute("/././usr/bin"),
   "/usr/bin"
 )
 
 assertMessage(
-  transf.string.path_resolved("/../bar"),
+  hs.fs.pathToAbsolute("/../bar"),
   "/bar"
 )
 
 assertMessage(
-  transf.string.path_resolved("/../../bar"),
+  hs.fs.pathToAbsolute("/../../bar"),
   "/bar"
 )
 
 assertMessage(
-  transf.string.path_resolved("./foo"),
+  hs.fs.pathToAbsolute("./foo"),
   "foo"
 )
 
 assertMessage(
-  transf.string.path_resolved("././foo"),
+  hs.fs.pathToAbsolute("././foo"),
   "foo"
 )
 
 assertMessage(
-  transf.string.path_resolved("../bar"),
+  hs.fs.pathToAbsolute("../bar"),
   "../bar"
 )
 
 assertMessage(
-  transf.string.path_resolved("../../bar"),
+  hs.fs.pathToAbsolute("../../bar"),
   "../../bar"
 )
 
 assertMessage(
-  transf.string.path_resolved("foo/."),
+  hs.fs.pathToAbsolute("foo/."),
   "foo"
 )
 
 assertMessage(
-  transf.string.path_resolved("foo/./."),
+  hs.fs.pathToAbsolute("foo/./."),
   "foo"
 )
 
 assertMessage(
-  transf.string.path_resolved("foo/.."),
+  hs.fs.pathToAbsolute("foo/.."),
   "."
 )
 
 assertMessage(
-  transf.string.path_resolved("foo/../.."),
+  hs.fs.pathToAbsolute("foo/../.."),
   ".."
 )
 
 assertMessage(
-  transf.string.path_resolved("foo/./bar"),
+  hs.fs.pathToAbsolute("foo/./bar"),
   "foo/bar"
 )
 
 assertMessage(
-  transf.string.path_resolved("foo/../foo"),
+  hs.fs.pathToAbsolute("foo/../foo"),
   "foo"
 )
 
 assertMessage(
-  transf.string.path_resolved("foo/./../bar"),
+  hs.fs.pathToAbsolute("foo/./../bar"),
   "bar"
 )
 
 assertMessage(
-  transf.string.path_resolved("foo/.././bar"),
+  hs.fs.pathToAbsolute("foo/.././bar"),
   "bar"
 )
 

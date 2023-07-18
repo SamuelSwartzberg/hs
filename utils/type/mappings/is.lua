@@ -151,25 +151,26 @@ is = {
       return not is.path.remote_path(path)
     end,
     absolute_path = function(path)
-      return is.path.local_absolute_path(path) or is.path.remote_absolute_path(path)
+      return (
+        is.path.remote_path(path) and is.remote_path.remote_absolute_path()
+      ) or (
+        is.path.local_path(path) and is.local_path.local_absolute_path()
+      )
     end,
-    empty_dir = function(path)
-      return testPath(path, {
-        dirness = "dir",
-        contents = false
-      })
-    end,
-    parent_dir = function (path)
-      return testPath(path, {
-        dirness = "dir",
-        contents = true
-      })
+    extant_path = function(path)
+      return is.path.absolute_path(path) and is.absolute_path.extant_path(path)
     end,
     volume = function(path)
       return stringy.startswith(path, "/Volumes/")
     end,
     path_with_intra_file_locator = function(path)
       return eutf8.find(transf.path.leaf(path), ":%d+$") ~= nil
+    end,
+    useless_file_leaf = function(path)
+      return get.array.contains(mt._list.useless_files, transf.path.leaf(path))
+    end,
+    not_useless_file_leaf = function(path)
+      return not is.path.useless_file_leaf(path)
     end,
   },
   remote_path = {
@@ -194,7 +195,7 @@ is = {
       return is.labelled_remote_extant_path.labelled_remote_dir(path)
     end,
     remote_file = function(path)
-      return not is.path.remote_dir(path)
+      return not is.remote_extant_path.remote_dir(path)
     end,
   },
   labelled_remote_extant_path = {
@@ -205,18 +206,45 @@ is = {
       })
     end,
     labelled_remote_file = function(path)
-      return not is.path.labelled_remote_dir(path)
+      return not is.labelled_remote_extant_path.labelled_remote_dir(path)
+    end,
+  },
+  labelled_remote_file = {
+    empty_labelled_remote_file = function(path)
+      local contents = transf.labelled_remote_file.contents(path)
+      return contents == nil or contents == ""
+    end,
+    nonempty_labelled_remote_file = function(path)
+      return not is.labelled_remote_file.empty_labelled_remote_file(path)
+    end,
+  },
+  remote_file = {
+    empty_remote_file = function(path)
+      return is.labelled_remote_file.empty_labelled_remote_file(path)
+    end,
+    nonempty_remote_file = function(path)
+      return is.labelled_remote_file.empty_labelled_remote_file(path)
+    end,
+  },
+  labelled_remote_dir = {
+    empty_labelled_remote_dir = function(path)
+      return transf.labelled_remote_dir.children_absolute_path_value_stateful_iter(path)() == nil
+    end,
+    nonempty_labelled_remote_dir = function(path)
+      return not is.labelled_remote_dir.empty_labelled_remote_dir(path)
+    end,
+  },
+  remote_dir = {
+    empty_remote_dir = function(path)
+      return is.labelled_remote_dir.empty_labelled_remote_dir(path)
+    end,
+    nonempty_remote_dir = function(path)
+      return not is.labelled_remote_dir.empty_labelled_remote_dir(path)
     end,
   },
   local_path = {
-    local_tilde_absolute_path = function(path)
-      return stringy.startswith(path, "~/")
-    end,
-    local_true_absolute_path = function(path)
-      return stringy.startswith(path, "/")
-    end,
     local_absolute_path = function(path)
-      return is.path.local_tilde_absolute_path(path) or is.path.local_true_absolute_path(path)
+      return stringy.startswith(path, "/")
     end,
   },
   local_absolute_path = {
@@ -237,9 +265,30 @@ is = {
       return not is.path.local_dir(path)
     end,
   },
+  local_file = {
+    empty_local_file = function(path)
+      local contents =  transf.local_file.contents(path)
+      return contents == nil or contents == ""
+    end,
+    nonempty_local_file = function(path)
+      return not is.path.empty_local_file(path)
+    end,
+  },
+  local_dir = {
+    empty_local_dir = function(path)
+      return transf.local_dir.children_absolute_path_value_stateful_iter(path)() == nil
+    end,
+    nonempty_local_dir = function(path)
+      return not is.path.empty_local_dir(path)
+    end,
+  },
   absolute_path = {
     extant_path = function(path)
-      return is.remote_absolute_path.remote_extant_path(path) or is.local_absolute_path.local_extant_path(path)
+      return (
+        is.path.remote_path(path) and is.remote_absolute_path.remote_extant_path(path)
+      ) or (
+        is.path.local_path(path) and is.local_absolute_path.local_extant_path(path)
+      )
     end,
     nonextant_path = function(path)
       return not is.path.extant_path(path)
@@ -250,14 +299,24 @@ is = {
     file = function(path)
       return is.absolute_path.file(path) and is.extant_path.file(path)
     end,
+    nonempty_dir = function(path)
+      return is.absolute_path.dir(path) and is.dir.nonempty_dir(path)
+    end,
   
   },
   extant_path = {
     dir = function(path)
-      return is.remote_extant_path.remote_dir(path) or is.local_extant_path.local_dir(path)
+      return (
+        is.path.remote_path(path) and is.remote_extant_path.remote_dir(path)
+      ) or (
+        is.path.local_path(path) and is.local_extant_path.local_dir(path)
+      )
     end,
     file = function(path)
-      return not is.path.extant_dir(path)
+      return not is.extant_path.dir(path)
+    end,
+    in_git_dir = function(path)
+      return get.extant_path.find_self_or_ancestor_sibling_with_leaf(path, ".git")
     end,
   },
   dir = {
@@ -267,13 +326,24 @@ is = {
         {_exactly = ".git"}
       )
     end,
-    
+    empty_dir = function(path)
+      return (
+        is.path.remote_path(path) and is.remote_dir.empty_remote_dir(path)
+      ) or (
+        is.path.local_path(path) and is.local_dir.empty_local_dir(path)
+      )
+    end,
+    nonempty_dir = function(path)
+      return not is.dir.empty_dir(path)
+    end,
+  },
+  nonempty_dir = {
     grandparent_dir = function (path)
       return get.array.some_pass(
         transf.dir.children_absolute_path_array(path),
-        is.path.dir
+        is.absolute_path.dir
       )
-    end
+    end,
   },
   in_git_dir = {
     has_changes = function(path)
@@ -291,9 +361,7 @@ is = {
       return get.path.usable_as_filetype(path, "audio") or get.path.usable_as_filetype(path, "video")
     end,
     shellscript_file = function(path)
-      return testPath(path, {
-        contents = { _r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" }
-      }) or get.path.usable_as_filetype(path, "shell-script")
+      return get.path.usable_as_filetype(path, "shell-script") or get.file.find_contents(path, { _r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" })
     end,
     email_file = function(path)
       return 

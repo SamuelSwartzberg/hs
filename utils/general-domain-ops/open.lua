@@ -35,9 +35,9 @@ function open(opts, do_after)
       path = "https://www.google.com/search?q=" .. transf.string.urlencoded(opts.url)
     end
   elseif opts.host then 
-    path = mustEnd(opts.host, "/")
+    path = get.string.with_suffix_string(opts.host, "/")
     if opts.path then 
-      path = path .. mustNotStart(opts.path, "/")
+      path = path .. get.string.no_prefix_string(opts.path, "/")
     end
     if opts.params then 
       path = path .. "?" .. transf.dict.url_params(opts.params)

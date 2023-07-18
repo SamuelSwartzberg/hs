@@ -31,7 +31,7 @@ DiscordItemSpecifier = {
         local raw_attachments = {}
         
         for _, attachment in transf.array.index_value_stateless_iter(msg.attachments) do
-          local attachment_leaf = pathSlice(attachment.uri, "-1:-1")[1]
+          local attachment_leaf = transf.path.leaf(attachment.uri)
           local attachment_path = self:get("media-dir-for-chat", msg.chat_obj) .. "/" .. attachment_leaf
           table.insert(raw_attachments, attachment_path)
         end

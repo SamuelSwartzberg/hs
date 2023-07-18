@@ -35,8 +35,8 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   -- resolve tilde
 
-  source = transf.string.path_resolved(source, true)
-  target = transf.string.path_resolved(target, true)
+  source = hs.fs.pathToAbsolute(source, true)
+  target = hs.fs.pathToAbsolute(target, true)
 
   -- check if path is remote, customize things accordingly
 
@@ -61,7 +61,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
   -- create (parent) path if necessary
 
   if create_path then
-    if testPath(target, "dir") or into then
+    if is.absolute_path.dir(target) or into then
       dothis.absolute_path.create_dir(target)
     else
       dothis.absolute_path.create_dir(target, "1:-2")
@@ -70,7 +70,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   -- check if target exists, and if return early if it does not match the condition
 
-  if testPath(target) then
+  if is.path.extant_path(target) then
     if condition == "not-exists" then
       return nil
     end
@@ -83,10 +83,10 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
   -- if into, then change target to be the target directory + the leaf of the source
 
   if into then
-    if not testPath(target, "dir") then
+    if not is.absolute_path.dir(target) then
       error("target must be a directory if into is true. Target: " .. target)
     end
-    target = target .. "/" .. pathSlice(source, "-1:-1")[1]
+    target = target .. "/" .. transf.path.leaf(source)
     dothis.absolute_path.create_dir(target, "1:-2")
   end
 
@@ -105,13 +105,13 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
     -- if all_in, then change target to be the target directory + the leaf of the source
     -- this does mean that this doesn't play nice with the `into` option, but I don't think that's a problem
     if all_in then
-      final_target = target .. "/" .. pathSlice(final_source, "-1:-1")[1]
+      final_target = target .. "/" .. transf.path.leaf(final_source)
       dothis.absolute_path.create_dir(final_target, "1:-2")
     end
 
     if not has_remote_path then 
       if action == "copy" then
-        if testPath(final_source, "dir") then
+        if is.absolute_path.dir(final_source) then
           _, err_msg =  dir.clonetree(final_source, final_target)
         else
           _, err_msg  =  file.copy(final_source, final_target)

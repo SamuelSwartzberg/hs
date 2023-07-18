@@ -46,7 +46,7 @@ OmegatProjectDirItemSpecifier = {
             local path = transf.path_leaf_specifier.path({
               date = os.date(tblmap.date_component_name.rfc3339like_dt_format_string["day"]),
               path = env.MDIARY .. "/i_made_this/translations/",
-              ["general-name"] = pathSlice(odt:get("completely-resolved-path"), "-2:-2", { ext_sep = true })[1],
+              ["general-name"] = -- todo filename of odt,
               extension = "odt",
               tag = {
                 client = client,

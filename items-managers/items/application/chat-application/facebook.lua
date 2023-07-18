@@ -27,7 +27,7 @@ FacebookItemSpecifier = {
         for _, attachment_type in transf.array.index_value_stateless_iter({"photos", "videos", "files", "audio_files", "gifs", "share", "sticker", "animated_image_attachments"}) do
           if msg[attachment_type] then
             for _, attachment in transf.array.index_value_stateless_iter(msg[attachment_type]) do
-              local attachment_leaf = pathSlice(attachment.uri, "-1:-1")[1]
+              local attachment_leaf = transf.path.leaf(attachment.uri)
               local attachment_path = self:get("media-dir-for-chat", msg.chat_obj) .. "/" .. attachment_leaf
               table.insert(raw_attachments, attachment_path)
             end
@@ -107,7 +107,7 @@ FacebookItemSpecifier = {
       end,
       ["preprocess-backup-files"] = function()
         for _, subdir in itemsInPath({path = env.TMP_FACEBOOK_EXPORT_PARENT, include_files = false}) do
-          if not find({"photos", "stickers_used"}, pathSlice(subdir, "-1:-1"))[1] then
+          if not find({"photos", "stickers_used"}, transf.path.leaf(subdir)[1]) then
             srctgt("move", subdir, env.MCHATS_GLOBAL_FACEBOOK_MEDIA, "any", true, false, true) dothis.absolute_path.delete(subdir))
           end
         end

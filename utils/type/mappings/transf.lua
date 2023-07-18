@@ -59,34 +59,34 @@ transf = {
   },
   potentially_indicated_binary_string = {
     indicated_binary_string = function(bin)
-      return mustStart(bin, "0b")
+      return get.string.with_prefix_string(bin, "0b")
     end,
     number = function(bin)
-      return get.string_or_number.number(mustNotStart(bin, "0b"), 2)
+      return get.string_or_number.number(get.string.no_prefix_string(bin, "0b"), 2)
     end
   },
   potentially_indicated_octal_string = {
     indicated_octal_string = function(oct)
-      return mustStart(oct, "0o")
+      return get.string.with_prefix_string(oct, "0o")
     end,
     number = function(oct)
-      return get.string_or_number.number(mustNotStart(oct, "0o"), 8)
+      return get.string_or_number.number(get.string.no_prefix_string(oct, "0o"), 8)
     end
   },
   potentially_indicated_decimal_string = {
     indicated_decimal_string = function(dec)
-      return mustStart(dec, "0d")
+      return get.string.with_prefix_string(dec, "0d")
     end,
     number = function(dec)
-      return get.string_or_number.number(mustNotStart(dec, "0d"), 10)
+      return get.string_or_number.number(get.string.no_prefix_string(dec, "0d"), 10)
     end
   },
   potentially_indicated_hex_string = {
     indicated_hex_string = function(hex)
-      return mustStart(hex, "0x")
+      return get.string.with_prefix_string(hex, "0x")
     end,
     number = function(hex)
-      return get.string_or_number.number(mustNotStart(hex, "0x"), 16)
+      return get.string_or_number.number(get.string.no_prefix_string(hex, "0x"), 16)
     end
   },
 
@@ -418,32 +418,98 @@ transf = {
     form_path = function(path)
       return "@" .. path
     end,
-    extension = function(path)
-      return pathSlice(path, "-1:-1", refstore.params.path_slice.opts.ext_sep)[1]
+    path_component_array = function(path)
+      if path == "" then
+        return {""}
+      elseif path == "/" then
+        return {"/"}
+      else
+        -- remove leading and trailing slashes
+        if eutf8.sub(path, 1, 1) == "/" then
+          path = eutf8.sub(path, 2)
+        end
+        if eutf8.sub(path, -1) == "/" then
+          path = eutf8.sub(path, 1, -2)
+        end
+
+        -- split into components
+        return get.string.split_single_char(path, "/")
+      end
     end,
-    standartized_extension = function(path)
-      return pathSlice(path, "-1:-1", refstore.params.path_slice.opts.sep_standartize)[1]
+    path_array_of_path_component_array = function(path)
+      return get.path.path_array_from_sliced_path_component_array(
+        get.path.path_component_array(path),
+        {start = 1, stop = -1}
+      )
+    end,
+    path_segments = function(path)
+      local path_components = transf.path.path_component_array(path)
+      local leaf = dothis.array.pop(path_components)
+      local without_extension = ""
+      local extension = ""
+      if leaf == "" then
+        -- already both empty, nothing to do
+      elseif stringy.startswith(leaf, ".") then -- dotfile
+        without_extension = leaf
+      elseif stringy.endswith(leaf, ".") then -- file that ends with a dot, does not count as having an extension
+        without_extension = leaf
+      elseif not stringy.find(leaf, ".") then
+        without_extension = leaf
+      else -- in case of multiple dots, everything after the last dot is considered the extension
+        without_extension, extension = eutf8.match(leaf, transf.string.whole_regex(mt._r_lua.without_extension_and_extension))
+      end
+      dothis.array.push(path_components, without_extension)
+      dothis.array.push(path_components, extension)
+    end,
+    extension = function(path)
+      local psegments = transf.path.path_segments(path)
+     ---@diagnostic disable-next-line: need-check-nil -- path_segments always returns a table with at least two elements for any valid path
+      return psegments[#psegments]
+    end,
+    normalized_extension = function(path)
+      return normalize.extension[
+        transf.path.extension(path)
+      ]
     end,
     no_extension = function(path)
-      return pathSlice(path, "1:-2", refstore.params.path_slice.opts.sep_rejoin)
+      return get.path.path_from_sliced_path_segment_array(
+        get.path.path_segments(path),
+        {start = 1, stop = -2}
+      )
     end,
     filename = function(path)
-      return pathSlice(path, "-2:-2", refstore.params.path_slice.opts.ext_sep)[1]
+      local psegments = transf.path.path_segments(path)
+      dothis.array.pop(psegments)
+      ---@diagnostic disable-next-line: need-check-nil -- path_segments always returns a table with at least two elements for any valid path
+      return psegments[#psegments]
     end,
     ending_with_slash = function(path)
-      return mustEnd(path or "", "/")
+      return get.string.with_suffix_string(path or "", "/")
     end,
     leaf = function(path)
-      return pathSlice(path, "-1:-1")[1]
+      local pcomponents = transf.path.path_component_array(path)
+      return pcomponents[#pcomponents]
     end,
     parent_path = function(path)
-      return pathSlice(path, "1:-2", refstore.params.path_slice.opts.sep_rejoin)
+      return get.path.path_from_sliced_path_component_array(
+        get.path.path_component_array(path),
+        {start = 1, stop = -2}
+      )
     end,
     parent_leaf = function(path)
-      return pathSlice(path, "-2:-2", refstore.params.path_slice.opts.ext_sep)[1]
+      local pcomponents = transf.path.path_component_array(path)
+      dothis.array.pop(pcomponents)
+      return pcomponents[#pcomponents]
     end,
-    ancestor_array = function(path)
-      return pathSlice(path, "1:-2", {entire_path_for_each = true})
+    parent_path_component_array = function(path)
+      return transf.path.path_component_array(
+        transf.path.parent_path(path)
+      )
+    end,
+    parent_path_array_of_path_component_array = function(path)
+      return transf.path.path_array_of_path_component_array(
+        transf.path.parent_path(path)
+      )
     end,
     path_leaf_specifier = function(path)
       local rf3339like_dt_or_interval, general_name, fs_tag_string = transf.leaf.rf3339like_dt_or_interval_general_name_fs_tag_string(transf.path.leaf(path))
@@ -510,6 +576,9 @@ transf = {
     end,
      
   },
+  local_path = {
+    local_absolute_path = hs.fs.pathToAbsolute, -- resolves ~, ., .., and symlinks
+  },
   remote_path = {
 
   },
@@ -518,45 +587,39 @@ transf = {
       return "file://" .. transf.absolute_path.local_absolute_path(path)
     end,
   },
-  local_tilde_absolute_path = {
-    local_true_absolute_path = function(path)
-      return env.HOME .. eutf8.sub(path, 2)
-    end,
-  },
   local_absolute_path = {
-    local_true_absolute_path = function(path)
-      if stringy.startswith(path, "~") then
-        return transf.local_tilde_absolute_path.local_true_absolute_path(path)
-      else
-        return path
-      end
-    end,
+    
   },
   extant_path = {
     sibling_absolute_path_array = function(path)
       return transf.dir.children_absolute_path_array(transf.path.parent_path(path))
     end,
-    descendants_absolute_path_array = function(dir)
-      return itemsInPath({
-        path = dir,
-        recursive = true,
-      })
+    descendants_absolute_path_array = function(path)
+      return get.extant_path.absolute_path_array(
+        path,
+        {recursion = true}
+      )
     end,
-    descendant_file_array = function(dir)
-      return itemsInPath({
-        path = dir,
-        recursive = true,
-        include_dirs = false,
-      })
+    descendant_file_array = function(path)
+      return get.extant_path.absolute_path_array(
+        path,
+        {recursion = true, include_dirs = false}
+      )
     end,
-    descendants_leaves_array = function(dir)
-      return transf.path_array.leaves_array(transf.extant_path.descendants_absolute_path_array(dir))
+    descendant_dir_array = function(path)
+      return get.extant_path.absolute_path_array(
+        path,
+        {recursion = true, include_files = false}
+      )
     end,
-    descendants_filenames_array = function(dir)
-      return transf.path_array.filenames_array(transf.extant_path.descendants_absolute_path_array(dir))
+    descendants_leaves_array = function(path)
+      return transf.path_array.leaves_array(transf.extant_path.descendants_absolute_path_array(path))
     end,
-    descendants_extensions_array = function(dir)
-      return transf.path_array.extensions_array(transf.extant_path.descendants_absolute_path_array(dir))
+    descendants_filenames_array = function(path)
+      return transf.path_array.filenames_array(transf.extant_path.descendants_absolute_path_array(path))
+    end,
+    descendants_extensions_array = function(path)
+      return transf.path_array.extensions_array(transf.extant_path.descendants_absolute_path_array(path))
     end,
     prompted_path_relative_to = function(path)
       return promptPipeline({
@@ -605,7 +668,10 @@ transf = {
     end,
     
   },
-  path_in_home = {
+  local_dir = {
+    children_absolute_path_value_stateful_iter = hs.fs.dir
+  },
+  local_absolute_path_in_home = {
     local_http_server_url = function(path)
       return env.FS_HTTP_SERVER .. path
     end,
@@ -630,6 +696,9 @@ transf = {
     end,
     attachment_string = function(path_array)
       return table.concat(transf.path_array.attachment_array(path_array), "\n")
+    end,
+    useless_file_leaf_filtered_path_array = function(path_array)
+      return hs.fnutils.ifilter(path_array, is.path.not_useless_file_leaf)
     end,
   },
   extant_path_array = {
@@ -657,11 +726,18 @@ transf = {
     filter_git_root_dir_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.dir.git_root_dir)
     end,
+    children_absolute_path_array = function(path_array)
+      return map(
+        path_array,
+        transf.dir.children_absolute_path_array,
+        {flatten = true}
+      )
+    end,
   },
-  remote_absolute_path = {
-    contained_absolute_path_array = function(remote_absolute_path)
+  labelled_remote_dir = {
+    children_absolute_path_array = function(remote_extant_path)
       local output = run({
-        args = {"rclone", "lsf", {value = remote_absolute_path, type = "quoted"}},
+        args = {"rclone", "lsf", {value = remote_extant_path, type = "quoted"}},
         catch = function() return nil end,
       }) 
       if output then
@@ -674,8 +750,21 @@ transf = {
       else
         items = {}
       end
-      return transf.indexable.value_stateful_iter(items)
-    end
+      return items
+    end,
+    children_absolute_path_value_stateful_iter = function(remote_extant_path)
+      return transf.indexable.value_stateful_iter(
+        transf.remote_dir.children_absolute_path_array(remote_extant_path)
+      )
+    end,
+  },
+  remote_dir = {
+    children_absolute_path_array = function(remote_extant_path)
+      return transf.labelled_remote_dir.children_absolute_path_array(remote_extant_path)
+    end,
+    children_absolute_path_value_stateful_iter = function(remote_extant_path)
+      return transf.labelled_remote_dir.children_absolute_path_value_stateful_iter(remote_extant_path)
+    end,
   },
   local_file = {
     contents = function(path)
@@ -710,7 +799,14 @@ transf = {
   },
   dir = {
     children_absolute_path_array = function(dir)
-      return itemsInPath(dir)
+      return get.extant_path.absolute_path_array(dir)
+    end,
+    children_absolute_path_value_stateful_iter = function(dir)
+      if is.path.remote_path(dir) then
+        return transf.remote_dir.children_absolute_path_value_stateful_iter(dir)
+      else
+        return transf.local_dir.children_absolute_path_value_stateful_iter(dir)
+      end
     end,
     children_leaves_array = function(dir)
       return transf.path_array.leaves_array(transf.dir.children_absolute_path_array(dir))
@@ -760,8 +856,8 @@ transf = {
         path,
         "git config --get remote.origin.url"
       )
-      raw = mustNotEnd(raw, ".git")
-      raw = mustNotEnd(raw, "/")
+      raw = get.string.no_suffix_string(raw, ".git")
+      raw = get.string.no_suffix_string(raw, "/")
       return raw
     end,
     remote_owner_item = function(path)
@@ -815,8 +911,8 @@ transf = {
     hooks_dir = function(git_root_dir)
       return transf.path.ending_with_slash(git_root_dir) .. ".git/hooks"
     end,
-    hooks = function(git_root_dir)
-      return itemsInPath(transf.git_root_dir.hooks_dir(git_root_dir))
+    hooks_absolute_path_array = function(git_root_dir)
+      return transf.dir.children_absolute_path_array(transf.git_root_dir.hooks_dir(git_root_dir))
     end,
   },
 
@@ -1118,7 +1214,7 @@ transf = {
       local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
       local outpath = temppath .. "_out"
       run("mmime < " .. transf.string.single_quoted_escaped(temppath) .. " > " .. transf.string.single_quoted_escaped(outpath))
-      dothis.absolute_path.delete
+      dothis.absolute_path.delete(temppath)
       return outpath
     end
   },
@@ -1156,8 +1252,8 @@ transf = {
       dothis.ics_file.generate_json_file(temppath)
       local jsonpath = transf.file.contents(get.path.with_different_extension(temppath, "json"))
       local res = json.decode(transf.file.contents(jsonpath))
-      dothis.absolute_path.delete
-      dothis.absolute_path.delete
+      dothis.absolute_path.delete(temppath)
+      dothis.absolute_path.delete(jsonpath)
       return res
     end,
   },
@@ -3071,7 +3167,7 @@ transf = {
     potentially_atpath_resolved = function(str)
       if stringy.startswith(str, "@") then
         local valpath = eutf8.sub(str, 2)
-        valpath = transf.string.path_resolved(valpath, true)
+        valpath = hs.fs.pathToAbsolute(valpath, true)
         str = "@" .. valpath
       end
       return str
@@ -3874,7 +3970,7 @@ transf = {
       local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
       dothis.table.write_ics_file(t, tmpdir_ics_path)
       local contents = transf.file.contents(tmpdir_ics_path)
-      dothis.absolute_path.delete
+      dothis.absolute_path.delete(tmpdir_ics_path)
       return contents
     end,
     value_set = function(t)
@@ -4181,16 +4277,16 @@ transf = {
         else
           url = "https://"
         end
-        url = url .. mustEnd(comps.host, "/")
+        url = url .. get.string.with_suffix_string(comps.host, "/")
         if comps.endpoint then
-          url = url .. (mustNotStart(comps.endpoint, "/") or "/")
+          url = url .. (get.string.no_prefix_string(comps.endpoint, "/") or "/")
         end   
       end     
       if comps.params then
         if type(comps.params) == "table" then
           url = url .. "?" .. transf.dict.url_params(comps.params)
         else
-          url = url .. mustStart(comps.params, "?")
+          url = url .. get.string.with_prefix_string(comps.params, "?")
         end
       end
       return url
@@ -4228,8 +4324,8 @@ transf = {
   doi_urnlike = {
     pure_doi = function(urnlike)
       doi = urnlike:lower()
-      doi = mustNotStart(urnlike, "urn:")
-      doi = mustNotStart(urnlike, "doi:")
+      doi = get.string.no_prefix_string(urnlike, "urn:")
+      doi = get.string.no_prefix_string(urnlike, "doi:")
       return doi
     end,
     doi_url = function(urnlike)
@@ -5423,7 +5519,7 @@ transf = {
       local parts = stringy.split(url, ":")
       table.remove(parts, 1)
       local rejoined = table.concat(parts, ":")
-      return mustNotStart(rejoined, "//")
+      return get.string.no_prefix_string(rejoined, "//")
     end,
     vdirsyncer_pair_specifier = function(url)
       local name = "webcal_readonly_" .. transf.not_userdata_or_function.md5(url)
@@ -5468,7 +5564,7 @@ transf = {
   },
   owner_item_url = {
     owner_item = function(url)
-      return eutf8.match(transf.url.path(url), "^/([^/]+[^/]+)")
+      return get.path.sliced_path_component_array(transf.url.path(url), "1:2")
     end,
   },
   github_url = {
@@ -5751,7 +5847,7 @@ transf = {
       return non_data_part
     end,
     payload_part = function(data_url)
-      return mustNotStart(transf.url.no_scheme(data_url), transf.data_url.header_part(data_url))
+      return get.string.no_prefix_string(transf.url.no_scheme(data_url), transf.data_url.header_part(data_url))
     end,
       
     raw_type_param_table = function(data_url)
@@ -6004,13 +6100,13 @@ transf = {
         d = action_specifier.d,
       }
       if action_specifier.dothis == nil or action_specifier.dothis == dothis.array.choose_item then
-        cspec.e = mustStart(cspec.e, "👉")
-        cspec.d = mustStart(cspec.d, "ci")
+        cspec.e = get.string.with_prefix_string(cspec.e, "👉")
+        cspec.d = get.string.with_prefix_string(cspec.d, "ci")
       elseif action_specifier.dothis == dothis.any.choose_action then
-        cspec.e = mustStart(cspec.e, "👉👊")
-        cspec.d = mustStart(cspec.d, "c")
+        cspec.e = get.string.with_prefix_string(cspec.e, "👉👊")
+        cspec.d = get.string.with_prefix_string(cspec.d, "c")
       end
-      cspec.d = mustEnd(cspec.d, ".")
+      cspec.d = get.string.with_suffix_string(cspec.d, ".")
       return {text = transf.chooser_item_text_specifier.string(cspec)}
     end
   },

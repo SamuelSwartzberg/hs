@@ -4,58 +4,13 @@ DirItemSpecifier = {
   properties = {
 
     getables = {
-      ["is-parent-dir"] = function(self)
-        return testPath(self:get("c"), {
-          dirness = "dir",
-          contents = true
-        })
-      end, 
-      ["is-empty-dir"] = function(self)
-        return is.extant_path.empty_dir(self:get("c"))
-      end,
-      ["is-dir-by-path"] = function()
-        return true
-      end,
       ["is-logging-dir"] = function(self)
         return stringy.endswith(self:get("resolved-path"), "_logs")
-      end,
-
-      ["path-content-item"] = function(self)
-        return self.root_super
-      end,
-      
-      -- the following methods can be implemented here, even though we don't know yet if we have descendants or only children, since we implement self:get("descendant-string-array") polymorphically, and as such getting 'descendants' actually gets children if there are no descendants
-      ["descendant-string-array"] = function(self) 
-        return ar(self:get("descendants")) end,
-      ["descendant-string-item-array"] = function(self) 
-        return self:get("descendant-string-array"):get("to-string-item-array") 
-      end,
-      ["descendant-file-only-string-item-array"] = function(self)
-        return self:get("descendant-string-item-array"):get("filter-to-array-of-files")
-      end,
-      ["descendant-dir-only-string-item-array"] = function(self)
-        return self:get("descendant-string-item-array"):get("filter-to-array-of-dirs")
       end,
       ["descendants-any-pass"] = function(self, query) return self:get("descendant-string-item-array"):get("some-pass", query) end,
       ["descendants-to-line-array"] = function(self) 
         return self:get("descendant-file-only-string-item-array")
           :get("map-to-line-array-of-file-contents-with-no-empty-strings")
-      end,
-      ["descendant-filename-only-array"] = function(self)
-        return self:get("descendant-string-array"):get("map-to-new-array", function(item)
-          return pathSlice(item, "-2:-2", { ext_sep = true })[1]
-        end)
-      end,
-      ["descendant-filename-only-string-item-array"] = function(self)
-        return self:get("descendant-filename-only-array"):get("to-string-item-array")
-      end,
-      ["find-descendant"] = function(self, func)
-        return find(self:get("descendants"), func)
-      end,
-      ["descendant-ending-with"] = function(self, ending)
-        return self:get("find-descendant", function(item)
-          return stringy.endswith(item, ending)
-        end)
       end,
       ["descendant-ending-with-to-string-item"] = function(self, ending)
         return st(self:get("descendant-ending-with", ending))
@@ -63,7 +18,7 @@ DirItemSpecifier = {
 
       ["find-or-create-child-dir"] = function(self, specifier)
         local child = get.dir.find_child(self:get("c"), specifier.find_func)
-        if child == nil or not testPath(child, "dir") then
+        if child == nil or not is.absolute_path.dir(child) then
           self:doThis("create-empty-dir-in-dir", specifier.default_name)
           child = self:get("parent-dir-path") .. "/" .. specifier.default_name
         end

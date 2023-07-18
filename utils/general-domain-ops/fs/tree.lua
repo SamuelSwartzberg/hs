@@ -9,10 +9,10 @@ function fsTree(path, do_files, tree_files)
   do_files = do_files or "read"
   tree_files = tree_files or {"json", "yaml"}
   local res = {}
-  path = mustEnd(path, "/")
+  path = get.string.with_suffix_string(path, "/")
   for _,full_path in transf.array.index_value_stateless_iter(itemsInPath(path)) do
-    local file = pathSlice(full_path, "-1:-1")[1]
-    if testPath(full_path, "dir") then 
+    local file = transf.path.leaf(full_path)
+    if is.absolute_path.dir(full_path) then 
       res[file] = fsTree(full_path, do_files, tree_files)
     else
       if do_files == "read" then 

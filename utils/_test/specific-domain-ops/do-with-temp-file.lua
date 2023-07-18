@@ -26,4 +26,4 @@ doWithTempFile({ path = test4FileName, contents = test4FileContents }, function(
   
 end)
 
-assertMessage(testPath(test4FileName), false)
+assertMessage(is.path.extant_path(test4FileName), false)
