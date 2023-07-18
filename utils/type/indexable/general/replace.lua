@@ -115,10 +115,10 @@ function replace(thing, opts, globalopts)
           if thing.isovtable then
             parts[1] = ovtable.new() -- due to the check above, we know that we're not overwriting any information. Same for below
           else
-            parts[1] = assoc({})
+            parts[1] = transf.table.determined_assoc_arr_table({})
           end
         else
-          parts[1] = array({})
+          parts[1] = transf.table.determined_array_table({})
         end
       end
     end

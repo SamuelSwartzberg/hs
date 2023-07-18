@@ -34,12 +34,12 @@ assertMessage(
 )
 
 assertMessage(
-  is.any.empty_table(array({})),
+  is.any.empty_table(transf.table.determined_array_table({})),
   true
 )
 
 assertMessage(
-  is.any.empty_table(assoc({})),
+  is.any.empty_table(transf.table.determined_assoc_arr_table({})),
   true
 )
 
@@ -59,12 +59,12 @@ assertMessage(
 )
 
 assertMessage(
-  is.table.empty_unspecified_table(array({})),
+  is.table.empty_unspecified_table(transf.table.determined_array_table({})),
   false
 )
 
 assertMessage(
-  is.table.empty_unspecified_table(assoc({})),
+  is.table.empty_unspecified_table(transf.table.determined_assoc_arr_table({})),
   false
 )
 
@@ -99,22 +99,22 @@ assertMessage(
 )
 
 assertMessage(
-  is.any.array(assoc({})),
+  is.any.array(transf.table.determined_assoc_arr_table({})),
   false
 )
 
 assertMessage(
-  isList(assoc({})),
+  isList(transf.table.determined_assoc_arr_table({})),
   false
 )
 
 assertMessage(
-  is.any.array(array({})),
+  is.any.array(transf.table.determined_array_table({})),
   true
 )
 
 assertMessage(
-  isList(array({})),
+  isList(transf.table.determined_array_table({})),
   true
 )
 

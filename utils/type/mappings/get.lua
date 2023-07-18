@@ -469,7 +469,7 @@ get = {
       return get.array.sorted(list, comp)[#list]
     end,
     revsorted = function(arr, comp)
-      return rev(get.array.sorted(arr, comp))
+      return transf.indexable.reversed_indexable(get.array.sorted(arr, comp))
     end,
     --- @generic T
     --- @param list T[]

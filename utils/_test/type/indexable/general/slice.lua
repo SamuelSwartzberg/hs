@@ -89,10 +89,10 @@ local result2 = slice(test_tbl, 2, 4)
 assertMessage(result2, {"b", "c", "d"})
 
 -- Test 2b: Basic slice on an assoc arr
-local test_assoc = assoc({a = 1, b = 2, c = 3, d = 4, e = 5})
+local test_assoc = transf.table.determined_assoc_arr_table({a = 1, b = 2, c = 3, d = 4, e = 5})
 
 local result2b = slice(test_assoc, 2, 4)
-assertMessage(result2b, assoc({b = 2, c = 3, d = 4}))
+assertMessage(result2b, transf.table.determined_assoc_arr_table({b = 2, c = 3, d = 4}))
 
 -- Test 3: Basic slice with negative indices on a string
 local result3 = slice(test_str, -5, -1)
@@ -104,7 +104,7 @@ assertMessage(result4, {"c", "d", "e"})
 
 -- Test 4b: Basic slice with negative indices on an assoc arr
 local result4b = slice(test_assoc, -3, -1)
-assertMessage(result4b, assoc({c = 3, d = 4, e = 5}))
+assertMessage(result4b, transf.table.determined_assoc_arr_table({c = 3, d = 4, e = 5}))
 
 -- Test 5: Slice with a step on a string
 local result5 = slice(test_str, 1, 10, 2)
@@ -116,7 +116,7 @@ assertMessage(result6, {"a", "c", "e"})
 
 -- Test 6b: Slice with a step on an assoc arr
 local result5b = slice(test_assoc, 1, 5, 2)
-assertMessage(result5b, assoc({a = 1, c = 3, e = 5}))
+assertMessage(result5b, transf.table.determined_assoc_arr_table({a = 1, c = 3, e = 5}))
 
 -- Test 7: Slice using a sliceSpec string on a string
 local result7 = slice(test_str, "1:5")
@@ -128,7 +128,7 @@ assertMessage(result8, {"b", "c", "d"})
 
 -- Test 8b: Slice using a sliceSpec string on an assoc arr
 local result8b = slice(test_assoc, "2:4")
-assertMessage(result8b, assoc({b = 2, c = 3, d = 4}))
+assertMessage(result8b, transf.table.determined_assoc_arr_table({b = 2, c = 3, d = 4}))
 
 -- Test 9: Slice using a conditionSpec on a string
 local result9 = slice(test_str, {start = {_contains = "e"}, stop = 5})
@@ -140,7 +140,7 @@ assertMessage(result10, {"b", "c", "d"})
 
 -- Test 10b: Slice using a conditionSpec on an assoc arr
 local result10b = slice(test_assoc, {start = {_exactly = 2}, stop = 4}) -- the fact that {_exactly = 2} is identical to the index 2 is a coincidence
-assertMessage(result10b, assoc({b = 2, c = 3, d = 4}))
+assertMessage(result10b, transf.table.determined_assoc_arr_table({b = 2, c = 3, d = 4}))
 
 -- Test 11: Slice with a step and negative indices on a string
 local result11 = slice(test_str, -10, -1, 2)
@@ -206,8 +206,8 @@ assertMessage(
 -- indices that are out of bounds for tables, strings, and assoc arrs, empty inputs
 
 assertMessage(
-  slice(array({}), 500, 1),
-  array({})
+  slice(transf.table.determined_array_table({}), 500, 1),
+  transf.table.determined_array_table({})
 )
 
 assertMessage(
@@ -216,18 +216,18 @@ assertMessage(
 )
 
 assertMessage(
-  slice(assoc({}), 500, 1),
-  assoc({})
+  slice(transf.table.determined_assoc_arr_table({}), 500, 1),
+  transf.table.determined_assoc_arr_table({})
 )
 
 assertMessage(
-  slice(array({}), 1, 500),
-  array({})
+  slice(transf.table.determined_array_table({}), 1, 500),
+  transf.table.determined_array_table({})
 )
 
 assertMessage(
-  slice(array({}), 1, 500, 8),
-  array({})
+  slice(transf.table.determined_array_table({}), 1, 500, 8),
+  transf.table.determined_array_table({})
 )
 
 assertMessage(

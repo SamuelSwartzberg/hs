@@ -90,7 +90,7 @@ local ot16_result = replace(
   {
     cond = {_type = "number"}, 
     mode = "replace", 
-    proc = rev, 
+    proc = transf.indexable.reversed_indexable, 
     args = "k",
     ret = "k"
   }

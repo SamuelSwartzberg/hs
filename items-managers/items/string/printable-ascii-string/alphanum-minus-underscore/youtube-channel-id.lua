@@ -15,7 +15,7 @@ YoutubeChannelIdItemSpecifier = {
     {
       text = "📌🆔⛵️ addidnwsb.",
       dothis = dothis.youtube_channel_id.add_to_newsboat_urls_file,
-      args = pt({ category = "string"})
+      args = transf.table.indicated_prompt_table({ category = "string"})
     }
   }
   

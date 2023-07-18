@@ -75,9 +75,9 @@ end
 function getEmptyResult(thing, opts)
   opts = opts or {}
   if opts.tolist  then -- manual case 1
-    return array({})
+    return transf.table.determined_array_table({})
   elseif opts.output == "table" then -- manual case 2
-    return assoc({})
+    return transf.table.determined_assoc_arr_table({})
   elseif opts.output == "ovtable" then -- manual case 2
     return ovtable.new()
   elseif type(thing) == "string" then -- inferred case 2
@@ -86,15 +86,15 @@ function getEmptyResult(thing, opts)
     if thing.isovtable then -- explicit case 1 of inferred case 3
       return ovtable.new()
     elseif thing.isarr then -- explicit case 2 of inferred case 3
-      return array({})
+      return transf.table.determined_array_table({})
     elseif thing.isassoc then -- explicit case 3 of inferred case 3
-      return assoc({})
+      return transf.table.determined_assoc_arr_table({})
     elseif is.table.empty_table(thing) then -- if it's empty, and we haven't explicitly specified a type, we can't assume anything, so we'll just return an empty table
       return {}
     elseif is.table.non_empty_table_arraylike_by_keys(thing) then
-      return array({})
+      return transf.table.determined_array_table({})
     else
-      return assoc({})
+      return transf.table.determined_assoc_arr_table({})
     end
   else 
     return {}

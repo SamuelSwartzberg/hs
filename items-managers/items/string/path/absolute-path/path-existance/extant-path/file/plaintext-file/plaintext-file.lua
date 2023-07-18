@@ -67,7 +67,7 @@ PlaintextFileItemSpecifier = {
     },{
       text = "🫳⩶ appdln.",
       dothis = dothis.plaintext_file.append_line,
-      args = pt( { line = "string" })
+      args = transf.table.indicated_prompt_table( { line = "string" })
     }
   }
 }

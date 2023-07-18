@@ -366,7 +366,7 @@ transf = {
   },
   hole_y_arraylike = {
     array = function(tbl)
-      local new_tbl = array({})
+      local new_tbl = transf.table.determined_array_table({})
       for i = 1, #tbl do
         if tbl[i] ~= nil then
           new_tbl[#new_tbl + 1] = tbl[i]
@@ -3570,6 +3570,18 @@ transf = {
     long_flag = function(word)
       return "--" .. word
     end,
+    determinant_metatable_creator_fn = function(word)
+      return function(tbl)
+        tbl = get.table.copy(tbl, true)
+        local metatbl = {
+            __index = {
+            }
+        }
+        metatbl.__index["is" .. word] = true
+        setmetatable(tbl, metatbl)
+        return tbl
+      end
+    end
   },
   syn_specifier = {
     synoynms_array = function (syn_specifier)
@@ -3994,15 +4006,12 @@ transf = {
       return res
     end,
     key_value_stateless_iter = pairs,
-    key_value_stateful_iter = get.stateless_generator.stateful_generator(transf.native_table.key_value_stateless_iter)
+    key_value_stateful_iter = get.stateless_generator.stateful_generator(transf.native_table.key_value_stateless_iter),
+    reversed_native_table = function(t)
+      return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(thing)))
+    end,
   },
   table = {
-    first_key = function(t)
-      return elemAt(t, 1, "k")
-    end,
-    first_value = function(t)
-      return elemAt(t, 1, "v")
-    end,
     --- @return function, table?, any?
     pair_stateless_iter = function(t)
       if t.isovtable then
@@ -4010,12 +4019,6 @@ transf = {
       else
         return transf.native_table.key_value_stateless_iter(t)
       end
-    end,
-    last_key = function(t)
-      return elemAt(t, transf.indexable.length(t), "k")
-    end,
-    last_value = function(t)
-      return elemAt(t, transf.indexable.length(t), "v")
     end,
     toml_string = toml.encode,
     --- value and comment must be strings
@@ -4051,6 +4054,15 @@ transf = {
     end,
     n_anys = function(t)
       return table.unpack(t)
+    end,
+    determined_array_table = function(t)
+      return transf.word.determinant_metatable_creator_fn("arr")(t)
+    end,
+    determined_assoc_arr_table = function(t)
+      return transf.word.determinant_metatable_creator_fn("assoc")(t)
+    end,
+    indicated_prompt_table = function(t)
+      return transf.word.determinant_metatable_creator_fn("prompttbl")(t)
     end,
     
   },
@@ -4090,6 +4102,9 @@ transf = {
     end,
     last_value = function(t)
       return t[t:len()]
+    end,
+    reversed_orderedtable = function(t)
+      return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(t)), {toovtable = true});
     end,
   },
   dict = {
@@ -6504,6 +6519,18 @@ transf = {
     end,
   },
   indexable = {
+    first_key = function(t)
+      return elemAt(t, 1, "k")
+    end,
+    first_value = function(t)
+      return elemAt(t, 1, "v")
+    end,
+    last_key = function(t)
+      return elemAt(t, transf.indexable.length(t), "k")
+    end,
+    last_value = function(t)
+      return elemAt(t, transf.indexable.length(t), "v")
+    end,
     length = function(indexable)
       if type(indexable) == "string" then
         return eutf8.len(indexable)
@@ -6526,6 +6553,17 @@ transf = {
             len = len + 1
           end
           return len
+        end
+      end
+    end,
+    reversed_indexable = function(thing)
+      if type(thing) == "string" then
+        return eutf8.reverse(thing)
+      elseif type(thing) == "table" then
+        if not thing.isovtable then
+          return transf.native_table.reversed_native_table(thing)
+        else
+          return transf.orderedtable.reversed_orderedtable(thing)
         end
       end
     end,
@@ -6573,13 +6611,13 @@ transf = {
       end)
     end,
     reverse_mapped = function(arr)
-      return map(arr, rev)
+      return map(arr, transf.indexable.reversed_indexable)
     end,
     longest_common_suffix_indexable_array = function(arr)
       local reversed_res = transf.indexable_array.longest_common_prefix_indexable(
         transf.indexable_array.reverse_mapped(arr)
       )
-      return rev(reversed_res)
+      return transf.indexable.reversed_indexable(reversed_res)
     end,
   },
   array_and_array = {
