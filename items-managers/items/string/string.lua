@@ -91,12 +91,12 @@ StringItemSpecifier = {
     }, {
       d = "eval",
       i = "🧬",
-      getfn = transf.string.evaled_lua
+      getfn = get.string.evaled_as_lua
     }, 
     {
       d = "tmpeval",
       i = "🕳🧬",
-      getfn = transf.string.evaled_template
+      getfn = get.string.evaled_as_template
     }, {
       d = "basheval",
       i = "🐚🧬",

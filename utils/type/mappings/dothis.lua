@@ -177,7 +177,7 @@ dothis = {
     end,
     add_event_interactive = function(event_table)
       event_table = event_table or {}
-      local temp_file_contents = le(transf.event_table.calendar_template(event_table))
+      local temp_file_contents = get.string.evaled_as_template(transf.event_table.calendar_template(event_table))
       local do_after = event_table.do_after
       event_table.do_after = nil
       doWithTempFile({edit_before = true, contents = temp_file_contents, use_contents = true}, function(tmp_file)
@@ -214,7 +214,7 @@ dothis = {
   },
   pandoc = {
     markdown_to = function(source, format, metadata, do_after)
-      local source, target = resolve({s = {path = source}, t = {suffix = "." .. tblmap.pandoc_format.extension[format]}})
+      local target = transf.path.path_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
       local rawsource = transf.file.contents(source)
       local processedsource = join.string.table.with_yaml_metadata(rawsource, metadata)
       rawsource = eutf8.gsub(rawsource, "\n +\n", "\n&nbsp;\n")
@@ -433,7 +433,7 @@ dothis = {
       end
     end,
     paste_le = function(str)
-      dothis.string.paste(le(str))
+      dothis.string.paste(get.string.evaled_as_template(str))
     end,
     copy = hs.pasteboard.setContents,
     fill_with_lines = function(str)
@@ -529,8 +529,8 @@ dothis = {
     write_template = function(path, template_path)
       dothis.absolute_path.write_file(
         path,
-        le(
-          singleLe(template_path),
+        get.string.evaled_as_template
+          get.string.evaled_as_lua(template_path),
           path
         )
       )
@@ -637,6 +637,21 @@ dothis = {
   local_absolute_path = {
     create_dir = function(path)
       run("mkdir -p " .. transf.string.single_quoted_escaped(path))
+    end,
+
+  },
+  local_nonabsolute_path_relative_to_home = {
+    copy_local_to_labelled_remote = function(path)
+      dothis.absolute_path.copy(
+        transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path),
+        transf.labelled_remote_path.labelled_remote_absolute_path(path)
+      )
+    end,
+    copy_labelled_remote_to_local = function(path)
+      dothis.absolute_path.copy(
+        transf.labelled_remote_path.labelled_remote_absolute_path(path),
+        transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path)
+      )
     end,
 
   },
@@ -931,7 +946,7 @@ dothis = {
         path = path,
         edit_before = true,
       }, function(path)
-        dothis.absolute_path.write_file(path, le(transf.file.contents(path))) -- re-eval
+        dothis.absolute_path.write_file(path, get.string.evaled_as_template(ßtransf.file.contents(path))) -- re-eval
         dothis.email_file.send(path, do_after)
       end)
     end,
@@ -1249,6 +1264,24 @@ dothis = {
       })
     end,
   },
+  timestamp_s = {
+    do_at = function(timestamp, fn)
+      local last_midnight = getUnixTimeLastMidnight()
+      local seconds_to_wait = timestamp - last_midnight
+      if seconds_to_wait < 0 then
+        error("Timestamp is in the past by " .. -seconds_to_wait .. " seconds")
+      elseif seconds_to_wait == 0 then
+        fn()
+        return
+      end
+      local is_more_than_24_hours = seconds_to_wait > 86400
+
+      if is_more_than_24_hours then
+        error("Timestamp is more than 24 hours in the future, which lua itself cannot handle, and I have not yet implemented a workaround for this")
+      end
+      hs.timer.doAt(seconds_to_wait, fn)
+    end
+  },
   string_array = {
     join_and_paste = function(array, sep)
       dothis.string.paste_le(transf.string.join(array, sep))
@@ -1421,14 +1454,14 @@ dothis = {
   },
   jxa_tab_specifier = {
     make_main = function(jxa_tab_specifier)
-      getViaOSA("js", ("Application('%s').windows()[%d].activeTabIndex = %d"):format(
+      get.string.evaled_js_osa( ("Application('%s').windows()[%d].activeTabIndex = %d"):format(
         jxa_tab_specifier.application_name,
         jxa_tab_specifier.window_index,
         jxa_tab_specifier.tab_index
       ))
     end,
     close = function(jxa_tab_specifier)
-      getViaOSA("js", ("Application('%s').windows()[%d].tabs()[%d].close()"):format(
+      get.string.evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].close()"):format(
         jxa_tab_specifier.application_name,
         jxa_tab_specifier.window_index,
         jxa_tab_specifier.tab_index
@@ -2268,5 +2301,16 @@ dothis = {
       dothis.creation_specifier_array.create(arr, copied_spec)
     end,
     create_background_streams = nil -- TODO
+  },
+  preference_domain_string = {
+    write_default = function(domain, key, value, type)
+      run("defaults write" .. transf.string.single_quoted_escaped(domain) .. transf.string.single_quoted_escaped(key) .. " -" .. type .. " " .. transf.string.single_quoted_escaped(value))
+    end
+
+  },
+  ["nil"] = {
+    sync_vdirsyncer = function()
+      run("vdirsyncer sync", true)
+    end,
   }
 }

@@ -33,7 +33,7 @@ function promptStringInner(prompt_args)
   local ok_button_pressed = button_pressed == prompt_args.buttonA
 
   if stringy.startswith(rawReturn, " ") then -- space triggers lua eval mode
-    rawReturn = singleLe(rawReturn)
+    rawReturn = get.string.evaled_as_lua(rawReturn)
   end
   if rawReturn == "" then
     rawReturn = nil

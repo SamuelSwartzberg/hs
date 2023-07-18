@@ -246,7 +246,11 @@ is = {
     local_absolute_path = function(path)
       return stringy.startswith(path, "/")
     end,
+    local_nonabsolute_path = function(path)
+      return not is.path.local_absolute_path(path)
+    end,
   },
+
   local_absolute_path = {
     local_extant_path = function(path)
       local file = io.open(path, "r")

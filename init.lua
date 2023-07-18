@@ -252,7 +252,7 @@ local keymap = {
     explanation = "Choose a composite item, eval and choose an action on it.",
     fn = function()
       compTable:doThis("choose-item", function (item)
-        st(le(item)):doThis("choose-action")
+        st(get.string.evaled_as_template(item)):doThis("choose-action")
       end)
     end,
   },
@@ -388,7 +388,7 @@ System:get("manager", "creatable"):doThis("create-all", {
 System:get("manager", "timer"):doThis("create-all", {
   dothis.newsboat.reload,
   dothis.vdirsyncer.sync,
-  bind(syncHomeRelativePath, {"me/state/todo", "push"}),
+  hs.fnutils.parital(dothis.local_nonabsolute_path_relative_to_home.copy_local_to_labelled_remote, "me/state/todo"),
   st(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),

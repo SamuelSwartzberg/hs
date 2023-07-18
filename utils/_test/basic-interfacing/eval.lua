@@ -4,31 +4,31 @@ env = {
 }
 
 
--- test singleLe:
+-- test get.string.evaled_as_lua:
 
 -- test simple expressions
 
 assertMessage(
-  singleLe("1"),
+  get.string.evaled_as_lua("1"),
   1
 )
 
 assertMessage(
-  singleLe("2 * 3"),
+  get.string.evaled_as_lua("2 * 3"),
   6
 )
 
 -- test that _G injection works
 
 assertMessage(
-  singleLe("env.HOME"),
+  get.string.evaled_as_lua("env.HOME"),
   env.HOME
 )
 
 -- test statements
 
 assertMessage(
-  singleLe([[
+  get.string.evaled_as_lua([[
     local foo = 1
     if (true) then
       foo = foo + 1;
@@ -46,21 +46,21 @@ assertMessage(
 -- no interpolation
 
 assertMessage(
-  le("Foo bar baz"),
+  get.string.evaled_as_template("Foo bar baz"),
   "Foo bar baz"
 )
 
 -- simple interpolation
 
 assertMessage(
-  le("I got {{[ 11 * 9 ]}} problems, but lack of {{[ 'interpolation' ]}} ain't one"),
+  get.string.evaled_as_template("I got {{[ 11 * 9 ]}} problems, but lack of {{[ 'interpolation' ]}} ain't one"),
   "I got 99 problems, but lack of interpolation ain't one"
 )
 
 -- interpolation with statements
 
 assertMessage(
-le([[
+get.string.evaled_as_template([[
 Lines: 
 
 {{[

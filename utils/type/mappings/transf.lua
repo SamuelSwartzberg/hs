@@ -471,7 +471,7 @@ transf = {
         transf.path.extension(path)
       ]
     end,
-    no_extension = function(path)
+    path_without_extension = function(path)
       return get.path.path_from_sliced_path_segment_array(
         get.path.path_segments(path),
         {start = 1, stop = -2}
@@ -677,12 +677,20 @@ transf = {
     local_http_server_url = function(path)
       return env.FS_HTTP_SERVER .. path
     end,
-    path_relative_to_home = function(path)
+    local_nonabsolute_path_relative_to_home = function(path)
       return get.absolute_path.relative_path_from(path, env.HOME)
     end,
     labelled_remote_path = function(path)
-      return "hsftp:/home/" .. transf.local_absolute_path_in_home.path_relative_to_home(path)
+      return transf.local_nonabsolute_path_relative_to_home.labelled_remote_absolute_path(transf.local_absolute_path_in_home.local_nonabsolute_path_relative_to_home(path))
     end
+  },
+  local_nonabsolute_path_relative_to_home = {
+    labelled_remote_absolute_path = function(path)
+      return "hsftp:/home/" .. path
+    end,
+    local_absolute_path = function(path)
+      return env.HOME .. "/" .. path
+    end,
   },
   path_array = {
     leaves_array = function(path_array)
@@ -1262,7 +1270,7 @@ transf = {
       
 
       local mail = join.string.table.email(body, specifier)
-      local evaled_mail = le(mail)
+      local evaled_mail = get.string.evaled_as_template(mail)
       local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
       local outpath = temppath .. "_out"
       run("mmime < " .. transf.string.single_quoted_escaped(temppath) .. " > " .. transf.string.single_quoted_escaped(outpath))
@@ -2816,9 +2824,7 @@ transf = {
     consonants = function(str)
       error("todo")
     end,
-    evaled_lua = singleLe,
     evaled_bash = run,
-    evaled_template = le,
     escaped_lua_regex = function(str)
       return replace(str, to.regex.escaped_lua_regex)
     end,
@@ -3693,7 +3699,7 @@ transf = {
       return transf.word.capitalized(transf.any.string(k)) .. ": " .. transf.any.string(v)
     end,
     email_header = function(key, value)
-      return transf.word.capitalized(transf.any.string(key)) .. ": " .. le(transf.any.string(value))
+      return transf.word.capitalized(transf.any.string(key)) .. ": " .. get.string.evaled_as_template(transf.any.string(value))
     end,
     url_param = function(key, value)
       return transf.any.string(key) .. "=" .. transf.string.urlencoded(transf.any.string(value))
@@ -4799,14 +4805,14 @@ transf = {
     end,
     rechnung_email_specifier = function(dir)
       return {
-        body = le(comp.documents.translation.rechnung_email_de, dir),
+        body = get.string.evaled_as_template(comp.documents.translation.rechnung_email_de, dir),
         non_inline_attachments = {
           transf.omegat_project_dir.rechnung_pdf_path(dir)
         }
       }
     end,
     raw_rechnung = function(dir)
-      return le(comp.documents.translation.rechnung_de, dir)
+      return get.string.evaled_as_template(comp.documents.translation.rechnung_de, dir)
     end,
 
   },
@@ -4972,7 +4978,7 @@ transf = {
       )
     end,
     jxa_window_index = function(window)
-      return getViaOSA("js", 
+      return get.string.evaled_js_osa(
         "Application('" .. transf.window.mac_application_name(window) .. "')" ..
           ".windows().findIndex(" ..
             "window => window.title() == '" .. transf.window.filtered_title(window) .. "'" ..
@@ -5009,7 +5015,7 @@ transf = {
   },
   tabbable_jxa_window_specifier = {
     amount_of_tabs = function(window_spec)
-      return getViaOSA("js", 
+      return get.string.evaled_js_osa( 
         "Application('" .. window_spec.application_name .. "')" ..
           ".windows().[" ..
             window_spec.window_index ..
@@ -5028,7 +5034,7 @@ transf = {
       return tab_spec_array
     end,
     active_tab_index = function(window_spec)
-      return getViaOSA("js", 
+      return get.string.evaled_js_osa( 
         "Application('" .. window_spec.application_name .. "')" ..
           ".windows().[" ..
             window_spec.window_index ..
@@ -6158,7 +6164,7 @@ transf = {
     end,
     passw_pass_item_name_array = function()
       return transf.dir.children_filename_array(env.MPASSPASSW)
-    end
+    end,
 
 
   },

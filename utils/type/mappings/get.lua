@@ -696,6 +696,44 @@ get = {
         return str .. suffix
       end
     end,
+    evaled_js_osa = function(str)
+      local succ, parsed_res = hs.osascript.javascript(str)
+      if succ then
+        return parsed_res
+      else
+        return nil
+      end
+    end,
+    evaled_as_osa = function(str)
+      local succ, parsed_res = hs.osascript.applescript(str)
+      if succ then
+        return parsed_res
+      else
+        return nil
+      end
+    end,
+    evaled_as_lua = function(str, d)
+      if d then -- add d to global namespace so that it can be accessed in the string
+        _G.d = d
+      end
+      local luaExecutable = load("return " .. str, "chunk", "t", _G)
+      if luaExecutable ~= nil then -- expression
+        return luaExecutable()
+      else
+        local luaExecutable = load(str, "chunk", "t", _G)
+        if luaExecutable ~= nil then -- statement, must return within the statement itself
+          return luaExecutable()
+        else
+          error("Neither a valid expression nor a valid statement.")
+        end
+      end
+    end,
+    evaled_as_template = function(str, d)
+      local res = eutf8.gsub(str, "{{%[(.-)%]}}", function(item)
+        return get.string.evaled_as_template(item, d)
+      end)
+      return res
+    end
 
 
   },
@@ -825,7 +863,7 @@ get = {
       end
     end,
     with_different_extension = function(path, ext)
-      return transf.path.no_extension(path) .. "." .. ext
+      return transf.path.path_without_extension(path) .. "." .. ext
     end,
     leaf_starts_with = function(path, str)
       return stringy.startswith(transf.path.leaf(path), str)
@@ -1644,7 +1682,7 @@ get = {
       }
     end,
     property = function(window_specifier, property)
-      return getViaOSA("js", ("Application('%s').windows()[%d].%s()"):format(
+      return get.string.evaled_js_osa( ("Application('%s').windows()[%d].%s()"):format(
         window_specifier.application_name,
         window_specifier.window_index,
         property
@@ -1653,7 +1691,7 @@ get = {
   },
   jxa_tab_specifier = {
     property = function(tab_specifier, property)
-      return getViaOSA("js", ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(
+      return get.string.evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(
         tab_specifier.application_name,
         tab_specifier.window_index,
         tab_specifier.tab_index,
