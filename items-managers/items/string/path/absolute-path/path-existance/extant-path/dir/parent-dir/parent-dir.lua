@@ -11,15 +11,6 @@ ParentDirItemSpecifier = {
         return ar(self:get("children")) 
       end,
       ["child-string-item-array"] = function(self) return self:get("child-string-array"):get("to-string-item-array") end,
-      ["child-file-only-string-item-array"] = function(self)
-        return self:get("child-string-item-array"):get("filter-to-array-of-files")
-      end,
-      ["child-dir-only-string-item-array"] = function(self)
-        return self:get("child-string-item-array"):get("filter-to-array-of-dirs")
-      end,
-      ["raw-child-string-array"] = function(self)
-        return ar(itemsInPath(self:get("c")))
-      end,
       ["children-any-pass"] = function(self, query) return self:get("child-string-item-array"):get("some-pass", query) end,
       ["is-grandparent-dir"] = function(self)
         return is.dir.grandparent_dir(self:get("c"))

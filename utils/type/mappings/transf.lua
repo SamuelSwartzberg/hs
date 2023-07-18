@@ -584,11 +584,13 @@ transf = {
   },
   absolute_path = {
     file_url = function(path)
-      return "file://" .. transf.absolute_path.local_absolute_path(path)
+      return transf.local_absolute_path.file_url(transf.absolute_path.local_absolute_path(path))
     end,
   },
   local_absolute_path = {
-    
+    file_url = function(path)
+      return "file://" .. path
+    end,
   },
   extant_path = {
     sibling_absolute_path_array = function(path)
@@ -631,7 +633,7 @@ transf = {
       local path = transf.extant_path.prompted_path_relative_to(path)
       local filename = prompt("string", {prompt_args = {message = "file in " .. path}})
       return path .. "/" .. filename
-    end
+    end,
   },
   local_extant_path = {
     size = function(path)
@@ -675,6 +677,12 @@ transf = {
     local_http_server_url = function(path)
       return env.FS_HTTP_SERVER .. path
     end,
+    path_relative_to_home = function(path)
+      return get.absolute_path.relative_path_from(path, env.HOME)
+    end,
+    labelled_remote_path = function(path)
+      return "hsftp:/home/" .. transf.local_absolute_path_in_home.path_relative_to_home(path)
+    end
   },
   path_array = {
     leaves_array = function(path_array)
@@ -811,7 +819,7 @@ transf = {
     children_leaves_array = function(dir)
       return transf.path_array.leaves_array(transf.dir.children_absolute_path_array(dir))
     end,
-    children_filenames_array = function(dir)
+    children_filename_array = function(dir)
       return transf.path_array.filenames_array(transf.dir.children_absolute_path_array(dir))
     end,
     children_extensions_array = function(dir)
@@ -826,7 +834,51 @@ transf = {
     git_root_dir_descendants = function(dir)
       return transf.dir_array.filter_git_root_dir_array(transf.extant_path.descendants_absolute_path_array(dir))
     end,
-
+    absolute_path_key_leaf_string_or_nested_value_dict = function(path)
+      local res = {}
+      path = get.string.with_suffix_string(path, "/")
+      for child_path in transf.dir.children_absolute_path_value_stateful_iter(path) do
+        if is.absolute_path.dir(child_path) then
+          res[child_path] = transf.dir.absolute_path_key_leaf_string_or_nested_value_dict(child_path)
+        else
+          res[child_path] = "leaf"
+        end
+      end
+      return res
+    end,
+    plaintext_dictonary_read_assoc_arr = function(path)
+      transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc_arr(
+        transf.dir.absolute_path_key_leaf_string_or_nested_value_dict(path)
+      )
+    end,
+  },
+  absolute_path_key_leaf_string_or_nested_value_dict = {
+    leaf_key_leaf_string_or_nested_value_dict = function(dict)
+      local res = {}
+      for k, v in transf.table.pair_stateless_iter(dict) do
+        local leaf = transf.path.leaf(k)
+        if is.any.table(v) then
+          res[leaf] = transf.absolute_path_key_leaf_string_or_nested_value_dict.leaf_key_leaf_string_or_nested_value_dict(v)
+        else
+          res[leaf] = v
+        end
+      end
+      return res
+    end,
+    plaintext_dictonary_read_assoc_arr = function(dict)
+      local res = {}
+      for k, v in transf.table.pair_stateless_iter(dict) do
+        local filename = transf.path.filename(k)
+        if is.any.table(v) then
+          res[filename] = transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc_arr(v)
+        else
+          if is.file.plaintext_dictionary_file(k) then
+            res[filename] = transf.plaintext_dictionary_file.table(k)
+          end
+        end
+      end
+      return res
+    end,
   },
 
   in_git_dir = {
@@ -1246,7 +1298,7 @@ transf = {
   },
 
   ics_file = {
-    array_of_tables = function(path)
+    array_of_assoc_arrs = function(path)
       local temppath = transf.string.in_tmp_dir(transf.path.filename(path) .. ".ics")
       srctgt("copy", path, temppath)
       dothis.ics_file.generate_json_file(temppath)
@@ -1258,18 +1310,18 @@ transf = {
     end,
   },
   json_file = {
-    table = function(path)
-      return transf.not_userdata_or_function.table(transf.file.contents(path))
+    not_userdata_or_function = function(path)
+      return transf.json_string.not_userdata_or_function(transf.file.contents(path))
     end,
   },
   ini_file = {
-    table = function(path)
-      return transf.ini_string.table(transf.file.contents(path))
+    assoc_arr = function(path)
+      return transf.ini_string.assoc_arr(transf.file.contents(path))
     end,
   },
   toml_file = {
-    table = function(path)
-      return transf.toml_string.table(transf.file.contents(path))
+    assoc_arr = function(path)
+      return transf.toml_string.assoc_arr(transf.file.contents(path))
     end,
   },
   xml_file = {
@@ -3119,8 +3171,8 @@ transf = {
     --- @return hs.styledtext
     with_styled_start_end_markers = function(str)
       local res =  hs.styledtext.new("^" .. str .. "$")
-      res = styleText(res, { style = "light", starts = 1, ends = 1 })
-      res = styleText(res, { style = "light", starts = #res, ends = #res})
+      res = get.styledtext.styledtext_with_slice_styled(res, "light", 1, 1)
+      res = get.styledtext.styledtext_with_slice_styled(res, "light", #res, #res)
       return res
     end,
     email_quoted = function(str)
@@ -3256,7 +3308,7 @@ transf = {
     end,
   },
   toml_string = {
-    table = toml.decode
+    assoc_arr = toml.decode
   },
   yaml_file = {
     not_userdata_or_function = function(path)
@@ -3265,11 +3317,26 @@ transf = {
   },
   
   ini_string = {
-    table = function(str)
+    assoc_arr = function(str)
       return runJSON(
         "jc --ini <<EOF " .. str .. "EOF"
       )
     end,
+  },
+  plaintext_dictonary_file = {
+    table = function(file)
+      if is.plaintext_dictionary_file.yaml_file(file) then
+        return transf.yaml_file.not_userdata_or_function(file)
+      elseif is.plaintext_dictionary_file.json_file(file) then
+        return transf.json_file.not_userdata_or_function(file)
+      elseif is.plaintext_dictionary_file.ini_file(file) then
+        return transf.ini_file.assoc_arr(file)
+      elseif is.plaintext_dictionary_file.toml_file(file) then
+        return transf.toml_file.assoc_arr(file)
+      elseif is.plaintext_dictionary_file.ics_file(file) then
+        return transf.ics_file.array_of_assoc_arrs(file) 
+      end
+    end
   },
   header_string = {
     dict = function(str)
@@ -4431,7 +4498,7 @@ transf = {
       return get.extant_path.find_descendant_with_leaf_ending(env.MCITATIONS, id)
     end,
     csl_table = function(id)
-      return transf.json_file.table(
+      return transf.json_file.not_userdata_or_function(
         transf.filename_safe_indicated_citable_object_id.local_csl_file(id)
       )
     end,
@@ -5867,7 +5934,7 @@ transf = {
   },
   source_id_array = {
     next_to_be_activated = function(source_id_array)
-      return get.array.next_by_fn_wrapping(source_id_array, is.source_id.active)
+      return get.array.next_by_fn_wrapping(source_id_array, is.source_id.active_source_id)
     end,
   },
   -- for future reference, since I'll forget: mod is a hypernym of mod_name, mod_symbol, and mod_char. Via the implementation in `normalize` we can be sure that no matter what we provide when we use tblmap, we will get the desired thing back.
@@ -6077,7 +6144,7 @@ transf = {
       return math.random() < 0.5
     end,
     all_applications = function()
-      return transf.dir.children_filenames_array("/Applications")
+      return transf.dir.children_filename_array("/Applications")
     end,
     sox_is_recording = function()
       local succ, res = pcall(run, "pgrep -x rec")
@@ -6088,6 +6155,9 @@ transf = {
         mt._list.markdown_extensions,
         { mode="list"}
       )
+    end,
+    passw_pass_item_name_array = function()
+      return transf.dir.children_filename_array(env.MPASSPASSW)
     end
 
 

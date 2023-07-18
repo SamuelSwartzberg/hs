@@ -5,7 +5,7 @@ IcsFileItemSpecifier = {
   type = "ics-file",
   properties = {
     getables = {
-      ["parse-to-lua-table"] = bc( transf.ics_file.array_of_tables)
+      ["parse-to-lua-table"] = bc( transf.ics_file.array_of_assoc_arrs)
       
     },
     doThisables = {

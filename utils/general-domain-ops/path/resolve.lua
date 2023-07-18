@@ -102,10 +102,3 @@ function resolve(opts)
 
   return source, target
 end
-
-remote = function(path)
-  return select(2, resolve({s=path, t = {prefix = "hsftp:", root = ""}}))
-end
-fshttp = function(path)
-  return select(2, resolve({s=path, t = {prefix = env.FS_HTTP_SERVER, root = ""}}))
-end

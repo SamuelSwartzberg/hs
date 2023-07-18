@@ -20,12 +20,12 @@ require("package-imports")
 require("utils")
 
 
-comp = fsTree(env.MCOMPOSITE, "as-tree")
-fstblmap = fsTree(env.MDICTIONARIES .. "/mappings", "as-tree")
+comp = transf.dir.plaintext_dictonary_read_assoc_arr(env.MCOMPOSITE)
+fstblmap = transf.dir.plaintext_dictonary_read_assoc_arr(env.MDICTIONARIES .. "/mappings")
 
 require("items-managers")
 
-projectDirsArray = ar(itemsInPath({path = env.ME, recursion = 2, include_files = false})):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)
+projectDirsArray = ar(get.extant_path.absolute_path_array(env.ME, {recursion = 2, include_files = false})):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)
 
 
 envTable = dc(env)
@@ -218,9 +218,10 @@ local keymap = {
   p = {
     explanation = "Choose a pass and fill it",
     fn = function()
-      ar(
-        map(itemsInPath(env.MPASSPASSW), function(fl) return pathSlice(fl, "-2:-2", { ext_sep = true })[1] end)
-      ):doThis("choose-item-and-then-action")
+      dothis.array.choose_item(
+        transf["nil"].passw_pass_item_name_array(),
+        dothis.login_pass_item_name.fill
+      )
     end,
   },
   ["["] = nil, -- unassigned

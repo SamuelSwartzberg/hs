@@ -725,7 +725,15 @@ get = {
         new_styledtext = new_styledtext:setStyle(v.styledtext_attributes_specifier, v.starts, v.ends)
       end
       return new_styledtext
-    end
+    end,
+    styledtext_with_slice_styled = function(styledtext, style, start, stop)
+      start = start or 1
+      stop = stop or #styledtext
+      if style == "light" then
+        style = { color = { red = 0, green = 0, blue = 0, alpha = 0.3 } }
+      end
+      return styledtext:copy():setStyle(style, start, stop)
+    end,
   },
   string_or_styledtext_array = {
     styledtext_array_merge = function(arr, styledtext_attributes_specifier)
@@ -809,8 +817,7 @@ get = {
   },
   path = {
     usable_as_filetype = function(path, filetype)
-      path = hs.fs.pathToAbsolute(path)
-      local extension = pathSlice(path, "-1:-1", { ext_sep = true, standartize_ext = true })[1]
+      local extension = transf.path.normalized_extension(path)
       if find(mt._list.filetype[filetype], extension) then
         return true
       else
@@ -828,6 +835,12 @@ get = {
     end,
     is_standartized_extension = function(path, ext)
       return transf.path.normalized_extension(path) == ext
+    end,
+    is_extension_in = function(path, exts)
+      return get.array.contains(exts, transf.path.extension(path))
+    end,
+    is_standartized_extension_in = function(path, exts)
+      return get.array.contains(exts, transf.path.normalized_extension(path))
     end,
     is_filename = function(path, filename)
       return transf.path.filename(path) == filename

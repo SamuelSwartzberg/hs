@@ -7,10 +7,10 @@ DataURLItemSpecifier = {
         return transf.data_url.content_type(self:get("c"))
       end,
       ["is-image-data-url"] = function(self)
-        return is.media_type.image(self:get("data-content-type"))
+        return is.media_type.image_media_type(self:get("data-content-type"))
       end,
       ["is-base-64-data-url"] = function (self)
-        return is.data_url.base64(self:get("c"))
+        return is.data_url.base64_data_url(self:get("c"))
       end,
       ["payload-part"] = function (self)
         return transf.data_url.payload_part(self:get("c"))

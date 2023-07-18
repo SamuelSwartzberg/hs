@@ -94,7 +94,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
 
   local sources
   if all_in then
-    sources = itemsInPath(source)
+    sources = transf.dir.children_absolute_path_array(source)
   else
     sources = {source}
   end

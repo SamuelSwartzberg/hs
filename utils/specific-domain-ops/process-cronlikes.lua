@@ -76,7 +76,7 @@ end
 
 --- @param path string
 function processSetupDirectivesInFiles(path)
-  for _, child in transf.array.index_value_stateless_iter(itemsInPath({path = path, include_dirs = false})) do
+  for _, child in transf.local_dir.children_absolute_path_value_stateful_iter do
     local cronlikeSpecs = processCronlikeFile(child)
     
     for _, spec in transf.array.index_value_stateless_iter(cronlikeSpecs) do

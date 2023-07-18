@@ -180,19 +180,19 @@ assert(
 )
 
 assert(
-  is.data_url.base64("data:text/plain;charset=utf-8;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
+  is.data_url.base64_data_url("data:text/plain;charset=utf-8;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
 )
 
 assert(
-  not is.data_url.base64("data:text/plain;charset=utf-8;,SGVsbG8sIFdvcmxkIQ%3D%3D%3D")
+  not is.data_url.base64_data_url("data:text/plain;charset=utf-8;,SGVsbG8sIFdvcmxkIQ%3D%3D%3D")
 )
 
 assert(
-  is.media_type.image("image/png")
+  is.media_type.image_media_type("image/png")
 )
 
 assert(
-  not is.media_type.image("text/plain")
+  not is.media_type.image_media_type("text/plain")
 )
 
 -- Test is.string.looks_like_path

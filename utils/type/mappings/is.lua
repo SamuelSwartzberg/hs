@@ -322,7 +322,7 @@ is = {
   dir = {
     git_root_dir = function(path)
       return get.array.some_pass(
-        transf.dir.children_filenames_array(path),
+        transf.dir.children_filename_array(path),
         {_exactly = ".git"}
       )
     end,
@@ -357,6 +357,9 @@ is = {
     plaintext_file = function(path)
       error("TODO")
     end,
+    plaintext_dictionary_file = function(path)
+      return is.file.plaintext_file(path) and is.plaintext_file.plaintext_dictionary_file(path)
+    end,
     playable_file = function (path)
       return get.path.usable_as_filetype(path, "audio") or get.path.usable_as_filetype(path, "video")
     end,
@@ -377,6 +380,21 @@ is = {
     warnings = function(path)
       return transf.shellscript_file.gcc_string_warnings(path) ~= ""
     end,
+  },
+  plaintext_file = {
+    plaintext_dictionary_file = function(path)
+      get.path.is_standartized_extension_in(
+        path,
+        mt._list.filetype["plaintext-dictionary"]
+      )
+    end,
+  },
+  plaintext_dictionary_file = {
+    yaml_file = bind(get.path.is_standartized_extension, {a_use, "yaml"}),
+    json_file = bind(get.path.is_standartized_extension, {a_use, "json"}),
+    toml_file = bind(get.path.is_standartized_extension, {a_use, "toml"}),
+    ini_file = bind(get.path.is_standartized_extension, {a_use, "ini"}),
+    ics_file = bind(get.path.is_standartized_extension, {a_use, "ics"}),
   },
   plaintext_table_file = {
     timestamp_first_column_plaintext_table_file = function(path)
@@ -426,19 +444,28 @@ is = {
     data_url = function(url)
       return stringy.startswith(url, "data:")
     end,
+    url_with_path = function(url)
+      return transf.url.path(url) ~= nil
+    end,
+
+  },
+  url_with_path = {
+    owner_item_url = function(url)
+      return #transf.owner_item_url.owner_item == 2
+    end,
   },
   data_url = {
-    base64 = function(url)
+    base64_data_url = function(url)
       return stringy.endswith(transf.data_url.header_part(url), ";base64")
     end,
   },
   media_type = {
-    image = function(media_type)
+    image_media_type = function(media_type)
       return stringy.startswith(media_type, "image/")
     end,
   },
   source_id = {
-    active = function(source_id)
+    active_source_id = function(source_id)
       return hs.keycodes.currentSourceID() == source_id
     end,
   },
