@@ -17,31 +17,6 @@ ExtantPathItemSpecifier = {
       ["cd-and-run-this-task"] = function(self, task)
         run(self:get("cd-and-this-task", task))
       end,
-      ["open-path"] = function (self, app)
-        open({path = self:get("completely-resolved-path"), app = app})
-      end,
-      ["open-parent"] = function (self, app)
-        open({path = self:get("parent-dir-path"), app = app})
-      end,
-      ["open-path-in-finder"] = function(self)
-        hs.execute("open -R '" .. self:get("completely-resolved-path") .. "'")
-      end,
-      ["open-with-application"] = function(self, application)
-        run({
-          "open",
-          "-a",
-          application,
-          { value = self:get("completely-resolved-path"), type = "quoted" }
-        }, true)
-      end,
-      ["open-contents-in-new-vscode-window"] = function(self)
-        -- this should ideally use the `code` command, but it is currently broken
-        open(self:get("completely-resolved-path"))
-      end,
-      ["open-contents-in-current-vscode-window"] = function(self)
-        -- this should ideally use the `code` command, but it is currently broken
-        open(self:get("completely-resolved-path"))
-      end,
       ["move-safe"] = function(self, target)
         srctgt("move", self:get("c"), target, "not-exists")
       end,

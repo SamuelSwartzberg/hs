@@ -2289,4 +2289,8 @@ get = {
   }, 
   stream_creation_specifier = {
   },
+  fn = {
+    first_n_args_bound_fn = hs.fnutils.partial,
+    arbitrary_args_bound_fn = func
+  }
 }

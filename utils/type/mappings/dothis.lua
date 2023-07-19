@@ -496,6 +496,9 @@ dothis = {
     open_app = function(path, app, do_after)
       run("open -a " .. transf.string.single_quoted_escaped(app) .. " " .. transf.string.single_quoted_escaped(path), do_after)
     end,
+    open_and_reveal = function(path)
+      run("open -R " .. transf.string.single_quoted_escaped(path))
+    end,
     write_relative_path_dict = function(path, relative_path_dict, extension)
       dothis.dynamic_absolute_path_dict.write(
         get.relative_path_dict.absolute_path_dict(relative_path_dict, path, extension)
@@ -529,7 +532,7 @@ dothis = {
     write_template = function(path, template_path)
       dothis.absolute_path.write_file(
         path,
-        get.string.evaled_as_template
+        get.string.evaled_as_template(
           get.string.evaled_as_lua(template_path),
           path
         )
@@ -946,7 +949,7 @@ dothis = {
         path = path,
         edit_before = true,
       }, function(path)
-        dothis.absolute_path.write_file(path, get.string.evaled_as_template(ßtransf.file.contents(path))) -- re-eval
+        dothis.absolute_path.write_file(path, get.string.evaled_as_template(transf.file.contents(path))) -- re-eval
         dothis.email_file.send(path, do_after)
       end)
     end,
@@ -1478,7 +1481,7 @@ dothis = {
       dothis.local_path.open_app(
         transf.path_with_intra_file_locator_specifier.path(specifier),
         env.GUI_EDITOR,
-        hs.fnutils.partial(dothis.path_with_intra_file_locator_specifier.go_to, specifier)
+        get.fn.first_n_args_bound_fn(dothis.path_with_intra_file_locator_specifier.go_to, specifier)
       )
     end
   },
@@ -1488,6 +1491,15 @@ dothis = {
         transf.path_with_intra_file_locator.path_with_intra_file_locator_specifier(path_with_intra_file_locator)
       )
     end
+  },
+  url_components = {
+    open_browser = function(url_components, browser, do_after)
+      dothis.url_or_local_path.open_browser(
+        transf.url_components.url(url_components),
+        browser,
+        do_after
+      )
+    end,
   },
   iban = {
     fill_bank_form = function(iban)
@@ -1710,7 +1722,7 @@ dothis = {
     build_and_open_pdf = function(latex_project_dir)
       dothis.latex_project_dir.build(
         latex_project_dir,
-        hs.fnutils.partial(dothis.latex_project_dir.open_pdf, latex_project_dir)
+        get.fn.first_n_args_bound_fn(dothis.latex_project_dir.open_pdf, latex_project_dir)
       )
     end,
     write_bib = function(latex_project_dir)

@@ -1,4 +1,3 @@
-a_use = math.random(999999999)
 
 --- binds arguments to a function
 --- @param func function
@@ -37,12 +36,4 @@ function bind(func, arg_spec, ignore_spec)
   end
 
   return inner_func
-end
-
---- bind the "c" contents of an item to a function
-function bc(fn, ...)
-  local args = {...} 
-  return function(item)
-    return fn(item:get("c"), table.unpack(args))
-  end
 end

@@ -115,9 +115,9 @@ function rest(specifier, do_after, have_tried_access_refresh)
           open_spec.params = glue(open_spec.params, tblmap.api_name.additional_auth_params[specifier.api_name])
         end
         
-        open(open_spec, function() -- our server listening on the above port will save the authorization code to the proper location
+        dothis.url_components.open_browser(open_spec, nil, function() -- our server listening on the above port will save the authorization code to the proper location
           local authorization_code = transf.file.contents(api_keys_location .. "authorization_code")
-          dothis.absolute_path.delete
+          dothis.absolute_path.delete(api_keys_location .. "authorization_code") -- this lost it's argument during refactor, i've added it back in, but I'm not sure if it's correct
           if not authorization_code then
             error("Failed to get authorization code from server")
           end

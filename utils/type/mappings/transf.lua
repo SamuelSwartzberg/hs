@@ -6366,7 +6366,7 @@ transf = {
       return table.concat(
         hs.fnutils.imap(
           {"pause", "loop", "shuffle", "video"},
-          hs.fnutils.partial(get.mpv_ipc_socket_id.boolean_emoji, mpv_ipc_socket_id)
+          get.fn.first_n_args_bound_fn(get.mpv_ipc_socket_id.boolean_emoji, mpv_ipc_socket_id)
         ),
         ""
       )

@@ -220,7 +220,7 @@ StringItemSpecifier = {
     transf.extant_path.descendants_absolute_path_array(env.MQF),
     function(path)
       return {
-        dothis = hs.fnutils.partial(
+        dothis = get.fn.first_n_args_bound_fn(
           dothis.plaintext_file.append_line_and_commit,
           path
         ),

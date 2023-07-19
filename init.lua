@@ -19,6 +19,7 @@ require("package-imports")
 
 require("utils")
 
+a_use = math.random(999999999)
 
 comp = transf.dir.plaintext_dictonary_read_assoc_arr(env.MCOMPOSITE)
 fstblmap = transf.dir.plaintext_dictonary_read_assoc_arr(env.MDICTIONARIES .. "/mappings")
