@@ -11,7 +11,7 @@ function runThreaded(command_specifier_list, threads, do_after, catch)
   local function runNextChunk()
     local _, chunk = next_pair()
     if chunk then
-      for command_id, command_parts in transf.table.pair_stateless_iter(chunk) do
+      for command_id, command_parts in transf.table.key_value_iter(chunk) do
         local task = run({
           args = command_parts,
           catch = function(exit_code, std_err)

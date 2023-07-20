@@ -90,7 +90,7 @@ DirItemSpecifier = {
       ["table-to-fs-children-dispatch"] = function(self, specifier) 
         -- assumes a table where all values are of the same type
         local child_filenames = transf.dir.children_leaves_array(self:get("c"))
-        for k, v in transf.table.pair_stateless_iter(specifier.payload) do
+        for k, v in transf.table.key_value_iter(specifier.payload) do
           local desired_name = k
 
           -- allow for regex names 

@@ -6,7 +6,7 @@
 --- @param value any
 --- @return boolean
 function valuesContainShape(tbl, value)
-  for _, v in wdefarg(transf.table.pair_stateless_iter)(tbl) do
+  for _, v in transf.table_or_nil.key_value_iter(tbl) do
     if hsInspectCleaned(v, 5) == hsInspectCleaned(value, 5) then return true end
   end
   return false

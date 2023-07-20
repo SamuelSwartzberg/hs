@@ -18,7 +18,7 @@ function find(indexable, cond, opts)
   if not (type(indexable) == "string") then
     local iterator = getIterator(opts)
     local manual_counter = 0
-    for k, v in wdefarg(iterator)(indexable) do
+    for k, v in iterator(indexable) do
       local retriever
       retriever, manual_counter = getRetriever(indexable, k, v, manual_counter)
       local res = findsingle(retriever[opts.args[1]], cond, "boolean")

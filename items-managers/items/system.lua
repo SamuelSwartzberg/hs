@@ -25,7 +25,7 @@ SystemSpecifier = {
           transf.native_table_or_nil.value_array(
             hs.audiodevice["all" .. replace(subtype, to.case.capitalized) .. "Devices"]()
           ),
-          bind(CreateAudiodeviceSpecifierItem, {a_use, subtype })
+          get.fn.arbitrary_args_bound_or_ignored_fn(CreateAudiodeviceSpecifierItem, {a_use, subtype })
         ))
       end,
       ["all-output-devices-audiodevice-array"] = function(self)

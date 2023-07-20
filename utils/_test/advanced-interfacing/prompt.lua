@@ -172,7 +172,11 @@ local getMockPrompterInvalidWhenTransformedFirstTry = function()
 end
 
 local mockTransformerRejectsInvalidWhenTransformed = function(x)
-  return ternary(x == "Invalid when transformed", nil, x), true
+  if(x == "Invalid when transformed") then
+    return nil, false
+  else
+    return x, true
+  end
 end
 
 -- try permutations of on_raw_invalid, on_transformed_invalid, on_cancel and "return_nil", "error", "reprompt"

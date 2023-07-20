@@ -19,10 +19,10 @@ StringItemSpecifier = {
       dothis = dothis.string.paste
     },{
       text = "👄🇺🇸 sayen.",
-      dothis = bind(dothis.string.say, {a_use, "en"})
+      dothis = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.string.say, {a_use, "en"})
     },{
       text = "👄🇯🇵 sayja.",
-      dothis = bind(dothis.string.say, {a_use, "ja"})
+      dothis = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.string.say, {a_use, "ja"})
     }, {
       text = "📓🦄 logdia.",
       dothis = dothis.entry_logging_dir.log_string,
@@ -205,7 +205,7 @@ StringItemSpecifier = {
     }, {
       d = "spltarr",
       i = "⽄,",
-      getfn = bind(get.string.split_single_char_stripped, {a_use, ","}),
+      getfn = get.fn.arbitrary_args_bound_or_ignored_fn(get.string.split_single_char_stripped, {a_use, ","}),
     },
     {
       text = "🌄📚 crsess.",

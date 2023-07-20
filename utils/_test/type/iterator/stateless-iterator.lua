@@ -679,7 +679,7 @@ local tbl_w_var_values = {
 
 local manual_counter = 0
 
-for k, v in transf.table.pair_stateless_iter(tbl_w_var_values) do
+for k, v in transf.table.key_value_iter(tbl_w_var_values) do
   manual_counter = manual_counter + 1
   -- fastpairs does not guarantee order
   if manual_counter == 5 then
@@ -701,7 +701,7 @@ local ovtable_w_var_values = ovtable.init({
 
 local manual_counter = 0
 
-for k, v in transf.table.pair_stateless_iter(ovtable_w_var_values) do
+for k, v in transf.table.key_value_iter(ovtable_w_var_values) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, "a")
@@ -735,7 +735,7 @@ local list_w_var_values = {
 
 local manual_counter = 0
 
-for k, v in transf.table.pair_stateless_iter(list_w_var_values) do
+for k, v in transf.table.key_value_iter(list_w_var_values) do
   manual_counter = manual_counter + 1
   if manual_counter == 1 then
     assertMessage(k, 1)

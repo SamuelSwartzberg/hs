@@ -274,7 +274,7 @@ get = {
     ---@return string[]
     yaml_lines_aligned_with_predetermined_stops = function(table, keystop, valuestop, depth)
       local lines = {}
-      for value_k, value_v in transf.table.pair_stateless_iter(table) do
+      for value_k, value_v in transf.table.key_value_iter(table) do
         local pre_padding_length = depth * 2
         local key_length = #value_k
         local key_padding_length = keystop - (key_length + pre_padding_length)
@@ -320,7 +320,7 @@ get = {
         new = {}
       end
       copied_tables[tostring(t)] = new
-      for k, v in transf.table.pair_stateless_iter(t) do
+      for k, v in transf.table.key_value_iter(t) do
         if type(v) == "table" and deep then
           if copied_tables[tostring(v)] then -- we've already copied this table, so just reference it
             new[k] = copied_tables[tostring(v)]
@@ -366,7 +366,7 @@ get = {
     dict_of_arrays_by_array = function(dict_of_dicts, arr)
       return hs.fnutils.map(
         dict_of_dicts,
-        bind(get.dict.array_by_array, {a_use, arr})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.dict.array_by_array, {a_use, arr})
       )
     end
   },
@@ -394,7 +394,7 @@ get = {
   table_of_assoc_arrs = {
     array_of_assoc_arrs = function(assoc_arr, key)
       local res = {}
-      for k, v in transf.table.pair_stateless_iter(assoc_arr) do
+      for k, v in transf.table.key_value_iter(assoc_arr) do
         local copied = get.table.copy(v, true)
         copied[key] = k
         dothis.array.push(res, copied)
@@ -777,7 +777,7 @@ get = {
     styledtext_array_merge = function(arr, styledtext_attributes_specifier)
       return hs.fnutils.imap(
         arr,
-        bind(get.string_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.string_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
       )
     end,
   },
@@ -1620,7 +1620,7 @@ get = {
     array_of_dicts_by_array = function(arr_of_arr, arr2)
       return hs.fnutils.imap(
         arr_of_arr,
-        bind(get.array.dict_by_array, {a_use, arr2})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.array.dict_by_array, {a_use, arr2})
       )
     end,
     dict_of_arrays_by_first_element = function(arr_of_arr)
@@ -1641,7 +1641,7 @@ get = {
     dict_of_dicts_by_array = function(dict_of_arr, arr2)
       return hs.fnutils.map(
         dict_of_arr,
-        bind(get.array.dict_by_array, {a_use, arr2})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.array.dict_by_array, {a_use, arr2})
       )
     end,
   },
@@ -1947,7 +1947,7 @@ get = {
     result_array = function(arr, value)
       return hs.fnutils.imap(
         arr, 
-        bind(get.retriever_specifier.result, {a_use, value})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.retriever_specifier.result, {a_use, value})
       )
     end,
     result_joined = function(arr, value)
@@ -2063,7 +2063,7 @@ get = {
     find_created_item_specifier_with_creation_specifier = function(arr, creation_specifier)
       return hs.fnutils.find(
         arr,
-        bind(get.table.key_value_equals, {a_use, "creation_specifier", creation_specifier})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.table.key_value_equals, {a_use, "creation_specifier", creation_specifier})
       )
     end,
   },
@@ -2291,6 +2291,44 @@ get = {
   },
   fn = {
     first_n_args_bound_fn = hs.fnutils.partial,
-    arbitrary_args_bound_fn = func
+
+    --- binds arguments to a function
+    --- @param func function
+    --- @param arg_spec any | any[] List of arguments to bind. Use a_use to consume an argument passed at runtime.
+    --- @param ignore_spec? integer | integer[] List of arguments to ignore (by index).
+    --- @return function
+    arbitrary_args_bound_or_ignored_fn = function(func, arg_spec, ignore_spec)
+
+      -- handle shorthand
+      if not is.any.array(arg_spec) then
+        arg_spec = { arg_spec }
+      end
+      if not is.any.array(ignore_spec) then
+        ignore_spec = { ignore_spec }
+      end
+      
+      -- initialize inner_func to the original function
+      local inner_func = function(...)
+        local args = {...}
+        table.sort(ignore_spec, function(a, b) return a > b end)
+        for _, index in transf.array.index_value_stateless_iter(ignore_spec) do
+          table.remove(args, index)
+        end
+        local new_args = {}
+        for index, arg in transf.array.index_value_stateless_iter(arg_spec) do -- for all arg_lists to bind
+          if arg == a_use then
+            new_args[index] = table.remove(args, 1)
+          else
+            new_args[index] = arg
+          end
+        end
+        for _, arg in transf.array.index_value_stateless_iter(args) do -- for all remaining args
+          table.insert(new_args, arg)
+        end
+        return func(table.unpack(new_args))
+      end
+
+      return inner_func
+    end
   }
 }

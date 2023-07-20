@@ -11,7 +11,7 @@ table.insert(types_w_any, "any")
 function resolveTypeMatchingToKeys(test_tbl, shape)
   for _, typ in transf.array.index_value_stateless_iter(types_w_any) do -- for any possible type
     if shape["[" .. typ .. "]"] then -- if shape has a key "[<type>|any]", then this is the type we want for any key (of type|any) not explicitly specified in the shape
-      for k, _ in transf.table.pair_stateless_iter(test_tbl) do -- for each key in test_tbl
+      for k, _ in transf.table.key_value_iter(test_tbl) do -- for each key in test_tbl
         if type(k) == typ or typ == "any" then -- if the test_tbl key is of the type we want
           if not shape[k] then -- and if the test_tbl key is not explicitly specified in the shape already
             shape[k] = get.table.copy(shape["[" .. typ .. "]"])  -- then add a copy of the type we want to the shape
@@ -76,10 +76,10 @@ function shapeMatchesInner(test_tbl, shape, path)
       error(("Unexpected value in shape: %s"):format(v), 0)
     end
   end
-  for k, v in transf.table.pair_stateless_iter(recollected_optional_keys) do
+  for k, v in transf.table.key_value_iter(recollected_optional_keys) do
     shape[k] = v
   end
-  for k, v in transf.table.pair_stateless_iter(test_tbl) do
+  for k, v in transf.table.key_value_iter(test_tbl) do
     if not shape[k] then 
       error(("Key %s is in %s but not in shape"):format(k, path), 0) 
     end

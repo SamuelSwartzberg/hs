@@ -55,7 +55,7 @@ FileItemSpecifier = {
     {
       i = emj.open .. emj.libreoffice,
       d = "oplbr",
-      dothis = bind(dothis.local_path.open_app, {a_use, "LibreOffice"})
+      dothis = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.local_path.open_app, {a_use, "LibreOffice"})
     }
   }
 }

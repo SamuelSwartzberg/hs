@@ -863,7 +863,7 @@ transf = {
   absolute_path_key_leaf_string_or_nested_value_dict = {
     leaf_key_leaf_string_or_nested_value_dict = function(dict)
       local res = {}
-      for k, v in transf.table.pair_stateless_iter(dict) do
+      for k, v in transf.table.key_value_iter(dict) do
         local leaf = transf.path.leaf(k)
         if is.any.table(v) then
           res[leaf] = transf.absolute_path_key_leaf_string_or_nested_value_dict.leaf_key_leaf_string_or_nested_value_dict(v)
@@ -875,7 +875,7 @@ transf = {
     end,
     plaintext_dictonary_read_assoc_arr = function(dict)
       local res = {}
-      for k, v in transf.table.pair_stateless_iter(dict) do
+      for k, v in transf.table.key_value_iter(dict) do
         local filename = transf.path.filename(k)
         if is.any.table(v) then
           res[filename] = transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc_arr(v)
@@ -1039,7 +1039,7 @@ transf = {
     fs_tag_string_dict = function(fs_tag_string)
       return map(
         transf.fs_tag_string.fs_tag_string_part_array(fs_tag_string),
-        bind(get.string.split_unpacked, {a_use, "-", 2}),
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.split_unpacked, {a_use, "-", 2}),
         {"v", "kv"}
       )
     end,
@@ -1053,7 +1053,7 @@ transf = {
     fs_tag_string_dict = function(fs_tag_string_part_array)
       return map(
         fs_tag_string_part_array,
-        bind(get.string.split_unpacked, {a_use, "-", 2}),
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.split_unpacked, {a_use, "-", 2}),
         {"v", "kv"}
       )
     end,
@@ -1070,7 +1070,7 @@ transf = {
     fs_tag_assoc = function(dict)
       return hs.fnutils.map(
         dict,
-        bind(stringy.split, {a_use, ","})
+        get.fn.arbitrary_args_bound_or_ignored_fn(stringy.split, {a_use, ","})
       )
     end,
     fs_tag_string_part_array = function(dict)
@@ -1937,7 +1937,7 @@ transf = {
     interval_specifier_with_earliest_start = function(interval_specifier_array)
       return reduce(
         interval_specifier_array,
-        bind(get.table_and_table.smaller_table_by_key, {a_use, a_use, "start"})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.smaller_table_by_key, {a_use, a_use, "start"})
       )
     end,
     earliest_start = function(interval_specifier_array)
@@ -1948,7 +1948,7 @@ transf = {
     interval_specifier_with_latest_start = function(interval_specifier_array)
       return reduce(
         interval_specifier_array,
-        bind(get.table_and_table.larger_table_by_key, {a_use, a_use, "start"})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key, {a_use, a_use, "start"})
       )
     end,
     latest_start = function(interval_specifier_array)
@@ -1959,7 +1959,7 @@ transf = {
     interval_specifier_with_latest_stop = function(interval_specifier_array)
       return reduce(
         interval_specifier_array,
-        bind(get.table_and_table.larger_table_by_key, {a_use, a_use, "stop"})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key, {a_use, a_use, "stop"})
       )
     end,
     latest_stop = function(interval_specifier_array)
@@ -1970,7 +1970,7 @@ transf = {
     interval_specifier_with_earliest_stop = function(interval_specifier_array)
       return reduce(
         interval_specifier_array,
-        bind(get.table_and_table.smaller_table_by_key, {a_use, a_use, "stop"})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.smaller_table_by_key, {a_use, a_use, "stop"})
       )
     end,
     earliest_stop = function(interval_specifier_array)
@@ -3387,10 +3387,10 @@ transf = {
   event_table = {
     calendar_template = function(event_table)
       local template = get.khal.calendar_template_empty()
-      for key, value in transf.table.pair_stateless_iter(event_table) do
+      for key, value in transf.table.key_value_iter(event_table) do
         if template[key] then
           if key == "repeat" then
-            for subkey, subvalue in transf.table.pair_stateless_iter(value) do
+            for subkey, subvalue in transf.table.key_value_iter(value) do
               template[key][subkey].value = subvalue
             end
           else
@@ -3464,7 +3464,7 @@ transf = {
       return {
         i = emj.search .. emj[search_engine],
         d = dsc.search .. dsc[search_engine],
-        dothis = bind(
+        dothis = get.fn.arbitrary_args_bound_or_ignored_fn(
           dothis.string.search,
           {a_use, search_engine}
         )
@@ -3988,7 +3988,10 @@ transf = {
     value_array = function(t)
       if t == nil then return {} end
       return transf.native_table.value_array(t)
-    end
+    end,
+    key_value_stateless_iter = function(t)
+      if t == nil then t = {} end
+    end,
   },
   native_table = {
     key_array = function(t)
@@ -4011,11 +4014,18 @@ transf = {
       return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(thing)))
     end,
   },
+  table_or_nil = {
+    key_value_iter = function(t)
+      if t == nil then t = {} end
+      return transf.table.key_value_iter(t)
+    end,
+  },
   table = {
+    --- one is stateless, one is stateful, but that should be fine
     --- @return function, table?, any?
-    pair_stateless_iter = function(t)
+    key_value_iter = function(t)
       if t.isovtable then
-        return t:pairs()
+        return t:pairs() 
       else
         return transf.native_table.key_value_stateless_iter(t)
       end
@@ -4197,7 +4207,7 @@ transf = {
   string_key_dict = {
     string_key_dict_of_string_key_dicts_or_prev_values_by_space = function(tbl)
       local res = {}
-      for k, v in transf.table.pair_stateless_iter(tbl) do
+      for k, v in transf.table.key_value_iter(tbl) do
         local key_parts = stringy.split(k, " ")
         local label = key_parts[1]
         local key = key_parts[2]
@@ -4256,8 +4266,8 @@ transf = {
   dict_of_dicts = {
     dict_by_space = function(dict_of_dicts)
       local res = {}
-      for label, dict in transf.table.pair_stateless_iter(dict_of_dicts) do
-        for k, v in transf.table.pair_stateless_iter(dict) do
+      for label, dict in transf.table.key_value_iter(dict_of_dicts) do
+        for k, v in transf.table.key_value_iter(dict) do
           res[label .. " " .. k] = v
         end
       end
@@ -6300,13 +6310,13 @@ transf = {
     highest_precedence_retriever_specifier = function(retriever_specifier_array)
       return reduce(
         retriever_specifier_array,
-        bind(get.table_and_table.larger_table_by_key {a_use, a_use, "precedence"})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key {a_use, a_use, "precedence"})
       )
     end,
     precedence_ordered_retriever_specifier_array = function(retriever_specifier_array)
       return get.array.sorted(
         retriever_specifier_array,
-        bind(get.table_and_table.larger_table_by_key) {a_use, a_use, "precedence"})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key) {a_use, a_use, "precedence"})
     end
   },
   ipc_socket_id = {

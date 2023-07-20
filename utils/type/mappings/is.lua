@@ -394,11 +394,11 @@ is = {
     end,
   },
   plaintext_dictionary_file = {
-    yaml_file = bind(get.path.is_standartized_extension, {a_use, "yaml"}),
-    json_file = bind(get.path.is_standartized_extension, {a_use, "json"}),
-    toml_file = bind(get.path.is_standartized_extension, {a_use, "toml"}),
-    ini_file = bind(get.path.is_standartized_extension, {a_use, "ini"}),
-    ics_file = bind(get.path.is_standartized_extension, {a_use, "ics"}),
+    yaml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "yaml"}),
+    json_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "json"}),
+    toml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "toml"}),
+    ini_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "ini"}),
+    ics_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "ics"}),
   },
   plaintext_table_file = {
     timestamp_first_column_plaintext_table_file = function(path)

@@ -118,7 +118,7 @@ function map(tbl, f, opts, visited)
 
 
   local manual_counter = 0
-  for k, v in wdefarg(iterator)(tbl) do
+  for k, v in iterator(tbl) do
     if not opts.mapcondition or findsingle(v, opts.mapcondition) then
       if 
         shouldRecurse(opts) and 

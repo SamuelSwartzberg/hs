@@ -889,7 +889,7 @@ dothis = {
     open_all = function(path, browser)
       hs.fnutils.ieach(
         transf.plaintext_file.nocomment_noindent_content_lines(path),
-        bind(dothis.url_or_local_path.open_browser, {a_use, browser})
+        get.fn.arbitrary_args_bound_or_ignored_fn(dothis.url_or_local_path.open_browser, {a_use, browser})
       )
     end,
   },
@@ -1893,7 +1893,7 @@ dothis = {
       end
     end,
     sort = table.sort,
-    shuffle = bind(table.sort, {a_use, transf["nil"].random_boolean}),
+    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(table.sort, {a_use, transf["nil"].random_boolean}),
     remove_by_index = table.remove,
     revove_by_item = function(array, item)
       local index = get.indexable.index_by_item(array, item)
@@ -2019,7 +2019,7 @@ dothis = {
     choose_action = function(any)
       dothis.any.choose_action_specifier(
         any, 
-        bind(dothis.action_specifier.execute, {a_use, any})
+        get.fn.arbitrary_args_bound_or_ignored_fn(dothis.action_specifier.execute, {a_use, any})
       )
     end,
   },
