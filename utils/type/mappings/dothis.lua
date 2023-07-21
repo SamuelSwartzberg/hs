@@ -586,19 +586,19 @@ dothis = {
         dothis.extant_path.empty_file(path)
       end
     end,
-    delete_if_empty = function(path)
+    delete_if_empty_path = function(path)
       if is.path.extant_path(path) then
-        dothis.extant_path.delete_if_empty(path)
+        dothis.extant_path.delete_if_empty_path(path)
       end
     end,
-    delete_file_if_empty = function(path)
+    delete_file_if_empty_file = function(path)
       if is.path.extant_path(path) then
-        dothis.extant_path.delete_file_if_empty(path)
+        dothis.extant_path.delete_file_if_empty_file(path)
       end
     end,
-    delete_dir_if_empty = function(path)
+    delete_dir_if_empty_dir = function(path)
       if is.path.extant_path(path) then
-        dothis.extant_path.delete_dir_if_empty(path)
+        dothis.extant_path.delete_dir_if_empty_dir(path)
       end
     end,
     initialize_omegat_project = function (path)
@@ -611,21 +611,21 @@ dothis = {
     end,
     append_or_write_file = function(path, contents)
       dothis.absolute_path.create_parent_dir(path)
-      dothis.file.append_file(path, contents)
+      dothis.file.append_or_write_file(path, contents)
     end,
-    append_file = function(path, contents)
+    append_file_if_file = function(path, contents)
       if is.absolute_path.file(path) then
         dothis.absolute_path.create_parent_dir(path)
         dothis.file.append_file(path, contents)
       end
     end,
-    create_file = function(path, contents)
+    write_file_if_nonextant_path = function(path, contents)
       if is.absolute_path.nonextant_path(path) then
         dothis.absolute_path.create_parent_dir(path)
         dothis.file.write_file(path, contents)
       end
     end,
-    replace_file = function(path, contents)
+    write_file_if_file = function(path, contents)
       if is.absolute_path.file(path) then
         dothis.absolute_path.create_parent_dir(path)
         dothis.file.write_file(path, contents)
@@ -777,9 +777,9 @@ dothis = {
       run("rclone copyto" .. transf.string.single_quoted_escaped(temp_file) .. " " .. transf.string.single_quoted_escaped(path))
       dothis.absolute_path.delete(temp_file)
     end,
-    append_file = function(path, contents)
+    append_or_write_file = function(path, contents)
       local temp_file = transf.string.in_tmp_dir(path, "labelled_remote_temp_file")
-      dothis.local_extant_path.append_file(temp_file, contents)
+      dothis.local_extant_path.append_or_write_file(temp_file, contents)
       dothis.labelled_remote_file.write_file(path, transf.local_file.contents(temp_file))
     end,
   },
@@ -796,8 +796,8 @@ dothis = {
     write_file = function(path, contents)
       dothis.labelled_remote_file.write_file(path, contents)
     end,
-    append_file = function(path, contents)
-      dothis.labelled_remote_file.append_file(path, contents)
+    append_or_write_file = function(path, contents)
+      dothis.labelled_remote_file.append_or_write_file(path, contents)
     end,
   },
   remote_dir =  {
@@ -814,7 +814,7 @@ dothis = {
       file:write(contents)
       file:close()
     end,
-    append_file = function(path, contents)
+    append_or_write_file = function(path, contents)
       local file = io.open(path, "a")
       file:write(contents)
       file:close()
@@ -856,7 +856,7 @@ dothis = {
         dothis.file.delete_file(path)
       end
     end,
-    delete_if_empty = function(path)
+    delete_if_empty_path = function(path)
       if is.extant_path.empty_path(path) then
         dothis.extant_path.delete(path)
       end
@@ -871,9 +871,9 @@ dothis = {
         dothis.file.delete_file(path)
       end
     end,
-    delete_file_if_empty = function(path)
+    delete_file_if_empty_file = function(path)
       if is.extant_path.file(path) then
-        dothis.file.delete_file_if_empty(path)
+        dothis.file.delete_file_if_empty_file(path)
       end
     end,
     delete_dir = function(path)
@@ -881,9 +881,9 @@ dothis = {
         dothis.dir.delete_dir(path)
       end
     end,
-    delete_dir_if_empty = function(path)
+    delete_dir_if_empty_dir = function(path)
       if is.extant_path.dir(path) then
-        dothis.dir.delete_dir_if_empty(path)
+        dothis.dir.delete_dir_if_empty_dir(path)
       end
     end,
     empty_dir = function(path)
@@ -973,12 +973,12 @@ dothis = {
         transf.path.local_or_remote_string(path) .. "_extant_path"
       ].write_file(path, contents)
     end,
-    append_file = function(path, contents)
+    append_or_write_file = function(path, contents)
       dothis[
         transf.path.local_or_remote_string(path) .. "_extant_path"
-      ].append_file(path, contents)
+      ].append_or_write_file(path, contents)
     end,
-    replace_file = function(path, contents)
+    write_file_if_file = function(path, contents)
       dothis.file.write_file(path, contents) -- if the file already exists, replacing is the same as writing
     end,
     empty_file = function(path)
@@ -989,7 +989,7 @@ dothis = {
         transf.path.local_or_remote_string(path) .. "_extant_path"
       ].delete_file(path)
     end,
-    delete_file_if_empty = function(path)
+    delete_file_if_empty_file = function(path)
       if is.file.empty_file(path) then
         dothis.file.delete_file(path)
       end
@@ -1007,7 +1007,7 @@ dothis = {
   plaintext_file = {
     append_lines = function(path, lines)
       local contents = transf.plaintext_file.one_final_newline(path)
-      dothis.absolute_path.replace_file(path, contents .. table.concat(lines, "\n"))
+      dothis.absolute_path.write_file_if_file(path, contents .. table.concat(lines, "\n"))
     end,
     append_line = function(path, line)
       dothis.plaintext_file.append_lines(path, {line})
@@ -1017,7 +1017,7 @@ dothis = {
       dothis.in_git_dir.commit_self(path, "Added line " .. line .. " to " .. get.absolute_path.relative_path_from(path, transf.in_git_dir.git_root_dir(path)))
     end,
     write_lines = function(path, lines)
-      dothis.absolute_path.replace_file(path, table.concat(lines, "\n"))
+      dothis.absolute_path.write_file_if_file(path, table.concat(lines, "\n"))
     end,
     set_line = function(path, line, line_number)
       local lines = transf.plaintext_file.lines(path)
@@ -1182,7 +1182,7 @@ dothis = {
         transf.path.local_or_remote_string(path) .. "_extant_path"
       ].delete_dir(path)
     end,
-    delete_dir_if_empty = function(path)
+    delete_dir_if_empty_dir = function(path)
       if is.dir.empty_dir(path) then
         dothis.dir.delete_dir(path)
       end
@@ -1850,7 +1850,7 @@ dothis = {
     create_all_translated_documents = dothis.omegat.create_all_translated_documents,
     create_current_translated_document = dothis.omegat.create_current_translated_document,
     create_and_open_new_source_odt = function(omegat_project_dir, name) -- while we support any source file, if we manually create a file, it should be an odt
-      dothis.absolute_path.create_file(
+      dothis.absolute_path.write_file_if_nonextant_path(
         transf.omegat_project_dir.source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
       )
       dothis.local_path.open(
