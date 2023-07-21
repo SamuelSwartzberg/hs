@@ -27,9 +27,9 @@ function benchmarkFunctions(specifier, args, iters)
     local func = func_specifier.func
     for i = 1, specifier.iterations do
       if func_specifier.args then
-        global_store = func(returnUnpackIfTable(func_specifier.args))
+        global_store = func(transf.any.n_anys_if_table(func_specifier.args))
       elseif args then
-        global_store = func(returnUnpackIfTable(args))
+        global_store = func(transf.any.n_anys_if_table(args))
       else
         global_store = func()
       end

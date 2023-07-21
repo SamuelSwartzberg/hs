@@ -102,7 +102,6 @@ end
 --- @field on_cancel? failure_action What to do if the user cancels the prompt. May error, return nil, or reprompt. Default is "error".
 --- @field on_raw_invalid? failure_action What to do if the raw return value is invalid. May error, return nil, or reprompt. Default is "return_nil".
 --- @field on_transformed_invalid? failure_action What to do if the transformed return value is invalid. May error, return nil, or reprompt. Default is "reprompt".
---- @field final_postprocessor? fun(transformedReturn: any): any A function to run on the final transformed return value, after validation. Default is the identity function.
 
 --- Main function to handle prompts. Uses a given prompt_spec or defaults.
 --- With the default prompt_spec, we will error if cancelled, return nil if the raw return value is the equivalent of an empty value, and never reprompt.
@@ -154,13 +153,7 @@ function promptNopolicy(prompt_spec)
       if prompt_spec.raw_validator(raw_return) then -- raw input was valid
         local transformed_return = prompt_spec.transformer(raw_return)
         if prompt_spec.transformed_validator(transformed_return) then -- transformed input was valid
-
-          -- if the prompt_spec has a final_postprocessor, call it. No matter what, return the result
-          if prompt_spec.final_postprocessor then
-            return prompt_spec.final_postprocessor(transformed_return)
-          else
-            return transformed_return
-          end
+          return transformed_return
         else -- transformed input was invalid, handle according to prompt_spec.on_transformed_invalid
           if prompt_spec.on_transformed_invalid == "error" then
             error("WARN: User input was invalid (after transformation).", 0)

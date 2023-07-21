@@ -14,8 +14,8 @@ lemap = {
     fill_template = transf.multiline_string.trimmed_lines([[Fill the following template
     
     {{[
-      table.concat(map(d.out_fields, function (field)
-        return field.value .. (field.explanation and " (" .. field.explanation .. ")" or "") .. ":"
+      table.concat(map(d.form_field_specifier_array, function (form_field_specifier)
+        return form_field_specifier.value .. (form_field_specifier.explanation and " (" .. form_field_specifier.explanation .. ")" or "") .. ":"
       end), "\n")
     ]}}
 

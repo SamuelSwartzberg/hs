@@ -64,39 +64,39 @@ if mode == "full-test" then
         checkEvent("mouse", "right", function() 
           checkEvent("key", "l", function()
             assertMessage(
-              parseSeriesSpecifier("."),
+              transf.input_spec_string.input_spec("."),
               { mode = "click", button = "l" }
             )
             assertMessage(
-              parseSeriesSpecifier(".r"),
+              transf.input_spec_string.input_spec(".r"),
               { mode = "click", button = "r" }
             )
             assertMessage(
-              parseSeriesSpecifier(".m"),
+              transf.input_spec_string.input_spec(".m"),
               { mode = "click", button = "m" }
             )
             assertMessage(
-              parseSeriesSpecifier(":a"),
+              transf.input_spec_string.input_spec(":a"),
               { mode = "key", keys = {"a"}}
             )
             assertMessage(
-              parseSeriesSpecifier(":cmd+a"),
+              transf.input_spec_string.input_spec(":cmd+a"),
               { mode = "key", keys = {"cmd", "a"}}
             )
             assertMessage(
-              parseSeriesSpecifier(":cmd+shift+a"),
+              transf.input_spec_string.input_spec(":cmd+shift+a"),
               { mode = "key", keys = {"cmd", "shift", "a"}}
             )
             assertMessage(
-              parseSeriesSpecifier("m500 500"),
+              transf.input_spec_string.input_spec("m500 500"),
               { mode = "move", target_point = {x = 500, y = 500} }
             )
             assertMessage(
-              parseSeriesSpecifier("s500 500"),
+              transf.input_spec_string.input_spec("s500 500"),
               { mode = "scroll", target_point = {x = 500, y = 500} }
             )
             assertMessage(
-              parseSeriesSpecifier("m500 500 %tl"),
+              transf.input_spec_string.input_spec("m500 500 %tl"),
               { mode = "move", target_point = {x = 500, y = 500}, relative_to = "tl" }
             )
             print("Finished testing doInput")

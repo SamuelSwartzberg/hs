@@ -86,10 +86,6 @@ YoutubePlayableItemItemSpecifier = {
       }
     },
   ),
-  potential_interfaces = ovtable.init({
-    { key = "youtube-playlist", value = CreateYoutubePlaylistItem },
-    { key = "youtube-video", value = CreateYoutubeVideoItem },
-  })
 }
 
 --- @type BoundNewDynamicContentsComponentInterface

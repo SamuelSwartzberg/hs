@@ -36,7 +36,7 @@ is = {
     end,
   },
   ascii = {
-    issn = function(str)
+    issn = function(str) 
       return onig.find(str, transf.string.whole_regex(mt._r.id.issn))
     end,
     uuid = function(str)
@@ -796,6 +796,23 @@ is = {
   stream_created_item_specifier = {
     alive = function(stream_created_item_specifier)
       return is.mpv_ipc_socket_id.alive(stream_created_item_specifier.inner_item.ipc_socket_id)
+    end,
+  },
+  input_spec = {
+    declared_click_input_spec = function(input_spec)
+      return input_spec.mode == "click"
+    end,
+    declared_key_input_spec = function(input_spec)
+      return input_spec.mode == "key"
+    end,
+    declared_move_input_spec = function(input_spec)
+      return input_spec.mode == "move"
+    end,
+    declared_scroll_input_spec = function(input_spec)
+      return input_spec.mode == "scroll"
+    end,
+    declared_position_change_input_spec = function(input_spec)
+      return is.input_spec.declared_move_input_spec(input_spec) or is.input_spec.declared_scroll_input_spec(input_spec)
     end,
   }
 }

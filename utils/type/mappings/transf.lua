@@ -571,7 +571,7 @@ transf = {
         return ":" .. specifier.line
       end
     end,
-    series_specifier = function(specifier)
+    input_spec_array = function(specifier)
       return ":ctrl+g,:+" .. transf.path_with_intra_file_locator_specifier.intra_file_locator(specifier) .. ",:+return"
     end,
      
@@ -1600,10 +1600,10 @@ transf = {
       return get.logging_dir.log_path_for_date(env.MENTRY_LOGS, date)
     end,
     full_rfc3339like_dt = function(date)
-      return get.date.formatted(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
+      return get.date.formatted_string(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
     end,
     full_rfc3339like_time = function(date)
-      return get.date.formatted(date, tblmap.date_format_name.date_format["rfc3339-time"])
+      return get.date.formatted_string(date, tblmap.date_format_name.date_format["rfc3339-time"])
     end,
     timestamp_s = function(date)
       return transf.full_date_component_name_value_dict.timestamp_s(
@@ -6190,6 +6190,14 @@ transf = {
     passw_pass_item_name_array = function()
       return transf.dir.children_filename_array(env.MPASSPASSW)
     end,
+    timestamp_s_last_midnight = function()
+      return transf.date.timestamp_s(
+        get.date.precision_date(
+          date(),
+          "day"
+        )
+      )
+    end,
 
 
   },
@@ -6764,4 +6772,157 @@ transf = {
       return table.unpack(component_array)
     end
   },
+  form_field_specifier = {
+
+  },
+  position_change_state_spec = {
+    should_continue = function(position_change_state_spec)
+      return position_change_state_spec.num_steps > 0
+        and (position_change_state_spec.delta_hs_geometry_point.x > 0.1
+          or position_change_state_spec.delta_hs_geometry_point.y > 0.1)
+    end,
+    next_position_change_state_spec = function(position_change_state_spec)
+      local next_position_change_state_spec  = {}
+      next_position_change_state_spec.num_steps = position_change_state_spec.num_steps - 1
+      next_position_change_state_spec.delta_hs_geometry_point = position_change_state_spec.delta_hs_geometry_point * position_change_state_spec.factor_of_deceleration
+      next_position_change_state_spec.past_ideal_hs_geometry_point = position_change_state_spec.past_ideal_hs_geometry_point + position_change_state_spec.delta_hs_geometry_point
+      local jittered_delta_hs_geometry_point = next_position_change_state_spec.delta_hs_geometry_point * transf.float_interval_specifier.random({
+        start = -position_change_state_spec.jitter_factor,
+        stop = position_change_state_spec.jitter_factor
+      })
+      next_position_change_state_spec.current_hs_geometry_point = next_position_change_state_spec.past_ideal_hs_geometry_point * jittered_delta_hs_geometry_point
+      next_position_change_state_spec.jitter_factor = position_change_state_spec.jitter_factor
+      return next_position_change_state_spec
+    end,
+  },
+  declared_position_change_input_spec = {
+    target_hs_geometry_point = function(declared_position_change_input_spec)
+      local target_point = declared_position_change_input_spec.target_hs_geometry_point or hs.geometry.point(0, 0)
+      if declared_position_change_input_spec.relative_to then
+        if declared_position_change_input_spec.relative_to ~= "curpos" then
+          local front_window = transf.running_application.main_window(hs.application.frontmostApplication())
+          target_point = get.window.hs_geometry_point_with_offset(front_window, declared_position_change_input_spec.relative_to, target_point)
+        else
+          target_point = target_point + transf[
+            declared_position_change_input_spec.mode .. "_input_spec"
+          ].starting_hs_geometry_point(declared_position_change_input_spec)
+        end
+      end
+      return target_point
+    end,
+    jitter_factor = function(declared_position_change_input_spec)
+      return declared_position_change_input_spec.jitter_factor or 0.1
+    end,
+    duration = function(declared_position_change_input_spec)
+      return declared_position_change_input_spec.duration or transf.float_interval_specifier.random({start=0.1, stop=0.3})
+    end,
+    factor_of_deceleration = function(declared_position_change_input_spec)
+      return declared_position_change_input_spec.factor_of_deceleration or 0.95
+    end,
+    starting_position_change_state_spec = function(declared_position_change_input_spec)
+      local starting_point = transf[
+        declared_position_change_input_spec.mode .. "_input_spec"
+      ].starting_hs_geometry_point(declared_position_change_input_spec)
+      local total_delta = transf.declared_position_change_input_spec.target_hs_geometry_point(declared_position_change_input_spec) - starting_point
+      local starting_position_change_state_spec = {}
+      starting_position_change_state_spec.num_steps = math.ceil(
+        transf.declared_position_change_input_spec.duration(declared_position_change_input_spec) / refstore.consts.POLLING_INTERVAL
+      )
+
+      --- Function that calculates the initial delta value given a certain distance, factor of deceleration and number of steps.
+      --- @param distance number: The total distance to travel.
+      --- @param factor_of_deceleration number: The deceleration factor to use. If this is >= 1, we'll move linearly.
+      --- @param steps number: The number of steps to take in total.
+      --- @return number: The starting delta value.
+      function getStartingDelta(distance, factor_of_deceleration, steps)
+        if factor_of_deceleration >= 1 then -- invalid deceleration factor, would never reach target ≙ we're just going to move linearly
+          return distance / steps 
+        else 
+          return distance * (1 - factor_of_deceleration) / (1 - factor_of_deceleration ^ (steps - 1))
+        end
+      end
+
+      starting_position_change_state_spec.past_ideal_hs_geometry_point = hs.geometry.new(starting_point)
+      starting_position_change_state_spec.delta_hs_geometry_point = hs.geometry.point(
+        getStartingDelta(total_delta.x, transf.declared_position_change_input_spec.factor_of_deceleration(declared_position_change_input_spec), starting_position_change_state_spec.num_steps),
+        getStartingDelta(total_delta.y, transf.declared_position_change_input_spec.factor_of_deceleration(declared_position_change_input_spec), starting_position_change_state_spec.num_steps)
+      )
+      starting_position_change_state_spec.jitter_factor = transf.declared_position_change_input_spec.jitter_factor(declared_position_change_input_spec)
+      return starting_position_change_state_spec
+    end,
+  },
+
+  click_input_spec = {
+    click_fn = function(spec)
+      return hs.eventtap[
+        tblmap.mouse_button_string.mouse_button_function_name[spec.mouse_button_string]
+      ]
+    end,
+  },
+
+  -- <input_spec_string> ::= <click_spec_string> | <key_spec_string> | <move_scroll_spec_string>
+  -- <click_spec_string> ::= "." <mouse_button>
+  -- <mouse_button> ::= "l" | "r" | "m" | ... -- l for left, r for right, m for middle, etc.
+  -- <key_spec_string> ::= ":" <keys>
+  -- <keys> ::= <key> | <key> "+" <keys>
+  -- <key> ::= <any_valid_key_representation>
+  -- <move_scroll_spec_string> ::= <mode> <target_point> [<relative_position_spec_string>]
+  -- <mode> ::= "m" | "s" -- m for move, s for scroll
+  -- <target_point> ::= <coordinate> "," <coordinate>
+  -- <coordinate> ::= <number>
+  -- <relative_position_spec_string> ::= " " <relative_position>
+  -- <relative_position> ::= "tl" | "tr" | "bl" | "br" | "c" | "curpos" -- tl for top-left, tr for top-right, bl for bottom-left, br for bottom-right, c for center, curpos for current position.
+  input_spec_string = {
+    input_spec = function(str)
+      local input_spec = {}
+      if stringy.startswith(str, ".") then
+        input_spec.mode = "click"
+        if #str == 1 then
+          input_spec.mouse_button_string = "l"
+        else
+          input_spec.mouse_button_string = string.sub(str, 2, 2)
+        end
+      elseif stringy.startswith(str, ":") then
+        input_spec.mode = "key"
+        local parts = transf.hole_y_arraylike.array(stringy.split(string.sub(str, 2), "+")) -- separating modifier keys with `+`
+        if #parts > 1 then
+          input_spec.key = dothis.array.pop(parts)
+          input_spec.mods = parts
+        else
+          input_spec.key = parts[1]
+        end
+      else
+        local mode_char, x, y, optional_relative_specifier = onig.match(str, "^(.)"..mt._r.syntax.point.."( %[a-zA-Z]+)?$")
+        if not mode_char or not x or not y then
+          error("Tried to parse string series_specifier, but it didn't match any known format:\n\n" .. str)
+        end
+        if mode_char == "m" then
+          input_spec.mode = "move"
+        elseif mode_char == "s" then
+          input_spec.mode = "scroll"
+        else
+          error("doInput: invalid mode character `" .. mode_char .. "` in series specifier:\n\n" .. str)
+        end
+        input_spec.target_point = hs.geometry.new({
+          x = get.string_or_number.number(x),
+          y = get.string_or_number.number(y)
+        })
+        if optional_relative_specifier and #optional_relative_specifier > 0 then
+          input_spec.relative_to = string.sub(optional_relative_specifier, 3)
+        end
+      end
+      return input_spec
+    end
+  },
+  input_spec_series_string = {
+    input_spec_string_array = function(str)
+      return transf.hole_y_arraylike.array(get.string.split_single_char_stripped(str, "\n"))
+    end,
+    input_spec_array = function(str)
+      return hs.fnutils.imap(
+        transf.input_spec_series_string.input_spec_string_array(str),
+        transf.input_spec_string.input_spec
+      )
+    end,
+  }
 }

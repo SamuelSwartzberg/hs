@@ -145,16 +145,16 @@ assertMessage(
 )
 
 assertMessage(
-  returnUnpackIfTable("foo"),
+  transf.any.n_anys_if_table("foo"),
   "foo"
 )
 
 assertMessage(
-  returnUnpackIfTable({ "foo" }),
+  transf.any.n_anys_if_table({ "foo" }),
   "foo"
 )
 
 assertMessage(
-  select(2, returnUnpackIfTable({ "foo", "bar" })),
+  select(2, transf.any.n_anys_if_table({ "foo", "bar" })),
   "bar"
 )

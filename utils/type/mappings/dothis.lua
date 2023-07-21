@@ -301,40 +301,8 @@ dothis = {
       dothis.khard.edit_contact(transf.contact_table.uid(contact_table))
     end,
   },
-  youtube = {
-    do_extracted_attrs_via_ai = function(video_id, do_after)
-      fillTemplateGPT({
-        in_fields = {
-          title = transf.youtube_video_id.title(video_id),
-          channel_title = transf.youtube_video_id.channel_title(video_id),
-          description = slice(transf.youtube_video_id.description(video_id), { stop = 400, sliced_indicator = "... (truncated)" }),
-        },
-        out_fields = {
-          {
-            alias = "tcrea",
-            value = "Artist"
-          },
-          {
-            alias = "title",
-            value = "Title"
-          },
-          {
-            alias = "srs",
-            value = "Series"
-          },
-          {
-            alias = "srsrel",
-            value = "Relation to series",
-            explanation = "op, ed, ost, insert song, etc."
-          },
-          {
-            alias = "srsrelindex",
-            value = "Index in the relation to series",
-            explanation = "positive integer"
-          }
-        },
-      },do_after)
-    end,
+  youtube_video_id = {
+    
   },
   sox = {
     rec_start = function(path, do_after)
@@ -1462,7 +1430,7 @@ dothis = {
   },
   timestamp_s = {
     do_at = function(timestamp, fn)
-      local last_midnight = getUnixTimeLastMidnight()
+      local last_midnight = transf["nil"].timestamp_s_last_midnight()
       local seconds_to_wait = timestamp - last_midnight
       if seconds_to_wait < 0 then
         error("Timestamp is in the past by " .. -seconds_to_wait .. " seconds")
@@ -1667,8 +1635,8 @@ dothis = {
   },
   path_with_intra_file_locator_specifier = {
     go_to = function(specifier)
-      doSeries(
-        transf.path_with_intra_file_locator_specifier.series_specifier(specifier)
+      dothis.input_spec_array.exec(
+        transf.path_with_intra_file_locator_specifier.input_spec_array(specifier)
       )
     end,
     open_go_to = function(specifier)
@@ -2050,6 +2018,35 @@ dothis = {
     
 
   },
+  youtube_playlist_creation_specifier = {
+    --- @param spec {title?: string, description?: string, privacyStatus?: string, youtube_video_id_array?: string[]}
+    --- @param do_after? fun(id: string): nil
+    create_youtube_playlist = function(spec, do_after)
+      rest({
+        api_name = "youtube",
+        endpoint = "playlists",
+        params = { part = "snippet,status" },
+        request_table = {
+          snippet = {
+            title = spec.title or string.format("Playlist from %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
+            description = spec.description or string.format("Created at %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
+          }
+        },
+      }, function(result)
+        local id = result.id
+        hs.timer.doAfter(3, function () -- wait for playlist to be created, seems to not happen instantly
+          if spec.youtube_video_id_array then
+            dothis.youtube_playlist_id.add_youtube_video_id_array(id, spec.youtube_video_id_array, do_after)
+          else
+            if do_after then
+              do_after(id)
+            end
+          end
+        end)
+      end)
+    end
+    
+  },
   array = {
     choose_item = function(array, callback, target_item_chooser_item_specifier_name)
       dothis.choosing_hschooser_specifier.choose_identified_item(
@@ -2129,6 +2126,22 @@ dothis = {
           i = i + 1
         end
       end
+    end,
+    each_with_delay = function(array, delay, fn, do_after)
+      local next_item = transf.array.index_value_stateful_iter(array)
+      local do_next_item
+      do_next_item = function()
+        local index, item = next_item()
+        if index then
+          fn(item)
+          hs.timer.doAfter(delay, do_next_item)
+        else
+          if do_after then
+            do_after()
+          end
+        end
+      end
+      do_next_item()
     end,
   },
   action_specifier = {
@@ -2511,6 +2524,116 @@ dothis = {
   preference_domain_string = {
     write_default = function(domain, key, value, type)
       run("defaults write" .. transf.string.single_quoted_escaped(domain) .. transf.string.single_quoted_escaped(key) .. " -" .. type .. " " .. transf.string.single_quoted_escaped(value))
+    end
+
+  },
+  move_input_spec = {
+    final_exec = function(spec)
+      hs.mouse.absolutePosition(
+        transf.declared_position_change_input_spec.target_hs_geometry_point(spec)
+      )
+    end,
+    exec_position_change_state_spec = function(spec, position_change_state_spec)
+      hs.mouse.absolutePosition(position_change_state_spec.current_hs_geometry_point)
+    end,
+    exec = function(spec, do_after)
+      dothis.declared_position_change_input_spec.exec(
+        get.input_spec.declared_input_spec(spec, "move"),
+        do_after
+      )
+    end,
+  },
+  scroll_input_spec = {
+    final_exec = function() end,
+    exec_position_change_state_spec = function(spec, position_change_state_spec)
+      hs.eventtap.scrollWheel({position_change_state_spec.delta_hs_geometry_point.x, position_change_state_spec.delta_hs_geometry_point.y}, {}, "pixel")
+    end,
+    exec = function(spec, do_after)
+      dothis.declared_position_change_input_spec.exec(
+        get.input_spec.declared_input_spec(spec, "scroll"),
+        do_after
+      )
+    end,
+  },
+  declared_position_change_input_spec = {
+    exec = function(spec, do_after)
+      local position_change_state_spec = transf.declared_position_change_input_spec.starting_position_change_state_spec(spec)
+      local timer = hs.timer.doWhile(function() 
+        if 
+          not transf.position_change_state_spec.should_continue(position_change_state_spec)
+        then
+          dothis[
+            spec.mode .. "_input_spec"
+          ].final_exec(spec, do_after)
+          if do_after then
+            hs.timer.doAfter(0.2, do_after)
+          end
+          return false
+        else
+          position_change_state_spec = transf.position_change_state_spec.next_position_change_state_spec(position_change_state_spec)
+          return true
+        end
+      end, function()
+        dothis[
+          spec.mode .. "_input_spec"
+        ].exec_position_change_state_spec(spec, position_change_state_spec)
+      end, refstore.consts.POLLING_INTERVAL)
+      timer:start()
+    end,
+  },
+  key_input_spec = {
+    exec = function(spec, do_after)
+      if spec.mods then
+        local mods = map(spec.mods, normalize.mod)
+        hs.eventtap.keyStroke(mods, spec.key)
+      elseif #spec.key == 1 then
+        hs.eventtap.keyStroke({}, spec.key)
+      else
+        hs.eventtap.keyStrokes(spec.key)
+      end
+      hs.timer.doAfter(0.2, do_after)
+    end,
+  },
+  click_input_spec = {
+    exec = function(spec, do_after)
+      transf.click_input_spec.click_fn(spec)(hs.mouse.absolutePosition())
+      hs.timer.doAfter(0.2, do_after)
+    end,
+  },
+  input_spec = {
+    exec = function(spec, do_after)
+      dothis[
+        spec.mode .. "_input_spec"
+      ].exec(spec, do_after)
+    end,
+  },
+  input_spec_array = {
+    exec = function(specarr, wait_time, do_after)
+      wait_time = wait_time or transf.float_interval_specifier.random({start=0.10, stop=0.12})
+      if #specarr == 0 then
+        if do_after then
+          do_after()
+        end
+        return
+      end
+      hs.timer.doAfter(
+        wait_time, 
+        function()
+          local subspecifier = dothis.array.shift(specarr)
+          dothis.input_spec.exec(subspecifier, function()
+            dothis.input_spec_array.exec(subspecifier, do_after)
+          end)
+        end
+      )
+    end
+  },
+  input_spec_series_string = {
+    exec = function(str, wait_time, do_after)
+      dothis.input_spec_array.exec(
+        transf.input_spec_series_string.input_spec_array(str),
+        wait_time,
+        do_after 
+      )
     end
 
   },

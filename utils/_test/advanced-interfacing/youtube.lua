@@ -24,7 +24,7 @@ assertMessage(
   1
 )
 
-createYoutubePlaylist({
+dothis.youtube_playlist_creation_specifier.create_youtube_playlis({
   title = "Test Playlist",
   description = "This is a test playlist created at " .. os.date("%Y-%m-%dT%H:%M:%S%Z"),
 }, function (createdPlaylistId)
@@ -117,7 +117,7 @@ createYoutubePlaylist({
 
       assert(not succ)
 
-      createYoutubePlaylist({
+      dothis.youtube_playlist_creation_specifier.create_youtube_playlist({
         videos = {
           "M7FIvfx5J10",
           "V4DDt30Aat4",

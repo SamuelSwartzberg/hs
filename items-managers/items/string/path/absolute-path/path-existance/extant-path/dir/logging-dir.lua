@@ -14,7 +14,7 @@ LoggingDirSpecifier = {
       ["log-now"] = function(self, contents)
         self:doThis("log-timestamp-table", ovtable.init({{
           key = tostring(os.time()),
-          value = {returnUnpackIfTable(contents)}
+          value = {transf.any.n_anys_if_table(contents)}
         }}))
       end,
       ["log-now-empty"] = function(self)

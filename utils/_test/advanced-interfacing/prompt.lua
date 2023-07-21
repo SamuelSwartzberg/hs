@@ -265,17 +265,6 @@ assertMessage(
   "Hello World!"
 )
 
--- final_postprocessor
-
-assertMessage(
-  promptNopolicy({
-    prompter = mockPrompterReturnsString,
-    final_postprocessor = function(x)
-      return x .. "!"
-    end,
-  }),
-  "Hello World!!"
-)
 
 -- prompt
 

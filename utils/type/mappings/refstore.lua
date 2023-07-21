@@ -85,5 +85,8 @@ refstore = {
         },
       }
     }
+  },
+  consts = {
+    POLLING_INTERVAL = 0.01 -- seconds, seems like good compromise between what applications might expect and performance
   }
 }

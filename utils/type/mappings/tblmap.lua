@@ -10,6 +10,13 @@ tblmap = {
       ["\0"] = "\\0"
     },
   },
+  mouse_button_string = {
+    mouse_button_function_name = {
+      l = "leftClick",
+      r = "rightClick",
+      m = "middleClick"
+    }
+  },
   char = {
     name = {
       ["\t"] = "tab",
@@ -541,7 +548,8 @@ tblmap = {
       username = "👤🔤",
       default = "🔘⚫️",
       ["or"] = "|",
-      ["and"] = "&"
+      ["and"] = "&",
+      stream = "🎸"
     },
     description = {
       open = "op",
@@ -624,6 +632,10 @@ tblmap = {
       recovery_key = "rky",
       security_question = "secq",
       username = "usrnm",
+      default = "dflt",
+      ["or"] = "or",
+      ["and"] = "and",
+      stream = "strm"
     }
   },
   stream_attribute = {

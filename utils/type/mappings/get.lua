@@ -1458,53 +1458,53 @@ get = {
     end,
   },
   date = {
-    with_added = function(date, amount, component)
+    with_date_component_value_added = function(date, date_component_value, date_component_name)
       local dtcp = date:copy()
-      return dtcp["add" .. tblmap.date_component_name.date_component_name_long[component] .. "s"](dtcp, amount)
+      return dtcp["add" .. tblmap.date_component_name.date_component_name_long[date_component_name] .. "s"](dtcp, date_component_value)
     end,
-    with_subtracted = function(date, amount, component)
-      return get.date.with_added(date, -amount, component)
+    with_date_component_value_subtracted = function(date, date_component_value, date_component_name)
+      return get.date.with_date_component_value_added(date, -date_component_value, date_component_name)
     end,
-    component_value = function(date, component)
-      return date["get" .. tblmap.date_component_name.date_component_name_long[component]](date)
+    date_component_value = function(date, date_component_name)
+      return date["get" .. tblmap.date_component_name.date_component_name_long[date_component_name]](date)
     end,
-    surrounding_date_sequence_specifier = function(date, amount, step, unit)
+    surrounding_date_sequence_specifier = function(date, date_component_value, step, unit)
       return {
-        start = get.date.with_subtracted(date, amount, step),
-        stop = get.date.with_added(date, amount, step),
+        start = get.date.with_date_component_value_subtracted(date, date_component_value, step),
+        stop = get.date.with_date_component_value_added(date, date_component_value, step),
         step = step,
         unit = unit,
       }
     end,
-    date_sequence_specifier_of_lower_component = function(date, step, component)
+    date_sequence_specifier_of_lower_component = function(date, step, date_component_name)
       return get.full_date_component_name_value_dict.date_sequence_specifier_of_lower_component(
         transf.date.full_date_component_name_value_dict(date),
         step,
-        component
+        date_component_name
       )
     end,
-    hours_date_sequence_specifier = function(date, amount)
-      return get.date.date_sequence_specifier_of_lower_component(date, amount, "day")
+    hours_date_sequence_specifier = function(date, date_component_value)
+      return get.date.date_sequence_specifier_of_lower_component(date, date_component_value, "day")
     end,
-    to_precision = function(date, component)
-      return get.full_date_component_name_value_dict.to_precision_date(
+    precision_date = function(date, date_component_name)
+      return get.full_date_component_name_value_dict.precision_date(
         transf.date.full_date_component_name_value_dict(date),
-        component
+        date_component_name
       )
     end,
     --- accepts both format strings and format names
-    formatted = function(date, format)
+    formatted_string = function(date, format)
       local retrieved_format = tblmap.date_format_name.date_format[format]
       return date:fmt(retrieved_format or format)
     end,
     rfc3339like_dt_of_precision = function(date, precision)
-      return get.date.formatted(date, tblmap.date_component_name.rfc3339like_dt_format_string[precision])
+      return get.date.formatted_string(date, tblmap.date_component_name.rfc3339like_dt_format_string[precision])
     end,
 
   },
   timestamp_s = {
     formatted = function(timestamp_s, format)
-      return get.date.formatted(
+      return get.date.formatted_string(
         transf.timestamp_s.date(timestamp_s),
         format
       )
@@ -1512,7 +1512,7 @@ get = {
   },
   timestamp_ms = {
     formatted = function(timestamp_s, format)
-      return get.date.formatted(
+      return get.date.formatted_string(
         transf.timestamp_s.date(timestamp_s),
         format
       )
@@ -1578,26 +1578,26 @@ get = {
     end,
   },
   full_date_component_name_value_dict = {
-    prefix_partial_date_component_name_value_dict = function(full_date_component_name_value_dict, component)
+    prefix_partial_date_component_name_value_dict = function(full_date_component_name_value_dict, date_component_name)
       return map(
-        transf.date_component_name.date_component_name_value_dict_larger_or_same(component),
+        transf.date_component_name.date_component_name_value_dict_larger_or_same(date_component_name),
         full_date_component_name_value_dict
       )
     end,
-    date_sequence_specifier_of_lower_component = function (full_date_component_name_value_dict, step, component, additional_steps_down)
+    date_sequence_specifier_of_lower_component = function (full_date_component_name_value_dict, step, date_component_name, additional_steps_down)
       return get.date_component_name_value_dict.date_sequence_specifier(
-        transf.full_date_component_name_value_dict.prefix_partial_date_component_name_value_dict(full_date_component_name_value_dict, component),
+        get.full_date_component_name_value_dict.prefix_partial_date_component_name_value_dict(full_date_component_name_value_dict, date_component_name),
         step,
-        get.date_component_name.next(component, additional_steps_down)
+        get.date_component_name.next(date_component_name, additional_steps_down)
       )      
     end,
-    to_precision_full_date_component_name_value_dict = function(full_date_component_name_value_dict, component)
+    precision_full_date_component_name_value_dict = function(full_date_component_name_value_dict, date_component_name)
       return transf.full_date_component_name_value_dict.min_full_date_component_name_value_dict(
-        transf.full_date_component_name_value_dict.prefix_partial_date_component_name_value_dict(full_date_component_name_value_dict, component)
+        get.full_date_component_name_value_dict.prefix_partial_date_component_name_value_dict(full_date_component_name_value_dict, date_component_name)
       )
     end,
-    to_precision_date = function(full_date_component_name_value_dict, component)
-      return date(transf.full_date_component_name_value_dict.to_precision_full_date_component_name_value_dict(full_date_component_name_value_dict, component))
+    precision_date = function(full_date_component_name_value_dict, date_component_name)
+      return date(get.full_date_component_name_value_dict.precision_full_date_component_name_value_dict(full_date_component_name_value_dict, date_component_name))
     end,
   },
   rfc3339like_dt = {
@@ -2289,6 +2289,51 @@ get = {
   }, 
   stream_creation_specifier = {
   },
+  youtube_video_id = {
+    get_extracted_attr_dict_via_ai = function(video_id, do_after)
+      return get.form_filling_specifier.filled_string_dict({
+        in_fields = {
+          title = transf.youtube_video_id.title(video_id),
+          channel_title = transf.youtube_video_id.channel_title(video_id),
+          description = slice(transf.youtube_video_id.description(video_id), { stop = 400, sliced_indicator = "... (truncated)" }),
+        },
+        form_field_specifier_array = {
+          {
+            alias = "tcrea",
+            value = "Artist"
+          },
+          {
+            alias = "title",
+            value = "Title"
+          },
+          {
+            alias = "srs",
+            value = "Series"
+          },
+          {
+            alias = "srsrel",
+            value = "Relation to series",
+            explanation = "op, ed, ost, insert song, etc."
+          },
+          {
+            alias = "srsrelindex",
+            value = "Index in the relation to series",
+            explanation = "positive integer"
+          }
+        },
+      })
+    end,
+  },
+  youtube_video_id_array = {
+    youtube_playlist_creation_specifier = function(arr, name, desc, privacy)
+      return {
+        name = name,
+        desc = desc,
+        privacy = privacy,
+        youtube_video_id_array = arr
+      }
+    end,
+  },
   fn = {
     first_n_args_bound_fn = hs.fnutils.partial,
 
@@ -2330,5 +2375,72 @@ get = {
 
       return inner_func
     end
+  },
+  form_field_specifier_array = {
+    form_filling_specifier = function(specarr, in_fields)
+      return {
+        form_field_specifier_array = specarr,
+        in_fields = in_fields
+      }
+    end,
+    filled_string_dict_from_string = function(specarr, str)
+      return map(
+        specarr,
+        function (form_field_specifier)
+          return 
+            form_field_specifier.alias or form_field_specifier.value, 
+            string.match(str, form_field_specifier.value .. "[^\n]-: *(.-)\n") or string.match(str, form_field_specifier.value .. "[^\n]-: *(.-)$")
+        end,
+        {"v", "kv"}
+      )
+    end,
+    filled_string_dict_from_string_array = function(specarr, in_fields)
+      return get.form_filling_specifier.filled_string_dict(
+        get.form_field_specifier_array.form_filling_specifier(
+          specarr,
+          in_fields
+        )
+      )
+    end
+  },
+  form_filling_specifier = {
+    --- @class form_field_specifier  
+    --- @field value string The field to fill, as we want GPT to see it (i.e. chosing a name that GPT will understand)
+    --- @field alias? string The field to fill, as we want the user to see it (i.e. chosing a name that the user will understand). May often be unset, in which case the value field is used.
+    --- @field explanation? string The explanation to show to GPT for the field. May be unset if the field is self-explanatory.
+
+    --- @class form_filling_specifier
+    --- @field in_fields {[string]: string} The fields to take the data from
+    --- @field form_field_specifier_array form_field_specifier[] The fields (i.e. the template) to fill
+    --- fills a template using GPT
+    --- example use-case: Imagine trying to get the metadata of some song from a youtube video, where the artist name may be in the title, or the channel name, or not present at all, where the title may contain a bunch of other stuff besides the song title
+    --- in this case you could call this function as
+    --- ```
+    --- fillTemplateGPT(
+    ---   {
+    ---     in_fields = {
+    ---       channel_name = "XxAimerLoverxX",
+    ---       video_title = "XxAimerLoverxX - Aimer - Last Stardust",
+    ---     },
+    ---     form_field_specifier_array = {
+    ---       {value = "artist"},
+    ---       {value = "song_title"},
+    ---     }
+    ---   }, ...
+    --- )
+    --- ```
+
+    filled_string_dict = function(spec)
+      local query = get.string.evaled_as_template(lemap.gpt.fill_template, spec)
+      local res = gpt(query,  { temperature = 0})
+      return get.form_field_specifier_array.filled_string_dict_from_string(spec.form_field_specifier_array, res)
+    end,
+  },
+  input_spec = {
+    declared_input_spec = function(input_spec, type)
+      local cpy = get.table.copy(input_spec)
+      cpy.type = type
+      return cpy
+    end,
   }
 }

@@ -310,7 +310,7 @@ hs.timer.doAfter(1, function()
   dothis.pass.delete_otp("testotp")
 end)
 
-dothis.youtube.do_extracted_attrs_via_ai("EBNl8bwdVcA", function(res_tbl)
+dothis.youtube_video_id.do_extracted_attrs_via_ai("EBNl8bwdVcA", function(res_tbl)
   assertMessage(
     res_tbl.tcrea,
     "nobodyknows+"

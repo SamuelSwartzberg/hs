@@ -37,7 +37,7 @@ function find(indexable, cond, opts)
           if not finalres then finalres = {} end
           dothis.array.push(finalres, retres)
         else
-          return returnUnpackIfTable(retres)
+          return transf.any.n_anys_if_table(retres)
         end
       end
 

@@ -33,8 +33,3 @@ YoutubePlaylistItemSpecifier = {
   },
   action_table = {}
 }
-
-
-CreateYoutubePlaylistItem = function(super)
-  return NewDynamicContentsComponentInterface(YoutubePlaylistItemSpecifier, super)
-end
