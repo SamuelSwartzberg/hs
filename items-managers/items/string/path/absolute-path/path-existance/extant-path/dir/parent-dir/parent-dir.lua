@@ -47,9 +47,6 @@ ParentDirItemSpecifier = {
       ["choose-child-string-item-dir"]  = function(self)
         self:get("child-dir-only-string-item-array"):doThis("choose-item-and-then-action")
       end,
-      ["move-contents"] = function(self, target)
-        srctgt("move", self:get("c"), target, "any", false, false, true)
-      end,
     }
   },
   potential_interfaces = ovtable.init({

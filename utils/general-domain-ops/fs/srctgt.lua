@@ -11,84 +11,9 @@
 --- @return nil
 function srctgt(action, source, target, condition, create_path, into, all_in, relative_to)
 
-  -- set defaults
-
-  condition = get.any.default_if_nil(condition, "any")
-  create_path = get.any.default_if_nil(create_path, true)
-  into = get.any.default_if_nil(into, false)
-  all_in = get.any.default_if_nil(all_in, false)
-  target = get.any.default_if_nil(target, source .. "." .. action)
-
-  local source_is_url = isUrl(source)
-
-  if source_is_url then
-    if action == "move" or action == "link" then
-      error("cannot " .. action .. " a URL")
-    end
-    if all_in then
-      error("cannot action all_in a URL, as listing the contents of a URL cannot reliably be done")
-    end
-    local url = source
-    source = transf.url.in_cache_dir(url)
-    run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(source))
-  end
-
-  -- resolve tilde
-
-  source = hs.fs.pathToAbsolute(source, true)
-  target = hs.fs.pathToAbsolute(target, true)
-
   -- check if path is remote, customize things accordingly
 
-  local source_is_remote = is.path.remote_path(source)
-  local target_is_remote = is.path.remote_path(target)
   local has_remote_path = source_is_remote or target_is_remote
-
-  -- resolve relative_to
-
-  if relative_to then
-    source, target = resolve({
-      s = {
-        path = source,
-        root = relative_to,
-      },
-      t = {
-        prefix = is.path.remote_path(target) and "hsftp:" or nil
-      }
-    })
-  end
-
-  -- create (parent) path if necessary
-
-  if create_path then
-    if is.absolute_path.dir(target) or into then
-      dothis.absolute_path.create_dir(target)
-    else
-      dothis.absolute_path.create_dir(target, "1:-2")
-    end
-  end
-
-  -- check if target exists, and if return early if it does not match the condition
-
-  if is.path.extant_path(target) then
-    if condition == "not-exists" then
-      return nil
-    end
-  else
-    if condition == "exists" then
-      return nil
-    end
-  end
-
-  -- if into, then change target to be the target directory + the leaf of the source
-
-  if into then
-    if not is.absolute_path.dir(target) then
-      error("target must be a directory if into is true. Target: " .. target)
-    end
-    target = target .. "/" .. transf.path.leaf(source)
-    dothis.absolute_path.create_dir(target, "1:-2")
-  end
 
   -- prepare a list of sources to action, or a 'list' of one if not all_in
 
@@ -129,21 +54,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
         })
       end
     else
-      if action == "copy" then
-        run({
-          "rclone",
-          "copyto",
-          { value = final_source, type = "quoted"},
-          { value = final_target, type = "quoted"}
-        })
-      elseif action == "move" then
-        run({
-          "rclone",
-          "moveto",
-          { value = final_source, type = "quoted"},
-          { value = final_target, type = "quoted"}
-        })
-      elseif action == "link" then
+      if action == "link" then
         error("linking remote files is not supported (not supported by rclone and also not really sensible)")
       elseif action == "zip" then
         tmptarget = env.TMPDIR .. "/" .. os.time() .. "-" .. transf.int.random_int_of_length(8) .. ".zip"
@@ -165,7 +76,7 @@ function srctgt(action, source, target, condition, create_path, into, all_in, re
   -- finalize actions that could not be performed in the loop
 
   if tmptarget then
-    srctgt("copy", tmptarget, final_target)
+    dothis.extant_path.copy_to_absolute_path(tmptarget, final_target)
     dothis.absolute_path.delete
   end
 end

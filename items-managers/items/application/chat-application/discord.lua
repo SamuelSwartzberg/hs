@@ -95,7 +95,7 @@ DiscordItemSpecifier = {
       end,
       ["pre-process-chat-messages-hook"] = function (self, chat_obj)
         local media_dir = st(chat_obj.found_in):get("child-ending-with", "_Files")
-        srctgt("move", media_dir, self:get("media-dir-for-chat", chat_obj), "any", false, false, true)
+        dothis.dir.move_children_absolute_path_array_into_absolute_path(media_dir, self:get("media-dir-for-chat", chat_obj))
       end,
     }
   },

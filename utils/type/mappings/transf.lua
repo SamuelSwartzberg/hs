@@ -1308,7 +1308,7 @@ transf = {
   ics_file = {
     array_of_assoc_arrs = function(path)
       local temppath = transf.string.in_tmp_dir(transf.path.filename(path) .. ".ics")
-      srctgt("copy", path, temppath)
+      dothis.extant_path.copy_to_absolute_path(path, temppath)
       dothis.ics_file.generate_json_file(temppath)
       local jsonpath = transf.file.contents(get.path.with_different_extension(temppath, "json"))
       local res = json.decode(transf.file.contents(jsonpath))

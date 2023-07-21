@@ -17,18 +17,6 @@ ExtantPathItemSpecifier = {
       ["cd-and-run-this-task"] = function(self, task)
         run(self:get("cd-and-this-task", task))
       end,
-      ["move-safe"] = function(self, target)
-        srctgt("move", self:get("c"), target, "not-exists")
-      end,
-      ["move-force"] = function(self, target)
-        srctgt("move", self:get("c"), target)
-      end,
-      ["move-replace-self"] = function(self, origin)
-        srctgt("move", origin, self:get("c"))
-      end,
-      ["move-into-dir"] = function (self, target)
-        srctgt("move", self:get("c"), target, nil, true, true)
-      end,
       ["move-safe-and-choose-action"] = function(self, target)
         self:doThis("move-safe", target)
         st(target):doThis("choose-action")
@@ -40,12 +28,6 @@ ExtantPathItemSpecifier = {
       ["move-up-and-choose-action"] = function(self)
         self:doThis("move-safe-and-choose-action", self:get("parent-dir-path"))
       end,
-      ["copy-safe"] = function(self, target)
-        srctgt("copy", self:get("c"), target, "not-exists")
-      end,
-      ["copy-force"] = function(self, target)
-        srctgt("copy", self:get("c"), target)
-      end,
       ["copy-safe-and-choose-action"] = function(self, target)
         self:doThis("copy-safe", target)
         st(target):doThis("choose-action")
@@ -53,18 +35,6 @@ ExtantPathItemSpecifier = {
       ["copy-force-and-choose-action"] = function(self, target)
         self:doThis("copy-force", target)
         st(target):doThis("choose-action")
-      end,
-      ["rename"] = function(self, new_name)
-        local new_path = self:get("parent-dir-path") .. "/" .. new_name
-        self:get("move-safe", new_path)
-      end,
-      ["zip"] = function(self, target_path)
-        srctgt("zip", self:get("c"), target_path)
-      end,
-      ["zip-and-choose-action"] = function(self, target_path)
-        srctgt("zip", self:get("c"), target_path, function(target)
-          st(target):doThis("choose-action")
-        end)
       end,
       ["send-in-email-and-choose-action"] = function(self)
         self:doThis("send-in-email", function(target)

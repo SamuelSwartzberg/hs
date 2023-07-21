@@ -400,7 +400,7 @@ dothis = {
       })
       dothis.absolute_path.delete(tmpdir_json_path)
       if path then
-        srctgt("move", tmpdir_ics_path, path)
+        dothis.extant_path.move_to_absolute_path(tmpdir_ics_path, path)
         dothis.absolute_path.delete(tmpdir_ics_path)
       end
     end
@@ -539,17 +539,22 @@ dothis = {
       )
     end,
     create_dir = function(path)
-      if is.path.remote_path(path) then
-        dothis.remote_absolute_path.create_dir(path)
-      else
-        dothis.local_absolute_path.create_dir(path)
+      if is.absolute_path.nonextant_path(path) then
+        dothis.nonextant_path.create_dir(path)
       end
     end,
-    copy_single_into = function(path, tgt)
-      srctgt("copy", path, tgt, "any", true, false)
+    create_parent_dir = function(path)
+      dothis.absolute_path.create_parent_dir(path)
     end,
-    copy_all_in_into = function(path, tgt)
-      srctgt("copy", path, tgt, "any", true, true)
+    copy_into_absolute_path = function(path, tgt)
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.copy_into_absolute_path(path, tgt)
+      end
+    end,
+    copy_to_absolute_path = function(path, tgt)
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.copy_to_absolute_path(path, tgt)
+      end
     end,
     delete = function(path)
       if is.absolute_path.extant_path(path) then
@@ -601,57 +606,49 @@ dothis = {
       dothis.omegat_project_dir.pull_project_materials(path)
     end,
     write_file = function(path, contents)
-      dothis.absolute_path.create_dir(
-        transf.path.parent_path(path)
-      )
+      dothis.absolute_path.create_parent_dir(path)
       dothis.file.write_file(path, contents)
     end,
     append_or_write_file = function(path, contents)
-      dothis.absolute_path.create_dir(
-        transf.path.parent_path(path)
-      )
+      dothis.absolute_path.create_parent_dir(path)
       dothis.file.append_file(path, contents)
     end,
     append_file = function(path, contents)
       if is.absolute_path.file(path) then
-        dothis.absolute_path.create_dir(
-          transf.path.parent_path(path)
-        )
+        dothis.absolute_path.create_parent_dir(path)
         dothis.file.append_file(path, contents)
       end
     end,
     create_file = function(path, contents)
       if is.absolute_path.nonextant_path(path) then
-        dothis.absolute_path.create_dir(
-          transf.path.parent_path(path)
-        )
+        dothis.absolute_path.create_parent_dir(path)
         dothis.file.write_file(path, contents)
       end
     end,
     replace_file = function(path, contents)
       if is.absolute_path.file(path) then
-        dothis.absolute_path.create_dir(
-          transf.path.parent_path(path)
-        )
+        dothis.absolute_path.create_parent_dir(path)
         dothis.file.write_file(path, contents)
       end
     end,
   },
   local_absolute_path = {
+
+  },
+  local_nonextant_path = {
     create_dir = function(path)
       run("mkdir -p " .. transf.string.single_quoted_escaped(path))
     end,
-
   },
   local_nonabsolute_path_relative_to_home = {
     copy_local_to_labelled_remote = function(path)
-      dothis.absolute_path.copy(
+      dothis.absolute_path.copy_to_absolute_path(
         transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path),
         transf.labelled_remote_path.labelled_remote_absolute_path(path)
       )
     end,
     copy_labelled_remote_to_local = function(path)
-      dothis.absolute_path.copy(
+      dothis.absolute_path.copy_to_absolute_path(
         transf.labelled_remote_path.labelled_remote_absolute_path(path),
         transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path)
       )
@@ -659,13 +656,48 @@ dothis = {
 
   },
   labelled_remote_absolute_path = {
+    
+  },
+  labelled_remote_nonextant_path = {
     create_dir = function(path)
       run("rclone mkdir " .. transf.string.single_quoted_escaped(path))
     end,
-  }, 
+  },
   remote_absolute_path = {
-    create_path = function(path)
+    
+  },
+  remote_extant_path = {
+    zip_to_absolute_path = function(path, tgt)
+      local tmppath = transf.string.in_tmp_dir(tgt, "temp_zip")
+      dothis.extant_path.copy_to_absolute_path(
+        path,
+        tmppath
+      )
+      dothis.local_extant_path.zip_to_absolute_path_and_delete(tmppath, tgt)
+    end,
+  },
+  remote_extant_path_array = {
+    zip_to_absolute_path = function(arr, tgt)
+      local tmppath = transf.string.in_tmp_dir(tgt, "temp_zip")
+      dothis.extant_path_array.copy_into_absolute_path(
+        arr,
+        tmppath
+      )
+      dothis.extant_path.zip_to_absolute_path_and_delete(tmppath, tgt)
+    end,
+  },
+  remote_nonextant_path = {
+    create_dir = function(path)
       dothis.labelled_remote_absolute_path.create_dir(path)
+    end,
+  },
+  nonextant_path = {
+    create_dir = function(path)
+      if is.path.remote_path(path) then
+        dothis.remote_absolute_path.create_dir(path)
+      else
+        dothis.local_extant_path.create_dir(path)
+      end
     end,
   },
   local_extant_path = {
@@ -679,9 +711,65 @@ dothis = {
         dothis.dir.do_in_path(transf.path.parent_path(path), cmd, do_after)
       end
     end,
-    delete = os.remove
+    delete = os.remove,
+    move_to_local_absolute_path = function(path, tgt)
+      dothis.local_extant_path.create_parent_dir(tgt)
+      os.rename(path, tgt)
+    end,
+    zip_to_local_absolute_path = function(path, tgt)
+      dothis.local_extant_path.create_parent_dir(tgt)
+      run("zip -r " .. transf.string.single_quoted_escaped(tgt) .. " " .. transf.string.single_quoted_escaped(path))
+    end,
+    zip_to_absolute_path = function(path, tgt)
+      local tmptgt = transf.string.in_tmp_dir(tgt, "temp_zip_target")
+      dothis.local_extant_path.zip_to_local_absolute_path(path, tmptgt)
+      dothis.extant_path.move_to_absolute_path(tmptgt, tgt)
+    end,
+    zip_to_absolute_path_and_delete = function(path, tgt)
+      dothis.local_extant_path.zip_to_absolute_path(path, tgt)
+      dothis.local_extant_path.delete(path)
+    end,
+    link_to_local_absolute_path = function(path, tgt)
+      dothis.absolute_path.create_parent_dir(tgt)
+      hs.fs.link(path, tgt, true)
+    end,
+    link_into_local_absolute_path = function(path, tgt)
+      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
+      dothis.local_extant_path.link_to_local_absolute_path(path, finaltgt)
+    end,
+    link_descendant_file_array_into_local_absolute_path = function(path, tgt)
+      dothis.local_extant_path_array.link_into_local_absolute_path(
+        transf.path.descendant_file_array(path),
+        tgt
+      )
+    end
     
   },
+  local_extant_path_array = {
+    zip_to_local_absolute_path = function(arr, tgt)
+      dothis.local_extant_path.create_parent_dir(tgt)
+      run("zip -r " .. transf.string.single_quoted_escaped(tgt) .. " " .. transf.string.single_quoted_escaped(table.concat(arr, " ")))
+    end,
+    zip_to_absolute_path = function(arr, tgt)
+      local tmptgt = transf.string.in_tmp_dir(tgt, "temp_zip_target")
+      dothis.local_absolute_path_array.zip_to_local_absolute_path(arr, tmptgt)
+      dothis.extant_path.move_to_absolute_path(tmptgt, tgt)
+    end,
+    zip_to_absolute_path_and_delete = function(arr, tgt)
+      dothis.local_absolute_path_array.zip_to_absolute_path(arr, tgt)
+      dothis.local_absolute_path_array.delete(arr)
+    end,
+    link_into_local_absolute_path = function(arr, tgt)
+      hs.fnutils.ieach(
+        arr,
+        get.fn.arbitrary_args_bound_or_ignored_fn(
+          dothis.local_extant_path.link_into_local_absolute_path,
+          {a_use, tgt}
+        )
+      )
+    end,
+  },
+  
   labelled_remote_file = {
     write_file = function(path, contents)
       local temp_file = transf.string.in_tmp_dir(path, "labelled_remote_temp_file")
@@ -698,7 +786,7 @@ dothis = {
   labelled_remote_dir = {
     empty_dir = function(path)
       dothis.labelled_remote_dir.delete_dir(path)
-      dothis.labelled_remote_absolute_path.create_dir(path)
+      dothis.labelled_remote_nonextant_path.create_dir(path)
     end,
     delete_dir = function(path)
       run("rclone purge " .. transf.string.single_quoted_escaped(path))
@@ -731,12 +819,26 @@ dothis = {
       file:write(contents)
       file:close()
     end,
+    copy_to_local_absolute_path = function(path, tgt)
+      dothis.local_extant_path.create_parent_dir(tgt)
+      file.copy(path, tgt)
+    end,
   },
   local_dir = {
     empty_dir = function(path)
       run("rm -rf " .. transf.string.single_quoted_escaped(
         transf.path.ending_with_slash(path) .. "*"
       ) .. "/*")
+    end,
+    copy_to_local_absolute_path = function(path, tgt)
+      dothis.local_extant_path.create_parent_dir(tgt)
+      dir.clonetree(path, tgt)
+    end,
+    link_children_absolute_path_array_into_local_absolute_path = function(path, tgt)
+      dothis.local_absolute_path_array.link_into_local_absolute_path(
+        transf.path.children_absolute_path_array(path),
+        tgt
+      )
     end,
   },
   extant_path = {
@@ -789,6 +891,78 @@ dothis = {
         dothis.dir.empty_dir(path)
       end
     end,
+    copy_to_absolute_path = function(path, tgt)
+      dothis.absolute_path.create_parent_dir(tgt)
+      run("rclone copyto " .. transf.string.single_quoted_escaped(path) .. " " .. transf.string.single_quoted_escaped(tgt))
+    end,
+    copy_into_absolute_path = function(path, tgt)
+      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
+      dothis.extant_path.copy_to_absolute_path(path, finaltgt)
+    end,
+    copy_descendant_file_array_into_absolute_path = function(path, tgt)
+      dothis.extant_path_array.copy_into_absolute_path(
+        transf.extant_path.descendant_file_array(path),
+        tgt
+      )
+    end,
+    move_to_absolute_path = function(path, tgt)
+      dothis.absolute_path.create_parent_dir(tgt)
+      run("rclone moveto " .. transf.string.single_quoted_escaped(path) .. " " .. transf.string.single_quoted_escaped(tgt))
+    end,
+    move_into_absolute_path = function(path, tgt)
+      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
+      dothis.extant_path.move_to_absolute_path(path, finaltgt)
+    end,
+    move_descendant_file_array_into_absolute_path = function(path, tgt)
+      dothis.extant_path_array.move_into_absolute_path(
+        transf.extant_path.descendant_file_array(path),
+        tgt
+      )
+    end,
+    zip_to_absolute_path = function(path, tgt)
+      if is.path.remote_path(path) then
+        dothis.remote_extant_path.zip_to_absolute_path(path, tgt)
+      else
+        dothis.local_extant_path.zip_to_absolute_path(path, tgt)
+      end
+    end,
+    zip_to_absolute_path_and_delete = function(path, tgt)
+      dothis.extant_path.zip_to_absolute_path(path, tgt)
+      dothis.extant_path.delete(path)
+    end,
+    zip_into_absolute_path = function(path, tgt)
+      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
+      dothis.extant_path.zip_to_absolute_path(path, finaltgt)
+    end,
+    zip_descendant_file_array_to_absolute_path = function(path, tgt)
+      dothis.extant_path_array.zip_to_absolute_path(
+        transf.extant_path.descendant_file_array(path),
+        tgt
+      )
+    end,
+  },
+  extant_path_array = {
+    copy_into_absolute_path = function(arr, tgt)
+      hs.fnutils.ieach(
+        arr,
+        get.fn.arbitrary_args_bound_or_ignored_fn(dothis.extant_path.copy_into_absolute_path, {a_use, tgt})
+      )
+    end,
+    move_into_absolute_path = function(arr, tgt)
+      hs.fnutils.ieach(
+        arr,
+        get.fn.arbitrary_args_bound_or_ignored_fn(dothis.extant_path.move_into_absolute_path, {a_use, tgt})
+      )
+    end,
+    zip_to_absolute_path = function(arr, tgt)
+      if is.path_array.remote_path_array(arr) then
+          dothis.remote_extant_path_array.zip_to_absolute_path(arr, tgt)
+      elseif is.path_array.local_path_array(arr) then
+          dothis.local_extant_path_array.zip_to_absolute_path(arr, tgt)
+      else
+          error("Cannot currently zip mixed local & remote paths")
+      end
+    end,      
   },
   file = {
     do_in_path = function(path, cmd, do_after)
@@ -1013,6 +1187,25 @@ dothis = {
         dothis.dir.delete_dir(path)
       end
     end,
+    copy_children_absolute_path_array_into_absolute_path = function(path, tgt)
+      dothis.extant_path_array.copy_into_absolute_path(
+        transf.dir.children_absolute_path_array(path),
+        tgt
+      )
+    end,
+    move_children_absolute_path_array_into_absolute_path = function(path, tgt)
+      dothis.extant_path_array.move_into_absolute_path(
+        transf.dir.children_absolute_path_array(path),
+        tgt
+      )
+    end,
+    zip_children_absolute_path_array_to_absolute_path = function(path, tgt)
+      dothis.extant_path_array.zip_to_absolute_path(
+        transf.dir.children_absolute_path_array(path),
+        tgt
+      )
+    end,
+    
   },
   maildir_dir = {
     
@@ -1133,20 +1326,20 @@ dothis = {
     end,
     add_hook = function(path, hook_path, name)
       name = name or transf.path.filename(hook_path)
-      srctgt("copy", hook_path, get.git_root_dir.hook_path(path, name))
+      dothis.extant_path.copy_to_absolute_path(hook_path, get.git_root_dir.hook_path(path, name))
       dothis.local_extant_path.make_executable(get.git_root_dir.hook_path(path, name))
     end,
     copy_hook = function(path, type, name)
       type = type or "default"
       local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
       dothis.local_extant_path.make_executable(source_hook)
-      srctgt("copy", source_hook, get.git_root_dir.hook_path(path, name))
+      dothis.extant_path.copy_to_absolute_path(source_hook, get.git_root_dir.hook_path(path, name))
     end,
     link_hook = function(path, type, name)
       type = type or "default"
       local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
       dothis.local_extant_path.make_executable(source_hook)
-      srctgt("link", source_hook, get.git_root_dir.hook_path(path, name))
+      dothis.local_extant_path.link_to_local_absolute_path(source_hook, get.git_root_dir.hook_path(path, name))
     end,
     link_all_hooks = function(path, type)
       local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
@@ -1444,6 +1637,7 @@ dothis = {
     set_relevant_grid = function(window, grid)
       hs.grid.setGrid(grid, transf.window.screen(window))
     end,
+
     set_grid_cell = function(window, grid_cell)
       hs.grid.set(window, grid_cell, transf.window.screen(window))
     end,
@@ -1596,28 +1790,28 @@ dothis = {
       )
     end,
     pull_subtype_project_materials = function(project_dir, type, subtype)
-      srctgt("copy", 
+      dothis.dir.copy_children_absolute_path_array_into_absolute_path( 
         get.project_dir.global_subtype_project_material_path(project_dir, type, subtype),
-        get.project_dir.local_subtype_project_material_path(project_dir, type, subtype),
-      "any", true, false, true)
+        get.project_dir.local_subtype_project_material_path(project_dir, type, subtype)
+      )
     end,
     push_subtype_project_materials = function(project_dir, type, subtype)
-      srctgt("copy", 
+      dothis.dir.copy_children_absolute_path_array_into_absolute_path( 
         get.project_dir.local_subtype_project_material_path(project_dir, type, subtype),
-        get.project_dir.global_subtype_project_material_path(project_dir, type, subtype),
-      "any", false, false, true)
+        get.project_dir.global_subtype_project_material_path(project_dir, type, subtype)
+      )
     end,
     pull_universal_project_materials = function(project_dir, type)
-      srctgt("copy", 
+      dothis.dir.copy_children_absolute_path_array_into_absolute_path( 
         get.project_dir.global_universal_project_material_path(project_dir, type),
-        get.project_dir.local_universal_project_material_path(project_dir, type),
-      "any", true, false, true)
+        get.project_dir.local_universal_project_material_path(project_dir, type)
+      )
     end,
     push_universal_project_materials = function(project_dir, type)
-      srctgt("copy", 
+      dothis.dir.copy_children_absolute_path_array_into_absolute_path( 
         get.project_dir.local_universal_project_material_path(project_dir, type),
-        get.project_dir.global_universal_project_material_path(project_dir, type),
-      "any", false, false, true)
+        get.project_dir.global_universal_project_material_path(project_dir, type)
+      )
     end,
     pull_project_materials = function(project_dir, type, subtype)
       dothis.project_dir.pull_universal_project_materials(project_dir, type)
@@ -1644,14 +1838,14 @@ dothis = {
         "glossary",
         transf.omegat_project_dir.client_name(omegat_project_dir)
       )
-      srctgt("copy",
+      dothis.extant_path.copy_into_absolute_path(
         transf.omegat_project_dir.local_resultant_tm(omegat_project_dir),
         get.project_dir.global_subtype_project_material_path(
           omegat_project_dir,
           "tm",
           transf.omegat_project_dir.client_name(omegat_project_dir)
-        ),
-        "any", true, true)
+        )
+      )
     end,
     create_all_translated_documents = dothis.omegat.create_all_translated_documents,
     create_current_translated_document = dothis.omegat.create_current_translated_document,
@@ -1733,7 +1927,7 @@ dothis = {
     end,
     add_local_citable_object_file = function(latex_project_dir, indicated_citable_object_id)
       local local_citable_object_file = transf.indicated_citable_object_id.local_citable_object_file(indicated_citable_object_id)
-      dothis.absolute_path.copy_single_into(
+      dothis.absolute_path.copy_into_absolute_path(
         transf.latex_project_dir.citable_object_files(latex_project_dir),
         local_citable_object_file
       )
@@ -1746,7 +1940,7 @@ dothis = {
     end,
     add_local_citable_object_notes_file = function(latex_project_dir, indicated_citable_object_id)
       local local_citable_object_notes_file = transf.indicated_citable_object_id.local_citable_object_notes_file(indicated_citable_object_id)
-      dothis.absolute_path.copy_single_into(
+      dothis.absolute_path.copy_into_absolute_path(
         transf.latex_project_dir.citable_object_notes_files(latex_project_dir),
         local_citable_object_notes_file
       )

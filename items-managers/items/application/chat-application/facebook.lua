@@ -108,7 +108,7 @@ FacebookItemSpecifier = {
       ["preprocess-backup-files"] = function()
         for _, subdir in transf.local_dir.children_absolute_path_value_stateful_iter(env.TMP_FACEBOOK_EXPORT_PARENT) do
           if not find({"photos", "stickers_used"}, transf.path.leaf(subdir)[1]) then
-            srctgt("move", subdir, env.MCHATS_GLOBAL_FACEBOOK_MEDIA, "any", true, false, true) dothis.absolute_path.delete(subdir))
+            dothis.dir.move_children_absolute_path_array_into_absolute_path(subdir, env.MCHATS_GLOBAL_FACEBOOK_MEDIA)
           end
         end
       end,
@@ -119,7 +119,7 @@ FacebookItemSpecifier = {
       end,
       ["pre-process-chat-messages-hook"] = function (self, chat_obj)
         for _, subdir in transf.local_dir.children_absolute_path_value_stateful_iter(env.TMP_FACEBOOK_EXPORT_CHATS .. "/" .. chat_obj.found_in) do
-          srctgt("move", subdir,  env.MCHATS_FACEBOOK_MEDIA .. "/" .. self:get("convo-id", chat_obj), "any", true, false, true)
+          dothis.dir.move_children_absolute_path_array_into_absolute_path(subdir,  env.MCHATS_FACEBOOK_MEDIA .. "/" .. self:get("convo-id", chat_obj))
           dothis.absolute_path.delete(subdir))
         end
       end,

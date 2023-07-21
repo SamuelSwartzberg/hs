@@ -723,6 +723,18 @@ is = {
         is.path.absolute_path
       )
     end,
+    remote_path_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.path.remote_path
+      )
+    end,
+    local_path_array = function(array)
+      return get.array.all_pass(
+        array,
+        is.path.local_path
+      )
+    end,
   },
   absolute_path_array = {
     extant_path_array = function(array)

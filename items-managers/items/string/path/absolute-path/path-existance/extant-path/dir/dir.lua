@@ -65,12 +65,6 @@ DirItemSpecifier = {
     },
   
     doThisables = {
-      ["copy-into"] = function(self, source)
-        srctgt("copy", source, self:get("c"))
-      end,
-      ["move-into"] = function(self, source)
-        srctgt("move", source, self:get("c"), "any", true, true)
-      end,
       ["create-empty-file-in-dir"] = function(self, name)
         local path = self:get("path-ensure-final-slash") .. name
         writeFile(path, "", "not-exists")
@@ -142,7 +136,7 @@ DirItemSpecifier = {
       end,
       ["send-in-email"] = function(self, do_after)
         local temp_file = writeFile(nil, "")
-        srctgt("zip", self:get("c"), temp_file)
+        dothis.extant_path.zip_to_absolute_path(self:get("c"), temp_file)
         dothis.absolute_path.delete
         if do_after then
           do_after()
