@@ -67,7 +67,7 @@ DirItemSpecifier = {
     doThisables = {
       ["create-empty-file-in-dir"] = function(self, name)
         local path = self:get("path-ensure-final-slash") .. name
-        writeFile(path, "", "not-exists")
+        dothis.absolute_path.write_file_if_nonextant_path(path, "")
       end,
       ["create-empty-dir-in-dir"] = function(self, name)
         local path = self:get("path-ensure-final-slash") .. name
@@ -79,7 +79,7 @@ DirItemSpecifier = {
       end,
       ["create-file-with-contents"] = function(self, specifier)
         local path = self:get("path-ensure-final-slash") .. specifier.name
-        writeFile(path, specifier.contents)
+        dothis.absolute_path.write_file(path, specifier.contents)
       end,
       ["table-to-fs-children-dispatch"] = function(self, specifier) 
         -- assumes a table where all values are of the same type
@@ -135,7 +135,7 @@ DirItemSpecifier = {
         self:get("descendant-dir-only-string-item-array"):doThis("choose-item-and-then-action")
       end,
       ["send-in-email"] = function(self, do_after)
-        local temp_file = writeFile(nil, "")
+        local temp_file = dothis.absolute_path.write_file(nil, "")
         dothis.extant_path.zip_to_absolute_path(self:get("c"), temp_file)
         dothis.absolute_path.delete
         if do_after then
@@ -144,7 +144,7 @@ DirItemSpecifier = {
       end,
       ["create-child-file-and-choose-action"] = function(self, filename)
         local path = self:get("completely-resolved-path") .. "/" .. filename
-        writeFile(path, "", "not-exists")
+        dothis.absolute_path.write_file_if_nonextant_path(path, "")
         st(path):doThis("choose-action")
       end,
       ["create-child-dir-and-choose-action"] = function(self, dirname)

@@ -4,7 +4,7 @@ manual_tests.do_when_ready = function()
   local temp_file_3 = env.TMPDIR .. "/do-when-ready/" .. os.time() .. "-3.txt"
   
   local function writeHelloWorld(path)
-    writeFile(path, "Hello World!", "any", true)
+    dothis.absolute_path.write_file(path, "Hello World!")
   end
   
   doWhenReady(writeHelloWorld, temp_file_1)

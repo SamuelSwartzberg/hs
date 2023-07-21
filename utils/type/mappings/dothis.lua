@@ -390,9 +390,9 @@ dothis = {
   },
   table = {
     write_ics_file = function(tbl, path)
-      local tmpdir_json_path = transf.not_userdata_or_function.in_tmp_dir(arr) .. ".json"
-      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(arr) .. ".ics"
-      writeFile(tmpdir_json_path, json.encode(tbl))
+      local tmpdir_json_path = transf.not_userdata_or_function.in_tmp_dir(tbl) .. ".json"
+      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(tbl) .. ".ics"
+      dothis.absolute_path.write_file(tmpdir_json_path, json.encode(tbl))
       run({
         "ical2json",
         "-r",
@@ -1092,7 +1092,7 @@ dothis = {
           { value = path, type = "quoted" },
         },
         catch = function()
-          writeFile(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.contents(path, "error"))
+          dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.contents(path, "error"))
         end,
         finally = function()
           dothis.absolute_path.delete(path)

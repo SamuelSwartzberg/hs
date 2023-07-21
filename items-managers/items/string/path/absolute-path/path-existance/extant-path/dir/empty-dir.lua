@@ -8,7 +8,7 @@ local project_type_init_map = {
     }, true)
   end,
   omegat = function(path)
-    writeFile(path .. "/omegat.project", comp.templates.omegat, "not-exists")
+    dothis.absolute_path.write_file_if_nonextant_path(path .. "/omegat.project", comp.templates.omegat)
   end,
 }
 

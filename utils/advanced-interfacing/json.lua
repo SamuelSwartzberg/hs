@@ -76,10 +76,10 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
       local function process_tokenres(tokenres)
         if tokenres.refresh_token then
-          writeFile(api_keys_location .. "refresh_token", tokenres.refresh_token)
+          dothis.absolute_path.write_file(api_keys_location .. "refresh_token", tokenres.refresh_token)
         end
         if tokenres.access_token then
-          writeFile(api_keys_location .. "access_token", tokenres.access_token)
+          dothis.absolute_path.write_file(api_keys_location .. "access_token", tokenres.access_token)
           return rest(original_specifier, do_after) -- try again
         else
           error("Failed to refresh access token. Result was:\n" .. json.encode(tokenres))

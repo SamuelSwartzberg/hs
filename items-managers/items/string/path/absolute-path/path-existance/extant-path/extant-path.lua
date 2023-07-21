@@ -43,7 +43,7 @@ ExtantPathItemSpecifier = {
       end,
       ["create-sibling-file-and-choose-action"] = function(self, filename)
         local path = self:get("parent-dir-path") .. "/" .. filename
-        writeFile(path, "", "not-exists")
+        dothis.absolute_path.write_file_if_nonextant_path(path, "")
         st(path):doThis("choose-action")
       end,
 

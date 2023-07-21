@@ -83,7 +83,7 @@ local gen_cache_methods = {
   fs = {
     put = function(fnid, opts_as_str, params, result, opts)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, params)
-      writeFile(cache_path, json.encode(result), "any", true)
+      dothis.absolute_path.write_file(cache_path, json.encode(result))
     end,
     get = function(fnid, opts_as_str, params, opts)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, params)
@@ -93,14 +93,14 @@ local gen_cache_methods = {
     end,
     reset = function(fnid, opts_as_str)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str)
-      dothis.absolute_path.delete
+      dothis.absolute_path.delete(cache_path)
     end,
     get_created_time = function(fnid, opts_as_str)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
       return get.string_or_number.number(transf.file.contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
     end,
     set_created_time = function(fnid, opts_as_str, created_time)
-      writeFile(getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~"), tostring(created_time), "any", true)
+      dothis.absolute_path.write_file(getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~"), tostring(created_time))
     end
   }
 }

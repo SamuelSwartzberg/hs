@@ -103,7 +103,7 @@ assertMessage(
 
 local tmp_file_path = env.TMPDIR .. "/test-cronlike/" .. os.time() .. "/cron-like"
 
-writeFile(tmp_file_path, three_lines_comment)
+dothis.absolute_path.write_file(tmp_file_path, three_lines_comment)
 
 assertMessage(
   processCronlikeFile(tmp_file_path),

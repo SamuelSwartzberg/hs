@@ -59,7 +59,7 @@ PrintableAsciiStringItemSpecifier = {
         run("yes" .. transf.string.single_quoted_escaped(self:get("c")) .. "| pass insert passw/" .. name, true)
       end,
       ["add-as-username"] = function(self, name)
-        writeFile(env.MPASSUSERNAME .. "/" .. name .. ".txt", self:get("c"))
+        dothis.absolute_path.write_file(env.MPASSUSERNAME .. "/" .. name .. ".txt", self:get("c"))
       end,
       ["add-as-password-with-prompt-username"] = function(self, name)
         local username = prompt("string", "Username")

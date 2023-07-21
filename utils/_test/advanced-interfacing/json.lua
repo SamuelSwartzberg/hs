@@ -175,7 +175,7 @@ assertMessage(
 local timestamp = os.time()
 local filepath = env.TMPDIR .. "/rest-form-file-" .. timestamp .. ".txt"
 
-writeFile(filepath, "test")
+dothis.absolute_path.write_file(filepath, "test")
 
 local rest_res = rest({
   host = "httpbin.org",
@@ -370,7 +370,7 @@ assertMessage(
 
 -- different auth_header w/ bearer
 
-writeFile(env.MAPI .. "/httpbin/key", "123456")
+dothis.absolute_path.write_file(env.MAPI .. "/httpbin/key", "123456")
 
 local diff_auth_header_response = rest({
   host = "httpbin.org",

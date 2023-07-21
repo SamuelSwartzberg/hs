@@ -58,7 +58,7 @@ YoutubePlayableItemItemSpecifier = {
           {"string", {prompt_args = {message = "Subdirectory name", default = specifier.tag.srs or specifier.tag.tcrea }}},
         })
         specifier.extension = "m3u"
-        writeFile(transf.path_leaf_specifier.path(specifier), self:get("c"))
+        dothis.absolute_path.write_file(transf.path_leaf_specifier.path(specifier), self:get("c"))
       end,
       ["to-stream"] = function(self, specifier)
         return ar({self.root_super}):doThis("to-stream", specifier)
