@@ -668,6 +668,7 @@ transf = {
     a_date = function(path)
       return transf.timestamp_s.date(transf.extant_path.a_timestamp_s(path))
     end,
+
     
   },
   local_dir = {
@@ -6924,5 +6925,210 @@ transf = {
         transf.input_spec_string.input_spec
       )
     end,
+  },
+  prompt_args_string = {
+    --- @class prompt_args
+    --- @field message? any Message to display in the prompt.
+    --- @field default? any Default value for the prompt.
+
+    --- @class prompt_args_string : prompt_args
+    --- @field informative_text? any Additional text to display in the prompt.
+    --- @field buttonA? any Label for the first button.
+    --- @field buttonB? any Label for the second button.
+
+    --- @param prompt_args? prompt_args_string
+    --- @return (string|nil), boolean
+    string_or_nil_and_boolean = function(prompt_args)
+
+      -- set up default values, make sure provided values are strings
+
+      prompt_args = prompt_args or {}
+      prompt_args.message = transf.not_nil.string(prompt_args.message) or "Enter a string."
+      prompt_args.informative_text = transf.not_nil.string(prompt_args.informative_text) or ""
+      prompt_args.default = transf.not_nil.string(prompt_args.default) or ""
+      prompt_args.buttonA = transf.not_nil.string(prompt_args.buttonA) or "OK"
+      prompt_args.buttonB = transf.not_nil.string(prompt_args.buttonB) or "Cancel"
+
+      -- show prompt
+
+      --- @type string, string|nil
+      local button_pressed, raw_return = doWithActivated("Hammerspoon", function()
+        return hs.dialog.textPrompt(prompt_args.message, prompt_args.informative_text, prompt_args.default,
+        prompt_args.buttonA, prompt_args.buttonB)
+      end)
+
+      -- process result
+
+      local ok_button_pressed = button_pressed == prompt_args.buttonA
+
+      if stringy.startswith(raw_return, " ") then -- space triggers lua eval mode
+        raw_return = get.string.evaled_as_lua(raw_return)
+      end
+      if raw_return == "" then
+        raw_return = nil
+      end
+
+      -- return result
+
+      return raw_return, ok_button_pressed
+    end
+
+  },
+  prompt_args_path = {
+
+    --- @class prompt_args_path
+    --- @field can_choose_files? boolean 
+    --- @field can_choose_directories? boolean
+    --- @field multiple? boolean
+    --- @field allowed_file_types? string[]
+    --- @field resolves_aliases? boolean
+
+    --- @param prompt_args prompt_args_path
+    --- @return (string|string[]|nil), boolean
+    local_absolute_path_or_local_absolute_path_array_and_boolean = function(prompt_args)
+
+      -- set up default values, make sure message and default are strings
+  
+      prompt_args                        = prompt_args or {}
+      prompt_args.message                = get.any.default_if_nil(transf.not_nil.string(prompt_args.message), "Choose a file or folder.")
+      prompt_args.default                = get.any.default_if_nil(transf.not_nil.string(prompt_args.default), env.HOME)
+      prompt_args.can_choose_files       = get.any.default_if_nil(prompt_args.can_choose_files, true)
+      prompt_args.can_choose_directories = get.any.default_if_nil(prompt_args.can_choose_directories, true)
+      prompt_args.multiple  = get.any.default_if_nil(prompt_args.multiple, false)
+      prompt_args.allowed_file_types     = get.any.default_if_nil(prompt_args.allowed_file_types, {})
+      prompt_args.resolves_aliases       = get.any.default_if_nil(prompt_args.resolves_aliases, true)
+    
+      prompt_args.default = hs.fs.pathToAbsolute(prompt_args.default, true) -- resolve the path ourself, to be sure & remain in control
+    
+      -- show prompt
+    
+      local raw_return                    = hs.dialog.chooseFileOrFolder(prompt_args.message, prompt_args.default, prompt_args.can_choose_files, prompt_args.can_choose_directories, prompt_args.multiple, prompt_args.allowed_file_types, prompt_args.resolves_aliases)
+    
+      -- process result
+    
+      if raw_return == nil then
+        return nil, false
+      end
+      local list_return = transf.native_table_or_nil.value_array(raw_return)
+      if #list_return == 0 then
+        return nil, true
+      end
+    
+      -- return result
+    
+      if prompt_args.multiple then
+        return list_return, true
+      else
+        return list_return[1], true
+      end
+    end,
+    local_absolute_path_and_boolean = function(prompt_args)
+      prompt_args.multiple = false
+      return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean(prompt_args)
+    end,
+    local_absolute_path_array_and_boolean = function(prompt_args)
+      prompt_args.multiple = true
+      return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean(prompt_args)
+    end,
+  
+  },
+  prompt_spec = {
+
+    --- @alias failure_action "error" | "return_nil" | "reprompt"
+
+    --- @class prompt_spec
+    --- @field prompter? fun(prompt_args: table): any, boolean The function that implements prompting. Must return nil on the equivalent of an empty value.
+    --- @field prompt_args? table Arguments to pass to `prompter`.
+    --- @field transformer? fun(rawReturn: any): any transforms the raw return value into the transformed return value. Default is the identity function.
+    --- @field raw_validator? fun(rawReturn: any): boolean validates before application of `transformer`. Default is ensuring the return value is not nil.
+    --- @field transformed_validator? fun(transformedReturn: any): boolean validates after application of `transformer`. Default is ensuring the return value is not nil.
+    --- @field on_cancel? failure_action What to do if the user cancels the prompt. May error, return nil, or reprompt. Default is "error".
+    --- @field on_raw_invalid? failure_action What to do if the raw return value is invalid. May error, return nil, or reprompt. Default is "return_nil".
+    --- @field on_transformed_invalid? failure_action What to do if the transformed return value is invalid. May error, return nil, or reprompt. Default is "reprompt".
+
+    --- Main function to handle prompts. Uses a given prompt_spec or defaults.
+    --- With the default prompt_spec, we will error if cancelled, return nil if the raw return value is the equivalent of an empty value, and never reprompt.
+    --- @param prompt_spec prompt_spec
+    --- @return any -- Returns the user's input as processed according to the prompt_spec, or the appropriate error or nil value.
+    any = function(prompt_spec)
+
+      -- set defaults for all prompt_spec fields
+      prompt_spec = get.table.copy(prompt_spec)
+      prompt_spec.prompter = prompt_spec.prompter or transf.prompt_args_string.string_or_nil_and_boolean
+      prompt_spec.transformer = prompt_spec.transformer or function(x) return x end
+      prompt_spec.raw_validator = prompt_spec.raw_validator or function(x) return x ~= nil end
+      prompt_spec.transformed_validator = prompt_spec.transformed_validator or function(x) return x ~= nil end
+      prompt_spec.on_cancel = prompt_spec.on_cancel or "error"
+      prompt_spec.on_raw_invalid = prompt_spec.on_raw_invalid or "return_nil"
+      prompt_spec.on_transformed_invalid = prompt_spec.on_transformed_invalid or "reprompt"
+      prompt_spec.prompt_args = prompt_spec.prompt_args or {}
+
+      -- generate some informative text mainly used when prompter is promptStringInner, though other prompters can consume this too
+      local validation_extra
+      local original_informative_text = prompt_spec.prompt_args.informative_text
+      local info_on_reactions = "c: " ..
+        prompt_spec.on_cancel ..
+        ", r_i: " ..
+        prompt_spec.on_raw_invalid .. 
+        ", t_i: " .. 
+        prompt_spec.on_transformed_invalid
+      local static_informative_text 
+      if original_informative_text then
+        static_informative_text = original_informative_text .. "\n" .. info_on_reactions
+      else
+        static_informative_text = info_on_reactions
+      end
+
+      -- main loop to allow reprompting when prompt_spec conditions for reprompting are met
+      while true do
+
+        -- add information on why the prompter is being called to the informative text, if it exists
+        if validation_extra then
+          prompt_spec.prompt_args.informative_text = static_informative_text .. "\n" .. validation_extra
+        else
+          prompt_spec.prompt_args.informative_text = static_informative_text
+        end
+
+        -- call the prompter
+        local raw_return, ok_button_pressed = prompt_spec.prompter(prompt_spec.prompt_args)
+
+        if ok_button_pressed then -- not cancelled
+          if prompt_spec.raw_validator(raw_return) then -- raw input was valid
+            local transformed_return = prompt_spec.transformer(raw_return)
+            if prompt_spec.transformed_validator(transformed_return) then -- transformed input was valid
+              return transformed_return
+            else -- transformed input was invalid, handle according to prompt_spec.on_transformed_invalid
+              if prompt_spec.on_transformed_invalid == "error" then
+                error("WARN: User input was invalid (after transformation).", 0)
+              elseif prompt_spec.on_transformed_invalid == "return_nil" then
+                return nil
+              elseif prompt_spec.on_transformed_invalid == "reprompt" then
+                local has_string_eqviv, string_eqviv = pcall(tostring, raw_return)
+                local transformed_has_string_eqviv, transformed_string_eqviv = pcall(tostring, transformed_return)
+                validation_extra =
+                    "Invalid input:\n" ..
+                    "  Original: " .. (has_string_eqviv and string_eqviv or "<not tostringable>") .. "\n" ..
+                    "  Transformed: " .. (transformed_has_string_eqviv and transformed_string_eqviv or "<not tostringable>")
+              end
+            end
+          else -- raw input was invalid, handle according to prompt_spec.on_raw_invalid
+            if prompt_spec.on_raw_invalid == "error" then
+              error("WARN: User input was invalid (before transformation).", 0)
+            elseif prompt_spec.on_raw_invalid == "return_nil" then
+              return nil
+            elseif prompt_spec.on_raw_invalid == "reprompt" then
+              local has_string_eqviv, string_eqviv = pcall(tostring, raw_return)
+              validation_extra = "Invalid input: " .. (has_string_eqviv and string_eqviv or "<not tostringable>")
+            end
+          end
+        else -- cancelled, handle according to prompt_spec.on_cancel
+          if prompt_spec.on_cancel == "error" then
+            error("WARN: User cancelled modal.", 0)
+          elseif prompt_spec.on_cancel == "return_nil" then
+            return nil
+          end
+        end
+      end
+    end
   }
 }

@@ -3,13 +3,13 @@ if mode == "full-test" then
 -- promptStringInner
 
 assertMessage(
-  doGui("Hello World!\n",promptStringInner),
+  doGui("Hello World!\n",transf.prompt_args_string.string_or_nil_and_boolean),
   "Hello World!"
 )
 
 assertMessage(
   doGui("\n", function ()
-    return promptStringInner({
+    return transf.prompt_args_string.string_or_nil_and_boolean({
       default = "Hello World!",
     })
   end),
@@ -17,34 +17,34 @@ assertMessage(
 )
 
 assertMessage(
-  doGui("\n", promptStringInner),
+  doGui("\n", transf.prompt_args_string.string_or_nil_and_boolean),
   nil -- "" -> nil conversion
 )
 
 assertMessage(
-  doGui(" 2 + 2\n", promptStringInner),
+  doGui(" 2 + 2\n", transf.prompt_args_string.string_or_nil_and_boolean),
   4
 )
 
-local rawreturn, ok_button_pressed = doGui("Hello World!\n", promptStringInner)
+local rawreturn, ok_button_pressed = doGui("Hello World!\n", transf.prompt_args_string.string_or_nil_and_boolean)
 
 assertMessage(ok_button_pressed, true)
 
 -- promptPathInner
 
 assertMessage(
-  doGui("De\n", promptPathInner),
+  doGui("De\n", transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean),
   env.DESKTOP
 )
 
 assertMessage(
-  doGui("\n", promptPathInner),
+  doGui("\n", transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean),
   env.HOME
 )
 
 assertMessage(
   doGui("\n", function ()
-    return promptPathInner({
+    return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean({
       default = env.DESKTOP,
     })
   end),
@@ -55,7 +55,7 @@ local rawres, succ = doGui(
   function ()
     hs.eventtap.keyStroke({}, "escape")
   end,
-  promptPathInner
+  transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean
 )
 
 assertMessage(succ, false)
@@ -63,7 +63,7 @@ assertMessage(rawres, nil)
 
 assertMessage(
   doGui("sudoer\n", function ()
-    return promptPathInner({
+    return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean({
       default = "/private/etc",
       can_choose_directories = false,
       can_choose_files = true,
@@ -74,7 +74,7 @@ assertMessage(
 
 assertMessage(
   doGui("sudoer\n", function ()
-    return promptPathInner({
+    return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean({
       default = "/private/etc",
       can_choose_directories = true,
       can_choose_files = false,
@@ -91,7 +91,7 @@ end
 
 assertMessage(
   doGui(choosetc, function ()
-    return promptPathInner({
+    return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean({
       default = "/",
       resolves_aliases = true,
     })
@@ -101,7 +101,7 @@ assertMessage(
 
 assertMessage(
   doGui(choosetc, function ()
-    return promptPathInner({
+    return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean({
       default = "/",
       resolves_aliases = false,
     })
@@ -111,7 +111,7 @@ assertMessage(
 
 assertMessage(
   doGui("\n", function ()
-    return promptPathInner({
+    return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_array_and_boolean({
       default = env.HOME,
       allows_loop_selection = true,
     })
@@ -182,14 +182,14 @@ end
 -- try permutations of on_raw_invalid, on_transformed_invalid, on_cancel and "return_nil", "error", "reprompt"
 
 assertMessage(
-  promptNopolicy({
+  transf.prompt_spec.any({
     prompter = mockPrompterReturnsNil,
     on_raw_invalid = "return_nil",
   }),
   nil
 )
 
-local succ, res = pcall(promptNopolicy, {
+local succ, res = pcall(transf.prompt_spec.any, {
   prompter = mockPrompterReturnsNil,
   on_raw_invalid = "error"
 })
@@ -198,7 +198,7 @@ assertMessage(succ, false)
 assertMessage(res, "WARN: User input was invalid (before transformation).")
 
 assertMessage(
-  promptNopolicy({
+  transf.prompt_spec.any({
     prompter = getMockPrompterReturnsNilFirstTry(),
     on_raw_invalid = "reprompt",
   }),
@@ -206,14 +206,14 @@ assertMessage(
 )
 
 assertMessage(
-  promptNopolicy({
+  transf.prompt_spec.any({
     prompter = mockPrompterCancelled,
     on_cancel = "return_nil",
   }),
   nil
 )
 
-local succ, res = pcall(promptNopolicy, {
+local succ, res = pcall(transf.prompt_spec.any, {
   prompter = mockPrompterCancelled,
   on_cancel = "error"
 })
@@ -222,7 +222,7 @@ assertMessage(succ, false)
 assertMessage(res, "WARN: User cancelled modal.")
 
 assertMessage(
-  promptNopolicy({
+  transf.prompt_spec.any({
     prompter = getMockPrompterCancelledFirstTry(),
     on_cancel = "reprompt",
   }),
@@ -230,7 +230,7 @@ assertMessage(
 )
 
 assertMessage(
-  promptNopolicy({
+  transf.prompt_spec.any({
     prompter = mockPrompterInvalidWhenTransformed,
     transformer = mockTransformerRejectsInvalidWhenTransformed,
     on_transformed_invalid = "return_nil",
@@ -238,7 +238,7 @@ assertMessage(
   nil
 )
 
-local succ, res = pcall(promptNopolicy, {
+local succ, res = pcall(transf.prompt_spec.any, {
   prompter = mockPrompterInvalidWhenTransformed,
   transformer = mockTransformerRejectsInvalidWhenTransformed,
   on_transformed_invalid = "error"
@@ -248,7 +248,7 @@ assertMessage(succ, false)
 assertMessage(res, "WARN: User input was invalid (after transformation).")
 
 assertMessage(
-  promptNopolicy({
+  transf.prompt_spec.any({
     prompter = getMockPrompterInvalidWhenTransformedFirstTry(),
     transformer = mockTransformerRejectsInvalidWhenTransformed,
     on_transformed_invalid = "reprompt",
@@ -259,7 +259,7 @@ assertMessage(
 -- success
 
 assertMessage(
-  promptNopolicy({
+  transf.prompt_spec.any({
     prompter = mockPrompterReturnsString,
   }),
   "Hello World!"

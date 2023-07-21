@@ -180,7 +180,7 @@ dothis = {
       local temp_file_contents = get.string.evaled_as_template(transf.event_table.calendar_template(event_table))
       local do_after = event_table.do_after
       event_table.do_after = nil
-      doWithTempFile({edit_before = true, contents = temp_file_contents, use_contents = true}, function(tmp_file)
+      dothis.string.edit_temp_file_in_vscode_act_on_contents(temp_file_contents, function(tmp_file)
         local new_specifier = transf.yaml_string.not_userdata_or_function(tmp_file)
         new_specifier.do_after = do_after
         dothis.khal.add_event_from_specifier(new_specifier)
@@ -423,11 +423,20 @@ dothis = {
       dothis.absolute_path.write_file(path, str)
       return path
     end,
-    open_temp_file = function(str)
+    open_temp_file = function(str, do_after)
       dothis.local_path.open_app(
         transf.string.write_to_temp_file(str),
-        env.GUI_EDITOR
+        env.GUI_EDITOR,
+        do_after
       )
+    end,
+    edit_temp_file_in_vscode_act_on_path = function(str, do_after)
+      local path = transf.string.write_to_temp_file(str)
+      dothis.local_file.edit_file_in_vscode_act_on_path(path, do_after)
+    end,
+    edit_temp_file_in_vscode_act_on_contents = function(str, do_after)
+      local path = transf.string.write_to_temp_file(str)
+      dothis.local_file.edit_file_in_vscode_act_on_contents(path, do_after)
     end,
     create_url_array_as_session_in_msessions = function(str)
       dothis.url_array.create_as_session_in_msessions(
@@ -791,6 +800,21 @@ dothis = {
       dothis.local_extant_path.create_parent_dir(tgt)
       file.copy(path, tgt)
     end,
+    edit_file_in_vscode_act_on_path = function(path, do_after)
+      run("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
+        if do_after then
+          do_after(path)
+        end
+        dothis.absolute_path.delete(path)
+      end)
+    end,
+    edit_file_in_vscode_act_on_contents = function(path, do_after)
+      run("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
+        local contents = transf.file.contents(path)
+        dothis.absolute_path.delete(path)
+        do_after(contents)
+      end)
+    end
   },
   local_dir = {
     empty_dir = function(path)
@@ -1087,11 +1111,8 @@ dothis = {
       end, true)
     end,
     edit_then_send = function(path, do_after)
-      doWithTempFile({
-        path = path,
-        edit_before = true,
-      }, function(path)
-        dothis.absolute_path.write_file(path, get.string.evaled_as_template(transf.file.contents(path))) -- re-eval
+      dothis.local_file.edit_file_in_vscode_act_on_contents(path, function(str)
+        dothis.absolute_path.write_file(path, get.string.evaled_as_template(str)) -- re-eval
         dothis.email_file.send(path, do_after)
       end)
     end,

@@ -308,7 +308,11 @@ get = {
     --- Copy a table, optionally deep, return other types as-is.  
     --- Ensures that changes to the copy do not affect the original.  
     --- Handles self-referential tables.
-    copy = function(t, deeop, copied_tables)
+    --- @generic T
+    --- @param t T
+    --- @param deep? boolean
+    --- @return T
+    copy = function(t, deep, copied_tables)
       if type(t) ~= "table" then return t end -- non-tables don't need to be copied
       deep = get.any.default_if_nil(deep, true)
       copied_tables = get.any.default_if_nil(copied_tables, {})
@@ -1094,6 +1098,28 @@ get = {
   local_extant_path = {
     attr = function(path, attr)
       return hs.fs.attributes(hs.fs.pathToAbsolute(path, true))[attr]
+    end,
+    prompted_once_local_absolute_path_from_default = function(path, message)
+      return transf.prompt_spec.any({
+        prompter = transf.prompt_args_path.local_absolute_path_and_boolean,
+        prompt_args = {default = path, message = message or "Choose an absolute path..."}
+      })
+    end,
+    prompted_once_dir_from_default = function(path, message)
+      return transf.prompt_spec.any({
+        prompter = transf.prompt_args_path.local_absolute_path_and_boolean,
+        prompt_args = {
+          default = path,
+          can_choose_files = false,
+          message = message or "Choose a directory..."
+        }
+      })
+    end,
+    prompted_once_local_absolute_path_array_from_default = function(path, message)
+      return transf.prompt_spec.any({
+        prompter = transf.prompt_args_path.local_absolute_path_array_and_boolean,
+        prompt_args = {default = path, message = message or "Choose absolute paths..."}
+      })
     end,
   },
   dir = {
