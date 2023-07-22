@@ -604,54 +604,6 @@ get = {
         transf.string.urlencoded_search(str, tblmap.search_engine.spaces_percent[search_engine])
       )
     end,
-    --- get a deterministic transformation of a string, either zero or few-shot
-    deterministic_gpt_transformation = function(str, query, shots)
-      local msgs = {
-        {
-          role = "user",
-          content = query
-        }, {
-          role = "user",
-          content = "If the input is already valid, echo the input."
-        }, {
-          role = "user",
-          content = "If you are unable to fulfill the request, return 'IMPOSSIBLE'."
-        }
-      }
-      if shots then
-        for _, shot in transf.array.index_value_stateless_iter(shots) do
-          table.insert(msgs, {
-            role = "user",
-            content = shot[1]
-          })
-          table.insert(msgs, {
-            role = "assistant",
-            content = shot[2]
-          })
-        end
-      end
-      table.insert(msgs, {
-        role = "user",
-        content = str
-      })
-      local res = memoize(gpt, refstore.params.memoize.opts.permanent_fs)(
-        msgs,
-        refstore.params.gpt.opts.temperature_0
-      )
-      if res == "IMPOSSIBLE" then
-        return nil
-      else
-        return res
-      end
-    end,
-    deterministic_gpt_json = function(str, query, keys, shots)
-      query = query .. "\nAlways return json." 
-      if keys then
-        query = query .. "\nValid keys are: " .. table.concat(keys, ", ")
-      end
-      local res = get.string.deterministic_gpt_transformation(str, query, shots)
-      return transf.json_string.not_userdata_or_function(res)
-    end,
     window_array_by_pattern = function(str, app_name)
       return get.running_application.window_array_by_pattern(
         transf.mac_application_name.running_application(app_name),
@@ -753,7 +705,27 @@ get = {
         return get.string.evaled_as_template(item, d)
       end)
       return res
-    end
+    end,
+    llm_response_string_freeform = function(str, temperature, max_tokens)
+      return get.role_content_message_spec_array.llm_response_string(
+        {{
+          content = str,
+          role = "user"
+        }},
+        temperature,
+        max_tokens
+      )
+    end,
+    llm_response_string_stringent = function(str, temperature, max_tokens)
+      return get.role_content_message_spec_array.llm_response_string(
+        transf.role_content_message_spec_array.api_role_content_message_spec_array({{
+          content = str,
+          role = "user"
+        }}),
+        temperature,
+        max_tokens
+      )
+    end,
 
 
   },
@@ -1896,17 +1868,17 @@ get = {
   iso_3366_1_alpha_2 = {
     --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_full_name instead
     full_name_in_language = function(code, language_identifier_string)
-      return get.string.deterministic_gpt_transformation(
-        "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
-        code
-      )
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+        query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
+        input = code
+      })
     end,
     --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_short_name instead
     short_name_in_language = function(code, language_identifier_string)
-      return get.string.deterministic_gpt_transformation(
-        "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
-        code
-      )
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+        query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
+        input = code
+      })
     end,
   },
   any = {
@@ -2534,4 +2506,40 @@ get = {
       )
     end,
   },
+  role_content_message_spec_array = {
+    llm_response_string = function(arr, temperature, max_tokens)
+      local request = {
+        endpoint = "chat/completions",
+        api_name = "openai",
+        request_table = {
+          temperature = temperature or 0,
+          max_tokens = max_tokens or 1000,
+          model = "gpt-4",
+          messages = arr
+        }
+      }
+      local res = rest(request)
+      return transf.gpt_response_table.response_text(res)
+    end,
+  },
+  n_shot_role_content_message_spec_array = {
+    n_shot_llm_spec = function(arr)
+
+
+    end,
+  },
+  n_shot_llm_spec = {
+    n_shot_api_query_llm_response_string = function(spec, temperature, max_tokens)
+      local res = get.role_content_message_spec_array.llm_response_string(
+        transf.n_shot_llm_spec.n_shot_api_query_role_content_message_spec_array(spec),
+        temperature,
+        max_tokens
+      )
+      if res == "IMPOSSIBLE" then
+        return nil
+      else
+        return res
+      end
+    end,
+  }
 }

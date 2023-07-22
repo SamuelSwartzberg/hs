@@ -1386,7 +1386,7 @@ transf = {
     end,
     env_string = function(dict)
       transf.env_line_array.env_string(
-        transf.pair_array.env_line_array(
+        transf.string_pair_array.env_line_array(
           transf.env_var_name_value_dict.dependency_ordered_key_value_array(dict)
         )
       )
@@ -3048,9 +3048,9 @@ transf = {
       return str
     end,
     romanized_gpt = function(str)
-      return get.string.deterministic_gpt_transformation(str, "Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)", {
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query =  "Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)", shots = {
         {"こっち", "kocchi"}
-      })
+      }})
     end,
     folded = function(str)
       return eutf8.gsub(str, "\n", " ")
@@ -3143,7 +3143,7 @@ transf = {
       return " <<EOF\n" .. str .. "\nEOF"
     end,
     rfc3339like_dt = function(str)
-      return get.string.deterministic_gpt_transformation(str, "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified.")
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified."})
     end,
     raw_contact = function(searchstr)
       return memoize(run)("khard show --format=yaml " .. searchstr, {catch = true} )
@@ -3190,13 +3190,13 @@ transf = {
       return transf.string.kana_inner("--extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.string.single_quoted_escaped(str))
     end,
     japanese_writing = function(str)
-      return get.string.deterministic_gpt_transformation(str, "You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:")
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query =  "You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:"})
     end,
     kana_readings = function(str)
-      return get.string.deterministic_gpt_transformation(str, "Provide kana readings for:")
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query =  "Provide kana readings for:"})
     end,
     ruby_annotated_kana = function(str)
-      return get.string.deterministic_gpt_transformation(str, "Add kana readings to this text as <ruby> annotations, including <rp> fallback:")
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query =  "Add kana readings to this text as <ruby> annotations, including <rp> fallback:"})
     end,
     --- @param str string
     --- @return hs.styledtext
@@ -4286,6 +4286,8 @@ transf = {
       end
       return res
     end,
+  },
+  string_pair_array = {
     env_line_array = function (arr)
       return hs.fnutils.imap(
         arr,
@@ -4293,8 +4295,21 @@ transf = {
           return "export " .. pair[1] .. "=" .. transf.string.double_quoted_escaped(pair[2])
         end
       )
+    end,
+    n_shot_role_content_message_spec_array = function(arr)
+      local res = {}
+      for _, pair in transf.array.index_value_stateless_iter(arr) do
+        dothis.array.push(res, {
+          role = "user",
+          content = pair[1],
+        })
+        dothis.array.push(res, {
+          role = "assistant",
+          content = pair[2],
+        })
+      end
+      return res
     end
-
   },
   dict_of_string_value_dicts = {
     ini_string = function(t)
@@ -6127,40 +6142,40 @@ transf = {
   },
   country_identifier_string = {
     iso_3366_1_alpha_2 = function(country_identifier)
-      return get.string.deterministic_gpt_transformation(
-        country_identifier, 
-        "Suppose the following identifies a country. Return its ISO 3166-1 Alpha-2 country code."
-      ):lower()
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+        input = country_identifier, 
+        query = "Suppose the following identifies a country. Return its ISO 3166-1 Alpha-2 country code."
+      }):lower()
     end,
   },
   language_identifier_string = {
     bcp_47_language_tag = function(country_identifier)
-      return get.string.deterministic_gpt_transformation(
-        country_identifier, 
-        "Suppose the following identifies a language or variety. Return its BCP 47 language tag. Be conservative and only add information that is present in the input, or is necessary to make it into a valid BCP 47 language tag."
-      )
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+        input = country_identifier, 
+        query = "Suppose the following identifies a language or variety. Return its BCP 47 language tag. Be conservative and only add information that is present in the input, or is necessary to make it into a valid BCP 47 language tag."
+      })
     end,
   },
   bcp_47_language_tag = {
     summary = function(bcp_47_language_tag)
-      return get.string.deterministic_gpt_transformation(
-        bcp_47_language_tag, 
-        "Suppose the following is a BCP 47 language tag. Return a natural language description of it."
-      )
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+        input = bcp_47_language_tag, 
+        query = "Suppose the following is a BCP 47 language tag. Return a natural language description of it."
+      })
     end,
   },
   iso_3366_1_alpha_2 = {
     iso_3366_1_full_name = function(iso_3366_1_alpha_2)
-      return get.string.deterministic_gpt_transformation(
-        iso_3366_1_alpha_2, 
-        "Get the ISO 3366-1 full name of the country identified by the following ISO 3366-1 Alpha-2 country code."
-      )
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+        input = iso_3366_1_alpha_2, 
+        query = "Get the ISO 3366-1 full name of the country identified by the following ISO 3366-1 Alpha-2 country code."
+      })
     end,
     iso_3366_1_short_name = function(iso_3366_1_alpha_2)
-      return get.string.deterministic_gpt_transformation(
-        iso_3366_1_alpha_2, 
-        "Get the ISO 3366-1 short name of the country identified by the following ISO 3366-1 Alpha-2 country code."
-      )
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+        input = iso_3366_1_alpha_2, 
+        query = "Get the ISO 3366-1 short name of the country identified by the following ISO 3366-1 Alpha-2 country code."
+      })
     end,
   },
   boolean = {
@@ -7193,6 +7208,48 @@ transf = {
         end
       end
       return res
+    end,
+  },
+  role_content_message_spec = {
+
+  },
+  role_content_message_spec_array = {
+    api_role_content_message_spec_array = function(arr)
+      return glue({{
+        role = "system",
+        content = "You are a helpful assistant being queried through an API. Your output will be parsed, so adhere to any instructions given as to the format or content of the output. Only output the result."
+      }}, arr)
+    end,
+  },
+  --- like a role_content_message_spec_array, but alternating user/assistant role_content_message_specs, where a pair of user/assistant role_content_message_specs is a shot
+  n_shot_role_content_message_spec_array = {
+
+  },
+  n_shot_llm_spec = {
+    n_shot_api_query_role_content_message_spec_array = function(spec)
+      return transf.role_content_message_spec_array.api_role_content_message_spec_array(
+        concat(
+          {
+            {
+              role = "user",
+              content = spec.query
+            }, {
+              role = "user",
+              content = "If the input is already valid, echo the input."
+            }, {
+              role = "user",
+              content = "If you are unable to fulfill the request, return 'IMPOSSIBLE'."
+            }
+          },
+          transf.string_pair_array.n_shot_role_content_message_spec_array(spec.shots), 
+          {
+            {
+              role = "user",
+              content = spec.input
+            }
+          }
+        )
+      )
     end,
   }
 }
