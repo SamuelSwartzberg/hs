@@ -362,7 +362,10 @@ transf = {
         local output = concat( get.any_stateful_generator.array(combine.powerset, arr), {{}} )
         return output
       end
-    end
+    end,
+    n_anys = function(t)
+      return table.unpack(t)
+    end,
   },
   hole_y_arraylike = {
     array = function(tbl)
@@ -433,7 +436,7 @@ transf = {
         end
 
         -- split into components
-        return get.string.split_single_char(path, "/")
+        return get.string.string_array_split_single_char(path, "/")
       end
     end,
     path_array_of_path_component_array = function(path)
@@ -1040,7 +1043,7 @@ transf = {
     fs_tag_string_dict = function(fs_tag_string)
       return map(
         transf.fs_tag_string.fs_tag_string_part_array(fs_tag_string),
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.split_unpacked, {a_use, "-", 2}),
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.n_strings_split, {a_use, "-", 2}),
         {"v", "kv"}
       )
     end,
@@ -1054,7 +1057,7 @@ transf = {
     fs_tag_string_dict = function(fs_tag_string_part_array)
       return map(
         fs_tag_string_part_array,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.split_unpacked, {a_use, "-", 2}),
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.two_strings_split_or_nil, {a_use, "-"}),
         {"v", "kv"}
       )
     end,
@@ -1336,14 +1339,35 @@ transf = {
   xml_file = {
     tree = xml.parseFile
   },
+  -- a tree_node_like is a table with a key <ckey> which at some depth contains a tree_node_like_array, and a key <lkey> which contains a thing of any type that can be seen as the label of the node (or use self), such the tree_node_like it can be transformed to a tree_node
+  tree_node_like = {
+
+  },
+  tree_node_like_array = {
+
+  },
   tree_node = {
-
+    array_of_label_arrays = function(node, path, include_inner)
+      path = get.table.copy(path) or {}
+      dothis.array.push(path, node.label)
+      local res = {}
+      if not node.children or include_inner then
+        res = {path}
+      end
+      if node.children then
+        res = glue(res, transf.tree_node_array.array_of_label_arrays(node.children, path, include_inner))
+      end
+      return res
+    end
   },
-  inner_tree_node = {
-
-  },
-  leaf_tree_node = {
-
+  tree_node_array = {
+    array_of_label_arrays = function(arr, path, include_inner)
+      local res = {}
+      for _, node in ipairs(arr) do
+        res = glue(res, transf.tree_node.array_of_label_arrays(node, path, include_inner))
+      end
+      return res
+    end,
   },
 
   env_var_name_value_dict = {
@@ -3207,6 +3231,27 @@ transf = {
     whole_regex = function(str)
       return "^" .. str .. "$"
     end,
+    string_pair_split_by_minus_or_nil = function(str)
+      return get.string.string_pair_split_or_nil(str, "-")
+    end,
+    prompted_once_string_pair_for = function(str)
+      return transf.prompt_spec.any({
+        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        transformer = transf.string.string_pair_split_by_minus_or_nil,
+        prompt_args = {
+          message = "Please enter a string pair for " .. str .. " (e.g. 'foo-bar')",
+        }
+      })
+    end,
+    prompted_multiple_string_pair_array_for = function(str)
+      return transf.prompt_spec.any_array({
+        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        transformer = transf.string.string_pair_split_by_minus_or_nil,
+        prompt_args = {
+          message = "Please enter a string pair for " .. str .. " (e.g. 'foo-bar')",
+        }
+      })
+    end,
   },
   line = {
     noindent = function(str)
@@ -4063,9 +4108,6 @@ transf = {
     value_set = function(t)
       return transf.array.set(transf.native_table_or_nil.value_array(t))
     end,
-    n_anys = function(t)
-      return table.unpack(t)
-    end,
     determined_array_table = function(t)
       return transf.word.determinant_metatable_creator_fn("arr")(t)
     end,
@@ -4909,8 +4951,14 @@ transf = {
       return app:bundleID()
     end,
     menu_item_table_array = function(app)
-      local flattened = listWithChildrenKeyToListIncludingPath(app:getMenuItems(), {}, { title_key_name = "AXTitle", children_key_name = "AXChildren", levels_of_nesting_to_skip = 1 })
-      local filtered = filter(flattened, function (v) return v.AXTitle ~= "" end)
+      local arr = get.array_of_label_arrays.array_of_leaf_labels_with_title_path(
+        get.tree_node_like_array.tree_node_array(
+          app:getMenuItems(),
+          { levels_of_nesting_to_skip = 1}
+        ),
+        "AXTitle"
+      )
+      local filtered = filter(arr, function (v) return v.AXTitle ~= "" end)
       for k, v in transf.native_table.key_value_stateless_iter(filtered) do
         v.application = app
       end
@@ -6917,7 +6965,7 @@ transf = {
   },
   input_spec_series_string = {
     input_spec_string_array = function(str)
-      return transf.hole_y_arraylike.array(get.string.split_single_char_stripped(str, "\n"))
+      return transf.hole_y_arraylike.array(get.string.string_array_split_single_char_stripped(str, "\n"))
     end,
     input_spec_array = function(str)
       return hs.fnutils.imap(
@@ -7062,6 +7110,7 @@ transf = {
       prompt_spec.on_raw_invalid = prompt_spec.on_raw_invalid or "return_nil"
       prompt_spec.on_transformed_invalid = prompt_spec.on_transformed_invalid or "reprompt"
       prompt_spec.prompt_args = prompt_spec.prompt_args or {}
+      prompt_spec.prompt_args.message = prompt_spec.prompt_args.message or "Enter a value."
 
       -- generate some informative text mainly used when prompter is promptStringInner, though other prompters can consume this too
       local validation_extra
@@ -7129,6 +7178,21 @@ transf = {
           end
         end
       end
-    end
+    end,
+    any_array = function(prompt_spec)
+      local res = {}
+      prompt_spec.prompt_args = prompt_spec.prompt_args or {}
+      prompt_spec.prompt_args.message = prompt_spec.prompt_args.message or "Enter a value."
+      prompt_spec.prompt_args.message = prompt_spec.prompt_args.message .. " Enter an empty value to stop."
+      while true do
+        local x = transf.prompt_spec.any(prompt_spec)
+        if x == nil then
+          return res
+        else
+          dothis.array.push(res, x)
+        end
+      end
+      return res
+    end,
   }
 }

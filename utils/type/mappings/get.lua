@@ -553,15 +553,31 @@ get = {
     
   },
   string = {
-    split_single_char = stringy.split,
-    split_single_char_stripped = function(str, sep)
+    string_array_split_single_char = stringy.split,
+    string_array_split_single_char_stripped = function(str, sep)
       return transf.string_array.stripped_string_array(
         transf.string.split_single_char(str, sep)
       )
     end,
-    split = stringx.split,
-    split_unpacked = function(str, sep, n)
-      return table.unpack(transf.string.split(str, sep, n))
+    string_array_split = stringx.split,
+    n_strings_split = function(str, sep, n)
+      return transf.array.n_anys(get.string.string_array_split(str, sep, n))
+    end,
+    string_pair_split_or_nil = function(str, sep)
+      local arr = get.string.string_array_split(str, sep, 2)
+      if #arr ~= 2 then
+        return nil
+      else
+        return arr
+      end
+    end,
+    two_strings_split_or_nil = function(str, sep)
+      local arr = get.string.string_array_split(str, sep, 2)
+      if #arr ~= 2 then
+        return nil
+      else
+        return arr[1], arr[2]
+      end
     end,
     lines_tail = function(path, n)
       return slice(transf.string.lines(path), -(n or 10))
@@ -790,7 +806,7 @@ get = {
       return table.concat(arr, sep)
     end,
     resplit_by_oldnew = function(arr, sep)
-      return get.string.split(
+      return get.string.string_array_split(
         get.string_array.join(
           arr,
           sep
@@ -799,7 +815,7 @@ get = {
       )
     end,
     resplit_by_new = function(arr, sep)
-      return get.string.split(
+      return get.string.string_array_split(
         get.string_array.join(
           arr,
           ""
@@ -808,7 +824,7 @@ get = {
       )
     end,
     resplit_by_oldnew_single_char = function(arr, sep)
-      return get.string.split_single_char(
+      return get.string.string_array_split_single_char(
         get.string_array.join(
           arr,
           sep
@@ -817,7 +833,7 @@ get = {
       )
     end,
     resplit_by_oldnew_single_char_noempty = function(arr, sep)
-      return filter(get.string.split_single_char(
+      return filter(get.string.string_array_split_single_char(
         get.string_array.join(
           arr,
           sep
@@ -826,7 +842,7 @@ get = {
       ), true)
     end,
     resplit_by_new_single_char = function(arr, sep)
-      return get.string.split_single_char(
+      return get.string.string_array_split_single_char(
         get.string_array.join(
           arr,
           ""
@@ -2468,5 +2484,54 @@ get = {
       cpy.type = type
       return cpy
     end,
-  }
+  },
+  tree_node_like = {
+    tree_node = function(tree_node_like, treeify_spec)
+      local raw_children = tree_node_like[treeify_spec.children_key or "children"]
+      tree_node_like[treeify_spec.children_key] = nil -- remove children old node
+      local label
+      if treeify_spec.label_key then
+        label = tree_node_like[treeify_spec.label_key]
+      else
+        label = get.table.copy(tree_node_like, true)
+      end
+      if raw_children and #raw_children > 0 and treeify_spec.levels_of_nesting_to_skip then
+        for i = 1, treeify_spec.levels_of_nesting_to_skip do -- this is to handle cases in which instead of children being { item, item, ... }, it's {{ item, item, ... }} etc. Really, this shouldn't be necessary, but some of the data I'm working with is like that.
+          raw_children = raw_children[1]
+        end
+      end
+      local children = get.tree_node_like_array.tree_node_array(raw_children, treeify_spec)
+      return {
+        label = label,
+        children = children
+      }
+    end
+  },
+  tree_node_like_array = {
+    tree_node_array = function(tree_node_like_array, treeify_spec)
+      return hs.fnutils.imap(
+        tree_node_like_array,
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.tree_node_like.tree_node, {a_use, treeify_spec})
+      )
+    end,
+  },
+  label_array = {
+    leaf_label_with_title_path = function(arr, title_key)
+      local leaf = get.table.copy(dothis.array.pop(arr))
+      local title_path = map(
+        arr,
+        {_k = title_key}
+      )
+      leaf.path = title_path
+      return leaf
+    end
+  },
+  array_of_label_arrays = {
+    array_of_leaf_labels_with_title_path = function(arr, title_key)
+      return hs.fnutils.imap(
+        arr,
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.label_array.leaf_label_with_title_path, {a_use, title_key})
+      )
+    end,
+  },
 }

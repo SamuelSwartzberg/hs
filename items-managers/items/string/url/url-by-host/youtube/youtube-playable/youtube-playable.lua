@@ -52,7 +52,7 @@ YoutubePlayableItemItemSpecifier = {
       ["add-as-m3u"] = function(self, deduced_tags)
         local specifier = {}
         local edited_tags = map(deduced_tags, {_pd = "string"})
-        specifier.tag = glue(edited_tags, promptUserToAddNKeyValuePairs("tag"))
+        specifier.tag = glue(edited_tags, transf.string.prompted_multiple_string_pair_array_for("tag"))
         specifier.path  = promptPipeline({
           {"dir", {prompt_args = {default = env.MAUDIOVISUAL}}},
           {"string", {prompt_args = {message = "Subdirectory name", default = specifier.tag.srs or specifier.tag.tcrea }}},

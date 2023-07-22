@@ -205,7 +205,7 @@ StringItemSpecifier = {
     }, {
       d = "spltarr",
       i = "⽄,",
-      getfn = get.fn.arbitrary_args_bound_or_ignored_fn(get.string.split_single_char_stripped, {a_use, ","}),
+      getfn = get.fn.arbitrary_args_bound_or_ignored_fn(get.string.string_array_split_single_char_stripped, {a_use, ","}),
     },
     {
       text = "🌄📚 crsess.",
