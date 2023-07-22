@@ -3282,6 +3282,12 @@ transf = {
       return eutf8.gsub(str, "-", "")
     end,
   },
+  alphanum_underscore = {
+    
+  },
+  alphanum_minus_underscore = {
+    
+  },
   pass_item_name = {
     password = function(pass_item_name)
       return get.pass_item_name.value(pass_item_name, "passw")

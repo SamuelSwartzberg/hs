@@ -30,7 +30,7 @@ ImageFileItemSpecifier = {
         hs.eventtap.keyStroke({"cmd"}, "v")
       end,
       ["add-as-otp"] = function(self, name)
-        dothis.pass.add_otp_url(transf.image_file.qr_data(self:get("completely-resolved-path")), name)
+        dothis.otp_url.add_otp_pass_item(transf.image_file.qr_data(self:get("completely-resolved-path")), name)
       end,
       ["shrink"] = function(self)
         local shrink_specifier_array = ar(map( {

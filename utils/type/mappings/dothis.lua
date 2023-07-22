@@ -248,33 +248,22 @@ dothis = {
     end,
   },
   pass = {
-    add_otp_url = function(url, name)
-      run({
-        "echo",
-        {value = url, type = "quoted"},
-        "|",
-        "pass otp insert otp/" .. name
-      })
-    end,
-    add_item = function(data, type, name)
-      run("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name, true)
-    end,
     add_contact_data = function(data, type, uid)
       type = "contacts/" .. type
       dothis.alphanum_minus_underscore.set_pass_json(data, type, uid)
     end,      
-    delete = function(type, name)
-      run("pass rm " .. type .. "/" .. name, true)
-    end, 
   },
   pass_item_name = {
     replace = function(name, type, data)
       run("pass rm " .. type .. "/" .. name, function()
-        dothis.pass.add_item(data, type, name)
+        dothis.alphanum_minus_underscore.add_pass_item_name(name, type, data)
       end)
     end,
     rename = function(name, type, new_name)
       run("pass mv " .. type .. "/" .. name .. " " .. type .. "/" .. new_name, true)
+    end,
+    remove = function(name, type)
+      run("pass rm " .. type .. "/" .. name, true)
     end,
   },
   login_pass_item_name = {
@@ -287,10 +276,13 @@ dothis = {
   },
   alphanum_minus_underscore = {
     add_pass_item_name_with_json = function(name, type, data)
-      dothis.pass.add_item(json.encode(data), type, name)
+      dothis.alphanum_minus_underscore.add_pass_item_name(name, type, json.encode(data))
+    end,
+    add_pass_item_name = function(name, type, data)
+      run("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name, true)
     end,
     add_passw_pass_item_name = function(name, password)
-      dothis.pass.add_item(password, "passw", name)
+      dothis.alphanum_minus_underscore.add_pass_item_name(name, "passw", password)
     end,
   },
   contact_table = {
@@ -344,6 +336,16 @@ dothis = {
   url = {
     download = function(url, target)
       run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
+    end,
+  },
+  otp_url = {
+    add_otp_pass_item = function(url, name)
+      run({
+        "echo",
+        {value = url, type = "quoted"},
+        "|",
+        "pass otp insert otp/" .. name
+      })
     end,
   },
   booru_url = {

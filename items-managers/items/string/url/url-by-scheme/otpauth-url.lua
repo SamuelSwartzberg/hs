@@ -8,7 +8,7 @@ OtpauthURLItemSpecifier = {
     }, 
     doThisables = {
       ["add-as-otp"] = function (self, name)
-        dothis.pass.add_otp_url(self:get("c"), name)
+        dothis.otp_url.add_otp_pass_item(self:get("c"), name)
       end
     }
   },
