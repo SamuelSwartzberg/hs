@@ -69,46 +69,14 @@ get = {
       )
     end
   },
-  upkg = {
-    package_managers = function()
-      return transf.string.lines(run("upkg list-package-managers"))
+  package_manager_name_or_nil = {
+    package_name_semver_compound_string_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
+    package_name_semver_package_manager_name_compound_string_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
+    package_name_package_manager_name_compound_string = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
+    semver_string_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
+    absolute_path_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
-    backed_up_packages = function(mgr)
-      return transf.string.lines(run("upkg " .. (mgr or "") .. " read-backup"))
-    end,
-    missing_packages = function(mgr)
-      return transf.string.lines(run("upkg " .. (mgr or "") .. " missing"))
-    end,
-    added_packages = function(mgr)
-      return transf.string.lines(run("upkg " .. (mgr or "") .. " added"))
-    end,
-    difference_packages = function(mgr)
-      return transf.string.lines(run("upkg " .. (mgr or "") .. " difference"))
-    end,
-    package_manager_version = function(mgr)
-      return run("upkg " .. (mgr or "") .. " package-manager-version")
-    end,
-    which_package_manager = function(mgr)
-      return run("upkg " .. (mgr or "") .. " which-package-manager")
-    end,
-    package_managers_with_missing_packages = function()
-      return transf.string.lines(run("upkg missing-package-manager"))
-    end,
-    list = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list ")) end,
-    list_version = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-version ")) end,
-    list_no_version = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-no-version ")) end,
-    list_version_package_manager = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
-    list_with_package_manager = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
-    count = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " count ")) end,
-    with_version = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
-    with_version_package_manager = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
-    with_package_manager = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
-    version = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
-    which = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
-    end,
-    is_installed = function(mgr, arg) return pcall(run, "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
-    installed_package_manager = function(arg) return transf.string.lines(run("upkg " .. (arg or "") .. " installed-package-manager")) end,
-  
+    boolean_array_installed = function(mgr, arg) return pcall(run, "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
   },
   khal = {
     all_calendars = function()
@@ -560,6 +528,17 @@ get = {
       )
     end,
     string_array_split = stringx.split,
+    --- don't split on the edge of the string, i.e. don't return empty strings at the start or end
+    string_array_split_noedge = function(str, sep)
+      local res = transf.string.string_array_split(str, sep)
+      if res[1] == "" then
+        dothis.array.shift(res)
+      end
+      if res[#res] == "" then
+        dothis.array.pop(res)
+      end
+      return res
+    end,
     n_strings_split = function(str, sep, n)
       return transf.array.n_anys(get.string.string_array_split(str, sep, n))
     end,

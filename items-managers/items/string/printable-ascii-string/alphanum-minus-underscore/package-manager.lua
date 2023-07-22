@@ -4,7 +4,7 @@ PackageManagerItemSpecifier = {
   action_table = {
    {
       text = "📦 lpkg.",
-      getfn = get.upkg.list,
+      getfn = get.upkg.package_name_or_package_name_semver_compound_string_array,
     }
   }
 }

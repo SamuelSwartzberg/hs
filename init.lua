@@ -405,7 +405,7 @@ System:get("manager", "timer"):doThis("create-all", {
     interval = "*/5 * * * *",
   },
   {
-    fn = dothis.upkg.upgrade_all,
+    fn = dothis.package_manager_name.upgrade_all,
     interval = "0 0 * * *"
   }
   --[[CreateApplicationItem("Firefox"):get("backup-timer"),

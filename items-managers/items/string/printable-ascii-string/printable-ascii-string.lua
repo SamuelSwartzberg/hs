@@ -47,10 +47,10 @@ PrintableAsciiStringItemSpecifier = {
         return onig.find(self:get("c"), transf.string.whole_regex(mt._r.b.b32.crockford))
       end,
       ["is-installed-package"] = function(self, mgr)
-        return get.upkg.is_installed(mgr, self:get("c"))
+        return get.upkg.boolean_array_installed(mgr, self:get("c"))
       end,
       ["with-version-package-manager-array"] = function(self, mgr)
-        return ar(get.upkg.with_version_package_manager(mgr, self:get("c")))
+        return ar(get.upkg.package_name_semver_package_manager_name_compound_string_array(mgr, self:get("c")))
       end,
 
     },
@@ -67,10 +67,10 @@ PrintableAsciiStringItemSpecifier = {
         st(username):doThis("add-as-username", name)
       end,
       ["upkg-install"] = function(self, mgr)
-        dothis.upkg.install(mgr, self:get("c"))
+        dothis.package_manager_name.install(mgr, self:get("c"))
       end,
       ["upkg-remove"] = function(self, mgr)
-        dothis.upkg.remove(mgr, self:get("c"))
+        dothis.package_manager_name.remove(mgr, self:get("c"))
       end,
 
     }

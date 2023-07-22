@@ -1570,8 +1570,8 @@ transf = {
       )
     end
   },
-  semver = {
-    semver_components = function(str)
+  semver_string = {
+    semver_component_specifier = function(str)
       local major, minor, patch, prerelease, build = onig.match(str, mt._r.version.semver)
       return {
         major = get.string_or_number.number(major),
@@ -1580,6 +1580,43 @@ transf = {
         prerelease = prerelease,
         build = build
       }
+    end,
+  },
+  package_name_semver_compound_string = {
+    package_name_semver_string_array = function(str)
+      return get.string.string_array_split_noedge(str, "@")
+    end,
+    package_name = function(str)
+      return transf.package_name_semver_compound_string.package_name_semver_string_array(str)[1]
+    end,
+    semver_string = function(str)
+      return transf.package_name_semver_compound_string.package_name_semver_string_array(str)[2]
+    end,
+  },
+  package_name_semver_package_manager_name_compound_string = {
+    package_name_semver_compound_string = function(str)
+      return get.string.string_array_split_noedge(str, ":")[1]
+    end,
+    package_name = function(str)
+      return transf.package_name_semver_compound_string.package_name(
+        transf.package_name_semver_package_manager_name_compound_string.package_name_semver_compound_string(str)
+      )
+    end,
+    semver_string = function(str)
+      return transf.package_name_semver_compound_string.semver_string(
+        transf.package_name_semver_package_manager_name_compound_string.package_name_semver_compound_string(str)
+      )
+    end,
+    package_manager_name = function(str)
+      return get.string.string_array_split_noedge(str, ":")[2]
+    end,
+  },
+  package_name_package_manager_name_compound_string = {
+    package_name = function(str)
+      return get.string.string_array_split_noedge(str, ":")[1]
+    end,
+    package_manager_name = function(str)
+      return get.string.string_array_split_noedge(str, ":")[2]
     end,
   },
   dice_notation = {
@@ -6268,8 +6305,51 @@ transf = {
         )
       )
     end,
+    package_manager_name_array = function()
+      return transf.string.lines(run("upkg list-package-managers"))
+    end,
+    package_manager_name_array_with_missing_packages = function()
+      return transf.string.lines(run("upkg missing-package-manager"))
+    end,
+    semver_string_array_of_installed_package_managers = function ()
+      return transf.string.lines(run("upkg package-manager-version"))
+    end,
+    absolute_path_array_of_installed_package_managers = function()
+      return transf.string.lines(run("upkg which-package-maanger"))
+    end,
 
 
+  },
+  package_manager_name = {
+    semver_string = function(mgr)
+      return run("upkg " .. mgr .. " package-manager-version")
+    end,
+    absolute_path = function(mgr)
+      return run("upkg " .. mgr .. " which-package-manager")
+    end,
+  },
+  package_manager_name_or_nil = {
+    backed_up_package_name_array = function(mgr)
+      return transf.string.lines(run("upkg " .. (mgr or "") .. " read-backup"))
+    end,
+    missing_package_name_array = function(mgr)
+      return transf.string.lines(run("upkg " .. (mgr or "") .. " missing"))
+    end,
+    added_package_name_array = function(mgr)
+      return transf.string.lines(run("upkg " .. (mgr or "") .. " added"))
+    end,
+    difference_package_name_array = function(mgr)
+      return transf.string.lines(run("upkg " .. (mgr or "") .. " difference"))
+    end,
+    package_name_or_package_name_semver_compound_string_array = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list ")) end,
+    package_name_semver_compound_string_array = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-version ")) end,
+    package_name_array = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-no-version ")) end,
+    package_name_semver_package_manager_name_compound_string_array = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
+    package_name_package_manager_name_compound_string = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
+    nonindicated_decimal_string_array_installed = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " count ")) end,
+  },
+  package_name = {
+    installed_package_manager = function(pkg) return transf.string.lines(run("upkg installed_package_manager " .. pkg)) end,
   },
   action_specifier = {
     action_chooser_item_specifier = function(action_specifier)

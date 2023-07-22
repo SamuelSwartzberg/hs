@@ -17,7 +17,7 @@ dothis = {
       run("mullvad relay set hostname " .. hostname, true)
     end,
   },
-  upkg = {
+  package_manager_name = {
     install = function(mgr, pkg)
       run("upkg " .. mgr .. " install " .. transf.string.single_quoted_escaped(pkg), true)
     end,
@@ -59,13 +59,13 @@ dothis = {
       end)
     end,
     backup = function(mgr)
-      dothis.upkg.do_backup_and_commit(mgr, "backup", "backup packages")
+      dothis.package_manager_name.do_backup_and_commit(mgr, "backup", "backup packages")
     end,
     delete_backup = function(mgr)
-      dothis.upkg.do_backup_and_commit(mgr, "delete-backup", "delete backup of packages")
+      dothis.package_manager_name.do_backup_and_commit(mgr, "delete-backup", "delete backup of packages")
     end,
     replace_backup = function(mgr)
-      dothis.upkg.do_backup_and_commit(mgr, "replace-backup", "replace backup of packages")
+      dothis.package_manager_name.do_backup_and_commit(mgr, "replace-backup", "replace backup of packages")
     end,
   },
   khard = {
@@ -247,10 +247,10 @@ dothis = {
       hs.grid.show()
     end,
   },
-  pass = {
-    add_contact_data = function(data, type, uid)
+  uuid = {
+    add_contact_data = function(uuid, data, type)
       type = "contacts/" .. type
-      dothis.alphanum_minus_underscore.set_pass_json(data, type, uid)
+      dothis.alphanum_minus_underscore.set_pass_json(uuid, type, data)
     end,      
   },
   pass_item_name = {
@@ -287,7 +287,7 @@ dothis = {
   },
   contact_table = {
     add_iban = function(contact_table, iban)
-      dothis.pass.add_contact_data(iban, "iban", transf.contact_table.uid(contact_table))
+      dothis.uuid.add_contact_data(transf.contact_table.uid(contact_table), "iban", iban)
     end,
     edit = function(contact_table)
       dothis.khard.edit_contact(transf.contact_table.uid(contact_table))

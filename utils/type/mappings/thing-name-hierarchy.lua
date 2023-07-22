@@ -12,7 +12,14 @@ thing_name_hierarchy = {
           secq_pass_item_name = "leaf",
           username_pass_item_name = "leaf",
           login_pass_item_name = "leaf"
-        }
+        },
+        alphanum_minus = {
+
+        },
+        alphanum_underscore = {
+          lowercase_alphanum_underscore = 
+        },
+        package_manager = {}
       }
     },
     path = {
