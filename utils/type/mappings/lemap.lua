@@ -11,7 +11,7 @@ lemap = {
     
     Please ask me for the gist of what I want to respond with once you are ready.]],
     text_first_draft = [[The following is the first draft of {{[d.text_purpose]}}. However, it's still a bit {{[d.problem or "wordy and awkward in places"]}}. Please edit it for {{[d.change or "style and clarity"]}}. Feel free to change stuff around a bit.]],
-    fill_template = transf.multiline_string.trimmed_lines([[Fill the following template
+    fill_template = transf.multiline_string.trimmed_lines_multiline_string([[Fill the following template
     
     {{[
       table.concat(map(d.form_field_specifier_array, function (form_field_specifier)

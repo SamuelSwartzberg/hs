@@ -1,20 +1,7 @@
 dothis = {
-  mullvad = {
-    connect = function()
-      run("mullvad connect", true)
-    end,
-    disconnect = function()
-      run("mullvad disconnect", true)
-    end,
-    toggle = function()
-      if get.mullvad.mullvad_boolean_connected() then
-        dothis.mullvad.disconnect()
-      else
-        dothis.mullvad.connect()
-      end
-    end,
-    relay_set = function(hostname)
-      run("mullvad relay set hostname " .. hostname, true)
+  mullvad_relay_identifier = {
+    set_active_mullvad_relay_dentifier = function(id)
+      run("mullvad relay set hostname " .. id, true)
     end,
   },
   package_manager_name = {
@@ -283,6 +270,12 @@ dothis = {
     end,
     add_passw_pass_item_name = function(name, password)
       dothis.alphanum_minus_underscore.add_pass_item_name(name, "passw", password)
+    end,
+    add_username_pass_item_name = function(name, username)
+      dothis.absolute_path.write_file(
+        get.pass_item_name.path(name, "username", "txt"),
+        username
+      )
     end,
   },
   contact_table = {

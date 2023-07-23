@@ -42,28 +42,6 @@ get = {
       })
     end,
   },
-  mullvad = {
-    mullvad_status_string = function()
-      return run("mullvad status")
-    end,
-    mullvad_boolean_connected = function()
-      return stringy.startswith(get.mullvad.mullvad_status_string(),"Connected")
-    end,
-    mullvad_relay_list_string = function()
-      return memoize(run)("mullvad relay list")
-    end,
-    mullvad_flat_relay_array = function()
-      return 
-        flatten(
-          transf.multiline_string.relay_table(
-            get.mullvad.mullvad_relay_list_string()
-          )
-      )
-    end,
-    mullvad_relay_string = function()
-      return run("mullvad relay get"):match("hostname ([^ ]+)")
-    end,
-  },
   khard = {
     list = function()
       return memoize(run)(
@@ -225,6 +203,19 @@ get = {
   ["nil"] = {
     default_audiodevice = function(type)
       return hs.audiodevice["default" .. transf.word.capitalized(type) .. "Device"]()
+    end,
+    mullvad_connect = function()
+      run("mullvad connect", true)
+    end,
+    mullvad_disconnect = function()
+      run("mullvad disconnect", true)
+    end,
+    mullvad_toggle = function()
+      if transf["nil"].mullvad_boolean_connected() then
+        dothis["nil"].mullvad_disconnect()
+      else
+        dothis["nil"].mullvad_connect()
+      end
     end,
   },
   audiodevice_specifier = {
@@ -736,7 +727,7 @@ get = {
     number = function(str,  base)
       str = eutf8.gsub(str, "[ \t\n\r_]", "")
       str = eutf8.gsub(str, ",", ".")
-      return get.string_or_number.number(str, base)
+      return tonumber(str, base)
     end,
     int = function(str, base)
       return transf.number.int(
@@ -1884,16 +1875,16 @@ get = {
       return get.project_dir.global_subtype_project_material_path(dir, type, "universal")
     end,
   },
-  iso_3366_1_alpha_2 = {
+  iso_3366_1_alpha_2_code = {
     --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_full_name instead
-    full_name_in_language = function(code, language_identifier_string)
+    full_name_in_language_string = function(code, language_identifier_string)
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
         query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
         input = code
       })
     end,
     --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_short_name instead
-    short_name_in_language = function(code, language_identifier_string)
+    short_name_in_language_string = function(code, language_identifier_string)
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
         query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
         input = code

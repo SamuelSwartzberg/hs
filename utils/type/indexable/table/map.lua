@@ -77,25 +77,6 @@ function map(tbl, f, opts, visited)
         f = function(...)
           return string.format(frmt, ...)
         end
-      elseif f._pd ~= nil  or f._pm ~= nil  then
-        local get_prompt_type, get_default
-        if f._pd ~= nil then
-          get_prompt_type = function() return f._pd end
-          get_default = function(v) return v end
-        else
-          get_prompt_type = function(v) return v end
-          get_default = function() return f._pm and f._pm or nil end
-        end
-        opts.args = {"k", "v"}
-        f = function(k, v)
-          local new_v = prompt(get_prompt_type(v), {
-            prompt_args = {
-              message = "Confirm value for " .. k,
-              default = get_default(v),
-            },
-          })
-          return new_v or v
-        end
       end
     else
       f = function(arg)

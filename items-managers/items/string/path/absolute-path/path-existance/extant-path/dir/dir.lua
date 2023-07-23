@@ -50,12 +50,6 @@ DirItemSpecifier = {
           "&&",
         }
       end,
-      ["related-path-gui"] = function(self)
-        return st(prompt("dir", self:get("c")))
-      end,
-      ["related-path-with-subdirs-gui"] = function(self)
-        return st(promptPathChildren(self:get("c") .. "/"))
-      end,
       ["ls"] = function (self)
         return run({"ls", "-F", "-1", { value = self:get("completely-resolved-path"), type = "quoted" }})
       end,

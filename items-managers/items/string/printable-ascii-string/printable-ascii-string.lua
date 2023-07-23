@@ -31,28 +31,9 @@ PrintableAsciiStringItemSpecifier = {
       ["is-unicode-codepoint"] = function(self)
         return stringy.startswith(self:get("c"), "U+") and string.match(self:get("c"), "^U+%x+$")
       end,
-      ["is-handle"] = function(self)
-        return stringy.startswith(self:get("c"), "@")
-      end,
-      ["is-url-base64"] = function(self)
-        return onig.find(self:get("c"), transf.string.whole_regex(mt._r.b.b64.url))
-      end,
-      ["is-general-base64"] = function(self)
-        return onig.find(self:get("c"), transf.string.whole_regex(mt._r.b.b64.gen))
-      end,
-      ["is-general-base32"] = function(self)
-        return onig.find(self:get("c"), transf.string.whole_regex(mt._r.b.b32.gen))
-      end,
-      ["is-crockford-base32"] =  function(self)
-        return onig.find(self:get("c"), transf.string.whole_regex(mt._r.b.b32.crockford))
-      end,
       ["is-installed-package"] = function(self, mgr)
         return get.upkg.boolean_array_installed(mgr, self:get("c"))
       end,
-      ["with-version-package-manager-array"] = function(self, mgr)
-        return ar(get.upkg.package_name_semver_package_manager_name_compound_string_array(mgr, self:get("c")))
-      end,
-
     },
     doThisables = {
       ["add-as-password"] = function(self, name)
@@ -62,36 +43,13 @@ PrintableAsciiStringItemSpecifier = {
         dothis.absolute_path.write_file(env.MPASSUSERNAME .. "/" .. name .. ".txt", self:get("c"))
       end,
       ["add-as-password-with-prompt-username"] = function(self, name)
-        local username = prompt("string", "Username")
+        local username = get.string.prompted_once_string_from_default("", "Username")
         self:doThis("add-as-password", name)
         st(username):doThis("add-as-username", name)
-      end,
-      ["upkg-install"] = function(self, mgr)
-        dothis.package_manager_name.install(mgr, self:get("c"))
-      end,
-      ["upkg-remove"] = function(self, mgr)
-        dothis.package_manager_name.remove(mgr, self:get("c"))
       end,
 
     }
   },
-  potential_interfaces = ovtable.init({
-    { key = "alphanum-minus-underscore", value = CreateAlphanumMinusUnderscoreItem },
-    { key = "iban", value = CreateIbanItem },
-    { key = "doi", value = CreateDoiItem },
-    { key = "num", value = CreateNumItem },
-    { key = "email-address", value = CreateEmailAddressItem },
-    { key = "phone-number", value = CreatePhoneNumberItem },
-    { key = "digit-string", value = CreateDigitStringItem },
-    { key = "date-related-item", value = CreateDateRelatedItem },
-    { key = "dice-notation-item", value = CreateDiceNotationItem },
-    { key = "unicode-codepoint", value = CreateUnicodeCodepointItem },
-    { key = "handle", value = CreateHandleItem },
-    { key = "url-base64", value = CreateUrlBase64Item },
-    { key = "general-base64", value = CreateGeneralBase64Item },
-    { key = "general-base32", value = CreateGeneralBase32Item },
-    { key = "crockford-base32", value = CreateCrockfordBase32Item },
-  }),
   action_table = concat(getChooseItemTable({
    
   }),{

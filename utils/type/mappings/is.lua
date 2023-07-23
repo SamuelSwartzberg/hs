@@ -1,10 +1,5 @@
 is = {
   string = {
-    package_manager = function(str)
-      return find(transf.string.lines(
-        memoize(run)("upkg list-package-managers")
-      ), {_exactly = str})
-    end,
     potentially_phone_number = function(str)
       if #str > 16 then return false end
       local _, amount_of_digits = eutf8.gsub(str, "%d", "")
@@ -25,30 +20,24 @@ is = {
     int_string = function(str)
       return is.string.number_string(str) and is.number.int(get.string_or_number.number(str))
     end,
-    printable_ascii = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.charset.printable_ascii))
-    end,
-    ascii = function(str)
+   
+    ascii_string = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.charset.ascii))
     end,
     url = function(str)
-      return is.string.ascii(str) and is.ascii.url(str)
+      return is.string.ascii_string(str) and is.printable_ascii_string.url(str)
     end,
   },
-  ascii = {
-    issn = function(str) 
-      return onig.find(str, transf.string.whole_regex(mt._r.id.issn))
+  ascii_string = {
+    printable_ascii_string = function(str)
+      return onig.find(str, transf.string.whole_regex(mt._r.charset.printable_ascii))
     end,
-    uuid = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.id.uuid), 1, "i")
-    end,
-    relay_identifier = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.id.relay_identifier))
-    end,
+  },
+  printable_ascii_string = {
     base32_gen_string = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.id.b32.gen))
     end,
-    base32_crock_stringford = function(str)
+    base32_crock_string = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.id.b32.crockford))
     end,
     base64_gen_string = function(str)
@@ -57,11 +46,11 @@ is = {
     base64_url_string = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.id.b64.url))
     end,
-    base32 = function(str)
-      return is.ascii.base32_gen_string(str) or is.ascii.base32_crock_stringford(str)
+    base32_string = function(str)
+      return is.printable_ascii_string.base32_gen_string(str) or is.printable_ascii_string.base32_crock_string(str)
     end,
-    base64 = function(str)
-      return is.ascii.base64_gen_string(str) or is.ascii.base64_url_string(str)
+    base64_string = function(str)
+      return is.printable_ascii_string.base64_gen_string(str) or is.printable_ascii_string.base64_url_string(str)
     end,
     digit_string = function(str)
       return get.string_or_number.number(str, 16) ~= nil -- this may not return the correct value for non-hex strings, but that doesn't matter, we're only checking if it is a digit string of whatever kind, so what value exactly it returns doesn't matter
@@ -70,10 +59,10 @@ is = {
       return 
         stringy.startswith(str, "0") and
         get.array.contains(transf.native_table_or_nil.key_array(tblmap.base_letter.base), str:sub(2, 2)) and
-        is.ascii.digit_string(str:sub(3))
+        is.printable_ascii_string.digit_string(str:sub(3))
     end,
     potentially_indicated_digit_string = function(str)
-      return is.ascii.indicated_digit_string(str) or is.ascii.digit_string(str)
+      return is.printable_ascii_string.indicated_digit_string(str) or is.printable_ascii_string.digit_string(str)
     end,
     binary_string = function(str)
       return get.string_or_number.number(str, 2) ~= nil
@@ -89,35 +78,46 @@ is = {
     end,
 
     indicated_binary_string = function(str)
-      return stringy.startswith(str, "0b") and is.ascii.binary_string(str:sub(3))
+      return stringy.startswith(str, "0b") and is.printable_ascii_string.binary_string(str:sub(3))
     end,
     indicated_hex_string = function(str)
-      return stringy.startswith(str, "0x") and is.ascii.hex_string(str:sub(3))
+      return stringy.startswith(str, "0x") and is.printable_ascii_string.hex_string(str:sub(3))
     end,
     indicated_octal_string = function(str)
-      return stringy.startswith(str, "0o") and is.ascii.octal_string(str:sub(3))
+      return stringy.startswith(str, "0o") and is.printable_ascii_string.octal_string(str:sub(3))
     end,
     indicated_decimal_string = function(str)
-      return stringy.startswith(str, "0d") and is.ascii.decimal_string(str:sub(3))
+      return stringy.startswith(str, "0d") and is.printable_ascii_string.decimal_string(str:sub(3))
     end,
     potentially_indicated_binary_string = function(str)
-      return is.ascii.indicated_binary_string(str) or is.ascii.binary_string(str)
+      return is.printable_ascii_string.indicated_binary_string(str) or is.printable_ascii_string.binary_string(str)
     end,
     potentially_indicated_hex_string = function(str)
-      return is.ascii.indicated_hex_string(str) or is.ascii.hex_string(str)
+      return is.printable_ascii_string.indicated_hex_string(str) or is.printable_ascii_string.hex_string(str)
     end,
     potentially_indicated_octal_string = function(str)
-      return is.ascii.indicated_octal_string(str) or is.ascii.octal_string(str)
+      return is.printable_ascii_string.indicated_octal_string(str) or is.printable_ascii_string.octal_string(str)
     end,
     potentially_indicated_decimal_string = function(str)
-      return is.ascii.indicated_decimal_string(str) or is.ascii.decimal_string(str)
+      return is.printable_ascii_string.indicated_decimal_string(str) or is.printable_ascii_string.decimal_string(str)
     end,
     url = isUrl,
-
+    handle = function(str)
+      return stringy.startswith(str, "@")
+    end,
   },
   alphanum_minus = {
     isbn = function(str)
       return onig.find(transf.alphanum_minus.alphanum(str), transf.string.whole_regex(mt._r.id.isbn))
+    end,
+    issn = function(str) 
+      return onig.find(str, transf.string.whole_regex(mt._r.id.issn))
+    end,
+    uuid = function(str)
+      return onig.find(str, transf.string.whole_regex(mt._r.id.uuid), 1, "i")
+    end,
+    relay_identifier = function(str)
+      return onig.find(str, transf.string.whole_regex(mt._r.id.relay_identifier))
     end,
     
   },
@@ -429,7 +429,10 @@ is = {
     end
   },
   alphanum_minus_underscore = {
-    word =  function(str) 
+    package_manager_name = function(str)
+      return get.array.contains(transf["nil"].package_manager_name_array(), str)
+    end,
+    alphanum_underscore =  function(str) 
       return not string.find(str, "-")
     end,
     alphanum_minus = function(str)

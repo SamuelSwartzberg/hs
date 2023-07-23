@@ -1,5 +1,3 @@
---- @alias relay_table { [string]: { [string]: string[] } }
-
 --- maps one thing_name to another thing_name
 --- so transf.<thing_name1>.<thing_name2>(<thing1>) -> <thing2>
 transf = {
@@ -2676,8 +2674,8 @@ transf = {
     country_identifier_string = function(single_address_table)
       return single_address_table.Country
     end,
-    iso_3366_1_alpha_2 = function(single_address_table)
-      return transf.country_identifier_string.iso_3366_1_alpha_2(
+    iso_3366_1_alpha_2_country_code = function(single_address_table)
+      return transf.country_identifier_string.iso_3366_1_alpha_2_country_code(
         transf.address_table.country_identifier_string(single_address_table)
       )
     end,
@@ -2720,7 +2718,7 @@ transf = {
       })
     end,
     relevant_location_array = function(single_address_table)
-      if transf.address_table.iso_3366_1_alpha_2(single_address_table) == "de" then
+      if transf.address_table.iso_3366_1_alpha_2_country_code(single_address_table) == "de" then
         return transf.address_table.in_country_location_array(single_address_table)
       else
         return transf.address_table.international_location_array(single_address_table)
@@ -2739,7 +2737,7 @@ transf = {
       )
     end,
     relevant_address_array = function(single_address_table)
-      if transf.address_table.iso_3366_1_alpha_2(single_address_table) == "de" then
+      if transf.address_table.iso_3366_1_alpha_2_country_code(single_address_table) == "de" then
         return transf.address_table.in_country_address_array(single_address_table)
       else
         return transf.address_table.international_address_array(single_address_table)
@@ -2759,7 +2757,7 @@ transf = {
         transf.address_table.region_country_line(single_address_table)
     end,
     relevant_address_label = function(single_address_table)
-      if transf.address_table.iso_3366_1_alpha_2(single_address_table) == "de" then
+      if transf.address_table.iso_3366_1_alpha_2_country_code(single_address_table) == "de" then
         return transf.address_table.in_country_address_label(single_address_table)
       else
         return transf.address_table.international_address_label(single_address_table)
@@ -2905,7 +2903,7 @@ transf = {
     consonants = function(str)
       error("todo")
     end,
-    evaled_bash = run,
+    evaled_bash_string = run,
     escaped_lua_regex = function(str)
       return replace(str, to.regex.escaped_lua_regex)
     end,
@@ -3339,7 +3337,9 @@ transf = {
     end,
   },
   alphanum_underscore = {
-    
+    evaled_shell_var = function(str)
+      return run("echo $" .. str)
+    end,
   },
   alphanum_minus_underscore = {
     
@@ -3367,10 +3367,12 @@ transf = {
       return transf.pass_item_name.username(pass_item_name) or env.MAIN_EMAIL
     end,
     username = function(pass_item_name)
-      return transf.plaintext_file.no_final_newlines(env.MPASSUSERNAME .. "/" .. pass_item_name .. ".txt")
+      return transf.plaintext_file.no_final_newlines(
+        transf.pass_item_name.username_absolute_path(pass_item_name)
+      )
     end,
     username_absolute_path = function(pass_item_name)
-      return env.MPASSUSERNAME .. "/" .. pass_item_name .. ".txt"
+      return get.pass_item_name.path(pass_item_name, "username")
     end,
     otp = function(item)
       return run("pass otp otp/" .. item)
@@ -3476,7 +3478,7 @@ transf = {
   },
   base64 = {
     decoded_string = function(b64)
-      if is.ascii.base64_gen_string(b64) then
+      if is.printable_ascii_string.base64_gen_string(b64) then
         return transf.base64_gen_string.decoded_string(b64)
       else
         return transf.base64_url_string.decoded_string(b64)
@@ -3485,7 +3487,7 @@ transf = {
   },
   base32 = {
     decoded_string = function(b32)
-      if is.ascii.base32_gen_string(b32) then
+      if is.printable_ascii_string.base32_gen_string(b32) then
         return transf.base32_gen_string.decoded_string(b32)
       else
         return transf.base32_crock_string.decoded_string(b32)
@@ -3580,12 +3582,12 @@ transf = {
     end,
   },
   multiline_string = {
-    trimmed_lines = function(str)
+    trimmed_lines_multiline_string = function(str)
       local lines = split(str, "\n")
       local trimmed_lines = map(lines, stringy.strip)
       return table.concat(trimmed_lines, "\n")
     end,
-    relay_table = function(raw)
+    iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_array_value_dict_value_dict = function(raw)
       local raw_countries = stringx.split(raw, "\n\n") -- stringy does not support splitting by multiple characters
       raw_countries = filter(raw_countries, true)
       local countries = {}
@@ -6221,7 +6223,7 @@ transf = {
     end,
   },
   country_identifier_string = {
-    iso_3366_1_alpha_2 = function(country_identifier)
+    iso_3366_1_alpha_2_country_code = function(country_identifier)
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
         input = country_identifier, 
         query = "Suppose the following identifies a country. Return its ISO 3166-1 Alpha-2 country code."
@@ -6244,7 +6246,7 @@ transf = {
       })
     end,
   },
-  iso_3366_1_alpha_2 = {
+  iso_3366_1_alpha_2_country_code = {
     iso_3366_1_full_name = function(iso_3366_1_alpha_2)
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
         input = iso_3366_1_alpha_2, 
@@ -6353,6 +6355,26 @@ transf = {
     end,
     absolute_path_array_of_installed_package_managers = function()
       return transf.string.lines(run("upkg which-package-maanger"))
+    end,
+    mullvad_status_string = function()
+      return run("mullvad status")
+    end,
+    mullvad_boolean_connected = function()
+      return stringy.startswith(transf["nil"].mullvad_status_string(),"Connected")
+    end,
+    mullvad_relay_list_string = function()
+      return memoize(run)("mullvad relay list")
+    end,
+    mullvad_relay_identifier_array = function()
+      return 
+        flatten(
+          transf.multiline_string.relay_table(
+            transf["nil"].mullvad_relay_list_string()
+          )
+      )
+    end,
+    active_mullvad_relay_identifier = function()
+      return run("mullvad relay get"):match("hostname ([^ ]+)")
     end,
 
 

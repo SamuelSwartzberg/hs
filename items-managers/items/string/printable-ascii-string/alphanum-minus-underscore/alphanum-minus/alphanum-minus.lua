@@ -6,10 +6,9 @@ AlphanumMinusItemSpecifier = {
   properties = {
     getables = {
       ["is-isbn"] = bc(is.alphanum_minus.isbn),
-      ["is-issn"] = bc(is.ascii.issn),
-      ["is-uuid"] = bc(is.ascii.uuid),
+      ["is-issn"] = bc(is.printable_ascii_string.issn),
+      ["is-uuid"] = bc(is.printable_ascii_string.uuid),
       ["is-package-manager"] = bc(is.string.package_manager),
-      ["is-mullvad-relay-identifier"] = bc(is.ascii.relay_identifier)
 
     }
   },
@@ -18,7 +17,6 @@ AlphanumMinusItemSpecifier = {
     { key = "issn", value = CreateIssnItem },
     { key = "uuid", value = CreateUuidItem },
     { key = "package-manager", value = CreatePackageManagerItem },
-    { key = "mullvad-relay-identifier", value = CreateMullvadRelayIdentifierItem },
   }),
   action_table ={
     

@@ -96,13 +96,13 @@ local keymap = {
   },
   ["6"] = {
     explanation = "Enable and disable mullvad",
-    fn = dothis.mullvad.toggle
+    fn = dothis.["nil"].mullvad_toggle
   },
   ["7"] = {
     explanation = "Switch ·to a different mullvad server",
     fn = function ()
-      ar(get.mullvad.mullvad_flat_relay_array)
-        :doThis("choose-item", dothis.mullvad.relay_set)
+      ar(transf["nil"].mullvad_relay_identifier_array)
+        :doThis("choose-item", dothis.mullvad_relay_identifier.set_active_mullvad_relay_dentifier)
     end
   },
   ["8"] = {
@@ -150,7 +150,7 @@ local keymap = {
       dc(searches)
         :doThis("choose-item", function(val)
           local true_val = transf.array.last(stringy.split(val, " ")) -- ignore all the `magrep -i` or `mpick -t` stuff, that's just for user comprehension
-          true_val = string.format(true_val, prompt("string", "Search for: "))
+          true_val = string.format(true_val, get.string.prompted_once_string_from_default("", "Search for: "))
           local results
           if stringy.startswith(val, "magrep") then
             results = get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, true_val)
@@ -288,7 +288,7 @@ local keymap = {
   ["`"] = {
     explanation = "Choose an action on a user-entered string",
     fn = function()
-      local res = prompt("string", "String to act on")
+      local res = get.string.prompted_once_string_from_default("", "String to act on")
       if res then 
         st(res):doThis("choose-action")
       end

@@ -100,7 +100,7 @@ StringItemSpecifier = {
     }, {
       d = "basheval",
       i = "🐚🧬",
-      getfn = transf.string.evaled_bash
+      getfn = transf.string.evaled_bash_string
     }, {
       d = "envsubst",
       i = "🌥🧬",
