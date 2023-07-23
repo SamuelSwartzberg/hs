@@ -549,7 +549,25 @@ tblmap = {
       default = "🔘⚫️",
       ["or"] = "|",
       ["and"] = "&",
-      stream = "🎸"
+      stream = "🎸",
+      date = "📅",
+      giga = "9",
+      mega = "6",
+      kilo = "3",
+      milli = "-3",
+      micro = "-6",
+      nano = "-9",
+      second = "⏳",
+      sign = "±",
+      decimal = "d",
+      binary = "b",
+      hex = "x",
+      octal = "o",
+      indication = "ℹ️",
+      pos = "📈",
+      neg = "📉",
+      unicode = "🟪",
+      codepoint = "🟪",
     },
     description = {
       open = "op",
@@ -635,7 +653,23 @@ tblmap = {
       default = "dflt",
       ["or"] = "or",
       ["and"] = "and",
-      stream = "strm"
+      stream = "strm",
+      date = "dt",
+      giga = "G",
+      mega = "M",
+      kilo = "k",
+      milli = "m",
+      micro = "µ",
+      nano = "n",
+      second = "s",
+      sign = "sgn",
+      decimal = "dec",
+      binary = "bin",
+      hex = "hex",
+      octal = "oct",
+      indication = "ind",
+      pos = "pos",
+      neg = "neg"
     }
   },
   stream_attribute = {
@@ -914,6 +948,23 @@ tblmap.thing_name.action_specifier_array = {
       e = emj.username .. emj["or"] .. emj.default,
       d = dsc.username .. dsc["or"] .. dsc.default,
       getfn = transf.pass_item_name.username_or_default
+    }
+  },
+  pos_int = {
+
+  },
+  timestamp_s = {
+    {
+      e = emj.date .. emj.second,
+      d = dsc.date .. dsc.second,
+      getfn = transf.timestamp_s.date
+    }
+  },
+  timestamp_ms = {
+    {
+      e = emj.date .. emj.milli .. emj.second,
+      d = dsc.date .. dsc.milli .. dsc.second,
+      getfn = transf.timestamp_ms.date
     }
   },
 }

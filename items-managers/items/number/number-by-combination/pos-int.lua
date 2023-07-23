@@ -9,10 +9,10 @@ PosIntSpecifier = {
         return string.format("U+%x", self:get("c"))
       end,
       ["codepoint-to-unicode-prop-table"] = function(self)
-        return dc(transf.number.unicode_prop_table(self:get("c")))
+        return dc(transf.pos_int.unicode_prop_table_from_unicde_codepoint(self:get("c")))
       end,
       ["utf8-to-unicode-prop-table"] = function(self)
-        return dc(transf.number.utf8_unicode_prop_table(self:get("c")))
+        return dc(transf.pos_int.unicode_prop_table_from_utf8(self:get("c")))
       end,
     },
     doThisables = {

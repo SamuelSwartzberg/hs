@@ -474,10 +474,10 @@ is = {
     end,
   },
   number = {
-    pos = function(num)
+    pos_number = function(num)
       return num > 0
     end,
-    neg = function(num)
+    neg_number = function(num)
       return num < 0
     end,
     zero = function(num)
@@ -489,19 +489,34 @@ is = {
     float = function(num)
       return not is.number.int(num)
     end,
-    even = function(num)
+    even_number = function(num)
       return num % 2 == 0
     end,
   },
   int = {
-    even = function(num)
+    even_int = function(num)
       return num % 2 == 0
     end,
+    pos_int = function(num)
+      return num > 0
+    end,
+    timestamp_s = transf["nil"]["true"](), -- all integers are valid timestamps (s)
+    timestamp_ms = transf["nil"]["true"](), -- all integers are valid timestamps (ms)
+  },
+  timestamp_s = {
+    reasonable_timestamp_s = function(num)
+      return num > 1e7 and num < 1e10
+    end,
+  },
+  timestamp_ms = {
+    reasonable_timestamp_ms = function(num)
+      return num > 1e10 and num < 1e13
+    end,
+  },
+  pos_int = {
+    
   },
   any = {
-    component_interface = function(val)
-      return type(val) == "table" and val.is_interface == true
-    end,
     number = function(val)
       return type(val) == "number"
     end,
@@ -509,10 +524,10 @@ is = {
       return is.any.number(val) and is.number.int(val)
     end,
     pos_int = function(val)
-      return is.any.int(val) and is.number.pos(val)
+      return is.any.int(val) and is.number.pos_number(val)
     end,
     neg_int = function(val)
-      return is.any.int(val) and is.number.neg(val)
+      return is.any.int(val) and is.number.neg_number(val)
     end,
     float = function(val)
       return is.any.number(val) and is.number.float(val)

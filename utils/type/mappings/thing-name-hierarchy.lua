@@ -55,5 +55,14 @@ thing_name_hierarchy = {
     created_item_specifier = {
       stream_created_item_specifier = "leaf"
     }
+  },
+  number = {
+    int = {
+      timestamp_s = "leaf",
+      timestamp_ms = "leaf",
+    },
+    float = "leaf",
+    pos_number = "leaf",
+    neg_number = "leaf",
   }
 }

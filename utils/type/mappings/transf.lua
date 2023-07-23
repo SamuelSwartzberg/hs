@@ -7,10 +7,10 @@ transf = {
     char = function(hex)
       return string.char(get.string_or_number.number(hex, 16))
     end,
-    utf8_unicode_prop_table = function(hex)
+    unicode_prop_table_from_utf8 = function(hex)
       return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped("utf8:" .. transf.digit_string.canonical_digit_string(hex)))[1]
     end,
-    unicode_codepoint = function(hex)
+    unicode_codepoint_string = function(hex)
       return "U+"  .. transf.digit_string.canonical_digit_string(hex)
     end,
   },
@@ -96,9 +96,9 @@ transf = {
       return string.char(get.string_or_number.number(num, 16))
     end,
   },
-  unicode_codepoint = { -- U+X...
+  unicode_codepoint_string = { -- U+X...
     number = function(codepoint)
-      return get.potentially_indicated_hex_string.number(transf.unicode_codepoint.hex_string(codepoint))
+      return get.potentially_indicated_hex_string.number(transf.unicode_codepoint_string.hex_string(codepoint))
     end,
     hex_string = function(codepoint)
       return codepoint:sub(3)
@@ -108,7 +108,7 @@ transf = {
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
           "U+" .. transf.digit_string.canonical_digit_string(
-            transf.unicode_codepoint.hex_string(codepoint)
+            transf.unicode_codepoint_string.hex_string(codepoint)
           )
         )
       )[1]
@@ -166,38 +166,36 @@ transf = {
     end,
   },
   number = {
+    sign_indicator = function(num)
+      if num < 0 then
+        return "-"
+      else
+        return ""
+      end
+    end,
     decimal_string = function(num)
       return tostring(num)
     end,
     indicated_decimal_string = function(num)
-      return "0d" .. transf.number.decimal_string(num)
+      return transf.number.sign_indicator(num) .. "0d" .. transf.number.decimal_string(transf.number.pos_number(num))
     end,
     hex_string = function(num)
       return string.format("%X", num)
     end,
     indicated_hex_string = function(num)
-      return "0x" .. transf.number.hex_string(num)
-    end,
-    unicode_codepoint = function(num)
-      return "U+" .. transf.number.hex_string(num)
+      return transf.number.sign_indicator(num) .. "0x" .. transf.number.hex_string(transf.number.pos_number(num))
     end,
     octal_string = function(num)
       return string.format("%o", num)
     end,
     indicated_octal_string = function(num)
-      return "0o" .. transf.number.octal_string(num)
+      return transf.number.sign_indicator(num) .. "0o" .. transf.number.octal_string(transf.number.pos_number(num))
     end,
     binary_string = function(num)
       return string.format("%b", num)
     end,
     indicated_binary_string = function(num)
-      return "0b" .. transf.number.binary_string(num)
-    end,
-    unicode_prop_table = function(num)
-      return transf.unicode_codepoint.unicode_prop_table(transf.number.unicode_codepoint(num))
-    end,
-    utf8_unicode_prop_table = function(num)
-      return transf.hex_string.utf8_unicode_prop_table(transf.number.hex_string(num))
+      return transf.number.sign_indicator(num) .. "0b" .. transf.number.binary_string(transf.number.pos_number(num))
     end,
     int = function(num)
       return math.floor(num + 0.5)
@@ -223,11 +221,17 @@ transf = {
         return nil
       end
     end,
+    pos_number = function(num)
+      return math.abs(num)
+    end,
+    neg_number = function(num)
+      return -math.abs(num)
+    end,
     pos_int = function(num)
-      return transf.int.pos_int(transf.number.int(num))
+      return transf.number.pos_number(transf.number.int(num))
     end,
     neg_int = function(num)
-      return transf.int.neg_int(transf.number.int(num))
+      return transf.number.pos_numbert(transf.number.int(num))
     end,
     floor = math.floor,
     ceil = math.ceil,
@@ -237,6 +241,12 @@ transf = {
     with_1_subtracted = function(num)
       return num - 1
     end,
+  },
+  pos_number = {
+
+  },
+  neg_number = {
+
   },
   num_chars = {
     normzeilen = function(num_chars)
@@ -264,12 +274,6 @@ transf = {
         return nil
       end
     end,
-    pos_int = function(int)
-      return math.abs(int)
-    end,
-    neg_int = function(int)
-      return -math.abs(int)
-    end,
     random_int_of_length = function(int)
       return math.random(
         transf.pos_int.smallest_int_of_length(int),
@@ -289,6 +293,15 @@ transf = {
     end,
     center_int_of_length = function(int)
       return (transf.pos_int.largest_int_of_length(int)+1) / 2
+    end,
+    unicode_codepoint = function(num)
+      return "U+" .. transf.number.hex_string(num)
+    end,
+    unicode_prop_table_from_unicde_codepoint = function(num)
+      return transf.unicode_codepoint_string.unicode_prop_table(transf.pos_int.unicode_codepoint(num))
+    end,
+    unicode_prop_table_from_utf8 = function(num)
+      return transf.hex_string.unicode_prop_table_from_utf8(transf.number.hex_string(num))
     end,
   },
   not_nil = {
@@ -6396,7 +6409,28 @@ transf = {
     end,
   },
   thing_name = {
-
+    transf_action_specifier_array = function(thing_name)
+      return map(
+        transf[thing_name],
+        function(thing_name2, fn)
+          return {
+            d = "transf." .. thing_name .. "." .. thing_name2,
+            getfn = fn
+          }
+        end,
+        {
+          args = "kv",
+          ret = "v",
+          tolist = true,
+        }
+      )
+    end,
+    action_specifier_array = function(thing_name)
+      return glue(
+        tblmap.thing_name.action_specifier_array[thing_name],
+        transf.thing_name.transf_action_specifier_array[thing_name]
+      )
+    end,
   },
   thing_name_hierarchy = {
     thing_name_array = function(thing_name_hierarchy)
