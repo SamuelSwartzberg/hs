@@ -138,7 +138,7 @@ function run(opts, and_then, ...)
       -- encode command in base64 so we can pass it to bash without worrying about escaping
       command = string.format(
         "base64 -d <<< '%s' | /opt/homebrew/bin/bash -s",
-        transf.string.base64_gen(cmd)
+        transf.string.base64_gen_string(cmd)
       )
     end
     local output, status, reason, code = hs.execute(command)

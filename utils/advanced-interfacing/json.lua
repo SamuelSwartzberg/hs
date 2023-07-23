@@ -280,7 +280,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     local auth_header = specifier.auth_header .. get.string.with_suffix_string(specifier.auth_process or "Basic", " ")
     dothis.array.push(curl_command, "-H")
     dothis.array.push(curl_command, 
-      { value =  auth_header .. transf.string.base64_url(specifier.username .. ":" .. specifier.password), type = "quoted"})
+      { value =  auth_header .. transf.string.base64_url_string(specifier.username .. ":" .. specifier.password), type = "quoted"})
   end
 
   -- assembole other parts of curl commmand

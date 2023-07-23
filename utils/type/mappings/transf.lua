@@ -280,7 +280,7 @@ transf = {
         transf.pos_int.largest_int_of_length(int)
       )
     end,
-    random_base64_gen_of_length = function(int)
+    random_base64_gen_string_of_length = function(int)
       return run("openssl rand -base64 " .. tostring(int))
     end,
   },
@@ -294,11 +294,11 @@ transf = {
     center_int_of_length = function(int)
       return (transf.pos_int.largest_int_of_length(int)+1) / 2
     end,
-    unicode_codepoint = function(num)
+    unicode_codepoint_string = function(num)
       return "U+" .. transf.number.hex_string(num)
     end,
     unicode_prop_table_from_unicde_codepoint = function(num)
-      return transf.unicode_codepoint_string.unicode_prop_table(transf.pos_int.unicode_codepoint(num))
+      return transf.unicode_codepoint_string.unicode_prop_table(transf.pos_int.unicode_codepoint_string(num))
     end,
     unicode_prop_table_from_utf8 = function(num)
       return transf.hex_string.unicode_prop_table_from_utf8(transf.number.hex_string(num))
@@ -1158,7 +1158,7 @@ transf = {
       )
     end,
   },
-  audio_file = {
+  whisper_file = {
     transcribed = function(path)
       return memoize(rest, refstore.params.memoize.opts.invalidate_1_year_fs, "rest")({
         api_name = "openai",
@@ -3056,14 +3056,14 @@ transf = {
     envsubsted = function(str)
       return run("echo " .. transf.string.single_quoted_escaped(str) .. " | envsubst")
     end,
-    bits = basexx.to_bit,
-    hex = basexx.to_hex,
-    base64_gen = basexx.to_base64,
-    base64_url = basexx.to_url64,
-    base32_gen = basexx.to_base32,
-    base32_crock = basexx.to_crockford,
-    html_entitiy_encoded = htmlEntities.encode,
-    html_entitiy_decoded = htmlEntities.decode,
+    binary_string = basexx.to_bit,
+    hex_string = basexx.to_hex,
+    base64_gen_string = basexx.to_base64,
+    base64_url_string = basexx.to_url64,
+    base32_gen_string = basexx.to_base32,
+    base32_crock_string = basexx.to_crockford,
+    html_entitiy_encoded_string = htmlEntities.encode,
+    html_entitiy_decoded_string = htmlEntities.decode,
     header_key_value = function(str)
       local k, v = eutf8.match(str, "^([^:]+):%s*(.+)$")
       return transf.word.notcapitalized(k), v
@@ -3456,33 +3456,33 @@ transf = {
       )
     end
   },
-  base64_gen = {
+  base64_gen_string = {
     decoded_string = basexx.from_base64,
   },
-  base64_url = {
+  base64_url_string = {
     decoded_string = basexx.from_url64,
   },
-  base32_gen = {
+  base32_gen_string = {
     decoded_string = basexx.from_base32,
   },
-  base32_crock = {
+  base32_crock_string = {
     decoded_string = basexx.from_crockford,
   },
   base64 = {
     decoded_string = function(b64)
-      if is.ascii.base64_gen(b64) then
-        return transf.base64_gen.decoded_string(b64)
+      if is.ascii.base64_gen_string(b64) then
+        return transf.base64_gen_string.decoded_string(b64)
       else
-        return transf.base64_url.decoded_string(b64)
+        return transf.base64_url_string.decoded_string(b64)
       end
     end
   },
   base32 = {
     decoded_string = function(b32)
-      if is.ascii.base32_gen(b32) then
-        return transf.base32_gen.decoded_string(b32)
+      if is.ascii.base32_gen_string(b32) then
+        return transf.base32_gen_string.decoded_string(b32)
       else
-        return transf.base32_crock.decoded_string(b32)
+        return transf.base32_crock_string.decoded_string(b32)
       end
     end
   },
@@ -4172,6 +4172,9 @@ transf = {
     end,
     indicated_prompt_table = function(t)
       return transf.word.determinant_metatable_creator_fn("prompttbl")(t)
+    end,
+    json_string_pretty = function(t)
+      return hs.json.encode(t, true)
     end,
     
   },
@@ -5505,7 +5508,7 @@ transf = {
       return csl_table.URL
     end,
     urlmd5 = function(csl_table)
-      return transf.not_userdata_or_function.md5(transf.csl_table.url(csl_table))
+      return transf.not_userdata_or_function.md5_hex_string(transf.csl_table.url(csl_table))
     end,
     accession = function(csl_table)
       return csl_table.accession
@@ -5740,7 +5743,7 @@ transf = {
       return get.string.no_prefix_string(rejoined, "//")
     end,
     vdirsyncer_pair_specifier = function(url)
-      local name = "webcal_readonly_" .. transf.not_userdata_or_function.md5(url)
+      local name = "webcal_readonly_" .. transf.not_userdata_or_function.md5_hex_string(url)
       local local_storage_path =  env.XDG_STATE_HOME .. "/vdirsyncer/" .. name
       return  {
         name = name,
@@ -5792,7 +5795,7 @@ transf = {
     transcribed = function(url)
       local path = transf.url.in_cache_dir(url)
       dothis.url.download(url, path)
-      return transf.audio_file.transcribed(path)
+      return transf.whisper_file.transcribed(path)
 
     end
   },
@@ -5825,7 +5828,7 @@ transf = {
     end
   },
   not_userdata_or_function = {
-    md5 = function(thing)
+    md5_hex_string = function(thing)
       if type(thing) ~= "string" then 
         thing = json.encode(thing) 
       end
@@ -5833,15 +5836,23 @@ transf = {
       md5:update(thing)
       return md5:hexdigest()
     end,
+    md5_base32_crock_string = function(thing)
+      if type(thing) ~= "string" then 
+        thing = json.encode(thing) 
+      end
+      local md5 = hashings("md5")
+      md5:update(thing)
+      return transf.string.base32_crock_string(md5:digest())
+    end,
     in_cache_dir = function(data, type)
       return transf.string.in_cache_dir(
-        transf.not_userdata_or_function.md5(data),
+        transf.not_userdata_or_function.md5_hex_string(data),
         type
       )
     end,
     in_tmp_dir = function(data, type)
       return transf.string.in_tmp_dir(
-        transf.not_userdata_or_function.md5(data),
+        transf.not_userdata_or_function.md5_hex_string(data),
         type
       )
     end,
@@ -5849,6 +5860,13 @@ transf = {
       return transf.string.single_quoted_escaped(json.encode(t))
     end,
     json_string = json.encode,
+    json_string_pretty = function(t)
+      if is.any.table(t) then
+        return transf.table.json_string_pretty(t)
+      else
+        return transf.not_userdata_or_function.json_string(t)
+      end
+    end,
     --- wraps yaml.dump into a more intuitive form which always encodes a single document
     --- @param tbl any
     --- @return string
@@ -6367,25 +6385,10 @@ transf = {
   action_specifier = {
     action_chooser_item_specifier = function(action_specifier)
       if action_specifier.text then error("old action_specifier format, contains action_specifier.text") end
-      local cspec = {
-        e = action_specifier.e,
-        d = action_specifier.d,
-      }
-      if action_specifier.dothis == nil or action_specifier.dothis == dothis.array.choose_item then
-        cspec.e = get.string.with_prefix_string(cspec.e, "👉")
-        cspec.d = get.string.with_prefix_string(cspec.d, "ci")
-      elseif action_specifier.dothis == dothis.any.choose_action then
-        cspec.e = get.string.with_prefix_string(cspec.e, "👉👊")
-        cspec.d = get.string.with_prefix_string(cspec.d, "c")
-      end
-      cspec.d = get.string.with_suffix_string(cspec.d, ".")
-      return {text = transf.chooser_item_text_specifier.string(cspec)}
+      local str = get.string.with_suffix_string(action_specifier.d, ".")
+      str = str .. " #" .. get.not_userdata_or_function.md5_base32_crock_string_of_length(action_specifier.d, 3) -- shortcode for easy use
+      return {text = str}
     end
-  },
-  chooser_item_text_specifier = {
-    string = function(chooser_item_text_specifier)
-      return chooser_item_text_specifier.e .. " " .. chooser_item_text_specifier.d
-    end,
   },
   action_specifier_array = {
     action_chooser_item_specifier_array = function(action_specifier_array)

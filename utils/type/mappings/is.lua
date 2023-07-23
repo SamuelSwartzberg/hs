@@ -45,23 +45,23 @@ is = {
     relay_identifier = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.id.relay_identifier))
     end,
-    base32_gen = function(str)
+    base32_gen_string = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.id.b32.gen))
     end,
-    base32_crockford = function(str)
+    base32_crock_stringford = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.id.b32.crockford))
     end,
-    base64_gen = function(str)
+    base64_gen_string = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.id.b64.gen))
     end,
-    base64_url = function(str)
+    base64_url_string = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.id.b64.url))
     end,
     base32 = function(str)
-      return is.ascii.base32_gen(str) or is.ascii.base32_crockford(str)
+      return is.ascii.base32_gen_string(str) or is.ascii.base32_crock_stringford(str)
     end,
     base64 = function(str)
-      return is.ascii.base64_gen(str) or is.ascii.base64_url(str)
+      return is.ascii.base64_gen_string(str) or is.ascii.base64_url_string(str)
     end,
     digit_string = function(str)
       return get.string_or_number.number(str, 16) ~= nil -- this may not return the correct value for non-hex strings, but that doesn't matter, we're only checking if it is a digit string of whatever kind, so what value exactly it returns doesn't matter
@@ -361,11 +361,11 @@ is = {
     plaintext_file = function(path)
       error("TODO")
     end,
+    binary_file = function(path)
+      return not is.file.plaintext_file(path)
+    end,
     plaintext_dictionary_file = function(path)
       return is.file.plaintext_file(path) and is.plaintext_file.plaintext_dictionary_file(path)
-    end,
-    playable_file = function (path)
-      return get.path.usable_as_filetype(path, "audio") or get.path.usable_as_filetype(path, "video")
     end,
     shellscript_file = function(path)
       return get.path.usable_as_filetype(path, "shell-script") or get.file.find_contents(path, { _r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" })
@@ -376,6 +376,22 @@ is = {
        transf.path.parent_leaf(path) == "new" or
        transf.path.parent_leaf(path == "cur")
      end,
+  },
+  binary_file = {
+    db_file = function(path)
+      return get.path.is_standartized_extension_in(
+        path,
+        mt._list.filetype["db"]
+      )
+    end,
+    playable_file = function (path)
+      return get.path.usable_as_filetype(path, "audio") or get.path.usable_as_filetype(path, "video")
+    end,
+  },
+  playable_file = {
+    whisper_file = function(path)
+      return get.path.usable_as_filetype(path, "whisper-audio")
+    end,
   },
   shellscript_file = {
     errors = function(path)

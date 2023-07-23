@@ -705,8 +705,6 @@ get = {
         max_tokens
       )
     end,
-
-
   },
   string_or_styledtext = {
     styledtext_ignore_styled = function(str, styledtext_attributes_specifier)
@@ -2519,6 +2517,11 @@ get = {
       else
         return res
       end
+    end,
+  },
+  not_userdata_or_function = {
+    md5_base32_crock_string_of_length = function(any, length)
+      return transf.not_userdata_or_function.md5_base32_crock_string(any):sub(1, length)
     end,
   }
 }

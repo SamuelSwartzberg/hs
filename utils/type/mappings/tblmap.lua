@@ -454,223 +454,6 @@ tblmap = {
     }
   },
   action_specifier_word = {
-    emoji = {
-      open = "🗄",
-      remove = "🗑",
-      delete = "🗑",
-      empty = "🗑🎒",
-      content = "🎒",
-      vscode = "🔷",
-      finder = "👤",
-      parent = "👩‍👧",
-      choose = "👉",
-      downloads = "📥",
-      zip = "🤐",
-      size = "📏",
-      libreoffice = "✳️📄",
-      source = "🌀",
-      target = "🎯",
-      create = "🌄",
-      all = "全",
-      translation = "🅰️🈴",
-      email = "📧",
-      string = "💻🔡",
-      multiline = "⩶⩶",
-      summary = "📚💬",
-      playback_backwards = "⏪",
-      playback_forwards = "⏩",
-      playback_first = "⏪⏪",
-      playback_last = "⏩⏩",
-      sixty = "6️⃣0️⃣",
-      fifteen = "1️⃣5️⃣",
-      chapter_backwards = "↖️",
-      chapter_forwards = "↗️",
-      chapter_first = "↖️↖️",
-      chapter_last = "↗️↗️",
-      playlist_backwards = "⬅️",
-      playlist_forwards = "➡️",
-      playlist_first = "⬅️⬅️",
-      playlist_last = "➡️➡️",
-      cycle_pause = "⏯",
-      stop = "⏹",
-      cycle_loop_playlist = "🔁",
-      cycle_loop_playback = "🔂1️⃣",
-      cycle_shuffle = "🔀",
-      url = "🔗",
-      title = "👒",
-      line = "⩶",
-      action = "👊",
-      array = "📜",
-      fill = "✍️",
-      wiktionary = "⬜️",
-      wikipedia = "🏐",
-      youtube = "🟥▶️",
-      jisho = "🟩",
-      glottopedia = "🟧",
-      ["ruby-apidoc"] = "🔴",
-      ["python-docs"] = "🐍",
-      ["merriam-webster"] = "🆎",
-      ["dict-cc"] = "📙",
-      ["deepl-en-ja"] = "🟦🇺🇸🇯🇵",
-      ["deepl-de-en"] = "🟦🇩🇪🇺🇸",
-      deepl = "🟦",
-      en = "🇺🇸",
-      ja = "🇯🇵",
-      de = "🇩🇪",
-      mdn = "🦊",
-      scihub = "🦅",
-      libgen = "⛴",
-      ["semantic-scholar"] = "👩‍🔧🎓",
-      ["google-scholar"] = "🏳️‍🌈🎓",
-      ["google-images"] = "🏳️‍🌈🖼",
-      ["google-maps"] = "🏳️‍🌈🗺",
-      google = "🏳️‍🌈",
-      maps = "🗺",
-      image = "🖼",
-      scholar = "🎓",
-      search = "🔍",
-      join = "🤝",
-      option = "🔘",
-      option_string = "--",
-      prefix = "↞",
-      suffix = "↠",
-      common = "🌏",
-      repeated = "🔁",
-      browser = "🌐",
-      session = "📚",
-      add = "📌",
-      pass_item_name = "🔑🗃",
-      password = "🔑",
-      otp = "⌚️🗝",
-      path = "📂",
-      recovery_key = "↺🗝",
-      security_question = "🎭❓",
-      username = "👤🔤",
-      default = "🔘⚫️",
-      ["or"] = "|",
-      ["and"] = "&",
-      stream = "🎸",
-      date = "📅",
-      giga = "9",
-      mega = "6",
-      kilo = "3",
-      milli = "-3",
-      micro = "-6",
-      nano = "-9",
-      second = "⏳",
-      sign = "±",
-      decimal = "d",
-      binary = "b",
-      hex = "x",
-      octal = "o",
-      indication = "ℹ️",
-      pos = "📈",
-      neg = "📉",
-      unicode = "🟪",
-      codepoint = "🟪",
-    },
-    description = {
-      open = "op",
-      remove = "rm",
-      delete = "rm",
-      empty = "empt",
-      content = "cnt",
-      vscode = "vsc",
-      finder = "fd",
-      parent = "prnt",
-      choose = "c",
-      downloads = "dl",
-      zip = "zip",
-      size = "sz",
-      libreoffice = "lo",
-      source = "src",
-      target = "tgt",
-      create = "crt",
-      all = "all",
-      translation = "trans",
-      email = "em",
-      string = "str",
-      multiline = "ml",
-      summary = "sum",
-      playback = "pb",
-      backwards = "bwd",
-      forwards = "fwd",
-      first = "fst",
-      last = "lst",
-      sixty = "60",
-      fifteen = "15",
-      chapter = "ch",
-      playlist = "pl",
-      cycle = "cyc",
-      pause = "ps",
-      stop = "stp",
-      loop = "lp",
-      shuffle = "shuf",
-      url = "url",
-      title = "ttl",
-      line = "ln",
-      action = "act",
-      array = "arr",
-      fill = "fll",
-      wiktionary = "wkt",
-      wikipedia = "wp",
-      youtube = "yt",
-      jisho = "ji",
-      glottopedia = "gl",
-      ["ruby-apidoc"] = "rb",
-      ["python-docs"] = "py",
-      ["merriam-webster"] = "mw",
-      ["dict-cc"] = "dc",
-      ["deepl-en-ja"] = "dej",
-      ["deepl-de-en"] = "dde",
-      ["semantic-scholar"] = "ss",
-      ["google-scholar"] = "gs",
-      ["google-images"] = "gi",
-      ["google-maps"] = "gm",
-      google = "go",
-      ["danbooru"] = "db",
-      ["gelbooru"] = "gb",
-      maps = "mp",
-      image = "img",
-      scholar = "sclr",
-      search = "s",
-      join = "jn",
-      option = "opt",
-      option_string = "optstr",
-      prefix = "pre",
-      suffix = "suf",
-      common = "cmn",
-      repeated = "rpt",
-      browser = "br",
-      add = "add",
-      pass_item_name = "pitnm",
-      password = "pw",
-      otp = "otp",
-      path = "pth",
-      recovery_key = "rky",
-      security_question = "secq",
-      username = "usrnm",
-      default = "dflt",
-      ["or"] = "or",
-      ["and"] = "and",
-      stream = "strm",
-      date = "dt",
-      giga = "G",
-      mega = "M",
-      kilo = "k",
-      milli = "m",
-      micro = "µ",
-      nano = "n",
-      second = "s",
-      sign = "sgn",
-      decimal = "dec",
-      binary = "bin",
-      hex = "hex",
-      octal = "oct",
-      indication = "ind",
-      pos = "pos",
-      neg = "neg"
-    }
   },
   stream_attribute = {
     true_emoji = {
@@ -748,226 +531,85 @@ tblmap = {
   }
 }
 
-emj = tblmap.action_specifier_word.emoji
-dsc = tblmap.action_specifier_word.description
-
 tblmap.thing_name.action_specifier_array = {
   stream_created_item_specifier = {
     {
-      e = emj.cycle_pause,
-      d = dsc.cycle .. dsc.pause,
+      d = "dothis.stream_created_item_specifier.cycle_pause",
       dothis = dothis.stream_created_item_specifier.cycle_pause,
     }, {
-      e = emj.stop,
-      d = dsc.stop,
+      d = "dothis.stream_created_item_specifier.stop",
       dothis = dothis.stream_created_item_specifier.stop,
     }, {
-      e = emj.playlist_first,
-      d = dsc.playlist .. dsc.first,
+      d = "dothis.stream_created_item_specifier.set_playlist_first",
       dothis = dothis.stream_created_item_specifier.set_playlist_first 
     }, {
-      e = emj.playback_first,
-      d = dsc.playback .. dsc.first,
+      d = "dothis.stream_created_item_specifier.set_playback_first",
       dothis = dothis.stream_created_item_specifier.set_playback_first
     }, {
-      e = emj.playlist_forwards,
-      d = dsc.playlist .. dsc.forwards,
+      d = "dothis.stream_created_item_specifier.playlist_forwards",
       dothis = dothis.stream_created_item_specifier.playlist_forwards
     }, {
-      e = emj.playlist_backwards,
-      d = dsc.playlist .. dsc.backwards,
+      d = "dothis.stream_created_item_specifier.playlist_backwards",
       dothis = dothis.stream_created_item_specifier.playlist_backwards
     }, {
-      e = emj.cycle_shuffle,
-      d = dsc.cycle .. dsc.shuffle,
+      d = "dothis.stream_created_item_specifier.cycle_shuffle",
       dothis = dothis.stream_created_item_specifier.cycle_shuffle
     }, {
-      e = emj.cycle_loop_playlist,
-      d = dsc.cycle .. dsc.loop .. dsc.playlist,
+      d = "dothis.stream_created_item_specifier.cycle_loop_playlist",
       dothis = dothis.stream_created_item_specifier.cycle_loop_playlist
     }, {
-      e = emj.cycle_loop_playback,
-      d = dsc.cycle .. dsc.loop .. dsc.playback,
+      d = "dothis.stream_created_item_specifier.cycle_loop_playback",
       dothis = dothis.stream_created_item_specifier.cycle_loop_playback
     }, {
-      e = emj.playback_forwards .. emj.fifteen,
-      d = dsc.playback .. dsc.forwards .. dsc.fifteen,
+      d = "dothis.stream_created_item_specifier.set_playback_seconds_relative(15)",
       dothis = dothis.stream_created_item_specifier.set_playback_seconds_relative,
       args = 15
     }, {
-      e = emj.playback_backwards .. emj.fifteen,
-      d = dsc.playback .. dsc.backwards .. dsc.fifteen,
+      d = "dothis.stream_created_item_specifier.set_playback_seconds_relative(-15)",
       dothis = dothis.stream_created_item_specifier.set_playback_seconds_relative,
       args = -15
     }, {
-      e = emj.playback_forwards .. emj.sixty,
-      d = dsc.playback .. dsc.forwards .. dsc.sixty,
+      d = "dothis.stream_created_item_specifier.set_playback_seconds_relative(60)",
       dothis = dothis.stream_created_item_specifier.set_playback_seconds_relative,
       args = 60
     }, {
-      e = emj.playback_backwards .. emj.sixty,
-      d = dsc.playback .. dsc.backwards .. dsc.sixty,
+      d = "dothis.stream_created_item_specifier.set_playback_seconds_relative(-60)",
       dothis = dothis.stream_created_item_specifier.set_playback_seconds_relative,
       args = -60
     }, {
-      e = emj.chapter_forwards,
-      d = dsc.chapter .. dsc.forwards,
+      d = "dothis.stream_created_item_specifier.chapter_forwards",
       dothis = dothis.stream_created_item_specifier.chapter_forwards
     }, {
-      e = emj.chapter_backwards,
-      d = dsc.chapter .. dsc.backwards,
+      d = "dothis.stream_created_item_specifier.chapter_backwards",
       dothis = dothis.stream_created_item_specifier.chapter_backwards
-    }, {
-      e = emj.title,
-      d = dsc.title,
-      getfn = transf.stream_created_item_specifier.title
-    }, {
-      e = emj.url,
-      d = dsc.url,
-      getfn = transf.stream_created_item_specifier.current_url
-    }, {
-      e = emj.create .. emj.url,
-      d = dsc.create .. dsc.url,
-      getfn = transf.stream_created_item_specifier.creation_urls
     }
-  },
-  indexable_array = {
-    {
-      e = emj.common .. emj.prefix,
-      d = dsc.common .. dsc.prefix,
-      getfn = transf.indexable_array.longest_common_prefix_indexable
-    }, {
-      e = emj.common .. emj.suffix,
-      d = dsc.common .. dsc.suffix,
-      getfn = transf.indexable_array.longest_common_suffix_indexable
-    }
-  },
-  plaintext_file_array = {
-    {
-      e = emj.content .. emj.line .. emj.array,
-      d = dsc.content .. dsc.line .. dsc.array,
-      getfn = transf.plaintext_file_array.content_lines_array
-    },
   },
   string_array = {
     {
-      e = emj.fill,
-      d = dsc.fill,
+      d = "dothis.string_array.fill_with",
       dothis = dothis.string_array.fill_with
-    }, {
-      e = emj.repeated .. emj.option_string,
-      d = dsc.repeated .. dsc.option_string,
-      getfn = transf.string_array.repeated_option_string
-    },{
-      e = emj.multiline .. emj.string,
-      d = dsc.multiline .. dsc.string,
-      getfn = transf.string_array.multiline_string
-    },
+    }
   },
   url_array = {
     {
-      e = emj.open .. emj.browser,
-      d = dsc.open .. dsc.browser,
+      d = "dothis.url_array.open_all",
       dothis = dothis.url_array.open_all
     }, {
-      e = emj.create .. emj.session,
-      d = dsc.create .. dsc.session,
+      d = "dothis.url_array.create_as_session_in_msessions",
       dothis = dothis.url_array.create_as_session_in_msessions
     }, {
-      e = emj.add .. emj.url,
-      d = dsc.add .. dsc.url,
+      d = "dothis.url_array.create_as_url_files_in_murls",
       dothis = dothis.url_array.create_as_url_files_in_murls
-    }
-  },
-  pass_item_name = {
-    {
-      e = emj
-    }
-  },
-  otp_pass_item_name = {
-    {
-      e = emj.otp,
-      d = dsc.otp,
-      getfn = transf.pass_item_name.otp
-    }, {
-      e = emj.otp .. emj.path,
-      d = dsc.otp .. dsc.path,
-      getfn = transf.pass_item_name.otp_absolute_path
-    }
-  },
-  passw_pass_item_name = {
-    {
-      e = emj.password,
-      d = dsc.password,
-      getfn = transf.pass_item_name.password
-    }, {
-      e = emj.password .. emj.path,
-      d = dsc.password .. dsc.path,
-      getfn = transf.pass_item_name.password_absolute_path
-    }
-  },
-  recovery_pass_item_name = {
-    {
-      e = emj.recovery_key,
-      d = dsc.recovery_key,
-      getfn = transf.pass_item_name.recovery_key
-    }, {
-      e = emj.recovery_key .. emj.path,
-      d = dsc.recovery_key .. dsc.path,
-      getfn = transf.pass_item_name.recovery_key_absolute_path
-    }
-  },
-  secq_pass_item_name = {
-    {
-      e = emj.security_question,
-      d = dsc.security_question,
-      getfn = transf.pass_item_name.security_question
-    }, {
-      e = emj.security_question .. emj.path,
-      d = dsc.security_question .. dsc.path,
-      getfn = transf.pass_item_name.security_question_absolute_path
-    }
-  },
-  username_pass_item_name = {
-    {
-      e = emj.username,
-      d = dsc.username,
-      getfn = transf.pass_item_name.username
-    }, {
-      e = emj.username .. emj.path,
-      d = dsc.username .. dsc.path,
-      getfn = transf.pass_item_name.username_absolute_path
     }
   },
   login_pass_item_name = {
     {
-      e = emj.fill .. emj.pass_item_name,
-      d = dsc.fill .. dsc.pass_item_name,
+      d = "dothis.login_pass_item_name.fill",
       dothis = dothis.login_pass_item_name.fill
-    }, {
-      e = emj.username .. emj["or"] .. emj.default,
-      d = dsc.username .. dsc["or"] .. dsc.default,
-      getfn = transf.pass_item_name.username_or_default
-    }
-  },
-  pos_int = {
-
-  },
-  timestamp_s = {
-    {
-      e = emj.date .. emj.second,
-      d = dsc.date .. dsc.second,
-      getfn = transf.timestamp_s.date
-    }
-  },
-  timestamp_ms = {
-    {
-      e = emj.date .. emj.milli .. emj.second,
-      d = dsc.date .. dsc.milli .. dsc.second,
-      getfn = transf.timestamp_ms.date
-    }
+    },
   },
 }
+
 
 -- make sure to automatically normalize any input to tblmap
 

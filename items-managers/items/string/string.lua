@@ -59,27 +59,27 @@ StringItemSpecifier = {
     {
       d = "binec",
       i = "🅱️2️⃣📦",
-      getfn = transf.string.bits
+      getfn = transf.string.binary_string
     }, {
       d = "hexec",
       i = "🅱️1️⃣6️⃣📦",
-      getfn = transf.string.hex
+      getfn = transf.string.hex_string
     }, {
       d = "urlb64ec",
       i = "🔗🅱️6️⃣4️⃣📦",
-      getfn = transf.string.base64_url
+      getfn = transf.string.base64_url_string
     }, {
       d = "genb64ec",
       i = "🤝🅱️6️⃣4️⃣📦",
-      getfn = transf.string.base64_gen
+      getfn = transf.string.base64_gen_string
     }, {
       d = "crc32ec",
       i = "👴🏻🅱️3️⃣2️⃣📦",
-      getfn = transf.string.base32_crock
+      getfn = transf.string.base32_crock_string
     }, {
       d = "gen32ec",
       i = "🤝🅱️3️⃣2️⃣📦",
-      getfn = transf.string.base32_gen
+      getfn = transf.string.base32_gen_string
     }, {
       d = "escrgx",
       i = "🏃🏾‍♀️🧩",
@@ -171,11 +171,11 @@ StringItemSpecifier = {
     },{
       d = "hendc",
       i = "🔶📖",
-      getfn = transf.string.html_entitiy_decoded
+      getfn = transf.string.html_entitiy_decoded_string
     },{
       d = "henec",
       i = "🔶📦",
-      getfn = transf.string.html_entitiy_encoded
+      getfn = transf.string.html_entitiy_encoded_string
     },{
       text = "👉📚 csynav.",
       getfn = transf.word.synonym_string_array,

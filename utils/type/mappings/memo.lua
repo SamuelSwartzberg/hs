@@ -13,7 +13,7 @@ function getFsCachePath(name, func_id, opts_as_str, args)
   end
   if args then 
     -- encode args to json and hash it, to use as the key for the cache
-    local hash = transf.not_userdata_or_function.md5(args)
+    local hash = transf.not_userdata_or_function.md5_hex_string(args)
     path = path .. hash
   end
   return path

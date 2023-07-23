@@ -11,12 +11,6 @@ ImageFileItemSpecifier = {
       ["chooser-image"] = function(self)
         return self:get("as-hs-image")
       end,
-      ["booru-url"] = function(self)
-        return transf.image_file.booru_url(self:get("completely-resolved-path"))
-      end,
-      ["qr-data"] = function(self)
-        return transf.image_file.qr_data(self:get("completely-resolved-path"))
-      end,
     },
     doThisables = {
       ["add-to-local-booru"] = function(self)
