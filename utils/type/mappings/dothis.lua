@@ -7,7 +7,7 @@ dothis = {
       run("mullvad disconnect", true)
     end,
     toggle = function()
-      if get.mullvad.connected() then
+      if get.mullvad.mullvad_boolean_connected() then
         dothis.mullvad.disconnect()
       else
         dothis.mullvad.connect()
@@ -405,7 +405,7 @@ dothis = {
     paste_le = function(str)
       dothis.string.paste(get.string.evaled_as_template(str))
     end,
-    copy = hs.pasteboard.setContents,
+    add_to_clipboard = hs.pasteboard.setContents,
     fill_with_lines = function(str)
       dothis.string_array.fill_with(transf.string.lines(str))
     end,
@@ -995,8 +995,32 @@ dothis = {
       run("play " .. transf.string.single_quoted_escaped(path), do_after)
     end
   },
-  image_file = {
-
+  local_image_file = {
+    add_hs_image_to_clipboard = function(path)
+      dothis.hs_image.add_to_clipboard(
+        transf.local_image_file.hs_image(path)
+      )
+    end,
+    paste_hs_image = function(path)
+      dothis.hs_image.paste(
+        transf.local_image_file.hs_image(path)
+      )
+    end,
+    add_as_otp = function(path, name)
+      dothis.otp_url.add_otp_pass_item(
+        transf.local_image_file.qr_data(path),
+        name
+      )
+    end,
+  },
+  hs_image = {
+    add_to_clipboard = function(hsimage)
+      hs.pasteboard.writeObjects(hsimage)
+    end,
+    paste = function(hsimage)
+      hs.pasteboard.writeObjects(hsimage)
+      hs.eventtap.keyStroke({"cmd"}, "v")
+    end,
   },
   plaintext_file = {
     append_lines = function(path, lines)
@@ -1488,11 +1512,11 @@ dothis = {
       dothis.absolute_path_string_value_dict.write(abs_path_dict)
     end,
     create_as_url_files_in_murls = function(url_array)
-      local path = transf.extant_path.prompted_path_relative_to(env.MURLS)
+      local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(env.MURLS)
       dothis.url_array.create_as_url_files(url_array, path)
     end,
     create_as_session = function(url_array, root)
-      local path = transf.extant_path.prompted_file_relative_to(root)
+      local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(root)
       path = get.string.with_suffix_string(path, ".session")
       dothis.absolute_path.write_file(
         path,
@@ -2174,8 +2198,8 @@ dothis = {
         args = {spec.args}
       end
       for k, v in transf.native_table.key_value_stateless_iter(spec.args) do
-        if args.isprompttbl then
-          args[k] = map(v, {_pm = false}, {tolist = true})[1]
+        if is.any.fn(v) then
+          args[k] = v(target)
         else
           args[k] = v
         end

@@ -467,7 +467,10 @@ tblmap = {
   },
   thing_name = {
     chooser_image_partial_retriever_specifier = {
-
+      local_image_file = {
+        thing_name = "hs_image",
+        precedence = 999
+      }
     },
     chooser_text_partial_retriever_specifier = {
       string = {
@@ -608,6 +611,17 @@ tblmap.thing_name.action_specifier_array = {
       dothis = dothis.login_pass_item_name.fill
     },
   },
+  local_image_file = {
+    {
+      d = "dothis.local_image_file.add_hs_image_to_clipboard",
+      dothis = dothis.local_image_file.add_hs_image_to_clipboard
+    },
+    {
+      d = "dothis.local_image_file.paste_hs_image",
+      dothis = dothis.local_image_file.paste_hs_image,
+      
+    }
+  }
 }
 
 

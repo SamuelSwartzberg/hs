@@ -101,7 +101,7 @@ local keymap = {
   ["7"] = {
     explanation = "Switch ·to a different mullvad server",
     fn = function ()
-      ar(get.mullvad.flat_relay_array)
+      ar(get.mullvad.mullvad_flat_relay_array)
         :doThis("choose-item", dothis.mullvad.relay_set)
     end
   },

@@ -2,9 +2,7 @@ get = {
   string_or_number = {
     number = function(t, base)
       if type(t) == "string" then
-        t = eutf8.gsub(t, "[ \t\n\r_]", "")
-        t = eutf8.gsub(t, ",", ".")
-        return get.string_or_number.number(t, base)
+        return get.string.number(t, base)
       else
         return t
       end
@@ -20,28 +18,49 @@ get = {
       )
     end,
   },
-  int = {
+  int_or_nil = {
+    prompted_once_int_from_default = function(int, message)
+      return transf.prompt_spec.any({
+        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        transformer = get.string.int,
+        prompt_args = {
+          message = message or "Enter an int...",
+          default = transf.number.decimal_string(int or 0),
+        }
+      })
+    end,
+  },
+  number_or_nil = {
+    prompted_once_number_from_default = function(no, message)
+      return transf.prompt_spec.any({
+        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        transformer = get.string.number,
+        prompt_args = {
+          message = message or "Enter a number...",
+          default = transf.number.decimal_string(no or 0),
+        }
+      })
+    end,
   },
   mullvad = {
-    status = function()
+    mullvad_status_string = function()
       return run("mullvad status")
     end,
-    connected = function()
-      return stringy.startswith(get.mullvad.status(),"Connected")
+    mullvad_boolean_connected = function()
+      return stringy.startswith(get.mullvad.mullvad_status_string(),"Connected")
     end,
-    relay_list_raw = function()
+    mullvad_relay_list_string = function()
       return memoize(run)("mullvad relay list")
     end,
-    flat_relay_array = function()
-      return ar(
+    mullvad_flat_relay_array = function()
+      return 
         flatten(
           transf.multiline_string.relay_table(
-            get.mullvad.relay_list_raw()
+            get.mullvad.mullvad_relay_list_string()
           )
-        )
       )
     end,
-    relay = function()
+    mullvad_relay_string = function()
       return run("mullvad relay get"):match("hostname ([^ ]+)")
     end,
   },
@@ -705,6 +724,25 @@ get = {
         max_tokens
       )
     end,
+    prompted_once_string_from_default = function(str, message)
+      return transf.prompt_spec.any({
+        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompt_args = {
+          message = message or "Enter a string...",
+          default = str,
+        }
+      })
+    end,
+    number = function(str,  base)
+      str = eutf8.gsub(str, "[ \t\n\r_]", "")
+      str = eutf8.gsub(str, ",", ".")
+      return get.string_or_number.number(str, base)
+    end,
+    int = function(str, base)
+      return transf.number.int(
+        get.string.number(str, base)
+      )
+    end,
   },
   string_or_styledtext = {
     styledtext_ignore_styled = function(str, styledtext_attributes_specifier)
@@ -1069,6 +1107,10 @@ get = {
         prompter = transf.prompt_args_path.local_absolute_path_and_boolean,
         prompt_args = {default = path, message = message or "Choose an absolute path..."}
       })
+    end,
+    prompted_multiple_local_absolute_path_from_default = function(path, message)
+      local intermediate_path = get.local_extant_path.prompted_once_local_absolute_path_from_default(path, message)
+      return transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(intermediate_path)
     end,
     prompted_once_dir_from_default = function(path, message)
       return transf.prompt_spec.any({

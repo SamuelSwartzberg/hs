@@ -13,7 +13,7 @@ StringItemSpecifier = {
   action_table = concat({
     {
       text = "📋 cp.",
-      dothis = dothis.string.copy
+      dothis = dothis.string.add_to_clipboard
     },{
       text = "📎 pst.",
       dothis = dothis.string.paste

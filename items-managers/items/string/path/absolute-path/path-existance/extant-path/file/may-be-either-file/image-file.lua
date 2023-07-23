@@ -3,66 +3,12 @@
 --- @type ItemSpecifier
 ImageFileItemSpecifier = {
   type = "image-file",
-  properties = {
-    getables = {
-      ["as-hs-image"] = function(self)
-        return transf.image_file.hs_image(self:get("completely-resolved-path"))
-      end,
-      ["chooser-image"] = function(self)
-        return self:get("as-hs-image")
-      end,
-    },
-    doThisables = {
-      ["add-to-local-booru"] = function(self)
-        self:get("str-item", "booru-url"):doThis("add-to-local")
-      end,
-      ["copy-as-image"] = function(self)
-        hs.pasteboard.writeObjects(self:get("as-hs-image"))
-      end,
-      ["paste-as-image"] = function(self)
-        hs.pasteboard.writeObjects(self:get("as-hs-image"))
-        hs.eventtap.keyStroke({"cmd"}, "v")
-      end,
-      ["add-as-otp"] = function(self, name)
-        dothis.otp_url.add_otp_pass_item(transf.image_file.qr_data(self:get("completely-resolved-path")), name)
-      end,
-      ["shrink"] = function(self)
-        local shrink_specifier_array = ar(map( {
-          { type = "image", format = "png" },
-          { type = "image", format = "jpg" },
-          { type = "image", format = "png", resize = true },
-          { type = "image", format = "jpg", resize = true },
-        },dc ))
-        shrink_specifier_array:doThis("create-shrunken-versions", self:get("completely-resolved-path"))
-        self:doThis("move-replace-self", shrink_specifier_array:get("best-version"))
-        shrink_specifier_array:doThis("delete-non-best-versions")
-      end,
-    }
-  },
+
   action_table = concat(
-    getChooseItemTable({
-      {
-        i = "🍡",
-        d = "bruurl",
-        key = "booru-url"
-      },
-      {
-        i = "🔳🎒",
-        d = "qrcnt",
-        key = "qr-data"
-      }
-    }),{
+    getChooseItemTable({{
       {
         text = "📌 addtbru.",
         key = "add-to-local-booru",
-      },
-      {
-        text = "📋🏞 cpasimg.",
-        key = "copy-as-image",
-      },
-      {
-        text = "📎🏞 pstasimg.",
-        key = "paste-as-image",
       },
       {
         text = "📎🏞🗑 pstasimgrm.",

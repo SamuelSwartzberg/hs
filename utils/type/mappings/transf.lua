@@ -607,6 +607,23 @@ transf = {
     file_url = function(path)
       return "file://" .. path
     end,
+    prompted_multiple_local_absolute_path_from_default = function(path)
+      return transf.prompt_spec.any_array({
+        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompt_args = {
+          message =  "Enter a subdirectory (or file, if last) (started with: " .. path .. ")",
+        }
+      })
+    end,
+    prompted_once_local_absolute_path_from_default = function(path)
+      return transf.prompt_spec.any({
+        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompt_args = {
+          message =  "Enter a directory or file as a child of " .. path,
+        }
+      })
+    end,
+
   },
   extant_path = {
     sibling_absolute_path_array = function(path)
@@ -638,17 +655,6 @@ transf = {
     end,
     descendants_extensions_array = function(path)
       return transf.path_array.extensions_array(transf.extant_path.descendants_absolute_path_array(path))
-    end,
-    prompted_path_relative_to = function(path)
-      return promptPipeline({
-        {"dir", {prompt_args = {default = path}}},
-        {"string", {prompt_args = {message = "Subdirectory name"}}, "pipeline"}
-      }) --[[ @as string ]]
-    end,
-    prompted_file_relative_to = function(path)
-      local path = transf.extant_path.prompted_path_relative_to(path)
-      local filename = prompt("string", {prompt_args = {message = "file in " .. path}})
-      return path .. "/" .. filename
     end,
   },
   local_extant_path = {
@@ -1171,7 +1177,7 @@ transf = {
       }).text
     end
   },
-  image_file = {
+  local_image_file = {
     qr_data = function(path)
       return run("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
     end,
@@ -1187,7 +1193,7 @@ transf = {
     end,
     data_url = function(path)
       local ext = transf.path.extension(path)
-      return memoize(hs.image.encodeAsURLString)(transf.image_file.hs_image(path), ext)
+      return memoize(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
     end,
   },
   email_file = {
@@ -5813,7 +5819,7 @@ transf = {
     qr_data = function(url)
       local path = transf.url.in_cache_dir(url)
       dothis.url.download(url, path)
-      return transf.image_file.qr_data(path)
+      return transf.local_image_file.qr_data(path)
     end,
     data_url = function(url)
       local ext = transf.path.extension(url)

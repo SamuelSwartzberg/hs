@@ -533,6 +533,9 @@ is = {
     
   },
   any = {
+    fn = function(val)
+      return type(val) == "function"
+    end,
     number = function(val)
       return type(val) == "number"
     end,
