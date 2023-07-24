@@ -80,5 +80,105 @@ act = {
         dothis.ics_file.add_events_from_file(ics_file, calendar)
       end)
     end,
-  }
+  },
+  hs_geometry_size_like = {
+    show_grid = function(grid)
+      hs.grid.setGrid(grid)
+      hs.grid.show()
+    end,
+  },
+  url_or_local_path = {
+    open_ff = function(url)
+      dothis.url_or_local_path.open_browser(url, "Firefox")
+    end,
+    open_safari = function(url)
+      dothis.url_or_local_path.open_browser(url, "Safari")
+    end,
+    open_chrome = function(url)
+      dothis.url_or_local_path.open_browser(url, "Google Chrome")
+    end,
+  },
+  url_array = {
+    open_all_ff = function(url_array)
+      dothis.url_array.open_all(url_array, "Firefox")
+    end,
+    create_as_url_files_in_murls = function(url_array)
+      local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(env.MURLS)
+      dothis.url_array.create_as_url_files(url_array, path)
+    end,
+    create_as_session_in_msessions = function(url_array)
+      dothis.url_array.create_as_session(url_array, env.MSESSIONS)
+    end,
+  },
+  plaintext_url_or_local_path_file = {
+    open_all_ff = function(path)
+      dothis.plaintext_url_or_local_path_file.open_all(path, "Firefox")
+    end,
+  },
+  stream_created_item_specifier = {
+    set_playback_seconds_plus_15 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, 15}),
+    set_playback_seconds_minus_15 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, -15}),
+    set_playback_seconds_plus_60 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, 60}),
+    set_playback_seconds_minus_60 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, -60}),
+    set_playback_percent_plus_5 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_percent, {a_use, 5}),
+    set_playback_percent_minus_5 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_percent, {a_use, -5}),
+    set_state_transitioned_state = function(spec)
+      spec.inner_item.state = transf.stream_created_item_specifier.transitioned_stream_state(spec)
+    end,
+    cycle_loop_playlist = function(spec)
+      return dothis.mpv_ipc_socket_id.cycle_loop_playlist(spec.inner_item.ipc_socket_id)
+    end,
+    cycle_loop_playback = function(spec)
+      return dothis.mpv_ipc_socket_id.cycle_loop_playback(spec.inner_item.ipc_socket_id)
+    end,
+    set_playlist_first = function(spec)
+      return dothis.mpv_ipc_socket_id.set_playlist_first(spec.inner_item.ipc_socket_id)
+    end,
+    set_playlist_last = function(spec)
+      return dothis.mpv_ipc_socket_id.set_playlist_last(spec.inner_item.ipc_socket_id)
+    end,
+    set_playback_first = function(spec)
+      return dothis.mpv_ipc_socket_id.set_playback_first(spec.inner_item.ipc_socket_id)
+    end,
+    set_chapter = function(spec, chapter)
+      return dothis.mpv_ipc_socket_id.set_chapter(spec.inner_item.ipc_socket_id, chapter)
+    end,
+    chapter_backwards = function(spec)
+      return dothis.mpv_ipc_socket_id.chapter_backwards(spec.inner_item.ipc_socket_id)
+    end,
+    chapter_forwards = function(spec)
+      return dothis.mpv_ipc_socket_id.chapter_forwards(spec.inner_item.ipc_socket_id)
+    end,
+    restart = function(spec)
+      return dothis.mpv_ipc_socket_id.restart(spec.inner_item.ipc_socket_id)
+    end,
+    cycle_pause = function(spec)
+      return dothis.mpv_ipc_socket_id.cycle_pause(spec.creation_specifier.ipc_socket_id)
+    end,
+    stop = function(spec)
+      return dothis.mpv_ipc_socket_id.stop(spec.creation_specifier.ipc_socket_id)
+    end,
+    playlist_backwards = function(spec)
+      return dothis.mpv_ipc_socket_id.playlist_backwards(spec.creation_specifier.ipc_socket_id)
+    end,
+    playlist_forwards = function(spec)
+      return dothis.mpv_ipc_socket_id.playlist_forwards(spec.creation_specifier.ipc_socket_id)
+    end,
+    cycle_shuffle = function(spec)
+      return dothis.mpv_ipc_socket_id.cycle_shuffle(spec.creation_specifier.ipc_socket_id)
+    end,
+  },
+  stream_created_item_specifier_array = {
+    set_state_transitioned_state_all = function(array)
+      hs.fnutils.ieach(array, act.stream_created_item_specifier.set_state_transitioned_state)
+    end,
+    filter_in_place_valid = function(array)
+      dothis.array.filter_in_place(array, transf.stream_created_item_specifier.is_valid)
+    end,
+    maintain_state = function(array)
+      act.stream_created_item_specifier_array.set_state_transitioned_state_all(array)
+      act.stream_created_item_specifier_array.filter_in_place_valid(array)
+    end,
+
+  },
 }

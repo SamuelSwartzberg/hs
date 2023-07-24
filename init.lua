@@ -55,7 +55,7 @@ end
 local keymap = {
   ["tab"] = {
     explanation = "Grid cell mapper",
-    fn = bindArg(dothis.grid.show, {y = 2, x = 4})
+    fn = bindArg(act.hs_geometry_size_like.show_grid, {y = 2, x = 4})
   },
   ["1"] = {
     explanation = "Command palette for frontmost app",

@@ -160,12 +160,6 @@ dothis = {
       end)
     end,
   },
-  grid = {
-    show = function(grid)
-      hs.grid.setGrid(grid)
-      hs.grid.show()
-    end,
-  },
   uuid = {
     add_contact_data = function(uuid, data, type)
       type = "contacts/" .. type
@@ -352,15 +346,6 @@ dothis = {
       else
         run("open -a" .. transf.string.single_quoted_escaped(browser))
       end
-    end,
-    open_ff = function(url)
-      dothis.url_or_local_path.open_browser(url, "Firefox")
-    end,
-    open_safari = function(url)
-      dothis.url_or_local_path.open_browser(url, "Safari")
-    end,
-    open_chrome = function(url)
-      dothis.url_or_local_path.open_browser(url, "Google Chrome")
     end,
   },
   local_path = {
@@ -979,7 +964,7 @@ dothis = {
     end,
 
   },
-  plaintext_url_or_path_file = {
+  plaintext_url_or_local_path_file = {
     open_all = function(path, browser)
       hs.fnutils.ieach(
         transf.plaintext_file.nocomment_noindent_content_lines(path),
@@ -1407,18 +1392,14 @@ dothis = {
     end
   },
   url_array = {
-    open_all = function(url_array)
+    open_all = function(url_array, browser)
       for _, url in transf.array.index_value_stateless_iter(url_array) do
-        dothis.url_or_local_path.open_browser(url)
+        dothis.url_or_local_path.open_browser(url, browser)
       end
     end,
     create_as_url_files = function(url_array, path)
       local abs_path_dict = get.url_array.absolute_path_dict_of_url_files(url_array, path)
       dothis.absolute_path_string_value_dict.write(abs_path_dict)
-    end,
-    create_as_url_files_in_murls = function(url_array)
-      local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(env.MURLS)
-      dothis.url_array.create_as_url_files(url_array, path)
     end,
     create_as_session = function(url_array, root)
       local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(root)
@@ -1428,9 +1409,7 @@ dothis = {
         transf.url_array.session_string(url_array)
       )
     end,
-    create_as_session_in_msessions = function(url_array)
-      dothis.url_array.create_as_session(url_array, env.MSESSIONS)
-    end,
+    
   },
   html_url_array = {
    
@@ -2375,26 +2354,11 @@ dothis = {
     end
   },
   stream_created_item_specifier = {
-    set_state_transitioned_state = function(spec)
-      spec.inner_item.state = transf.stream_created_item_specifier.transitioned_stream_state(spec)
-    end,
-    cycle_loop_playlist = function(spec)
-      return dothis.mpv_ipc_socket_id.cycle_loop_playlist(spec.inner_item.ipc_socket_id)
-    end,
-    cycle_loop_playback = function(spec)
-      return dothis.mpv_ipc_socket_id.cycle_loop_playback(spec.inner_item.ipc_socket_id)
-    end,
     exec = function(spec, ...)
       return dothis.mpv_ipc_socket_id.exec(spec.inner_item.ipc_socket_id, ...)
     end,
     set_playlist_index = function(spec, index)
       return dothis.mpv_ipc_socket_id.set_playlist_index(spec.inner_item.ipc_socket_id, index)
-    end,
-    set_playlist_first = function(spec)
-      return dothis.mpv_ipc_socket_id.set_playlist_first(spec.inner_item.ipc_socket_id)
-    end,
-    set_playlist_last = function(spec)
-      return dothis.mpv_ipc_socket_id.set_playlist_last(spec.inner_item.ipc_socket_id)
     end,
     set_playback_seconds = function(spec, seconds)
       return dothis.mpv_ipc_socket_id.set_playback_seconds(spec.inner_item.ipc_socket_id, seconds)
@@ -2405,49 +2369,6 @@ dothis = {
     set_playback_seconds_relative = function(spec, seconds)
       return dothis.mpv_ipc_socket_id.set_playback_seconds_relative(spec.inner_item.ipc_socket_id, seconds)
     end,
-    set_playback_first = function(spec)
-      return dothis.mpv_ipc_socket_id.set_playback_first(spec.inner_item.ipc_socket_id)
-    end,
-    set_chapter = function(spec, chapter)
-      return dothis.mpv_ipc_socket_id.set_chapter(spec.inner_item.ipc_socket_id, chapter)
-    end,
-    chapter_backwards = function(spec)
-      return dothis.mpv_ipc_socket_id.chapter_backwards(spec.inner_item.ipc_socket_id)
-    end,
-    chapter_forwards = function(spec)
-      return dothis.mpv_ipc_socket_id.chapter_forwards(spec.inner_item.ipc_socket_id)
-    end,
-    restart = function(spec)
-      return dothis.mpv_ipc_socket_id.restart(spec.inner_item.ipc_socket_id)
-    end,
-    cycle_pause = function(spec)
-      return dothis.mpv_ipc_socket_id.cycle_pause(spec.creation_specifier.ipc_socket_id)
-    end,
-    stop = function(spec)
-      return dothis.mpv_ipc_socket_id.stop(spec.creation_specifier.ipc_socket_id)
-    end,
-    playlist_backwards = function(spec)
-      return dothis.mpv_ipc_socket_id.playlist_backwards(spec.creation_specifier.ipc_socket_id)
-    end,
-    playlist_forwards = function(spec)
-      return dothis.mpv_ipc_socket_id.playlist_forwards(spec.creation_specifier.ipc_socket_id)
-    end,
-    cycle_shuffle = function(spec)
-      return dothis.mpv_ipc_socket_id.cycle_shuffle(spec.creation_specifier.ipc_socket_id)
-    end,
-  },
-  stream_created_item_specifier_array = {
-    set_state_transitioned_state_all = function(array)
-      hs.fnutils.ieach(array, dothis.stream_created_item_specifier.set_state_transitioned_state)
-    end,
-    filter_in_place_valid = function(array)
-      dothis.array.filter_in_place(array, transf.stream_created_item_specifier.is_valid)
-    end,
-    maintain_state = function(array)
-      dothis.stream_created_item_specifier_array.set_state_transitioned_state_all(array)
-      dothis.stream_created_item_specifier_array.filter_in_place_valid(array)
-    end,
-
   },
   creation_specifier_array  = {
     create = function(arr, spec)

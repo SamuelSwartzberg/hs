@@ -1476,10 +1476,10 @@ transf = {
       return transf.string.last_line(transf.plaintext_file.contents(path))
     end,
     bytechars = function(path)
-      return transf.string.bytechars(transf.plaintext_file.contents(path))
+      return transf.string.bytechar_array(transf.plaintext_file.contents(path))
     end,
     chars = function(path)
-      return transf.string.chars(transf.plaintext_file.contents(path))
+      return transf.string.char_array(transf.plaintext_file.contents(path))
     end,
     no_final_newlines = function(path)
       return transf.string.no_final_newlines(transf.plaintext_file.contents(path))
@@ -3119,7 +3119,7 @@ transf = {
     end,
     --- @param str string
     --- @return string[]
-    bytechars = function(str)
+    bytechar_array = function(str)
       local t = {}
       for i = 1, #str do
         t[i] = str:sub(i, i)
@@ -3128,13 +3128,13 @@ transf = {
     end,
 
     len_bytechars = function(str)
-      return #transf.string.bytechars(str)
+      return #transf.string.bytechar_array(str)
     end,
 
 
     --- @param str string
     --- @return string[]
-    chars = function(str)
+    char_array = function(str)
       local t = {}
       for i = 1, eutf8.len(str) do
         t[i] = eutf8.sub(str, i, i)
@@ -3143,7 +3143,7 @@ transf = {
     end,
 
     len_chars = function(str)
-      return #transf.string.chars(str)
+      return #transf.string.char_array(str)
     end,
 
     --- @param str string
@@ -4057,7 +4057,7 @@ transf = {
     end,
     
   },
-  plaintext_url_or_path_file = {
+  plaintext_url_or_local_path_file = {
 
   },
   plaintext_file_array = {
@@ -6479,7 +6479,6 @@ transf = {
     end,
     action_specifier_array = function(thing_name)
       return concat(
-        tblmap.thing_name.action_specifier_array[thing_name],
         transf.thing_name.act_action_specifier_array[thing_name],
         transf.thing_name.transf_action_specifier_array[thing_name]
       )
