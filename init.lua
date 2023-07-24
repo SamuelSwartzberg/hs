@@ -55,7 +55,7 @@ end
 local keymap = {
   ["tab"] = {
     explanation = "Grid cell mapper",
-    fn = bindArg(dothis.grid.show_certain, {y = 2, x = 4})
+    fn = bindArg(dothis.grid.show, {y = 2, x = 4})
   },
   ["1"] = {
     explanation = "Command palette for frontmost app",
@@ -102,7 +102,7 @@ local keymap = {
     explanation = "Switch ·to a different mullvad server",
     fn = function ()
       ar(transf["nil"].mullvad_relay_identifier_array)
-        :doThis("choose-item", dothis.mullvad_relay_identifier.set_active_mullvad_relay_dentifier)
+        :doThis("choose-item", act.mullvad_relay_identifier.set_active_mullvad_relay_dentifier)
     end
   },
   ["8"] = {
@@ -174,7 +174,7 @@ local keymap = {
   r = {
     explanation = "Record some audio, then choose an action on it",
     fn = function() 
-      dothis.sox.rec_toggle_cache(function(file)
+      dothis.sox.sox_rec_toggle_cache(function(file)
         st(file):doThis("choose-action")
       end)
     end,
@@ -387,14 +387,14 @@ System:get("manager", "creatable"):doThis("create-all", {
 
 
 System:get("manager", "timer"):doThis("create-all", {
-  dothis.newsboat.reload,
+  dothis["nil"].newsboat_reload,
   dothis.vdirsyncer.sync,
   hs.fnutils.parital(dothis.local_nonabsolute_path_relative_to_home.copy_local_to_labelled_remote, "me/state/todo"),
   st(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
   { 
-    fn = dothis.mbsync.sync, 
+    fn = dothis["nil"].mbsync_sync, 
     interval = "* * * * *"
   },
   {
@@ -405,7 +405,7 @@ System:get("manager", "timer"):doThis("create-all", {
     interval = "*/5 * * * *",
   },
   {
-    fn = dothis.package_manager_name.upgrade_all,
+    fn = act.package_manager_name.upgrade_all,
     interval = "0 0 * * *"
   }
   --[[CreateApplicationItem("Firefox"):get("backup-timer"),

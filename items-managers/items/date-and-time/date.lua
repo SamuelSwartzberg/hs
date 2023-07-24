@@ -51,11 +51,6 @@ DateSpecifier = {
           st(format):doThis("choose-action")
         end)
       end,
-      ["create-event-with-start"] = function(self)
-        dothis.khal.add_event_interactive({
-          start = self:get("to-precision", "min")
-        })
-      end,
     }
   },
   

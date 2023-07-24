@@ -1,18 +1,7 @@
 dothis = {
-  mullvad_relay_identifier = {
-    set_active_mullvad_relay_dentifier = function(id)
-      run("mullvad relay set hostname " .. id, true)
-    end,
-  },
   package_manager_name = {
     install = function(mgr, pkg)
       run("upkg " .. mgr .. " install " .. transf.string.single_quoted_escaped(pkg), true)
-    end,
-    install_self = function(mgr)
-      run("upkg " .. mgr .. " install-self", true)
-    end,
-    install_missing = function(mgr)
-      run("upkg " .. mgr .. " install-missing", true)
     end,
     remove = function(mgr, pkg)
       run("upkg " .. mgr .. " remove " .. transf.string.single_quoted_escaped(pkg), true)
@@ -25,9 +14,6 @@ dothis = {
     end,
     link = function(mgr, pkg)
       run("upkg " .. mgr .. " link " .. transf.string.single_quoted_escaped(pkg), true)
-    end,
-    upgrade_all = function(mgr)
-      run("upkg " .. mgr .. " upgrade-all", true)
     end,
     do_backup_and_commit = function(mgr, action, msg)
       run("upkg " .. mgr .. " " .. action, function()
@@ -45,30 +31,9 @@ dothis = {
         end
       end)
     end,
-    backup = function(mgr)
-      dothis.package_manager_name.do_backup_and_commit(mgr, "backup", "backup packages")
-    end,
-    delete_backup = function(mgr)
-      dothis.package_manager_name.do_backup_and_commit(mgr, "delete-backup", "delete backup of packages")
-    end,
-    replace_backup = function(mgr)
-      dothis.package_manager_name.do_backup_and_commit(mgr, "replace-backup", "replace backup of packages")
-    end,
   },
-  khard = {
-    edit = function(uid, do_after)
-      run("khard edit " .. uid, do_after)
-    end,
-  },
-  khal = {
-    add_event_from_file = function(calendar, path)
-      run("khal import --include-calendar " .. calendar .. " " .. transf.string.single_quoted_escaped(path), true)
-    end,
-    add_event_from_url = function(calendar, url)
-      local temp_path_arg = transf.string.single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
-      run('curl' .. transf.string.single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg, true)
-    end,
-    add_event_from_specifier = function(specifier)
+  event_table = {
+    add_event_from = function(specifier, do_after)
       specifier = specifier or {}
       specifier = map(specifier, stringy.strip, {
         mapcondition = { _type = "string"}
@@ -155,48 +120,15 @@ dothis = {
         )
       end
 
-      run(command, function(std_out)
-        -- todo: build RRULE, add it to event
-        if specifier.do_after then 
-          specifier.do_after(stringy.strip(std_out))
-        end
-      end)
+      run(command, do_after)
     end,
-    add_event_interactive = function(event_table)
+    add_event_interactive = function(event_table, do_after)
       event_table = event_table or {}
       local temp_file_contents = get.string.evaled_as_template(transf.event_table.calendar_template(event_table))
-      local do_after = event_table.do_after
-      event_table.do_after = nil
-      dothis.string.edit_temp_file_in_vscode_act_on_contents(temp_file_contents, function(tmp_file)
-        local new_specifier = transf.yaml_string.not_userdata_or_function(tmp_file)
-        new_specifier.do_after = do_after
-        dothis.khal.add_event_from_specifier(new_specifier)
+      dothis.string.edit_temp_file_in_vscode_act_on_contents(temp_file_contents, function(cnt)
+        local new_specifier = transf.yaml_string.not_userdata_or_function(cnt)
+        dothis.event_table.add_event_from(new_specifier, do_after)
       end)
-    end,
-    --- edit event by adding new event and deleting old one (necessary since khal won't allow us to use a GUI editor (Don't try, I've spent hours on this, it's not possible))
-    edit_event = function(searchstr, include, exclude) 
-      local event_table = get.khal.search_event_tables(searchstr)[1]
-      event_table.do_after = function()
-        dothis.khal.delete_event(searchstr, include, exclude)
-      end
-      dothis.khal.add_event_interactive(event_table)
-    end,
-
-    delete_event = function(searchstr, include, exclude)
-      local command = 
-        "echo $'D\ny\n' | khal edit " .. get.khal.basic_command_parts(include, exclude) .. transf.string.single_quoted_escaped(searchstr)
-      run(command, true)
-    end,
-  },
-  event_table = {
-    delete = function(event_table)
-      dothis.khal.delete_event(event_table.uid, event_table.calendar)
-    end,
-    edit = function(event_table)
-      dothis.khal.edit_event(event_table.uid, event_table.calendar)
-    end,
-    create_similar = function(event_table)
-      dothis.khal.add_event_interactive(event_table)
     end,
   },
   pandoc = {
@@ -229,7 +161,7 @@ dothis = {
     end,
   },
   grid = {
-    show_certain = function(grid)
+    show = function(grid)
       hs.grid.setGrid(grid)
       hs.grid.show()
     end,
@@ -238,7 +170,10 @@ dothis = {
     add_contact_data = function(uuid, data, type)
       type = "contacts/" .. type
       dothis.alphanum_minus_underscore.set_pass_json(uuid, type, data)
-    end,      
+    end,
+    edit_contact = function(uuid, do_after)
+      run("khard edit " .. uuid, do_after)
+    end,
   },
   pass_item_name = {
     replace = function(name, type, data)
@@ -283,52 +218,19 @@ dothis = {
       dothis.uuid.add_contact_data(transf.contact_table.uid(contact_table), "iban", iban)
     end,
     edit = function(contact_table)
-      dothis.khard.edit_contact(transf.contact_table.uid(contact_table))
+      dothis.uuid.edit_contact(transf.contact_table.uid(contact_table))
     end,
   },
   youtube_video_id = {
     
   },
-  sox = {
-    rec_start = function(path, do_after)
-      run("rec " .. transf.string.single_quoted_escaped(path), function()
-        if do_after then
-          do_after(path)
-        end
-      end)
-    end,
-    rec_start_cache = function(do_after)
-      dothis.sox.rec_start(transf.string.in_cache_dir(os.time(), "recording"), do_after)
-    end,
-    rec_stop = function(do_after)
-      run("killall rec", do_after)
-    end,
-    rec_toggle_cache = function(do_after)
-      if transf["nil"].sox_is_recording() then
-        dothis.sox.rec_stop()
-      else
-        dothis.sox.rec_start_cache(do_after)
-      end
-    end,
-  },
-  vdirsyncer = {
-    sync = function()
-      run("vdirsyncer sync", true)
-    end
-  },
-  newsboat = {
-    reload = function()
-      run("newsboat -x reload", true)
-    end,
-  },
-  mbsync = {
-    sync = function()
-      run('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel', true)
-    end,
-  },
   url = {
     download = function(url, target)
       run("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
+    end,
+    add_event_from_url = function(url, calendar)
+      local temp_path_arg = transf.string.single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
+      run('curl' .. transf.string.single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg, true)
     end,
   },
   otp_url = {
@@ -605,7 +507,14 @@ dothis = {
     end,
   },
   local_absolute_path = {
-
+    start_recording_to = function(path, do_after)
+      dothis.absolute_path.create_parent_dir(path)
+      run("rec " .. transf.string.single_quoted_escaped(path), function()
+        if do_after then
+          do_after(path)
+        end
+      end)
+    end,
   },
   local_nonextant_path = {
     create_dir = function(path)
@@ -1325,6 +1234,9 @@ dothis = {
           type = "quoted"
         }
       })
+    end,
+    add_events_from_file = function(path, calendar)
+      run("khal import --include-calendar " .. calendar .. " " .. transf.string.single_quoted_escaped(path), true)
     end,
   },
   git_root_dir = {
@@ -2678,8 +2590,27 @@ dothis = {
 
   },
   ["nil"] = {
-    sync_vdirsyncer = function()
+    vdirsyncer_sync = function()
       run("vdirsyncer sync", true)
+    end,
+    newsboat_reload = function()
+      run("newsboat -x reload", true)
+    end,
+    sox_rec_start_cache = function(do_after)
+      dothis.local_absolute_path.start_recording_to(transf.string.in_cache_dir(os.time(), "recording"), do_after)
+    end,
+    sox_rec_stop = function(do_after)
+      run("killall rec", do_after)
+    end,
+    sox_rec_toggle_cache = function(do_after)
+      if transf["nil"].sox_is_recording() then
+        dothis.sox.sox_rec_stop()
+      else
+        dothis.sox.sox_rec_start_cache(do_after)
+      end
+    end,
+    mbsync_sync  = function()
+      run('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel', true)
     end,
   }
 }

@@ -1692,6 +1692,11 @@ transf = {
     timestamp_ms = function(date)
       return transf.date.timestamp_s(date) * 1000
     end,
+    event_table_with_start = function(date)
+      return {
+        start = transf.date.full_rfc3339like_dt(date)
+      }
+    end,
 
   },
   timestamp_s = {
@@ -3550,17 +3555,17 @@ transf = {
       return event_table.url
     end,
 
-    start_fullrfc3339like_dt = function(event_table)
+    start_rfc3339like_dt = function(event_table)
       return event_table.start
     end,
-    end_fullrfc3339like_dt = function(event_table)
+    end_rfc3339like_dt = function(event_table)
       return event_table["end"]
     end,
     start_date = function(event_table)
-      return transf.full_rfc3339like_dt.date(event_table.start)
+      return transf.rfc3339like_dt.min_date(event_table.start)
     end,
     end_date = function(event_table)
-      return transf.full_rfc3339like_dt.date(event_table["end"])
+      return transf.rfc3339like_dt.min_date(event_table["end"])
     end,
     date_interval_specifier = function(event_table)
       return {
