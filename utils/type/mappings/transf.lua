@@ -6461,9 +6461,26 @@ transf = {
         }
       )
     end,
+    act_action_specifier_array = function(thing_name)
+      return map(
+        act[thing_name],
+        function(action, fn)
+          return {
+            d = "act." .. thing_name .. "." .. action,
+            getfn = fn
+          }
+        end,
+        {
+          args = "kv",
+          ret = "v",
+          tolist = true,
+        }
+      )
+    end,
     action_specifier_array = function(thing_name)
-      return glue(
+      return concat(
         tblmap.thing_name.action_specifier_array[thing_name],
+        transf.thing_name.act_action_specifier_array[thing_name],
         transf.thing_name.transf_action_specifier_array[thing_name]
       )
     end,

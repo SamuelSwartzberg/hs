@@ -2098,27 +2098,17 @@ dothis = {
   },
   action_specifier = {
     execute = function(spec, target)
-      local args = {}
-      if not is.any.array(spec.args) then
-        args = {spec.args}
-      end
-      for k, v in transf.native_table.key_value_stateless_iter(spec.args) do
-        if is.any.fn(v) then
-          args[k] = v(target)
-        else
-          args[k] = v
-        end
-      end
       
-      local doargs = args
       if spec.getfn then
-        target = spec.getfn(target, table.unpack(args))
-        doargs = {}
+        target = spec.getfn(target)
       end
 
-      spec.dothis = spec.dothis or dothis.any.choose_action
-      spec.dothis(target, table.unpack(doargs))
-  end
+      if spec.dothis then
+        spec.dothis(target)
+      end
+
+      dothis.any.choose_action(target)
+    end
   },
   action_specifier_array = {
 
