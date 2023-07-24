@@ -719,7 +719,17 @@ get = {
       return transf.prompt_spec.any({
         prompter = transf.prompt_args_string.string_or_nil_and_boolean,
         prompt_args = {
-          message = message or "Enter a string...",
+          message = message,
+          default = str,
+        }
+      })
+    end,
+    prompted_once_alphanum_minus_underscore_string_from_default = function(str, message)
+      return transf.prompt_spec.any({
+        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        transformed_validator = is.string.alphanum_minus_underscore,
+        prompt_args = {
+          message = message,
           default = str,
         }
       })

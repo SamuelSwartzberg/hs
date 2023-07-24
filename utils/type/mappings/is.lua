@@ -24,6 +24,9 @@ is = {
     ascii_string = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.charset.ascii))
     end,
+    alphanum_minus_underscore = function(str)
+      return is.string.ascii_string(str) and is.ascii_string.alphanum_minus_underscore(str)
+    end,
     url = function(str)
       return is.string.ascii_string(str) and is.printable_ascii_string.url(str)
     end,
@@ -31,6 +34,9 @@ is = {
   ascii_string = {
     printable_ascii_string = function(str)
       return onig.find(str, transf.string.whole_regex(mt._r.charset.printable_ascii))
+    end,
+    alphanum_minus_underscore = function(str)
+      return is.ascii_string.printable_ascii_string(str) and is.printable_ascii_string.alphanum_minus_underscore(str)
     end,
   },
   printable_ascii_string = {
@@ -360,6 +366,9 @@ is = {
   file = {
     plaintext_file = function(path)
       error("TODO")
+    end,
+    image_file = function(path)
+      return get.path.usable_as_filetype(path, "image")
     end,
     binary_file = function(path)
       return not is.file.plaintext_file(path)

@@ -772,6 +772,12 @@ dothis = {
         dothis.dir.empty_dir(path)
       end
     end,
+    move_to_parent_path = function(path)
+      dothis.extant_path.move_to_absolute_path(path, transf.path.parent_path(path))
+    end,
+    move_to_parent_path_with_extension_if_any = function(path)
+      dothis.extant_path.move_to_absolute_path(path, transf.path.parent_path_with_extension_if_any(path))
+    end,
     copy_to_absolute_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
       run("rclone copyto " .. transf.string.single_quoted_escaped(path) .. " " .. transf.string.single_quoted_escaped(tgt))

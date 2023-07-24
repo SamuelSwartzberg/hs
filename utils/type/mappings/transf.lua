@@ -421,10 +421,6 @@ transf = {
     end,
   },
   path = {
-    attachment = function(path)
-      local mimetype = mimetypes.guess(path) or "text/plain"
-      return "#" .. mimetype .. " " .. path
-    end,
     no_leading_following_slash_or_whitespace = function(item)
       item = stringy.strip(item)
       return item
@@ -545,7 +541,12 @@ transf = {
         return "local"
       end
     end,
-    
+    parent_path_with_extension_if_any = function(path)
+      local extension = transf.path.extension(path)
+      local parent_path = transf.path.parent_path(path)
+      local new_path = parent_path .. extension
+      return new_path
+    end,
 
   },
   path_with_intra_file_locator = {
@@ -728,12 +729,6 @@ transf = {
     extant_path_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.extant_path)
     end,
-    attachment_array = function(path_array)
-      return hs.fnutils.imap(path_array, transf.path.attachment)
-    end,
-    attachment_string = function(path_array)
-      return table.concat(transf.path_array.attachment_array(path_array), "\n")
-    end,
     useless_file_leaf_filtered_path_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.not_useless_file_leaf)
     end,
@@ -813,6 +808,28 @@ transf = {
       else
         error("Couldn't read file at " .. path .. "!")
       end
+    end,
+    attachment_string = function(path)
+      local mimetype = mimetypes.guess(path) or "text/plain"
+      return "#" .. mimetype .. " " .. path
+    end,
+    email_specifier = function(path)
+      return {
+        non_inline_attachment_local_file_array = {path}
+      }
+    end,
+  },
+  local_file_array = {
+    attachment_array = function(path_array)
+      return hs.fnutils.imap(path_array, transf.local_file.attachment_string)
+    end,
+    attachment_string = function(path_array)
+      return table.concat(transf.path_array.attachment_array(path_array), "\n")
+    end,
+    email_specifier = function(path_array)
+      return {
+        non_inline_attachment_local_file_array = path_array
+      }
     end,
   },
   labelled_remote_file = {
@@ -1277,12 +1294,12 @@ transf = {
       specifier = get.table.copy(specifier)
       local body = specifier.body or ""
       specifier.body = nil
-      local non_inline_attachments = specifier.non_inline_attachments
-      specifier.non_inline_attachments = nil
+      local non_inline_attachment_local_file_array = specifier.non_inline_attachment_local_file_array
+      specifier.non_inline_attachment_local_file_array = nil
       local header = transf.dict.email_header(specifier)
       local mail = string.format("%s\n\n%s", header, body)
-      if non_inline_attachments then
-        mail = mail .. "\n" .. transf.path_array.attachment_string(non_inline_attachments)
+      if non_inline_attachment_local_file_array then
+        mail = mail .. "\n" .. transf.path_array.attachment_string(non_inline_attachment_local_file_array)
       end
       return mail
     end,
@@ -3311,6 +3328,12 @@ transf = {
         }
       })
     end,
+    prompted_once_string_from_default = function(str)
+      return get.string.prompted_once_string_from_default(str, "Enter a string...")
+    end,
+    prompted_once_alphanum_minus_underscore_string_from_default = function(str)
+      return get.string.prompted_once_alphanum_minus_underscore_string_from_default(str, "Enter a string (alphanum, minus, underscore)...")
+    end,
   },
   line = {
     noindent = function(str)
@@ -4961,7 +4984,7 @@ transf = {
     rechnung_email_specifier = function(dir)
       return {
         body = get.string.evaled_as_template(comp.documents.translation.rechnung_email_de, dir),
-        non_inline_attachments = {
+        non_inline_attachment_local_file_array = {
           transf.omegat_project_dir.rechnung_pdf_path(dir)
         }
       }

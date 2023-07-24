@@ -181,4 +181,38 @@ act = {
     end,
 
   },
+  local_image_file = {
+    add_hs_image_to_clipboard = function(path)
+      dothis.hs_image.add_to_clipboard(
+        transf.local_image_file.hs_image(path)
+      )
+    end,
+    paste_hs_image = function(path)
+      dothis.hs_image.paste(
+        transf.local_image_file.hs_image(path)
+      )
+    end,
+    paste_hs_image_and_delete = function(path)
+      dothis.hs_image.paste(
+        transf.local_image_file.hs_image(path)
+      )
+      dothis.absolute_path.delete(path)
+    end,
+    add_as_otp_with_prompted_name = function(path)
+      act.otp_url.add_otp_pass_item_with_prompted_name(
+        transf.local_image_file.qr_data(path)
+      )
+    end,
+  },
+  otp_url = {
+    add_otp_pass_item_with_prompted_name = function(url)
+      local name = get.string.prompted_once_alphanum_minus_underscore_string_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
+      dothis.otp_url.add_otp_pass_item(url, name)
+    end,
+  },
+  local_path = {
+    open_libreoffice_async = function(path)
+      dothis.local_path.open_app(path, "LibreOffice", true)
+    end,
+  }
 }
