@@ -226,7 +226,7 @@ function findsingle(item, conditions, opts)
 
   --- @param acc matchspec
   --- @param val matchspec
-  local res = reduce(results, function(acc, val) 
+  local res = hs.fnutils.reduce(results, function(acc, val) 
     -- we need to make a decision how we want to treat cases where we had multiple conditions, and thus the k and v are different
     -- My current perspective is that since we require all conditions to be true, the k is the smallest k, and the v is the match from the first k to the largest k + #v 
     -- This is a somewhat arbitrary decision, but its results are fairly predictable and intuitive

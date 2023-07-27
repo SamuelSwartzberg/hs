@@ -50,7 +50,7 @@ PrintableAsciiStringItemSpecifier = {
 
     }
   },
-  action_table = concat(getChooseItemTable({
+  (getChooseItemTable({
    
   }),{
     {

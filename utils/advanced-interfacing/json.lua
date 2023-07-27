@@ -112,7 +112,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
           open_spec.params.scope = tblmap.api_name.scopes[specifier.api_name]
         end
         if tblmap.api_name.additional_auth_params[specifier.api_name] then
-          open_spec.params = glue(open_spec.params, tblmap.api_name.additional_auth_params[specifier.api_name])
+          open_spec.params = transf.two_table_or_nils.table_nonrecursive(open_spec.params, tblmap.api_name.additional_auth_params[specifier.api_name])
         end
         
         dothis.url_components.open_browser(open_spec, nil, function() -- our server listening on the above port will save the authorization code to the proper location
@@ -228,7 +228,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if secondary_api_name and tblmap.secondary_api_name.default_params[secondary_api_name] then
     specifier.params = specifier.params or {}
-    specifier.params = glue(get.table.copy(tblmap.secondary_api_name.default_params[secondary_api_name], true), specifier.params)
+    specifier.params = transf.two_table_or_nils.table_nonrecursive(get.table.copy(tblmap.secondary_api_name.default_params[secondary_api_name], true), specifier.params)
   end
 
   specifier.scheme = specifier.scheme or tblmap.api_name.scheme[specifier.api_name]
@@ -348,7 +348,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     args = curl_command,
   }
   if specifier.run_json_opts then
-    args = glue(args, specifier.run_json_opts)
+    args = transf.two_table_or_nils.table_nonrecursive(args, specifier.run_json_opts)
   end
   if not specifier.non_json_response then
     args.json_catch = catch_auth_error

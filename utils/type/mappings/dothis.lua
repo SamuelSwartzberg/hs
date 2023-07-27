@@ -931,28 +931,28 @@ dothis = {
       dothis.absolute_path.write_file_if_file(path, table.concat(lines, "\n"))
     end,
     set_line = function(path, line, line_number)
-      local lines = transf.plaintext_file.lines(path)
+      local lines = transf.plaintext_file.line_array(path)
       lines[line_number] = line
       dothis.plaintext_file.write_lines(path, lines)
     end,
     pop_line = function(path)
-      local lines = transf.plaintext_file.lines(path)
+      local lines = transf.plaintext_file.line_array(path)
       local line = table.remove(lines, #lines)
       dothis.plaintext_file.write_lines(path, lines)
       return line
     end,
     remove_line = function(path, line_number)
-      local lines = transf.plaintext_file.lines(path)
+      local lines = transf.plaintext_file.line_array(path)
       table.remove(lines, line_number)
       dothis.plaintext_file.write_lines(path, lines)
     end,
     find_remove_line = function(path, cond, opts)
-      local lines = transf.plaintext_file.lines(path)
+      local lines = transf.plaintext_file.line_array(path)
       local index = get.string_array.find(lines, cond, {ret = "i"})
       dothis.plaintext_file.remove_line(path, index)
     end,
     find_remove_nocomment_noindent_line = function(path, cond, opts)
-      local lines = transf.plaintext_file.lines(path)
+      local lines = transf.plaintext_file.line_array(path)
       local index = find(lines, function(line)
         local nocomment_noindent = transf.line.nocomment_noindent(line)
         return findsingle(nocomment_noindent, cond)
@@ -1036,14 +1036,14 @@ dothis = {
       end)
     end,
     reply = function(path, specifier, do_after)
-      specifier = glue(transf.email_file.reply_email_specifier(path), specifier)
+      specifier = transf.two_tables.table_nonrecursive(transf.email_file.reply_email_specifier(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
     edit_then_reply = function(path, do_after)
       dothis.email_specifier.edit_then_send(transf.email_file.reply_email_specifier(path), do_after)
     end,
     forward = function(path, specifier, do_after)
-      specifier = glue(transf.email_file.forward_email_specifier(path), specifier)
+      specifier = transf.two_tables.table_nonrecursive(transf.email_file.forward_email_specifier(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
     edit_then_forward = function(path, do_after)

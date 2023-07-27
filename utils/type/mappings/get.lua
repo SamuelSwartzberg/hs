@@ -349,7 +349,7 @@ get = {
   },
   dict_with_timestamp = {
     array_by_array_with_timestamp_first = function(dict, arr)
-      arr = glue({"timestamp"}, arr)
+      arr = transf.any_and_array.array("timestamp", arr)
       return get.dict.array_by_array(dict, arr)
     end,
     timestamp_key_array_value_dict_by_array = function(dict, arr)
@@ -878,12 +878,10 @@ get = {
     end,
   },
   string_array = {
-    join = function(arr, sep)
-      return table.concat(arr, sep)
-    end,
+    string_joined = table.concat,
     resplit_by_oldnew = function(arr, sep)
       return get.string.string_array_split(
-        get.string_array.join(
+        get.string_array.string_joined(
           arr,
           sep
         ),
@@ -892,7 +890,7 @@ get = {
     end,
     resplit_by_new = function(arr, sep)
       return get.string.string_array_split(
-        get.string_array.join(
+        get.string_array.string_joined(
           arr,
           ""
         ),
@@ -901,7 +899,7 @@ get = {
     end,
     resplit_by_oldnew_single_char = function(arr, sep)
       return get.string.string_array_split_single_char(
-        get.string_array.join(
+        get.string_array.string_joined(
           arr,
           sep
         ),
@@ -909,24 +907,23 @@ get = {
       )
     end,
     resplit_by_oldnew_single_char_noempty = function(arr, sep)
-      return filter(get.string.string_array_split_single_char(
-        get.string_array.join(
+      return get.string.string_array_split_single_char_noempty(
+        get.string_array.string_joined(
           arr,
           sep
         ),
         sep
-      ), true)
+      )
     end,
     resplit_by_new_single_char = function(arr, sep)
       return get.string.string_array_split_single_char(
-        get.string_array.join(
+        get.string_array.string_joined(
           arr,
           ""
         ),
         sep
       )
     end,
-    find = find,
     find_nocomment_noindent = function(arr, cond, opts)
       return find(transf.string_array.nocomment_noindent_string_array(arr), cond, opts)
     end,
@@ -1294,11 +1291,11 @@ get = {
       return get.string.lines_head(transf.plaintext_file.contents(path), n)
     end,
     nth_line = function(path, n)
-      return transf.plaintext_file.lines(path)[n]
+      return transf.plaintext_file.line_array(path)[n]
     end,
     contents_lines_appended = function(path, lines)
-      local extlines = transf.plaintext_file.lines(path)
-      return glue(extlines, lines)
+      local extlines = transf.plaintext_file.line_array(path)
+      return transf.two_arrays.array(extlines, lines)
     end,
     contents_line_appended = function(path, line)
       return dothis.plaintext_file.contents_lines_appended(path, {line})
@@ -1310,7 +1307,7 @@ get = {
       return dothis.plaintext_file.content_lines_appended_to_string(path, {line})
     end,
     find_line = function(path, cond, opts)
-      return find(transf.plaintext_file.lines(path), cond, opts)
+      return find(transf.plaintext_file.line_array(path), cond, opts)
     end,
     find_nocomment_noindent_content_lines = function(path, cond, opts)
       return find(transf.plaintext_file.nocomment_noindent_content_lines(path), cond, opts)
@@ -1323,7 +1320,7 @@ get = {
     end,
     dict_of_dicts_by_header_file = function(plaintext_file, header_file)
       local array_of_arrays = transf.plaintext_table_file.array_of_array_of_fields(plaintext_file)
-      return get.array_of_arrays.dict_of_dicts_by_header_file(array_of_arrays, transf.plaintext_file.lines(header_file))
+      return get.array_of_arrays.dict_of_dicts_by_header_file(array_of_arrays, transf.plaintext_file.line_array(header_file))
     end,
   },
   timestamp_first_column_plaintext_table_file = {
@@ -1691,7 +1688,7 @@ get = {
   },
   date_interval_specifier = {
     event_tables_within_range = function(date_interval_specifier, specifier, include, exclude)
-      specifier = glue(transf.date_interval_specifier.event_table(date_interval_specifier), specifier)
+      specifier = transf.two_tables.table_nonrecursive(transf.date_interval_specifier.event_table(date_interval_specifier), specifier)
       return get.khal.list_event_tables(
         specifier,
         include,

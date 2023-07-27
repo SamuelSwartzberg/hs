@@ -30,6 +30,12 @@ is = {
     url = function(str)
       return is.string.ascii_string(str) and is.printable_ascii_string.url(str)
     end,
+    empty_string = function(str)
+      return str == ""
+    end,
+    noempty_string = function(str)
+      return not is.string.empty_string(str)
+    end,
     line = function(str)
       return eutf8.find(str, "[\n\r]") == nil
     end,

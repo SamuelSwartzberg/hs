@@ -1583,7 +1583,7 @@ transf = {
       return transf.toml_string.assoc_arr(transf.file.contents(path))
     end,
   },
-  xml_file = {
+  xml_local_file = {
     tree = xml.parseFile
   },
   -- a tree_node_like is a table with a key <ckey> which at some depth contains a tree_node_like_array, and a key <lkey> which contains a thing of any type that can be seen as the label of the node (or use self), such the tree_node_like it can be transformed to a tree_node
@@ -1602,7 +1602,7 @@ transf = {
         res = {path}
       end
       if node.children then
-        res = glue(res, transf.tree_node_array.array_of_label_arrays(node.children, path, include_inner))
+        res = transf.two_arrays.array(res, transf.tree_node_array.array_of_label_arrays(node.children, path, include_inner))
       end
       return res
     end
@@ -1611,7 +1611,7 @@ transf = {
     array_of_label_arrays = function(arr, path, include_inner)
       local res = {}
       for _, node in ipairs(arr) do
-        res = glue(res, transf.tree_node.array_of_label_arrays(node, path, include_inner))
+        res = transf.two_arrays.array(res, transf.tree_node.array_of_label_arrays(node, path, include_inner))
       end
       return res
     end,
@@ -1687,7 +1687,7 @@ transf = {
     contents = function(path)
       return transf.file.contents(path)
     end,
-    lines = function(path)
+    line_array = function(path)
       return transf.string.lines(transf.plaintext_file.contents(path))
     end,
     content_lines = function(path)
@@ -1897,7 +1897,7 @@ transf = {
       return date:getisoweeknumber()
     end,
     full_date_component_name_value_dict = function(date)
-      local tbl = glue(
+      local tbl = transf.two_tables.table_nonrecursive(
         date:getdate(),
         date:gettime()
       )
@@ -2002,7 +2002,7 @@ transf = {
       )[#list]
     end,
     date_component_name_list_inverse = function(list)
-      return transf.array_and_array.difference_set(mt._list.date.date_component_names, list)
+      return transf.two_arrays.difference_set(mt._list.date.date_component_names, list)
     end,
     rfc3339like_dt_separator_list  = function(list)
       return map(
@@ -2254,7 +2254,7 @@ transf = {
   },
   interval_specifier_array = {
     interval_specifier_with_earliest_start = function(interval_specifier_array)
-      return reduce(
+      return hs.fnutils.reduce(
         interval_specifier_array,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.smaller_table_by_key, {a_use, a_use, "start"})
       )
@@ -2265,7 +2265,7 @@ transf = {
         ).start
     end,
     interval_specifier_with_latest_start = function(interval_specifier_array)
-      return reduce(
+      return hs.fnutils.reduce(
         interval_specifier_array,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key, {a_use, a_use, "start"})
       )
@@ -2276,7 +2276,7 @@ transf = {
         ).start
     end,
     interval_specifier_with_latest_stop = function(interval_specifier_array)
-      return reduce(
+      return hs.fnutils.reduce(
         interval_specifier_array,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key, {a_use, a_use, "stop"})
       )
@@ -2287,7 +2287,7 @@ transf = {
         ).stop
     end,
     interval_specifier_with_earliest_stop = function(interval_specifier_array)
-      return reduce(
+      return hs.fnutils.reduce(
         interval_specifier_array,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.smaller_table_by_key, {a_use, a_use, "stop"})
       )
@@ -2433,13 +2433,13 @@ transf = {
       return transf.date_component_name_list.max_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
     min_full_date_component_name_value_dict = function(date_component_name_value_dict)
-      return glue(
+      return transf.two_tables.table_nonrecursive(
         date_component_name_value_dict,
         transf.date_component_name_value_dict.min_date_component_name_value_dict_not_set(date_component_name_value_dict)
       )
     end,
     max_full_date_component_name_value_dict = function(date_component_name_value_dict)
-      return glue(
+      return transf.two_tables.table_nonrecursive(
         date_component_name_value_dict,
         transf.date_component_name_value_dict.max_date_component_name_value_dict_not_set(date_component_name_value_dict)
       )
@@ -2506,25 +2506,25 @@ transf = {
     date_component_name_value_dict_where_date_component_value_is_max_date_component_value = function(date_component_name_value_dict)
       return get.dict.key_value_fn_filtered_dict(
         date_component_name_value_dict,
-        function(k, v) return v == tblmap.date_component_name.max_date_component_value[k] end,
+        function(k, v) return v == tblmap.date_component_name.max_date_component_value[k] end
       )
     end,
     date_component_name_value_dict_where_date_component_value_is_min_date_component_value = function(date_component_name_value_dict)
       return get.dict.key_value_fn_filtered_dict(
         date_component_name_value_dict,
-        function(k, v) return v == tblmap.date_component_name.min_date_component_value[k] end,
+        function(k, v) return v == tblmap.date_component_name.min_date_component_value[k] end
       )
     end,
     date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_dict)
       return get.dict.key_value_fn_filtered_dict(
         date_component_name_value_dict,
-        function(k, v) return v ~= tblmap.date_component_name.max_date_component_value[k] end,
+        function(k, v) return v ~= tblmap.date_component_name.max_date_component_value[k] end
       )
     end,
     date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value = function(date_component_name_value_dict)
       return get.dict.key_value_fn_filtered_dict(
         date_component_name_value_dict,
-        function(k, v) return v ~= tblmap.date_component_name.min_date_component_value[k] end,
+        function(k, v) return v ~= tblmap.date_component_name.min_date_component_value[k] end
       )
     end,
     prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_dict)
@@ -2633,7 +2633,10 @@ transf = {
     end,
     separated_iban = function(iban)
       return table.concat(
-        chunk(iban, 4),
+        get.string.string_array_groups_utf8_from_end(
+          transf.iban.cleaned_iban(iban),
+          4
+        ),
         " "
       )
     end,
@@ -2961,13 +2964,13 @@ transf = {
       end
     end,
     in_country_address_array = function(single_address_table)
-      return glue(
+      return transf.two_arrays.array(
         transf.address_table.addressee_array(single_address_table),
         transf.address_table.in_country_location_array(single_address_table)
       )
     end,
     international_address_array = function(single_address_table)
-      return glue(
+      return transf.two_arrays.array(
         transf.address_table.addressee_array(single_address_table),
         transf.address_table.international_location_array(single_address_table)
       )
@@ -4216,7 +4219,7 @@ transf = {
       )
     end,
     noemtpy_string_array = function(arr)
-      return memoize(filter, refstore.params.memoize.opts.stringify_json)(transf.string.lines(arr), true)
+      return hs.fnutils.filter(arr, is.string.noempty_string)
     end,
     noindent_string_array = function(arr)
       return hs.fnutils.imap(arr, transf.line.noindent)
@@ -4278,6 +4281,88 @@ transf = {
           "\n\nset +u\n"
     end,
   },
+  two_arrays = {
+    array = function(arr1, arr2)
+      local res = get.table.copy(arr1)
+      for _, v in transf.array.index_value_stateless_iter(arr2) do
+        res[#res + 1] = v
+      end
+      return res
+    end,
+    union_set = function(arr1, arr2)
+      local new_arr = transf.two_arrays.array(arr1, arr2)
+      return transf.array.set(new_arr)
+    end,
+    intersection_set = function(arr1, arr2)
+      local new_arr = {}
+      for _, v in transf.array.index_value_stateless_iter(arr1) do
+        if get.array.contains(arr2, v) then
+          new_arr[#new_arr + 1] = v
+        end
+      end
+      return transf.array.set(new_arr)
+    end,
+    difference_set = function(arr1, arr2)
+      local new_arr = {}
+      for _, v in transf.array.index_value_stateless_iter(arr1) do
+        if not get.array.contains(arr2, v) then
+          new_arr[#new_arr + 1] = v
+        end
+      end
+      return transf.array.set(new_arr)
+    end,
+    symmetric_difference_set = function(arr1, arr2)
+      local new_arr = {}
+      for _, v in transf.array.index_value_stateless_iter(arr1) do
+        if not get.array.contains(arr2, v) then
+          new_arr[#new_arr + 1] = v
+        end
+      end
+      for _, v in transf.array.index_value_stateless_iter(arr2) do
+        if not get.array.contains(arr1, v) then
+          new_arr[#new_arr + 1] = v
+        end
+      end
+      return transf.array.set(new_arr)
+    end,
+  },
+  two_array_or_nils = {
+    array = function(arr1, arr2)
+      if arr1 == nil then arr1 = {} end
+      if arr2 == nil then arr2 = {} end
+      return transf.two_arrays.array(arr1, arr2)
+    end,
+  },
+  two_tables = {
+    table_nonrecursive = function(t1, t2)
+      local res = get.table.copy(t1)
+      for k, v in transf.table.key_value_stateless_iter(t2) do
+        res[k] = v
+      end
+      return res
+    end,
+  },
+  two_table_or_nils = {
+    table_nonrecursive = function(t1, t2)
+      if t1 == nil then t1 = {} end
+      if t2 == nil then t2 = {} end
+      return transf.two_tables.table_nonrecursive(t1, t2)
+    end,
+  },
+  any_and_array = {
+    array = function(any, arr)
+      local res = get.table.copy(arr)
+      dothis.array.unshift(res, any)
+      return res
+    end,
+  },
+  array_and_any = {
+    array = function(arr, any)
+      local res = get.table.copy(arr)
+      dothis.array.push(res, any)
+      return res
+    end,
+  },
   array_of_string_arrays = {
 
   },
@@ -4323,7 +4408,7 @@ transf = {
       return hs.fnutils.imap(arr, transf.plaintext_file.contents)
     end,
     lines_array = function(arr)
-      return map(arr, transf.plaintext_file.lines, {flatten = true})
+      return map(arr, transf.plaintext_file.line_array, {flatten = true})
     end,
     content_lines_array = function(arr)
       return map(arr, transf.plaintext_file.content_lines, {flatten = true})
@@ -4416,8 +4501,8 @@ transf = {
         mode = "assoc",
         val = {"valuestop", "keystop"},
       })
-      local valuestop = reduce(map(stops, {_k = "valuestop"}, {tolist = true}))
-      local keystop = reduce(map(stops, {_k = "keystop"}, {tolist = true}))
+      local valuestop = hs.fnutils.reduce(map(stops, {_k = "valuestop"}, {tolist = true}), transf.two_comparables.larger)
+      local keystop = hs.fnutils.reduce(map(stops, {_k = "keystop"}, {tolist = true}), transf.two_comparables.larger)
       return table.concat(get.table.yaml_lines_aligned_with_predetermined_stops(tbl, keystop, valuestop, 0), "\n")
     end,
     yaml_metadata = function(t)
@@ -6382,7 +6467,7 @@ transf = {
       return menu_item_table.AXTitle
     end,
     full_action_path = function(menu_item_table)
-      return glue(menu_item_table.path, menu_item_table.AXTitle)
+      return transf.array_and_any.array(menu_item_table.path, menu_item_table.AXTitle)
     end,
     full_action_path_string = function(menu_item_table)
       return transf.string_array.action_path_string(transf.menu_item_table.full_action_path(menu_item_table))
@@ -6417,7 +6502,7 @@ transf = {
       return shortcut_specifier.key
     end,
     shortcut_array = function(shortcut_specifier)
-      return glue(
+      return transf.array_and_any.array(
         shortcut_specifier.mod_array,
         shortcut_specifier.key
       )
@@ -6821,7 +6906,7 @@ transf = {
   },
   retriever_specifier_array = {
     highest_precedence_retriever_specifier = function(retriever_specifier_array)
-      return reduce(
+      return hs.fnutils.reduce(
         retriever_specifier_array,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key {a_use, a_use, "precedence"})
       )
@@ -7113,7 +7198,7 @@ transf = {
   },
   indexable_array = {
     longest_common_prefix_indexable = function(arr)
-      return reduce(arr, function(acc, thing)
+      return hs.fnutils.reduce(arr, function(acc, thing)
         local isstring =type(thing) == "string"
         local last_matching_index = 0
         for i = 1, transf.indexable.length(thing) do
@@ -7137,50 +7222,12 @@ transf = {
       return transf.indexable.reversed_indexable(reversed_res)
     end,
   },
-  array_and_array = {
-    union_set = function(arr1, arr2)
-      local new_arr = glue(arr1, arr2)
-      return transf.array.set(new_arr)
-    end,
-    intersection_set = function(arr1, arr2)
-      local new_arr = {}
-      for _, v in transf.array.index_value_stateless_iter(arr1) do
-        if get.array.contains(arr2, v) then
-          new_arr[#new_arr + 1] = v
-        end
-      end
-      return transf.array.set(new_arr)
-    end,
-    difference_set = function(arr1, arr2)
-      local new_arr = {}
-      for _, v in transf.array.index_value_stateless_iter(arr1) do
-        if not get.array.contains(arr2, v) then
-          new_arr[#new_arr + 1] = v
-        end
-      end
-      return transf.array.set(new_arr)
-    end,
-    symmetric_difference_set = function(arr1, arr2)
-      local new_arr = {}
-      for _, v in transf.array.index_value_stateless_iter(arr1) do
-        if not get.array.contains(arr2, v) then
-          new_arr[#new_arr + 1] = v
-        end
-      end
-      for _, v in transf.array.index_value_stateless_iter(arr2) do
-        if not get.array.contains(arr1, v) then
-          new_arr[#new_arr + 1] = v
-        end
-      end
-      return transf.array.set(new_arr)
-    end,
-  },
-  set_and_set = {
+  two_sets = {
     union_set = function(set1, set2)
-      return transf.array_and_array.union_set(set1, set2)
+      return transf.two_arrays.union_set(set1, set2)
     end,
     intersection_set = function(set1, set2)
-      return transf.array_and_array.intersection_set(set1, set2)
+      return transf.two_arrays.intersection_set(set1, set2)
     end,
     is_subset = function(set1, set2)
       for _, v in transf.array.index_value_stateless_iter(set1) do
@@ -7190,10 +7237,10 @@ transf = {
       end
     end,
     is_superset = function(set1, set2)
-      return transf.array_and_array.is_subset(set2, set1)
+      return transf.two_arrays.is_subset(set2, set1)
     end,
     equals = function(set1, set2)
-      return transf.set_and_set.is_subset(set1, set2) and transf.set_and_set.is_superset(set1, set2)
+      return transf.two_sets.is_subset(set1, set2) and transf.two_sets.is_superset(set1, set2)
     end,
   },
   cronspec_string = {
@@ -7650,10 +7697,10 @@ transf = {
   },
   role_content_message_spec_array = {
     api_role_content_message_spec_array = function(arr)
-      return glue({{
+      return transf.any_and_array.array({
         role = "system",
         content = "You are a helpful assistant being queried through an API. Your output will be parsed, so adhere to any instructions given as to the format or content of the output. Only output the result."
-      }}, arr)
+      }, arr)
     end,
   },
   --- like a role_content_message_spec_array, but alternating user/assistant role_content_message_specs, where a pair of user/assistant role_content_message_specs is a shot

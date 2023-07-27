@@ -53,12 +53,12 @@ PlaintextFileItemSpecifier = {
     },
     {
       text = "👉🎒全⩶ ccntlns.",
-      getfn = transf.plaintext_file.lines,
+      getfn = transf.plaintext_file.line_array,
       dothis = dothis.any.choose_action
     },
     {
       text = "👉🎒⩶ ccntln.",
-      getfn = transf.plaintext_file.lines,
+      getfn = transf.plaintext_file.line_array,
       dothis = dothis.array.choose_item_and_action
     },
     {

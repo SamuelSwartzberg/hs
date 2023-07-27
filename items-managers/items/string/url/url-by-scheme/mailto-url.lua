@@ -21,7 +21,7 @@ MailtoURLItemSpecifier = {
     }
   },
 
-  action_table = concat(getChooseItemTable({
+  (getChooseItemTable({
     {
       d = "sbj",
       i = "👒",

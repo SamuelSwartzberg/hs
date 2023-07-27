@@ -10,7 +10,7 @@ StringItemSpecifier = {
     { key = "path", value = CreatePathItem },
     { key = "printable-ascii-string-item", value = CreatePrintableAsciiStringItem },
   }),
-  action_table = concat({
+  ({
     {
       text = "📋 cp.",
       dothis = dothis.string.add_to_clipboard

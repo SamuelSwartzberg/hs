@@ -81,7 +81,7 @@ URLItemSpecifier = {
     { key = "url-by-path", value = CreateURLByPathItem },
     { key = "url-by-scheme", value = CreateURLBySchemeItem }
   }),
-  action_table = concat(getChooseItemTable({
+  (getChooseItemTable({
     {
       i = "🏛⚙️🔗",
       d = "wbmchurl",

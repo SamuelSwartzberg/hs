@@ -68,7 +68,7 @@ ProjectDirItemSpecifier = {
     { key = "cargo-project-dir", value = CreateCargoProjectDirItem },
     { key = "sass-project-dir", value = CreateSassProjectDirItem },
   }),
-  action_table = concat({
+  ({
     {
       text = "🗄🏗️ opproj.",
       key = "open-project"

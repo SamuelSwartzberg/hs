@@ -22,7 +22,7 @@ ImageURLItemSpecifier = {
       end,
     }
   },
-  action_table = concat(
+  (
     getChooseItemTable({
       {
         i = "🍡",
