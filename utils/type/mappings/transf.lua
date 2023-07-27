@@ -48,6 +48,14 @@ transf = {
       )
     end,
   },
+  decimal_id = {
+    gelbooru_post_url = function(decimal_id)
+      return "https://gelbooru.com/index.php?page=post&s=view&id=" .. decimal_id
+    end,
+    danbooru_post_url = function(decimal_id)
+      return "https://danbooru.donmai.us/posts/" .. decimal_id
+    end,
+  },
   percent_encoded_octet = {
     char = function(percent)
       local num = percent:sub(2, 3)
@@ -1863,8 +1871,13 @@ transf = {
     end,
   },
   dice_notation = {
-    result = function(dice_notation)
+    nonindicated_decimal_number_string_result = function(dice_notation)
       return run("roll" .. transf.string.single_quoted_escaped(dice_notation))
+    end,
+    int_result = function(dice_notation)
+      return transf.nonindicated_number_string.number_base_10(
+        transf.dice_notation.nonindicated_decimal_number_string_result(dice_notation)
+      )
     end,
   },
   date = {

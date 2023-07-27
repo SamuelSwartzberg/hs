@@ -5,7 +5,7 @@ DiceNotationItemSpecifier = {
     {
       i = "🎲",
       d = "rll",
-      getfn = transf.dice_notation.result,
+      getfn = transf.dice_notation.nonindicated_decimal_number_string_result,
     }
   }
   ,
