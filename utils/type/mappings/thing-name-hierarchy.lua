@@ -20,6 +20,10 @@ thing_name_hierarchy = {
           lowercase_alphanum_underscore = 
         },
         package_manager = {}
+      },
+      number_string = {
+        indicated_number_string = "leaf",
+        nonindicated_number_string = "leaf"
       }
     },
     path = {

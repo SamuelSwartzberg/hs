@@ -80,7 +80,7 @@ to = {
       {
         mode = "replace",
         cond = {_r = "%%%x%x", _regex_engine = "eutf8"},
-        proc = transf.percent.char
+        proc = transf.percent_encoded_octet.char
       },
       {
         mode = "replace",

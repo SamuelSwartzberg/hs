@@ -1,113 +1,81 @@
 --- maps one thing_name to another thing_name
 --- so transf.<thing_name1>.<thing_name2>(<thing1>) -> <thing2>
 transf = {
-  hex_string = { -- a hex string
-    char = function(hex)
-      return string.char(get.string_or_number.number(hex, 16))
+  nonindicated_number_string_array = {
+    number_base_2_array = function(hex_array)
+      return get.nonindicated_number_string_array.number_array(hex_array, 2)
     end,
-    unicode_prop_table_from_utf8 = function(hex)
-      return memoize(runJSON)("uni print -compact -format=all -as=json".. transf.string.single_quoted_escaped("utf8:" .. transf.digit_string.canonical_digit_string(hex)))[1]
+    number_base_8_array = function(hex_array)
+      return get.nonindicated_number_string_array.number_array(hex_array, 8)
     end,
-    unicode_codepoint_string = function(hex)
-      return "U+"  .. transf.digit_string.canonical_digit_string(hex)
+    number_base_10_array = function(hex_array)
+      return get.nonindicated_number_string_array.number_array(hex_array, 10)
     end,
-  },
-  potentially_indicated_digit_string = {
-    digit_string = function(indicated_number)
-      return onig.match(indicated_number, "^(?:0[" .. table.concat(transf.native_table_or_nil.key_array(tblmap.base_letter.base), "") .. "])?(.+)$")
+    number_base_16_array = function(hex_array)
+      return get.nonindicated_number_string_array.number_array(hex_array, 16)
     end,
   },
-  digit_string = {
-    canonical_digit_string = function(digit_string)
-      local cleaned = eutf8.gsub(digit_string, "[_ ]", "")
-      local seps_fixed = eutf8.gsub(cleaned, ",", ".")
-      return seps_fixed
+  nonindicated_number_string = {
+    number_base_2 = function(num)
+      return get.nonindicated_number_string.number_or_nil(num, 2)
     end,
-    nonfractional_fractional_part = function(digit_string)
-      return onig.match(
-        transf.digit_string.canonical_digit_string(digit_string), 
-        "^(\\d*+)(\\.\\d+?)?$"
-      )
+    number_base_8 = function(num)
+      return get.nonindicated_number_string.number_or_nil(num, 8)
     end,
-    separated_canonical_digit_string = function(digit_string)
-      local nonfractional, fractional = transf.digit_string.nonfractional_fractional_part(digit_string)
-      local nonfractional_separated = table.concat(
-        chunk(nonfractional, 3),
-        "_"
-      )
-      return nonfractional_separated .. fractional
+    number_base_10 = function(num)
+      return get.nonindicated_number_string.number_or_nil(num, 10)
     end,
-
+    number_base_16 = function(num)
+      return get.nonindicated_number_string.number_or_nil(num, 16)
+    end,
   },
-  indicated_digit_string = {
+  indicated_number_string = {
     number_string = function(indicated_number)
       return indicated_number:sub(3)
     end,
+    base_letter = function(indicated_number)
+      return indicated_number:sub(2, 2)
+    end,
     base = function(indicated_number)
       return tblmap.base_letter.base[
-          indicated_number:sub(2, 2)
+        transf.indicated_number_string.base_letter(indicated_number)
         ]
     end,
     number = function(indicated_number)
-      return get.string_or_number.number(
+      return get.nonindicated_number_string.number_or_nil(
         indicated_number:sub(3),
-        transf.indicated_digit_string.base(indicated_number)
+        transf.indicated_number_string.base(indicated_number)
       )
     end,
   },
-  potentially_indicated_binary_string = {
-    indicated_binary_string = function(bin)
-      return get.string.with_prefix_string(bin, "0b")
-    end,
-    number = function(bin)
-      return get.string_or_number.number(get.string.no_prefix_string(bin, "0b"), 2)
-    end
-  },
-  potentially_indicated_octal_string = {
-    indicated_octal_string = function(oct)
-      return get.string.with_prefix_string(oct, "0o")
-    end,
-    number = function(oct)
-      return get.string_or_number.number(get.string.no_prefix_string(oct, "0o"), 8)
-    end
-  },
-  potentially_indicated_decimal_string = {
-    indicated_decimal_string = function(dec)
-      return get.string.with_prefix_string(dec, "0d")
-    end,
-    number = function(dec)
-      return get.string_or_number.number(get.string.no_prefix_string(dec, "0d"), 10)
-    end
-  },
-  potentially_indicated_hex_string = {
-    indicated_hex_string = function(hex)
-      return get.string.with_prefix_string(hex, "0x")
-    end,
-    number = function(hex)
-      return get.string_or_number.number(get.string.no_prefix_string(hex, "0x"), 16)
-    end
-  },
-
-  percent = {
+  percent_encoded_octet = {
     char = function(percent)
       local num = percent:sub(2, 3)
-      return string.char(get.string_or_number.number(num, 16))
+      return string.char(get.string_or_number.number_or_nil(num, 16))
     end,
   },
   unicode_codepoint_string = { -- U+X...
     number = function(codepoint)
-      return get.potentially_indicated_hex_string.number(transf.unicode_codepoint_string.hex_string(codepoint))
+      return get.nonindicated_number_string.number_or_nil(transf.unicode_codepoint_string.nonindicated_hex_number_string(codepoint), 16)
     end,
-    hex_string = function(codepoint)
+    nonindicated_hex_number_string = function(codepoint)
       return codepoint:sub(3)
     end,
     unicode_prop_table = function(codepoint)
       return memoize(runJSON)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
-          "U+" .. transf.digit_string.canonical_digit_string(
-            transf.unicode_codepoint_string.hex_string(codepoint)
-          )
+          codepoint
+        )
+      )[1]
+    end
+  },
+  indicated_utf8_hex_string = {
+    unicode_prop_table = function(str)
+      return memoize(runJSON)(
+        "uni print -compact -format=all -as=json" 
+        .. transf.string.single_quoted_escaped(
+          str
         )
       )[1]
     end
@@ -147,7 +115,7 @@ transf = {
       return unicode_prop_table.plane
     end,
     utf8_hex_string = function(unicode_prop_table)
-      return transf.string.nowhitespace(unicode_prop_table.utf8)
+      return transf.string.nowhitespace_string(unicode_prop_table.utf8)
     end,
     summary = function(unicode_prop_table)
       return transf.unicode_prop_table.char(unicode_prop_table) .. ": "
@@ -171,31 +139,59 @@ transf = {
         return ""
       end
     end,
-    decimal_string = function(num)
-      return tostring(num)
+    
+    nonindicated_decimal_number_string = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_decimal_number_string(transf.number.pos_number(num))
     end,
-    indicated_decimal_string = function(num)
-      return transf.number.sign_indicator(num) .. "0d" .. transf.number.decimal_string(transf.number.pos_number(num))
+    separated_nonindicated_decimal_number_string = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_decimal_number_string(transf.number.pos_number(num))
     end,
-    hex_string = function(num)
-      return string.format("%X", num)
+    indicated_decimal_number_string = function(num)
+      return transf.number.sign_indicator(num) .. "0d" .. transf.pos_number.nonindicated_decimal_number_string(transf.number.pos_number(num))
     end,
-    indicated_hex_string = function(num)
-      return transf.number.sign_indicator(num) .. "0x" .. transf.number.hex_string(transf.number.pos_number(num))
+    nonindicated_hex_number_string = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_hex_number_string(transf.number.pos_number(num))
     end,
-    octal_string = function(num)
-      return string.format("%o", num)
+    separated_nonindicated_hex_number_string = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_hex_number_string(transf.number.pos_number(num))
     end,
-    indicated_octal_string = function(num)
-      return transf.number.sign_indicator(num) .. "0o" .. transf.number.octal_string(transf.number.pos_number(num))
+    indicated_hex_number_string = function(num)
+      return transf.number.sign_indicator(num) .. "0x" .. transf.pos_number.nonindicated_hex_number_string(transf.number.pos_number(num))
     end,
-    binary_string = function(num)
-      return string.format("%b", num)
+    byte_hex_number_string_array = function(num)
+      return  get.string.string_array_groups_ascii_from_end(
+        transf.number.nonindicated_hex_number_string(num),
+        2
+      )
     end,
-    indicated_binary_string = function(num)
-      return transf.number.sign_indicator(num) .. "0b" .. transf.number.binary_string(transf.number.pos_number(num))
+    two_byte_hex_number_string_array = function(num)
+      return  get.string.string_array_groups_ascii_from_end(
+        transf.number.nonindicated_hex_number_string(num),
+        4
+      )
     end,
-    int = function(num)
+    
+    noninciated_octal_number_string = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.noninciated_octal_number_string(transf.number.pos_number(num))
+    end,
+
+    separated_nonindicated_octal_number_string = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_octal_number_string(transf.number.pos_number(num))
+    end,
+    indicated_octal_number_string = function(num)
+      return transf.number.sign_indicator(num) .. "0o" .. transf.pos_number.noninciated_octal_number_string(transf.number.pos_number(num))
+    end,
+
+    nonindicated_binary_number_string = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_binary_number_string(transf.number.pos_number(num))
+    end,
+    separated_nonindicated_binary_number_string = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_binary_number_string(transf.number.pos_number(num))
+    end,
+    indicated_binary_number_string = function(num)
+      return transf.number.sign_indicator(num) .. "0b" .. transf.pos_number.nonindicated_binary_number_string(transf.number.pos_number(num))
+    end,
+    int_by_rounded = function(num)
       return math.floor(num + 0.5)
     end,
     int_or_nil = function(num)
@@ -226,13 +222,28 @@ transf = {
       return -math.abs(num)
     end,
     pos_int = function(num)
-      return transf.number.pos_number(transf.number.int(num))
+      return transf.number.pos_number(transf.number.int_by_rounded(num))
     end,
     neg_int = function(num)
-      return transf.number.pos_numbert(transf.number.int(num))
+      return transf.number.pos_numbert(transf.number.int_by_rounded(num))
     end,
-    floor = math.floor,
-    ceil = math.ceil,
+    floor_int = math.floor,
+    ceil_int = math.ceil,
+    pos_int_part = function(num)
+      return transf.number.floor_int(
+        transf.number.pos_number(num)
+      )
+    end,
+    pos_float_part = function(num)
+      return transf.number.pos_number(num) - transf.number.pos_int_part(num)
+    end,
+    pos_int_float_part = function(num)
+      return transf.nonindicated_number_string.number_base_10(
+        tostring(
+          transf.number.pos_float_part(num)
+        ):sub(3)
+      )
+    end,
     with_1_added = function(num)
       return num + 1
     end,
@@ -240,15 +251,120 @@ transf = {
       return num - 1
     end,
   },
-  pos_number = {
-
+  pos_number = { 
+    nonindicated_decimal_number_string = function(num)
+      return 
+        transf.pos_int.nonindicated_decimal_number_string(
+          transf.number.pos_int_part(num)
+        ) .. 
+        (
+          transf.number.pos_float_part(num) == 0 and "" or 
+          (
+            "." .. transf.pos_int.nonindicated_decimal_number_string(
+              transf.number.pos_int_float_part(num)
+            )
+          )
+        )
+      end,
+    separated_nonindicated_decimal_number_string = function(num)
+      return 
+        transf.pos_int.separated_nonindicated_decimal_number_string(
+          transf.number.pos_int_part(num)
+        ) .. 
+        (
+          transf.number.pos_float_part(num) == 0 and "" or 
+          (
+            "." .. transf.pos_int.separated_nonindicated_decimal_number_string(
+              transf.number.pos_int_float_part(num)
+            )
+          )
+        )
+      end,
+    nonindicated_hex_number_string = function(num)
+      return transf.pos_int.nonindicated_hex_number_string(
+        transf.number.pos_int_part(num)
+      ) .. 
+      (
+        transf.number.pos_float_part(num) == 0 and "" or 
+        (
+          "." .. transf.pos_int.nonindicated_hex_number_string(
+            transf.number.pos_int_float_part(num)
+          )
+        )
+      )
+    end,
+    separated_nonindicated_hex_number_string = function(num)
+      return transf.pos_int.separated_nonindicated_hex_number_string(
+        transf.number.pos_int_part(num)
+      ) .. 
+      (
+        transf.number.pos_float_part(num) == 0 and "" or 
+        (
+          "." .. transf.pos_int.separated_nonindicated_hex_number_string(
+            transf.number.pos_int_float_part(num)
+          )
+        )
+      )
+    end,
+    noninciated_octal_number_string = function(num)
+      return transf.pos_int.noninciated_octal_number_string(
+        transf.number.pos_int_part(num)
+      ) .. 
+      (
+        transf.number.pos_float_part(num) == 0 and "" or 
+        (
+          "." .. transf.pos_int.noninciated_octal_number_string(
+            transf.number.pos_int_float_part(num)
+          )
+        )
+      )
+    end,
+    separated_nonindicated_octal_number_string = function(num)
+      return transf.pos_int.separated_nonindicated_octal_number_string(
+        transf.number.pos_int_part(num)
+      ) .. 
+      (
+        transf.number.pos_float_part(num) == 0 and "" or 
+        (
+          "." .. transf.pos_int.separated_nonindicated_octal_number_string(
+            transf.number.pos_int_float_part(num)
+          )
+        )
+      )
+    end,
+    nonindicated_binary_number_string = function(num)
+      return transf.pos_int.nonindicated_binary_number_string(
+        transf.number.pos_int_part(num)
+      ) .. 
+      (
+        transf.number.pos_float_part(num) == 0 and "" or 
+        (
+          "." .. transf.pos_int.nonindicated_binary_number_string(
+            transf.number.pos_int_float_part(num)
+          )
+        )
+      )
+    end,
+    separated_nonindicated_binary_number_string = function(num)
+      return transf.pos_int.separated_nonindicated_binary_number_string(
+        transf.number.pos_int_part(num)
+      ) .. 
+      (
+        transf.number.pos_float_part(num) == 0 and "" or 
+        (
+          "." .. transf.pos_int.separated_nonindicated_binary_number_string(
+            transf.number.pos_int_float_part(num)
+          )
+        )
+      )
+    end,
   },
   neg_number = {
 
   },
   num_chars = {
     normzeilen = function(num_chars)
-      return transf.number.int(
+      return transf.number.int_by_rounded(
         num_chars / 55
       )
     end,
@@ -283,6 +399,49 @@ transf = {
     end,
   },
   pos_int = {
+    nonindicated_decimal_number_string = function(num)
+      return tostring(num)
+    end,
+    separated_nonindicated_decimal_number_string = function(num)
+      return get.string.string_with_separator_grouped_ascii_from_end(
+        transf.pos_int.nonindicated_decimal_number_string(num),
+        3,
+        " "
+      )
+    end,
+    nonindicated_hex_number_string = function(num)
+      return string.format("%X", num)
+    end,
+    separated_nonindicated_hex_number_string = function(num)
+      return get.string.string_with_separator_grouped_ascii_from_end(
+        transf.pos_int.nonindicated_hex_number_string(num),
+        2,
+        " "
+      )
+    end,
+    noninciated_octal_number_string = function(num)
+      return string.format("%o", num)
+    end,
+    separated_nonindicated_octal_number_string = function(num)
+      return get.string.string_with_separator_grouped_ascii_from_end(
+        transf.pos_int.noninciated_octal_number_string(num),
+        3,
+        " "
+      )
+    end,
+    nonindicated_binary_number_string = function(num)
+      return string.format("%b", num)
+    end,
+    separated_nonindicated_binary_number_string = function(num)
+      return get.string.string_with_separator_grouped_ascii_from_end(
+        transf.pos_int.nonindicated_binary_number_string(num),
+        4,
+        " "
+      )
+    end,
+    indicated_utf8_hex_string = function(int)
+      return "utf8:" .. transf.pos_int.nonindicated_hex_number_string(int)
+    end,
     largest_int_of_length = function(int)
       return 10^int - 1
     end,
@@ -293,13 +452,63 @@ transf = {
       return (transf.pos_int.largest_int_of_length(int)+1) / 2
     end,
     unicode_codepoint_string = function(num)
-      return "U+" .. transf.number.hex_string(num)
+      return "U+" .. transf.pos_int.nonindicated_hex_number_string(num)
     end,
     unicode_prop_table_from_unicde_codepoint = function(num)
       return transf.unicode_codepoint_string.unicode_prop_table(transf.pos_int.unicode_codepoint_string(num))
     end,
     unicode_prop_table_from_utf8 = function(num)
-      return transf.hex_string.unicode_prop_table_from_utf8(transf.number.hex_string(num))
+      return  transf.indicated_utf8_hex_string.unicode_prop_table(transf.pos_int.indicated_utf8_hex_string(num))
+    end,
+    ascii_char = function(num)
+      return string.char(num)
+    end,
+  },
+  pos_int_array = {
+    unicode_codepoint_string_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.pos_int.unicode_codepoint_string
+      )
+    end,
+    ascii_char_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.pos_int.ascii_char
+      )
+    end,
+    string_from_ascii_char_array = function(arr)
+      return table.concat(
+        transf.pos_int.ascii_char_array(arr)
+      )
+    end,
+    unicode_prop_table_array_from_unicode_codepoint_array = function(arr)
+      return memoize(runJSON)(
+        "uni print -compact -format=all -as=json" 
+        .. transf.string.single_quoted_escaped(
+          table.concat(
+            transf.pos_int.unicode_codepoint_string_array(arr),
+            " "
+          )
+        )
+      )
+    end,
+    indicated_utf8_hex_string_array = function(arr)
+      return hs.fnutils.imap(
+        arr,
+        transf.pos_int.indicated_utf8_hex_string
+      )
+    end,
+    unicode_prop_table_array_from_utf8_array = function(arr)
+      return memoize(runJSON)(
+        "uni print -compact -format=all -as=json" 
+        .. transf.string.single_quoted_escaped(
+          table.concat(
+            transf.pos_int.indicated_utf8_hex_string_array(arr),
+            " "
+          )
+        )
+      )
     end,
   },
   not_nil = {
@@ -1541,7 +1750,7 @@ transf = {
   },
   timestamp_first_column_plaintext_table_file = {
     last_accessed = function(path)
-      return get.string_or_number.number(transf.file.contents(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
+      return get.string_or_number.number_or_nil(transf.file.contents(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
     end,
     --- gets the entries from a timestamp_first_column_plaintext_table_file that are newer than the timestamp stored in file storing the last backup time
     new_timestamp_key_array_value_dict = function(path)
@@ -1608,9 +1817,9 @@ transf = {
     semver_component_specifier = function(str)
       local major, minor, patch, prerelease, build = onig.match(str, mt._r.version.semver)
       return {
-        major = get.string_or_number.number(major),
-        minor = get.string_or_number.number(minor),
-        patch = get.string_or_number.number(patch),
+        major = get.string_or_number.number_or_nil(major),
+        minor = get.string_or_number.number_or_nil(minor),
+        patch = get.string_or_number.number_or_nil(patch),
         prerelease = prerelease,
         build = build
       }
@@ -1811,7 +2020,7 @@ transf = {
     date_component_name_value_dict = function(str)
       local comps = {onig.match(str, mt._r.date.rfc3339like_dt)}
       return map(mt._list.date.date_component_names, function(k, v)
-        return v and get.string_or_number.number(comps[k]) or nil
+        return v and get.string_or_number.number_or_nil(comps[k]) or nil
       end, {"kv", "kv"})
     end,
     date_interval_specifier = function(str)
@@ -2514,7 +2723,7 @@ transf = {
       )
     end,
     translation_rate = function(contact_table)
-      return get.string_or_number.number(contact_table.Private["translation-rate"])
+      return get.string_or_number.number_or_nil(contact_table.Private["translation-rate"])
     end,
     iban = function (contact_table)
       return get.contact_table.encrypted_data(contact_table, "iban")
@@ -3129,9 +3338,12 @@ transf = {
       }})
     end,
     folded = function(str)
-      return eutf8.gsub(str, "\n", " ")
+      return eutf8.gsub(str, "\n\r", " ")
     end,
-    nowhitespace = function(str)
+    whitespace_collapsed_string = function(str)
+      return eutf8.gsub(str, "%s+", " ")
+    end,
+    nowhitespace_string = function(str)
       return eutf8.gsub(str, "%s", "")
     end,
     --- @param str string
@@ -3333,6 +3545,18 @@ transf = {
     end,
     prompted_once_alphanum_minus_underscore_string_from_default = function(str)
       return get.string.prompted_once_alphanum_minus_underscore_string_from_default(str, "Enter a string (alphanum, minus, underscore)...")
+    end,
+    nowhitespace_string_array = function(str)
+      return get.string.string_array_split_single_char_stripped(
+        transf.string.whitespace_collapsed_string(str),
+        " "
+      )
+    end,
+    nonindicated_number_string = function(str)
+      local res = str
+      res = eutf8.gsub(res, ",", ".")
+      res = eutf8.gsub(str, "^[0-9a-zA-Z]+", "")
+      return res
     end,
   },
   line = {
@@ -4435,7 +4659,7 @@ transf = {
     ymd_nested_key_array_of_arrays_value_assoc_arr = function(timestamp_key_table)
       local year_month_day_time_table = {}
       for timestamp_str, fields in get.indexable.key_value_stateless_iter(timestamp_key_table,-1,1,-1) do 
-        local timestamp = get.string_or_number.number(timestamp_str)
+        local timestamp = get.string_or_number.number_or_nil(timestamp_str)
         local year = os.date("%Y", timestamp)
         local year_month = os.date("%Y-%m", timestamp)
         local year_month_day = os.date("%Y-%m-%d", timestamp)
@@ -6961,7 +7185,7 @@ transf = {
       return run("ncron" .. transf.string.single_quoted_escaped(cronspec_string))
     end,
     next_timestamp_s = function(cronspec_string)
-      return get.string_or_number.number(transf.cronspec_string.next_timestamp_s_string(cronspec_string))
+      return get.string_or_number.number_or_nil(transf.cronspec_string.next_timestamp_s_string(cronspec_string))
     end,
   },
   start_stop_step_unit = {
@@ -7163,8 +7387,8 @@ transf = {
           error("doInput: invalid mode character `" .. mode_char .. "` in series specifier:\n\n" .. str)
         end
         input_spec.target_point = hs.geometry.new({
-          x = get.string_or_number.number(x),
-          y = get.string_or_number.number(y)
+          x = get.string_or_number.number_or_nil(x),
+          y = get.string_or_number.number_or_nil(y)
         })
         if optional_relative_specifier and #optional_relative_specifier > 0 then
           input_spec.relative_to = string.sub(optional_relative_specifier, 3)

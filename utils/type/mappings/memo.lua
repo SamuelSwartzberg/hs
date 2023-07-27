@@ -97,7 +97,7 @@ local gen_cache_methods = {
     end,
     get_created_time = function(fnid, opts_as_str)
       local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
-      return get.string_or_number.number(transf.file.contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
+      return get.string_or_number.number_or_nil(transf.file.contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
     end,
     set_created_time = function(fnid, opts_as_str, created_time)
       dothis.absolute_path.write_file(getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~"), tostring(created_time))

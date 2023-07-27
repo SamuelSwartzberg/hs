@@ -4,7 +4,7 @@ BinaryDigitStringItemSpecifier = {
   properties = {
     getables = {
       ["binary-numeric-value"] = function(self)
-        return get.string_or_number.number(self:get("c"), 2)
+        return get.string_or_number.number_or_nil(self:get("c"), 2)
       end,
       ["binary-to-number-interface"] = function(self)
         return nr(self:get("binary-numeric-equivalent"))

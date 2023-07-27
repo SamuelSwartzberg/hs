@@ -1,20 +1,22 @@
 get = {
   string_or_number = {
-    number = function(t, base)
+    number_or_nil = function(t, base)
       if type(t) == "string" then
-        return get.string.number(t, base)
+        return get.string.number_or_nil(t, base)
       else
         return t
       end
     end,
-    int = function(t, base)
-      return transf.number.int(
-        get.string_or_number.number(t, base)
-      )
+    int_by_rounded_or_nil = function(t, base)
+      if type(t) == "string" then
+        return get.string.int_by_rounded_or_nil(t, base)
+      else
+        return t
+      end
     end,
     pos_int_or_nil = function(t, base)
       return transf.number.pos_int_or_nil(
-        get.string_or_number.number(t, base)
+        get.string_or_number.number_or_nil(t, base)
       )
     end,
   },
@@ -22,10 +24,10 @@ get = {
     prompted_once_int_from_default = function(int, message)
       return transf.prompt_spec.any({
         prompter = transf.prompt_args_string.string_or_nil_and_boolean,
-        transformer = get.string.int,
+        transformer = get.string.int_by_rounded_or_nil,
         prompt_args = {
           message = message or "Enter an int...",
-          default = transf.number.decimal_string(int or 0),
+          default = transf.number.nonindicated_decimal_number_string(int or 0),
         }
       })
     end,
@@ -34,10 +36,10 @@ get = {
     prompted_once_number_from_default = function(no, message)
       return transf.prompt_spec.any({
         prompter = transf.prompt_args_string.string_or_nil_and_boolean,
-        transformer = get.string.number,
+        transformer = get.string.number_or_nil,
         prompt_args = {
           message = message or "Enter a number...",
-          default = transf.number.decimal_string(no or 0),
+          default = transf.number.nonindicated_decimal_number_string(no or 0),
         }
       })
     end,
@@ -734,14 +736,71 @@ get = {
         }
       })
     end,
-    number = function(str,  base)
-      str = eutf8.gsub(str, "[ \t\n\r_]", "")
-      str = eutf8.gsub(str, ",", ".")
-      return tonumber(str, base)
+    string_array_groups_ascii_fron_start = function(str, n)
+      local res = {}
+      for i = 1, #str, n do
+        dothis.array.push(res, str:sub(i, i + n - 1))
+      end
+      return res
     end,
-    int = function(str, base)
-      return transf.number.int(
-        get.string.number(str, base)
+    string_with_separator_grouped_ascii_from_start = function(str, n, sep)
+      return table.concat(get.string.string_array_groups_ascii_fron_start(str, n), sep)
+    end,
+    string_array_groups_ascii_from_end = function(str, n)
+      local res = {}
+      for i = #str, 1, -n do
+        dothis.array.push(res, str:sub(i - n + 1, i))
+      end
+      return res
+    end,
+    string_with_separator_grouped_ascii_from_end = function(str, n, sep)
+      return table.concat(get.string.string_array_groups_ascii_from_end(str, n), sep)
+    end,
+    string_array_groups_utf8_from_start = function(str, n)
+      local res = {}
+      for i = 1, eutf8.len(str), n do
+        dothis.array.push(res, eutf8.sub(str, i, i + n - 1))
+      end
+      return res
+    end,
+    string_with_separator_grouped_utf8_from_start = function(str, n, sep)
+      return table.concat(get.string.string_array_groups_utf8_from_start(str, n), sep)
+    end,
+    string_array_groups_utf8_from_end = function(str, n)
+      local res = {}
+      for i = eutf8.len(str), 1, -n do
+        dothis.array.push(res, eutf8.sub(str, i - n + 1, i))
+      end
+      return res
+    end,
+    string_with_separator_grouped_utf8_from_end = function(str, n, sep)
+      return table.concat(get.string.string_array_groups_utf8_from_end(str, n), sep)
+    end,
+    number_or_nil = function(str,  base)
+      local nonindicated_number_string = transf.string.nonindicated_number_string(str)
+      return get.nonindicated_number_string.number_or_nil(nonindicated_number_string, base)
+    end,
+    int_by_rounded_or_nil = function(str, base)
+      local nonindicated_number_string = transf.string.nonindicated_number_string(str)
+      return get.nonindicated_number_string.int_by_rounded_or_nil(nonindicated_number_string, base)
+    end,
+  },
+  nonindicated_number_string_array = {
+    number_array = function(arr, base)
+      return hs.fnutils.imap(
+        arr,
+        get.fn.arbitrary_args_bound_or_ignored_fn(
+          get.nonindicated_number_string.number_or_nil,
+          {a_use, base}
+        )
+      )
+    end,
+  },
+  nonindicated_number_string = {
+    number_or_nil = tonumber,
+    int_by_rounded_or_nil = function(num, base)
+      return transf.number.int_by_rounded(
+        get.nonindicated_number_string.number_or_nil(num, base)
       )
     end,
   },
@@ -1245,7 +1304,7 @@ get = {
       local _, second_row = rows()
       if not first_row then return nil end
       if not second_row then second_row = {"0"} end
-      local first_timestamp, second_timestamp = get.string_or_number.number(first_row[1]), get.string_or_number.number(second_row[1])
+      local first_timestamp, second_timestamp = get.string_or_number.number_or_nil(first_row[1]), get.string_or_number.number_or_nil(second_row[1])
       if first_timestamp < second_timestamp then
         error("Timestamps are not in descending order. This is not recommended, as it forces us to read the entire file.")
       end
@@ -1261,7 +1320,7 @@ get = {
       end
       for i, row in rows do
         local current_timestamp = row[1]
-        if get.string_or_number.number(current_timestamp) > timestamp then
+        if get.string_or_number.number_or_nil(current_timestamp) > timestamp then
           if assoc_arr then 
             table.remove(row, 1)
             res[current_timestamp] = row
@@ -2083,7 +2142,7 @@ get = {
       } )
     end,
     int = function(id, key)
-      return get.string_or_number.int(
+      return get.string_or_number.int_by_rounded_or_nil(
         get.mpv_ipc_socket_id.string(id, key)
       )
     end,

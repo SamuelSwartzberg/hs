@@ -36,9 +36,9 @@ function slice(thing, start_or_spec, stop, step)
       stripped_str, 
       "^\\[?(-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
     )
-    spec.start = get.string_or_number.int(start_str)
-    spec.stop = get.string_or_number.int(stop_str)
-    spec.step = get.string_or_number.int(step_str)
+    spec.start = get.string_or_number.int_by_rounded_or_nil(start_str)
+    spec.stop = get.string_or_number.int_by_rounded_or_nil(stop_str)
+    spec.step = get.string_or_number.int_by_rounded_or_nil(step_str)
 
   else
     spec.start = start_or_spec

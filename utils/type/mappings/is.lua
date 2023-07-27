@@ -15,10 +15,10 @@ is = {
         and str:find("%s$") == nil
     end,
     number_string = function(str)
-      return get.string_or_number.number(str) ~= nil
+      return get.string_or_number.number_or_nil(str) ~= nil
     end,
     int_string = function(str)
-      return is.string.number_string(str) and is.number.int(get.string_or_number.number(str))
+      return is.string.number_string(str) and is.number.int(get.string_or_number.number_or_nil(str))
     end,
    
     ascii_string = function(str)
@@ -58,29 +58,29 @@ is = {
     base64_string = function(str)
       return is.printable_ascii_string.base64_gen_string(str) or is.printable_ascii_string.base64_url_string(str)
     end,
-    digit_string = function(str)
-      return get.string_or_number.number(str, 16) ~= nil -- this may not return the correct value for non-hex strings, but that doesn't matter, we're only checking if it is a digit string of whatever kind, so what value exactly it returns doesn't matter
+    number_string = function(str)
+      return get.string_or_number.number_or_nil(str, 16) ~= nil -- this may not return the correct value for non-hex strings, but that doesn't matter, we're only checking if it is a digit string of whatever kind, so what value exactly it returns doesn't matter
     end,
-    indicated_digit_string = function(str)
+    indicated_number_string = function(str)
       return 
         stringy.startswith(str, "0") and
         get.array.contains(transf.native_table_or_nil.key_array(tblmap.base_letter.base), str:sub(2, 2)) and
-        is.printable_ascii_string.digit_string(str:sub(3))
+        is.printable_ascii_string.number_string(str:sub(3))
     end,
-    potentially_indicated_digit_string = function(str)
-      return is.printable_ascii_string.indicated_digit_string(str) or is.printable_ascii_string.digit_string(str)
+    potentially_indicated_number_string = function(str)
+      return is.printable_ascii_string.indicated_number_string(str) or is.printable_ascii_string.number_string(str)
     end,
     binary_string = function(str)
-      return get.string_or_number.number(str, 2) ~= nil
+      return get.string_or_number.number_or_nil(str, 2) ~= nil
     end,
     hex_string = function(str)
-      return get.string_or_number.number(str, 16) ~= nil
+      return get.string_or_number.number_or_nil(str, 16) ~= nil
     end,
     octal_string = function(str)
-      return get.string_or_number.number(str, 8) ~= nil
+      return get.string_or_number.number_or_nil(str, 8) ~= nil
     end,
     decimal_string = function(str)
-      return get.string_or_number.number(str, 10) ~= nil
+      return get.string_or_number.number_or_nil(str, 10) ~= nil
     end,
 
     indicated_binary_string = function(str)

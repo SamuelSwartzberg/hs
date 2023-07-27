@@ -2342,7 +2342,7 @@ function htmlEntities.ASCII_DEC(input)
     if error_msg_htmlEntities then error('htmlEntities[ASCII_DEC] >> ERROR: input is value nil') end
     return false
   end
-  local output = htmlEntities.ASCII_HEX(get.string_or_number.number(input, 16))
+  local output = htmlEntities.ASCII_HEX(get.string_or_number.number_or_nil(input, 16))
   return output
 end
 
