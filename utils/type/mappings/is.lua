@@ -629,8 +629,8 @@ is = {
     end,
   },
   audiodevice_specifier = {
-    default = function(audiodevice_specifier)
-      return get.audiodevice.is_default(audiodevice_specifier.device, audiodevice_specifier.subtype)
+    active_audiodevice_specifier = function(audiodevice_specifier)
+      return get.audiodevice.is_active_audiodevice_specifier(audiodevice_specifier.device, audiodevice_specifier.subtype)
     end,
   },
   csl_table = {

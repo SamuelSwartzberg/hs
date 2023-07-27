@@ -224,7 +224,7 @@ get = {
 
   },
   audiodevice = {
-    is_default = function (device, type)
+    is_active_audiodevice_specifier = function (device, type)
       return device == get["nil"].default_audiodevice(type)
     end,
     
@@ -525,6 +525,7 @@ get = {
       return {
         chooser_item_specifier_array = get.array.item_with_index_chooser_item_specifier_array(arr, target_item_chooser_item_specifier_name),
         placeholder_text = transf.array.summary(arr),
+        initial_selected_index = transf.array.initial_selected_index(arr),
       }
     end,
     choosing_hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
@@ -2072,6 +2073,12 @@ get = {
     chooser_subtext = function(arr, value)
       return get.retriever_specifier_array.result_joined(
         transf.thing_name_array.chooser_subtext_retriever_specifier_array(arr),
+        value
+      )
+    end,
+    initial_selected_index = function(arr, value)
+      return get.retriever_specifier_array.result_highest_precedence(
+        transf.thing_name_array.initial_selected_retriever_specifier_array(arr),
         value
       )
     end,

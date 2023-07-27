@@ -477,6 +477,10 @@ tblmap = {
         thing_name = "summary",
         precedence = -999
       },
+      audiodevice_specifier = {
+        thing_name = "name",
+        precedence = 999
+      },
       stream_created_item_specifier = {
         thing_name = "summary_line"
       }
@@ -487,6 +491,9 @@ tblmap = {
       }
     },
     placeholder_text_partial_retriever_specifier = {
+      
+    },
+    initial_selected_index_partial_retriever_specifier = {
       
     },
   },

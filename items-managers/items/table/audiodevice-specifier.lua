@@ -4,7 +4,7 @@ AudiodeviceSpecifierItemSpecifier = {
   properties = {
     getables = {
       ["to-string"] = bc(transf.audiodevice_specifier.name),
-      ["chooser-initial-selected"] = bc(is.audiodevice_specifier.default)
+      ["chooser-initial-selected"] = bc(is.audiodevice_specifier.active_audiodevice_specifier)
     }
   }
 }

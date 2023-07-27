@@ -2118,8 +2118,8 @@ dothis = {
       hschooser:placeholderText(spec.placeholder_text)
       hschooser:choices(choices)
       hschooser:show()
-      if spec.inital_selected then
-        hschooser:selectedRow(spec.inital_selected)
+      if spec.initial_selected_index then
+        hschooser:selectedRow(spec.initial_selected_index)
       end
     end,
     choose_get_key = function(spec, key_name, callback)

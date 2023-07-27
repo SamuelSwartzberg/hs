@@ -594,6 +594,11 @@ transf = {
     n_anys = function(t)
       return table.unpack(t)
     end,
+    initial_selected_index = function(arr)
+      return get.thing_name_array.initial_selected_index(
+        transf.any.applicable_thing_name_array(arr)
+      ) or 1 
+    end,
   },
   hole_y_arraylike = {
     array = function(tbl)
@@ -6462,6 +6467,11 @@ transf = {
     end
 
   },
+  audiodevice_specifier_array = {
+    active_audiodevice_specifier_index = function(arr)
+      return find(arr, is.audiodevice_specifier.active_audiodevice_specifier, {"i"})
+    end,
+  },
   audiodevice = {
     name = function(audiodevice)
       return audiodevice:name()
@@ -6766,10 +6776,11 @@ transf = {
       return hs.fnutils.imap(
         thing_name_array,
         function(thing_name)
-          local spec = get.table.copy(tblmap.thing_name.chooser_image_partial_retriever_specifier)
-          spec.thing_name = thing_name
-          spec.precedence = spec.precedence or 1
-          return spec
+          local spec = tblmap.thing_name.chooser_image_partial_retriever_specifier(thing_name)
+          local newspec = {}
+          newspec.thing_name = spec.thing_name
+          newspec.precedence = spec.precedence or 1
+          return newspec
         end
       )
     end,
@@ -6777,10 +6788,11 @@ transf = {
       return map(
         thing_name_array,
         function(thing_name)
-          local spec = get.table.copy(tblmap.thing_name.chooser_text_partial_retriever_specifier)
-          spec.thing_name = thing_name
-          spec.precedence = spec.precedence or 1
-          return spec
+          local spec = tblmap.thing_name.chooser_text_partial_retriever_specifier(thing_name)
+          local newspec = {}
+          newspec.thing_name = spec.thing_name
+          newspec.precedence = spec.precedence or 1
+          return newspec
         end
       )
     end,
@@ -6788,10 +6800,11 @@ transf = {
       return map(
         thing_name_array,
         function(thing_name)
-          local spec = get.table.copy(tblmap.thing_name.placeholder_text_partial_retriever_specifier)
-          spec.thing_name = thing_name
-          spec.precedence = spec.precedence or 1
-          return spec
+          local spec = tblmap.thing_name.placeholder_text_partial_retriever_specifier(thing_name)
+          local newspec = {}
+          newspec.thing_name = spec.thing_name
+          newspec.precedence = spec.precedence or 1
+          return newspec
         end
       )
     end,
@@ -6799,10 +6812,23 @@ transf = {
       return map(
         thing_name_array,
         function(thing_name)
-          local spec = get.table.copy(tblmap.thing_name.chooser_subtext_partial_retriever_specifier)
-          spec.thing_name = thing_name
-          spec.precedence = spec.precedence or 1
-          return spec
+          local spec = tblmap.thing_name.chooser_subtext_partial_retriever_specifier(thing_name)
+          local newspec = {}
+          newspec.thing_name = spec.thing_name
+          newspec.precedence = spec.precedence or 1
+          return newspec
+        end
+      )
+    end,
+    chooser_initial_selected_index_retriever_specifier_array = function(thing_name_array)
+      return map(
+        thing_name_array,
+        function(thing_name)
+          local spec = tblmap.thing_name.chooser_initial_selected_index_partial_retriever_2specifier(thing_name)
+          local newspec = {}
+          newspec.thing_name = spec.thing_name
+          newspec.precedence = spec.precedence or 1
+          return newspec
         end
       )
     end,
