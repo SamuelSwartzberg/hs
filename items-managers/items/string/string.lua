@@ -5,7 +5,7 @@ StringItemSpecifier = {
       ["to-string"] = bc(transf.string.folded),
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "url", value = CreateURLItem },
     { key = "path", value = CreatePathItem },
     { key = "printable-ascii-string-item", value = CreatePrintableAsciiStringItem },

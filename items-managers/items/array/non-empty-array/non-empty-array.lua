@@ -24,7 +24,7 @@ NonEmptyArraySpecifier = {
 
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "pair", value = CreatePair },
     { key = "does-not-contain-nil-array", value = CreateDoesNotContainNilArray },
     { key = "contains-nil-array", value = CreateContainsNilArray },

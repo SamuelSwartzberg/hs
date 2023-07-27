@@ -20,7 +20,7 @@ AlphanumMinusUnderscoreItemSpecifier = {
       end,
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "word", value = CreateWordItem },
     { key = "alphanum-minus", value = CreateAlphanumMinusItem },
     { key = "youtube-id", value = CreateYoutubeVideoIdItem },

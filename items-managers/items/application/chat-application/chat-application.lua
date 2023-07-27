@@ -75,7 +75,7 @@ ChatApplicationItemSpecifier = {
 
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "discord", value = CreateDiscordItem },
     { key = "facebook", value = CreateFacebookItem },
     { key = "signal", value = CreateSignalItem },

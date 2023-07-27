@@ -6,7 +6,7 @@ GeneralBase32ItemSpecifier = {
       ["is-base-32"] = transf["nil"]["true"],
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "base-32", value =  CreateBase32Item}
   }),
   action_table = {}

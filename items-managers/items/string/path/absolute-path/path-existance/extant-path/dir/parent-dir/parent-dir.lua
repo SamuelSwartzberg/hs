@@ -49,7 +49,7 @@ ParentDirItemSpecifier = {
       end,
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "grandparent-dir", value = CreateGrandparentDirItem },
     { key = "parent-but-not-grandparent-dir", value = CreateParentButNotGrandparentDirItem },
     { key = "project-dir", value = CreateProjectDirItem },

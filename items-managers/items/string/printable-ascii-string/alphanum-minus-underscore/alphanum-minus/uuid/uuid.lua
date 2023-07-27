@@ -6,7 +6,7 @@ UuidItemSpecifier = {
       ["is-contact"] = bc(is.uuid.contact)
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "contact", value = CreateContactItem },
    
   }),

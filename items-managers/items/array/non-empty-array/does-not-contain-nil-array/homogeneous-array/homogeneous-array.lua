@@ -7,7 +7,7 @@ HomogeneousArraySpecifier = {
       ["to-string"] = bc(transf.array.summary),
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "array-of-interfaces", value = CreateArrayOfInterfaces },
     { key = "array-of-noninterfaces", value = CreateArrayOfNoninterfaces },
   }),

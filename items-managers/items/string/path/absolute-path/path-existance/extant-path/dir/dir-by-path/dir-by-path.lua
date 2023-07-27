@@ -18,7 +18,7 @@ DirByPathItemSpecifier = {
 
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "applications-dir", value = CreateApplicationsDirItem },
     { key = "diary-dir", value = CreateDiaryDirItem },
     { key = "menv-dir", value = CreateMenvDirItem },

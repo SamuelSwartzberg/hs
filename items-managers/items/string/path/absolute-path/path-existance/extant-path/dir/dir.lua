@@ -158,7 +158,7 @@ DirItemSpecifier = {
 
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "parent-dir", value = CreateParentDirItem },
     { key = "empty-dir", value = CreateEmptyDirItem },
     { key = "dir-by-path", value = createPathByPathItem },

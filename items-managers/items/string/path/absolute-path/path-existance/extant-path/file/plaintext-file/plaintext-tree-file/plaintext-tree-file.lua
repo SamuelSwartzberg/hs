@@ -11,7 +11,7 @@ PlaintextTreeFileItemSpecifier = {
       
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "xml-file", value = CreateXmlFileItem },
   })
 }

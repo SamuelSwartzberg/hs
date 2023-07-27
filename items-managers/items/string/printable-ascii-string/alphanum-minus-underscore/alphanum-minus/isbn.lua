@@ -8,7 +8,7 @@ IsbnItemSpecifier = {
       ["is-citable-object-id"] = transf["nil"]["true"],
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "citable-object-id", value = CreateIndicatedCitableObjectIdItem },
   }),
   action_table ={

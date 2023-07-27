@@ -11,7 +11,7 @@ PathItemSpecifier = {
       ["is-in-path"] = function(self, path) return stringy.startswith(self:get("resolved-path"), path) end,
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "absolute-path", value = CreateAbsolutePathItem },
     { key = "relative-path", value = CreateRelativePathItem },
     { key = "path-leaf", value = CreatePathLeaf },

@@ -1,4 +1,4 @@
----@alias indexable string|any[]|table|orderedtable
+---@alias indexable string|any[]|table
 
 --- @class sliceSpec
 --- @field start? integer|conditionSpec inclusive (both when positive, negative and for any conditionSpec). Default 1

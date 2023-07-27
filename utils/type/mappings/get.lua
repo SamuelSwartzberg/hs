@@ -77,14 +77,17 @@ get = {
     end,
     boolean_array_installed = function(mgr, arg) return pcall(run, "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
   },
+  calendar_name = {
+   
+  },
   khal = {
-    all_calendars = function()
+    calendar_name_array = function()
       return transf.string.lines(run("khal printcalendars"))
     end,
     writeable_calendars = function()
-      return filter(
-        get.khal.all_calendars(),
-        { _start =  "r-:", _invert = true }
+      return hs.fnutils.filter(
+        get.khal.calendar_name_array(),
+        is.calendar_name.writeable_calendar_name
       )
     end,
     writeable_calendar_string = function()
@@ -111,7 +114,7 @@ get = {
     search_event_tables = function(searchstr, include, exclude)
       local command = "khal search" .. get.khal.basic_command_parts(include, exclude)
       command = command .. " " .. transf.string.single_quoted_escaped(searchstr)
-      return transf.multiline_string.array_of_event_tables(run(command, true))
+      return transf.multirecord_string.array_of_event_tables(run(command, true))
     end,
     list_event_tables = function(specifier, include, exclude)
       local command = {
@@ -128,7 +131,7 @@ get = {
       specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
       dothis.array.push(command, { value = specifier.start, type = "quoted" })
       dothis.array.push(command, { value = specifier["end"], type = "quoted" })
-      return transf.multiline_string.array_of_event_tables(run(table.concat(command, " "), true))
+      return transf.multirecord_string.array_of_event_tables(run(table.concat(command, " "), true))
     end,
     calendar_template_empty = function()
       CALENDAR_TEMPLATE_SPECIFIER = ovtable.new()
@@ -297,12 +300,7 @@ get = {
       deep = get.any.default_if_nil(deep, true)
       copied_tables = get.any.default_if_nil(copied_tables, {})
       if not t then return t end
-      local new
-      if t.isovtable then -- orderedtable
-        new = ovtable.new()
-      else
-        new = {}
-      end
+      local new = {}
       copied_tables[tostring(t)] = new
       for k, v in transf.table.key_value_iter(t) do
         if type(v) == "table" and deep then
@@ -320,7 +318,8 @@ get = {
     end,
     key_value_equals = function(t, key, value)
       return t[key] == value
-    end
+    end,
+    
     
   },
   dict = {
@@ -332,6 +331,19 @@ get = {
         end,
         "k"
       )
+    end,
+    key_value_fn_filtered_dict = function(t, fn)
+      return transf.pair_array.dict(
+        hs.fnutils.filter(
+          transf.dict.pair_array(t),
+          function(pair)
+            return fn(pair[1], pair[2])
+          end
+        )
+      )
+    end,
+    value_fn_filtered_dict = function(t, fn)
+      return get.dict.key_value_fn_filtered_dict(t, function(k, v) return fn(v) end)
     end,
 
   },
@@ -535,12 +547,22 @@ get = {
   },
   string = {
     string_array_split_single_char = stringy.split,
+    string_array_split_single_char_noempty = function(str, sep)
+      return transf.string_array.noemtpy_string_array(
+        transf.string.string_array_split_single_char(str, sep)
+      )
+    end,
     string_array_split_single_char_stripped = function(str, sep)
       return transf.string_array.stripped_string_array(
         transf.string.split_single_char(str, sep)
       )
     end,
     string_array_split = stringx.split,
+    string_array_split_noempty = function(str, sep)
+      return transf.string_array.noemtpy_string_array(
+        transf.string.string_array_split(str, sep)
+      )
+    end,
     --- don't split on the edge of the string, i.e. don't return empty strings at the start or end
     string_array_split_noedge = function(str, sep)
       local res = transf.string.string_array_split(str, sep)
@@ -578,13 +600,19 @@ get = {
       return slice(transf.string.lines(path), 1, n or 10)
     end,
     content_lines_tail = function(path, n)
-      return slice(transf.string.content_lines(path), -(n or 10))
+      return slice(transf.string.noempty_line_string_array(path), -(n or 10))
     end,
     content_lines_head = function(path, n)
-      return slice(transf.string.content_lines(path), 1, n or 10)
+      return slice(transf.string.noempty_line_string_array(path), 1, n or 10)
     end,
-    startswith = stringy.startswith,
-    endswith = stringy.endswith,
+    bool_startswith = stringy.startswith,
+    bool_endswith = stringy.endswith,
+    bool_not_startswith = function(str, prefix)
+      return not transf.string.bool_startswith(str, prefix)
+    end,
+    bool_not_endswith = function(str, suffix)
+      return not transf.string.bool_endswith(str, suffix)
+    end,
     split2d = function(str, upper_sep, lower_sep)
       local upper = transf.string.split(str, upper_sep)
       return hs.fnutils.imap(upper, function(v)

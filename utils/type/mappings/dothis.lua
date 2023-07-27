@@ -299,7 +299,7 @@ dothis = {
       dothis.string_array.fill_with(transf.string.lines(str))
     end,
     fill_with_content_lines = function(path)
-      dothis.string_array.fill_with(transf.string.content_lines(path))
+      dothis.string_array.fill_with(transf.string.noempty_line_string_array(path))
     end,
     fill_with_nocomment_noindent_content_lines = function(path)
       dothis.string_array.fill_with(transf.string.nocomment_noindent_content_lines(path))
@@ -1768,18 +1768,17 @@ dothis = {
       dothis.running_application.focus_main_window(running_application)
     end,
     generate_target_txts = function(dir, do_after)
-      local generation_tasks = map(
+      hs.fnutils.ieach(
         transf.omegat_project_dir.target_files(dir),
         function(file)
-          return file, "soffice --headless --convert-to txt:Text --outdir"..
+          run("soffice --headless --convert-to txt:Text --outdir"..
           transf.string.single_quoted_escaped(
             transf.omegat_project_dir.target_txt_dir(dir)
           ) ..
-          transf.string.single_quoted_escaped(file)
-        end,
-        {"v", "kv"}
+          transf.string.single_quoted_escaped(file))
+        end
       )
-      runThreaded(generation_tasks, 1, do_after)
+      error("TODO: Watch dir, count files every second or so until they are all there, then do_after. Perhaps refactor this into a general function")
     end,
     generate_rechnung_md = function(omegat_project_dir)
       dothis.absolute_path.write_file(

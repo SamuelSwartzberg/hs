@@ -15,7 +15,7 @@ PathInterfaceItemSpecifier = {
       end,
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     -- these two must come first, since checking later potential_interfaces depends on them
     { key = "tilde-absolute-path", value = CreateTildeAbsolutePathItem },
     { key = "true-absolute-path", value = CreateTrueAbsolutePathItem },

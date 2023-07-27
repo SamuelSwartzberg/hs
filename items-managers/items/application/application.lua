@@ -15,7 +15,7 @@ ApplicationItemSpecifier = {
       end,
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "title-url-application", value = CreateTitleUrlApplicationItem },
     { key = "hydrus-network", value = CreateHydrusNetworkItem },
     { key = "tachiyomi", value = CreateTachiyomiItem },

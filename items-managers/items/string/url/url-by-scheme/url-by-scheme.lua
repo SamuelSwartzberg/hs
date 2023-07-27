@@ -17,7 +17,7 @@ URLBySchemeItemSpecifier = {
       end,
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "mailto-url", value = CreateMailtoURLItem },
     { key = "tel-url", value = CreateTelURLItem },
     { key = "otpauth-url", value = CreateOtpauthURLItem },

@@ -6,7 +6,7 @@ GeneralBase64ItemSpecifier = {
       ["is-base-64"] = transf["nil"]["true"],
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "base-64", value = CreateBase64Item }
   }),
   action_table = {}

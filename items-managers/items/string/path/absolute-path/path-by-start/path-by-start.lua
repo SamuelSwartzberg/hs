@@ -11,7 +11,7 @@ PathByStartItemSpecifier = {
       end,
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "path-in-home", value = CreatePathInHomeItem },
     { key = "path-not-in-home", value = CreatePathNotInHomeItem },
   })

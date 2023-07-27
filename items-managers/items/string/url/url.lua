@@ -75,7 +75,7 @@ URLItemSpecifier = {
 
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "url-by-contenttype", value = CreateURLByContenttypeItem },
     { key = "url-by-host", value = CreateURLByHostItem },
     { key = "url-by-path", value = CreateURLByPathItem },

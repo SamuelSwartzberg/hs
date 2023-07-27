@@ -7,7 +7,7 @@ UrlBase64ItemSpecifier = {
       ["is-citable-object-id"] = transf["nil"]["true"]
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "base-64", value = CreateBase64Item },
     { key = "citable-object-id", value = CreateIndicatedCitableObjectIdItem },
   }),

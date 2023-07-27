@@ -643,10 +643,6 @@ transf = {
     end,
   },
   path = {
-    no_leading_following_slash_or_whitespace = function(item)
-      item = stringy.strip(item)
-      return item
-    end,
     form_path = function(path)
       return "@" .. path
     end,
@@ -995,12 +991,8 @@ transf = {
         catch = function() return nil end,
       }) 
       if output then
-        items = transf.string.lines(output)
-        items = memoize(filter, refstore.params.memoize.opts.stringify_json)(items, false)
-        items = memoize(map, refstore.params.memoize.opts.stringify_json)(
-          items,
-          transf.path.no_leading_following_slash_or_whitespace
-        )
+        items = transf.string.noempty_line_string_array(output)
+        items = transf.string_array.stripped_string_array(items)
       else
         items = {}
       end
@@ -1217,8 +1209,7 @@ transf = {
         path,
         "git log --branches --not --remotes --pretty=format:'%h'"
       )
-      local lines = transf.string.lines(raw_hashes)
-      return filter(lines, true)
+      return transf.string.noempty_line_string_array(raw_hashes)
     end
 
 
@@ -1700,7 +1691,7 @@ transf = {
       return transf.string.lines(transf.plaintext_file.contents(path))
     end,
     content_lines = function(path)
-      return transf.string.content_lines(transf.plaintext_file.contents(path))
+      return transf.string.noempty_line_string_array(transf.plaintext_file.contents(path))
     end,
     noindent_content_lines = function(path)
       return transf.string.noindent_content_lines(transf.plaintext_file.contents(path))
@@ -2513,31 +2504,27 @@ transf = {
       end
     end,
     date_component_name_value_dict_where_date_component_value_is_max_date_component_value = function(date_component_name_value_dict)
-      return filter(
+      return get.dict.key_value_fn_filtered_dict(
         date_component_name_value_dict,
         function(k, v) return v == tblmap.date_component_name.max_date_component_value[k] end,
-        "kv"
       )
     end,
     date_component_name_value_dict_where_date_component_value_is_min_date_component_value = function(date_component_name_value_dict)
-      return filter(
+      return get.dict.key_value_fn_filtered_dict(
         date_component_name_value_dict,
         function(k, v) return v == tblmap.date_component_name.min_date_component_value[k] end,
-        "kv"
       )
     end,
     date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_dict)
-      return filter(
+      return get.dict.key_value_fn_filtered_dict(
         date_component_name_value_dict,
         function(k, v) return v ~= tblmap.date_component_name.max_date_component_value[k] end,
-        "kv"
       )
     end,
     date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value = function(date_component_name_value_dict)
-      return filter(
+      return get.dict.key_value_fn_filtered_dict(
         date_component_name_value_dict,
         function(k, v) return v ~= tblmap.date_component_name.min_date_component_value[k] end,
-        "kv"
       )
     end,
     prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_dict)
@@ -3407,30 +3394,30 @@ transf = {
     end,
 
 
-    content_lines = function(str)
+    noempty_line_string_array = function(str)
       return transf.string_array.noemtpy_string_array(
         transf.string.lines(str)
       )
     end,
     noindent_content_lines = function(str)
-      return transf.string_array.noindent_string_array(transf.string.content_lines(str))
+      return transf.string_array.noindent_string_array(transf.string.noempty_line_string_array(str))
     end,
     nocomment_noindent_content_lines = function(str)
-      return transf.string_array.nocomment_noindent_string_array(transf.string.content_lines(str))
+      return transf.string_array.nocomment_noindent_string_array(transf.string.noempty_line_string_array(str))
     end,
 
     first_line = function(str)
       return transf.string.lines(str)[1]
     end,
     first_content_line = function(str)
-      return transf.string.content_lines(str)[1]
+      return transf.string.noempty_line_string_array(str)[1]
     end,
     last_line = function(str)
       local lines = transf.string.lines(str)
       return lines[#lines]
     end,
     last_content_line = function(str)
-      local lines = transf.string.content_lines(str)
+      local lines = transf.string.noempty_line_string_array(str)
       return lines[#lines]
     end,
     first_char = function(str)
@@ -3726,7 +3713,7 @@ transf = {
   },
   header_string = {
     dict = function(str)
-      local lines = transf.string.content_lines(str)
+      local lines = transf.string.noempty_line_string_array(str)
       return map(
         lines,
         transf.string.header_key_value,
@@ -3858,12 +3845,10 @@ transf = {
       return table.concat(trimmed_lines, "\n")
     end,
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_array_value_dict_value_dict = function(raw)
-      local raw_countries = stringx.split(raw, "\n\n") -- stringy does not support splitting by multiple characters
-      raw_countries = filter(raw_countries, true)
+      local raw_countries = get.string.string_array_split_noempty(raw, "\n\n")
       local countries = {}
       for _, raw_country in transf.array.index_value_stateless_iter(raw_countries) do
-        local raw_country_lines = stringy.split(raw_country, "\n")
-        raw_country_lines = filter(raw_country_lines, true)
+        local raw_country_lines = get.string.string_array_split_single_char_noempty(raw_country, "\n")
         local country_header = raw_country_lines[1]
         local country_code = slice(country_header, "(", ")")
         if country_code == nil then error("could not find country code in header. header was " .. country_header) end
@@ -3884,10 +3869,18 @@ transf = {
     
       return countries
     end,
+    
+  },
+  multirecord_string = {
+    array_of_record_strings = function(str)
+      return get.string.string_array_split_noempty(
+        str,
+        mt._contains.unique_record_separator
+      )
+    end,
     array_of_event_tables = function(str)
-      local res = filter(stringx.split(str, mt._contains.unique_record_separator))
       return hs.fnutils.imap(
-        res,
+        transf.multirecord_string.array_of_record_strings(str),
         transf.string.event_table
       )
     end,
@@ -3938,7 +3931,7 @@ transf = {
     end,
     synonym_string_array = function(str)
       local items = stringy.split(transf.word.raw_av_output(str), "\t")
-      items = filter(items, function(itm)
+      items = hs.fnutils.filter(items, function(itm)
         if itm == nil then
           return false
         end
@@ -4229,9 +4222,9 @@ transf = {
       return hs.fnutils.imap(arr, transf.line.noindent)
     end,
     nocomment_line_filtered_string_array = function(arr)
-      return filter(
+      return hs.fnutils.filter(
         arr,
-        {_r = "^%s*#", _regex_engine = "eutf8", _invert = true}
+        is.string.nocomment_line
       )
     end,
     nocomment_string_array = function(arr)
@@ -4480,23 +4473,6 @@ transf = {
       )
     end,
   },
-  orderedtable = {
-    first_key = function(t)
-      return t:keyfromindex(1)
-    end,
-    last_key = function(t)
-      return t:keyfromindex(t:len())
-    end,
-    first_value = function(t)
-      return t[1]
-    end,
-    last_value = function(t)
-      return t[t:len()]
-    end,
-    reversed_orderedtable = function(t)
-      return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(t)), {toovtable = true});
-    end,
-  },
   dict = {
     pair_array = function(t)
       return map(
@@ -4572,7 +4548,7 @@ transf = {
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.key_chooser_item)
     end,
     truthy_value_dict = function(t)
-      return filter(
+      return hs.fnutils.filter(
         t,
         transf.any.boolean
       )
@@ -4675,6 +4651,7 @@ transf = {
     --- @param timestamp_key_table orderedtable
     --- @return { [string]: { [string]: { [string]: string[] } } }
     ymd_nested_key_array_of_arrays_value_assoc_arr = function(timestamp_key_table)
+      error("this still uses orderedtable, but I've removed that package")
       local year_month_day_time_table = {}
       for timestamp_str, fields in get.indexable.key_value_stateless_iter(timestamp_key_table,-1,1,-1) do 
         local timestamp = get.string_or_number.number_or_nil(timestamp_str)
@@ -5310,7 +5287,7 @@ transf = {
         ),
         "AXTitle"
       )
-      local filtered = filter(arr, function (v) return v.AXTitle ~= "" end)
+      local filtered = hs.fnutils.filter(arr, function (v) return v.AXTitle ~= "" end)
       for k, v in transf.native_table.key_value_stateless_iter(filtered) do
         v.application = app
       end
@@ -6651,6 +6628,12 @@ transf = {
     active_mullvad_relay_identifier = function()
       return run("mullvad relay get"):match("hostname ([^ ]+)")
     end,
+    non_root_volume_absolute_path_array = function()
+      return hs.fnutils.filter(
+        transf.native_table_or_nil.key_array(hs.fs.volume.allVolumes()),
+        is.local_absolute_path.root_local_absolute_path
+      )
+    end,
 
 
   },
@@ -7075,9 +7058,7 @@ transf = {
       if type(indexable) == "string" then
         return eutf8.len(indexable)
       elseif type(indexable) == "table" then
-        if indexable.isovtable then
-          return indexable:len()
-        elseif is.any.empty_table(indexable) then
+       if is.any.empty_table(indexable) then
           return 0
         elseif is.any.array(indexable) then
           local largestkey = 0
@@ -7100,11 +7081,7 @@ transf = {
       if type(thing) == "string" then
         return eutf8.reverse(thing)
       elseif type(thing) == "table" then
-        if not thing.isovtable then
-          return transf.native_table.reversed_native_table(thing)
-        else
-          return transf.orderedtable.reversed_orderedtable(thing)
-        end
+        return transf.native_table.reversed_native_table(thing)
       end
     end,
     key_array = function(indexable)

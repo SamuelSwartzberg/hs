@@ -16,7 +16,7 @@ PlaintextFileItemSpecifier = {
       ["is-md-file"] = bc(get.path.is_standartized_extension, "md")
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "m3u-file", value = CreateM3uFileItem },
     { key = "plaintext-table-file", value = CreatePlaintextTableFileItem },
     { key = "plaintext-dictionary-file", value = CreatePlaintextDictionaryFileItem },

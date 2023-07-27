@@ -9,7 +9,7 @@ join = {
         local final_metadata, final_contents
         if stringy.startswith(stripped_str, "---") then
           -- splice in the metadata
-          local parts = filter(stringy.split(str, "---"), true) -- this should now have the existing metadata as [1], and the content as [2] ... [n]
+          local parts = get.string.string_array_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
           local extant_metadata = table.remove(parts, 1)
           final_metadata = extant_metadata .. "\n" .. transf.not_userdata_or_string.yaml_string(tbl)
           final_contents = concat(parts, "---")

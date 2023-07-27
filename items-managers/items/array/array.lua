@@ -11,7 +11,7 @@ ArraySpecifier = {
     doThisables = {
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     {key = "non-empty-array", value = CreateNonEmptyArray },
     {key = "empty-array", value = CreateEmptyArray},
     {key = "managed-array", value = CreateManagedArray}

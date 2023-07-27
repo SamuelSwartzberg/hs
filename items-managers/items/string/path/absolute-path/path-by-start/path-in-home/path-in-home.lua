@@ -14,7 +14,7 @@ PathInHomeItemSpecifier = {
      
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "path-in-me", value = CreatePathInMeItem },
     { key = "path-in-screenshots", value = CreatePathInScreenshotsItem },
   }),

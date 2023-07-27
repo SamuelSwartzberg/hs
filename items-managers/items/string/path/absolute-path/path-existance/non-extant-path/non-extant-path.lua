@@ -6,7 +6,7 @@ NonExtantPathItemSpecifier = {
       ["is-path-with-intra-file-locator"] =bc(is.path.path_with_intra_file_locator)
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     {key = "path-with-intra-file-locator", value = CreatePathWithIntraFileLocator},
   }),
   action_table = {

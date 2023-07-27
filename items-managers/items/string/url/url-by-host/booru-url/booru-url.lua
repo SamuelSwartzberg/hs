@@ -23,7 +23,7 @@ BooruURLItemSpecifier = {
       end,
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "danbooru-url", value = CreateDanbooruURLItem },
     { key = "gelbooru-url", value = CreateGelbooruURLItem },
     { key = "yandere-url", value = CreateYandereURLItem },

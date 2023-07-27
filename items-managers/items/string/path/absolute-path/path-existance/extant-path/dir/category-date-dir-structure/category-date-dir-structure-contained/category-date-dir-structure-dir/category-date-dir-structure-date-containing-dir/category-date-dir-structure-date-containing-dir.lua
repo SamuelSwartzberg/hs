@@ -25,7 +25,7 @@ CategoryDateDirStructureDateContainingDirSpecifier = {
       end,
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "category-date-dir-structure-managed-date-dir", value = CreateCategoryDateDirStructureManagedDateDir },
   })
 }

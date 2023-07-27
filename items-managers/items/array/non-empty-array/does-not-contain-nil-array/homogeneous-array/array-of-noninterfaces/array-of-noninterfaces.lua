@@ -34,7 +34,7 @@ ArrayOfNoninterfacesSpecifier = {
       end,
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "array-of-strings", value = CreateArrayOfStrings },
 
   }),

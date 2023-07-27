@@ -8,7 +8,7 @@ CategoryDateDirStructureContainedItemSpecifier = {
       end,
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "category-date-dir-structure-dir", value = CreateCategoryDateDirStructureDir },
   })
 }

@@ -28,7 +28,7 @@ DataURLItemSpecifier = {
       key = "payload-part"
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "image-data-url", value = CreateImageDataURLItem },
     { key = "base-64-data-url", value = CreateBase64DataURLItem },
   })

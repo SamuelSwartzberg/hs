@@ -8,7 +8,7 @@ YoutubeItemSpecifier = {
       end,
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "youtube-playable-item", value = CreateYoutubePlayableItem },
   })
 }

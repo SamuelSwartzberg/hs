@@ -30,6 +30,20 @@ is = {
     url = function(str)
       return is.string.ascii_string(str) and is.printable_ascii_string.url(str)
     end,
+    line = function(str)
+      return eutf8.find(str, "[\n\r]") == nil
+    end,
+    noncomment_line = function(str)
+      return is.string.line(str) and is.line.noncomment_line(str)
+    end,
+  },
+  line = {
+    comment_line = function(str)
+      return eutf8.find(str, "^%s*#") ~= nil
+    end,
+    noncomment_line = function(str)
+      return not is.line.comment_line(str)
+    end,
   },
   ascii_string = {
     printable_ascii_string = function(str)
@@ -110,6 +124,11 @@ is = {
     url = isUrl,
     handle = function(str)
       return stringy.startswith(str, "@")
+    end,
+  },
+  calendar_name = {
+    writeable_calendar_name = function(name)
+      return get.string.bool_not_startswith(name, "r-:")
     end,
   },
   alphanum_minus = {
@@ -265,6 +284,9 @@ is = {
     end,
     local_nonextant_path = function(path)
       return not is.path.local_extant_path(path)
+    end,
+    root_local_absolute_path = function(path)
+      return path == "/"
     end,
   },
   local_extant_path = {

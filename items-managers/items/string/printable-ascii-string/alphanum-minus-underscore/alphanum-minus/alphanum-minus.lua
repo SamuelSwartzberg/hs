@@ -12,7 +12,7 @@ AlphanumMinusItemSpecifier = {
 
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "isbn", value = CreateIsbnItem },
     { key = "issn", value = CreateIssnItem },
     { key = "uuid", value = CreateUuidItem },

@@ -21,7 +21,7 @@ NonRootVolumeItemSpecifier = {
       end
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "time-machine-volume", value = CreateTimeMachineVolumeItem },
     { key = "dynamic-time-machine-volume", value = CreateDynamicTimeMachineVolumeItem },
   }),

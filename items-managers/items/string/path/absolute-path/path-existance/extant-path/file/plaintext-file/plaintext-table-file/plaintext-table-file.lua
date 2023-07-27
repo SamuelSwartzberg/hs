@@ -9,7 +9,7 @@ PlaintextTableFileItemSpecifier = {
       ["is-tsv-table-file"] = bc(get.path.is_extension, "tsv"),
     },
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "csv-table-file", value = CreateCsvTableFileItem },
     { key = "tsv-table-file", value = CreateTsvTableFileItem },
 

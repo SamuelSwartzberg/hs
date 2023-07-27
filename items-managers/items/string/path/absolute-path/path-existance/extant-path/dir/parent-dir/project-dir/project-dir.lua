@@ -61,7 +61,7 @@ ProjectDirItemSpecifier = {
       
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "latex-project-dir", value = CreateLatexProjectDirItem },
     { key = "omegat-project-dir", value = CreateOmegatProjectDirItem },
     { key = "npm-project-dir", value = CreateNpmProjectDirItem },

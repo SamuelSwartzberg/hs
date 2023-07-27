@@ -39,7 +39,7 @@ DoesNotContainNilArraySpecifier = {
       key = "choose-item-and-then-action"
     }
   },
-  potential_interfaces = ovtable.init({
+  ({
     { key = "homogeneous-array", value = CreateHomogeneousArray },
     { key = "non-homogeneous-array", value = CreateNonHomogeneousArray },
   })
