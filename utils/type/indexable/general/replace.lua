@@ -63,7 +63,7 @@ function replace(thing, opts, globalopts)
 
   
     if not opt.cond and type(proc) == "table" and not is.table.array(proc) then
-      cond = {_list = transf.native_table_or_nil.key_array(proc)} -- if no condition is specified, use the keys of the processor table as the condition
+      cond = {_list = transf.table_or_nil.key_array(proc)} -- if no condition is specified, use the keys of the processor table as the condition
     end
   
     local splitopts = {

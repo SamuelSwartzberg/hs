@@ -91,13 +91,13 @@ get = {
       )
     end,
     writeable_calendar_string = function()
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         get.khal.writeable_calendars(),
         ","
       )
     end,
     parseable_format_specifier = function()
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         map(
           mt._list.khal.parseable_format_component_array,
           {_f ="{%s}"}
@@ -131,7 +131,7 @@ get = {
       specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
       dothis.array.push(command, { value = specifier.start, type = "quoted" })
       dothis.array.push(command, { value = specifier["end"], type = "quoted" })
-      return transf.multirecord_string.array_of_event_tables(run(table.concat(command, " "), true))
+      return transf.multirecord_string.array_of_event_tables(run(get.string_or_number_array.string_by_joined(command, " "), true))
     end,
     calendar_template_empty = function()
       CALENDAR_TEMPLATE_SPECIFIER = ovtable.new()
@@ -257,13 +257,13 @@ get = {
     ---@return string[]
     yaml_lines_aligned_with_predetermined_stops = function(table, keystop, valuestop, depth)
       local lines = {}
-      for value_k, value_v in transf.table.key_value_iter(table) do
+      for value_k, value_v in transf.table.stateless_key_value_iter(table) do
         local pre_padding_length = depth * 2
         local key_length = #value_k
         local key_padding_length = keystop - (key_length + pre_padding_length)
         if type(value_v) == "table" and not (value_v.value or value_v.comment) then 
           dothis.array.push(lines, string.rep(" ", depth * 2) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " ")
-          lines = concat(lines, get.table.yaml_lines_aligned_with_predetermined_stops(value_v, keystop, valuestop, depth + 1))
+          lines = transf.two_arrays.array_by_appended(lines, get.table.yaml_lines_aligned_with_predetermined_stops(value_v, keystop, valuestop, depth + 1))
         elseif type(value_v) == "table" and (value_v.value or value_v.comment) then 
           local key_part = string.rep(" ", pre_padding_length) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " "
           local value_length = 0
@@ -302,7 +302,7 @@ get = {
       if not t then return t end
       local new = {}
       copied_tables[tostring(t)] = new
-      for k, v in transf.table.key_value_iter(t) do
+      for k, v in transf.table.stateless_key_value_iter(t) do
         if type(v) == "table" and deep then
           if copied_tables[tostring(v)] then -- we've already copied this table, so just reference it
             new[k] = copied_tables[tostring(v)]
@@ -319,7 +319,13 @@ get = {
     key_value_equals = function(t, key, value)
       return t[key] == value
     end,
-    
+    array_of_label_arrays = function(t, bool_by_is_leaf_arg_fn, include_inner, visited)
+      visited = get.any.default_if_nil(visited, {})
+      include_inner = get.any.default_if_nil(include_inner, true)
+      local res = {}
+      for k, v in transf.table.stateless_key_value_iter do
+      end
+    end,
     
   },
   dict = {
@@ -390,7 +396,7 @@ get = {
   table_of_assoc_arrs = {
     array_of_assoc_arrs = function(assoc_arr, key)
       local res = {}
-      for k, v in transf.table.key_value_iter(assoc_arr) do
+      for k, v in transf.table.stateless_key_value_iter(assoc_arr) do
         local copied = get.table.copy(v, true)
         copied[key] = k
         dothis.array.push(res, copied)
@@ -773,7 +779,7 @@ get = {
       return res
     end,
     string_with_separator_grouped_ascii_from_start = function(str, n, sep)
-      return table.concat(get.string.string_array_groups_ascii_fron_start(str, n), sep)
+      return get.string_or_number_array.string_by_joined(get.string.string_array_groups_ascii_fron_start(str, n), sep)
     end,
     string_array_groups_ascii_from_end = function(str, n)
       local res = {}
@@ -783,7 +789,7 @@ get = {
       return res
     end,
     string_with_separator_grouped_ascii_from_end = function(str, n, sep)
-      return table.concat(get.string.string_array_groups_ascii_from_end(str, n), sep)
+      return get.string_or_number_array.string_by_joined(get.string.string_array_groups_ascii_from_end(str, n), sep)
     end,
     string_array_groups_utf8_from_start = function(str, n)
       local res = {}
@@ -793,7 +799,7 @@ get = {
       return res
     end,
     string_with_separator_grouped_utf8_from_start = function(str, n, sep)
-      return table.concat(get.string.string_array_groups_utf8_from_start(str, n), sep)
+      return get.string_or_number_array.string_by_joined(get.string.string_array_groups_utf8_from_start(str, n), sep)
     end,
     string_array_groups_utf8_from_end = function(str, n)
       local res = {}
@@ -803,7 +809,7 @@ get = {
       return res
     end,
     string_with_separator_grouped_utf8_from_end = function(str, n, sep)
-      return table.concat(get.string.string_array_groups_utf8_from_end(str, n), sep)
+      return get.string_or_number_array.string_by_joined(get.string.string_array_groups_utf8_from_end(str, n), sep)
     end,
     number_or_nil = function(str,  base)
       local nonindicated_number_string = transf.string.nonindicated_number_string(str)
@@ -877,8 +883,10 @@ get = {
       )
     end,
   },
+  string_or_number_array = {
+    string_by_joined = table.concat,
+  },
   string_array = {
-    string_joined = table.concat,
     resplit_by_oldnew = function(arr, sep)
       return get.string.string_array_split(
         get.string_array.string_joined(
@@ -931,10 +939,10 @@ get = {
   },
   array_of_string_arrays = {
     array_of_string_records = function(arr, field_sep)
-      return hs.fnutils.imap(arr, function(x) return table.concat(x, field_sep) end)
+      return hs.fnutils.imap(arr, function(x) return get.string_or_number_array.string_by_joined(x, field_sep) end)
     end,
     string_table = function(arr, field_sep, record_sep)
-      return table.concat(get.array_of_string_arrays.array_of_string_records(arr, field_sep), record_sep)
+      return get.string_or_number_array.string_by_joined(get.array_of_string_arrays.array_of_string_records(arr, field_sep), record_sep)
     end,
     
   },
@@ -996,7 +1004,7 @@ get = {
     path_from_sliced_path_component_array = function(path, spec)
       local sliced_path_component_array = transf.path.sliced_path_component_array(path, spec)
       dothis.array.push(sliced_path_component_array, "")
-      return table.concat(sliced_path_component_array, "/")
+      return get.string_or_number_array.string_by_joined(sliced_path_component_array, "/")
     end,
     path_from_sliced_path_segment_array = function(path, spec)
       local sliced_path_segment_array = transf.path.sliced_path_segment_array(path, spec)
@@ -1012,7 +1020,7 @@ get = {
       if #sliced_path_segment_array == 0 then
         return leaf
       else
-        return table.concat(sliced_path_segment_array, "/") .. "/" .. leaf
+        return get.string_or_number_array.string_by_joined(sliced_path_segment_array, "/") .. "/" .. leaf
       end
     end,
     path_array_from_sliced_path_component_array = function(path, spec)
@@ -1035,7 +1043,7 @@ get = {
           if started_with_slash then
             table.insert(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
           end
-          res[i] = table.concat(relevant_path_components, "/")
+          res[i] = get.string_or_number_array.string_by_joined(relevant_path_components, "/")
         end
       end
       
@@ -1295,13 +1303,13 @@ get = {
     end,
     contents_lines_appended = function(path, lines)
       local extlines = transf.plaintext_file.line_array(path)
-      return transf.two_arrays.array(extlines, lines)
+      return transf.two_arrays.array_by_appended(extlines, lines)
     end,
     contents_line_appended = function(path, line)
       return dothis.plaintext_file.contents_lines_appended(path, {line})
     end,
     contents_lines_appended_to_string = function(path, lines)
-      return table.concat(dothis.plaintext_file.contents_lines_appended(path, lines), "\n")
+      return get.string_or_number_array.string_by_joined(dothis.plaintext_file.contents_lines_appended(path, lines), "\n")
     end,
     contents_line_appended_to_string = function(path, line)
       return dothis.plaintext_file.content_lines_appended_to_string(path, {line})
@@ -1840,7 +1848,7 @@ get = {
       if node.value then
         local value = node.value
         if type(node.value) == 'table' then -- list value
-          value = table.concat(
+          value = get.string_or_number_array.string_by_joined(
             map(node.value, {_f = prev_key .. "%s"}), 
             ":"
           )
@@ -1868,19 +1876,19 @@ get = {
       else
         dependent_dict = {}
       end
-      return concat({self_dict, dependent_dict})
+      return transf.(self_dict, dependent_dict)
     end,
   },
   env_var_name_env_node_dict = {
     env_var_name_value_dict = function(dict, prev_key)
       if prev_key then prev_key = prev_key .. "/" else prev_key = "" end
       local values = {}
-      for key, value in transf.native_table.key_value_stateless_iter(dict) do
+      for key, value in transf.table.key_value_stateless_iter(dict) do
         if type(value) == "string" then
           values[key] = prev_key .. value
         else
           local subvalues = get.detailed_env_node.env_var_name_value_dict(value, prev_key, key)
-          values = concat({values, subvalues})
+          values = transf.two_dict_or_nils.dict_by_take_new(values, subvalues)
         end
       end
       return values
@@ -1989,7 +1997,7 @@ get = {
   any = {
     join_if_array = function(arg, separator)
       if is.any.array(arg) then
-        return table.concat(arg, separator)
+        return get.string_or_number_array.string_by_joined(arg, separator)
       else
         return arg
       end
@@ -2008,7 +2016,7 @@ get = {
       local_thing_name_hierarchy = local_thing_name_hierarchy or get.table.copy(thing_name_hierarchy, true)
       parent = parent or "any"
       local res = {}
-      for thing_name, child_thing_name_hierarchy_or_leaf_indication_string in transf.native_table.key_value_stateless_iter(thing_name_hierarchy) do
+      for thing_name, child_thing_name_hierarchy_or_leaf_indication_string in transf.table.key_value_stateless_iter(thing_name_hierarchy) do
         local passes = is[parent][thing_name](any)
         if passes then
           if type(child_thing_name_hierarchy_or_leaf_indication_string) == "table" then
@@ -2070,7 +2078,7 @@ get = {
       )
     end,
     result_joined = function(arr, value)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         get.retriever_specifier.result_array(arr, value),
         " | "
       )
@@ -2130,11 +2138,11 @@ get = {
     styled_chooser_item_specifier_array = function(arr, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict)
       local res = get.table.copy(arr)
       for i, chooser_item_specifier in transf.array.index_value_stateless_iter(res) do
-        local text_styledtext_attribute_specifier = concat( {
+        local text_styledtext_attribute_specifier = transf.two_dict_or_nils.dict_by_take_new( {
           font = {size = 14 },
           color = { red = 0, green = 0, blue = 0, alpha = 0.7 },
         }, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict.styledtext_attribute_specifier.text)
-        local subtext_styledtext_attribute_specifier = concat( {
+        local subtext_styledtext_attribute_specifier = transf.two_dict_or_nils.dict_by_take_new( {
           font = {size = 12 },
           color = { red = 0, green = 0, blue = 0, alpha = 0.5 },
         }, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict.styledtext_attribute_specifier.subtext)
@@ -2204,7 +2212,7 @@ get = {
     --- @param limit? integer
     --- @return function, indexable, integer
     key_value_stateless_iter = function(thing, start, stop, step, limit)
-      local tblkeys = transf.native_table_or_nil.key_array(thing)
+      local tblkeys = transf.table_or_nil.key_array(thing)
       local iter, tbl, idx = get.indexable.index_value_stateless_iter(thing, start, stop, step, limit, tblkeys)
       return function(tbl)
         local i, v = iter(tbl, idx)
@@ -2252,7 +2260,7 @@ get = {
       if (start - stop) * (step/math.abs(step)) > 0 then
         start, stop = stop, start -- swap if they're in the wrong order
       end
-      local tblkeys = precalc_keys or transf.native_table_or_nil.key_array(indexable)
+      local tblkeys = precalc_keys or transf.table_or_nil.key_array(indexable)
       return function(thing, i)
         i = i + step
         iters = iters + 1

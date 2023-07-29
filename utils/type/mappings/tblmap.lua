@@ -470,7 +470,15 @@ tblmap = {
       local_image_file = {
         thing_name = "hs_image",
         precedence = 999
-      }
+      },
+      image_url = {
+        thing_name = "hs_image",
+        precedence = 999
+      },
+      image_data_url = {
+        thing_name = "hs_image",
+        precedence = 999
+      },
     },
     chooser_text_partial_retriever_specifier = {
       string = {
@@ -544,9 +552,9 @@ tblmap = {
 
 -- make sure to automatically normalize any input to tblmap
 
-for k, v in transf.native_table.key_value_stateless_iter(tblmap) do
+for k, v in transf.table.key_value_stateless_iter(tblmap) do
   local thing_to_normalize = k 
-  for k2, v2 in transf.native_table.key_value_stateless_iter(v) do
+  for k2, v2 in transf.table.key_value_stateless_iter(v) do
     setmetatable(
       v2,
       {

@@ -40,7 +40,7 @@ dothis = {
       })
       local command = {"khal", "new" }
       if specifier.calendar then
-        command = concat(
+        command = transf.two_arrays.array_by_appended(
           command,
           {
             "--calendar",
@@ -50,7 +50,7 @@ dothis = {
       end
 
       if specifier.location then
-        command = concat(
+        command = transf.two_arrays.array_by_appended(
           command,
           {
             "--location",
@@ -60,13 +60,13 @@ dothis = {
       end
 
       if specifier.alarms then
-        local alarms_str = table.concat(
+        local alarms_str = get.string_or_number_array.string_by_joined(
           map(specifier.alarms, stringy.strip, {
             mapcondition = { _type = "string"}
           }),
           ","
         )
-        command = concat(
+        command = transf.two_arrays.array_by_appended(
           command,
           {
             "--alarm",
@@ -76,7 +76,7 @@ dothis = {
       end
 
       if specifier.url then 
-        command = concat(
+        command = transf.two_arrays.array_by_appended(
           command,
           {
             "--url",
@@ -86,7 +86,7 @@ dothis = {
       end
 
       -- needed for postcreation modifications 
-      command = concat(
+      command = transf.two_arrays.array_by_appended(
         command,
         {
           "--format",
@@ -111,7 +111,7 @@ dothis = {
       end
 
       if specifier.description then
-        command = concat(
+        command = transf.two_arrays.array_by_appended(
           command,
           {
             "::",
@@ -144,7 +144,7 @@ dothis = {
       }
       table.insert(command_parts, "--wrap=preserve")
       table.insert(command_parts, "-f")
-      table.insert(command_parts, "markdown+" .. table.concat(get.pandoc.extensions(), "+"))
+      table.insert(command_parts, "markdown+" .. get.string_or_number_array.string_by_joined(get.pandoc.extensions(), "+"))
       table.insert(command_parts, "--standalone")
       table.insert(command_parts, "-t")
       table.insert(command_parts, format)
@@ -614,7 +614,7 @@ dothis = {
   local_extant_path_array = {
     zip_to_local_absolute_path = function(arr, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
-      run("zip -r " .. transf.string.single_quoted_escaped(tgt) .. " " .. transf.string.single_quoted_escaped(table.concat(arr, " ")))
+      run("zip -r " .. transf.string.single_quoted_escaped(tgt) .. " " .. transf.string.single_quoted_escaped(get.string_or_number_array.string_by_joined(arr, " ")))
     end,
     zip_to_absolute_path = function(arr, tgt)
       local tmptgt = transf.string.in_tmp_dir(tgt, "temp_zip_target")
@@ -918,7 +918,7 @@ dothis = {
   plaintext_file = {
     append_lines = function(path, lines)
       local contents = transf.plaintext_file.one_final_newline(path)
-      dothis.absolute_path.write_file_if_file(path, contents .. table.concat(lines, "\n"))
+      dothis.absolute_path.write_file_if_file(path, contents .. get.string_or_number_array.string_by_joined(lines, "\n"))
     end,
     append_line = function(path, line)
       dothis.plaintext_file.append_lines(path, {line})
@@ -928,7 +928,7 @@ dothis = {
       dothis.in_git_dir.commit_self(path, "Added line " .. line .. " to " .. get.absolute_path.relative_path_from(path, transf.in_git_dir.git_root_dir(path)))
     end,
     write_lines = function(path, lines)
-      dothis.absolute_path.write_file_if_file(path, table.concat(lines, "\n"))
+      dothis.absolute_path.write_file_if_file(path, get.string_or_number_array.string_by_joined(lines, "\n"))
     end,
     set_line = function(path, line, line_number)
       local lines = transf.plaintext_file.line_array(path)
@@ -964,7 +964,7 @@ dothis = {
   plaintext_table_file = {
     append_array_of_arrays_of_fields = function(path, array_of_arrays_of_fields)
       local lines = hs.fnutils.imap(array_of_arrays_of_fields, function (arr)
-        return table.concat(arr, transf.plaintext_table_file.field_separator())
+        return get.string_or_number_array.string_by_joined(arr, transf.plaintext_table_file.field_separator())
       end)
       dothis.plaintext_file.append_lines(path, lines)
     end,
@@ -1425,7 +1425,7 @@ dothis = {
   },
   dynamic_absolute_path_dict = {
     write = function(dynamic_absolute_path_dict)
-      for absolute_path, contents in transf.native_table.key_value_stateless_iter(dynamic_absolute_path_dict) do
+      for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_dict) do
         local fn = eutf8.match(contents, "^(%w-):")
         local contents = eutf8.sub(contents, #fn + 2)
         dothis.absolute_path[fn](absolute_path, contents)
@@ -1434,7 +1434,7 @@ dothis = {
   },
   absolute_path_string_value_dict = {
     write = function(absolute_path_string_value_dict)
-      for absolute_path, contents in transf.native_table.key_value_stateless_iter(absolute_path_string_value_dict) do
+      for absolute_path, contents in transf.table.key_value_stateless_iter(absolute_path_string_value_dict) do
         dothis.absolute_path.write_file(absolute_path, contents)
       end
     end,
@@ -2107,7 +2107,7 @@ dothis = {
     choose = function(spec, callback)
       local hschooser = get.hschooser_specifier.partial_hschooser(spec, callback)
       hschooser:rows(spec.rows or 30)
-      for k, v in transf.native_table.key_value_stateless_iter(spec.whole_chooser_style_keys) do
+      for k, v in transf.table.key_value_stateless_iter(spec.whole_chooser_style_keys) do
         hschooser[k](hschooser, v)
       end
       local choices = get.chooser_item_specifier_array.styled_chooser_item_specifier_array(

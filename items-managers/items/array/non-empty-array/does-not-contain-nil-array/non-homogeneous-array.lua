@@ -13,7 +13,7 @@ NonHomogeneousArraySpecifier = {
         return homogeneous_array_map
       end,
       ["to-list-of-homogeneous-arrays"] = function(self)
-        return transf.native_table_or_nil.value_array(self:get("to-map-of-homogeneous-arrays"))
+        return transf.table_or_nil.value_array(self:get("to-map-of-homogeneous-arrays"))
       end,
       ["to-homogeneous-array-of-type"] = function(self, type)
         return self:get("to-map-of-homogeneous-arrays")[type]
@@ -30,7 +30,7 @@ NonHomogeneousArraySpecifier = {
     },
     doThisables = {
       ["continue-with-chosen-homogeneous-array"] = function(self, callback)
-        ar(transf.native_table_or_nil.key_array(self:get("to-map-of-homogeneous-arrays"))):doThis("choose-item", function(chosen_item)
+        ar(transf.table_or_nil.key_array(self:get("to-map-of-homogeneous-arrays"))):doThis("choose-item", function(chosen_item)
           local homogeneous_array = ar(self:get("to-homogeneous-array-of-type", chosen_item.text))
           callback(homogeneous_array)
         end)

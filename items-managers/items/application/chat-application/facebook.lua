@@ -43,7 +43,7 @@ FacebookItemSpecifier = {
           for _, reaction in transf.array.index_value_stateless_iter(msg["reactions"]) do
             reaction_tally[reaction.reaction] = (reaction_tally[reaction.reaction] or 0) + 1
           end
-          for reaction, count in transf.native_table.key_value_stateless_iter(reaction_tally) do
+          for reaction, count in transf.table.key_value_stateless_iter(reaction_tally) do
             table.insert(raw_reactions, ("%s (%d)"):format(reaction, count))
           end
         end

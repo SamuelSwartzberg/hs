@@ -14,7 +14,7 @@ function split(thing, sep, opts)
   local splintervals = find(
     thing,
     sep,
-    concat({
+    conclat({
       ret = "iv",
       findall = true,
       limit = opts.limit

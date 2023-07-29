@@ -13,7 +13,7 @@ function recursiveMerge(base, addition, opts)
       type(opts.recurse) == "number" and 
       (opts.recurse < opts.depth)
     )
-  for k, v in transf.table.key_value_iter(addition) do
+  for k, v in transf.table.stateless_key_value_iter(addition) do
     if 
       not no_recurse and
       type(v) == "table" and not is.table.array(v) and

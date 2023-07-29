@@ -21,7 +21,7 @@ function append(base, addition, opts)
       new_thing[#new_thing + 1] = addition
       return new_thing
     else
-      if #transf.native_table_or_nil.value_array(addition) >= 2 then
+      if #transf.table_or_nil.value_array(addition) >= 2 then
         if not opts.nooverwrite or not new_thing[addition[1]] then
           new_thing[addition[1]] = addition[2]
         end

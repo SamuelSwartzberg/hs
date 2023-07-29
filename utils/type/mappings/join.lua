@@ -12,7 +12,8 @@ join = {
           local parts = get.string.string_array_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
           local extant_metadata = table.remove(parts, 1)
           final_metadata = extant_metadata .. "\n" .. transf.not_userdata_or_string.yaml_string(tbl)
-          final_contents = concat(parts, "---")
+          final_contents = get.string_or_number_array.string_by_joined(parts)
+          final_contents = final_contents .. "---"
         else
           final_metadata = transf.not_userdata_or_string.yaml_string(tbl)
           final_contents = str

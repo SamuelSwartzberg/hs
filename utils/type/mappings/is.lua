@@ -84,7 +84,7 @@ is = {
     indicated_number_string = function(str)
       return 
         stringy.startswith(str, "0") and
-        get.array.contains(transf.native_table_or_nil.key_array(tblmap.base_letter.base), str:sub(2, 2)) and
+        get.array.contains(transf.table_or_nil.key_array(tblmap.base_letter.base), str:sub(2, 2)) and
         is.printable_ascii_string.number_string(str:sub(3))
     end,
     potentially_indicated_number_string = function(str)
@@ -511,7 +511,7 @@ is = {
   },
   url_with_path = {
     owner_item_url = function(url)
-      return #transf.owner_item_url.owner_item == 2
+      return #transf.owner_item_url.owner_item(url) == 2
     end,
   },
   data_url = {
@@ -701,7 +701,7 @@ is = {
       return not t.isovtable
     end,
     empty_table = function(t)
-      for k, v in transf.native_table.key_value_stateless_iter(t) do
+      for k, v in transf.table.key_value_stateless_iter(t) do
         return false
       end
       return true
@@ -710,7 +710,7 @@ is = {
       return not is.table.empty_table(t)
     end,
     arraylike_by_keys = function(t)
-      for k, v in transf.native_table.key_value_stateless_iter(t) do
+      for k, v in transf.table.key_value_stateless_iter(t) do
         if type(k) ~= "number" then return false end
       end
       return true

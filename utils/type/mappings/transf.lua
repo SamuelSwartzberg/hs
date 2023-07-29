@@ -486,7 +486,7 @@ transf = {
       )
     end,
     string_from_ascii_char_array = function(arr)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.pos_int.ascii_char_array(arr)
       )
     end,
@@ -494,7 +494,7 @@ transf = {
       return memoize(runJSON)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
-          table.concat(
+          get.string_or_number_array.string_by_joined(
             transf.pos_int.unicode_codepoint_string_array(arr),
             " "
           )
@@ -511,7 +511,7 @@ transf = {
       return memoize(runJSON)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
-          table.concat(
+          get.string_or_number_array.string_by_joined(
             transf.pos_int.indicated_utf8_hex_string_array(arr),
             " "
           )
@@ -572,7 +572,7 @@ transf = {
       return map(arr, function(v) return v, true end, { args = "v", ret = "kv", nooverwrite = true })
     end,
     set = function(arr)
-      return transf.native_table_or_nil.key_array(
+      return transf.table_or_nil.key_array(
         transf.array.value_boolean_dict(arr)
       )
     end,
@@ -587,7 +587,7 @@ transf = {
       if #arr == 0 then
         return {{}}
       else
-        local output = concat( get.any_stateful_generator.array(combine.powerset, arr), {{}} )
+        local output = transf.array_and_any.array( get.any_stateful_generator.array(combine.powerset, arr), {} )
         return output
       end
     end,
@@ -776,12 +776,12 @@ transf = {
         specifier = {
           column = final_part,
           line = dothis.array.pop(parts),
-          path = table.concat(parts, ":")
+          path = get.string_or_number_array.string_by_joined(parts, ":")
         }
       else
         specifier = {
           line = final_part,
-          path = table.concat(parts, ":")
+          path = get.string_or_number_array.string_by_joined(parts, ":")
         }
       end
       return specifier
@@ -1038,7 +1038,7 @@ transf = {
       return hs.fnutils.imap(path_array, transf.local_file.attachment_string)
     end,
     attachment_string = function(path_array)
-      return table.concat(transf.path_array.attachment_array(path_array), "\n")
+      return get.string_or_number_array.string_by_joined(transf.path_array.attachment_array(path_array), "\n")
     end,
     email_specifier = function(path_array)
       return {
@@ -1115,7 +1115,7 @@ transf = {
   absolute_path_key_leaf_string_or_nested_value_dict = {
     leaf_key_leaf_string_or_nested_value_dict = function(dict)
       local res = {}
-      for k, v in transf.table.key_value_iter(dict) do
+      for k, v in transf.table.stateless_key_value_iter(dict) do
         local leaf = transf.path.leaf(k)
         if is.any.table(v) then
           res[leaf] = transf.absolute_path_key_leaf_string_or_nested_value_dict.leaf_key_leaf_string_or_nested_value_dict(v)
@@ -1127,7 +1127,7 @@ transf = {
     end,
     plaintext_dictonary_read_assoc_arr = function(dict)
       local res = {}
-      for k, v in transf.table.key_value_iter(dict) do
+      for k, v in transf.table.stateless_key_value_iter(dict) do
         local filename = transf.path.filename(k)
         if is.any.table(v) then
           res[filename] = transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc_arr(v)
@@ -1270,7 +1270,7 @@ transf = {
       return transf.fs_tag_assoc.fs_tag_string(path_leaf_specifier.fs_tag_assoc)
     end,
     fs_tag_keys = function(path_leaf_specifier)
-      return transf.native_table_or_nil.key_array(path_leaf_specifier.fs_tag_assoc)
+      return transf.table_or_nil.key_array(path_leaf_specifier.fs_tag_assoc)
     end,
     path = function(path_leaf_specifier)
       return transf.path.ending_with_slash(path_leaf_specifier.path) 
@@ -1314,7 +1314,7 @@ transf = {
       )
     end,
     fs_tag_string = function(fs_tag_string_part_array)
-      return "%" .. table.concat(fs_tag_string_part_array, "%")
+      return "%" .. get.string_or_number_array.string_by_joined(fs_tag_string_part_array, "%")
     end,
   },
   fs_tag_string_dict = {
@@ -1602,7 +1602,7 @@ transf = {
         res = {path}
       end
       if node.children then
-        res = transf.two_arrays.array(res, transf.tree_node_array.array_of_label_arrays(node.children, path, include_inner))
+        res = transf.two_arrays.array_by_appended(res, transf.tree_node_array.array_of_label_arrays(node.children, path, include_inner))
       end
       return res
     end
@@ -1610,8 +1610,8 @@ transf = {
   tree_node_array = {
     array_of_label_arrays = function(arr, path, include_inner)
       local res = {}
-      for _, node in ipairs(arr) do
-        res = transf.two_arrays.array(res, transf.tree_node.array_of_label_arrays(node, path, include_inner))
+      for _, node in transf.array.index_value_stateless_iter(arr) do
+        res = transf.two_arrays.array_by_appended(res, transf.tree_node.array_of_label_arrays(node, path, include_inner))
       end
       return res
     end,
@@ -1666,7 +1666,7 @@ transf = {
       end
   
       -- Perform DFS traversal for each key in the graph
-      for key, _ in transf.native_table.key_value_stateless_iter(dict) do
+      for key, _ in transf.table.key_value_stateless_iter(dict) do
           dfs(key)
       end
   
@@ -1745,7 +1745,7 @@ transf = {
       iter() -- skip header, seems to be a bug in ftcsv
       return iter
     end,
-    array_of_dicts = function(path)
+    dict_array = function(path)
       return select(1, ftcsv.parse(path, transf.plaintext_table_file.field_separator(path)))
     end,
     iter_of_dicts = function(path)
@@ -1885,7 +1885,7 @@ transf = {
       }
     end,
     y_ym_ymd_path = function(date)
-      return table.concat(transf.date.y_ym_ymd_table(date), "/")
+      return get.string_or_number_array.string_by_joined(transf.date.y_ym_ymd_table(date), "/")
     end,
     weekday_number_start_1 = function(date)
       return date:getisoweekday()
@@ -2002,7 +2002,7 @@ transf = {
       )[#list]
     end,
     date_component_name_list_inverse = function(list)
-      return transf.two_arrays.difference_set(mt._list.date.date_component_names, list)
+      return transf.two_arrays.set_by_difference(mt._list.date.date_component_names, list)
     end,
     rfc3339like_dt_separator_list  = function(list)
       return map(
@@ -2388,10 +2388,10 @@ transf = {
   },
   date_component_name_value_dict = {
     date_component_name_list_set = function(date_component_name_value_dict)
-      return transf.native_table_or_nil.key_array(date_component_name_value_dict)
+      return transf.table_or_nil.key_array(date_component_name_value_dict)
     end,
     date_component_value_list_set = function(date_component_name_value_dict)
-      return transf.native_table_or_nil.value_array(date_component_name_value_dict)
+      return transf.table_or_nil.value_array(date_component_name_value_dict)
     end,
     date_component_name_list_not_set = function(date_component_name_value_dict)
       return transf.date_component_name_list.date_component_name_list_inverse(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
@@ -2556,7 +2556,7 @@ transf = {
   },
   string_format_part_specifier_array = {
     string = function(string_format_part_specifier_array)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         hs.fnutils.imap(
           string_format_part_specifier_array,
           transf.string_format_part_specifier.string
@@ -2606,7 +2606,7 @@ transf = {
       return {iban, transf.iban.bic(iban), transf.iban.bank_name(iban)}
     end,
     bank_details_string = function(iban)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.iban.iban_bic_bank_name_array(iban),
         "\n"
       )
@@ -2632,7 +2632,7 @@ transf = {
       return transf.cleaned_iban.data(iban).bankName
     end,
     separated_iban = function(iban)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         get.string.string_array_groups_utf8_from_end(
           transf.iban.cleaned_iban(iban),
           4
@@ -2758,7 +2758,7 @@ transf = {
       })
     end,
     full_name_western = function(contact_table)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.contact_table.full_name_western_array(contact_table),
         " "
       )
@@ -2770,7 +2770,7 @@ transf = {
       })
     end,
     normal_name_western = function(contact_table)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.contact_table.normal_name_western_array(contact_table),
         " "
       )
@@ -2787,7 +2787,7 @@ transf = {
       })
     end,
     full_name_eastern = function(contact_table)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.contact_table.full_name_eastern_array(contact_table),
         " "
       )
@@ -2799,7 +2799,7 @@ transf = {
       })
     end,
     normal_name_eastern = function(contact_table)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.contact_table.normal_name_eastern_array(contact_table),
         " "
       )
@@ -2812,7 +2812,7 @@ transf = {
       })
     end,
     name_additions = function(contact_table)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.contact_table.name_additions_array(contact_table),
         ", "
       )
@@ -2829,7 +2829,7 @@ transf = {
       }
     end,
     name_bank_details_string = function(contact_table)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.contact_table.main_name_iban_bic_bank_name_array(contact_table),
         "\n"
       )
@@ -2841,7 +2841,7 @@ transf = {
       return transf.table.value_set(transf.contact_table.vcard_type_phone_number_dict(contact_table))
     end,
     phone_number_string = function (contact_table)
-      return table.concat(transf.contact_table.phone_number_array(contact_table), ", ")
+      return get.string_or_number_array.string_by_joined(transf.contact_table.phone_number_array(contact_table), ", ")
     end,
     vcard_type_email_dict = function (contact_table)
       return contact_table.Email
@@ -2850,7 +2850,7 @@ transf = {
       return transf.table.value_set(transf.contact_table.vcard_type_email_dict(contact_table))
     end,
     email_string = function (contact_table)
-      return table.concat(transf.contact_table.email_array(contact_table), ", ")
+      return get.string_or_number_array.string_by_joined(transf.contact_table.email_array(contact_table), ", ")
     end,
     vcard_type_address_table_dict = function (contact_table)
       return contact_table.Addresses
@@ -2891,7 +2891,7 @@ transf = {
   },
   vcard_type_dict = {
     vcard_types = function (vcard_type_dict)
-      return transf.native_table_or_nil.key_array(vcard_type_dict)
+      return transf.table_or_nil.key_array(vcard_type_dict)
     end
   },
   vcard_type_address_table_dict = {
@@ -2964,13 +2964,13 @@ transf = {
       end
     end,
     in_country_address_array = function(single_address_table)
-      return transf.two_arrays.array(
+      return transf.two_arrays.array_by_appended(
         transf.address_table.addressee_array(single_address_table),
         transf.address_table.in_country_location_array(single_address_table)
       )
     end,
     international_address_array = function(single_address_table)
-      return transf.two_arrays.array(
+      return transf.two_arrays.array_by_appended(
         transf.address_table.addressee_array(single_address_table),
         transf.address_table.international_location_array(single_address_table)
       )
@@ -2984,13 +2984,13 @@ transf = {
     end,
     in_country_address_label = function(single_address_table)
       return 
-        table.concat(transf.address_table.addressee_array(single_address_table), "\n") .. "\n" ..
+        get.string_or_number_array.string_by_joined(transf.address_table.addressee_array(single_address_table), "\n") .. "\n" ..
         transf.address_table.street(single_address_table) .. "\n" ..
         transf.address_table.postal_code_city_line(single_address_table)
     end,
     international_address_label = function(single_address_table)
       return 
-        table.concat(transf.address_table.addressee_array(single_address_table), "\n") .. "\n" ..
+        get.string_or_number_array.string_by_joined(transf.address_table.addressee_array(single_address_table), "\n") .. "\n" ..
         transf.address_table.street(single_address_table) .. "\n" ..
         transf.address_table.postal_code_city_line(single_address_table) .. "\n" ..
         transf.address_table.region_country_line(single_address_table)
@@ -3222,7 +3222,7 @@ transf = {
     upper_camel_snake_case = function(str)
       local parts = transf.string.snake_case_parts(str)
       local upper_parts = hs.fnutils.imap(parts, transf.word.capitalized)
-      return table.concat(upper_parts, "_")
+      return get.string_or_number_array.string_by_joined(upper_parts, "_")
     end,
     lower_camel_snake_case = function(str)
       return eutf8.lower(transf.string.upper_camel_snake_case(str))
@@ -3230,7 +3230,7 @@ transf = {
     upper_camel_case = function(str)
       local parts = transf.string.snake_case_parts(str)
       local upper_parts = hs.fnutils.imap(parts, transf.word.capitalized)
-      return table.concat(upper_parts, "")
+      return get.string_or_number_array.string_by_joined(upper_parts, "")
     end,
     lower_camel_case = function(str)
       return eutf8.lower(transf.string.upper_camel_case(str))
@@ -3316,10 +3316,8 @@ transf = {
       local title_cased_words = map(words, transf.word.title_case_policy)
       title_cased_words[1] = replace(title_cased_words[1], to.case.capitalized)
       title_cased_words[#title_cased_words] = replace(title_cased_words[#title_cased_words], to.case.capitalized)
-      return concat({
-        isopts = "isopts",
-        sep = removed,
-      }, title_cased_words)
+      local arr = transf.two_arrays.array_by_interleaved_stop_a1(title_cased_words, removed)
+      return get.string_or_number_array.string_by_joined(arr, "")
     end,
     romanized_deterministic = function(str)
       local raw_romanized = run(
@@ -3757,10 +3755,10 @@ transf = {
   event_table = {
     calendar_template = function(event_table)
       local template = get.khal.calendar_template_empty()
-      for key, value in transf.table.key_value_iter(event_table) do
+      for key, value in transf.table.stateless_key_value_iter(event_table) do
         if template[key] then
           if key == "repeat" then
-            for subkey, subvalue in transf.table.key_value_iter(value) do
+            for subkey, subvalue in transf.table.stateless_key_value_iter(value) do
               template[key][subkey].value = subvalue
             end
           else
@@ -3769,7 +3767,7 @@ transf = {
         end
       end
       if template.alarms.value then 
-        template.alarms.value = table.concat(template.alarms.value, ",")
+        template.alarms.value = get.string_or_number_array.string_by_joined(template.alarms.value, ",")
       end
       return transf.table.yaml_aligned(template)
 
@@ -3845,7 +3843,7 @@ transf = {
     trimmed_lines_multiline_string = function(str)
       local lines = split(str, "\n")
       local trimmed_lines = map(lines, stringy.strip)
-      return table.concat(trimmed_lines, "\n")
+      return get.string_or_number_array.string_by_joined(trimmed_lines, "\n")
     end,
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_array_value_dict_value_dict = function(raw)
       local raw_countries = get.string.string_array_split_noempty(raw, "\n\n")
@@ -3967,10 +3965,10 @@ transf = {
       return syn_specifier.antonyms
     end,
     synonyms_string = function (syn_specifier)
-      return table.concat(syn_specifier.synonyms, ", ")
+      return get.string_or_number_array.string_by_joined(syn_specifier.synonyms, ", ")
     end,
     antonyms_string = function (syn_specifier)
-      return table.concat(syn_specifier.antonyms, ", ")
+      return get.string_or_number_array.string_by_joined(syn_specifier.antonyms, ", ")
     end,
     summary = function (syn_specifier)
       return 
@@ -4187,7 +4185,7 @@ transf = {
   },
   string_array = {
     repeated_option_string = function(arr, opt)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         hs.fnutils.imap(
           arr,
           function (itm)
@@ -4204,16 +4202,16 @@ transf = {
       )
     end,
     single_quoted_escaped_string = function(arr)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.string_array.single_quoted_escaped_string_array(arr),
         " "
       )
     end,
     action_path_string = function(arr)
-      return table.concat(arr, " > ")
+      return get.string_or_number_array.string_by_joined(arr, " > ")
     end,
     path = function(arr)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         hs.fnutils.imap(arr, transf.string.safe_filename), 
         "/"
       )
@@ -4258,10 +4256,10 @@ transf = {
       return hs.fnutils.imap(arr, stringy.strip)
     end,
     multiline_string = function(arr)
-      return table.concat(arr, "\n")
+      return get.string_or_number_array.string_by_joined(arr, "\n")
     end,
     contents_summary = function(arr)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         slice(arr, {
           start = 1,
           stop = 10,
@@ -4274,7 +4272,7 @@ transf = {
   },
   env_line_array = {
     env_string = function(arr)
-      local env_string_inner = table.concat(arr, "\n")
+      local env_string_inner = get.string_or_number_array.string_by_joined(arr, "\n")
       return "#!/usr/bin/env bash\n\n" ..
           "set -u\n\n" .. 
           env_string_inner .. 
@@ -4282,18 +4280,83 @@ transf = {
     end,
   },
   two_arrays = {
-    array = function(arr1, arr2)
+    array_by_appended = function(arr1, arr2)
       local res = get.table.copy(arr1)
       for _, v in transf.array.index_value_stateless_iter(arr2) do
         res[#res + 1] = v
       end
       return res
     end,
-    union_set = function(arr1, arr2)
-      local new_arr = transf.two_arrays.array(arr1, arr2)
+    pair_array_by_zip_stop_a1 = function(arr1, arr2)
+      local res = {}
+      for i = 1, #arr1 do
+        res[#res + 1] = {arr1[i], arr2[i]}
+      end
+      return res
+    end,
+    pair_array_by_zip_stop_a2 = function(arr1, arr2)
+      local res = {}
+      for i = 1, #arr2 do
+        res[#res + 1] = {arr1[i], arr2[i]}
+      end
+      return res
+    end,
+    pair_array_by_zip_stop_shortest = function(arr1, arr2)
+      local res = {}
+      local shortest = transf.two_comparables.smaller(#arr1, #arr2)
+      for i = 1, shortest do
+        res[#res + 1] = {arr1[i], arr2[i]}
+      end
+      return res
+    end,
+    pair_array_by_zip_stop_longest = function(arr1, arr2)
+      local res = {}
+      local longest = transf.two_comparables.larger(#arr1, #arr2)
+      for i = 1, longest do
+        res[#res + 1] = {arr1[i], arr2[i]}
+      end
+      return res
+    end,
+    array_by_interleaved_stop_a1 = function(arr1, arr2)
+      local res = {}
+      for i, v in transf.array.index_value_stateless_iter(arr1) do
+        res[#res + 1] = v
+        res[#res + 1] = arr2[i]
+      end
+      return res
+    end,
+    array_by_interleaved_stop_a2 = function(arr1, arr2)
+      local res = {}
+      for i, v in transf.array.index_value_stateless_iter(arr2) do
+        res[#res + 1] = arr1[i]
+        res[#res + 1] = v
+      end
+      return res
+    end,
+    array_by_interleaved_stop_shortest = function(arr1, arr2)
+      local res = {}
+      local shortest = transf.two_comparables.smaller(#arr1, #arr2)
+      for i = 1, shortest do
+        res[#res + 1] = arr1[i]
+        res[#res + 1] = arr2[i]
+      end
+      return res
+    end,
+    array_by_interleaved_stop_longest = function(arr1, arr2)
+      local res = {}
+      local longest = transf.two_comparables.larger(#arr1, #arr2)
+      for i = 1, longest do
+        res[#res + 1] = arr1[i]
+        res[#res + 1] = arr2[i]
+      end
+      return res
+    end,
+
+    set_by_union = function(arr1, arr2)
+      local new_arr = transf.two_arrays.array_by_appended(arr1, arr2)
       return transf.array.set(new_arr)
     end,
-    intersection_set = function(arr1, arr2)
+    set_by_intersection = function(arr1, arr2)
       local new_arr = {}
       for _, v in transf.array.index_value_stateless_iter(arr1) do
         if get.array.contains(arr2, v) then
@@ -4302,7 +4365,7 @@ transf = {
       end
       return transf.array.set(new_arr)
     end,
-    difference_set = function(arr1, arr2)
+    set_by_difference = function(arr1, arr2)
       local new_arr = {}
       for _, v in transf.array.index_value_stateless_iter(arr1) do
         if not get.array.contains(arr2, v) then
@@ -4311,7 +4374,7 @@ transf = {
       end
       return transf.array.set(new_arr)
     end,
-    symmetric_difference_set = function(arr1, arr2)
+    set_by_symmetric_difference = function(arr1, arr2)
       local new_arr = {}
       for _, v in transf.array.index_value_stateless_iter(arr1) do
         if not get.array.contains(arr2, v) then
@@ -4330,7 +4393,7 @@ transf = {
     array = function(arr1, arr2)
       if arr1 == nil then arr1 = {} end
       if arr2 == nil then arr2 = {} end
-      return transf.two_arrays.array(arr1, arr2)
+      return transf.two_arrays.array_by_appended(arr1, arr2)
     end,
   },
   two_tables = {
@@ -4374,7 +4437,7 @@ transf = {
       )
     end,
     session_string = function(html_url_array)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.url.url_potentially_with_title_comment_array(html_url_array),
         "\n"
       )
@@ -4415,12 +4478,6 @@ transf = {
     end,
   },
   array_of_event_tables = {
-    item_array_of_event_table_items = function(arr)
-      return ar(hs.fnutils.imap(
-        arr,
-        CreateEventTableItem
-      ))
-    end,
   },
   email_file_array = {
     email_file_summary_dict = function(email_file_array)
@@ -4438,55 +4495,39 @@ transf = {
       )
     end,
   },
-  native_table_or_nil = {
+  table_or_nil = {
+    key_value_stateless_iter = function(t)
+      if t == nil then t = {} end
+      return transf.table.stateless_key_value_iter(t)
+    end,
     key_array = function(t)
       if t == nil then return {} end
-      return transf.native_table.key_array(t)
+      return transf.table.key_array(t)
     end,
     value_array = function(t)
       if t == nil then return {} end
-      return transf.native_table.value_array(t)
-    end,
-    key_value_stateless_iter = function(t)
-      if t == nil then t = {} end
+      return transf.table.value_array(t)
     end,
   },
-  native_table = {
+  table = {
     key_array = function(t)
       local res = {}
-      for k, _ in transf.native_table.key_value_stateless_iter(t) do
+      for k, _ in transf.table.key_value_stateless_iter(t) do
         res[#res + 1] = k
       end
       return res
     end,
     value_array = function(t)
       local res = {}
-      for _, v in transf.native_table.key_value_stateless_iter(t) do
+      for _, v in transf.table.key_value_stateless_iter(t) do
         res[#res + 1] = v
       end
       return res
     end,
     key_value_stateless_iter = pairs,
-    key_value_stateful_iter = get.stateless_generator.stateful_generator(transf.native_table.key_value_stateless_iter),
-    reversed_native_table = function(t)
-      return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(thing)))
-    end,
-  },
-  table_or_nil = {
-    key_value_iter = function(t)
-      if t == nil then t = {} end
-      return transf.table.key_value_iter(t)
-    end,
-  },
-  table = {
-    --- one is stateless, one is stateful, but that should be fine
-    --- @return function, table?, any?
-    key_value_iter = function(t)
-      if t.isovtable then
-        return t:pairs() 
-      else
-        return transf.native_table.key_value_stateless_iter(t)
-      end
+    key_value_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateless_iter),
+    reversed_table = function(t)
+      return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(t)))
     end,
     toml_string = toml.encode,
     --- value and comment must be strings
@@ -4503,7 +4544,7 @@ transf = {
       })
       local valuestop = hs.fnutils.reduce(map(stops, {_k = "valuestop"}, {tolist = true}), transf.two_comparables.larger)
       local keystop = hs.fnutils.reduce(map(stops, {_k = "keystop"}, {tolist = true}), transf.two_comparables.larger)
-      return table.concat(get.table.yaml_lines_aligned_with_predetermined_stops(tbl, keystop, valuestop, 0), "\n")
+      return get.string_or_number_array.string_by_joined(get.table.yaml_lines_aligned_with_predetermined_stops(tbl, keystop, valuestop, 0), "\n")
     end,
     yaml_metadata = function(t)
       local string_contents = transf.not_userdata_or_string.yaml_string(t)
@@ -4518,7 +4559,7 @@ transf = {
       return contents
     end,
     value_set = function(t)
-      return transf.array.set(transf.native_table_or_nil.value_array(t))
+      return transf.array.set(transf.table_or_nil.value_array(t))
     end,
     determined_array_table = function(t)
       return transf.word.determinant_metatable_creator_fn("arr")(t)
@@ -4573,7 +4614,7 @@ transf = {
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.url_param)
     end,
     url_params = function(t)
-      return table.concat(transf.dict.url_param_array(t), "&")
+      return get.string_or_number_array.string_by_joined(transf.dict.url_param_array(t), "&")
     end,
     --- @param t { [string]: string }
     --- @return string
@@ -4590,10 +4631,10 @@ transf = {
       for key, value in get.indexable.key_value_stateless_iter(t) do
         table.insert(header_lines, transf.pair.email_header({key, value}))
       end
-      return table.concat(header_lines, "\n")
+      return get.string_or_number_array.string_by_joined(header_lines, "\n")
     end,
-    curl_form_field_list = function(t)
-      return concat(
+    curl_form_field_array = function(t)
+      return transf.array_of_arrays.array(
         hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.curl_form_field_args)
       )
     end,
@@ -4601,7 +4642,7 @@ transf = {
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.ini_line)
     end,
     ini_string = function(t)
-      return table.concat(transf.dict.ini_line_array(t), "\n")
+      return get.string_or_number_array.string_by_joined(transf.dict.ini_line_array(t), "\n")
     end,
     envlike_line_array = function(t)
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.envlike_line)
@@ -4618,10 +4659,10 @@ transf = {
       return "dict (" .. transf.dict.length(t) .. "): " .. transf.dict.contents_summary(t)
     end,
     dict_entry_multiline_string = function(t)
-      return table.concat(transf.dict.dict_entry_string_array(t), "\n")
+      return get.string_or_number_array.string_by_joined(transf.dict.dict_entry_string_array(t), "\n")
     end,
     envlike_string = function(t)
-      return table.concat(transf.dict.envlike_line_array(t), "\n")
+      return get.string_or_number_array.string_by_joined(transf.dict.envlike_line_array(t), "\n")
     end,
     chooser_item_list = function(t)
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.chooser_item)
@@ -4639,7 +4680,49 @@ transf = {
       )
     end,
     truthy_value_key_array = function(t)
-      return transf.native_table_or_nil.key_array(transf.dict.truthy_value_dict(t))
+      return transf.table_or_nil.key_array(transf.dict.truthy_value_dict(t))
+    end,
+  },
+  dict_array = {
+    dict_by_take_new = function(t)
+      local res = {}
+      for _, dict in transf.array.index_value_stateless_iter(t) do
+        for k, v in transf.table.stateless_key_value_iter(dict) do
+          res[k] = v
+        end
+      end
+      return res
+    end,
+    dict_by_take_old = function(t)
+      local res = {}
+      for _, dict in transf.array.index_value_stateless_iter(t) do
+        for k, v in transf.table.stateless_key_value_iter(dict) do
+          if not res[k] then
+            res[k] = v
+          end
+        end
+      end
+      return res
+    end,
+  },
+  two_dicts = {
+    dict_by_take_new = function(t1, t2)
+      return transf.dict_array.dict_by_take_new({t1, t2})
+    end,
+    dict_by_take_old = function(t1, t2)
+      return transf.dict_array.dict_by_take_old({t1, t2})
+    end,
+  },
+  two_dict_or_nils = {
+    dict_by_take_new = function(t1, t2)
+      if t1 == nil then t1 = {} end
+      if t2 == nil then t2 = {} end
+      return transf.two_dicts.dict_by_take_new(t1, t2)
+    end,
+    dict_by_take_old = function(t1, t2)
+      if t1 == nil then t1 = {} end
+      if t2 == nil then t2 = {} end
+      return transf.two_dicts.dict_by_take_old(t1, t2)
     end,
   },
   string_value_dict = {
@@ -4648,7 +4731,7 @@ transf = {
   string_key_dict = {
     string_key_dict_of_string_key_dicts_or_prev_values_by_space = function(tbl)
       local res = {}
-      for k, v in transf.table.key_value_iter(tbl) do
+      for k, v in transf.table.stateless_key_value_iter(tbl) do
         local key_parts = stringy.split(k, " ")
         local label = key_parts[1]
         local key = key_parts[2]
@@ -4673,8 +4756,11 @@ transf = {
       )
     end,
     truthy_long_flag_string = function(dict)
-      return table.concat(transf.dict.truthy_long_flag_array(dict), " ")
+      return get.string_or_number_array.string_by_joined(transf.dict.truthy_long_flag_array(dict), " ")
     end,
+  },
+  array_of_arrays = {
+    array = array2d.flatten,
   },
   pair_array = {
     dict = function(arr)
@@ -4711,7 +4797,7 @@ transf = {
   },
   dict_of_string_value_dicts = {
     ini_string = function(t)
-      return table.concat(map(
+      return get.string_or_number_array.string_by_joined(map(
         t,
         function(k,v)
           return "[" .. k .. "]\n" .. transf.dict.ini_string(v)
@@ -4722,8 +4808,8 @@ transf = {
   dict_of_dicts = {
     dict_by_space = function(dict_of_dicts)
       local res = {}
-      for label, dict in transf.table.key_value_iter(dict_of_dicts) do
-        for k, v in transf.table.key_value_iter(dict) do
+      for label, dict in transf.table.stateless_key_value_iter(dict_of_dicts) do
+        for k, v in transf.table.stateless_key_value_iter(dict) do
           res[label .. " " .. k] = v
         end
       end
@@ -4747,7 +4833,7 @@ transf = {
         if not year_month_day_time_table[year] then year_month_day_time_table[year] = {} end
         if not year_month_day_time_table[year][year_month] then year_month_day_time_table[year][year_month] = {} end
         if not year_month_day_time_table[year][year_month][year_month_day] then year_month_day_time_table[year][year_month][year_month_day] = {} end
-        local contents = concat({time}, fields)
+        local contents = transf.any_and_array.array(time, fields)
         table.insert(year_month_day_time_table[year][year_month][year_month_day], contents)
       end
       return year_month_day_time_table
@@ -5068,7 +5154,7 @@ transf = {
       )
     end,
     citations_file_string = function(arr)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.indicated_citable_object_id_array.citations_file_line_array(arr), 
         "\n"
       )
@@ -5313,7 +5399,7 @@ transf = {
   translation_price_specifier = {
     translation_price_block_german = function(spec)
       return 
-        table.concat(
+        get.string_or_number_array.string_by_joined(
           hs.fnutils.imap(
             spec.translation_price_specifier_array,
             function(v)
@@ -5373,7 +5459,7 @@ transf = {
         "AXTitle"
       )
       local filtered = hs.fnutils.filter(arr, function (v) return v.AXTitle ~= "" end)
-      for k, v in transf.native_table.key_value_stateless_iter(filtered) do
+      for k, v in transf.table.key_value_stateless_iter(filtered) do
         v.application = app
       end
       return filtered
@@ -5641,7 +5727,7 @@ transf = {
       )
     end,
     bib_string = function(arr)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.csl_table_array.bib_string_array(arr),
         "\n"
       )
@@ -5706,7 +5792,7 @@ transf = {
       return csl_table.author
     end,
     naive_author_summary = function(csl_table)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         hs.fnutils.imap(
           transf.csl_table.author_array(csl_table),
           transf.csl_person.naive_name
@@ -5727,7 +5813,7 @@ transf = {
       )
     end,
     authors_et_al_string = function(csl_table)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.csl_table.authors_et_al_array(csl_table),
         ", "
       )
@@ -5739,7 +5825,7 @@ transf = {
     end,
     filename = function(csl_table)
       return slice(
-        table.concat(
+        get.string_or_number_array.string_by_joined(
           {
             transf.csl_table.authors_et_al_string(csl_table),
             get.csl_table.key_year_force_first(csl_table, "issued"),
@@ -5939,7 +6025,7 @@ transf = {
       return csl_person.literal
     end,
     naive_name = function(csl_person)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         transf.hole_y_arraylike.array({
           transf.csl_person.given(csl_person),
           transf.csl_person.dropping_particle(csl_person),
@@ -5959,7 +6045,7 @@ transf = {
   },
   date_parts_single = {
     rfc3339like_dt = function(date_parts)
-      return table.concat(date_parts, "-")
+      return get.string_or_number_array.string_by_joined(date_parts, "-")
     end,
     prefix_partial_date_component_name_value_dict = function(date_parts)
       return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
@@ -6079,7 +6165,7 @@ transf = {
     no_scheme = function(url)
       local parts = stringy.split(url, ":")
       table.remove(parts, 1)
-      local rejoined = table.concat(parts, ":")
+      local rejoined = get.string_or_number_array.string_by_joined(parts, ":")
       return get.string.no_prefix_string(rejoined, "//")
     end,
     vdirsyncer_pair_specifier = function(url)
@@ -6213,7 +6299,7 @@ transf = {
     yaml_string = function(tbl)
       local raw_yaml = yaml.dump({tbl})
       local lines = stringy.split(raw_yaml, "\n")
-      return table.concat(lines, "\n", 2, #lines - 2)
+      return get.string_or_number_array.string_by_joined(lines, "\n", 2, #lines - 2)
     end,
     json_here_string = function(t)
       return transf.string.here_string(json.encode(t))
@@ -6436,6 +6522,11 @@ transf = {
       end, {"v", "kv"})
     end
   },
+  image_data_url = {
+    hs_image = function(data_url)
+      return transf.image_url.hs_image(data_url)
+    end,
+  },
   source_id = {
     language = function(source_id)
       return slice(stringy.split(source_id, "."), -1, -1)[1]
@@ -6555,7 +6646,7 @@ transf = {
         yaml_files,
         transf.yaml_file.not_userdata_or_function
       )
-      local env_var_name_env_node_dict = concat(env_var_name_env_node_dict_array)
+      local env_var_name_env_node_dict = transf.dict_array.dict_by_take_new(env_var_name_env_node_dict_array)
       return transf.env_var_name_env_node_dict.env_string(env_var_name_env_node_dict)
     end,
   },
@@ -6715,7 +6806,7 @@ transf = {
     end,
     non_root_volume_absolute_path_array = function()
       return hs.fnutils.filter(
-        transf.native_table_or_nil.key_array(hs.fs.volume.allVolumes()),
+        transf.table_or_nil.key_array(hs.fs.volume.allVolumes()),
         is.local_absolute_path.root_local_absolute_path
       )
     end,
@@ -6816,7 +6907,7 @@ transf = {
       )
     end,
     action_specifier_array = function(thing_name)
-      return concat(
+      return transf.two_arrays.array_by_appended(
         transf.thing_name.act_action_specifier_array[thing_name],
         transf.thing_name.transf_action_specifier_array[thing_name]
       )
@@ -6836,7 +6927,7 @@ transf = {
       )
     end,
     action_specifier_array = function(thing_name_array)
-      return concat(
+      return transf.array_of_arrays.array(
         transf.thing_name_array.array_of_action_specifier_arrays(thing_name_array)
       )
     end,
@@ -6971,7 +7062,7 @@ transf = {
       )
     end,
     summary_line_emoji = function(mpv_ipc_socket_id)
-      return table.concat(
+      return get.string_or_number_array.string_by_joined(
         hs.fnutils.imap(
           {"pause", "loop", "shuffle", "video"},
           get.fn.first_n_args_bound_fn(get.mpv_ipc_socket_id.boolean_emoji, mpv_ipc_socket_id)
@@ -6994,8 +7085,8 @@ transf = {
         
   },
   stream_creation_specifier = {
-    flags_with_default = function(stream_creation_specifier)
-      return concat(
+    flag_dict_by_with_default = function(stream_creation_specifier)
+      return transf.two_dicts.dict_by_take_new(
         tblmap.stream_creation_specifier_flag_profile_name.stream_creation_specifier_flag_profile[stream_creation_specifier.flag_profile_name or "foreground"],
         stream_creation_specifier.flags 
       )
@@ -7147,7 +7238,7 @@ transf = {
           return 0
         elseif is.any.array(indexable) then
           local largestkey = 0
-          for k, v in transf.native_table.key_value_stateless_iter(indexable) do
+          for k, v in transf.table.key_value_stateless_iter(indexable) do
             if type(k) == "number" and k > largestkey then
               largestkey = k
             end
@@ -7155,7 +7246,7 @@ transf = {
           return largestkey
         else
           local len = 0
-          for k, v in transf.native_table.key_value_stateless_iter(indexable) do
+          for k, v in transf.table.key_value_stateless_iter(indexable) do
             len = len + 1
           end
           return len
@@ -7166,7 +7257,7 @@ transf = {
       if type(thing) == "string" then
         return eutf8.reverse(thing)
       elseif type(thing) == "table" then
-        return transf.native_table.reversed_native_table(thing)
+        return transf.table.reversed_table(thing)
       end
     end,
     key_array = function(indexable)
@@ -7224,10 +7315,10 @@ transf = {
   },
   two_sets = {
     union_set = function(set1, set2)
-      return transf.two_arrays.union_set(set1, set2)
+      return transf.two_arrays.set_by_union(set1, set2)
     end,
     intersection_set = function(set1, set2)
-      return transf.two_arrays.intersection_set(set1, set2)
+      return transf.two_arrays.set_by_intersection(set1, set2)
     end,
     is_subset = function(set1, set2)
       for _, v in transf.array.index_value_stateless_iter(set1) do
@@ -7554,7 +7645,7 @@ transf = {
       if raw_return == nil then
         return nil, false
       end
-      local list_return = transf.native_table_or_nil.value_array(raw_return)
+      local list_return = transf.table_or_nil.value_array(raw_return)
       if #list_return == 0 then
         return nil, true
       end
@@ -7710,7 +7801,7 @@ transf = {
   n_shot_llm_spec = {
     n_shot_api_query_role_content_message_spec_array = function(spec)
       return transf.role_content_message_spec_array.api_role_content_message_spec_array(
-        concat(
+        transf.array_of_arrays.array(
           {
             {
               role = "user",

@@ -331,8 +331,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
       )
     else
       content_type = "multipart/form-data"
-      local form_field_args = transf.dict.curl_form_field_list(specifier.request_table)
-      curl_command = concat(
+      local form_field_args = transf.dict.curl_form_field_array(specifier.request_table)
+      curl_command = transf.two_arrays.array_by_appended(
         curl_command,
         form_field_args
       )

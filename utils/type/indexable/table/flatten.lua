@@ -105,7 +105,7 @@ function flatten(tbl, opts, visited)
       local newitem = {}
       if opts.val.value then newitem.value = v end
       if opts.val.key then newitem.key = k end
-      if opts.val.path then newitem.path = concat(opts.path, k) end
+      if opts.val.path then newitem.path = conclat(opts.path, k) end
       if opts.val.depth then newitem.depth = opts.depth end
       if opts.val.valuestop then newitem.valuestop = #v end
       if opts.val.keystop then newitem.keystop = (opts.depth) * opts.indentation + #k end
@@ -147,7 +147,7 @@ function flatten(tbl, opts, visited)
 
   if opts.join_path and opts.depth == 0 then
     for k, v in get.indexable.key_value_stateless_iter(res) do
-      v.path = table.concat(v.path, opts.join_path)
+      v.path = get.string_or_number_array.string_by_joined(v.path, opts.join_path)
     end
   end
   

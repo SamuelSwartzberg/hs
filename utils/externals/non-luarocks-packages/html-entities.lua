@@ -2300,7 +2300,7 @@ function htmlEntities.filter(input, table)
     return false
   end
   local output = input
-  for s, v in transf.native_table.key_value_stateless_iter(table) do
+  for s, v in transf.table.key_value_stateless_iter(table) do
     output = output:gsub(s, v)
   end
   return output
