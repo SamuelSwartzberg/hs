@@ -30,14 +30,7 @@ projectDirsArray = ar(get.extant_path.absolute_path_array(env.ME, {recursion = 2
 
 
 envTable = dc(env)
-compTable = dc(flatten(comp, {
-  mode = "path-assoc",
-  val = "plain-value",
-  join_path = ".",
-  treat_as_leaf = "list",
-}))
-
-System = CreateSystem()
+compTable = transf.table.dot_notation_key_dict_by_primitive_and_arraylike_is_leaf(comp)
 
 System:get("manager", "hotkey"):doThis("create", {key = "r", fn = hs.reload})
 

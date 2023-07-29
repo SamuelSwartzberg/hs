@@ -85,7 +85,7 @@ get = {
       return transf.string.lines(run("khal printcalendars"))
     end,
     writeable_calendars = function()
-      return hs.fnutils.filter(
+      return hs.fnutils.ifilter(
         get.khal.calendar_name_array(),
         is.calendar_name.writeable_calendar_name
       )
@@ -319,15 +319,69 @@ get = {
     key_value_equals = function(t, key, value)
       return t[key] == value
     end,
-    array_of_label_arrays = function(t, bool_by_is_leaf_arg_fn, include_inner, visited)
+    array_of_arrays_by_label_root_to_leaf = function(t, table_arg_bool_by_is_leaf_ret_fn, visited, path)
       visited = get.any.default_if_nil(visited, {})
-      include_inner = get.any.default_if_nil(include_inner, true)
-      local res = {}
-      for k, v in transf.table.stateless_key_value_iter do
+      local arr_o_arrs = {}
+      for k, v in transf.table.stateless_key_value_iter(t) do
+        local path = transf.array_and_any.array(path, k)
+        if not is.any.table(v) or table_arg_bool_by_is_leaf_ret_fn(v) then -- this is inherently a leaf, or we've been told to treat it as one
+          dothis.array.push(
+            arr_o_arrs, 
+            transf.array_and_any.array(path, v)
+          )
+        else -- not a leaf
+          if not get.array.contains(visited, v) then -- only if we've not seen this yet, to avoid infinite loops
+            arr_o_arrs = transf.two_arrays.array_by_appended(
+              arr_o_arrs,
+              get.table.array_of_arrays_by_label_root_to_leaf(
+                v,
+                table_arg_bool_by_is_leaf_ret_fn,
+                transf.two_arrays.array_by_appended(visited, v),
+                path
+              )
+            )
+          end
+        end
       end
+      return arr_o_arrs
     end,
+    array_of_arrays_by_key_label = function(t, table_arg_bool_by_is_leaf_ret_fn, visited, path)
+      visited = get.any.default_if_nil(visited, {})
+      local arr_o_arrs = {}
+      for k, v in transf.table.stateless_key_value_iter(t) do
+        local path = transf.array_and_any.array(path, k)
+        dothis.array.push(
+          arr_o_arrs, 
+          path
+        )
+        if is.any.table(v) and table_arg_bool_by_is_leaf_ret_fn(v) then -- not a leaf
+          if not get.array.contains(visited, v) then -- only if we've not seen this yet, to avoid infinite loops
+            arr_o_arrs = transf.two_arrays.array_by_appended(
+              arr_o_arrs,
+              get.table.array_of_arrays_by_key_label(
+                v,
+                table_arg_bool_by_is_leaf_ret_fn,
+                transf.two_arrays.array_by_appended(visited, v),
+                path
+              )
+            )
+          end
+        end
+      end
+      return arr_o_arrs
+    end,
+    string_by_joined_key_any_value_dict = function(t, table_arg_bool_by_is_leaf_ret_fn, joiner)
+      return get.array_of_arrays.string_by_joined_key_any_value_dict(
+        get.table.array_of_arrays_by_label_root_to_leaf(t, table_arg_bool_by_is_leaf_ret_fn),
+        joiner
+      )
+    end,
+    stop_specifier = function(t, table_arg_bool_by_is_leaf_ret_fn)
+      return get
+    end
     
   },
+
   dict = {
     array_by_array = function(dict, arr)
       return map(
@@ -340,7 +394,7 @@ get = {
     end,
     key_value_fn_filtered_dict = function(t, fn)
       return transf.pair_array.dict(
-        hs.fnutils.filter(
+        hs.fnutils.ifilter(
           transf.dict.pair_array(t),
           function(pair)
             return fn(pair[1], pair[2])
@@ -405,6 +459,30 @@ get = {
     end,
   },
   array = {
+    array_by_filtered = hs.fnutils.ifilter,
+    two_arrays_by_filtered_nonfiltered = function(arr, fn)
+      local passes = {}
+      local fails = {}
+      for _, v in transf.array.key_value_stateless_iter(arr) do
+        if fn(v) then
+          dothis.array.push(passes, v)
+        else
+          dothis.array.push(fails, v)
+        end
+      end
+      return passes, fails
+    end,
+    string_by_joined = function(arr, joiner)
+      return get.string_or_number_array.string_by_joined(
+        transf.array.string_array(arr),
+        joiner
+      )
+    end,
+    string_by_joined_any_pair = function(arr, joiner)
+      local any = dothis.array.pop(arr)
+      local str = get.string_or_number_array.string_by_joined(arr, joiner)
+      return { str, any }
+    end,
     some_pass = function(arr, cond)
       return find(arr, cond, {"v", "boolean"})
     end,
@@ -818,6 +896,62 @@ get = {
     int_by_rounded_or_nil = function(str, base)
       local nonindicated_number_string = transf.string.nonindicated_number_string(str)
       return get.nonindicated_number_string.int_by_rounded_or_nil(nonindicated_number_string, base)
+    end,
+    two_integer_or_nils_by_onig_regex_match = onig.find,
+    two_integer_or_nils_by_eutf8_regex_match = eutf8.find,
+    string_array_by_onig_regex_match = function(str, regex)
+      local res = {}
+      for match in onig.gmatch(str, regex) do
+        dothis.array.push(res, match)
+      end
+      return res
+    end,
+    two_string_arrays_by_onig_regex_match_nomatch = function(str, regex)
+      local matches = {}
+      local nomatches = {}
+      local prev_index = 1
+      while true do
+        local start, stop = get.string.two_integer_or_nils_by_onig_regex_match(str, regex, prev_index)
+        if start == nil then
+          if prev_index <= #str then
+            dothis.array.push(nomatches, str:sub(prev_index))
+          end          
+          return matches, nomatches
+        else
+          dothis.array.push(matches, str:sub(start, stop))
+          if start > prev_index then
+            dothis.array.push(nomatches, str:sub(prev_index, start - 1))
+          end
+          prev_index = stop + 1
+        end
+      end
+    end,
+    string_array_by_eutf8_regex_match = function(str, regex)
+      local res = {}
+      for match in eutf8.gmatch(str, regex) do
+        dothis.array.push(res, match)
+      end
+      return res
+    end,
+    two_string_arrays_by_eutf8_regex_match_nomatch = function(str, regex)
+      local matches = {}
+      local nomatches = {}
+      local prev_index = 1
+      while true do
+        local start, stop = get.string.two_integer_or_nils_by_eutf8_regex_match(str, regex, prev_index)
+        if start == nil then
+          if prev_index <= eutf8.len(str) then
+            dothis.array.push(nomatches, eutf8.sub(str, prev_index))
+          end          
+          return matches, nomatches
+        else
+          dothis.array.push(matches, eutf8.sub(str, start, stop))
+          if start > prev_index then
+            dothis.array.push(nomatches, eutf8.sub(str, prev_index, start - 1))
+          end
+          prev_index = stop + 1
+        end
+      end
     end,
   },
   nonindicated_number_string_array = {
@@ -1744,6 +1878,17 @@ get = {
   array_of_arrays = {
     column = array2d.column,
     row = array2d.row,
+    string_by_joined_any_pair_array = function(arr, joiner)
+      return hs.fnutils.imap(
+        arr,
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.n_string_or_number_any_array.string_by_joined_any_pair, {a_use, joiner})
+      )
+    end,
+    string_by_joined_key_any_value_dict = function(arr, joiner)
+      return transf.pair_array.dict(
+        get.array_of_n_string_or_number_any_arrays.string_by_joined_any_pair_array(arr, joiner)
+      )
+    end,
     array_of_dicts_by_array = function(arr_of_arr, arr2)
       return hs.fnutils.imap(
         arr_of_arr,
@@ -1876,7 +2021,7 @@ get = {
       else
         dependent_dict = {}
       end
-      return transf.(self_dict, dependent_dict)
+      return transf.two_dict_or_nils.dict_by_take_new(self_dict, dependent_dict)
     end,
   },
   env_var_name_env_node_dict = {
@@ -2606,7 +2751,7 @@ get = {
       )
     end,
   },
-  label_array = {
+  n_any_assoc_arr_array = {
     leaf_label_with_title_path = function(arr, title_key)
       local leaf = get.table.copy(dothis.array.pop(arr))
       local title_path = map(
@@ -2617,11 +2762,11 @@ get = {
       return leaf
     end
   },
-  array_of_label_arrays = {
-    array_of_leaf_labels_with_title_path = function(arr, title_key)
+  array_of_n_any_assoc_arr_arrays = {
+    array_of_assoc_arr_leaf_labels_with_title_path = function(arr, title_key)
       return hs.fnutils.imap(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.label_array.leaf_label_with_title_path, {a_use, title_key})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.n_any_assoc_arr_array.leaf_label_with_title_path, {a_use, title_key})
       )
     end,
   },

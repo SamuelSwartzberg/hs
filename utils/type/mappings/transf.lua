@@ -1594,7 +1594,7 @@ transf = {
 
   },
   tree_node = {
-    array_of_label_arrays = function(node, path, include_inner)
+    array_of_arrays_by_label = function(node, path, include_inner)
       path = get.table.copy(path) or {}
       dothis.array.push(path, node.label)
       local res = {}
@@ -1602,16 +1602,16 @@ transf = {
         res = {path}
       end
       if node.children then
-        res = transf.two_arrays.array_by_appended(res, transf.tree_node_array.array_of_label_arrays(node.children, path, include_inner))
+        res = transf.two_arrays.array_by_appended(res, transf.tree_node_array.array_of_arrays_by_label(node.children, path, include_inner))
       end
       return res
     end
   },
   tree_node_array = {
-    array_of_label_arrays = function(arr, path, include_inner)
+    array_of_arrays_by_label = function(arr, path, include_inner)
       local res = {}
       for _, node in transf.array.index_value_stateless_iter(arr) do
-        res = transf.two_arrays.array_by_appended(res, transf.tree_node.array_of_label_arrays(node, path, include_inner))
+        res = transf.two_arrays.array_by_appended(res, transf.tree_node.array_of_arrays_by_label(node, path, include_inner))
       end
       return res
     end,
@@ -3312,13 +3312,13 @@ transf = {
       return transf.word.notcapitalized(k), v
     end,
     title_case = function(str)
-      local words, removed = split(str, {_r = "[ :–\\—\\-\\t\\n]", _regex_engine = "onig"})
+      local words, removed = get.string.two_string_arrays_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
       local title_cased_words = map(words, transf.word.title_case_policy)
       title_cased_words[1] = replace(title_cased_words[1], to.case.capitalized)
       title_cased_words[#title_cased_words] = replace(title_cased_words[#title_cased_words], to.case.capitalized)
       local arr = transf.two_arrays.array_by_interleaved_stop_a1(title_cased_words, removed)
       return get.string_or_number_array.string_by_joined(arr, "")
-    end,
+    end, 
     romanized_deterministic = function(str)
       local raw_romanized = run(
         { "echo", "-n",  {value = str, type = "quoted"}, "|", "kakasi", "-iutf8", "-outf8", "-ka", "-Ea", "-Ka", "-Ha", "-Ja", "-s", "-ga" }
@@ -3841,7 +3841,7 @@ transf = {
   },
   multiline_string = {
     trimmed_lines_multiline_string = function(str)
-      local lines = split(str, "\n")
+      local lines = get.string.string_array_split(str, "\n")
       local trimmed_lines = map(lines, stringy.strip)
       return get.string_or_number_array.string_by_joined(trimmed_lines, "\n")
     end,
@@ -3932,7 +3932,7 @@ transf = {
     end,
     synonym_string_array = function(str)
       local items = stringy.split(transf.word.raw_av_output(str), "\t")
-      items = hs.fnutils.filter(items, function(itm)
+      items = hs.fnutils.ifilter(items, function(itm)
         if itm == nil then
           return false
         end
@@ -4217,13 +4217,13 @@ transf = {
       )
     end,
     noemtpy_string_array = function(arr)
-      return hs.fnutils.filter(arr, is.string.noempty_string)
+      return hs.fnutils.ifilter(arr, is.string.noempty_string)
     end,
     noindent_string_array = function(arr)
       return hs.fnutils.imap(arr, transf.line.noindent)
     end,
     nocomment_line_filtered_string_array = function(arr)
-      return hs.fnutils.filter(
+      return hs.fnutils.ifilter(
         arr,
         is.string.nocomment_line
       )
@@ -4245,7 +4245,7 @@ transf = {
       )
     end,
     filter_to_url_array = function(arr)
-      return hs.fnutils.filter(arr, is.string.url)
+      return hs.fnutils.ifilter(arr, is.string.url)
     end,
     filter_nocomment_noindent_to_url_array = function(arr)
       return transf.string_array.filter_to_url_array(
@@ -4530,21 +4530,15 @@ transf = {
       return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(t)))
     end,
     toml_string = toml.encode,
-    --- value and comment must be strings
     yaml_aligned = function(tbl)
-      local value_table = map(
-        tbl,
-        {_k = "value", _ret = "orig" },
-        { recurse = true, treat_as_leaf = "list" }
+      local tmp = transf.string.in_tmp_dir(
+        transf.not_userdata_or_function.yaml_string(tbl),
+        "shell-input"
       )
-      local stops = flatten(value_table, {
-        treat_as_leaf = "list",
-        mode = "assoc",
-        val = {"valuestop", "keystop"},
-      })
-      local valuestop = hs.fnutils.reduce(map(stops, {_k = "valuestop"}, {tolist = true}), transf.two_comparables.larger)
-      local keystop = hs.fnutils.reduce(map(stops, {_k = "keystop"}, {tolist = true}), transf.two_comparables.larger)
-      return get.string_or_number_array.string_by_joined(get.table.yaml_lines_aligned_with_predetermined_stops(tbl, keystop, valuestop, 0), "\n")
+      run("align " .. transf.string.single_quoted_escaped(tmp))
+      local res = transf.yaml_file.not_userdata_or_function(tmp)
+      dothis.local_extant_path.delete(tmp)
+      return res
     end,
     yaml_metadata = function(t)
       local string_contents = transf.not_userdata_or_string.yaml_string(t)
@@ -4573,29 +4567,58 @@ transf = {
     json_string_pretty = function(t)
       return hs.json.encode(t, true)
     end,
-    
-  },
-  assoc_arr = {
-    relative_path_dict = function(t)
-      return flatten(
+    array_of_arrays_by_label_root_to_leaf_only_primitive_is_leaf = function(t)
+      return get.table.array_of_arrays_by_label_root_to_leaf(
         t,
-        {
-          treat_as_leaf = "list",
-          mode = "path-assoc",
-          join_path = "/"
-        }
+        transf["nil"]["false"]()
       )
     end,
-    nested_key_to_array = function(t)
-      return flatten(
+    array_of_arrays_by_label_root_to_leaf_primitive_and_arraylike_is_leaf = function(t)
+      return get.table.array_of_arrays_by_label_root_to_leaf(
         t,
-        {
-          treat_as_leaf = "list",
-          val = "plain-key",
-          mode="list",
-          add_nonleaf = true,
-
-        }
+        is.table.arraylike
+      )
+    end,
+    array_of_arrays_by_key_label_only_primitive_is_leaf = function(t)
+      return get.table.array_of_arrays_by_key_label(
+        t,
+        transf["nil"]["false"]()
+      )
+    end,
+    array_of_arrays_by_key_label_primitive_and_arraylike_is_leaf = function(t)
+      return get.table.array_of_arrays_by_key_label(
+        t,
+        is.table.arraylike
+      )
+    end,
+    relative_path_key_dict_by_primitive_and_arraylike_is_leaf = function(t)
+      return get.table.string_by_joined_key_any_value_dict(
+        t,
+        is.table.arraylike,
+        "/"
+      )
+    end,
+    dot_notation_key_dict_by_primitive_and_arraylike_is_leaf = function(t)
+      return get.table.string_by_joined_key_any_value_dict(
+        t,
+        is.table.arraylike,
+        "."
+      )
+    end,
+    array_by_nested_final_key_label_by_primitive_and_arraylike_is_leaf = function(t)
+      return transf.array_of_arrays.array_by_map_to_last(
+        get.table.array_of_arrays_by_key_label(
+          t,
+          is.table.arraylike
+        )
+      )
+    end,
+    array_by_nested_value_primitive_and_arraylike_is_leaf = function(t)
+      return transf.array.array_by_map_to_last(
+        get.table.array_of_arrays_by_label_root_to_leaf(
+          t,
+          is.table.arraylike
+        )
       )
     end,
   },
@@ -4634,7 +4657,7 @@ transf = {
       return get.string_or_number_array.string_by_joined(header_lines, "\n")
     end,
     curl_form_field_array = function(t)
-      return transf.array_of_arrays.array(
+      return transf.array_of_arrays.array_by_flatten(
         hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.curl_form_field_args)
       )
     end,
@@ -4674,7 +4697,7 @@ transf = {
       return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.key_chooser_item)
     end,
     truthy_value_dict = function(t)
-      return hs.fnutils.filter(
+      return hs.fnutils.ifilter(
         t,
         transf.any.boolean
       )
@@ -4760,7 +4783,13 @@ transf = {
     end,
   },
   array_of_arrays = {
-    array = array2d.flatten,
+    array_by_flatten = array2d.flatten,
+    array_by_map_to_last = function(arr)
+      return hs.fnutils.imap(arr, transf.array.last)
+    end,
+    array_by_map_to_first = function(arr)
+      return hs.fnutils.imap(arr, transf.array.first)
+    end,
   },
   pair_array = {
     dict = function(arr)
@@ -4816,6 +4845,15 @@ transf = {
       return res
     end,
 
+  },
+  array_value_dict = {
+    array_of_arrays = function(arr)
+      return transf.table.value_array(arr)
+    end,
+    array_by_flatten = function(arr)
+      return transf.array_of_arrays.array_by_flatten(transf.table.value_array(arr))
+    end,
+        
   },
   timestamp_key_array_value_dict = {
     --- transforms a timestamp-key orderedtable into a table of the structure [yyyy] = { [yyyy-mm] = { [yyyy-mm-dd] = { [hh:mm:ss, ...] } } }
@@ -5451,24 +5489,18 @@ transf = {
       return app:bundleID()
     end,
     menu_item_table_array = function(app)
-      local arr = get.array_of_label_arrays.array_of_leaf_labels_with_title_path(
+      local arr = get.array_of_n_any_assoc_arr_arrays.array_of_assoc_arr_leaf_labels_with_title_path(
         get.tree_node_like_array.tree_node_array(
           app:getMenuItems(),
           { levels_of_nesting_to_skip = 1}
         ),
         "AXTitle"
       )
-      local filtered = hs.fnutils.filter(arr, function (v) return v.AXTitle ~= "" end)
+      local filtered = hs.fnutils.ifilter(arr, function (v) return v.AXTitle ~= "" end)
       for k, v in transf.table.key_value_stateless_iter(filtered) do
         v.application = app
       end
       return filtered
-    end,
-    menu_item_table_item_array = function(app)
-      return hs.fnutils.imap(
-        transf.running_application.menu_item_table_array(app),
-        CreateMenuItemTable
-      )
     end,
     icon_hs_image = function(app)
       return transf.bundle_id.icon_hs_image(
@@ -6729,7 +6761,7 @@ transf = {
     end,
     --- Create a function that returns a unique identifier for a given object.
     --- @return fun(any): number
-    identifier_function = function()
+    any_arg_pos_int_ret_fn_by_unique_id_primitives_equal = function()
       local fn_id_map = setmetatable({}, {__mode = "k"}) -- weak keys to allow garbage collection
       local next_id = 0
 
@@ -6756,9 +6788,8 @@ transf = {
       return succ
     end,
     pandoc_full_md_extension_set = function()
-      return flatten(
-        mt._list.markdown_extensions,
-        { mode="list"}
+      return transf.array_value_dict.array_by_flatten(
+        mt._list.markdown_extensions
       )
     end,
     passw_pass_item_name_array = function()
@@ -6795,8 +6826,8 @@ transf = {
     end,
     mullvad_relay_identifier_array = function()
       return 
-        flatten(
-          transf.multiline_string.relay_table(
+        transf.table.array_by_nested_value_primitive_and_arraylike_is_leaf(
+          transf.multiline_string.iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_array_value_dict_value_dict(
             transf["nil"].mullvad_relay_list_string()
           )
       )
@@ -6805,7 +6836,7 @@ transf = {
       return run("mullvad relay get"):match("hostname ([^ ]+)")
     end,
     non_root_volume_absolute_path_array = function()
-      return hs.fnutils.filter(
+      return hs.fnutils.ifilter(
         transf.table_or_nil.key_array(hs.fs.volume.allVolumes()),
         is.local_absolute_path.root_local_absolute_path
       )
@@ -6915,7 +6946,7 @@ transf = {
   },
   thing_name_hierarchy = {
     thing_name_array = function(thing_name_hierarchy)
-      return transf.assoc_arr.nested_key_to_array(thing_name_hierarchy)
+      return transf.table.array_by_nested_final_key_label_by_primitive_and_arraylike_is_leaf(thing_name_hierarchy)
     end
   },
   thing_name_array = {
@@ -6927,7 +6958,7 @@ transf = {
       )
     end,
     action_specifier_array = function(thing_name_array)
-      return transf.array_of_arrays.array(
+      return transf.array_of_arrays.array_by_flatten(
         transf.thing_name_array.array_of_action_specifier_arrays(thing_name_array)
       )
     end,
@@ -7801,7 +7832,7 @@ transf = {
   n_shot_llm_spec = {
     n_shot_api_query_role_content_message_spec_array = function(spec)
       return transf.role_content_message_spec_array.api_role_content_message_spec_array(
-        transf.array_of_arrays.array(
+        transf.array_of_arrays.array_by_flatten(
           {
             {
               role = "user",
@@ -7826,3 +7857,5 @@ transf = {
     end,
   }
 }
+
+transf.any.pos_int_by_unique_id_primitives_equal = transf["nil"].any_arg_pos_int_ret_fn_by_unique_id_primitives_equal()

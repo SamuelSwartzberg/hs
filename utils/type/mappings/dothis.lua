@@ -365,7 +365,7 @@ dothis = {
     end,
     write_dynamic_path_dict = function(path, assoc_arr, extension)
       dothis.local_path.write_relative_path_dict(
-        transf.assoc_arr.relative_path_dict(path), 
+        transf.table.relative_path_dict(path), 
         assoc_arr, 
         extension
       )
@@ -1477,7 +1477,7 @@ dothis = {
     open_recent = function(application_name, item)
       dothis.mac_application_name.execute_full_action_path(
         application_name,
-        append(
+        transf.array_and_any.array(
           tblmap.mac_application_name.recent_full_action_path[application_name],
           item
         )

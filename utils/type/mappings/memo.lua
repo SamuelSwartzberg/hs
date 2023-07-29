@@ -118,7 +118,7 @@ end
 --- @field stringify_table_params? boolean whether to stringify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to stringify the params to use them as a path
 --- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be stringified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
 
-local identifier = transf["nil"].identifier_function()
+local identifier = transf["nil"].any_arg_pos_int_ret_fn_by_unique_id_primitives_equal()
 
 --- memoize a function if it's not already memoized, or return the memoized version if it is
 --- @generic I, O

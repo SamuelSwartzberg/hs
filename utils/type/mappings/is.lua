@@ -597,6 +597,9 @@ is = {
     table = function(val)
       return type(val) == "table"
     end,
+    primitive = function(val)
+      return not is.any.table(val)
+    end,
     arraylike = function(val)
       return is.any.table(val) and is.table.arraylike(val)
     end,
@@ -721,7 +724,6 @@ is = {
     arraylike = function(t)
       if t.isarr then return true end -- signal value to indicate that this is a list
       if t.isassoc then return false end -- signal value to indicate that this is an assoc table
-      if t.isovtable then return false end
       return is.table.arraylike_by_keys(t)
     end,
     non_arraylike = function(t)
