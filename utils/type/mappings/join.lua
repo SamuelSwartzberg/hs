@@ -4,7 +4,7 @@ join = {
       with_yaml_metadata = function(str, tbl)
         if not str then return transf.table.yaml_metadata(tbl) end
         if not tbl then return str end
-        if transf.indexable.length(tbl) == 0 then return str end
+        if transf.table.pos_int_by_num_keys(tbl) == 0 then return str end
         local stripped_str = stringy.strip(str)
         local final_metadata, final_contents
         if stringy.startswith(stripped_str, "---") then

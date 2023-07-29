@@ -6,8 +6,6 @@
 --- @field step? integer May also be negative. Default 1
 --- @field sliced_indicator? any Optional indicator to be added to the result when changed as a result of slicing, e.g. for adding ellipses. Default nil (no indicator)
 --- @field fill? any Optional value to fill any positions that were sliced away with, such that the result is the same length as the original. Default nil (no filling)
---- @field last_start? boolean When using a conditionSpec for start, this indicates that the last matching element should be used instead of the first. Default false
---- @field last_stop? boolean When using a conditionSpec for stop, this indicates that the last matching element should be used instead of the first. Default false
 
 --- @alias sliceSpecLike sliceSpec | string string here is a shorthand parsed as [<start>]:[<stop>][:[<step>]]
 
@@ -18,30 +16,23 @@
 --- - start > stop (if pos step) or start < stop (if neg step) will return an empty table
 --- @generic T : indexable
 --- @param thing T
---- @param start_or_spec? integer|string|sliceSpec if we're specifying the start, stop and step as separate arguments, otherwise a sliceSpec or a string to be parsed as a sliceSpec
+--- @param notation? integer|string|sliceSpec if we're specifying the start, stop and step as separate arguments, otherwise a sliceSpec or a string to be parsed as a sliceSpec
 --- @param stop? conditionSpec integer if we're specifying the start, stop and step as separate arguments, otherwise nil
 --- @param step? integer see above
 --- @return T, sliceSpec
-function slice(thing, start_or_spec, stop, step)
+function slice(thing, notation, stop, step)
 
   local spec = {}
 
   -- parse the slice spec if it's a string or table
 
-  if type(start_or_spec) == "table" then
-    spec = get.table.copy(start_or_spec, false)
-  elseif type(start_or_spec) == "string" then
-    local stripped_str = stringy.strip(start_or_spec)
-    local start_str, stop_str, step_str = onig.match(
-      stripped_str, 
-      "^\\[?(-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
-    )
-    spec.start = get.string_or_number.int_by_rounded_or_nil(start_str)
-    spec.stop = get.string_or_number.int_by_rounded_or_nil(stop_str)
-    spec.step = get.string_or_number.int_by_rounded_or_nil(step_str)
+  if type(notation) == "table" then
+    spec = get.table.copy(notation, false)
+  elseif type(notation) == "string" then
+    l
 
   else
-    spec.start = start_or_spec
+    spec.start = notation
     spec.stop = stop
     spec.step = step
   end

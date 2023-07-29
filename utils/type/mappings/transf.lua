@@ -529,6 +529,13 @@ transf = {
     end,
   },
   array = {
+    array_by_reversed = function(arr)
+      local res = {}
+      for i = #arr, 1, -1 do
+        dothis.array.push(res, arr[i])
+      end
+      return res
+    end,
     first = function(arr)
       return arr[1]
     end,
@@ -568,6 +575,7 @@ transf = {
     
     index_value_stateless_iter = ipairs,
     index_value_stateful_iter = get.stateless_generator.stateful_generator(transf.array.index_value_stateless_iter),
+    index_stateful_iter = get.stateless_generator.stateful_generator(transf.array.index_value_stateless_iter, 1, 1),
     value_boolean_dict = function(arr)
       return map(arr, function(v) return v, true end, { args = "v", ret = "kv", nooverwrite = true })
     end,
@@ -999,7 +1007,7 @@ transf = {
       return items
     end,
     children_absolute_path_value_stateful_iter = function(remote_extant_path)
-      return transf.indexable.value_stateful_iter(
+      return transf.table.value_stateful_iter(
         transf.remote_dir.children_absolute_path_array(remote_extant_path)
       )
     end,
@@ -1989,7 +1997,7 @@ transf = {
       )
     end,
     date_component_name_ordered_list = function(list)
-      return get.array.sorted(list, transf.two_date_component_names.larger)
+      return get.array.array_by_sorted(list, transf.two_date_component_names.larger)
     end,
     largest_date_component_name = function(list)
       return transf.date_component_name_list.date_component_name_ordered_list(
@@ -4279,7 +4287,26 @@ transf = {
           "\n\nset +u\n"
     end,
   },
+  slice_notation = {
+    three_pos_int_or_nils = function(notation)
+      local stripped_str = stringy.strip(notation)
+      local start_str, stop_str, step_str = onig.match(
+        stripped_str, 
+        "^\\[?(-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
+      )
+      return
+        start_str == "" and nil or get.string.number_or_nil(start_str),
+        stop_str == "" and nil or get.string.number_or_nil(stop_str),
+        step_str == "" and nil or get.string.number_or_nil(step_str)
+    end,
+  },
   two_arrays = {
+    two_anys_by_first = function(arr1, arr2)
+      return arr1[1], arr2[1]
+    end,
+    bool_by_larger_first = function(arr1, arr2)
+      return transf.two_comparables.larger(arr1[1], arr2[1])
+    end,
     array_by_appended = function(arr1, arr2)
       local res = get.table.copy(arr1)
       for _, v in transf.array.index_value_stateless_iter(arr2) do
@@ -4517,6 +4544,9 @@ transf = {
       end
       return res
     end,
+    pos_int_by_num_keys = function(t)
+      return #transf.table.key_array(t)
+    end,
     value_array = function(t)
       local res = {}
       for _, v in transf.table.key_value_stateless_iter(t) do
@@ -4526,9 +4556,8 @@ transf = {
     end,
     key_value_stateless_iter = pairs,
     key_value_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateless_iter),
-    reversed_table = function(t)
-      return get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(get.indexable.reversed_key_value_stateless_iter(t)))
-    end,
+    key_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateful_iter, 1, 1),
+    value_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateful_iter, 2, 2),
     toml_string = toml.encode,
     yaml_aligned = function(tbl)
       local tmp = transf.string.in_tmp_dir(
@@ -4630,6 +4659,11 @@ transf = {
         refstore.params.map.opts.kv_to_list
       )
     end,
+    pair_array_by_sorted_larger_key_first = function(t)
+      return transf.array_of_arrays.array_of_arrays_by_larger_first(
+        transf.dict.pair_array(t)
+      )
+    end,
     length = function(t)
       return #transf.dict.pair_array(t)
     end,
@@ -4651,9 +4685,13 @@ transf = {
           t[header_name] = nil
         end
       end
-      for key, value in get.indexable.key_value_stateless_iter(t) do
-        table.insert(header_lines, transf.pair.email_header({key, value}))
-      end
+      header_lines = transf.two_arrays.array_by_appended(
+        header_lines,
+        hs.fnutils.imap(
+          transf.dict.pair_array_by_sorted_larger_key_first(t),
+          transf.pair.email_header
+        )
+      )
       return get.string_or_number_array.string_by_joined(header_lines, "\n")
     end,
     curl_form_field_array = function(t)
@@ -4783,12 +4821,42 @@ transf = {
     end,
   },
   array_of_arrays = {
+    array_of_arrays_by_larger_first = function(arr)
+      return get.array.array_by_sorted(
+        arr,
+        transf.two_arrays.bool_by_larger_first
+      )
+    end,
     array_by_flatten = array2d.flatten,
     array_by_map_to_last = function(arr)
       return hs.fnutils.imap(arr, transf.array.last)
     end,
     array_by_map_to_first = function(arr)
       return hs.fnutils.imap(arr, transf.array.first)
+    end,
+    array_by_longest_common_prefix = function(a_o_a)
+      local last_matching_index = 0
+      hs.fnutils.reduce(a_o_a, function(acc, arr)
+        for i = 1, #arr do
+          if arr[i] == acc[i] then
+            last_matching_index = i
+          else
+            break
+          end
+        end
+    
+        return arr
+      end)
+      return slice(a_o_a[1], 1, last_matching_index)
+    end,
+    array_of_arrays_by_reverse = function(arr)
+      return map(arr, transf.array.array_by_reverse)
+    end,
+    array_by_longest_common_suffix = function(arr)
+      local reversed_res = transf.array.array_by_longest_common_prefix(
+        transf.array.reverse_mapped(arr)
+      )
+      return transf.array_by_reversed.array(reversed_res)
     end,
   },
   pair_array = {
@@ -4862,7 +4930,7 @@ transf = {
     ymd_nested_key_array_of_arrays_value_assoc_arr = function(timestamp_key_table)
       error("this still uses orderedtable, but I've removed that package")
       local year_month_day_time_table = {}
-      for timestamp_str, fields in get.indexable.key_value_stateless_iter(timestamp_key_table,-1,1,-1) do 
+      for timestamp_str, fields in get.indxbl.key_value_stateless_iter(timestamp_key_table,-1,1,-1) do
         local timestamp = get.string_or_number.number_or_nil(timestamp_str)
         local year = os.date("%Y", timestamp)
         local year_month = os.date("%Y-%m", timestamp)
@@ -5839,9 +5907,10 @@ transf = {
       )
     end,
     authors_et_al_array = function(csl_table)
-      return slice(
+      return get.array.array_by_slice_removed_indicator_and_flatten_w_slice_spec(
         transf.csl_table.author_last_name_array(csl_table),
-        { stop = 5, sliced_indicator = "et_al" }
+        { stop = 5 },
+        "et_al"
       )
     end,
     authors_et_al_string = function(csl_table)
@@ -6364,7 +6433,7 @@ transf = {
     self_and_empty_string = function(any)
       return any, ""
     end,
-    self = function(any)
+    any_by_self = function(any)
       return any
     end,
     boolean = function(any)
@@ -7034,7 +7103,7 @@ transf = {
       )
     end,
     precedence_ordered_retriever_specifier_array = function(retriever_specifier_array)
-      return get.array.sorted(
+      return get.array.array_by_sorted(
         retriever_specifier_array,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key) {a_use, a_use, "precedence"})
     end
@@ -7246,102 +7315,6 @@ transf = {
         stream_created_item_specifier_array,
         transf.stream_created_item_specifier.is_running
       )
-    end,
-  },
-  indexable = {
-    first_key = function(t)
-      return elemAt(t, 1, "k")
-    end,
-    first_value = function(t)
-      return elemAt(t, 1, "v")
-    end,
-    last_key = function(t)
-      return elemAt(t, transf.indexable.length(t), "k")
-    end,
-    last_value = function(t)
-      return elemAt(t, transf.indexable.length(t), "v")
-    end,
-    length = function(indexable)
-      if type(indexable) == "string" then
-        return eutf8.len(indexable)
-      elseif type(indexable) == "table" then
-       if is.any.empty_table(indexable) then
-          return 0
-        elseif is.any.array(indexable) then
-          local largestkey = 0
-          for k, v in transf.table.key_value_stateless_iter(indexable) do
-            if type(k) == "number" and k > largestkey then
-              largestkey = k
-            end
-          end
-          return largestkey
-        else
-          local len = 0
-          for k, v in transf.table.key_value_stateless_iter(indexable) do
-            len = len + 1
-          end
-          return len
-        end
-      end
-    end,
-    reversed_indexable = function(thing)
-      if type(thing) == "string" then
-        return eutf8.reverse(thing)
-      elseif type(thing) == "table" then
-        return transf.table.reversed_table(thing)
-      end
-    end,
-    key_array = function(indexable)
-      local t = {}
-      for k, _ in get.indexable.key_value_stateless_iter(indexable) do
-        t[#t + 1] = k
-      end
-      return t
-    end,
-    value_array = function(indexable)
-      local t = {}
-      for _, v in get.indexable.key_value_stateless_iter(indexable) do
-        t[#t + 1] = v
-      end
-      return t
-    end,
-    unspecified_equivalent_empty_indexable = function(indexable)
-      if is.any.string(indexable) then
-        return ""
-      else
-        return {}
-      end
-    end,
-    key_value_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter),
-    key_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter, 1, 1),
-    value_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.key_value_stateless_iter, 2, 2),
-    index_value_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.index_value_stateless_iter),
-    index_stateful_iter = get.stateless_generator.stateful_generator(get.indexable.index_value_stateless_iter, 1, 1),
-  },
-  indexable_array = {
-    longest_common_prefix_indexable = function(arr)
-      return hs.fnutils.reduce(arr, function(acc, thing)
-        local isstring =type(thing) == "string"
-        local last_matching_index = 0
-        for i = 1, transf.indexable.length(thing) do
-          if elemAt(thing, i) == elemAt(acc, i) then
-            last_matching_index = i
-          else
-            break
-          end
-        end
-    
-        return slice(acc, 1, last_matching_index) or ( isstring and "" or {} )
-      end)
-    end,
-    reverse_mapped = function(arr)
-      return map(arr, transf.indexable.reversed_indexable)
-    end,
-    longest_common_suffix_indexable_array = function(arr)
-      local reversed_res = transf.indexable_array.longest_common_prefix_indexable(
-        transf.indexable_array.reverse_mapped(arr)
-      )
-      return transf.indexable.reversed_indexable(reversed_res)
     end,
   },
   two_sets = {

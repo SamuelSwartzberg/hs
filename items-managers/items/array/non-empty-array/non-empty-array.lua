@@ -51,7 +51,7 @@ NonEmptyArraySpecifier = {
       args = { key = "revsorted-to-new-array-default" },
     },{
       text = "👉👆 chd.",
-      getfn = get.array.head,
+      getfn = get.array.array_by_head,
       
     },{
       text = "👉👇 ctl.",

@@ -459,7 +459,105 @@ get = {
     end,
   },
   array = {
+    two_arrays_of_arrays_by_slice_w_slice_spec = function(arr, slice_spec)
+      
+
+    end,
+    array_by_slice_w_slice_spec = function(arr, slice_spec)
+      return transf.array_of_arrays.array_by_flatten(
+        select(
+          1, 
+          get.array.two_arrays_of_arrays_by_slice_w_slice_spec(arr, slice_spec)
+        )
+      )
+    end,
+    two_arrays_of_arrays_by_slice_w_3_pos_int_or_nils = function(arr, start, stop, step)
+      return get.array.two_arrays_of_arrays_by_slice_w_slice_spec(
+        arr,
+        {
+          start = start,
+          stop = stop,
+          step = step,
+        }
+      )
+    end,
+    array_by_slice_w_3_pos_int_or_nils = function(arr, start, stop, step)
+      return get.array.array_by_slice_w_slice_spec(
+        arr,
+        {
+          start = start,
+          stop = stop,
+          step = step,
+        }
+      )
+    end,
+    two_arrays_of_arrays_by_slice_w_slice_notation = function(arr, notation)
+      return get.array.two_arrays_of_arrays_by_slice_w_3_pos_int_or_nils(
+        arr,
+        transf.slice_notation.three_pos_int_or_nils(notation)
+      )
+    end,
+    array_by_slice_w_slice_notation = function(arr, notation)
+      return get.array.array_by_slice_w_3_pos_int_or_nils(
+        arr,
+        transf.slice_notation.three_pos_int_or_nils(notation)
+      )
+    end,
+    two_arrays_of_arrays_by_slice_and_removed_filler_w_slice_spec = function(arr, slice_spec, fill)
+      local hits, removed = get.array.two_arrays_of_arrays_by_slice_w_slice_spec(arr, slice_spec)
+      return hits, get.array_of_arrays.array_of_arrays_by_mapped(
+        removed,
+        function(arr)
+          return hs.fnutils.imap(
+            arr,
+            function()
+              return fill
+            end
+          )
+        end
+      )
+    end,
+    array_of_arrays_by_slice_and_removed_filler_w_slice_spec = function(arr, slice_spec, fill)
+      local hits, fill = get.array.two_arrays_of_arrays_by_slice_and_removed_filler_w_slice_spec(arr, slice_spec, fill)
+      return transf.two_arrays.array_by_interleaved_stop_longest(hits, fill)
+    end,
+    array_by_slice_removed_filler_and_flatten_w_slice_spec = function(arr, slice_spec, fill)
+      return transf.array_of_arrays.array_by_flatten(
+        get.array.array_of_arrays_by_slice_and_removed_filler_w_slice_spec(arr, slice_spec, fill)
+      )
+    end,
+    --- the difference between this function and the _removed_filler one is that this will replace an array of removed elements with a single element (the indicator) unless length zero, whereas the other will replace it with an array of elements (the fill)
+    two_array_of_arrays_by_slice_and_removed_indicator_w_slice_spec = function(arr, slice_spec, indicator)
+      local hits, removed = get.array.two_arrays_of_arrays_by_slice_w_slice_spec(arr, slice_spec)
+      return hits, get.array_of_arrays.array_of_arrays_by_mapped_if_not_length_0(
+        removed,
+        function(arr)
+          return {indicator}
+        end
+      )
+    end,
+    array_of_arrays_by_slice_and_removed_indicator_w_slice_spec = function(arr, slice_spec, indicator)
+      local hits, indicator = get.array.two_array_of_arrays_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
+      return transf.two_arrays.array_by_interleaved_stop_longest(hits, indicator)
+    end,
+    array_by_slice_removed_indicator_and_flatten_w_slice_spec = function(arr, slice_spec, indicator)
+      return transf.array_of_arrays.array_by_flatten(
+        get.array.array_of_arrays_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
+      )
+    end,
+    pos_int_by_first_match_w_any = tablex.find,
+    pos_int_by_last_match_w_any = tablex.rfind,
+    pos_int_by_first_match_w_fn = hs.fnutils.find,
     array_by_filtered = hs.fnutils.ifilter,
+    pos_int_by_last_match_w_fn = function(arr, fn)
+      local rev = transf.array.array_by_reversed(arr)
+      local index = get.array.pos_int_by_first_match_w_fn(rev, fn)
+      if index then
+        return #arr - index + 1
+      else
+        return nil
+      end
+    end,
     two_arrays_by_filtered_nonfiltered = function(arr, fn)
       local passes = {}
       local fails = {}
@@ -500,36 +598,36 @@ get = {
       end
       return get.array.none_pass(arr, cond)
     end,
-    head = function(arr, n)
-      return slice(arr, 1, n or 10)
+    array_by_head = function(arr, n)
+      return get.array.array_by_slice_w_3_pos_int_or_nils(arr, 1, n or 10)
     end,
-    tail = function(arr, n)
-      return slice(arr, -(n or 10))
+    array_by_tail = function(arr, n)
+      return get.array.array_by_slice_w_3_pos_int_or_nils(arr, -(n or 10))
     end,
-    nth_element = function(arr, n)
+    any_w_index = function(arr, n)
       return arr[n]
     end,
-    next_by_index = function(arr, n)
+    any_by_next_w_index = function(arr, n)
       return arr[n + 1]
     end,
-    next_by_index_wrapping = function(arr, n)
+    any_by_next_wrapping_w_index = function(arr, n)
       return arr[(n % #arr) + 1]
     end,
     next_by_item = function(arr, item)
-      local index = get.indexable.index_by_item(arr, item)
-      return get.array.next_by_index(arr, index)
+      local index = get.array.pos_int_by_first_match_w_any(arr, item)
+      return get.array.any_by_next_w_index(arr, index)
     end,
     next_by_item_wrapping = function(arr, item)
-      local index = get.indexable.index_by_item(arr, item)
-      return get.array.next_by_index_wrapping(arr, index)
+      local index = get.array.pos_int_by_first_match_w_any(arr, item)
+      return get.array.any_by_next_wrapping_w_index(arr, index)
     end,
     next_by_fn = function(arr, fn)
       local index = find(arr, fn, {"i"})
-      return get.array.next_by_index(arr, index)
+      return get.array.any_by_next_w_index(arr, index)
     end,
     next_by_fn_wrapping = function(arr, fn)
       local index = find(arr, fn, {"i"})
-      return get.array.next_by_index_wrapping(arr, index)
+      return get.array.any_by_next_wrapping_w_index(arr, index)
     end,
     previous = function(arr, n)
       return arr[n - 1]
@@ -537,19 +635,19 @@ get = {
     previous_wrapping = function(arr, n)
       return arr[(n - 2) % #arr + 1]
     end,
-    sorted = function(list, comp)
+    array_by_sorted = function(list, comp)
       local new_list = get.table.copy(list, false)
       table.sort(new_list, comp)
       return new_list
     end,
-    min = function(list, comp)
-      return get.array.sorted(list, comp)[1]
+    any_by_min = function(list, comp)
+      return get.array.array_by_sorted(list, comp)[1]
     end,
-    max = function(list, comp)
-      return get.array.sorted(list, comp)[#list]
+    any_by_max = function(list, comp)
+      return get.array.array_by_sorted(list, comp)[#list]
     end,
     revsorted = function(arr, comp)
-      return transf.indexable.reversed_indexable(get.array.sorted(arr, comp))
+      return transf.array.array_by_reversed(get.array.array_by_sorted(arr, comp))
     end,
     --- @generic T
     --- @param list T[]
@@ -678,16 +776,16 @@ get = {
       end
     end,
     lines_tail = function(path, n)
-      return slice(transf.string.lines(path), -(n or 10))
+      return get.array.array_by_slice_w_3_pos_int_or_nils(transf.string.lines(path), -(n or 10))
     end,
     lines_head = function(path, n)
-      return slice(transf.string.lines(path), 1, n or 10)
+      return get.array.array_by_slice_w_3_pos_int_or_nils(transf.string.lines(path), 1, n or 10)
     end,
     content_lines_tail = function(path, n)
-      return slice(transf.string.noempty_line_string_array(path), -(n or 10))
+      return get.array.array_by_slice_w_3_pos_int_or_nils(transf.string.noempty_line_string_array(path), -(n or 10))
     end,
     content_lines_head = function(path, n)
-      return slice(transf.string.noempty_line_string_array(path), 1, n or 10)
+      return get.array.array_by_slice_w_3_pos_int_or_nils(transf.string.noempty_line_string_array(path), 1, n or 10)
     end,
     bool_startswith = stringy.startswith,
     bool_endswith = stringy.endswith,
@@ -1711,7 +1809,7 @@ get = {
   date_component_name = {
     next = function(component, n)
       n = n or 0
-      return get.array.next_by_index(mt._list.date.date_component_names, transf.date_component_name.index(component) + n)
+      return get.array.any_by_next_w_index(mt._list.date.date_component_names, transf.date_component_name.index(component) + n)
     end,
     previous = function(component, n)
       n = n or 0
@@ -1878,6 +1976,18 @@ get = {
   array_of_arrays = {
     column = array2d.column,
     row = array2d.row,
+    array_of_arrays_by_mapped_if_not_length_0 = function(arr_of_arr, fn)
+      return hs.fnutils.imap(
+        arr_of_arr,
+        function(arr)
+          if #arr == 0 then
+            return arr
+          else
+            return fn(arr)
+          end
+        end
+      )
+    end,
     string_by_joined_any_pair_array = function(arr, joiner)
       return hs.fnutils.imap(
         arr,
@@ -1907,7 +2017,13 @@ get = {
         get.array_of_arrays.dict_of_arrays_by_first_element(arr_of_arr),
         arr2
       )
-    end
+    end,
+    array_of_arrays_by_mapped = function(arr_of_arr, fn)
+      return hs.fnutils.imap(
+        arr_of_arr,
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.array.array_by_mapped, {a_use, fn})
+      )
+    end,
   },
   dict_of_arrays = {
     dict_of_dicts_by_array = function(dict_of_arr, arr2)
@@ -2346,87 +2462,6 @@ get = {
     end,
   },
   indexable = {
-    --- pairs dropin replacement that is ordered by default, supports start/stop/step and works with any indexable
-    --- difference from iprs is that it returns the key instead of the index
-    --- in case of a list/string, the key is the index, so it's the same as iprs
-    --- guarantees the same order every time, thus may have a different order than pairs
-    --- @param thing indexable
-    --- @param start? integer
-    --- @param stop? integer
-    --- @param step? integer
-    --- @param limit? integer
-    --- @return function, indexable, integer
-    key_value_stateless_iter = function(thing, start, stop, step, limit)
-      local tblkeys = transf.table_or_nil.key_array(thing)
-      local iter, tbl, idx = get.indexable.index_value_stateless_iter(thing, start, stop, step, limit, tblkeys)
-      return function(tbl)
-        local i, v = iter(tbl, idx)
-        if i then
-          idx = i
-          return elemAt(thing, i, "kv", tblkeys)
-        end
-      end, tbl, idx
-    end,
-    --- @param thing indexable
-    --- @param start? integer
-    --- @param stop? integer
-    --- @param step? integer
-    --- @param limit? integer
-    --- @return function, indexable, integer
-    reversed_key_value_stateless_iter = function(thing, start, stop, step, limit)
-      return get.indexable.key_value_stateless_iter(thing, start, stop, step and -math.abs(step) or -1, limit)
-    end,
-    --- ipairs dropin replacement that supports start/stop/step and works with any indexable
-    --- slow though
-    --- guarantees the same order every time, and typically also the same order as ipairs (though this is not guaranteed)
-    --- @param indexable indexable
-    --- @param start? integer
-    --- @param stop? integer
-    --- @param step? integer
-    --- @param limit? integer limit the number of iterations, regardless of the index
-    --- @param precalc_keys? any[] precalculated keys 
-    --- @return function, indexable, integer
-    index_value_stateless_iter = function(indexable, start, stop, step, limit, precalc_keys)
-      local len_thing = transf.indexable.length(indexable)
-      if len_thing == 0 then
-        return function() end, indexable, 0
-      end
-      start = start or 1 -- default to first elem
-      if start < 0 then -- if negative, count from the end
-        start = len_thing + start + 1 -- e.g. 8 + -1 + 1 = 8 -> last elem
-      end
-      stop = stop or len_thing -- default to last elem
-      if stop < 0 then -- if negative, count from the end
-        stop = len_thing + stop + 1
-      end
-      step = step or 1
-      limit = limit or math.huge
-      local iters = 0
-      if (start - stop) * (step/math.abs(step)) > 0 then
-        start, stop = stop, start -- swap if they're in the wrong order
-      end
-      local tblkeys = precalc_keys or transf.table_or_nil.key_array(indexable)
-      return function(thing, i)
-        i = i + step
-        iters = iters + 1
-        if 
-          ((step > 0 and i <= stop) or
-          (step < 0 and i >= stop)) and
-          iters <= limit
-        then
-          return i, elemAt(thing, i, nil, tblkeys)
-        end
-      end, indexable, start - step
-    end,
-    --- @param thing indexable
-    --- @param start? integer
-    --- @param stop? integer
-    --- @param step? integer
-    --- @param limit? integer
-    --- @return function, indexable, integer
-    reversed_index_value_stateless_iter = function(thing, start, stop, step, limit)
-      return get.indexable.index_value_stateless_iter(thing, start, stop, step and -math.abs(step) or -1, limit)
-    end,
     index_by_item = function(arr, item)
       return find(
         arr,

@@ -2022,8 +2022,8 @@ dothis = {
     sort = table.sort,
     shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(table.sort, {a_use, transf["nil"].random_boolean}),
     remove_by_index = table.remove,
-    revove_by_item = function(array, item)
-      local index = get.indexable.index_by_item(array, item)
+    revove_by_first_item_w_any = function(array, item)
+      local index = get.array.pos_int_by_first_match_w_any(array, item)
       if index then
         dothis.array.remove_by_index(array, index)
       end
@@ -2034,7 +2034,7 @@ dothis = {
       dothis.array.insert_at_index(array, target_index, item)
     end,
     move_to_index_by_item = function(array, item, index)
-      local source_index = get.indexable.index_by_item(array, item)
+      local source_index = get.array.pos_int_by_first_match_w_any(array, item)
       if source_index then
         dothis.array.move_to_index_by_index(array, source_index, index)
       end
@@ -2043,7 +2043,7 @@ dothis = {
       dothis.array.move_to_index_by_item(array, item, 1)
     end,
     move_to_front_or_unshift = function(array, item)
-      local index = get.indexable.index_by_item(array, item)
+      local index = get.array.pos_int_by_first_match_w_any(array, item)
       if index then
         dothis.array.move_to_index_by_index(array, index, 1)
       else
