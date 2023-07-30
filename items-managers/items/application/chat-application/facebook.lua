@@ -107,7 +107,7 @@ FacebookItemSpecifier = {
       end,
       ["preprocess-backup-files"] = function()
         for _, subdir in transf.local_dir.children_absolute_path_value_stateful_iter(env.TMP_FACEBOOK_EXPORT_PARENT) do
-          if not find({"photos", "stickers_used"}, transf.path.leaf(subdir)[1]) then
+          if not hs.fnutils.find({"photos", "stickers_used"}, transf.path.leaf(subdir)[1]) then
             dothis.dir.move_children_absolute_path_array_into_absolute_path(subdir, env.MCHATS_GLOBAL_FACEBOOK_MEDIA)
           end
         end

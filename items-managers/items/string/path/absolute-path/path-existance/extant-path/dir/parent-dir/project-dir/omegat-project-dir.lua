@@ -32,7 +32,7 @@ OmegatProjectDirItemSpecifier = {
    
       end,
       ["file-rechnung"] = function(self)
-        local rechnung_target = get.dir.find_child(env.MDIARY .. "/moments/work", {_stop =  "translation"}) .. "/rechnungen"
+        local rechnung_target = get.dir.extant_path_by_child_w_fn(env.MDIARY .. "/moments/work", {_stop =  "translation"}) .. "/rechnungen"
 
         self:get("str-item", "rechnung-pdf-path"):doThis("move-into-dir", rechnung_target)
       end,

@@ -941,23 +941,28 @@ dothis = {
       dothis.plaintext_file.write_lines(path, lines)
       return line
     end,
-    remove_line = function(path, line_number)
+    remove_line_w_pos_int = function(path, line_number)
       local lines = transf.plaintext_file.line_array(path)
       table.remove(lines, line_number)
       dothis.plaintext_file.write_lines(path, lines)
     end,
-    find_remove_line = function(path, cond, opts)
+    remove_line_w_fn = function(path, cond)
       local lines = transf.plaintext_file.line_array(path)
-      local index = get.string_array.find(lines, cond, {ret = "i"})
-      dothis.plaintext_file.remove_line(path, index)
+      local index = get.array.pos_int_or_nil_by_first_match_w_fn(lines, cond)
+      dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
-    find_remove_nocomment_noindent_line = function(path, cond, opts)
+    remove_line_w_string = function(path, cond)
       local lines = transf.plaintext_file.line_array(path)
-      local index = find(lines, function(line)
+      local index = get.array.pos_int_or_nil_by_first_match_w_t(lines, cond)
+      dothis.plaintext_file.remove_line_w_pos_int(path, index)
+    end,
+    find_remove_nocomment_noindent_line = function(path, cond)
+      local lines = transf.plaintext_file.line_array(path)
+      local index = hs.fnutils.find(lines, function(line)
         local nocomment_noindent = transf.line.nocomment_noindent(line)
         return findsingle(nocomment_noindent, cond)
-      end, {ret = "i"})
-      dothis.plaintext_file.remove_line(path, index)
+      end)
+      dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
 
   },
@@ -2023,7 +2028,7 @@ dothis = {
     shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(table.sort, {a_use, transf["nil"].random_boolean}),
     remove_by_index = table.remove,
     revove_by_first_item_w_any = function(array, item)
-      local index = get.array.pos_int_by_first_match_w_any(array, item)
+      local index = get.array.pos_int_or_nil_by_first_match_w_t(array, item)
       if index then
         dothis.array.remove_by_index(array, index)
       end
@@ -2034,7 +2039,7 @@ dothis = {
       dothis.array.insert_at_index(array, target_index, item)
     end,
     move_to_index_by_item = function(array, item, index)
-      local source_index = get.array.pos_int_by_first_match_w_any(array, item)
+      local source_index = get.array.pos_int_or_nil_by_first_match_w_t(array, item)
       if source_index then
         dothis.array.move_to_index_by_index(array, source_index, index)
       end
@@ -2043,7 +2048,7 @@ dothis = {
       dothis.array.move_to_index_by_item(array, item, 1)
     end,
     move_to_front_or_unshift = function(array, item)
-      local index = get.array.pos_int_by_first_match_w_any(array, item)
+      local index = get.array.pos_int_or_nil_by_first_match_w_t(array, item)
       if index then
         dothis.array.move_to_index_by_index(array, index, 1)
       else
@@ -2523,6 +2528,19 @@ dothis = {
         dothis.sox.sox_rec_stop()
       else
         dothis.sox.sox_rec_start_cache(do_after)
+      end
+    end,
+    mullvad_connect = function()
+      run("mullvad connect", true)
+    end,
+    mullvad_disconnect = function()
+      run("mullvad disconnect", true)
+    end,
+    mullvad_toggle = function()
+      if transf["nil"].mullvad_boolean_connected() then
+        dothis["nil"].mullvad_disconnect()
+      else
+        dothis["nil"].mullvad_connect()
       end
     end,
     mbsync_sync  = function()

@@ -17,7 +17,7 @@ DirItemSpecifier = {
       end,
 
       ["find-or-create-child-dir"] = function(self, specifier)
-        local child = get.dir.find_child(self:get("c"), specifier.find_func)
+        local child = get.dir.extant_path_by_child_w_fn(self:get("c"), specifier.find_func)
         if child == nil or not is.absolute_path.dir(child) then
           self:doThis("create-empty-dir-in-dir", specifier.default_name)
           child = self:get("parent-dir-path") .. "/" .. specifier.default_name
@@ -84,7 +84,7 @@ DirItemSpecifier = {
           -- allow for regex names 
           if stringy.startswith(k, "match:") then
             local search_string = eutf8.sub(k, 7)
-            local match = find(child_filenames, function(item)
+            local match = hs.fnutils.find(child_filenames, function(item)
               return eutf8.match(item, search_string)
             end)
             if match then

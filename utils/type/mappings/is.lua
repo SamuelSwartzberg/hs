@@ -84,7 +84,7 @@ is = {
     indicated_number_string = function(str)
       return 
         stringy.startswith(str, "0") and
-        get.array.contains(transf.table_or_nil.key_array(tblmap.base_letter.base), str:sub(2, 2)) and
+        get.array.bool_by_contains(transf.table_or_nil.key_array(tblmap.base_letter.base), str:sub(2, 2)) and
         is.printable_ascii_string.number_string(str:sub(3))
     end,
     potentially_indicated_number_string = function(str)
@@ -160,7 +160,7 @@ is = {
   },
   youtube_video_id = {
     extant = function(id)
-      return get.array.contains(mt._list.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
+      return get.array.bool_by_contains(mt._list.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
     end,
     private = function(id)
       return transf.youtube_video_id.privacy_status(id) == "private"
@@ -198,7 +198,7 @@ is = {
       return eutf8.find(transf.path.leaf(path), ":%d+$") ~= nil
     end,
     useless_file_leaf = function(path)
-      return get.array.contains(mt._list.useless_files, transf.path.leaf(path))
+      return get.array.bool_by_contains(mt._list.useless_files, transf.path.leaf(path))
     end,
     not_useless_file_leaf = function(path)
       return not is.path.useless_file_leaf(path)
@@ -354,14 +354,14 @@ is = {
       return not is.extant_path.dir(path)
     end,
     in_git_dir = function(path)
-      return get.extant_path.find_self_or_ancestor_sibling_with_leaf(path, ".git")
+      return get.extant_path.extant_path_by_self_or_ancestor_sibling_w_leaf(path, ".git")
     end,
   },
   dir = {
     git_root_dir = function(path)
-      return get.array.some_pass(
+      return get.array.bool_by_some_pass_w_t(
         transf.dir.children_filename_array(path),
-        {_exactly = ".git"}
+        ".git"
       )
     end,
     empty_dir = function(path)
@@ -377,7 +377,7 @@ is = {
   },
   nonempty_dir = {
     grandparent_dir = function (path)
-      return get.array.some_pass(
+      return get.array.bool_by_some_pass_w_fn(
         transf.dir.children_absolute_path_array(path),
         is.absolute_path.dir
       )
@@ -405,7 +405,11 @@ is = {
       return is.file.plaintext_file(path) and is.plaintext_file.plaintext_dictionary_file(path)
     end,
     shellscript_file = function(path)
-      return get.path.usable_as_filetype(path, "shell-script") or get.file.find_contents(path, { _r = "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+" })
+      return get.path.usable_as_filetype(path, "shell-script") 
+      or onig.find(
+        transf.file.contents(path),
+        "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+"
+      )
     end,
     email_file = function(path)
       return 
@@ -467,7 +471,7 @@ is = {
   },
   alphanum_minus_underscore = {
     package_manager_name = function(str)
-      return get.array.contains(transf["nil"].package_manager_name_array(), str)
+      return get.array.bool_by_contains(transf["nil"].package_manager_name_array(), str)
     end,
     alphanum_underscore =  function(str) 
       return not string.find(str, "-")
@@ -769,13 +773,13 @@ is = {
       return #array > 0
     end,
     string_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.any.string
       )
     end,
     array_of_arrays = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.any.array
       )
@@ -786,7 +790,7 @@ is = {
   },
   string_array = {
     path_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.string.path
       )
@@ -794,19 +798,19 @@ is = {
   },
   path_array = {
     absolute_path_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.path.absolute_path
       )
     end,
     remote_path_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.path.remote_path
       )
     end,
     local_path_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.path.local_path
       )
@@ -814,7 +818,7 @@ is = {
   },
   absolute_path_array = {
     extant_path_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.absolute_path.file
       )
@@ -822,13 +826,13 @@ is = {
   },
   extant_path_array = {
     dir_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.extant_path.dir
       )
     end,
     file_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.extant_path.file
       )
@@ -836,7 +840,7 @@ is = {
   },
   dir_array = {
     git_root_dir_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.dir.git_root_dir
       )
@@ -847,7 +851,7 @@ is = {
   },
   file_array = {
     plaintext_file_array = function(array)
-      return get.array.all_pass(
+      return get.array.bool_by_all_pass_w_fn(
         array,
         is.file.plaintext_file
       )

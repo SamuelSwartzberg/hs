@@ -15,9 +15,9 @@ function buildInnerCommand(command_parts)
     elseif type(command_part) == "table" then -- command_part needs to be calculated
       command_part.type = command_part.type or "quoted"
       if command_part.type == "quoted" then -- wrap the command_part in quotes
-        command = command .. transf.string.escaped_double_quote_safe(command_part.value)
+        command = command .. transf.string.double_quoted_escaped(command_part.value)
       elseif command_part.type == "sq" then
-        command = command .. transf.string.escaped_single_quote_safe(command_part.value)
+        command = command .. transf.string.single_quoted_escaped(command_part.value)
       elseif command_part.type == "interpolated" then -- recursively build the command_part and wrap it in $()
         command = command .. ' "$('  .. buildInnerCommand(command_part.value) .. ')"'
       else

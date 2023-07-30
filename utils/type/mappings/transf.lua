@@ -625,6 +625,11 @@ transf = {
       return new_tbl
     end
   },
+  two_id_assoc_arrs = {
+    bool_by_equal = function(t1, t2)
+      return t1.id == t2.id
+    end,
+  },
   assoc_arr_array = {
     assoc_arr_with_index_as_key_array = function(arr)
       local res = get.table.copy(arr, true)
@@ -1199,7 +1204,7 @@ transf = {
       return transf.url.sld(transf.in_git_dir.remote_url(path))
     end,
     remote_type = function(path)
-      if get.array.contains(mt._list.remote_types, transf.in_git_dir.remote_sld(path)) then
+      if get.array.bool_by_contains(mt._list.remote_types, transf.in_git_dir.remote_sld(path)) then
         return transf.in_git_dir.remote_sld(path)
       else
         return tblmap.host.remote_type[transf.in_git_dir.remote_host(path)] -- we'll hardcode known hosts there
@@ -1402,10 +1407,9 @@ transf = {
       )
     end,
     path_leaf_specifier_with_earliest_start = function(arr)
-      return find(
+      return get.dict.kt_or_nil_by_first_match_w_vt(
         transf.path_leaf_specifier_array.path_leaf_specifier_date_interval_specifier_dict(arr),
-        {_exactly = transf.path_leaf_specifier_array.interval_specifier_with_earliest_start(arr)},
-        {"k", "v"}
+        transf.path_leaf_specifier_array.interval_specifier_with_earliest_start(arr)
       )
     end,
   },
@@ -3119,7 +3123,7 @@ transf = {
   youtube_video_title = {
     cleaned = function(title)
       title = replace(title, {
-        { cond = {_r = mt._r.text_bloat.youtube.vieo, _ignore_case = true}, mode="remove" },
+        { cond = {_r = mt._r.text_bloat.youtube.video, _ignore_case = true}, mode="remove" },
         { cond = {_r = mt._r.text_bloat.youtube.misc, _ignore_case = true}, mode="remove" },
       })
       return title
@@ -3283,9 +3287,15 @@ transf = {
       local folded = transf.string.singleline_string_by_folded(str)
       return transf.string.encoded_query_param_value(folded)
     end,
-    string_by_percent_decoded = plurl.unquote,
+    string_by_percent_decoded_also_plus = plurl.unquote,
+    string_by_percent_decoded_no_plus = function(str)
+      return transf.string.string_by_percent_decoded_also_plus(
+        eutf8.gsub(str, "%+", "%%2B") -- encode plus sign as %2B, so that it then gets decoded as a plus sign
+      )
+    end,
     escaped_csv_field = function(field)
-      return '"' .. replace(field, to.string.escaped_csv_field_contents)  .. '"'
+      local escaped = eutf8.gsub(field, '"', '""')
+      return '"' .. escaped  .. '"'
     end,
     unicode_prop_table_array = function(str)
       return memoize(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(str))
@@ -3296,10 +3306,10 @@ transf = {
       )
     end,
     single_quoted_escaped = function(str)
-      return " '" .. memoize(replace)(str, to.string.escaped_single_quote_safe) .. "'"
+      return " '" .. eutf8.gsub(str, "'", "\\'") .. "'"
     end,
     double_quoted_escaped = function(str)
-      return ' "' .. memoize(replace)(str, to.string.escaped_double_quote_safe) .. '"'
+      return ' "' .. eutf8.gsub(str, '"', '\\"') .. '"'
     end,
     envsubsted = function(str)
       return run("echo " .. transf.string.single_quoted_escaped(str) .. " | envsubst")
@@ -3894,7 +3904,7 @@ transf = {
   },
   word = {
     title_case_policy = function(word)
-      if find(mt._contains.small_words, word) then
+      if get.array.bool_by_contains(mt._contains.small_words, word) then
         return word
       elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
         return word
@@ -4377,7 +4387,7 @@ transf = {
     set_by_intersection = function(arr1, arr2)
       local new_arr = {}
       for _, v in transf.array.index_value_stateless_iter(arr1) do
-        if get.array.contains(arr2, v) then
+        if get.array.bool_by_contains(arr2, v) then
           new_arr[#new_arr + 1] = v
         end
       end
@@ -4386,7 +4396,7 @@ transf = {
     set_by_difference = function(arr1, arr2)
       local new_arr = {}
       for _, v in transf.array.index_value_stateless_iter(arr1) do
-        if not get.array.contains(arr2, v) then
+        if not get.array.bool_by_contains(arr2, v) then
           new_arr[#new_arr + 1] = v
         end
       end
@@ -4395,12 +4405,12 @@ transf = {
     set_by_symmetric_difference = function(arr1, arr2)
       local new_arr = {}
       for _, v in transf.array.index_value_stateless_iter(arr1) do
-        if not get.array.contains(arr2, v) then
+        if not get.array.bool_by_contains(arr2, v) then
           new_arr[#new_arr + 1] = v
         end
       end
       for _, v in transf.array.index_value_stateless_iter(arr2) do
-        if not get.array.contains(arr1, v) then
+        if not get.array.bool_by_contains(arr1, v) then
           new_arr[#new_arr + 1] = v
         end
       end
@@ -5072,7 +5082,7 @@ transf = {
   },
   pure_doi = {
     doi_url = function(doi)
-      return replace(doi, to.resolved.doi)
+      return "https://doi.org/" .. doi
     end,
     doi_urnlike = function(doi)
       return "doi:" .. doi
@@ -5185,7 +5195,7 @@ transf = {
       return plstringx.split(filename, "!citid:")[2]
     end,
     indicated_citable_object_id = function(filename)
-      return transf.string.string_by_percent_decoded(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
+      return transf.string.string_by_percent_decoded_also_plus(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
     end,
   },
   citable_path = {
@@ -5634,12 +5644,11 @@ transf = {
     native_window_index = function(window)
       local running_application = transf.window.running_application(window)
       local window_array = transf.running_application.window_array(running_application)
-      return find(
+      return hs.fnutils.find(
         window_array,
         function(v)
           return v:id() == window:id()
-        end,
-        {"v", "k"}
+        end
       )
     end,
     jxa_window_index = function(window)
@@ -5851,7 +5860,7 @@ transf = {
   },
   csl_table = {
     main_title = function(csl_table)
-      return get.assoc_arr.first_matching_value_for_keys(csl_table, mt._list.csl_title_keys)
+      return get.assoc_arr.vt_by_first_match_w_kv_arr(csl_table, mt._list.csl_title_keys)
     end,
     issued_date_parts_single_or_range = function(csl_table)
       return csl_table.issued
@@ -6250,7 +6259,7 @@ transf = {
           local param_parts = stringy.split(param_part, "=")
           local key = param_parts[1]
           local value = param_parts[2]
-          params[key] = transf.string.string_by_percent_decoded(value)
+          params[key] = transf.string.string_by_percent_decoded_also_plus(value)
         end
       end
       return params
@@ -6712,7 +6721,7 @@ transf = {
   },
   audiodevice_specifier_array = {
     active_audiodevice_specifier_index = function(arr)
-      return find(arr, is.audiodevice_specifier.active_audiodevice_specifier, {"i"})
+      return hs.fnutils.find(arr, is.audiodevice_specifier.active_audiodevice_specifier)
     end,
   },
   audiodevice = {
@@ -7318,7 +7327,7 @@ transf = {
     end,
     is_subset = function(set1, set2)
       for _, v in transf.array.index_value_stateless_iter(set1) do
-        if not get.array.contains(set2, v) then
+        if not get.array.bool_by_contains(set2, v) then
           return false
         end
       end

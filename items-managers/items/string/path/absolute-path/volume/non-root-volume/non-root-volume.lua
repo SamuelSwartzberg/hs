@@ -13,7 +13,7 @@ NonRootVolumeItemSpecifier = {
     doThisables = {
       eject = function (self)
         hs.fs.volume.eject(self:get("resolved-path"))
-        if find(hs.fs.volume.allVolumes(), self:get("resolved-path")) then
+        if get.array.bool_by_first_match_w_t(transf["nil"].non_root_volume_absolute_path_array(), self:get("resolved-path")) then
           error("Volume could not be ejected.", 0)
         else 
           hs.alert.show("Volume ejected successfully.")

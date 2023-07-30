@@ -209,19 +209,6 @@ get = {
     default_audiodevice = function(type)
       return hs.audiodevice["default" .. transf.string.string_by_first_eutf8_upper(type) .. "Device"]()
     end,
-    mullvad_connect = function()
-      run("mullvad connect", true)
-    end,
-    mullvad_disconnect = function()
-      run("mullvad disconnect", true)
-    end,
-    mullvad_toggle = function()
-      if transf["nil"].mullvad_boolean_connected() then
-        dothis["nil"].mullvad_disconnect()
-      else
-        dothis["nil"].mullvad_connect()
-      end
-    end,
     nth_arg_ret_fn = function(_, n)
       return function(...)
         return select(n, ...)
@@ -335,7 +322,7 @@ get = {
             transf.array_and_any.array(path, v)
           )
         else -- not a leaf
-          if not get.array.contains(visited, v) then -- only if we've not seen this yet, to avoid infinite loops
+          if not get.array.bool_by_contains(visited, v) then -- only if we've not seen this yet, to avoid infinite loops
             arr_o_arrs = transf.two_arrays.array_by_appended(
               arr_o_arrs,
               get.table.array_of_arrays_by_label_root_to_leaf(
@@ -360,7 +347,7 @@ get = {
           path
         )
         if is.any.table(v) and table_arg_bool_by_is_leaf_ret_fn(v) then -- not a leaf
-          if not get.array.contains(visited, v) then -- only if we've not seen this yet, to avoid infinite loops
+          if not get.array.bool_by_contains(visited, v) then -- only if we've not seen this yet, to avoid infinite loops
             arr_o_arrs = transf.two_arrays.array_by_appended(
               arr_o_arrs,
               get.table.array_of_arrays_by_key_label(
@@ -410,6 +397,34 @@ get = {
     value_fn_filtered_dict = function(t, fn)
       return get.dict.key_value_fn_filtered_dict(t, function(k, v) return fn(v) end)
     end,
+    kt_or_nil_by_first_match_w_kt_vt_arg_fn = function(t, fn)
+      local arr = transf.dict.pair_array_by_sorted_larger_key_first(t)
+      for _, pair in transf.array.index_value_stateless_iter(arr) do
+        if fn(pair[1], pair[2]) then
+          return pair[1]
+        end
+      end
+    end,
+    kt_or_nil_by_first_match_w_kt_arg_fn = function(t, fn)
+      return get.dict.kt_or_nil_by_first_match_w_kt_vt_arg_fn(t, function(k, v) return fn(k) end)
+    end,
+    kt_or_nil_by_first_match_w_vt_arg_fn = function(t, fn)
+      return get.dict.kt_or_nil_by_first_match_w_kt_vt_arg_fn(t, function(k, v) return fn(v) end)
+    end,
+    kt_or_nil_by_first_match_w_vt = function(t, vt)
+      return get.dict.kt_or_nil_by_first_match_w_vt_arg_fn(t, function(v) return v == vt end)
+    end,
+    kt_by_first_match_w_kt_arr = function(t, keys)
+      return get.dict.kt_or_nil_by_first_match_w_kt_arg_fn(t, function(k) return get.array.bool_by_contains(keys, k) end)
+    end,
+    vt_by_first_match_w_kt_arr= function(t, keys)
+      local key = get.dict.kt_or_nil_by_first_match_w_kt_arr(t, keys)
+      if key then
+        return t[key]
+      else
+        return nil
+      end
+    end,
 
   },
   dict_with_timestamp = {
@@ -448,9 +463,6 @@ get = {
         extension
       )
     end,
-    first_matching_value_for_keys= function(t, keys)
-      return find(t, {_list = keys}, {"k", "v"})
-    end,
   },
   table_of_assoc_arrs = {
     array_of_assoc_arrs = function(assoc_arr, key)
@@ -472,11 +484,11 @@ get = {
     two_arrays_of_arrays_by_slice_w_slice_spec = function(arr, spec)
       
       if spec.start and not is.any.number(spec.start) then
-        spec.start = get.array.pos_int_by_first_match_w_any(arr, spec.start)
+        spec.start = get.array.pos_int_or_nil_by_first_match_w_t(arr, spec.start)
       end
 
       if spec.stop and  not is.any.number(spec.start) then
-        spec.stop = get.array.pos_int_by_first_match_w_any(arr, spec.stop)
+        spec.stop = get.array.pos_int_or_nil_by_first_match_w_t(arr, spec.stop)
       end
 
       local hits = {}
@@ -645,13 +657,35 @@ get = {
         get.array.array_of_arrays_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
       )
     end,
-    pos_int_by_first_match_w_any = pltablex.find,
-    pos_int_by_last_match_w_any = pltablex.rfind,
-    pos_int_by_first_match_w_fn = hs.fnutils.find,
+    pos_int_or_nil_by_first_match_w_t = pltablex.find,
+    pos_int_or_nil_by_last_match_w_t = pltablex.rfind,
+    pos_int_or_nil_by_first_match_w_t_array = function(arr, t_arr)
+      return get.array.pos_int_or_nil_by_first_match_w_fn(arr, function(t)
+        return get.array.bool_by_first_match_w_t(t_arr, t)
+      end)
+    end,
+    pos_int_or_nil_by_first_match_w_fn = hs.fnutils.find,
+    t_or_nil_by_first_match_w_fn = function(arr, fn)
+      local index = get.array.pos_int_or_nil_by_first_match_w_fn(arr, fn)
+      if index then
+        return arr[index]
+      else
+        return nil
+      end
+    end,
+    bool_by_first_match_w_t = function(arr, t)
+      return get.array.pos_int_or_nil_by_first_match_w_t(arr, t) ~= nil
+    end,
+    bool_by_last_match_w_t = function(arr, t)
+      return get.array.pos_int_or_nil_by_last_match_w_t(arr, t) ~= nil
+    end,
+    bool_by_first_match_w_fn = function(arr, fn)
+      return get.array.pos_int_or_nil_by_first_match_w_fn(arr, fn) ~= nil
+    end,
     array_by_filtered = hs.fnutils.ifilter,
     pos_int_by_last_match_w_fn = function(arr, fn)
       local rev = transf.array.array_by_reversed(arr)
-      local index = get.array.pos_int_by_first_match_w_fn(rev, fn)
+      local index = get.array.pos_int_or_nil_by_first_match_w_fn(rev, fn)
       if index then
         return #arr - index + 1
       else
@@ -681,22 +715,23 @@ get = {
       local str = get.string_or_number_array.string_by_joined(arr, joiner)
       return { str, any }
     end,
-    some_pass = function(arr, cond)
-      return find(arr, cond, {"v", "boolean"})
+    bool_by_some_pass_w_fn = function(arr, fn)
+      return get.array.bool_by_first_match_w_fn(arr, fn)
     end,
-    none_pass = function(arr, cond)
-      return not get.array.some_pass(arr, cond)
+    bool_by_none_pass_w_fn = function(arr, cond)
+      return not get.array.bool_by_some_pass_w_fn(arr, cond)
     end,
-    all_pass = function(arr, cond)
-      if type(cond) == "table" then
-        cond._invert = not cond._invert
-      elseif type(cond) == "function" then
-        local oldcond = cond
-        cond = function(x) return not oldcond(x) end
-      else
-        error("Due to the transformations we need to do to the condition, it needs to be either a table or a function")
-      end
-      return get.array.none_pass(arr, cond)
+    bool_by_all_pass_w_fn = function(arr, cond)
+      return get.array.bool_by_none_pass_w_fn(arr, function(x) return not cond(x) end)
+    end,
+    bool_by_some_pass_w_t = function(arr, t)
+      return get.array.some_pass_w_fn(arr, function(x) return x == t end)
+    end,
+    bool_by_none_pass_w_t = function(arr, t)
+      return get.array.none_pass_w_fn(arr, function(x) return x == t end)
+    end,
+    bool_by_all_pass_w_t = function(arr, t)
+      return get.array.all_pass_w_fn(arr, function(x) return x == t end)
     end,
     array_by_head = function(arr, n)
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(arr, 1, n or 10)
@@ -714,19 +749,19 @@ get = {
       return arr[(n % #arr) + 1]
     end,
     next_by_item = function(arr, item)
-      local index = get.array.pos_int_by_first_match_w_any(arr, item)
+      local index = get.array.pos_int_or_nil_by_first_match_w_t(arr, item)
       return get.array.any_by_next_w_index(arr, index)
     end,
     next_by_item_wrapping = function(arr, item)
-      local index = get.array.pos_int_by_first_match_w_any(arr, item)
+      local index = get.array.pos_int_or_nil_by_first_match_w_t(arr, item)
       return get.array.any_by_next_wrapping_w_index(arr, index)
     end,
-    next_by_fn = function(arr, fn)
-      local index = find(arr, fn, {"i"})
+    t_by_next_w_fn = function(arr, fn)
+      local index = get.array.pos_int_or_nil_by_first_match_w_fn(arr, fn)
       return get.array.any_by_next_w_index(arr, index)
     end,
     next_by_fn_wrapping = function(arr, fn)
-      local index = find(arr, fn, {"i"})
+      local index = get.array.pos_int_or_nil_by_first_match_w_fn(arr, fn)
       return get.array.any_by_next_wrapping_w_index(arr, index)
     end,
     previous = function(arr, n)
@@ -740,10 +775,10 @@ get = {
       table.sort(new_list, comp)
       return new_list
     end,
-    any_by_min = function(list, comp)
+    t_by_min = function(list, comp)
       return get.array.array_by_sorted(list, comp)[1]
     end,
-    any_by_max = function(list, comp)
+    t_by_max = function(list, comp)
       return get.array.array_by_sorted(list, comp)[#list]
     end,
     revsorted = function(arr, comp)
@@ -780,7 +815,7 @@ get = {
         "k"
       )
     end,
-    contains = function(arr, v)
+    bool_by_contains = function(arr, v)
       for _, v2 in transf.array.index_value_stateless_iter(arr) do
         if v2 == v then return true end
       end
@@ -826,6 +861,17 @@ get = {
       return get.hschooser_specifier.choosing_hschooser_specifier(transf.array.hschooser_specifier(arr, target_item_chooser_item_specifier_name), "index", arr)
     end,
     
+  },
+  id_assoc_arr_array = {
+    id_assoc_arr_by_first_match_w_id_assoc_arr = function(arr, assoc_arr)
+      return get.array.t_or_nil_by_first_match_w_fn(
+        arr,
+        get.fn.first_n_args_bound_fn(
+          transf.two_id_assoc_arrs.bool_by_equal,
+          assoc_arr
+        )
+      )
+    end
   },
   string = {
     string_array_split_single_char = stringy.split,
@@ -1023,6 +1069,29 @@ get = {
         regex_quantifiable,
         ""
       )
+    end,
+    string_by_replaced_all_eutf8_w_regex_string_array = function(str, regex_string_array, replacement)
+      local res = str
+      for _, regex_string in transf.array.key_value_stateless_iter(regex_string_array) do
+        res = eutf8.gsub(
+          res,
+          regex_string,
+          replacement
+        )
+      end
+    end,
+    string_by_replaced_first_eutf8_w_regex_string_array = function(str, regex_string_array, replacement)
+      for _, regex_string in transf.array.key_value_stateless_iter(regex_string_array) do
+        local res, matches = eutf8.gsub(
+          str,
+          regex_string,
+          replacement,
+          1
+        )
+        if matches > 0 then
+          return res
+        end
+      end
     end,
     evaled_js_osa = function(str)
       local succ, parsed_res = hs.osascript.javascript(str)
@@ -1324,8 +1393,39 @@ get = {
         sep
       )
     end,
-    find_nocomment_noindent = function(arr, cond, opts)
-      return find(transf.string_array.nocomment_noindent_string_array(arr), cond, opts)
+    pos_int_or_nil_by_first_match_nocomment_noindent_w_string = function(arr, str)
+      return get.array.pos_int_or_nil_by_first_match_w_t(
+        transf.string_array.nocomment_noindent_string_array(arr),
+        str
+      )
+    end,
+    pos_int_or_nil_by_first_match_ending_w_string = function(arr, str)
+      return get.array.pos_int_or_nil_by_first_match_w_fn(
+        arr,
+        get.fn.first_n_args_bound_fn(
+          get.string.bool_endswith,
+          str
+        )
+      )
+    end,
+    string_or_nil_by_first_match_ending_w_string = function(arr, str)
+      return arr[
+        get.array.pos_int_or_nil_by_first_match_ending_w_string(arr, str)
+      ]
+    end,
+    pos_int_or_nil_by_first_match_starting_w_string = function(arr, str)
+      return get.array.pos_int_or_nil_by_first_match_w_fn(
+        arr,
+        get.fn.first_n_args_bound_fn(
+          get.string.bool_startswith,
+          str
+        )
+      )
+    end,
+    string_or_nil_by_first_match_starting_w_string = function(arr, str)
+      return arr[
+        get.array.pos_int_or_nil_by_first_match_starting_w_string(arr, str)
+      ]
     end,
 
   },
@@ -1349,7 +1449,7 @@ get = {
   path = {
     usable_as_filetype = function(path, filetype)
       local extension = transf.path.normalized_extension(path)
-      if find(mt._list.filetype[filetype], extension) then
+      if get.array.contains(mt._list.filetype[filetype], extension) then
         return true
       else
         return false
@@ -1368,10 +1468,10 @@ get = {
       return transf.path.normalized_extension(path) == ext
     end,
     is_extension_in = function(path, exts)
-      return get.array.contains(exts, transf.path.extension(path))
+      return get.array.bool_by_contains(exts, transf.path.extension(path))
     end,
     is_standartized_extension_in = function(path, exts)
-      return get.array.contains(exts, transf.path.normalized_extension(path))
+      return get.array.bool_by_contains(exts, transf.path.normalized_extension(path))
     end,
     is_filename = function(path, filename)
       return transf.path.filename(path) == filename
@@ -1485,7 +1585,7 @@ get = {
       if opts.follow_links then
         seen_paths = seen_paths or {}
         local links_resolved_path = hs.fs.pathToAbsolute(path)
-        if get.array.contains(seen_paths, links_resolved_path) then
+        if get.array.bool_by_contains(seen_paths, links_resolved_path) then
           return {}
         else
           dothis.array.push(seen_paths, links_resolved_path)
@@ -1542,13 +1642,13 @@ get = {
     find_ancestor = function(path, fn)
       return get.extant_path.find_self_or_ancestor(transf.path.parent_path(path), fn)
     end,
-    find_self_or_ancestor_siblings = function(path, cond, opts)
+    extant_path_by_self_or_ancestor_siblings_w_fn = function(path, fn)
       return get.extant_path.find_self_or_ancestor(path, function(x)
-        return find(transf.dir.children_absolute_path_array(transf.path.parent_path(x)), cond, opts)
+        return hs.fnutils.find(transf.dir.children_absolute_path_array(transf.path.parent_path(x)), fn)
       end)
     end,
-    find_self_or_ancestor_sibling_with_leaf = function(path, leaf)
-      return get.extant_path.find_self_or_ancestor_siblings(path, function(x)
+    extant_path_by_self_or_ancestor_sibling_w_leaf = function(path, leaf)
+      return get.extant_path.extant_path_by_self_or_ancestor_siblings_w_fn(path, function(x)
         return transf.path.leaf(x) == leaf
       end)
     end,
@@ -1559,8 +1659,8 @@ get = {
         return get.dir.cmd_output_from_path(transf.path.parent_path(path), cmd)
       end
     end,
-    find_descendant = function(dir, cond, opts)
-      return find(transf.extant_path.descendants_absolute_path_array(dir), cond, opts)
+    extant_path_by_descendant_w_fn = function(dir, cond)
+      return hs.fnutils.find(transf.extant_path.descendants_absolute_path_array(dir), cond)
     end,
     find_descendant_ending_with = function(dir, ending)
       return get.path_array.find_ending_with(transf.extant_path.descendants_absolute_path_array(dir), ending)
@@ -1616,8 +1716,8 @@ get = {
     end,
   },
   dir = {
-    find_child = function(dir, cond, opts)
-      return find(transf.dir.children_absolute_path_array(dir), cond, opts)
+    extant_path_by_child_w_fn = function(dir, fn)
+      return hs.fnutils.find(transf.dir.children_absolute_path_array(dir), fn)
     end,
     find_child_ending_with = function(dir, ending)
       return get.path_array.find_ending_with(transf.dir.children_absolute_path_array(dir), ending)
@@ -1679,9 +1779,6 @@ get = {
     end,
   },
   file = {
-    find_contents = function(path, cond, opts)
-      return find(transf.plaintext_file.contents(path), cond, opts)
-    end,
   },
   plaintext_file = {
     lines_tail = function(path, n)
@@ -1705,12 +1802,6 @@ get = {
     end,
     contents_line_appended_to_string = function(path, line)
       return dothis.plaintext_file.content_lines_appended_to_string(path, {line})
-    end,
-    find_line = function(path, cond, opts)
-      return find(transf.plaintext_file.line_array(path), cond, opts)
-    end,
-    find_nocomment_noindent_content_lines = function(path, cond, opts)
-      return find(transf.plaintext_file.nocomment_noindent_content_lines(path), cond, opts)
     end,
   },
   plaintext_table_file = {
@@ -1832,7 +1923,7 @@ get = {
       return eutf8.sub(prefixed_header, #header + 2) -- +2 for the colon and the space
     end,
     addresses = function(path, header, only)
-      if not get.array.contains(mt._list.email_headers_containin_emails, header) then
+      if not get.array.bool_by_contains(mt._list.email_headers_containin_emails, header) then
         error("Header can't contain email addresses")
       end
       only = get.any.default_if_nil(only, true)
@@ -1922,13 +2013,13 @@ get = {
       end)
     end,
     find_ending_with = function(path_array, ending)
-      return find(path_array, {_stop = ending})
+      return get.string.string_or_nil_by_first_match_ending_w_string(path_array, ending)
     end,
     find_leaf = function(path_array, leaf)
-      return find(transf.path_array.leaves_array(path_array), {_exactly = leaf})
+      return get.array.bool_by_contains(transf.path_array.leaves_array(path_array), leaf)
     end,
     find_extension = function(path_array, extension)
-      return find(transf.path_array.extensions_array(path_array), {_exactly = extension})
+      return get.array.bool_by_contains(transf.path_array.extensions_array(path_array), extension)
     end,
     find_path_with_leaf = function(path_array, leaf)
       return hs.fnutils.find(path_array, function(path)
@@ -2620,17 +2711,6 @@ get = {
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table.key_value_equals, {a_use, "creation_specifier", creation_specifier})
       )
     end,
-  },
-  indexable = {
-    index_by_item = function(arr, item)
-      return find(
-        arr,
-        {_exactly = item},
-        {"i"}
-      )
-    end,
-
-
   },
   stateless_generator = {
     --- stateful generator will create iterators that return values until they are over, at which point they return nil once, and then error on subsequent calls
