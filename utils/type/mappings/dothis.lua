@@ -277,7 +277,7 @@ dothis = {
     end,
     say = function(str, lang)
       lang = lang or "en"
-      speak:voice(tblmap.lang.voice[lang]):speak(transf.string.folded(str))
+      speak:voice(tblmap.lang.voice[lang]):speak(transf.string.singleline_string_by_folded(str))
     end,
     paste = function(str)
       local lines = stringy.split(str, "\n")
@@ -687,7 +687,7 @@ dothis = {
     end,
     copy_to_local_absolute_path = function(path, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
-      file.copy(path, tgt)
+      plfile.copy(path, tgt)
     end,
     edit_file_in_vscode_act_on_path = function(path, do_after)
       run("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
@@ -713,7 +713,7 @@ dothis = {
     end,
     copy_to_local_absolute_path = function(path, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
-      dir.clonetree(path, tgt)
+      pldir.clonetree(path, tgt)
     end,
     link_children_absolute_path_array_into_local_absolute_path = function(path, tgt)
       dothis.local_absolute_path_array.link_into_local_absolute_path(
@@ -1175,7 +1175,7 @@ dothis = {
   },
   audiodevice = {
     set_default = function(device, type)
-      device["setDefault" .. transf.word.capitalized(type) .. "Device"](device)
+      device["setDefault" .. transf.string.string_by_first_eutf8_upper(type) .. "Device"](device)
     end,
     ensure_sound_will_be_played = function(device)
       device:setOutputMuted(false)
@@ -1409,7 +1409,7 @@ dothis = {
     end,
     create_as_session = function(url_array, root)
       local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(root)
-      path = get.string.with_suffix_string(path, ".session")
+      path = get.string.string_by_with_suffix(path, ".session")
       dothis.absolute_path.write_file(
         path,
         transf.url_array.session_string(url_array)

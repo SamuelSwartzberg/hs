@@ -142,7 +142,7 @@ local keymap = {
       searches["adv"] = "mpick -t %s"
       dc(searches)
         :doThis("choose-item", function(val)
-          local true_val = transf.array.last(stringy.split(val, " ")) -- ignore all the `magrep -i` or `mpick -t` stuff, that's just for user comprehension
+          local true_val = transf.array.t_by_last(stringy.split(val, " ")) -- ignore all the `magrep -i` or `mpick -t` stuff, that's just for user comprehension
           true_val = string.format(true_val, get.string.prompted_once_string_from_default("", "Search for: "))
           local results
           if stringy.startswith(val, "magrep") then

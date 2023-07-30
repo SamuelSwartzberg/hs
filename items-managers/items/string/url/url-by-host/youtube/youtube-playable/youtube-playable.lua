@@ -43,7 +43,7 @@ YoutubePlayableItemItemSpecifier = {
           },
           do_after = function(tags)
             local cleaned = map(tags, function(v)
-              return transf.string.romanized_snake(v)
+              return transf.string.lower_snake_case_string_by_romanized(v)
             end)
             self:doThis("add-as-m3u", cleaned)
           end

@@ -2,7 +2,7 @@ StringItemSpecifier = {
   type = "string",
   properties = {
     getables = {
-      ["to-string"] = bc(transf.string.folded),
+      ["to-string"] = bc(transf.string.singleline_string_by_folded),
     },
   },
   ({
@@ -96,7 +96,7 @@ StringItemSpecifier = {
     }, {
       d = "rsnu",
       i = "🅰🐍🧗‍♀️",
-      getnf = transf.string.romanized_snake
+      getnf = transf.string.lower_snake_case_string_by_romanized
     },
     {
       d = "rdet",
@@ -130,7 +130,7 @@ StringItemSpecifier = {
     },{
       d = "al",
       i = "🪂",
-      getfn = transf.string.lowercase
+      getfn = transf.string.string_by_all_eutf8_upper
     },
     {
       d = "snl",
@@ -145,7 +145,7 @@ StringItemSpecifier = {
     {
       d = "au",
       i = "🧗‍♀️",
-      getfn = transf.string.uppercase
+      getfn = transf.string.string_by_all_eutf8_lower
     },
     {
       d = "snu",
@@ -175,7 +175,7 @@ StringItemSpecifier = {
     },{
       d = "fld",
       i = "🗺",
-      getfn = transf.string.folded
+      getfn = transf.string.singleline_string_by_folded
     },{
       d = "lnhd",
       i = "⩶👆",

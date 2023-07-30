@@ -39,7 +39,7 @@ OmegatProjectDirItemSpecifier = {
       ["file-source-and-target"] = function(self)
         local source_odts = self:get("source-files-extension", "odt"):get("c")
         local target_odts = self:get("target-files-extension", "odt"):get("c")
-        local odts = tablex.zip(source_odts, target_odts)
+        local odts = pltablex.zip(source_odts, target_odts)
         for i, odt_pair in transf.array.index_value_stateless_iter(odts) do 
           for j, odt in transf.array.index_value_stateless_iter(odt_pair) do
             local client = self:get("local-data-object").client

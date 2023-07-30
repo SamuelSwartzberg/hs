@@ -207,7 +207,7 @@ get = {
   },
   ["nil"] = {
     default_audiodevice = function(type)
-      return hs.audiodevice["default" .. transf.word.capitalized(type) .. "Device"]()
+      return hs.audiodevice["default" .. transf.string.string_by_first_eutf8_upper(type) .. "Device"]()
     end,
     mullvad_connect = function()
       run("mullvad connect", true)
@@ -220,6 +220,11 @@ get = {
         dothis["nil"].mullvad_disconnect()
       else
         dothis["nil"].mullvad_connect()
+      end
+    end,
+    nth_arg_ret_fn = function(_, n)
+      return function(...)
+        return select(n, ...)
       end
     end,
   },
@@ -458,20 +463,99 @@ get = {
       return res
     end,
   },
+  complete_pos_int_slice_spec = {
+    boolen_by_is_hit_w_pos_int = function(spec, i)
+      return i >= spec.start and i <= spec.stop and (i - spec.start) % spec.step == 0 
+    end,
+  },
   array = {
-    two_arrays_of_arrays_by_slice_w_slice_spec = function(arr, slice_spec)
+    two_arrays_of_arrays_by_slice_w_slice_spec = function(arr, spec)
       
+      if spec.start and not is.any.number(spec.start) then
+        spec.start = get.array.pos_int_by_first_match_w_any(arr, spec.start)
+      end
+
+      if spec.stop and  not is.any.number(spec.start) then
+        spec.stop = get.array.pos_int_by_first_match_w_any(arr, spec.stop)
+      end
+
+      local hits = {}
+      local misses = {}
+
+      -- set defaults
+
+      if not spec.step then spec.step = 1 end
+      if not spec.start then spec.start = 1 end
+      if not spec.stop then spec.stop = transf.array.pos_int_by_length(arr) end
+
+      -- resolve negative indices
+
+      if spec.start < 0 then
+        spec.start = transf.array.pos_int_by_length(arr) + spec.start + 1
+      end
+      if spec.stop < 0 then
+        spec.stop = transf.array.pos_int_by_length(arr) + spec.stop + 1
+      end
+
+      -- clamp indices to ensure we don't go out of bounds (+/-1 because we want over/underindexing to produce an empty thing, not the last element)
+
+      spec.start = get.comparable.comparable_by_clamped(spec.start, 1, transf.indexable.length(arr) + 1)
+      spec.stop = get.comparable.comparable_by_clamped(spec.stop, 1-1, transf.indexable.length(arr))
+
+      -- handle cases where users have passed conditions that will result in an infinite loop
+
+      if spec.start > spec.stop and spec.step > 0 then
+        return {}, arr
+      elseif spec.start < spec.stop and spec.step < 0 then
+        return {}, arr
+      end
+
+      -- I want to return an array of arrays, with each series of hits or misses being its own array
+      local current = {}
+      local current_type = nil
+
+      for i = 1, #arr do
+        if get.complete_pos_int_slice_spec.boolen_by_is_hit_w_pos_int(spec, i) then
+          if current_type == "misses" then
+            dothis.array.push(hits, current)
+            current = {}
+          end
+          current_type = "hits"
+          dothis.array.push(current, arr[i])
+        else
+          if current_type == "hits" then
+            dothis.array.push(misses, current)
+            current = {}
+          end
+          current_type = "misses"
+          dothis.array.push(current, arr[i])
+        end
+        
+      end
+
+      if #current > 0 then
+        if current_type == "hits" then
+          dothis.array.push(hits, current)
+        else
+          dothis.array.push(misses, current)
+        end
+    end
+
+      return hits, misses
+
 
     end,
+    two_arrays_by_slice_w_slice_spec = function(arr, spec)
+      local hits, misses = get.array.two_arrays_of_arrays_by_slice_w_slice_spec(arr, spec)
+      return get.array.array_by_flatten(hits), get.array.array_by_flatten(misses)
+    end,
     array_by_slice_w_slice_spec = function(arr, slice_spec)
-      return transf.array_of_arrays.array_by_flatten(
-        select(
-          1, 
-          get.array.two_arrays_of_arrays_by_slice_w_slice_spec(arr, slice_spec)
-        )
+      return select(
+        1,
+        get.array.two_arrays_by_slice_w_slice_spec(arr, slice_spec)
       )
     end,
-    two_arrays_of_arrays_by_slice_w_3_pos_int_or_nils = function(arr, start, stop, step)
+    two_arrays_of_arrays_by_slice_w_3_int_any_or_nils = function(arr, start, stop, step)
       return get.array.two_arrays_of_arrays_by_slice_w_slice_spec(
         arr,
         {
@@ -481,7 +565,17 @@ get = {
         }
       )
     end,
-    array_by_slice_w_3_pos_int_or_nils = function(arr, start, stop, step)
+    two_arrays_by_slice_w_3_int_any_or_nils = function(arr, start, stop, step)
+      return get.array.two_arrays_by_slice_w_slice_spec(
+        arr,
+        {
+          start = start,
+          stop = stop,
+          step = step,
+        }
+      )
+    end,
+    array_by_slice_w_3_pos_int_any_or_nils = function(arr, start, stop, step)
       return get.array.array_by_slice_w_slice_spec(
         arr,
         {
@@ -492,13 +586,19 @@ get = {
       )
     end,
     two_arrays_of_arrays_by_slice_w_slice_notation = function(arr, notation)
-      return get.array.two_arrays_of_arrays_by_slice_w_3_pos_int_or_nils(
+      return get.array.two_arrays_of_arrays_by_slice_w_3_int_any_or_nils(
+        arr,
+        transf.slice_notation.three_pos_int_or_nils(notation)
+      )
+    end,
+    two_arrays_by_slice_w_slice_notation = function(arr, notation)
+      return get.array.two_arrays_by_slice_w_3_int_any_or_nils(
         arr,
         transf.slice_notation.three_pos_int_or_nils(notation)
       )
     end,
     array_by_slice_w_slice_notation = function(arr, notation)
-      return get.array.array_by_slice_w_3_pos_int_or_nils(
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(
         arr,
         transf.slice_notation.three_pos_int_or_nils(notation)
       )
@@ -545,8 +645,8 @@ get = {
         get.array.array_of_arrays_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
       )
     end,
-    pos_int_by_first_match_w_any = tablex.find,
-    pos_int_by_last_match_w_any = tablex.rfind,
+    pos_int_by_first_match_w_any = pltablex.find,
+    pos_int_by_last_match_w_any = pltablex.rfind,
     pos_int_by_first_match_w_fn = hs.fnutils.find,
     array_by_filtered = hs.fnutils.ifilter,
     pos_int_by_last_match_w_fn = function(arr, fn)
@@ -599,10 +699,10 @@ get = {
       return get.array.none_pass(arr, cond)
     end,
     array_by_head = function(arr, n)
-      return get.array.array_by_slice_w_3_pos_int_or_nils(arr, 1, n or 10)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(arr, 1, n or 10)
     end,
     array_by_tail = function(arr, n)
-      return get.array.array_by_slice_w_3_pos_int_or_nils(arr, -(n or 10))
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(arr, -(n or 10))
     end,
     any_w_index = function(arr, n)
       return arr[n]
@@ -739,7 +839,7 @@ get = {
         transf.string.split_single_char(str, sep)
       )
     end,
-    string_array_split = stringx.split,
+    string_array_split = plstringx.split,
     string_array_split_noempty = function(str, sep)
       return transf.string_array.noemtpy_string_array(
         transf.string.string_array_split(str, sep)
@@ -776,16 +876,16 @@ get = {
       end
     end,
     lines_tail = function(path, n)
-      return get.array.array_by_slice_w_3_pos_int_or_nils(transf.string.lines(path), -(n or 10))
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.lines(path), -(n or 10))
     end,
     lines_head = function(path, n)
-      return get.array.array_by_slice_w_3_pos_int_or_nils(transf.string.lines(path), 1, n or 10)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.lines(path), 1, n or 10)
     end,
     content_lines_tail = function(path, n)
-      return get.array.array_by_slice_w_3_pos_int_or_nils(transf.string.noempty_line_string_array(path), -(n or 10))
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.noempty_line_string_array(path), -(n or 10))
     end,
     content_lines_head = function(path, n)
-      return get.array.array_by_slice_w_3_pos_int_or_nils(transf.string.noempty_line_string_array(path), 1, n or 10)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.noempty_line_string_array(path), 1, n or 10)
     end,
     bool_startswith = stringy.startswith,
     bool_endswith = stringy.endswith,
@@ -803,7 +903,7 @@ get = {
     end,
     search_engine_search_url = function(str, search_engine)
       return tblmap.search_engine.url[search_engine]:format(
-        transf.string.urlencoded_search(str, tblmap.search_engine.spaces_percent[search_engine])
+        transf.string.urlencoded_search(str, tblmap.search_engine.param_is_path[search_engine])
       )
     end,
     window_array_by_pattern = function(str, app_name)
@@ -842,33 +942,87 @@ get = {
     starts_ends = function(str, start, ends)
       return transf.string.startswith(str, start) and transf.string.endswith(str, ends)
     end,
-    no_prefix_string = function(str, prefix)
+    string_by_no_prefix = function(str, prefix)
       if stringy.startswith(str, prefix) then
         return str:sub(#prefix + 1)
       else
         return str
       end
     end,
-    no_suffix_string = function(str, suffix)
+    string_by_no_suffix = function(str, suffix)
       if stringy.endswith(str, suffix) then
         return str:sub(1, #str - #suffix)
       else
         return str
       end
     end,
-    with_prefix_string = function(str, prefix)
+    string_by_with_prefix = function(str, prefix)
       if stringy.startswith(str, prefix) then
         return str
       else
         return prefix .. str
       end
     end,
-    with_suffix_string = function(str, suffix)
+    string_by_with_suffix = function(str, suffix)
       if stringy.endswith(str, suffix) then
         return str
       else
         return str .. suffix
       end
+    end,
+    string_by_no_adfix = function(str, adfix)
+      return transf.string.string_by_no_prefix(
+        transf.string.string_by_no_suffix(str, adfix),
+        adfix
+      )
+    end,
+    string_by_with_adfix = function(str, adfix)
+      return transf.string.string_by_with_prefix(
+        transf.string.string_by_with_suffix(str, adfix),
+        adfix
+      )
+    end,
+    string_by_continuous_collapsed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return onig.gsub(
+        str,
+        "(" .. regex_quantifiable .. "){2,}", -- using {2,} instead of + saves us some performance, given a match of length 1 just gets replaced with itself. However, this is not available in eutf8, so we have to use + there
+        "%1"
+      )
+    end,
+    string_by_continuous_collapsed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
+      return eutf8.gsub(
+        str,
+        "(" .. regex_quantifiable .. ")+",
+        "%1"
+      )
+    end,
+    string_by_continuous_replaced_onig_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
+      return onig.gsub(
+        str,
+        regex_quantifiable .. "+",
+        replacement
+      )
+    end,
+    string_by_continuous_replaced_eutf8_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
+      return eutf8.gsub(
+        str,
+        regex_quantifiable .. "+",
+        replacement
+      )
+    end,
+    string_by_removed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return onig.gsub(
+        str,
+        regex_quantifiable,
+        ""
+      )
+    end,
+    string_by_removed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
+      return eutf8.gsub(
+        str,
+        regex_quantifiable,
+        ""
+      )
     end,
     evaled_js_osa = function(str)
       local succ, parsed_res = hs.osascript.javascript(str)
@@ -1051,6 +1205,13 @@ get = {
         end
       end
     end,
+    string_by_shortened_start_ellipsis = function(str, len)
+      return plstringx.shorten(str, len)
+    end,
+    string_by_shortened_end_ellipsis = function(str, len)
+      return plstringx.shorten(str, len, true)
+    end
+
   },
   nonindicated_number_string_array = {
     number_array = function(arr, base)
@@ -1090,8 +1251,7 @@ get = {
   styledtext = {
     styledtext_merge = function(styledtext, styledtext_attributes_specifier)
       local existing_style = styledtext:asTable()
-      local text_string = slice(existing_style, 1, 1)[1]
-      local style = slice(existing_style, 2, #existing_style)
+      local text_string, style = get.array.two_arrays_by_slice_w_3_pos_int_any_or_nils(existing_style, 1, 1)
       local new_styledtext = hs.styledtext.new(text_string, styledtext_attributes_specifier)
       for _, v in transf.array.index_value_stateless_iter(style) do
         new_styledtext = new_styledtext:setStyle(v.styledtext_attributes_specifier, v.starts, v.ends)
@@ -1225,13 +1385,13 @@ get = {
         app_name
       )
     end,
-    sliced_path_component_array = function(path, spec)
+    path_component_array_by_slice_w_slice_spec = function(path, spec)
       local path_component_array = transf.path.path_component_array(path)
-      return slice(path_component_array, spec)
+      return get.array.array_by_slice_w_slice_spec(path_component_array, spec)
     end,
-    sliced_path_segment_array = function(path, spec)
+    path_segment_array_by_slice_w_slice_spec = function(path, spec)
       local path_segment_array = transf.path.path_segment_array(path)
-      return slice(path_segment_array, spec)
+      return get.array.array_by_slice_w_slice_spec(path_segment_array, spec)
     end,
     path_from_sliced_path_component_array = function(path, spec)
       local sliced_path_component_array = transf.path.sliced_path_component_array(path, spec)
@@ -1271,7 +1431,7 @@ get = {
         -- Use the map to find the index of the current path component
         local rawi = path_component_index_map[v]
         if rawi then
-          local relevant_path_components = slice(whole_path_component_array, { start = 1, stop = rawi })
+          local relevant_path_components = get.array.array_by_slice_w_slice_spec(whole_path_component_array, { start = 1, stop = rawi })
           if started_with_slash then
             table.insert(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
           end
@@ -1284,7 +1444,7 @@ get = {
   },
   absolute_path = {
     relative_path_from = function(path, starting_point)
-      return get.string.no_prefix_string(path, get.string.with_suffix_string(starting_point, "/"))
+      return get.string.string_by_no_prefix(path, get.string.string_by_with_suffix(starting_point, "/"))
     end,
   },
   extant_path = {
@@ -1334,7 +1494,7 @@ get = {
     
       for file_name in transf.dir.children_absolute_path_value_stateful_iter(path) do
         if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" then
-          local file_path = path .. get.string.no_suffix_string(file_name, "/")
+          local file_path = path .. get.string.string_by_no_suffix(file_name, "/")
           if is.extant_path.dir(file_name) then 
             if opts.include_dirs then
               extant_paths[#extant_paths + 1] = file_path
@@ -1809,11 +1969,11 @@ get = {
   date_component_name = {
     next = function(component, n)
       n = n or 0
-      return get.array.any_by_next_w_index(mt._list.date.date_component_names, transf.date_component_name.index(component) + n)
+      return get.array.any_by_next_w_index(mt._list.date.date_component_names, transf.date_component_name.date_component_index(component) + n)
     end,
     previous = function(component, n)
       n = n or 0
-      return get.array.previous(mt._list.date.date_component_names, transf.date_component_name.index(component) - n)
+      return get.array.previous(mt._list.date.date_component_names, transf.date_component_name.date_component_index(component) - n)
     end,
   },
   date = {
@@ -1974,8 +2134,8 @@ get = {
     end,
   },
   array_of_arrays = {
-    column = array2d.column,
-    row = array2d.row,
+    column = plarray2d.column,
+    row = plarray2d.row,
     array_of_arrays_by_mapped_if_not_length_0 = function(arr_of_arr, fn)
       return hs.fnutils.imap(
         arr_of_arr,
@@ -2008,7 +2168,7 @@ get = {
     dict_of_arrays_by_first_element = function(arr_of_arr)
       return map(
         arr_of_arr,
-        transf.array.first_rest,
+        transf.array.t_and_array_by_first_rest,
         {"v", "kv"}
       )
     end,
@@ -2571,7 +2731,7 @@ get = {
     end,
   },
   comparable = {
-    clamped = function(comparable, min, max)
+    comparable_by_clamped = function(comparable, min, max)
       if comparable < min then
         return min
       elseif comparable > max then
@@ -2608,7 +2768,7 @@ get = {
         in_fields = {
           title = transf.youtube_video_id.title(video_id),
           channel_title = transf.youtube_video_id.channel_title(video_id),
-          description = slice(transf.youtube_video_id.description(video_id), { stop = 400, sliced_indicator = "... (truncated)" }),
+          description = get.string.string_by_shortened_start_ellipsis(transf.youtube_video_id.description(video_id)),
         },
         form_field_specifier_array = {
           {

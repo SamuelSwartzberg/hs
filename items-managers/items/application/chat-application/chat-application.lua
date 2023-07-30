@@ -11,10 +11,10 @@ ChatApplicationItemSpecifier = {
         return self:get("media-dir") .. "/" .. self:get("convo-id", chat_obj)
       end,
       ["msg-attachments"] = function(self, msg)
-        return stringx.join(",", self:get("msg-raw-attachments", msg))
+        return plstringx.join(",", self:get("msg-raw-attachments", msg))
       end,
       ["msg-reactions"] = function(self, msg)
-        return stringx.join(",", self:get("msg-raw-reactions", msg))
+        return plstringx.join(",", self:get("msg-raw-reactions", msg))
       end,
       ["assemble-messages"] = function(self, chat_obj)
         local messages = {}

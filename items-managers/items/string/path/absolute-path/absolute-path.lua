@@ -11,7 +11,7 @@ PathInterfaceItemSpecifier = {
       ["is-path-by-start"] = transf["nil"]["true"],
       ["relative-path-from"] = function(self, starting_point)
         starting_point = starting_point or env.HOME
-        return self:get("difference-from-prefix-or-nil", get.string.with_suffix_string(starting_point, "/"))
+        return self:get("difference-from-prefix-or-nil", get.string.string_by_with_suffix(starting_point, "/"))
       end,
     },
   },

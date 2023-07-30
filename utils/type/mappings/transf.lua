@@ -536,17 +536,23 @@ transf = {
       end
       return res
     end,
-    first = function(arr)
+    t_by_first = function(arr)
       return arr[1]
     end,
-    last = function(arr)
+    t_by_last = function(arr)
       return arr[#arr]
     end,
-    length = function(arr)
+    pos_int_by_length = function(arr)
       return #arr
     end,
-    first_rest = function(arr)
-      return arr[1], slice(arr, 2)
+    t_and_array_by_first_rest = function(arr)
+      return arr[1], get.array.array_by_slice_w_3_pos_int_any_or_nils(arr, 2)
+    end,
+    array_by_nofirst = function(arr)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(arr, 2)
+    end,
+    array_by_nolast = function(arr)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(arr, 1, -2)
     end,
     empty_string_value_dict = function(arr)
       return map(
@@ -720,7 +726,7 @@ transf = {
       return psegments[#psegments]
     end,
     ending_with_slash = function(path)
-      return get.string.with_suffix_string(path or "", "/")
+      return get.string.string_by_with_suffix(path or "", "/")
     end,
     leaf = function(path)
       local pcomponents = transf.path.path_component_array(path)
@@ -819,6 +825,9 @@ transf = {
   },
   local_path = {
     local_absolute_path = hs.fs.pathToAbsolute, -- resolves ~, ., .., and symlinks
+    local_path_by_percent_encoded = function(path)
+      return plurl.quote(path)
+    end,
   },
   remote_path = {
 
@@ -1104,7 +1113,7 @@ transf = {
     end,
     absolute_path_key_leaf_string_or_nested_value_dict = function(path)
       local res = {}
-      path = get.string.with_suffix_string(path, "/")
+      path = get.string.string_by_with_suffix(path, "/")
       for child_path in transf.dir.children_absolute_path_value_stateful_iter(path) do
         if is.absolute_path.dir(child_path) then
           res[child_path] = transf.dir.absolute_path_key_leaf_string_or_nested_value_dict(child_path)
@@ -1176,8 +1185,8 @@ transf = {
         path,
         "git config --get remote.origin.url"
       )
-      raw = get.string.no_suffix_string(raw, ".git")
-      raw = get.string.no_suffix_string(raw, "/")
+      raw = get.string.string_by_no_suffix(raw, ".git")
+      raw = get.string.string_by_no_suffix(raw, "/")
       return raw
     end,
     remote_owner_item = function(path)
@@ -1959,21 +1968,21 @@ transf = {
     end
   },
   date_component_name = {
-    date_component_name_list_larger_or_same = function(component)
-      return slice(mt._list.date.date_component_names, 1, {_exactly = component})
+    date_component_name_list_larger_or_same = function(date_component_name)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(mt._list.date.date_component_names, 1, date_component_name)
     end,
-    date_component_name_list_same_or_smaller = function(component)
-      return slice(mt._list.date.date_component_names, {_exactly = component})
+    date_component_name_list_same_or_smaller = function(date_component_name)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(mt._list.date.date_component_names, date_component_name)
     end,
-    date_component_name_list_larger_all_same = function(component)
+    date_component_name_list_larger_all_same = function(date_component_name)
       return map(
-        transf.date_component_name.date_component_name_list_larger_or_same(component),
-        transf.any.same,
+        transf.date_component_name.date_component_name_list_larger_or_same(date_component_name),
+        transf.any.t_by_self,
         {"v", "k"}
       )
     end,
-    index = function(component)
-      return tblmap.date_component_name.date_component_index[component]
+    date_component_index = function(date_component_name)
+      return tblmap.date_component_name.date_component_index[date_component_name]
     end,
     
   },
@@ -2095,7 +2104,7 @@ transf = {
   },
   rfc3339like_interval = {
     start_rfc3339like_dt = function(str)
-      return stringx.split(str, "_to_")[1]
+      return plstringx.split(str, "_to_")[1]
     end,
     start_date_component_name_value_dict = function(str)
       return transf.rfc3339like_dt.date_component_name_value_dict(
@@ -2113,7 +2122,7 @@ transf = {
       )
     end,
     end_rfc3339like_dt = function(str)
-      return stringx.split(str, "_to_")[2]
+      return plstringx.split(str, "_to_")[2]
     end,
     end_date_component_name_value_dict = function(str)
       return transf.rfc3339like_dt.date_component_name_value_dict(
@@ -2670,7 +2679,7 @@ transf = {
               -- We split the type_list into individual vcard_types. This is done because 
               -- each vcard_type might need to be processed independently in the future. 
               -- It also makes the data more structured and easier to handle.
-              local vcard_types = stringx.split(type_list, ", ")
+              local vcard_types = plstringx.split(type_list, ", ")
         
               -- For each vcard_type, we create a new key-value pair in the contact_table. 
               -- This way, we can access the value directly by vcard_type, 
@@ -3216,7 +3225,9 @@ transf = {
       return filename
     end,
     snake_case = function(str)
-      return replace(str, to.case.snake)
+      local naive_snake_case = get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[^%w%d]+", "_")
+      local multi_cleaned_snake_case = get.string.string_by_continuous_collapsed_eutf8_w_regex_quantifiable(naive_snake_case, "_")
+      return get.string.string_by_no_adfix(multi_cleaned_snake_case, "_")
     end,
     lower_snake_case = function(str)
       return eutf8.lower(transf.string.snake_case(str))
@@ -3229,7 +3240,7 @@ transf = {
     end,
     upper_camel_snake_case = function(str)
       local parts = transf.string.snake_case_parts(str)
-      local upper_parts = hs.fnutils.imap(parts, transf.word.capitalized)
+      local upper_parts = hs.fnutils.imap(parts, transf.string.string_by_first_eutf8_upper)
       return get.string_or_number_array.string_by_joined(upper_parts, "_")
     end,
     lower_camel_snake_case = function(str)
@@ -3237,14 +3248,16 @@ transf = {
     end,
     upper_camel_case = function(str)
       local parts = transf.string.snake_case_parts(str)
-      local upper_parts = hs.fnutils.imap(parts, transf.word.capitalized)
+      local upper_parts = hs.fnutils.imap(parts, transf.string.string_by_first_eutf8_upper)
       return get.string_or_number_array.string_by_joined(upper_parts, "")
     end,
     lower_camel_case = function(str)
       return eutf8.lower(transf.string.upper_camel_case(str))
     end,
     kebap_case = function(str)
-      return replace(str, to.case.kebap)
+      local naive_kebap_case = get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[^%w%d]+", "-")
+      local multi_cleaned_kebap_case = get.string.string_by_continuous_collapsed_eutf8_w_regex_quantifiable(naive_kebap_case, "-")
+      return get.string.string_by_no_adfix(multi_cleaned_kebap_case, "-")
     end,
     lower_kebap_case = function(str)
       return eutf8.lower(transf.string.kebap_case(str))
@@ -3252,41 +3265,25 @@ transf = {
     upper_kebap_case = function(str)
       return eutf8.upper(transf.string.kebap_case(str))
     end,
-    lowercase = function(str)
-      return eutf8.lower(str)
+    string_by_all_eutf8_lower = eutf8.lower,
+    string_by_all_eutf8_upper = eutf8.upper,
+    string_by_first_eutf8_upper = function(str)
+      return eutf8.upper(eutf8.sub(str, 1, 1)) .. eutf8.sub(str, 2)
     end,
-    uppercase = function(str)
-      return eutf8.upper(str)
+    string_by_first_eutf8_lower = function(str)
+      return eutf8.lower(eutf8.sub(str, 1, 1)) .. eutf8.sub(str, 2)
     end,
     alphanum = function(str)
-      return replace(str, to.case.alphanum)
+      return get.string.string_by_removed_eutf8_w_regex_quantifiable(str, "[^%w%d]")
     end,
-
-    --- URL-encodes a string.
-    --- @param url string
-    --- @param spaces_percent? boolean whether to encode spaces as %20 (true) or + (false)
-    --- @return string
-    urlencoded = function(url, spaces_percent)
-      if url == nil then
-        return ""
-      end
-      url = eutf8.gsub(url, "\n", "\r\n")
-      url = eutf8.gsub(url, "([^%w _%%%-%.~])", transf.char.percent)
-      if spaces_percent then
-        url = eutf8.gsub(url, " ", "%%20")
-      else
-        url = eutf8.gsub(url, " ", "+")
-      end
-      return url
+    encoded_query_param_value = function(str)
+      return plurl.quote(str, true)
     end,
-    urlencoded_search = function(str, spaces_percent)
-      local folded = transf.string.folded(str)
-      return transf.string.urlencoded(folded, spaces_percent)
+    encoded_query_param_value_by_folded = function(str)
+      local folded = transf.string.singleline_string_by_folded(str)
+      return transf.string.encoded_query_param_value(folded)
     end,
-
-    urldecoded = function(url)
-      return replace(url, to.url.decoded)
-    end,
+    string_by_percent_decoded = plurl.unquote,
     escaped_csv_field = function(field)
       return '"' .. replace(field, to.string.escaped_csv_field_contents)  .. '"'
     end,
@@ -3317,13 +3314,13 @@ transf = {
     html_entitiy_decoded_string = htmlEntities.decode,
     header_key_value = function(str)
       local k, v = eutf8.match(str, "^([^:]+):%s*(.+)$")
-      return transf.word.notcapitalized(k), v
+      return transf.string.string_by_initial_lower(k), v
     end,
     title_case = function(str)
       local words, removed = get.string.two_string_arrays_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
       local title_cased_words = map(words, transf.word.title_case_policy)
-      title_cased_words[1] = replace(title_cased_words[1], to.case.capitalized)
-      title_cased_words[#title_cased_words] = replace(title_cased_words[#title_cased_words], to.case.capitalized)
+      title_cased_words[1] = transf.string.string_by_first_eutf8_upper(title_cased_words[1])
+      title_cased_words[#title_cased_words] = transf.string.string_by_first_eutf8_upper(title_cased_words[#title_cased_words])
       local arr = transf.two_arrays.array_by_interleaved_stop_a1(title_cased_words, removed)
       return get.string_or_number_array.string_by_joined(arr, "")
     end, 
@@ -3340,10 +3337,11 @@ transf = {
       })
       return romanized
     end,
-    romanized_snake = function(str)
+    lower_snake_case_string_by_romanized = function(str)
       str = eutf8.gsub(str, "[%^']", "")
       str = transf.string.romanized_deterministic(str)
-      str = eutf8.lower(replace(str, to.case.snake))
+      str = eutf8.lower(str)
+      str = transf.string.snake_case(str)
       return str
     end,
     romanized_gpt = function(str)
@@ -3351,14 +3349,14 @@ transf = {
         {"こっち", "kocchi"}
       }})
     end,
-    folded = function(str)
-      return eutf8.gsub(str, "\n\r", " ")
+    singleline_string_by_folded = function(str)
+      return get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[\n\r\v\f]", " ")
     end,
     whitespace_collapsed_string = function(str)
-      return eutf8.gsub(str, "%s+", " ")
+      return get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", " ")
     end,
     nowhitespace_string = function(str)
-      return eutf8.gsub(str, "%s", "")
+      return get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", "")
     end,
     --- @param str string
     --- @return string[]
@@ -3456,7 +3454,7 @@ transf = {
       return contact
     end,
     event_table = function(str)
-      local components = stringx.split(str, mt._contains.unique_field_separator)
+      local components = plstringx.split(str, mt._contains.unique_field_separator)
       local parsed = ovtable.new()
       for i, component in transf.array.index_value_stateless_iter(components) do
         local key = mt._list.khal.parseable_format_components[i]
@@ -3465,7 +3463,7 @@ transf = {
         elseif key == "description" then
           parsed[key] = component
         else
-          parsed[key] = stringx.replace(component, "\n", "")
+          parsed[key] = plstringx.replace(component, "\n", "")
         end
       end
       return parsed
@@ -3509,10 +3507,10 @@ transf = {
       return res
     end,
     email_quoted = function(str)
-      return stringx.join(
+      return plstringx.join(
         "\n",
         hs.fnutils.imap(
-          stringx.splitlines(
+          plstringx.splitlines(
             stringy.strip(str)
           ),
           function(v)
@@ -3578,13 +3576,13 @@ transf = {
       return eutf8.match(str, "^%s*(.*)$")
     end,
     nocomment = function(str)
-      return stringx.split(str, " # ")[1]
+      return plstringx.split(str, " # ")[1]
     end,
     nocomment_noindent = function(str)
       return transf.line.noindent(transf.line.nocomment(str))
     end,
     comment = function(str)
-      return stringx.split(str, " # ")[2]
+      return plstringx.split(str, " # ")[2]
     end,
   },
   potentially_atpath = {
@@ -3859,9 +3857,9 @@ transf = {
       for _, raw_country in transf.array.index_value_stateless_iter(raw_countries) do
         local raw_country_lines = get.string.string_array_split_single_char_noempty(raw_country, "\n")
         local country_header = raw_country_lines[1]
-        local country_code = slice(country_header, "(", ")")
+        local country_code = onig.match(country_header, "\\(([^\\)]+\\)")
         if country_code == nil then error("could not find country code in header. header was " .. country_header) end
-        local payload_lines = slice(raw_country_lines, 2, -1)
+        local payload_lines = transf.array.array_by_nofirst(raw_country_lines)
         countries[country_code] = {}
         local city_code
         for _, payload_line in transf.array.index_value_stateless_iter(payload_lines) do
@@ -3869,7 +3867,7 @@ transf = {
             local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
             dothis.array.push(countries[country_code][city_code], relay_code)
           elseif stringy.startswith(payload_line, "\t") then -- line specifying an entire city
-            city_code = slice(payload_line, "(", ")") -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
+            city_code = onig.match(payload_line," \\(([^\\)]+\\) " ) -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
             countries[country_code][city_code] = {}
           end
         end
@@ -3901,20 +3899,14 @@ transf = {
       elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
         return word
       else
-        return replace(word, to.case.capitalized)
+        return transf.string.string_by_first_eutf8_upper(word)
       end
-    end,
-    capitalized = function(word)
-      return replace(word, to.case.capitalized)
-    end,
-    notcapitalized = function(word)
-      return replace(word, to.case.notcapitalized)
     end,
     raw_syn_output = function(str)
       return memoize(run)( "syn -p" .. transf.string.single_quoted_escaped(str) )
     end,
     term_syn_specifier_dict = function(str)
-      local synonym_parts = stringx.split(transf.word.raw_syn_output(str), "\n\n")
+      local synonym_parts = plstringx.split(transf.word.raw_syn_output(str), "\n\n")
       local synonym_tables = map(
         synonym_parts,
         function (synonym_part)
@@ -3981,10 +3973,10 @@ transf = {
     summary = function (syn_specifier)
       return 
         "synonyms: " ..
-        slice(syn_specifier.synonyms, { stop = 2, sliced_indicator = "..." }) ..
+        get.array.array_by_slice_removed_indicator_and_flatten_w_slice_spec(syn_specifier.synonyms, { stop = 2}, "...") ..
         "\n" ..
         "antonyms: " ..
-        slice(syn_specifier.antonyms, { stop = 2, sliced_indicator = "..." })
+        get.array.array_by_slice_removed_indicator_and_flatten_w_slice_spec(syn_specifier.antonyms, { stop = 2}, "...")
     end,
   },
   pair = {
@@ -4090,13 +4082,13 @@ transf = {
       return value
     end,
     header = function(k, v)
-      return transf.word.capitalized(transf.any.string(k)) .. ": " .. transf.any.string(v)
+      return transf.string.string_by_first_eutf8_upper(transf.any.string(k)) .. ": " .. transf.any.string(v)
     end,
     email_header = function(key, value)
-      return transf.word.capitalized(transf.any.string(key)) .. ": " .. get.string.evaled_as_template(transf.any.string(value))
+      return transf.string.string_by_first_eutf8_upper(transf.any.string(key)) .. ": " .. get.string.evaled_as_template(transf.any.string(value))
     end,
     url_param = function(key, value)
-      return transf.any.string(key) .. "=" .. transf.string.urlencoded(transf.any.string(value))
+      return transf.any.string(key) .. "=" .. transf.string.encoded_query_param_value(transf.any.string(value))
     end,
     ini_line = function(key, value)
       return transf.any.string(key) .. " = " .. transf.any.string(value)
@@ -4268,11 +4260,10 @@ transf = {
     end,
     contents_summary = function(arr)
       return get.string_or_number_array.string_by_joined(
-        slice(arr, {
+        get.array.array_by_slice_removed_indicator_and_flatten_w_slice_spec(arr, {
           start = 1,
           stop = 10,
-          sliced_indicator = "…",
-        }),
+        }, "..."),
         ", "
       )
     end,
@@ -4827,12 +4818,12 @@ transf = {
         transf.two_arrays.bool_by_larger_first
       )
     end,
-    array_by_flatten = array2d.flatten,
+    array_by_flatten = plarray2d.flatten,
     array_by_map_to_last = function(arr)
-      return hs.fnutils.imap(arr, transf.array.last)
+      return hs.fnutils.imap(arr, transf.array.t_by_last)
     end,
     array_by_map_to_first = function(arr)
-      return hs.fnutils.imap(arr, transf.array.first)
+      return hs.fnutils.imap(arr, transf.array.t_by_first)
     end,
     array_by_longest_common_prefix = function(a_o_a)
       local last_matching_index = 0
@@ -4847,7 +4838,7 @@ transf = {
     
         return arr
       end)
-      return slice(a_o_a[1], 1, last_matching_index)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(a_o_a[1], 1, last_matching_index)
     end,
     array_of_arrays_by_reverse = function(arr)
       return map(arr, transf.array.array_by_reverse)
@@ -5024,7 +5015,7 @@ transf = {
         else
           url = "https://"
         end
-        url = url .. get.string.with_suffix_string(comps.host, "/")
+        url = url .. get.string.string_by_with_suffix(comps.host, "/")
         if comps.endpoint then
           url = url .. (get.string.no_prefix_string(comps.endpoint, "/") or "/")
         end   
@@ -5191,10 +5182,10 @@ transf = {
   },
   citable_filename = {
     filename_safe_indicated_citable_object_id = function(filename)
-      return stringx.split(filename, "!citid:")[2]
+      return plstringx.split(filename, "!citid:")[2]
     end,
     indicated_citable_object_id = function(filename)
-      return transf.string.urldecoded(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
+      return transf.string.string_by_percent_decoded(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
     end,
   },
   citable_path = {
@@ -5800,7 +5791,7 @@ transf = {
   },
   chat_mac_application_name = {
     chat_storage_dir = function(app_name)
-      return env.MCHATS .. "/" .. transf.string.lowercase(app_name)
+      return env.MCHATS .. "/" .. transf.string.string_by_all_eutf8_lower(app_name)
     end,
     chat_media_dir = function(app_name)
       return transf.chat_mac_application_name.chat_storage_dir(app_name) .. "/media"
@@ -5925,7 +5916,7 @@ transf = {
       )
     end,
     filename = function(csl_table)
-      return slice(
+      return string.sub(
         get.string_or_number_array.string_by_joined(
           {
             transf.csl_table.authors_et_al_string(csl_table),
@@ -5934,7 +5925,8 @@ transf = {
           },
           "__"
         ),
-        { stop = 200 } -- max 255 chars filename and needs some room for the citatable object id
+        1,
+        200 -- max filename length, with some space for other stuff
       )
     end,
     volume = function(csl_table)
@@ -5969,7 +5961,7 @@ transf = {
         1 -- afaik there is never a case where pages don't increase by 1 (there is no notation that says 'every other page', for example)
       )
     end,
-    indicated_page_stirng = function(csl_table)
+    indicated_page_string = function(csl_table)
       local page = transf.csl_table.page(csl_table)
       if page then
         if stringy.find(page, "-") then
@@ -6087,10 +6079,10 @@ transf = {
       .. " # " .. transf.csl_table.apa_string(csl_table)
     end,
     filename_safe_citable_object_id = function(csl_table)
-      return transf.string.urlencoded(transf.csl_table.citable_object_id(csl_table))
+      return transf.string.encoded_query_param_value(transf.csl_table.citable_object_id(csl_table))
     end,
     filename_safe_indicated_citable_object_id = function(csl_table)
-      return transf.string.urlencoded(transf.csl_table.indicated_citable_object_id(csl_table))
+      return transf.string.encoded_query_param_value(transf.csl_table.indicated_citable_object_id(csl_table))
     end,
     citable_filename = function(csl_table)
       return 
@@ -6258,7 +6250,7 @@ transf = {
           local param_parts = stringy.split(param_part, "=")
           local key = param_parts[1]
           local value = param_parts[2]
-          params[key] = transf.string.urldecoded(value)
+          params[key] = transf.string.string_by_percent_decoded(value)
         end
       end
       return params
@@ -6312,7 +6304,7 @@ transf = {
   },
   owner_item_url = {
     owner_item = function(url)
-      return get.path.sliced_path_component_array(transf.url.path(url), "1:2")
+      return get.path.path_component_array_by_slice_w_slice_spec(transf.url.path(url), "1:2")
     end,
   },
   github_url = {
@@ -6433,7 +6425,7 @@ transf = {
     self_and_empty_string = function(any)
       return any, ""
     end,
-    any_by_self = function(any)
+    t_by_self = function(any)
       return any
     end,
     boolean = function(any)
@@ -6511,10 +6503,7 @@ transf = {
       local rawstr =  transf.styledtext.string(
         copied_spec.text
       )
-      local truncated = slice(rawstr, {
-        stop = 250,
-        sliced_indicator = "..."
-      })
+      local truncated = get.string.string_by_shortened_start_ellipsis(rawstr, 250)
       copied_spec.text = transf.string.with_styled_start_end_markers(truncated)
       return copied_spec
     end
@@ -6630,7 +6619,7 @@ transf = {
   },
   source_id = {
     language = function(source_id)
-      return slice(stringy.split(source_id, "."), -1, -1)[1]
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(stringy.split(source_id, "."), -1, -1)[1]
     end,
   },
   source_id_array = {
@@ -6700,7 +6689,7 @@ transf = {
       )
     end,
     shortcut_string = function(shortcut_specifier)
-      local modstr = stringx.join("", map(shortcut_specifier.mod_array, tblmap.mod.mod_symbol))
+      local modstr = plstringx.join("", map(shortcut_specifier.mod_array, tblmap.mod.mod_symbol))
       if modstr == "" then
         return shortcut_specifier.key
       else
@@ -6815,6 +6804,9 @@ transf = {
     end,
     one = function()
       return 1
+    end,
+    second_arg_ret_fn = function()
+      return get["nil"].nth_arg_ret_fn(nil, 2)
     end,
     poisonable = function()
       local dirty = false
@@ -6947,7 +6939,7 @@ transf = {
   action_specifier = {
     action_chooser_item_specifier = function(action_specifier)
       if action_specifier.text then error("old action_specifier format, contains action_specifier.text") end
-      local str = get.string.with_suffix_string(action_specifier.d, ".")
+      local str = get.string.string_by_with_suffix(action_specifier.d, ".")
       str = str .. " #" .. get.not_userdata_or_function.md5_base32_crock_string_of_length(action_specifier.d, 3) -- shortcode for easy use
       return {text = str}
     end

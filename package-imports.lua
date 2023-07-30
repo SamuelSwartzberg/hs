@@ -1,15 +1,17 @@
 --- @type pl.stringx
-stringx = require("pl.stringx")
+plstringx = require("pl.stringx")
 --- @type pl.dir
-dir = require("pl.dir")
+pldir = require("pl.dir")
 --- @type pl.file
-file = require("pl.file")
+plfile = require("pl.file")
 --- @type pl.tablex
-tablex = require("pl.tablex")
+pltablex = require("pl.tablex")
 --- @type pl.array2d
-array2d = require("pl.array2d")
+plarray2d = require("pl.array2d")
 --- @type pl.data 
-data = require("pl.data")
+pldata = require("pl.data")
+--- @type pl.url
+plurl = require("pl.url")
 --- @type ftcsv
 ftcsv = require('ftcsv')
 --- @type date
@@ -39,6 +41,3 @@ shelve = require "shelve"
 
 --- @type hashings 
 hashings = require("hashings")
-
---- @type promiselib | fun(fn: promisefn): PromiseObj
-Promise = require 'promise'

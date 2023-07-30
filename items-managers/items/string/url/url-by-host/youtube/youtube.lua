@@ -4,7 +4,7 @@ YoutubeItemSpecifier = {
   properties = {
     getables = {
       ["is-youtube-playable-item"] = function(self)
-        return stringx.endswith(self:get("url-path"), {"watch", "playlist"})
+        return plstringx.endswith(self:get("url-path"), {"watch", "playlist"})
       end,
     }
   },

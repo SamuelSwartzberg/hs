@@ -223,7 +223,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
   end
 
   if secondary_api_name and tblmap.secondary_api_name.endpoint_prefix[secondary_api_name] and specifier.endpoint then
-    specifier.endpoint = get.string.with_suffix_string(tblmap.secondary_api_name.endpoint_prefix[secondary_api_name], "/") .. get.string.no_prefix_string(specifier.endpoint, "/")
+    specifier.endpoint = get.string.string_by_with_suffix(tblmap.secondary_api_name.endpoint_prefix[secondary_api_name], "/") .. get.string.string_by_no_prefix(specifier.endpoint, "/")
   end
 
   if secondary_api_name and tblmap.secondary_api_name.default_params[secondary_api_name] then
@@ -261,7 +261,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
   end
 
   specifier.auth_header = specifier.auth_header or "Authorization"
-  specifier.auth_header = get.string.with_suffix_string(specifier.auth_header, ": ")
+  specifier.auth_header = get.string.string_by_with_suffix(specifier.auth_header, ": ")
 
   -- add auth to curl command
 
@@ -270,14 +270,14 @@ function rest(specifier, do_after, have_tried_access_refresh)
   end
 
   if specifier.token_where == "header" or specifier.token_where == "both" then
-    local auth_header = specifier.auth_header .. get.string.with_suffix_string(specifier.auth_process or "Bearer", " ")
+    local auth_header = specifier.auth_header .. get.string.string_by_with_suffix(specifier.auth_process or "Bearer", " ")
     dothis.array.push(curl_command, "-H")
     dothis.array.push(curl_command, 
       { value =  auth_header .. specifier.token, type = "quoted"})
   end
 
   if specifier.username_pw_where == "header" or specifier.username_pw_where == "both" then
-    local auth_header = specifier.auth_header .. get.string.with_suffix_string(specifier.auth_process or "Basic", " ")
+    local auth_header = specifier.auth_header .. get.string.string_by_with_suffix(specifier.auth_process or "Basic", " ")
     dothis.array.push(curl_command, "-H")
     dothis.array.push(curl_command, 
       { value =  auth_header .. transf.string.base64_url_string(specifier.username .. ":" .. specifier.password), type = "quoted"})

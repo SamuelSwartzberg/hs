@@ -377,10 +377,15 @@ tblmap = {
       ["danbooru"] = "https://danbooru.donmai.us/posts?tags=%s",
       ["gelbooru"] = "https://gelbooru.com/index.php?page=post&s=list&tags=%s",
     },
-    spaces_percent = {
+    param_is_path = {
+      wikipedia = true,
+      wiktionary = true,
       jisho = true,
+      ["merriam-webster"] = true,
       ["deepl-en-ja"] = true,
       ["deepl-de-en"] = true,
+      scihub = true,
+      ["google-maps"] = true,
     }
   },
   host = {
