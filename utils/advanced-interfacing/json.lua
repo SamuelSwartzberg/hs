@@ -33,7 +33,7 @@
 --- @return any
 function rest(specifier, do_after, have_tried_access_refresh)
   local original_specifier = specifier
-  specifier = get.table.copy(specifier) or {}
+  specifier = get.table.table_by_copy(specifier) or {}
 
   local api_keys_location, catch_auth_error, secondary_api_name
 
@@ -228,7 +228,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if secondary_api_name and tblmap.secondary_api_name.default_params[secondary_api_name] then
     specifier.params = specifier.params or {}
-    specifier.params = transf.two_table_or_nils.table_nonrecursive(get.table.copy(tblmap.secondary_api_name.default_params[secondary_api_name], true), specifier.params)
+    specifier.params = transf.two_table_or_nils.table_nonrecursive(get.table.table_by_copy(tblmap.secondary_api_name.default_params[secondary_api_name], true), specifier.params)
   end
 
   specifier.scheme = specifier.scheme or tblmap.api_name.scheme[specifier.api_name]

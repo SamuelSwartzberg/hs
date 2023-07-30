@@ -106,7 +106,7 @@ function map(tbl, f, opts, visited)
         (type(v) == "table" and not isLeaf(v)) and
         (type(proc) ~= "table" or (not proc._k or not v[proc._k])) -- if we're using a _k mapProcessor, we don't want to recurse into the table if it has the key we're looking for
       then
-        local optcopy = get.table.copy(opts)
+        local optcopy = get.table.table_by_copy(opts)
         optcopy.ret = {"v"} -- when recursing, the recursive call is going to return a single value, which represents the new value of our current key, so we have to overwrite .ret here. Maybe there's a cleaner option that allows for more flexibility, but I can't think of one right now, let's see how this works out
         local itemres
         if visited[tostring(v)] then
@@ -124,7 +124,7 @@ function map(tbl, f, opts, visited)
       end
     else
       print("not recursing...")
-      local optcopy = get.table.copy(opts)
+      local optcopy = get.table.table_by_copy(opts)
       optcopy.ret = {} -- if we're not mapping the value, there's are no returned values to use. this way, addToRes will default to k, v.
       addToRes({}, res, optcopy, k, v)
     end

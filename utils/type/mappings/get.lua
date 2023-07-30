@@ -277,7 +277,7 @@ get = {
       
       return lines
     end,
-    has_key = function(t, key)
+    bool_by_has_key = function(t, key)
       return t[key] ~= nil
     end,
     --- Copy a table, optionally deep, return other types as-is.  
@@ -287,7 +287,7 @@ get = {
     --- @param t T
     --- @param deep? boolean
     --- @return T
-    copy = function(t, deep, copied_tables)
+    table_by_copy = function(t, deep, copied_tables)
       if type(t) ~= "table" then return t end -- non-tables don't need to be copied
       deep = get.any.default_if_nil(deep, true)
       copied_tables = get.any.default_if_nil(copied_tables, {})
@@ -299,7 +299,7 @@ get = {
           if copied_tables[tostring(v)] then -- we've already copied this table, so just reference it
             new[k] = copied_tables[tostring(v)]
           else -- we haven't copied this table yet, so copy it and reference it
-            new[k] = get.table.copy(v, deep, copied_tables)
+            new[k] = get.table.table_by_copy(v, deep, copied_tables)
           end
         else
           new[k] = v
@@ -369,11 +369,64 @@ get = {
       )
     end,
     stop_specifier = function(t, table_arg_bool_by_is_leaf_ret_fn)
-      return get
+      error("I never finished writing this???")
+      return get 
+    end,
+    table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn = function(t, fn)
+      local res = {}
+      for k, v in transf.table.stateless_key_value_iter(t) do
+        local nk, nv = fn(k, v)
+        res[nk] = nv
+      end
+      return res
+    end,
+    table_by_mapped_w_kt_vt_arg_kt_ret_fn = function(t, fn)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(t, function(k, v) return fn(k, v), v end)
+    end,
+    table_by_mapped_w_kt_vt_arg_vt_ret_fn = function(t, fn)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(t, function(k, v) return k, fn(k, v) end)
+    end,
+    table_by_mapped_w_kt_arg_kt_ret_fn = function(t, fn)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(t, function(k, v) return fn(k), v end)
+    end,
+    table_by_mapped_w_vt_arg_vt_ret_fn = hs.fnutils.map,
+    table_by_mapped_w_vt_arg_kt_ret_fn = function(t, fn)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(t, function(k, v) return fn(v), v end)
+    end,
+    table_by_mapped_w_vt_arg_kt_vt_ret_fn = function(t, fn)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(t, function(k, v) return fn(v) end)
+    end,
+    table_by_mapped_w_kt_arg_vt_ret_fn = function(t, fn)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(t, function(k, v) return k, fn(k) end)
+    end,
+    table_by_mapped_w_kt_arg_kt_vt_ret_fn = function(t, fn)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(t, function(k, v) return fn(k) end)
+    end,
+    array_by_mapped_w_kt_vt_arg_vt_ret_fn = function(t, fn)
+      local res = {}
+      for k, v in transf.table.stateless_key_value_iter(t) do
+        dothis.array.push(res, fn(k, v))
+      end
+      return res
+    end,
+    array_by_mapped_w_kt_arg_vt_ret_fn = function(t, fn)
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(t, function(k, v) return fn(k) end)
+    end,
+    array_by_mapped_w_vt_arg_vt_ret_fn = function(t, fn)
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(t, function(k, v) return fn(v) end)
+    end,
+    string_array_by_mapped_w_fmt_string = function(t, fmt_str)
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        t,
+        function(k,v)
+          return eutf8.format(fmt_str, k, v)
+        end
+      )
     end
+
     
   },
-
+  
   dict = {
     array_by_array = function(dict, arr)
       return map(
@@ -468,7 +521,7 @@ get = {
     array_of_assoc_arrs = function(assoc_arr, key)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc_arr) do
-        local copied = get.table.copy(v, true)
+        local copied = get.table.table_by_copy(v, true)
         copied[key] = k
         dothis.array.push(res, copied)
       end
@@ -771,7 +824,7 @@ get = {
       return arr[(n - 2) % #arr + 1]
     end,
     array_by_sorted = function(list, comp)
-      local new_list = get.table.copy(list, false)
+      local new_list = get.table.table_by_copy(list, false)
       table.sort(new_list, comp)
       return new_list
     end,
@@ -791,7 +844,7 @@ get = {
     --- @return T
     median = function (list, comp, if_even)
       if_even = if_even or "lower"
-      list = get.table.copy(list, false) -- don't modify the original list
+      list = get.table.table_by_copy(list, false) -- don't modify the original list
       table.sort(list, comp)
       local mid = math.floor(#list / 2)
       if #list % 2 == 0 then
@@ -859,6 +912,19 @@ get = {
     end,
     choosing_hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
       return get.hschooser_specifier.choosing_hschooser_specifier(transf.array.hschooser_specifier(arr, target_item_chooser_item_specifier_name), "index", arr)
+    end,
+    array_by_mapped_w_vt_arg_vt_ret_fn = hs.fnutils.imap,
+    array_by_mapped_w_pos_int_vt_arg_vt_ret_fn = function(arr, fn)
+      local res = {}
+      for i, v in transf.array.key_value_stateless_iter(arr) do
+        dothis.array.push(res, fn(i, v))
+      end
+    end,
+    array_by_mapped_w_vt_key_dict = function(arr, dict)
+      return get.array.array_by_mapped_w_vt_arg_vt_ret_fn(
+        arr,
+        function(v) return dict[v] end
+      )
     end,
     
   },
@@ -2525,7 +2591,7 @@ get = {
       return table.unpack(get.any.array_repeated(arr, times))
     end,
     applicable_thing_name_hierarchy = function(any, local_thing_name_hierarchy, parent)
-      local_thing_name_hierarchy = local_thing_name_hierarchy or get.table.copy(thing_name_hierarchy, true)
+      local_thing_name_hierarchy = local_thing_name_hierarchy or get.table.table_by_copy(thing_name_hierarchy, true)
       parent = parent or "any"
       local res = {}
       for thing_name, child_thing_name_hierarchy_or_leaf_indication_string in transf.table.key_value_stateless_iter(thing_name_hierarchy) do
@@ -2541,7 +2607,7 @@ get = {
       return res
     end,
     has_key = function(any, key)
-      return is.any.table(any) and get.table.has_key(any, key)
+      return is.any.table(any) and get.table.bool_by_has_key(any, key)
     end,
     default_if_nil = function(any, default)
       if any == nil then
@@ -2648,7 +2714,7 @@ get = {
   },
   chooser_item_specifier_array = {
     styled_chooser_item_specifier_array = function(arr, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict)
-      local res = get.table.copy(arr)
+      local res = get.table.table_by_copy(arr)
       for i, chooser_item_specifier in transf.array.index_value_stateless_iter(res) do
         local text_styledtext_attribute_specifier = transf.two_dict_or_nils.dict_by_take_new( {
           font = {size = 14 },
@@ -2826,20 +2892,6 @@ get = {
       return math.abs(a - b) < distance
     end,
   },
-  stateless_iter_component_array = {
-    table = function(stateless_iter_component_array, opts)
-      opts = defaultOpts(opts, "kv")
-    
-      local res = getEmptyResult({}, opts)
-    
-      for a1, a2, a3, a4, a5, a6, a7, a8, a9 in transf.stateless_iter_component_array.stateless_iter(stateless_iter_component_array) do
-        local as = {a1, a2, a3, a4, a5, a6, a7, a8, a9}
-        addToRes(as, res, opts, nil, nil)
-      end
-    
-      return res
-    end
-  }, 
   stream_creation_specifier = {
   },
   youtube_video_id = {
@@ -2991,7 +3043,7 @@ get = {
   },
   input_spec = {
     declared_input_spec = function(input_spec, type)
-      local cpy = get.table.copy(input_spec)
+      local cpy = get.table.table_by_copy(input_spec)
       cpy.type = type
       return cpy
     end,
@@ -3004,7 +3056,7 @@ get = {
       if treeify_spec.label_key then
         label = tree_node_like[treeify_spec.label_key]
       else
-        label = get.table.copy(tree_node_like, true)
+        label = get.table.table_by_copy(tree_node_like, true)
       end
       if raw_children and #raw_children > 0 and treeify_spec.levels_of_nesting_to_skip then
         for i = 1, treeify_spec.levels_of_nesting_to_skip do -- this is to handle cases in which instead of children being { item, item, ... }, it's {{ item, item, ... }} etc. Really, this shouldn't be necessary, but some of the data I'm working with is like that.
@@ -3028,7 +3080,7 @@ get = {
   },
   n_any_assoc_arr_array = {
     leaf_label_with_title_path = function(arr, title_key)
-      local leaf = get.table.copy(dothis.array.pop(arr))
+      local leaf = get.table.table_by_copy(dothis.array.pop(arr))
       local title_path = map(
         arr,
         {_k = title_key}

@@ -2,18 +2,6 @@
 
 refstore = {
   params = {
-    map = {
-      opts = {
-        kv_to_list = {args = "kv", ret = "v", tolist = true}
-      }
-    },
-    gpt = {
-      opts = {
-        temperature_0 = {
-          temperature = 0
-        },
-      }
-    },
     memoize = {
       opts = {
         stringify_table_params = {
@@ -69,13 +57,6 @@ refstore = {
         permanent_fs = {
           mode = "fs",
         },
-      }
-    },
-    table_proc_fn = {
-      opts = {
-        tolist = {
-          tolist = true
-        }
       }
     },
     ftcsv_parse = {

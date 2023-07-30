@@ -49,7 +49,7 @@ local gen_cache_methods = {
         node.children[param] = node.children[param] or {}
         node = node.children[param]
       end
-      node.results = get.table.copy(result, true)
+      node.results = get.table.table_by_copy(result, true)
     end,
     get = function(fnid, opts_as_str, params, opts)
       memstore[fnid] = memstore[fnid] or {}
@@ -70,7 +70,7 @@ local gen_cache_methods = {
         node = node.children and node.children[param]
         if not node then return nil end
       end
-      return get.table.copy(node.results, true)
+      return get.table.table_by_copy(node.results, true)
     end,
     reset = function(fnid, opts_as_str)
       memstore[fnid] = memstore[fnid] or {}
@@ -148,7 +148,7 @@ function memoize(fn, opts, funcname)
   local opts_as_str = opts_as_str_or_nil or "noopts"
 
   --- set default options
-  opts = get.table.copy(opts) or {}
+  opts = get.table.table_by_copy(opts) or {}
   opts.mode = opts.mode or "mem"
   opts.is_async = get.any.default_if_nil(opts.is_async, false)
   opts.invalidation_mode = opts.invalidation_mode or "none"

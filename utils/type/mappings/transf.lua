@@ -632,7 +632,7 @@ transf = {
   },
   assoc_arr_array = {
     assoc_arr_with_index_as_key_array = function(arr)
-      local res = get.table.copy(arr, true)
+      local res = get.table.table_by_copy(arr, true)
       for i, v in transf.array.index_value_stateless_iter(arr) do
         v.index = i
       end
@@ -1347,14 +1347,9 @@ transf = {
       )
     end,
     fs_tag_string_part_array = function(dict)
-      return map(
+      return get.table.string_array_by_mapped_w_fmt_string(
         dict,
-        {_f = "%s-%s"},
-        {
-          args = "kv",
-          ret = "v",
-          tolist = true,
-        }
+        "%s-%s"
       )
     end,
     fs_tag_string = function(dict)
@@ -1525,7 +1520,7 @@ transf = {
       }
     end,
     email_string = function(specifier)
-      specifier = get.table.copy(specifier)
+      specifier = get.table.table_by_copy(specifier)
       local body = specifier.body or ""
       specifier.body = nil
       local non_inline_attachment_local_file_array = specifier.non_inline_attachment_local_file_array
@@ -1616,7 +1611,7 @@ transf = {
   },
   tree_node = {
     array_of_arrays_by_label = function(node, path, include_inner)
-      path = get.table.copy(path) or {}
+      path = get.table.table_by_copy(path) or {}
       dothis.array.push(path, node.label)
       local res = {}
       if not node.children or include_inner then
@@ -1643,7 +1638,8 @@ transf = {
       return hs.fnutils.imap(dict, function(value)
         return {
           value = value,
-          dependencies = get.stateless_iter_component_array.table(transf.stateless_iter.stateless_iter_component_array(eutf8.gmatch(value, "%$([A-Z0-9_]+)")), {tolist=true, ret="v"})
+          dependencies = get.stateless_iter.table(
+            eutf8.gmatch(value, "%$([A-Z0-9_]+)")), {tolist=true, ret="v"}
         }
       end)
     end,
@@ -2494,7 +2490,7 @@ transf = {
     --- i.e. { month = 02, hour = 12 } will return { "year", "month", "day", "hour" }
     --- this should be equal to prefix_date_component_name_ordered_list_set if date_component_name_value_dict is a prefix_date_component_name_value_dict since prefix_ is defined as having no nil values before potential trailing nil values
     prefix_date_component_name_ordered_list_no_trailing_nil = function(date_component_name_value_dict)
-      local ol = get.table.copy(mt._list.date.date_component_names)
+      local ol = get.table.table_by_copy(mt._list.date.date_component_names)
       while(date_component_name_value_dict[
         ol[#ol]
       ] == nil) do
@@ -3956,7 +3952,7 @@ transf = {
     end,
     determinant_metatable_creator_fn = function(word)
       return function(tbl)
-        tbl = get.table.copy(tbl, true)
+        tbl = get.table.table_by_copy(tbl, true)
         local metatbl = {
             __index = {
             }
@@ -4309,7 +4305,7 @@ transf = {
       return transf.two_comparables.larger(arr1[1], arr2[1])
     end,
     array_by_appended = function(arr1, arr2)
-      local res = get.table.copy(arr1)
+      local res = get.table.table_by_copy(arr1)
       for _, v in transf.array.index_value_stateless_iter(arr2) do
         res[#res + 1] = v
       end
@@ -4426,7 +4422,7 @@ transf = {
   },
   two_tables = {
     table_nonrecursive = function(t1, t2)
-      local res = get.table.copy(t1)
+      local res = get.table.table_by_copy(t1)
       for k, v in transf.table.key_value_stateless_iter(t2) do
         res[k] = v
       end
@@ -4442,14 +4438,14 @@ transf = {
   },
   any_and_array = {
     array = function(any, arr)
-      local res = get.table.copy(arr)
+      local res = get.table.table_by_copy(arr)
       dothis.array.unshift(res, any)
       return res
     end,
   },
   array_and_any = {
     array = function(arr, any)
-      local res = get.table.copy(arr)
+      local res = get.table.table_by_copy(arr)
       dothis.array.push(res, any)
       return res
     end,
@@ -4521,6 +4517,18 @@ transf = {
         transf.email_file.email_file_simple_view_key_value
         {"v", "kv"}
       )
+    end,
+  },
+  stateless_iter = {
+    array = function(...)
+      local res = {}
+      for a1, a2, a3, a4, a5, a6, a7, a8, a9 in ... do
+        dothis.array.push(
+          res,
+          {a1, a2, a3, a4, a5, a6, a7, a8, a9}
+        )
+      end
+      return res
     end,
   },
   table_or_nil = {
@@ -6508,7 +6516,7 @@ transf = {
   },
   item_chooser_item_specifier = {
     truncated_text_item_chooser_item_specifier = function(item_chooser_item_specifier)
-      local copied_spec = get.table.copy(item_chooser_item_specifier)
+      local copied_spec = get.table.table_by_copy(item_chooser_item_specifier)
       local rawstr =  transf.styledtext.string(
         copied_spec.text
       )
@@ -6976,35 +6984,25 @@ transf = {
   },
   thing_name = {
     transf_action_specifier_array = function(thing_name)
-      return map(
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(
         transf[thing_name],
         function(thing_name2, fn)
           return {
             d = "transf." .. thing_name .. "." .. thing_name2,
             getfn = fn
           }
-        end,
-        {
-          args = "kv",
-          ret = "v",
-          tolist = true,
-        }
+        end
       )
     end,
     act_action_specifier_array = function(thing_name)
-      return map(
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(
         act[thing_name],
         function(action, fn)
           return {
             d = "act." .. thing_name .. "." .. action,
             getfn = fn
           }
-        end,
-        {
-          args = "kv",
-          ret = "v",
-          tolist = true,
-        }
+        end
       )
     end,
     action_specifier_array = function(thing_name)
@@ -7023,8 +7021,7 @@ transf = {
     array_of_action_specifier_arrays = function(thing_name_array)
       return map(
         thing_name_array,
-        tblmap.thing_name.action_specifier_array,
-        {tolist=true}
+        tblmap.thing_name.action_specifier_array
       )
     end,
     action_specifier_array = function(thing_name_array)
@@ -7404,16 +7401,6 @@ transf = {
     end
     
   },
-  stateless_iter = {
-    stateless_iter_component_array = function(...)
-      return {...}
-    end
-  },
-  stateless_iter_component_array = {
-    stateless_iter = function(component_array)
-      return table.unpack(component_array)
-    end
-  },
   form_field_specifier = {
 
   },
@@ -7694,7 +7681,7 @@ transf = {
     any = function(prompt_spec)
 
       -- set defaults for all prompt_spec fields
-      prompt_spec = get.table.copy(prompt_spec)
+      prompt_spec = get.table.table_by_copy(prompt_spec)
       prompt_spec.prompter = prompt_spec.prompter or transf.prompt_args_string.string_or_nil_and_boolean
       prompt_spec.transformer = prompt_spec.transformer or function(x) return x end
       prompt_spec.raw_validator = prompt_spec.raw_validator or function(x) return x ~= nil end

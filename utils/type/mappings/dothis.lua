@@ -271,7 +271,7 @@ dothis = {
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
     end,
     alert = function(str, opts)
-      opts = get.table.copy(opts) or {}
+      opts = get.table.table_by_copy(opts) or {}
       opts.duration = opts.duration or 10
       return hs.alert.show(str, {textSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3}, opts.duration)
     end,
@@ -2387,7 +2387,7 @@ dothis = {
   },
   stream_creation_specifier_array = {
     create_background_stream = function(arr, spec)
-      local copied_spec = get.table.copy(spec)
+      local copied_spec = get.table.table_by_copy(spec)
       copied_spec.flag_profile_name = "background"
       copied_spec.type = "stream"
       dothis.creation_specifier_array.create(arr, copied_spec)
