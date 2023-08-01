@@ -44,30 +44,7 @@ get = {
       })
     end,
   },
-  khard = {
-    list = function()
-      return memoize(run)(
-        "khard list --parsable"
-      )
-    end,
-    all_contact_uids = function()
-      local res = map(
-        stringy.split(get.khard.list(), "\n"), 
-        function (line)
-          return stringy.split(line, "\t")[1]
-        end
-      )
-      return res
-    end,
-    all_contact_tables = function()
-      return hs.fnutils.imap(
-        get.khard.all_contact_uids(),
-        function(uid)
-          return transf.uuid.contact_table(uid)
-        end
-      )
-    end
-  },
+
   package_manager_name_or_nil = {
     package_name_semver_compound_string_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
     package_name_semver_package_manager_name_compound_string_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
@@ -81,21 +58,6 @@ get = {
    
   },
   khal = {
-    calendar_name_array = function()
-      return transf.string.lines(run("khal printcalendars"))
-    end,
-    writeable_calendars = function()
-      return hs.fnutils.ifilter(
-        get.khal.calendar_name_array(),
-        is.calendar_name.writeable_calendar_name
-      )
-    end,
-    writeable_calendar_string = function()
-      return get.string_or_number_array.string_by_joined(
-        get.khal.writeable_calendars(),
-        ","
-      )
-    end,
     parseable_format_specifier = function()
       return get.string_or_number_array.string_by_joined(
         map(
@@ -136,7 +98,7 @@ get = {
     calendar_template_empty = function()
       CALENDAR_TEMPLATE_SPECIFIER = ovtable.new()
       CALENDAR_TEMPLATE_SPECIFIER.calendar = { 
-        comment = 'one of: {{[ get.khal.writeable_calendar_string() ]}}' ,
+        comment = 'one of: {{[ transf["nil"].writeable_calendar_string() ]}}' ,
         value = "default"
       }
       CALENDAR_TEMPLATE_SPECIFIER.start = {
@@ -428,13 +390,10 @@ get = {
   },
   
   dict = {
-    array_by_array = function(dict, arr)
-      return map(
+    array_by_mapped_w_kt_array = function(dict, arr)
+      return get.array.array_by_mapped_w_t_key_dict(
         arr,
-        function(i, v)
-          return i, dict[v]
-        end,
-        "k"
+        dict
       )
     end,
     key_value_fn_filtered_dict = function(t, fn)
@@ -483,11 +442,11 @@ get = {
   dict_with_timestamp = {
     array_by_array_with_timestamp_first = function(dict, arr)
       arr = transf.any_and_array.array("timestamp", arr)
-      return get.dict.array_by_array(dict, arr)
+      return get.dict.array_by_mapped_w_kt_array(dict, arr)
     end,
     timestamp_key_array_value_dict_by_array = function(dict, arr)
       return {
-        [dict.timestamp] = get.dict.array_by_array(dict, arr)
+        [dict.timestamp] = get.dict.array_by_mapped_w_kt_array(dict, arr)
       }
     end,
   },
@@ -495,7 +454,7 @@ get = {
     dict_of_arrays_by_array = function(dict_of_dicts, arr)
       return hs.fnutils.map(
         dict_of_dicts,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.dict.array_by_array, {a_use, arr})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.dict.array_by_mapped_w_kt_array, {a_use, arr})
       )
     end
   },
@@ -913,15 +872,15 @@ get = {
     choosing_hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
       return get.hschooser_specifier.choosing_hschooser_specifier(transf.array.hschooser_specifier(arr, target_item_chooser_item_specifier_name), "index", arr)
     end,
-    array_by_mapped_w_vt_arg_vt_ret_fn = hs.fnutils.imap,
-    array_by_mapped_w_pos_int_vt_arg_vt_ret_fn = function(arr, fn)
+    array_by_mapped_w_t_arg_t_ret_fn = hs.fnutils.imap,
+    array_by_mapped_w_pos_int_t_arg_t_ret_fn = function(arr, fn)
       local res = {}
       for i, v in transf.array.key_value_stateless_iter(arr) do
         dothis.array.push(res, fn(i, v))
       end
     end,
-    array_by_mapped_w_vt_key_dict = function(arr, dict)
-      return get.array.array_by_mapped_w_vt_arg_vt_ret_fn(
+    array_by_mapped_w_t_key_dict = function(arr, dict)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(v) return dict[v] end
       )
@@ -2196,13 +2155,13 @@ get = {
   },
   date_component_name_list = {
     date_component_value_list = function(date_component_name_list, date_component_name_value_dict)
-      return map(
+      return get.array.array_by_mapped_w_t_key_dict(
         date_component_name_list,
         date_component_name_value_dict
       )
     end,
     date_component_value_ordered_list = function(date_component_name_list, date_component_name_value_dict)
-      return map(
+      return get.array.array_by_mapped_w_t_key_dict(
         transf.date_component_name_list.date_component_name_ordered_list(date_component_name_list),
         date_component_name_value_dict
       )
@@ -2255,7 +2214,7 @@ get = {
   },
   full_date_component_name_value_dict = {
     prefix_partial_date_component_name_value_dict = function(full_date_component_name_value_dict, date_component_name)
-      return map(
+      return get.array.array_by_mapped_w_t_key_dict(
         transf.date_component_name.date_component_name_value_dict_larger_or_same(date_component_name),
         full_date_component_name_value_dict
       )
@@ -2319,14 +2278,13 @@ get = {
     array_of_dicts_by_array = function(arr_of_arr, arr2)
       return hs.fnutils.imap(
         arr_of_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.array.dict_by_array, {a_use, arr2})
+        get.fn.arbitrary_args_bound_or_ignored_fn(transf.two_arrays.dict_by_zip_stop_shortest, {arr2, a_use})
       )
     end,
     dict_of_arrays_by_first_element = function(arr_of_arr)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr_of_arr,
-        transf.array.t_and_array_by_first_rest,
-        {"v", "kv"}
+        transf.array.t_and_array_by_first_rest
       )
     end,
     dict_of_dicts_by_first_element_and_array = function(arr_of_arr, arr2)
@@ -2338,7 +2296,13 @@ get = {
     array_of_arrays_by_mapped = function(arr_of_arr, fn)
       return hs.fnutils.imap(
         arr_of_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.array.array_by_mapped, {a_use, fn})
+        get.fn.second_n_args_bound_fn(get.array.array_by_mapped, fn)
+      )
+    end,
+    --- essentially flatMap
+    array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten = function(arr, fn)
+      return transf.array.array_by_flatten(
+        get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, fn)
       )
     end,
   },
@@ -2346,7 +2310,7 @@ get = {
     dict_of_dicts_by_array = function(dict_of_arr, arr2)
       return hs.fnutils.map(
         dict_of_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.array.dict_by_array, {a_use, arr2})
+        get.fn.arbitrary_args_bound_or_ignored_fn(transf.two_arrays.dict_by_zip_stop_shortest, {arr2, a_use})
       )
     end,
   },
@@ -2981,6 +2945,15 @@ get = {
       return inner_func
     end
   },
+  second_n_args_bound_fn = function(func, ...)
+    return get.fn.arbitrary_args_bound_or_ignored_fn(
+      func,
+      transf.any_and_array.array(
+        a_use,
+        transf.n_anys.array(...)
+      )
+    )
+  end,
   form_field_specifier_array = {
     form_filling_specifier = function(specarr, in_fields)
       return {
@@ -2989,14 +2962,13 @@ get = {
       }
     end,
     filled_string_dict_from_string = function(specarr, str)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         specarr,
         function (form_field_specifier)
           return 
             form_field_specifier.alias or form_field_specifier.value, 
             string.match(str, form_field_specifier.value .. "[^\n]-: *(.-)\n") or string.match(str, form_field_specifier.value .. "[^\n]-: *(.-)$")
-        end,
-        {"v", "kv"}
+        end
       )
     end,
     filled_string_dict_from_string_array = function(specarr, in_fields)

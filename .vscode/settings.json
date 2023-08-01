@@ -6,5 +6,10 @@
   "Lua.diagnostics.disable": [
     "lowercase-global",
     "param-type-mismatch"
-  ]
+  ],
+  "Lua.workspace.library": [
+    "/Users/sam/Library/Application Support/Code - Insiders/User/globalStorage/sumneko.lua/addonManager/addons/penlight/module/library",
+    "${3rd}/lfs/library"
+  ],
+  "Lua.workspace.checkThirdParty": false
 }

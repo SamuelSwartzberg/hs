@@ -88,11 +88,11 @@ StringItemSpecifier = {
     }, {
       d = "basheval",
       i = "🐚🧬",
-      getfn = transf.string.evaled_bash_string
+      getfn = transf.string.string_by_evaled_bash
     }, {
       d = "envsubst",
       i = "🌥🧬",
-      getfn = transf.string.envsubsted
+      getfn = transf.string.string_by_envsubsted
     }, {
       d = "rsnu",
       i = "🅰🐍🧗‍♀️",

@@ -66,7 +66,7 @@ act = {
       dothis.url.add_event_from_url(url, "default")
     end,
     add_event_to_chosen_calendar = function(url)
-      dothis.array.choose_item(get.khal.writeable_calendars(), function(calendar)
+      dothis.array.choose_item(transf["nil"].writeable_calendar_name_array(), function(calendar)
         dothis.url.add_event_from_url(url, calendar)
       end)
     end,
@@ -76,7 +76,7 @@ act = {
       dothis.ics_file.add_events_from_file(ics_file, "default")
     end,
     add_events_to_chosen_calendar = function(ics_file)
-      dothis.array.choose_item(get.khal.writeable_calendars(), function(calendar)
+      dothis.array.choose_item(transf["nil"].writeable_calendar_name_array(), function(calendar)
         dothis.ics_file.add_events_from_file(ics_file, calendar)
       end)
     end,

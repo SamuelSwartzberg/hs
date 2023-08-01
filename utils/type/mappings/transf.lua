@@ -555,10 +555,9 @@ transf = {
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(arr, 1, -2)
     end,
     empty_string_value_dict = function(arr)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
-        transf.any.self_and_empty_string,
-        {"v", "kv"}
+        transf.any.self_and_empty_string
       )
     end,
     string_array = function(arr)
@@ -583,7 +582,7 @@ transf = {
     index_value_stateful_iter = get.stateless_generator.stateful_generator(transf.array.index_value_stateless_iter),
     index_stateful_iter = get.stateless_generator.stateful_generator(transf.array.index_value_stateless_iter, 1, 1),
     value_boolean_dict = function(arr)
-      return map(arr, function(v) return v, true end, { args = "v", ret = "kv", nooverwrite = true })
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(arr, function(v) return v, true end)
     end,
     set = function(arr)
       return transf.table_or_nil.key_array(
@@ -987,10 +986,9 @@ transf = {
       return transf.dir_array.filter_git_root_dir_array(transf.extant_path_array.filter_dir_array(path_array))
     end,
     descendant_file_array = function(path_array)
-      return map(
+      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
         path_array,
-        transf.extant_path.descendant_file_array,
-        {flatten = true}
+        transf.extant_path.descendant_file_array
       )
     end,
   },
@@ -999,10 +997,9 @@ transf = {
       return hs.fnutils.ifilter(path_array, is.dir.git_root_dir)
     end,
     children_absolute_path_array = function(path_array)
-      return map(
+      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
         path_array,
-        transf.dir.children_absolute_path_array,
-        {flatten = true}
+        transf.dir.children_absolute_path_array
       )
     end,
   },
@@ -1111,7 +1108,7 @@ transf = {
       return transf.extant_path_array.newest(transf.dir.children_absolute_path_array(dir))
     end,
     grandchildren_absolute_path_array = function(dir)
-      return map(transf.dir.children_absolute_path_array(dir), transf.dir.children_absolute_path_array, { flatten = true })
+      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.children_absolute_path_array(dir), transf.dir.children_absolute_path_array)
     end,
     git_root_dir_descendants = function(dir)
       return transf.dir_array.filter_git_root_dir_array(transf.extant_path.descendants_absolute_path_array(dir))
@@ -1310,10 +1307,9 @@ transf = {
       )
     end,
     fs_tag_string_dict = function(fs_tag_string)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         transf.fs_tag_string.fs_tag_string_part_array(fs_tag_string),
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.n_strings_split, {a_use, "-", 2}),
-        {"v", "kv"}
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.n_strings_split, {a_use, "-", 2})
       )
     end,
     fs_tag_assoc = function(fs_tag_string)
@@ -1324,10 +1320,9 @@ transf = {
   },
   fs_tag_string_part_array = {
     fs_tag_string_dict = function(fs_tag_string_part_array)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         fs_tag_string_part_array,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.two_strings_split_or_nil, {a_use, "-"}),
-        {"v", "kv"}
+        get.fn.second_n_args_bound_fn(get.string.two_strings_split_or_nil, "-")
       )
     end,
     fs_tag_assoc = function(fs_tag_string_part_array)
@@ -1378,7 +1373,7 @@ transf = {
   },
   path_leaf_specifier_array = {
     path_leaf_specifier_date_interval_specifier_dict = function(arr)
-      return map(
+      return get.table.table_by_mapped_w_kt_arg_kt_vt_ret_fn(
         arr,
         function(path_leaf_specifier)
           return 
@@ -1386,8 +1381,7 @@ transf = {
             transf.path_leaf_specifier.date_interval_specifier(
               path_leaf_specifier
             )
-        end,
-        {"k", "kv"}
+        end
       )
     end,
     date_interval_specifier_array = function(arr)
@@ -1968,18 +1962,11 @@ transf = {
     end
   },
   date_component_name = {
-    date_component_name_list_larger_or_same = function(date_component_name)
+    date_component_name_array_larger_or_same = function(date_component_name)
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(mt._list.date.date_component_names, 1, date_component_name)
     end,
-    date_component_name_list_same_or_smaller = function(date_component_name)
+    date_component_name_array_same_or_smaller = function(date_component_name)
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(mt._list.date.date_component_names, date_component_name)
-    end,
-    date_component_name_list_larger_all_same = function(date_component_name)
-      return map(
-        transf.date_component_name.date_component_name_list_larger_or_same(date_component_name),
-        transf.any.t_by_self,
-        {"v", "k"}
-      )
     end,
     date_component_index = function(date_component_name)
       return tblmap.date_component_name.date_component_index[date_component_name]
@@ -1988,21 +1975,19 @@ transf = {
   },
   date_component_name_list = {
     min_date_component_name_value_dict = function(list)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         list,
         function(component)
           return component, tblmap.date_component_name.min_date_component_value[component]
-        end,
-        {"v", "kv"}
+        end
       )
     end,
     max_date_component_name_value_dict = function(list)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         list,
         function(component)
           return component, tblmap.date_component_name.max_date_component_value[component]
-        end,
-        {"v", "kv"}
+        end
       )
     end,
     date_component_name_ordered_list = function(list)
@@ -3159,7 +3144,7 @@ transf = {
     consonants = function(str)
       error("todo")
     end,
-    evaled_bash_string = run,
+    string_by_evaled_bash = run,
     escaped_lua_regex = function(str)
       return replace(str, to.regex.escaped_lua_regex)
     end,
@@ -3307,7 +3292,7 @@ transf = {
     double_quoted_escaped = function(str)
       return ' "' .. eutf8.gsub(str, '"', '\\"') .. '"'
     end,
-    envsubsted = function(str)
+    string_by_envsubsted = function(str)
       return run("echo " .. transf.string.single_quoted_escaped(str) .. " | envsubst")
     end,
     binary_string = basexx.to_bit,
@@ -3318,9 +3303,15 @@ transf = {
     base32_crock_string = basexx.to_crockford,
     html_entitiy_encoded_string = htmlEntities.encode,
     html_entitiy_decoded_string = htmlEntities.decode,
-    header_key_value = function(str)
+    two_strings_by_split_header = function(str)
       local k, v = eutf8.match(str, "^([^:]+):%s*(.+)$")
       return transf.string.string_by_initial_lower(k), v
+    end,
+    two_string_or_nils_by_split_envlike = function(str)
+      return get.string.two_strings_split_or_nil(str, "=")
+    end,
+    two_string_or_nils_by_split_ini = function(str)
+      return get.string.two_strings_split_or_nil(str, " = ")
     end,
     title_case = function(str)
       local words, removed = get.string.two_string_arrays_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
@@ -3727,10 +3718,9 @@ transf = {
   header_string = {
     dict = function(str)
       local lines = transf.string.noempty_line_string_array(str)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         lines,
-        transf.string.header_key_value,
-        {"v", "kv"}
+        transf.string.two_strings_by_split_header
       )
     end
   },
@@ -3766,7 +3756,7 @@ transf = {
   },
   event_table = {
     calendar_template = function(event_table)
-      local template = get.khal.calendar_template_empty()
+      local template = transf["nil"].calendar_template_empty()
       for key, value in transf.table.stateless_key_value_iter(event_table) do
         if template[key] then
           if key == "repeat" then
@@ -3913,7 +3903,7 @@ transf = {
     end,
     term_syn_specifier_dict = function(str)
       local synonym_parts = plstringx.split(transf.word.raw_syn_output(str), "\n\n")
-      local synonym_tables = map(
+      local synonym_tables = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         synonym_parts,
         function (synonym_part)
           local synonym_part_lines = stringy.split(synonym_part, "\n")
@@ -3926,8 +3916,7 @@ transf = {
             synonyms = synonyms,
             antonyms = antonyms,
           }
-        end,
-        {"v", "kv"}
+        end
       )
       return synonym_tables
     end,
@@ -4333,6 +4322,11 @@ transf = {
       end
       return res
     end,
+    dict_by_zip_stop_shortest = function(arr1, arr2)
+      return transf.pair_array.dict(
+        transf.two_arrays.pair_array_by_zip_stop_shortest(arr1, arr2)
+      )
+    end,
     pair_array_by_zip_stop_longest = function(arr1, arr2)
       local res = {}
       local longest = transf.two_comparables.larger(#arr1, #arr2)
@@ -4467,14 +4461,13 @@ transf = {
       )
     end,
     relative_path_dict_of_url_files = function(url_array)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         url_array,
         function(url)
           return 
             transf.url.title_or_url_as_filename(url),
             url
-        end,
-        {"v", "kv"}
+        end
       )
     end,
   },
@@ -4495,27 +4488,25 @@ transf = {
       return hs.fnutils.imap(arr, transf.plaintext_file.contents)
     end,
     lines_array = function(arr)
-      return map(arr, transf.plaintext_file.line_array, {flatten = true})
+      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.line_array)
     end,
     content_lines_array = function(arr)
-      return map(arr, transf.plaintext_file.content_lines, {flatten = true})
+      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.content_lines)
     end,
   },
   array_of_event_tables = {
   },
   email_file_array = {
     email_file_summary_dict = function(email_file_array)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         email_file_array,
         transf.email_file.email_file_summary_key_value
-        {"v", "kv"}
       )
     end,
     email_file_simple_view_dict = function(email_file_array)
-      return map(
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         email_file_array,
         transf.email_file.email_file_simple_view_key_value
-        {"v", "kv"}
       )
     end,
   },
@@ -4662,10 +4653,9 @@ transf = {
   },
   dict = {
     pair_array = function(t)
-      return map(
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
-        transf.key_value.pair,
-        refstore.params.map.opts.kv_to_list
+        transf.key_value.pair
       )
     end,
     pair_array_by_sorted_larger_key_first = function(t)
@@ -6623,10 +6613,10 @@ transf = {
       local parts = stringy.split(transf.data_url.header_part(data_url), ";")
       table.remove(parts, 1) -- this is the content type
       table.remove(parts, #parts) -- this is the base64, or ""
-      return memoize(map)(parts, function(part)
+      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(parts, function(part)
         local kv = stringy.split(part, "=")
         return kv[1], kv[2]
-      end, {"v", "kv"})
+      end)
     end
   },
   image_data_url = {
@@ -6919,7 +6909,36 @@ transf = {
         is.local_absolute_path.root_local_absolute_path
       )
     end,
-
+    calendar_name_array = function()
+      return transf.string.lines(run("khal printcalendars"))
+    end,
+    writeable_calendar_name_array = function()
+      return hs.fnutils.ifilter(
+        transf["nil"].calendar_name_array(),
+        is.calendar_name.writeable_calendar_name
+      )
+    end,
+    string_by_khard_list_output = function()
+      return memoize(run)(
+        "khard list --parsable"
+      )
+    end,
+    contact_uid_array = function()
+      return hs.fnutils.imap(
+        stringy.split(transf["nil"].string_by_khard_list_output(), "\n"), 
+        function (line)
+          return stringy.split(line, "\t")[1]
+        end
+      )
+    end,
+    contact_table_array = function()
+      return hs.fnutils.imap(
+        transf["nil"].contact_uid_array(),
+        function(uid)
+          return transf.uuid.contact_table(uid)
+        end
+      )
+    end
 
   },
   package_manager_name = {
@@ -7816,7 +7835,8 @@ transf = {
         )
       )
     end,
-  }
+  },
+  
 }
 
 transf.any.pos_int_by_unique_id_primitives_equal = transf["nil"].any_arg_pos_int_ret_fn_by_unique_id_primitives_equal()

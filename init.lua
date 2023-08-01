@@ -66,7 +66,7 @@ local keymap = {
     explanation = "Choose contact and action on that contact (from local vcf files)",
     fn = function()
       ar(
-        memoize(get.khard.all_contact_tables)
+        memoize(transf["nil"].contact_table_array)
       ):doThis("choose-item-and-then-action") 
     end,
     mnemonic = "2 by association with @"
