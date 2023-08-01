@@ -42,16 +42,14 @@ YoutubePlayableItemItemSpecifier = {
             }
           },
           do_after = function(tags)
-            local cleaned = map(tags, function(v)
-              return transf.string.lower_snake_case_string_by_romanized(v)
-            end)
+            local cleaned = hs.fnutils.imap(tags,transf.string.lower_snake_case_string_by_romanized)
             self:doThis("add-as-m3u", cleaned)
           end
         })
       end,
       ["add-as-m3u"] = function(self, deduced_tags)
         local specifier = {}
-        local edited_tags = map(deduced_tags, {_pd = "string"})
+        local edited_tags = transf.string_value_dict.string_value_dict_by_prompted_once_from_default(deduced_tags)
         specifier.tag = transf.two_array_or_nils.array(edited_tags, transf.string.prompted_multiple_string_pair_array_for("tag"))
         specifier.path  = promptPipeline({
           {"dir", {prompt_args = {default = env.MAUDIOVISUAL}}},

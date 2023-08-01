@@ -43,7 +43,7 @@ PrintableAsciiStringItemSpecifier = {
         dothis.absolute_path.write_file(env.MPASSUSERNAME .. "/" .. name .. ".txt", self:get("c"))
       end,
       ["add-as-password-with-prompt-username"] = function(self, name)
-        local username = get.string.prompted_once_string_from_default("", "Username")
+        local username = get.string.string_by_prompted_once_from_default("", "Username")
         self:doThis("add-as-password", name)
         st(username):doThis("add-as-username", name)
       end,

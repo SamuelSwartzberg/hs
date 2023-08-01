@@ -35,9 +35,7 @@ dothis = {
   event_table = {
     add_event_from = function(specifier, do_after)
       specifier = specifier or {}
-      specifier = map(specifier, stringy.strip, {
-        mapcondition = { _type = "string"}
-      })
+      specifier = get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier, stringy.strip, is.any.string)
       local command = {"khal", "new" }
       if specifier.calendar then
         command = transf.two_arrays.array_by_appended(
@@ -61,9 +59,7 @@ dothis = {
 
       if specifier.alarms then
         local alarms_str = get.string_or_number_array.string_by_joined(
-          map(specifier.alarms, stringy.strip, {
-            mapcondition = { _type = "string"}
-          }),
+          get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier.alarms, stringy.strip, is.any.string),
           ","
         )
         command = transf.two_arrays.array_by_appended(
@@ -2457,7 +2453,7 @@ dothis = {
   key_input_spec = {
     exec = function(spec, do_after)
       if spec.mods then
-        local mods = map(spec.mods, normalize.mod)
+        local mods = get.array.array_by_mapped_w_t_key_dict(spec.mods, normalize.mod)
         hs.eventtap.keyStroke(mods, spec.key)
       elseif #spec.key == 1 then
         hs.eventtap.keyStroke({}, spec.key)
@@ -2545,6 +2541,33 @@ dothis = {
     end,
     mbsync_sync  = function()
       run('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel', true)
+    end,
+    purge_memstore_cache = function()
+      memstore = {}
+    end,
+    purge_fsmemoize_cache = function()
+      dothis.absolute_path.delete(
+        dothis.absolute_path.empty_dir(env.XDG_CACHE_HOME .. "/hs/fsmemoize")
+      )
+    end,
+  },
+  fn = {
+    purge_memstore_cache = function(fn)
+      dothis.fnid.purge_memstore_cache(
+        transf.fn.fnid(fn)
+      )
+    end,
+  },
+  fnid = {
+    purge_memstore_cache = function(fnid)
+      memstore[fnid] = nil
+    end,
+  },
+  fnname = {
+    purge_fsmemoize_cache = function(func_name)
+      dothis.absolute_path.delete(
+        transf.string.in_cache_dir("fsmemoize", func_name)
+      )
     end,
   }
 }

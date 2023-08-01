@@ -206,7 +206,7 @@ act = {
   },
   otp_url = {
     add_otp_pass_item_with_prompted_name = function(url)
-      local name = get.string.prompted_once_alphanum_minus_underscore_string_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
+      local name = get.string.alphanum_minus_underscore_string_by_prompted_once_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
       dothis.otp_url.add_otp_pass_item(url, name)
     end,
   },

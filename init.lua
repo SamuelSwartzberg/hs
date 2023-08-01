@@ -143,7 +143,7 @@ local keymap = {
       dc(searches)
         :doThis("choose-item", function(val)
           local true_val = transf.array.t_by_last(stringy.split(val, " ")) -- ignore all the `magrep -i` or `mpick -t` stuff, that's just for user comprehension
-          true_val = string.format(true_val, get.string.prompted_once_string_from_default("", "Search for: "))
+          true_val = string.format(true_val, get.string.string_by_prompted_once_from_default("", "Search for: "))
           local results
           if stringy.startswith(val, "magrep") then
             results = get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, true_val)
@@ -281,7 +281,7 @@ local keymap = {
   ["`"] = {
     explanation = "Choose an action on a user-entered string",
     fn = function()
-      local res = get.string.prompted_once_string_from_default("", "String to act on")
+      local res = get.string.string_by_prompted_once_from_default("", "String to act on")
       if res then 
         st(res):doThis("choose-action")
       end

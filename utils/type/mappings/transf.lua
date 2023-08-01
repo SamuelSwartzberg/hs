@@ -1973,48 +1973,48 @@ transf = {
     end,
     
   },
-  date_component_name_list = {
-    min_date_component_name_value_dict = function(list)
+  date_component_name_array = {
+    min_date_component_name_value_dict = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        list,
+        arr,
         function(component)
           return component, tblmap.date_component_name.min_date_component_value[component]
         end
       )
     end,
-    max_date_component_name_value_dict = function(list)
+    max_date_component_name_value_dict = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        list,
+        arr,
         function(component)
           return component, tblmap.date_component_name.max_date_component_value[component]
         end
       )
     end,
-    date_component_name_ordered_list = function(list)
-      return get.array.array_by_sorted(list, transf.two_date_component_names.larger)
+    date_component_name_ordered_array = function(arr)
+      return get.array.array_by_sorted(arr, transf.two_date_component_names.larger)
     end,
-    largest_date_component_name = function(list)
-      return transf.date_component_name_list.date_component_name_ordered_list(
-        list
+    largest_date_component_name = function(arr)
+      return transf.date_component_name_array.date_component_name_ordered_array(
+        arr
       )[1]
     end,
-    smallest_date_component_name = function(list)
-      return transf.date_component_name_list.date_component_name_ordered_list(
-        list
-      )[#list]
+    smallest_date_component_name = function(arr)
+      return transf.date_component_name_array.date_component_name_ordered_array(
+        arr
+      )[#arr]
     end,
-    date_component_name_list_inverse = function(list)
-      return transf.two_arrays.set_by_difference(mt._list.date.date_component_names, list)
+    date_component_name_array_inverse = function(arr)
+      return transf.two_arrays.set_by_difference(mt._list.date.date_component_names, arr)
     end,
-    rfc3339like_dt_separator_list  = function(list)
-      return map(
-        list,
+    rfc3339like_dt_separator_array  = function(arr)
+      return get.array.array_by_mapped_w_t_key_dict(
+        arr,
         tblmap.date_component_name.rfc3339like_dt_separator
       )
     end,
-    rfc3339like_dt_string_format_part_list = function(list)
-      return map(
-        list,
+    rfc3339like_dt_string_format_part_array = function(arr)
+      return get.array.array_by_mapped_w_t_key_dict(
+        arr,
         tblmap.date_component_name.rfc3339like_dt_string_format_part
       )
     end,
@@ -2030,9 +2030,9 @@ transf = {
   rfc3339like_dt = {
     date_component_name_value_dict = function(str)
       local comps = {onig.match(str, mt._r.date.rfc3339like_dt)}
-      return map(mt._list.date.date_component_names, function(k, v)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(mt._list.date.date_component_names, function(k, v)
         return v and get.string_or_number.number_or_nil(comps[k]) or nil
-      end, {"kv", "kv"})
+      end)
     end,
     date_interval_specifier = function(str)
       return transf.date_component_name_value_dict.date_interval_specifier(transf.rfc3339like_dt.date_component_name_value_dict(str))
@@ -2396,7 +2396,7 @@ transf = {
       return transf.table_or_nil.value_array(date_component_name_value_dict)
     end,
     date_component_name_list_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.date_component_name_list_inverse(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+      return transf.date_component_name_array.date_component_name_array_inverse(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
     end,
     date_component_value_list_not_set = function(date_component_name_value_dict)
       return get.date_component_name_list.date_component_value_list(
@@ -2405,7 +2405,7 @@ transf = {
       )
     end,
     date_component_name_ordered_list_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.date_component_name_ordered_list(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+      return transf.date_component_name_array.date_component_name_ordered_array(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
     end,
     date_component_value_ordered_list_set = function(date_component_name_value_dict)
       return get.date_component_name_list.date_component_value_ordered_list(
@@ -2414,25 +2414,25 @@ transf = {
       )
     end,
     date_component_name_ordered_list_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.date_component_name_ordered_list(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+      return transf.date_component_name_array.date_component_name_ordered_array(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
     largest_date_component_name_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.largest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+      return transf.date_component_name_array.largest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
     end,
     smallest_date_component_name_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.smallest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+      return transf.date_component_name_array.smallest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
     end,
     largest_date_component_name_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.largest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+      return transf.date_component_name_array.largest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
     smallest_date_component_name_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.smallest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+      return transf.date_component_name_array.smallest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
     min_date_component_name_value_dict_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.min_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+      return transf.date_component_name_array.min_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
     max_date_component_name_value_dict_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.max_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+      return transf.date_component_name_array.max_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
     min_full_date_component_name_value_dict = function(date_component_name_value_dict)
       return transf.two_tables.table_nonrecursive(
@@ -2467,7 +2467,7 @@ transf = {
       )
     end,
     prefix_date_component_name_ordered_list_set = function(date_component_name_value_dict)
-      return transf.date_component_name_list.date_component_name_ordered_list_set(
+      return transf.date_component_name_array.date_component_name_ordered_list_set(
         transf.date_component_name_value_dict.prefix_date_component_name_value_dict(date_component_name_value_dict)
       )
     end,
@@ -3315,7 +3315,7 @@ transf = {
     end,
     title_case = function(str)
       local words, removed = get.string.two_string_arrays_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
-      local title_cased_words = map(words, transf.word.title_case_policy)
+      local title_cased_words = hs.fnutils.imap(words, transf.word.title_case_policy)
       title_cased_words[1] = transf.string.string_by_first_eutf8_upper(title_cased_words[1])
       title_cased_words[#title_cased_words] = transf.string.string_by_first_eutf8_upper(title_cased_words[#title_cased_words])
       local arr = transf.two_arrays.array_by_interleaved_stop_a1(title_cased_words, removed)
@@ -3550,10 +3550,10 @@ transf = {
       })
     end,
     prompted_once_string_from_default = function(str)
-      return get.string.prompted_once_string_from_default(str, "Enter a string...")
+      return get.string.string_by_prompted_once_from_default(str, "Enter a string...")
     end,
     prompted_once_alphanum_minus_underscore_string_from_default = function(str)
-      return get.string.prompted_once_alphanum_minus_underscore_string_from_default(str, "Enter a string (alphanum, minus, underscore)...")
+      return get.string.alphanum_minus_underscore_string_by_prompted_once_from_default(str, "Enter a string (alphanum, minus, underscore)...")
     end,
     nowhitespace_string_array = function(str)
       return get.string.string_array_split_single_char_stripped(
@@ -3844,7 +3844,7 @@ transf = {
   multiline_string = {
     trimmed_lines_multiline_string = function(str)
       local lines = get.string.string_array_split(str, "\n")
-      local trimmed_lines = map(lines, stringy.strip)
+      local trimmed_lines = hs.fnutils.imap(lines, stringy.strip)
       return get.string_or_number_array.string_by_joined(trimmed_lines, "\n")
     end,
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_array_value_dict_value_dict = function(raw)
@@ -3910,8 +3910,8 @@ transf = {
           local synonym_term = eutf8.sub(synonym_part_lines[1], 2) -- syntax: ❯<term>
           local synonyms_raw = eutf8.sub(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
           local antonyms_raw = eutf8.sub(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
-          local synonyms = map(stringy.split(synonyms_raw, ", "), stringy.strip)
-          local antonyms = map(stringy.split(antonyms_raw, ", "), stringy.strip)
+          local synonyms = hs.fnutils.imap(stringy.split(synonyms_raw, ", "), stringy.strip)
+          local antonyms = hs.fnutils.imap(stringy.split(antonyms_raw, ", "), stringy.strip)
           return synonym_term, {
             synonyms = synonyms,
             antonyms = antonyms,
@@ -4167,16 +4167,6 @@ transf = {
   },
   phone_number = {
 
-  },
-  table_array = {
-    item_array_of_item_tables = function(arr)
-      return ar(map(
-        arr,
-        function (arr)
-          return dc(arr)
-        end
-      ))
-    end
   },
   string_array = {
     repeated_option_string = function(arr, opt)
@@ -4786,7 +4776,14 @@ transf = {
     end,
   },
   string_value_dict = {
-
+    string_value_dict_by_prompted_once_from_default = function(dict)
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(dict, function(k, v)
+        return get.string.string_by_prompted_once_from_default(
+          v,
+          "Enter a new value for '" .. k .. "'"
+        )
+      end)
+    end,
   },
   string_key_dict = {
     string_key_dict_of_string_key_dicts_or_prev_values_by_space = function(tbl)
@@ -4849,7 +4846,7 @@ transf = {
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(a_o_a[1], 1, last_matching_index)
     end,
     array_of_arrays_by_reverse = function(arr)
-      return map(arr, transf.array.array_by_reverse)
+      return hs.fnutils.imap(arr, transf.array.array_by_reverse)
     end,
     array_by_longest_common_suffix = function(arr)
       local reversed_res = transf.array.array_by_longest_common_prefix(
@@ -4893,7 +4890,7 @@ transf = {
   },
   dict_of_string_value_dicts = {
     ini_string = function(t)
-      return get.string_or_number_array.string_by_joined(map(
+      return get.string_or_number_array.string_by_joined(hs.fnutils.imap(
         t,
         function(k,v)
           return "[" .. k .. "]\n" .. transf.dict.ini_string(v)
@@ -6673,13 +6670,13 @@ transf = {
   },
   mod_array = {
     mod_symbol_array = function(mod_array)
-      return memoize(map, refstore.params.memoize.opts.stringify_json)(mod_array, transf.mod.mod_symbol)
+      return get.array.array_by_mapped_w_t_key_dict(mod_array, transf.mod.mod_symbol)
     end,
     mod_char_array = function(mod_array)
-      return memoize(map, refstore.params.memoize.opts.stringify_json)(mod_array, transf.mod.mod_char)
+      return get.array.array_by_mapped_w_t_key_dict(mod_array, transf.mod.mod_char)
     end,
     mod_name_array = function(mod_array)
-      return memoize(map, refstore.params.memoize.opts.stringify_json)(mod_array, transf.mod.mod_name)
+      return get.array.array_by_mapped_w_t_key_dict(mod_array, transf.mod.mod_name)
     end,
   },
   shortcut_specifier = {
@@ -6696,7 +6693,7 @@ transf = {
       )
     end,
     shortcut_string = function(shortcut_specifier)
-      local modstr = plstringx.join("", map(shortcut_specifier.mod_array, tblmap.mod.mod_symbol))
+      local modstr = plstringx.join("", get.array.array_by_mapped_w_t_key_dict(shortcut_specifier.mod_array, tblmap.mod.mod_symbol))
       if modstr == "" then
         return shortcut_specifier.key
       else
@@ -7038,7 +7035,7 @@ transf = {
   },
   thing_name_array = {
     array_of_action_specifier_arrays = function(thing_name_array)
-      return map(
+      return get.array.array_by_mapped_w_t_key_dict(
         thing_name_array,
         tblmap.thing_name.action_specifier_array
       )
@@ -7061,7 +7058,7 @@ transf = {
       )
     end,
     chooser_text_retriever_specifier_array = function(thing_name_array)
-      return map(
+      return hs.fnutils.map(
         thing_name_array,
         function(thing_name)
           local spec = tblmap.thing_name.chooser_text_partial_retriever_specifier(thing_name)
@@ -7073,7 +7070,7 @@ transf = {
       )
     end,
     placeholder_text_retriever_specifier_array = function(thing_name_array)
-      return map(
+      return hs.fnutils.map(
         thing_name_array,
         function(thing_name)
           local spec = tblmap.thing_name.placeholder_text_partial_retriever_specifier(thing_name)
@@ -7085,7 +7082,7 @@ transf = {
       )
     end,
     chooser_subtext_retriever_specifier_array = function(thing_name_array)
-      return map(
+      return hs.fnutils.map(
         thing_name_array,
         function(thing_name)
           local spec = tblmap.thing_name.chooser_subtext_partial_retriever_specifier(thing_name)
@@ -7097,7 +7094,7 @@ transf = {
       )
     end,
     chooser_initial_selected_index_retriever_specifier_array = function(thing_name_array)
-      return map(
+      return hs.fnutils.map(
         thing_name_array,
         function(thing_name)
           local spec = tblmap.thing_name.chooser_initial_selected_index_partial_retriever_2specifier(thing_name)
@@ -7836,7 +7833,19 @@ transf = {
       )
     end,
   },
+  fn = {
+
+  },
+  fnid = {
+
+  },
+  fnname = {
+    local_absolute_path_by_in_cache = function(fnname)
+      return transf.string.in_cache_dir(fnname, "fsmemoize")
+    end,
+  }
   
 }
 
 transf.any.pos_int_by_unique_id_primitives_equal = transf["nil"].any_arg_pos_int_ret_fn_by_unique_id_primitives_equal()
+transf.fn.fnid = transf["nil"].any_arg_pos_int_ret_fn_by_unique_id_primitives_equal() -- functionally the same, but I'll limit it to functions 'by hand'

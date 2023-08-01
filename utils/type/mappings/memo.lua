@@ -1,12 +1,11 @@
 ---@diagnostic disable: duplicate-set-field
 
 --- gets the cache path for a namespace and within that given function and args
---- @param name string
---- @param func_id string
+--- @param fnid string
 --- @param opts_as_str? string
 --- @param args? any[]
-function getFsCachePath(name, func_id, opts_as_str, args)
-  local path = env.XDG_CACHE_HOME .. "/hs/" .. name .. "/" .. func_id .. "/"
+function getFsCachePath(fnid, opts_as_str, args)
+  local path = transf.func
 
   if opts_as_str then
     path = path .. opts_as_str .. "/"
@@ -19,12 +18,6 @@ function getFsCachePath(name, func_id, opts_as_str, args)
   return path
 end
 
-
-memstore = {}
-memoized = {}
-memoized_w_opts = {}
-
-local nil_singleton = {}
 
 -- Define a table with methods for cache storage in memory and filesystem
 local gen_cache_methods = {
@@ -82,43 +75,35 @@ local gen_cache_methods = {
   },
   fs = {
     put = function(fnid, opts_as_str, params, result, opts)
-      local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, params)
+      local cache_path = getFsCachePath(fnid, opts_as_str, params)
       dothis.absolute_path.write_file(cache_path, json.encode(result))
     end,
     get = function(fnid, opts_as_str, params, opts)
-      local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, params)
+      local cache_path = getFsCachePath(fnid, opts_as_str, params)
       local raw_cnt = transf.file.contents(cache_path)
       if not raw_cnt then return nil end
       return json.decode(raw_cnt)
     end,
     reset = function(fnid, opts_as_str)
-      local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str)
+      local cache_path = getFsCachePath(fnid, opts_as_str)
       dothis.absolute_path.delete(cache_path)
     end,
     get_created_time = function(fnid, opts_as_str)
-      local cache_path = getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
+      local cache_path = getFsCachePath(fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
       return get.string_or_number.number_or_nil(transf.file.contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
     end,
     set_created_time = function(fnid, opts_as_str, created_time)
-      dothis.absolute_path.write_file(getFsCachePath("fsmemoize", fnid, opts_as_str, "~~~created~~~"), tostring(created_time))
+      dothis.absolute_path.write_file(getFsCachePath(fnid, opts_as_str, "~~~created~~~"), tostring(created_time))
     end
   }
 }
 
-function optsTostring(opts)
-  return json.encode(opts)
-end
-
-
 --- @class memoOpts
---- @field mode? "mem" | "fs" whether to use memory or filesystem to store the cache. Fs cache is more persistent, but slower. Defaults to "mem"
 --- @field is_async? boolean whether we are memoizing an async function. Defaults to false
 --- @field invalidation_mode? "invalidate" | "reset" | "none" whether and in what way to invalidate the cache. Defaults to "none"
 --- @field interval? number how often to invalidate the cache, in seconds. Defaults to 0
 --- @field stringify_table_params? boolean whether to stringify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to stringify the params to use them as a path
 --- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be stringified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
-
-local identifier = transf["nil"].any_arg_pos_int_ret_fn_by_unique_id_primitives_equal()
 
 --- memoize a function if it's not already memoized, or return the memoized version if it is
 --- @generic I, O
@@ -127,7 +112,7 @@ local identifier = transf["nil"].any_arg_pos_int_ret_fn_by_unique_id_primitives_
 --- @param funcname? string the name of the function. Optional, but required if mode = "fs", since we need to use the function name to create a unique cache path. We can't rely on an automatically generated identifier, since this may change between sessions
 --- @return fun(...: I): O, hs.timer?
 function memoize(fn, opts, funcname)
-  local fnid = funcname or identifier(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
+  local fnid = funcname or transf.fn.fnid(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
 
   local opts_as_str_or_nil
   if memoized[fnid] then 
@@ -135,7 +120,7 @@ function memoize(fn, opts, funcname)
   elseif opts == nil then
     -- no-op: we only need to make the else block isn't executed if opts is nil, since that will result in an infinite loop
   else
-    opts_as_str_or_nil = memoize(optsTostring)(opts)
+    opts_as_str_or_nil = memoize(json.encode)(opts)
     if memoized_w_opts[fnid] then
       if memoized_w_opts[fnid][opts_as_str_or_nil] then -- if the function is already memoized with the same options, return the memoized version.  This allows us to use memoized functions immediately as `memoize(fn)(...)` without having to assign it to a variable first
         return memoized_w_opts[fnid][opts_as_str_or_nil]
@@ -149,26 +134,21 @@ function memoize(fn, opts, funcname)
 
   --- set default options
   opts = get.table.table_by_copy(opts) or {}
-  opts.mode = opts.mode or "mem"
+  local mode = funcname and "fs" or "mem"
   opts.is_async = get.any.default_if_nil(opts.is_async, false)
   opts.invalidation_mode = opts.invalidation_mode or "none"
   opts.interval = opts.interval or 0
   opts.stringify_table_params = get.any.default_if_nil(opts.stringify_table_params, false)
   opts.table_param_subset = opts.table_param_subset or "json"
 
-  if opts.mode == "fs" and not funcname then
-    error("If mode = 'fs', you must provide a function name to ensure persistence between sessions")
-  end
-
-
   -- initialize the cache if using memory
-  if opts.mode == "mem" then
+  if mode == "mem" then
     memstore[fnid] = memstore[fnid] or {}
   end
   
   -- create some variables that will be used later
 
-  local cache_methods = gen_cache_methods[opts.mode]
+  local cache_methods = gen_cache_methods[mode]
   local timer
   
   local created_at = cache_methods.get_created_time(fnid, opts_as_str)
@@ -196,7 +176,7 @@ function memoize(fn, opts, funcname)
     if opts.invalidation_mode == "invalidate" then
       if created_at + opts.interval < os.time() then -- cache is invalid, so we need to recalculate
         cache_methods.reset(fnid)
-        if opts.mode == "fs" then
+        if mode == "fs" then
           cache_methods.set_created_time(fnid, opts_as_str, os.time())
         end
         created_at = os.time()
@@ -236,25 +216,4 @@ function memoize(fn, opts, funcname)
     memoized_w_opts[fnid][opts_as_str] = memoized_func
   end
   return memoized_func, timer
-end
-
---- purge the cache for a function, or the entire cache if no function is specified
---- @param fn_or_fnid? function | string
---- @param mode? "mem" | "fs" 
-function purgeCache(fn_or_fnid, mode)
-  mode = mode or "fs"
-  if fn_or_fnid then
-    if mode == "fs" then
-      dothis.absolute_path.delete
-    else
-      local fnid = identifier(fn_or_fnid)
-      memstore[fnid] = nil
-    end
-  else
-    if mode == "fs" then
-      dothis.absolute_path.empty_dir(env.XDG_CACHE_HOME .. "/fsmemoize")
-    else
-      memstore = {}
-    end
-  end
 end

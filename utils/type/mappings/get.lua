@@ -60,9 +60,9 @@ get = {
   khal = {
     parseable_format_specifier = function()
       return get.string_or_number_array.string_by_joined(
-        map(
+        get.array.string_array_by_mapped_values_w_fmt_string(
           mt._list.khal.parseable_format_component_array,
-          {_f ="{%s}"}
+          "{%s}"
         ), mt._contains.unique_field_separator
       ) .. mt._contains.unique_record_separator
     end,
@@ -384,7 +384,19 @@ get = {
           return eutf8.format(fmt_str, k, v)
         end
       )
-    end
+    end,
+    table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn = function(t, fn, bool_fn)
+      return get.table.table_by_mapped_w_vt_arg_vt_ret_fn(
+        t,
+        function(v)
+          if bool_fn(v) then
+            return fn(v)
+          else
+            return v
+          end
+        end
+      )
+    end,
 
     
   },
@@ -460,11 +472,11 @@ get = {
   },
   relative_path_dict = {
     absolute_path_dict = function(relative_path_dict, starting_point, extension)
-      return map(relative_path_dict, function(k)
+      return get.table.table_by_mapped_w_kt_arg_kt_ret_fn(relative_path_dict, function(k)
         local ext_part = ""
         if extension then ext_part = "." .. extension end
         return (starting_point or "") .. "/" .. k .. ext_part
-      end, "k")
+      end)
     end,
   },
   assoc_arr = {
@@ -820,13 +832,6 @@ get = {
         return list[mid + 1]
       end
     end,
-    dict_by_array = function(arr, arr2)
-      return map(
-        arr,
-        arr2,
-        "k"
-      )
-    end,
     bool_by_contains = function(arr, v)
       for _, v2 in transf.array.index_value_stateless_iter(arr) do
         if v2 == v then return true end
@@ -884,6 +889,23 @@ get = {
         arr,
         function(v) return dict[v] end
       )
+    end,
+    string_array_by_mapped_values_w_fmt_string = function(arr, fmt_str)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        get.fn.first_n_args_bound_fn(eutf8.format, fmt_str)
+      )
+    end,
+    array_by_mapped_w_t_arg_t_ret_fn_and_t_arg_bool_ret_fn = function(arr, mapfn, condfn)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        function(v)
+          if condfn(v) then
+            return mapfn(v)
+          else 
+            return v
+          end
+        end)
     end,
     
   },
@@ -1176,7 +1198,7 @@ get = {
         max_tokens
       )
     end,
-    prompted_once_string_from_default = function(str, message)
+    string_by_prompted_once_from_default = function(str, message)
       return transf.prompt_spec.any({
         prompter = transf.prompt_args_string.string_or_nil_and_boolean,
         prompt_args = {
@@ -1185,7 +1207,7 @@ get = {
         }
       })
     end,
-    prompted_once_alphanum_minus_underscore_string_from_default = function(str, message)
+    alphanum_minus_underscore_string_by_prompted_once_from_default = function(str, message)
       return transf.prompt_spec.any({
         prompter = transf.prompt_args_string.string_or_nil_and_boolean,
         transformed_validator = is.string.alphanum_minus_underscore,
@@ -1462,6 +1484,11 @@ get = {
       return get.string_or_number_array.string_by_joined(get.array_of_string_arrays.array_of_string_records(arr, field_sep), record_sep)
     end,
     
+  },
+  array_of_tables = {
+    array_of_vts_w_kt = function(arr, kt)
+      return hs.fnutils.imap(arr, function(x) return x[kt] end)
+    end,
   },
   path_leaf_specifier = {
     tag_value = function(parts, key)
@@ -2162,7 +2189,7 @@ get = {
     end,
     date_component_value_ordered_list = function(date_component_name_list, date_component_name_value_dict)
       return get.array.array_by_mapped_w_t_key_dict(
-        transf.date_component_name_list.date_component_name_ordered_list(date_component_name_list),
+        transf.date_component_name_array.date_component_name_ordered_array(date_component_name_list),
         date_component_name_value_dict
       )
     end,
@@ -2391,7 +2418,7 @@ get = {
         local value = node.value
         if type(node.value) == 'table' then -- list value
           value = get.string_or_number_array.string_by_joined(
-            map(node.value, {_f = prev_key .. "%s"}), 
+            get.array.string_array_by_mapped_values_w_fmt_string(node.value,  prev_key .. "%s"), -- todo: currently refactoring and I'm not sure that node.value is an array, but I can't check rn. potentially needs replacing with a get.table call
             ":"
           )
         else
@@ -2943,17 +2970,22 @@ get = {
       end
 
       return inner_func
-    end
-  },
-  second_n_args_bound_fn = function(func, ...)
-    return get.fn.arbitrary_args_bound_or_ignored_fn(
-      func,
-      transf.any_and_array.array(
-        a_use,
-        transf.n_anys.array(...)
+    end,
+    second_n_args_bound_fn = function(func, ...)
+      return get.fn.arbitrary_args_bound_or_ignored_fn(
+        func,
+        transf.any_and_array.array(
+          a_use,
+          transf.n_anys.array(...)
+        )
       )
-    )
-  end,
+    end,
+  },
+  fnname = {
+    local_absolute_path_by_in_cache_w_string_and_array_or_nil = function(fnname, optsstr, args)
+      
+    end,
+  },
   form_field_specifier_array = {
     form_filling_specifier = function(specarr, in_fields)
       return {
@@ -3053,10 +3085,7 @@ get = {
   n_any_assoc_arr_array = {
     leaf_label_with_title_path = function(arr, title_key)
       local leaf = get.table.table_by_copy(dothis.array.pop(arr))
-      local title_path = map(
-        arr,
-        {_k = title_key}
-      )
+      local title_path = get.array_of_tables.array_of_vts_w_kt(arr, title_key)
       leaf.path = title_path
       return leaf
     end
