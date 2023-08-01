@@ -70,7 +70,7 @@ transf = {
       return codepoint:sub(3)
     end,
     unicode_prop_table = function(codepoint)
-      return memoize(runJSON)(
+      return get.fn.rt_or_nil_by_memoized(runJSON)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
           codepoint
@@ -80,7 +80,7 @@ transf = {
   },
   indicated_utf8_hex_string = {
     unicode_prop_table = function(str)
-      return memoize(runJSON)(
+      return get.fn.rt_or_nil_by_memoized(runJSON)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
           str
@@ -491,7 +491,7 @@ transf = {
       )
     end,
     unicode_prop_table_array_from_unicode_codepoint_array = function(arr)
-      return memoize(runJSON)(
+      return get.fn.rt_or_nil_by_memoized(runJSON)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
           get.string_or_number_array.string_by_joined(
@@ -508,7 +508,7 @@ transf = {
       )
     end,
     unicode_prop_table_array_from_utf8_array = function(arr)
-      return memoize(runJSON)(
+      return get.fn.rt_or_nil_by_memoized(runJSON)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
           get.string_or_number_array.string_by_joined(
@@ -646,7 +646,7 @@ transf = {
       return string.format("%%%02X", string.byte(char))
     end,
     unicode_prop_table = function(char)
-      return memoize(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(char))[1]
+      return get.fn.rt_or_nil_by_memoized(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(char))[1]
     end
   },
   leaf = {
@@ -1404,7 +1404,7 @@ transf = {
   },
   whisper_file = {
     transcribed = function(path)
-      return memoize(rest, refstore.params.memoize.opts.invalidate_1_year_fs, "rest")({
+      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_year_fs, "rest")({
         api_name = "openai",
         endpoint = "audio/transcriptions",
         request_table_type = "form",
@@ -1420,7 +1420,7 @@ transf = {
       return run("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
     end,
     hs_image = function(path)
-      return memoize(hs.image.imageFromPath, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromPath")(path)
+      return get.fn.rt_or_nil_by_memoized(hs.image.imageFromPath, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromPath")(path)
     end,
     booru_url = function(path)
       return run(
@@ -1431,7 +1431,7 @@ transf = {
     end,
     data_url = function(path)
       local ext = transf.path.extension(path)
-      return memoize(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
+      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
     end,
   },
   email_file = {
@@ -1450,7 +1450,7 @@ transf = {
       return transf.header_string.dict(transf.email_file.all_useful_headers_raw(path))
     end,
     rendered_body = function(path)
-      return memoize(run)(
+      return get.fn.rt_or_nil_by_memoized(run)(
         "mshow -R" .. transf.string.single_quoted_escaped(path)
       )
     end,
@@ -1489,7 +1489,7 @@ transf = {
       return transf.mime_parts_raw.attachments(transf.email_file.mime_parts_raw(path))
     end,
     summary = function(path)
-      return memoize(run)("mscan -f %D **%f** %200s" .. transf.string.single_quoted_escaped(path))
+      return get.fn.rt_or_nil_by_memoized(run)("mscan -f %D **%f** %200s" .. transf.string.single_quoted_escaped(path))
     end,
     email_file_summary_key_value = function(path)
       return path, transf.email_file.summary(path)
@@ -2619,7 +2619,7 @@ transf = {
   },
   cleaned_iban = {
     data = function(iban)
-      local res = memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
+      local res = get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
         host = "openiban.com/",
         endpoint = "validate/" .. iban,
         params = { getBIC = "true" },
@@ -2691,7 +2691,7 @@ transf = {
   },
   uuid = {
     raw_contact = function(uuid)
-      return memoize(run)( "khard show --format=yaml uid:" .. uuid, {catch = true} )
+      return get.fn.rt_or_nil_by_memoized(run)( "khard show --format=yaml uid:" .. uuid, {catch = true} )
     end,
     contact_table = function(uuid)
       local raw_contact = transf.uuid.raw_contact(uuid)
@@ -3008,7 +3008,7 @@ transf = {
   },
   youtube_video_id = {
     youtube_video_item = function(id)
-      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
+      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
         api_name = "youtube",
         endpoint = "videos",
         params = {
@@ -3039,7 +3039,7 @@ transf = {
       return "https://www.youtube.com/watch?v=" .. id
     end,
     captions_list = function(id)
-      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
+      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
         api_name = "youtube",
         endpoint = "captions",
         params = {
@@ -3088,7 +3088,7 @@ transf = {
       return "https://www.youtube.com/channel/" .. id
     end,
     youtube_channel_item = function(id)
-      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
+      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
         api_name = "youtube",
         endpoint = "channels",
         params = {
@@ -3121,7 +3121,7 @@ transf = {
   },
   handle = {
     youtube_channel_item = function(handle)
-      return memoize(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
+      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
         api_name = "youtube",
         endpoint = "channels",
         params = { handle = handle}
@@ -3168,10 +3168,10 @@ transf = {
       return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.string.safe_filename(data)
     end,
     qr_utf8_image_bow = function(data)
-      return memoize(run)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
+      return get.fn.rt_or_nil_by_memoized(run)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
     end,
     qr_utf8_image_wob = function(data)
-      return memoize(run, refstore.params.memoize.opts.stringify_json)({
+      return get.fn.rt_or_nil_by_memoized(run, refstore.params.memoize.opts.stringify_json)({
         args = "qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data),
         dont_clean_output = true,
       })
@@ -3279,7 +3279,7 @@ transf = {
       return '"' .. escaped  .. '"'
     end,
     unicode_prop_table_array = function(str)
-      return memoize(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(str))
+      return get.fn.rt_or_nil_by_memoized(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(str))
     end,
     unicode_prop_table_item_array = function(str)
       return transf.unicode_prop_table_array.unicode_prop_table_item_array(
@@ -3443,7 +3443,7 @@ transf = {
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified."})
     end,
     raw_contact = function(searchstr)
-      return memoize(run)("khard show --format=yaml " .. searchstr, {catch = true} )
+      return get.fn.rt_or_nil_by_memoized(run)("khard show --format=yaml " .. searchstr, {catch = true} )
     end,
     contact_table = function(searchstr)
       local raw_contact = transf.string.raw_contact(searchstr)
@@ -3899,7 +3899,7 @@ transf = {
       end
     end,
     raw_syn_output = function(str)
-      return memoize(run)( "syn -p" .. transf.string.single_quoted_escaped(str) )
+      return get.fn.rt_or_nil_by_memoized(run)( "syn -p" .. transf.string.single_quoted_escaped(str) )
     end,
     term_syn_specifier_dict = function(str)
       local synonym_parts = plstringx.split(transf.word.raw_syn_output(str), "\n\n")
@@ -3921,7 +3921,7 @@ transf = {
       return synonym_tables
     end,
     raw_av_output = function (str)
-      memoize(run)(
+      get.fn.rt_or_nil_by_memoized(run)(
         "synonym" .. transf.string.single_quoted_escaped(str)
       )
     end,
@@ -6203,14 +6203,14 @@ transf = {
       return "https://web.archive.org/web/*/" .. transf.url.ensure_scheme(url)
     end,
     default_negotiation_url_contents = function(url)
-      return memoize(run, refstore.params.memoize.opts.invalidate_1_day_fs, "run")
+      return get.fn.rt_or_nil_by_memoized(run, refstore.params.memoize.opts.invalidate_1_day_fs, "run")
           "curl -L" .. transf.string.single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
       return transf.not_userdata_or_function.in_cache_dir(transf.url.ensure_scheme(url), "url")
     end,
     url_table = function(url)
-      return memoize(urlparse)(transf.url.ensure_scheme(url))
+      return get.fn.rt_or_nil_by_memoized(urlparse)(transf.url.ensure_scheme(url))
     end,
     scheme = function(url)
       return transf.url.url_table(url).scheme
@@ -6331,7 +6331,7 @@ transf = {
       )
     end,
     hs_image = function(url)
-      return memoize(hs.image.imageFromURL, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromURL")(url)
+      return get.fn.rt_or_nil_by_memoized(hs.image.imageFromURL, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromURL")(url)
     end,
     qr_data = function(url)
       local path = transf.url.in_cache_dir(url)
@@ -6340,7 +6340,7 @@ transf = {
     end,
     data_url = function(url)
       local ext = transf.path.extension(url)
-      return memoize(hs.image.encodeAsURLString)(transf.image_url.hs_image(url), ext)
+      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.image_url.hs_image(url), ext)
     end,
   },
   gpt_response_table = {
@@ -6887,7 +6887,7 @@ transf = {
       return stringy.startswith(transf["nil"].mullvad_status_string(),"Connected")
     end,
     mullvad_relay_list_string = function()
-      return memoize(run)("mullvad relay list")
+      return get.fn.rt_or_nil_by_memoized(run)("mullvad relay list")
     end,
     mullvad_relay_identifier_array = function()
       return 
@@ -6916,7 +6916,7 @@ transf = {
       )
     end,
     string_by_khard_list_output = function()
-      return memoize(run)(
+      return get.fn.rt_or_nil_by_memoized(run)(
         "khard list --parsable"
       )
     end,
@@ -7837,12 +7837,46 @@ transf = {
 
   },
   fnid = {
-
+    rt_by_memo = function(fnid, opts_as_str, params, opts)
+      memstore[fnid] = memstore[fnid] or {}
+      memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
+      local node = memstore[fnid][opts_as_str]
+      for i=1, #params do
+        local param = params[i]
+        if param == nil then param = nil_singleton 
+        elseif opts.stringify_table_params and type(param) == "table" then
+          if opts.table_param_subset == "json" then
+            param = json.encode(param)
+          elseif opts.table_param_subset == "no-fn-userdata-loops" then
+            param = shelve.marshal(param)
+          elseif opts.table_param_subset == "any" then
+            param = hs.inspect(param, { depth = 4 })
+          end
+        end
+        node = node.children and node.children[param]
+        if not node then return nil end
+      end
+      return get.table.table_by_copy(node.results, true)
+    end,
+    timestamp_s_by_created_time = function() -- no special functionality here, just needs to exist for polymorphic implementation with fscache
+      return os.time()
+    end
   },
   fnname = {
     local_absolute_path_by_in_cache = function(fnname)
       return transf.string.in_cache_dir(fnname, "fsmemoize")
     end,
+    rt_by_memo = function(fnid, opts_as_str, params, opts)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str, params)
+      local raw_cnt = transf.file.contents(cache_path)
+      if not raw_cnt then return nil end
+      return json.decode(raw_cnt)
+    end,
+    timestamp_s_by_created_time = function(fnid, opts_as_str)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
+      return get.string_or_number.number_or_nil(transf.file.contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
+    end,
+    
   }
   
 }

@@ -4,7 +4,7 @@ URLItemSpecifier = {
   properties = {
     getables = {
       ["parsed-url"] = function(self)
-        return memoize(parseGuessScheme)(self:get("c"))
+        return get.fn.rt_or_nil_by_memoized(parseGuessScheme)(self:get("c"))
       end,
       ["is-url-by-contenttype"] = function(self)
         return self:get("url-path") and is.path.has_extension(self:get("url-path"))

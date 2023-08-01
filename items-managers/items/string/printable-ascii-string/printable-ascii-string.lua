@@ -12,7 +12,7 @@ PrintableAsciiStringItemSpecifier = {
           and contents:find("^%w%w")
           and not contents:find("[^%w%-%_ ]")
       end,
-      ["is-doi"] = function(self) return memoize(onig.find)(self:get("c"), transf.string.whole_regex(mt._r.id.doi)) end,
+      ["is-doi"] = function(self) return get.fn.rt_or_nil_by_memoized(onig.find)(self:get("c"), transf.string.whole_regex(mt._r.id.doi)) end,
       ["is-num"] = function(self) return get.string_or_number.number_or_nil(self:get("c")) ~= nil end,
       ["is-email-address"] = function(self) -- trying to determine what string is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
         local contents = self:get("c")
@@ -23,7 +23,7 @@ PrintableAsciiStringItemSpecifier = {
       end,
       ["is-digit-string"] = function(self) return onig.find(self:get("c"), "^-?[0-9a-fA-F]*[\\.,]?[0-9a-fA-F]+$") end,
       ["is-date-related-item"] = function(self) 
-        return memoize(onig.find)(self:get("c"), transf.string.whole_regex(mt._r.date.rfc3339like_dt))
+        return get.fn.rt_or_nil_by_memoized(onig.find)(self:get("c"), transf.string.whole_regex(mt._r.date.rfc3339like_dt))
       end,
       ["is-dice-notation-item"] = function(self)
         return onig.match(self:get("c"), transf.string.whole_regex(mt._r.syntax.dice))

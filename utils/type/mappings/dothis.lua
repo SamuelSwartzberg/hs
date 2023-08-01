@@ -131,7 +131,7 @@ dothis = {
     markdown_to = function(source, format, metadata, do_after)
       local target = transf.path.path_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
       local rawsource = transf.file.contents(source)
-      local processedsource = join.string.table.with_yaml_metadata(rawsource, metadata)
+      local processedsource = get.string.string_by_with_yaml_metadata(rawsource, metadata)
       rawsource = eutf8.gsub(rawsource, "\n +\n", "\n&nbsp;\n")
       local temp_path = source .. ".tmp"
       dothis.absolute_path.write_file(temp_path, processedsource) 
@@ -2552,22 +2552,59 @@ dothis = {
     end,
   },
   fn = {
-    purge_memstore_cache = function(fn)
-      dothis.fnid.purge_memstore_cache(
+    reset_by_all = function(fn)
+      dothis.fnid.reset_by_all(
         transf.fn.fnid(fn)
       )
     end,
   },
   fnid = {
-    purge_memstore_cache = function(fnid)
+    put_memo = function(fnid, opts_as_str, params, result, opts)
+      memstore[fnid] = memstore[fnid] or {}
+      memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
+      local node = memstore[fnid][opts_as_str]
+      for i=1, #params do
+        local param = params[i]
+        if param == nil then param = nil_singleton 
+        elseif opts.stringify_table_params and type(param) == "table" then
+          if opts.table_param_subset == "json" then
+            param = json.encode(param)
+          elseif opts.table_param_subset == "no-fn-userdata-loops" then
+            param = shelve.marshal(param)
+          elseif opts.table_param_subset == "any" then
+            param = hs.inspect(param, { depth = 4 })
+          end
+        end
+        node.children = node.children or {}
+        node.children[param] = node.children[param] or {}
+        node = node.children[param]
+      end
+      node.results = get.table.table_by_copy(result, true)
+    end,
+    reset_by_opts = function(fnid, opts_as_str)
+      memstore[fnid] = memstore[fnid] or {}
+      memstore[fnid][opts_as_str] = {}
+    end,
+    reset_by_all = function(fnid)
       memstore[fnid] = nil
     end,
   },
   fnname = {
-    purge_fsmemoize_cache = function(func_name)
+    put_memo = function(fnid, opts_as_str, params, result, opts)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str, params)
+      dothis.absolute_path.write_file(cache_path, json.encode(result))
+    end,
+    reset_by_opts = function(fnid, opts_as_str)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str)
+      dothis.absolute_path.delete(cache_path)
+    end,
+    reset_by_all = function(fnname)
       dothis.absolute_path.delete(
-        transf.string.in_cache_dir("fsmemoize", func_name)
+        transf.fnname.local_absolute_path_by_in_cache(fnname)
       )
     end,
+    set_timestamp_s_created_time = function(fnid, opts_as_str, created_time)
+      dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str, "~~~created~~~"), tostring(created_time))
+    end
   }
 }

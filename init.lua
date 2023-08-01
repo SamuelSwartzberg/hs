@@ -66,7 +66,7 @@ local keymap = {
     explanation = "Choose contact and action on that contact (from local vcf files)",
     fn = function()
       ar(
-        memoize(transf["nil"].contact_table_array)
+        get.fn.rt_or_nil_by_memoized(transf["nil"].contact_table_array)
       ):doThis("choose-item-and-then-action") 
     end,
     mnemonic = "2 by association with @"
@@ -190,7 +190,7 @@ local keymap = {
   u = {
     explanation = "Choose item and action on it in MAUDIOVISUAL (mostly for interacting with streams)",
     fn = function() 
-      memoize(function()
+      get.fn.rt_or_nil_by_memoized(function()
         return st(env.MAUDIOVISUAL)
           :get("descendant-string-item-array")
           :get("map-to-table-of-path-and-path-content-items")
@@ -266,7 +266,7 @@ local keymap = {
   ["'"] = {
     explanation = "Choose a citation item, and then choose an action on it.",
     fn = function()
-      memoize(createCSLArray)()
+      get.fn.rt_or_nil_by_memoized(createCSLArray)()
         :doThis("choose-item-and-then-action")
     end,
   },

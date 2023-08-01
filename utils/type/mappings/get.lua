@@ -151,7 +151,7 @@ get = {
   },
   pass_item_name = {
     value = function(item, type)
-      return memoize(run, refstore.params.memoize.opts.invalidate_1_day)("pass show " .. type .. "/" .. item)
+      return get.fn.rt_or_nil_by_memoized(run, refstore.params.memoize.opts.invalidate_1_day)("pass show " .. type .. "/" .. item)
     end,
     path = function(item, type, ext)
       return env.PASSWORD_STORE_DIR .. "/" .. type .. "/" .. item .. "." .. (ext or "gpg")
@@ -1326,7 +1326,26 @@ get = {
     end,
     string_by_shortened_end_ellipsis = function(str, len)
       return plstringx.shorten(str, len, true)
-    end
+    end,
+    string_by_with_yaml_metadata = function(str, tbl)
+      if not str then return transf.table.yaml_metadata(tbl) end
+      if not tbl then return str end
+      if transf.table.pos_int_by_num_keys(tbl) == 0 then return str end
+      local stripped_str = stringy.strip(str)
+      local final_metadata, final_contents
+      if stringy.startswith(stripped_str, "---") then
+        -- splice in the metadata
+        local parts = get.string.string_array_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
+        local extant_metadata = table.remove(parts, 1)
+        final_metadata = extant_metadata .. "\n" .. transf.not_userdata_or_string.yaml_string(tbl)
+        final_contents = get.string_or_number_array.string_by_joined(parts)
+        final_contents = final_contents .. "---"
+      else
+        final_metadata = transf.not_userdata_or_string.yaml_string(tbl)
+        final_contents = str
+      end
+      return "---\n" .. final_metadata .. "\n---\n" .. final_contents
+    end,
 
   },
   nonindicated_number_string_array = {
@@ -2468,17 +2487,17 @@ get = {
   },
   html_string = {
     html_query_selector_all = function(str, selector)
-      return memoize(run)(
+      return get.fn.rt_or_nil_by_memoized(run)(
         "htmlq" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
     text_query_selector_all = function(str, selector)
-      return memoize(run)(
+      return get.fn.rt_or_nil_by_memoized(run)(
         "htmlq --text" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
     attribute_query_selector_all = function(str, selector, attribute)
-      return memoize(run)(
+      return get.fn.rt_or_nil_by_memoized(run)(
         "htmlq --attribute " .. transf.string.single_quoted_escaped(attribute) .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
@@ -2980,10 +2999,145 @@ get = {
         )
       )
     end,
+    --- @class memoOpts
+    --- @field is_async? boolean whether we are memoizing an async function. Defaults to false
+    --- @field invalidation_mode? "invalidate" | "reset" | "none" whether and in what way to invalidate the cache. Defaults to "none"
+    --- @field interval? number how often to invalidate the cache, in seconds. Defaults to 0
+    --- @field stringify_table_params? boolean whether to stringify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to stringify the params to use them as a path
+    --- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be stringified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
+
+    --- memoize a function if it's not already memoized, or return the memoized version if it is
+    --- @generic I, O
+    --- @param fn fun(...: I): O
+    --- @param opts? memoOpts
+    --- @param fnname? string the name of the function. Optional, but required for fsmemoization and switches to fsmemoization if provided, since we need to use the function name to create a unique cache path. We can't rely on an automatically generated identifier, since this may change between sessions
+    --- @return fun(...: I): O, hs.timer?
+    rt_or_nil_by_memoized = function(fn, opts, fnname)
+      local fnid = fnname or transf.fn.fnid(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
+    
+      local opts_as_str_or_nil
+      if memoized[fnid] then 
+        return memoized[fnid]
+      elseif opts == nil then
+        -- no-op: we only need to make the else block isn't executed if opts is nil, since that will result in an infinite loop
+      else
+        opts_as_str_or_nil = get.fn.rt_or_nil_by_memoized(json.encode)(opts)
+        if memoized_w_opts[fnid] then
+          if memoized_w_opts[fnid][opts_as_str_or_nil] then -- if the function is already memoized with the same options, return the memoized version.  This allows us to use memoized functions immediately as `get.fn.rt_or_nil_by_memoized(fn)(...)` without having to assign it to a variable first
+            return memoized_w_opts[fnid][opts_as_str_or_nil]
+          end
+        else
+          memoized_w_opts[fnid] = {}
+        end
+      end
+    
+      local opts_as_str = opts_as_str_or_nil or "noopts"
+    
+      --- set default options
+      opts = get.table.table_by_copy(opts) or {}
+      local mode, fnidentifier_type
+      if fnname then
+        mode = "fs"
+        fnidentifier_type = "fnname"
+      else
+        mode = "mem"
+        fnidentifier_type = "fnid"
+      end
+      opts.is_async = get.any.default_if_nil(opts.is_async, false)
+      opts.invalidation_mode = opts.invalidation_mode or "none"
+      opts.interval = opts.interval or 0
+      opts.stringify_table_params = get.any.default_if_nil(opts.stringify_table_params, false)
+      opts.table_param_subset = opts.table_param_subset or "json"
+    
+      -- initialize the cache if using memory
+      if mode == "mem" then
+        memstore[fnid] = memstore[fnid] or {}
+      end
+      
+      -- create some variables that will be used later
+    
+      local timer
+      
+      local created_at = get[fnidentifier_type].timestamp_s_by_created_time(fnid, opts_as_str)
+    
+      -- create a timer to invalidate the cache if needed
+      if opts.invalidation_mode == "reset" then
+        timer = hs.timer.doEvery(opts.interval, function()
+          dothis[fnidentifier_type].reset_by_opts(fnid, opts_as_str)
+        end)
+      end
+    
+      -- create the memoized function
+      local memoized_func = function(...)
+        local params = {...}
+        local callback = nil
+        if opts.is_async then -- assume that async functions always have a callback as the last argument
+          callback = params[#params]
+          params[#params] = nil
+        end 
+    
+    
+    
+        local result 
+    
+        if opts.invalidation_mode == "invalidate" then
+          if created_at + opts.interval < os.time() then -- cache is invalid, so we need to recalculate
+            dothis[fnidentifier_type].reset_by_opts(fnid)
+            if mode == "fs" then
+              dothis[fnidentifier_type].set_timestamp_s_created_time(fnid, opts_as_str, os.time())
+            end
+            created_at = os.time()
+          end
+    
+        else
+    
+          -- get the result from the cache
+          result = get[fnidentifier_type].rt_by_memo(fnid, opts_as_str, params, opts)
+        end
+    
+        if not opts.is_async then
+          if not result then  -- no result yet, so we need to call the original function and store the result in the cache
+            -- print("cache miss for", fnid)
+            result = { fn(...) }
+            dothis[fnidentifier_type].put_memo(fnid, opts_as_str, params, result, opts)
+          else
+            -- print("cache hit for", fnid)
+            -- inspPrint(result)
+          end
+          return table.unpack(result) -- we're sure to have a result now, so we can return it
+        else
+          if result then -- if we have a result, we can call the callback immediately
+            callback(table.unpack(result))
+          else -- else we need to call the original function and wrap the callback to store the result in the cache before calling it
+            fn(table.unpack(params), function(...)
+              local result = {...}
+              dothis[fnidentifier_type].put_memo(fnid, opts_as_str, params, result, opts)
+              callback(table.unpack(result))
+            end)
+          end
+        end
+      end
+      if opts_as_str_or_nil == nil then
+        memoized[fnid] = memoized_func
+      else
+        memoized_w_opts[fnid][opts_as_str] = memoized_func
+      end
+      return memoized_func, timer
+    end
   },
   fnname = {
     local_absolute_path_by_in_cache_w_string_and_array_or_nil = function(fnname, optsstr, args)
-      
+      local path = transf.fnname.local_absolute_path_by_in_cache(fnname)
+
+      if optsstr then
+        path = path .. optsstr .. "/"
+      end
+      if args then 
+        -- encode args to json and hash it, to use as the key for the cache
+        local hash = transf.not_userdata_or_function.md5_hex_string(args)
+        path = path .. hash
+      end
+      return path
     end,
   },
   form_field_specifier_array = {
