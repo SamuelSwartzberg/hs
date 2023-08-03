@@ -3145,6 +3145,93 @@ transf = {
       error("todo")
     end,
     string_by_evaled_bash = run,
+    string_by_env_getter_comamnds_prepended = function(str)
+      return string.format(
+        "base64 -d <<< '%s' | /opt/homebrew/bin/bash -s",
+        transf.string.base64_gen_string(
+          "cd && source \"$HOME/.target/envfile\" && " ..  str
+        )
+      )
+    end,
+    string_by_minimal_locale_setter_commands_prepended = function(str)
+      return "LC_ALL=en_US.UTF-8 && LANG=en_US.UTF-8 && LANGUAGE=en_US.UTF-8 && " .. str
+    end,
+    string_or_string_and_8_bit_pos_int_by_evaled_raw_bash = function(str)
+      local command = transf.string.string_by_minimal_locale_setter_commands_prepended(str)
+      local output, status, reason, code = hs.execute(command)
+      if status then
+        return output -- stdout
+      else
+        return output, code -- stderr, exit code
+      end
+    end,
+    string_or_string_and_8_bit_pos_int_by_evaled_raw_bash_stripped = function(str)
+      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_raw_bash(str)
+      res = stringy.strip(res)
+      return res, code
+    end,
+    string_or_nil_by_evaled_raw_bash_stripped = function(str)
+      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_raw_bash_stripped(str)
+      if code == 0 then
+        return res
+      else
+        return nil
+      end
+    end,
+    string_or_err_by_evaled_raw_bash_stripped = function(str)
+      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_raw_bash_stripped(str)
+      if code == 0 then
+        return res
+      else
+        error("Exit code " .. code .. " for command " .. str ". Stderr:\n\n" .. res)
+      end
+    end,
+    string_or_string_and_8_bit_pos_int_by_evaled_env_bash = function(str)
+      local command = transf.string.string_by_env_getter_comamnds_prepended(str)
+      local output, status, reason, code = hs.execute(command)
+      if status then
+        return output -- stdout
+      else
+        return output, code -- stderr, exit code
+      end
+    end,
+    string_or_string_and_8_bit_pos_int_by_evaled_env_bash_stripped = function(str)
+      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash(str)
+      res = stringy.strip(res)
+      return res, code
+    end,
+    string_or_nil_by_evaled_env_bash_stripped = function(str)
+      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash_stripped(str)
+      if code == 0 then
+        return res
+      else
+        return nil
+      end
+    end,
+    string_or_err_by_evaled_env_bash_stripped = function(str)
+      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash_stripped(str)
+      if code == 0 then
+        return res
+      else
+        error("Exit code " .. code .. " for command " .. str ". Stderr:\n\n" .. res)
+      end
+    end,
+    string_or_err_by_evaled_env_bash = function(str)
+      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash(str)
+      if code == 0 then
+        return res
+      else
+        error("Exit code " .. code .. " for command " .. str ". Stderr:\n\n" .. res)
+      end
+    end,
+    string_or_err_by_evaled_env_bash_stripped_noempty = function(str)
+      local res = transf.string.string_or_err_by_evaled_env_bash_stripped(str)
+      if res == "" then
+        error("Empty result for command " .. str)
+      else
+        return res
+      end
+    end,
     escaped_lua_regex = function(str)
       return replace(str, to.regex.escaped_lua_regex)
     end,
@@ -3171,10 +3258,7 @@ transf = {
       return get.fn.rt_or_nil_by_memoized(run)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
     end,
     qr_utf8_image_wob = function(data)
-      return get.fn.rt_or_nil_by_memoized(run, refstore.params.memoize.opts.stringify_json)({
-        args = "qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data),
-        dont_clean_output = true,
-      })
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_err_by_evaled_env_bash, refstore.params.memoize.opts.stringify_json)("qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data))
     end,
     qr_png_in_cache = function(data)
       local path = transf.string.in_cache_dir(data, "qr")
@@ -5131,12 +5215,12 @@ transf = {
   indicated_citable_object_id = {
     local_csl_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.local_csl_file(
-        transf.stirng.urlencoded(id)
+        transf.string.urlencoded(id)
       )
     end,
     local_csl_table = function(id)
       return transf.filename_safe_indicated_citable_object_id.csl_table(
-        transf.stirng.urlencoded(id)
+        transf.string.urlencoded(id)
       )
     end,
     citable_object_id = function(id)
@@ -5154,12 +5238,12 @@ transf = {
     end,
     local_citable_object_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.local_citable_object_file(
-        transf.stirng.urlencoded(id)
+        transf.string.urlencoded(id)
       )
     end,
     local_citable_object_notes_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.local_citable_object_notes_file(
-        transf.stirng.urlencoded(id)
+        transf.string.urlencoded(id)
       )
     end,
     citations_file_line = function(id)
@@ -7834,7 +7918,31 @@ transf = {
     end,
   },
   fn = {
-
+    rt_or_nil_fn_by_pcall = function(fn)
+      return function(...)
+        local succ, res = pcall(fn, ...)
+        if succ then
+          return res
+        else
+          return nil
+        end
+      end
+    end,
+    bool_ret_fn_by_pcall = function(fn)
+      return function(...)
+        local succ, res = pcall(fn, ...)
+        return succ
+      end
+    end,
+  },
+  number_and_two_anys ={
+    any_or_any_and_number = function(num, a1, a2)
+      if num == 0 then
+        return a1
+      else
+        return a2, num
+      end
+    end,
   },
   fnid = {
     rt_by_memo = function(fnid, opts_as_str, params, opts)

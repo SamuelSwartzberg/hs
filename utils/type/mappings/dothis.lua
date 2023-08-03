@@ -1,19 +1,19 @@
 dothis = {
   package_manager_name = {
     install = function(mgr, pkg)
-      run("upkg " .. mgr .. " install " .. transf.string.single_quoted_escaped(pkg), true)
+      dothis.string.env_bash_eval("upkg " .. mgr .. " install " .. transf.string.single_quoted_escaped(pkg))
     end,
     remove = function(mgr, pkg)
-      run("upkg " .. mgr .. " remove " .. transf.string.single_quoted_escaped(pkg), true)
+      dothis.string.env_bash_eval("upkg " .. mgr .. " remove " .. transf.string.single_quoted_escaped(pkg))
     end,
     upgrade = function(mgr, pkg)
       local target
       if pkg then target = transf.string.single_quoted_escaped(pkg)
       else target = "" end
-      run("upkg " .. mgr .. " upgrade " .. target, true)
+      dothis.string.env_bash_eval("upkg " .. mgr .. " upgrade " .. target)
     end,
     link = function(mgr, pkg)
-      run("upkg " .. mgr .. " link " .. transf.string.single_quoted_escaped(pkg), true)
+      dothis.string.env_bash_eval("upkg " .. mgr .. " link " .. transf.string.single_quoted_escaped(pkg))
     end,
     do_backup_and_commit = function(mgr, action, msg)
       run("upkg " .. mgr .. " " .. action, function()
@@ -172,10 +172,10 @@ dothis = {
       end)
     end,
     rename = function(name, type, new_name)
-      run("pass mv " .. type .. "/" .. name .. " " .. type .. "/" .. new_name, true)
+      dothis.string.env_bash_eval("pass mv " .. type .. "/" .. name .. " " .. type .. "/" .. new_name)
     end,
     remove = function(name, type)
-      run("pass rm " .. type .. "/" .. name, true)
+      dothis.string.env_bash_eval("pass rm " .. type .. "/" .. name)
     end,
   },
   login_pass_item_name = {
@@ -191,7 +191,7 @@ dothis = {
       dothis.alphanum_minus_underscore.add_pass_item_name(name, type, json.encode(data))
     end,
     add_pass_item_name = function(name, type, data)
-      run("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name, true)
+      dothis.string.env_bash_eval("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
     end,
     add_passw_pass_item_name = function(name, password)
       dothis.alphanum_minus_underscore.add_pass_item_name(name, "passw", password)
@@ -220,7 +220,7 @@ dothis = {
     end,
     add_event_from_url = function(url, calendar)
       local temp_path_arg = transf.string.single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
-      run('curl' .. transf.string.single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg, true)
+      dothis.string.env_bash_eval('curl' .. transf.string.single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg)
     end,
   },
   otp_url = {
@@ -329,7 +329,54 @@ dothis = {
       dothis.url_array.create_as_session_in_msessions(
         transf.string.url_array(str)
       )
-    end
+    end,
+    raw_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn = function(str, fn)
+      local task = hs.task.new(
+        "/opt/homebrew/bin/bash",
+        function (...) fn(transf.number_and_two_anys.any_or_any_and_number(...)) end,
+        { "-c", transf.string.string_by_minimal_locale_setter_commands_prepended(
+          str
+        )}
+      )
+      task:start()
+      return task
+    end,
+    env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn = function(str, fn)
+      local task = hs.task.new(
+        "/opt/homebrew/bin/bash",
+        function (...) fn(transf.number_and_two_anys.any_or_any_and_number(...)) end,
+        { "-c", transf.string.string_by_env_getter_comamnds_prepended(
+          str
+        )}
+      )
+      task:start()
+      return task
+    end,
+    env_bash_eval_async = function(str)
+      local task = hs.task.new(
+        "/opt/homebrew/bin/bash",
+        transf["nil"]["nil"],
+        { "-c", transf.string.string_by_env_getter_comamnds_prepended(
+          str
+        )}
+      )
+      task:start()
+      return task
+    end,
+    env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn_by_stripped = function(str, fn)
+      local task = hs.task.new(
+        "/opt/homebrew/bin/bash",
+        function(...)
+          local out, stat = transf.number_and_two_anys.any_or_any_and_number(...)
+          fn(stringy.strip(out), stat)
+        end,
+        { "-c", transf.string.string_by_env_getter_comamnds_prepended(
+          str
+        )}
+      )
+      task:start()
+      return task
+    end,
 
   },
   url_or_local_path = {
@@ -1228,13 +1275,13 @@ dothis = {
       })
     end,
     add_events_from_file = function(path, calendar)
-      run("khal import --include-calendar " .. calendar .. " " .. transf.string.single_quoted_escaped(path), true)
+      dothis.string.env_bash_eval("khal import --include-calendar " .. calendar .. " " .. transf.string.single_quoted_escaped(path))
     end,
   },
   git_root_dir = {
     run_hook =  function(path, hook)
       local hook_path = get.git_root_dir.hook_path(path, hook)
-      run(hook_path, true)
+      dothis.string.env_bash_eval(hook_path)
     end,
     add_hook = function(path, hook_path, name)
       name = name or transf.path.filename(hook_path)
@@ -2508,10 +2555,10 @@ dothis = {
   },
   ["nil"] = {
     vdirsyncer_sync = function()
-      run("vdirsyncer sync", true)
+      dothis.string.env_bash_eval_async("vdirsyncer sync")
     end,
     newsboat_reload = function()
-      run("newsboat -x reload", true)
+      dothis.string.env_bash_eval_async("newsboat -x reload")
     end,
     sox_rec_start_cache = function(do_after)
       dothis.local_absolute_path.start_recording_to(transf.string.in_cache_dir(os.time(), "recording"), do_after)
@@ -2527,10 +2574,10 @@ dothis = {
       end
     end,
     mullvad_connect = function()
-      run("mullvad connect", true)
+      dothis.string.env_bash_eval_async("mullvad connect")
     end,
     mullvad_disconnect = function()
-      run("mullvad disconnect", true)
+      dothis.string.env_bash_eval_async("mullvad disconnect")
     end,
     mullvad_toggle = function()
       if transf["nil"].mullvad_boolean_connected() then
@@ -2540,7 +2587,7 @@ dothis = {
       end
     end,
     mbsync_sync  = function()
-      run('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel', true)
+      dothis.string.env_bash_eval('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel')
     end,
     purge_memstore_cache = function()
       memstore = {}

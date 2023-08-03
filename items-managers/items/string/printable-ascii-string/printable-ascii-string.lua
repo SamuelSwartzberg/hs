@@ -37,7 +37,7 @@ PrintableAsciiStringItemSpecifier = {
     },
     doThisables = {
       ["add-as-password"] = function(self, name)
-        run("yes" .. transf.string.single_quoted_escaped(self:get("c")) .. "| pass insert passw/" .. name, true)
+        dothis.string.env_bash_eval("yes" .. transf.string.single_quoted_escaped(self:get("c")) .. "| pass insert passw/" .. name)
       end,
       ["add-as-username"] = function(self, name)
         dothis.absolute_path.write_file(env.MPASSUSERNAME .. "/" .. name .. ".txt", self:get("c"))

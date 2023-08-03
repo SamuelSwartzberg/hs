@@ -1,3 +1,5 @@
+
+
 --- @alias command_part string | {value: string | command_parts, type: "quoted"  | "interpolated" | "sq" | nil}
 --- @alias command_parts command_part[]
 
@@ -57,14 +59,7 @@ end
 --- @type run
 function run(opts, and_then, ...)
   local varargs = {...}
-  if not opts then
-    error("No args provided")
-  else
-    if (type(opts) ~= "table") or is.table.arraylike(opts) then -- handle shorthand
-      opts = {args = opts}
-    end
-  end
-  local cmd = "cd && source \"$HOME/.target/envfile\" && " .. buildInnerCommand(opts.args)
+  local cmd = .. buildInnerCommand(opts.args)
 
   opts.dont_clean_output = get.any.default_if_nil(opts.dont_clean_output, false)
   
@@ -103,12 +98,6 @@ function run(opts, and_then, ...)
             error_to_rethrow = res
           end
         else
-          if not opts.dont_clean_output then
-            std_out = stringy.strip(std_out)
-          end
-          if opts.error_on_empty_output and std_out == "" then
-            catch(-1, "Output was empty and error_on_empty_output was true.")
-          end
           if opts.delay then
             hs.timer.doAfter(opts.delay, function()
               and_then(std_out)
@@ -136,32 +125,10 @@ function run(opts, and_then, ...)
       command = "LC_ALL=en_US.UTF-8 && LANG=en_US.UTF-8 && LANGUAGE=en_US.UTF-8 && " .. buildInnerCommand(opts.args)
     else 
       -- encode command in base64 so we can pass it to bash without worrying about escaping
-      command = string.format(
-        "base64 -d <<< '%s' | /opt/homebrew/bin/bash -s",
-        transf.string.base64_gen_string(cmd)
-      )
+      command = 
     end
     local output, status, reason, code = hs.execute(command)
     local error_to_rethrow
-    if status then
-      if not opts.dont_clean_output then
-        output = stringy.strip(output)
-      end
-      if opts.error_on_empty_output and output == "" then
-        catch(-1, "Output was empty and error_on_empty_output was true.")
-      end
-      if opts.and_then then
-        return opts.and_then(output)
-      else
-        return output
-      end
-    else
-      local status, res = pcall(catch, code, output)
-      if not status then
-        error_to_rethrow = res
-      end
-    end
-
     if opts.finally then
       opts.finally(code, output)
     end

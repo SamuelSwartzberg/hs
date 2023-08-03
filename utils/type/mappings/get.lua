@@ -76,7 +76,7 @@ get = {
     search_event_tables = function(searchstr, include, exclude)
       local command = "khal search" .. get.khal.basic_command_parts(include, exclude)
       command = command .. " " .. transf.string.single_quoted_escaped(searchstr)
-      return transf.multirecord_string.array_of_event_tables(run(command, true))
+      return transf.multirecord_string.array_of_event_tables(run(command))
     end,
     list_event_tables = function(specifier, include, exclude)
       local command = {
@@ -3123,7 +3123,7 @@ get = {
         memoized_w_opts[fnid][opts_as_str] = memoized_func
       end
       return memoized_func, timer
-    end
+    end,
   },
   fnname = {
     local_absolute_path_by_in_cache_w_string_and_array_or_nil = function(fnname, optsstr, args)

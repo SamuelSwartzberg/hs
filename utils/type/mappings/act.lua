@@ -5,18 +5,18 @@
 act = {
   mullvad_relay_identifier = {
     set_active_mullvad_relay_dentifier = function(id)
-      run("mullvad relay set hostname " .. id, true)
+      dothis.string.env_bash_eval("mullvad relay set hostname " .. id)
     end,
   },
   package_manager_name = {
     install_self = function(mgr)
-      run("upkg " .. mgr .. " install-self", true)
+      dothis.string.env_bash_eval_async("upkg " .. mgr .. " install-self")
     end,
     install_missing = function(mgr)
-      run("upkg " .. mgr .. " install-missing", true)
+      dothis.string.env_bash_eval_async("upkg " .. mgr .. " install-missing")
     end,
     upgrade_all = function(mgr)
-      run("upkg " .. mgr .. " upgrade-all", true)
+      dothis.string.env_bash_eval_async("upkg " .. mgr .. " upgrade-all")
     end,
     backup = function(mgr)
       dothis.package_manager_name.do_backup_and_commit(mgr, "backup", "backup packages")
@@ -41,7 +41,7 @@ act = {
     delete_event = function(event_search_specifier)
       local command = 
         "echo $'D\ny\n' | khal edit " .. get.khal.basic_command_parts(event_search_specifier.include, event_search_specifier.exclude) .. transf.string.single_quoted_escaped(event_search_specifier.searchstr)
-      run(command, true)
+      dothis.string.env_bash_eval(command)
     end,
   },
   event_table = {
