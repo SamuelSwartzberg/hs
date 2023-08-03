@@ -1423,7 +1423,7 @@ transf = {
       return get.fn.rt_or_nil_by_memoized(hs.image.imageFromPath, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromPath")(path)
     end,
     booru_url = function(path)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "saucenao --file" ..
         transf.string.single_quoted_escaped(path)
         .. "--output-properties booru-url"
@@ -1436,12 +1436,12 @@ transf = {
   },
   email_file = {
     all_headers_raw = function(path)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "mshow -L" .. transf.string.single_quoted_escaped(path)
       )
     end,
     all_useful_headers_raw = function(path)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "mshow -q" .. transf.string.single_quoted_escaped(path)
       )
     end,
@@ -1481,7 +1481,7 @@ transf = {
       return get.email_file.header(path, "subject")
     end,
     mime_parts_raw = function(path)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "mshow -t" .. transf.string.single_quoted_escaped(path)
       )
     end,
@@ -5167,7 +5167,7 @@ transf = {
       return "doi:" .. doi
     end,
     online_bib = function(doi)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "curl -LH Accept: application/x-bibtex" .. transf.string.single_quoted_escaped(
           transf.pure_doi.doi_url(doi)
         )
@@ -5185,12 +5185,12 @@ transf = {
   },
   isbn = {
     online_bib = function(isbn)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " bibtex"
       )
     end,
     online_csl_table = function(isbn)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " csl"
       )
     end,
@@ -5200,14 +5200,14 @@ transf = {
   },
   isbn10 = {
     isbn13 = function(isbn10)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "to_isbn13" .. transf.string.single_quoted_escaped(isbn10)
       )
     end,
   },
   isbn13 = {
     isbn10 = function(isbn13)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "to_isbn10" .. transf.string.single_quoted_escaped(isbn13)
       )
     end,
@@ -6178,7 +6178,7 @@ transf = {
         "!citid:" .. transf.csl_table.filename_safe_indicated_citable_object_id(csl_table)
     end,
     bib_string = function(csl_table)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "pandoc -f csljson -t biblatex" .. transf.string.here_string(transf.not_userdata_or_function.json_string(csl_table))
       )
     end,
@@ -6408,7 +6408,7 @@ transf = {
   },
   image_url = {
     booru_url = function(url)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "saucenao --url" ..
         transf.string.single_quoted_escaped(url)
         .. "--output-properties booru-url"

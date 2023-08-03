@@ -1935,7 +1935,7 @@ get = {
   },
   csl_table_or_csl_table_array = {
     raw_citations = function(csl_table, style)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_function.json_here_string(csl_table)
       )
     end,
@@ -1985,7 +1985,7 @@ get = {
       return response .. "\n\n" .. transf.email_file.quoted_body(path)
     end,
     prefixed_header = function(path, header)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "mshow -qh" .. transf.string.single_quoted_escaped(header) .. transf.string.single_quoted_escaped(path)
       )
     end,

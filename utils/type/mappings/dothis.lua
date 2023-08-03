@@ -757,7 +757,7 @@ dothis = {
   },
   local_dir = {
     empty_dir = function(path)
-      run("rm -rf " .. transf.string.single_quoted_escaped(
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("rm -rf " .. transf.string.single_quoted_escaped(
         transf.path.ending_with_slash(path) .. "*"
       ) .. "/*")
     end,
@@ -1043,7 +1043,7 @@ dothis = {
           old_do_after(att_path)
         end
       end
-      run(
+      transf.string.string_or_nil_by_evaled_env_bash_stripped(
         'cd ' .. transf.single_quoted_escaped(cache_path) .. ' && mshow -x'
         .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(name),
         do_after
@@ -1826,7 +1826,7 @@ dothis = {
       hs.fnutils.ieach(
         transf.omegat_project_dir.target_files(dir),
         function(file)
-          run("soffice --headless --convert-to txt:Text --outdir"..
+          transf.string.string_or_nil_by_evaled_env_bash_stripped("soffice --headless --convert-to txt:Text --outdir"..
           transf.string.single_quoted_escaped(
             transf.omegat_project_dir.target_txt_dir(dir)
           ) ..
@@ -2333,7 +2333,7 @@ dothis = {
   },
   task_creation_specifier = {
     create_inner_item = function(spec)
-      return run(
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         spec.opts
       )
     end,
