@@ -42,7 +42,7 @@ dothis = {
           command,
           {
             "--calendar",
-            { value = specifier.calendar, type = "quoted" }
+            transf.string.single_quoted_escaped(specifier.calendar)
           }
         )
       end
@@ -52,7 +52,7 @@ dothis = {
           command,
           {
             "--location",
-            { value = specifier.location, type = "quoted" }
+            transf.string.single_quoted_escaped(specifier.location)
           }
         )
       end
@@ -66,7 +66,7 @@ dothis = {
           command,
           {
             "--alarm",
-            { value = alarms_str , type = "quoted" }
+            transf.string.single_quoted_escaped(alarms_str )
           }
         )
       end
@@ -76,7 +76,7 @@ dothis = {
           command,
           {
             "--url",
-            { value = specifier.url, type = "quoted" }
+            transf.string.single_quoted_escaped(specifier.url)
           }
         )
       end
@@ -86,7 +86,7 @@ dothis = {
         command,
         {
           "--format",
-          { value = "{uid}", type = "quoted" }
+          transf.string.single_quoted_escaped("{uid}")
         }
       )
 
@@ -111,7 +111,7 @@ dothis = {
           command,
           {
             "::",
-            { value = specifier.description, type = "quoted" }
+            transf.string.single_quoted_escaped(specifier.description)
           }
         )
       end
@@ -251,7 +251,7 @@ dothis = {
       run({
         "ical2json",
         "-r",
-        { value = tmpdir_ics_path, type = "quoted" }
+        transf.string.single_quoted_escaped(tmpdir_ics_path)
       })
       dothis.absolute_path.delete(tmpdir_json_path)
       if path then
@@ -1053,7 +1053,7 @@ dothis = {
           "msmtp",
           "-t",
           "<",
-          { value = path, type = "quoted" },
+          transf.string.single_quoted_escaped(path),
         },
         catch = function()
           dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.contents(path, "error"))
@@ -1064,17 +1064,17 @@ dothis = {
       }, 
       {
         "cat",
-        { value = path, type = "quoted" },
+        transf.string.single_quoted_escaped(path),
         "|",
         "msed",
         { value = "/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time()), type = "quoted" },
         "|",
         "msed",
-        { value = "/Status/a/S/", type = "quoted" },
+        transf.string.single_quoted_escaped("/Status/a/S/"),
         "|",
         "mdeliver",
         "-c",
-        { value = env.MBSYNC_ARCHIVE, type = "quoted" },
+        transf.string.single_quoted_escaped(env.MBSYNC_ARCHIVE),
       }, function()
         dothis.absolute_path.delete(path)
         if do_after then
@@ -1105,15 +1105,15 @@ dothis = {
     move = function(source, target)
       run({
         "mdeliver",
-        { value = target, type = "quoted" },
+        transf.string.single_quoted_escaped(target),
         "<",
-        { value = source, type = "quoted" }
+        transf.string.single_quoted_escaped(source)
       }, {
         "minc", -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
-        { value = target, type = "quoted" }
+        transf.string.single_quoted_escaped(target)
       }, {
         "rm",
-        { value = source, type = "quoted" }
+        transf.string.single_quoted_escaped(source)
       }, true)
     end,
       

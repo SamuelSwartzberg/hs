@@ -28,7 +28,7 @@ URLItemSpecifier = {
         dothis.url.download_to(self:get("c"), path, true)
       end,
       ["download-url-to-downloads"] = function(self)
-        self:doThis("download-url", { value = "$HOME/Downloads", type = "quoted" })
+        self:doThis("download-url", transf.string.single_quoted_escaped("$HOME/Downloads"))
       end,
       ["add-to-newsboat"] = function(self, category)
         st(env.NEWSBOAT_URLS):doThis("append-newsboat-url", {
@@ -63,11 +63,11 @@ URLItemSpecifier = {
         run({
           "vdirsyncer",
           "discover",
-          { value = vdirsyncer_pair_specifier.name, type = "quoted" }
+          transf.string.single_quoted_escaped(vdirsyncer_pair_specifier.name)
         }, {
           "vdirsyncer",
           "sync",
-          { value = vdirsyncer_pair_specifier.name, type = "quoted" }
+          transf.string.single_quoted_escaped(vdirsyncer_pair_specifier.name)
         }, true)
         khal_config:doThis("git-commit-self", "Add web-calendar " .. name)
         khal_config:doThis("git-push")

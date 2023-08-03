@@ -46,15 +46,15 @@ DirItemSpecifier = {
       ["cd-and-task"] = function(self)
         return {
           "cd",
-          { value = self:get("path-ensure-final-slash"), type = "quoted" },
+          transf.string.single_quoted_escaped(self:get("path-ensure-final-slash")),
           "&&",
         }
       end,
       ["ls"] = function (self)
-        return run({"ls", "-F", "-1", { value = self:get("completely-resolved-path"), type = "quoted" }})
+        return run({"ls", "-F", "-1", transf.string.single_quoted_escaped(self:get("completely-resolved-path"))})
       end,
       ["tree"] = function(self)
-        return run({"tree", "--noreport", "-F", { value = self:get("completely-resolved-path"), type = "quoted" }})
+        return run({"tree", "--noreport", "-F", transf.string.single_quoted_escaped(self:get("completely-resolved-path"))})
       end,
     },
   

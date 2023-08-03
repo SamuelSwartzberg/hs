@@ -78,7 +78,7 @@ SignalItemSpecifier = {
           "sigtop",
           "export-messages",
           "-f", "json",
-          { value = "$TMP_SIGNAL_EXPORT_PARENT", type = "quoted" }
+          transf.string.single_quoted_escaped("$TMP_SIGNAL_EXPORT_PARENT")
         },  function()
           dothis.absolute_path.empty_dir(env.TMP_SIGNAL_EXPORT_MEDIA_PARENT)
           run(
@@ -86,7 +86,7 @@ SignalItemSpecifier = {
               args = {
                 "sigtop",
                 "export-attachments",
-                { value = "$TMP_SIGNAL_EXPORT_MEDIA_PARENT", type = "quoted" }
+                transf.string.single_quoted_escaped("$TMP_SIGNAL_EXPORT_MEDIA_PARENT")
               }, 
               and_then = do_after
             }, 

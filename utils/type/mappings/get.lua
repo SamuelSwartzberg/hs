@@ -91,8 +91,8 @@ get = {
       end
       specifier.start = specifier.start or "today"
       specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
-      dothis.array.push(command, { value = specifier.start, type = "quoted" })
-      dothis.array.push(command, { value = specifier["end"], type = "quoted" })
+      dothis.array.push(command, transf.string.single_quoted_escaped(specifier.start))
+      dothis.array.push(command, transf.string.single_quoted_escaped(specifier["end"]))
       return transf.multirecord_string.array_of_event_tables(run(get.string_or_number_array.string_by_joined(command, " "), true))
     end,
     calendar_template_empty = function()
