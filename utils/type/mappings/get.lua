@@ -3125,6 +3125,14 @@ get = {
       return memoized_func, timer
     end,
   },
+  n_any_arg_fn = {
+    --- basically `decorate`
+    n_t_arg_fn_w_n_any_arg_n_t_ret_fn = function(fn, fn2)
+      return function(...)
+        return fn(fn2(...))
+      end
+    end,
+  },
   fnname = {
     local_absolute_path_by_in_cache_w_string_and_array_or_nil = function(fnname, optsstr, args)
       local path = transf.fnname.local_absolute_path_by_in_cache(fnname)

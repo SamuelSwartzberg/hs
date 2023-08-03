@@ -333,7 +333,7 @@ dothis = {
     raw_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn = function(str, fn)
       local task = hs.task.new(
         "/opt/homebrew/bin/bash",
-        function (...) fn(transf.number_and_two_anys.any_or_any_and_number(...)) end,
+        function (...) fn(transf.number_and_two_anys.any_or_any_and_number_by_zero(...)) end,
         { "-c", transf.string.string_by_minimal_locale_setter_commands_prepended(
           str
         )}
@@ -344,7 +344,7 @@ dothis = {
     env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn = function(str, fn)
       local task = hs.task.new(
         "/opt/homebrew/bin/bash",
-        function (...) fn(transf.number_and_two_anys.any_or_any_and_number(...)) end,
+        function (...) fn(transf.number_and_two_anys.any_or_any_and_number_by_zero(...)) end,
         { "-c", transf.string.string_by_env_getter_comamnds_prepended(
           str
         )}
@@ -371,19 +371,17 @@ dothis = {
       )
     end,
     env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn_by_stripped = function(str, fn)
-      local task = hs.task.new(
-        "/opt/homebrew/bin/bash",
-        function(...)
-          local out, stat = transf.number_and_two_anys.any_or_any_and_number(...)
-          fn(stringy.strip(out), stat)
-        end,
-        { "-c", transf.string.string_by_env_getter_comamnds_prepended(
-          str
-        )}
+      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn(
+        str,
+        get.n_any_arg_fn.n_t_arg_fn_w_n_any_arg_n_t_ret_fn(fn, transf.string_and_n_anys.string_and_n_anys_by_stripped)
       )
-      task:start()
-      return task
     end,
+    env_bash_eval_w_string_or_nil_by_stripped = function(str, fn)
+      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn_by_stripped(
+        str,
+        get.n_any_arg_fn.n_t_arg_fn_w_n_any_arg_n_t_ret_fn(fn, transf.string_and_number_or_nil.string_or_nil_by_number)
+      )
+    end
 
   },
   url_or_local_path = {

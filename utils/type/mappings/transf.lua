@@ -1005,10 +1005,7 @@ transf = {
   },
   labelled_remote_dir = {
     children_absolute_path_array = function(remote_extant_path)
-      local output = run({
-        args = {"rclone", "lsf", {value = remote_extant_path, type = "quoted"}},
-        catch = function() return nil end,
-      }) 
+      local output = transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone lsf" .. transf.string.single_quoted_escaped(remote_extant_path))
       if output then
         items = transf.string.noempty_line_string_array(output)
         items = transf.string_array.stripped_string_array(items)
@@ -6607,6 +6604,12 @@ transf = {
       return #{...}
     end,
   },
+  string_and_n_anys = {
+    string_and_n_anys_by_stripped = function(...)
+      local arg1 = select(1, ...)
+      return stringy.strip(arg1), select(2, ...)
+    end
+  },
   n_boolean_functions = {
     and_boolean_function = function(...)
       local functions = {...}
@@ -7936,11 +7939,20 @@ transf = {
     end,
   },
   number_and_two_anys ={
-    any_or_any_and_number = function(num, a1, a2)
+    any_or_any_and_number_by_zero = function(num, a1, a2)
       if num == 0 then
         return a1
       else
         return a2, num
+      end
+    end,
+  },
+  string_and_number_or_nil = {
+    string_or_nil_by_number = function(str, num)
+      if num then
+        return nil
+      else
+        return str
       end
     end,
   },
