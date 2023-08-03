@@ -273,14 +273,14 @@ function rest(specifier, do_after, have_tried_access_refresh)
     local auth_header = specifier.auth_header .. get.string.string_by_with_suffix(specifier.auth_process or "Bearer", " ")
     dothis.array.push(curl_command, "-H")
     dothis.array.push(curl_command, 
-      { value =  auth_header .. specifier.token, type = "quoted"})
+      transf.string.single_quoted_escaped(auth_header .. specifier.token))
   end
 
   if specifier.username_pw_where == "header" or specifier.username_pw_where == "both" then
     local auth_header = specifier.auth_header .. get.string.string_by_with_suffix(specifier.auth_process or "Basic", " ")
     dothis.array.push(curl_command, "-H")
     dothis.array.push(curl_command, 
-      { value =  auth_header .. transf.string.base64_url_string(specifier.username .. ":" .. specifier.password), type = "quoted"})
+      transf.string.single_quoted_escaped(auth_header .. transf.string.base64_url_string(specifier.username .. ":" .. specifier.password)))
   end
 
   -- assembole other parts of curl commmand
@@ -291,7 +291,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     specifier.request_verb = specifier.request_verb:upper()
     dothis.array.push(curl_command, "--request")
     dothis.array.push(curl_command, 
-      { value = specifier.request_verb, type = "quoted"}
+      transf.string.single_quoted_escaped(specifier.request_verb)
     )
   end
 
@@ -303,11 +303,11 @@ function rest(specifier, do_after, have_tried_access_refresh)
   then
     dothis.array.push(curl_command, "-d")
     dothis.array.push(curl_command, 
-      { value = tblmap.api_name.empty_post_body[specifier.api_name], type = "quoted"}
+      transf.string.single_quoted_escaped(tblmap.api_name.empty_post_body[specifier.api_name])
     )
     dothis.array.push(curl_command, "-H")
     dothis.array.push(curl_command, 
-    { value = "Content-Type: " .. tblmap.api_name.empty_post_body_content_type[specifier.api_name], type = "quoted"}
+    transf.string.single_quoted_escaped("Content-Type: " .. tblmap.api_name.empty_post_body_content_type[specifier.api_name])
   )
   end
 
@@ -327,7 +327,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
       end
       dothis.array.push(curl_command, "-d")
       dothis.array.push(curl_command, 
-        { value = request_string, type = "quoted"}
+        transf.string.single_quoted_escaped(request_string)
       )
     else
       content_type = "multipart/form-data"
@@ -340,7 +340,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     
     dothis.array.push(curl_command, "-H")
     dothis.array.push(curl_command, 
-      { value = "Content-Type: " .. content_type, type = "quoted"}
+      transf.string.single_quoted_escaped("Content-Type: " .. content_type)
     )
   
   end

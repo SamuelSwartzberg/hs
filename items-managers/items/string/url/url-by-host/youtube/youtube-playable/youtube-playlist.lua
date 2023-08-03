@@ -6,14 +6,13 @@ YoutubePlaylistItemSpecifier = {
       ["playlist-attr"] = function(self, attr)
         return run(
           {
-            "youtube-dl",
-            "--no-warnings",
+            "youtube-dl -no-warnings",
             "--dump-single-json",
-            {value = self:get("c"), type = "quoted"},
+            transf.string.single_quoted_escaped(self:get("c")),
             "|",
             "jq",
             "-r",
-            {value = "." .. attr, type = "quoted"},
+            transf.string.single_quoted_escaped("." .. attr),
           }
         )
       end,

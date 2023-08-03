@@ -145,9 +145,9 @@ dothis = {
       table.insert(command_parts, "-t")
       table.insert(command_parts, format)
       table.insert(command_parts, "-i")
-      table.insert(command_parts, {value = temp_path, type ="quoted"})
+      table.insert(command_parts, transf.string.single_quoted_escaped(temp_path))
       table.insert(command_parts, "-o")
-      table.insert(command_parts, {value = target, type ="quoted"})
+      table.insert(command_parts, transf.string.single_quoted_escaped(target))
       run(command_parts, function ()
         dothis.absolute_path.delete(temp_path)
         if do_after then
@@ -227,7 +227,7 @@ dothis = {
     add_otp_pass_item = function(url, name)
       run({
         "echo",
-        {value = url, type = "quoted"},
+        transf.string.single_quoted_escaped(url),
         "|",
         "pass otp insert otp/" .. name
       })
@@ -1191,11 +1191,11 @@ dothis = {
     write_to_csv = function(sqlite_file, query, output_path, do_after)
       run({
         "sqlite3",
-        {value = sqlite_file, type = "quoted"},
+        transf.string.single_quoted_escaped(sqlite_file),
         "-csv",
-        {value = query, type = "quoted"},
+        transf.string.single_quoted_escaped(query),
         ">",
-        {value = output_path, type = "quoted"},
+        transf.string.single_quoted_escaped(output_path),
       }, do_after)
     end,
     write_to_csv_cache = function(sqlite_file, query, do_after)

@@ -232,7 +232,7 @@ is = {
   labelled_remote_extant_path = {
     labelled_remote_dir = function(path)
       return pcall(runJSON,{
-        args = {"rclone", "lsjson", "--stat", {value = path, type = "quoted"}},
+        args = {"rclone", "lsjson", "--stat", transf.string.single_quoted_escaped(path)},
         key_that_contains_payload = "IsDir"
       })
     end,

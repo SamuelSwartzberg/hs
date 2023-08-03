@@ -74,7 +74,7 @@ FacebookItemSpecifier = {
                 "open",
                 "-a",
                 "Firefox",
-                { value = "https://www.facebook.com/dyi/?referrer=yfi_settings", type = "quoted"}
+                transf.string.single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings")
               },
               delay = 1,
             }, function()

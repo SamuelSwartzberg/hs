@@ -3404,7 +3404,7 @@ transf = {
     end, 
     romanized_deterministic = function(str)
       local raw_romanized = run(
-        { "echo", "-n",  {value = str, type = "quoted"}, "|", "kakasi", "-iutf8", "-outf8", "-ka", "-Ea", "-Ka", "-Ha", "-Ja", "-s", "-ga" }
+        { "echo", "-n",  transf.string.single_quoted_escaped(str), "|", "kakasi", "-iutf8", "-outf8", "-ka", "-Ea", "-Ka", "-Ha", "-Ja", "-s", "-ga" }
       )
       local is_ok, romanized = pcall(eutf8.gsub, raw_romanized, "(%w)%^", "%1%1")
       if not is_ok then
