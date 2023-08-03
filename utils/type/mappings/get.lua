@@ -46,11 +46,11 @@ get = {
   },
 
   package_manager_name_or_nil = {
-    package_name_semver_compound_string_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
-    package_name_semver_package_manager_name_compound_string_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
-    package_name_package_manager_name_compound_string = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
-    semver_string_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
-    absolute_path_array = function(mgr, arg) return transf.string.lines(run("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
+    package_name_semver_compound_string_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
+    package_name_semver_package_manager_name_compound_string_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
+    package_name_package_manager_name_compound_string = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
+    semver_string_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
+    absolute_path_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
     boolean_array_installed = function(mgr, arg) return pcall(run, "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
   },
@@ -76,7 +76,7 @@ get = {
     search_event_tables = function(searchstr, include, exclude)
       local command = "khal search" .. get.khal.basic_command_parts(include, exclude)
       command = command .. " " .. transf.string.single_quoted_escaped(searchstr)
-      return transf.multirecord_string.array_of_event_tables(run(command))
+      return transf.multirecord_string.array_of_event_tables(transf.string.string_or_nil_by_evaled_env_bash_stripped(command))
     end,
     list_event_tables = function(specifier, include, exclude)
       local command = {
@@ -1809,7 +1809,7 @@ get = {
       return get.path_array.find_path_with_leaf_ending(transf.dir.children_absolute_path_array(dir), leaf_ending)
     end,
     cmd_output_from_path = function(path, cmd)
-      return run("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd)
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd)
     end
   },
   git_root_dir = {
@@ -1818,7 +1818,7 @@ get = {
     end,
     hook_res = function(path, hook)
       local hook_path = get.git_root_dir.hook_path(path, hook)
-      return run(hook_path)
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped(hook_path)
     end,
   },
   in_git_dir = {
@@ -1977,7 +1977,7 @@ get = {
       return runJSON("shellcheck --format=json --severity=" .. severity .. transf.string.single_quoted_escaped(path))
     end,
     lint_gcc_string = function(path, severity)
-      return run("shellcheck --format=gcc --severity=" .. severity .. transf.string.single_quoted_escaped(path))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("shellcheck --format=gcc --severity=" .. severity .. transf.string.single_quoted_escaped(path))
     end,
   },
   email_file = {
@@ -2004,7 +2004,7 @@ get = {
       else
         headerpart = ""
       end
-      local res = run("maddr " .. (only and "-a" or "")  .. headerpart .. transf.string.single_quoted_escaped(path))
+      local res = transf.string.string_or_nil_by_evaled_env_bash_stripped("maddr " .. (only and "-a" or "")  .. headerpart .. transf.string.single_quoted_escaped(path))
       return transf.array.set(transf.string.lines(res))
     end,
     displayname_addresses_dict_of_dicts = function(path, header)
@@ -2033,7 +2033,7 @@ get = {
       end
       cmd = cmd .. " | msort " .. flags
 
-      return transf.string.lines(run(cmd))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped(cmd))
     end
 
   },

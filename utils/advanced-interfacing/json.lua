@@ -186,7 +186,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if specifier.username_pw_where then
     specifier.username = specifier.username or transf.file.contents(env.MPASSUSERNAME .. "/" .. specifier.api_name .. ".txt") or env.MAIN_EMAIL
-    specifier.password = specifier.password or run("pass passw/" .. specifier.api_name )
+    specifier.password = specifier.password or transf.string.string_or_nil_by_evaled_env_bash_stripped("pass passw/" .. specifier.api_name )
     if not specifier.username then
       error("Username required but could not be fetched. Specifier: " .. json.encode(specifier))
     end

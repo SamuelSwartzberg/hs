@@ -403,7 +403,7 @@ transf = {
       )
     end,
     random_base64_gen_string_of_length = function(int)
-      return run("openssl rand -base64 " .. tostring(int))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. tostring(int))
     end,
   },
   pos_int = {
@@ -1067,7 +1067,7 @@ transf = {
   },
   labelled_remote_file = {
     contents = function(path)
-      return run("rclone cat" .. transf.string.single_quoted_escaped(path))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone cat" .. transf.string.single_quoted_escaped(path))
     end,
   },
   remote_file = {
@@ -1417,7 +1417,7 @@ transf = {
   },
   local_image_file = {
     qr_data = function(path)
-      return run("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
     end,
     hs_image = function(path)
       return get.fn.rt_or_nil_by_memoized(hs.image.imageFromPath, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromPath")(path)
@@ -1534,7 +1534,7 @@ transf = {
       local evaled_mail = get.string.evaled_as_template(mail)
       local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
       local outpath = temppath .. "_out"
-      run("mmime < " .. transf.string.single_quoted_escaped(temppath) .. " > " .. transf.string.single_quoted_escaped(outpath))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("mmime < " .. transf.string.single_quoted_escaped(temppath) .. " > " .. transf.string.single_quoted_escaped(outpath))
       dothis.absolute_path.delete(temppath)
       return outpath
     end
@@ -1879,7 +1879,7 @@ transf = {
   },
   dice_notation = {
     nonindicated_decimal_number_string_result = function(dice_notation)
-      return run("roll" .. transf.string.single_quoted_escaped(dice_notation))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("roll" .. transf.string.single_quoted_escaped(dice_notation))
     end,
     int_result = function(dice_notation)
       return transf.nonindicated_number_string.number_base_10(
@@ -3377,7 +3377,7 @@ transf = {
       return ' "' .. eutf8.gsub(str, '"', '\\"') .. '"'
     end,
     string_by_envsubsted = function(str)
-      return run("echo " .. transf.string.single_quoted_escaped(str) .. " | envsubst")
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("echo " .. transf.string.single_quoted_escaped(str) .. " | envsubst")
     end,
     binary_string = basexx.to_bit,
     hex_string = basexx.to_hex,
@@ -3550,10 +3550,10 @@ transf = {
       return parsed
     end,
     kana_inner = function(argstr)
-      return run("kana --vowel-shortener x " .. argstr )
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("kana --vowel-shortener x " .. argstr )
     end,
     kana_inner_nospaces = function(argstr)
-      return run("kana --vowel-shortener x " .. argstr .. "| tr -d ' '")
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("kana --vowel-shortener x " .. argstr .. "| tr -d ' '")
     end,
     hiragana_only = function(str)
       return transf.string.kana_inner(transf.string.single_quoted_escaped(str))
@@ -3683,7 +3683,7 @@ transf = {
   },
   alphanum_underscore = {
     evaled_shell_var = function(str)
-      return run("echo $" .. str)
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("echo $" .. str)
     end,
   },
   alphanum_minus_underscore = {
@@ -3720,7 +3720,7 @@ transf = {
       return get.pass_item_name.path(pass_item_name, "username")
     end,
     otp = function(item)
-      return run("pass otp otp/" .. item)
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("pass otp otp/" .. item)
     end,
     otp_absolute_path = function(item)
       return "otp/" .. item
@@ -4638,7 +4638,7 @@ transf = {
         transf.not_userdata_or_function.yaml_string(tbl),
         "shell-input"
       )
-      run("align " .. transf.string.single_quoted_escaped(tmp))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("align " .. transf.string.single_quoted_escaped(tmp))
       local res = transf.yaml_file.not_userdata_or_function(tmp)
       dothis.local_extant_path.delete(tmp)
       return res
@@ -6953,19 +6953,19 @@ transf = {
       )
     end,
     package_manager_name_array = function()
-      return transf.string.lines(run("upkg list-package-managers"))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg list-package-managers"))
     end,
     package_manager_name_array_with_missing_packages = function()
-      return transf.string.lines(run("upkg missing-package-manager"))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg missing-package-manager"))
     end,
     semver_string_array_of_installed_package_managers = function ()
-      return transf.string.lines(run("upkg package-manager-version"))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg package-manager-version"))
     end,
     absolute_path_array_of_installed_package_managers = function()
-      return transf.string.lines(run("upkg which-package-maanger"))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg which-package-maanger"))
     end,
     mullvad_status_string = function()
-      return run("mullvad status")
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("mullvad status")
     end,
     mullvad_boolean_connected = function()
       return stringy.startswith(transf["nil"].mullvad_status_string(),"Connected")
@@ -6982,7 +6982,7 @@ transf = {
       )
     end,
     active_mullvad_relay_identifier = function()
-      return run("mullvad relay get"):match("hostname ([^ ]+)")
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("mullvad relay get"):match("hostname ([^ ]+)")
     end,
     non_root_volume_absolute_path_array = function()
       return hs.fnutils.ifilter(
@@ -6991,7 +6991,7 @@ transf = {
       )
     end,
     calendar_name_array = function()
-      return transf.string.lines(run("khal printcalendars"))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("khal printcalendars"))
     end,
     writeable_calendar_name_array = function()
       return hs.fnutils.ifilter(
@@ -7024,34 +7024,34 @@ transf = {
   },
   package_manager_name = {
     semver_string = function(mgr)
-      return run("upkg " .. mgr .. " package-manager-version")
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. mgr .. " package-manager-version")
     end,
     absolute_path = function(mgr)
-      return run("upkg " .. mgr .. " which-package-manager")
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. mgr .. " which-package-manager")
     end,
   },
   package_manager_name_or_nil = {
     backed_up_package_name_array = function(mgr)
-      return transf.string.lines(run("upkg " .. (mgr or "") .. " read-backup"))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " read-backup"))
     end,
     missing_package_name_array = function(mgr)
-      return transf.string.lines(run("upkg " .. (mgr or "") .. " missing"))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " missing"))
     end,
     added_package_name_array = function(mgr)
-      return transf.string.lines(run("upkg " .. (mgr or "") .. " added"))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " added"))
     end,
     difference_package_name_array = function(mgr)
-      return transf.string.lines(run("upkg " .. (mgr or "") .. " difference"))
+      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " difference"))
     end,
-    package_name_or_package_name_semver_compound_string_array = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list ")) end,
-    package_name_semver_compound_string_array = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-version ")) end,
-    package_name_array = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-no-version ")) end,
-    package_name_semver_package_manager_name_compound_string_array = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
-    package_name_package_manager_name_compound_string = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
-    nonindicated_decimal_string_array_installed = function(mgr) return transf.string.lines(run("upkg " .. (mgr or "") .. " count ")) end,
+    package_name_or_package_name_semver_compound_string_array = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list ")) end,
+    package_name_semver_compound_string_array = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version ")) end,
+    package_name_array = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-no-version ")) end,
+    package_name_semver_package_manager_name_compound_string_array = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
+    package_name_package_manager_name_compound_string = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
+    nonindicated_decimal_string_array_installed = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " count ")) end,
   },
   package_name = {
-    installed_package_manager = function(pkg) return transf.string.lines(run("upkg installed_package_manager " .. pkg)) end,
+    installed_package_manager = function(pkg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg installed_package_manager " .. pkg)) end,
   },
   action_specifier = {
     action_chooser_item_specifier = function(action_specifier)
@@ -7438,7 +7438,7 @@ transf = {
   },
   cronspec_string = {
     next_timestamp_s_string = function(cronspec_string)
-      return run("ncron" .. transf.string.single_quoted_escaped(cronspec_string))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("ncron" .. transf.string.single_quoted_escaped(cronspec_string))
     end,
     next_timestamp_s = function(cronspec_string)
       return get.string_or_number.number_or_nil(transf.cronspec_string.next_timestamp_s_string(cronspec_string))
