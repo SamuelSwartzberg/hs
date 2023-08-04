@@ -354,6 +354,6 @@ function rest(specifier, do_after, have_tried_access_refresh)
     args.json_catch = catch_auth_error
     return runJSON(args, do_after)
   else 
-    return run(args, do_after)
+    return dothis.string.env_bash_eval_w_string_or_nil_by_stripped(args, do_after)
   end
 end

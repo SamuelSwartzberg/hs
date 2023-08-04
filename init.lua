@@ -360,7 +360,7 @@ System:get("manager", "creatable"):doThis("create-all", {
         local vol = st(information.path)
         if vol:get("is-time-machine-volume") then
           hs.alert.show("Starting backup...")
-          run({"tmutil", "startbackup"})
+          dothis.string.env_bash_eval_async("tmutil startbackup")
         end
       elseif event == hs.fs.volume.didUnmount then
         local vol = st(information.path)

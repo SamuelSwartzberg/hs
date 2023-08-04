@@ -82,8 +82,8 @@ DiscordItemSpecifier = {
           "exportdm",
           "--media",
           "--reuse-media",
-          "-f", "json",
-          "--dateformat", "unix",
+          "-f json",
+          "--dateformat unix",
           "-o", transf.string.single_quoted_escaped("$TMP_DISCORD_EXPORT_ITEM") },
           do_after
         )

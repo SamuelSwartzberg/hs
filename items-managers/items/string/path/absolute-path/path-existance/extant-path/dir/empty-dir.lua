@@ -1,11 +1,11 @@
 local project_type_init_map = {
   npm = function(path)
-    run({
-      "cd",
-      transf.string.single_quoted_escaped(path),
-      "&& npm init --yes && npm pkg set",
-      transf.string.single_quoted_escaped("name=" .. transf.path.leaf(path)),
-    }, true)
+    dothis.string.env_bash_eval_async(
+      "cd" ..
+      transf.string.single_quoted_escaped(path) ..
+      "&& npm init --yes && npm pkg set" ..
+      transf.string.single_quoted_escaped("name=" .. transf.path.leaf(path))
+  )
   end,
   omegat = function(path)
     dothis.absolute_path.write_file_if_nonextant_path(path .. "/omegat.project", comp.templates.omegat)

@@ -60,15 +60,14 @@ URLItemSpecifier = {
         khal_config:doThis("append-file-contents", "\n\n" .. khal_data)
         vdirsyncer_config:doThis("append-file-contents", "\n\n" .. transf.vdirsyncer_pair_specifier.ini_string(vdirsyncer_pair_specifier))
         dothis.absolute_path.create_dir(path)
-        run({
-          "vdirsyncer",
-          "discover",
-          transf.string.single_quoted_escaped(vdirsyncer_pair_specifier.name)
-        }, {
-          "vdirsyncer",
-          "sync",
-          transf.string.single_quoted_escaped(vdirsyncer_pair_specifier.name)
-        }, true)
+        dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+          "vdirsyncer discover" ..
+          transf.string.single_quoted_escaped(vdirsyncer_pair_specifier.name),
+          get.fn.first_n_args_bound_fn(
+            dothis.string.env_bash_eval_async,
+            "vdirsyncer sync" .. transf.string.single_quoted_escaped(vdirsyncer_pair_specifier.name)
+          )
+        )
         khal_config:doThis("git-commit-self", "Add web-calendar " .. name)
         khal_config:doThis("git-push")
       end,

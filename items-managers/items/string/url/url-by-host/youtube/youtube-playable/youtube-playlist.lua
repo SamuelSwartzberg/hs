@@ -4,16 +4,11 @@ YoutubePlaylistItemSpecifier = {
   properties = {
     getables = {
       ["playlist-attr"] = function(self, attr)
-        return run(
-          {
-            "youtube-dl -no-warnings",
-            "--dump-single-json",
-            transf.string.single_quoted_escaped(self:get("c")),
-            "|",
-            "jq",
-            "-r",
-            transf.string.single_quoted_escaped("." .. attr),
-          }
+        return transf.string.string_or_nil_by_evaled_env_bash_stripped(
+          "youtube-dl -no-warnings --dump-single-json" ..
+          transf.string.single_quoted_escaped(self:get("c")) ..
+          "| jq -r" ..
+          transf.string.single_quoted_escaped("." .. attr)
         )
       end,
       ["all-attrs"] = function(self, attr)

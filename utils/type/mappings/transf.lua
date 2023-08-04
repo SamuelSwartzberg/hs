@@ -3403,8 +3403,8 @@ transf = {
       return get.string_or_number_array.string_by_joined(arr, "")
     end, 
     romanized_deterministic = function(str)
-      local raw_romanized = run(
-        { "echo", "-n",  transf.string.single_quoted_escaped(str), "|", "kakasi", "-iutf8", "-outf8", "-ka", "-Ea", "-Ka", "-Ha", "-Ja", "-s", "-ga" }
+      local raw_romanized = transf.string.string_or_nil_by_evaled_env_bash_stripped(
+         "echo -n" .. transf.string.single_quoted_escaped(str) .. "| kakasi -iutf8 -outf8 -ka -Ea -Ka -Ha -Ja -s -ga" 
       )
       local is_ok, romanized = pcall(eutf8.gsub, raw_romanized, "(%w)%^", "%1%1")
       if not is_ok then

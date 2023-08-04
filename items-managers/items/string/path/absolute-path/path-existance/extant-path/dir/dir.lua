@@ -51,10 +51,10 @@ DirItemSpecifier = {
         }
       end,
       ["ls"] = function (self)
-        return run({"ls", "-F", "-1", transf.string.single_quoted_escaped(self:get("completely-resolved-path"))})
+        return transf.string.string_or_nil_by_evaled_env_bash_stripped("ls -F -1" .. transf.string.single_quoted_escaped(self:get("completely-resolved-path")))
       end,
       ["tree"] = function(self)
-        return run({"tree", "--noreport", "-F", transf.string.single_quoted_escaped(self:get("completely-resolved-path"))})
+        return transf.string.string_or_nil_by_evaled_env_bash_stripped("tree --noreport -F" .. transf.string.single_quoted_escaped(self:get("completely-resolved-path")))
       end,
     },
   
@@ -104,11 +104,11 @@ DirItemSpecifier = {
       end,
 
       ["git-init"] = function(self)
-        self:doThis("cd-and-run-this-task", { "git", "init" })
+        self:doThis("cd-and-run-this-task", { "git init" })
       end,
       ["initialize-as-git-dir"] = function(self)
         self:doThis("git-init")
-        self:doThis("create-empty-file-in-dir", ".gitignore")
+        self:doThis("create-empty-file-in-dir .gitignore")
       end,
       ["rm-dir"] = function(self)
         dothis.absolute_path.delete(self:get("c")))

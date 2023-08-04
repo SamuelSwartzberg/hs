@@ -4,13 +4,7 @@ NpmProjectDirItemSpecifier = {
   properties = {
     doThisables = {
       ["bump-version"] = function(self, type)
-        run({
-          "npm",
-          "version",
-          type,
-          "-m",
-          "Bump version to %s"
-        }, true)
+        dothis.string.env_bash_eval_async("npm version " .. type .. "-m Bump version to %s")
       end,
       ["open-project"] = function(self)
         self:doThis("open-in-new-vscode-window")

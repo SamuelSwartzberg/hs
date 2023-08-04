@@ -93,7 +93,7 @@ get = {
       specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
       dothis.array.push(command, transf.string.single_quoted_escaped(specifier.start))
       dothis.array.push(command, transf.string.single_quoted_escaped(specifier["end"]))
-      return transf.multirecord_string.array_of_event_tables(run(get.string_or_number_array.string_by_joined(command, " "), true))
+      return transf.multirecord_string.array_of_event_tables(transf.string.string_or_nil_by_evaled_env_bash_stripped(get.string_or_number_array.string_by_joined(command, " "))
     end,
     calendar_template_empty = function()
       CALENDAR_TEMPLATE_SPECIFIER = ovtable.new()

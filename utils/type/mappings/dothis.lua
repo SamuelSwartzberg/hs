@@ -16,7 +16,7 @@ dothis = {
       dothis.string.env_bash_eval("upkg " .. mgr .. " link " .. transf.string.single_quoted_escaped(pkg))
     end,
     do_backup_and_commit = function(mgr, action, msg)
-      run("upkg " .. mgr .. " " .. action, function()
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped("upkg " .. mgr .. " " .. action, function()
         local message = msg or action
         
         if mgr then
@@ -40,20 +40,16 @@ dothis = {
       if specifier.calendar then
         command = transf.two_arrays.array_by_appended(
           command,
-          {
-            "--calendar",
+            "--calendar" ..
             transf.string.single_quoted_escaped(specifier.calendar)
-          }
         )
       end
 
       if specifier.location then
         command = transf.two_arrays.array_by_appended(
           command,
-          {
-            "--location",
+            "--location" ..
             transf.string.single_quoted_escaped(specifier.location)
-          }
         )
       end
 
@@ -64,30 +60,24 @@ dothis = {
         )
         command = transf.two_arrays.array_by_appended(
           command,
-          {
-            "--alarm",
+            "--alarm" ..
             transf.string.single_quoted_escaped(alarms_str )
-          }
         )
       end
 
       if specifier.url then 
         command = transf.two_arrays.array_by_appended(
           command,
-          {
-            "--url",
+            "--url" ..
             transf.string.single_quoted_escaped(specifier.url)
-          }
         )
       end
 
       -- needed for postcreation modifications 
       command = transf.two_arrays.array_by_appended(
         command,
-        {
-          "--format",
+          "--format" ..
           transf.string.single_quoted_escaped("{uid}")
-        }
       )
 
       if specifier.start then
@@ -109,14 +99,14 @@ dothis = {
       if specifier.description then
         command = transf.two_arrays.array_by_appended(
           command,
-          {
-            "::",
+            "::" ..
             transf.string.single_quoted_escaped(specifier.description)
-          }
         )
       end
 
-      run(command, do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+        get.string_or_number_array.string_by_joined(command, " "), 
+        do_after)
     end,
     add_event_interactive = function(event_table, do_after)
       event_table = event_table or {}
@@ -135,20 +125,15 @@ dothis = {
       rawsource = eutf8.gsub(rawsource, "\n +\n", "\n&nbsp;\n")
       local temp_path = source .. ".tmp"
       dothis.absolute_path.write_file(temp_path, processedsource) 
-      local command_parts = {
-        "pandoc",
-      }
-      table.insert(command_parts, "--wrap=preserve")
-      table.insert(command_parts, "-f")
-      table.insert(command_parts, "markdown+" .. get.string_or_number_array.string_by_joined(get.pandoc.extensions(), "+"))
-      table.insert(command_parts, "--standalone")
-      table.insert(command_parts, "-t")
-      table.insert(command_parts, format)
-      table.insert(command_parts, "-i")
-      table.insert(command_parts, transf.string.single_quoted_escaped(temp_path))
-      table.insert(command_parts, "-o")
-      table.insert(command_parts, transf.string.single_quoted_escaped(target))
-      run(command_parts, function ()
+      local cmd = 
+        "pandoc" ..
+        "--wrap=preserve -f markdown+" .. get.string_or_number_array.string_by_joined(get.pandoc.extensions(), "+") .. " --standalone -t" ..
+        format ..
+        "-i" ..
+        transf.string.single_quoted_escaped(temp_path)
+        "-o" ..
+        transf.string.single_quoted_escaped(target)
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(cmd, function ()
         dothis.absolute_path.delete(temp_path)
         if do_after then
           do_after(target)
@@ -162,12 +147,12 @@ dothis = {
       dothis.alphanum_minus_underscore.set_pass_json(uuid, type, data)
     end,
     edit_contact = function(uuid, do_after)
-      run("khard edit " .. uuid, do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped("khard edit " .. uuid, do_after)
     end,
   },
   pass_item_name = {
     replace = function(name, type, data)
-      run("pass rm " .. type .. "/" .. name, function()
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped("pass rm " .. type .. "/" .. name, function()
         dothis.alphanum_minus_underscore.add_pass_item_name(name, type, data)
       end)
     end,
@@ -225,12 +210,11 @@ dothis = {
   },
   otp_url = {
     add_otp_pass_item = function(url, name)
-      run({
-        "echo",
-        transf.string.single_quoted_escaped(url),
-        "|",
-        "pass otp insert otp/" .. name
-      })
+      dothis.string.env_bash_eval_async(
+        "echo" ..
+        transf.string.single_quoted_escaped(url) ..
+        "| pass otp insert otp/" .. name
+      )
     end,
   },
   booru_url = {
@@ -248,11 +232,11 @@ dothis = {
       local tmpdir_json_path = transf.not_userdata_or_function.in_tmp_dir(tbl) .. ".json"
       local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(tbl) .. ".ics"
       dothis.absolute_path.write_file(tmpdir_json_path, json.encode(tbl))
-      run({
-        "ical2json",
-        "-r",
+      dothis.string.env_bash_eval_sync(
+        "ical2json" ..
+        "-r" ..
         transf.string.single_quoted_escaped(tmpdir_ics_path)
-      })
+      )
       dothis.absolute_path.delete(tmpdir_json_path)
       if path then
         dothis.extant_path.move_to_absolute_path(tmpdir_ics_path, path)
@@ -1048,39 +1032,29 @@ dothis = {
       )
     end,
     send = function(path, do_after)
-      run({
-        args = {
-          "msmtp",
-          "-t",
-          "<",
-          transf.string.single_quoted_escaped(path),
-        },
-        catch = function()
-          dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.contents(path, "error"))
-        end,
-        finally = function()
-          dothis.absolute_path.delete(path)
-        end,
-      }, 
-      {
-        "cat",
-        transf.string.single_quoted_escaped(path),
-        "|",
-        "msed",
-        { value = "/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time()), type = "quoted" },
-        "|",
-        "msed",
-        transf.string.single_quoted_escaped("/Status/a/S/"),
-        "|",
-        "mdeliver",
-        "-c",
-        transf.string.single_quoted_escaped(env.MBSYNC_ARCHIVE),
-      }, function()
-        dothis.absolute_path.delete(path)
-        if do_after then
-          do_after()
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+        "msmtp -t <" .. transf.string.single_quoted_escaped(path),
+        function(res)
+          if not res then
+            dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.contents(path))
+            dothis.absolute_path.delete(path)
+          else
+            dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+              "cat" ..
+              transf.string.single_quoted_escaped(path) .. "| msed" ..
+              transf.string.single_quoted_escaped("/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time())) ..
+              "| msed".. transf.string.single_quoted_escaped("/Status/a/S/") ..
+              "| mdeliver -c" .. transf.string.single_quoted_escaped(env.MBSYNC_ARCHIVE),
+              function()
+                dothis.absolute_path.delete(path)
+                if do_after then
+                  do_after()
+                end
+              end
+            )
+          end
         end
-      end, true)
+      )
     end,
     edit_then_send = function(path, do_after)
       dothis.local_file.edit_file_in_vscode_act_on_contents(path, function(str)
@@ -1103,18 +1077,21 @@ dothis = {
       dothis.email_specifier.edit_then_send(transf.email_file.forward_email_specifier(path), do_after)
     end,
     move = function(source, target)
-      run({
-        "mdeliver",
-        transf.string.single_quoted_escaped(target),
-        "<",
-        transf.string.single_quoted_escaped(source)
-      }, {
-        "minc", -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
-        transf.string.single_quoted_escaped(target)
-      }, {
-        "rm",
-        transf.string.single_quoted_escaped(source)
-      }, true)
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+        "mdeliver" .. transf.string.single_quoted_escaped(target) ..
+        "<" .. transf.string.single_quoted_escaped(source),
+        function()
+          dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+            "minc" .. transf.string.single_quoted_escaped(target), -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
+            function ()
+              dothis.string.env_bash_eval_async(
+                "rm" .. transf.string.single_quoted_escaped(source)
+              )
+            end
+          )
+        end
+      )
+        
     end,
       
     
@@ -1189,14 +1166,14 @@ dothis = {
   },
   sqlite_file = {
     write_to_csv = function(sqlite_file, query, output_path, do_after)
-      run({
-        "sqlite3",
-        transf.string.single_quoted_escaped(sqlite_file),
-        "-csv",
-        transf.string.single_quoted_escaped(query),
-        ">",
-        transf.string.single_quoted_escaped(output_path),
-      }, do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+        "sqlite3" ..
+        transf.string.single_quoted_escaped(sqlite_file) ..
+        "-csv" ..
+        transf.string.single_quoted_escaped(query) ..
+        ">" ..
+        transf.string.single_quoted_escaped(output_path)
+      , do_after)
     end,
     write_to_csv_cache = function(sqlite_file, query, do_after)
       dothis.sqlite_file.write_to_csv(
@@ -1271,13 +1248,9 @@ dothis = {
   },
   ics_file = {
     generate_json_file = function(path)
-      return run({
-        "ical2json",
-        {
-          value = path,
-          type = "quoted"
-        }
-      })
+      return dothis.string.env_bash_eval_async(
+        "ical2json" .. transf.string.single_quoted_escaped(path)
+      )
     end,
     add_events_from_file = function(path, calendar)
       dothis.string.env_bash_eval("khal import --include-calendar " .. calendar .. " " .. transf.string.single_quoted_escaped(path))
@@ -1544,13 +1517,13 @@ dothis = {
   },
   firefox = {
     dump_state = function(do_after)
-      run('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
     end
 
   },
   newpipe = {
     extract_backup = function(do_after)
-      run('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
     end
   },
   omegat = {
@@ -2569,7 +2542,7 @@ dothis = {
       dothis.local_absolute_path.start_recording_to(transf.string.in_cache_dir(os.time(), "recording"), do_after)
     end,
     sox_rec_stop = function(do_after)
-      run("killall rec", do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_by_stripped("killall rec", do_after)
     end,
     sox_rec_toggle_cache = function(do_after)
       if transf["nil"].sox_is_recording() then

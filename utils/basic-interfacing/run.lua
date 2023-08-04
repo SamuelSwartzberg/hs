@@ -84,9 +84,7 @@ function run(opts, and_then, ...)
     if opts.and_then == true then -- in this case, we're only using and_then to indicate that we want to run the task asyncly
       and_then = function() end
     elseif type(opts.and_then) == "table" then -- shorthand for and_then being another call to `run`, with and_then being opts of the second call, and the varargs being the and_then of the second call, and potentially further
-      and_then = function()
-        run(opts.and_then, table.unpack(varargs))
-      end
+     
     end
     local task =  hs.task.new(
       "/opt/homebrew/bin/bash",
