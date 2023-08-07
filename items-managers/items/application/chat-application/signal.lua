@@ -74,24 +74,12 @@ SignalItemSpecifier = {
       --- @param do_after function
       ["generate-backup"] = function(self, do_after)
         dothis.absolute_path.empty_dir(env.TMP_SIGNAL_EXPORT_PARENT)
-        run({
-          "sigtop",
-          "export-messages",
-          "-f", "json",
-          transf.string.single_quoted_escaped("$TMP_SIGNAL_EXPORT_PARENT")
-        },  function()
+        dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+          "sigtop export-messages -f json" ..
+          transf.string.double_quoted_escaped("$TMP_SIGNAL_EXPORT_PARENT"),  function()
           dothis.absolute_path.empty_dir(env.TMP_SIGNAL_EXPORT_MEDIA_PARENT)
-          run(
-            { 
-              args = {
-                "sigtop",
-                "export-attachments",
-                transf.string.single_quoted_escaped("$TMP_SIGNAL_EXPORT_MEDIA_PARENT")
-              }, 
-              and_then = do_after
-            }, 
-            true
-          )
+          dothis.string.env_bash_eval_async("sigtop export-attachments" ..
+          transf.string.double_quoted_escaped("$TMP_SIGNAL_EXPORT_MEDIA_PARENT"))
           end)
       end,
       --- @param self ItemSpecifier

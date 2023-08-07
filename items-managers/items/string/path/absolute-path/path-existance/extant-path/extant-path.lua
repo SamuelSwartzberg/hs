@@ -14,33 +14,6 @@ ExtantPathItemSpecifier = {
       end, 
     },
     doThisables = {
-      ["cd-and-run-this-task"] = function(self, task)
-        run(self:get("cd-and-this-task", task))
-      end,
-      ["move-safe-and-choose-action"] = function(self, target)
-        self:doThis("move-safe", target)
-        st(target):doThis("choose-action")
-      end,
-      ["move-force-and-choose-action"] = function(self, target)
-        self:doThis("move-force", target)
-        st(target):doThis("choose-action")
-      end,
-      ["move-up-and-choose-action"] = function(self)
-        self:doThis("move-safe-and-choose-action", self:get("parent-dir-path"))
-      end,
-      ["copy-safe-and-choose-action"] = function(self, target)
-        self:doThis("copy-safe", target)
-        st(target):doThis("choose-action")
-      end,
-      ["copy-force-and-choose-action"] = function(self, target)
-        self:doThis("copy-force", target)
-        st(target):doThis("choose-action")
-      end,
-      ["send-in-email-and-choose-action"] = function(self)
-        self:doThis("send-in-email", function(target)
-          st(target):doThis("choose-action")
-        end)
-      end,
       ["create-sibling-file-and-choose-action"] = function(self, filename)
         local path = self:get("parent-dir-path") .. "/" .. filename
         dothis.absolute_path.write_file_if_nonextant_path(path, "")

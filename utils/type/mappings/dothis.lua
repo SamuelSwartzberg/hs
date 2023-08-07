@@ -16,7 +16,7 @@ dothis = {
       dothis.string.env_bash_eval("upkg " .. mgr .. " link " .. transf.string.single_quoted_escaped(pkg))
     end,
     do_backup_and_commit = function(mgr, action, msg)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped("upkg " .. mgr .. " " .. action, function()
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("upkg " .. mgr .. " " .. action, function()
         local message = msg or action
         
         if mgr then
@@ -104,7 +104,7 @@ dothis = {
         )
       end
 
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
         get.string_or_number_array.string_by_joined(command, " "), 
         do_after)
     end,
@@ -133,7 +133,7 @@ dothis = {
         transf.string.single_quoted_escaped(temp_path)
         "-o" ..
         transf.string.single_quoted_escaped(target)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(cmd, function ()
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(cmd, function ()
         dothis.absolute_path.delete(temp_path)
         if do_after then
           do_after(target)
@@ -147,12 +147,12 @@ dothis = {
       dothis.alphanum_minus_underscore.set_pass_json(uuid, type, data)
     end,
     edit_contact = function(uuid, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped("khard edit " .. uuid, do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("khard edit " .. uuid, do_after)
     end,
   },
   pass_item_name = {
     replace = function(name, type, data)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped("pass rm " .. type .. "/" .. name, function()
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("pass rm " .. type .. "/" .. name, function()
         dothis.alphanum_minus_underscore.add_pass_item_name(name, type, data)
       end)
     end,
@@ -314,7 +314,7 @@ dothis = {
         transf.string.url_array(str)
       )
     end,
-    raw_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn = function(str, fn)
+    raw_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn = function(str, fn)
       local task = hs.task.new(
         "/opt/homebrew/bin/bash",
         function (...) fn(transf.number_and_two_anys.any_or_any_and_number_by_zero(...)) end,
@@ -325,7 +325,7 @@ dothis = {
       task:start()
       return task
     end,
-    env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn = function(str, fn)
+    env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn = function(str, fn)
       local task = hs.task.new(
         "/opt/homebrew/bin/bash",
         function (...) fn(transf.number_and_two_anys.any_or_any_and_number_by_zero(...)) end,
@@ -354,18 +354,109 @@ dothis = {
         )
       )
     end,
-    env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn_by_stripped = function(str, fn)
-      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn(
+    env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn_by_stripped = function(str, fn)
+      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn(
         str,
         get.n_any_arg_fn.n_t_arg_fn_w_n_any_arg_n_t_ret_fn(fn, transf.string_and_n_anys.string_and_n_anys_by_stripped)
       )
     end,
-    env_bash_eval_w_string_or_nil_by_stripped = function(str, fn)
-      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_ret_fn_by_stripped(
+    env_bash_eval_w_string_or_nil_arg_fn_by_stripped = function(str, fn)
+      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn_by_stripped(
         str,
         get.n_any_arg_fn.n_t_arg_fn_w_n_any_arg_n_t_ret_fn(fn, transf.string_and_number_or_nil.string_or_nil_by_number)
       )
-    end
+    end,
+    env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped = function(str, succfn, failfn)
+      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn_by_stripped(
+        str,
+        function(res, code)
+          if code then
+            failfn("Exit code " .. code .. " for command " .. str ". Stderr:\n\n" .. res)
+          else
+            succfn(res)
+          end
+        end
+      )
+    end,
+    env_bash_eval_w_string_or_nil_arg_fn_by_stripped_noempty = function(str,fn)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+        str,
+        function(str_or_nil)
+          if str_or_nil == "" then str_or_nil = nil end
+          fn(str_or_nil)
+        end
+      )
+    end,
+    env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped_noempty = function(str, succfn, failfn)
+      dothis.string.env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped(
+        str,
+        function(str)
+          if str == "" then failfn("Empty string for command " .. str) else succfn(str) end
+        end,
+        failfn
+      )
+    end,
+    env_bash_eval_w_not_userdata_or_function_or_nil_arg_fn_by_parsed_json = function(str, fn)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped_noempty(
+        str,
+        function(str_or_nil)
+          str_or_nil = transf.fn.rt_or_nil_fn_by_pcall(transf.json_string.not_userdata_or_function)(str_or_nil)
+          fn(str_or_nil)
+        end
+      )
+    end,
+    env_bash_eval_w_not_userdata_or_function_arg_fn_string_arg_fn_by_parsed_json = function(str, succfn, failfn)
+      dothis.string.env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped_noempty(
+        str,
+        function(str)
+          local succ, res = pcall(transf.json_string.not_userdata_or_function, str)
+          if succ then
+            succfn(res)
+          else
+            failfn(res)
+          end
+        end,
+        failfn
+      )
+    end,
+    env_bash_eval_w_table_or_nil_arg_fn_by_parsed_json = function(str, fn)
+      dothis.string.env_bash_eval_w_not_userdata_or_function_or_nil_arg_fn_by_parsed_json(
+        str,
+        function(arg)
+          if not is.any.table(arg) then arg = nil end
+          fn(arg)
+        end
+      )
+    end,
+    env_bash_eval_w_table_arg_fn_string_arg_fn = function(str, succfn, failfn)
+      dothis.string.env_bash_eval_w_not_userdata_or_function_arg_fn_string_arg_fn_by_parsed_json(
+        str,
+        function(arg)
+          if not is.any.table(arg) then failfn("Not a table: " .. arg) else succfn(arg) end
+        end,
+        failfn
+      )
+    end,
+    env_bash_eval_w_table_or_nil_arg_fn_by_parsed_json_nil_error_key = function(str, fn)
+      dothis.string.env_bash_eval_w_table_or_nil_arg_fn_by_parsed_json(
+        str,
+        function(arg)
+          if arg.error then arg = nil end
+          fn(arg)
+        end
+      )
+    end,
+    env_bash_eval_w_table_arg_fn_string_arg_fn_fail_error_key = function(str, succfn, failfn)
+      dothis.string.env_bash_eval_w_table_arg_fn_string_arg_fn(
+        str,
+        function(arg)
+          if arg.error then failfn(arg.error) else succfn(arg) end
+        end,
+        failfn
+      )
+    end,
+   
+
 
   },
   url_or_local_path = {
@@ -1032,14 +1123,14 @@ dothis = {
       )
     end,
     send = function(path, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
         "msmtp -t <" .. transf.string.single_quoted_escaped(path),
         function(res)
           if not res then
             dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.contents(path))
             dothis.absolute_path.delete(path)
           else
-            dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+            dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
               "cat" ..
               transf.string.single_quoted_escaped(path) .. "| msed" ..
               transf.string.single_quoted_escaped("/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time())) ..
@@ -1077,11 +1168,11 @@ dothis = {
       dothis.email_specifier.edit_then_send(transf.email_file.forward_email_specifier(path), do_after)
     end,
     move = function(source, target)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
         "mdeliver" .. transf.string.single_quoted_escaped(target) ..
         "<" .. transf.string.single_quoted_escaped(source),
         function()
-          dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+          dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
             "minc" .. transf.string.single_quoted_escaped(target), -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
             function ()
               dothis.string.env_bash_eval_async(
@@ -1166,7 +1257,7 @@ dothis = {
   },
   sqlite_file = {
     write_to_csv = function(sqlite_file, query, output_path, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
         "sqlite3" ..
         transf.string.single_quoted_escaped(sqlite_file) ..
         "-csv" ..
@@ -1517,13 +1608,13 @@ dothis = {
   },
   firefox = {
     dump_state = function(do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
     end
 
   },
   newpipe = {
     extract_backup = function(do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
     end
   },
   omegat = {
@@ -2542,7 +2633,7 @@ dothis = {
       dothis.local_absolute_path.start_recording_to(transf.string.in_cache_dir(os.time(), "recording"), do_after)
     end,
     sox_rec_stop = function(do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_by_stripped("killall rec", do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("killall rec", do_after)
     end,
     sox_rec_toggle_cache = function(do_after)
       if transf["nil"].sox_is_recording() then

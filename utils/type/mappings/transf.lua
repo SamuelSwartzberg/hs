@@ -62,7 +62,7 @@ transf = {
       return string.char(get.string_or_number.number_or_nil(num, 16))
     end,
   },
-  unicode_codepoint_string = { -- U+X...
+  unicode_codepoint_string = { -- U+X...`
     number = function(codepoint)
       return get.nonindicated_number_string.number_or_nil(transf.unicode_codepoint_string.nonindicated_hex_number_string(codepoint), 16)
     end,
@@ -70,7 +70,7 @@ transf = {
       return codepoint:sub(3)
     end,
     unicode_prop_table = function(codepoint)
-      return get.fn.rt_or_nil_by_memoized(runJSON)(
+      return get.fn.rt_or_nil_by_memoized(transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
           codepoint
@@ -80,7 +80,7 @@ transf = {
   },
   indicated_utf8_hex_string = {
     unicode_prop_table = function(str)
-      return get.fn.rt_or_nil_by_memoized(runJSON)(
+      return get.fn.rt_or_nil_by_memoized(transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
           str
@@ -491,7 +491,7 @@ transf = {
       )
     end,
     unicode_prop_table_array_from_unicode_codepoint_array = function(arr)
-      return get.fn.rt_or_nil_by_memoized(runJSON)(
+      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
           get.string_or_number_array.string_by_joined(
@@ -508,7 +508,7 @@ transf = {
       )
     end,
     unicode_prop_table_array_from_utf8_array = function(arr)
-      return get.fn.rt_or_nil_by_memoized(runJSON)(
+      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.string.single_quoted_escaped(
           get.string_or_number_array.string_by_joined(
@@ -646,7 +646,7 @@ transf = {
       return string.format("%%%02X", string.byte(char))
     end,
     unicode_prop_table = function(char)
-      return get.fn.rt_or_nil_by_memoized(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(char))[1]
+      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(char))[1]
     end
   },
   leaf = {
@@ -1447,7 +1447,7 @@ transf = {
       return transf.header_string.dict(transf.email_file.all_useful_headers_raw(path))
     end,
     rendered_body = function(path)
-      return get.fn.rt_or_nil_by_memoized(run)(
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
         "mshow -R" .. transf.string.single_quoted_escaped(path)
       )
     end,
@@ -1486,7 +1486,7 @@ transf = {
       return transf.mime_parts_raw.attachments(transf.email_file.mime_parts_raw(path))
     end,
     summary = function(path)
-      return get.fn.rt_or_nil_by_memoized(run)("mscan -f %D **%f** %200s" .. transf.string.single_quoted_escaped(path))
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.string.single_quoted_escaped(path))
     end,
     email_file_summary_key_value = function(path)
       return path, transf.email_file.summary(path)
@@ -1550,14 +1550,9 @@ transf = {
   },
   bib_file = {
     array_of_csl_tables = function(path)
-      return runJSON({
-        "citation-js",
-        "--input",
-        {
-          value = path,
-          type = "quoted"
-        },
-        "--output-language", "json"
+      return transf.string.table_or_err_by_evaled_env_bash_parsed_json({
+        "citation-js --input" .. transf.string.single_quoted_escaped(path) ..
+        "--output-language json"
       })
     end,
 
@@ -2688,7 +2683,7 @@ transf = {
   },
   uuid = {
     raw_contact = function(uuid)
-      return get.fn.rt_or_nil_by_memoized(run)( "khard show --format=yaml uid:" .. uuid, {catch = true} )
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)( "khard show --format=yaml uid:" .. uuid)
     end,
     contact_table = function(uuid)
       local raw_contact = transf.uuid.raw_contact(uuid)
@@ -3141,7 +3136,6 @@ transf = {
     consonants = function(str)
       error("todo")
     end,
-    string_by_evaled_bash = run,
     string_by_env_getter_comamnds_prepended = function(str)
       return string.format(
         "base64 -d <<< '%s' | /opt/homebrew/bin/bash -s",
@@ -3192,6 +3186,10 @@ transf = {
         return output, code -- stderr, exit code
       end
     end,
+    bool_by_evaled_env_bash_success = function(str)
+      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash(str)
+      return code == 0
+    end,
     string_or_string_and_8_bit_pos_int_by_evaled_env_bash_stripped = function(str)
       local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash(str)
       res = stringy.strip(res)
@@ -3229,6 +3227,36 @@ transf = {
         return res
       end
     end,
+    not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json = function(str)
+      local res = transf.string.string_or_err_by_evaled_env_bash_stripped_noempty(str)
+      return transf.json_string.not_userdata_or_function(res)
+    end,
+    table_or_err_by_evaled_env_bash_parsed_json = function(str)
+      local res = transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json(str)
+      if type(res) == "table" then
+        return res
+      else
+        error("Result for command " .. str .. " is not a table")
+      end
+    end,
+    table_or_nil_by_evaled_env_bash_parsed_json = function(str)
+      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
+        transf.string.table_or_err_by_evaled_env_bash_parsed_json
+      )(str)
+    end,
+    table_or_err_by_evaled_env_bash_parsed_json_err_error_key = function(str)
+      local res = transf.string.table_or_err_by_evaled_env_bash_parsed_json(str)
+      if res.error then
+        error("Error for command " .. str .. ":\n\n" .. transf.not_userdata_or_function.json_string_pretty(res.error))
+      else
+        return res
+      end
+    end,
+    table_or_nil_by_evaled_env_bash_parsed_json_err_error_key = function(str)
+      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
+        transf.string.table_or_err_by_evaled_env_bash_parsed_json_err_error_key
+      )(str)
+    end,
     escaped_lua_regex = function(str)
       return replace(str, to.regex.escaped_lua_regex)
     end,
@@ -3252,7 +3280,7 @@ transf = {
       return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.string.safe_filename(data)
     end,
     qr_utf8_image_bow = function(data)
-      return get.fn.rt_or_nil_by_memoized(run)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
     end,
     qr_utf8_image_wob = function(data)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_err_by_evaled_env_bash, refstore.params.memoize.opts.stringify_json)("qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data))
@@ -3360,7 +3388,7 @@ transf = {
       return '"' .. escaped  .. '"'
     end,
     unicode_prop_table_array = function(str)
-      return get.fn.rt_or_nil_by_memoized(runJSON)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(str))
+      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(str))
     end,
     unicode_prop_table_item_array = function(str)
       return transf.unicode_prop_table_array.unicode_prop_table_item_array(
@@ -3524,7 +3552,7 @@ transf = {
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified."})
     end,
     raw_contact = function(searchstr)
-      return get.fn.rt_or_nil_by_memoized(run)("khard show --format=yaml " .. searchstr, {catch = true} )
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("khard show --format=yaml " .. searchstr )
     end,
     contact_table = function(searchstr)
       local raw_contact = transf.string.raw_contact(searchstr)
@@ -3776,7 +3804,7 @@ transf = {
   
   ini_string = {
     assoc_arr = function(str)
-      return runJSON(
+      return transf.string.table_or_err_by_evaled_env_bash_parsed_json(
         "jc --ini <<EOF " .. str .. "EOF"
       )
     end,
@@ -3980,7 +4008,7 @@ transf = {
       end
     end,
     raw_syn_output = function(str)
-      return get.fn.rt_or_nil_by_memoized(run)( "syn -p" .. transf.string.single_quoted_escaped(str) )
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.string.single_quoted_escaped(str) )
     end,
     term_syn_specifier_dict = function(str)
       local synonym_parts = plstringx.split(transf.word.raw_syn_output(str), "\n\n")
@@ -4002,7 +4030,7 @@ transf = {
       return synonym_tables
     end,
     raw_av_output = function (str)
-      get.fn.rt_or_nil_by_memoized(run)(
+      get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
         "synonym" .. transf.string.single_quoted_escaped(str)
       )
     end,
@@ -5887,7 +5915,7 @@ transf = {
   },
   bib_string = {
     csl_table_array = function(str)
-      return runJSON("pandoc -f biblatex -t csljson" .. transf.string.here_string(str))
+      return transf.string.table_or_err_by_evaled_env_bash_parsed_json("pandoc -f biblatex -t csljson" .. transf.string.here_string(str))
     end,
     urls = function(str)
       return transf.csl_table_array.url_array(
@@ -6284,7 +6312,7 @@ transf = {
       return "https://web.archive.org/web/*/" .. transf.url.ensure_scheme(url)
     end,
     default_negotiation_url_contents = function(url)
-      return get.fn.rt_or_nil_by_memoized(run, refstore.params.memoize.opts.invalidate_1_day_fs, "run")
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped, refstore.params.memoize.opts.invalidate_1_day_fs, "run")
           "curl -L" .. transf.string.single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
@@ -6580,7 +6608,7 @@ transf = {
       else
         return any
       end
-    end,
+    end
   },
   item_chooser_item_specifier = {
     truncated_text_item_chooser_item_specifier = function(item_chooser_item_specifier)
@@ -6872,7 +6900,7 @@ transf = {
   boolean = {
     negated = function(boolean)
       return not boolean
-    end,
+    end
   },
   ["nil"] = {
     ["true"] = function()
@@ -6936,8 +6964,7 @@ transf = {
       return transf.dir.children_filename_array("/Applications")
     end,
     sox_is_recording = function()
-      local succ, res = pcall(run, "pgrep -x rec")
-      return succ
+      return transf.string.bool_by_evaled_env_bash_success("pgrep -x rec")
     end,
     pandoc_full_md_extension_set = function()
       return transf.array_value_dict.array_by_flatten(
@@ -6974,7 +7001,7 @@ transf = {
       return stringy.startswith(transf["nil"].mullvad_status_string(),"Connected")
     end,
     mullvad_relay_list_string = function()
-      return get.fn.rt_or_nil_by_memoized(run)("mullvad relay list")
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("mullvad relay list")
     end,
     mullvad_relay_identifier_array = function()
       return 
@@ -7003,7 +7030,7 @@ transf = {
       )
     end,
     string_by_khard_list_output = function()
-      return get.fn.rt_or_nil_by_memoized(run)(
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
         "khard list --parsable"
       )
     end,
@@ -7935,6 +7962,31 @@ transf = {
       return function(...)
         local succ, res = pcall(fn, ...)
         return succ
+      end
+    end,
+  },
+  n_anys_or_err_ret_fn = {
+    n_anys_or_nil_ret_fn_by_pcall = function(fn)
+      return function(...)
+        local rets = {pcall(fn, ...)}
+        local succ = dothis.array.shift(rets)
+        if succ then
+          return table.unpack(rets)
+        else
+          return nil
+        end
+      end
+    end,
+  },
+  n_anys_or_nil_ret_fn = {
+    n_anys_or_err_ret_fn_by_pcall = function(fn)
+      return function(...)
+        local rets = {fn(...)}
+        if rets[1] == nil then
+          return error("Function returned nil.")
+        else
+          return table.unpack(rets)
+        end
       end
     end,
   },

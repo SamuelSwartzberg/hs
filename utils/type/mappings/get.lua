@@ -52,7 +52,7 @@ get = {
     semver_string_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
     absolute_path_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
-    boolean_array_installed = function(mgr, arg) return pcall(run, "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
+    boolean_array_installed = function(mgr, arg) return transf.string.bool_by_evaled_env_bash_success( "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
   },
   calendar_name = {
    
@@ -151,7 +151,7 @@ get = {
   },
   pass_item_name = {
     value = function(item, type)
-      return get.fn.rt_or_nil_by_memoized(run, refstore.params.memoize.opts.invalidate_1_day)("pass show " .. type .. "/" .. item)
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped, refstore.params.memoize.opts.invalidate_1_day)("pass show " .. type .. "/" .. item)
     end,
     path = function(item, type, ext)
       return env.PASSWORD_STORE_DIR .. "/" .. type .. "/" .. item .. "." .. (ext or "gpg")
@@ -160,7 +160,7 @@ get = {
       return is.absolute_path.extant_path(get.pass_item_name.path(item, type, ext))
     end,
     json = function(item, type)
-      return runJSON("pass show " .. type .. "/" .. item)
+      return transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json("pass show " .. type .. "/" .. item)
     end,
     contact_json = function(item, type)
       return get.pass_item_name.json(item, "contacts/" .. type)
@@ -270,8 +270,15 @@ get = {
       setmetatable(new, getmetatable(t)) -- I don't I currently have any metatables where data is stored and thus copy(getmetatable(t)) would be necessary, but this comment is here so that I remember to add it if I ever do
       return new
     end,
-    key_value_equals = function(t, key, value)
+    bool_by_key_equals_value = function(t, key, value)
       return t[key] == value
+    end,
+    vt_or_err = function(t, key)
+      if t[key] then
+        return t[key]
+      else
+        error("Table did not contain key " .. key)
+      end
     end,
     array_of_arrays_by_label_root_to_leaf = function(t, table_arg_bool_by_is_leaf_ret_fn, visited, path)
       visited = get.any.default_if_nil(visited, {})
@@ -1346,6 +1353,37 @@ get = {
       end
       return "---\n" .. final_metadata .. "\n---\n" .. final_contents
     end,
+    not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+      local tbl = transf.string.table_or_err_by_evaled_env_bash_parsed_json(str)
+      return get.table.vt_or_err(tbl, key)
+    end,
+    not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
+        get.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json_in_key
+      )(str, key)
+    end,
+    string_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+      local tbl = transf.string.table_or_err_by_evaled_env_bash_parsed_json(str)
+      local res = get.table.vt_or_err(tbl, key)
+      if type(res) == "string" then
+        return res
+      else
+        error("Not a string.")
+      end
+    end,
+    string_or_nil_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
+        get.string.string_or_err_by_evaled_env_bash_parsed_json_in_key
+      )(str, key)
+    end,
+    string_or_err_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
+      return stringy.strip(get.string.string_or_err_by_evaled_env_bash_parsed_json_in_key(str, key))
+    end,
+    string_or_nil_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
+      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
+        get.string.string_or_err_by_evaled_env_bash_parsed_json_in_key_stripped
+      )(str, key)
+    end,
 
   },
   nonindicated_number_string_array = {
@@ -1974,7 +2012,7 @@ get = {
   },
   shellscript_file = {
     lint_table = function(path, severity)
-      return runJSON("shellcheck --format=json --severity=" .. severity .. transf.string.single_quoted_escaped(path))
+      return transf.string.table_or_err_by_evaled_env_bash_parsed_json("shellcheck --format=json --severity=" .. severity .. transf.string.single_quoted_escaped(path))
     end,
     lint_gcc_string = function(path, severity)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("shellcheck --format=gcc --severity=" .. severity .. transf.string.single_quoted_escaped(path))
@@ -2487,17 +2525,17 @@ get = {
   },
   html_string = {
     html_query_selector_all = function(str, selector)
-      return get.fn.rt_or_nil_by_memoized(run)(
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
         "htmlq" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
     text_query_selector_all = function(str, selector)
-      return get.fn.rt_or_nil_by_memoized(run)(
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
         "htmlq --text" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
     attribute_query_selector_all = function(str, selector, attribute)
-      return get.fn.rt_or_nil_by_memoized(run)(
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
         "htmlq --attribute " .. transf.string.single_quoted_escaped(attribute) .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
@@ -2747,20 +2785,10 @@ get = {
   },
   ipc_socket_id = {
     response_table_or_nil = function(ipc_socket_id, request_table)
-        
-      local succ, res = pcall(runJSON, {
-        args = 
-          "echo '" .. json.encode(request_table) .. "' | /opt/homebrew/bin/socat UNIX-CONNECT:" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " STDIO"
-        ,
-        key_that_contains_payload = "data"
-      })
-
-      if succ then
-        return res
-      else
-        return nil
-      end
-
+      return get.string.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key(
+        "echo '" .. json.encode(request_table) .. "' | /opt/homebrew/bin/socat UNIX-CONNECT:" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " STDIO",
+        "data"
+      )
     end
   },
   mpv_ipc_socket_id = {
@@ -2784,7 +2812,7 @@ get = {
     find_created_item_specifier_with_creation_specifier = function(arr, creation_specifier)
       return hs.fnutils.find(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.table.key_value_equals, {a_use, "creation_specifier", creation_specifier})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.table.bool_by_key_equals_value, {a_use, "creation_specifier", creation_specifier})
       )
     end,
   },

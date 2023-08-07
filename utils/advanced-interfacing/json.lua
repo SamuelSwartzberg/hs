@@ -25,7 +25,6 @@
 --- @field oauth2_authorization_url? string The URL to send the OAuth2 authorization request to. If not specified, it will default to oauth2_url. If nil but required, tries to fetch it from a stored default for the api.
 --- @field non_json_response? boolean Indicates whether the response is not JSON. Some REST apis may return non-JSON responses in certain cases, this is used to handle those cases. Defaults to false. If using this, oauth2 token refresh with a refresh token will not work.
 --- @field accept_json_different_header? string Some data may be sent as JSON but not have the content type "application/json", for example vnd.citationstyles.csl+json. This is used to handle those cases.
---- @field run_json_opts? run_first_arg args to pass through to runJSON. Mainly used for testing.
 
 --- @param specifier? RESTApiSpecifier
 --- @param do_after? fun(result: table): nil Function to execute after the request is completed. This is used to make the request synchronous or asynchronous.
@@ -344,16 +343,17 @@ function rest(specifier, do_after, have_tried_access_refresh)
     )
   
   end
-  local args = {
-    args = curl_command,
-  }
-  if specifier.run_json_opts then
-    args = transf.two_table_or_nils.table_nonrecursive(args, specifier.run_json_opts)
-  end
+  local cmd = get.string_or_number_array.string_by_joined(curl_command, " ")
   if not specifier.non_json_response then
+    if do_after then
+      specifier.json_catch = catch_auth_error
+      return runJSON(cmd, do_after)
+    else 
+      return dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(cmd)
+    end
     args.json_catch = catch_auth_error
-    return runJSON(args, do_after)
+    return runJSON(cmd, do_after)
   else 
-    return dothis.string.env_bash_eval_w_string_or_nil_by_stripped(args, do_after)
+    return dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(cmd, do_after)
   end
 end

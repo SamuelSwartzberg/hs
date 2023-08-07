@@ -60,7 +60,7 @@ URLItemSpecifier = {
         khal_config:doThis("append-file-contents", "\n\n" .. khal_data)
         vdirsyncer_config:doThis("append-file-contents", "\n\n" .. transf.vdirsyncer_pair_specifier.ini_string(vdirsyncer_pair_specifier))
         dothis.absolute_path.create_dir(path)
-        dothis.string.env_bash_eval_w_string_or_nil_by_stripped(
+        dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
           "vdirsyncer discover" ..
           transf.string.single_quoted_escaped(vdirsyncer_pair_specifier.name),
           get.fn.first_n_args_bound_fn(

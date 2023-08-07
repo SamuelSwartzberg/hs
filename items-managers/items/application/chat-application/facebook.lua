@@ -69,15 +69,8 @@ FacebookItemSpecifier = {
       ["generate-backup"] = function(self, do_after) 
         doWhenReady(
           function()
-            run({
-              args = {
-                "open",
-                "-a",
-                "Firefox",
-                transf.string.single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings")
-              },
-              delay = 1,
-            }, function()
+            dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -a Firefox" .. 
+            transf.string.single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings") " && sleep 1", function()
               hs.eventtap.keyStroke({"cmd"}, "0") -- reset zoom
               local ff_window = CreateRunningApplicationItem(hs.application.get("Firefox")):get("focused-window-item")
               ff_window:doThis("set-grid", {x = 2, y = 1})

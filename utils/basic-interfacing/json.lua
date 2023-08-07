@@ -9,7 +9,7 @@ function runJSON(opts, and_then)
       args = opts
     }
   end
-  if not and_then then -- since we're populating and_then when calling run(), we can't use it as a heuristic for if we're async or not, so we need to communicate that via force_sync
+  if not and_then then -- since we're populating and_then when calling run (), we can't use it as a heuristic for if we're async or not, so we need to communicate that via force_sync
     opts.force_sync = true
   end
 
@@ -39,20 +39,10 @@ function runJSON(opts, and_then)
         res.error
       ))
     end
-    if opts.key_that_contains_payload  then 
-      if res[opts.key_that_contains_payload] then
-        res = res[opts.key_that_contains_payload]
-      else
-        error(("Opts say that the payload is in the key %s, but response contained no such key.\nResponse:\n\n%s"):format(
-          opts.key_that_contains_payload,
-          json.encode(res)
-        ))
-      end
-    end
     return res
   end
 
-  return run(
+  return dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
     opts,
     function(std_out)
       local succ, res = pcall(handleOutputfunction, std_out)

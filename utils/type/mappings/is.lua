@@ -218,7 +218,7 @@ is = {
   },
   labelled_remote_absolute_path = {
     labelled_remote_extant_path = function(path)
-      return pcall(run, "rclone ls " .. transf.string.single_quoted_escaped(path))
+      return transf.string.bool_by_evaled_env_bash_success("rclone ls " .. transf.string.single_quoted_escaped(path))
     end,
   },
   remote_extant_path = {
@@ -231,10 +231,7 @@ is = {
   },
   labelled_remote_extant_path = {
     labelled_remote_dir = function(path)
-      return pcall(runJSON,{
-        args = {"rclone", "lsjson", "--stat", transf.string.single_quoted_escaped(path)},
-        key_that_contains_payload = "IsDir"
-      })
+      return get.string.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key("rclone lsjson --stat" .. transf.string.single_quoted_escaped(path))
     end,
     labelled_remote_file = function(path)
       return not is.labelled_remote_extant_path.labelled_remote_dir(path)
