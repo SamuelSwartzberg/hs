@@ -3,21 +3,6 @@ URLItemSpecifier = {
   type = "url",
   properties = {
     getables = {
-      ["parsed-url"] = function(self)
-        return get.fn.rt_or_nil_by_memoized(parseGuessScheme)(self:get("c"))
-      end,
-      ["is-url-by-contenttype"] = function(self)
-        return self:get("url-path") and is.path.has_extension(self:get("url-path"))
-      end,
-      ["is-url-by-host"] = function(self)
-        return self:get("url-host")
-      end,
-      ["is-url-by-path"] = function(self)
-        return self:get("url-path")
-      end,
-      ["is-url-by-scheme"] = function(self)
-        return self:get("url-scheme")
-      end,
       ["html-d"] = function (self)
         return self:get("text-by-selector", "meta[name=d]")
       end,

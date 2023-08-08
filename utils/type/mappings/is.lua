@@ -172,7 +172,7 @@ is = {
     end,
   },
   path = {
-    has_extension = function(path)
+    extension_path = function(path)
       return transf.path.extension(path) ~= ""
     end,
     remote_path = function(path)
@@ -565,6 +565,18 @@ is = {
     owner_item_url = function(url)
       return #transf.owner_item_url.owner_item(url) == 2
     end,
+    extension_url = function(url)
+      return is.path.extension_path(transf.path_url.path(url))
+    end,
+    danbooru_style_post_url = function(url)
+      return eutf8.find(transf.path_url.path(url), "^/posts/%d+/?$") ~= nil
+    end,
+    yandere_style_post_url = function(url)
+      return eutf8.find(transf.path_url.path(url), "^/post/show/%d+/?$") ~= nil
+    end,
+  },
+  extension_url = {
+
   },
   authority_url = {
     host_url = function(url)
@@ -572,7 +584,23 @@ is = {
     end,
   },
   host_url = {
-
+    booru_url = function(url)
+      return get.array.bool_by_contains(mt._list.url.booru, transf.host_url.host(url))
+    end,
+    youtube_url = function(url)
+      return transf.host_url.host(url) == "youtube.com"
+    end,
+  },
+  booru_url = {
+    danbooru_url = function(url)
+      return transf.url.host(url) == "danbooru.donmai.us"
+    end,
+    gelbooru_url = function(url)
+      return transf.url.host(url) == "gelbooru.com"
+    end,
+    safebooru_url = function(url)
+      return transf.url.host(url) == "safebooru.org"
+    end,
   },
   data_url = {
     base64_data_url = function(url)
