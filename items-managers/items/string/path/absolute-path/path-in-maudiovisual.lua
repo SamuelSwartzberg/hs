@@ -26,6 +26,17 @@ PathInMaudiovisualItemSpecifier = {
           :get("media-urls-string-item-array")
           :doThis("to-stream", specifier)
       end,
+      ["lines-as-stream-queue"] = function(m3ufile)
+        ar(transf.plaintext_file.line_array(m3ufile:get("c"))):doThis("for-all", function(url)
+            if url == "" then return end
+            System:get("manager", "stream")
+              :doThis(
+                "create", 
+                { initial_data = { urls = ar({st(url)})}}
+              )
+        end)
+        m3ufile:doThis("empty-file")
+      end,
     }
   },
   

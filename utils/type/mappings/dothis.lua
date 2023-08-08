@@ -641,6 +641,10 @@ dothis = {
       dothis.absolute_path.create_parent_dir(path)
       dothis.file.write_file(path, contents)
     end,
+    empty_write_file = function(path)
+      dothis.absolute_path.create_parent_dir(path)
+      dothis.file.empty_write_file(path)
+    end,
     append_or_write_file = function(path, contents)
       dothis.absolute_path.create_parent_dir(path)
       dothis.file.append_or_write_file(path, contents)
@@ -900,7 +904,7 @@ dothis = {
       if is.extant_path.dir(path) then
         dothis.dir.empty_dir(path)
       elseif is.extant_path.file(path) then
-        dothis.file.empty_file(path)
+        dothis.file.empty_write_file(path)
       end
     end,
     delete = function(path)
@@ -917,7 +921,7 @@ dothis = {
     end,
     empty_file = function(path)
       if is.extant_path.file(path) then
-        dothis.file.empty_file(path)
+        dothis.file.empty_write_file(path)
       end
     end,
     delete_file = function(path)
@@ -1044,7 +1048,7 @@ dothis = {
     write_file_if_file = function(path, contents)
       dothis.file.write_file(path, contents) -- if the file already exists, replacing is the same as writing
     end,
-    empty_file = function(path)
+    empty_write_file = function(path)
       dothis.file.write_file(path, "")
     end,
     delete_file = function(path)
@@ -1102,6 +1106,15 @@ dothis = {
     append_line_and_commit = function(path, line)
       dothis.plaintext_file.append_line(path, line)
       dothis.in_git_dir.commit_self(path, "Added line " .. line .. " to " .. get.absolute_path.relative_path_from(path, transf.in_git_dir.git_root_dir(path)))
+    end,
+    append_line_and_commit_by_prompted = function(path)
+      dothis.plaintext_file.append_line_and_commit(
+        path,
+        get.string.string_by_prompted_once_from_default(
+          "",
+          "Enter line to add to " .. path
+        )
+      )
     end,
     write_lines = function(path, lines)
       dothis.absolute_path.write_file_if_file(path, get.string_or_number_array.string_by_joined(lines, "\n"))
@@ -1271,19 +1284,19 @@ dothis = {
     end,
     copy_children_absolute_path_array_into_absolute_path = function(path, tgt)
       dothis.extant_path_array.copy_into_absolute_path(
-        transf.dir.children_absolute_path_array(path),
+        transf.dir.absolute_path_array_by_children(path),
         tgt
       )
     end,
     move_children_absolute_path_array_into_absolute_path = function(path, tgt)
       dothis.extant_path_array.move_into_absolute_path(
-        transf.dir.children_absolute_path_array(path),
+        transf.dir.absolute_path_array_by_children(path),
         tgt
       )
     end,
     zip_children_absolute_path_array_to_absolute_path = function(path, tgt)
       dothis.extant_path_array.zip_to_absolute_path(
-        transf.dir.children_absolute_path_array(path),
+        transf.dir.absolute_path_array_by_children(path),
         tgt
       )
     end,

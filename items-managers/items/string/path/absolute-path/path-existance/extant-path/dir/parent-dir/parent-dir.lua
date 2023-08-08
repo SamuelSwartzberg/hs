@@ -5,7 +5,7 @@ ParentDirItemSpecifier = {
 
     getables = {
       ["children"] = function(self)
-        return transf.dir.children_absolute_path_array(self:get("c"))
+        return transf.dir.absolute_path_array_by_children(self:get("c"))
       end,
       ["child-string-array"] = function(self) 
         return ar(self:get("children")) 

@@ -215,6 +215,11 @@ act = {
       dothis.local_path.open_app(path, "LibreOffice", true)
     end,
   },
+  local_dir = {
+    git_init = function(path)
+      dothis.local_extant_path.do_in_path(path, "git init")
+    end,
+  },
   env_yaml_file_container = {
     write_env_and_check = function(env_yaml_file_container)
       dothis.env_string.write_env_and_check(

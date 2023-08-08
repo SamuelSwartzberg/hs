@@ -871,7 +871,7 @@ transf = {
   },
   extant_path = {
     sibling_absolute_path_array = function(path)
-      return transf.dir.children_absolute_path_array(transf.path.parent_path(path))
+      return transf.dir.absolute_path_array_by_children(transf.path.parent_path(path))
     end,
     descendants_absolute_path_array = function(path)
       return get.extant_path.absolute_path_array(
@@ -1005,7 +1005,7 @@ transf = {
     children_absolute_path_array = function(path_array)
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
         path_array,
-        transf.dir.children_absolute_path_array
+        transf.dir.absolute_path_array_by_children
       )
     end,
   },
@@ -1088,8 +1088,32 @@ transf = {
     end,
   },
   dir = {
-    children_absolute_path_array = function(dir)
+    absolute_path_array_by_children = function(dir)
       return get.extant_path.absolute_path_array(dir)
+    end,
+    absolute_path_array_by_children_or_self = function(dir)
+      return transf.array_and_any.array(
+        transf.dir.absolute_path_array_by_children(dir),
+        dir
+      )
+    end,
+    file_array_by_children = function(dir)
+      return get.extant_path.absolute_path_array(dir, {include_dirs = false})
+    end,
+    absolute_path_array_by_file_children_or_self = function(dir)
+      return transf.array_and_any.array(
+        transf.dir.file_array_by_children(dir),
+        dir
+      )
+    end,
+    dir_array_by_children = function(dir)
+      return get.extant_path.absolute_path_array(dir, {include_files = false})
+    end,
+    dir_array_by_children_or_self = function(dir)
+      return transf.array_and_any.array(
+        transf.dir.dir_array_by_children(dir),
+        dir
+      )
     end,
     children_absolute_path_value_stateful_iter = function(dir)
       if is.path.remote_path(dir) then
@@ -1099,19 +1123,19 @@ transf = {
       end
     end,
     children_leaves_array = function(dir)
-      return transf.path_array.leaves_array(transf.dir.children_absolute_path_array(dir))
+      return transf.path_array.leaves_array(transf.dir.absolute_path_array_by_children(dir))
     end,
     children_filename_array = function(dir)
-      return transf.path_array.filenames_array(transf.dir.children_absolute_path_array(dir))
+      return transf.path_array.filenames_array(transf.dir.absolute_path_array_by_children(dir))
     end,
     children_extensions_array = function(dir)
-      return transf.path_array.extensions_array(transf.dir.children_absolute_path_array(dir))
+      return transf.path_array.extensions_array(transf.dir.absolute_path_array_by_children(dir))
     end,
     newest_child = function(dir)
-      return transf.extant_path_array.newest(transf.dir.children_absolute_path_array(dir))
+      return transf.extant_path_array.newest(transf.dir.absolute_path_array_by_children(dir))
     end,
     grandchildren_absolute_path_array = function(dir)
-      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.children_absolute_path_array(dir), transf.dir.children_absolute_path_array)
+      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_array_by_children(dir), transf.dir.absolute_path_array_by_children)
     end,
     git_root_dir_descendants = function(dir)
       return transf.dir_array.filter_git_root_dir_array(transf.extant_path.descendants_absolute_path_array(dir))
@@ -1132,6 +1156,12 @@ transf = {
       transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc(
         transf.dir.absolute_path_key_leaf_string_or_nested_value_dict(path)
       )
+    end,
+    string_by_ls = function(path)
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("ls -F -1" .. transf.string.single_quoted_escaped(path))
+    end,
+    string_by_tree = function(path)
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("tree -F --noreport" .. transf.string.single_quoted_escaped(path))
     end,
   },
   absolute_path_key_leaf_string_or_nested_value_dict = {
@@ -1165,7 +1195,7 @@ transf = {
 
   in_git_dir = {
     git_root_dir = function(path)
-      return get.extant_path.find_self_or_ancestor(
+      return get.extant_path.extant_path_by_self_or_ancestor_w_fn(
         path,
         is.dir.git_root_dir
       )
@@ -1245,7 +1275,7 @@ transf = {
       return transf.path.ending_with_slash(git_root_dir) .. ".git/hooks"
     end,
     hooks_absolute_path_array = function(git_root_dir)
-      return transf.dir.children_absolute_path_array(transf.git_root_dir.hooks_dir(git_root_dir))
+      return transf.dir.absolute_path_array_by_children(transf.git_root_dir.hooks_dir(git_root_dir))
     end,
   },
 
@@ -4702,9 +4732,6 @@ transf = {
     determined_assoc_table = function(t)
       return transf.word.determinant_metatable_creator_fn("assoc")(t)
     end,
-    indicated_prompt_table = function(t)
-      return transf.word.determinant_metatable_creator_fn("prompttbl")(t)
-    end,
     json_string_pretty = function(t)
       return hs.json.encode(t, true)
     end,
@@ -5280,7 +5307,7 @@ transf = {
   },
   filename_safe_indicated_citable_object_id = {
     local_csl_file = function(id)
-      return get.extant_path.find_descendant_with_leaf_ending(env.MCITATIONS, id)
+      return get.extant_path.absolute_path_by_descendant_with_leaf_ending(env.MCITATIONS, id)
     end,
     csl_table = function(id)
       return transf.json_file.not_userdata_or_function(
@@ -5288,10 +5315,10 @@ transf = {
       )
     end,
     local_citable_object_file = function(id)
-      return get.extant_path.find_descendant_with_leaf_ending(env.MPAPERS, id)
+      return get.extant_path.absolute_path_by_descendant_with_leaf_ending(env.MPAPERS, id)
     end,
     local_citable_object_notes_file = function(id)
-      return get.extant_path.find_descendant_with_leaf_ending(env.MPAPERNOTES, id)
+      return get.extant_path.absolute_path_by_descendant_with_leaf_ending(env.MPAPERNOTES, id)
     end,
   },
   citable_filename = {
@@ -5525,12 +5552,12 @@ transf = {
       return transf.path.ending_with_slash(dir) .. "tm"
     end,
     source_files = function(dir)
-      return transf.dir.children_absolute_path_array(
+      return transf.dir.absolute_path_array_by_children(
         transf.omegat_project_dir.source_dir(dir)
       )
     end,
     target_files = function(dir)
-      return transf.dir.children_absolute_path_array(
+      return transf.dir.absolute_path_array_by_children(
         transf.omegat_project_dir.target_dir(dir)
       )
     end,
@@ -5551,7 +5578,7 @@ transf = {
     end,
     target_file_num_chars_array = function(dir)
       return hs.fnutils.imap(
-        transf.dir.children_absolute_path_array(
+        transf.dir.absolute_path_array_by_children(
           transf.omegat_project_dir.target_txt_dir(dir)
         ),
         transf.plaintext_file.chars

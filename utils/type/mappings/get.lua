@@ -1747,7 +1747,7 @@ get = {
     
       return extant_paths
     end,
-    find_self_or_ancestor = function(path, fn)
+    extant_path_by_self_or_ancestor_w_fn = function(path, fn)
       local ancestor = path
       while ancestor ~= "/" or ancestor ~= "" do
         if fn(ancestor) then
@@ -1757,12 +1757,12 @@ get = {
         end
       end
     end,
-    find_ancestor = function(path, fn)
-      return get.extant_path.find_self_or_ancestor(transf.path.parent_path(path), fn)
+    extant_path_by_ancestor_w_fn = function(path, fn)
+      return get.extant_path.extant_path_by_self_or_ancestor_w_fn(transf.path.parent_path(path), fn)
     end,
     extant_path_by_self_or_ancestor_siblings_w_fn = function(path, fn)
-      return get.extant_path.find_self_or_ancestor(path, function(x)
-        return hs.fnutils.find(transf.dir.children_absolute_path_array(transf.path.parent_path(x)), fn)
+      return get.extant_path.extant_path_by_self_or_ancestor_w_fn(path, function(x)
+        return hs.fnutils.find(transf.dir.absolute_path_array_by_children(transf.path.parent_path(x)), fn)
       end)
     end,
     extant_path_by_self_or_ancestor_sibling_w_leaf = function(path, leaf)
@@ -1777,30 +1777,33 @@ get = {
         return get.dir.cmd_output_from_path(transf.path.parent_path(path), cmd)
       end
     end,
-    extant_path_by_descendant_w_fn = function(dir, cond)
-      return hs.fnutils.find(transf.extant_path.descendants_absolute_path_array(dir), cond)
+    extant_path_by_descendant_w_fn = function(path, cond)
+      return hs.fnutils.find(transf.extant_path.descendants_absolute_path_array(path), cond)
     end,
-    find_descendant_ending_with = function(dir, ending)
-      return get.path_array.find_ending_with(transf.extant_path.descendants_absolute_path_array(dir), ending)
+    find_descendant_ending_with = function(path, ending)
+      return get.path_array.find_ending_with(transf.extant_path.descendants_absolute_path_array(path), ending)
     end,
-    find_leaf_of_descendant = function(dir, filename)
-      return get.path_array.find_leaf(transf.extant_path.descendants_absolute_path_array(dir), filename)
+    find_leaf_of_descendant = function(path, filename)
+      return get.path_array.find_leaf(transf.extant_path.descendants_absolute_path_array(path), filename)
     end,
-    find_extension_of_descendant = function(dir, extension)
-      return get.path_array.find_extension(transf.extant_path.descendants_absolute_path_array(dir), extension)
+    bool_by_descendant_with_extnesion = function(path, extension)
+      return get.path_array.find_extension(transf.extant_path.descendants_absolute_path_array(path), extension)
     end,
-    find_descendant_with_leaf = function(dir, leaf)
-      return get.path_array.find_path_with_leaf(transf.extant_path.descendants_absolute_path_array(dir), leaf)
+    absolute_path_by_descendant_with_leaf = function(path, leaf)
+      return get.path_array.find_path_with_leaf(transf.extant_path.descendants_absolute_path_array(path), leaf)
     end,
-    find_descendant_with_extension = function(dir, extension)
-      return get.path_array.find_path_with_extension(transf.extant_path.descendants_absolute_path_array(dir), extension)
+    absolute_path_by_descendant_with_extension = function(path, extension)
+      return get.path_array.find_path_with_extension(transf.extant_path.descendants_absolute_path_array(path), extension)
     end,
-    find_descendant_with_leaf_ending = function(dir, leaf_ending)
-      return get.path_array.find_path_with_leaf_ending(transf.extant_path.descendants_absolute_path_array(dir), leaf_ending)
+    absolute_path_by_descendant_with_leaf_ending = function(path, leaf_ending)
+      return get.path_array.find_path_with_leaf_ending(transf.extant_path.descendants_absolute_path_array(path), leaf_ending)
     end,
-    find_descendant_with_filename = function(dir, filename)
-      return get.path_array.find_path_with_filename(transf.extant_path.descendants_absolute_path_array(dir), filename)
+    absolute_path_by_descendant_with_filename = function(path, filename)
+      return get.path_array.find_path_with_filename(transf.extant_path.descendants_absolute_path_array(path), filename)
     end,
+    bool_by_some_descendants_pass_w_fn = function(path, fn)
+      return get.array.bool_by_some_pass_w_fn(transf.extant_path.descendants_absolute_path_array(path), fn)
+    end
   },
   local_extant_path = {
     attr = function(path, attr)
@@ -1835,25 +1838,25 @@ get = {
   },
   dir = {
     extant_path_by_child_w_fn = function(dir, fn)
-      return hs.fnutils.find(transf.dir.children_absolute_path_array(dir), fn)
+      return hs.fnutils.find(transf.dir.absolute_path_array_by_children(dir), fn)
     end,
     find_child_ending_with = function(dir, ending)
-      return get.path_array.find_ending_with(transf.dir.children_absolute_path_array(dir), ending)
+      return get.path_array.find_ending_with(transf.dir.absolute_path_array_by_children(dir), ending)
     end,
     find_leaf_of_child = function(dir, filename)
-      return get.path_array.find_leaf(transf.dir.children_absolute_path_array(dir), filename)
+      return get.path_array.find_leaf(transf.dir.absolute_path_array_by_children(dir), filename)
     end,
     find_extension_of_child = function(dir, extension)
-      return get.path_array.find_extension(transf.dir.children_absolute_path_array(dir), extension)
+      return get.path_array.find_extension(transf.dir.absolute_path_array_by_children(dir), extension)
     end,
     find_child_with_leaf = function(dir, leaf)
-      return get.path_array.find_path_with_leaf(transf.dir.children_absolute_path_array(dir), leaf)
+      return get.path_array.find_path_with_leaf(transf.dir.absolute_path_array_by_children(dir), leaf)
     end,
     find_child_with_extension = function(dir, extension)
-      return get.path_array.find_path_with_extension(transf.dir.children_absolute_path_array(dir), extension)
+      return get.path_array.find_path_with_extension(transf.dir.absolute_path_array_by_children(dir), extension)
     end,
     find_child_with_leaf_ending = function(dir, leaf_ending)
-      return get.path_array.find_path_with_leaf_ending(transf.dir.children_absolute_path_array(dir), leaf_ending)
+      return get.path_array.find_path_with_leaf_ending(transf.dir.absolute_path_array_by_children(dir), leaf_ending)
     end,
     cmd_output_from_path = function(path, cmd)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd)

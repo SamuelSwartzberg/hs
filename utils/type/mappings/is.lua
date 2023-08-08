@@ -393,11 +393,14 @@ is = {
     nonempty_dir = function(path)
       return not is.dir.empty_dir(path)
     end,
+    logging_dir = function(path)
+      return stringy.endswith(transf.path.leaf(path), "_logs")
+    end,
   },
   nonempty_dir = {
     grandparent_dir = function (path)
       return get.array.bool_by_some_pass_w_fn(
-        transf.dir.children_absolute_path_array(path),
+        transf.dir.absolute_path_array_by_children(path),
         is.absolute_path.dir
       )
     end,
@@ -468,6 +471,27 @@ is = {
         mt._list.filetype["plaintext-dictionary"]
       )
     end,
+    plaintext_table_file = function(path)
+      get.path.is_standartized_extension_in(
+        path,
+        mt._list.filetype["plaintext-table"]
+      )
+    end,
+    m3u_file = function(path)
+      return get.path.is_extension(path, "m3u")
+    end,
+    gitignore_file = function(path)
+      return get.path.is_filename(path, ".gitignore")
+    end,
+    log_file = function(path)
+      return get.path.is_extension(path, "log")
+    end,
+    newsboat_urls_file = function(path)
+      return get.path.is_leaf(path, "urls")
+    end,
+    md_file = function(path)
+      return get.path.is_standartized_extension(path, "md")
+    end,
   },
   plaintext_dictionary_file = {
     yaml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "yaml"}),
@@ -508,7 +532,7 @@ is = {
       return stringy.startswith(str, "UC") and #str == 24
     end,
     pass_item_name = function(str)
-      return get.extant_path.find_descendant_with_filename(env.MPASS, str)
+      return get.extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
     end,
   },
   url = {
