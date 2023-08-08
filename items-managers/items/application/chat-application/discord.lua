@@ -13,7 +13,7 @@ DiscordItemSpecifier = {
         return chat_obj.messages
       end,
       ["find-messages-by-id"] = function(self, specifier)
-        return get.id_assoc_arr_array.id_assoc_arr_by_first_match_w_id_assoc_arr(self:get("raw-messages", specifier.chat_obj), specifier)
+        return get.id_assoc_array.id_assoc_by_first_match_w_id_assoc(self:get("raw-messages", specifier.chat_obj), specifier)
       end,
       ["msg-timestamp"] = function(self, msg)
         return date.diff(msg.timestamp, date.epoch()):spanseconds()

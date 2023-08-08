@@ -55,10 +55,10 @@ act = {
       act.khal.add_event_interactive(event_table)
     end,
     add_event_from_async = function(event_table)
-      dothis.event_table.add_event_from(event_table, true)
+      dothis.event_table.add_event_from(event_table, function() end)
     end,
     add_event_interactive_async = function(event_table)
-      dothis.event_table.add_event_interactive(event_table, true)
+      dothis.event_table.add_event_interactive(event_table, function() end)
     end,
   },
   url = {
@@ -214,5 +214,34 @@ act = {
     open_libreoffice_async = function(path)
       dothis.local_path.open_app(path, "LibreOffice", true)
     end,
-  }
+  },
+  env_yaml_file_container = {
+    write_env_and_check = function(env_yaml_file_container)
+      dothis.env_string.write_env_and_check(
+        transf.env_yaml_file_container.env_string(env_yaml_file_container)
+      )
+    end,
+  },
+  indicated_citable_object_id = {
+    edit_local_csl_file = function(indicated_citable_object_id)
+      dothis.local_path.open_app(
+        transf.indicated_citable_object_id.local_csl_file_path(indicated_citable_object_id),
+        env.GUI_EDITOR
+      )
+    end,
+    open_local_citable_object_file = function(indicated_citable_object_id)
+      dothis.local_path.open(
+        transf.indicated_citable_object_id.local_citable_object_file_path(indicated_citable_object_id)
+      )
+    end,
+
+  },
+  login_pass_item_name = {
+    fill = function(name)
+      dothis.string_array.fill_with({
+        transf.pass_item_name.username_or_default(name),
+        transf.pass_item_name.password(name),
+      })
+    end,
+  },
 }

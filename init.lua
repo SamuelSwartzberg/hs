@@ -21,8 +21,8 @@ require("utils")
 
 a_use = math.random(999999999) + 1000
 
-comp = transf.dir.plaintext_dictonary_read_assoc_arr(env.MCOMPOSITE)
-fstblmap = transf.dir.plaintext_dictonary_read_assoc_arr(env.MDICTIONARIES .. "/mappings")
+comp = transf.dir.plaintext_dictonary_read_assoc(env.MCOMPOSITE)
+fstblmap = transf.dir.plaintext_dictonary_read_assoc(env.MDICTIONARIES .. "/mappings")
 
 require("items-managers")
 
@@ -402,7 +402,7 @@ System:get("manager", "timer"):doThis("create-all", {
   },
   {
     fn = function()
-      dothis.env_yaml_file_container.write_env_and_check(env.ENVFILE)
+      act.env_yaml_file_container.write_env_and_check(env.ENVFILE)
       env = transf.string.string_or_nil_by_evaled_env_bash_stripped("env | jc --ini")
     end,
     interval = "*/5 * * * *",

@@ -104,9 +104,16 @@ dothis = {
         )
       end
 
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-        get.string_or_number_array.string_by_joined(command, " "), 
-        do_after)
+      if do_after then
+        dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+          get.string_or_number_array.string_by_joined(command, " "), 
+          do_after
+        )
+      else
+        dothis.string.env_bash_eval_sync(
+          get.string_or_number_array.string_by_joined(command, " ")
+        )
+      end
     end,
     add_event_interactive = function(event_table, do_after)
       event_table = event_table or {}
@@ -161,14 +168,6 @@ dothis = {
     end,
     remove = function(name, type)
       dothis.string.env_bash_eval("pass rm " .. type .. "/" .. name)
-    end,
-  },
-  login_pass_item_name = {
-    fill = function(name)
-      dothis.string_array.fill_with({
-        transf.pass_item_name.username_or_default(name),
-        transf.pass_item_name.password(name),
-      })
     end,
   },
   alphanum_minus_underscore = {
@@ -486,10 +485,10 @@ dothis = {
         get.relative_path_dict.absolute_path_dict(relative_path_dict, path, extension)
       )
     end,
-    write_dynamic_path_dict = function(path, assoc_arr, extension)
+    write_dynamic_path_dict = function(path, assoc, extension)
       dothis.local_path.write_relative_path_dict(
         transf.table.relative_path_dict(path), 
-        assoc_arr, 
+        assoc, 
         extension
       )
     end,
@@ -1451,9 +1450,9 @@ dothis = {
     end
   },
   logging_dir = {
-    log_ymd_nested_key_array_of_arrays_value_assoc_arr = function(path, ymd_nested_key_array_of_arrays_value_assoc_arr)
-      local abs_path_dict = get.assoc_arr.absolute_path_dict(
-        ymd_nested_key_array_of_arrays_value_assoc_arr,
+    log_ymd_nested_key_array_of_arrays_value_assoc = function(path, ymd_nested_key_array_of_arrays_value_assoc)
+      local abs_path_dict = get.assoc.absolute_path_dict(
+        ymd_nested_key_array_of_arrays_value_assoc,
         path,
         ".csv"
       )
@@ -1462,9 +1461,9 @@ dothis = {
       end
     end,
     log_timestamp_key_array_value_dict = function(path, timestamp_key_array_value_dict)
-      dothis.logging_dir.log_ymd_nested_key_array_of_arrays_value_assoc_arr(
+      dothis.logging_dir.log_ymd_nested_key_array_of_arrays_value_assoc(
         path,
-        transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc_arr(timestamp_key_array_value_dict)
+        transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc(timestamp_key_array_value_dict)
       )
     end,
     log_dict_with_timestamp = function(path, dict)
@@ -1621,37 +1620,6 @@ dothis = {
     end,
       
   },
-  firefox = {
-    dump_state = function(do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
-    end
-
-  },
-  newpipe = {
-    extract_backup = function(do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
-    end
-  },
-  omegat = {
-    create_all_translated_documents = function()
-      dothis.mac_application_name.execute_full_action_path(
-        "OmegaT",
-        {
-          "Project",
-          "Create Translated Documents"
-        }
-      )
-    end,
-    create_current_translated_document = function()
-      dothis.mac_application_name.execute_full_action_path(
-        "OmegaT",
-        {
-          "Project",
-          "Create Current Translated Document"
-        }
-      )
-    end,
-  },
   window = {
     focus = function(window)
       window:focus()
@@ -1771,13 +1739,6 @@ dothis = {
       )
     end,
   },
-  env_yaml_file_container = {
-    write_env_and_check = function(env_yaml_file_container)
-      dothis.env_string.write_env_and_check(
-        transf.env_yaml_file_container.env_string(env_yaml_file_container)
-      )
-    end,
-  },
   citable_object_id = {
     save_local_csl_file = function(citable_object_id, indication)
       local csl_table = transf[indication].online_csl_table(citable_object_id)
@@ -1786,20 +1747,6 @@ dothis = {
         transf.not_userdata_or_function.json_string(csl_table)
       )
     end,
-  },
-  indicated_citable_object_id = {
-    edit_local_csl_file = function(indicated_citable_object_id)
-      dothis.local_path.open_app(
-        transf.indicated_citable_object_id.local_csl_file_path(indicated_citable_object_id),
-        env.GUI_EDITOR
-      )
-    end,
-    open_local_citable_object_file = function(indicated_citable_object_id)
-      dothis.local_path.open(
-        transf.indicated_citable_object_id.local_citable_object_file_path(indicated_citable_object_id)
-      )
-    end,
-
   },
   citations_file = {
     write_bib = function(citations_file, path)
@@ -1887,8 +1834,6 @@ dothis = {
         )
       )
     end,
-    create_all_translated_documents = dothis.omegat.create_all_translated_documents,
-    create_current_translated_document = dothis.omegat.create_current_translated_document,
     create_and_open_new_source_odt = function(omegat_project_dir, name) -- while we support any source file, if we manually create a file, it should be an odt
       dothis.absolute_path.write_file_if_nonextant_path(
         transf.omegat_project_dir.source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
@@ -2486,7 +2431,7 @@ dothis = {
   },
   hotkey_created_item_specifier_array = {
     create_or_recreate_all = function (arr, key_partial_creation_specifier_dict)
-      local creation_specifier_arr = get.table_of_assoc_arrs.array_of_assoc_arrs(key_partial_creation_specifier_dict, "key")
+      local creation_specifier_arr = get.table_of_assocs.array_of_assocs(key_partial_creation_specifier_dict, "key")
       dothis.created_item_specifier_array.create_or_recreate_all(
         arr,
         creation_specifier_arr
@@ -2682,6 +2627,30 @@ dothis = {
     purge_fsmemoize_cache = function()
       dothis.absolute_path.delete(
         dothis.absolute_path.empty_dir(env.XDG_CACHE_HOME .. "/hs/fsmemoize")
+      )
+    end,
+    firefox_dump_state = function(do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
+    end,
+    newpipe_extract_backup = function(do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
+    end,
+    omegat_create_all_translated_documents = function()
+      dothis.mac_application_name.execute_full_action_path(
+        "OmegaT",
+        {
+          "Project",
+          "Create Translated Documents"
+        }
+      )
+    end,
+    omegat_create_current_translated_document = function()
+      dothis.mac_application_name.execute_full_action_path(
+        "OmegaT",
+        {
+          "Project",
+          "Create Current Translated Document"
+        }
       )
     end,
   },

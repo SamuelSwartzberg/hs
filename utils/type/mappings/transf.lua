@@ -624,13 +624,13 @@ transf = {
       return new_tbl
     end
   },
-  two_id_assoc_arrs = {
+  two_id_assocs = {
     bool_by_equal = function(t1, t2)
       return t1.id == t2.id
     end,
   },
-  assoc_arr_array = {
-    assoc_arr_with_index_as_key_array = function(arr)
+  assoc_array = {
+    assoc_with_index_as_key_array = function(arr)
       local res = get.table.table_by_copy(arr, true)
       for i, v in transf.array.index_value_stateless_iter(arr) do
         v.index = i
@@ -1122,8 +1122,8 @@ transf = {
       end
       return res
     end,
-    plaintext_dictonary_read_assoc_arr = function(path)
-      transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc_arr(
+    plaintext_dictonary_read_assoc = function(path)
+      transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc(
         transf.dir.absolute_path_key_leaf_string_or_nested_value_dict(path)
       )
     end,
@@ -1141,12 +1141,12 @@ transf = {
       end
       return res
     end,
-    plaintext_dictonary_read_assoc_arr = function(dict)
+    plaintext_dictonary_read_assoc = function(dict)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(dict) do
         local filename = transf.path.filename(k)
         if is.any.table(v) then
-          res[filename] = transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc_arr(v)
+          res[filename] = transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc(v)
         else
           if is.file.plaintext_dictionary_file(k) then
             res[filename] = transf.plaintext_dictionary_file.table(k)
@@ -1559,7 +1559,7 @@ transf = {
   },
 
   ics_file = {
-    array_of_assoc_arrs = function(path)
+    array_of_assocs = function(path)
       local temppath = transf.string.in_tmp_dir(transf.path.filename(path) .. ".ics")
       dothis.extant_path.copy_to_absolute_path(path, temppath)
       dothis.ics_file.generate_json_file(temppath)
@@ -1576,13 +1576,13 @@ transf = {
     end,
   },
   ini_file = {
-    assoc_arr = function(path)
-      return transf.ini_string.assoc_arr(transf.file.contents(path))
+    assoc = function(path)
+      return transf.ini_string.assoc(transf.file.contents(path))
     end,
   },
   toml_file = {
-    assoc_arr = function(path)
-      return transf.toml_string.assoc_arr(transf.file.contents(path))
+    assoc = function(path)
+      return transf.toml_string.assoc(transf.file.contents(path))
     end,
   },
   xml_local_file = {
@@ -3794,7 +3794,7 @@ transf = {
     end,
   },
   toml_string = {
-    assoc_arr = toml.decode
+    assoc = toml.decode
   },
   yaml_file = {
     not_userdata_or_function = function(path)
@@ -3803,7 +3803,7 @@ transf = {
   },
   
   ini_string = {
-    assoc_arr = function(str)
+    assoc = function(str)
       return transf.string.table_or_err_by_evaled_env_bash_parsed_json(
         "jc --ini <<EOF " .. str .. "EOF"
       )
@@ -3816,11 +3816,11 @@ transf = {
       elseif is.plaintext_dictionary_file.json_file(file) then
         return transf.json_file.not_userdata_or_function(file)
       elseif is.plaintext_dictionary_file.ini_file(file) then
-        return transf.ini_file.assoc_arr(file)
+        return transf.ini_file.assoc(file)
       elseif is.plaintext_dictionary_file.toml_file(file) then
-        return transf.toml_file.assoc_arr(file)
+        return transf.toml_file.assoc(file)
       elseif is.plaintext_dictionary_file.ics_file(file) then
-        return transf.ics_file.array_of_assoc_arrs(file) 
+        return transf.ics_file.array_of_assocs(file) 
       end
     end
   },
@@ -4686,7 +4686,7 @@ transf = {
     determined_array_table = function(t)
       return transf.word.determinant_metatable_creator_fn("arr")(t)
     end,
-    determined_assoc_arr_table = function(t)
+    determined_assoc_table = function(t)
       return transf.word.determinant_metatable_creator_fn("assoc")(t)
     end,
     indicated_prompt_table = function(t)
@@ -5032,7 +5032,7 @@ transf = {
     --- transforms a timestamp-key orderedtable into a table of the structure [yyyy] = { [yyyy-mm] = { [yyyy-mm-dd] = { [hh:mm:ss, ...] } } }
     --- @param timestamp_key_table orderedtable
     --- @return { [string]: { [string]: { [string]: string[] } } }
-    ymd_nested_key_array_of_arrays_value_assoc_arr = function(timestamp_key_table)
+    ymd_nested_key_array_of_arrays_value_assoc = function(timestamp_key_table)
       error("this still uses orderedtable, but I've removed that package")
       local year_month_day_time_table = {}
       for timestamp_str, fields in get.indxbl.key_value_stateless_iter(timestamp_key_table,-1,1,-1) do
@@ -5662,7 +5662,7 @@ transf = {
       return app:bundleID()
     end,
     menu_item_table_array = function(app)
-      local arr = get.array_of_n_any_assoc_arr_arrays.array_of_assoc_arr_leaf_labels_with_title_path(
+      local arr = get.array_of_n_any_assoc_arrays.array_of_assoc_leaf_labels_with_title_path(
         get.tree_node_like_array.tree_node_array(
           app:getMenuItems(),
           { levels_of_nesting_to_skip = 1}
@@ -5964,7 +5964,7 @@ transf = {
   },
   csl_table = {
     main_title = function(csl_table)
-      return get.assoc_arr.vt_by_first_match_w_kv_arr(csl_table, mt._list.csl_title_keys)
+      return get.assoc.vt_by_first_match_w_kv_arr(csl_table, mt._list.csl_title_keys)
     end,
     issued_date_parts_single_or_range = function(csl_table)
       return csl_table.issued
@@ -6564,7 +6564,7 @@ transf = {
       return transf.action_specifier_array.action_chooser_item_specifier_array(transf.any.applicable_action_specifier_array(any))
     end,
     applicable_action_with_index_chooser_item_specifier_array = function(any)
-      return transf.assoc_arr_array.assoc_arr_with_index_as_key_array(transf.any.applicable_action_chooser_item_specifier_array(any))
+      return transf.assoc_array.assoc_with_index_as_key_array(transf.any.applicable_action_chooser_item_specifier_array(any))
     end,
     placeholder_text = function(any)
       return "Choose action on: " .. (
@@ -7099,7 +7099,7 @@ transf = {
       )
     end,
     action_with_index_choose_item_specifier_array = function(action_specifier_array)
-      return transf.assoc_arr_array.assoc_arr_with_index_as_key_array(
+      return transf.assoc_array.assoc_with_index_as_key_array(
         transf.action_specifier.action_chooser_item_specifier_array(action_specifier_array)
       )
     end,
@@ -7211,7 +7211,7 @@ transf = {
       return hs.fnutils.map(
         thing_name_array,
         function(thing_name)
-          local spec = tblmap.thing_name.chooser_initial_selected_index_partial_retriever_2specifier(thing_name)
+          local spec = tblmap.thing_name.chooser_initial_selected_index_partial_retriever_specifier(thing_name)
           local newspec = {}
           newspec.thing_name = spec.thing_name
           newspec.precedence = spec.precedence or 1

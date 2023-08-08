@@ -342,7 +342,7 @@ tblmap = {
       end
     },
     before_backup = {
-      Newpipe = dothis.newpipe.extract_backup
+      Newpipe = dothis["nil"].newpipe_extract_backup
     },
   },
   mac_application_name = {
@@ -496,6 +496,9 @@ tblmap = {
       },
       stream_created_item_specifier = {
         thing_name = "summary_line"
+      },
+      csl_table = {
+        thing_name = ""
       }
     },
     chooser_subtext_partial_retriever_specifier = {
@@ -507,7 +510,10 @@ tblmap = {
       
     },
     initial_selected_index_partial_retriever_specifier = {
-      
+      audiodevice_specifier_array = {
+        thing_name = "active_audiodevice_specifier_index",
+        precedence = 999
+      }
     },
   },
   state_type = {

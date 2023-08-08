@@ -486,19 +486,19 @@ get = {
       end)
     end,
   },
-  assoc_arr = {
+  assoc = {
     absolute_path_dict = function(t, starting_point, extension)
       return get.relative_path_dict.absolute_path_dict(
-        transf.assoc_arr.to_relative_path_dict(t),
+        transf.assoc.to_relative_path_dict(t),
         starting_point,
         extension
       )
     end,
   },
-  table_of_assoc_arrs = {
-    array_of_assoc_arrs = function(assoc_arr, key)
+  table_of_assocs = {
+    array_of_assocs = function(assoc, key)
       local res = {}
-      for k, v in transf.table.stateless_key_value_iter(assoc_arr) do
+      for k, v in transf.table.stateless_key_value_iter(assoc) do
         local copied = get.table.table_by_copy(v, true)
         copied[key] = k
         dothis.array.push(res, copied)
@@ -870,7 +870,7 @@ get = {
       end
     end,
     item_with_index_chooser_item_specifier_array = function(arr, target_item_chooser_item_specifier_name)
-      return transf.assoc_arr_array.assoc_arr_with_index_as_key_array(
+      return transf.assoc_array.assoc_with_index_as_key_array(
         get.array.item_chooser_item_specifier_array(arr, target_item_chooser_item_specifier_name)
       )
     end,
@@ -916,13 +916,13 @@ get = {
     end,
     
   },
-  id_assoc_arr_array = {
-    id_assoc_arr_by_first_match_w_id_assoc_arr = function(arr, assoc_arr)
+  id_assoc_array = {
+    id_assoc_by_first_match_w_id_assoc = function(arr, assoc)
       return get.array.t_or_nil_by_first_match_w_fn(
         arr,
         get.fn.first_n_args_bound_fn(
-          transf.two_id_assoc_arrs.bool_by_equal,
-          assoc_arr
+          transf.two_id_assocs.bool_by_equal,
+          assoc
         )
       )
     end
@@ -1924,7 +1924,7 @@ get = {
     end,
   },
   timestamp_first_column_plaintext_table_file = {
-    something_newer_than_timestamp = function(path, timestamp, assoc_arr)
+    something_newer_than_timestamp = function(path, timestamp, assoc)
       local rows = transf.plaintext_table_file.iter_of_array_of_fields(path)
       local _, first_row = rows()
       local _, second_row = rows()
@@ -1935,7 +1935,7 @@ get = {
         error("Timestamps are not in descending order. This is not recommended, as it forces us to read the entire file.")
       end
       local res
-      if assoc_arr then 
+      if assoc then 
         res = ovtable.new()
         table.remove(first_row, 1)
         res[first_timestamp] = first_row
@@ -1947,7 +1947,7 @@ get = {
       for i, row in rows do
         local current_timestamp = row[1]
         if get.string_or_number.number_or_nil(current_timestamp) > timestamp then
-          if assoc_arr then 
+          if assoc then 
             table.remove(row, 1)
             res[current_timestamp] = row
           else
@@ -2684,9 +2684,9 @@ get = {
   retriever_specifier = {
     result = function(retriever_specifier, value)
       return transf[
-        retriever_specifier.thing_name
-      ][
         retriever_specifier.target
+      ][
+        retriever_specifier.thing_name
       ](value)
     end,
   },
@@ -2842,7 +2842,7 @@ get = {
     end
   },
   two_anys_stateful_generator = {
-    assoc_arr = function(gen, ...)
+    assoc = function(gen, ...)
       local res = {}
       local iter = gen(...)
       while true do
@@ -3272,7 +3272,7 @@ get = {
       )
     end,
   },
-  n_any_assoc_arr_array = {
+  n_any_assoc_array = {
     leaf_label_with_title_path = function(arr, title_key)
       local leaf = get.table.table_by_copy(dothis.array.pop(arr))
       local title_path = get.array_of_tables.array_of_vts_w_kt(arr, title_key)
@@ -3280,11 +3280,11 @@ get = {
       return leaf
     end
   },
-  array_of_n_any_assoc_arr_arrays = {
-    array_of_assoc_arr_leaf_labels_with_title_path = function(arr, title_key)
+  array_of_n_any_assoc_arrays = {
+    array_of_assoc_leaf_labels_with_title_path = function(arr, title_key)
       return hs.fnutils.imap(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.n_any_assoc_arr_array.leaf_label_with_title_path, {a_use, title_key})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.n_any_assoc_array.leaf_label_with_title_path, {a_use, title_key})
       )
     end,
   },

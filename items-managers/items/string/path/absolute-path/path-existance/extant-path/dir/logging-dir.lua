@@ -4,7 +4,7 @@ LoggingDirSpecifier = {
   properties = {
     doThisables = {
       ["log-timestamp-table"] = function(self, timestamp_key_array_value_dict)
-        local ymd_array_table = transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc_arr(timestamp_key_array_value_dict)
+        local ymd_array_table = transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc(timestamp_key_array_value_dict)
         self:doThis("table-to-fs", {
           payload = ymd_array_table,
           mode = "write",
