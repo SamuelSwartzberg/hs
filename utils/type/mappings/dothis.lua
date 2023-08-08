@@ -520,13 +520,16 @@ dothis = {
   },
   local_path = {
     open_default = function(path, do_after)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("open " .. transf.string.single_quoted_escaped(path), do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open " .. transf.string.single_quoted_escaped(path), do_after)
     end,
     open_app = function(path, app, do_after)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("open -a " .. transf.string.single_quoted_escaped(app) .. " " .. transf.string.single_quoted_escaped(path), do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -a " .. transf.string.single_quoted_escaped(app) .. " " .. transf.string.single_quoted_escaped(path), do_after)
+    end,
+    open_gui_editor = function(path, do_after)
+      dothis.local_path.open_app(path, env.GUI_EDITOR, do_after)
     end,
     open_and_reveal = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("open -R " .. transf.string.single_quoted_escaped(path))
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -R " .. transf.string.single_quoted_escaped(path))
     end,
     write_relative_path_dict = function(path, relative_path_dict, extension)
       dothis.dynamic_absolute_path_dict.write(
@@ -778,7 +781,7 @@ dothis = {
         transf.path.descendant_file_array(path),
         tgt
       )
-    end
+    end,
     
   },
   local_extant_path_array = {
@@ -860,7 +863,7 @@ dothis = {
       plfile.copy(path, tgt)
     end,
     edit_file_in_vscode_act_on_path = function(path, do_after)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
+      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
         if do_after then
           do_after(path)
         end
@@ -868,7 +871,7 @@ dothis = {
       end)
     end,
     edit_file_in_vscode_act_on_contents = function(path, do_after)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
+      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
         local contents = transf.file.contents(path)
         dothis.absolute_path.delete(path)
         do_after(contents)
@@ -944,6 +947,9 @@ dothis = {
     end,
     move_to_parent_path = function(path)
       dothis.extant_path.move_to_absolute_path(path, transf.path.parent_path(path))
+    end,
+    move_to_downloads = function(path)
+      dothis.extant_path.move_to_absolute_path(path, env.DOWNLOADS)
     end,
     move_to_parent_path_with_extension_if_any = function(path)
       dothis.extant_path.move_to_absolute_path(path, transf.path.parent_path_with_extension_if_any(path))

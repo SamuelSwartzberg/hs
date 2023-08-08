@@ -16,51 +16,7 @@ PlaintextFileItemSpecifier = {
       ["is-md-file"] = bc(get.path.is_standartized_extension, "md")
     },
   },
-  ({
-    { key = "m3u-file", value = CreateM3uFileItem },
-    { key = "plaintext-table-file", value = CreatePlaintextTableFileItem },
-    { key = "plaintext-dictionary-file", value = CreatePlaintextDictionaryFileItem },
-    { key = "plaintext-tree-file", value = CreatePlaintextTreeFileItem },
-    { key = "executable-code-file", value = CreateExecutableCodeFileItem },
-    { key = "gitignore-file", value = CreateGitignoreFileItem },
-    { key = "log-file", value = CreateLogFileItem },
-    { key = "email-file", value = CreateEmailFileItem },
-    { key = "newsboat-urls-file", value = CreateNewsboatUrlsFileItem },
-    { key = "md-file", value = CreateMdFileItem },
-    
-  }),
   action_table = {
-    { 
-      d = "cnt",
-      i = "🎒",
-      getfn = transf.plaintext_file.contents
-    },{
-      d = "cntchrs",
-      i = "🎒🀇📏",
-      getfn = transf.plaintext_file.len_chars
-    },{
-      d = "cntln",
-      i = "🎒8️⃣📏",
-      getfn = transf.plaintext_file.len_lines
-    },{
-      d = "cnthd",
-      i = "🎒👆",
-      key = get.plaintext_file.lines_head
-    },{
-      d = "cnttl",
-      i = "🎒👇",
-      key = get.plaintext_file.lines_tail
-    },
-    {
-      text = "👉🎒全⩶ ccntlns.",
-      getfn = transf.plaintext_file.line_array,
-      dothis = dothis.any.choose_action
-    },
-    {
-      text = "👉🎒⩶ ccntln.",
-      getfn = transf.plaintext_file.line_array,
-      dothis = dothis.array.choose_item_and_action
-    },
     {
       text = "👉✂️🎒⩶ ccutcntln.",
       getfn = dothis.plaintext_file.pop_line,
