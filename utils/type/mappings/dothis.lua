@@ -1605,6 +1605,21 @@ dothis = {
         transf.mac_application_name.running_application(application_name)
       )
     end,
+    activate = function(application_name)
+      dothis.running_application.activate(
+        transf.mac_application_name.running_application(application_name)
+      )
+    end,
+    --- if you need `fn` to take args, bind them beforehand
+    do_with_activated = function(application_name, fn)
+      local app = transf.mac_application_name.running_application(application_name)
+      local prev_app = hs.application.frontmostApplication()
+      dothis.mac_application_name.activate(application_name)
+      local retval = {fn()}
+      dothis.running_application.activate(prev_app)
+      return table.unpack(retval)
+    end,
+      
   },
   firefox = {
     dump_state = function(do_after)
@@ -1728,6 +1743,9 @@ dothis = {
     end,
     focus_main_window = function(running_application)
       transf.running_application.main_window(running_application):focus()
+    end,
+    activate = function(running_application)
+      running_application:activate()
     end,
   },
   menu_item_table = {
@@ -2722,5 +2740,28 @@ dothis = {
     set_timestamp_s_created_time = function(fnid, opts_as_str, created_time)
       dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str, "~~~created~~~"), tostring(created_time))
     end
+  },
+  fn_queue_specifier = {
+    update = function(qspec)
+      hs.alert.closeSpecific(qspec.alert)
+      if #qspec.fn_array == 0 then 
+        dothis.hotkey_created_item_specifier.pause(qspec.hotkey_created_item_specifier)
+      else
+        qspec.alert = dothis.string.alert(
+          transf.fn_queue_specifier.string_by_waiting_message(qspec),
+          {duration = "indefinite"}
+        )
+        dothis.hotkey_created_item_specifier.resume(qspec.hotkey_created_item_specifier)
+      end
+    end,
+    push = function(qspec, fn)
+      dothis.array.push(qspec.fn_array, fn)
+      dothis.fn_queue_specifier.update(qspec)
+    end,
+    pop = function(qspec)
+      local fn = dothis.array.pop(qspec.fn_array)
+      fn()
+      dothis.fn_queue_specifier.update(qspec)
+    end,
   }
 }

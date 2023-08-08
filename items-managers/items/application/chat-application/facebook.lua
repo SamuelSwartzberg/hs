@@ -67,7 +67,7 @@ FacebookItemSpecifier = {
     },
     doThisables = {
       ["generate-backup"] = function(self, do_after) 
-        doWhenReady(
+        dothis.fn_queue_specifier.push(main_qspec,
           function()
             dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -a Firefox" .. 
             transf.string.single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings") " && sleep 1", function()

@@ -62,7 +62,7 @@ TelegramItemSpecifier = {
     },
     doThisables = {
       ["generate-backup"] = function(self, do_after) 
-        doWhenReady(
+        dothis.fn_queue_specifier.push(main_qspec,
           function()
             local window = self:get("running-application-item"):get("main-window-item")
             window:doThis("focus")

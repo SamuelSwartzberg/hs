@@ -346,13 +346,19 @@ function rest(specifier, do_after, have_tried_access_refresh)
   local cmd = get.string_or_number_array.string_by_joined(curl_command, " ")
   if not specifier.non_json_response then
     if do_after then
-      specifier.json_catch = catch_auth_error
-      return runJSON(cmd, do_after)
+      dothis.string.env_bash_eval_w_table_arg_fn_string_arg_fn_fail_error_key(
+        cmd,
+        do_after,
+        catch_auth_error
+      )
     else 
-      return dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(cmd)
+      local succ,res = pcall(transf.string.table_or_err_by_evaled_env_bash_parsed_json_err_error_key,cmd)
+      if succ then
+        return res
+      else
+        catch_auth_error(res)
+      end
     end
-    args.json_catch = catch_auth_error
-    return runJSON(cmd, do_after)
   else 
     return dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(cmd, do_after)
   end

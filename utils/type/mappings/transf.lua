@@ -3252,7 +3252,7 @@ transf = {
         return res
       end
     end,
-    table_or_nil_by_evaled_env_bash_parsed_json_err_error_key = function(str)
+    table_or_nil_by_evaled_env_bash_parsed_json_nil_error_key = function(str)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
         transf.string.table_or_err_by_evaled_env_bash_parsed_json_err_error_key
       )(str)
@@ -7709,11 +7709,10 @@ transf = {
 
       -- show prompt
 
+      dothis.mac_application_name.activate("Hammerspoon")
       --- @type string, string|nil
-      local button_pressed, raw_return = doWithActivated("Hammerspoon", function()
-        return hs.dialog.textPrompt(prompt_args.message, prompt_args.informative_text, prompt_args.default,
-        prompt_args.buttonA, prompt_args.buttonB)
-      end)
+      local button_pressed, raw_return = hs.dialog.textPrompt(prompt_args.message, prompt_args.informative_text, prompt_args.default,
+      prompt_args.buttonA, prompt_args.buttonB)
 
       -- process result
 
@@ -7964,6 +7963,12 @@ transf = {
         return succ
       end
     end,
+  },
+  fn_queue_specifier = {
+    string_by_waiting_message  = function(qspec)
+      return "Waiting to proceed (" .. #qspec.fn_array .. " waiting in queue) ... (Press " .. transf.hotkey_created_item_specifier.shortcut_string(qspec.hotkey_created_item_specifier) .. " to continue.)"
+    end,
+      
   },
   n_anys_or_err_ret_fn = {
     n_anys_or_nil_ret_fn_by_pcall = function(fn)

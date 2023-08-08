@@ -19,7 +19,7 @@ require("package-imports")
 
 require("utils")
 
-a_use = math.random(999999999)
+a_use = math.random(999999999) + 1000
 
 comp = transf.dir.plaintext_dictonary_read_assoc_arr(env.MCOMPOSITE)
 fstblmap = transf.dir.plaintext_dictonary_read_assoc_arr(env.MDICTIONARIES .. "/mappings")
@@ -33,6 +33,16 @@ envTable = dc(env)
 compTable = transf.table.dot_notation_key_dict_by_primitive_and_arraylike_is_leaf(comp)
 
 System:get("manager", "hotkey"):doThis("create", {key = "r", fn = hs.reload})
+
+main_qspec = {}
+main_qspec = {
+  fn_array = {},
+  hotkey_created_item_specifier = dothis.creation_specifier.create({
+    type = "hotkey",
+    key = "/",
+    fn = get.fn.first_n_args_bound_fn(dothis.fn_queue_specifier.pop, main_qspec)
+  })
+}
 
 local function createCSLArray()
   return st(env.MCITATIONS)
