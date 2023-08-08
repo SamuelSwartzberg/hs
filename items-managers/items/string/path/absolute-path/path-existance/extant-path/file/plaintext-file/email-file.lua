@@ -19,33 +19,6 @@ EmailFileItemSpecifier = {
     {
       text = "👉📎 cattch.",
       key = "choose-save-act-on-attachment"
-    },{
-      text = "↩️📧 re.",
-      dothis = dothis.email_file.edit_then_reply
-    },{
-      text = "↪️📧 fwd.",
-      dothis = dothis.email_file.edit_then_forward
-    },{
-      text = "👉📬 cemladdr.",
-      getfn = get.email_file.addresses,
-      act = "cia"
-    },
-    {
-      d = "sbj",
-      i = "👒",
-      getfn = transf.email_file.subject,
-    },{
-      d = "bdy",
-      i = "📜",
-      getfn = transf.email_file.rendered_body,
-    },{
-      d = "bdyqt",
-      i = "📜💬",
-      getfn = transf.email_file.quoted_body,
-    },{
-      d = "smm",
-      i = "⋯",
-      getfn = transf.email_file.summary,
     }
   }
 }
