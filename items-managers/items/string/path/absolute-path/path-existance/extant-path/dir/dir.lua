@@ -4,14 +4,6 @@ DirItemSpecifier = {
   properties = {
 
     getables = {
-      ["descendants-to-line-array"] = function(self) 
-        return self:get("descendant-file-only-string-item-array")
-          :get("map-to-line-array-of-file-contents-with-no-empty-strings")
-      end,
-      ["descendant-ending-with-to-string-item"] = function(self, ending)
-        return st(self:get("descendant-ending-with", ending))
-      end,
-
       ["find-or-create-child-dir"] = function(self, specifier)
         local child = get.dir.extant_path_by_child_w_fn(self:get("c"), specifier.find_func)
         if child == nil or not is.absolute_path.dir(child) then

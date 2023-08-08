@@ -536,9 +536,18 @@ is = {
     end,
   },
   url = {
-    has_scheme = function(url)
+    scheme_url = function(url)
       return onig.match(url, mt._r.url.scheme) ~= nil
     end,
+    path_url = function(url)
+      return transf.url.path(url) ~= nil
+    end,
+    authority_url = function(url)
+      return transf.url.authority(url) ~= nil
+    end,
+
+  },
+  scheme_url = {
     mailto_url = function(url)
       return stringy.startswith(url, "mailto:")
     end,
@@ -551,19 +560,26 @@ is = {
     data_url = function(url)
       return stringy.startswith(url, "data:")
     end,
-    url_with_path = function(url)
-      return transf.url.path(url) ~= nil
-    end,
-
   },
-  url_with_path = {
+  path_url = {
     owner_item_url = function(url)
       return #transf.owner_item_url.owner_item(url) == 2
     end,
   },
+  authority_url = {
+    host_url = function(url)
+      return transf.url.host(url) ~= nil
+    end,
+  },
+  host_url = {
+
+  },
   data_url = {
     base64_data_url = function(url)
       return stringy.endswith(transf.data_url.header_part(url), ";base64")
+    end,
+    image_data_url = function(url)
+      return  s.media_type.image_media_type(transf.data_url.content_type(url))
     end,
   },
   media_type = {

@@ -6329,7 +6329,7 @@ transf = {
   },
   url = {
     ensure_scheme = function(url)
-      if is.url.has_scheme(url) then
+      if is.url.scheme_url(url) then
         return url
       else
         return "https://" .. url
@@ -6700,14 +6700,14 @@ transf = {
     first_email = function(mailto_url)
       return transf.mailto_url.emails(mailto_url)[1]
     end,
-    subject = function(tel_url)
-      return transf.url.param_table(tel_url).subject 
+    subject = function(mailto_url)
+      return transf.url.param_table(mailto_url).subject 
     end,
-    body = function(tel_url)
-      return transf.url.param_table(tel_url).body 
+    body = function(mailto_url)
+      return transf.url.param_table(mailto_url).body 
     end,
-    cc = function(tel_url)
-      return transf.url.param_table(tel_url).cc 
+    cc = function(mailto_url)
+      return transf.url.param_table(mailto_url).cc 
     end,
 
   },
