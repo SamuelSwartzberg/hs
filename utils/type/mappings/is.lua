@@ -84,7 +84,7 @@ is = {
     indicated_number_string = function(str)
       return 
         stringy.startswith(str, "0") and
-        get.array.bool_by_contains(transf.table_or_nil.key_array(tblmap.base_letter.base), str:sub(2, 2)) and
+        get.array.bool_by_contains(transf.table_or_nil.kt_array(tblmap.base_letter.base), str:sub(2, 2)) and
         is.printable_ascii_string.number_string(str:sub(3))
     end,
     potentially_indicated_number_string = function(str)

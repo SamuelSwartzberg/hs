@@ -498,7 +498,20 @@ tblmap = {
         thing_name = "summary_line"
       },
       csl_table = {
-        thing_name = ""
+        thing_name = "apa_string",
+        precedence = 999
+      },
+      menu_item_table = {
+        thing_name = "summary",
+        precedence = 999
+      },
+      syn_specifier = {
+        thing_name = "summary",
+        precedence = 999
+      },
+      pair = {
+        thing_name = "dict_entry_string",
+        precedence = 999
       }
     },
     chooser_subtext_partial_retriever_specifier = {

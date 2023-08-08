@@ -404,7 +404,16 @@ get = {
         end
       )
     end,
-
+    kt_array_by_sorted = function(t, fn)
+      local kt_arr = transf.table.kt_array(t)
+      dothis.array.sort(kt_arr, fn)
+      return kt_arr
+    end,
+    vt_array_by_sorted = function(t, fn)
+      local vt_arr = transf.table.vt_array(t)
+      dothis.array.sort(vt_arr, fn)
+      return vt_arr
+    end,
     
   },
   
@@ -418,7 +427,7 @@ get = {
     key_value_fn_filtered_dict = function(t, fn)
       return transf.pair_array.dict(
         hs.fnutils.ifilter(
-          transf.dict.pair_array(t),
+          transf.table.pair_array(t),
           function(pair)
             return fn(pair[1], pair[2])
           end
@@ -429,7 +438,7 @@ get = {
       return get.dict.key_value_fn_filtered_dict(t, function(k, v) return fn(v) end)
     end,
     kt_or_nil_by_first_match_w_kt_vt_arg_fn = function(t, fn)
-      local arr = transf.dict.pair_array_by_sorted_larger_key_first(t)
+      local arr = transf.table.pair_array_by_sorted_larger_key_first(t)
       for _, pair in transf.array.index_value_stateless_iter(arr) do
         if fn(pair[1], pair[2]) then
           return pair[1]

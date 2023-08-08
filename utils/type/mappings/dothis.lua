@@ -241,7 +241,55 @@ dothis = {
         dothis.extant_path.move_to_absolute_path(tmpdir_ics_path, path)
         dothis.absolute_path.delete(tmpdir_ics_path)
       end
-    end
+    end,
+    choose_w_pair_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+      dothis.array.choose_item(
+        transf.table.pair_array_by_sorted_smaller_key_first(tbl),
+        fn,
+        target_item_chooser_item_specifier_name
+      )
+    end,
+    choose_w_kt_vt_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+      dothis.array.choose_item(
+        transf.table.pair_array_by_sorted_smaller_key_first(tbl),
+        function(pair)
+          fn(transf.pair.key_value(pair))
+        end,
+        target_item_chooser_item_specifier_name
+      )
+    end,
+    choose_w_kt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+      dothis.array.choose_item(
+        transf.table.pair_array_by_sorted_smaller_key_first(tbl),
+        function(pair)
+          fn(transf.pair.key(pair))
+        end,
+        target_item_chooser_item_specifier_name
+      )
+    end,
+    choose_w_vt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+      dothis.array.choose_item(
+        transf.table.pair_array_by_sorted_smaller_key_first(tbl),
+        function (pair)
+          fn(transf.pair.value(pair))
+        end,
+        target_item_chooser_item_specifier_name
+      )
+    end,
+    choose_kt_w_kt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+      dothis.array.choose_item(
+        transf.table.kt_array_by_sorted_smaller_first(tbl),
+        fn,
+        target_item_chooser_item_specifier_name
+      )
+    end,
+    choose_vt_w_vt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+      dothis.array.choose_item(
+        transf.table.vt_array_by_sorted_smaller_first(tbl),
+        fn,
+        target_item_chooser_item_specifier_name
+      )
+    end,
   },
   string = {
     generate_qr_png = function(data, path)

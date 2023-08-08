@@ -585,7 +585,7 @@ transf = {
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(arr, function(v) return v, true end)
     end,
     set = function(arr)
-      return transf.table_or_nil.key_array(
+      return transf.table_or_nil.kt_array(
         transf.array.value_boolean_dict(arr)
       )
     end,
@@ -1286,7 +1286,7 @@ transf = {
       return transf.fs_tag_assoc.fs_tag_string(path_leaf_specifier.fs_tag_assoc)
     end,
     fs_tag_keys = function(path_leaf_specifier)
-      return transf.table_or_nil.key_array(path_leaf_specifier.fs_tag_assoc)
+      return transf.table_or_nil.kt_array(path_leaf_specifier.fs_tag_assoc)
     end,
     path = function(path_leaf_specifier)
       return transf.path.ending_with_slash(path_leaf_specifier.path) 
@@ -2382,10 +2382,10 @@ transf = {
   },
   date_component_name_value_dict = {
     date_component_name_list_set = function(date_component_name_value_dict)
-      return transf.table_or_nil.key_array(date_component_name_value_dict)
+      return transf.table_or_nil.kt_array(date_component_name_value_dict)
     end,
     date_component_value_list_set = function(date_component_name_value_dict)
-      return transf.table_or_nil.value_array(date_component_name_value_dict)
+      return transf.table_or_nil.vt_array(date_component_name_value_dict)
     end,
     date_component_name_list_not_set = function(date_component_name_value_dict)
       return transf.date_component_name_array.date_component_name_array_inverse(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
@@ -2885,7 +2885,7 @@ transf = {
   },
   vcard_type_dict = {
     vcard_types = function (vcard_type_dict)
-      return transf.table_or_nil.key_array(vcard_type_dict)
+      return transf.table_or_nil.kt_array(vcard_type_dict)
     end
   },
   vcard_type_address_table_dict = {
@@ -4124,7 +4124,7 @@ transf = {
       return transf.key_value.value_chooser_item(pair[1], pair[2])
     end,
     larger = function(pair)
-      return transf.two_comparables.larger(pair[1], pair[2])
+      return transf.two_comparables.comparable_by_larger(pair[1], pair[2])
     end,
   },
   two_anys = {
@@ -4139,22 +4139,28 @@ transf = {
     end,
   },
   two_comparables = {
-    larger = function(a, b)
+    comparable_by_larger = function(a, b)
       if a > b then
         return a
       else
         return b
       end
     end,
-    smaller = function(a, b)
+    comparable_by_smaller = function(a, b)
       if a < b then
         return a
       else
         return b
       end
     end,
-    equal = function(a, b)
+    bool_by_equal = function(a, b)
       return a == b
+    end,
+    bool_by_larger = function(a, b)
+      return a > b
+    end,
+    bool_by_smaller = function(a, b)
+      return a < b
     end,
   },
   two_numbers ={
@@ -4389,8 +4395,11 @@ transf = {
     two_anys_by_first = function(arr1, arr2)
       return arr1[1], arr2[1]
     end,
-    bool_by_larger_first = function(arr1, arr2)
-      return transf.two_comparables.larger(arr1[1], arr2[1])
+    bool_by_larger_first_item = function(arr1, arr2)
+      return transf.two_comparables.boolean_by_larger(arr1[1], arr2[1])
+    end,
+    bool_by_smaller_first_item = function(arr1, arr2)
+      return transf.two_comparables.boolean_by_smaller(arr1[1], arr2[1])
     end,
     array_by_appended = function(arr1, arr2)
       local res = get.table.table_by_copy(arr1)
@@ -4415,7 +4424,7 @@ transf = {
     end,
     pair_array_by_zip_stop_shortest = function(arr1, arr2)
       local res = {}
-      local shortest = transf.two_comparables.smaller(#arr1, #arr2)
+      local shortest = transf.two_comparables.comparable_by_smaller(#arr1, #arr2)
       for i = 1, shortest do
         res[#res + 1] = {arr1[i], arr2[i]}
       end
@@ -4428,7 +4437,7 @@ transf = {
     end,
     pair_array_by_zip_stop_longest = function(arr1, arr2)
       local res = {}
-      local longest = transf.two_comparables.larger(#arr1, #arr2)
+      local longest = transf.two_comparables.comparable_by_larger(#arr1, #arr2)
       for i = 1, longest do
         res[#res + 1] = {arr1[i], arr2[i]}
       end
@@ -4452,7 +4461,7 @@ transf = {
     end,
     array_by_interleaved_stop_shortest = function(arr1, arr2)
       local res = {}
-      local shortest = transf.two_comparables.smaller(#arr1, #arr2)
+      local shortest = transf.two_comparables.comparable_by_smaller(#arr1, #arr2)
       for i = 1, shortest do
         res[#res + 1] = arr1[i]
         res[#res + 1] = arr2[i]
@@ -4461,7 +4470,7 @@ transf = {
     end,
     array_by_interleaved_stop_longest = function(arr1, arr2)
       local res = {}
-      local longest = transf.two_comparables.larger(#arr1, #arr2)
+      local longest = transf.two_comparables.comparable_by_larger(#arr1, #arr2)
       for i = 1, longest do
         res[#res + 1] = arr1[i]
         res[#res + 1] = arr2[i]
@@ -4626,17 +4635,33 @@ transf = {
       if t == nil then t = {} end
       return transf.table.stateless_key_value_iter(t)
     end,
-    key_array = function(t)
+    kt_array = function(t)
       if t == nil then return {} end
-      return transf.table.key_array(t)
+      return transf.table.kt_array(t)
     end,
-    value_array = function(t)
+    vt_array = function(t)
       if t == nil then return {} end
-      return transf.table.value_array(t)
+      return transf.table.vt_array(t)
     end,
   },
   table = {
-    key_array = function(t)
+    pair_array = function(t)
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        t,
+        transf.key_value.pair
+      )
+    end,
+    pair_array_by_sorted_larger_key_first = function(t)
+      return transf.array_of_arrays.array_of_arrays_by_sorted_larger_first_item(
+        transf.table.pair_array(t)
+      )
+    end,
+    pair_array_by_sorted_smaller_key_first = function(t)
+      return transf.array_of_arrays.array_of_arrays_by_sorted_smaller_first_item(
+        transf.table.pair_array(t)
+      )
+    end,
+    kt_array = function(t)
       local res = {}
       for k, _ in transf.table.key_value_stateless_iter(t) do
         res[#res + 1] = k
@@ -4644,14 +4669,26 @@ transf = {
       return res
     end,
     pos_int_by_num_keys = function(t)
-      return #transf.table.key_array(t)
+      return #transf.table.kt_array(t)
     end,
-    value_array = function(t)
+    vt_array = function(t)
       local res = {}
       for _, v in transf.table.key_value_stateless_iter(t) do
         res[#res + 1] = v
       end
       return res
+    end,
+    kt_array_by_sorted_smaller_first = function(t)
+      return get.table.kt_array_by_sorted(t, transf.two_comparables.bool_by_smaller)
+    end,
+    kt_array_by_sorted_larger_first = function(t)
+      return get.table.kt_array_by_sorted(t, transf.two_comparables.bool_by_larger)
+    end,
+    vt_array_by_sorted_smaller_first = function(t)
+      return get.table.vt_array_by_sorted(t, transf.two_comparables.bool_by_smaller)
+    end,
+    vt_array_by_sorted_larger_first = function(t)
+      return get.table.vt_array_by_sorted(t, transf.two_comparables.bool_by_larger)
     end,
     key_value_stateless_iter = pairs,
     key_value_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateless_iter),
@@ -4681,7 +4718,7 @@ transf = {
       return contents
     end,
     value_set = function(t)
-      return transf.array.set(transf.table_or_nil.value_array(t))
+      return transf.array.set(transf.table_or_nil.vt_array(t))
     end,
     determined_array_table = function(t)
       return transf.word.determinant_metatable_creator_fn("arr")(t)
@@ -4751,22 +4788,11 @@ transf = {
     end,
   },
   dict = {
-    pair_array = function(t)
-      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(
-        t,
-        transf.key_value.pair
-      )
-    end,
-    pair_array_by_sorted_larger_key_first = function(t)
-      return transf.array_of_arrays.array_of_arrays_by_larger_first(
-        transf.dict.pair_array(t)
-      )
-    end,
     length = function(t)
-      return #transf.dict.pair_array(t)
+      return #transf.table.pair_array(t)
     end,
     url_param_array = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.url_param)
+      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.url_param)
     end,
     url_params = function(t)
       return get.string_or_number_array.string_by_joined(transf.dict.url_param_array(t), "&")
@@ -4786,7 +4812,7 @@ transf = {
       header_lines = transf.two_arrays.array_by_appended(
         header_lines,
         hs.fnutils.imap(
-          transf.dict.pair_array_by_sorted_larger_key_first(t),
+          transf.table.pair_array_by_sorted_larger_key_first(t),
           transf.pair.email_header
         )
       )
@@ -4794,20 +4820,20 @@ transf = {
     end,
     curl_form_field_array = function(t)
       return transf.array_of_arrays.array_by_flatten(
-        hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.curl_form_field_args)
+        hs.fnutils.imap(transf.table.pair_array(t), transf.pair.curl_form_field_args)
       )
     end,
     ini_line_array = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.ini_line)
+      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.ini_line)
     end,
     ini_string = function(t)
       return get.string_or_number_array.string_by_joined(transf.dict.ini_line_array(t), "\n")
     end,
     envlike_line_array = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.envlike_line)
+      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.envlike_line)
     end,
     dict_entry_string_array = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.dict_entry_string)
+      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.dict_entry_string)
     end,
     contents_summary = function(t)
       return transf.string_array.contents_summary(
@@ -4824,13 +4850,13 @@ transf = {
       return get.string_or_number_array.string_by_joined(transf.dict.envlike_line_array(t), "\n")
     end,
     chooser_item_list = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.chooser_item)
+      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.chooser_item)
     end,
     value_chooser_item_list = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.value_chooser_item)
+      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.value_chooser_item)
     end,
     key_chooser_item_list = function(t)
-      return hs.fnutils.imap(transf.dict.pair_array(t), transf.pair.key_chooser_item)
+      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.key_chooser_item)
     end,
     truthy_value_dict = function(t)
       return hs.fnutils.ifilter(
@@ -4839,7 +4865,7 @@ transf = {
       )
     end,
     truthy_value_key_array = function(t)
-      return transf.table_or_nil.key_array(transf.dict.truthy_value_dict(t))
+      return transf.table_or_nil.kt_array(transf.dict.truthy_value_dict(t))
     end,
   },
   dict_array = {
@@ -4926,12 +4952,19 @@ transf = {
     end,
   },
   array_of_arrays = {
-    array_of_arrays_by_larger_first = function(arr)
+    array_of_arrays_by_sorted_larger_first_item = function(arr)
       return get.array.array_by_sorted(
         arr,
-        transf.two_arrays.bool_by_larger_first
+        transf.two_arrays.bool_by_larger_first_item
       )
     end,
+    array_of_arrays_by_sorted_smaller_first_item = function(arr)
+      return get.array.array_by_sorted(
+        arr,
+        transf.two_arrays.bool_by_smaller_first_item
+      )
+    end,
+
     array_by_flatten = plarray2d.flatten,
     array_by_map_to_last = function(arr)
       return hs.fnutils.imap(arr, transf.array.t_by_last)
@@ -5021,10 +5054,10 @@ transf = {
   },
   array_value_dict = {
     array_of_arrays = function(arr)
-      return transf.table.value_array(arr)
+      return transf.table.vt_array(arr)
     end,
     array_by_flatten = function(arr)
-      return transf.array_of_arrays.array_by_flatten(transf.table.value_array(arr))
+      return transf.array_of_arrays.array_by_flatten(transf.table.vt_array(arr))
     end,
         
   },
@@ -7016,7 +7049,7 @@ transf = {
     end,
     non_root_volume_absolute_path_array = function()
       return hs.fnutils.ifilter(
-        transf.table_or_nil.key_array(hs.fs.volume.allVolumes()),
+        transf.table_or_nil.kt_array(hs.fs.volume.allVolumes()),
         is.local_absolute_path.root_local_absolute_path
       )
     end,
@@ -7766,7 +7799,7 @@ transf = {
       if raw_return == nil then
         return nil, false
       end
-      local list_return = transf.table_or_nil.value_array(raw_return)
+      local list_return = transf.table_or_nil.vt_array(raw_return)
       if #list_return == 0 then
         return nil, true
       end
