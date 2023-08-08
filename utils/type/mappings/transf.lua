@@ -682,6 +682,9 @@ transf = {
         return get.string.string_array_split_single_char(path, "/")
       end
     end,
+    pos_int_by_path_component_array_length = function(path)
+      return #transf.path.path_component_array(path)
+    end,
     path_array_of_path_component_array = function(path)
       return get.path.path_array_from_sliced_path_component_array(
         get.path.path_component_array(path),
@@ -861,6 +864,9 @@ transf = {
         }
       })
     end,
+
+  },
+  extant_volume_local_extant_path = {
 
   },
   extant_path = {
@@ -4114,15 +4120,6 @@ transf = {
     dict_entry_string = function(pair)
       return transf.key_value.dict_entry_string(pair[1], pair[2])
     end,
-    chooser_item = function(pair)
-      return transf.key_value.chooser_item(pair[1], pair[2])
-    end,
-    key_chooser_item = function(pair)
-      return transf.key_value.key_chooser_item(pair[1], pair[2])
-    end,
-    value_chooser_item = function(pair)
-      return transf.key_value.value_chooser_item(pair[1], pair[2])
-    end,
     larger = function(pair)
       return transf.two_comparables.comparable_by_larger(pair[1], pair[2])
     end,
@@ -4214,27 +4211,6 @@ transf = {
     end,
     dict_entry_string = function(key, value)
       return "[" .. transf.any.string(key) .. "] = " .. transf.any.string(value)
-    end,
-    chooser_item = function(key, value)
-      return {
-        text = transf.key_value.dict_entry_string(key, value),
-        k = key,
-        v = value,
-      }
-    end,
-    key_chooser_item = function(key, value)
-      return {
-        text = transf.any.string(key),
-        k = key,
-        v = value,
-      }
-    end,
-    value_chooser_item = function(key, value)
-      return {
-        text = transf.any.string(value),
-        k = key,
-        v = value,
-      }
     end,
     
     
@@ -4848,15 +4824,6 @@ transf = {
     end,
     envlike_string = function(t)
       return get.string_or_number_array.string_by_joined(transf.dict.envlike_line_array(t), "\n")
-    end,
-    chooser_item_list = function(t)
-      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.chooser_item)
-    end,
-    value_chooser_item_list = function(t)
-      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.value_chooser_item)
-    end,
-    key_chooser_item_list = function(t)
-      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.key_chooser_item)
     end,
     truthy_value_dict = function(t)
       return hs.fnutils.ifilter(

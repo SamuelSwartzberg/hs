@@ -191,9 +191,6 @@ is = {
     extant_path = function(path)
       return is.path.absolute_path(path) and is.absolute_path.extant_path(path)
     end,
-    volume = function(path)
-      return stringy.startswith(path, "/Volumes/")
-    end,
     path_with_intra_file_locator = function(path)
       return eutf8.find(transf.path.leaf(path), ":%d+$") ~= nil
     end,
@@ -291,6 +288,31 @@ is = {
     root_local_absolute_path = function(path)
       return path == "/"
     end,
+    in_volume_local_absolute_path = function(path)
+      return stringy.startswith(path, "/Volumes/")
+    end,
+    extant_volume_local_extant_path = function(path)
+      return get.array.bool_by_contains(
+        transf["nil"].non_root_volume_absolute_path_array(),
+        path
+      )
+    end,
+  },
+  in_volume_local_absolute_path = {
+    
+  },
+  extant_volume_local_extant_path = {
+    
+    dynamic_time_machine_extant_volume_local_extant_path = function(path)
+      return stringy.startswith(
+        path,
+        "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. get.fn.rt_or_nil_by_memoized(hs.host.localizedName)() .. "/" .. os.date("%Y-%m-%d-%H")
+      )
+    end,
+    static_time_machine_extant_volume_local_extant_path = function(path)
+      return path == env.TMBACKUPVOL .. "/"
+    end
+      
   },
   local_extant_path = {
     local_dir = function(path)

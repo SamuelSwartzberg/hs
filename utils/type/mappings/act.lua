@@ -246,5 +246,21 @@ act = {
   },
   dict = {
     
-  }
+  },
+  extant_volume_local_extant_path = {
+    eject_or_err = function(path)
+      hs.fs.volume.eject(path)
+      if is.local_absolute_path.extant_volume_local_extant_path(path) then
+        error("Volume could not be ejected.", 0)
+      end
+    end,
+    eject_or_msg = function(path)
+      local succ, res = pcall(act.extant_volume_local_extant_path.eject_or_err, path)
+      if succ then
+        dothis.string.alert("Volume ejected successfully.")
+      else
+        dothis.string.alert(res)
+      end
+    end
+  },
 }

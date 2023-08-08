@@ -509,6 +509,10 @@ tblmap = {
         thing_name = "summary",
         precedence = 999
       },
+      array = {
+        thing_name = "summary",
+        precedence = 1
+      },
       pair = {
         thing_name = "dict_entry_string",
         precedence = 999
