@@ -339,6 +339,23 @@ is = {
       return not is.path.empty_local_dir(path)
     end,
   },
+  nonempty_local_dir = {
+    latex_project_dir = function(dir)
+      return get.dir.bool_by_leaf_of_child(dir, "main.tex")
+    end,
+    omegat_project_dir = function(dir)
+      return get.dir.bool_by_leaf_of_child(dir, "omegat.project")
+    end,
+    npm_project_dir = function(dir)
+      return get.dir.bool_by_leaf_of_child(dir, "package.json")
+    end,
+    cargo_project_dir = function(dir)
+      return get.dir.bool_by_leaf_of_child(dir, "Cargo.toml")
+    end,
+    sass_project_dir = function(dir)
+      return get.dir.bool_by_extension_of_child(dir, "sass")
+    end,
+  },
   absolute_path = {
     extant_path = function(path)
       return (

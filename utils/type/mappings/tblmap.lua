@@ -427,19 +427,20 @@ tblmap = {
   dynamic_structure_name = {
     dynamic_structure = {
       latex = {
-        citations = "write_file:",
-        ["main.tex"] = "write_template:comp.templates.latex_main",
-        citable_objects = "create_path:"
+        citations = "write_file",
+        ["main.tex"] = {"write_template","comp.templates.latex_main"},
+        citable_objects = "create_dir"
       },
       omegat = {
-        dictionary = "create_path:",
-        glossary = "create_path:",
-        omegat = "create_path:",
-        source = "create_path:",
-        target = "create_path:",
-        tm = "create_path:",
-        ["data.yaml"] = "write_template:comp.templates.data_yaml"
-      }
+        dictionary = "create_dir",
+        glossary = "create_dir",
+        omegat = "create_dir",
+        source = "create_dir",
+        target = "create_dir",
+        tm = "create_dir",
+        ["data.yaml"] = {"write_template","comp.templates.data_yaml"},
+        ["omegat.project"] = {"write_template", "comp.templates.omegat"}
+      },
     }
   },
   project_type = {

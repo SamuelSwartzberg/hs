@@ -1860,10 +1860,10 @@ get = {
     find_child_ending_with = function(dir, ending)
       return get.path_array.find_ending_with(transf.dir.absolute_path_array_by_children(dir), ending)
     end,
-    find_leaf_of_child = function(dir, filename)
+    bool_by_leaf_of_child = function(dir, filename)
       return get.path_array.find_leaf(transf.dir.absolute_path_array_by_children(dir), filename)
     end,
-    find_extension_of_child = function(dir, extension)
+    bool_by_extension_of_child = function(dir, extension)
       return get.path_array.find_extension(transf.dir.absolute_path_array_by_children(dir), extension)
     end,
     find_child_with_leaf = function(dir, leaf)

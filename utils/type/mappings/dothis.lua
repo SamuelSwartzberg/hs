@@ -1624,9 +1624,11 @@ dothis = {
   dynamic_absolute_path_dict = {
     write = function(dynamic_absolute_path_dict)
       for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_dict) do
-        local fn = eutf8.match(contents, "^(%w-):")
-        local contents = eutf8.sub(contents, #fn + 2)
-        dothis.absolute_path[fn](absolute_path, contents)
+        if is.any.array(contents) then
+          dothis.absolute_path[dothis.array.shift(contents)](absolute_path, table.unpack(contents))
+        else
+          act.absolute_path[contents](absolute_path)
+        end
       end
     end,
   },
@@ -2115,6 +2117,14 @@ dothis = {
     end
     
 
+  },
+  handle = {
+    add_to_newsboat_urls_file = function(handle, category)
+      dothis.youtube_channel_id.add_to_newsboat_urls_file(
+        transf.handle.youtube_channel_id(handle),
+        category
+      )
+    end
   },
   youtube_playlist_creation_specifier = {
     --- @param spec {title?: string, description?: string, privacyStatus?: string, youtube_video_id_array?: string[]}
