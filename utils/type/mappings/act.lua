@@ -273,5 +273,18 @@ act = {
       local name = get.string.alphanum_minus_underscore_string_by_prompted_once_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
       dothis.otpauth_url.add_as_otp(url, name)
     end,
+  },
+  md_file = {
+    to_pdf_file_in_downloads = function(path)
+      dothis.md_file.to_file_in_downloads(path, "pdf")
+    end,
+    to_revealjs_file_in_downloads = function(path)
+      dothis.md_file.to_file_in_downloads(path, "revealjs")
+    end,
+  },
+  email_file = {
+    choose_attachment_and_choose_action = function(path)
+      dothis.email_file.choose_attachment_and_download(path, dothis.any.choose_action)
+    end,
   }
 }

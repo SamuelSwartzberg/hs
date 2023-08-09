@@ -124,8 +124,8 @@ dothis = {
       end)
     end,
   },
-  pandoc = {
-    markdown_to = function(source, format, metadata, do_after)
+  md_file = {
+    to_file_in_same_dir = function(source, format, metadata, do_after)
       local target = transf.path.path_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
       local rawsource = transf.file.contents(source)
       local processedsource = get.string.string_by_with_yaml_metadata(rawsource, metadata)
@@ -146,6 +146,14 @@ dothis = {
           do_after(target)
         end
       end)
+    end,
+    to_file_in_target = function(source, target_dir, format, metadata)
+      dothis.md_file.to_file_in_same_dir(source, format, metadata, function(target)
+        dothis.extant_path.move_into_absolute_path(target, target_dir)
+      end)
+    end,
+    to_file_in_downloads = function(source, format, metadata)
+      dothis.md_file.to_file_in_target(source, env.DOWNLOADS, format, metadata)
     end,
   },
   uuid = {
@@ -1179,16 +1187,20 @@ dothis = {
     download_attachment = function(path, name, do_after)
       local cache_path = env.XDG_CACHE_HOME .. '/hs/email_attachments'
       local att_path = cache_path .. '/' .. name
-      if type(do_after) == "function" then
-        local old_do_after = do_after
-        do_after = function()
-          old_do_after(att_path)
-        end
-      end
-      transf.string.string_or_nil_by_evaled_env_bash_stripped(
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
         'cd ' .. transf.single_quoted_escaped(cache_path) .. ' && mshow -x'
         .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(name),
-        do_after
+        function()
+          do_after(att_path)
+        end
+      )
+    end,
+    choose_attachment_and_download = function(path, fn)
+      dothis.array.choose_item(
+        transf.email_file.attachments(path),
+        function(att)
+          dothis.email_file.download_attachment(path, att, fn)
+        end
       )
     end,
     send = function(path, do_after)
@@ -1937,7 +1949,7 @@ dothis = {
       )
     end,
     generate_rechnung_pdf = function(omegat_project_dir, do_after)
-      dothis.pandoc.markdown_to(
+      dothis.md_file.to_file_in_same_dir(
         transf.omegat_project_dir.rechnung_md_path(omegat_project_dir),
         "pdf",
         transf.omegat_project_dir.rechnung_pdf_path(omegat_project_dir),
