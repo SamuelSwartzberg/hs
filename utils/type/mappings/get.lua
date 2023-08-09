@@ -1813,7 +1813,13 @@ get = {
       }
     end,
     stream_creation_specifier_array = function(path, flag_profile_name)
-
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        transf.extant_path.m3u_file_array_by_descendants(path),
+        get.fn.arbitrary_args_bound_or_ignored_fn(
+          get.m3u_file.stream_creation_specifier,
+          {a_use, flag_profile_name} 
+        )
+      )
     end,
   },
   local_extant_path = {
@@ -1935,6 +1941,16 @@ get = {
     contents_line_appended_to_string = function(path, line)
       return dothis.plaintext_file.content_lines_appended_to_string(path, {line})
     end,
+  },
+  m3u_file = {
+    stream_creation_specifier = function(path, flag_profile_name)
+      return {
+        source_path = path,
+        urls = transf.plaintext_file.string_array_by_content_lines(path),
+        type = "stream",
+        flag_profile_name = flag_profile_name,
+      }
+    end
   },
   plaintext_table_file = {
     dict_of_dicts_by_first_element_and_array = function(plaintext_file, arr2)
@@ -2832,8 +2848,14 @@ get = {
     end,
   },
   created_item_specifier_array = {
-    find_created_item_specifier_with_creation_specifier = function(arr, creation_specifier)
-      return hs.fnutils.find(
+    created_item_specifier_w_creation_specifier = function(arr, creation_specifier)
+      return get.array.t_or_nil_by_first_match_w_fn(
+        arr,
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.table.bool_by_key_equals_value, {a_use, "creation_specifier", creation_specifier})
+      )
+    end,
+    pos_int_w_creation_specifier = function(arr, creation_specifier)
+      return get.array.pos_int_or_nil_by_first_match_w_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table.bool_by_key_equals_value, {a_use, "creation_specifier", creation_specifier})
       )

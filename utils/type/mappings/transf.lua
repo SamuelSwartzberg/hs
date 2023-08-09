@@ -880,21 +880,25 @@ transf = {
         {recursion = true}
       )
     end,
-    descendant_file_array = function(path)
+    file_array_by_descendants = function(path)
       return get.extant_path.absolute_path_array(
         path,
         {recursion = true, include_dirs = false}
       )
     end,
-    plaintext_file_array = function(path)
-      return get.extant_path.absolute_path_array(
-        path,
-        {recursion = true, include_dirs = false, include_nonplaintext_files = false}
+    plaintext_file_array_by_descendants = function(path)
+      return transf.file_array.plaintext_file_array(
+        transf.extant_path.file_array_by_descendants(path)
+      )
+    end,
+    m3u_file_array_by_descendants = function(path)
+      return transf.plaintext_file_array.m3u_file_array(
+        transf.extant_path.plaintext_file_array_by_descendants(path)
       )
     end,
     url_or_local_path_array_by_descendant_m3u_file_content_lines = function(path)
       return transf.file_array.url_or_local_path_array_by_m3u_file_content_lines(
-        transf.extant_path.descendant_file_array(path)
+        transf.extant_path.file_array_by_descendants(path)
       )
     end,
     
@@ -1007,7 +1011,7 @@ transf = {
     descendant_file_array = function(path_array)
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
         path_array,
-        transf.extant_path.descendant_file_array
+        transf.extant_path.file_array_by_descendants
       )
     end,
   },
@@ -6946,7 +6950,7 @@ transf = {
   },
   env_yaml_file_container = {
     env_string = function(env_yaml_file_container)
-      local files = transf.extant_path.descendant_file_array(env_yaml_file_container)
+      local files = transf.extant_path.file_array_by_descendants(env_yaml_file_container)
       local yaml_files = get.path_array.filter_to_same_extension(files, "yaml")
       local env_var_name_env_node_dict_array = hs.fnutils.imap(
         yaml_files,

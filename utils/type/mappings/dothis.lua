@@ -968,7 +968,7 @@ dothis = {
     end,
     copy_descendant_file_array_into_absolute_path = function(path, tgt)
       dothis.extant_path_array.copy_into_absolute_path(
-        transf.extant_path.descendant_file_array(path),
+        transf.extant_path.file_array_by_descendants(path),
         tgt
       )
     end,
@@ -982,7 +982,7 @@ dothis = {
     end,
     move_descendant_file_array_into_absolute_path = function(path, tgt)
       dothis.extant_path_array.move_into_absolute_path(
-        transf.extant_path.descendant_file_array(path),
+        transf.extant_path.file_array_by_descendants(path),
         tgt
       )
     end,
@@ -1003,9 +1003,12 @@ dothis = {
     end,
     zip_descendant_file_array_to_absolute_path = function(path, tgt)
       dothis.extant_path_array.zip_to_absolute_path(
-        transf.extant_path.descendant_file_array(path),
+        transf.extant_path.file_array_by_descendants(path),
         tgt
       )
+    end,
+    create_stream = function(path, flag_profile_name)
+
     end,
   },
   extant_path_array = {
@@ -2475,23 +2478,36 @@ dothis = {
     end,
   },
   created_item_specifier_array = {
+    create = function(arr, creation_specifier)
+      local itm = dothis.creation_specifier.create(creation_specifier)
+      dothis.array.push(arr, itm)
+      return itm
+    end,
+    create_all = function(arr, creation_specifier_arr)
+      hs.fnutils.each(creation_specifier_arr, function(creation_specifier)
+        dothis.created_item_specifier_array.create(arr, creation_specifier)
+      end)
+    end,
+    --- shouldn't I be adding them to the array too????
     get_or_create = function(arr, creation_specifier)
-      local created_item_specifier = get.created_item_specifier_array.find_created_item_specifier_with_creation_specifier(arr, creation_specifier)
+      local created_item_specifier = get.created_item_specifier_array.created_item_specifier_w_creation_specifier(arr, creation_specifier)
       if created_item_specifier then
         return created_item_specifier
       else
-        return dothis.created_item_specifier.create(creation_specifier), true
+        return dothis.created_item_specifier_array.create(arr, creation_specifier)
       end
     end,
     create_or_recreate = function(arr, creation_specifier)
-      local res, new = dothis.created_item_specifier_array.get_or_create(arr, creation_specifier)
-      if not new then
-        res = dothis.created_item_specifier.recreate(res)
+      local idx = get.created_item_specifier_array.pos_int_w_creation_specifier(arr, creation_specifier)
+      if idx then
+        arr[idx] = dothis.created_item_specifier.recreate(arr[idx])
+        return arr[idx]
+      else
+        return dothis.created_item_specifier_array.create(arr, creation_specifier)
       end
-      return res
     end,
     create_or_recreate_all = function (arr, creation_specifier_arr)
-      hs.fnutils.each(creation_specifier_arr, function(creation_specifier)
+      hs.fnutils.ieach(creation_specifier_arr, function(creation_specifier)
         dothis.created_item_specifier_array.create_or_recreate(arr, creation_specifier)
       end)
     end
@@ -2522,17 +2538,12 @@ dothis = {
       return dothis.mpv_ipc_socket_id.set_playback_seconds_relative(spec.inner_item.ipc_socket_id, seconds)
     end,
   },
-  creation_specifier_array  = {
-    create = function(arr, spec)
-      dothis.array.push(arr, dothis.creation_specifier.create(spec))
-    end,
-  },
-  stream_creation_specifier_array = {
+  stream_created_item_specifier_array = {
     create_background_stream = function(arr, spec)
       local copied_spec = get.table.table_by_copy(spec)
       copied_spec.flag_profile_name = "background"
       copied_spec.type = "stream"
-      dothis.creation_specifier_array.create(arr, copied_spec)
+      dothis.created_item_specifier_array.create(arr, copied_spec)
     end,
     create_background_streams = nil -- TODO
   },
