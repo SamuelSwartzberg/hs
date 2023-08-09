@@ -2,13 +2,7 @@
 YoutubePlayableItemItemSpecifier = {
   type = "youtube-playable",
   properties = {
-    getables = {
-      ["is-youtube-playlist"] = function(self)
-        return stringy.endswith(self:get("url-path"), "playlist")
-      end,
-      ["is-youtube-video"] = function(self)
-        return stringy.endswith(self:get("url-path"), "watch")
-      end,
+    
       ["youtube-playable-item-title-cleaned"] = function(self)
         return transf.youtube_video_title.cleaned(self:get("youtube-playable-item-title"))
       end,
@@ -63,30 +57,4 @@ YoutubePlayableItemItemSpecifier = {
       end,
     }
   },
-  action_table = {
-      {
-        d = "ttl",
-        i = "🏧",
-        key = "youtube-playable-item-title-cleaned"
-      },
-      {
-        d = "crea",
-        i = "👩‍🎤",
-        key = "youtube-playable-item-channel-cleaned"
-      },
-      {
-        text = "📌🎸🔨 addm3udet.",
-        key = "add-as-m3u-deterministic",
-      },
-      {
-        text = "📌🎸🧠 addm3uai.",
-        key = "add-as-m3u-ai",
-      }
-    },
-  ),
 }
-
---- @type BoundNewDynamicContentsComponentInterface
-CreateYoutubePlayableItem = function(super)
-  return NewDynamicContentsComponentInterface(YoutubePlayableItemItemSpecifier, super)
-end

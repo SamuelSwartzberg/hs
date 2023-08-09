@@ -1803,7 +1803,18 @@ get = {
     end,
     bool_by_some_descendants_pass_w_fn = function(path, fn)
       return get.array.bool_by_some_pass_w_fn(transf.extant_path.descendants_absolute_path_array(path), fn)
-    end
+    end,
+    stream_creation_specifier = function(path, flag_profile_name)
+      return {
+        source_path = path,
+        urls = transf.extant_path.url_or_local_path_array_by_descendant_m3u_file_content_lines(path),
+        type = "stream",
+        flag_profile_name = flag_profile_name,
+      }
+    end,
+    stream_creation_specifier_array = function(path, flag_profile_name)
+
+    end,
   },
   local_extant_path = {
     attr = function(path, attr)
@@ -1903,16 +1914,16 @@ get = {
   },
   plaintext_file = {
     lines_tail = function(path, n)
-      return get.string.lines_tail(transf.plaintext_file.contents(path), n)
+      return get.string.lines_tail(transf.plaintext_file.string_by_contents(path), n)
     end,
     lines_head = function(path, n)
-      return get.string.lines_head(transf.plaintext_file.contents(path), n)
+      return get.string.lines_head(transf.plaintext_file.string_by_contents(path), n)
     end,
     nth_line = function(path, n)
-      return transf.plaintext_file.line_array(path)[n]
+      return transf.plaintext_file.string_array_by_lines(path)[n]
     end,
     contents_lines_appended = function(path, lines)
-      local extlines = transf.plaintext_file.line_array(path)
+      local extlines = transf.plaintext_file.string_array_by_lines(path)
       return transf.two_arrays.array_by_appended(extlines, lines)
     end,
     contents_line_appended = function(path, line)
@@ -1932,7 +1943,7 @@ get = {
     end,
     dict_of_dicts_by_header_file = function(plaintext_file, header_file)
       local array_of_arrays = transf.plaintext_table_file.array_of_array_of_fields(plaintext_file)
-      return get.array_of_arrays.dict_of_dicts_by_header_file(array_of_arrays, transf.plaintext_file.line_array(header_file))
+      return get.array_of_arrays.dict_of_dicts_by_header_file(array_of_arrays, transf.plaintext_file.string_array_by_lines(header_file))
     end,
   },
   timestamp_first_column_plaintext_table_file = {

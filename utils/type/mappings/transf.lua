@@ -48,14 +48,6 @@ transf = {
       )
     end,
   },
-  decimal_id = {
-    gelbooru_post_url = function(decimal_id)
-      return "https://gelbooru.com/index.php?page=post&s=view&id=" .. decimal_id
-    end,
-    danbooru_post_url = function(decimal_id)
-      return "https://danbooru.donmai.us/posts/" .. decimal_id
-    end,
-  },
   percent_encoded_octet = {
     char = function(percent)
       local num = percent:sub(2, 3)
@@ -471,6 +463,12 @@ transf = {
     ascii_char = function(num)
       return string.char(num)
     end,
+    gelbooru_post_url = function(pos_int)
+      return "https://gelbooru.com/index.php?page=post&s=view&id=" .. pos_int
+    end,
+    danbooru_post_url = function(pos_int)
+      return "https://danbooru.donmai.us/posts/" .. pos_int
+    end,
   },
   pos_int_array = {
     unicode_codepoint_string_array = function(arr)
@@ -735,6 +733,9 @@ transf = {
     ending_with_slash = function(path)
       return get.string.string_by_with_suffix(path or "", "/")
     end,
+    initial_path_component = function(path)
+      return transf.path.path_component_array(path)[1]
+    end,
     leaf = function(path)
       local pcomponents = transf.path.path_component_array(path)
       return pcomponents[#pcomponents]
@@ -885,6 +886,18 @@ transf = {
         {recursion = true, include_dirs = false}
       )
     end,
+    plaintext_file_array = function(path)
+      return get.extant_path.absolute_path_array(
+        path,
+        {recursion = true, include_dirs = false, include_nonplaintext_files = false}
+      )
+    end,
+    url_or_local_path_array_by_descendant_m3u_file_content_lines = function(path)
+      return transf.file_array.url_or_local_path_array_by_m3u_file_content_lines(
+        transf.extant_path.descendant_file_array(path)
+      )
+    end,
+    
     descendant_dir_array = function(path)
       return get.extant_path.absolute_path_array(
         path,
@@ -1008,6 +1021,16 @@ transf = {
         transf.dir.absolute_path_array_by_children
       )
     end,
+  },
+  file_array = {
+    plaintext_file_array = function(path_array)
+      return hs.fnutils.ifilter(path_array, is.file.plaintext_file)
+    end,
+    url_or_local_path_array_by_m3u_file_content_lines = function(path_array)
+      return transf.plaintext_file_array.url_or_local_path_array_by_m3u_file_content_lines(
+        transf.file_array.plaintext_file_array(path_array)
+      )
+    end
   },
   labelled_remote_dir = {
     children_absolute_path_array = function(remote_extant_path)
@@ -1723,47 +1746,47 @@ transf = {
   },
 
   plaintext_file = {
-    contents = function(path)
+    string_by_contents = function(path)
       return transf.file.contents(path)
     end,
-    line_array = function(path)
-      return transf.string.lines(transf.plaintext_file.contents(path))
+    string_array_by_lines = function(path)
+      return transf.string.lines(transf.plaintext_file.string_by_contents(path))
     end,
-    content_lines = function(path)
-      return transf.string.noempty_line_string_array(transf.plaintext_file.contents(path))
+    string_array_by_content_lines = function(path)
+      return transf.string.noempty_line_string_array(transf.plaintext_file.string_by_contents(path))
     end,
     noindent_content_lines = function(path)
-      return transf.string.noindent_content_lines(transf.plaintext_file.contents(path))
+      return transf.string.noindent_content_lines(transf.plaintext_file.string_by_contents(path))
     end,
     nocomment_noindent_content_lines = function(path)
-      return transf.string.nocomment_noindent_content_lines(transf.plaintext_file.contents(path))
+      return transf.string.nocomment_noindent_content_lines(transf.plaintext_file.string_by_contents(path))
     end,
     first_line = function(path)
-      return transf.string.first_line(transf.plaintext_file.contents(path))
+      return transf.string.first_line(transf.plaintext_file.string_by_contents(path))
     end,
     last_line = function(path)
-      return transf.string.last_line(transf.plaintext_file.contents(path))
+      return transf.string.last_line(transf.plaintext_file.string_by_contents(path))
     end,
     bytechars = function(path)
-      return transf.string.bytechar_array(transf.plaintext_file.contents(path))
+      return transf.string.bytechar_array(transf.plaintext_file.string_by_contents(path))
     end,
     chars = function(path)
-      return transf.string.char_array(transf.plaintext_file.contents(path))
+      return transf.string.char_array(transf.plaintext_file.string_by_contents(path))
     end,
     no_final_newlines = function(path)
-      return transf.string.no_final_newlines(transf.plaintext_file.contents(path))
+      return transf.string.no_final_newlines(transf.plaintext_file.string_by_contents(path))
     end,
     one_final_newline = function(path)
-      return transf.string.one_final_newline(transf.plaintext_file.contents(path))
+      return transf.string.one_final_newline(transf.plaintext_file.string_by_contents(path))
     end,
     len_lines = function(path)
-      return transf.string.len_lines(transf.plaintext_file.contents(path))
+      return transf.string.len_lines(transf.plaintext_file.string_by_contents(path))
     end,
     len_chars = function(path)
-      return transf.string.len_chars(transf.plaintext_file.contents(path))
+      return transf.string.len_chars(transf.plaintext_file.string_by_contents(path))
     end,
     len_bytechars = function(path)
-      return transf.string.len_bytechars(transf.plaintext_file.contents(path))
+      return transf.string.len_bytechars(transf.plaintext_file.string_by_contents(path))
     end,
 
     
@@ -3102,10 +3125,22 @@ transf = {
     youtube_playlist_id = function(url)
       return transf.url.param_table(url).list
     end,
+    title = function(url)
+      return transf.youtube_playlist_id.title(transf.youtube_playlist_url.youtube_playlist_id(url))
+    end,
+    uploader = function(url)
+      return transf.youtube_playlist_id.uploader(transf.youtube_playlist_url.youtube_playlist_id(url))
+    end,
   },
   youtube_video_url = {
     youtube_video_id = function(url)
       return transf.url.param_table(url).v
+    end,
+    title = function(url)
+      return transf.youtube_video_id.title(transf.youtube_video_url.youtube_video_id(url))
+    end,
+    channel_title = function(url)
+      return transf.youtube_video_id.channel_title(transf.youtube_video_url.youtube_video_id(url))
     end,
   },
   youtube_channel_id = {
@@ -3834,7 +3869,7 @@ transf = {
   },
   yaml_file = {
     not_userdata_or_function = function(path)
-      return transf.yaml_string.not_userdata_or_function(transf.plaintext_file.contents(path))
+      return transf.yaml_string.not_userdata_or_function(transf.plaintext_file.string_by_contents(path))
     end
   },
   
@@ -4598,15 +4633,24 @@ transf = {
 
   },
   plaintext_file_array = {
-    contents_array = function(arr)
-      return hs.fnutils.imap(arr, transf.plaintext_file.contents)
+    string_array_by_contents = function(arr)
+      return hs.fnutils.imap(arr, transf.plaintext_file.string_by_contents)
     end,
-    lines_array = function(arr)
-      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.line_array)
+    string_array_by_lines = function(arr)
+      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.string_array_by_lines)
     end,
-    content_lines_array = function(arr)
-      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.content_lines)
+    string_array_by_content_lines = function(arr)
+      return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.string_array_by_content_lines)
     end,
+    m3u_file_array = function(path_array)
+      return hs.fnutils.ifilter(path_array, is.plaintext_file.m3u_file)
+    end,
+    url_or_local_path_array_by_m3u_file_content_lines = function(arr)
+      return transf.plaintext_file_array.string_array_by_content_lines(
+        transf.plaintext_file_array.m3u_file_array(arr)
+      )
+    end,
+    
   },
   array_of_event_tables = {
   },
@@ -6328,7 +6372,7 @@ transf = {
     end,
   },
   url = {
-    ensure_scheme = function(url)
+    url_by_ensure_scheme = function(url)
       if is.url.scheme_url(url) then
         return url
       else
@@ -6336,17 +6380,17 @@ transf = {
       end
     end,
     in_wayback_machine = function(url)
-      return "https://web.archive.org/web/*/" .. transf.url.ensure_scheme(url)
+      return "https://web.archive.org/web/*/" .. transf.url.url_by_ensure_scheme(url)
     end,
     default_negotiation_url_contents = function(url)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped, refstore.params.memoize.opts.invalidate_1_day_fs, "run")
           "curl -L" .. transf.string.single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
-      return transf.not_userdata_or_function.in_cache_dir(transf.url.ensure_scheme(url), "url")
+      return transf.not_userdata_or_function.in_cache_dir(transf.url.url_by_ensure_scheme(url), "url")
     end,
     url_table = function(url)
-      return get.fn.rt_or_nil_by_memoized(urlparse)(transf.url.ensure_scheme(url))
+      return get.fn.rt_or_nil_by_memoized(urlparse)(transf.url.url_by_ensure_scheme(url))
     end,
     scheme = function(url)
       return transf.url.url_table(url).scheme
@@ -6433,6 +6477,14 @@ transf = {
     end,
 
   },
+  path_url = {
+    initial_path_component = function(url)
+      return transf.path.initial_path_component(transf.url.path(url))
+    end,
+    leaf = function(url)
+      return transf.path.leaf(transf.url.path(url))
+    end,
+  },
   html_url = {
     html_string = transf.url.default_negotiation_url_contents, -- ideally we would reject non-html responses, but currently, that's too much work
     title = function(url)
@@ -6478,6 +6530,24 @@ transf = {
       local ext = transf.path.extension(url)
       return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.image_url.hs_image(url), ext)
     end,
+  },
+  gelbooru_style_post_url = {
+    nonindicated_number_string_by_booru_post_id = function(url)
+      return transf.url.param_table(url).id
+    end,
+    pos_int_by_booru_post_id = function(url)
+      return transf.nonindicated_number_string.number_base_10(transf.gelbooru_style_post_url.nonindicated_number_string_by_booru_post_id(url))
+    end,
+  },
+  yandere_style_post_url = {
+    nonindicated_number_string_by_booru_post_id = function(url)
+      return eutf8.match(transf.url.path(url), "/post/show/(%d+)")
+    end
+  },
+  danbooru_style_post_url = {
+    nonindicated_number_string_by_booru_post_id = function(url)
+      return eutf8.match(transf.url.path(url), "/posts/(%d+)")
+    end
   },
   gpt_response_table = {
     response_text = function(result)

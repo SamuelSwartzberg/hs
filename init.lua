@@ -210,7 +210,7 @@ local keymap = {
   i = {
     explanation = "Choose a favorite stream",
     fn = function() 
-      ar(transf.plaintext_file.line_array("/Users/sam/me/state/init_playlists"))
+      ar(transf.plaintext_file.string_array_by_lines("/Users/sam/me/state/init_playlists"))
         :doThis("choose-item", function(item)
           System:get("manager", "stream"):doThis("create-background-stream", item)
         end)

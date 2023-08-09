@@ -508,7 +508,7 @@ dothis = {
   },
   url_or_local_path = {
     open_browser = function(url, browser, do_after)
-      url = transf.url.ensure_scheme(url)
+      url = transf.url.url_by_ensure_scheme(url)
       browser = browser or "Firefox"
       if do_after then -- if we're opening an url, typically, we would exit immediately, negating the need for a callback. Therefore, we want to wait. The only easy way to do this is to use a completely different browser. 
         transf.string.string_or_nil_by_evaled_env_bash_stripped("open -a Safari -W" .. transf.string.single_quoted_escaped(url), do_after)
@@ -1120,33 +1120,33 @@ dothis = {
       dothis.absolute_path.write_file_if_file(path, get.string_or_number_array.string_by_joined(lines, "\n"))
     end,
     set_line = function(path, line, line_number)
-      local lines = transf.plaintext_file.line_array(path)
+      local lines = transf.plaintext_file.string_array_by_lines(path)
       lines[line_number] = line
       dothis.plaintext_file.write_lines(path, lines)
     end,
     pop_line = function(path)
-      local lines = transf.plaintext_file.line_array(path)
+      local lines = transf.plaintext_file.string_array_by_lines(path)
       local line = table.remove(lines, #lines)
       dothis.plaintext_file.write_lines(path, lines)
       return line
     end,
     remove_line_w_pos_int = function(path, line_number)
-      local lines = transf.plaintext_file.line_array(path)
+      local lines = transf.plaintext_file.string_array_by_lines(path)
       table.remove(lines, line_number)
       dothis.plaintext_file.write_lines(path, lines)
     end,
     remove_line_w_fn = function(path, cond)
-      local lines = transf.plaintext_file.line_array(path)
+      local lines = transf.plaintext_file.string_array_by_lines(path)
       local index = get.array.pos_int_or_nil_by_first_match_w_fn(lines, cond)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
     remove_line_w_string = function(path, cond)
-      local lines = transf.plaintext_file.line_array(path)
+      local lines = transf.plaintext_file.string_array_by_lines(path)
       local index = get.array.pos_int_or_nil_by_first_match_w_t(lines, cond)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
     find_remove_nocomment_noindent_line = function(path, cond)
-      local lines = transf.plaintext_file.line_array(path)
+      local lines = transf.plaintext_file.string_array_by_lines(path)
       local index = hs.fnutils.find(lines, function(line)
         local nocomment_noindent = transf.line.nocomment_noindent(line)
         return findsingle(nocomment_noindent, cond)

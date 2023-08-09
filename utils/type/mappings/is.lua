@@ -545,6 +545,9 @@ is = {
     authority_url = function(url)
       return transf.url.authority(url) ~= nil
     end,
+    query_url = function(url)
+      return transf.url.query(url) ~= nil
+    end,
 
   },
   scheme_url = {
@@ -575,6 +578,12 @@ is = {
       return eutf8.find(transf.path_url.path(url), "^/post/show/%d+/?$") ~= nil
     end,
   },
+  query_url = {
+    gelbooru_style_post_url = function(url)
+      local paramtbl = transf.url.param_table(url)
+      return is.any.int_string(paramtbl["id"]) and paramtbl["page"] == "post"
+    end
+  },
   extension_url = {
 
   },
@@ -600,6 +609,17 @@ is = {
     end,
     safebooru_url = function(url)
       return transf.url.host(url) == "safebooru.org"
+    end,
+  },
+  youtube_url = {
+    youtube_video_url = function(url)
+      return transf.path_url.initial_path_component(url) == "watch"
+    end,
+    youtube_playlist_url = function(url)
+      return transf.path_url.initial_path_component(url) == "playlist"
+    end,
+    youtube_playable_url = function(url)
+      return is.youtube_url.youtube_video_url(url) or is.youtube_url.youtube_playlist_url(url)
     end,
   },
   data_url = {
