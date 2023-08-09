@@ -23,6 +23,8 @@ a_use = math.random(999999999) + 1000
 
 comp = transf.dir.plaintext_dictonary_read_assoc(env.MCOMPOSITE)
 fstblmap = transf.dir.plaintext_dictonary_read_assoc(env.MDICTIONARIES .. "/mappings")
+timer_arr = {}
+timer_arr_refresher = hs.timer.doEvery(1, get.fn.first_n_args_bound_fn(dothis.timer_spec_array.fire_all_if_ready_and_space_if_necessary, timer_arr))
 
 require("items-managers")
 

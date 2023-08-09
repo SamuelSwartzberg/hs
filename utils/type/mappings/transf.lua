@@ -7575,6 +7575,18 @@ transf = {
       return get.string_or_number.number_or_nil(transf.cronspec_string.next_timestamp_s_string(cronspec_string))
     end,
   },
+  timer_spec = {
+    int_by_interval_left = function(spec)
+      return spec.next_timestamp_s - os.time() 
+    end,
+    bool_by_ready = function(spec)
+      return transf.timer_spec.int_by_interval_left(spec) <= 0
+    end,
+    bool_by_long_timer = function(spec)
+      return spec.largest_interval and spec.largest_interval > 60
+    end
+
+  },
   start_stop_step_unit = {
     array = function(start, stop, step, unit)
       start = get.any.default_if_nil(start, 1)

@@ -2547,6 +2547,52 @@ dothis = {
     end,
     create_background_streams = nil -- TODO
   },
+  timer_spec = {
+    set_next_timestamp_s = function(spec)
+      spec.next_timestamp_s = transf.cronspec_string.next_timestamp_s(spec.cronspec_string)
+    end,
+    postpone_next_timestamp_s = function(spec, s)
+      spec.next_timestamp_s = spec.next_timestamp_s + s
+    end,
+    fire = function(spec)
+      spec.fn()
+      dothis.timer_spec.set_next_timestamp_s(spec)
+      spec.largest_interval = transf.two_comparables.bool_by_larger(spec.largest_interval, transf.timer_spec.int_by_interval_left(spec))
+    end,
+  },
+  timer_spec_array = {
+    fire_all_if_ready_and_space_if_necessary = function(arr)
+      local fired = false
+      for _, v in transf.array.index_value_stateless_iter(arr) do
+        if 
+          transf.timer_spec.bool_by_ready(v) 
+        then
+          if 
+            not fired or
+            not transf.timer_spec.bool_by_long_timer(v)
+          then
+            dothis.timer_spec.fire(v)
+            fired = true
+          else
+            dothis.timer_spec.postpone_next_timestamp_s(v, 1)
+          end
+        end
+      end
+    end,
+    create = function(arr, spec)
+      dothis.array.push(arr, spec)
+      dothis.timer_spec.set_next_timestamp_s(spec)
+    end,
+    create_by_default_interval = function(arr, fn)
+      dothis.timer_spec_array.create(
+        arr,
+        {
+          fn = fn,
+          cronspec_string = "*/10 * * * *",
+        }
+      )
+    end
+  },
   preference_domain_string = {
     write_default = function(domain, key, value, type)
       transf.string.string_or_nil_by_evaled_env_bash_stripped("defaults write" .. transf.string.single_quoted_escaped(domain) .. transf.string.single_quoted_escaped(key) .. " -" .. type .. " " .. transf.string.single_quoted_escaped(value))
