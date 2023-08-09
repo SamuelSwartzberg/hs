@@ -1,23 +1,7 @@
 StringItemSpecifier = {
   type = "string",
   properties = {
-    getables = {
-      ["to-string"] = bc(transf.string.singleline_string_by_folded),
-    },
-  },
-  ({
-    { key = "url", value = CreateURLItem },
-    { key = "path", value = CreatePathItem },
-    { key = "printable-ascii-string-item", value = CreatePrintableAsciiStringItem },
-  }),
-  ({
-    {
-      text = "📋 cp.",
-      dothis = dothis.string.add_to_clipboard
-    },{
-      text = "📎 pst.",
-      dothis = dothis.string.paste
-    },{
+  ({{
       text = "👄🇺🇸 sayen.",
       dothis = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.string.say, {a_use, "en"})
     },{
@@ -43,48 +27,6 @@ StringItemSpecifier = {
     },{
       text = "👉🍾 cev.",
       getfn = get.khal.search_event_tables
-    },
-    {
-      d = "binec",
-      i = "🅱️2️⃣📦",
-      getfn = transf.string.binary_string
-    }, {
-      d = "hexec",
-      i = "🅱️1️⃣6️⃣📦",
-      getfn = transf.string.hex_string
-    }, {
-      d = "urlb64ec",
-      i = "🔗🅱️6️⃣4️⃣📦",
-      getfn = transf.string.base64_url_string
-    }, {
-      d = "genb64ec",
-      i = "🤝🅱️6️⃣4️⃣📦",
-      getfn = transf.string.base64_gen_string
-    }, {
-      d = "crc32ec",
-      i = "👴🏻🅱️3️⃣2️⃣📦",
-      getfn = transf.string.base32_crock_string
-    }, {
-      d = "gen32ec",
-      i = "🤝🅱️3️⃣2️⃣📦",
-      getfn = transf.string.base32_gen_string
-    }, {
-      d = "escrgx",
-      i = "🏃🏾‍♀️🧩",
-      getfn = transf.string.escaped_general_regex
-    }, {
-      d = "escluargx",
-      i = "🏃🏾‍♀️🔵🧩",
-      getfn = transf.string.escaped_lua_regex
-    }, {
-      d = "eval",
-      i = "🧬",
-      getfn = get.string.evaled_as_lua
-    }, 
-    {
-      d = "tmpeval",
-      i = "🕳🧬",
-      getfn = get.string.evaled_as_template
     }, {
       d = "basheval",
       i = "🐚🧬",
@@ -176,16 +118,7 @@ StringItemSpecifier = {
       d = "fld",
       i = "🗺",
       getfn = transf.string.singleline_string_by_folded
-    },{
-      d = "lnhd",
-      i = "⩶👆",
-      getfn = get.string.lines_head,
-
-    },{
-      d = "lntl",
-      i = "⩶👇",
-      getfn = get.string.lines_tail,
-    },
+    }
     {
       d = "ln",
       i = "⩶",
@@ -220,19 +153,3 @@ StringItemSpecifier = {
     end
   ))
 }
-
---- @type BoundRootInitializeInterface
-function st(contents)
-  if type(contents) ~= "string" then
-    if type(contents) == "number" then 
-      contents = tostring(contents)
-    elseif type(contents) == "boolean" then
-      contents = tostring(contents)
-    else
-      print("Error: contents must be a string. Got:")
-      inspPrint(contents)
-      error("Cannot proceed.")
-    end
-  end
-  return RootInitializeInterface(StringItemSpecifier, contents)
-end

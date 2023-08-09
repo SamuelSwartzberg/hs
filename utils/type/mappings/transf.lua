@@ -3207,6 +3207,17 @@ transf = {
       return eutf8.sub(handle, 2)
     end,
   },
+  youtube_channel_url = {
+    handle = function(url)
+      return get.string.string_by_no_adfix(
+        transf.url.path(url),
+        "/"
+      )
+    end,
+    youtube_channel_id = function(url)
+      return transf.handle.youtube_channel_id(transf.youtube_channel_url.handle(url))
+    end,
+  },
   string = {
     consonants = function(str)
       error("todo")
@@ -4601,15 +4612,15 @@ transf = {
 
   },
   url_array = {
-    url_potentially_with_title_comment_array = function(html_url_array)
+    url_potentially_with_title_comment_array = function(sgml_url_array)
       return hs.fnutils.imap(
-        html_url_array,
+        sgml_url_array,
         transf.url.url_potentially_with_title_comment
       )
     end,
-    session_string = function(html_url_array)
+    session_string = function(sgml_url_array)
       return get.string_or_number_array.string_by_joined(
-        transf.url.url_potentially_with_title_comment_array(html_url_array),
+        transf.url.url_potentially_with_title_comment_array(sgml_url_array),
         "\n"
       )
     end,
@@ -4624,11 +4635,11 @@ transf = {
       )
     end,
   },
-  html_url_array = {
-    html_url_with_title_comment_array = function(html_url_array)
+  sgml_url_array = {
+    sgml_url_with_title_comment_array = function(sgml_url_array)
       return hs.fnutils.imap(
-        html_url_array,
-        transf.html_url.html_url_with_title_comment
+        sgml_url_array,
+        transf.sgml_url.sgml_url_with_title_comment
       )
     end,
     
@@ -6464,7 +6475,7 @@ transf = {
       }
     end,
     url_potentially_with_title_comment = function(url)
-      local title = transf.html_url.title(url)
+      local title = transf.sgml_url.string_or_nil_by_title(url)
       if title and title ~= "" then
         return url .. " # " .. title
       else
@@ -6472,7 +6483,7 @@ transf = {
       end
     end,
     title_or_url_as_filename = function(url)
-      local title = transf.html_url.title(url)
+      local title = transf.sgml_url.string_or_nil_by_title(url)
       if title and title ~= "" then
         return transf.string.safe_filename(title) .. ".url2"
       else
@@ -6489,13 +6500,16 @@ transf = {
       return transf.path.leaf(transf.url.path(url))
     end,
   },
-  html_url = {
-    html_string = transf.url.default_negotiation_url_contents, -- ideally we would reject non-html responses, but currently, that's too much work
-    title = function(url)
-      return get.html_url.text_query_selector_all(url, "title")
+  sgml_url = {
+    sgml_string = transf.url.default_negotiation_url_contents, -- ideally we would reject non-html responses, but currently, that's too much work
+    string_or_nil_by_title = function(url)
+      return get.sgml_url.string_or_nil_by_query_selector_all(url, "title")
     end,
-    html_url_with_title_comment = function(url)
-      return url .. " # " .. transf.html_url.title(url)
+    string_or_nil_by_description = function(url)
+      return get.sgml_url.string_or_nil_by_query_selector_all(url, "meta[name=description]")
+    end,
+    sgml_url_with_title_comment = function(url)
+      return url .. " # " .. transf.sgml_url.string_or_nil_by_title(url)
     end
   },
   owner_item_url = {
@@ -6509,7 +6523,7 @@ transf = {
   whisper_url = {
     transcribed = function(url)
       local path = transf.url.in_cache_dir(url)
-      dothis.url.download(url, path)
+      dothis.url.download_to(url, path)
       return transf.whisper_file.transcribed(path)
 
     end
@@ -6527,7 +6541,7 @@ transf = {
     end,
     qr_data = function(url)
       local path = transf.url.in_cache_dir(url)
-      dothis.url.download(url, path)
+      dothis.url.download_to(url, path)
       return transf.local_image_file.qr_data(path)
     end,
     data_url = function(url)

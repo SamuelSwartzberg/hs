@@ -2563,40 +2563,40 @@ get = {
   url = {
 
   },
-  html_string = {
-    html_query_selector_all = function(str, selector)
+  sgml_string = {
+    sgml_string_or_nil_by_query_selector_all = function(str, selector)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
         "htmlq" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
-    text_query_selector_all = function(str, selector)
+    string_or_nil_by_query_selector_all = function(str, selector)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
         "htmlq --text" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
-    attribute_query_selector_all = function(str, selector, attribute)
+    string_or_nil_by_attribute_query_selector_all = function(str, selector, attribute)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
         "htmlq --attribute " .. transf.string.single_quoted_escaped(attribute) .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
     -- non-all seems to not be possible with htmlq. At least for html_, it would be possible if we parsed the html, but for text_, there seems to be no indication of when each result ends.
   },
-  html_url = {
-    html_query_selector_all = function(url, selector)
-      return get.html_string.html_query_selector_all(
-        transf.html_url.html_string(url),
+  sgml_url = {
+    sgml_string_or_nil_by_query_selector_all = function(url, selector)
+      return get.sgml_string.sgml_string_or_nil_by_query_selector_all(
+        transf.sgml_url.sgml_string(url),
         selector
       )
     end,
-    text_query_selector_all = function(url, selector)
-      return get.html_string.text_query_selector_all(
-        transf.html_url.html_string(url),
+    string_or_nil_by_query_selector_all = function(url, selector)
+      return get.sgml_string.string_or_nil_by_query_selector_all(
+        transf.sgml_url.sgml_string(url),
         selector
       )
     end,
-    attribute_query_selector_all = function(url, selector, attribute)
-      return get.html_string.attribute_query_selector_all(
-        transf.html_url.html_string(url),
+    string_or_nil_by_attribute_query_selector_all = function(url, selector, attribute)
+      return get.sgml_string.string_or_nil_by_attribute_query_selector_all(
+        transf.sgml_url.sgml_string(url),
         selector,
         attribute
       )

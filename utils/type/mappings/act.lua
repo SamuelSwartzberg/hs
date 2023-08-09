@@ -70,6 +70,9 @@ act = {
         dothis.url.add_event_from_url(url, calendar)
       end)
     end,
+    download_into_downloads_async = function(url)
+      dothis.url.download_into_async(url, env.DOWNLOADS)
+    end
   },
   ics_file = {
     add_events_to_default_calendar = function(ics_file)
@@ -306,5 +309,5 @@ act = {
         )
       )
     end,
-  }
+  },
 }

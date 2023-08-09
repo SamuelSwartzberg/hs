@@ -207,9 +207,19 @@ dothis = {
     
   },
   url = {
-    download = function(url, target)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
+    download_to_async = function(url, target)
+      dothis.string.env_bash_eval_async("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
     end,
+    download_to_sync = function(url, target)
+      dothis.string.env_bash_eval_sync("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
+    end,
+    download_into_async = function(url, target_dir)
+      dothis.string.env_bash_eval_async("cd " .. transf.string.single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.string.single_quoted_escaped(url) .. " -O")
+    end,
+    download_into_sync = function(url, target_dir)
+      dothis.string.env_bash_eval_sync("cd " .. transf.string.single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.string.single_quoted_escaped(url) .. " -O")
+    end,
+      
     add_event_from_url = function(url, calendar)
       local temp_path_arg = transf.string.single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
       dothis.string.env_bash_eval('curl' .. transf.string.single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg)
@@ -232,7 +242,7 @@ dothis = {
         request_table = { url = url },
         request_verb = "POST",
       })
-    end
+    end,
   },
   table = {
     write_ics_file = function(tbl, path)
@@ -1375,6 +1385,26 @@ dothis = {
       )
     end,
   },
+  youtube_channel_url = {
+    add_to_newsboat_urls_file = function(channel_url, category)
+      dothis.youtube_channel_id.add_to_newsboat_urls_file(
+        transf.youtube_channel_url.channel_id(channel_url),
+        category
+      )
+    end,
+  },
+  sgml_url = {
+    add_to_newsboat_urls_file = function(url, category)
+      dothis.newsboat_urls_file.append_newsboat_url_specifier(
+        env.NEWSBOAT_URLS,
+        {
+          url = url,
+          title = transf.sgml_url.string_or_nil_by_title(url),
+          category = category,
+        }
+      )
+    end,
+  },
   audiodevice = {
     set_default = function(device, type)
       device["setDefault" .. transf.string.string_by_first_eutf8_upper(type) .. "Device"](device)
@@ -1615,7 +1645,7 @@ dothis = {
     end,
     
   },
-  html_url_array = {
+  sgml_url_array = {
    
   },
   absolute_path_dict = {

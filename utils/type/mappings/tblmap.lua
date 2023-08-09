@@ -488,7 +488,7 @@ tblmap = {
     },
     chooser_text_partial_retriever_specifier = {
       string = {
-        thing_name = "summary",
+        thing_name = "singleline_string_by_folded",
         precedence = -999
       },
       audiodevice_specifier = {

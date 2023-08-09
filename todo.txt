@@ -1,3 +1,10 @@
+refac:
+  - dissolve remaining 'items' stuff
+  - dissolve actable_paths
+  - move/add things from dothis to act
+  - add implementations of various 'get' things to 'transf'
+  - fix static type errors in remaining files
+  - write tests with busted
 post 'lua is working':  
   - add/rename missing m3us
   - history
@@ -18,28 +25,28 @@ post 'lua is working':
     - contact em 
     - contact freiland aktzeichen host (ask first if still hosting)
   - newsboat formatting, interface
-  - health data downsync
+  - health data downsync:
     - strava
     - other devices: general heartrate? Blood pressure? steps
     - dna test?
     - regular blood test?
     - family health data
-  - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them -> Perhaps better: cache MAUDIOVISUAL urls, allow playing of those local files as dropin (however, we also query a lot from yt, so we need to cache that - ideally permanently). However: Cache should be conceptualized as temporary, but this cache as permanent. So we need some solution to say 'don't delete this cache', or a different kind of cache.
-  - srctgt is a little meh atm
+  - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them -> Perhaps better\: cache MAUDIOVISUAL urls, allow playing of those local files as dropin (however, we also query a lot from yt, so we need to cache that - ideally permanently). However\: Cache should be conceptualized as temporary, but this cache as permanent. So we need some solution to say 'don't delete this cache', or a different kind of cache.
+  - srctgt is a little meh atm:
     - etcconfig: link files individually, rather than whole dirs
     - etcconfig: requires sudo ability
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
   - jcw/jcwserve in string menu?
   - danbooru search links need their query to count as 'seen' for other queries
   - wrapper for hs chords?
-  - https://www.hammerspoon.org/docs/hs.application.watcher.html: use to deactivate mullvad when geforce now? wrap application watchers to make it easier to create stuff?
+  - https://www.hammerspoon.org/docs/hs.application.watcher.html use to deactivate mullvad when geforce now? wrap application watchers to make it easier to create stuff?:
     - maybe make watchers table with function, type, watcher keys such that we can subclass watchers based on type, this would also unlock additional functionality
   - citations
     - add citations and test citation usage workflow
     - rename, sort books based on what is needed for citation workflow, and what is desirable
     - enable book sync to phone  
-post: 'stuff is implemented'
-  - performance
+post 'stuff is implemented':
+  - performance:
     - optimize checks by using new stringy functions & memoization where necessary
     - fix memory leak
     - more memoization
