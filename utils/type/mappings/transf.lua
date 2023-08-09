@@ -394,11 +394,11 @@ transf = {
         transf.pos_int.largest_int_of_length(int)
       )
     end,
-    random_base64_gen_string_of_length = function(int)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. tostring(int))
-    end,
   },
   pos_int = {
+    random_base64_gen_string_of_length = function(int)
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. tostring(transf.number.int_by_rounded(int * 3/4))) -- 3/4 because base64 takes the int to be the input length, but we want to specify the output length (which is 4/3 the input length in case of base64)
+    end,
     nonindicated_decimal_number_string = function(num)
       return tostring(num)
     end,

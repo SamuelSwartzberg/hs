@@ -128,13 +128,40 @@ is = {
       return is.printable_ascii_string.indicated_decimal_string(str) or is.printable_ascii_string.decimal_string(str)
     end,
     url = isUrl,
+    alphanum_minus_underscore = function(str)
+      return not string.find(str, "[^%w%-_]")
+    end,
+    alphanum = function(str)
+      return is.printable_ascii_string.alphanum_minus_underscore(str) and is.alphanum_minus_underscore.alphanum(str)
+    end,
+    
     handle = function(str)
       return stringy.startswith(str, "@")
     end,
+    --- trying to determine what string is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
+    email_address = function(str)
+      return 
+        get.string.bool_by_contains_w_string(str, "@") and
+        get.string.bool_by_contains_w_string(str, ".") and
+        not eutf8.find(str, "%s")
+    end,
+    dice_notation = function(str)
+      return onig.find(str, transf.string.whole_regex(mt._r.syntax.dice))
+    end,
+    installed_package_name = function(str)
+      return get.array.bool_by_contains(transf.package_manager_name_or_nil.package_name_array(nil), str)
+    end,
+    unicode_codepoint_string = function(str)
+      return stringy.startswith(str, "U+") and string.match(str, "^U+%x+$")
+    end,
+    iban = function(str)
+      local cleaned_iban = transf.iban.cleaned_iban(str)
+      return #cleaned_iban <= 34 and is.printable_ascii_string.alphanum(cleaned_iban)
+    end
   },
   calendar_name = {
     writeable_calendar_name = function(name)
-      return get.string.bool_not_startswith(name, "r-:")
+      return get.string.bool_by_not_startswith(name, "r-:")
     end,
   },
   alphanum_minus = {
@@ -534,10 +561,13 @@ is = {
       return get.array.bool_by_contains(transf["nil"].package_manager_name_array(), str)
     end,
     alphanum_underscore =  function(str) 
-      return not string.find(str, "-")
+      return not stringy.find(str, "-")
     end,
     alphanum_minus = function(str)
-      return not string.find(str, "_")
+      return not stringy.find(str, "_")
+    end,
+    alphanum = function(str)
+      return is.alphanum_minus_underscore.alphanum_underscore(str) or is.alphanum_minus_underscore.alphanum_minus(str)
     end,
     youtube_video_id = function(str)
       return #str == 11 -- not officially specified, but b/c 64^11 > 2^64 > 64^10 and 64 chars in base64, allowing for billions of ids per living person, unlikely to change

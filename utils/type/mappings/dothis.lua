@@ -168,7 +168,7 @@ dothis = {
   pass_item_name = {
     replace = function(name, type, data)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("pass rm " .. type .. "/" .. name, function()
-        dothis.alphanum_minus_underscore.add_pass_item_name(name, type, data)
+        dothis.alphanum_minus_underscore.add_as_pass_item_name(name, type, data)
       end)
     end,
     rename = function(name, type, new_name)
@@ -179,16 +179,16 @@ dothis = {
     end,
   },
   alphanum_minus_underscore = {
-    add_pass_item_name_with_json = function(name, type, data)
-      dothis.alphanum_minus_underscore.add_pass_item_name(name, type, json.encode(data))
+    add_as_pass_item_name_with_json = function(name, type, data)
+      dothis.alphanum_minus_underscore.add_as_pass_item_name(name, type, json.encode(data))
     end,
-    add_pass_item_name = function(name, type, data)
+    add_as_pass_item_name = function(name, type, data)
       dothis.string.env_bash_eval("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
     end,
-    add_passw_pass_item_name = function(name, password)
-      dothis.alphanum_minus_underscore.add_pass_item_name(name, "passw", password)
+    add_as_passw_pass_item_name = function(name, password)
+      dothis.alphanum_minus_underscore.add_as_pass_item_name(name, "passw", password)
     end,
-    add_username_pass_item_name = function(name, username)
+    add_as_username_pass_item_name = function(name, username)
       dothis.absolute_path.write_file(
         get.pass_item_name.path(name, "username", "txt"),
         username

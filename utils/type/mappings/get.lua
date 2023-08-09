@@ -996,14 +996,15 @@ get = {
     content_lines_head = function(path, n)
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.noempty_line_string_array(path), 1, n or 10)
     end,
-    bool_startswith = stringy.startswith,
-    bool_endswith = stringy.endswith,
-    bool_not_startswith = function(str, prefix)
+    bool_by_startswith = stringy.startswith,
+    bool_by_endswith = stringy.endswith,
+    bool_by_not_startswith = function(str, prefix)
       return not transf.string.bool_startswith(str, prefix)
     end,
-    bool_not_endswith = function(str, suffix)
+    bool_by_not_endswith = function(str, suffix)
       return not transf.string.bool_endswith(str, suffix)
     end,
+    bool_by_contains_w_string = stringy.find,
     split2d = function(str, upper_sep, lower_sep)
       local upper = transf.string.split(str, upper_sep)
       return hs.fnutils.imap(upper, function(v)
@@ -1516,7 +1517,7 @@ get = {
       return get.array.pos_int_or_nil_by_first_match_w_fn(
         arr,
         get.fn.first_n_args_bound_fn(
-          get.string.bool_endswith,
+          get.string.bool_by_endswith,
           str
         )
       )
@@ -1530,7 +1531,7 @@ get = {
       return get.array.pos_int_or_nil_by_first_match_w_fn(
         arr,
         get.fn.first_n_args_bound_fn(
-          get.string.bool_startswith,
+          get.string.bool_by_startswith,
           str
         )
       )

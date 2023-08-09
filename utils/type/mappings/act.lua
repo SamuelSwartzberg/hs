@@ -286,5 +286,25 @@ act = {
     choose_attachment_and_choose_action = function(path)
       dothis.email_file.choose_attachment_and_download(path, dothis.any.choose_action)
     end,
+  },
+  alphanum_minus_underscore = {
+    add_as_passw_pass_item_name_by_prompted_password = function(name)
+      dothis.alphanum_minus_underscore.add_as_pass_item_name(
+        name,
+        get.string.string_by_prompted_once_from_default(
+          transf.pos_int.random_base64_gen_string_of_length(32),
+          "Enter a password, or confirm the generated 32-character base64 pregenerated one:"
+        )
+      )
+    end,
+    add_as_username_pass_item_name_by_prompted_username = function(name)
+      dothis.alphanum_minus_underscore.add_as_username_pass_item_name(
+        name,
+        get.string.string_by_prompted_once_from_default(
+          "",
+          "Enter a username:"
+        )
+      )
+    end,
   }
 }
