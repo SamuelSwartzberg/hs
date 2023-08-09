@@ -216,7 +216,7 @@ dothis = {
       )
     end,
   },
-  booru_url = {
+  booru_post_url = {
     add_to_local = function(url)
       rest({
         api_name = "hydrus",

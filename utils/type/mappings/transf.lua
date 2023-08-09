@@ -1482,7 +1482,7 @@ transf = {
     hs_image = function(path)
       return get.fn.rt_or_nil_by_memoized(hs.image.imageFromPath, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromPath")(path)
     end,
-    booru_url = function(path)
+    booru_post_url = function(path)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "saucenao --file" ..
         transf.string.single_quoted_escaped(path)
@@ -6515,7 +6515,7 @@ transf = {
     end
   },
   image_url = {
-    booru_url = function(url)
+    booru_post_url = function(url)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "saucenao --url" ..
         transf.string.single_quoted_escaped(url)

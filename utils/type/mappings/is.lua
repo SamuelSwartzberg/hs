@@ -548,6 +548,14 @@ is = {
     query_url = function(url)
       return transf.url.query(url) ~= nil
     end,
+    booru_post_url = function(url)
+      return 
+        (is.url.query_url(url) and is.query_url.gelbooru_style_post_url(url)) or
+        (is.url.path_url(url) and (
+          is.path_url.danbooru_style_post_url(url) or
+          is.path_url.yandere_style_post_url(url)
+        ))
+    end,
 
   },
   scheme_url = {
@@ -585,7 +593,26 @@ is = {
     end
   },
   extension_url = {
-
+    image_url = function(url)
+      return get.path.is_extension_in(transf.path_url.path(url), mt._list.filetype.image)
+    end,
+    playable_url = function(url)
+      return get.path.usable_as_filetype(
+        transf.path_url.path(url),
+        "audio"
+      ) or get.path.usable_as_filetype(
+        transf.path_url.path(url),
+        "video"
+      )
+    end
+  },
+  playable_url = {
+    whisper_url = function(url)
+      return get.path.usable_as_filetype(
+        transf.path_url.path(url),
+        "whisper-audio"
+      )
+    end,
   },
   authority_url = {
     host_url = function(url)
