@@ -352,5 +352,19 @@ act = {
         dothis.any.choose_action
       )
     end,
+  },
+  string = {
+    say_ja = function(str)
+      dothis.string.say(str, "ja")
+    end,
+    say_en = function(str)
+      dothis.string.say(str, "en")
+    end,
+    log_in_diary = function(str)
+      dothis.entry_logging_dir.log_string(
+        env.MENTRY_LOGS,
+        str
+      )
+    end
   }
 }
