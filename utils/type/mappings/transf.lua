@@ -6460,8 +6460,11 @@ transf = {
       local rejoined = get.string_or_number_array.string_by_joined(parts, ":")
       return get.string.no_prefix_string(rejoined, "//")
     end,
+    string_by_webcal_name = function(url)
+      return "webcal_readonly_" .. transf.not_userdata_or_function.md5_hex_string(url)
+    end,
     vdirsyncer_pair_specifier = function(url)
-      local name = "webcal_readonly_" .. transf.not_userdata_or_function.md5_hex_string(url)
+      local name = transf.url.string_by_webcal_name(url)
       local local_storage_path =  env.XDG_STATE_HOME .. "/vdirsyncer/" .. name
       return  {
         name = name,
@@ -6473,6 +6476,17 @@ transf = {
         remote_storage_type = "http",
         remote_storage_url = url,
       }
+    end,
+    absolute_path_by_webcal_storage_location = function(url)
+      return env.XDG_STATE_HOME .. "/vdirsyncer/" .. transf.url.string_by_webcal_name(url)
+    end,
+    ini_string_by_khal_config_section = function(url)
+      return transf.dict_of_string_value_dicts.ini_string({
+        ["[ro:".. transf.url.sld(url) .. "]"] = {
+          path = transf.url.absolute_path_by_webcal_storage_location(url),
+          priority = 0,
+        }
+      })
     end,
     url_potentially_with_title_comment = function(url)
       local title = transf.sgml_url.string_or_nil_by_title(url)

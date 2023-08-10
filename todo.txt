@@ -3,6 +3,7 @@ refac:
   - dissolve actable_paths
   - move/add things from dothis to act
   - add implementations of various 'get' things to 'transf'
+  - merge dict and assoc? Seem to just be two names for the same thing
   - fix static type errors in remaining files
   - write tests with busted
 post 'lua is working':  

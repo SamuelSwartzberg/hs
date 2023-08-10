@@ -61,6 +61,34 @@ act = {
       dothis.event_table.add_event_interactive(event_table, function() end)
     end,
   },
+  vdirsyncer_pair_specifier = {
+    write_to_config = function(spec)
+      dothis.absolute_path.append_file_if_file(
+        env.VDIRSYNCER_CONFIG .. "/config",
+        "\n\n" .. transf.vdirsyncer_pair_specifier.ini_string(spec)
+      )
+      dothis.absolute_path.append_file_if_file(
+        env.KHAL_CONFIG .. "/config",
+        "\n\n" .. transf.url.ini_string_by_khal_config_section(url)
+      )
+      dothis.absolute_path.create_dir(
+        transf.url.absolute_path_by_webcal_storage_location(url)
+      )
+      local name = transf.url.string_by_webcal_name(url)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+        "vdirsyncer discover" ..
+        transf.string.single_quoted_escaped(name),
+        get.fn.first_n_args_bound_fn(
+          dothis.string.env_bash_eval_async,
+          "vdirsyncer sync" .. transf.string.single_quoted_escaped(name)
+        )
+      )
+      dothis.in_git_dir.commit_self(
+        env.KHAL_CONFIG .. "/config",
+        "Add web calendar " .. name
+      )
+    end,
+  },
   url = {
     add_event_to_default_calendar = function(url)
       dothis.url.add_event_from_url(url, "default")
@@ -72,6 +100,13 @@ act = {
     end,
     download_into_downloads_async = function(url)
       dothis.url.download_into_async(url, env.DOWNLOADS)
+    end,
+    create_as_url_file_in_murls = function(url)
+      act.url_array.create_as_url_files_in_murls({url})
+    end,
+    subscribe_to_calendar = function(url)
+      local pair_spec = transf.url.vdirsyncer_pair_specifier(url)
+      act.vdirsyncer_pair_specifier.write_to_config(pair_spec)
     end
   },
   ics_file = {
