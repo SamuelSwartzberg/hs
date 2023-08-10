@@ -2251,27 +2251,27 @@ get = {
         date_component_name
       )
     end,
-    --- accepts both format strings and format names
-    formatted_string = function(date, format)
+    --- date_format_indicator = date_format or date_format_name
+    string_w_date_format_indicator = function(date, format)
       local retrieved_format = tblmap.date_format_name.date_format[format]
       return date:fmt(retrieved_format or format)
     end,
     rfc3339like_dt_of_precision = function(date, precision)
-      return get.date.formatted_string(date, tblmap.date_component_name.rfc3339like_dt_format_string[precision])
+      return get.date.string_w_date_format_indicator(date, tblmap.date_component_name.rfc3339like_dt_format_string[precision])
     end,
 
   },
   timestamp_s = {
-    formatted = function(timestamp_s, format)
-      return get.date.formatted_string(
+    string_w_date_format_indicator = function(timestamp_s, format)
+      return get.date.string_w_date_format_indicator(
         transf.timestamp_s.date(timestamp_s),
         format
       )
     end,
   },
   timestamp_ms = {
-    formatted = function(timestamp_s, format)
-      return get.date.formatted_string(
+    string_w_date_format_indicator = function(timestamp_s, format)
+      return get.date.string_w_date_format_indicator(
         transf.timestamp_s.date(timestamp_s),
         format
       )

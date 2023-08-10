@@ -194,7 +194,8 @@ tblmap = {
       ["german-date"] = "%d.%m.%Y",
       ["german-time"] = "%H:%M:%S",
       ["german-datetime"] = "%d.%m.%Y %H:%M:%S",
-      ["email"] = "%a, %d %b %Y %H:%M:%S %z"
+      ["email"] = "%a, %d %b %Y %H:%M:%S %z",
+      ["detailed"] = "%A, %Y-%m-%d %H:%M:%S"
     },
   },
   int = {
@@ -516,6 +517,10 @@ tblmap = {
       },
       pair = {
         thing_name = "dict_entry_string",
+        precedence = 999
+      },
+      date = {
+        thing_name = "summary",
         precedence = 999
       }
     },

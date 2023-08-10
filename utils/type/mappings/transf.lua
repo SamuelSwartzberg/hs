@@ -1980,10 +1980,10 @@ transf = {
       return get.logging_dir.log_path_for_date(env.MENTRY_LOGS, date)
     end,
     full_rfc3339like_dt = function(date)
-      return get.date.formatted_string(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
+      return get.date.string_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
     end,
     full_rfc3339like_time = function(date)
-      return get.date.formatted_string(date, tblmap.date_format_name.date_format["rfc3339-time"])
+      return get.date.string_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-time"])
     end,
     timestamp_s = function(date)
       return transf.full_date_component_name_value_dict.timestamp_s(
@@ -1998,6 +1998,9 @@ transf = {
         start = transf.date.full_rfc3339like_dt(date)
       }
     end,
+    summary = function(date)
+      return get.date.string_w_date_format_indicator(date, "detailed")
+    end
 
   },
   timestamp_s = {
@@ -5624,7 +5627,7 @@ transf = {
       return transf.omegat_project_dir.tm_dir(dir) .. "/" .. transf.path.leaf(dir) .. "-omegat.tmx"
     end,
     rechnung_filename = function(dir)
-      return get.timestamp_s.formatted(
+      return get.timestamp_s.string_by_date_format_indicator(
         os.time(),
         tblmap.date_component_name.rfc3339like_dt_format_string["day"]
       ) .. "--" .. transf.omegat_project_dir.client_name(dir) .. "_" .. transf.omegat_project_dir.rechnung_number(dir)

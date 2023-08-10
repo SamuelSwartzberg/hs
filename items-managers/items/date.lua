@@ -8,7 +8,7 @@ DateSpecifier = {
   properties = {
     getables = {
       ["weekday-str"] = function(self)
-        return transf.mon1_int.weekday_en[self:get("weekday-number-start-1")] 
+        return tblmap.mon1_int.weekday_en[self:get("weekday-number-start-1")] 
       end,
       ["weekday-offset"] = function(self, specifier) -- get the nth previous/next weekday
         -- specifier has keys "weekday" and "offset"
@@ -35,36 +35,15 @@ DateSpecifier = {
           unit = "weeks",
           amount = math.abs(specifier.offset - 1)
         })
-      end,
-      ["to-string"] = function(self)
-        return self:get("c"):fmt("%A, %Y-%m-%d %H:%M:%S")
-      end,
+      end
     },
-    doThisables = {
-      ["choose-format"] = function(self, do_after)
-        format_array:doThis("choose-item", function(format)
-          do_after(self:get("to-given-format", format))
-        end)
-      end,
-      ["choose-format-and-action"] = function(self)
-        self:doThis("choose-format", function(format)
-          st(format):doThis("choose-action")
-        end)
-      end,
-    }
   },
   
   ({
     {
       text = "👉📏 cfmt.",
       key = "choose-format-and-action"
-    }, {
-      text = "📓🗄🦄 logop-dia.",
-      key = "log-open-diary",
-    }, {
-      text = "👉🤗📅 csrdy.",
-      key = "choose-surrounding-day",
-    }, {
+    }ß{
       text = "👉🕚 ctm.",
       key = "choose-item-and-then-action-on-result-of-get",
       args = {

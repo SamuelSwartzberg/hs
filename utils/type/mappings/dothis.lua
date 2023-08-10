@@ -1559,6 +1559,14 @@ dothis = {
   date = {
     create_log_entry = function(date, path, contents)
       error("todo")
+    end,
+    choose_format = function(dt, fn)
+      dothis.table.choose_w_vt_fn(
+        tblmap.date_format_name.date_format,
+        function(date_format)
+          fn(get.date.string_w_date_format_indicator(dt, date_format))
+        end,
+      )
     end
   },
   logging_dir = {
