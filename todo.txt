@@ -6,6 +6,7 @@ refac:
   - merge dict and assoc? Seem to just be two names for the same thing
   - fix static type errors in remaining files
   - write tests with busted
+  - fix logging dirs, etc, to now use json
 post 'lua is working':  
   - add/rename missing m3us
   - history

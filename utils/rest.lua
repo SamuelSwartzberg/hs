@@ -111,7 +111,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
           open_spec.params.scope = tblmap.api_name.scopes[specifier.api_name]
         end
         if tblmap.api_name.additional_auth_params[specifier.api_name] then
-          open_spec.params = transf.two_table_or_nils.table_nonrecursive(open_spec.params, tblmap.api_name.additional_auth_params[specifier.api_name])
+          open_spec.params = transf.two_table_or_nils.table_by_take_new(open_spec.params, tblmap.api_name.additional_auth_params[specifier.api_name])
         end
         
         dothis.url_components.open_browser(open_spec, nil, function() -- our server listening on the above port will save the authorization code to the proper location
@@ -227,7 +227,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if secondary_api_name and tblmap.secondary_api_name.default_params[secondary_api_name] then
     specifier.params = specifier.params or {}
-    specifier.params = transf.two_table_or_nils.table_nonrecursive(get.table.table_by_copy(tblmap.secondary_api_name.default_params[secondary_api_name], true), specifier.params)
+    specifier.params = transf.two_table_or_nils.table_by_take_new(get.table.table_by_copy(tblmap.secondary_api_name.default_params[secondary_api_name], true), specifier.params)
   end
 
   specifier.scheme = specifier.scheme or tblmap.api_name.scheme[specifier.api_name]

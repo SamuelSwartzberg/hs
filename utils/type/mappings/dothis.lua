@@ -1245,14 +1245,14 @@ dothis = {
       end)
     end,
     reply = function(path, specifier, do_after)
-      specifier = transf.two_tables.table_nonrecursive(transf.email_file.reply_email_specifier(path), specifier)
+      specifier = transf.two_tables.table_by_take_new(transf.email_file.reply_email_specifier(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
     edit_then_reply = function(path, do_after)
       dothis.email_specifier.edit_then_send(transf.email_file.reply_email_specifier(path), do_after)
     end,
     forward = function(path, specifier, do_after)
-      specifier = transf.two_tables.table_nonrecursive(transf.email_file.forward_email_specifier(path), specifier)
+      specifier = transf.two_tables.table_by_take_new(transf.email_file.forward_email_specifier(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
     edit_then_forward = function(path, do_after)
@@ -1570,40 +1570,39 @@ dothis = {
     end
   },
   logging_dir = {
-    log_ymd_nested_key_array_of_arrays_value_assoc = function(path, ymd_nested_key_array_of_arrays_value_assoc)
-      local abs_path_dict = get.assoc.absolute_path_key_dict(
-        ymd_nested_key_array_of_arrays_value_assoc,
+    log_nonabsolute_path_key_timestamp_ms_key_dict_value_dict_by_ymd = function(path, dict)
+      local abs_path_dict = get.nonabsolute_path_key_dict.absolute_path_key_dict(
+        dict,
         path,
-        ".csv"
+        ".json"
       )
-      for path, array_of_arrays in abs_path_dict do 
-        dothis.plaintext_table_file.append_array_of_arrays_of_fields(path, array_of_arrays)
+      for path, dict in abs_path_dict do 
+        dothis.json_file.merge_w_table(path, dict)
       end
     end,
-    log_timestamp_key_array_value_dict = function(path, timestamp_key_array_value_dict)
-      dothis.logging_dir.log_ymd_nested_key_array_of_arrays_value_assoc(
+    log_timestamp_ms_key_dict_value_dict = function(path, timestamp_ms_key_dict_value_dict)
+      dothis.logging_dir.log_nonabsolute_path_key_timestamp_ms_key_dict_value_dict_by_ymd(
         path,
-        transf.timestamp_key_array_value_dict.ymd_nested_key_array_of_arrays_value_assoc(timestamp_key_array_value_dict)
+        transf.timestamp_ms_key_dict_value_dict.nonabsolute_path_key_timestamp_ms_key_dict_value_dict_by_ymd(timestamp_ms_key_dict_value_dict)
       )
     end,
-    log_dict_with_timestamp = function(path, dict)
-      dothis.logging_dir.log_timestamp_key_array_value_dict(
+  },
+  json_file = {
+    merge_w_table = function(path, table)
+      local tblcnt = get.json_file.table_or_nil(path)
+      local newcnt = transf.two_table_or_nils.table_by_take_new(tblcnt, table)
+      dothis.local_file.write_file(
         path,
-        transf.dict_with_timestamp.timestamp_key_array_value_dict_by_array(dict, transf.logging_dir.headers(path))
-      )
-    end,
-    write_header_file = function(path, headers)
-      dothis.plaintext_file.write_lines(
-        transf.logging_dir.header_file(path),
-        headers
+        transf.not_userdata_or_function.json_string(newcnt)
       )
     end
   },
   entry_logging_dir = {
     log_string = function(path, str)
-      dothis.logging_dir.log_dict_with_timestamp(path, {
-        timestamp = os.time(),
-        entry = str
+      dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(path, {
+        [os.time() * 1000] = {
+          entry = str
+        }
       })
     end,
   },

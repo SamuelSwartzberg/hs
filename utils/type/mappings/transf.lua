@@ -1637,6 +1637,9 @@ transf = {
     not_userdata_or_function = function(path)
       return transf.json_string.not_userdata_or_function(transf.file.contents(path))
     end,
+    table_or_nil = function(path)
+      return transf.json_string.table_or_nil(transf.file.contents(path))
+    end,
   },
   ini_file = {
     assoc = function(path)
@@ -1818,20 +1821,7 @@ transf = {
       return ftcsv.parseLine(path, transf.plaintext_table_file.field_separator(path))
     end,
   },
-  timestamp_first_column_plaintext_table_file = {
-    last_accessed = function(path)
-      return get.string_or_number.number_or_nil(transf.file.contents(env.MLAST_BACKUP .. transf.path.filename(path)) or 0)
-    end,
-    --- gets the entries from a timestamp_first_column_plaintext_table_file that are newer than the timestamp stored in file storing the last backup time
-    new_timestamp_key_array_value_dict = function(path)
-      local last_access = transf.timestamp_first_column_plaintext_table_file.last_accessed(path)
-      local new_timestamp = os.time()
-      local new_timestamp_key_array_value_dict = get.timestamp_first_column_plaintext_table_file.timestamp_key_array_value_dict_newer_than_timestamp(path, last_access)
-      if new_timestamp_key_array_value_dict then
-        dothis.absolute_path.write_file(env.MLAST_BACKUP .. transf.path.filename(path), new_timestamp)
-      end
-      return new_timestamp_key_array_value_dict
-    end,
+  timestamp_s_key_dict_value_dict_json_file = {
 
   },
   dated_children_dir = {
@@ -1841,32 +1831,7 @@ transf = {
 
   },
   logging_dir = {
-    header_file = function(path)
-      return transf.path.ending_with_slash(path) .. "header"
-    end,
-    headers = function(path)
-      return transf.plaintext_file.nocomment_noindent_content_lines(
-        transf.logging_dir.header_file(path)
-      )
-    end,
-    header_empty_string_dict = function(path)
-      return transf.array.empty_string_value_dict(
-        transf.logging_dir.headers(path)
-      )
-    end,
-    header_empty_string_dict_with_timestamp = function(path)
-      local header_empty_string_dict = transf.logging_dir.header_empty_string_dict(path)
-      header_empty_string_dict.timestamp = ""
-      return header_empty_string_dict
-    end,
-    header_empty_string_dict_now = function(path)
-      local header_empty_string_dict = transf.logging_dir.header_empty_string_dict(path)
-      header_empty_string_dict.timestamp = os.time()
-      return header_empty_string_dict
-    end,
-    yaml_form = function(path)
-      return transf.not_userdata_or_string.yaml_string(transf.logging_dir.header_empty_string_dict(path))
-    end,
+   
   },
   dated_named_item = {
 
@@ -1963,7 +1928,7 @@ transf = {
       return date:getisoweeknumber()
     end,
     full_date_component_name_value_dict = function(date)
-      local tbl = transf.two_tables.table_nonrecursive(
+      local tbl = transf.two_tables.table_by_take_new(
         date:getdate(),
         date:gettime()
       )
@@ -1975,9 +1940,6 @@ transf = {
     end,
     quarter_hours_of_day_date_sequence_specifier = function(date)
       return get.date.date_sequence_specifier_of_lower_component(date, 15, "day")
-    end,
-    entry_in_diary = function(date)
-      return get.logging_dir.log_path_for_date(env.MENTRY_LOGS, date)
     end,
     full_rfc3339like_dt = function(date)
       return get.date.string_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
@@ -2493,13 +2455,13 @@ transf = {
       return transf.date_component_name_array.max_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
     end,
     min_full_date_component_name_value_dict = function(date_component_name_value_dict)
-      return transf.two_tables.table_nonrecursive(
+      return transf.two_tables.table_by_take_new(
         date_component_name_value_dict,
         transf.date_component_name_value_dict.min_date_component_name_value_dict_not_set(date_component_name_value_dict)
       )
     end,
     max_full_date_component_name_value_dict = function(date_component_name_value_dict)
-      return transf.two_tables.table_nonrecursive(
+      return transf.two_tables.table_by_take_new(
         date_component_name_value_dict,
         transf.date_component_name_value_dict.max_date_component_name_value_dict_not_set(date_component_name_value_dict)
       )
@@ -3875,7 +3837,17 @@ transf = {
     end,
   },
   json_string = {
-    not_userdata_or_function = json.decode,
+    not_userdata_or_function = function(str)
+      return transf.fn.rt_or_nil_fn_by_pcall(json.decode)(str)
+    end,
+    table_or_nil = function(str)
+      local res =  transf.not_userdata_or_function.json_string(str)
+      if type(res) == "table" then
+        return res
+      else
+        return nil
+      end
+    end,
     yaml_string = function(str)
       return transf.not_userdata_or_function.yaml_string(
         transf.json_string.not_userdata_or_function(str)
@@ -3898,7 +3870,7 @@ transf = {
       )
     end,
   },
-  plaintext_dictonary_file = {
+  plaintext_dictionary_file = {
     table = function(file)
       if is.plaintext_dictionary_file.yaml_file(file) then
         return transf.yaml_file.not_userdata_or_function(file)
@@ -4581,22 +4553,6 @@ transf = {
       return transf.two_arrays.array_by_appended(arr1, arr2)
     end,
   },
-  two_tables = {
-    table_nonrecursive = function(t1, t2)
-      local res = get.table.table_by_copy(t1)
-      for k, v in transf.table.key_value_stateless_iter(t2) do
-        res[k] = v
-      end
-      return res
-    end,
-  },
-  two_table_or_nils = {
-    table_nonrecursive = function(t1, t2)
-      if t1 == nil then t1 = {} end
-      if t2 == nil then t2 = {} end
-      return transf.two_tables.table_nonrecursive(t1, t2)
-    end,
-  },
   any_and_array = {
     array = function(any, arr)
       local res = get.table.table_by_copy(arr)
@@ -4924,8 +4880,8 @@ transf = {
       return transf.table_or_nil.kt_array(transf.dict.truthy_value_dict(t))
     end,
   },
-  dict_array = {
-    dict_by_take_new = function(t)
+  table_array = {
+    table_by_take_new = function(t)
       local res = {}
       for _, dict in transf.array.index_value_stateless_iter(t) do
         for k, v in transf.table.stateless_key_value_iter(dict) do
@@ -4934,7 +4890,7 @@ transf = {
       end
       return res
     end,
-    dict_by_take_old = function(t)
+    table_by_take_old = function(t)
       local res = {}
       for _, dict in transf.array.index_value_stateless_iter(t) do
         for k, v in transf.table.stateless_key_value_iter(dict) do
@@ -4946,24 +4902,24 @@ transf = {
       return res
     end,
   },
-  two_dicts = {
-    dict_by_take_new = function(t1, t2)
-      return transf.dict_array.dict_by_take_new({t1, t2})
+  two_tables = {
+    table_by_take_new = function(t1, t2)
+      return transf.table_array.table_by_take_new({t1, t2})
     end,
-    dict_by_take_old = function(t1, t2)
-      return transf.dict_array.dict_by_take_old({t1, t2})
+    table_by_take_old = function(t1, t2)
+      return transf.table_array.table_by_take_old({t1, t2})
     end,
   },
-  two_dict_or_nils = {
-    dict_by_take_new = function(t1, t2)
+  two_table_or_nils = {
+    table_by_take_new = function(t1, t2)
       if t1 == nil then t1 = {} end
       if t2 == nil then t2 = {} end
-      return transf.two_dicts.dict_by_take_new(t1, t2)
+      return transf.two_tables.table_by_take_new(t1, t2)
     end,
-    dict_by_take_old = function(t1, t2)
+    table_by_take_old = function(t1, t2)
       if t1 == nil then t1 = {} end
       if t2 == nil then t2 = {} end
-      return transf.two_dicts.dict_by_take_old(t1, t2)
+      return transf.two_tables.table_by_take_old(t1, t2)
     end,
   },
   string_value_dict = {
@@ -5117,35 +5073,35 @@ transf = {
     end,
         
   },
-  timestamp_key_array_value_dict = {
-    --- transforms a timestamp-key orderedtable into a table of the structure [yyyy] = { [yyyy-mm] = { [yyyy-mm-dd] = { [hh:mm:ss, ...] } } }
-    --- @param timestamp_key_table orderedtable
-    --- @return { [string]: { [string]: { [string]: string[] } } }
-    ymd_nested_key_array_of_arrays_value_assoc = function(timestamp_key_table)
-      error("this still uses orderedtable, but I've removed that package")
-      local year_month_day_time_table = {}
-      for timestamp_str, fields in get.indxbl.key_value_stateless_iter(timestamp_key_table,-1,1,-1) do
-        local timestamp = get.string_or_number.number_or_nil(timestamp_str)
-        local year = os.date("%Y", timestamp)
-        local year_month = os.date("%Y-%m", timestamp)
-        local year_month_day = os.date("%Y-%m-%d", timestamp)
-        local time = os.date("%H:%M:%S", timestamp)
-        if not year_month_day_time_table[year] then year_month_day_time_table[year] = {} end
-        if not year_month_day_time_table[year][year_month] then year_month_day_time_table[year][year_month] = {} end
-        if not year_month_day_time_table[year][year_month][year_month_day] then year_month_day_time_table[year][year_month][year_month_day] = {} end
-        local contents = transf.any_and_array.array(time, fields)
-        table.insert(year_month_day_time_table[year][year_month][year_month_day], contents)
+  timestamp_ms_key_dict_value_dict = {
+    nonabsolute_path_key_timestamp_ms_key_dict_value_dict_by_ymd = function(timestamp_key_table)
+      local tbl = {}
+      for timestamp_ms, dict in transf.table.key_value_stateless_iter(timestamp_key_table) do
+        local ymd = os.date("%Y/%Y-%m/%Y-%m-%d", timestamp_ms/1000)
+        if not tbl[ymd] then tbl[ymd] = {} end
+        local found_unoccupied = false
+        -- we don't want to overwrite any existing entries, so we will increment the timestamp_ms until we find an unoccupied slot
+        -- this is acceptable as none of our use-cases require sub-second precision, and neither do I expect there to be many entries per second
+        -- ergo our drift will be limited to a few ms at most, and the loop will terminate
+        while not found_unoccupied do
+          if not tbl[ymd][timestamp_ms] then
+            tbl[ymd][timestamp_ms] = dict
+            found_unoccupied = true
+          else
+            timestamp_ms = timestamp_ms + 1
+          end
+        end
       end
-      return year_month_day_time_table
+      return tbl
     end
   },
   tachiyomi_json_table = {
-    timestamp_key_array_value_dict = function(raw_backup)
+    timestamp_key_dict_value_dict = function(raw_backup)
       -- data we care about is in the backupManga array in the json file
       -- each array element is a manga which has general metadata keys such as title, author, url, etc
       -- and a chapters array which has chapter metadata keys such as name, chapterNumber, url, etc
       -- and a history array which has the keys url and lastRead (unix timestamp in ms)
-      -- we want to transform this into a table of our own design, where the key is a timestamp (but in seconds) and the value is an array consisting of some of the metadata of the manga and some of the metadata of the chapter
+      -- we want to transform this into a table of our own design, where the key is a timestamp (but in seconds) and the value is a dict consisting of some of the metadata of the manga and some of the metadata of the chapter
       -- specifically: url (of the manga), title, chapterNumber, name (of the chapter)
       -- for that, we need to match the key url in the history array with the key url in the chapters array, for which we will create a temporary table with the urls as keys and the chapter metadata we will use as values
 
@@ -5158,17 +5114,17 @@ transf = {
           name = chapter.name
         }
       end
-      local history_list = {}
+      local history_dict = {}
       for _, hist_item in transf.array.index_value_stateless_iter(manga.history) do
         local chapter = chapter_map[hist_item.url]
-        history_list[hist_item.lastRead / 1000] = {
-          manga_url,
-          manga_title,
-          chapter.chapterNumber,
-          chapter.name
+        history_dict[hist_item.lastRead] = {
+          url = manga_url,
+          title = manga_title,
+          chapter_number = chapter.chapterNumber,
+          chapter_name = chapter.name
         }
       end
-      return history_list
+      return history_dict
     end,
   },
   vdirsyncer_pair_specifier = {
@@ -6987,7 +6943,7 @@ transf = {
         yaml_files,
         transf.yaml_file.not_userdata_or_function
       )
-      local env_var_name_env_node_dict = transf.dict_array.dict_by_take_new(env_var_name_env_node_dict_array)
+      local env_var_name_env_node_dict = transf.table_array.table_by_take_new(env_var_name_env_node_dict_array)
       return transf.env_var_name_env_node_dict.env_string(env_var_name_env_node_dict)
     end,
   },
@@ -7446,7 +7402,7 @@ transf = {
   },
   stream_creation_specifier = {
     flag_dict_by_with_default = function(stream_creation_specifier)
-      return transf.two_dicts.dict_by_take_new(
+      return transf.two_tables.table_by_take_new(
         tblmap.stream_creation_specifier_flag_profile_name.stream_creation_specifier_flag_profile[stream_creation_specifier.flag_profile_name or "foreground"],
         stream_creation_specifier.flags 
       )

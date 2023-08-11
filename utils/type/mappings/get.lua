@@ -467,25 +467,6 @@ get = {
     end,
 
   },
-  dict_with_timestamp = {
-    array_by_array_with_timestamp_first = function(dict, arr)
-      arr = transf.any_and_array.array("timestamp", arr)
-      return get.dict.array_by_mapped_w_kt_array(dict, arr)
-    end,
-    timestamp_key_array_value_dict_by_array = function(dict, arr)
-      return {
-        [dict.timestamp] = get.dict.array_by_mapped_w_kt_array(dict, arr)
-      }
-    end,
-  },
-  dict_of_dicts = {
-    dict_of_arrays_by_array = function(dict_of_dicts, arr)
-      return hs.fnutils.map(
-        dict_of_dicts,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.dict.array_by_mapped_w_kt_array, {a_use, arr})
-      )
-    end
-  },
   nonabsolute_path_key_dict = {
     absolute_path_key_dict = function(nonabsolute_path_key_dict, starting_point, extension)
       return get.table.table_by_mapped_w_kt_arg_kt_ret_fn(nonabsolute_path_key_dict, function(k)
@@ -493,15 +474,6 @@ get = {
         if extension then ext_part = "." .. extension end
         return (starting_point or "") .. "/" .. k .. ext_part
       end)
-    end,
-  },
-  assoc = {
-    absolute_path_key_dict = function(t, starting_point, extension)
-      return get.nonabsolute_path_key_dict.absolute_path_key_dict(
-        transf.assoc.to_nonabsolute_path_key_dict(t),
-        starting_point,
-        extension
-      )
     end,
   },
   table_of_assocs = {
@@ -1953,59 +1925,6 @@ get = {
       }
     end
   },
-  plaintext_table_file = {
-    dict_of_dicts_by_first_element_and_array = function(plaintext_file, arr2)
-      local array_of_arrays = transf.plaintext_table_file.array_of_array_of_fields(plaintext_file)
-      return get.array_of_arrays.dict_of_dicts_by_first_element_and_array(array_of_arrays, arr2)
-    end,
-    dict_of_dicts_by_header_file = function(plaintext_file, header_file)
-      local array_of_arrays = transf.plaintext_table_file.array_of_array_of_fields(plaintext_file)
-      return get.array_of_arrays.dict_of_dicts_by_header_file(array_of_arrays, transf.plaintext_file.string_array_by_lines(header_file))
-    end,
-  },
-  timestamp_first_column_plaintext_table_file = {
-    something_newer_than_timestamp = function(path, timestamp, assoc)
-      local rows = transf.plaintext_table_file.iter_of_array_of_fields(path)
-      local _, first_row = rows()
-      local _, second_row = rows()
-      if not first_row then return nil end
-      if not second_row then second_row = {"0"} end
-      local first_timestamp, second_timestamp = get.string_or_number.number_or_nil(first_row[1]), get.string_or_number.number_or_nil(second_row[1])
-      if first_timestamp < second_timestamp then
-        error("Timestamps are not in descending order. This is not recommended, as it forces us to read the entire file.")
-      end
-      local res
-      if assoc then 
-        res = ovtable.new()
-        table.remove(first_row, 1)
-        res[first_timestamp] = first_row
-        table.remove(second_row, 1)
-        res[second_timestamp] = second_row
-      else
-        res = {first_row, second_row}
-      end
-      for i, row in rows do
-        local current_timestamp = row[1]
-        if get.string_or_number.number_or_nil(current_timestamp) > timestamp then
-          if assoc then 
-            table.remove(row, 1)
-            res[current_timestamp] = row
-          else
-            table.insert(res, row)
-          end
-        else
-          break
-        end
-      end
-      return res
-    end,
-    array_of_fields_newer_than_timestamp = function(path, timestamp)
-      return transf.timestamp_first_column_plaintext_table_file.something_newer_than_timestamp(path, timestamp, false)
-    end,
-    timestamp_key_array_value_dict_newer_than_timestamp = function(path, timestamp)
-      return transf.timestamp_first_column_plaintext_table_file.something_newer_than_timestamp(path, timestamp, true)
-    end,
-  },
   bib_file = {
     raw_citations = function(path, format)
       get.csl_table_or_csl_table_array.raw_citations(transf.bib_file.array_of_csl_tables(path), format)
@@ -2124,20 +2043,6 @@ get = {
   logging_dir = {
     log_path_for_date = function(path, date)
       return hs.fs.pathToAbsolute(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"
-    end,
-    array_of_arrays_for_date = function(path, date)
-      return transf.plaintext_table_file.array_of_array_of_fields(
-        transf.logging_dir.log_path_for_date(path, date)
-      )
-    end,
-    time_dict_of_dicts_for_date = function(path, date)
-      return get.array_of_arrays.dict_of_dicts_by_first_element_and_array(
-        get.logging_dir.array_of_arrays_for_date(path, date),
-        transf.logging_dir.headers(path)
-      )
-    end,
-    entry_dict_for_date = function(path, date)
-      return get.logging_dir.time_dict_of_dicts_for_date(path, date)[transf.date.full_rfc3339like_time(date)]
     end,
   },
   path_array = {
@@ -2328,7 +2233,7 @@ get = {
   },
   date_interval_specifier = {
     event_tables_within_range = function(date_interval_specifier, specifier, include, exclude)
-      specifier = transf.two_tables.table_nonrecursive(transf.date_interval_specifier.event_table(date_interval_specifier), specifier)
+      specifier = transf.two_tables.table_by_take_new(transf.date_interval_specifier.event_table(date_interval_specifier), specifier)
       return get.khal.list_event_tables(
         specifier,
         include,
@@ -2542,7 +2447,7 @@ get = {
       else
         dependent_dict = {}
       end
-      return transf.two_dict_or_nils.dict_by_take_new(self_dict, dependent_dict)
+      return transf.two_table_or_nils.table_by_take_new(self_dict, dependent_dict)
     end,
   },
   env_var_name_env_node_dict = {
@@ -2554,7 +2459,7 @@ get = {
           values[key] = prev_key .. value
         else
           local subvalues = get.detailed_env_node.env_var_name_value_dict(value, prev_key, key)
-          values = transf.two_dict_or_nils.dict_by_take_new(values, subvalues)
+          values = transf.two_table_or_nils.table_by_take_new(values, subvalues)
         end
       end
       return values
@@ -2804,11 +2709,11 @@ get = {
     styled_chooser_item_specifier_array = function(arr, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict)
       local res = get.table.table_by_copy(arr)
       for i, chooser_item_specifier in transf.array.index_value_stateless_iter(res) do
-        local text_styledtext_attribute_specifier = transf.two_dict_or_nils.dict_by_take_new( {
+        local text_styledtext_attribute_specifier = transf.two_table_or_nils.table_by_take_new( {
           font = {size = 14 },
           color = { red = 0, green = 0, blue = 0, alpha = 0.7 },
         }, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict.styledtext_attribute_specifier.text)
-        local subtext_styledtext_attribute_specifier = transf.two_dict_or_nils.dict_by_take_new( {
+        local subtext_styledtext_attribute_specifier = transf.two_table_or_nils.table_by_take_new( {
           font = {size = 12 },
           color = { red = 0, green = 0, blue = 0, alpha = 0.5 },
         }, chooser_item_specifier_text_key_styledtext_attributes_specifier_dict.styledtext_attribute_specifier.subtext)
