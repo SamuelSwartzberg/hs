@@ -844,6 +844,13 @@ transf = {
     file_url = function(path)
       return transf.local_absolute_path.file_url(transf.absolute_path.local_absolute_path(path))
     end,
+    string_or_nil_by_file_contents = function(path)
+      if is.absolute_path.file(path) then
+        return transf.file.contents(path)
+      else
+        return nil
+      end
+    end,
   },
   local_absolute_path = {
     file_url = function(path)
@@ -1650,6 +1657,13 @@ transf = {
     assoc = function(path)
       return transf.toml_string.assoc(transf.file.contents(path))
     end,
+  },
+  backup_type_identifier = {
+    timestamp_ms = function(identifier)
+      return  transf.absolute_path.string_or_nil_by_file_contents(
+        transf.path.ending_with_slash(env.MLAST_BACKUP) .. identifier
+      ) or 0
+    end
   },
   xml_local_file = {
     tree = xml.parseFile
@@ -2526,25 +2540,25 @@ transf = {
       end
     end,
     date_component_name_value_dict_where_date_component_value_is_max_date_component_value = function(date_component_name_value_dict)
-      return get.dict.key_value_fn_filtered_dict(
+      return get.dict.dict_by_filtered_w_kt_vt_fn(
         date_component_name_value_dict,
         function(k, v) return v == tblmap.date_component_name.max_date_component_value[k] end
       )
     end,
     date_component_name_value_dict_where_date_component_value_is_min_date_component_value = function(date_component_name_value_dict)
-      return get.dict.key_value_fn_filtered_dict(
+      return get.dict.dict_by_filtered_w_kt_vt_fn(
         date_component_name_value_dict,
         function(k, v) return v == tblmap.date_component_name.min_date_component_value[k] end
       )
     end,
     date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_dict)
-      return get.dict.key_value_fn_filtered_dict(
+      return get.dict.dict_by_filtered_w_kt_vt_fn(
         date_component_name_value_dict,
         function(k, v) return v ~= tblmap.date_component_name.max_date_component_value[k] end
       )
     end,
     date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value = function(date_component_name_value_dict)
-      return get.dict.key_value_fn_filtered_dict(
+      return get.dict.dict_by_filtered_w_kt_vt_fn(
         date_component_name_value_dict,
         function(k, v) return v ~= tblmap.date_component_name.min_date_component_value[k] end
       )
@@ -5096,7 +5110,7 @@ transf = {
     end
   },
   tachiyomi_json_table = {
-    timestamp_key_dict_value_dict = function(raw_backup)
+    timestamp_ms_key_dict_value_dict = function(raw_backup)
       -- data we care about is in the backupManga array in the json file
       -- each array element is a manga which has general metadata keys such as title, author, url, etc
       -- and a chapters array which has chapter metadata keys such as name, chapterNumber, url, etc
@@ -5934,6 +5948,9 @@ transf = {
     end,
     running_application = function(app_name)
       return hs.application.get(app_name)
+    end,
+    bool_by_running_application = function(app_name)
+      return transf.mac_application_name.running_application(app_name) ~= nil
     end,
     ensure_running_application = function(app_name)
       local app = transf.mac_application_name.running_application(app_name)
@@ -7501,9 +7518,7 @@ transf = {
       return watcher_creation_specifier.watcher_type
     end,
     hswatcher_creation_fn = function(watcher_creation_specifier)
-      return hs[
-        transf.watcher_creation_specifier.watcher_type(watcher_creation_specifier)
-      ].watcher.new
+      return transf.watcher_creation_specifier.watcher_type(watcher_creation_specifier).watcher.new
     end,
   },
   creation_specifier = {

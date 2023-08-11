@@ -1347,25 +1347,21 @@ dothis = {
 
   },
   sqlite_file = {
-    write_to_csv = function(sqlite_file, query, output_path, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+    query_w_csv_string_arg_fn = function(sqlite_file, query, fn)
+      dothis.string.env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped(
         "sqlite3" ..
         transf.string.single_quoted_escaped(sqlite_file) ..
         "-csv" ..
-        transf.string.single_quoted_escaped(query) ..
-        ">" ..
-        transf.string.single_quoted_escaped(output_path)
-      , do_after)
+        transf.string.single_quoted_escaped(query)
+      , fn, error)
     end,
-    write_to_csv_cache = function(sqlite_file, query, do_after)
-      dothis.sqlite_file.write_to_csv(
-        sqlite_file, 
-        query, 
-        transf.string.in_cache_dir(
-          query .. "@" .. transf.path.filename(sqlite_file) .. ".csv",
-          "sqlite_csv"
-        )
-      )
+    query_w_table_arg_fn = function(sqlite_file, query, fn)
+      dothis.string.env_bash_eval_w_table_arg_fn_string_arg_fn(
+        "sqlite3" ..
+        transf.string.single_quoted_escaped(sqlite_file) ..
+        "-json" ..
+        transf.string.single_quoted_escaped(query),
+        fn, error)
     end,
   },
   newsboat_urls_file = {
@@ -1675,28 +1671,6 @@ dothis = {
         dothis.absolute_path.write_file(absolute_path, contents)
       end
     end,
-  },
-  application_name = {
-    backup = function(application_name)
-      local before_backup = tblmap.application_name.before_backup[application_name]
-      if before_backup then
-        before_backup(function ()
-          dothis.application_name.backup_once_ready(application_name)
-        end)
-      else
-        dothis.application_name.backup_once_ready(application_name)
-      end
-    end,
-    backup_once_ready = function(application_name)
-      local histfile =tblmap.application_name.history_file_path[application_name]
-      local csv_export_histfile = get.application_name.in_tmp_dir(application_name, transf.path.leaf(histfile))
-      dothis.sqlite_file.write_to_csv(
-        histfile,
-        tblmap.application_name.history_sql_query[application_name],
-        csv_export_histfile,
-        function()
-        end)
-    end
   },
   mac_application_name = {
     execute_full_action_path = function(application_name, full_action_path)
@@ -2836,6 +2810,84 @@ dothis = {
         }
       )
     end,
+    -- expects to be called on a watcher for tachiyomi state
+    tachiyomi_backup = function()
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
+        local tmst_dict = transf.tachiyomi_json_table.timestamp_ms_key_dict_value_dict(transf.json_file.not_userdata_or_function(env.TMP_TACHIYOMI_JSON))
+        tmst_dict = get.timestamp_ms_key_dict_value_dict.timestamp_ms_key_dict_value_dict_by_filtered_timestamp(tmst_dict, "tachiyomi")
+        dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+          env.MMANGA_LOGS,
+          tmst_dict
+        )
+        dothis.backup_type_identifier.write_current_timestamp_ms("tachiyomi")
+      end)
+    end,
+    --- do once ff is quit
+    ff_backup = function()
+      local timestamp = transf.backup_type_identifier.timestamp_ms("firefox")
+      if transf.mac_application_name.bool_by_running_application("Firefox") then
+        return -- don't try to backup while firefox is running
+      end
+      dothis.sqlite_file.query_w_table_arg_fn(
+        env.MAC_FIREFOX_PLACES_SQULITE,
+        "SELECT json_group_object(visit_date/1000, json_object('title', title, 'url', url))" .. 
+        "FROM moz_places " ..
+        "INNER JOIN moz_historyvisits ON moz_places.id = moz_historyvisits.place_id " ..
+        "WHERE visit_date > " .. timestamp * 1000 .. " " ..
+        "ORDER BY timestamp DESC;",
+        function(tbl)
+          dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+            env.MBROWSER_LOGS,
+            tbl
+          )
+          dothis.backup_type_identifier.write_current_timestamp_ms("firefox")
+        end
+      )
+    end,
+    newpipe_backup = function()
+      dothis["nil"].newpipe_extract_backup(function()
+        local timestamp = transf.backup_type_identifier.timestamp_ms("newpipe")
+        dothis.sqlite_file.query_w_table_arg_fn(
+          env.env.NEWPIPE_STATE_DIR .. "/history.db",
+          "SELECT json_group_object(access_date, json_object('title', title, 'url', url))" .. 
+          "FROM stream_history " ..
+          "INNER JOIN streams ON stream_history.stream_id = streams.uid " ..
+          "WHERE access_date > " .. timestamp  .. " " ..
+          "ORDER BY timestamp DESC;",
+          function(tbl)
+            dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+              env.MMEDIA_LOGS,
+              tbl
+            )
+            dothis.backup_type_identifier.write_current_timestamp_ms("newpipe")
+          end
+        )
+      end)
+    end,
+    git_backup = function()
+      local tbl = {}
+      for file in transf.dir.children_absolute_path_value_stateful_iter(env.TMP_GIT_LOG_PARENT) do
+        local commit = transf.json_file.not_userdata_or_function(file)
+        local timestamp_s = commit.epoch
+        commit.epoch = nil
+        tbl[timestamp_s * 1000] = commit
+      end
+      dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+        env.MDIARY_COMMITS,
+        tbl
+      )
+      dothis.extant_path.empty_dir(env.TMP_GIT_LOG_PARENT)
+    end
+
+  },
+  backup_type_identifier = {
+    write_current_timestamp_ms = function(identifier)
+      dothis.local_file.write_file(
+        transf.path.ending_with_slash(env.MLAST_BACKUP) .. "tachiyomi",
+        (os.time() - 30) * 1000
+      )
+    end,
+
   },
   fn = {
     reset_by_all = function(fn)

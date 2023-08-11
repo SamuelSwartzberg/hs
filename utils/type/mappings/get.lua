@@ -424,7 +424,7 @@ get = {
         dict
       )
     end,
-    key_value_fn_filtered_dict = function(t, fn)
+    dict_by_filtered_w_kt_vt_fn = function(t, fn)
       return transf.pair_array.dict(
         hs.fnutils.ifilter(
           transf.table.pair_array(t),
@@ -434,8 +434,8 @@ get = {
         )
       )
     end,
-    value_fn_filtered_dict = function(t, fn)
-      return get.dict.key_value_fn_filtered_dict(t, function(k, v) return fn(v) end)
+    dict_by_filtered_w_vt_fn = function(t, fn)
+      return get.dict.dict_by_filtered_w_kt_vt_fn(t, function(k, v) return fn(v) end)
     end,
     kt_or_nil_by_first_match_w_kt_vt_arg_fn = function(t, fn)
       local arr = transf.table.pair_array_by_sorted_larger_key_first(t)
@@ -2040,6 +2040,22 @@ get = {
   email_specifier = {
     
   },
+  sqlite_file = {
+    csv_or_nil_by_query = function(path, query)
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("sqlite3 -csv " .. transf.string.single_quoted_escaped(path) .. " " .. transf.string.single_quoted_escaped(query))
+    end,
+    json_or_nil_by_query = function(path, query)
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("sqlite3 -json " .. transf.string.single_quoted_escaped(path) .. " " .. transf.string.single_quoted_escaped(query))
+    end,
+  },
+  timestamp_ms_key_dict_value_dict = {
+    timestamp_ms_key_dict_value_dict_by_filtered_timestamp = function(timestamp_ms_key_dict_value_dict, identifier)
+      local timestamp = transf.backup_type_identifier.timestamp_ms(identifier)
+      return get.dict.dict_by_filtered_w_kt_vt_fn(timestamp_ms_key_dict_value_dict, function(k, v)
+        return k > timestamp
+      end)
+    end,
+  },
   logging_dir = {
     log_path_for_date = function(path, date)
       return hs.fs.pathToAbsolute(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"
@@ -2341,11 +2357,6 @@ get = {
         dict_of_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(transf.two_arrays.dict_by_zip_stop_shortest, {arr2, a_use})
       )
-    end,
-  },
-  application_name = {
-    in_tmp_dir = function(app_name, file)
-      return get.string.in_tmp_dir("app/" .. app_name, file)
     end,
   },
   mac_application_name = {

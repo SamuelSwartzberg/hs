@@ -6,15 +6,6 @@ hs.ipc.cliInstall("/opt/homebrew") -- install the homebrew cli, stupidly has to 
 --- @type any
 _=nil
 
-mode = "dev" -- "full-test", "dev" or "prod"
--- currently:
--- full-test: run all tests
--- dev: run all tests except those marked as "full-test"
--- prod: run no tests
-
-log = hs.logger.new("init", "debug")
-log.i("Log initialized.")
-
 require("package-imports")
 
 require("utils")
@@ -25,6 +16,49 @@ comp = transf.dir.plaintext_dictonary_read_assoc(env.MCOMPOSITE)
 fstblmap = transf.dir.plaintext_dictonary_read_assoc(env.MDICTIONARIES .. "/mappings")
 timer_arr = {}
 timer_arr_refresher = hs.timer.doEvery(1, get.fn.first_n_args_bound_fn(dothis.timer_spec_array.fire_all_if_ready_and_space_if_necessary, timer_arr))
+watcher_arr = {}
+dothis.created_item_specifier_array.create_all(
+  watcher_arr,
+  {
+    {
+      type = "watcher",
+      watcher_type = hs.application,
+      fn = function(mac_application_name, hs_applicaton_event_type, running_application)
+        if mac_application_name == "Firefox" and hs_applicaton_event_type == hs.application.watcher.terminated then
+          hs.timer.doAfter(3, dothis["nil"].ff_backup)
+        end
+      end
+    },{ 
+      type = "watcher",
+      watcher_type = hs.pasteboard, 
+      fn = function(item)
+        System:get("manager", "clipboard"):doThis("create", item)
+      end 
+    },
+    {
+      type = "watcher",
+      watcher_type = hs.fs.volume,
+      fn = function(event, information)
+        if event == hs.fs.volume.didMount then
+          local vol = st(information.path)
+          if vol:get("is-time-machine-volume") then
+            hs.alert.show("Starting backup...")
+            dothis.string.env_bash_eval_async("tmutil startbackup")
+          end
+        elseif event == hs.fs.volume.didUnmount then
+          local vol = st(information.path)
+          if vol:get("is-dynamic-time-machine-volume") then
+            hs.timer.doAfter(30, function()
+              hs.alert.show("Backup completed. Ejecting...")
+              st(env.TMBACKUPVOL):doThis("eject")
+            end)
+          end
+        end
+      end
+    },
+  }
+  
+)
 
 require("items-managers")
 
@@ -357,34 +391,7 @@ System:get("manager", "input-method"):doThis("create-all", {
 -- structure below is not final, more OO way will emerge in the course of working on this I think
 
 System:get("manager", "creatable"):doThis("create-all", {
-  { 
-    type = "watcher",
-    watchertype = hs.pasteboard.watcher, 
-    fn = function(item)
-      System:get("manager", "clipboard"):doThis("create", item)
-    end 
-  },
-  {
-    type = "watcher",
-    watchertype = hs.fs.volume,
-    fn = function(event, information)
-      if event == hs.fs.volume.didMount then
-        local vol = st(information.path)
-        if vol:get("is-time-machine-volume") then
-          hs.alert.show("Starting backup...")
-          dothis.string.env_bash_eval_async("tmutil startbackup")
-        end
-      elseif event == hs.fs.volume.didUnmount then
-        local vol = st(information.path)
-        if vol:get("is-dynamic-time-machine-volume") then
-          hs.timer.doAfter(30, function()
-            hs.alert.show("Backup completed. Ejecting...")
-            st(env.TMBACKUPVOL):doThis("eject")
-          end)
-        end
-      end
-    end
-  },
+  
   { type = "task", args = {"jcwserve", env.JSON_SHELL_API_LAYER_SERVER_PORT} },
   { type = "task", args = "oauth2callback"}
 })
