@@ -3,44 +3,12 @@ TelegramItemSpecifier = {
   type = "telegram",
   properties = {
     getables = {
-      ["convo-id"] = function(self, chat_obj)
-        return chat_obj.id
-      end,
-      ["author"] = function(self, chat_obj)
-        return chat_obj.name
-      end,
-      ["raw-messages"] = function(self, chat_obj)
-        return chat_obj.messages
-      end,
       ["find-messages-by-id"] = function(self, specifier)
         return  get.id_assoc_array.id_assoc_by_first_match_w_id_assoc(self:get("raw-messages", specifier.chat_obj), specifier)
-      end,
-      ["msg-timestamp"] = function(self, msg)
-        return msg.date_unixtime
-      end,
-      ["msg-author"] = function(self, msg)
-        return msg.from
-      end,
-      ["msg-content"] = function(self, msg)
-        return msg.text
       end,
       ["msg-raw-attachments"] = function(self, msg)
         return {self:get("media-dir-for-chat", msg.chat_obj) .. "/" .. transf.path.leaf(msg.file)}
       end,
-      ["msg-raw-reactions"] = function(self, msg)
-        local raw_reactions = {}
-        if msg["reactions"] then
-          local reaction_tally = {}
-          for _, reaction in transf.array.index_value_stateless_iter(msg["reactions"]) do
-            reaction_tally[reaction.reaction] = (reaction_tally[reaction.reaction] or 0) + 1
-          end
-          for reaction, count in transf.table.key_value_stateless_iter(reaction_tally) do
-            table.insert(raw_reactions, ("%s (%d)"):format(reaction, count))
-          end
-        end
-        return raw_reactions
-      end,
-
       ["msg-sticker-emoji"] = function(self, msg)
         return msg.sticker_emoji
       end,

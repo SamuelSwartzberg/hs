@@ -3,24 +3,6 @@ FacebookItemSpecifier = {
   type = "facebook",
   properties = {
     getables = {
-      ["convo-id"] = function(self, chat_obj)
-        return chat_obj.thread_path:match("_(%d+)$")
-      end,
-      ["author"] = function(self, chat_obj)
-        return chat_obj.title
-      end,
-      ["raw-messages"] = function(self, chat_obj)
-        return chat_obj.messages
-      end,
-      ["msg-timestamp"] = function(self, msg)
-        return msg.timestamp_ms / 1000
-      end,
-      ["msg-author"] = function(self, msg)
-        return msg.sender_name
-      end,
-      ["msg-content"] = function(self, msg)
-        return msg.content
-      end,
       ["msg-raw-attachments"] = function(self, msg)
         local raw_attachments = {}
 
@@ -36,20 +18,6 @@ FacebookItemSpecifier = {
 
         return raw_attachments
       end,
-      ["msg-raw-reactions"] = function(self, msg)
-        local raw_reactions = {}
-        if msg["reactions"] then
-          local reaction_tally = {}
-          for _, reaction in transf.array.index_value_stateless_iter(msg["reactions"]) do
-            reaction_tally[reaction.reaction] = (reaction_tally[reaction.reaction] or 0) + 1
-          end
-          for reaction, count in transf.table.key_value_stateless_iter(reaction_tally) do
-            table.insert(raw_reactions, ("%s (%d)"):format(reaction, count))
-          end
-        end
-        return raw_reactions
-      end,
-
       ["msg-call-duration"] = function(self, msg)
         if msg["call_log"] then
           return msg["call_log"].duration / (1000 * 60)

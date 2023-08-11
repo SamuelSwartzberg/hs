@@ -3,26 +3,8 @@ DiscordItemSpecifier = {
   type = "discord",
   properties = {
     getables = {
-      ["convo-id"] = function(self, chat_obj)
-        return chat_obj.channel.id
-      end,
-      ["author"] = function(self, chat_obj)
-        return chat_obj.channel.name
-      end,
-      ["raw-messages"] = function(self, chat_obj)
-        return chat_obj.messages
-      end,
       ["find-messages-by-id"] = function(self, specifier)
         return get.id_assoc_array.id_assoc_by_first_match_w_id_assoc(self:get("raw-messages", specifier.chat_obj), specifier)
-      end,
-      ["msg-timestamp"] = function(self, msg)
-        return date.diff(msg.timestamp, date.epoch()):spanseconds()
-      end,
-      ["msg-author"] = function(self, msg)
-        return ("%s#%s"):format(msg.author.name, msg.author.discriminator)
-      end,
-      ["msg-content"] = function(self, msg)
-        return msg.content
       end,
       ["msg-raw-attachments"] = function(self, msg)
         local raw_attachments = {}
@@ -35,15 +17,6 @@ DiscordItemSpecifier = {
     
         return raw_attachments
       end,
-      ["msg-raw-reactions"] = function(self, msg)
-        local raw_reactions = {}
-        for _, reaction in transf.array.index_value_stateless_iter(msg.reactions) do
-          local reaction_str = ("%s (%s)"):format(reaction.emoji.name, reaction.count)
-          table.insert(raw_reactions, reaction_str)
-        end
-        return raw_reactions
-      end,
-
       ["msg-call-duration"] = function(self, msg)
         if msg.callEndedTimestamp then
           return date.diff(msg.callEndedTimestamp, msg.timestamp):spanminutes()

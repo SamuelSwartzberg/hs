@@ -8169,7 +8169,154 @@ transf = {
       return get.string_or_number.number_or_nil(transf.file.contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
     end,
     
-  }
+  },
+  discord_export_chat_main_object = {
+    discord_export_chat_message_array = function(main_object)
+      return main_object.messages
+    end,
+    string_by_author = function(main_object)
+      return main_object.channel.name
+    end,
+    string_by_id = function(main_object)
+      return main_object.channel.id
+    end,
+  },
+  discord_export_chat_message  = {
+    timestamp_ms = function(msg)
+      return transf.date.timestamp_ms(
+        date(msg.timestamp)
+      )
+    end,
+    string_by_author = function(msg)
+      error("The code I'm migrating still assumed #discriminators, but discord has since migrated to handles. I'll need to update this code to reflect that.")
+      return
+    end,
+    string_by_content = function(msg)
+      return msg.content
+    end,
+    reaction_spec_array = function(msg)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        msg.reactions or {},
+        function(reaction)
+          return {
+            emoji = reaction.emoji.name,
+            count = reaction.count,
+          }
+        end
+      )
+    end,
+  },
+  facebook_export_chat_main_object = {
+    facebook_export_chat_message_array = function(main_object)
+      return main_object.messages
+    end,
+    string_by_author = function(main_object)
+      return main_object.title
+    end,
+    string_by_id = function(main_object)
+      return main_object.thread_path:match("_(%d+)$")
+    end,
+  },
+  facebook_export_chat_message  = {
+    timestamp_ms = function(msg)
+      return msg.timestamp_ms
+    end,
+    string_by_author = function(msg)
+      return msg.sender_name
+    end,
+    string_by_content = function(msg)
+      return msg.content
+    end,
+    reaction_spec_array = function(msg)
+      local tally = {}
+      for _, reaction in ipairs(msg.reactions or {}) do
+        tally[reaction.reaction] = (tally[reaction.reaction] or 0) + 1
+      end
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        tally,
+        function(emoji, count)
+          return {
+            emoji = emoji,
+            count = count,
+          }
+        end
+      )
+    end,
+  },
+  signal_export_chat_main_object = {
+    signal_export_chat_message_array = function(main_object)
+      return main_object.messages
+    end,
+    string_by_author = function(main_object)
+      return main_object.author
+    end,
+    string_by_id = function(main_object)
+      return main_object[1].conversationId
+    end,
+  },
+  signal_export_chat_message  = {
+    timestamp_ms = function(msg)
+      return msg.sent_at
+    end,
+    string_by_author = function(msg)
+      if msg.type == "outgoing" then
+        return "me"
+      else
+        return msg.global_author
+      end
+    end,
+    string_by_content = function(msg)
+      return msg.body
+    end,
+    reaction_spec_array = function(msg)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        msg.reactions or {},
+        function(emoji)
+          return {
+            emoji = emoji,
+            count = 1,
+          }
+        end
+      )
+    end,
+  },
+  telegram_export_chat_main_object = {
+    telegram_export_chat_message_array = function(main_object)
+      return main_object.messages
+    end,
+    string_by_author = function(main_object)
+      return main_object.name
+    end,
+    string_by_id = function(main_object)
+      return main_object.id
+    end,
+  },
+  telegram_export_chat_message  = {
+    timestamp_ms = function(msg)
+      return msg.date_unixtime * 1000
+    end,
+    string_by_author = function(msg)
+      return msg.from
+    end,
+    string_by_content = function(msg)
+      return msg.text
+    end,
+    reaction_spec_array = function(msg)
+      local tally = {}
+      for _, reaction in ipairs(msg.reactions or {}) do
+        tally[reaction.reaction] = (tally[reaction.reaction] or 0) + 1
+      end
+      return get.table.array_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        tally,
+        function(emoji, count)
+          return {
+            emoji = emoji,
+            count = count,
+          }
+        end
+      )
+    end,
+  },
   
 }
 

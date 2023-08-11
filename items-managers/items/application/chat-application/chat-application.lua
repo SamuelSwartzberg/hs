@@ -10,12 +10,6 @@ ChatApplicationItemSpecifier = {
       ["media-dir-for-chat"] = function(self, chat_obj)
         return self:get("media-dir") .. "/" .. self:get("convo-id", chat_obj)
       end,
-      ["msg-attachments"] = function(self, msg)
-        return plstringx.join(",", self:get("msg-raw-attachments", msg))
-      end,
-      ["msg-reactions"] = function(self, msg)
-        return plstringx.join(",", self:get("msg-raw-reactions", msg))
-      end,
       ["assemble-messages"] = function(self, chat_obj)
         local messages = {}
         local last_backup = self:get("last-backup", self:get("chat-id", chat_obj))

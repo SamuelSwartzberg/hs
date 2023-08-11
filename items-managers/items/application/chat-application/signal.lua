@@ -3,28 +3,6 @@ SignalItemSpecifier = {
   type = "signal",
   properties = {
     getables = {
-      ["convo-id"] = function(self, chat_obj)
-        return chat_obj[1].conversationId
-      end,
-      ["author"] = function(self, chat_obj)
-        return chat_obj.author
-      end,
-      ["raw-messages"] = function(self, chat_obj)
-        return chat_obj.messages
-      end,
-      ["msg-timestamp"] = function(self, msg)
-        return msg.sent_at / 1000
-      end,
-      ["msg-author"] = function(self, msg)
-        if msg.type == "outgoing" then
-          return "me"
-        else
-          return msg.global_author
-        end
-      end,
-      ["msg-content"] = function(self, msg)
-        return msg.body
-      end,
       ["msg-raw-attachments"] = function(self, msg)
         if msg.attachments then
           local attachments = {}
@@ -37,15 +15,6 @@ SignalItemSpecifier = {
             end
           end
           return attachments
-        end
-      end,
-      ["msg-raw-reactions"] = function(self, msg)
-        if msg.reactions then
-          local reactions = {}
-          for _, react in transf.array.index_value_stateless_iter(msg.reactions) do
-            table.insert(reactions, react.emoji .. " (1)")
-          end
-          return reactions
         end
       end,
       ["msg-call-duration"] = function(self, msg)
