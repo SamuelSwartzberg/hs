@@ -4627,7 +4627,7 @@ transf = {
         "\n"
       )
     end,
-    relative_path_dict_of_url_files = function(url_array)
+    nonabsolute_path_key_dict_of_url_files = function(url_array)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         url_array,
         function(url)

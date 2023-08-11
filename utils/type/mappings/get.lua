@@ -486,9 +486,9 @@ get = {
       )
     end
   },
-  relative_path_dict = {
-    absolute_path_dict = function(relative_path_dict, starting_point, extension)
-      return get.table.table_by_mapped_w_kt_arg_kt_ret_fn(relative_path_dict, function(k)
+  nonabsolute_path_key_dict = {
+    absolute_path_key_dict = function(nonabsolute_path_key_dict, starting_point, extension)
+      return get.table.table_by_mapped_w_kt_arg_kt_ret_fn(nonabsolute_path_key_dict, function(k)
         local ext_part = ""
         if extension then ext_part = "." .. extension end
         return (starting_point or "") .. "/" .. k .. ext_part
@@ -496,9 +496,9 @@ get = {
     end,
   },
   assoc = {
-    absolute_path_dict = function(t, starting_point, extension)
-      return get.relative_path_dict.absolute_path_dict(
-        transf.assoc.to_relative_path_dict(t),
+    absolute_path_key_dict = function(t, starting_point, extension)
+      return get.nonabsolute_path_key_dict.absolute_path_key_dict(
+        transf.assoc.to_nonabsolute_path_key_dict(t),
         starting_point,
         extension
       )
@@ -2603,9 +2603,9 @@ get = {
     end,
   },
   url_array = {
-    absolute_path_dict_of_url_files = function(arr, root)
-      return get.relative_path_dict.absolute_path_dict(
-        transf.url_array.relative_path_dict_of_url_files(arr),
+    absolute_path_key_dict_of_url_files = function(arr, root)
+      return get.nonabsolute_path_key_dict.absolute_path_key_dict(
+        transf.url_array.nonabsolute_path_key_dict_of_url_files(arr),
         root
       )
     end,

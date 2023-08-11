@@ -549,14 +549,14 @@ dothis = {
     open_and_reveal = function(path)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -R " .. transf.string.single_quoted_escaped(path))
     end,
-    write_relative_path_dict = function(path, relative_path_dict, extension)
-      dothis.dynamic_absolute_path_dict.write(
-        get.relative_path_dict.absolute_path_dict(relative_path_dict, path, extension)
+    write_nonabsolute_path_key_dict = function(path, nonabsolute_path_key_dict, extension)
+      dothis.dynamic_absolute_path_key_dict.write(
+        get.nonabsolute_path_key_dict.absolute_path_key_dict(nonabsolute_path_key_dict, path, extension)
       )
     end,
     write_dynamic_path_dict = function(path, assoc, extension)
-      dothis.local_path.write_relative_path_dict(
-        transf.table.relative_path_dict(path), 
+      dothis.local_path.write_nonabsolute_path_key_dict(
+        transf.table.nonabsolute_path_key_dict(path), 
         assoc, 
         extension
       )
@@ -1565,13 +1565,13 @@ dothis = {
         tblmap.date_format_name.date_format,
         function(date_format)
           fn(get.date.string_w_date_format_indicator(dt, date_format))
-        end,
+        end
       )
     end
   },
   logging_dir = {
     log_ymd_nested_key_array_of_arrays_value_assoc = function(path, ymd_nested_key_array_of_arrays_value_assoc)
-      local abs_path_dict = get.assoc.absolute_path_dict(
+      local abs_path_dict = get.assoc.absolute_path_key_dict(
         ymd_nested_key_array_of_arrays_value_assoc,
         path,
         ".csv"
@@ -1640,7 +1640,7 @@ dothis = {
       end
     end,
     create_as_url_files = function(url_array, path)
-      local abs_path_dict = get.url_array.absolute_path_dict_of_url_files(url_array, path)
+      local abs_path_dict = get.url_array.absolute_path_key_dict_of_url_files(url_array, path)
       dothis.absolute_path_string_value_dict.write(abs_path_dict)
     end,
     create_as_session = function(url_array, root)
@@ -1656,12 +1656,12 @@ dothis = {
   sgml_url_array = {
    
   },
-  absolute_path_dict = {
+  absolute_path_key_dict = {
 
   },
-  dynamic_absolute_path_dict = {
-    write = function(dynamic_absolute_path_dict)
-      for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_dict) do
+  dynamic_absolute_path_key_dict = {
+    write = function(dynamic_absolute_path_key_dict)
+      for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_key_dict) do
         if is.any.array(contents) then
           dothis.absolute_path[dothis.array.shift(contents)](absolute_path, table.unpack(contents))
         else
