@@ -17,25 +17,11 @@ SignalItemSpecifier = {
           return attachments
         end
       end,
-      ["msg-call-duration"] = function(self, msg)
-        if msg.callHistoryDetails then
-          local call_ended_timestamp = msg.callHistoryDetails.endedTime / 1000
-          return (call_ended_timestamp - self:get("msg-timestamp", msg)) / 60
-        end
-      end,
-      ["msg-replying-to-timestamp"] = function(self, msg)
-        if msg.quote then 
-          return msg.quote.id / 1000 -- yes, the id field is a timestamp in ms. Why call it id? Who knows.
-        end
-      end,
       ["chat-obj"] = function(self, exp_item)
         local chat_obj = exp_item:get("parse-to-lua-table")
         chat_obj.author = exp_item:get("path-leaf"):match("^([^(]+)")
         chat_obj.media_dir = exp_item:get("find-sibling-dir-with-same-filename")
         return chat_obj
-      end,
-      ["backup-interval"] = function(self)
-        return 10 * tblmap.date_component_name.sec.min
       end,
     },
     doThisables = {

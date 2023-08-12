@@ -8179,7 +8179,7 @@ transf = {
     end,
     string_by_id = function(main_object)
       return main_object.channel.id
-    end,
+    end
   },
   discord_export_chat_message  = {
     timestamp_ms = function(msg)
@@ -8204,6 +8204,11 @@ transf = {
           }
         end
       )
+    end,
+    int_or_nil_by_call_duration = function(msg)
+      if msg.callEndedTimestamp then
+        return msg.callEndedTimestamp - transf.discord_export_chat_message.timestamp_ms(msg)
+      end
     end,
   },
   facebook_export_chat_main_object = {
@@ -8242,6 +8247,11 @@ transf = {
         end
       )
     end,
+    int_or_nil_by_call_duration = function(msg)
+      if msg.call_log then
+        return msg.call_log.duration 
+      end
+    end,
   },
   signal_export_chat_main_object = {
     signal_export_chat_message_array = function(main_object)
@@ -8278,6 +8288,11 @@ transf = {
           }
         end
       )
+    end,
+    int_or_nil_by_call_duration = function(msg)
+      if msg.callHistoryDetails then
+        return msg.callHistoryDetails.endedTime - transf.signal_export_chat_message.timestamp_ms(msg)
+      end 
     end,
   },
   telegram_export_chat_main_object = {
@@ -8316,7 +8331,12 @@ transf = {
         end
       )
     end,
+    int_or_nil_by_call_duration = function(msg)
+      error("TODO")
+    end,
+
   },
+  
   
 }
 

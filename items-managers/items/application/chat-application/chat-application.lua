@@ -7,27 +7,6 @@ ChatApplicationItemSpecifier = {
       ["is-facebook"] = function(self) return self:get("c") == "Facebook" end,
       ["is-signal"] = function(self) return self:get("c") == "Signal" end,
       ["is-telegram"] = function(self) return self:get("c") == "Telegram Lite" end,
-      ["media-dir-for-chat"] = function(self, chat_obj)
-        return self:get("media-dir") .. "/" .. self:get("convo-id", chat_obj)
-      end,
-      ["assemble-messages"] = function(self, chat_obj)
-        local messages = {}
-        local last_backup = self:get("last-backup", self:get("chat-id", chat_obj))
-        for _, msg in transf.array.index_value_stateless_iter(self:get("raw-messages", chat_obj)) do
-          local msg_timestamp = get.string_or_number.number_or_nil(self:get("msg-timestamp", msg))
-          if msg_timestamp > last_backup then
-            local msg_author = self:get("msg-author", msg)
-            local msg_content = self:get("msg-content", msg)
-            local msg_attachments = self:get("msg-attachments", msg)
-            local msg_reactions = self:get("msg-reactions", msg)
-            local msg_call_duration = self:get("msg-call-duration", msg)
-            local msg_sticker_emoji = self:get("msg-sticker-emoji", msg)
-            local msg_replying_to_timestamp = self:get("msg-replying-to-timestamp", msg)
-            messages[msg_timestamp] = {msg_author, msg_content, msg_attachments, msg_reactions, msg_call_duration, msg_sticker_emoji, msg_replying_to_timestamp}
-          end
-        end
-        return messages
-      end,
     },
     doThisables = {
       ["log-chat-messages"] = function(self, chat_obj)

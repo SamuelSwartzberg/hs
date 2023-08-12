@@ -3,9 +3,6 @@ DiscordItemSpecifier = {
   type = "discord",
   properties = {
     getables = {
-      ["find-messages-by-id"] = function(self, specifier)
-        return get.id_assoc_array.id_assoc_by_first_match_w_id_assoc(self:get("raw-messages", specifier.chat_obj), specifier)
-      end,
       ["msg-raw-attachments"] = function(self, msg)
         local raw_attachments = {}
         
@@ -17,34 +14,11 @@ DiscordItemSpecifier = {
     
         return raw_attachments
       end,
-      ["msg-call-duration"] = function(self, msg)
-        if msg.callEndedTimestamp then
-          return date.diff(msg.callEndedTimestamp, msg.timestamp):spanminutes()
-        else
-          return nil
-        end
-      end,
-      ["msg-replying-to-timestamp"] = function(self, msg)
-        if msg.reference then
-          local referenced_msg_id = msg.reference.messageId
-          local referenced_msg = self:get("find-messages-by-id", { chat_obj = msg.chat_obj, id = referenced_msg_id })
-          if referenced_msg then
-            return self:get("msg-timestamp", referenced_msg)
-          else
-            return nil
-          end
-        else
-          return nil
-        end
-      end,
       ["chat-obj"] = function(self, chat_dir)
         local message_json_file = chat_dir:get("child-ending-with", ".json")
         local chat_obj = json.decode(message_json_file:get("c"))
         chat_obj.found_in = chat_dir:get("c")
         return chat_obj
-      end,
-      ["backup-interval"] = function(self)
-        return 60 * tblmap.date_component_name.seconds["min"]
       end,
     },
     doThisables = {

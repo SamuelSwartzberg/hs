@@ -18,14 +18,6 @@ FacebookItemSpecifier = {
 
         return raw_attachments
       end,
-      ["msg-call-duration"] = function(self, msg)
-        if msg["call_log"] then
-          return msg["call_log"].duration / (1000 * 60)
-        end
-      end,
-      ["msg-replying-to-timestamp"] = function(self, msg)
-        return nil -- facebook doesn't include this in the export
-      end,
       ["chat-obj"] = function(self, chat_dir)
         local chat_obj = json.decode(transf.file.contents(env.chat_dir .. "/messages_1.json"))
         chat_obj.found_in = chat_dir

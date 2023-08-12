@@ -3290,5 +3290,89 @@ get = {
     md5_base32_crock_string_of_length = function(any, length)
       return transf.not_userdata_or_function.md5_base32_crock_string(any):sub(1, length)
     end,
+  },
+  export_chat_main_object = {
+    backup_type_identifier = function(obj, typ)
+      return typ .. "/" .. transf[typ .. "_export_chat_main_object"].string_by_id(obj)
+    end,
+    timestamp_ms_last_backup = function(obj, typ)
+      return transf.backup_type_identifier.timestamp_ms(
+        transf.export_chat_main_object.backup_type_identifier(obj, typ)
+      )
+    end,
+    id_key_timestamp_ms_value_dict = function(main_object, typ)
+      local res = {}
+      for _, msg in ipairs(main_object.messages) do
+        res[msg.id] = get.export_chat_message.timestamp_ms(msg, typ)
+      end
+      return res
+    end,
+    dir_by_target_backup_location = function(obj, typ)
+      return env.MCHATS .. "/" .. transf.export_chat_main_object.backup_type_identifier(obj, typ)
+    end,
+    logging_dir = function(obj, typ)
+      return transf.export_chat_main_object.dir_by_target_backup_location(obj, typ) .. "/_logs"
+    end,
+    media_dir = function(obj, typ)
+      return transf.export_chat_main_object.dir_by_target_backup_location(obj, typ) .. "/media"
+    end,
+  },
+  export_chat_message = {
+    msg_spec = function(msg, typ, obj)
+      local export_chat_message_type = typ .. "_export_chat_message"
+      return {
+        author = transf[export_chat_message_type].string_by_author(msg),
+        content = transf[export_chat_message_type].string_by_content(msg),
+        attachments = transf[export_chat_message_type].absolute_path_array_by_attachments(msg),
+        reactions = transf[export_chat_message_type].reaction_spec_array(msg),
+        call_duration = transf[export_chat_message_type].int_or_nil_by_call_duration(msg),
+        sticker_emoji = transf[export_chat_message_type].string_or_nil_by_sticker_emoji(msg),
+        replying_to_timestamp = get[export_chat_message_type].timestamp_ms_or_nil_by_replying_to(msg, obj),
+      }
+    end,
+    timestamp_ms = function(msg, typ)
+      return transf[
+        typ .. "_export_chat_message"
+      ].timestamp_ms(msg)
+    end,
+
+  },
+  export_chat_message_array = {
+    timestamp_ms_key_msg_spec_value_dict_by_filtered = function(arr, typ, timestamp_ms)
+      local res = {}
+      for _, msg in transf.array.index_value_stateless_iter(arr) do
+        local msg_timestamp_ms = get.export_chat_message.timestamp_ms(msg, typ)
+        if msg_timestamp_ms >= timestamp_ms then
+          res[msg_timestamp_ms] = get.export_chat_message.msg_spec(msg, typ)
+        end
+      end
+      return res
+    end
+  },
+  discord_export_chat_message = {
+    timestamp_ms_or_nil_by_replying_to = function(msg, obj)
+      return get.fn.rt_or_nil_by_memoized(
+        get.export_chat_main_object.id_key_timestamp_ms_value_dict
+      )(obj, "discord")[msg.reference.messageId]
+    end
+  },
+  telegram_export_chat_message = {
+    timestamp_ms_or_nil_by_replying_to = function(msg, obj)
+      return get.fn.rt_or_nil_by_memoized(
+        get.export_chat_main_object.id_key_timestamp_ms_value_dict
+      )(obj, "telegram")[msg.reply_to_message_id]
+    end
+  },
+  signal_export_chat_message = {
+    timestamp_ms_or_nil_by_replying_to = function(msg)
+      if msg.quote then
+        return msg.quote.id -- despite the name, this is actually the timestamp
+      end
+    end
+  },
+  facebook_export_chat_message = {
+    timestamp_ms_or_nil_by_replying_to = function(msg)
+      return nil -- facebook doesn't have replies in its export
+    end
   }
 }

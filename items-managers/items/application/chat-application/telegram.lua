@@ -3,26 +3,11 @@ TelegramItemSpecifier = {
   type = "telegram",
   properties = {
     getables = {
-      ["find-messages-by-id"] = function(self, specifier)
-        return  get.id_assoc_array.id_assoc_by_first_match_w_id_assoc(self:get("raw-messages", specifier.chat_obj), specifier)
-      end,
       ["msg-raw-attachments"] = function(self, msg)
         return {self:get("media-dir-for-chat", msg.chat_obj) .. "/" .. transf.path.leaf(msg.file)}
       end,
       ["msg-sticker-emoji"] = function(self, msg)
         return msg.sticker_emoji
-      end,
-      ["msg-replying-to-timestamp"] = function(self, msg)
-        if msg.reply_to_message_id then
-          local referenced_msg = self:get("find-messages-by-id", { chat_obj = msg.chat_obj, id = msg.reply_to_message_id })
-          if referenced_msg then
-            return self:get("msg-timestamp", referenced_msg)
-          else
-            return nil
-          end
-        else
-          return nil
-        end
       end,
       ["chat-obj"] = function(self, chat)
         return chat
