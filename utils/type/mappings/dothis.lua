@@ -2877,8 +2877,58 @@ dothis = {
         tbl
       )
       dothis.extant_path.empty_dir(env.TMP_GIT_LOG_PARENT)
-    end
+    end,
+    telegram_generate_backup = function(_, do_after)
+      dothis.fn_queue_specifier.push(main_qspec,
+        function()
+          local window = self:get("running-application-item"):get("main-window-item")
+          window:doThis("focus")
+          window:doThis("set-size", {w = 800, h = 1500})
+          window:doThis("set-position", {x = 0, y = 0})
+          dothis.input_spec_array.exec({
+            "m30 65 %tl", ".",
+            "m40 395 %tl", ".",
+            "m0 -300 %c", ".",
+            "m0 295 %c", ".",
+            "m-150 -155 %c", ".",
+            "m-150 -65 %c", ".",
+            "s0 -200",
+            "m0 0 %c", ".",
+            "s0 -200",
+            "s0 -200",
+            "s0 -70",
+            "m0 0 %c", ".",
+            "m0 -100 %c",
+            "s0 -300",
+            "s0 -300",
+            "m0 170 %c", ".",
+            "m130 215 %c", ".",
+          })
+          hs.timer.doAfter(300, do_after)
+        end
+      )
+    end,
 
+  },
+  telegram_raw_export_dir = {
+    process_to_telegram_export_dir = function(dir)
+      for _, chat_dir in transf.array.index_value_stateless_iter(transf.dir.absolute_path_array_by_children(transf.path.ending_with_slash(dir) .. "chats")) do
+        local media_path = transf.path.ending_with_slash(dir) .. "media/" 
+        for _, media_type_dir in transf.array.index_value_stateless_iter(
+          transf.dir.absolute_path_array_by_children(chat_dir)
+        ) do
+          dothis.dir.move_children_absolute_path_array_into_absolute_path(
+            media_type_dir,
+            media_path
+          )
+        end
+      end
+      dothis.extant_path.move_to_absolute_path(
+        dir,
+        transf.string.in_cache_dir("telegram", "export")
+      )
+
+    end,
   },
   backup_type_identifier = {
     write_current_timestamp_ms = function(identifier)
@@ -2967,5 +3017,30 @@ dothis = {
       fn()
       dothis.fn_queue_specifier.update(qspec)
     end,
+  },
+  export_chat_main_object = {
+    log = function(obj, typ)
+      local logging_dir = get.export_chat_main_object.logging_dir(obj, typ)
+      dothis.absolute_path.create_dir(
+        logging_dir
+      )
+      dothis.absolute_path.create_dir(
+        get.export_chat_main_object.media_dir(obj, typ)
+      )
+      dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+        logging_dir,
+        get.export_chat_main_object.timestamp_ms_key_msg_spec_value_dict_by_filtered(
+          obj,
+          typ
+        )
+      )
+      dothis.backup_type_identifier.write_current_timestamp_ms(
+        get.export_chat_main_object.backup_type_identifier(obj, typ)
+      )
+    end,
+      
+  },
+  telegram_export_dir = {
+    
   }
 }

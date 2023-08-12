@@ -3316,6 +3316,13 @@ get = {
     media_dir = function(obj, typ)
       return transf.export_chat_main_object.dir_by_target_backup_location(obj, typ) .. "/media"
     end,
+    timestamp_ms_key_msg_spec_value_dict_by_filtered = function(obj, typ)
+      return get.export_chat_message_array.timestamp_ms_key_msg_spec_value_dict_by_filtered(
+        obj.messages,
+        typ,
+        transf.export_chat_main_object.timestamp_ms_last_backup(obj, typ)
+      )
+    end,
   },
   export_chat_message = {
     msg_spec = function(msg, typ, obj)
@@ -3354,13 +3361,35 @@ get = {
       return get.fn.rt_or_nil_by_memoized(
         get.export_chat_main_object.id_key_timestamp_ms_value_dict
       )(obj, "discord")[msg.reference.messageId]
+    end,
+    absolute_path_array_by_attachments = function(msg, obj)
+      local media_dir = get.export_chat_main_object.media_dir(obj, "discord")
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        msg.attachments or {},
+        function(att)
+          return media_dir .. "/" .. transf.path.leaf(att.uri)
+        end
+      )
     end
   },
-  telegram_export_chat_message = {
-    timestamp_ms_or_nil_by_replying_to = function(msg, obj)
-      return get.fn.rt_or_nil_by_memoized(
-        get.export_chat_main_object.id_key_timestamp_ms_value_dict
-      )(obj, "telegram")[msg.reply_to_message_id]
+  facebook_export_chat_message = {
+    timestamp_ms_or_nil_by_replying_to = function(msg)
+      return nil -- facebook doesn't have replies in its export
+    end,
+    absolute_path_array_by_attachments = function(msg, obj)
+      local media_dir = get.export_chat_main_object.media_dir(obj, "facebook")
+      local res = {}
+
+      for _, attachment_type in transf.array.index_value_stateless_iter({"photos", "videos", "files", "audio_files", "gifs", "share", "sticker", "animated_image_attachments"}) do
+        if msg[attachment_type] then
+          for _, attachment in transf.array.index_value_stateless_iter(msg[attachment_type]) do
+            local attachment_path = media_dir .. "/" .. transf.path.leaf(attachment.uri)
+            dothis.res.push(res, attachment_path)
+          end
+        end
+      end
+
+      return res
     end
   },
   signal_export_chat_message = {
@@ -3368,11 +3397,22 @@ get = {
       if msg.quote then
         return msg.quote.id -- despite the name, this is actually the timestamp
       end
+    end,
+
+  },
+  telegram_export_chat_message = {
+    timestamp_ms_or_nil_by_replying_to = function(msg, obj)
+      return get.fn.rt_or_nil_by_memoized(
+        get.export_chat_main_object.id_key_timestamp_ms_value_dict
+      )(obj, "telegram")[msg.reply_to_message_id]
+    end,
+    absolute_path_array_by_attachments = function(msg, obj)
+      if msg.file then
+        local media_dir = get.export_chat_main_object.media_dir(obj, "telegram")
+        return {media_dir .. "/" .. transf.path.leaf(msg.file)}
+      else
+        return {}
+      end
     end
   },
-  facebook_export_chat_message = {
-    timestamp_ms_or_nil_by_replying_to = function(msg)
-      return nil -- facebook doesn't have replies in its export
-    end
-  }
 }

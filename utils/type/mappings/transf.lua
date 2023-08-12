@@ -7154,7 +7154,13 @@ transf = {
           return transf.uuid.contact_table(uid)
         end
       )
-    end
+    end,
+    telegram_raw_export_dir_by_current = function()
+      return env.DOWNLOADS .. "/Telegram Desktop/DataExport_" .. get.date.string_w_date_format_indicator(
+        date(),
+        "%Y-%m-%d"
+      )
+    end,
 
   },
   package_manager_name = {
@@ -8170,6 +8176,23 @@ transf = {
     end,
     
   },
+  discord_export_dir = {
+    discord_export_chat_main_object_media_dir_pair_array = function(dir)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        transf.dir.dir_array_by_children(dir),
+        transf.discord_export_child_dir.discord_export_chat_main_object_media_dir_pair
+      )
+    end,
+    
+  },
+  discord_export_child_dir = {
+    discord_export_chat_main_object_media_dir_pair = function(dir)
+      local json_file = get.dir.find_child_with_extension(dir, "json")
+      local media_dir = get.dir.find_child_with_extension(dir, "_Files")
+      if not json_file or not media_dir then error("Could not find json or media dir in " .. dir) end
+      return {transf.json_file.not_userdata_or_function(json_file), media_dir}
+    end,
+  },
   discord_export_chat_main_object = {
     discord_export_chat_message_array = function(main_object)
       return main_object.messages
@@ -8179,7 +8202,7 @@ transf = {
     end,
     string_by_id = function(main_object)
       return main_object.channel.id
-    end
+    end,
   },
   discord_export_chat_message  = {
     timestamp_ms = function(msg)
@@ -8210,6 +8233,12 @@ transf = {
         return msg.callEndedTimestamp - transf.discord_export_chat_message.timestamp_ms(msg)
       end
     end,
+    string_or_nil_by_sticker_emoji = function(msg)
+      return nil
+    end
+  },
+  facebook_export_dir = {
+
   },
   facebook_export_chat_main_object = {
     facebook_export_chat_message_array = function(main_object)
@@ -8252,6 +8281,9 @@ transf = {
         return msg.call_log.duration 
       end
     end,
+    string_or_nil_by_sticker_emoji = function(msg)
+      return nil
+    end
   },
   signal_export_chat_main_object = {
     signal_export_chat_message_array = function(main_object)
@@ -8294,6 +8326,29 @@ transf = {
         return msg.callHistoryDetails.endedTime - transf.signal_export_chat_message.timestamp_ms(msg)
       end 
     end,
+    string_or_nil_by_sticker_emoji = function(msg)
+      return nil
+    end
+  },
+  telegram_export_dir = {
+    telegram_export_chat_main_object_media_dir_pair_array = function(dir)
+      local json_file = get.dir.find_child_with_leaf(dir, "result.json")
+      local export_json = transf.json_file.not_userdata_or_function(json_file)
+
+      local chats = export_json.chats.list
+
+      return get.array.array_by_mapped_w_pos_int_t_arg_t_ret_fn(
+        chats,
+        function(index, chat)
+          return {
+            chat,
+            dir .. "/chats/chat_" .. index .. "/media"
+          }
+        end
+      )
+
+    end,
+    
   },
   telegram_export_chat_main_object = {
     telegram_export_chat_message_array = function(main_object)
@@ -8334,6 +8389,9 @@ transf = {
     int_or_nil_by_call_duration = function(msg)
       error("TODO")
     end,
+    string_or_nil_by_sticker_emoji = function(msg)
+      return msg.sticker_emoji
+    end
 
   },
   

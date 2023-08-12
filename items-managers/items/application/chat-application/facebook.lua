@@ -3,21 +3,6 @@ FacebookItemSpecifier = {
   type = "facebook",
   properties = {
     getables = {
-      ["msg-raw-attachments"] = function(self, msg)
-        local raw_attachments = {}
-
-        for _, attachment_type in transf.array.index_value_stateless_iter({"photos", "videos", "files", "audio_files", "gifs", "share", "sticker", "animated_image_attachments"}) do
-          if msg[attachment_type] then
-            for _, attachment in transf.array.index_value_stateless_iter(msg[attachment_type]) do
-              local attachment_leaf = transf.path.leaf(attachment.uri)
-              local attachment_path = self:get("media-dir-for-chat", msg.chat_obj) .. "/" .. attachment_leaf
-              table.insert(raw_attachments, attachment_path)
-            end
-          end
-        end
-
-        return raw_attachments
-      end,
       ["chat-obj"] = function(self, chat_dir)
         local chat_obj = json.decode(transf.file.contents(env.chat_dir .. "/messages_1.json"))
         chat_obj.found_in = chat_dir
