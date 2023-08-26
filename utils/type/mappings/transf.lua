@@ -123,14 +123,6 @@ transf = {
         .. transf.unicode_prop_table.unicode_character_name(unicode_prop_table)
     end,
   },
-  unicode_prop_table_array = {
-    unicode_prop_table_item_array = function(unicode_prop_table_array)
-      return hs.fnutils.imap(
-        unicode_prop_table_array,
-        CreateUnicodePropTable
-      )
-    end,
-  },
   number = {
     sign_indicator = function(num)
       if num < 0 then
@@ -766,7 +758,7 @@ transf = {
       return {
         extension = transf.path.extension(path),
         path = transf.path.parent_path(path),
-        rfc3339like_dt_or_range = rf3339like_dt_or_interval,
+        rfc3339like_dt_or_interval = rf3339like_dt_or_interval,
         general_name = general_name,
         fs_tag_assoc = transf.fs_tag_string.fs_tag_assoc(fs_tag_string),
       }
@@ -789,6 +781,7 @@ transf = {
     end,
 
   },
+
   path_with_intra_file_locator = {
     path_with_intra_file_locator_specifier = function(path)
       local parts = stringy.split(path, ":")
@@ -1001,6 +994,19 @@ transf = {
     useless_file_leaf_filtered_path_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.not_useless_file_leaf)
     end,
+    path_leaf_specifier_array = function(path_array)
+      return hs.fnutils.imap(path_array, transf.path.path_leaf_specifier)
+    end,
+    date_interval_specifier_array = function(path_array)
+      return transf.path_leaf_specifier_array.date_interval_specifier_array(
+        transf.path_array.path_leaf_specifier_array(path_array)
+      )
+    end,
+    rfc3339like_dt_or_interval_by_union = function(path_array)
+      return transf.path_leaf_specifier_array.rfc3339like_dt_or_interval_by_union(
+        transf.path_array.path_leaf_specifier_array(path_array)
+      )
+    end,
   },
   extant_path_array = {
     newest = function(path_array)
@@ -1197,6 +1203,28 @@ transf = {
     string_by_tree = function(path)
       transf.string.string_or_nil_by_evaled_env_bash_stripped("tree -F --noreport" .. transf.string.single_quoted_escaped(path))
     end,
+    path_leaf_specifier_array_by_children = function(path)
+      return transf.path_array.path_leaf_specifier_array(
+        transf.dir.absolute_path_array_by_children(path)
+      )
+    end,
+    rfc3339like_dt_or_interval_by_union_of_children = function(path)
+      return transf.path_leaf_specifier_array.rfc3339like_dt_or_interval_by_union(
+        transf.dir.path_leaf_specifier_array_by_children(path)
+      )
+    end,
+    path_leaf_specifier_by_using_union_rf3339like_dt_or_interval = function(path)
+      local path_leaf_specifier = transf.path.path_leaf_specifier(path)
+      local union_rf3339like_dt_or_interval = transf.dir.rfc3339like_dt_or_interval_by_union_of_children(path)
+      if union_rf3339like_dt_or_interval then
+        path_leaf_specifier.rfc3339like_dt_or_interval = union_rf3339like_dt_or_interval
+      end
+      return path_leaf_specifier
+    end,
+    path_by_using_union_rfc3339like_dt_or_interval = function(path)
+      local path_leaf_specifier = transf.dir.path_leaf_specifier_by_using_union_rf3339like_dt_or_interval(path)
+      return transf.path_leaf_specifier.path(path_leaf_specifier)
+    end
   },
   absolute_path_key_leaf_string_or_nested_value_dict = {
     leaf_key_leaf_string_or_nested_value_dict = function(dict)
@@ -1337,8 +1365,12 @@ transf = {
     rf3339like_dt_or_interval_part = function(path_leaf_specifier)
       return path_leaf_specifier.rf3339like_dt_or_interval or ""
     end,
-    date_interval_specifier = function(path_leaf_specifier)
-      return transf.rf3339like_dt_or_interval.date_interval_specifier(path_leaf_specifier.rf3339like_dt_or_interval)
+    date_interval_specifier_or_nil = function(path_leaf_specifier)
+      if path_leaf_specifier.rf3339like_dt_or_interval then
+        return transf.rf3339like_dt_or_interval.date_interval_specifier(path_leaf_specifier.rf3339like_dt_or_interval)
+      else
+        return nil
+      end
     end,
     path_part = function(path_leaf_specifier)
       return transf.path.ending_with_slash(path_leaf_specifier.path) 
@@ -1445,27 +1477,47 @@ transf = {
         function(path_leaf_specifier)
           return 
             path_leaf_specifier,
-            transf.path_leaf_specifier.date_interval_specifier(
+            transf.path_leaf_specifier.date_interval_specifier_or_nil(
               path_leaf_specifier
             )
         end
       )
     end,
     date_interval_specifier_array = function(arr)
-      return hs.fnutils.imap(
+      return get.table.array_by_mapped_w_vt_arg_vt_ret_fn(
         arr,
-        transf.path_leaf_specifier.date_interval_specifier
+        transf.path_leaf_specifier.date_interval_specifier_or_nil
       )
     end,
-    interval_specifier_with_earliest_start = function(arr)
+    date_interval_specifier_or_nil_by_earliest_start = function(arr)
       return transf.interval_specifier_array.interval_specifier_with_earliest_start(
         transf.path_leaf_specifier_array.date_interval_specifier_array(arr)
       )
     end,
-    path_leaf_specifier_with_earliest_start = function(arr)
+    date_by_earliest_start = function(arr)
+      return transf.interval_specifier_array.earliest_start(
+        transf.path_leaf_specifier_array.date_interval_specifier_array(arr)
+      )
+    end,
+    date_by_latest_end = function(arr)
+      return transf.interval_specifier_array.latest_end(
+        transf.path_leaf_specifier_array.date_interval_specifier_array(arr)
+      )
+    end,
+    date_interval_specifier_by_union = function(arr)
+      return transf.interval_specifier_array.interval_specifier_by_union(
+        transf.path_leaf_specifier_array.date_interval_specifier_array(arr)
+      )
+    end,
+    rfc3339like_dt_or_interval_by_union = function(arr)
+      return transf.date_interval_specifier.rf3339like_dt_or_interval(
+        transf.path_leaf_specifier_array.date_interval_specifier_by_union(arr)
+      )
+    end,
+    path_leaf_specifier_or_nil_by_earliest_start = function(arr)
       return get.dict.kt_or_nil_by_first_match_w_vt(
         transf.path_leaf_specifier_array.path_leaf_specifier_date_interval_specifier_dict(arr),
-        transf.path_leaf_specifier_array.interval_specifier_with_earliest_start(arr)
+        transf.path_leaf_specifier_array.date_interval_specifier_or_nil_by_earliest_start(arr)
       )
     end,
   },
@@ -2226,7 +2278,7 @@ transf = {
     date_interval_specifier = function(str)
       return transf[
         transf.rf3339like_dt_or_interval.dt_or_interval(str)
-      ].date_interval_specifier(str)
+      ].date_interval_specifier_or_nil(str)
     end,
   },
   rf3339like_dt_or_interval_array = {
@@ -2339,7 +2391,7 @@ transf = {
         stop = transf.interval_specifier_array.earliest_stop(interval_specifier_array),
       }
     end,
-    union_interval_specifier = function(interval_specifier_array)
+    intrval_specifier_by_union = function(interval_specifier_array)
       return {
         start = transf.interval_specifier_array.earliest_start(interval_specifier_array),
         stop = transf.interval_specifier_array.latest_stop(interval_specifier_array),
@@ -2367,10 +2419,10 @@ transf = {
     end,
   },
   date_interval_specifier = {
-    start_full_rfc3339like_dt = function(date_interval_specifier)
+    full_rfc3339like_dt_by_start = function(date_interval_specifier)
       return transf.date.full_rfc3339like_dt(date_interval_specifier.start)
     end,
-    end_full_rfc3339like_dt = function(date_interval_specifier)
+    full_rfc3339like_dt_by_end = function(date_interval_specifier)
       return transf.date.full_rfc3339like_dt(date_interval_specifier.stop)
     end,
     start_full_date_component_name_value_dict = function(date_interval_specifier)
