@@ -1658,7 +1658,7 @@ transf = {
       return transf.toml_string.assoc(transf.file.contents(path))
     end,
   },
-  backup_type_identifier = {
+  backuped_thing_identifier = {
     timestamp_ms = function(identifier)
       return  transf.absolute_path.string_or_nil_by_file_contents(
         transf.path.ending_with_slash(env.MLAST_BACKUP) .. identifier
@@ -7794,6 +7794,14 @@ transf = {
       return input_spec
     end
   },
+  input_spec_string_array = {
+    input_spec_array = function(str_array)
+      return hs.fnutils.imap(
+        str_array,
+        transf.input_spec_string.input_spec
+      )
+    end,
+  },
   input_spec_series_string = {
     input_spec_string_array = function(str)
       return transf.hole_y_arraylike.array(get.string.string_array_split_single_char_stripped(str, "\n"))
@@ -8177,7 +8185,7 @@ transf = {
     
   },
   discord_export_dir = {
-    discord_export_chat_main_object_media_dir_pair_array = function(dir)
+    export_chat_main_object_media_dir_pair_array = function(dir)
       return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.dir.dir_array_by_children(dir),
         transf.discord_export_child_dir.discord_export_chat_main_object_media_dir_pair
@@ -8285,6 +8293,28 @@ transf = {
       return nil
     end
   },
+  signal_export_dir = {
+    export_chat_main_object_media_dir_pair_array = function(dir)
+      local chat_json_files = transf.dir.absolute_path_array_by_children(dir .. "/chats")
+      local arr = get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        chat_json_files,
+        function(chat_json_file)
+          local filename = transf.path.filename(chat_json_file)
+          local author = filename:match("^([^(]+)")
+          local media_dir = dir .. "/media/" .. filename
+          local messages = transf.json_file.not_userdata_or_function(chat_json_file)
+          return {
+            {
+              author = author,
+              messages = messages,
+            },
+            media_dir
+          }
+        end
+      )
+      return arr
+    end,
+  },
   signal_export_chat_main_object = {
     signal_export_chat_message_array = function(main_object)
       return main_object.messages
@@ -8331,7 +8361,7 @@ transf = {
     end
   },
   telegram_export_dir = {
-    telegram_export_chat_main_object_media_dir_pair_array = function(dir)
+    export_chat_main_object_media_dir_pair_array = function(dir)
       local json_file = get.dir.find_child_with_leaf(dir, "result.json")
       local export_json = transf.json_file.not_userdata_or_function(json_file)
 

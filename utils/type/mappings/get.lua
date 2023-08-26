@@ -2050,7 +2050,7 @@ get = {
   },
   timestamp_ms_key_dict_value_dict = {
     timestamp_ms_key_dict_value_dict_by_filtered_timestamp = function(timestamp_ms_key_dict_value_dict, identifier)
-      local timestamp = transf.backup_type_identifier.timestamp_ms(identifier)
+      local timestamp = transf.backuped_thing_identifier.timestamp_ms(identifier)
       return get.dict.dict_by_filtered_w_kt_vt_fn(timestamp_ms_key_dict_value_dict, function(k, v)
         return k > timestamp
       end)
@@ -3292,12 +3292,12 @@ get = {
     end,
   },
   export_chat_main_object = {
-    backup_type_identifier = function(obj, typ)
+    backuped_thing_identifier = function(obj, typ)
       return typ .. "/" .. transf[typ .. "_export_chat_main_object"].string_by_id(obj)
     end,
     timestamp_ms_last_backup = function(obj, typ)
-      return transf.backup_type_identifier.timestamp_ms(
-        transf.export_chat_main_object.backup_type_identifier(obj, typ)
+      return transf.backuped_thing_identifier.timestamp_ms(
+        transf.export_chat_main_object.backuped_thing_identifier(obj, typ)
       )
     end,
     id_key_timestamp_ms_value_dict = function(main_object, typ)
@@ -3308,7 +3308,7 @@ get = {
       return res
     end,
     dir_by_target_backup_location = function(obj, typ)
-      return env.MCHATS .. "/" .. transf.export_chat_main_object.backup_type_identifier(obj, typ)
+      return env.MCHATS .. "/" .. transf.export_chat_main_object.backuped_thing_identifier(obj, typ)
     end,
     logging_dir = function(obj, typ)
       return transf.export_chat_main_object.dir_by_target_backup_location(obj, typ) .. "/_logs"
@@ -3396,6 +3396,19 @@ get = {
     timestamp_ms_or_nil_by_replying_to = function(msg)
       if msg.quote then
         return msg.quote.id -- despite the name, this is actually the timestamp
+      end
+    end,
+    absolute_path_array_by_attachments = function(msg, obj)
+      if msg.attachments then
+        local media_dir = get.export_chat_main_object.media_dir(obj, "signal")
+        return get.array.array_by_mapped_w_t_arg_t_ret_fn(
+          msg.attachments,
+          function(att)
+            return media_dir .. "/" .. att.fileName
+          end
+        )
+      else
+        return {}
       end
     end,
 

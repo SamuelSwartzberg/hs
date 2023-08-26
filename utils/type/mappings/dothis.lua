@@ -2732,6 +2732,15 @@ dothis = {
       )
     end
   },
+  input_spec_string_array = {
+    exec = function(strarr, wait_time, do_after)
+      dothis.input_spec_array.exec(
+        transf.input_spec_string_array.input_spec_array(strarr),
+        wait_time,
+        do_after
+      )
+    end
+  },
   input_spec_series_string = {
     exec = function(str, wait_time, do_after)
       dothis.input_spec_array.exec(
@@ -2819,12 +2828,12 @@ dothis = {
           env.MMANGA_LOGS,
           tmst_dict
         )
-        dothis.backup_type_identifier.write_current_timestamp_ms("tachiyomi")
+        dothis.backuped_thing_identifier.write_current_timestamp_ms("tachiyomi")
       end)
     end,
     --- do once ff is quit
     ff_backup = function()
-      local timestamp = transf.backup_type_identifier.timestamp_ms("firefox")
+      local timestamp = transf.backuped_thing_identifier.timestamp_ms("firefox")
       if transf.mac_application_name.bool_by_running_application("Firefox") then
         return -- don't try to backup while firefox is running
       end
@@ -2840,13 +2849,13 @@ dothis = {
             env.MBROWSER_LOGS,
             tbl
           )
-          dothis.backup_type_identifier.write_current_timestamp_ms("firefox")
+          dothis.backuped_thing_identifier.write_current_timestamp_ms("firefox")
         end
       )
     end,
     newpipe_backup = function()
       dothis["nil"].newpipe_extract_backup(function()
-        local timestamp = transf.backup_type_identifier.timestamp_ms("newpipe")
+        local timestamp = transf.backuped_thing_identifier.timestamp_ms("newpipe")
         dothis.sqlite_file.query_w_table_arg_fn(
           env.env.NEWPIPE_STATE_DIR .. "/history.db",
           "SELECT json_group_object(access_date, json_object('title', title, 'url', url))" .. 
@@ -2859,7 +2868,7 @@ dothis = {
               env.MMEDIA_LOGS,
               tbl
             )
-            dothis.backup_type_identifier.write_current_timestamp_ms("newpipe")
+            dothis.backuped_thing_identifier.write_current_timestamp_ms("newpipe")
           end
         )
       end)
@@ -2881,10 +2890,11 @@ dothis = {
     telegram_generate_backup = function(_, do_after)
       dothis.fn_queue_specifier.push(main_qspec,
         function()
-          local window = self:get("running-application-item"):get("main-window-item")
-          window:doThis("focus")
-          window:doThis("set-size", {w = 800, h = 1500})
-          window:doThis("set-position", {x = 0, y = 0})
+          local window = transf.running_application.main_window(
+            transf.mac_application_name.running_application("Telegram")
+          )
+          dothis.window.focus(window)
+          dothis.window.set_hs_geometry_rect_like(window, {x = 0, y = 0, w = 800, h = 1500})
           dothis.input_spec_array.exec({
             "m30 65 %tl", ".",
             "m40 395 %tl", ".",
@@ -2908,6 +2918,77 @@ dothis = {
         end
       )
     end,
+    signal_generate_backup = function(_, do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+        "sigtop export-messages -f json" ..
+        transf.string.single_quoted_escaped(
+          transf.string.in_cache_dir("signal", "export") .. "/chats"
+        ) .. "&& sigtop export-attachments" ..
+        transf.string.single_quoted_escaped(
+          transf.string.in_cache_dir("signal", "export") .. "/media"
+        ),
+        do_after
+      )
+    end,
+    facebook_generate_backup = function(_, do_after)
+      dothis.fn_queue_specifier.push(main_qspec,
+      function()
+        dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -a Firefox" .. 
+          transf.string.single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings") " && sleep 1", function()
+            hs.eventtap.keyStroke({"cmd"}, "0") -- reset zoom
+            local ff_window = transf.running_application.main_window(
+              transf.mac_application_name.running_application("Firefox")
+            )
+            dothis.window.focus(ff_window)
+            dothis.window.set_hs_geometry_rect_like(ff_window, {x = 0, y = 0, w = 1280, h = 1600})
+            dothis.input_spec_array.exec({ 
+              "m-100x-410 %c", -- format open
+              ".",
+              "m-100x-310 %c", -- format select
+              ".",
+              "m-100x-270 %c", -- date open
+              ".",
+              "m-100x-200 %c", -- date select
+              ".",
+              "m-80x690 %tr", -- deselect all
+              ".",
+              "m-63x945 %tr", -- select messages
+              ".",
+              "s0x-4000", -- scroll to end of page
+              "m530x1548 %l", -- export button
+              ".",
+            })
+            do_after()
+          end)
+        end
+      )
+    end,
+    discord_generate_backup = function(_, do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+        "dscexport exportdm --media --reuse-media -f json --dateformat unix -o" .. transf.string.single_quoted_escaped(
+          transf.string.in_cache_dir("discord", "export")
+        ),
+        do_after
+      )
+    end,
+    telegram_backup = function()
+      dothis["nil"].telegram_generate_backup(nil, function()
+        dothis.telegram_raw_export_dir.process_to_telegram_export_dir(
+          transf["nil"].telegram_raw_export_dir_by_current()
+        )
+        dothis.backup_type.log("telegram")
+      end)
+    end,
+    signal_backup = function()
+      dothis["nil"].signal_generate_backup(nil, function()
+        dothis.backup_type.log("signal")
+      end)
+    end,
+    discord_backup = function()
+      dothis["nil"].discord_generate_backup(nil, function()
+        dothis.backup_type.log("discord")
+      end)
+    end,
 
   },
   telegram_raw_export_dir = {
@@ -2930,10 +3011,10 @@ dothis = {
 
     end,
   },
-  backup_type_identifier = {
+  backuped_thing_identifier = {
     write_current_timestamp_ms = function(identifier)
       dothis.local_file.write_file(
-        transf.path.ending_with_slash(env.MLAST_BACKUP) .. "tachiyomi",
+        transf.path.ending_with_slash(env.MLAST_BACKUP) .. identifier,
         (os.time() - 30) * 1000
       )
     end,
@@ -3019,13 +3100,14 @@ dothis = {
     end,
   },
   export_chat_main_object = {
-    log = function(obj, typ)
+    log = function(obj, typ, source_media_dir)
       local logging_dir = get.export_chat_main_object.logging_dir(obj, typ)
       dothis.absolute_path.create_dir(
         logging_dir
       )
+      local media_dir = get.export_chat_main_object.media_dir(obj, typ)
       dothis.absolute_path.create_dir(
-        get.export_chat_main_object.media_dir(obj, typ)
+        media_dir
       )
       dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
         logging_dir,
@@ -3034,13 +3116,33 @@ dothis = {
           typ
         )
       )
-      dothis.backup_type_identifier.write_current_timestamp_ms(
-        get.export_chat_main_object.backup_type_identifier(obj, typ)
+      dothis.backuped_thing_identifier.write_current_timestamp_ms(
+        get.export_chat_main_object.backuped_thing_identifier(obj, typ)
+      )
+      dothis.dir.move_children_absolute_path_array_into_absolute_path(
+        source_media_dir,
+        media_dir
       )
     end,
       
   },
   telegram_export_dir = {
     
+  },
+  export_dir = {
+    log = function(dir, typ)
+      local arr = transf[typ .. "_export_dir"].export_chat_main_object_media_dir_pair_array(dir)
+      for _, pair in transf.array.index_value_stateless_iter(arr) do
+        dothis.export_chat_main_object.log(pair[1], typ, pair[2])
+      end
+    end
+  },
+  backup_type = {
+    log = function(typ)
+      dothis.export_dir.log(
+        transf.string.in_cache_dir(typ, "export"),
+        typ
+      )
+    end
   }
 }
