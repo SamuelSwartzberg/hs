@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.type.mappings")
+local rrq = hs.fnutils.partial(relative_require, "utils.type.mappings")
 
 rrq("transf")
 rrq("lemap")

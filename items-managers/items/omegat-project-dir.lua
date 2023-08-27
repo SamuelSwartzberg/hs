@@ -107,4 +107,4 @@ OmegatProjectDirItemSpecifier = {
 }
 
 --- @type BoundNewDynamicContentsComponentInterface
-CreateOmegatProjectDirItem = bindArg(NewDynamicContentsComponentInterface, OmegatProjectDirItemSpecifier)
+CreateOmegatProjectDirItem = hs.fnutils.partial(NewDynamicContentsComponentInterface, OmegatProjectDirItemSpecifier)

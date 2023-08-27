@@ -1,4 +1,4 @@
-local rrq = bindArg(relative_require, "utils.externals")
+local rrq = hs.fnutils.partial(relative_require, "utils.externals")
 
 
 rrq("external-typings")

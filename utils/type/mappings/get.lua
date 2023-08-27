@@ -985,7 +985,7 @@ get = {
     end,
     search_engine_search_url = function(str, search_engine)
       return tblmap.search_engine.url[search_engine]:format(
-        transf.string.urlencoded_search(str, tblmap.search_engine.param_is_path[search_engine])
+        get.string.string_by_percent_encoded(str, tblmap.search_engine.param_is_path[search_engine])
       )
     end,
     window_array_by_pattern = function(str, app_name)
@@ -1366,7 +1366,10 @@ get = {
         get.string.string_or_err_by_evaled_env_bash_parsed_json_in_key_stripped
       )(str, key)
     end,
-
+    string_by_percent_encoded = function(str, as_path)
+      if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
+      else return transf.string.encoded_query_param_value_by_folded(str) end
+    end
   },
   nonindicated_number_string_array = {
     number_array = function(arr, base)
@@ -1799,17 +1802,17 @@ get = {
     attr = function(path, attr)
       return hs.fs.attributes(hs.fs.pathToAbsolute(path, true))[attr]
     end,
-    prompted_once_local_absolute_path_from_default = function(path, message)
+    local_absolute_path_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
         prompter = transf.prompt_args_path.local_absolute_path_and_boolean,
         prompt_args = {default = path, message = message or "Choose an absolute path..."}
       })
     end,
-    prompted_multiple_local_absolute_path_from_default = function(path, message)
-      local intermediate_path = get.local_extant_path.prompted_once_local_absolute_path_from_default(path, message)
+    local_absolute_path_by_default_prompted_multiple = function(path, message)
+      local intermediate_path = get.local_extant_path.local_absolute_path_by_default_prompted_once(path, message)
       return transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(intermediate_path)
     end,
-    prompted_once_dir_from_default = function(path, message)
+    dir_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
         prompter = transf.prompt_args_path.local_absolute_path_and_boolean,
         prompt_args = {
@@ -1819,7 +1822,7 @@ get = {
         }
       })
     end,
-    prompted_once_local_absolute_path_array_from_default = function(path, message)
+    local_absolute_path_array_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
         prompter = transf.prompt_args_path.local_absolute_path_array_and_boolean,
         prompt_args = {default = path, message = message or "Choose absolute paths..."}
@@ -2909,8 +2912,8 @@ get = {
     get_extracted_attr_dict_via_ai = function(video_id, do_after)
       return get.form_filling_specifier.filled_string_dict({
         in_fields = {
-          title = transf.youtube_video_id.title(video_id),
-          channel_title = transf.youtube_video_id.channel_title(video_id),
+          title = transf.youtube_video_id.string_by_title(video_id),
+          channel_title = transf.youtube_video_id.string_by_channel_title(video_id),
           description = get.string.string_by_shortened_start_ellipsis(transf.youtube_video_id.description(video_id)),
         },
         form_field_specifier_array = {
@@ -3174,39 +3177,6 @@ get = {
         )
       )
     end
-  },
-  form_filling_specifier = {
-    --- @class form_field_specifier  
-    --- @field value string The field to fill, as we want GPT to see it (i.e. chosing a name that GPT will understand)
-    --- @field alias? string The field to fill, as we want the user to see it (i.e. chosing a name that the user will understand). May often be unset, in which case the value field is used.
-    --- @field explanation? string The explanation to show to GPT for the field. May be unset if the field is self-explanatory.
-
-    --- @class form_filling_specifier
-    --- @field in_fields {[string]: string} The fields to take the data from
-    --- @field form_field_specifier_array form_field_specifier[] The fields (i.e. the template) to fill
-    --- fills a template using GPT
-    --- example use-case: Imagine trying to get the metadata of some song from a youtube video, where the artist name may be in the title, or the channel name, or not present at all, where the title may contain a bunch of other stuff besides the song title
-    --- in this case you could call this function as
-    --- ```
-    --- fillTemplateGPT(
-    ---   {
-    ---     in_fields = {
-    ---       channel_name = "XxAimerLoverxX",
-    ---       video_title = "XxAimerLoverxX - Aimer - Last Stardust",
-    ---     },
-    ---     form_field_specifier_array = {
-    ---       {value = "artist"},
-    ---       {value = "song_title"},
-    ---     }
-    ---   }, ...
-    --- )
-    --- ```
-
-    filled_string_dict = function(spec)
-      local query = get.string.evaled_as_template(lemap.gpt.fill_template, spec)
-      local res = gpt(query,  { temperature = 0})
-      return get.form_field_specifier_array.filled_string_dict_from_string(spec.form_field_specifier_array, res)
-    end,
   },
   input_spec = {
     declared_input_spec = function(input_spec, type)

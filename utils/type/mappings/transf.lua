@@ -3103,11 +3103,21 @@ transf = {
         },
       }).items[1]
     end,
-    title = function(id)
+    string_by_title = function(id)
       return transf.youtube_video_id.youtube_video_item(id).snippet.title
     end,
-    channel_title = function(id)
+    string_by_cleaned_title = function(id)
+      return transf.string.string_by_cleaned_youtube_video_title(
+        transf.youtube_video_id.string_by_title(id)
+      )
+    end,
+    string_by_channel_title = function(id)
       return transf.youtube_video_id.youtube_video_item(id).snippet.channelTitle
+    end,
+    string_by_cleaned_channel_title = function(id)
+      return transf.string.string_by_cleaned_youtube_video_channel_title(
+        transf.youtube_video_id.string_by_channel_title(id)
+      )
     end,
     youtube_channel_id = function(id)
       return transf.youtube_video_id.youtube_video_item(id).snippet.channelId
@@ -3134,6 +3144,37 @@ transf = {
         },
       }).items
     end,
+    fs_tag_assoc = function(id)
+      local assoc = transf.form_filling_specifier.filled_string_dict({
+        in_fields = {
+          title = transf.youtube_video_id.string_by_title(id),
+          channel_title = transf.youtube_video_id.string_by_channel_title(id),
+        },
+        form_field_specifier_array = {
+          {
+            alias = "tcrea",
+            value = "Artist"
+          },
+          {
+            alias = "title",
+            value = "Title"
+          },
+          {
+            alias = "srs",
+            value = "Series"
+          },
+          {
+            alias = "srsrel",
+            value = "Relation to series",
+            explanation = "op, ed, ost, insert song, etc."
+          }
+        }
+      })
+      return get.table.table_by_mapped_w_vt_arg_vt_ret_fn(
+        assoc,
+        transf.string.lower_snake_case_string_by_romanized
+      )
+    end
   },
   youtube_playlist_id = {
     youtube_playlist_item = function(id)
@@ -3172,10 +3213,13 @@ transf = {
       return transf.url.param_table(url).v
     end,
     title = function(url)
-      return transf.youtube_video_id.title(transf.youtube_video_url.youtube_video_id(url))
+      return transf.youtube_video_id.string_by_title(transf.youtube_video_url.youtube_video_id(url))
     end,
     channel_title = function(url)
-      return transf.youtube_video_id.channel_title(transf.youtube_video_url.youtube_video_id(url))
+      return transf.youtube_video_id.string_by_channel_title(transf.youtube_video_url.youtube_video_id(url))
+    end,
+    fs_tag_assoc = function(url)
+      return transf.youtube_video_id.fs_tag_assoc(transf.youtube_video_url.youtube_video_id(url))
     end,
   },
   youtube_channel_id = {
@@ -3197,24 +3241,6 @@ transf = {
     end,
     channel_title = function(id)
       return transf.youtube_channel_id.youtube_channel_item(id).snippet.title
-    end,
-  },
-  youtube_video_title = {
-    cleaned = function(title)
-      title = replace(title, {
-        { cond = {_r = mt._r.text_bloat.youtube.video, _ignore_case = true}, mode="remove" },
-        { cond = {_r = mt._r.text_bloat.youtube.misc, _ignore_case = true}, mode="remove" },
-      })
-      return title
-    end,
-  },
-  youtube_channel_title = {
-    cleaned = function(channel)
-      channel = replace(channel, {
-        { cond = {_r = mt._r.text_bloat.youtube.channel_topic_producer, _ignore_case = true}, mode="remove" },
-        { value = {_r = mt._r.text_bloat.youtube.slash_suffix, _ignore_case = true}, mode="remove" },
-      })
-      return channel
     end,
   },
   handle = {
@@ -3793,6 +3819,20 @@ transf = {
       res = eutf8.gsub(str, "^[0-9a-zA-Z]+", "")
       return res
     end,
+    string_by_cleaned_youtube_video_title = function(title)
+      title = replace(title, {
+        { cond = {_r = mt._r.text_bloat.youtube.video, _ignore_case = true}, mode="remove" },
+        { cond = {_r = mt._r.text_bloat.youtube.misc, _ignore_case = true}, mode="remove" },
+      })
+      return title
+    end,
+    string_by_cleaned_youtube_video_channel_title = function(channel)
+      channel = replace(channel, {
+        { cond = {_r = mt._r.text_bloat.youtube.channel_topic_producer, _ignore_case = true}, mode="remove" },
+        { value = {_r = mt._r.text_bloat.youtube.slash_suffix, _ignore_case = true}, mode="remove" },
+      })
+      return channel
+    end,
   },
   line = {
     noindent = function(str)
@@ -4062,18 +4102,6 @@ transf = {
       return {
         start = transf.event_table.start_date(event_table),
         ["end"] = transf.event_table.end_date(event_table),
-      }
-    end,
-  },
-  search_engine = {
-    action_table_item = function(search_engine)
-      return {
-        i = emj.search .. emj[search_engine],
-        d = dsc.search .. dsc[search_engine],
-        dothis = get.fn.arbitrary_args_bound_or_ignored_fn(
-          dothis.string.search,
-          {a_use, search_engine}
-        )
       }
     end,
   },
@@ -5695,14 +5723,14 @@ transf = {
     end,
     rechnung_email_specifier = function(dir)
       return {
-        body = get.string.evaled_as_template(comp.documents.translation.rechnung_email_de, dir),
+        body = get.string.evaled_as_template(lemap.translation.rechnung_email_de, dir),
         non_inline_attachment_local_file_array = {
           transf.omegat_project_dir.rechnung_pdf_path(dir)
         }
       }
     end,
     raw_rechnung = function(dir)
-      return get.string.evaled_as_template(comp.documents.translation.rechnung_de, dir)
+      return get.string.evaled_as_template(lemap.translation.rechnung_de, dir)
     end,
 
   },
@@ -7704,8 +7732,37 @@ transf = {
     end
     
   },
-  form_field_specifier = {
+  form_filling_specifier = {
+    --- @class form_field_specifier  
+    --- @field value string The field to fill, as we want GPT to see it (i.e. chosing a name that GPT will understand)
+    --- @field alias? string The field to fill, as we want the user to see it (i.e. chosing a name that the user will understand). May often be unset, in which case the value field is used.
+    --- @field explanation? string The explanation to show to GPT for the field. May be unset if the field is self-explanatory.
 
+    --- @class form_filling_specifier
+    --- @field in_fields {[string]: string} The fields to take the data from
+    --- @field form_field_specifier_array form_field_specifier[] The fields (i.e. the template) to fill
+    --- fills a template using GPT
+    --- example use-case: Imagine trying to get the metadata of some song from a youtube video, where the artist name may be in the title, or the channel name, or not present at all, where the title may contain a bunch of other stuff besides the song title
+    --- in this case you could call this function as
+    --- ```
+    --- fillTemplateGPT(
+    ---   {
+    ---     in_fields = {
+    ---       channel_name = "XxAimerLoverxX",
+    ---       video_title = "XxAimerLoverxX - Aimer - Last Stardust",
+    ---     },
+    ---     form_field_specifier_array = {
+    ---       {value = "artist"},
+    ---       {value = "song_title"},
+    ---     }
+    ---   }, ...
+    --- )
+    --- ```
+    filled_string_dict = function(spec)
+      local query = get.string.evaled_as_template(lemap.gpt.fill_template, spec)
+      local res = gpt(query,  { temperature = 0})
+      return get.form_field_specifier_array.filled_string_dict_from_string(spec.form_field_specifier_array, res)
+    end,
   },
   position_change_state_spec = {
     should_continue = function(position_change_state_spec)

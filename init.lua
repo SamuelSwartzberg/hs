@@ -60,13 +60,8 @@ dothis.created_item_specifier_array.create_all(
   
 )
 
-require("items-managers")
-
 projectDirsArray = ar(get.extant_path.absolute_path_array(env.ME, {recursion = 2, include_files = false})):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)
 
-
-envTable = dc(env)
-compTable = transf.table.dot_notation_key_dict_by_primitive_and_arraylike_is_leaf(comp)
 
 System:get("manager", "hotkey"):doThis("create", {key = "r", fn = hs.reload})
 
@@ -94,7 +89,7 @@ end
 local keymap = {
   ["tab"] = {
     explanation = "Grid cell mapper",
-    fn = bindArg(act.hs_geometry_size_like.show_grid, {y = 2, x = 4})
+    fn = hs.fnutils.partial(act.hs_geometry_size_like.show_grid, {y = 2, x = 4})
   },
   ["1"] = {
     explanation = "Command palette for frontmost app",

@@ -365,6 +365,42 @@ act = {
         env.MENTRY_LOGS,
         str
       )
-    end
+    end,
+    create_snippet = function(str)
+      local path = get.local_extant_path.local_absolute_path_by_default_prompted_multiple(env.MCOMPOSITE .. "/snippets")
+      dothis.absolute_path.write_file_if_nonextant_path(path, str)
+    end,
+    push_qf_music = function(str)
+      dothis.plaintext_file.append_line_and_commit(
+        env.MQF .. "/music",
+        str
+      )
+    end,
+    push_qf_things = function(str)
+      dothis.plaintext_file.append_line_and_commit(
+        env.MQF .. "/things",
+        str
+      )
+    end,
+    search_wiktionary = function(query) dothis.search_engine.search("wiktionary", query) end,
+    search_wikipedia = function(query) dothis.search_engine.search("wikipedia", query) end,
+    search_youtube = function(query) dothis.search_engine.search("youtube", query) end,
+    search_jisho = function(query) dothis.search_engine.search("jisho", query) end,
+    search_glottopedia = function(query) dothis.search_engine.search("glottopedia", query) end,
+    search_ruby_apidoc = function(query) dothis.search_engine.search("ruby_apidoc", query) end,
+    search_python_docs = function(query) dothis.search_engine.search("python_docs", query) end,
+    search_merriam_webster = function(query) dothis.search_engine.search("merriam_webster", query) end,
+    search_dict_cc = function(query) dothis.search_engine.search("dict_cc", query) end,
+    search_deepl_en_ja = function(query) dothis.search_engine.search("deepl_en_ja", query) end,
+    search_deepl_de_en = function(query) dothis.search_engine.search("deepl_de_en", query) end,
+    search_mdn = function(query) dothis.search_engine.search("mdn", query) end,
+    search_scihub = function(query) dothis.search_engine.search("scihub", query) end,
+    search_libgen = function(query) dothis.search_engine.search("libgen", query) end,
+    search_semantic_scholar = function(query) dothis.search_engine.search("semantic_scholar", query) end,
+    search_google_scholar = function(query) dothis.search_engine.search("google_scholar", query) end,
+    search_google_images = function(query) dothis.search_engine.search("google_images", query) end,
+    search_google_maps = function(query) dothis.search_engine.search("google_maps", query) end,
+    search_danbooru = function(query) dothis.search_engine.search("danbooru", query) end,
+    search_gelbooru = function(query) dothis.search_engine.search("gelbooru", query) end,
   }
 }

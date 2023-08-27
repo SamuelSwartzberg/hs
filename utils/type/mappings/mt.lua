@@ -12,7 +12,6 @@ mt = {
     unique_field_separator = "Y:z:Y",
   },
   _list = {
-    search_engine_names = {"wiktionary", "wikipedia", "youtube", "jisho", "glottopedia", "ruby-apidoc", "python-docs", "merriam-webster", "dict-cc", "deepl-en-ja", "deepl-de-en", "mdn", "scihub", "libgen", "semantic-scholar", "google-scholar", "google-images", "google-maps", "danbooru", "gelbooru"},
     booru_hosts = {
       "gelbooru.com",
       "danbooru.donmai.us",

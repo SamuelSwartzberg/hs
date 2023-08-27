@@ -206,6 +206,18 @@ dothis = {
   youtube_video_id = {
     
   },
+  youtube_video_url = {
+    add_as_m3u = function(url)
+      local deduced_tags = transf.youtube_video_url.fs_tag_assoc(url)
+      local edited_tags = transf.string_value_dict.string_value_dict_by_prompted_once_from_default(deduced_tags)
+      local plspec = {}
+      plspec.tag = transf.two_array_or_nils.array(edited_tags, transf.string.prompted_multiple_string_pair_array_for("tag"))
+      plspec.path  = get.local_extant_path.dir_by_default_prompted_once(env.MAUDIOVISUAL)
+      plspec.path = transf.string.prompted_once_string_from_default(plspec.path)
+      plspec.extension = "m3u"
+      dothis.absolute_path.write_file(transf.path_leaf_specifier.path(plspec), url)
+    end,
+  },
   url = {
     download_to_async = function(url, target)
       dothis.string.env_bash_eval_async("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
@@ -790,13 +802,23 @@ dothis = {
       dothis.local_extant_path.zip_to_absolute_path(path, tgt)
       dothis.local_extant_path.delete(path)
     end,
-    link_to_local_absolute_path = function(path, tgt)
+    link_to_nosudo_nonextant_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
       hs.fs.link(path, tgt, true)
     end,
+    link_to_local_nonextant_path = function(path, tgt)
+      dothis.absolute_path.create_parent_dir(tgt)
+      dothis.string.env_bash_eval_sync(
+        "pass passw/os | sudo -S ln -s " .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(tgt)
+      )
+    end,
+    link_to_local_absolute_path = function(path, tgt)
+      dothis.absolute_path.delete(tgt)
+      dothis.local_extant_path.link_to_local_nonextant_path(path, tgt)
+    end,
     link_into_local_absolute_path = function(path, tgt)
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
-      dothis.local_extant_path.link_to_local_absolute_path(path, finaltgt)
+      dothis.local_extant_path.link_to_local_nonextant_path(path, finaltgt)
     end,
     link_descendant_file_array_into_local_absolute_path = function(path, tgt)
       dothis.local_extant_path_array.link_into_local_absolute_path(
@@ -1336,6 +1358,19 @@ dothis = {
         tgt
       )
     end,
+    git_init = function(path)
+      dothis.local_extant_path.do_in_path(
+        path,
+        "git init",
+        function()
+          dothis.absolute_path.write_file_if_nonextant_path(
+            transf.path.ending_with_slash(path) .. ".gitignore",
+            ""
+          )
+          dothis.in_git_dir.commit_all_root(path, "Initial commit")
+        end
+      )
+    end,
     
   },
   maildir_dir = {
@@ -1485,7 +1520,7 @@ dothis = {
       type = type or "default"
       local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
       dothis.local_extant_path.make_executable(source_hook)
-      dothis.local_extant_path.link_to_local_absolute_path(source_hook, get.git_root_dir.hook_path(path, name))
+      dothis.local_extant_path.link_to_nosudo_nonextant_path(source_hook, get.git_root_dir.hook_path(path, name))
     end,
     link_all_hooks = function(path, type)
       local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
@@ -3184,6 +3219,11 @@ dothis = {
         transf.string.in_cache_dir(typ, "export"),
         typ
       )
+    end
+  },
+  search_engine = {
+    search = function(engine, query)
+      dothis.string.search(query, engine)
     end
   }
 }
