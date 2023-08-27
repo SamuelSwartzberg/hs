@@ -1107,6 +1107,17 @@ dothis = {
       )
     end,
   },
+  local_zip_file = {
+    unzip_to_absolute_path = function(path, tgt)
+      dothis.absolute_path.create_parent_dir(tgt)
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("unzip " .. transf.string.single_quoted_escaped(path) .. " -d " .. transf.string.single_quoted_escaped(tgt))
+    end,
+    unzip_into_absolute_path = function(path, tgt)
+      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.filename(path)
+      dothis.local_zip_file.unzip_to_absolute_path(path, finaltgt)
+    end,
+    
+  },
   hs_image = {
     add_to_clipboard = function(hsimage)
       hs.pasteboard.writeObjects(hsimage)
@@ -2972,7 +2983,14 @@ dothis = {
       )
     end,
     facebook_preprocess_backup = function()
-      local fbbackups = get.dir.extan
+      local dlchildren = transf.dir.absolute_path_array_by_children(env.DOWNLOADS)
+      local fbfiles = get.path_array.path_array_by_filter_to_filename_starting(dlchildren, "facebook-samswartzberg")
+      local fbzips = get.path_array.path_array_by_filter_to_same_extension(fbfiles, "zip")
+      local newest_fbzip = transf.extant_path_array.extant_path_by_newest_creation(fbzips)
+      local tmploc = transf.string.in_tmp_dir("facebook", "export")
+      dothis.local_zip_file.unzip_to_absolute_path(newest_fbzip, tmploc)
+      dothis.file.delete_file(newest_fbzip)
+      dothis.facebook_raw_export_dir.process_to_facebook_export_dir(tmploc)
     end,
     telegram_backup = function()
       dothis["nil"].telegram_generate_backup(nil, function()
@@ -2999,7 +3017,7 @@ dothis = {
       for _, chat_dir in transf.array.index_value_stateless_iter(transf.dir.absolute_path_array_by_children(transf.path.ending_with_slash(dir) .. "chats")) do
         local media_path = transf.path.ending_with_slash(dir) .. "media/" 
         for _, media_type_dir in transf.array.index_value_stateless_iter(
-          transf.dir.absolute_path_array_by_children(chat_dir)
+          transf.dir.dir_array_by_children(chat_dir)
         ) do
           dothis.dir.move_children_absolute_path_array_into_absolute_path(
             media_type_dir,
@@ -3013,6 +3031,26 @@ dothis = {
       )
 
     end,
+  },
+  facebook_raw_export_dir = {
+    process_to_facebook_export_dir = function(dir)
+      local actual_dir = transf.path.ending_with_slash(dir) .. "messages/inbox/"
+      for _, chat_dir in transf.array.index_value_stateless_iter(transf.dir.absolute_path_array_by_children(actual_dir)) do
+        local media_path = chat_dir .. "media/"
+        for _, media_type_dir in transf.array.index_value_stateless_iter(
+          transf.dir.dir_array_by_children(chat_dir)
+        ) do
+          dothis.dir.move_children_absolute_path_array_into_absolute_path(
+            media_type_dir,
+            media_path
+          )
+        end
+      end
+      dothis.extant_path.move_to_absolute_path(
+        actual_dir,
+        transf.string.in_cache_dir("facebook", "export")
+      )
+    end
   },
   backuped_thing_identifier = {
     write_current_timestamp_ms = function(identifier)

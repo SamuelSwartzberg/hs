@@ -1763,16 +1763,16 @@ get = {
       return get.path_array.bool_by_contains_extension(transf.extant_path.descendants_absolute_path_array(path), extension)
     end,
     absolute_path_by_descendant_with_leaf = function(path, leaf)
-      return get.path_array.find_path_with_leaf(transf.extant_path.descendants_absolute_path_array(path), leaf)
+      return get.path_array.path_or_nil_by_first_having_leaf(transf.extant_path.descendants_absolute_path_array(path), leaf)
     end,
     absolute_path_by_descendant_with_extension = function(path, extension)
-      return get.path_array.find_path_with_extension(transf.extant_path.descendants_absolute_path_array(path), extension)
+      return get.path_array.path_or_nil_by_first_having_extension(transf.extant_path.descendants_absolute_path_array(path), extension)
     end,
     absolute_path_by_descendant_with_leaf_ending = function(path, leaf_ending)
-      return get.path_array.find_path_with_leaf_ending(transf.extant_path.descendants_absolute_path_array(path), leaf_ending)
+      return get.path_array.path_or_nil_by_first_having_leaf_ending(transf.extant_path.descendants_absolute_path_array(path), leaf_ending)
     end,
     absolute_path_by_descendant_with_filename = function(path, filename)
-      return get.path_array.find_path_with_filename(transf.extant_path.descendants_absolute_path_array(path), filename)
+      return get.path_array.path_or_nil_by_first_having_filename(transf.extant_path.descendants_absolute_path_array(path), filename)
     end,
     bool_by_some_descendants_pass_w_fn = function(path, fn)
       return get.array.bool_by_some_pass_w_fn(transf.extant_path.descendants_absolute_path_array(path), fn)
@@ -1840,13 +1840,13 @@ get = {
       return get.path_array.bool_by_contains_extension(transf.dir.absolute_path_array_by_children(dir), extension)
     end,
     extant_path_by_child_having_leaf = function(dir, leaf)
-      return get.path_array.find_path_with_leaf(transf.dir.absolute_path_array_by_children(dir), leaf)
+      return get.path_array.path_or_nil_by_first_having_leaf(transf.dir.absolute_path_array_by_children(dir), leaf)
     end,
     extant_path_by_child_having_extension = function(dir, extension)
-      return get.path_array.find_path_with_extension(transf.dir.absolute_path_array_by_children(dir), extension)
+      return get.path_array.path_or_nil_by_first_having_extension(transf.dir.absolute_path_array_by_children(dir), extension)
     end,
     extant_path_by_child_having_leaf_ending = function(dir, leaf_ending)
-      return get.path_array.find_path_with_leaf_ending(transf.dir.absolute_path_array_by_children(dir), leaf_ending)
+      return get.path_array.path_or_nil_by_first_having_leaf_ending(transf.dir.absolute_path_array_by_children(dir), leaf_ending)
     end,
     cmd_output_from_path = function(path, cmd)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd)
@@ -2082,8 +2082,19 @@ get = {
         return not get.path.is_extension(path, extension)
       end)
     end,
+    path_array_by_filter_to_filename_ending = function(path_array, leaf_ending)
+      return hs.fnutils.ifilter(path_array, function(path)
+        return stringy.endswith(transf.path.filename(path), leaf_ending)
+      end)
+    end,
+    path_array_by_filter_to_filename_starting = function(path_array, leaf_starting)
+      return hs.fnutils.ifilter(path_array, function(path)
+        return stringy.startswith(transf.path.filename(path), leaf_starting)
+      end)
+    end,
+
     path_or_nil_by_first_ending_find_ending_w_string = function(path_array, ending)
-      return get.string.string_or_nil_by_first_match_ending_w_string(path_array, ending)
+      return get.string_array.string_or_nil_by_first_match_ending_w_string(path_array, ending)
     end,
     bool_by_contains_leaf = function(path_array, leaf)
       return get.array.bool_by_contains(transf.path_array.leaves_array(path_array), leaf)
@@ -2091,23 +2102,23 @@ get = {
     bool_by_contains_extension = function(path_array, extension)
       return get.array.bool_by_contains(transf.path_array.extensions_array(path_array), extension)
     end,
-    find_path_with_leaf = function(path_array, leaf)
-      return hs.fnutils.find(path_array, function(path)
+    path_or_nil_by_first_having_leaf = function(path_array, leaf)
+      return get.array.t_or_nil_by_first_match_w_fn(path_array, function(path)
         return get.path.leaf(path) == leaf
       end)
     end,
-    find_path_with_extension = function(path_array, extension)
-      return hs.fnutils.find(path_array, function(path)
+    path_or_nil_by_first_having_extension = function(path_array, extension)
+      return get.array.t_or_nil_by_first_match_w_fn(path_array, function(path)
         return get.path.extension(path) == extension
       end)
     end,
-    find_path_with_leaf_ending = function(path_array, leaf_ending)
-      return hs.fnutils.find(path_array, function(path)
+    path_or_nil_by_first_having_leaf_ending = function(path_array, leaf_ending)
+      return get.array.t_or_nil_by_first_match_w_fn(path_array, function(path)
         return stringy.endswith(get.path.leaf(path), leaf_ending)
       end)
     end,
-    find_path_with_filename = function(path_array, filename)
-      return hs.fnutils.find(path_array, function(path)
+    path_or_nil_by_first_having_filename = function(path_array, filename)
+      return get.array.t_or_nil_by_first_match_w_fn(path_array, function(path)
         return get.path.filename(path) == filename
       end)
     end,

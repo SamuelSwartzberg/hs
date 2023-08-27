@@ -1009,17 +1009,17 @@ transf = {
     end,
   },
   extant_path_array = {
-    newest = function(path_array)
+    extant_path_by_newest_creation = function(path_array)
       return get.extant_path_array.extant_by_largest_of_attr(path_array, "creation")
     end,
-    filter_dir_array = function(path_array)
+    dir_array_by_filter = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.dir)
     end,
-    filter_file_array = function(path_array)
+    file_array_by_filter = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.file)
     end,
-    filter_git_root_dir_array = function(path_array)
-      return transf.dir_array.filter_git_root_dir_array(transf.extant_path_array.filter_dir_array(path_array))
+    git_root_dir_array_by_filter = function(path_array)
+      return transf.dir_array.filter_git_root_dir_array(transf.extant_path_array.dir_array_by_filter(path_array))
     end,
     descendant_file_array = function(path_array)
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
@@ -1172,7 +1172,7 @@ transf = {
       return transf.path_array.extensions_array(transf.dir.absolute_path_array_by_children(dir))
     end,
     newest_child = function(dir)
-      return transf.extant_path_array.newest(transf.dir.absolute_path_array_by_children(dir))
+      return transf.extant_path_array.extant_path_by_newest_creation(transf.dir.absolute_path_array_by_children(dir))
     end,
     grandchildren_absolute_path_array = function(dir)
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_array_by_children(dir), transf.dir.absolute_path_array_by_children)
@@ -8298,7 +8298,22 @@ transf = {
     end
   },
   facebook_export_dir = {
-
+    export_chat_main_object_media_dir_pair_array = function(dir)
+      local chat_dirs = transf.dir.dir_array_by_children(dir)
+      local arr = get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        chat_dirs,
+        function(chat_dir)
+          local media_dir = transf.path.ending_with_slash(chat_dir) .. "media"
+          local main_obj = transf.json_file.not_userdata_or_function(
+            transf.path.ending_with_slash(chat_dir) .. "message_1.json"
+          )
+          return {
+            main_obj,
+            media_dir
+          }
+        end
+      )
+    end
   },
   facebook_export_chat_main_object = {
     facebook_export_chat_message_array = function(main_object)
