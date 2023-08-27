@@ -1289,7 +1289,7 @@ dothis = {
     end,
     delete_child_with_leaf_ending = function(path, ending)
       dothis.absolute_path.delete(
-        get.dir.find_child_with_leaf_ending(path, ending)
+        get.dir.extant_path_by_child_having_leaf_ending(path, ending)
       )
     end,
     empty_dir = function(path)
@@ -2970,6 +2970,9 @@ dothis = {
         ),
         do_after
       )
+    end,
+    facebook_preprocess_backup = function()
+      local fbbackups = get.dir.extan
     end,
     telegram_backup = function()
       dothis["nil"].telegram_generate_backup(nil, function()

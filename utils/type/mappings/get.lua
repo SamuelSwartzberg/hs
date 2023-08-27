@@ -1754,13 +1754,13 @@ get = {
       return hs.fnutils.find(transf.extant_path.descendants_absolute_path_array(path), cond)
     end,
     find_descendant_ending_with = function(path, ending)
-      return get.path_array.find_ending_with(transf.extant_path.descendants_absolute_path_array(path), ending)
+      return get.path_array.path_or_nil_by_first_ending_find_ending_w_string(transf.extant_path.descendants_absolute_path_array(path), ending)
     end,
     find_leaf_of_descendant = function(path, filename)
-      return get.path_array.find_leaf(transf.extant_path.descendants_absolute_path_array(path), filename)
+      return get.path_array.bool_by_contains_leaf(transf.extant_path.descendants_absolute_path_array(path), filename)
     end,
     bool_by_descendant_with_extnesion = function(path, extension)
-      return get.path_array.find_extension(transf.extant_path.descendants_absolute_path_array(path), extension)
+      return get.path_array.bool_by_contains_extension(transf.extant_path.descendants_absolute_path_array(path), extension)
     end,
     absolute_path_by_descendant_with_leaf = function(path, leaf)
       return get.path_array.find_path_with_leaf(transf.extant_path.descendants_absolute_path_array(path), leaf)
@@ -1830,22 +1830,22 @@ get = {
     extant_path_by_child_w_fn = function(dir, fn)
       return hs.fnutils.find(transf.dir.absolute_path_array_by_children(dir), fn)
     end,
-    find_child_ending_with = function(dir, ending)
-      return get.path_array.find_ending_with(transf.dir.absolute_path_array_by_children(dir), ending)
+    extant_path_by_child_ending = function(dir, ending)
+      return get.path_array.path_or_nil_by_first_ending_find_ending_w_string(transf.dir.absolute_path_array_by_children(dir), ending)
     end,
     bool_by_leaf_of_child = function(dir, filename)
-      return get.path_array.find_leaf(transf.dir.absolute_path_array_by_children(dir), filename)
+      return get.path_array.bool_by_contains_leaf(transf.dir.absolute_path_array_by_children(dir), filename)
     end,
     bool_by_extension_of_child = function(dir, extension)
-      return get.path_array.find_extension(transf.dir.absolute_path_array_by_children(dir), extension)
+      return get.path_array.bool_by_contains_extension(transf.dir.absolute_path_array_by_children(dir), extension)
     end,
-    find_child_with_leaf = function(dir, leaf)
+    extant_path_by_child_having_leaf = function(dir, leaf)
       return get.path_array.find_path_with_leaf(transf.dir.absolute_path_array_by_children(dir), leaf)
     end,
-    find_child_with_extension = function(dir, extension)
+    extant_path_by_child_having_extension = function(dir, extension)
       return get.path_array.find_path_with_extension(transf.dir.absolute_path_array_by_children(dir), extension)
     end,
-    find_child_with_leaf_ending = function(dir, leaf_ending)
+    extant_path_by_child_having_leaf_ending = function(dir, leaf_ending)
       return get.path_array.find_path_with_leaf_ending(transf.dir.absolute_path_array_by_children(dir), leaf_ending)
     end,
     cmd_output_from_path = function(path, cmd)
@@ -2062,33 +2062,33 @@ get = {
     end,
   },
   path_array = {
-    filter_to_same_filename = function(path_array, filename)
+    path_array_by_filter_to_same_filename = function(path_array, filename)
       return hs.fnutils.ifilter(path_array, function(path)
         return get.path.is_filename(path, filename)
       end)
     end,
-    filter_to_different_filename = function(path_array, filename)
+    path_array_by_filter_to_different_filename = function(path_array, filename)
       return hs.fnutils.ifilter(path_array, function(path)
         return not get.path.is_filename(path, filename)
       end)
     end,
-    filter_to_same_extension = function(path_array, extension)
+    path_array_by_filter_to_same_extension = function(path_array, extension)
       return hs.fnutils.ifilter(path_array, function(path)
         return get.path.is_extension(path, extension)
       end)
     end,
-    filter_to_different_extension = function(path_array, extension)
+    path_array_by_filter_to_different_extension = function(path_array, extension)
       return hs.fnutils.ifilter(path_array, function(path)
         return not get.path.is_extension(path, extension)
       end)
     end,
-    find_ending_with = function(path_array, ending)
+    path_or_nil_by_first_ending_find_ending_w_string = function(path_array, ending)
       return get.string.string_or_nil_by_first_match_ending_w_string(path_array, ending)
     end,
-    find_leaf = function(path_array, leaf)
+    bool_by_contains_leaf = function(path_array, leaf)
       return get.array.bool_by_contains(transf.path_array.leaves_array(path_array), leaf)
     end,
-    find_extension = function(path_array, extension)
+    bool_by_contains_extension = function(path_array, extension)
       return get.array.bool_by_contains(transf.path_array.extensions_array(path_array), extension)
     end,
     find_path_with_leaf = function(path_array, leaf)
@@ -2113,13 +2113,13 @@ get = {
     end,
   },
   extant_path_array = {
-    sorted_by_attr_extant_path_array = function(arr, attr)
+    extant_path_array_by_sorted_via_attr = function(arr, attr)
       return table.sort(arr, function(a, b)
         return get.extant_path.attr(a, attr) < get.extant_path.attr(b, attr)
       end)
     end,
-    largest_by_attr = function(arr, attr)
-      return get.extant_path_array.sorted_by_attr_extant_path_array(arr, attr)[1]
+    extant_path_by_largest_of_attr = function(arr, attr)
+      return get.extant_path_array.extant_path_array_by_sorted_via_attr(arr, attr)[1]
     end,
   },
   git_hosting_service = {
@@ -2528,13 +2528,13 @@ get = {
   },
   omegat_project_dir = {
     source_files_extension = function(dir, ext)
-      return get.path_array.filter_to_same_extension(
+      return get.path_array.path_array_by_filter_to_same_extension(
         transf.omegat_project_dir.source_files(dir),
         ext
       )
     end,
     target_files_extension = function(dir, ext)
-      return get.path_array.filter_to_same_extension(
+      return get.path_array.path_array_by_filter_to_same_extension(
         transf.omegat_project_dir.source_files(dir),
         ext
       )

@@ -1010,7 +1010,7 @@ transf = {
   },
   extant_path_array = {
     newest = function(path_array)
-      return get.extant_path_array.largest_by_attr(path_array, "creation")
+      return get.extant_path_array.extant_by_largest_of_attr(path_array, "creation")
     end,
     filter_dir_array = function(path_array)
       return hs.fnutils.ifilter(path_array, is.path.dir)
@@ -7007,7 +7007,7 @@ transf = {
   env_yaml_file_container = {
     env_string = function(env_yaml_file_container)
       local files = transf.extant_path.file_array_by_descendants(env_yaml_file_container)
-      local yaml_files = get.path_array.filter_to_same_extension(files, "yaml")
+      local yaml_files = get.path_array.path_array_by_filter_to_same_extension(files, "yaml")
       local env_var_name_env_node_dict_array = hs.fnutils.imap(
         yaml_files,
         transf.yaml_file.not_userdata_or_function
@@ -8247,8 +8247,8 @@ transf = {
   },
   discord_export_child_dir = {
     discord_export_chat_main_object_media_dir_pair = function(dir)
-      local json_file = get.dir.find_child_with_extension(dir, "json")
-      local media_dir = get.dir.find_child_with_extension(dir, "_Files")
+      local json_file = get.dir.extant_path_by_child_having_extension(dir, "json")
+      local media_dir = get.dir.extant_path_by_child_having_extension(dir, "_Files")
       if not json_file or not media_dir then error("Could not find json or media dir in " .. dir) end
       return {transf.json_file.not_userdata_or_function(json_file), media_dir}
     end,
@@ -8414,7 +8414,7 @@ transf = {
   },
   telegram_export_dir = {
     export_chat_main_object_media_dir_pair_array = function(dir)
-      local json_file = get.dir.find_child_with_leaf(dir, "result.json")
+      local json_file = get.dir.extant_path_by_child_having_leaf(dir, "result.json")
       local export_json = transf.json_file.not_userdata_or_function(json_file)
 
       local chats = export_json.chats.list
