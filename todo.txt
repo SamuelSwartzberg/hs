@@ -10,6 +10,7 @@ refac:
   - fix logging dirs, etc, to now use json
   - many names don't yet corrrespond to the new schema
   - boolean -> bool
+  - fix tblmap
 post 'lua is working':  
   - add/rename missing m3us
   - history
