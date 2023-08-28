@@ -127,7 +127,7 @@ dothis = {
   md_file = {
     to_file_in_same_dir = function(source, format, metadata, do_after)
       local target = transf.path.path_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
-      local rawsource = transf.file.contents(source)
+      local rawsource = transf.file.string_by_contents(source)
       local processedsource = get.string.string_by_with_yaml_metadata(rawsource, metadata)
       rawsource = eutf8.gsub(rawsource, "\n +\n", "\n&nbsp;\n")
       local temp_path = source .. ".tmp"
@@ -351,7 +351,6 @@ dothis = {
     paste_le = function(str)
       dothis.string.paste(get.string.evaled_as_template(str))
     end,
-    add_to_clipboard = hs.pasteboard.setContents,
     fill_with_lines = function(str)
       dothis.string_array.fill_with(transf.string.lines(str))
     end,
@@ -863,7 +862,7 @@ dothis = {
     append_or_write_file = function(path, contents)
       local temp_file = transf.string.in_tmp_dir(path, "labelled_remote_temp_file")
       dothis.local_extant_path.append_or_write_file(temp_file, contents)
-      dothis.labelled_remote_file.write_file(path, transf.local_file.contents(temp_file))
+      dothis.labelled_remote_file.write_file(path, transf.local_file.string_by_contents(temp_file))
     end,
   },
   labelled_remote_dir = {
@@ -916,7 +915,7 @@ dothis = {
     end,
     edit_file_in_vscode_act_on_contents = function(path, do_after)
       dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
-        local contents = transf.file.contents(path)
+        local contents = transf.file.string_by_contents(path)
         dothis.absolute_path.delete(path)
         do_after(contents)
       end)
@@ -1251,7 +1250,7 @@ dothis = {
         "msmtp -t <" .. transf.string.single_quoted_escaped(path),
         function(res)
           if not res then
-            dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.contents(path))
+            dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.string_by_contents(path))
             dothis.absolute_path.delete(path)
           else
             dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
@@ -2281,6 +2280,14 @@ dothis = {
     end,
     move_to_end_by_item = function(array, item)
       dothis.array.move_to_index_by_item(array, item, #array)
+    end,
+    move_to_end_or_push = function(array, item)
+      local index = get.array.pos_int_or_nil_by_first_match_w_t(array, item)
+      if index then
+        dothis.array.move_to_index_by_index(array, index, #array)
+      else
+        dothis.array.push(array, item)
+      end
     end,
     filter_in_place = function(array, filterfn)
       local i = 1

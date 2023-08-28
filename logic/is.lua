@@ -273,7 +273,7 @@ is = {
   },
   labelled_remote_file = {
     empty_labelled_remote_file = function(path)
-      local contents = transf.labelled_remote_file.contents(path)
+      local contents = transf.labelled_remote_file.string_by_contents(path)
       return contents == nil or contents == ""
     end,
     nonempty_labelled_remote_file = function(path)
@@ -361,7 +361,7 @@ is = {
   },
   local_file = {
     empty_local_file = function(path)
-      local contents =  transf.local_file.contents(path)
+      local contents =  transf.local_file.string_by_contents(path)
       return contents == nil or contents == ""
     end,
     nonempty_local_file = function(path)
@@ -370,7 +370,10 @@ is = {
   },
   local_dir = {
     empty_local_dir = function(path)
-      return transf.local_dir.children_absolute_path_value_stateful_iter(path)() == nil
+      return transf.local_dir.absolute_path_value_stateful_iter_by_children(path)() == nil
+    end,
+    project_dir = function(path)
+      return is.local_dir.nonempty_local_dir(path) and is.nonempty_local_dir.project_dir(path)
     end,
     nonempty_local_dir = function(path)
       return not is.path.empty_local_dir(path)
@@ -391,6 +394,9 @@ is = {
     end,
     sass_project_dir = function(dir)
       return get.dir.bool_by_extension_of_child(dir, "sass")
+    end,
+    project_dir = function(dir)
+      return is.dir.latex_project_dir(dir) or is.dir.omegat_project_dir(dir) or is.dir.npm_project_dir(dir) or is.dir.cargo_project_dir(dir) or is.dir.sass_project_dir(dir)
     end,
   },
   absolute_path = {
@@ -483,7 +489,7 @@ is = {
     shellscript_file = function(path)
       return get.path.usable_as_filetype(path, "shell-script") 
       or onig.find(
-        transf.file.contents(path),
+        transf.file.string_by_contents(path),
         "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+"
       )
     end,
@@ -627,6 +633,17 @@ is = {
     end,
     data_url = function(url)
       return stringy.startswith(url, "data:")
+    end,
+    http_protocol_url = function(url)
+      return stringy.startswith(url, "http://") or stringy.startswith(url, "https://")
+    end,
+  },
+  http_protocol_url = {
+    http_url = function(url)
+      return stringy.startswith(url, "http://")
+    end,
+    https_url = function(url)
+      return stringy.startswith(url, "https://")
     end,
   },
   path_url = {

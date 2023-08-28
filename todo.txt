@@ -9,8 +9,8 @@ refac:
   - write tests with busted
   - fix logging dirs, etc, to now use json
   - many names don't yet corrrespond to the new schema
-  - boolean -> bool
-  - fix mt
+  - boolean -> bool, string -> str, array -> arr
+  - get forgotten logic from arrays
 post 'lua is working':  
   - add/rename missing m3us
   - history

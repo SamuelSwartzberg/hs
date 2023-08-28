@@ -426,7 +426,7 @@ get = {
     end,
     dict_by_filtered_w_kt_vt_fn = function(t, fn)
       return transf.pair_array.dict(
-        hs.fnutils.ifilter(
+        get.array.array_by_filtered(
           transf.table.pair_array(t),
           function(pair)
             return fn(pair[1], pair[2])
@@ -2088,32 +2088,32 @@ get = {
   },
   path_array = {
     path_array_by_filter_to_same_filename = function(path_array, filename)
-      return hs.fnutils.ifilter(path_array, function(path)
+      return get.array.array_by_filtered(path_array, function(path)
         return get.path.is_filename(path, filename)
       end)
     end,
     path_array_by_filter_to_different_filename = function(path_array, filename)
-      return hs.fnutils.ifilter(path_array, function(path)
+      return get.array.array_by_filtered(path_array, function(path)
         return not get.path.is_filename(path, filename)
       end)
     end,
     path_array_by_filter_to_same_extension = function(path_array, extension)
-      return hs.fnutils.ifilter(path_array, function(path)
+      return get.array.array_by_filtered(path_array, function(path)
         return get.path.is_extension(path, extension)
       end)
     end,
     path_array_by_filter_to_different_extension = function(path_array, extension)
-      return hs.fnutils.ifilter(path_array, function(path)
+      return get.array.array_by_filtered(path_array, function(path)
         return not get.path.is_extension(path, extension)
       end)
     end,
     path_array_by_filter_to_filename_ending = function(path_array, leaf_ending)
-      return hs.fnutils.ifilter(path_array, function(path)
+      return get.array.array_by_filtered(path_array, function(path)
         return stringy.endswith(transf.path.filename(path), leaf_ending)
       end)
     end,
     path_array_by_filter_to_filename_starting = function(path_array, leaf_starting)
-      return hs.fnutils.ifilter(path_array, function(path)
+      return get.array.array_by_filtered(path_array, function(path)
         return stringy.startswith(transf.path.filename(path), leaf_starting)
       end)
     end,

@@ -68,7 +68,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
       elseif specifier.token_type == "telegram" then
         -- todo
       end
-      specifier.token = transf.file.contents(keyloc)
+      specifier.token = transf.file.string_by_contents(keyloc)
     end
 
     if specifier.token_type == "oauth2"  then
@@ -85,12 +85,12 @@ function rest(specifier, do_after, have_tried_access_refresh)
         end
       end
 
-      local clientid = transf.file.contents(api_keys_location .. "clientid")
-      local clientsecret = transf.file.contents(api_keys_location .. "clientsecret")
+      local clientid = transf.file.string_by_contents(api_keys_location .. "clientid")
+      local clientsecret = transf.file.string_by_contents(api_keys_location .. "clientsecret")
       if not clientid or not clientsecret then
         error("Failed to get clientid or clientsecret from " .. api_keys_location ". Oauth2 apis must have these. Are you sure you've already set up the api?")
       end
-      local refresh_token = transf.file.contents(api_keys_location .. "refresh_token")
+      local refresh_token = transf.file.string_by_contents(api_keys_location .. "refresh_token")
 
       specifier.oauth2_url = specifier.oauth2_url or tblmap.api_name.oauth2_url[specifier.api_name]
       specifier.oauth2_authorization_url = specifier.oauth2_authorization_url or tblmap.api_name.oauth2_authorization_url[specifier.api_name] or specifier.oauth2_url
@@ -115,7 +115,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
         end
         
         dothis.url_components.open_browser(open_spec, nil, function() -- our server listening on the above port will save the authorization code to the proper location
-          local authorization_code = transf.file.contents(api_keys_location .. "authorization_code")
+          local authorization_code = transf.file.string_by_contents(api_keys_location .. "authorization_code")
           dothis.absolute_path.delete(api_keys_location .. "authorization_code") -- this lost it's argument during refactor, i've added it back in, but I'm not sure if it's correct
           if not authorization_code then
             error("Failed to get authorization code from server")
@@ -184,7 +184,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
   -- fetch username/password
 
   if specifier.username_pw_where then
-    specifier.username = specifier.username or transf.file.contents(env.MPASSUSERNAME .. "/" .. specifier.api_name .. ".txt") or env.MAIN_EMAIL
+    specifier.username = specifier.username or transf.file.string_by_contents(env.MPASSUSERNAME .. "/" .. specifier.api_name .. ".txt") or env.MAIN_EMAIL
     specifier.password = specifier.password or transf.string.string_or_nil_by_evaled_env_bash_stripped("pass passw/" .. specifier.api_name )
     if not specifier.username then
       error("Username required but could not be fetched. Specifier: " .. json.encode(specifier))

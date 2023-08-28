@@ -840,7 +840,7 @@ transf = {
     end,
     string_or_nil_by_file_contents = function(path)
       if is.absolute_path.file(path) then
-        return transf.file.contents(path)
+        return transf.file.string_by_contents(path)
       else
         return nil
       end
@@ -903,7 +903,7 @@ transf = {
       )
     end,
     
-    descendant_dir_array = function(path)
+    dir_array_by_descendants = function(path)
       return get.extant_path.absolute_path_array(
         path,
         {recursion = true, include_files = false}
@@ -915,58 +915,66 @@ transf = {
     descendants_filenames_array = function(path)
       return transf.path_array.filenames_array(transf.extant_path.descendants_absolute_path_array(path))
     end,
-    descendants_extensions_array = function(path)
+    extension_array_by_descendants = function(path)
       return transf.path_array.extensions_array(transf.extant_path.descendants_absolute_path_array(path))
+    end,
+
+    dir_array_by_descendants_depth_3 = function(path)
+      return get.extant_path.absolute_path_array(
+        path,
+        {recursion = 3, include_files = false}
+      )
     end,
   },
   local_extant_path = {
-    size = function(path)
+    int_by_size_bytes = function(path)
       return get.extant_path.attr(path, "size")
     end,
-    m_timestamp_s = function(path)
+    timestamp_s_by_modification = function(path)
       return get.extant_path.attr(path, "modification")
     end,
-    m_date = function(path)
+    date_by_modification = function(path)
       return transf.timestamp_s.date(transf.extant_path.m_timestamp_s(path))
     end,
-    cr_timestamp_s = function(path)
+    timestamp_s_by_creation = function(path)
       return get.extant_path.attr(path, "creation")
     end,
-    
-    cr_date = function(path)
-      return transf.timestamp_s.date(transf.extant_path.cr_timestamp_s(path))
+    date_by_creation = function(path)
+      return transf.timestamp_s.date(transf.extant_path.timestamp_s_by_creation(path))
     end,
-    
-    c_timestamp_s = function(path)
+    timestamp_s_by_change = function(path)
       return get.extant_path.attr(path, "change")
     end,
-    
-    c_date = function(path)
-      return transf.timestamp_s.date(transf.extant_path.c_timestamp_s(path))
+    date_by_change = function(path)
+      return transf.timestamp_s.date(transf.extant_path.timestamp_s_by_change(path))
     end,
-    
-    a_timestamp_s = function(path)
+    timestamp_s_by_access = function(path)
       return get.extant_path.attr(path, "access")
     end,
-    
-    a_date = function(path)
-      return transf.timestamp_s.date(transf.extant_path.a_timestamp_s(path))
+    date_by_access = function(path)
+      return transf.timestamp_s.date(transf.extant_path.timestamp_s_by_access(path))
     end,
+    project_dir_array_by_descendants_depth_3 = function(path)
+      return transf.local_dir_array.project_dir_array_by_filter(
+        transf.extant_path.dir_array_by_descendants_depth_3(path)
+      )
+
+    end
 
     
   },
   local_dir = {
-    children_absolute_path_value_stateful_iter = hs.fs.dir
+    absolute_path_value_stateful_iter_by_children = hs.fs.dir
   },
   local_absolute_path_in_home = {
-    local_http_server_url = function(path)
+    http_protocol_url_by_local_http_server = function(path)
       return env.FS_HTTP_SERVER .. path
     end,
-    local_nonabsolute_path_relative_to_home = function(path)
+    local_nonabsolute_path_by_relative_to_home = function(path)
       return get.absolute_path.relative_path_from(path, env.HOME)
     end,
     labelled_remote_path = function(path)
-      return transf.local_nonabsolute_path_relative_to_home.labelled_remote_absolute_path(transf.local_absolute_path_in_home.local_nonabsolute_path_relative_to_home(path))
+      return transf.local_nonabsolute_path_relative_to_home.labelled_remote_absolute_path(transf.local_absolute_path_in_home.local_nonabsolute_path_by_relative_to_home(path))
     end
   },
   local_nonabsolute_path_relative_to_home = {
@@ -990,10 +998,10 @@ transf = {
       return transf.array.set(extensions)
     end,
     extant_path_array = function(path_array)
-      return hs.fnutils.ifilter(path_array, is.path.extant_path)
+      return get.array.array_by_filtered(path_array, is.path.extant_path)
     end,
     useless_file_leaf_filtered_path_array = function(path_array)
-      return hs.fnutils.ifilter(path_array, is.path.not_useless_file_leaf)
+      return get.array.array_by_filtered(path_array, is.path.not_useless_file_leaf)
     end,
     path_leaf_specifier_array = function(path_array)
       return hs.fnutils.imap(path_array, transf.path.path_leaf_specifier)
@@ -1014,15 +1022,15 @@ transf = {
       return get.extant_path_array.extant_by_largest_of_attr(path_array, "creation")
     end,
     dir_array_by_filter = function(path_array)
-      return hs.fnutils.ifilter(path_array, is.path.dir)
+      return get.array.array_by_filtered(path_array, is.path.dir)
     end,
     file_array_by_filter = function(path_array)
-      return hs.fnutils.ifilter(path_array, is.path.file)
+      return get.array.array_by_filtered(path_array, is.path.file)
     end,
     git_root_dir_array_by_filter = function(path_array)
-      return transf.dir_array.filter_git_root_dir_array(transf.extant_path_array.dir_array_by_filter(path_array))
+      return transf.dir_array.git_root_dir_array_by_filter(transf.extant_path_array.dir_array_by_filter(path_array))
     end,
-    descendant_file_array = function(path_array)
+    file_array_by_descendants = function(path_array)
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
         path_array,
         transf.extant_path.file_array_by_descendants
@@ -1030,19 +1038,24 @@ transf = {
     end,
   },
   dir_array = {
-    filter_git_root_dir_array = function(path_array)
-      return hs.fnutils.ifilter(path_array, is.dir.git_root_dir)
+    git_root_dir_array_by_filter = function(path_array)
+      return get.array.array_by_filtered(path_array, is.dir.git_root_dir)
     end,
-    children_absolute_path_array = function(path_array)
+    absolute_path_array_by_children = function(path_array)
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
         path_array,
         transf.dir.absolute_path_array_by_children
       )
     end,
   },
+  local_dir_array = {
+    project_dir_array_by_filter = function(arr)
+      return get.array.array_by_filtered(arr, is.local_dir.project_dir)
+    end
+  },
   file_array = {
     plaintext_file_array = function(path_array)
-      return hs.fnutils.ifilter(path_array, is.file.plaintext_file)
+      return get.array.array_by_filtered(path_array, is.file.plaintext_file)
     end,
     url_or_local_path_array_by_m3u_file_content_lines = function(path_array)
       return transf.plaintext_file_array.url_or_local_path_array_by_m3u_file_content_lines(
@@ -1063,20 +1076,20 @@ transf = {
     end,
     children_absolute_path_value_stateful_iter = function(remote_extant_path)
       return transf.table.value_stateful_iter(
-        transf.remote_dir.children_absolute_path_array(remote_extant_path)
+        transf.remote_dir.absolute_path_array_by_children(remote_extant_path)
       )
     end,
   },
   remote_dir = {
-    children_absolute_path_array = function(remote_extant_path)
+    absolute_path_array_by_children = function(remote_extant_path)
       return transf.labelled_remote_dir.children_absolute_path_array(remote_extant_path)
     end,
-    children_absolute_path_value_stateful_iter = function(remote_extant_path)
+    absolute_path_value_stateful_iter_by_children = function(remote_extant_path)
       return transf.labelled_remote_dir.children_absolute_path_value_stateful_iter(remote_extant_path)
     end,
   },
   local_file = {
-    contents = function(path)
+    string_by_contents = function(path)
       local file = io.open(path, "r")
       if file ~= nil then
         local contents = file:read("*a")
@@ -1110,21 +1123,21 @@ transf = {
     end,
   },
   labelled_remote_file = {
-    contents = function(path)
+    string_by_contents = function(path)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone cat" .. transf.string.single_quoted_escaped(path))
     end,
   },
   remote_file = {
-    contents = function(path)
-      return transf.labelled_remote_file.contents(path)
+    string_by_contents = function(path)
+      return transf.labelled_remote_file.string_by_contents(path)
     end,
   },
   file = {
-    contents = function(path)
+    string_by_contents = function(path)
       if is.path.remote_path(path) then
-        return transf.remote_file.contents(path)
+        return transf.remote_file.string_by_contents(path)
       else
-        return transf.local_file.contents(path)
+        return transf.local_file.string_by_contents(path)
       end
     end,
   },
@@ -1158,9 +1171,9 @@ transf = {
     end,
     children_absolute_path_value_stateful_iter = function(dir)
       if is.path.remote_path(dir) then
-        return transf.remote_dir.children_absolute_path_value_stateful_iter(dir)
+        return transf.remote_dir.absolute_path_value_stateful_iter_by_children(dir)
       else
-        return transf.local_dir.children_absolute_path_value_stateful_iter(dir)
+        return transf.local_dir.absolute_path_value_stateful_iter_by_children(dir)
       end
     end,
     children_leaves_array = function(dir)
@@ -1179,7 +1192,7 @@ transf = {
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_array_by_children(dir), transf.dir.absolute_path_array_by_children)
     end,
     git_root_dir_descendants = function(dir)
-      return transf.dir_array.filter_git_root_dir_array(transf.extant_path.descendants_absolute_path_array(dir))
+      return transf.dir_array.git_root_dir_array_by_filter(transf.extant_path.descendants_absolute_path_array(dir))
     end,
     absolute_path_key_leaf_string_or_nested_value_dict = function(path)
       local res = {}
@@ -1686,8 +1699,8 @@ transf = {
       local temppath = transf.string.in_tmp_dir(transf.path.filename(path) .. ".ics")
       dothis.extant_path.copy_to_absolute_path(path, temppath)
       dothis.ics_file.generate_json_file(temppath)
-      local jsonpath = transf.file.contents(get.path.with_different_extension(temppath, "json"))
-      local res = json.decode(transf.file.contents(jsonpath))
+      local jsonpath = transf.file.string_by_contents(get.path.with_different_extension(temppath, "json"))
+      local res = json.decode(transf.file.string_by_contents(jsonpath))
       dothis.absolute_path.delete(temppath)
       dothis.absolute_path.delete(jsonpath)
       return res
@@ -1695,20 +1708,20 @@ transf = {
   },
   json_file = {
     not_userdata_or_function = function(path)
-      return transf.json_string.not_userdata_or_function(transf.file.contents(path))
+      return transf.json_string.not_userdata_or_function(transf.file.string_by_contents(path))
     end,
     table_or_nil = function(path)
-      return transf.json_string.table_or_nil(transf.file.contents(path))
+      return transf.json_string.table_or_nil(transf.file.string_by_contents(path))
     end,
   },
   ini_file = {
     assoc = function(path)
-      return transf.ini_string.assoc(transf.file.contents(path))
+      return transf.ini_string.assoc(transf.file.string_by_contents(path))
     end,
   },
   toml_file = {
     assoc = function(path)
-      return transf.toml_string.assoc(transf.file.contents(path))
+      return transf.toml_string.assoc(transf.file.string_by_contents(path))
     end,
   },
   backuped_thing_identifier = {
@@ -1821,7 +1834,7 @@ transf = {
 
   plaintext_file = {
     string_by_contents = function(path)
-      return transf.file.contents(path)
+      return transf.file.string_by_contents(path)
     end,
     string_array_by_lines = function(path)
       return transf.string.lines(transf.plaintext_file.string_by_contents(path))
@@ -4201,7 +4214,7 @@ transf = {
     end,
     synonym_string_array = function(str)
       local items = stringy.split(transf.word.raw_av_output(str), "\t")
-      items = hs.fnutils.ifilter(items, function(itm)
+      items = get.array.array_by_filtered(items, function(itm)
         if itm == nil then
           return false
         end
@@ -4452,13 +4465,13 @@ transf = {
       )
     end,
     noemtpy_string_array = function(arr)
-      return hs.fnutils.ifilter(arr, is.string.noempty_string)
+      return get.array.array_by_filtered(arr, is.string.noempty_string)
     end,
     noindent_string_array = function(arr)
       return hs.fnutils.imap(arr, transf.line.noindent)
     end,
     nocomment_line_filtered_string_array = function(arr)
-      return hs.fnutils.ifilter(
+      return get.array.array_by_filtered(
         arr,
         is.string.nocomment_line
       )
@@ -4480,7 +4493,7 @@ transf = {
       )
     end,
     filter_to_url_array = function(arr)
-      return hs.fnutils.ifilter(arr, is.string.url)
+      return get.array.array_by_filtered(arr, is.string.url)
     end,
     filter_nocomment_noindent_to_url_array = function(arr)
       return transf.string_array.filter_to_url_array(
@@ -4721,7 +4734,7 @@ transf = {
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.string_array_by_content_lines)
     end,
     m3u_file_array = function(path_array)
-      return hs.fnutils.ifilter(path_array, is.plaintext_file.m3u_file)
+      return get.array.array_by_filtered(path_array, is.plaintext_file.m3u_file)
     end,
     url_or_local_path_array_by_m3u_file_content_lines = function(arr)
       return transf.plaintext_file_array.string_array_by_content_lines(
@@ -4841,7 +4854,7 @@ transf = {
     ics_string = function(t)
       local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
       dothis.table.write_ics_file(t, tmpdir_ics_path)
-      local contents = transf.file.contents(tmpdir_ics_path)
+      local contents = transf.file.string_by_contents(tmpdir_ics_path)
       dothis.absolute_path.delete(tmpdir_ics_path)
       return contents
     end,
@@ -4975,7 +4988,7 @@ transf = {
       return get.string_or_number_array.string_by_joined(transf.dict.envlike_line_array(t), "\n")
     end,
     truthy_value_dict = function(t)
-      return hs.fnutils.ifilter(
+      return get.array.array_by_filtered(
         t,
         transf.any.boolean
       )
@@ -5818,7 +5831,7 @@ transf = {
         ),
         "AXTitle"
       )
-      local filtered = hs.fnutils.ifilter(arr, function (v) return v.AXTitle ~= "" end)
+      local filtered = get.array.array_by_filtered(arr, function (v) return v.AXTitle ~= "" end)
       for k, v in transf.table.key_value_stateless_iter(filtered) do
         v.application = app
       end
@@ -7213,7 +7226,7 @@ transf = {
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("mullvad relay get"):match("hostname ([^ ]+)")
     end,
     non_root_volume_absolute_path_array = function()
-      return hs.fnutils.ifilter(
+      return get.array.array_by_filtered(
         transf.table_or_nil.kt_array(hs.fs.volume.allVolumes()),
         is.local_absolute_path.root_local_absolute_path
       )
@@ -7222,7 +7235,7 @@ transf = {
       return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("khal printcalendars"))
     end,
     writeable_calendar_name_array = function()
-      return hs.fnutils.ifilter(
+      return get.array.array_by_filtered(
         transf["nil"].calendar_name_array(),
         is.calendar_name.writeable_calendar_name
       )
@@ -7617,7 +7630,7 @@ transf = {
       return watcher_creation_specifier.watcher_type
     end,
     hswatcher_creation_fn = function(watcher_creation_specifier)
-      return transf.watcher_creation_specifier.watcher_type(watcher_creation_specifier).watcher.new
+      return transf.watcher_creation_specifier.watcher_type(watcher_creation_specifier).new
     end,
   },
   creation_specifier = {
@@ -8296,13 +8309,13 @@ transf = {
     end,
     rt_by_memo = function(fnid, opts_as_str, params, opts)
       local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str, params)
-      local raw_cnt = transf.file.contents(cache_path)
+      local raw_cnt = transf.file.string_by_contents(cache_path)
       if not raw_cnt then return nil end
       return json.decode(raw_cnt)
     end,
     timestamp_s_by_created_time = function(fnid, opts_as_str)
       local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
-      return get.string_or_number.number_or_nil(transf.file.contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
+      return get.string_or_number.number_or_nil(transf.file.string_by_contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
     end,
     
   },

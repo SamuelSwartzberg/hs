@@ -298,6 +298,7 @@ act = {
       end
     end,
     eject_or_msg = function(path)
+      dothis.string.alert("Ejecting volume...")
       local succ, res = pcall(act.extant_volume_local_extant_path.eject_or_err, path)
       if succ then
         dothis.string.alert("Volume ejected successfully.")
@@ -379,6 +380,13 @@ act = {
     push_qf_things = function(str)
       dothis.plaintext_file.append_line_and_commit(
         env.MQF .. "/things",
+        str
+      )
+    end,
+    add_to_clipboard = hs.pasteboard.setContents,
+    add_to_pasteboard_arr = function(str)
+      dothis.array.move_to_front_or_unshift(
+        pasteboard_arr,
         str
       )
     end,

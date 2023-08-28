@@ -269,12 +269,17 @@
 --- @alias pasteboard_object string | hs.styledtext | hs.sound | hs.image | urltable | hs.drawing.color
 
 --- @class hs.pasteboard
---- @field watcher hs.pasteboard_watcher
+--- @field watcher hs.pasteboard.watcher
 --- @field setContents fun(contents: string, name?:string): boolean
 --- @field readString fun(name?: string, all?:boolean): string
 --- @field writeObjects fun(objects: pasteboard_object | pasteboard_object[], name?: string): boolean
 
---- @class hs.pasteboard_watcher
+--- @class hs.pasteboard.watcher
+--- @field new fun(fn: fun(contents: string|nil): (nil), name?: string): hs.pasteboard.watcher
+--- @field start fun(self: hs.pasteboard.watcher): hs.pasteboard.watcher
+--- @field stop fun(self: hs.pasteboard.watcher): hs.pasteboard.watcher
+--- @field running fun(self: hs.pasteboard.watcher): boolean
+--- @field interval fun(value: number): number
 
 --- @class hs.audiodevice
 
@@ -649,6 +654,9 @@ speak = hs.speech.new()
 --- @field didRename 3
 --- @field allVolumes fun(showHidden?: boolean): {[string]:table}
 --- @field eject fun(path: string): boolean | nil, err: string | nil
+--- @field new fun(fn: fun(event: integer, tbl: table): nil): hs.fs.volume
+--- @field start fun(self: hs.fs.volume): hs.fs.volume
+--- @field stop fun(self: hs.fs.volume): hs.fs.volume
 
 --- @class hs.application
 --- @field frontmostApplication fun(): hs.application
@@ -661,6 +669,19 @@ speak = hs.speech.new()
 --- @field title fun(self: hs.application): string
 --- @field name fun(self: hs.application): string
 --- @field hide fun(self: hs.application): boolean
+--- @field watcher hs.application.watcher
+
+--- @class hs.application.watcher
+--- @field new fun(fn: fun(name: string, event: integer, app: hs.application): nil): hs.application.watcher
+--- @field start fun(self: hs.application.watcher): hs.application.watcher
+--- @field stop fun(self: hs.application.watcher): hs.application.watcher
+--- @field activated integer
+--- @field deactivated integer
+--- @field hidden integer
+--- @field unhidden integer
+--- @field launched integer
+--- @field terminated integer
+--- @field launching integer
 
 --- @class hs.eventtap.eventtap
 --- @field isEnabled fun(self: hs.eventtap.eventtap): boolean

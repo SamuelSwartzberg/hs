@@ -14,15 +14,31 @@ require("logic")
 
 comp = transf.dir.plaintext_dictonary_read_assoc(env.MCOMPOSITE)
 fstblmap = transf.dir.plaintext_dictonary_read_assoc(env.MDICTIONARIES .. "/mappings")
+
 timer_arr = {}
 timer_arr_refresher = hs.timer.doEvery(1, get.fn.first_n_args_bound_fn(dothis.timer_spec_array.fire_all_if_ready_and_space_if_necessary, timer_arr))
+
+env = transf.string.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
+
 watcher_arr = {}
+hotkey_arr = {}
+pasteboard_arr = {}
+
+
+dothis.created_item_specifier_array.create(
+  hotkey_arr,
+  {
+    key = "r",
+    fn = hs.reload
+  }
+)
+
 dothis.created_item_specifier_array.create_all(
   watcher_arr,
   {
     {
       type = "watcher",
-      watcher_type = hs.application,
+      watcher_type = hs.application.watcher,
       fn = function(mac_application_name, hs_applicaton_event_type, running_application)
         if mac_application_name == "Firefox" and hs_applicaton_event_type == hs.application.watcher.terminated then
           hs.timer.doAfter(3, dothis["nil"].ff_backup)
@@ -30,28 +46,23 @@ dothis.created_item_specifier_array.create_all(
       end
     },{ 
       type = "watcher",
-      watcher_type = hs.pasteboard, 
-      fn = function(item)
-        System:get("manager", "clipboard"):doThis("create", item)
-      end 
+      watcher_type = hs.pasteboard.watcher, 
+      fn = act.string.add_to_pasteboard_arr
     },
     {
       type = "watcher",
       watcher_type = hs.fs.volume,
       fn = function(event, information)
         if event == hs.fs.volume.didMount then
-          local vol = st(information.path)
-          if vol:get("is-time-machine-volume") then
+          if is.extant_volume_local_extant_path.static_time_machine_extant_volume_local_extant_path(information.path) then
             hs.alert.show("Starting backup...")
             dothis.string.env_bash_eval_async("tmutil startbackup")
           end
         elseif event == hs.fs.volume.didUnmount then
-          local vol = st(information.path)
-          if vol:get("is-dynamic-time-machine-volume") then
-            hs.timer.doAfter(30, function()
-              hs.alert.show("Backup completed. Ejecting...")
-              st(env.TMBACKUPVOL):doThis("eject")
-            end)
+          if is.extant_volume_local_extant_path.dynamic_time_machine_extant_volume_local_extant_path(information.path) then
+            hs.timer.doAfter(30, 
+              get.fn.first_n_args_bound_fn(act.extant_volume_local_extant_path.eject_or_msg, env.TMBACKUPVOL)
+            )
           end
         end
       end
@@ -59,11 +70,6 @@ dothis.created_item_specifier_array.create_all(
   }
   
 )
-
-projectDirsArray = ar(get.extant_path.absolute_path_array(env.ME, {recursion = 2, include_files = false})):get("to-string-item-array"):get("filter-to-new-array", function(item) return item:get("is-actually-project-dir") end)
-
-
-System:get("manager", "hotkey"):doThis("create", {key = "r", fn = hs.reload})
 
 main_qspec = {}
 main_qspec = {
@@ -272,7 +278,9 @@ local keymap = {
   s = {
     explanation = "Choose a project and choose an action on it.",
     fn = function()
-      projectDirsArray:doThis("choose-item-and-then-action")
+      dothis.array.choose_item_and_action(
+        transf.local_extant_path.project_dir_array_by_descendants_depth_3(env.ME)
+      )
     end,
   },
   d = {
@@ -407,7 +415,7 @@ System:get("manager", "timer"):doThis("create-all", {
   {
     fn = function()
       act.env_yaml_file_container.write_env_and_check(env.ENVFILE)
-      env = transf.string.string_or_nil_by_evaled_env_bash_stripped("env | jc --ini")
+      env = transf.string.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
     end,
     interval = "*/5 * * * *",
   },
