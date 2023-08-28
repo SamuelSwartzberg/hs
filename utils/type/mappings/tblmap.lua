@@ -56,19 +56,12 @@ tblmap = {
       [" "] = "space",
     }
   },
-  mod = {
+  mod_name = {
     mod_symbol = {
       cmd = "⌘",
       alt = "⌥",
       shift = "⇧",
       ctrl = "⌃",
-      fn = "fn",
-    },
-    mod_name = {
-      cmd = "cmd",
-      alt = "alt",
-      shift = "shift",
-      ctrl = "ctrl",
       fn = "fn",
     },
     mod_char = {
@@ -181,6 +174,37 @@ tblmap = {
       [4] = "hour",
       [5] = "min",
       [6] = "sec",
+    },
+  },
+  rfc3339like_dt_format_part = {
+    date_component_name = {
+      ["%Y"] = "year",
+      ["%m"] = "month",
+      ["%d"] = "day",
+      ["%H"] = "hour",
+      ["%M"] = "min",
+      ["%S"] = "sec",
+    },
+  },
+  date_component_name_long = {
+    date_component_name = {
+      year = "year",
+      month = "month",
+      day = "day",
+      hour = "hour",
+      minute = "min",
+      second = "sec",
+    },
+  },
+  seconds = {
+    date_component_name = {
+      sec = 1,
+      min = 60,
+      hour = 60 * 60,
+      day = 60 * 60 * 24,
+      week = 60 * 60 * 24 * 7,
+      month = 60 * 60 * 24 * 30,
+      year = 60 * 60 * 24 * 365,
     },
   },
   date_format_name = {
@@ -306,6 +330,16 @@ tblmap = {
     likely_record_separator = {
       csv = "\n",
       tsv = "\n",
+    },
+    normalized_extension =  {
+      jpeg = "jpg",
+      jpg = "jpg",
+      htm = "html",
+      html = "html",
+      yml = "yaml",
+      yaml = "yaml",
+      markdown = "md",
+      md = "md",
     },
   },
   pandoc_format = {
@@ -561,24 +595,3 @@ tblmap = {
     }
   }
 }
-
-
--- make sure to automatically normalize any input to tblmap
-
-for k, v in transf.table.key_value_stateless_iter(tblmap) do
-  local thing_to_normalize = k 
-  for k2, v2 in transf.table.key_value_stateless_iter(v) do
-    setmetatable(
-      v2,
-      {
-        __index = function(t, k)
-          local key = k
-          if normalize[thing_to_normalize] then
-            key = normalize[thing_to_normalize][k]
-          end
-          return rawget(t, key)
-        end
-      }
-    )
-  end
-end

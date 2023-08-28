@@ -2728,7 +2728,7 @@ dothis = {
         dothis[
           spec.mode .. "_input_spec"
         ].exec_position_change_state_spec(spec, position_change_state_spec)
-      end, refstore.consts.POLLING_INTERVAL)
+      end, POLLING_INTERVAL)
       timer:start()
     end,
   },

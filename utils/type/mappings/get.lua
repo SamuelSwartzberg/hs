@@ -151,7 +151,7 @@ get = {
   },
   pass_item_name = {
     value = function(item, type)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped, refstore.params.memoize.opts.invalidate_1_day)("pass show " .. type .. "/" .. item)
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.string.string_or_nil_by_evaled_env_bash_stripped)("pass show " .. type .. "/" .. item)
     end,
     path = function(item, type, ext)
       return env.PASSWORD_STORE_DIR .. "/" .. type .. "/" .. item .. "." .. (ext or "gpg")
@@ -3127,6 +3127,35 @@ get = {
         memoized_w_opts[fnid][opts_as_str] = memoized_func
       end
       return memoized_func, timer
+    end,
+    rt_or_nil_by_memoized_invalidate = function(fn, interval, fnname)
+      return get.fn.rt_or_nil_by_memoized(fn, {
+        invalidation_mode = "invalidate",
+        interval = interval
+      }, fnname)
+    end,
+    rt_or_nil_by_memoized_invalidate_1_day = function(fn, fnname)
+      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 60 * 24, fnname)
+    end,
+    rt_or_nil_by_memoized_invalidate_1_week = function(fn, fnname)
+      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 60 * 24 * 7, fnname)
+    end,
+    rt_or_nil_by_memoized_invalidate_1_month = function(fn, fnname)
+      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 60 * 24 * 30, fnname)
+    end,
+    rt_or_nil_by_memoized_invalidate_1_year = function(fn, fnname)
+      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 60 * 24 * 365, fnname)
+    end,
+    rt_or_nil_by_memoized_invalidate_5_minutes = function(fn, fnname)
+      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 5, fnname)
+    end,
+    rt_or_nil_by_memoized_invalidate_stringify_json = function(fn, interval, fnname)
+      return get.fn.rt_or_nil_by_memoized(fn, {
+        invalidation_mode = "invalidate",
+        interval = interval,
+        stringify_table_params = true,
+        table_param_subset = "json"
+      }, fnname)
     end,
   },
   n_any_arg_fn = {

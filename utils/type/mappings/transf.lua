@@ -706,9 +706,10 @@ transf = {
       return psegments[#psegments]
     end,
     normalized_extension = function(path)
-      return normalize.extension[
-        transf.path.extension(path)
-      ]
+      local ext = transf.path.extension(path)
+      return tblmap.extension.normalized_extension[
+        ext
+      ] or ext
     end,
     path_without_extension = function(path)
       return get.path.path_from_sliced_path_segment_array(
@@ -1523,7 +1524,7 @@ transf = {
   },
   whisper_file = {
     transcribed = function(path)
-      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_year_fs, "rest")({
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_year(rest, "rest")({
         api_name = "openai",
         endpoint = "audio/transcriptions",
         request_table_type = "form",
@@ -1539,7 +1540,7 @@ transf = {
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
     end,
     hs_image = function(path)
-      return get.fn.rt_or_nil_by_memoized(hs.image.imageFromPath, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromPath")(path)
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_week(hs.image.imageFromPath, "hs.image.imageFromPath")(path)
     end,
     booru_post_url = function(path)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
@@ -1873,10 +1874,14 @@ transf = {
       return tblmap.extension.likely_record_separator[transf.path.extension(path)]
     end,
     array_of_array_of_fields = function(path)
-      return ftcsv.parse(path, transf.plaintext_table_file.field_separator(path), refstore.params.ftcsv_parse.opts.noheaders)
+      return ftcsv.parse(path, transf.plaintext_table_file.field_separator(path), {
+        headers = false
+      })
     end,
     iter_of_array_of_fields = function(path)
-      local iter = ftcsv.parseLine(path, transf.plaintext_table_file.field_separator(path), refstore.params.ftcsv_parse.opts.noheaders)
+      local iter = ftcsv.parseLine(path, transf.plaintext_table_file.field_separator(path), {
+        headers = false
+      })
       iter() -- skip header, seems to be a bug in ftcsv
       return iter
     end,
@@ -2705,7 +2710,7 @@ transf = {
   },
   cleaned_iban = {
     data = function(iban)
-      local res = get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
+      local res = get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest, "rest")({
         host = "openiban.com/",
         endpoint = "validate/" .. iban,
         params = { getBIC = "true" },
@@ -3094,7 +3099,7 @@ transf = {
   },
   youtube_video_id = {
     youtube_video_item = function(id)
-      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest)({
         api_name = "youtube",
         endpoint = "videos",
         params = {
@@ -3135,7 +3140,7 @@ transf = {
       return "https://www.youtube.com/watch?v=" .. id
     end,
     captions_list = function(id)
-      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs)({
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest)({
         api_name = "youtube",
         endpoint = "captions",
         params = {
@@ -3230,7 +3235,7 @@ transf = {
       return "https://www.youtube.com/channel/" .. id
     end,
     youtube_channel_item = function(id)
-      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest, "rest")({
         api_name = "youtube",
         endpoint = "channels",
         params = {
@@ -3245,7 +3250,7 @@ transf = {
   },
   handle = {
     youtube_channel_item = function(handle)
-      return get.fn.rt_or_nil_by_memoized(rest, refstore.params.memoize.opts.invalidate_1_month_fs, "rest")({
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest, "rest")({
         api_name = "youtube",
         endpoint = "channels",
         params = { handle = handle}
@@ -3426,7 +3431,10 @@ transf = {
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
     end,
     qr_utf8_image_wob = function(data)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_err_by_evaled_env_bash, refstore.params.memoize.opts.stringify_json)("qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data))
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_err_by_evaled_env_bash, {
+        stringify_table_params = true,
+        table_param_subset = "json"
+      })("qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data))
     end,
     qr_png_in_cache = function(data)
       local path = transf.string.in_cache_dir(data, "qr")
@@ -3826,21 +3834,7 @@ transf = {
       res = eutf8.gsub(res, ",", ".")
       res = eutf8.gsub(str, "^[0-9a-zA-Z]+", "")
       return res
-    end,
-    string_by_cleaned_youtube_video_title = function(title)
-      title = replace(title, {
-        { cond = {_r = mt._r.text_bloat.youtube.video, _ignore_case = true}, mode="remove" },
-        { cond = {_r = mt._r.text_bloat.youtube.misc, _ignore_case = true}, mode="remove" },
-      })
-      return title
-    end,
-    string_by_cleaned_youtube_video_channel_title = function(channel)
-      channel = replace(channel, {
-        { cond = {_r = mt._r.text_bloat.youtube.channel_topic_producer, _ignore_case = true}, mode="remove" },
-        { value = {_r = mt._r.text_bloat.youtube.slash_suffix, _ignore_case = true}, mode="remove" },
-      })
-      return channel
-    end,
+    end
   },
   line = {
     noindent = function(str)
@@ -6462,7 +6456,7 @@ transf = {
       return "https://web.archive.org/web/*/" .. transf.url.url_by_ensure_scheme(url)
     end,
     default_negotiation_url_contents = function(url)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped, refstore.params.memoize.opts.invalidate_1_day_fs, "run")
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.string.string_or_nil_by_evaled_env_bash_stripped, "run")
           "curl -L" .. transf.string.single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
@@ -6621,7 +6615,7 @@ transf = {
       )
     end,
     hs_image = function(url)
-      return get.fn.rt_or_nil_by_memoized(hs.image.imageFromURL, refstore.params.memoize.opts.invalidate_1_week_fs, "hs.image.imageFromURL")(url)
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_week(hs.image.imageFromURL, "hs.image.imageFromURL")(url)
     end,
     qr_data = function(url)
       local path = transf.url.in_cache_dir(url)
@@ -6951,7 +6945,7 @@ transf = {
       return menu_item_table.AXMenuItemCmdModifiers
     end,
     mod_symbol_array = function(menu_item_table)
-      return transf.mod_array.mod_symbol_array(transf.menu_item_table.mod_name_array(menu_item_table))
+      return transf.mod_name_array.mod_symbol_array(transf.menu_item_table.mod_name_array(menu_item_table))
     end,
     hotkey = function(menu_item_table)
       return menu_item_table.AXMenuItemCmdChar
@@ -6982,32 +6976,29 @@ transf = {
       end
     end
   },
-  mod_array = {
+  mod_name_array = {
     mod_symbol_array = function(mod_array)
       return get.array.array_by_mapped_w_t_key_dict(mod_array, transf.mod.mod_symbol)
     end,
     mod_char_array = function(mod_array)
       return get.array.array_by_mapped_w_t_key_dict(mod_array, transf.mod.mod_char)
     end,
-    mod_name_array = function(mod_array)
-      return get.array.array_by_mapped_w_t_key_dict(mod_array, transf.mod.mod_name)
-    end,
   },
   shortcut_specifier = {
-    mod_array = function(shortcut_specifier)
-      return shortcut_specifier.mod_array
+    mod_name_array = function(shortcut_specifier)
+      return shortcut_specifier.mod_name_array
     end,
     key = function(shortcut_specifier)
       return shortcut_specifier.key
     end,
     shortcut_array = function(shortcut_specifier)
       return transf.array_and_any.array(
-        shortcut_specifier.mod_array,
+        shortcut_specifier.mod_name_array,
         shortcut_specifier.key
       )
     end,
     shortcut_string = function(shortcut_specifier)
-      local modstr = plstringx.join("", get.array.array_by_mapped_w_t_key_dict(shortcut_specifier.mod_array, tblmap.mod.mod_symbol))
+      local modstr = plstringx.join("", get.array.array_by_mapped_w_t_key_dict(shortcut_specifier.mod_name_array, tblmap.mod_name.mod_symbol))
       if modstr == "" then
         return shortcut_specifier.key
       else
@@ -7829,7 +7820,7 @@ transf = {
       local total_delta = transf.declared_position_change_input_spec.target_hs_geometry_point(declared_position_change_input_spec) - starting_point
       local starting_position_change_state_spec = {}
       starting_position_change_state_spec.num_steps = math.ceil(
-        transf.declared_position_change_input_spec.duration(declared_position_change_input_spec) / refstore.consts.POLLING_INTERVAL
+        transf.declared_position_change_input_spec.duration(declared_position_change_input_spec) / POLLING_INTERVAL
       )
 
       --- Function that calculates the initial delta value given a certain distance, factor of deceleration and number of steps.
