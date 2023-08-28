@@ -22,7 +22,7 @@ is = {
     end,
    
     ascii_string = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.charset.ascii))
+      return onig.find(str, transf.string.whole_regex(r.g.charset.ascii))
     end,
     alphanum_minus_underscore = function(str)
       return is.string.ascii_string(str) and is.ascii_string.alphanum_minus_underscore(str)
@@ -53,7 +53,7 @@ is = {
   },
   ascii_string = {
     printable_ascii_string = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.charset.printable_ascii))
+      return onig.find(str, transf.string.whole_regex(r.g.charset.printable_ascii))
     end,
     alphanum_minus_underscore = function(str)
       return is.ascii_string.printable_ascii_string(str) and is.printable_ascii_string.alphanum_minus_underscore(str)
@@ -61,16 +61,16 @@ is = {
   },
   printable_ascii_string = {
     base32_gen_string = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.id.b32.gen))
+      return onig.find(str, transf.string.whole_regex(r.g.id.b32.gen))
     end,
     base32_crock_string = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.id.b32.crockford))
+      return onig.find(str, transf.string.whole_regex(r.g.id.b32.crockford))
     end,
     base64_gen_string = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.id.b64.gen))
+      return onig.find(str, transf.string.whole_regex(r.g.id.b64.gen))
     end,
     base64_url_string = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.id.b64.url))
+      return onig.find(str, transf.string.whole_regex(r.g.id.b64.url))
     end,
     base32_string = function(str)
       return is.printable_ascii_string.base32_gen_string(str) or is.printable_ascii_string.base32_crock_string(str)
@@ -153,7 +153,7 @@ is = {
         not eutf8.find(str, "%s")
     end,
     dice_notation = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.syntax.dice))
+      return onig.find(str, transf.string.whole_regex(r.g.syntax.dice))
     end,
     installed_package_name = function(str)
       return get.array.bool_by_contains(transf.package_manager_name_or_nil.package_name_array(nil), str)
@@ -173,16 +173,16 @@ is = {
   },
   alphanum_minus = {
     isbn = function(str)
-      return onig.find(transf.alphanum_minus.alphanum(str), transf.string.whole_regex(mt._r.id.isbn))
+      return onig.find(transf.alphanum_minus.alphanum(str), transf.string.whole_regex(r.g.id.isbn))
     end,
     issn = function(str) 
-      return onig.find(str, transf.string.whole_regex(mt._r.id.issn))
+      return onig.find(str, transf.string.whole_regex(r.g.id.issn))
     end,
     uuid = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.id.uuid), 1, "i")
+      return onig.find(str, transf.string.whole_regex(r.g.id.uuid), 1, "i")
     end,
     relay_identifier = function(str)
-      return onig.find(str, transf.string.whole_regex(mt._r.id.relay_identifier))
+      return onig.find(str, transf.string.whole_regex(r.g.id.relay_identifier))
     end,
     
   },
@@ -191,10 +191,13 @@ is = {
       local succ, res = pcall(transf.uuid.raw_contact, uuid)
       return succ 
     end,
+    null_uuid = function(uuid)
+      return uuid == "00000000-0000-0000-0000-000000000000"
+    end
   },
   youtube_video_id = {
     extant = function(id)
-      return get.array.bool_by_contains(mt._list.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
+      return get.array.bool_by_contains(ls.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
     end,
     private = function(id)
       return transf.youtube_video_id.privacy_status(id) == "private"
@@ -229,7 +232,7 @@ is = {
       return eutf8.find(transf.path.leaf(path), ":%d+$") ~= nil
     end,
     useless_file_leaf = function(path)
-      return get.array.bool_by_contains(mt._list.useless_files, transf.path.leaf(path))
+      return get.array.bool_by_contains(ls.useless_files, transf.path.leaf(path))
     end,
     not_useless_file_leaf = function(path)
       return not is.path.useless_file_leaf(path)
@@ -495,7 +498,7 @@ is = {
     db_file = function(path)
       return get.path.is_standartized_extension_in(
         path,
-        mt._list.filetype["db"]
+        ls.filetype["db"]
       )
     end,
     playable_file = function (path)
@@ -519,13 +522,13 @@ is = {
     plaintext_dictionary_file = function(path)
       get.path.is_standartized_extension_in(
         path,
-        mt._list.filetype["plaintext-dictionary"]
+        ls.filetype["plaintext-dictionary"]
       )
     end,
     plaintext_table_file = function(path)
       get.path.is_standartized_extension_in(
         path,
-        mt._list.filetype["plaintext-table"]
+        ls.filetype["plaintext-table"]
       )
     end,
     m3u_file = function(path)
@@ -591,7 +594,7 @@ is = {
   },
   url = {
     scheme_url = function(url)
-      return onig.match(url, mt._r.url.scheme) ~= nil
+      return onig.match(url, r.g.url.scheme) ~= nil
     end,
     path_url = function(url)
       return transf.url.path(url) ~= nil
@@ -648,7 +651,7 @@ is = {
   },
   extension_url = {
     image_url = function(url)
-      return get.path.is_extension_in(transf.path_url.path(url), mt._list.filetype.image)
+      return get.path.is_extension_in(transf.path_url.path(url), ls.filetype.image)
     end,
     playable_url = function(url)
       return get.path.usable_as_filetype(
@@ -675,7 +678,7 @@ is = {
   },
   host_url = {
     booru_url = function(url)
-      return get.array.bool_by_contains(mt._list.url.booru, transf.host_url.host(url))
+      return get.array.bool_by_contains(ls.url.booru, transf.host_url.host(url))
     end,
     youtube_url = function(url)
       return transf.host_url.host(url) == "youtube.com"

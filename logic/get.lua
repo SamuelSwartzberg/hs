@@ -61,10 +61,10 @@ get = {
     parseable_format_specifier = function()
       return get.string_or_number_array.string_by_joined(
         get.array.string_array_by_mapped_values_w_fmt_string(
-          mt._list.khal.parseable_format_component_array,
+          ls.khal.parseable_format_component_array,
           "{%s}"
-        ), mt._contains.unique_field_separator
-      ) .. mt._contains.unique_record_separator
+        ), fixedstr.unique_field_separator
+      ) .. fixedstr.unique_record_separator
     end,
     basic_command_parts = function(include, exclude)
       local command = " --format=" .. transf.string.single_quoted_escaped(get.khal.parseable_format_specifier())
@@ -1003,7 +1003,7 @@ get = {
     styledtext = function(str, styledtext_attributes_specifier)
       return hs.styledtext.new(str, styledtext_attributes_specifier)
     end,
-    contains_any = function(str, anyof)
+    bool_by_contains_any_w_ascii_string_array = function(str, anyof)
       for i = 1, #anyof do
         local res = stringy.find(str, anyof[i])
         if res then
@@ -1012,7 +1012,7 @@ get = {
       end
       return false
     end,
-    contains_all = function(str, allof)
+    bool_by_contains_all_w_ascii_string_array = function(str, allof)
       for i = 1, #allof do
         local res = stringy.find(str, allof[i])
         if not res then
@@ -1021,7 +1021,7 @@ get = {
       end
       return true
     end,
-    starts_ends = function(str, start, ends)
+    bool_by_starts_ends = function(str, start, ends)
       return transf.string.startswith(str, start) and transf.string.endswith(str, ends)
     end,
     string_by_no_prefix = function(str, prefix)
@@ -1115,6 +1115,28 @@ get = {
           replacement
         )
       end
+      return res
+    end,
+    string_by_replaced_all_w_ascii_string_array = function(str, ascii_string_array, replacement)
+      local res = str
+      for _, ascii_string in transf.array.key_value_stateless_iter(ascii_string_array) do
+        res = plstringx.replace(res, ascii_string, replacement)
+      end
+      return res
+    end,
+    string_by_prepended_all_w_ascii_string_array = function(str, ascii_string_array, prepend)
+      local res = str
+      for _, ascii_string in transf.array.key_value_stateless_iter(ascii_string_array) do
+        res = plstringx.replace(res, ascii_string, prepend .. ascii_string)
+      end
+      return res
+    end,
+    string_by_appended_all_w_ascii_string_array = function(str, ascii_string_array, append)
+      local res = str
+      for _, ascii_string in transf.array.key_value_stateless_iter(ascii_string_array) do
+        res = plstringx.replace(res, ascii_string, ascii_string .. append)
+      end
+      return res
     end,
     string_by_replaced_first_eutf8_w_regex_string_array = function(str, regex_string_array, replacement)
       for _, regex_string in transf.array.key_value_stateless_iter(regex_string_array) do
@@ -1543,7 +1565,7 @@ get = {
   path = {
     usable_as_filetype = function(path, filetype)
       local extension = transf.path.normalized_extension(path)
-      if get.array.contains(mt._list.filetype[filetype], extension) then
+      if get.array.contains(ls.filetype[filetype], extension) then
         return true
       else
         return false
@@ -1994,7 +2016,7 @@ get = {
       return eutf8.sub(prefixed_header, #header + 2) -- +2 for the colon and the space
     end,
     addresses = function(path, header, only)
-      if not get.array.bool_by_contains(mt._list.email_headers_containin_emails, header) then
+      if not get.array.bool_by_contains(ls.email_headers_containin_emails, header) then
         error("Header can't contain email addresses")
       end
       only = get.any.default_if_nil(only, true)
@@ -2144,11 +2166,11 @@ get = {
   date_component_name = {
     next = function(component, n)
       n = n or 0
-      return get.array.any_by_next_w_index(mt._list.date.date_component_names, transf.date_component_name.date_component_index(component) + n)
+      return get.array.any_by_next_w_index(ls.date.date_component_names, transf.date_component_name.date_component_index(component) + n)
     end,
     previous = function(component, n)
       n = n or 0
-      return get.array.previous(mt._list.date.date_component_names, transf.date_component_name.date_component_index(component) - n)
+      return get.array.previous(ls.date.date_component_names, transf.date_component_name.date_component_index(component) - n)
     end,
   },
   date = {

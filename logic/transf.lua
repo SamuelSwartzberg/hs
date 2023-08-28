@@ -644,8 +644,8 @@ transf = {
       return onig.match(
         leaf,
         ("^(%s(?:_to_%s)?--)?([^%%]*)(%%.*)?$"):format(
-          mt._r.date.rfc3339like_dt,
-          mt._r.date.rfc3339like_dt
+          r.g.date.rfc3339like_dt,
+          r.g.date.rfc3339like_dt
         )
       )
     end,
@@ -695,7 +695,7 @@ transf = {
       elseif not stringy.find(leaf, ".") then
         without_extension = leaf
       else -- in case of multiple dots, everything after the last dot is considered the extension
-        without_extension, extension = eutf8.match(leaf, transf.string.whole_regex(mt._r_lua.without_extension_and_extension))
+        without_extension, extension = eutf8.match(leaf, transf.string.whole_regex(r.g_lua.without_extension_and_extension))
       end
       dothis.array.push(path_components, without_extension)
       dothis.array.push(path_components, extension)
@@ -1297,7 +1297,7 @@ transf = {
       return transf.url.sld(transf.in_git_dir.remote_url(path))
     end,
     remote_type = function(path)
-      if get.array.bool_by_contains(mt._list.remote_types, transf.in_git_dir.remote_sld(path)) then
+      if get.array.bool_by_contains(ls.remote_types, transf.in_git_dir.remote_sld(path)) then
         return transf.in_git_dir.remote_sld(path)
       else
         return tblmap.host.remote_type[transf.in_git_dir.remote_host(path)] -- we'll hardcode known hosts there
@@ -1841,11 +1841,11 @@ transf = {
     last_line = function(path)
       return transf.string.last_line(transf.plaintext_file.string_by_contents(path))
     end,
-    bytechars = function(path)
-      return transf.string.bytechar_array(transf.plaintext_file.string_by_contents(path))
+    byte_char_array = function(path)
+      return transf.string.byte_char_array(transf.plaintext_file.string_by_contents(path))
     end,
-    chars = function(path)
-      return transf.string.char_array(transf.plaintext_file.string_by_contents(path))
+    utf8_char_array = function(path)
+      return transf.string.utf8_char_array(transf.plaintext_file.string_by_contents(path))
     end,
     no_final_newlines = function(path)
       return transf.string.no_final_newlines(transf.plaintext_file.string_by_contents(path))
@@ -1856,11 +1856,11 @@ transf = {
     len_lines = function(path)
       return transf.string.len_lines(transf.plaintext_file.string_by_contents(path))
     end,
-    len_chars = function(path)
-      return transf.string.len_chars(transf.plaintext_file.string_by_contents(path))
+    pos_int_by_len_utf8_chars = function(path)
+      return transf.string.pos_int_by_len_utf8_chars(transf.plaintext_file.string_by_contents(path))
     end,
-    len_bytechars = function(path)
-      return transf.string.len_bytechars(transf.plaintext_file.string_by_contents(path))
+    pos_int_by_len_byte_chars = function(path)
+      return transf.string.pos_int_by_len_byte_chars(transf.plaintext_file.string_by_contents(path))
     end,
 
     
@@ -1921,7 +1921,7 @@ transf = {
   },
   semver_string = {
     semver_component_specifier = function(str)
-      local major, minor, patch, prerelease, build = onig.match(str, mt._r.version.semver)
+      local major, minor, patch, prerelease, build = onig.match(str, r.g.version.semver)
       return {
         major = get.string_or_number.number_or_nil(major),
         minor = get.string_or_number.number_or_nil(minor),
@@ -2054,10 +2054,10 @@ transf = {
   },
   date_component_name = {
     date_component_name_array_larger_or_same = function(date_component_name)
-      return get.array.array_by_slice_w_3_pos_int_any_or_nils(mt._list.date.date_component_names, 1, date_component_name)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(ls.date.date_component_names, 1, date_component_name)
     end,
     date_component_name_array_same_or_smaller = function(date_component_name)
-      return get.array.array_by_slice_w_3_pos_int_any_or_nils(mt._list.date.date_component_names, date_component_name)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(ls.date.date_component_names, date_component_name)
     end,
     date_component_index = function(date_component_name)
       return tblmap.date_component_name.date_component_index[date_component_name]
@@ -2095,7 +2095,7 @@ transf = {
       )[#arr]
     end,
     date_component_name_array_inverse = function(arr)
-      return transf.two_arrays.set_by_difference(mt._list.date.date_component_names, arr)
+      return transf.two_arrays.set_by_difference(ls.date.date_component_names, arr)
     end,
     rfc3339like_dt_separator_array  = function(arr)
       return get.array.array_by_mapped_w_t_key_dict(
@@ -2120,8 +2120,8 @@ transf = {
   },
   rfc3339like_dt = {
     date_component_name_value_dict = function(str)
-      local comps = {onig.match(str, mt._r.date.rfc3339like_dt)}
-      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(mt._list.date.date_component_names, function(k, v)
+      local comps = {onig.match(str, r.g.date.rfc3339like_dt)}
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.date.date_component_names, function(k, v)
         return v and get.string_or_number.number_or_nil(comps[k]) or nil
       end)
     end,
@@ -2545,7 +2545,7 @@ transf = {
     end, 
     prefix_date_component_name_value_dict = function(date_component_name_value_dict)
       local res = {}
-      for _, date_component_name in transf.array.index_value_stateless_iter(mt._list.date.date_component_names) do
+      for _, date_component_name in transf.array.index_value_stateless_iter(ls.date.date_component_names) do
         if date_component_name_value_dict[date_component_name] == nil then
           return res
         end
@@ -2566,7 +2566,7 @@ transf = {
     --- i.e. { month = 02, hour = 12 } will return { "year", "month", "day", "hour" }
     --- this should be equal to prefix_date_component_name_ordered_list_set if date_component_name_value_dict is a prefix_date_component_name_value_dict since prefix_ is defined as having no nil values before potential trailing nil values
     prefix_date_component_name_ordered_list_no_trailing_nil = function(date_component_name_value_dict)
-      local ol = get.table.table_by_copy(mt._list.date.date_component_names)
+      local ol = get.table.table_by_copy(ls.date.date_component_names)
       while(date_component_name_value_dict[
         ol[#ol]
       ] == nil) do
@@ -2745,7 +2745,7 @@ transf = {
       -- In the vCard standard, some properties can have vcard_types. 
       -- For example, a phone number can be 'work' or 'home'. 
       -- Here, we're iterating over the keys in the contact data that have associated vcard_types.
-      for _, vcard_key in transf.array.index_value_stateless_iter(mt._list.vcard.keys_with_vcard_type) do
+      for _, vcard_key in transf.array.index_value_stateless_iter(ls.vcard.keys_with_vcard_type) do
       
           -- We iterate over each of these keys. Each key can have multiple vcard_types, 
           -- which we get as a comma-separated string (type_list). 
@@ -3406,10 +3406,18 @@ transf = {
       )(str)
     end,
     escaped_lua_regex = function(str)
-      return replace(str, to.regex.escaped_lua_regex)
+      return get.string.string_by_prepended_all_w_ascii_string_array(
+        str,
+        ls.lua_regex_metacharacters,
+        "%"
+      )
     end,
     escaped_general_regex = function(str)
-      return replace(str, to.regex.escaped_general_regex)
+      return get.string.string_by_prepended_all_w_ascii_string_array(
+        str,
+        ls.general_regex_metacharacters,
+        "%"
+      )
     end,
     window_array_by_pattern = function(str)
       local res = hs.window.find(str)
@@ -3625,7 +3633,7 @@ transf = {
     end,
     --- @param str string
     --- @return string[]
-    bytechar_array = function(str)
+    byte_char_array = function(str)
       local t = {}
       for i = 1, #str do
         t[i] = str:sub(i, i)
@@ -3633,14 +3641,14 @@ transf = {
       return t
     end,
 
-    len_bytechars = function(str)
-      return #transf.string.bytechar_array(str)
+    pos_int_by_len_byte_chars = function(str)
+      return #transf.string.byte_char_array(str)
     end,
 
 
     --- @param str string
     --- @return string[]
-    char_array = function(str)
+    utf8_char_array = function(str)
       local t = {}
       for i = 1, eutf8.len(str) do
         t[i] = eutf8.sub(str, i, i)
@@ -3648,8 +3656,8 @@ transf = {
       return t
     end,
 
-    len_chars = function(str)
-      return #transf.string.char_array(str)
+    pos_int_by_len_utf8_chars = function(str)
+      return #transf.string.utf8_char_array(str)
     end,
 
     --- @param str string
@@ -3719,10 +3727,10 @@ transf = {
       return contact
     end,
     event_table = function(str)
-      local components = plstringx.split(str, mt._contains.unique_field_separator)
+      local components = plstringx.split(str, fixedstr.unique_field_separator)
       local parsed = ovtable.new()
       for i, component in transf.array.index_value_stateless_iter(components) do
-        local key = mt._list.khal.parseable_format_components[i]
+        local key = ls.khal.parseable_format_components[i]
         if key == "alarms" then
           parsed[key] = stringy.split(component, ",")
         elseif key == "description" then
@@ -4144,7 +4152,7 @@ transf = {
     array_of_record_strings = function(str)
       return get.string.string_array_split_noempty(
         str,
-        mt._contains.unique_record_separator
+        fixedstr.unique_record_separator
       )
     end,
     array_of_event_tables = function(str)
@@ -4156,7 +4164,7 @@ transf = {
   },
   word = {
     title_case_policy = function(word)
-      if get.array.bool_by_contains(mt._contains.small_words, word) then
+      if get.array.bool_by_contains(ls.small_words, word) then
         return word
       elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
         return word
@@ -4918,7 +4926,7 @@ transf = {
     --- @return string
     email_header = function(t)
       local header_lines = {}
-      local initial_headers = mt._list.initial_headers
+      local initial_headers = ls.initial_headers
       for _, header_name in transf.array.index_value_stateless_iter(initial_headers) do
         local header_value = t[header_name]
         if header_value then
@@ -5308,7 +5316,7 @@ transf = {
   },
   doi_url = {
     pure_doi = function(url)
-      return onig.match(url, mt._r.id.doi_prefix .. "(.+)/?$")
+      return onig.match(url, r.g.id.doi_prefix .. "(.+)/?$")
     end,
     doi_urnlike = function(url)
       return transf.pure_doi.doi_urnlike(transf.doi_url.pure_doi(url))
@@ -5695,7 +5703,7 @@ transf = {
         transf.dir.absolute_path_array_by_children(
           transf.omegat_project_dir.target_txt_dir(dir)
         ),
-        transf.plaintext_file.chars
+        transf.plaintext_file.utf8_char_array
       )
     end,
     translation_price_specifier_array = function(dir)
@@ -6108,7 +6116,7 @@ transf = {
   },
   csl_table = {
     main_title = function(csl_table)
-      return get.assoc.vt_by_first_match_w_kv_arr(csl_table, mt._list.csl_title_keys)
+      return get.assoc.vt_by_first_match_w_kv_arr(csl_table, ls.csl_title_keys)
     end,
     issued_date_parts_single_or_range = function(csl_table)
       return csl_table.issued
@@ -7158,7 +7166,7 @@ transf = {
     end,
     pandoc_full_md_extension_set = function()
       return transf.array_value_dict.array_by_flatten(
-        mt._list.markdown_extensions
+        ls.markdown_extensions
       )
     end,
     passw_pass_item_name_array = function()
@@ -7886,7 +7894,7 @@ transf = {
           input_spec.key = parts[1]
         end
       else
-        local mode_char, x, y, optional_relative_specifier = onig.match(str, "^(.)"..mt._r.syntax.point.."( %[a-zA-Z]+)?$")
+        local mode_char, x, y, optional_relative_specifier = onig.match(str, "^(.)"..r.g.syntax.point.."( %[a-zA-Z]+)?$")
         if not mode_char or not x or not y then
           error("Tried to parse string series_specifier, but it didn't match any known format:\n\n" .. str)
         end
