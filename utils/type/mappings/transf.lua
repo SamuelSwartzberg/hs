@@ -3553,8 +3553,16 @@ transf = {
     base64_url_string = basexx.to_url64,
     base32_gen_string = basexx.to_base32,
     base32_crock_string = basexx.to_crockford,
-    html_entitiy_encoded_string = htmlEntities.encode,
-    html_entitiy_decoded_string = htmlEntities.decode,
+    string_by_html_entities_encoded = function(str)
+      return transf.string.string_or_err_by_evaled_env_bash_stripped(
+        "he --encode --use-named-refs" .. transf.string.here_string(str)
+      )
+    end,
+    string_by_html_entities_decoded = function(str)
+      return transf.string.string_or_err_by_evaled_env_bash_stripped(
+        "he --decode" .. transf.string.here_string(str)
+      )
+    end,
     two_strings_by_split_header = function(str)
       local k, v = eutf8.match(str, "^([^:]+):%s*(.+)$")
       return transf.string.string_by_initial_lower(k), v
@@ -6461,7 +6469,13 @@ transf = {
       return transf.not_userdata_or_function.in_cache_dir(transf.url.url_by_ensure_scheme(url), "url")
     end,
     url_table = function(url)
-      return get.fn.rt_or_nil_by_memoized(urlparse)(transf.url.url_by_ensure_scheme(url))
+      return get.fn.rt_or_nil_by_memoized(
+        transf.string.table_or_nil_by_evaled_env_bash_parsed_json,
+        {},
+        "transf.string.table_or_nil_by_evaled_env_bash_parsed_json"
+      )(
+        "url_parser_cli --json" .. transf.string.single_quoted_escaped(url)
+      )
     end,
     scheme = function(url)
       return transf.url.url_table(url).scheme
@@ -6491,7 +6505,7 @@ transf = {
       return transf.url.url_table(url).port
     end,
     user = function(url)
-      return transf.url.url_table(url).user
+      return transf.url.url_table(url).username
     end,
     password = function(url)
       return transf.url.url_table(url).password

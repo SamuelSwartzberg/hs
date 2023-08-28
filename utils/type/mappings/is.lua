@@ -127,7 +127,14 @@ is = {
     potentially_indicated_decimal_string = function(str)
       return is.printable_ascii_string.indicated_decimal_string(str) or is.printable_ascii_string.decimal_string(str)
     end,
-    url = isUrl,
+    url = function(str)
+      return get.fn.rt_or_nil_by_memoized(
+        transf.string.bool_by_evaled_env_bash_success,
+        {},
+        "is.printable_ascii_string.url")(
+        "url_parser_cli " .. transf.string.single_quoted_escaped(str)
+      )
+    end,
     alphanum_minus_underscore = function(str)
       return not string.find(str, "[^%w%-_]")
     end,
