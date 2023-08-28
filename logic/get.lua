@@ -632,7 +632,7 @@ get = {
       return hits, get.array_of_arrays.array_of_arrays_by_mapped(
         removed,
         function(arr)
-          return hs.fnutils.imap(
+          return get.array.array_by_mapped_w_t_arg_t_ret_fn(
             arr,
             function()
               return fill
@@ -835,14 +835,14 @@ get = {
       end
     end,
     raw_item_chooser_item_specifier_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.any.item_chooser_item_specifier
       )
     end,
     item_chooser_item_specifier_array = function(arr, target_item_chooser_item_specifier_name)
       if target_item_chooser_item_specifier_name then
-        return hs.fnutils.imap(
+        return get.array.array_by_mapped_w_t_arg_t_ret_fn(
           get.array.raw_item_chooser_item_specifier_array(arr),
           transf.item_chooser_item_specifier[target_item_chooser_item_specifier_name .. "_item_chooser_item_specifier"]
         )
@@ -979,7 +979,7 @@ get = {
     bool_by_contains_w_string = stringy.find,
     split2d = function(str, upper_sep, lower_sep)
       local upper = transf.string.split(str, upper_sep)
-      return hs.fnutils.imap(upper, function(v)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(upper, function(v)
         return transf.string.split(v, lower_sep)
       end)
     end,
@@ -1395,7 +1395,7 @@ get = {
   },
   nonindicated_number_string_array = {
     number_array = function(arr, base)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(
           get.nonindicated_number_string.number_or_nil,
@@ -1449,7 +1449,7 @@ get = {
   },
   string_or_styledtext_array = {
     styledtext_array_merge = function(arr, styledtext_attributes_specifier)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.string_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
       )
@@ -1542,7 +1542,7 @@ get = {
   },
   array_of_string_arrays = {
     array_of_string_records = function(arr, field_sep)
-      return hs.fnutils.imap(arr, function(x) return get.string_or_number_array.string_by_joined(x, field_sep) end)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return get.string_or_number_array.string_by_joined(x, field_sep) end)
     end,
     string_table = function(arr, field_sep, record_sep)
       return get.string_or_number_array.string_by_joined(get.array_of_string_arrays.array_of_string_records(arr, field_sep), record_sep)
@@ -1551,7 +1551,7 @@ get = {
   },
   array_of_tables = {
     array_of_vts_w_kt = function(arr, kt)
-      return hs.fnutils.imap(arr, function(x) return x[kt] end)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return x[kt] end)
     end,
   },
   path_leaf_specifier = {
@@ -2031,7 +2031,7 @@ get = {
     end,
     displayname_addresses_dict_of_dicts = function(path, header)
       local w_displaynames = transf.email_file.addresses(path, header, false)
-      return hs.fnutils.imap(w_displaynames, transf.email_or_displayname_email.displayname_email_dict)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(w_displaynames, transf.email_or_displayname_email.displayname_email_dict)
     end,
 
   },
@@ -2334,7 +2334,7 @@ get = {
     column = plarray2d.column,
     row = plarray2d.row,
     array_of_arrays_by_mapped_if_not_length_0 = function(arr_of_arr, fn)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr_of_arr,
         function(arr)
           if #arr == 0 then
@@ -2346,7 +2346,7 @@ get = {
       )
     end,
     string_by_joined_any_pair_array = function(arr, joiner)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.n_string_or_number_any_array.string_by_joined_any_pair, {a_use, joiner})
       )
@@ -2357,7 +2357,7 @@ get = {
       )
     end,
     array_of_dicts_by_array = function(arr_of_arr, arr2)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr_of_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(transf.two_arrays.dict_by_zip_stop_shortest, {arr2, a_use})
       )
@@ -2375,7 +2375,7 @@ get = {
       )
     end,
     array_of_arrays_by_mapped = function(arr_of_arr, fn)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr_of_arr,
         get.fn.second_n_args_bound_fn(get.array.array_by_mapped, fn)
       )
@@ -2690,7 +2690,7 @@ get = {
       )
     end,
     result_array = function(arr, value)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr, 
         get.fn.arbitrary_args_bound_or_ignored_fn(get.retriever_specifier.result, {a_use, value})
       )
@@ -3260,7 +3260,7 @@ get = {
   },
   tree_node_like_array = {
     tree_node_array = function(tree_node_like_array, treeify_spec)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         tree_node_like_array,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.tree_node_like.tree_node, {a_use, treeify_spec})
       )
@@ -3276,7 +3276,7 @@ get = {
   },
   array_of_n_any_assoc_arrays = {
     array_of_assoc_leaf_labels_with_title_path = function(arr, title_key)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.n_any_assoc_array.leaf_label_with_title_path, {a_use, title_key})
       )

@@ -14,7 +14,7 @@ lemap = {
     fill_template = transf.multiline_string.trimmed_lines_multiline_string([[Fill the following template
     
     {{[
-      get.string_or_number_array.string_by_joined(hs.fnutils.imap(d.form_field_specifier_array, function (form_field_specifier)
+      get.string_or_number_array.string_by_joined(get.array.array_by_mapped_w_t_arg_t_ret_fn(d.form_field_specifier_array, function (form_field_specifier)
         return form_field_specifier.value .. (form_field_specifier.explanation and " (" .. form_field_specifier.explanation .. ")" or "") .. ":"
       end), "\n")
     ]}}

@@ -464,13 +464,13 @@ transf = {
   },
   pos_int_array = {
     unicode_codepoint_string_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.pos_int.unicode_codepoint_string
       )
     end,
     ascii_char_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.pos_int.ascii_char
       )
@@ -492,7 +492,7 @@ transf = {
       )
     end,
     indicated_utf8_hex_string_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.pos_int.indicated_utf8_hex_string
       )
@@ -551,7 +551,7 @@ transf = {
       )
     end,
     string_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.any.string
       )
@@ -987,14 +987,14 @@ transf = {
   },
   path_array = {
     leaves_array = function(path_array)
-      return hs.fnutils.imap(path_array, transf.path.leaf)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(path_array, transf.path.leaf)
     end,
     filenames_array = function(path_array)
-      local filenames = hs.fnutils.imap(path_array, transf.path.filename)
+      local filenames = get.array.array_by_mapped_w_t_arg_t_ret_fn(path_array, transf.path.filename)
       return transf.array.set(filenames)
     end,
     extensions_array = function(path_array)
-      local extensions = hs.fnutils.imap(path_array, transf.path.extension)
+      local extensions = get.array.array_by_mapped_w_t_arg_t_ret_fn(path_array, transf.path.extension)
       return transf.array.set(extensions)
     end,
     extant_path_array = function(path_array)
@@ -1004,7 +1004,7 @@ transf = {
       return get.array.array_by_filtered(path_array, is.path.not_useless_file_leaf)
     end,
     path_leaf_specifier_array = function(path_array)
-      return hs.fnutils.imap(path_array, transf.path.path_leaf_specifier)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(path_array, transf.path.path_leaf_specifier)
     end,
     date_interval_specifier_array = function(path_array)
       return transf.path_leaf_specifier_array.date_interval_specifier_array(
@@ -1111,7 +1111,7 @@ transf = {
   },
   local_file_array = {
     attachment_array = function(path_array)
-      return hs.fnutils.imap(path_array, transf.local_file.attachment_string)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(path_array, transf.local_file.attachment_string)
     end,
     attachment_string = function(path_array)
       return get.string_or_number_array.string_by_joined(transf.path_array.attachment_array(path_array), "\n")
@@ -1767,7 +1767,7 @@ transf = {
 
   env_var_name_value_dict = {
     key_value_and_dependency_dict = function(dict)
-      return hs.fnutils.imap(dict, function(value)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(dict, function(value)
         return {
           value = value,
           dependencies = get.stateless_iter.table(
@@ -2193,7 +2193,7 @@ transf = {
   },
   rfc3339like_interval = {
     start_rfc3339like_dt = function(str)
-      return plstringx.split(str, "_to_")[1]
+      return get.string.string_array_split(str, "_to_")[1]
     end,
     start_date_component_name_value_dict = function(str)
       return transf.rfc3339like_dt.date_component_name_value_dict(
@@ -2211,7 +2211,7 @@ transf = {
       )
     end,
     end_rfc3339like_dt = function(str)
-      return plstringx.split(str, "_to_")[2]
+      return get.string.string_array_split(str, "_to_")[2]
     end,
     end_date_component_name_value_dict = function(str)
       return transf.rfc3339like_dt.date_component_name_value_dict(
@@ -2301,7 +2301,7 @@ transf = {
   },
   rf3339like_dt_or_interval_array = {
     date_interval_specifier_array = function(rf3339like_dt_or_interval_array)
-      return hs.fnutils.imap(rf3339like_dt_or_interval_array, transf.rf3339like_dt_or_interval.date_interval_specifier)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(rf3339like_dt_or_interval_array, transf.rf3339like_dt_or_interval.date_interval_specifier)
     end,
   },
   basic_interval_string = {
@@ -2588,7 +2588,7 @@ transf = {
       return ol
     end,
     rfc3339like_dt_string_format_part_specifier_array = function(date_component_name_value_dict)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.date_component_name_value_dict.prefix_date_component_name_ordered_list_no_trailing_nil(date_component_name_value_dict),
         function(date_component_name)
           return {
@@ -2663,7 +2663,7 @@ transf = {
   string_format_part_specifier_array = {
     string = function(string_format_part_specifier_array)
       return get.string_or_number_array.string_by_joined(
-        hs.fnutils.imap(
+        get.array.array_by_mapped_w_t_arg_t_ret_fn(
           string_format_part_specifier_array,
           transf.string_format_part_specifier.string
         ),
@@ -2768,7 +2768,7 @@ transf = {
               -- We split the type_list into individual vcard_types. This is done because 
               -- each vcard_type might need to be processed independently in the future. 
               -- It also makes the data more structured and easier to handle.
-              local vcard_types = plstringx.split(type_list, ", ")
+              local vcard_types = get.string.string_array_split(type_list, ", ")
         
               -- For each vcard_type, we create a new key-value pair in the contact_table. 
               -- This way, we can access the value directly by vcard_type, 
@@ -3506,7 +3506,7 @@ transf = {
     end,
     upper_camel_snake_case = function(str)
       local parts = transf.string.snake_case_parts(str)
-      local upper_parts = hs.fnutils.imap(parts, transf.string.string_by_first_eutf8_upper)
+      local upper_parts = get.array.array_by_mapped_w_t_arg_t_ret_fn(parts, transf.string.string_by_first_eutf8_upper)
       return get.string_or_number_array.string_by_joined(upper_parts, "_")
     end,
     lower_camel_snake_case = function(str)
@@ -3514,7 +3514,7 @@ transf = {
     end,
     upper_camel_case = function(str)
       local parts = transf.string.snake_case_parts(str)
-      local upper_parts = hs.fnutils.imap(parts, transf.string.string_by_first_eutf8_upper)
+      local upper_parts = get.array.array_by_mapped_w_t_arg_t_ret_fn(parts, transf.string.string_by_first_eutf8_upper)
       return get.string_or_number_array.string_by_joined(upper_parts, "")
     end,
     lower_camel_case = function(str)
@@ -3604,7 +3604,7 @@ transf = {
     end,
     title_case = function(str)
       local words, removed = get.string.two_string_arrays_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
-      local title_cased_words = hs.fnutils.imap(words, transf.word.title_case_policy)
+      local title_cased_words = get.array.array_by_mapped_w_t_arg_t_ret_fn(words, transf.word.title_case_policy)
       title_cased_words[1] = transf.string.string_by_first_eutf8_upper(title_cased_words[1])
       title_cased_words[#title_cased_words] = transf.string.string_by_first_eutf8_upper(title_cased_words[#title_cased_words])
       local arr = transf.two_arrays.array_by_interleaved_stop_a1(title_cased_words, removed)
@@ -3740,7 +3740,7 @@ transf = {
       return contact
     end,
     event_table = function(str)
-      local components = plstringx.split(str, fixedstr.unique_field_separator)
+      local components = get.string.string_array_split(str, fixedstr.unique_field_separator)
       local parsed = ovtable.new()
       for i, component in transf.array.index_value_stateless_iter(components) do
         local key = ls.khal.parseable_format_components[i]
@@ -3795,8 +3795,8 @@ transf = {
     email_quoted = function(str)
       return plstringx.join(
         "\n",
-        hs.fnutils.imap(
-          plstringx.splitlines(
+        get.array.array_by_mapped_w_t_arg_t_ret_fn(
+          get.string.string_array_splitlines(
             stringy.strip(str)
           ),
           function(v)
@@ -3862,13 +3862,13 @@ transf = {
       return eutf8.match(str, "^%s*(.*)$")
     end,
     nocomment = function(str)
-      return plstringx.split(str, " # ")[1]
+      return get.string.string_array_split(str, " # ")[1]
     end,
     nocomment_noindent = function(str)
       return transf.line.noindent(transf.line.nocomment(str))
     end,
     comment = function(str)
-      return plstringx.split(str, " # ")[2]
+      return get.string.string_array_split(str, " # ")[2]
     end,
   },
   potentially_atpath = {
@@ -4131,7 +4131,7 @@ transf = {
   multiline_string = {
     trimmed_lines_multiline_string = function(str)
       local lines = get.string.string_array_split(str, "\n")
-      local trimmed_lines = hs.fnutils.imap(lines, stringy.strip)
+      local trimmed_lines = get.array.array_by_mapped_w_t_arg_t_ret_fn(lines, stringy.strip)
       return get.string_or_number_array.string_by_joined(trimmed_lines, "\n")
     end,
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_array_value_dict_value_dict = function(raw)
@@ -4169,7 +4169,7 @@ transf = {
       )
     end,
     array_of_event_tables = function(str)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.multirecord_string.array_of_record_strings(str),
         transf.string.event_table
       )
@@ -4189,7 +4189,7 @@ transf = {
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.string.single_quoted_escaped(str) )
     end,
     term_syn_specifier_dict = function(str)
-      local synonym_parts = plstringx.split(transf.word.raw_syn_output(str), "\n\n")
+      local synonym_parts = get.string.string_array_split(transf.word.raw_syn_output(str), "\n\n")
       local synonym_tables = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         synonym_parts,
         function (synonym_part)
@@ -4197,8 +4197,8 @@ transf = {
           local synonym_term = eutf8.sub(synonym_part_lines[1], 2) -- syntax: ❯<term>
           local synonyms_raw = eutf8.sub(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
           local antonyms_raw = eutf8.sub(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
-          local synonyms = hs.fnutils.imap(stringy.split(synonyms_raw, ", "), stringy.strip)
-          local antonyms = hs.fnutils.imap(stringy.split(antonyms_raw, ", "), stringy.strip)
+          local synonyms = get.array.array_by_mapped_w_t_arg_t_ret_fn(stringy.split(synonyms_raw, ", "), stringy.strip)
+          local antonyms = get.array.array_by_mapped_w_t_arg_t_ret_fn(stringy.split(antonyms_raw, ", "), stringy.strip)
           return synonym_term, {
             synonyms = synonyms,
             antonyms = antonyms,
@@ -4434,7 +4434,7 @@ transf = {
   string_array = {
     repeated_option_string = function(arr, opt)
       return get.string_or_number_array.string_by_joined(
-        hs.fnutils.imap(
+        get.array.array_by_mapped_w_t_arg_t_ret_fn(
           arr,
           function (itm)
             return " " .. opt .. " " .. itm
@@ -4444,7 +4444,7 @@ transf = {
       )
     end,
     single_quoted_escaped_string_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.string.single_quoted_escaped
       )
@@ -4460,7 +4460,7 @@ transf = {
     end,
     path = function(arr)
       return get.string_or_number_array.string_by_joined(
-        hs.fnutils.imap(arr, transf.string.safe_filename), 
+        get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.string.safe_filename), 
         "/"
       )
     end,
@@ -4468,7 +4468,7 @@ transf = {
       return get.array.array_by_filtered(arr, is.string.noempty_string)
     end,
     noindent_string_array = function(arr)
-      return hs.fnutils.imap(arr, transf.line.noindent)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent)
     end,
     nocomment_line_filtered_string_array = function(arr)
       return get.array.array_by_filtered(
@@ -4477,7 +4477,7 @@ transf = {
       )
     end,
     nocomment_string_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.string_array.nocomment_line_filtered_string_array(arr),
         transf.line.nocomment
       )
@@ -4501,7 +4501,7 @@ transf = {
       )
     end,
     stripped_string_array = function(arr)
-      return hs.fnutils.imap(arr, stringy.strip)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, stringy.strip)
     end,
     multiline_string = function(arr)
       return get.string_or_number_array.string_by_joined(arr, "\n")
@@ -4689,7 +4689,7 @@ transf = {
   },
   url_array = {
     url_potentially_with_title_comment_array = function(sgml_url_array)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         sgml_url_array,
         transf.url.url_potentially_with_title_comment
       )
@@ -4713,7 +4713,7 @@ transf = {
   },
   sgml_url_array = {
     sgml_url_with_title_comment_array = function(sgml_url_array)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         sgml_url_array,
         transf.sgml_url.sgml_url_with_title_comment
       )
@@ -4725,7 +4725,7 @@ transf = {
   },
   plaintext_file_array = {
     string_array_by_contents = function(arr)
-      return hs.fnutils.imap(arr, transf.plaintext_file.string_by_contents)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.plaintext_file.string_by_contents)
     end,
     string_array_by_lines = function(arr)
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.string_array_by_lines)
@@ -4930,7 +4930,7 @@ transf = {
       return #transf.table.pair_array(t)
     end,
     url_param_array = function(t)
-      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.url_param)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_array(t), transf.pair.url_param)
     end,
     url_params = function(t)
       return get.string_or_number_array.string_by_joined(transf.dict.url_param_array(t), "&")
@@ -4949,7 +4949,7 @@ transf = {
       end
       header_lines = transf.two_arrays.array_by_appended(
         header_lines,
-        hs.fnutils.imap(
+        get.array.array_by_mapped_w_t_arg_t_ret_fn(
           transf.table.pair_array_by_sorted_larger_key_first(t),
           transf.pair.email_header
         )
@@ -4958,20 +4958,20 @@ transf = {
     end,
     curl_form_field_array = function(t)
       return transf.array_of_arrays.array_by_flatten(
-        hs.fnutils.imap(transf.table.pair_array(t), transf.pair.curl_form_field_args)
+        get.array.array_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_array(t), transf.pair.curl_form_field_args)
       )
     end,
     ini_line_array = function(t)
-      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.ini_line)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_array(t), transf.pair.ini_line)
     end,
     ini_string = function(t)
       return get.string_or_number_array.string_by_joined(transf.dict.ini_line_array(t), "\n")
     end,
     envlike_line_array = function(t)
-      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.envlike_line)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_array(t), transf.pair.envlike_line)
     end,
     dict_entry_string_array = function(t)
-      return hs.fnutils.imap(transf.table.pair_array(t), transf.pair.dict_entry_string)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_array(t), transf.pair.dict_entry_string)
     end,
     contents_summary = function(t)
       return transf.string_array.contents_summary(
@@ -5071,7 +5071,7 @@ transf = {
   },
   string_boolean_dict = {
     truthy_long_flag_array = function(dict)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.dict.truthy_value_key_array(dict),
         transf.word.long_flag
       )
@@ -5096,10 +5096,10 @@ transf = {
 
     array_by_flatten = plarray2d.flatten,
     array_by_map_to_last = function(arr)
-      return hs.fnutils.imap(arr, transf.array.t_by_last)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.array.t_by_last)
     end,
     array_by_map_to_first = function(arr)
-      return hs.fnutils.imap(arr, transf.array.t_by_first)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.array.t_by_first)
     end,
     array_by_longest_common_prefix = function(a_o_a)
       local last_matching_index = 0
@@ -5117,7 +5117,7 @@ transf = {
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(a_o_a[1], 1, last_matching_index)
     end,
     array_of_arrays_by_reverse = function(arr)
-      return hs.fnutils.imap(arr, transf.array.array_by_reverse)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.array.array_by_reverse)
     end,
     array_by_longest_common_suffix = function(arr)
       local reversed_res = transf.array.array_by_longest_common_prefix(
@@ -5137,7 +5137,7 @@ transf = {
   },
   string_pair_array = {
     env_line_array = function (arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(pair)
           return "export " .. pair[1] .. "=" .. transf.string.double_quoted_escaped(pair[2])
@@ -5161,7 +5161,7 @@ transf = {
   },
   dict_of_string_value_dicts = {
     ini_string = function(t)
-      return get.string_or_number_array.string_by_joined(hs.fnutils.imap(
+      return get.string_or_number_array.string_by_joined(get.array.array_by_mapped_w_t_arg_t_ret_fn(
         t,
         function(k,v)
           return "[" .. k .. "]\n" .. transf.dict.ini_string(v)
@@ -5458,10 +5458,15 @@ transf = {
   },
   citable_filename = {
     filename_safe_indicated_citable_object_id = function(filename)
-      return plstringx.split(filename, "!citid:")[2]
+      return get.string.string_array_split(filename, "!citid:")[2]
     end,
     indicated_citable_object_id = function(filename)
       return transf.string.string_by_percent_decoded_also_plus(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
+    end,
+    csl_table = function(filename)
+      return transf.indicated_citable_object_id.local_csl_table(
+        transf.citable_filename.indicated_citable_object_id(filename)
+      )
     end,
   },
   citable_path = {
@@ -5475,6 +5480,16 @@ transf = {
         transf.path.filename(path)
       )
     end,
+    csl_table = function(path)
+      return transf.citable_filename.csl_table(
+        transf.path.filename(path)
+      )
+    end,
+  },
+  citable_path_array = {
+    csl_table_array = function(arr)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.citable_path.csl_table)
+    end
   },
   citable_object_file ={ -- file with a citable_filename containing the data (e.g. pdf) of a citable object
 
@@ -5501,7 +5516,7 @@ transf = {
   },
   indicated_citable_object_id_array = {
     local_csl_table_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.indicated_citable_object_id.local_csl_table
       )
@@ -5521,7 +5536,7 @@ transf = {
       )
     end,
     citations_file_line_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.indicated_citable_object_id_array.local_csl_table_array(arr),
         transf.csl_table.citations_file_line
       )
@@ -5712,7 +5727,7 @@ transf = {
       return transf.path.ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".md"
     end,
     target_file_num_chars_array = function(dir)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.dir.absolute_path_array_by_children(
           transf.omegat_project_dir.target_txt_dir(dir)
         ),
@@ -5721,7 +5736,7 @@ transf = {
     end,
     translation_price_specifier_array = function(dir)
       local num_chars_array = transf.omegat_project_dir.target_file_num_char_array(dir)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         num_chars_array,
         function(num_chars)
           local normzeilen = transf.num_chars.normzeilen(num_chars)
@@ -5773,7 +5788,7 @@ transf = {
     translation_price_block_german = function(spec)
       return 
         get.string_or_number_array.string_by_joined(
-          hs.fnutils.imap(
+          get.array.array_by_mapped_w_t_arg_t_ret_fn(
             spec.translation_price_specifier_array,
             function(v)
               return ("%d Zeilen @ %.2f€ = %d€"):format(
@@ -6090,7 +6105,7 @@ transf = {
   },
   csl_table_array = {
     bib_string_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.csl_table.bib_string
       )
@@ -6103,7 +6118,7 @@ transf = {
     end,
     json_string = transf.not_userdata_or_function.json_string,
     indicated_citable_object_id_array = function(arr)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.csl_table.indicated_citable_object_id
       )
@@ -6114,7 +6129,7 @@ transf = {
       )
     end,
     url_array = function(csl_table_array)
-      return hs.fnutils.imap(csl_table_array, transf.csl_table.url)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(csl_table_array, transf.csl_table.url)
     end,
 
   },
@@ -6162,7 +6177,7 @@ transf = {
     end,
     naive_author_summary = function(csl_table)
       return get.string_or_number_array.string_by_joined(
-        hs.fnutils.imap(
+        get.array.array_by_mapped_w_t_arg_t_ret_fn(
           transf.csl_table.author_array(csl_table),
           transf.csl_person.naive_name
         ),
@@ -6170,7 +6185,7 @@ transf = {
       )
     end,
     author_last_name_array = function(csl_table)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.csl_table.author_array(csl_table),
         transf.csl_person.family
       )
@@ -6882,7 +6897,7 @@ transf = {
       local no_scheme = transf.url.no_scheme(mailto_url)
       local emails_part = stringy.split(no_scheme, "?")[1]
       local emails = stringy.split(emails_part, ",")
-      return hs.fnutils.imap(emails, stringy.strip)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(emails, stringy.strip)
     end,
     first_email = function(mailto_url)
       return transf.mailto_url.emails(mailto_url)[1]
@@ -7062,7 +7077,7 @@ transf = {
     env_string = function(env_yaml_file_container)
       local files = transf.extant_path.file_array_by_descendants(env_yaml_file_container)
       local yaml_files = get.path_array.path_array_by_filter_to_same_extension(files, "yaml")
-      local env_var_name_env_node_dict_array = hs.fnutils.imap(
+      local env_var_name_env_node_dict_array = get.array.array_by_mapped_w_t_arg_t_ret_fn(
         yaml_files,
         transf.yaml_file.not_userdata_or_function
       )
@@ -7246,7 +7261,7 @@ transf = {
       )
     end,
     contact_uid_array = function()
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         stringy.split(transf["nil"].string_by_khard_list_output(), "\n"), 
         function (line)
           return stringy.split(line, "\t")[1]
@@ -7254,7 +7269,7 @@ transf = {
       )
     end,
     contact_table_array = function()
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf["nil"].contact_uid_array(),
         function(uid)
           return transf.uuid.contact_table(uid)
@@ -7310,7 +7325,7 @@ transf = {
   },
   action_specifier_array = {
     action_chooser_item_specifier_array = function(action_specifier_array)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         action_specifier_array,
         transf.action_specifier.action_chooser_item_specifier
       )
@@ -7377,7 +7392,7 @@ transf = {
       )
     end,
     chooser_image_retriever_specifier_array = function(thing_name_array)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         thing_name_array,
         function(thing_name)
           local spec = tblmap.thing_name.chooser_image_partial_retriever_specifier(thing_name)
@@ -7508,7 +7523,7 @@ transf = {
     end,
     summary_line_emoji = function(mpv_ipc_socket_id)
       return get.string_or_number_array.string_by_joined(
-        hs.fnutils.imap(
+        get.array.array_by_mapped_w_t_arg_t_ret_fn(
           {"pause", "loop", "shuffle", "video"},
           get.fn.first_n_args_bound_fn(get.mpv_ipc_socket_id.boolean_emoji, mpv_ipc_socket_id)
         ),
@@ -7931,7 +7946,7 @@ transf = {
   },
   input_spec_string_array = {
     input_spec_array = function(str_array)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         str_array,
         transf.input_spec_string.input_spec
       )
@@ -7942,7 +7957,7 @@ transf = {
       return transf.hole_y_arraylike.array(get.string.string_array_split_single_char_stripped(str, "\n"))
     end,
     input_spec_array = function(str)
-      return hs.fnutils.imap(
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.input_spec_series_string.input_spec_string_array(str),
         transf.input_spec_string.input_spec
       )

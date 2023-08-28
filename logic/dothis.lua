@@ -1210,7 +1210,7 @@ dothis = {
   },
   plaintext_table_file = {
     append_array_of_arrays_of_fields = function(path, array_of_arrays_of_fields)
-      local lines = hs.fnutils.imap(array_of_arrays_of_fields, function (arr)
+      local lines = get.array.array_by_mapped_w_t_arg_t_ret_fn(array_of_arrays_of_fields, function (arr)
         return get.string_or_number_array.string_by_joined(arr, transf.plaintext_table_file.field_separator())
       end)
       dothis.plaintext_file.append_lines(path, lines)
