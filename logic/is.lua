@@ -41,6 +41,12 @@ is = {
     nowhitespace_string = function(str)
       return get.string.bool_by_not_matches_part_eutf8(str, "%s")
     end,
+    starting_with_dot_string = function(str)
+      return get.string.bool_by_startswith(str, ".")
+    end,
+    not_starting_with_dot_string = function(str)
+      return not is.string.starting_with_dot_string(str)
+    end,
   },
   line = {
     comment_line = function(str)
@@ -287,6 +293,13 @@ is = {
     citable_path = function(path)
       return 
         is.printable_ascii_string.citable_filename(transf.path.leaf(path)) 
+    end,
+    dotfilename_path = function(path)
+      return 
+        is.string.starting_with_dot_string(transf.path.leaf(path))
+    end,
+    not_dotfilename_path = function(path)
+      return not is.path.dotfilename_path(path)
     end,
   },
   citable_path = {
@@ -982,7 +995,7 @@ is = {
   },
   audiodevice_specifier = {
     active_audiodevice_specifier = function(audiodevice_specifier)
-      return get.audiodevice.is_active_audiodevice_specifier(audiodevice_specifier.device, audiodevice_specifier.subtype)
+      return get.audiodevice.is_active_audiodevice(audiodevice_specifier.device, audiodevice_specifier.subtype)
     end,
   },
   csl_table = {

@@ -82,7 +82,7 @@ main_qspec = {
 }
 
 local function createCSLArray()
-  return st(env.MCITATIONS)
+  return st()
     :get("descendant-file-only-string-item-array")
     :get("map-to-new-array", function(file) 
       return transf.table_array.item_array_of_item_tables(transf.bib_file.array_of_csl_tables(file:get("contents")))
@@ -136,7 +136,7 @@ local keymap = {
   },
   ["6"] = {
     explanation = "Enable and disable mullvad",
-    fn = dothis.["nil"].mullvad_toggle
+    fn = dothis["nil"].mullvad_toggle
   },
   ["7"] = {
     explanation = "Switch ·to a different mullvad server",
@@ -156,17 +156,17 @@ local keymap = {
   ["9"] = {
     explanation = "Switch the active input audiodevice",
     fn = function()
-      System
-        :get("all-input-devices-audiodevice-array")
-        :doThis("choose-and-set-default")
+      dothis.audiodevice_specifier_array.choose_item_and_set_default(
+        transf.audiodevice_type.audiodevice_specifier_array("input")
+      )
     end,
   },
   ["0"] = {
     explanation = "Switch the active output audiodevice",
     fn = function() 
-      System
-        :get("all-output-devices-audiodevice-array")
-        :doThis("choose-and-set-default")
+      dothis.audiodevice_specifier_array.choose_item_and_set_default(
+        transf.audiodevice_type.audiodevice_specifier_array("output")
+      )
     end,
   },
   ["-"] = {
@@ -302,9 +302,9 @@ local keymap = {
   g = {
     explanation = "Choose an item from the clipboard and then an action on it.",
     fn = function()
-      System:get("manager", "clipboard")
-        :get("first")
-        :doThis("choose-action")
+      dothis.any.choose_action(
+        pasteboard_arr[1]
+      )
     end,
   },
   h = nil, -- unassigned
@@ -315,8 +315,13 @@ local keymap = {
   ["'"] = {
     explanation = "Choose a citation item, and then choose an action on it.",
     fn = function()
-      get.fn.rt_or_nil_by_memoized(createCSLArray)()
-        :doThis("choose-item-and-then-action")
+      dothis.array.choose_item_and_action(
+        transf.path_array.csl_table_array_by_filtered_mapped(
+          transf.extant_path.file_array_by_descendants(
+            env.MCITATIONS
+          )
+        )
+      )
     end,
   },
   ["\\"] = {

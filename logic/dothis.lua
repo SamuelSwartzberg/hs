@@ -842,7 +842,7 @@ dothis = {
       dothis.local_absolute_path_array.delete(arr)
     end,
     link_into_local_absolute_path = function(arr, tgt)
-      hs.fnutils.ieach(
+      dothis.array.each(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(
           dothis.local_extant_path.link_into_local_absolute_path,
@@ -1052,13 +1052,13 @@ dothis = {
   },
   extant_path_array = {
     copy_into_absolute_path = function(arr, tgt)
-      hs.fnutils.ieach(
+      dothis.array.each(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(dothis.extant_path.copy_into_absolute_path, {a_use, tgt})
       )
     end,
     move_into_absolute_path = function(arr, tgt)
-      hs.fnutils.ieach(
+      dothis.array.each(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(dothis.extant_path.move_into_absolute_path, {a_use, tgt})
       )
@@ -1200,7 +1200,7 @@ dothis = {
     end,
     find_remove_nocomment_noindent_line = function(path, cond)
       local lines = transf.plaintext_file.string_array_by_lines(path)
-      local index = hs.fnutils.find(lines, function(line)
+      local index = get.array.pos_int_or_nil_by_first_match_w_fn(lines, function(line)
         local nocomment_noindent = transf.line.nocomment_noindent(line)
         return findsingle(nocomment_noindent, cond)
       end)
@@ -1219,7 +1219,7 @@ dothis = {
   },
   plaintext_url_or_local_path_file = {
     open_all = function(path, browser)
-      hs.fnutils.ieach(
+      dothis.array.each(
         transf.plaintext_file.nocomment_noindent_content_lines(path),
         get.fn.arbitrary_args_bound_or_ignored_fn(dothis.url_or_local_path.open_browser, {a_use, browser})
       )
@@ -1463,14 +1463,7 @@ dothis = {
       )
     end,
   },
-  audiodevice_system = {
-    ensure_sound_played_on_speakers = function()
-      local device = hs.audiodevice.findOutputByName("Built-in Output")
-      dothis.audiodevice.ensure_sound_will_be_played(device)
-      dothis.audiodevice.set_default(device, "output")
-    end,
-  },
-  audiodevice_array = {
+  audiodevice_specifier_array = {
     choose_item_and_set_default = function(array)
       dothis.array.choose_item(
         array,
@@ -1988,7 +1981,7 @@ dothis = {
       dothis.running_application.focus_main_window(running_application)
     end,
     generate_target_txts = function(dir, do_after)
-      hs.fnutils.ieach(
+      dothis.array.each(
         transf.omegat_project_dir.target_files(dir),
         function(file)
           transf.string.string_or_nil_by_evaled_env_bash_stripped("soffice --headless --convert-to txt:Text --outdir"..
@@ -2257,6 +2250,7 @@ dothis = {
         end
       end
     end,
+    each = hs.fnutils.ieach,
     each_with_delay = function(array, delay, fn, do_after)
       local next_item = transf.array.index_value_stateful_iter(array)
       local do_next_item
@@ -2551,7 +2545,7 @@ dothis = {
       end
     end,
     create_or_recreate_all = function (arr, creation_specifier_arr)
-      hs.fnutils.ieach(creation_specifier_arr, function(creation_specifier)
+      dothis.array.each(creation_specifier_arr, function(creation_specifier)
         dothis.created_item_specifier_array.create_or_recreate(arr, creation_specifier)
       end)
     end

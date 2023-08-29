@@ -168,9 +168,6 @@ get = {
     
   },
   ["nil"] = {
-    default_audiodevice = function(type)
-      return hs.audiodevice["default" .. transf.string.string_by_first_eutf8_upper(type) .. "Device"]()
-    end,
     nth_arg_ret_fn = function(_, n)
       return function(...)
         return select(n, ...)
@@ -178,13 +175,23 @@ get = {
     end,
   },
   audiodevice_specifier = {
-
+    is_active_audiodevice_specifier = function (spec)
+      return get.audiodevice.is_active_audiodevice(
+        spec.device,
+        spec.type
+      )
+    end,
   },
   audiodevice = {
-    is_active_audiodevice_specifier = function (device, type)
-      return device == get["nil"].default_audiodevice(type)
+    is_active_audiodevice = function (device, type)
+      return device == transf.audiodevice_type.default_audiodevice(type)
     end,
-    
+    audiodevice_specifier = function (device, type)
+      return {
+        device = device,
+        type = type,
+      }
+    end,
   },
   contact_table = {
     encrypted_data = function(contact_table, type)
@@ -1796,7 +1803,7 @@ get = {
     end,
     extant_path_by_self_or_ancestor_siblings_w_fn = function(path, fn)
       return get.extant_path.extant_path_by_self_or_ancestor_w_fn(path, function(x)
-        return hs.fnutils.find(transf.dir.absolute_path_array_by_children(transf.path.parent_path(x)), fn)
+        return get.array.pos_int_or_nil_by_first_match_w_fn(transf.dir.absolute_path_array_by_children(transf.path.parent_path(x)), fn)
       end)
     end,
     extant_path_by_self_or_ancestor_sibling_w_leaf = function(path, leaf)
@@ -1812,7 +1819,7 @@ get = {
       end
     end,
     extant_path_by_descendant_w_fn = function(path, cond)
-      return hs.fnutils.find(transf.extant_path.descendants_absolute_path_array(path), cond)
+      return get.array.pos_int_or_nil_by_first_match_w_fn(transf.extant_path.descendants_absolute_path_array(path), cond)
     end,
     find_descendant_ending_with = function(path, ending)
       return get.path_array.path_or_nil_by_first_ending_find_ending_w_string(transf.extant_path.descendants_absolute_path_array(path), ending)
@@ -1892,7 +1899,7 @@ get = {
   },
   dir = {
     extant_path_by_child_w_fn = function(dir, fn)
-      return hs.fnutils.find(transf.dir.absolute_path_array_by_children(dir), fn)
+      return get.array.pos_int_or_nil_by_first_match_w_fn(transf.dir.absolute_path_array_by_children(dir), fn)
     end,
     extant_path_by_child_ending = function(dir, ending)
       return get.path_array.path_or_nil_by_first_ending_find_ending_w_string(transf.dir.absolute_path_array_by_children(dir), ending)

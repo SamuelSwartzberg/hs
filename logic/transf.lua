@@ -5948,7 +5948,7 @@ transf = {
     native_window_index = function(window)
       local running_application = transf.window.running_application(window)
       local window_array = transf.running_application.window_array(running_application)
-      return hs.fnutils.find(
+      return get.array.pos_int_or_nil_by_first_match_w_fn(
         window_array,
         function(v)
           return v:id() == window:id()
@@ -7128,7 +7128,7 @@ transf = {
   },
   audiodevice_specifier_array = {
     active_audiodevice_specifier_index = function(arr)
-      return hs.fnutils.find(arr, is.audiodevice_specifier.active_audiodevice_specifier)
+      return get.array.pos_int_or_nil_by_first_match_w_fn(arr, is.audiodevice_specifier.active_audiodevice_specifier)
     end,
   },
   audiodevice = {
@@ -7354,6 +7354,19 @@ transf = {
       )
     end,
 
+  },
+  audiodevice_type = {
+    default_audiodevice = function(type)
+      return hs.audiodevice["default" .. transf.string.string_by_first_eutf8_upper(type) .. "Device"]()
+    end,
+    audiodevice_specifier_array = function(type)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(
+        hs.audiodevice["all" .. transf.string.string_by_first_eutf8_upper(type) .. "Devices"](),
+        function (device)
+          return get.audiodevice.audiodevice_specifier(device, type)
+        end
+      )
+    end,
   },
   package_manager_name = {
     semver_string = function(mgr)
@@ -7740,7 +7753,7 @@ transf = {
   },
   stream_created_item_specifier_array = {
     first_running = function(stream_created_item_specifier_array)
-      return hs.fnutils.find(
+      return get.array.pos_int_or_nil_by_first_match_w_fn(
         stream_created_item_specifier_array,
         transf.stream_created_item_specifier.is_running
       )

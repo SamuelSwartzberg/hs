@@ -208,7 +208,7 @@ act = {
   },
   stream_created_item_specifier_array = {
     set_state_transitioned_state_all = function(array)
-      hs.fnutils.ieach(array, act.stream_created_item_specifier.set_state_transitioned_state)
+      dothis.array.each(array, act.stream_created_item_specifier.set_state_transitioned_state)
     end,
     filter_in_place_valid = function(array)
       dothis.array.filter_in_place(array, transf.stream_created_item_specifier.is_valid)
@@ -410,5 +410,12 @@ act = {
     search_google_maps = function(query) dothis.search_engine.search("google_maps", query) end,
     search_danbooru = function(query) dothis.search_engine.search("danbooru", query) end,
     search_gelbooru = function(query) dothis.search_engine.search("gelbooru", query) end,
+  },
+  ["nil"] = {
+    ensure_sound_played_on_speakers = function()
+      local device = hs.audiodevice.findOutputByName("Built-in Output")
+      dothis.audiodevice.ensure_sound_will_be_played(device)
+      dothis.audiodevice.set_default(device, "output")
+    end,
   }
 }
