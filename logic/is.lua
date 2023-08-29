@@ -83,6 +83,11 @@ is = {
       local cleaned_iban = transf.iban.cleaned_iban(str)
       return #cleaned_iban <= 34 and is.printable_ascii_nowhitespace_string.alphanum(cleaned_iban)
     end,
+    citable_filename = function(str)
+      return 
+        get.string.bool_by_not_contains_w_ascii_string(str, "/") and
+        get.string.bool_by_contains_w_ascii_string(str, "!citid:")
+    end
   },
   printable_ascii_nowhitespace_string = {
     base32_gen_string = function(str)
@@ -109,8 +114,8 @@ is = {
     --- trying to determine what string is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
     email_address = function(str)
       return 
-        get.string.bool_by_contains_w_string(str, "@") and
-        get.string.bool_by_contains_w_string(str, ".")
+        get.string.bool_by_contains_w_ascii_string(str, "@") and
+        get.string.bool_by_contains_w_ascii_string(str, ".")
     end,
     dice_notation = function(str)
       return get.string.bool_by_matches_whole_onig(str, r.g.syntax.dice)
@@ -121,12 +126,47 @@ is = {
     unicode_codepoint_string = function(str)
       return get.string.bool_by_startswith(str, "U+") and transf.string.bool_by_matches_whole_eutf8(str, "^U+%x+$")
     end,
-    pure_doi = function(str)
+    doi = function(str)
       return get.string.bool_by_matches_whole_onig(str, r.g.id.doi)
     end,
     colon_period_alphanum_minus_underscore = function(str)
       return get.string.bool_by_not_matches_part_eutf8(str, "[^%w%-_:.]")
     end,
+    indicated_isbn = function(str)
+      return get.string.bool_by_startswith(str, "isbn:") -- gonna trust that if it's printable_ascii_nowhitespace_string and starts with isbn: it's an isbn, similarly for the following
+    end,
+    indicated_pmid = function(str)
+      return get.string.bool_by_startswith(str, "pmid:")
+    end,
+    indicated_doi = function(str)
+      return get.string.bool_by_startswith(str, "doi:")
+    end,
+    indicated_isbn_part_identifier = function(str)
+      return get.string.bool_by_startswith(str, "isbn_part:")
+    end,
+    indicated_pcmid = function(str)
+      return get.string.bool_by_startswith(str, "pmcid:")
+    end,
+    indicated_accession = function(str)
+      return get.string.bool_by_startswith(str, "accession:")
+    end,
+    indicated_issn_full_identifier = function(str)
+      return get.string.bool_by_startswith(str, "issn_full:")
+    end,
+    indicated_urlmd5 = function(str)
+      return get.string.bool_by_startswith(str, "urlmd5:")
+    end,
+    indicated_citable_object_id = function(str)
+      return
+        is.printable_ascii_nowhitespace_string.indicated_isbn(str) or
+        is.printable_ascii_nowhitespace_string.indicated_pmid(str) or
+        is.printable_ascii_nowhitespace_string.indicated_doi(str) or
+        is.printable_ascii_nowhitespace_string.indicated_isbn_part_identifier(str) or
+        is.printable_ascii_nowhitespace_string.indicated_pcmid(str) or
+        is.printable_ascii_nowhitespace_string.indicated_accession(str) or
+        is.printable_ascii_nowhitespace_string.indicated_issn_full_identifier(str) or
+        is.printable_ascii_nowhitespace_string.indicated_urlmd5(str)
+    end
   },
   colon_period_alphanum_minus_underscore = {
     colon_alphanum_minus_underscore = function(str)
@@ -165,9 +205,6 @@ is = {
     end,
     alphanum = function(str)
       return is.colon_alphanum_minus_underscore.alphanum_minus_underscore(str) and is.alphanum_minus_underscore.alphanum(str)
-    end,
-    indicated_isbn = function(str)
-      return get.string.bool_by_startswith(str, "isbn:") -- gonna trust that if it's only colon and alphanum_minus_underscore and starts with isbn: it's an isbn
     end,
   },
   calendar_name = {
@@ -246,6 +283,10 @@ is = {
     end,
     not_useless_file_leaf = function(path)
       return not is.path.useless_file_leaf(path)
+    end,
+    citable_path = function(path)
+      return 
+        is.printable_ascii_string.citable_filename(transf.path.leaf(path)) 
     end,
   },
   remote_path = {
@@ -343,6 +384,22 @@ is = {
         transf["nil"].non_root_volume_absolute_path_array(),
         path
       )
+    end,
+    in_home_local_absolute_path = function(path)
+      return get.string.bool_by_startswith(path, env.HOME)
+    end,
+  },
+  in_home_local_absolute_path = {
+    in_me_local_absolute_path = function(path)
+      return get.string.bool_by_startswith(path, env.ME)
+    end,
+  },
+  in_me_local_absolute_path = {
+    in_mcitations_absolute_path = function(path)
+      return get.string.bool_by_startswith(path, env.MCITATIONS)
+    end,
+    in_mpapers_absolute_path = function(path)
+      return get.string.bool_by_startswith(path, env.MPAPERS)
     end,
   },
   in_volume_local_absolute_path = {
@@ -587,13 +644,13 @@ is = {
       return get.array.bool_by_contains(transf["nil"].package_manager_name_array(), str)
     end,
     alphanum_underscore =  function(str) 
-      return not stringy.find(str, "-")
+      return get.string.bool_by_not_contains_w_string(str, "-")
     end,
     alphanum_minus = function(str)
-      return not stringy.find(str, "_")
+      return get.string.bool_by_not_contains_w_string(str, "_")
     end,
     alphanum = function(str)
-      return is.alphanum_minus_underscore.alphanum_underscore(str) or is.alphanum_minus_underscore.alphanum_minus(str)
+      return is.alphanum_minus_underscore.alphanum_underscore(str) and is.alphanum_minus_underscore.alphanum_minus(str)
     end,
     youtube_video_id = function(str)
       return #str == 11 -- not officially specified, but b/c 64^11 > 2^64 > 64^10 and 64 chars in base64, allowing for billions of ids per living person, unlikely to change
@@ -606,6 +663,25 @@ is = {
     end,
     pass_item_name = function(str)
       return get.extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
+    end,
+  },
+  alphanum = {
+    alpha_string = function(str)
+      return get.string.bool_by_matches_whole_onig(str, "\\w+")
+    end,
+    digit_string = function(str)
+      return get.string.bool_by_matches_whole_onig(str, "\\d+")
+    end,
+  },
+  digit_string = {
+
+  },
+  alpha_string = {
+    lower_alpha_string = function(str)
+      return get.string.bool_by_matches_whole_onig(str, "[a-z]+")
+    end,
+    upper_alpha_string = function(str)
+      return get.string.bool_by_matches_whole_onig(str, "[A-Z]+")
     end,
   },
   url = {

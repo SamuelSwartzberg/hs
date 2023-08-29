@@ -692,7 +692,7 @@ transf = {
         without_extension = leaf
       elseif stringy.endswith(leaf, ".") then -- file that ends with a dot, does not count as having an extension
         without_extension = leaf
-      elseif not stringy.find(leaf, ".") then
+      elseif get.string.bool_by_not_contains_w_ascii_string(leaf, ".") then
         without_extension = leaf
       else -- in case of multiple dots, everything after the last dot is considered the extension
         without_extension, extension = eutf8.match(leaf, transf.string.string_by_whole_regex(r.g_lua.without_extension_and_extension))
@@ -966,7 +966,7 @@ transf = {
   local_dir = {
     absolute_path_value_stateful_iter_by_children = hs.fs.dir
   },
-  local_absolute_path_in_home = {
+  in_home_local_absolute_path = {
     http_protocol_url_by_local_http_server = function(path)
       return env.FS_HTTP_SERVER .. path
     end,
@@ -974,7 +974,7 @@ transf = {
       return get.absolute_path.relative_path_from(path, env.HOME)
     end,
     labelled_remote_path = function(path)
-      return transf.local_nonabsolute_path_relative_to_home.labelled_remote_absolute_path(transf.local_absolute_path_in_home.local_nonabsolute_path_by_relative_to_home(path))
+      return transf.local_nonabsolute_path_relative_to_home.labelled_remote_absolute_path(transf.in_home_local_absolute_path.local_nonabsolute_path_by_relative_to_home(path))
     end
   },
   local_nonabsolute_path_relative_to_home = {
@@ -2277,7 +2277,7 @@ transf = {
   },
   rf3339like_dt_or_interval = {
     dt_or_interval = function(str)
-      if stringy.find(str, "_to_") then
+      if get.string.bool_by_contains_w_ascii_string(str, "_to_") then
         return "rfc3339like_interval"
       else
         return "rfc3339like_dt"
@@ -2318,7 +2318,7 @@ transf = {
   },
   single_value_or_basic_interval_string = {
     interval_specifier = function(str)
-      if stringy.find(str, "-") then
+      if get.string.bool_by_contains_w_ascii_string(str, "-") then
         return transf.basic_interval_string.interval_specifier(str)
       else
         return {
@@ -5306,63 +5306,63 @@ transf = {
       return url
     end,
   },
-  doi = {
-    pure_doi = function(doilike)
-      local doi = transf.doi_urnlike.pure_doi(doilike)
-      doi = transf.doi_url.pure_doi(doi)
+  doilike = {
+    doi = function(doilike)
+      local doi = transf.indicated_doi.doi(doilike)
+      doi = transf.doi_url.doi(doi)
       return doi
     end,
     doi_url = function(doilike)
-      local doi = transf.doi_urnlike.pure_doi(doilike)
-      doi = transf.pure_doi.doi_url(doi)
+      local doi = transf.indicated_doi.doi(doilike)
+      doi = transf.doi.doi_url(doi)
       return doi
     end,
-    doi_urnlike = function(doilike)
-      local doi = transf.doi_url.pure_doi(doilike)
-      doi = transf.pure_doi.doi_urnlike(doi)
+    indicated_doi = function(doilike)
+      local doi = transf.doi_url.doi(doilike)
+      doi = transf.doi.indicated_doi(doi)
       return doi
     end,
     online_csl_table = function(doilike)
-      local doi = transf.doi_url.pure_doi(doilike)
-      return transf.pure_doi.online_csl_table(doi)
+      local doi = transf.doi_url.doi(doilike)
+      return transf.doi.online_csl_table(doi)
     end,
   },
   doi_url = {
-    pure_doi = function(url)
+    doi = function(url)
       return onig.match(url, r.g.id.doi_prefix .. "(.+)/?$")
     end,
-    doi_urnlike = function(url)
-      return transf.pure_doi.doi_urnlike(transf.doi_url.pure_doi(url))
+    indicated_doi = function(url)
+      return transf.doi.indicated_doi(transf.doi_url.doi(url))
     end,
   },
-  doi_urnlike = {
-    pure_doi = function(urnlike)
+  indicated_doi = {
+    doi = function(urnlike)
       doi = urnlike:lower()
       doi = get.string.no_prefix_string(urnlike, "urn:")
       doi = get.string.no_prefix_string(urnlike, "doi:")
       return doi
     end,
     doi_url = function(urnlike)
-      return transf.pure_doi.doi_url(transf.doi_urnlike.pure_doi(urnlike))
+      return transf.doi.doi_url(transf.indicated_doi.doi(urnlike))
     end,
   },
-  pure_doi = {
+  doi = {
     doi_url = function(doi)
       return "https://doi.org/" .. doi
     end,
-    doi_urnlike = function(doi)
+    indicated_doi = function(doi)
       return "doi:" .. doi
     end,
     online_bib = function(doi)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "curl -LH Accept: application/x-bibtex" .. transf.string.single_quoted_escaped(
-          transf.pure_doi.doi_url(doi)
+          transf.doi.doi_url(doi)
         )
       )
     end,
     online_csl_table = function(doi)
       return rest({
-        url = transf.pure_doi.doi_url(doi),
+        url = transf.doi.doi_url(doi),
         accept_json_different_header = "application/vnd.citationstyles.csl+json",
       })
     end,
@@ -5402,12 +5402,12 @@ transf = {
   indicated_citable_object_id = {
     local_csl_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.local_csl_file(
-        transf.string.urlencoded(id)
+        transf.string.encoded_query_param_value(id)
       )
     end,
     local_csl_table = function(id)
       return transf.filename_safe_indicated_citable_object_id.csl_table(
-        transf.string.urlencoded(id)
+        transf.string.encoded_query_param_value(id)
       )
     end,
     citable_object_id = function(id)
@@ -5415,6 +5415,9 @@ transf = {
     end,
     citable_object_indicator = function(id)
       return stringy.split(id, ":")[1]
+    end,
+    filename_safe_indicated_citable_object_id = function(id)
+      return transf.string.encoded_query_param_value(id)
     end,
     online_csl_table = function(id)
       return transf[
@@ -5425,12 +5428,12 @@ transf = {
     end,
     local_citable_object_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.local_citable_object_file(
-        transf.string.urlencoded(id)
+        transf.string.encoded_query_param_value(id)
       )
     end,
     local_citable_object_notes_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.local_citable_object_notes_file(
-        transf.string.urlencoded(id)
+        transf.string.encoded_query_param_value(id)
       )
     end,
     citations_file_line = function(id)
@@ -5441,6 +5444,11 @@ transf = {
 
   },
   filename_safe_indicated_citable_object_id = {
+    indicated_citable_object_id = function(id)
+      return transf.string.string_by_percent_decoded_also_plus(
+        id
+      )
+    end,
     local_csl_file = function(id)
       return get.extant_path.absolute_path_by_descendant_with_leaf_ending(env.MCITATIONS, id)
     end,
@@ -6257,7 +6265,7 @@ transf = {
     indicated_page_string = function(csl_table)
       local page = transf.csl_table.page(csl_table)
       if page then
-        if stringy.find(page, "-") then
+        if get.string.bool_by_contains_w_ascii_string(page, "-") then
           return "pp. " .. page
         else
           return "p. " .. page
@@ -6276,8 +6284,20 @@ transf = {
     doi = function(csl_table)
       return csl_table.doi
     end,
+    indicated_doi = function(csl_table)
+      local doi = transf.csl_table.doi(csl_table)
+      if doi then
+        return "doi:" .. doi
+      end
+    end,
     isbn = function(csl_table)
       return csl_table.isbn
+    end,
+    indicated_isbn = function(csl_table)
+      local isbn = transf.csl_table.isbn(csl_table)
+      if isbn then
+        return "isbn:" .. isbn
+      end
     end,
     chapter = function(csl_table)
       return csl_table.chapter
@@ -6299,6 +6319,12 @@ transf = {
       end
       return isbn_part_identifier
     end,
+    indicated_isbn_part_identifier = function(csl_table)
+      local isbn_part_identifier = transf.csl_table.isbn_part_identifier(csl_table)
+      if isbn_part_identifier then
+        return "isbn_part:" .. isbn_part_identifier
+      end
+    end,
     issn = function(csl_table)
       return csl_table.ISSN
     end,
@@ -6310,11 +6336,29 @@ transf = {
         return nil
       end
     end,
+    indicated_issn_full_identifier = function(csl_table)
+      local issn_full_identifier = transf.csl_table.issn_full_identifier(csl_table)
+      if issn_full_identifier then
+        return "issn_full:" .. issn_full_identifier
+      end
+    end,
     pmid = function(csl_table)
       return csl_table.pmid
     end,
+    indicated_pmid = function(csl_table)
+      local pmid = transf.csl_table.pmid(csl_table)
+      if pmid then
+        return "pmid:" .. pmid
+      end
+    end,
     pmcid = function(csl_table)
       return csl_table.pmcid
+    end,
+    indicated_pmcid = function(csl_table)
+      local pmcid = transf.csl_table.pmcid(csl_table)
+      if pmcid then
+        return "pmcid:" .. pmcid
+      end
     end,
     url = function(csl_table)
       return csl_table.URL
@@ -6322,8 +6366,20 @@ transf = {
     urlmd5 = function(csl_table)
       return transf.not_userdata_or_function.md5_hex_string(transf.csl_table.url(csl_table))
     end,
+    indicated_urlmd5 = function(csl_table)
+      local urlmd5 = transf.csl_table.urlmd5(csl_table)
+      if urlmd5 then
+        return "urlmd5:" .. urlmd5
+      end
+    end,
     accession = function(csl_table)
       return csl_table.accession
+    end,
+    indicated_accession = function(csl_table)
+      local accession = transf.csl_table.accession(csl_table)
+      if accession then
+        return "accession:" .. accession
+      end
     end,
     citable_object_id = function(csl_table)
       if csl_table.doi then
@@ -6348,21 +6404,21 @@ transf = {
     end,
     indicated_citable_object_id = function(csl_table)
       if csl_table.doi then
-        return "doi:" .. csl_table.doi
+        return transf.csl_table.indicated_doi(csl_table)
       elseif csl_table.isbn and is.csl_table.whole_book(csl_table) then
-        return "isbn:" .. csl_table.isbn
+        return transf.csl_table.indicated_isbn(csl_table)
       elseif csl_table.isbn and not is.csl_table.whole_book(csl_table) then
-        return "isbn_part:" .. transf.csl_table.isbn_part_identifier(csl_table)
+        return transf.csl_table.indicated_isbn_part_identifier(csl_table)
       elseif csl_table.pmid then
-        return "pmid:" .. csl_table.pmid
+        return transf.csl_table.indicated_pmid(csl_table)
       elseif csl_table.pmcid then
-        return "pmcid:" .. csl_table.pmcid
+        return transf.csl_table.indicated_pmcid(csl_table)
       elseif csl_table.accession then
-        return "accession:" .. csl_table.accession
+        return transf.csl_table.indicated_accession(csl_table)
       elseif transf.csl_table.issn_full_identifier(csl_table) then
-        return "issn_full:" .. transf.csl_table.issn_full_identifier(csl_table)
+        return transf.csl_table.indicated_issn_full_identifier(csl_table)
       elseif csl_table.url then
-        return "urlmd5:" .. transf.csl_table.urlmd5(csl_table)
+        return transf.csl_table.indicated_urlmd5(csl_table)
       else
         return nil
       end
@@ -6375,7 +6431,7 @@ transf = {
       return transf.string.encoded_query_param_value(transf.csl_table.citable_object_id(csl_table))
     end,
     filename_safe_indicated_citable_object_id = function(csl_table)
-      return transf.string.encoded_query_param_value(transf.csl_table.indicated_citable_object_id(csl_table))
+      return transf.indicated_citable_object_id.filename_safe_indicated_citable_object_id(transf.csl_table.indicated_citable_object_id(csl_table))
     end,
     citable_filename = function(csl_table)
       return 

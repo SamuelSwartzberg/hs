@@ -985,8 +985,8 @@ get = {
       end
       return false
     end,
-    bool_by_contains_w_string = stringy.find,
-    bool_by_not_contains_w_string = function(str, substr)
+    bool_by_contains_w_ascii_string = stringy.find,
+    bool_by_not_contains_w_ascii_string = function(str, substr)
       return not transf.string.bool_by_contains_w_string(str, substr)
     end,
     array_of_string_arrays_by_split = function(str, upper_sep, lower_sep)
@@ -1017,7 +1017,7 @@ get = {
     end,
     bool_by_contains_any_w_ascii_string_array = function(str, anyof)
       for i = 1, #anyof do
-        local res = stringy.find(str, anyof[i])
+        local res = get.string.bool_by_contains_w_ascii_string(str, anyof[i])
         if res then
           return true
         end
@@ -1026,7 +1026,7 @@ get = {
     end,
     bool_by_contains_all_w_ascii_string_array = function(str, allof)
       for i = 1, #allof do
-        local res = stringy.find(str, allof[i])
+        local res = get.string.bool_by_contains_w_ascii_string(str, allof[i])
         if not res then
           return false
         end
