@@ -1880,10 +1880,10 @@ dothis = {
     end,
   },
   citable_object_id = {
-    save_local_csl_file = function(citable_object_id, indication)
-      local csl_table = transf[indication].online_csl_table(citable_object_id)
+    save_mcitations_csl_file = function(citable_object_id, indication)
+      local csl_table = transf[indication].csl_table_by_online(citable_object_id)
       dothis.absolute_path.write_file(
-        env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table),
+        env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table) .. ".json",
         transf.not_userdata_or_function.json_string(csl_table)
       )
     end,
@@ -2049,32 +2049,6 @@ dothis = {
         transf.latex_project_dir.main_bib_file(latex_project_dir)
       )
     end,
-    add_local_citable_object_file = function(latex_project_dir, indicated_citable_object_id)
-      local local_citable_object_file = transf.indicated_citable_object_id.local_citable_object_file(indicated_citable_object_id)
-      dothis.absolute_path.copy_into_absolute_path(
-        transf.latex_project_dir.citable_object_files(latex_project_dir),
-        local_citable_object_file
-      )
-    end,
-    remove_local_citable_object_file = function(latex_project_dir, indicated_citable_object_id)
-      dothis.dir.delete_child_with_leaf_ending(
-        transf.latex_project_dir.citable_object_files(latex_project_dir),
-        indicated_citable_object_id
-      )
-    end,
-    add_local_citable_object_notes_file = function(latex_project_dir, indicated_citable_object_id)
-      local local_citable_object_notes_file = transf.indicated_citable_object_id.local_citable_object_notes_file(indicated_citable_object_id)
-      dothis.absolute_path.copy_into_absolute_path(
-        transf.latex_project_dir.citable_object_notes_files(latex_project_dir),
-        local_citable_object_notes_file
-      )
-    end,
-    remove_local_citable_object_notes_file = function(latex_project_dir, indicated_citable_object_id)
-      dothis.dir.delete_child_with_leaf_ending(
-        transf.latex_project_dir.citable_object_notes_files(latex_project_dir),
-        indicated_citable_object_id
-      )
-    end,
     add_indicated_citable_object_id_raw = function(latex_project_dir, indicated_citable_object_id)
       dothis.citations_file.add_indicated_citable_object_id(
         transf.latex_project_dir.citations_file(latex_project_dir),
@@ -2088,14 +2062,6 @@ dothis = {
       )
     end,
     add_indicated_citable_object_id = function(latex_project_dir, indicated_citable_object_id)
-      dothis.latex_project_dir.add_local_citable_object_file(
-        latex_project_dir,
-        indicated_citable_object_id
-      )
-      dothis.latex_project_dir.add_local_citable_object_notes_file(
-        latex_project_dir,
-        indicated_citable_object_id
-      )
       dothis.latex_project_dir.add_indicated_citable_object_id_raw(
         latex_project_dir,
         indicated_citable_object_id
@@ -2103,14 +2069,6 @@ dothis = {
       dothis.latex_project_dir.write_bib(latex_project_dir)
     end,
     remove_indicated_citable_object_id = function(latex_project_dir, indicated_citable_object_id)
-      dothis.latex_project_dir.remove_local_citable_object_file(
-        latex_project_dir,
-        indicated_citable_object_id
-      )
-      dothis.latex_project_dir.remove_local_citable_object_notes_file(
-        latex_project_dir,
-        indicated_citable_object_id
-      )
       dothis.latex_project_dir.remove_indicated_citable_object_id_raw(
         latex_project_dir,
         indicated_citable_object_id

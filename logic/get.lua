@@ -1832,6 +1832,9 @@ get = {
     absolute_path_by_descendant_with_leaf_ending = function(path, leaf_ending)
       return get.path_array.path_or_nil_by_first_having_leaf_ending(transf.extant_path.descendants_absolute_path_array(path), leaf_ending)
     end,
+    absolute_path_or_nil_by_descendant_with_filename_ending = function(path, filename_ending)
+      return get.path_array.path_or_nil_by_first_having_filename_ending(transf.extant_path.descendants_absolute_path_array(path), filename_ending)
+    end,
     absolute_path_by_descendant_with_filename = function(path, filename)
       return get.path_array.path_or_nil_by_first_having_filename(transf.extant_path.descendants_absolute_path_array(path), filename)
     end,
@@ -2181,6 +2184,11 @@ get = {
     path_or_nil_by_first_having_filename = function(path_array, filename)
       return get.array.t_or_nil_by_first_match_w_fn(path_array, function(path)
         return get.path.filename(path) == filename
+      end)
+    end,
+    path_or_nil_by_first_having_filename_ending = function(path_array, filename_ending)
+      return get.array.t_or_nil_by_first_match_w_fn(path_array, function(path)
+        return stringy.endswith(get.path.filename(path), filename_ending)
       end)
     end,
   },

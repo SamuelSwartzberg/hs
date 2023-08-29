@@ -1000,8 +1000,8 @@ transf = {
     extant_path_array = function(path_array)
       return get.array.array_by_filtered(path_array, is.path.extant_path)
     end,
-    useless_file_leaf_filtered_path_array = function(path_array)
-      return get.array.array_by_filtered(path_array, is.path.not_useless_file_leaf)
+    not_useless_file_leaf_path_array_by_filtered = function(path_array)
+      return get.array.array_by_filtered(path_array, is.path.not_useless_file_leaf_path)
     end,
     path_leaf_specifier_array = function(path_array)
       return get.array.array_by_mapped_w_t_arg_t_ret_fn(path_array, transf.path.path_leaf_specifier)
@@ -1014,6 +1014,19 @@ transf = {
     rfc3339like_dt_or_interval_by_union = function(path_array)
       return transf.path_leaf_specifier_array.rfc3339like_dt_or_interval_by_union(
         transf.path_array.path_leaf_specifier_array(path_array)
+      )
+    end,
+    citable_path_array_by_filtered = function(path_array)
+      return get.array.array_by_filtered(path_array, is.path.citable_path)
+    end,
+    csl_table_array_by_filtered_mapped = function(path_array)
+      return transf.citable_path_array.csl_table_array(
+        transf.path_array.citable_path_array_by_filtered(path_array)
+      )
+    end,
+    indicated_citable_object_id_array_by_filtered_mapped = function(path_array)
+      return transf.citable_path_array.indicated_citable_object_id_array(
+        transf.path_array.citable_path_array_by_filtered(path_array)
       )
     end,
   },
@@ -5322,9 +5335,9 @@ transf = {
       doi = transf.doi.indicated_doi(doi)
       return doi
     end,
-    online_csl_table = function(doilike)
+    csl_table_by_online = function(doilike)
       local doi = transf.doi_url.doi(doilike)
-      return transf.doi.online_csl_table(doi)
+      return transf.doi.csl_table_by_online(doi)
     end,
   },
   doi_url = {
@@ -5360,7 +5373,7 @@ transf = {
         )
       )
     end,
-    online_csl_table = function(doi)
+    csl_table_by_online = function(doi)
       return rest({
         url = transf.doi.doi_url(doi),
         accept_json_different_header = "application/vnd.citationstyles.csl+json",
@@ -5376,7 +5389,7 @@ transf = {
         "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " bibtex"
       )
     end,
-    online_csl_table = function(isbn)
+    csl_table_by_online = function(isbn)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " csl"
       )
@@ -5400,13 +5413,13 @@ transf = {
     end,
   },
   indicated_citable_object_id = {
-    local_csl_file = function(id)
-      return transf.filename_safe_indicated_citable_object_id.local_csl_file(
+    mcitations_csl_file = function(id)
+      return transf.filename_safe_indicated_citable_object_id.mcitations_csl_file_or_nil(
         transf.string.encoded_query_param_value(id)
       )
     end,
     local_csl_table = function(id)
-      return transf.filename_safe_indicated_citable_object_id.csl_table(
+      return transf.filename_safe_indicated_citable_object_id.csl_table_or_nil(
         transf.string.encoded_query_param_value(id)
       )
     end,
@@ -5419,20 +5432,20 @@ transf = {
     filename_safe_indicated_citable_object_id = function(id)
       return transf.string.encoded_query_param_value(id)
     end,
-    online_csl_table = function(id)
+    csl_table_by_online = function(id)
       return transf[
         transf.indicated_citable_object_id.citable_object_indicator(id)
-      ].online_csl_table(
+      ].csl_table_by_online(
         transf.indicated_citable_object_id.citable_object_id(id)
       )
     end,
-    local_citable_object_file = function(id)
-      return transf.filename_safe_indicated_citable_object_id.local_citable_object_file(
+    mpapers_citable_object_file = function(id)
+      return transf.filename_safe_indicated_citable_object_id.mpapers_citable_object_file_or_nil(
         transf.string.encoded_query_param_value(id)
       )
     end,
-    local_citable_object_notes_file = function(id)
-      return transf.filename_safe_indicated_citable_object_id.local_citable_object_notes_file(
+    mpapernotes_citable_object_notes_file = function(id)
+      return transf.filename_safe_indicated_citable_object_id.mpapernotes_citable_object_notes_file_or_nil(
         transf.string.encoded_query_param_value(id)
       )
     end,
@@ -5449,19 +5462,24 @@ transf = {
         id
       )
     end,
-    local_csl_file = function(id)
-      return get.extant_path.absolute_path_by_descendant_with_leaf_ending(env.MCITATIONS, id)
+    mcitations_csl_file_or_nil = function(id)
+      return get.extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MCITATIONS, id)
     end,
-    csl_table = function(id)
-      return transf.json_file.not_userdata_or_function(
-        transf.filename_safe_indicated_citable_object_id.local_csl_file(id)
-      )
+    csl_table_or_nil = function(id)
+      local path = transf.filename_safe_indicated_citable_object_id.mcitations_csl_file_or_nil(id)
+      if path then
+        return transf.json_file.not_userdata_or_function(
+          path
+        )
+      else
+        return nil
+      end
     end,
-    local_citable_object_file = function(id)
-      return get.extant_path.absolute_path_by_descendant_with_leaf_ending(env.MPAPERS, id)
+    mpapers_citable_object_file_or_nil = function(id)
+      return get.extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MPAPERS, id)
     end,
-    local_citable_object_notes_file = function(id)
-      return get.extant_path.absolute_path_by_descendant_with_leaf_ending(env.MPAPERNOTES, id)
+    mpapernotes_citable_object_notes_file_or_nil = function(id)
+      return get.extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MPAPERNOTES, id)
     end,
   },
   citable_filename = {
@@ -5497,7 +5515,10 @@ transf = {
   citable_path_array = {
     csl_table_array = function(arr)
       return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.citable_path.csl_table)
-    end
+    end,
+    indicated_citable_object_id_array = function(arr)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.citable_path.indicated_citable_object_id)
+    end,
   },
   citable_object_file ={ -- file with a citable_filename containing the data (e.g. pdf) of a citable object
 
@@ -5513,12 +5534,12 @@ transf = {
     end,
     bib_string = function(file)
       return transf.indicated_citable_object_id_array.bib_string(
-        transf.citations_file.local_csl_table_array(file)
+        transf.citations_file.indicated_citable_object_id_array(file)
       )
     end,
     json_string = function(file)
       return transf.indicated_citable_object_id_array.json_string(
-        transf.citations_file.local_csl_table_array(file)
+        transf.citations_file.indicated_citable_object_id_array(file)
       )
     end,
   },
@@ -5531,14 +5552,14 @@ transf = {
     end,
     bib_string = function(arr)
       return transf.csl_table_array.bib_string(
-        transf.indicated_citable_object_id.local_csl_table_array(
+        transf.indicated_citable_object_id_array.local_csl_table_array(
           arr
         )
       )
     end,
     json_string = function(arr)
       return transf.csl_table_array.json_string(
-        transf.indicated_citable_object_id.local_csl_table_array(
+        transf.indicated_citable_object_id_array.local_csl_table_array(
           arr
         )
       )
@@ -5568,12 +5589,6 @@ transf = {
     end,
     main_bib_file = function(dir)
       return transf.path.ending_with_slash(dir) .. "main.bib"
-    end,
-    citable_object_files = function(dir)
-      return transf.path.ending_with_slash(dir) .. "citable_objects"
-    end,
-    citable_object_notes = function(dir)
-      return transf.path.ending_with_slash(dir) .. "citable_objects_notes"
     end,
     indicated_citable_object_id_array_from_citations = function(dir)
       return transf.citations_file.indicated_citable_object_id_array(

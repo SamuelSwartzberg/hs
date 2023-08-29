@@ -266,15 +266,15 @@ act = {
     end,
   },
   indicated_citable_object_id = {
-    edit_local_csl_file = function(indicated_citable_object_id)
+    edit_mcitations_csl_file = function(indicated_citable_object_id)
       dothis.local_path.open_app(
-        transf.indicated_citable_object_id.local_csl_file_path(indicated_citable_object_id),
+        transf.indicated_citable_object_id.mcitations_csl_file(indicated_citable_object_id),
         env.GUI_EDITOR
       )
     end,
-    open_local_citable_object_file = function(indicated_citable_object_id)
+    open_mpapers_citable_object_file = function(indicated_citable_object_id)
       dothis.local_path.open(
-        transf.indicated_citable_object_id.local_citable_object_file_path(indicated_citable_object_id)
+        transf.indicated_citable_object_id.mpapers_citable_object_file(indicated_citable_object_id)
       )
     end,
 

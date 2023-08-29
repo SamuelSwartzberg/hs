@@ -278,15 +278,35 @@ is = {
     path_with_intra_file_locator = function(path)
       return eutf8.find(transf.path.leaf(path), ":%d+$") ~= nil
     end,
-    useless_file_leaf = function(path)
+    useless_file_leaf_path = function(path)
       return get.array.bool_by_contains(ls.useless_files, transf.path.leaf(path))
     end,
-    not_useless_file_leaf = function(path)
-      return not is.path.useless_file_leaf(path)
+    not_useless_file_leaf_path = function(path)
+      return not is.path.useless_file_leaf_path(path)
     end,
     citable_path = function(path)
       return 
         is.printable_ascii_string.citable_filename(transf.path.leaf(path)) 
+    end,
+  },
+  citable_path = {
+    mpapers_citable_local_absolute_path = function(path)
+      return get.string.bool_by_startswith(path, env.MPAPERS)
+    end,
+    mcitations_citable_local_absolute_path = function(path)
+      return get.string.bool_by_startswith(path, env.MCITATIONS)
+    end,
+    mpapernotes_citable_local_absolute_path = function(path)
+      return get.string.bool_by_startswith(path, env.MPAPERNOTES)
+    end,
+    mpapers_citable_object_file = function(path)
+      return is.citable_path.mpapers_citable_local_absolute_path(path) and is.local_absolute_path.local_file(path)
+    end,
+    mcitations_csl_file = function(path)
+      return is.citable_path.mcitations_citable_local_absolute_path(path) and is.local_absolute_path.local_file(path)
+    end,
+    mpapernotes_citable_object_notes_file = function(path)
+      return is.citable_path.mpapernotes_citable_local_absolute_path(path) and is.local_absolute_path.local_file(path)
     end,
   },
   remote_path = {
@@ -369,6 +389,9 @@ is = {
       local file = io.open(path, "r")
       pcall(io.close, file)
       return file ~= nil
+    end,
+    local_file = function(path)
+      return is.local_absolute_path.local_extant_path(path) and is.local_extant_path.local_file(path)
     end,
     local_nonextant_path = function(path)
       return not is.path.local_extant_path(path)
