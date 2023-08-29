@@ -11,6 +11,7 @@ refac:
   - many names don't yet corrrespond to the new schema
   - boolean -> bool, string -> str, array -> arr
   - get forgotten logic from arrays
+  - replace package methods with my own
 post 'lua is working':  
   - add/rename missing m3us
   - history

@@ -30,7 +30,7 @@ transf = {
     end,
   },
   indicated_number_string = {
-    number_string = function(indicated_number)
+    nonindicated_number_string = function(indicated_number)
       return indicated_number:sub(3)
     end,
     base_letter = function(indicated_number)
@@ -688,14 +688,14 @@ transf = {
       local extension = ""
       if leaf == "" then
         -- already both empty, nothing to do
-      elseif stringy.startswith(leaf, ".") then -- dotfile
+      elseif get.string.bool_by_startswith(leaf, ".") then -- dotfile
         without_extension = leaf
       elseif stringy.endswith(leaf, ".") then -- file that ends with a dot, does not count as having an extension
         without_extension = leaf
       elseif not stringy.find(leaf, ".") then
         without_extension = leaf
       else -- in case of multiple dots, everything after the last dot is considered the extension
-        without_extension, extension = eutf8.match(leaf, transf.string.whole_regex(r.g_lua.without_extension_and_extension))
+        without_extension, extension = eutf8.match(leaf, transf.string.string_by_whole_regex(r.g_lua.without_extension_and_extension))
       end
       dothis.array.push(path_components, without_extension)
       dothis.array.push(path_components, extension)
@@ -3800,7 +3800,7 @@ transf = {
             stringy.strip(str)
           ),
           function(v)
-            if stringy.startswith(v, ">") then
+            if get.string.bool_by_startswith(v, ">") then
               return ">" .. v
             else
               return ">" .. " " .. v
@@ -3814,7 +3814,7 @@ transf = {
         transf.string.lines(str)
       )
     end,
-    whole_regex = function(str)
+    string_by_whole_regex = function(str)
       return "^" .. str .. "$"
     end,
     string_pair_split_by_minus_or_nil = function(str)
@@ -3858,22 +3858,22 @@ transf = {
     end
   },
   line = {
-    noindent = function(str)
+    noindent_line = function(str)
       return eutf8.match(str, "^%s*(.*)$")
     end,
-    nocomment = function(str)
+    nocomment_line = function(str)
       return get.string.string_array_split(str, " # ")[1]
     end,
     nocomment_noindent = function(str)
-      return transf.line.noindent(transf.line.nocomment(str))
+      return transf.line.noindent_line(transf.line.nocomment_line(str))
     end,
-    comment = function(str)
+    line_by_comment = function(str)
       return get.string.string_array_split(str, " # ")[2]
     end,
   },
   potentially_atpath = {
     potentially_atpath_resolved = function(str)
-      if stringy.startswith(str, "@") then
+      if get.string.bool_by_startswith(str, "@") then
         local valpath = eutf8.sub(str, 2)
         valpath = hs.fs.pathToAbsolute(valpath, true)
         str = "@" .. valpath
@@ -3882,8 +3882,8 @@ transf = {
     end,
   },
   alphanum_minus = {
-    alphanum = function(str)
-      return eutf8.gsub(str, "-", "")
+    alphanum_by_remove = function(str)
+      return get.string.string_by_removed_onig_w_regex_quantifiable(str, "-")
     end,
   },
   alphanum_underscore = {
@@ -4037,7 +4037,7 @@ transf = {
   },
   base64 = {
     decoded_string = function(b64)
-      if is.printable_ascii_string.base64_gen_string(b64) then
+      if is.printable_ascii_nowhitespace_string.base64_gen_string(b64) then
         return transf.base64_gen_string.decoded_string(b64)
       else
         return transf.base64_url_string.decoded_string(b64)
@@ -4046,7 +4046,7 @@ transf = {
   },
   base32 = {
     decoded_string = function(b32)
-      if is.printable_ascii_string.base32_gen_string(b32) then
+      if is.printable_ascii_nowhitespace_string.base32_gen_string(b32) then
         return transf.base32_gen_string.decoded_string(b32)
       else
         return transf.base32_crock_string.decoded_string(b32)
@@ -4146,10 +4146,10 @@ transf = {
         countries[country_code] = {}
         local city_code
         for _, payload_line in transf.array.index_value_stateless_iter(payload_lines) do
-          if stringy.startswith(payload_line, "\t\t") then -- line specifying a single relay
+          if get.string.bool_by_startswith(payload_line, "\t\t") then -- line specifying a single relay
             local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
             dothis.array.push(countries[country_code][city_code], relay_code)
-          elseif stringy.startswith(payload_line, "\t") then -- line specifying an entire city
+          elseif get.string.bool_by_startswith(payload_line, "\t") then -- line specifying an entire city
             city_code = onig.match(payload_line," \\(([^\\)]+\\) " ) -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
             countries[country_code][city_code] = {}
           end
@@ -4468,7 +4468,7 @@ transf = {
       return get.array.array_by_filtered(arr, is.string.noempty_string)
     end,
     noindent_string_array = function(arr)
-      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent)
+      return get.array.array_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent_line)
     end,
     nocomment_line_filtered_string_array = function(arr)
       return get.array.array_by_filtered(
@@ -4479,7 +4479,7 @@ transf = {
     nocomment_string_array = function(arr)
       return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         transf.string_array.nocomment_line_filtered_string_array(arr),
-        transf.line.nocomment
+        transf.line.nocomment_line
       )
     end,
     nocomment_line_filtered_noindent_string_array = function(arr)
@@ -7224,7 +7224,7 @@ transf = {
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("mullvad status")
     end,
     mullvad_boolean_connected = function()
-      return stringy.startswith(transf["nil"].mullvad_status_string(),"Connected")
+      return get.string.bool_by_startswith(transf["nil"].mullvad_status_string(),"Connected")
     end,
     mullvad_relay_list_string = function()
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("mullvad relay list")
@@ -7905,14 +7905,14 @@ transf = {
   input_spec_string = {
     input_spec = function(str)
       local input_spec = {}
-      if stringy.startswith(str, ".") then
+      if get.string.bool_by_startswith(str, ".") then
         input_spec.mode = "click"
         if #str == 1 then
           input_spec.mouse_button_string = "l"
         else
           input_spec.mouse_button_string = string.sub(str, 2, 2)
         end
-      elseif stringy.startswith(str, ":") then
+      elseif get.string.bool_by_startswith(str, ":") then
         input_spec.mode = "key"
         local parts = transf.hole_y_arraylike.array(stringy.split(string.sub(str, 2), "+")) -- separating modifier keys with `+`
         if #parts > 1 then
@@ -7997,7 +7997,7 @@ transf = {
 
       local ok_button_pressed = button_pressed == prompt_args.buttonA
 
-      if stringy.startswith(raw_return, " ") then -- space triggers lua eval mode
+      if get.string.bool_by_startswith(raw_return, " ") then -- space triggers lua eval mode
         raw_return = get.string.evaled_as_lua(raw_return)
       end
       if raw_return == "" then

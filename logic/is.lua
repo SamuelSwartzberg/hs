@@ -14,15 +14,8 @@ is = {
         and str:find("^%s") == nil
         and str:find("%s$") == nil
     end,
-    number_string = function(str)
-      return get.string_or_number.number_or_nil(str) ~= nil
-    end,
-    int_string = function(str)
-      return is.string.number_string(str) and is.number.int(get.string_or_number.number_or_nil(str))
-    end,
-   
     ascii_string = function(str)
-      return onig.find(str, transf.string.whole_regex(r.g.charset.ascii))
+      return get.string.bool_by_matches_whole_onig(str, r.g.charset.ascii)
     end,
     alphanum_minus_underscore = function(str)
       return is.string.ascii_string(str) and is.ascii_string.alphanum_minus_underscore(str)
@@ -37,95 +30,46 @@ is = {
       return not is.string.empty_string(str)
     end,
     line = function(str)
-      return eutf8.find(str, "[\n\r]") == nil
+      return get.string.bool_by_not_matches_part_eutf8(str, "[\n\r]")
+    end,
+    multiline_string = function(str)
+      return not is.string.line(str)
     end,
     noncomment_line = function(str)
       return is.string.line(str) and is.line.noncomment_line(str)
     end,
+    nowhitespace_string = function(str)
+      return get.string.bool_by_not_matches_part_eutf8(str, "%s")
+    end,
   },
   line = {
     comment_line = function(str)
-      return eutf8.find(str, "^%s*#") ~= nil
+      return get.string.bool_by_matches_part_eutf8(str, "^%s*#")
     end,
     noncomment_line = function(str)
       return not is.line.comment_line(str)
     end,
+    indent_line = function(str)
+      return get.string.bool_by_matches_part_eutf8(str, "^%s")
+    end,
+    nonindent_line = function(str)
+      return not is.line.indent_line(str)
+    end,
+  },
+  multiline_string = {
+
   },
   ascii_string = {
     printable_ascii_string = function(str)
-      return onig.find(str, transf.string.whole_regex(r.g.charset.printable_ascii))
+      return get.string.bool_by_matches_whole_onig(str, r.g.charset.printable_ascii)
     end,
     alphanum_minus_underscore = function(str)
-      return is.ascii_string.printable_ascii_string(str) and is.printable_ascii_string.alphanum_minus_underscore(str)
+      return is.ascii_string.printable_ascii_string(str) and is.printable_ascii_nowhitespace_string.alphanum_minus_underscore(str)
     end,
   },
   printable_ascii_string = {
-    base32_gen_string = function(str)
-      return onig.find(str, transf.string.whole_regex(r.g.id.b32.gen))
-    end,
-    base32_crock_string = function(str)
-      return onig.find(str, transf.string.whole_regex(r.g.id.b32.crockford))
-    end,
-    base64_gen_string = function(str)
-      return onig.find(str, transf.string.whole_regex(r.g.id.b64.gen))
-    end,
-    base64_url_string = function(str)
-      return onig.find(str, transf.string.whole_regex(r.g.id.b64.url))
-    end,
-    base32_string = function(str)
-      return is.printable_ascii_string.base32_gen_string(str) or is.printable_ascii_string.base32_crock_string(str)
-    end,
-    base64_string = function(str)
-      return is.printable_ascii_string.base64_gen_string(str) or is.printable_ascii_string.base64_url_string(str)
-    end,
-    number_string = function(str)
-      return get.string_or_number.number_or_nil(str, 16) ~= nil -- this may not return the correct value for non-hex strings, but that doesn't matter, we're only checking if it is a digit string of whatever kind, so what value exactly it returns doesn't matter
-    end,
-    indicated_number_string = function(str)
-      return 
-        stringy.startswith(str, "0") and
-        get.array.bool_by_contains(transf.table_or_nil.kt_array(tblmap.base_letter.base), str:sub(2, 2)) and
-        is.printable_ascii_string.number_string(str:sub(3))
-    end,
-    potentially_indicated_number_string = function(str)
-      return is.printable_ascii_string.indicated_number_string(str) or is.printable_ascii_string.number_string(str)
-    end,
-    binary_string = function(str)
-      return get.string_or_number.number_or_nil(str, 2) ~= nil
-    end,
-    hex_string = function(str)
-      return get.string_or_number.number_or_nil(str, 16) ~= nil
-    end,
-    octal_string = function(str)
-      return get.string_or_number.number_or_nil(str, 8) ~= nil
-    end,
-    decimal_string = function(str)
-      return get.string_or_number.number_or_nil(str, 10) ~= nil
-    end,
-
-    indicated_binary_string = function(str)
-      return stringy.startswith(str, "0b") and is.printable_ascii_string.binary_string(str:sub(3))
-    end,
-    indicated_hex_string = function(str)
-      return stringy.startswith(str, "0x") and is.printable_ascii_string.hex_string(str:sub(3))
-    end,
-    indicated_octal_string = function(str)
-      return stringy.startswith(str, "0o") and is.printable_ascii_string.octal_string(str:sub(3))
-    end,
-    indicated_decimal_string = function(str)
-      return stringy.startswith(str, "0d") and is.printable_ascii_string.decimal_string(str:sub(3))
-    end,
-    potentially_indicated_binary_string = function(str)
-      return is.printable_ascii_string.indicated_binary_string(str) or is.printable_ascii_string.binary_string(str)
-    end,
-    potentially_indicated_hex_string = function(str)
-      return is.printable_ascii_string.indicated_hex_string(str) or is.printable_ascii_string.hex_string(str)
-    end,
-    potentially_indicated_octal_string = function(str)
-      return is.printable_ascii_string.indicated_octal_string(str) or is.printable_ascii_string.octal_string(str)
-    end,
-    potentially_indicated_decimal_string = function(str)
-      return is.printable_ascii_string.indicated_decimal_string(str) or is.printable_ascii_string.decimal_string(str)
+    printable_ascii_nowhitespace_string = function(str)
+      return get.string.bool_by_not_matches_part_eutf8(str, "%s")
     end,
     url = function(str)
       return get.fn.rt_or_nil_by_memoized(
@@ -135,36 +79,96 @@ is = {
         "url_parser_cli " .. transf.string.single_quoted_escaped(str)
       )
     end,
-    alphanum_minus_underscore = function(str)
-      return not string.find(str, "[^%w%-_]")
+    iban = function(str)
+      local cleaned_iban = transf.iban.cleaned_iban(str)
+      return #cleaned_iban <= 34 and is.printable_ascii_nowhitespace_string.alphanum(cleaned_iban)
     end,
-    alphanum = function(str)
-      return is.printable_ascii_string.alphanum_minus_underscore(str) and is.alphanum_minus_underscore.alphanum(str)
+  },
+  printable_ascii_nowhitespace_string = {
+    base32_gen_string = function(str)
+      return get.string.bool_by_matches_whole_onig(str, r.g.id.b32.gen)
     end,
-    
+    base32_crock_string = function(str)
+      return get.string.bool_by_matches_whole_onig(str, r.g.id.b32.crockford)
+    end,
+    base64_gen_string = function(str)
+      return get.string.bool_by_matches_whole_onig(str, r.g.id.b64.gen)
+    end,
+    base64_url_string = function(str)
+      return get.string.bool_by_matches_whole_onig(str, r.g.id.b64.url)
+    end,
+    base32_string = function(str)
+      return is.printable_ascii_nowhitespace_string.base32_gen_string(str) or is.printable_ascii_nowhitespace_string.base32_crock_string(str)
+    end,
+    base64_string = function(str)
+      return is.printable_ascii_nowhitespace_string.base64_gen_string(str) or is.printable_ascii_nowhitespace_string.base64_url_string(str)
+    end,
     handle = function(str)
-      return stringy.startswith(str, "@")
+      return get.string.bool_by_startswith(str, "@")
     end,
     --- trying to determine what string is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
     email_address = function(str)
       return 
         get.string.bool_by_contains_w_string(str, "@") and
-        get.string.bool_by_contains_w_string(str, ".") and
-        not eutf8.find(str, "%s")
+        get.string.bool_by_contains_w_string(str, ".")
     end,
     dice_notation = function(str)
-      return onig.find(str, transf.string.whole_regex(r.g.syntax.dice))
+      return get.string.bool_by_matches_whole_onig(str, r.g.syntax.dice)
     end,
     installed_package_name = function(str)
       return get.array.bool_by_contains(transf.package_manager_name_or_nil.package_name_array(nil), str)
     end,
     unicode_codepoint_string = function(str)
-      return stringy.startswith(str, "U+") and string.match(str, "^U+%x+$")
+      return get.string.bool_by_startswith(str, "U+") and transf.string.bool_by_matches_whole_eutf8(str, "^U+%x+$")
     end,
-    iban = function(str)
-      local cleaned_iban = transf.iban.cleaned_iban(str)
-      return #cleaned_iban <= 34 and is.printable_ascii_string.alphanum(cleaned_iban)
-    end
+    pure_doi = function(str)
+      return get.string.bool_by_matches_whole_onig(str, r.g.id.doi)
+    end,
+    colon_period_alphanum_minus_underscore = function(str)
+      return get.string.bool_by_not_matches_part_eutf8(str, "[^%w%-_:.]")
+    end,
+  },
+  colon_period_alphanum_minus_underscore = {
+    colon_alphanum_minus_underscore = function(str)
+      return get.string.bool_by_not_contains_w_string(str, ".")
+    end,
+    period_alphanum_minus_underscore = function(str)
+      return get.string.bool_by_not_contains_w_string(str, ":")
+    end,
+  },
+  period_alphanum_minus_underscore = {
+    number_string = function(str)
+      return get.nonindicated_number_string.number_or_nil(str, 16) ~= nil -- this may not return the correct value for non-hex strings, but that doesn't matter, we're only checking if it is a digit string of whatever kind, so what value exactly it returns doesn't matter
+    end,
+    indicated_number_string = function(str)
+      return 
+        get.string.bool_by_startswith(str, "0") and
+        get.array.bool_by_contains(transf.table_or_nil.kt_array(tblmap.base_letter.base), str:sub(2, 2)) and
+        is.printable_ascii_string.number_string(str:sub(3))
+    end,
+    indicated_binary_number_string = function(str)
+      return get.string.bool_by_startswith(str, "0b") and is.printable_ascii_string.binary_string(str:sub(3))
+    end,
+    indicated_hex_number_string = function(str)
+      return get.string.bool_by_startswith(str, "0x") and is.printable_ascii_string.hex_string(str:sub(3))
+    end,
+    indicated_octal_number_string = function(str)
+      return get.string.bool_by_startswith(str, "0o") and is.printable_ascii_string.octal_string(str:sub(3))
+    end,
+    indicated_decimal_number_string = function(str)
+      return get.string.bool_by_startswith(str, "0d") and is.printable_ascii_string.decimal_string(str:sub(3))
+    end,
+  },
+  colon_alphanum_minus_underscore = {
+    alphanum_minus_underscore = function(str)
+      return get.string.bool_by_not_contains_w_string(str, ":")
+    end,
+    alphanum = function(str)
+      return is.colon_alphanum_minus_underscore.alphanum_minus_underscore(str) and is.alphanum_minus_underscore.alphanum(str)
+    end,
+    indicated_isbn = function(str)
+      return get.string.bool_by_startswith(str, "isbn:") -- gonna trust that if it's only colon and alphanum_minus_underscore and starts with isbn: it's an isbn
+    end,
   },
   calendar_name = {
     writeable_calendar_name = function(name)
@@ -172,17 +176,23 @@ is = {
     end,
   },
   alphanum_minus = {
+    isbn10 = function(str)
+      return get.string.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.id.isbn10)
+    end,
+    isbn13 = function(str)
+      return get.string.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.id.isbn13)
+    end,
     isbn = function(str)
-      return onig.find(transf.alphanum_minus.alphanum(str), transf.string.whole_regex(r.g.id.isbn))
+      return is.alphanum_minus.isbn10(str) or is.alphanum_minus.isbn13(str)
     end,
     issn = function(str) 
-      return onig.find(str, transf.string.whole_regex(r.g.id.issn))
+      return get.string.bool_by_matches_whole_onig(str, r.g.id.issn)
     end,
     uuid = function(str)
-      return onig.find(str, transf.string.whole_regex(r.g.id.uuid), 1, "i")
+      return get.string.bool_by_matches_whole_onig(transf.string.string_by_all_eutf8_lower(str), r.g.id.uuid)
     end,
     relay_identifier = function(str)
-      return onig.find(str, transf.string.whole_regex(r.g.id.relay_identifier))
+      return get.string.bool_by_matches_whole_onig(str, r.g.id.relay_identifier)
     end,
     
   },
@@ -306,7 +316,7 @@ is = {
   },
   local_path = {
     local_absolute_path = function(path)
-      return stringy.startswith(path, "/")
+      return get.string.bool_by_startswith(path, "/")
     end,
     local_nonabsolute_path = function(path)
       return not is.path.local_absolute_path(path)
@@ -326,7 +336,7 @@ is = {
       return path == "/"
     end,
     in_volume_local_absolute_path = function(path)
-      return stringy.startswith(path, "/Volumes/")
+      return get.string.bool_by_startswith(path, "/Volumes/")
     end,
     extant_volume_local_extant_path = function(path)
       return get.array.bool_by_contains(
@@ -341,7 +351,7 @@ is = {
   extant_volume_local_extant_path = {
     
     dynamic_time_machine_extant_volume_local_extant_path = function(path)
-      return stringy.startswith(
+      return get.string.bool_by_startswith(
         path,
         "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. get.fn.rt_or_nil_by_memoized(hs.host.localizedName)() .. "/" .. os.date("%Y-%m-%d-%H")
       )
@@ -589,10 +599,10 @@ is = {
       return #str == 11 -- not officially specified, but b/c 64^11 > 2^64 > 64^10 and 64 chars in base64, allowing for billions of ids per living person, unlikely to change
     end,
     youtube_playlist_id = function(str)
-      return stringy.startswith(str, "PL") and #str == 34
+      return get.string.bool_by_startswith(str, "PL") and #str == 34
     end,
     youtube_channel_id = function(str)
-      return stringy.startswith(str, "UC") and #str == 24
+      return get.string.bool_by_startswith(str, "UC") and #str == 24
     end,
     pass_item_name = function(str)
       return get.extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
@@ -623,27 +633,27 @@ is = {
   },
   scheme_url = {
     mailto_url = function(url)
-      return stringy.startswith(url, "mailto:")
+      return get.string.bool_by_startswith(url, "mailto:")
     end,
     tel_url = function(url)
-      return stringy.startswith(url, "tel:")
+      return get.string.bool_by_startswith(url, "tel:")
     end,
     otpauth_url = function(url)
-      return stringy.startswith(url, "otpauth:")
+      return get.string.bool_by_startswith(url, "otpauth:")
     end,
     data_url = function(url)
-      return stringy.startswith(url, "data:")
+      return get.string.bool_by_startswith(url, "data:")
     end,
     http_protocol_url = function(url)
-      return stringy.startswith(url, "http://") or stringy.startswith(url, "https://")
+      return get.string.bool_by_startswith(url, "http://") or get.string.bool_by_startswith(url, "https://")
     end,
   },
   http_protocol_url = {
     http_url = function(url)
-      return stringy.startswith(url, "http://")
+      return get.string.bool_by_startswith(url, "http://")
     end,
     https_url = function(url)
-      return stringy.startswith(url, "https://")
+      return get.string.bool_by_startswith(url, "https://")
     end,
   },
   path_url = {
@@ -733,7 +743,7 @@ is = {
   },
   media_type = {
     image_media_type = function(media_type)
-      return stringy.startswith(media_type, "image/")
+      return get.string.bool_by_startswith(media_type, "image/")
     end,
   },
   source_id = {

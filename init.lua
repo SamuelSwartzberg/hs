@@ -192,9 +192,9 @@ local keymap = {
           local true_val = transf.array.t_by_last(stringy.split(val, " ")) -- ignore all the `magrep -i` or `mpick -t` stuff, that's just for user comprehension
           true_val = string.format(true_val, get.string.string_by_prompted_once_from_default("", "Search for: "))
           local results
-          if stringy.startswith(val, "magrep") then
+          if get.string.bool_by_startswith(val, "magrep") then
             results = get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, true_val)
-          elseif stringy.startswith(val, "mpick") then
+          elseif get.string.bool_by_startswith(val, "mpick") then
             results = get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, nil, true_val)
           end
           ar(results)

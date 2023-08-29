@@ -956,16 +956,16 @@ get = {
         return arr[1], arr[2]
       end
     end,
-    lines_tail = function(path, n)
+    line_array_by_tail = function(path, n)
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.lines(path), -(n or 10))
     end,
-    lines_head = function(path, n)
+    line_array_by_head = function(path, n)
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.lines(path), 1, n or 10)
     end,
-    content_lines_tail = function(path, n)
+    noempty_line_array_by_tail = function(path, n)
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.noempty_line_string_array(path), -(n or 10))
     end,
-    content_lines_head = function(path, n)
+    noempty_line_array_by_head = function(path, n)
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.noempty_line_string_array(path), 1, n or 10)
     end,
     bool_by_startswith = stringy.startswith,
@@ -976,8 +976,20 @@ get = {
     bool_by_not_endswith = function(str, suffix)
       return not transf.string.bool_endswith(str, suffix)
     end,
+    bool_by_startswith_any_w_ascii_string_array = function(str, anyof)
+      for i = 1, #anyof do
+        local res = stringy.startswith(str, anyof[i])
+        if res then
+          return true
+        end
+      end
+      return false
+    end,
     bool_by_contains_w_string = stringy.find,
-    split2d = function(str, upper_sep, lower_sep)
+    bool_by_not_contains_w_string = function(str, substr)
+      return not transf.string.bool_by_contains_w_string(str, substr)
+    end,
+    array_of_string_arrays_by_split = function(str, upper_sep, lower_sep)
       local upper = transf.string.split(str, upper_sep)
       return get.array.array_by_mapped_w_t_arg_t_ret_fn(upper, function(v)
         return transf.string.split(v, lower_sep)
@@ -1024,8 +1036,32 @@ get = {
     bool_by_starts_ends = function(str, start, ends)
       return transf.string.startswith(str, start) and transf.string.endswith(str, ends)
     end,
+    bool_by_matches_whole_eutf8 = function(str, regex_string)
+      return eutf8.find(str, transf.string.string_by_whole_regex(regex_string)) ~= nil
+    end,
+    bool_by_matches_whole_onig = function(str, regex_string)
+      return onig.find(str, transf.string.string_by_whole_regex(regex_string)) ~= nil
+    end,
+    bool_by_matches_part_eutf8 = function(str, regex_string)
+      return eutf8.find(str, regex_string) ~= nil
+    end,
+    bool_by_matches_part_onig = function(str, regex_string)
+      return onig.find(str, regex_string) ~= nil
+    end,
+    bool_by_not_matches_whole_eutf8 = function(str, regex_string)
+      return not transf.string.bool_by_matches_whole_eutf8(str, regex_string)
+    end,
+    bool_by_not_matches_whole_onig = function(str, regex_string)
+      return not transf.string.bool_by_matches_whole_onig(str, regex_string)
+    end,
+    bool_by_not_matches_part_eutf8 = function(str, regex_string)
+      return not transf.string.bool_by_matches_part_eutf8(str, regex_string)
+    end,
+    bool_by_not_matches_part_onig = function(str, regex_string)
+      return not transf.string.bool_by_matches_part_onig(str, regex_string)
+    end,
     string_by_no_prefix = function(str, prefix)
-      if stringy.startswith(str, prefix) then
+      if get.string.bool_by_startswith(str, prefix) then
         return str:sub(#prefix + 1)
       else
         return str
@@ -1039,7 +1075,7 @@ get = {
       end
     end,
     string_by_with_prefix = function(str, prefix)
-      if stringy.startswith(str, prefix) then
+      if get.string.bool_by_startswith(str, prefix) then
         return str
       else
         return prefix .. str
@@ -1344,7 +1380,7 @@ get = {
       if transf.table.pos_int_by_num_keys(tbl) == 0 then return str end
       local stripped_str = stringy.strip(str)
       local final_metadata, final_contents
-      if stringy.startswith(stripped_str, "---") then
+      if get.string.bool_by_startswith(stripped_str, "---") then
         -- splice in the metadata
         local parts = get.string.string_array_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
         local extant_metadata = table.remove(parts, 1)
@@ -1575,7 +1611,7 @@ get = {
       return transf.path.path_without_extension(path) .. "." .. ext
     end,
     leaf_starts_with = function(path, str)
-      return stringy.startswith(transf.path.leaf(path), str)
+      return get.string.bool_by_startswith(transf.path.leaf(path), str)
     end,
     is_extension = function(path, ext)
       return transf.path.extension(path) == ext
@@ -1635,7 +1671,7 @@ get = {
       local sliced_path_component_array = transf.path.sliced_path_component_array(path, spec)
       local whole_path_component_array = transf.path.path_component_array(path)
       local res = {}
-      local started_with_slash = stringy.startswith(path, "/")
+      local started_with_slash = get.string.bool_by_startswith(path, "/")
       
       -- Create a map for quick lookup of the index of each path component
       local path_component_index_map = {}
@@ -1918,10 +1954,10 @@ get = {
   },
   plaintext_file = {
     lines_tail = function(path, n)
-      return get.string.lines_tail(transf.plaintext_file.string_by_contents(path), n)
+      return get.string.line_array_by_tail(transf.plaintext_file.string_by_contents(path), n)
     end,
     lines_head = function(path, n)
-      return get.string.lines_head(transf.plaintext_file.string_by_contents(path), n)
+      return get.string.line_array_by_head(transf.plaintext_file.string_by_contents(path), n)
     end,
     nth_line = function(path, n)
       return transf.plaintext_file.string_array_by_lines(path)[n]
@@ -2114,7 +2150,7 @@ get = {
     end,
     path_array_by_filter_to_filename_starting = function(path_array, leaf_starting)
       return get.array.array_by_filtered(path_array, function(path)
-        return stringy.startswith(transf.path.filename(path), leaf_starting)
+        return get.string.bool_by_startswith(transf.path.filename(path), leaf_starting)
       end)
     end,
 

@@ -1,13 +1,5 @@
 r = {
   g = {
-    text_bloat = {
-      youtube = {
-        video = "[\\-【 \\(]*(?:Official )?(?:Music Video|Video|MV)(?: full)?[\\-】 \\)]*",
-        misc = "[\\-【  \\(]*(?:Audio|TVアニメ|Official)[\\-】 \\)]*",
-        channel_topic_producer = "[\\-【 \\(]*(?:Official|YouTube|Music|Topic|SMEJ|VEVO|Channel|チャンネル ?){1, 3})[\\-】 \\)]*",
-        slash_suffix = " */ *[^/]+$"
-      }
-    },
     case = {
       snake = "[a-zA-Z0-9_]+",
       upper_snake = "[A-Z0-9_]+",
@@ -50,7 +42,8 @@ r = {
     },
     id = {
       issn = "[0-9]{4}-?[0-9]{3}[0-9xX]",
-      isbn = "(?:(?:[0-9]{13}|[0-9]{9}[0-9xX]))",
+      isbn10 = "[0-9]{9}[0-9xX]",
+      isbn13 = "[0-9]{13}",
       uuid = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
       doi = "(10\\.\\d{4,9}/[-._;()/:A-Z0-9]+)",
       doi_prefix = "^https?://[^/]+/",
