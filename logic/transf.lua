@@ -826,10 +826,12 @@ transf = {
      
   },
   local_path = {
-    local_absolute_path = hs.fs.pathToAbsolute, -- resolves ~, ., .., and symlinks
     local_path_by_percent_encoded = function(path)
       return plurl.quote(path)
-    end,
+    end
+  },
+  local_resolvable_path = {
+    local_absolute_path = hs.fs.pathToAbsolute, -- resolves ~, ., .., and symlinks
   },
   remote_path = {
 
@@ -868,17 +870,23 @@ transf = {
     end,
 
   },
-  extant_volume_local_extant_path = {
+  volume_local_extant_path = {
 
   },
   extant_path = {
-    sibling_absolute_path_array = function(path)
+    absolute_path_array_by_siblings = function(path)
       return transf.dir.absolute_path_array_by_children(transf.path.parent_path(path))
     end,
-    descendants_absolute_path_array = function(path)
+    absolute_path_array_by_descendants = function(path)
       return get.extant_path.absolute_path_array(
         path,
         {recursion = true}
+      )
+    end,
+    absolute_path_array_by_descendants_depth_3 = function(path)
+      return get.extant_path.absolute_path_array(
+        path,
+        {recursion = 3}
       )
     end,
     file_array_by_descendants = function(path)
@@ -910,13 +918,13 @@ transf = {
       )
     end,
     descendants_leaves_array = function(path)
-      return transf.path_array.leaves_array(transf.extant_path.descendants_absolute_path_array(path))
+      return transf.path_array.leaves_array(transf.extant_path.absolute_path_array_by_descendants(path))
     end,
     descendants_filenames_array = function(path)
-      return transf.path_array.filenames_array(transf.extant_path.descendants_absolute_path_array(path))
+      return transf.path_array.filenames_array(transf.extant_path.absolute_path_array_by_descendants(path))
     end,
     extension_array_by_descendants = function(path)
-      return transf.path_array.extensions_array(transf.extant_path.descendants_absolute_path_array(path))
+      return transf.path_array.extensions_array(transf.extant_path.absolute_path_array_by_descendants(path))
     end,
 
     dir_array_by_descendants_depth_3 = function(path)
@@ -924,6 +932,9 @@ transf = {
         path,
         {recursion = 3, include_files = false}
       )
+    end,
+    git_root_dir_array_by_descendants = function(dir)
+      return transf.dir_array.git_root_dir_array_by_filter(transf.extant_path.absolute_path_array_by_descendants(dir))
     end,
   },
   local_extant_path = {
@@ -1164,6 +1175,12 @@ transf = {
         dir
       )
     end,
+    absolute_path_array_by_children_or_parent = function(dir)
+      return transf.array_and_any.array(
+        transf.dir.absolute_path_array_by_children(dir),
+        transf.path.parent_path(dir)
+      )
+    end,
     file_array_by_children = function(dir)
       return get.extant_path.absolute_path_array(dir, {include_dirs = false})
     end,
@@ -1192,6 +1209,18 @@ transf = {
     children_leaves_array = function(dir)
       return transf.path_array.leaves_array(transf.dir.absolute_path_array_by_children(dir))
     end,
+    children_leaves_array_or_dot = function(dir)
+      return transf.array_and_any.array(
+        transf.dir.children_leaves_array(dir),
+        "."
+      )
+    end,
+    children_leaves_array_or_dotdot = function(dir)
+      return transf.array_and_any.array(
+        transf.dir.children_leaves_array(dir),
+        ".."
+      )
+    end,
     children_filename_array = function(dir)
       return transf.path_array.filenames_array(transf.dir.absolute_path_array_by_children(dir))
     end,
@@ -1203,9 +1232,6 @@ transf = {
     end,
     grandchildren_absolute_path_array = function(dir)
       return get.array_of_arrays.array_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_array_by_children(dir), transf.dir.absolute_path_array_by_children)
-    end,
-    git_root_dir_descendants = function(dir)
-      return transf.dir_array.git_root_dir_array_by_filter(transf.extant_path.descendants_absolute_path_array(dir))
     end,
     absolute_path_key_leaf_string_or_nested_value_dict = function(path)
       local res = {}
@@ -2026,7 +2052,7 @@ transf = {
     end,
     full_date_component_name_value_dict = function(date)
       local tbl = transf.two_tables.table_by_take_new(
-        date:getdate(),
+        date:gettransf["nil"].date_by_current(),
         date:gettime()
       )
       tbl.ticks = nil
@@ -5693,7 +5719,7 @@ transf = {
     end,
     rechnung_id = function(dir)
       return
-        date():fmt("%Y") .. "-" ..
+        transf["nil"].date_by_current():fmt("%Y") .. "-" ..
         transf.omegat_project_dir.client_name(dir):upper() .. "-" ..
         transf.omegat_project_dir.rechnung_number(dir)
     end,
@@ -7271,10 +7297,13 @@ transf = {
     passw_pass_item_name_array = function()
       return transf.dir.children_filename_array(env.MPASSPASSW)
     end,
+    date_by_current = function()
+      return transf["nil"].date_by_current()
+    end,
     timestamp_s_last_midnight = function()
       return transf.date.timestamp_s(
         get.date.precision_date(
-          date(),
+          transf["nil"].date_by_current(),
           "day"
         )
       )
@@ -7311,7 +7340,7 @@ transf = {
     active_mullvad_relay_identifier = function()
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("mullvad relay get"):match("hostname ([^ ]+)")
     end,
-    non_root_volume_absolute_path_array = function()
+    volume_local_extant_path_array = function()
       return get.array.array_by_filtered(
         transf.table_or_nil.kt_array(hs.fs.volume.allVolumes()),
         is.local_absolute_path.root_local_absolute_path
@@ -7349,8 +7378,14 @@ transf = {
     end,
     telegram_raw_export_dir_by_current = function()
       return env.DOWNLOADS .. "/Telegram Desktop/DataExport_" .. get.date.string_w_date_format_indicator(
-        date(),
+        transf["nil"].date_by_current(),
         "%Y-%m-%d"
+      )
+    end,
+    running_application_by_frontmost = hs.application.frontmostApplication,
+    menu_item_table_array_by_frontmost_application = function()
+      return transf.menu_item_table_array.menu_item_table_array_by_application(
+        transf["nil"].running_application_by_frontmost()
       )
     end,
 
@@ -7825,8 +7860,8 @@ transf = {
         stop = get.any.default_if_nil(stop, 10)
         step = get.any.default_if_nil(step, 1)
       elseif mode == "date" then
-        if start then start = start:copy() else start = date() end
-        if stop then stop = stop:copy() else stop = date():addays(10) end
+        if start then start = start:copy() else start = transf["nil"].date_by_current() end
+        if stop then stop = stop:copy() else stop = transf["nil"].date_by_current():addays(10) end
         step = get.any.default_if_nil(step, 1)
         unit = get.any.default_if_nil(unit, "days")
         addmethod = function(a, b) 

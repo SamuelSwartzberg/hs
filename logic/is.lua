@@ -389,14 +389,56 @@ is = {
     end,
   },
   local_path = {
-    local_absolute_path = function(path)
+    local_naive_absolute_path = function(path)
       return get.string.bool_by_startswith(path, "/")
+    end,
+    local_absolute_path = function(path)
+       return is.local_path.local_naive_absolute_path(path) and is.local_path.not_contains_relative_references_local_path(path)
     end,
     local_nonabsolute_path = function(path)
       return not is.path.local_absolute_path(path)
     end,
+    contains_relative_references_local_path = function(path)
+      return 
+        get.string.bool_by_startswith_any_w_ascii_string_array(
+          path,
+          {
+            "./",
+            "../",
+            "/./",
+            "/../",
+          }
+        ) or 
+        get.string.bool_by_contains_any_w_ascii_string_array(
+          path,
+          {
+            "/./",
+            "/../",
+          }
+        ) or
+        get.string.bool_by_endswith_any_w_ascii_string_array(
+          path,
+          {
+            "/.",
+            "/..",
+          }
+        )
+      end,
+    not_contains_relative_references_local_path = function(path)
+      return not is.path.contains_relative_references_path(path)
+    end,
+    local_tilde_path = function(path)
+      return is.local_path.local_nonabsolute_path(path) and is.local_nonabsolute_path.local_tilde_path(path)
+    end,
+    local_resolvable_path = function(path)
+      return is.local_path.local_naive_absolute_path(path) or is.local_path.local_tilde_path(path)
+    end
   },
-
+  local_nonabsolute_path = {
+    local_tilde_path = function(path)
+      return get.string.bool_by_startswith(path, "~/")
+    end,
+  },
   local_absolute_path = {
     local_extant_path = function(path)
       local file = io.open(path, "r")
@@ -415,9 +457,9 @@ is = {
     in_volume_local_absolute_path = function(path)
       return get.string.bool_by_startswith(path, "/Volumes/")
     end,
-    extant_volume_local_extant_path = function(path)
+    volume_local_extant_path = function(path)
       return get.array.bool_by_contains(
-        transf["nil"].non_root_volume_absolute_path_array(),
+        transf["nil"].volume_local_extant_path_array(),
         path
       )
     end,
@@ -441,15 +483,15 @@ is = {
   in_volume_local_absolute_path = {
     
   },
-  extant_volume_local_extant_path = {
+  volume_local_extant_path = {
     
-    dynamic_time_machine_extant_volume_local_extant_path = function(path)
+    dynamic_time_machine_volume_local_extant_path = function(path)
       return get.string.bool_by_startswith(
         path,
         "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. get.fn.rt_or_nil_by_memoized(hs.host.localizedName)() .. "/" .. os.date("%Y-%m-%d-%H")
       )
     end,
-    static_time_machine_extant_volume_local_extant_path = function(path)
+    static_time_machine_volume_local_extant_path = function(path)
       return path == env.TMBACKUPVOL .. "/"
     end
       

@@ -23,6 +23,7 @@ env = transf.string.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini"
 watcher_arr = {}
 hotkey_arr = {}
 pasteboard_arr = {}
+stream_arr = {}
 
 
 dothis.created_item_specifier_array.create(
@@ -54,14 +55,14 @@ dothis.created_item_specifier_array.create_all(
       watcher_type = hs.fs.volume,
       fn = function(event, information)
         if event == hs.fs.volume.didMount then
-          if is.extant_volume_local_extant_path.static_time_machine_extant_volume_local_extant_path(information.path) then
+          if is.volume_local_extant_path.static_time_machine_volume_local_extant_path(information.path) then
             hs.alert.show("Starting backup...")
             dothis.string.env_bash_eval_async("tmutil startbackup")
           end
         elseif event == hs.fs.volume.didUnmount then
-          if is.extant_volume_local_extant_path.dynamic_time_machine_extant_volume_local_extant_path(information.path) then
+          if is.volume_local_extant_path.dynamic_time_machine_volume_local_extant_path(information.path) then
             hs.timer.doAfter(30, 
-              get.fn.first_n_args_bound_fn(act.extant_volume_local_extant_path.eject_or_msg, env.TMBACKUPVOL)
+              get.fn.first_n_args_bound_fn(act.volume_local_extant_path.eject_or_msg, env.TMBACKUPVOL)
             )
           end
         end
@@ -77,17 +78,9 @@ main_qspec = {
   hotkey_created_item_specifier = dothis.creation_specifier.create({
     type = "hotkey",
     key = "/",
-    fn = get.fn.first_n_args_bound_fn(dothis.fn_queue_specifier.pop, main_qspec)
+    fn = act["nil"].pop_main_qspec
   })
 }
-
-local function createCSLArray()
-  return st()
-    :get("descendant-file-only-string-item-array")
-    :get("map-to-new-array", function(file) 
-      return transf.table_array.item_array_of_item_tables(transf.bib_file.array_of_csl_tables(file:get("contents")))
-    end)
-end
 
 --- @alias key_inner_specifier { explanation: string, fn: function, mnemonic?: string }
 
@@ -95,44 +88,24 @@ end
 local keymap = {
   ["tab"] = {
     explanation = "Grid cell mapper",
-    fn = hs.fnutils.partial(act.hs_geometry_size_like.show_grid, {y = 2, x = 4})
+    fn = act["nil"].show_2_by_4_grid
   },
   ["1"] = {
     explanation = "Command palette for frontmost app",
-    fn = function() 
-      ar(
-        transf.running_application.menu_item_table_item_array(
-          hs.application.frontmostApplication()
-        )
-      ):doThis("choose-item", function(item)
-        dothis.menu_item_table.execute(item:get("c"))
-      end)
-    end,
+    fn = act["nil"].choose_menu_item_table_and_execute_by_frontmost_application
   },
-  a_use, {
+  ["2"] = {
     explanation = "Choose contact and action on that contact (from local vcf files)",
-    fn = function()
-      ar(
-        get.fn.rt_or_nil_by_memoized(transf["nil"].contact_table_array)
-      ):doThis("choose-item-and-then-action") 
-    end,
+    fn = act["nil"].choose_item_and_action_on_contact_table_array,
     mnemonic = "2 by association with @"
   },
   ["3"] = {
     explanation = "Choose a volume and eject it",
-    fn = function() 
-      System
-        :get("all-non-root-volumes-string-item-array")
-        :doThis("choose-item-and-eject") 
-    end,
+    fn = act["nil"].choose_item_and_eject_or_msg_by_all_volumes,
   },
   ["4"] = {
     explanation = "Choose a screenshot and action on it",
-    fn = function() 
-      st(env.SCREENSHOTS)
-        :get("child-string-item-array")
-        :doThis("choose-item-and-then-action")
-      end,
+    fn = act["nil"].choose_item_and_action_on_screenshot_children
   },
   ["6"] = {
     explanation = "Enable and disable mullvad",
@@ -140,34 +113,19 @@ local keymap = {
   },
   ["7"] = {
     explanation = "Switch ·to a different mullvad server",
-    fn = function ()
-      ar(transf["nil"].mullvad_relay_identifier_array)
-        :doThis("choose-item", act.mullvad_relay_identifier.set_active_mullvad_relay_dentifier)
-    end
+    fn = act["nil"].choose_item_and_set_active_mullvad_relay_identifier
   },
   ["8"] = {
     explanation = "Choose a email in your inbox and action on it",
-    fn = function()
-      ar(get.maildir_dir.sorted_email_paths(env.MBSYNC_INBOX, true))
-        :get("to-string-item-array")
-        :doThis("choose-email-and-then-action")
-    end,
+    fn = act["nil"].choose_inbox_email_and_action
   },
   ["9"] = {
     explanation = "Switch the active input audiodevice",
-    fn = function()
-      dothis.audiodevice_specifier_array.choose_item_and_set_default(
-        transf.audiodevice_type.audiodevice_specifier_array("input")
-      )
-    end,
+    fn = act["nil"].choose_input_audiodevice_specifier_and_set_default
   },
   ["0"] = {
     explanation = "Switch the active output audiodevice",
-    fn = function() 
-      dothis.audiodevice_specifier_array.choose_item_and_set_default(
-        transf.audiodevice_type.audiodevice_specifier_array("output")
-      )
-    end,
+    fn = act["nil"].choose_output_audiodevice_specifier_and_set_default
   },
   ["-"] = {
     explanation = "Show information on hotkeys",
@@ -207,24 +165,15 @@ local keymap = {
   w = nil, -- never assign anything to w, since too many 'close window' hotkeys use it
   e = {
     explanation = "Choose an environment variable, and an action on it",
-    fn = function ()
-      envTable:doThis("choose-item-and-then-action")
-    end,
+    fn = act["nil"].choose_item_and_action_by_env_var
   },
   r = {
     explanation = "Record some audio, then choose an action on it",
-    fn = function() 
-      dothis.sox.sox_rec_toggle_cache(function(file)
-        st(file):doThis("choose-action")
-      end)
-    end,
+    fn = act["nil"].sox_rec_toggle_and_act
   },
   t = {
     explanation = "Choose an action on the current date.",
-    fn = function() 
-      dat(date())
-        :doThis("choose-action") 
-    end,
+    fn = act["nil"].choose_action_on_current_date
   },
   y = {
     explanation = "Choose action on tag name and value in MAUDIOVISUAL (mostly for interacting with streams)",
@@ -238,7 +187,7 @@ local keymap = {
     explanation = "Choose item and action on it in MAUDIOVISUAL (mostly for interacting with streams)",
     fn = function() 
       get.fn.rt_or_nil_by_memoized(function()
-        return st(env.MAUDIOVISUAL)
+        return st()
           :get("descendant-string-item-array")
           :get("map-to-table-of-path-and-path-content-items")
       end)():doThis("choose-item-and-then-action")
@@ -258,12 +207,7 @@ local keymap = {
   o = nil, -- unassigned
   p = {
     explanation = "Choose a pass and fill it",
-    fn = function()
-      dothis.array.choose_item(
-        transf["nil"].passw_pass_item_name_array(),
-        dothis.login_pass_item_name.fill
-      )
-    end,
+    fn = act["nil"].choose_login_pass_item_name_and_fill
   },
   ["["] = nil, -- unassigned
   ["]"] = nil, -- unassigned

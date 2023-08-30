@@ -102,7 +102,7 @@ get = {
         value = "default"
       }
       CALENDAR_TEMPLATE_SPECIFIER.start = {
-        value = date():fmt("%Y-%m-%dT%H:%M"),
+        value = transf["nil"].date_by_current():fmt("%Y-%m-%dT%H:%M"),
       }
       CALENDAR_TEMPLATE_SPECIFIER.title = {}
       CALENDAR_TEMPLATE_SPECIFIER.description = {}
@@ -992,6 +992,15 @@ get = {
       end
       return false
     end,
+    bool_by_endswith_any_w_ascii_string_array = function(str, anyof)
+      for i = 1, #anyof do
+        local res = stringy.endswith(str, anyof[i])
+        if res then
+          return true
+        end
+      end
+      return false
+    end,
     bool_by_contains_w_ascii_string = stringy.find,
     bool_by_not_contains_w_ascii_string = function(str, substr)
       return not transf.string.bool_by_contains_w_string(str, substr)
@@ -1819,34 +1828,34 @@ get = {
       end
     end,
     extant_path_by_descendant_w_fn = function(path, cond)
-      return get.array.pos_int_or_nil_by_first_match_w_fn(transf.extant_path.descendants_absolute_path_array(path), cond)
+      return get.array.pos_int_or_nil_by_first_match_w_fn(transf.extant_path.absolute_path_array_by_descendants(path), cond)
     end,
     find_descendant_ending_with = function(path, ending)
-      return get.path_array.path_or_nil_by_first_ending_find_ending_w_string(transf.extant_path.descendants_absolute_path_array(path), ending)
+      return get.path_array.path_or_nil_by_first_ending_find_ending_w_string(transf.extant_path.absolute_path_array_by_descendants(path), ending)
     end,
     find_leaf_of_descendant = function(path, filename)
-      return get.path_array.bool_by_contains_leaf(transf.extant_path.descendants_absolute_path_array(path), filename)
+      return get.path_array.bool_by_contains_leaf(transf.extant_path.absolute_path_array_by_descendants(path), filename)
     end,
     bool_by_descendant_with_extnesion = function(path, extension)
-      return get.path_array.bool_by_contains_extension(transf.extant_path.descendants_absolute_path_array(path), extension)
+      return get.path_array.bool_by_contains_extension(transf.extant_path.absolute_path_array_by_descendants(path), extension)
     end,
     absolute_path_by_descendant_with_leaf = function(path, leaf)
-      return get.path_array.path_or_nil_by_first_having_leaf(transf.extant_path.descendants_absolute_path_array(path), leaf)
+      return get.path_array.path_or_nil_by_first_having_leaf(transf.extant_path.absolute_path_array_by_descendants(path), leaf)
     end,
     absolute_path_by_descendant_with_extension = function(path, extension)
-      return get.path_array.path_or_nil_by_first_having_extension(transf.extant_path.descendants_absolute_path_array(path), extension)
+      return get.path_array.path_or_nil_by_first_having_extension(transf.extant_path.absolute_path_array_by_descendants(path), extension)
     end,
     absolute_path_by_descendant_with_leaf_ending = function(path, leaf_ending)
-      return get.path_array.path_or_nil_by_first_having_leaf_ending(transf.extant_path.descendants_absolute_path_array(path), leaf_ending)
+      return get.path_array.path_or_nil_by_first_having_leaf_ending(transf.extant_path.absolute_path_array_by_descendants(path), leaf_ending)
     end,
     absolute_path_or_nil_by_descendant_with_filename_ending = function(path, filename_ending)
-      return get.path_array.path_or_nil_by_first_having_filename_ending(transf.extant_path.descendants_absolute_path_array(path), filename_ending)
+      return get.path_array.path_or_nil_by_first_having_filename_ending(transf.extant_path.absolute_path_array_by_descendants(path), filename_ending)
     end,
     absolute_path_by_descendant_with_filename = function(path, filename)
-      return get.path_array.path_or_nil_by_first_having_filename(transf.extant_path.descendants_absolute_path_array(path), filename)
+      return get.path_array.path_or_nil_by_first_having_filename(transf.extant_path.absolute_path_array_by_descendants(path), filename)
     end,
     bool_by_some_descendants_pass_w_fn = function(path, fn)
-      return get.array.bool_by_some_pass_w_fn(transf.extant_path.descendants_absolute_path_array(path), fn)
+      return get.array.bool_by_some_pass_w_fn(transf.extant_path.absolute_path_array_by_descendants(path), fn)
     end,
     stream_creation_specifier = function(path, flag_profile_name)
       return {

@@ -535,6 +535,10 @@ tblmap = {
       date = {
         thing_name = "summary",
         precedence = 999
+      },
+      contact_table = {
+        thing_name = "summary",
+        precedence = 999
       }
     },
     chooser_subtext_partial_retriever_specifier = {

@@ -1311,9 +1311,9 @@ dothis = {
     
   },
   dir = {
-    pull_all = function(path)
+    pull_all_descendants = function(path)
       dothis.in_git_dir_array.pull_all(
-        transf.dir.git_root_dir_descendants(path)
+        transf.extant_path.git_root_dir_array_by_descendants(path)
       )
     end,
     do_in_path = function(path, cmd, do_after)
@@ -1370,6 +1370,25 @@ dothis = {
         end
       )
     end,
+    choose_leaf_or_dotdot_w_extant_path_arg_fn = function(path, fn)
+      dothis.array.choose_item(
+        transf.dir.leaf_or_dotdot_array(path),
+        function(leaf_or_dotdot)
+          local local_resolvable_path = transf.path.ending_with_slash(path) .. leaf_or_dotdot
+          local local_extant_path = transf.local_resolvable_path.local_absolute_path(local_resolvable_path)
+          fn(local_extant_path)
+        end
+      )
+    end,
+    choose_leaf_or_dotdot_until_file_w_file_arg_fn = function(path, fn)
+      dothis.dir.choose_leaf_or_dotdot_until_file_w_file_arg_fn(path, function(local_extant_path)
+        if is.local_extant_path.local_file(local_extant_path) then
+          fn(local_extant_path)
+        else
+          dothis.dir.choose_leaf_or_dotdot_until_file_w_file_arg_fn(local_extant_path, fn)
+        end
+      end)
+    end
     
   },
   maildir_dir = {

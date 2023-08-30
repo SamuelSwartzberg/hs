@@ -290,16 +290,16 @@ act = {
   dict = {
     
   },
-  extant_volume_local_extant_path = {
+  volume_local_extant_path = {
     eject_or_err = function(path)
       hs.fs.volume.eject(path)
-      if is.local_absolute_path.extant_volume_local_extant_path(path) then
+      if is.local_absolute_path.volume_local_extant_path(path) then
         error("Volume could not be ejected.", 0)
       end
     end,
     eject_or_msg = function(path)
       dothis.string.alert("Ejecting volume...")
-      local succ, res = pcall(act.extant_volume_local_extant_path.eject_or_err, path)
+      local succ, res = pcall(act.volume_local_extant_path.eject_or_err, path)
       if succ then
         dothis.string.alert("Volume ejected successfully.")
       else
@@ -411,11 +411,136 @@ act = {
     search_danbooru = function(query) dothis.search_engine.search("danbooru", query) end,
     search_gelbooru = function(query) dothis.search_engine.search("gelbooru", query) end,
   },
+  extant_path = {
+    create_stream_foreground = function(path)
+      dothis.created_item_specifier_array.create(
+        stream_arr,
+        get.extant_path.stream_creation_specifier(path, "foreground")
+      )
+    end,
+    create_stream_background = function(path)
+      dothis.created_item_specifier_array.create(
+        stream_arr,
+        get.extant_path.stream_creation_specifier(path, "background")
+      )
+    end,
+    choose_item_and_action_by_descendants = function(path)
+      dothis.array.choose_item_and_action(
+        transf.extant_path.absolute_path_array_by_descendants(path)
+      )
+    end,
+    choose_item_and_action_by_descendants_depth_3 = function(path)
+      dothis.array.choose_item_and_action(
+        transf.extant_path.absolute_path_array_by_descendants_depth_3(path)
+      )
+    end,
+  },
+  dir = {
+    choose_item_and_action_by_children = function(path)
+      dothis.array.choose_item_and_action(
+        transf.dir.absolute_path_array_by_children(path)
+      )
+    end,
+    choose_leaf_until_file_then_action = function(path)
+      dothis.dir.choose_leaf_or_dotdot_until_file_w_file_arg_fn(
+        path,
+        dothis.any.choose_action
+      )
+    end,
+    
+  },
+  volume_local_extant_path_array = {
+    choose_item_and_eject_or_msg = function(array)
+      dothis.array.choose_item(
+        array,
+        act.volume_local_extant_path.eject_or_msg
+      )
+    end,
+  },
   ["nil"] = {
     ensure_sound_played_on_speakers = function()
       local device = hs.audiodevice.findOutputByName("Built-in Output")
       dothis.audiodevice.ensure_sound_will_be_played(device)
       dothis.audiodevice.set_default(device, "output")
+    end,
+    choose_menu_item_table_and_execute_by_frontmost_application = function()
+      act.menu_item_table_array.choose_item_and_execute(
+        transf["nil"].menu_item_table_array_by_frontmost_application()
+      )
+    end,
+    choose_item_and_action_on_contact_table_array = function()
+      dothis.array.choose_item_and_action(
+        transf["nil"].contact_table_array()
+      )
+    end,
+    choose_item_and_eject_or_msg_by_all_volumes = function()
+      act.volume_local_extant_path_array.choose_item_and_eject_or_msg(
+        transf["nil"].volume_local_extant_path_array()
+      )
+    end,
+    choose_item_and_action_on_screenshot_children = function()
+      act.dir.choose_item_and_action_by_children(env.SCREENSHOTS)
+    end,
+    show_2_by_4_grid = function()
+      act.hs_geometry_size_like.show_grid({w=2, h=4})
+    end,
+    pop_main_qspec = function()
+      dothis.fn_queue_specifier.pop(
+        main_qspec
+      )
+    end,
+    choose_item_and_set_active_mullvad_relay_identifier = function()
+      act.mullvad_relay_identifier_array.choose_item_and_set_active(
+        transf["nil"].mullvad_relay_identifier_array()
+      )
+    end,
+    choose_inbox_email_and_action = function()
+      dothis.array.choose_item_and_action(
+        get.maildir_dir.sorted_email_paths(env.MBSYNC_INBOX, true)
+      )
+    end,
+    choose_input_audiodevice_specifier_and_set_default = function()
+      dothis.audiodevice_specifier_array.choose_item_and_set_default(
+        transf.audiodevice_type.audiodevice_specifier_array("input")
+      )
+    end,
+    choose_output_audiodevice_specifier_and_set_default = function()
+      dothis.audiodevice_specifier_array.choose_item_and_set_default(
+        transf.audiodevice_type.audiodevice_specifier_array("output")
+      )
+    end,
+    choose_item_and_action_by_env_var = function()
+      dothis.table.choose_w_vt_fn(
+        env
+      )
+    end,
+    sox_rec_toggle_and_act = function()
+      dothis.sox.sox_rec_toggle_cache(dothis.any.choose_action)
+    end,
+    choose_action_on_current_date = function()
+      dothis.any.choose_action(transf["nil"].date_by_current())
+    end,
+    choose_login_pass_item_name_and_fill = function()
+      dothis.array.choose_item(
+        transf["nil"].passw_pass_item_name_array(),
+        act.login_pass_item_name.fill
+      )
+    end
+  },
+  mullvad_relay_identifier_array = {
+    choose_item_and_set_active = function(array)
+      dothis.array.choose_item(
+        array,
+        act.mullvad_relay_identifier.set_active_mullvad_relay_dentifier
+      )
+    end,
+  },
+  menu_item_table_array = {
+    choose_item_and_execute = function(array)
+      dothis.array.choose_item(
+        array,
+        dothis.menu_item_table.execute
+      )
     end,
   }
 }
