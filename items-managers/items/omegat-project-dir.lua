@@ -73,13 +73,13 @@ OmegatProjectDirItemSpecifier = {
       i = emj.open .. emj.source,
       d = "opsrc",
       getfn = transf.omegat_project_dir.source_files,
-      dothis = dothis.array.choose_item_and_action
+      dothis = act.array.choose_item_and_action
     },
     {
       i = emj.open .. emj.target,
       d = "optgt",
       getfn = transf.omegat_project_dir.target_files,
-      dothis = dothis.array.choose_item_and_action
+      dothis = act.array.choose_item_and_action
     },
     {
       text = "♻️💥 reftgt.",

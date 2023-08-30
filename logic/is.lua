@@ -35,8 +35,8 @@ is = {
     multiline_string = function(str)
       return not is.string.line(str)
     end,
-    noncomment_line = function(str)
-      return is.string.line(str) and is.line.noncomment_line(str)
+    nocomment_line = function(str)
+      return is.string.line(str) and is.line.nocomment_line(str)
     end,
     nowhitespace_string = function(str)
       return get.string.bool_by_not_matches_part_eutf8(str, "%s")
@@ -52,7 +52,7 @@ is = {
     comment_line = function(str)
       return get.string.bool_by_matches_part_eutf8(str, "^%s*#")
     end,
-    noncomment_line = function(str)
+    nocomment_line = function(str)
       return not is.line.comment_line(str)
     end,
     indent_line = function(str)
@@ -61,6 +61,19 @@ is = {
     nonindent_line = function(str)
       return not is.line.indent_line(str)
     end,
+    noempty_line = function(str)
+      return is.string.noempty_string(str)
+    end,
+    empty_line = function(str)
+      return not is.line.noempty_line(str)
+    end,
+    noempty_nocomment_line = function(str)
+      return is.line.noempty_line(str) and is.line.nocomment_line(str)
+    end,
+    noempty_nocomment_nonindent_line = function(str)
+      return is.line.noempty_nocomment_line(str) and is.line.nonindent_line(str)
+    end,
+
   },
   multiline_string = {
 
@@ -240,7 +253,7 @@ is = {
     
   },
   uuid = {
-    contact = function(uuid)
+    contact_uuid = function(uuid)
       local succ, res = pcall(transf.uuid.raw_contact, uuid)
       return succ 
     end,
@@ -611,10 +624,10 @@ is = {
     end,
   },
   in_git_dir = {
-    has_changes = function(path)
+    in_has_changes_git_dir = function(path)
       return transf.in_git_dir.status(path) ~= ""
     end,
-    has_unpushed_commits = function(path)
+    in_has_unpushed_commits_git_dir = function(path)
       return #transf.in_git_dir.unpushed_commit_hash_list(path) > 0
     end,
   },
@@ -783,6 +796,9 @@ is = {
           is.path_url.yandere_style_post_url(url)
         ))
     end,
+    github_url = function(url)
+      return get.string.bool_by_startswith(url, "https://github.com/")
+    end
 
   },
   scheme_url = {

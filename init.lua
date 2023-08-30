@@ -24,7 +24,7 @@ watcher_arr = {}
 hotkey_arr = {}
 pasteboard_arr = {}
 stream_arr = {}
-
+source_id_arr = {}
 
 dothis.created_item_specifier_array.create(
   hotkey_arr,
@@ -204,7 +204,10 @@ local keymap = {
           
     end,
   },
-  o = nil, -- unassigned
+  o = {
+    explanation = "Choose a otp and paste it",
+    fn = act["nil"].choose_otp_pass_item_name_and_paste
+  }, -- unassigned
   p = {
     explanation = "Choose a pass and fill it",
     fn = act["nil"].choose_login_pass_item_name_and_fill
@@ -222,7 +225,7 @@ local keymap = {
   s = {
     explanation = "Choose a project and choose an action on it.",
     fn = function()
-      dothis.array.choose_item_and_action(
+      act.array.choose_item_and_action(
         transf.local_extant_path.project_dir_array_by_descendants_depth_3(env.ME)
       )
     end,
@@ -239,7 +242,7 @@ local keymap = {
     explanation = "Choose a composite item, eval and choose an action on it.",
     fn = function()
       compTable:doThis("choose-item", function (item)
-        st(get.string.evaled_as_template(item)):doThis("choose-action")
+        st(get.string.string_by_evaled_as_template(item)):doThis("choose-action")
       end)
     end,
   },
@@ -259,7 +262,7 @@ local keymap = {
   ["'"] = {
     explanation = "Choose a citation item, and then choose an action on it.",
     fn = function()
-      dothis.array.choose_item_and_action(
+      act.array.choose_item_and_action(
         transf.path_array.csl_table_array_by_filtered_mapped(
           transf.extant_path.file_array_by_descendants(
             env.MCITATIONS
@@ -325,20 +328,13 @@ local keymap = {
   {
     key = "`", 
     modifiers = {"cmd", "alt"}, 
-    fn = function() 
-      System:get("manager", "input-method")
-        :doThis("activate-next") 
-    end
+    fn = act["nil"].activate_next_source_id
   }
 
 }
 
 System:get("manager", "creatable"):doThis("create-all", keymap)
 
-System:get("manager", "input-method"):doThis("create-all", {
-  "com.apple.keylayout.US",
-  "com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
-})
 
 -- structure below is not final, more OO way will emerge in the course of working on this I think
 

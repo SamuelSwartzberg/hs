@@ -118,6 +118,21 @@ act = {
         dothis.ics_file.add_events_from_file(ics_file, calendar)
       end)
     end,
+    generate_json_file = function(path)
+      return dothis.string.env_bash_eval_async(
+        "ical2json" .. transf.string.single_quoted_escaped(path)
+      )
+    end,
+  },
+  booru_post_url = {
+    add_to_local = function(url)
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_urls/add_url",
+        request_table = { url = url },
+        request_verb = "POST",
+      })
+    end,
   },
   hs_geometry_size_like = {
     show_grid = function(grid)
@@ -298,12 +313,12 @@ act = {
       end
     end,
     eject_or_msg = function(path)
-      dothis.string.alert("Ejecting volume...")
+      act.string.alert("Ejecting volume...")
       local succ, res = pcall(act.volume_local_extant_path.eject_or_err, path)
       if succ then
-        dothis.string.alert("Volume ejected successfully.")
+        act.string.alert("Volume ejected successfully.")
       else
-        dothis.string.alert(res)
+        act.string.alert(res)
       end
     end
   },
@@ -390,6 +405,9 @@ act = {
         str
       )
     end,
+    alert = function(str)
+      dothis.string.alert(str, 10)
+    end,
     search_wiktionary = function(query) dothis.search_engine.search("wiktionary", query) end,
     search_wikipedia = function(query) dothis.search_engine.search("wikipedia", query) end,
     search_youtube = function(query) dothis.search_engine.search("youtube", query) end,
@@ -425,19 +443,19 @@ act = {
       )
     end,
     choose_item_and_action_by_descendants = function(path)
-      dothis.array.choose_item_and_action(
+      act.array.choose_item_and_action(
         transf.extant_path.absolute_path_array_by_descendants(path)
       )
     end,
     choose_item_and_action_by_descendants_depth_3 = function(path)
-      dothis.array.choose_item_and_action(
+      act.array.choose_item_and_action(
         transf.extant_path.absolute_path_array_by_descendants_depth_3(path)
       )
     end,
   },
   dir = {
     choose_item_and_action_by_children = function(path)
-      dothis.array.choose_item_and_action(
+      act.array.choose_item_and_action(
         transf.dir.absolute_path_array_by_children(path)
       )
     end,
@@ -469,7 +487,7 @@ act = {
       )
     end,
     choose_item_and_action_on_contact_table_array = function()
-      dothis.array.choose_item_and_action(
+      act.array.choose_item_and_action(
         transf["nil"].contact_table_array()
       )
     end,
@@ -495,7 +513,7 @@ act = {
       )
     end,
     choose_inbox_email_and_action = function()
-      dothis.array.choose_item_and_action(
+      act.array.choose_item_and_action(
         get.maildir_dir.sorted_email_paths(env.MBSYNC_INBOX, true)
       )
     end,
@@ -525,7 +543,16 @@ act = {
         transf["nil"].passw_pass_item_name_array(),
         act.login_pass_item_name.fill
       )
-    end
+    end,
+    choose_otp_pass_item_name_and_paste = function()
+      dothis.array.choose_item(
+        transf["nil"].otp_pass_item_name_array(),
+        dothis.string.paste
+      )
+    end,
+    activate_next_source_id = function()
+      act.source_id_arr.activate_next(source_id_arr)
+    end,
   },
   mullvad_relay_identifier_array = {
     choose_item_and_set_active = function(array)
@@ -542,5 +569,68 @@ act = {
         dothis.menu_item_table.execute
       )
     end,
-  }
+  },
+  array = {
+    choose_item_and_action = function(array)
+      dothis.array.choose_item(array, dothis.any.choose_action)
+    end,
+    pop = function(array)
+      local last = array[#array]
+      array[#array] = nil
+      return last
+    end,
+    shift = function(array)
+      local first = array[1]
+      table.remove(array, 1)
+      return first
+    end,
+    to_empty_table = function(array)
+      for i, v in transf.array.index_value_stateless_iter(array) do
+        array[i] = nil
+      end
+    end,
+    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.array.sort, {a_use, transf["nil"].random_boolean}),
+  },
+  contact_uuid = {
+    edit_contact = function(uuid)
+      dothis.contact_uuid.edit_contact(uuid)
+    end
+  },
+  youtube_video_url = {
+    add_as_m3u = function(url)
+      local deduced_tags = transf.youtube_video_url.fs_tag_assoc(url)
+      local edited_tags = transf.string_value_dict.string_value_dict_by_prompted_once_from_default(deduced_tags)
+      local plspec = {}
+      plspec.tag = transf.two_array_or_nils.array(edited_tags, transf.string.prompted_multiple_string_pair_array_for("tag"))
+      plspec.path  = get.local_extant_path.dir_by_default_prompted_once(env.MAUDIOVISUAL)
+      plspec.path = transf.string.prompted_once_string_from_default(plspec.path)
+      plspec.extension = "m3u"
+      dothis.absolute_path.write_file(transf.path_leaf_specifier.path(plspec), url)
+    end,
+  },
+  source_id = {
+    activate = function(source_id)
+      hs.keycodes.currentSourceID(source_id)
+      hs.alert.show(transf.source_id.language(source_id))
+    end,
+  },
+  source_id_arr = {
+    activate_next = function(arr)
+      act.source_id.activate(
+        transf.source_id_array.source_id_by_next_to_be_activated(arr)
+      )
+    end,
+  },
+  in_git_dir_array = {
+    pull_all = function(paths)
+      dothis.array.each(paths, dothis.in_git_dir.pull)
+    end,
+    push_all = function(paths)
+      dothis.array.each(paths, dothis.in_git_dir.push)
+    end,
+    fetch_all = function(paths)
+      dothis.array.each(paths, dothis.in_git_dir.fetch)
+    end,
+
+  },
 }

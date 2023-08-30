@@ -117,7 +117,7 @@ dothis = {
     end,
     add_event_interactive = function(event_table, do_after)
       event_table = event_table or {}
-      local temp_file_contents = get.string.evaled_as_template(transf.event_table.calendar_template(event_table))
+      local temp_file_contents = get.string.string_by_evaled_as_template(transf.event_table.calendar_template(event_table))
       dothis.string.edit_temp_file_in_vscode_act_on_contents(temp_file_contents, function(cnt)
         local new_specifier = transf.yaml_string.not_userdata_or_function(cnt)
         dothis.event_table.add_event_from(new_specifier, do_after)
@@ -156,13 +156,13 @@ dothis = {
       dothis.md_file.to_file_in_target(source, env.DOWNLOADS, format, metadata)
     end,
   },
-  uuid = {
+  contact_uuid = {
     add_contact_data = function(uuid, data, type)
       type = "contacts/" .. type
       dothis.alphanum_minus_underscore.set_pass_json(uuid, type, data)
     end,
     edit_contact = function(uuid, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("khard edit " .. uuid, do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("khard edit " .. uuid, do_after or function() end)
     end,
   },
   pass_item_name = {
@@ -197,26 +197,14 @@ dothis = {
   },
   contact_table = {
     add_iban = function(contact_table, iban)
-      dothis.uuid.add_contact_data(transf.contact_table.uid(contact_table), "iban", iban)
+      dothis.contact_uuid.add_contact_data(transf.contact_table.uid(contact_table), "iban", iban)
     end,
-    edit = function(contact_table)
-      dothis.uuid.edit_contact(transf.contact_table.uid(contact_table))
+    edit = function(contact_table, do_after)
+      dothis.contact_uuid.edit_contact(transf.contact_table.uid(contact_table), do_after)
     end,
   },
   youtube_video_id = {
     
-  },
-  youtube_video_url = {
-    add_as_m3u = function(url)
-      local deduced_tags = transf.youtube_video_url.fs_tag_assoc(url)
-      local edited_tags = transf.string_value_dict.string_value_dict_by_prompted_once_from_default(deduced_tags)
-      local plspec = {}
-      plspec.tag = transf.two_array_or_nils.array(edited_tags, transf.string.prompted_multiple_string_pair_array_for("tag"))
-      plspec.path  = get.local_extant_path.dir_by_default_prompted_once(env.MAUDIOVISUAL)
-      plspec.path = transf.string.prompted_once_string_from_default(plspec.path)
-      plspec.extension = "m3u"
-      dothis.absolute_path.write_file(transf.path_leaf_specifier.path(plspec), url)
-    end,
   },
   url = {
     download_to_async = function(url, target)
@@ -244,16 +232,6 @@ dothis = {
         transf.string.single_quoted_escaped(url) ..
         "| pass otp insert otp/" .. name
       )
-    end,
-  },
-  booru_post_url = {
-    add_to_local = function(url)
-      rest({
-        api_name = "hydrus",
-        endpoint = "add_urls/add_url",
-        request_table = { url = url },
-        request_verb = "POST",
-      })
     end,
   },
   table = {
@@ -327,13 +305,10 @@ dothis = {
         transf.string.string_or_nil_by_evaled_env_bash_stripped("qrencode -l M -m 2 -t PNG -o" .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(data))
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
     end,
-    alert = function(str, opts)
-      opts = get.table.table_by_copy(opts) or {}
-      opts.duration = opts.duration or 10
-      return hs.alert.show(str, {textSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3}, opts.duration)
+    alert = function(str, duration)
+      return hs.alert.show(str, {textSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3}, duration)
     end,
     say = function(str, lang)
-      lang = lang or "en"
       speak:voice(tblmap.lang.voice[lang]):speak(transf.string.singleline_string_by_folded(str))
     end,
     paste = function(str)
@@ -349,10 +324,10 @@ dothis = {
       end
     end,
     paste_le = function(str)
-      dothis.string.paste(get.string.evaled_as_template(str))
+      dothis.string.paste(get.string.string_by_evaled_as_template(str))
     end,
     fill_with_lines = function(str)
-      dothis.string_array.fill_with(transf.string.lines(str))
+      dothis.string_array.fill_with(transf.string.line_array(str))
     end,
     fill_with_content_lines = function(path)
       dothis.string_array.fill_with(transf.string.noempty_line_string_array(path))
@@ -593,7 +568,7 @@ dothis = {
     write_template = function(path, template_path)
       dothis.absolute_path.write_file(
         path,
-        get.string.evaled_as_template(
+        get.string.string_by_evaled_as_template(
           get.string.evaled_as_lua(template_path),
           path
         )
@@ -1272,7 +1247,7 @@ dothis = {
     end,
     edit_then_send = function(path, do_after)
       dothis.local_file.edit_file_in_vscode_act_on_contents(path, function(str)
-        dothis.absolute_path.write_file(path, get.string.evaled_as_template(str)) -- re-eval
+        dothis.absolute_path.write_file(path, get.string.string_by_evaled_as_template(str)) -- re-eval
         dothis.email_file.send(path, do_after)
       end)
     end,
@@ -1312,12 +1287,12 @@ dothis = {
   },
   dir = {
     pull_all_descendants = function(path)
-      dothis.in_git_dir_array.pull_all(
+      act.in_git_dir_array.pull_all(
         transf.extant_path.git_root_dir_array_by_descendants(path)
       )
     end,
     do_in_path = function(path, cmd, do_after)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd, do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd, do_after or function() end)
     end,
     delete_child_with_leaf_ending = function(path, ending)
       dothis.absolute_path.delete(
@@ -1490,23 +1465,7 @@ dothis = {
       )
     end,
   },
-  source_id = {
-    activate = function(source_id)
-      hs.keycodes.currentSourceID(source_id)
-      hs.alert.show(transf.source_id.language(source_id))
-    end,
-    activate_next = function(source_id)
-      dothis.source_id.activate(
-        transf.source_id.next_to_be_activated(source_id)
-      )
-    end,
-  },
   ics_file = {
-    generate_json_file = function(path)
-      return dothis.string.env_bash_eval_async(
-        "ical2json" .. transf.string.single_quoted_escaped(path)
-      )
-    end,
     add_events_from_file = function(path, calendar)
       dothis.string.env_bash_eval("khal import --include-calendar " .. calendar .. " " .. transf.string.single_quoted_escaped(path))
     end,
@@ -1601,13 +1560,6 @@ dothis = {
         do_after
       )
     end
-  },
-  in_git_dir_array = {
-    pull_all = function(paths)
-      for _, path in transf.array.index_value_stateless_iter(paths) do
-        dothis.in_git_dir.pull(path)
-      end
-    end,
   },
   date = {
     create_log_entry = function(date, path, contents)
@@ -1715,7 +1667,7 @@ dothis = {
     write = function(dynamic_absolute_path_key_dict)
       for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_key_dict) do
         if is.any.array(contents) then
-          dothis.absolute_path[dothis.array.shift(contents)](absolute_path, table.unpack(contents))
+          dothis.absolute_path[act.array.shift(contents)](absolute_path, table.unpack(contents))
         else
           act.absolute_path[contents](absolute_path)
         end
@@ -2188,37 +2140,18 @@ dothis = {
         callback
       )
     end,
-    choose_item_and_action = function(array)
-      dothis.array.choose_item(array, dothis.any.choose_action)
-    end,
     choose_item_truncated = function(array, callback)
       dothis.array.choose_item(array, callback, "truncated_text")
-    end,
-    pop = function(array)
-      local last = array[#array]
-      array[#array] = nil
-      return last
     end,
     push = function(array, item)
       array[#array + 1] = item
       return true
     end,
-    shift = function(array)
-      local first = array[1]
-      table.remove(array, 1)
-      return first
-    end,
     unshift = function(array, item)
       table.insert(array, 1, item)
       return true
     end,
-    to_empty_table = function(array)
-      for i, v in transf.array.index_value_stateless_iter(array) do
-        array[i] = nil
-      end
-    end,
     sort = table.sort,
-    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(table.sort, {a_use, transf["nil"].random_boolean}),
     remove_by_index = table.remove,
     revove_by_first_item_w_any = function(array, item)
       local index = get.array.pos_int_or_nil_by_first_match_w_t(array, item)
@@ -2748,7 +2681,7 @@ dothis = {
       hs.timer.doAfter(
         wait_time, 
         function()
-          local subspecifier = dothis.array.shift(specarr)
+          local subspecifier = act.array.shift(specarr)
           dothis.input_spec.exec(subspecifier, function()
             dothis.input_spec_array.exec(subspecifier, do_after)
           end)
@@ -3138,7 +3071,7 @@ dothis = {
       else
         qspec.alert = dothis.string.alert(
           transf.fn_queue_specifier.string_by_waiting_message(qspec),
-          {duration = "indefinite"}
+          "indefinite"
         )
         dothis.hotkey_created_item_specifier.resume(qspec.hotkey_created_item_specifier)
       end
@@ -3148,7 +3081,7 @@ dothis = {
       dothis.fn_queue_specifier.update(qspec)
     end,
     pop = function(qspec)
-      local fn = dothis.array.pop(qspec.fn_array)
+      local fn = act.array.pop(qspec.fn_array)
       fn()
       dothis.fn_queue_specifier.update(qspec)
     end,

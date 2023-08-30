@@ -683,7 +683,7 @@ transf = {
     end,
     path_segments = function(path)
       local path_components = transf.path.path_component_array(path)
-      local leaf = dothis.array.pop(path_components)
+      local leaf = act.array.pop(path_components)
       local without_extension = ""
       local extension = ""
       if leaf == "" then
@@ -719,7 +719,7 @@ transf = {
     end,
     filename = function(path)
       local psegments = transf.path.path_segments(path)
-      dothis.array.pop(psegments)
+      act.array.pop(psegments)
       ---@diagnostic disable-next-line: need-check-nil -- path_segments always returns a table with at least two elements for any valid path
       return psegments[#psegments]
     end,
@@ -741,7 +741,7 @@ transf = {
     end,
     parent_leaf = function(path)
       local pcomponents = transf.path.path_component_array(path)
-      dothis.array.pop(pcomponents)
+      act.array.pop(pcomponents)
       return pcomponents[#pcomponents]
     end,
     parent_path_component_array = function(path)
@@ -786,12 +786,12 @@ transf = {
   path_with_intra_file_locator = {
     path_with_intra_file_locator_specifier = function(path)
       local parts = stringy.split(path, ":")
-      local final_part = dothis.array.pop(parts)
+      local final_part = act.array.pop(parts)
       local specifier = {}
       if is.string.number_string(parts[#parts]) then
         specifier = {
           column = final_part,
-          line = dothis.array.pop(parts),
+          line = act.array.pop(parts),
           path = get.string_or_number_array.string_by_joined(parts, ":")
         }
       else
@@ -1315,14 +1315,14 @@ transf = {
         is.dir.git_root_dir
       )
     end,
-    relative_path_from_git_root_dir = function(path)
+    nonabsolute_path_by_from_git_root_dir = function(path)
       return transf.path.relative_path(
         path,
         transf.in_git_dir.git_root_dir(path)
       )
     end,
-    gitignore_path = function(path)
-      return transf.path.ending_with_slash(transf.in_git_dir.gitignore_path(path)) .. ".gitignore"
+    absolute_path_by_root_gitignore = function(path)
+      return transf.path.ending_with_slash(transf.in_git_dir.git_root_dir(path)) .. ".gitignore"
     end,
     current_branch = function(path)
       return get.extant_path.cmd_output_from_path(
@@ -1381,7 +1381,14 @@ transf = {
 
 
   },
-
+  in_git_dir_array = {
+    in_has_changes_git_dir_array_by_filtered = function(path_array)
+      return get.array.array_by_filtered(path_array, is.in_git_dir.in_has_changes_git_dir)
+    end,
+    in_has_unpushed_commits_git_dir_array_by_filtered = function(path_array)
+      return get.array.array_by_filtered(path_array, is.in_git_dir.in_has_unpushed_commits_git_dir)
+    end,
+  },
   git_root_dir = {
     dotgit_dir = function(git_root_dir)
       return transf.path.ending_with_slash(git_root_dir) .. ".git"
@@ -1703,7 +1710,7 @@ transf = {
       
 
       local mail = join.string.table.email(body, specifier)
-      local evaled_mail = get.string.evaled_as_template(mail)
+      local evaled_mail = get.string.string_by_evaled_as_template(mail)
       local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
       local outpath = temppath .. "_out"
       transf.string.string_or_nil_by_evaled_env_bash_stripped("mmime < " .. transf.string.single_quoted_escaped(temppath) .. " > " .. transf.string.single_quoted_escaped(outpath))
@@ -1714,7 +1721,7 @@ transf = {
   mime_parts_raw = {
     attachments = function(mime_parts_raw)
       local attachments = {}
-      for line in transf.string.lines(mime_parts_raw) do
+      for line in transf.string.line_array(mime_parts_raw) do
         local name = line:match("name=\"(.-)\"")
         if name then
           table.insert(attachments, name)
@@ -1737,7 +1744,7 @@ transf = {
     array_of_assocs = function(path)
       local temppath = transf.string.in_tmp_dir(transf.path.filename(path) .. ".ics")
       dothis.extant_path.copy_to_absolute_path(path, temppath)
-      dothis.ics_file.generate_json_file(temppath)
+      act.ics_file.generate_json_file(temppath)
       local jsonpath = transf.file.string_by_contents(get.path.with_different_extension(temppath, "json"))
       local res = json.decode(transf.file.string_by_contents(jsonpath))
       dothis.absolute_path.delete(temppath)
@@ -1876,7 +1883,7 @@ transf = {
       return transf.file.string_by_contents(path)
     end,
     string_array_by_lines = function(path)
-      return transf.string.lines(transf.plaintext_file.string_by_contents(path))
+      return transf.string.line_array(transf.plaintext_file.string_by_contents(path))
     end,
     string_array_by_content_lines = function(path)
       return transf.string.noempty_line_string_array(transf.plaintext_file.string_by_contents(path))
@@ -3714,7 +3721,7 @@ transf = {
 
     --- @param str string
     --- @return string[]
-    lines = function(str)
+    line_array = function(str)
       return stringy.split(
         stringy.strip(str),
         "\n"
@@ -3722,13 +3729,13 @@ transf = {
     end,
 
     len_lines = function(str)
-      return #transf.string.lines(str)
+      return #transf.string.line_array(str)
     end,
 
 
     noempty_line_string_array = function(str)
       return transf.string_array.noemtpy_string_array(
-        transf.string.lines(str)
+        transf.string.line_array(str)
       )
     end,
     noindent_content_lines = function(str)
@@ -3739,13 +3746,13 @@ transf = {
     end,
 
     first_line = function(str)
-      return transf.string.lines(str)[1]
+      return transf.string.line_array(str)[1]
     end,
     first_content_line = function(str)
       return transf.string.noempty_line_string_array(str)[1]
     end,
     last_line = function(str)
-      local lines = transf.string.lines(str)
+      local lines = transf.string.line_array(str)
       return lines[#lines]
     end,
     last_content_line = function(str)
@@ -3850,7 +3857,7 @@ transf = {
     end,
     url_array = function(str)
       return transf.string_array.filter_nocomment_noindent_to_url_array(
-        transf.string.lines(str)
+        transf.string.line_array(str)
       )
     end,
     string_by_whole_regex = function(str)
@@ -4403,7 +4410,7 @@ transf = {
       return transf.string.string_by_first_eutf8_upper(transf.any.string(k)) .. ": " .. transf.any.string(v)
     end,
     email_header = function(key, value)
-      return transf.string.string_by_first_eutf8_upper(transf.any.string(key)) .. ": " .. get.string.evaled_as_template(transf.any.string(value))
+      return transf.string.string_by_first_eutf8_upper(transf.any.string(key)) .. ": " .. get.string.string_by_evaled_as_template(transf.any.string(value))
     end,
     url_param = function(key, value)
       return transf.any.string(key) .. "=" .. transf.string.encoded_query_param_value(transf.any.string(value))
@@ -5810,14 +5817,14 @@ transf = {
     end,
     rechnung_email_specifier = function(dir)
       return {
-        body = get.string.evaled_as_template(lemap.translation.rechnung_email_de, dir),
+        body = get.string.string_by_evaled_as_template(lemap.translation.rechnung_email_de, dir),
         non_inline_attachment_local_file_array = {
           transf.omegat_project_dir.rechnung_pdf_path(dir)
         }
       }
     end,
     raw_rechnung = function(dir)
-      return get.string.evaled_as_template(lemap.translation.rechnung_de, dir)
+      return get.string.string_by_evaled_as_template(lemap.translation.rechnung_de, dir)
     end,
 
   },
@@ -7068,7 +7075,7 @@ transf = {
     end,
   },
   source_id_array = {
-    next_to_be_activated = function(source_id_array)
+    source_id_by_next_to_be_activated = function(source_id_array)
       return get.array.next_by_fn_wrapping(source_id_array, is.source_id.active_source_id)
     end,
   },
@@ -7297,6 +7304,9 @@ transf = {
     passw_pass_item_name_array = function()
       return transf.dir.children_filename_array(env.MPASSPASSW)
     end,
+    otp_pass_item_name_array = function()
+      return transf.dir.children_filename_array(env.MPASSOTP)
+    end,
     date_by_current = function()
       return transf["nil"].date_by_current()
     end,
@@ -7309,16 +7319,16 @@ transf = {
       )
     end,
     package_manager_name_array = function()
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg list-package-managers"))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg list-package-managers"))
     end,
     package_manager_name_array_with_missing_packages = function()
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg missing-package-manager"))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg missing-package-manager"))
     end,
     semver_string_array_of_installed_package_managers = function ()
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg package-manager-version"))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg package-manager-version"))
     end,
     absolute_path_array_of_installed_package_managers = function()
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg which-package-maanger"))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg which-package-manager"))
     end,
     mullvad_status_string = function()
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("mullvad status")
@@ -7347,7 +7357,7 @@ transf = {
       )
     end,
     calendar_name_array = function()
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("khal printcalendars"))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("khal printcalendars"))
     end,
     writeable_calendar_name_array = function()
       return get.array.array_by_filtered(
@@ -7360,7 +7370,7 @@ transf = {
         "khard list --parsable"
       )
     end,
-    contact_uid_array = function()
+    contact_uuid_array = function()
       return get.array.array_by_mapped_w_t_arg_t_ret_fn(
         stringy.split(transf["nil"].string_by_khard_list_output(), "\n"), 
         function (line)
@@ -7370,7 +7380,7 @@ transf = {
     end,
     contact_table_array = function()
       return get.array.array_by_mapped_w_t_arg_t_ret_fn(
-        transf["nil"].contact_uid_array(),
+        transf["nil"].contact_uuid_array(),
         function(uid)
           return transf.uuid.contact_table(uid)
         end
@@ -7413,26 +7423,26 @@ transf = {
   },
   package_manager_name_or_nil = {
     backed_up_package_name_array = function(mgr)
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " read-backup"))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " read-backup"))
     end,
     missing_package_name_array = function(mgr)
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " missing"))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " missing"))
     end,
     added_package_name_array = function(mgr)
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " added"))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " added"))
     end,
     difference_package_name_array = function(mgr)
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " difference"))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " difference"))
     end,
-    package_name_or_package_name_semver_compound_string_array = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list ")) end,
-    package_name_semver_compound_string_array = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version ")) end,
-    package_name_array = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-no-version ")) end,
-    package_name_semver_package_manager_name_compound_string_array = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
-    package_name_package_manager_name_compound_string = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
-    nonindicated_decimal_string_array_installed = function(mgr) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " count ")) end,
+    package_name_or_package_name_semver_compound_string_array = function(mgr) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list ")) end,
+    package_name_semver_compound_string_array = function(mgr) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version ")) end,
+    package_name_array = function(mgr) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-no-version ")) end,
+    package_name_semver_package_manager_name_compound_string_array = function(mgr) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
+    package_name_package_manager_name_compound_string = function(mgr) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
+    nonindicated_decimal_string_array_installed = function(mgr) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " count ")) end,
   },
   package_name = {
-    installed_package_manager = function(pkg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg installed_package_manager " .. pkg)) end,
+    installed_package_manager = function(pkg) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg installed_package_manager " .. pkg)) end,
   },
   action_specifier = {
     action_chooser_item_specifier = function(action_specifier)
@@ -7919,7 +7929,7 @@ transf = {
     --- )
     --- ```
     filled_string_dict = function(spec)
-      local query = get.string.evaled_as_template(lemap.gpt.fill_template, spec)
+      local query = get.string.string_by_evaled_as_template(lemap.gpt.fill_template, spec)
       local res = gpt(query,  { temperature = 0})
       return get.form_field_specifier_array.filled_string_dict_from_string(spec.form_field_specifier_array, res)
     end,
@@ -8035,7 +8045,7 @@ transf = {
         input_spec.mode = "key"
         local parts = transf.hole_y_arraylike.array(stringy.split(string.sub(str, 2), "+")) -- separating modifier keys with `+`
         if #parts > 1 then
-          input_spec.key = dothis.array.pop(parts)
+          input_spec.key = act.array.pop(parts)
           input_spec.mods = parts
         else
           input_spec.key = parts[1]
@@ -8372,7 +8382,7 @@ transf = {
     n_anys_or_nil_ret_fn_by_pcall = function(fn)
       return function(...)
         local rets = {pcall(fn, ...)}
-        local succ = dothis.array.shift(rets)
+        local succ = act.array.shift(rets)
         if succ then
           return table.unpack(rets)
         else

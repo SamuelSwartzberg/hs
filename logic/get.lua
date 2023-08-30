@@ -46,11 +46,11 @@ get = {
   },
 
   package_manager_name_or_nil = {
-    package_name_semver_compound_string_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
-    package_name_semver_package_manager_name_compound_string_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
-    package_name_package_manager_name_compound_string = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
-    semver_string_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
-    absolute_path_array = function(mgr, arg) return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
+    package_name_semver_compound_string_array = function(mgr, arg) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
+    package_name_semver_package_manager_name_compound_string_array = function(mgr, arg) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
+    package_name_package_manager_name_compound_string = function(mgr, arg) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
+    semver_string_array = function(mgr, arg) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
+    absolute_path_array = function(mgr, arg) return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
     boolean_array_installed = function(mgr, arg) return transf.string.bool_by_evaled_env_bash_success( "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
   },
@@ -730,7 +730,7 @@ get = {
       )
     end,
     string_by_joined_any_pair = function(arr, joiner)
-      local any = dothis.array.pop(arr)
+      local any = act.array.pop(arr)
       local str = get.string_or_number_array.string_by_joined(arr, joiner)
       return { str, any }
     end,
@@ -937,10 +937,10 @@ get = {
     string_array_split_noedge = function(str, sep)
       local res = transf.string.string_array_split(str, sep)
       if res[1] == "" then
-        dothis.array.shift(res)
+        act.array.shift(res)
       end
       if res[#res] == "" then
-        dothis.array.pop(res)
+        act.array.pop(res)
       end
       return res
     end,
@@ -964,10 +964,10 @@ get = {
       end
     end,
     line_array_by_tail = function(path, n)
-      return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.lines(path), -(n or 10))
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.line_array(path), -(n or 10))
     end,
     line_array_by_head = function(path, n)
-      return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.lines(path), 1, n or 10)
+      return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.line_array(path), 1, n or 10)
     end,
     noempty_line_array_by_tail = function(path, n)
       return get.array.array_by_slice_w_3_pos_int_any_or_nils(transf.string.noempty_line_string_array(path), -(n or 10))
@@ -1235,9 +1235,9 @@ get = {
         end
       end
     end,
-    evaled_as_template = function(str, d)
+    string_by_evaled_as_template = function(str, d)
       local res = eutf8.gsub(str, "{{%[(.-)%]}}", function(item)
-        return get.string.evaled_as_template(item, d)
+        return get.string.string_by_evaled_as_template(item, d)
       end)
       return res
     end,
@@ -1669,8 +1669,8 @@ get = {
     path_from_sliced_path_segment_array = function(path, spec)
       local sliced_path_segment_array = transf.path.sliced_path_segment_array(path, spec)
       dothis.array.push(sliced_path_segment_array, "")
-      local extension = dothis.array.pop(sliced_path_segment_array)
-      local filename = dothis.array.pop(sliced_path_segment_array)
+      local extension = act.array.pop(sliced_path_segment_array)
+      local filename = act.array.pop(sliced_path_segment_array)
       local leaf
       if extension == "" then
         leaf = filename
@@ -1946,7 +1946,7 @@ get = {
       local remote_type = transf.in_git_dir.remote_type(path)
       branch = branch or transf.in_git_dir.current_branch(path)
       local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
-      local relative_path = transf.in_git_dir.relative_path_from_git_root_dir(path)
+      local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(
         transf.in_git_dir.remote_blob_host(path),
         tblmap.remote_type.blob_indicator[remote_type],
@@ -1959,7 +1959,7 @@ get = {
       local remote_type = transf.in_git_dir.remote_type(path)
       branch = branch or transf.in_git_dir.current_branch(path)
       local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
-      local relative_path = transf.in_git_dir.relative_path_from_git_root_dir(path)
+      local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(
         transf.in_git_dir.remote_raw_host(path),
         tblmap.remote_type.raw_indicator[remote_type],
@@ -2082,7 +2082,7 @@ get = {
         headerpart = ""
       end
       local res = transf.string.string_or_nil_by_evaled_env_bash_stripped("maddr " .. (only and "-a" or "")  .. headerpart .. transf.string.single_quoted_escaped(path))
-      return transf.array.set(transf.string.lines(res))
+      return transf.array.set(transf.string.line_array(res))
     end,
     displayname_addresses_dict_of_dicts = function(path, header)
       local w_displaynames = transf.email_file.addresses(path, header, false)
@@ -2110,7 +2110,7 @@ get = {
       end
       cmd = cmd .. " | msort " .. flags
 
-      return transf.string.lines(transf.string.string_or_nil_by_evaled_env_bash_stripped(cmd))
+      return transf.string.line_array(transf.string.string_or_nil_by_evaled_env_bash_stripped(cmd))
     end
 
   },
@@ -3328,7 +3328,7 @@ get = {
   },
   n_any_assoc_array = {
     leaf_label_with_title_path = function(arr, title_key)
-      local leaf = get.table.table_by_copy(dothis.array.pop(arr))
+      local leaf = get.table.table_by_copy(act.array.pop(arr))
       local title_path = get.array_of_tables.array_of_vts_w_kt(arr, title_key)
       leaf.path = title_path
       return leaf
