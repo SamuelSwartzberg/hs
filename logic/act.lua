@@ -162,6 +162,18 @@ act = {
     create_as_session_in_msessions = function(url_array)
       dothis.url_array.create_as_session(url_array, env.MSESSIONS)
     end,
+    create_as_stream_foreground = function(url_array)
+      dothis.created_item_specifier_array.create(
+        stream_arr,
+        get.url_array.stream_creation_specifier(url_array, "foreground")
+      )
+    end,
+    create_as_stream_background = function(url_array)
+      dothis.created_item_specifier_array.create(
+        stream_arr,
+        get.url_array.stream_creation_specifier(url_array, "background")
+      )
+    end,
   },
   plaintext_url_or_local_path_file = {
     open_all_ff = function(path)
@@ -553,6 +565,22 @@ act = {
     activate_next_source_id = function()
       act.source_id_arr.activate_next(source_id_arr)
     end,
+    maintain_state_stream_arr = function()
+      act.stream_created_item_specifier_array.maintain_state(stream_arr)
+    end,
+    choose_action_on_first_running_stream = function()
+      local strm = transf.stream_created_item_specifier_array.stream_created_item_specifier_by_first_running(stream_arr)
+      if strm then
+        dothis.any.choose_action(strm)
+      else
+        act.string.alert("No running streams.")
+      end
+    end,
+    choose_action_on_first_item_in_pasteboard_arr = function()
+      dothis.any.choose_action(
+        pasteboard_arr[1]
+      )
+    end
   },
   mullvad_relay_identifier_array = {
     choose_item_and_set_active = function(array)

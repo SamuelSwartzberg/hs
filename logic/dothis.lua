@@ -2539,7 +2539,7 @@ dothis = {
   },
   timer_spec = {
     set_next_timestamp_s = function(spec)
-      spec.next_timestamp_s = transf.cronspec_string.next_timestamp_s(spec.cronspec_string)
+      spec.next_timestamp_s = transf.cronspec_string.timestamp_s_by_next(spec.cronspec_string)
     end,
     postpone_next_timestamp_s = function(spec, s)
       spec.next_timestamp_s = spec.next_timestamp_s + s

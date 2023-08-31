@@ -6845,7 +6845,7 @@ transf = {
     end,
   },
   any = {
-    inspect_string = function(thing)
+    string_by_inspect = function(thing)
       return hs.inspect(thing, {depth = 5})
     end,
     string = function(stringable)
@@ -6864,7 +6864,7 @@ transf = {
         if succ then
           return json
         else
-          return transf.any.inspect_string(stringable)
+          return transf.any.string_by_inspect(stringable)
         end
       end
     end,
@@ -6928,19 +6928,22 @@ transf = {
         image = get.thing_name_array.chooser_image(applicable_thing_name_array, any),
       }
     end,
-    with_1_added_if_number = function(any)
+    t_by_with_1_added_if_number = function(any)
       if type(any) == "number" then
         return any + 1
       else
         return any
       end
     end,
-    with_1_subtracted_if_number = function(any)
+    t_by_with_1_subtracted_if_number = function(any)
       if type(any) == "number" then
         return any - 1
       else
         return any
       end
+    end,
+    t_array = function(any)
+      return {any}
     end
   },
   item_chooser_item_specifier = {
@@ -7712,7 +7715,7 @@ transf = {
     creation_urls = function(stream_created_item_specifier)
       return stream_created_item_specifier.creation_specifier.urls
     end,
-    is_running = function(stream_created_item_specifier)
+    bool_by_is_running = function(stream_created_item_specifier)
       return transf.mpv_ipc_socket_id.is_running(stream_created_item_specifier.mpv_ipc_socket_id)
     end,
 
@@ -7797,40 +7800,40 @@ transf = {
     
   },
   stream_created_item_specifier_array = {
-    first_running = function(stream_created_item_specifier_array)
+    stream_created_item_specifier_by_first_running = function(stream_created_item_specifier_array)
       return get.array.pos_int_or_nil_by_first_match_w_fn(
         stream_created_item_specifier_array,
-        transf.stream_created_item_specifier.is_running
+        transf.stream_created_item_specifier.bool_by_is_running
       )
     end,
   },
   two_sets = {
-    union_set = function(set1, set2)
+    set_by_union = function(set1, set2)
       return transf.two_arrays.set_by_union(set1, set2)
     end,
-    intersection_set = function(set1, set2)
+    set_by_intersection = function(set1, set2)
       return transf.two_arrays.set_by_intersection(set1, set2)
     end,
-    is_subset = function(set1, set2)
+    bool_by_is_subset = function(set1, set2)
       for _, v in transf.array.index_value_stateless_iter(set1) do
         if not get.array.bool_by_contains(set2, v) then
           return false
         end
       end
     end,
-    is_superset = function(set1, set2)
+    bool_by_is_superset = function(set1, set2)
       return transf.two_arrays.is_subset(set2, set1)
     end,
-    equals = function(set1, set2)
-      return transf.two_sets.is_subset(set1, set2) and transf.two_sets.is_superset(set1, set2)
+    bool_by_equals = function(set1, set2)
+      return transf.two_sets.bool_by_is_subset(set1, set2) and transf.two_sets.bool_by_is_superset(set1, set2)
     end,
   },
   cronspec_string = {
-    next_timestamp_s_string = function(cronspec_string)
+    timestamp_s_string_by_next = function(cronspec_string)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("ncron" .. transf.string.single_quoted_escaped(cronspec_string))
     end,
-    next_timestamp_s = function(cronspec_string)
-      return get.string_or_number.number_or_nil(transf.cronspec_string.next_timestamp_s_string(cronspec_string))
+    timestamp_s_by_next = function(cronspec_string)
+      return get.string_or_number.number_or_nil(transf.cronspec_string.timestamp_s_string_by_next(cronspec_string))
     end,
   },
   timer_spec = {

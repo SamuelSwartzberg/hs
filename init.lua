@@ -248,11 +248,7 @@ local keymap = {
   },
   g = {
     explanation = "Choose an item from the clipboard and then an action on it.",
-    fn = function()
-      dothis.any.choose_action(
-        pasteboard_arr[1]
-      )
-    end,
+    fn = act["nil"].choose_action_on_first_item_in_pasteboard_arr,
   },
   h = nil, -- unassigned
   j = nil, -- unassigned
@@ -306,14 +302,7 @@ local keymap = {
   },
   n = {
     explanation = "Choose an action on the first playing stream.",
-    fn = function()
-      local first_playing_stream = System:get("manager", "stream"):get("first-playing-stream")
-      if first_playing_stream then
-        first_playing_stream:doThis("choose-action")
-      else 
-        hs.alert.show("No playing stream")
-      end
-    end,
+    fn = act["nil"].choose_action_on_first_running_stream
   },
   m = {
     explanation = "Choose a stream and then an action on it. (Stream management)",
@@ -349,7 +338,7 @@ System:get("manager", "creatable"):doThis("create-all", {
 System:get("manager", "timer"):doThis("create-all", {
   dothis["nil"].newsboat_reload,
   dothis.vdirsyncer.sync,
-  hs.fnutils.parital(dothis.local_nonabsolute_path_relative_to_home.copy_local_to_labelled_remote, "me/state/todo"),
+  hs.fnutils.partial(dothis.local_nonabsolute_path_relative_to_home.copy_local_to_labelled_remote, "me/state/todo"),
   st(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
@@ -367,6 +356,9 @@ System:get("manager", "timer"):doThis("create-all", {
   {
     fn = act.package_manager_name.upgrade_all,
     interval = "0 0 * * *"
+  },{
+    fn = act["nil"].maintain_state_stream_arr,
+    interval = "*/3 * * * *"
   }
   --[[CreateApplicationItem("Firefox"):get("backup-timer"),
   CreateApplicationItem("Signal"):get("backup-timer"),

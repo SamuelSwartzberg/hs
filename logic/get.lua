@@ -2621,6 +2621,13 @@ get = {
         root
       )
     end,
+    stream_creation_specifier = function(arr, flag_profile_name)
+      return {
+        urls = arr,
+        type = "stream",
+        flag_profile_name = flag_profile_name
+      }
+    end,
   },
   omegat_project_dir = {
     source_files_extension = function(dir, ext)
