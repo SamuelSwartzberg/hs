@@ -1,9 +1,7 @@
 thing_name_hierarchy = {
   string = {
-    url = {
-
-    },
     printable_ascii = {
+      url = {},
       alphanum_minus_underscore = {
         pass_item_name = {
           otp_pass_item_name = "leaf",

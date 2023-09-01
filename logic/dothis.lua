@@ -2307,7 +2307,7 @@ dothis = {
       dothis.mpv_ipc_socket_id.set(
         id, 
         key,
-        get.binary_specifier.inverted(
+        get.binary_specifier.string_or_bool_by_inverted(
           tblmap.binary_specifier_name.binary_specifier["inf_no"],
           get.mpv_ipc_socket_id.string(id, key)
         )

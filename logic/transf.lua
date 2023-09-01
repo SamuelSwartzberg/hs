@@ -4124,7 +4124,7 @@ transf = {
       return transf.table.yaml_string_by_aligned(template)
 
     end,
-    event_tagline = function(event_table)
+    string_by_event_tagline = function(event_table)
       local str = event_table.start
       if event_table["end"] then
         str = str .. " - " .. event_table["end"]

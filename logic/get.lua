@@ -2920,10 +2920,10 @@ get = {
         error("invalid argument")
       end
     end,
-    inverted_string = function(binary_specifier, bool)
+    string_by_inverted = function(binary_specifier, bool)
       return get.binary_specifier.string(binary_specifier, not bool)
     end,
-    inverted_bool = function(binary_specifier, str)
+    bool_by_inverted = function(binary_specifier, str)
       if str == binary_specifier.vt then
         return false
       elseif str == binary_specifier.vf then
@@ -2932,19 +2932,19 @@ get = {
         error("invalid argument")
       end
     end,
-    inverted = function(binary_specifier, str_or_bool)
+    string_or_bool_by_inverted = function(binary_specifier, str_or_bool)
       if type(str_or_bool) == "string" then
-        return get.binary_specifier.inverted_string(binary_specifier, str_or_bool)
+        return get.binary_specifier.string_by_inverted(binary_specifier, str_or_bool)
       else
-        return get.binary_specifier.inverted_bool(binary_specifier, str_or_bool)
+        return get.binary_specifier.bool_by_inverted(binary_specifier, str_or_bool)
       end
     end
   },
   two_numbers = {
-    sum_modulo_n = function(a, b, n)
+    number_by_sum_modulo_n = function(a, b, n)
       return (a + b) % n
     end,
-    difference_modulo_n = function(a, b, n)
+    number_by_difference_modulo_n = function(a, b, n)
       return (a - b) % n
     end,
   },
