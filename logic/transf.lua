@@ -571,12 +571,12 @@ transf = {
     index_value_stateless_iter = ipairs,
     index_value_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.index_value_stateless_iter),
     index_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.index_value_stateless_iter, 1, 1),
-    value_boolean_dict = function(arr)
+    value_bool_dict = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(arr, function(v) return v, true end)
     end,
     set = function(arr)
       return transf.table_or_nil.kt_arr(
-        transf.arr.value_boolean_dict(arr)
+        transf.arr.value_bool_dict(arr)
       )
     end,
     permutation_arr = function(arr)
@@ -862,7 +862,7 @@ transf = {
     end,
     prompted_multiple_local_absolute_path_from_default = function(path)
       return transf.prompt_spec.any_arr({
-        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompter = transf.prompt_args_string.string_or_nil_and_bool,
         prompt_args = {
           message =  "Enter a subdirectory (or file, if last) (started with: " .. path .. ")",
         }
@@ -870,7 +870,7 @@ transf = {
     end,
     prompted_once_local_absolute_path_from_default = function(path)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompter = transf.prompt_args_string.string_or_nil_and_bool,
         prompt_args = {
           message =  "Enter a directory or file as a child of " .. path,
         }
@@ -3872,7 +3872,7 @@ transf = {
     end,
     prompted_once_string_pair_for = function(str)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompter = transf.prompt_args_string.string_or_nil_and_bool,
         transformer = transf.string.string_pair_split_by_minus_or_nil,
         prompt_args = {
           message = "Please enter a string pair for " .. str .. " (e.g. 'foo-bar')",
@@ -3881,7 +3881,7 @@ transf = {
     end,
     prompted_multiple_string_pair_arr_for = function(str)
       return transf.prompt_spec.any_arr({
-        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompter = transf.prompt_args_string.string_or_nil_and_bool,
         transformer = transf.string.string_pair_split_by_minus_or_nil,
         prompt_args = {
           message = "Please enter a string pair for " .. str .. " (e.g. 'foo-bar')",
@@ -4348,10 +4348,10 @@ transf = {
     end,
   },
   two_anys = {
-    boolean_and = function(a, b)
+    bool_and = function(a, b)
       return a and b
     end,
-    boolean_or = function(a, b)
+    bool_or = function(a, b)
       return a or b
     end,
     string_two_anys = function(a, b)
@@ -4595,10 +4595,10 @@ transf = {
       return arr1[1], arr2[1]
     end,
     bool_by_larger_first_item = function(arr1, arr2)
-      return transf.two_comparables.boolean_by_larger(arr1[1], arr2[1])
+      return transf.two_comparables.bool_by_larger(arr1[1], arr2[1])
     end,
     bool_by_smaller_first_item = function(arr1, arr2)
-      return transf.two_comparables.boolean_by_smaller(arr1[1], arr2[1])
+      return transf.two_comparables.bool_by_smaller(arr1[1], arr2[1])
     end,
     arr_by_appended = function(arr1, arr2)
       local res = get.table.table_by_copy(arr1)
@@ -5041,7 +5041,7 @@ transf = {
     truthy_value_dict = function(t)
       return get.arr.arr_by_filtered(
         t,
-        transf.any.boolean
+        transf.any.bool
       )
     end,
     truthy_value_key_arr = function(t)
@@ -5120,7 +5120,7 @@ transf = {
   string_key_value_dict = {
 
   },
-  string_boolean_dict = {
+  string_bool_dict = {
     truthy_long_flag_arr = function(dict)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.dict.truthy_value_key_arr(dict),
@@ -6879,7 +6879,7 @@ transf = {
     t_by_self = function(any)
       return any
     end,
-    boolean = function(any)
+    bool = function(any)
       return not not any
     end,
     n_anys_if_table = function(any)
@@ -6979,8 +6979,8 @@ transf = {
       return stringy.strip(arg1), select(2, ...)
     end
   },
-  n_boolean_functions = {
-    and_boolean_function = function(...)
+  n_bool_functions = {
+    and_bool_function = function(...)
       local functions = {...}
       return function(arg)
         for _, fn in transf.arr.index_value_stateless_iter(functions) do
@@ -6991,7 +6991,7 @@ transf = {
         return true
       end
     end,
-    or_boolean_function = function(...)
+    or_bool_function = function(...)
       local functions = {...}
       return function(arg)
         for _, fn in transf.arr.index_value_stateless_iter(functions) do
@@ -7235,9 +7235,9 @@ transf = {
       })
     end,
   },
-  boolean = {
-    negated = function(boolean)
-      return not boolean
+  bool = {
+    negated = function(bool)
+      return not bool
     end
   },
   ["nil"] = {
@@ -7295,7 +7295,7 @@ transf = {
 
       return getIdentifier
     end,
-    random_boolean = function()
+    random_bool = function()
       return math.random() < 0.5
     end,
     all_applications = function()
@@ -7341,7 +7341,7 @@ transf = {
     mullvad_status_string = function()
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("mullvad status")
     end,
-    mullvad_boolean_connected = function()
+    mullvad_bool_connected = function()
       return get.string.bool_by_startswith(transf["nil"].mullvad_status_string(),"Connected")
     end,
     mullvad_relay_list_string = function()
@@ -7715,7 +7715,7 @@ transf = {
       return get.string_or_number_arr.string_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
           {"pause", "loop", "shuffle", "video"},
-          get.fn.first_n_args_bound_fn(get.mpv_ipc_socket_id.boolean_emoji, mpv_ipc_socket_id)
+          get.fn.first_n_args_bound_fn(get.mpv_ipc_socket_id.bool_emoji, mpv_ipc_socket_id)
         ),
         ""
       )
@@ -7728,7 +7728,7 @@ transf = {
       )
     end,
     is_running = function(mpv_ipc_socket_id)
-      return transf.any.boolean(
+      return transf.any.bool(
         get.mpv_ipc_socket_id.string(mpv_ipc_socket_id, "pause")
       )
     end,
@@ -7742,7 +7742,7 @@ transf = {
       )
     end,
     flags_string = function(stream_creation_specifier)
-      return transf.string_boolean_dict.truthy_long_flag_string(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
+      return transf.string_bool_dict.truthy_long_flag_string(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
     end,
     source_path = function(stream_created_item_specifier)
       return stream_created_item_specifier.source_path
@@ -8165,7 +8165,7 @@ transf = {
 
     --- @param prompt_args? prompt_args_string
     --- @return (string|nil), boolean
-    string_or_nil_and_boolean = function(prompt_args)
+    string_or_nil_and_bool = function(prompt_args)
 
       -- set up default values, make sure provided values are strings
 
@@ -8211,7 +8211,7 @@ transf = {
 
     --- @param prompt_args prompt_args_path
     --- @return (string|string[]|nil), boolean
-    local_absolute_path_or_local_absolute_path_arr_and_boolean = function(prompt_args)
+    local_absolute_path_or_local_absolute_path_arr_and_bool = function(prompt_args)
 
       -- set up default values, make sure message and default are strings
   
@@ -8248,13 +8248,13 @@ transf = {
         return list_return[1], true
       end
     end,
-    local_absolute_path_and_boolean = function(prompt_args)
+    local_absolute_path_and_bool = function(prompt_args)
       prompt_args.multiple = false
-      return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_arr_and_boolean(prompt_args)
+      return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_arr_and_bool(prompt_args)
     end,
-    local_absolute_path_arr_and_boolean = function(prompt_args)
+    local_absolute_path_arr_and_bool = function(prompt_args)
       prompt_args.multiple = true
-      return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_arr_and_boolean(prompt_args)
+      return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_arr_and_bool(prompt_args)
     end,
   
   },
@@ -8280,7 +8280,7 @@ transf = {
 
       -- set defaults for all prompt_spec fields
       prompt_spec = get.table.table_by_copy(prompt_spec)
-      prompt_spec.prompter = prompt_spec.prompter or transf.prompt_args_string.string_or_nil_and_boolean
+      prompt_spec.prompter = prompt_spec.prompter or transf.prompt_args_string.string_or_nil_and_bool
       prompt_spec.transformer = prompt_spec.transformer or function(x) return x end
       prompt_spec.raw_validator = prompt_spec.raw_validator or function(x) return x ~= nil end
       prompt_spec.transformed_validator = prompt_spec.transformed_validator or function(x) return x ~= nil end

@@ -617,7 +617,7 @@ act = {
         arr[i] = nil
       end
     end,
-    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.arr.sort, {a_use, transf["nil"].random_boolean}),
+    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.arr.sort, {a_use, transf["nil"].random_bool}),
   },
   contact_uuid = {
     edit_contact = function(uuid)

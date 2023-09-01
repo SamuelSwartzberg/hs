@@ -2735,7 +2735,7 @@ dothis = {
       dothis.string.env_bash_eval_async("mullvad disconnect")
     end,
     mullvad_toggle = function()
-      if transf["nil"].mullvad_boolean_connected() then
+      if transf["nil"].mullvad_bool_connected() then
         dothis["nil"].mullvad_disconnect()
       else
         dothis["nil"].mullvad_connect()

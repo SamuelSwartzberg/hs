@@ -23,7 +23,7 @@ get = {
   int_or_nil = {
     prompted_once_int_from_default = function(int, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompter = transf.prompt_args_string.string_or_nil_and_bool,
         transformer = get.string.int_by_rounded_or_nil,
         prompt_args = {
           message = message or "Enter an int...",
@@ -35,7 +35,7 @@ get = {
   number_or_nil = {
     prompted_once_number_from_default = function(no, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompter = transf.prompt_args_string.string_or_nil_and_bool,
         transformer = get.string.number_or_nil,
         prompt_args = {
           message = message or "Enter a number...",
@@ -52,7 +52,7 @@ get = {
     semver_string_arr = function(mgr, arg) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
     absolute_path_arr = function(mgr, arg) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
-    boolean_arr_installed = function(mgr, arg) return transf.string.bool_by_evaled_env_bash_success( "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
+    bool_arr_installed = function(mgr, arg) return transf.string.bool_by_evaled_env_bash_success( "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
   },
   calendar_name = {
    
@@ -1230,7 +1230,7 @@ get = {
     end,
     string_by_prompted_once_from_default = function(str, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompter = transf.prompt_args_string.string_or_nil_and_bool,
         prompt_args = {
           message = message,
           default = str,
@@ -1239,7 +1239,7 @@ get = {
     end,
     alphanum_minus_underscore_string_by_prompted_once_from_default = function(str, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_boolean,
+        prompter = transf.prompt_args_string.string_or_nil_and_bool,
         transformed_validator = is.string.alphanum_minus_underscore,
         prompt_args = {
           message = message,
@@ -1850,7 +1850,7 @@ get = {
     end,
     local_absolute_path_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_path.local_absolute_path_and_boolean,
+        prompter = transf.prompt_args_path.local_absolute_path_and_bool,
         prompt_args = {default = path, message = message or "Choose an absolute path..."}
       })
     end,
@@ -1860,7 +1860,7 @@ get = {
     end,
     dir_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_path.local_absolute_path_and_boolean,
+        prompter = transf.prompt_args_path.local_absolute_path_and_bool,
         prompt_args = {
           default = path,
           can_choose_files = false,
@@ -1870,7 +1870,7 @@ get = {
     end,
     local_absolute_path_arr_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_path.local_absolute_path_arr_and_boolean,
+        prompter = transf.prompt_args_path.local_absolute_path_arr_and_bool,
         prompt_args = {default = path, message = message or "Choose absolute paths..."}
       })
     end,
@@ -2830,7 +2830,7 @@ get = {
         get.mpv_ipc_socket_id.string(id, key)
       )
     end,
-    boolean_emoji = function(id, key)
+    bool_emoji = function(id, key)
       local res = get.mpv_ipc_socket_id.string(id, key)
       if res then return tblmap.stream_attribute.true_emoji[key]
       else return tblmap.stream_attribute.false_emoji[key] end
@@ -2911,7 +2911,7 @@ get = {
         return binary_specifier.vf
       end
     end,
-    boolean = function(binary_specifier, str)
+    bool = function(binary_specifier, str)
       if str == binary_specifier.vt then
         return true
       elseif str == binary_specifier.vf then
@@ -2923,7 +2923,7 @@ get = {
     inverted_string = function(binary_specifier, bool)
       return get.binary_specifier.string(binary_specifier, not bool)
     end,
-    inverted_boolean = function(binary_specifier, str)
+    inverted_bool = function(binary_specifier, str)
       if str == binary_specifier.vt then
         return false
       elseif str == binary_specifier.vf then
@@ -2936,7 +2936,7 @@ get = {
       if type(str_or_bool) == "string" then
         return get.binary_specifier.inverted_string(binary_specifier, str_or_bool)
       else
-        return get.binary_specifier.inverted_boolean(binary_specifier, str_or_bool)
+        return get.binary_specifier.inverted_bool(binary_specifier, str_or_bool)
       end
     end
   },
