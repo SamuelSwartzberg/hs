@@ -9,13 +9,11 @@ is = {
     end,
     path = function(str)
       return 
-        str:find("/") ~= nil
-        and str:find("[\n\t\r\f]") == nil
-        and str:find("^%s") == nil
-        and str:find("%s$") == nil
+        is.string.line(str) and
+        is.line.path(str)
     end,
     ascii_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, r.g.charset.ascii)
+      return get.string.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.ascii)
     end,
     alphanum_minus_underscore = function(str)
       return is.string.ascii_string(str) and is.ascii_string.alphanum_minus_underscore(str)
@@ -58,8 +56,14 @@ is = {
     indent_line = function(str)
       return get.string.bool_by_matches_part_eutf8(str, "^%s")
     end,
-    nonindent_line = function(str)
+    noindent_line = function(str)
       return not is.line.indent_line(str)
+    end,
+    trailing_whitespace_line = function(str)
+      return get.string.bool_by_matches_part_eutf8(str, "%s$")
+    end,
+    notrailing_whitespace_line = function(str)
+      return not is.line.trailing_whitespace_line(str)
     end,
     noempty_line = function(str)
       return is.string.noempty_string(str)
@@ -70,17 +74,48 @@ is = {
     noempty_nocomment_line = function(str)
       return is.line.noempty_line(str) and is.line.nocomment_line(str)
     end,
-    noempty_nocomment_nonindent_line = function(str)
-      return is.line.noempty_nocomment_line(str) and is.line.nonindent_line(str)
+    noempty_nocomment_noindent_line = function(str)
+      return is.line.noempty_nocomment_line(str) and is.line.noindent_line(str)
+    end,
+    trimmed_line = function(str)
+      return is.line.noindent_line(str) and is.line.notrailing_whitespace_line(str)
+    end,
+    path = function(str)
+      return is.line.trimmed_noweirdwhitespace_line(str) and is.trimmed_noweirdwhitespace_line.path(str)
+    end,
+    noweirdwhitespace_line = function(str)
+      return get.string.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
+    end,
+    trimmed_noweirdwhitespace_line = function(str)
+      return is.line.trimmed_line(str) and is.line.noweirdwhitespace_line(str)
     end,
 
+  },
+  noweirdwhitespace_line = {
+    leaflike = function(str)
+      return get.string.bool_by_not_contains_w_ascii_string(str, "/")
+    end,
+  },
+  leaflike = {
+    extension = function(str)
+      return get.string.bool_by_not_contains_w_ascii_string(str, ".") -- I consider e.g. .tar.gz files to have an extension of 'gz'
+    end,
+  },
+  trimmed_line = {
+    
+   
+  },
+  trimmed_noweirdwhitespace_line = {
+    path = function(str)
+      return get.string.bool_by_contains_w_ascii_string(str, "/")
+    end
   },
   multiline_string = {
 
   },
   ascii_string = {
     printable_ascii_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, r.g.charset.printable_ascii)
+      return get.string.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
     end,
     alphanum_minus_underscore = function(str)
       return is.ascii_string.printable_ascii_string(str) and is.printable_ascii_nowhitespace_string.alphanum_minus_underscore(str)
@@ -612,7 +647,7 @@ is = {
       return not is.dir.empty_dir(path)
     end,
     logging_dir = function(path)
-      return stringy.endswith(transf.path.leaf(path), "_logs")
+      return get.string.bool_by_endswith(transf.path.leaf(path), "_logs")
     end,
   },
   nonempty_dir = {
@@ -755,6 +790,9 @@ is = {
     pass_item_name = function(str)
       return get.extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
     end,
+  },
+  alphanum_underscore = {
+
   },
   alphanum = {
     alpha_string = function(str)
@@ -910,7 +948,7 @@ is = {
   },
   data_url = {
     base64_data_url = function(url)
-      return stringy.endswith(transf.data_url.header_part(url), ";base64")
+      return get.string.bool_by_endswith(transf.data_url.header_part(url), ";base64")
     end,
     image_data_url = function(url)
       return  s.media_type.image_media_type(transf.data_url.content_type(url))

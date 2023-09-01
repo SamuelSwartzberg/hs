@@ -629,15 +629,18 @@ transf = {
     end,
   },
   char = {
-    hex = function(char)
-      return get.string.string_by_formatted_w_n_anys("%02X", string.byte(char))
-    end,
-    percent = function(char)
-      return get.string.string_by_formatted_w_n_anys("%%%02X", string.byte(char))
-    end,
     unicode_prop_table = function(char)
       return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(char))[1]
     end
+  },
+  ascii_char = {
+    eight_bit_pos_int = string.byte,
+    indicated_hex_number_string = function(char)
+      return get.string.string_by_formatted_w_n_anys("0x%02X", string.byte(char))
+    end,
+    percent_encoded_octet = function(char)
+      return get.string.string_by_formatted_w_n_anys("%%%02X", string.byte(char))
+    end,
   },
   leaf = {
     rf3339like_dt_or_interval_general_name_fs_tag_string = function(leaf)
@@ -650,8 +653,13 @@ transf = {
       )
     end,
   },
+  ascii_string = {
+    printable_ascii_by_remove = function(str)
+      return get.string.string_by_removed_onig_inverted_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
+    end,
+  },
   path = {
-    form_path = function(path)
+    atpath = function(path)
       return "@" .. path
     end,
     path_component_arr = function(path)
@@ -690,12 +698,12 @@ transf = {
         -- already both empty, nothing to do
       elseif get.string.bool_by_startswith(leaf, ".") then -- dotfile
         without_extension = leaf
-      elseif stringy.endswith(leaf, ".") then -- file that ends with a dot, does not count as having an extension
+      elseif get.string.bool_by_endswith(leaf, ".") then -- file that ends with a dot, does not count as having an extension
         without_extension = leaf
       elseif get.string.bool_by_not_contains_w_ascii_string(leaf, ".") then
         without_extension = leaf
       else -- in case of multiple dots, everything after the last dot is considered the extension
-        without_extension, extension = eutf8.match(leaf, transf.string.string_by_whole_regex(r.g_lua.without_extension_and_extension))
+        without_extension, extension = eutf8.match(leaf, transf.string.string_by_whole_regex(r.lua.without_extension_and_extension))
       end
       dothis.arr.push(path_components, without_extension)
       dothis.arr.push(path_components, extension)
@@ -1589,7 +1597,7 @@ transf = {
         request_table_type = "form",
         request_table = {
           model = "whisper-1",
-          file = transf.path.form_path(path),
+          file = transf.path.atpath(path),
         }
       }).text
     end
@@ -3236,7 +3244,7 @@ transf = {
       })
       return get.table.table_by_mapped_w_vt_arg_vt_ret_fn(
         assoc,
-        transf.string.lower_snake_case_string_by_romanized
+        transf.string.lower_alphanum_underscore_string_by_romanized
       )
     end
   },
@@ -3532,22 +3540,22 @@ transf = {
       
       return filename
     end,
-    snake_case = function(str)
-      local naive_snake_case = get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[^%w%d]+", "_")
-      local multi_cleaned_snake_case = get.string.string_by_continuous_collapsed_eutf8_w_regex_quantifiable(naive_snake_case, "_")
-      return get.string.string_by_no_adfix(multi_cleaned_snake_case, "_")
+    alphanum_underscore = function(str)
+      local naive_alphanum_underscore = get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[^%w%d]+", "_")
+      local multi_cleaned_alphanum_underscore = get.string.string_by_continuous_collapsed_eutf8_w_regex_quantifiable(naive_alphanum_underscore, "_")
+      return get.string.string_by_no_adfix(multi_cleaned_alphanum_underscore, "_")
     end,
-    lower_snake_case = function(str)
-      return eutf8.lower(transf.string.snake_case(str))
+    lower_alphanum_underscore = function(str)
+      return eutf8.lower(transf.string.alphanum_underscore(str))
     end,
-    upper_snake_case = function(str)
-      return eutf8.upper(transf.string.snake_case(str))
+    upper_alphanum_underscore = function(str)
+      return eutf8.upper(transf.string.alphanum_underscore(str))
     end,
-    snake_case_parts = function(str) -- word separation is notoriously tricky. For now, we'll just use the same logic as in the snake_case function
-      return stringy.split(transf.string.snake_case(str), "_")
+    alphanum_array = function(str) -- word separation is notoriously tricky. For now, we'll just use the same logic as in the snake_case function
+      return stringy.split(transf.string.alphanum_underscore(str), "_")
     end,
     upper_camel_snake_case = function(str)
-      local parts = transf.string.snake_case_parts(str)
+      local parts = transf.string.alphanum_array(str)
       local upper_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(parts, transf.string.string_by_first_eutf8_upper)
       return get.string_or_number_arr.string_by_joined(upper_parts, "_")
     end,
@@ -3555,7 +3563,7 @@ transf = {
       return eutf8.lower(transf.string.upper_camel_snake_case(str))
     end,
     upper_camel_case = function(str)
-      local parts = transf.string.snake_case_parts(str)
+      local parts = transf.string.alphanum_array(str)
       local upper_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(parts, transf.string.string_by_first_eutf8_upper)
       return get.string_or_number_arr.string_by_joined(upper_parts, "")
     end,
@@ -3665,11 +3673,11 @@ transf = {
       })
       return romanized
     end,
-    lower_snake_case_string_by_romanized = function(str)
+    lower_alphanum_underscore_string_by_romanized = function(str)
       str = eutf8.gsub(str, "[%^']", "")
       str = transf.string.romanized_deterministic(str)
       str = eutf8.lower(str)
-      str = transf.string.snake_case(str)
+      str = transf.string.alphanum_underscore(str)
       return str
     end,
     romanized_gpt = function(str)
@@ -7042,7 +7050,7 @@ transf = {
       local non_data_part = ""
       for _, part in transf.arr.index_value_stateless_iter(parts) do
         non_data_part = non_data_part .. part
-        if stringy.endswith(part, ";") or stringy.endswith(part, "base64;") then
+        if get.string.bool_by_endswith(part, ";") or get.string.bool_by_endswith(part, "base64;") then
           break
         else
           non_data_part = non_data_part .. ","

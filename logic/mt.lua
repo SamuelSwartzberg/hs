@@ -11,9 +11,9 @@ r = {
       dice = "(?:\\d+)?d\\d+(?:[/x\\*]\\d+)?(?:[+-]\\d+)?",
       point = "([\\-\\d]+)..*?([\\-\\d]+)"
     },
-    charset = {
-      printable_ascii = "[\\x20-\\x7E]+",
-      ascii = "[\\x00-\\x7F]+",
+    char_range = {
+      printable_ascii = "\\x20-\\x7E",
+      ascii = "\\x00-\\x7F",
     },
     date = {
       rfc3339like_dt = "\\d{4}(?:" ..

@@ -946,7 +946,7 @@ get = {
     end,
     bool_by_endswith_any_w_ascii_string_arr = function(str, anyof)
       for i = 1, #anyof do
-        local res = stringy.endswith(str, anyof[i])
+        local res = get.string.bool_by_endswith(str, anyof[i])
         if res then
           return true
         end
@@ -1028,6 +1028,15 @@ get = {
     bool_by_not_matches_part_onig = function(str, regex_string)
       return not transf.string.bool_by_matches_part_onig(str, regex_string)
     end,
+    bool_by_matches_whole_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return transf.string.bool_by_matches_whole_onig(str, regex_quantifiable .. "*")
+    end,
+    bool_by_matches_whole_onig_w_regex_character_class_innards = function(str, regex_character_class_innards)
+      return transf.string.bool_by_matches_whole_onig_w_regex_quantifiable(str, "[" .. regex_character_class_innards .. "]")
+    end,
+    bool_by_matches_whole_onig_inverted_w_regex_character_class_innards = function(str, regex_character_class_innards)
+      return transf.string.bool_by_matches_whole_onig(str, "[^" .. regex_character_class_innards .. "]")
+    end,
     string_by_no_prefix = function(str, prefix)
       if get.string.bool_by_startswith(str, prefix) then
         return str:sub(#prefix + 1)
@@ -1036,7 +1045,7 @@ get = {
       end
     end,
     string_by_no_suffix = function(str, suffix)
-      if stringy.endswith(str, suffix) then
+      if get.string.bool_by_endswith(str, suffix) then
         return str:sub(1, #str - #suffix)
       else
         return str
@@ -1050,7 +1059,7 @@ get = {
       end
     end,
     string_by_with_suffix = function(str, suffix)
-      if stringy.endswith(str, suffix) then
+      if get.string.bool_by_endswith(str, suffix) then
         return str
       else
         return str .. suffix
@@ -1109,6 +1118,12 @@ get = {
         regex_quantifiable,
         ""
       )
+    end,
+    string_by_removed_onig_w_regex_character_class_innards = function(str, regex_character_class_innards)
+      return transf.string.string_by_removed_onig_w_regex_quantifiable(str, "[" .. regex_character_class_innards .. "]")
+    end,
+    string_by_removed_onig_inverted_w_regex_character_class_innards = function(str, regex_character_class_innards)
+      return transf.string.string_by_removed_onig_w_regex_quantifiable(str, "[^" .. regex_character_class_innards .. "]")
     end,
     string_by_replaced_all_eutf8_w_regex_string_arr = function(str, regex_string_arr, replacement)
       local res = str
@@ -2118,7 +2133,7 @@ get = {
     end,
     path_arr_by_filter_to_filename_ending = function(path_arr, leaf_ending)
       return get.arr.arr_by_filtered(path_arr, function(path)
-        return stringy.endswith(transf.path.filename(path), leaf_ending)
+        return get.string.bool_by_endswith(transf.path.filename(path), leaf_ending)
       end)
     end,
     path_arr_by_filter_to_filename_starting = function(path_arr, leaf_starting)
@@ -2148,7 +2163,7 @@ get = {
     end,
     path_or_nil_by_first_having_leaf_ending = function(path_arr, leaf_ending)
       return get.arr.t_or_nil_by_first_match_w_fn(path_arr, function(path)
-        return stringy.endswith(get.path.leaf(path), leaf_ending)
+        return get.string.bool_by_endswith(get.path.leaf(path), leaf_ending)
       end)
     end,
     path_or_nil_by_first_having_filename = function(path_arr, filename)
@@ -2158,7 +2173,7 @@ get = {
     end,
     path_or_nil_by_first_having_filename_ending = function(path_arr, filename_ending)
       return get.arr.t_or_nil_by_first_match_w_fn(path_arr, function(path)
-        return stringy.endswith(get.path.filename(path), filename_ending)
+        return get.string.bool_by_endswith(get.path.filename(path), filename_ending)
       end)
     end,
   },
