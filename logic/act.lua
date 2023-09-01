@@ -94,7 +94,7 @@ act = {
       dothis.url.add_event_from_url(url, "default")
     end,
     add_event_to_chosen_calendar = function(url)
-      dothis.array.choose_item(transf["nil"].writeable_calendar_name_array(), function(calendar)
+      dothis.arr.choose_item(transf["nil"].writeable_calendar_name_arr(), function(calendar)
         dothis.url.add_event_from_url(url, calendar)
       end)
     end,
@@ -102,7 +102,7 @@ act = {
       dothis.url.download_into_async(url, env.DOWNLOADS)
     end,
     create_as_url_file_in_murls = function(url)
-      act.url_array.create_as_url_files_in_murls({url})
+      act.url_arr.create_as_url_files_in_murls({url})
     end,
     subscribe_to_calendar = function(url)
       local pair_spec = transf.url.vdirsyncer_pair_specifier(url)
@@ -114,7 +114,7 @@ act = {
       dothis.ics_file.add_events_from_file(ics_file, "default")
     end,
     add_events_to_chosen_calendar = function(ics_file)
-      dothis.array.choose_item(transf["nil"].writeable_calendar_name_array(), function(calendar)
+      dothis.arr.choose_item(transf["nil"].writeable_calendar_name_arr(), function(calendar)
         dothis.ics_file.add_events_from_file(ics_file, calendar)
       end)
     end,
@@ -151,27 +151,27 @@ act = {
       dothis.url_or_local_path.open_browser(url, "Google Chrome")
     end,
   },
-  url_array = {
-    open_all_ff = function(url_array)
-      dothis.url_array.open_all(url_array, "Firefox")
+  url_arr = {
+    open_all_ff = function(url_arr)
+      dothis.url_arr.open_all(url_arr, "Firefox")
     end,
-    create_as_url_files_in_murls = function(url_array)
+    create_as_url_files_in_murls = function(url_arr)
       local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(env.MURLS)
-      dothis.url_array.create_as_url_files(url_array, path)
+      dothis.url_arr.create_as_url_files(url_arr, path)
     end,
-    create_as_session_in_msessions = function(url_array)
-      dothis.url_array.create_as_session(url_array, env.MSESSIONS)
+    create_as_session_in_msessions = function(url_arr)
+      dothis.url_arr.create_as_session(url_arr, env.MSESSIONS)
     end,
-    create_as_stream_foreground = function(url_array)
-      dothis.created_item_specifier_array.create(
+    create_as_stream_foreground = function(url_arr)
+      dothis.created_item_specifier_arr.create(
         stream_arr,
-        get.url_array.stream_creation_specifier(url_array, "foreground")
+        get.url_arr.stream_creation_specifier(url_arr, "foreground")
       )
     end,
-    create_as_stream_background = function(url_array)
-      dothis.created_item_specifier_array.create(
+    create_as_stream_background = function(url_arr)
+      dothis.created_item_specifier_arr.create(
         stream_arr,
-        get.url_array.stream_creation_specifier(url_array, "background")
+        get.url_arr.stream_creation_specifier(url_arr, "background")
       )
     end,
   },
@@ -233,16 +233,16 @@ act = {
       return dothis.mpv_ipc_socket_id.cycle_shuffle(spec.creation_specifier.ipc_socket_id)
     end,
   },
-  stream_created_item_specifier_array = {
-    set_state_transitioned_state_all = function(array)
-      dothis.array.each(array, act.stream_created_item_specifier.set_state_transitioned_state)
+  stream_created_item_specifier_arr = {
+    set_state_transitioned_state_all = function(arr)
+      dothis.arr.each(arr, act.stream_created_item_specifier.set_state_transitioned_state)
     end,
-    filter_in_place_valid = function(array)
-      dothis.array.filter_in_place(array, transf.stream_created_item_specifier.is_valid)
+    filter_in_place_valid = function(arr)
+      dothis.arr.filter_in_place(arr, transf.stream_created_item_specifier.is_valid)
     end,
-    maintain_state = function(array)
-      act.stream_created_item_specifier_array.set_state_transitioned_state_all(array)
-      act.stream_created_item_specifier_array.filter_in_place_valid(array)
+    maintain_state = function(arr)
+      act.stream_created_item_specifier_arr.set_state_transitioned_state_all(arr)
+      act.stream_created_item_specifier_arr.filter_in_place_valid(arr)
     end,
 
   },
@@ -308,7 +308,7 @@ act = {
   },
   login_pass_item_name = {
     fill = function(name)
-      dothis.string_array.fill_with({
+      dothis.string_arr.fill_with({
         transf.pass_item_name.username_or_default(name),
         transf.pass_item_name.password(name),
       })
@@ -412,7 +412,7 @@ act = {
     end,
     add_to_clipboard = hs.pasteboard.setContents,
     add_to_pasteboard_arr = function(str)
-      dothis.array.move_to_front_or_unshift(
+      dothis.arr.move_to_front_or_unshift(
         pasteboard_arr,
         str
       )
@@ -443,32 +443,32 @@ act = {
   },
   extant_path = {
     create_stream_foreground = function(path)
-      dothis.created_item_specifier_array.create(
+      dothis.created_item_specifier_arr.create(
         stream_arr,
         get.extant_path.stream_creation_specifier(path, "foreground")
       )
     end,
     create_stream_background = function(path)
-      dothis.created_item_specifier_array.create(
+      dothis.created_item_specifier_arr.create(
         stream_arr,
         get.extant_path.stream_creation_specifier(path, "background")
       )
     end,
     choose_item_and_action_by_descendants = function(path)
-      act.array.choose_item_and_action(
-        transf.extant_path.absolute_path_array_by_descendants(path)
+      act.arr.choose_item_and_action(
+        transf.extant_path.absolute_path_arr_by_descendants(path)
       )
     end,
     choose_item_and_action_by_descendants_depth_3 = function(path)
-      act.array.choose_item_and_action(
-        transf.extant_path.absolute_path_array_by_descendants_depth_3(path)
+      act.arr.choose_item_and_action(
+        transf.extant_path.absolute_path_arr_by_descendants_depth_3(path)
       )
     end,
   },
   dir = {
     choose_item_and_action_by_children = function(path)
-      act.array.choose_item_and_action(
-        transf.dir.absolute_path_array_by_children(path)
+      act.arr.choose_item_and_action(
+        transf.dir.absolute_path_arr_by_children(path)
       )
     end,
     choose_leaf_until_file_then_action = function(path)
@@ -479,10 +479,10 @@ act = {
     end,
     
   },
-  volume_local_extant_path_array = {
-    choose_item_and_eject_or_msg = function(array)
-      dothis.array.choose_item(
-        array,
+  volume_local_extant_path_arr = {
+    choose_item_and_eject_or_msg = function(arr)
+      dothis.arr.choose_item(
+        arr,
         act.volume_local_extant_path.eject_or_msg
       )
     end,
@@ -494,18 +494,18 @@ act = {
       dothis.audiodevice.set_default(device, "output")
     end,
     choose_menu_item_table_and_execute_by_frontmost_application = function()
-      act.menu_item_table_array.choose_item_and_execute(
-        transf["nil"].menu_item_table_array_by_frontmost_application()
+      act.menu_item_table_arr.choose_item_and_execute(
+        transf["nil"].menu_item_table_arr_by_frontmost_application()
       )
     end,
-    choose_item_and_action_on_contact_table_array = function()
-      act.array.choose_item_and_action(
-        transf["nil"].contact_table_array()
+    choose_item_and_action_on_contact_table_arr = function()
+      act.arr.choose_item_and_action(
+        transf["nil"].contact_table_arr()
       )
     end,
     choose_item_and_eject_or_msg_by_all_volumes = function()
-      act.volume_local_extant_path_array.choose_item_and_eject_or_msg(
-        transf["nil"].volume_local_extant_path_array()
+      act.volume_local_extant_path_arr.choose_item_and_eject_or_msg(
+        transf["nil"].volume_local_extant_path_arr()
       )
     end,
     choose_item_and_action_on_screenshot_children = function()
@@ -520,23 +520,23 @@ act = {
       )
     end,
     choose_item_and_set_active_mullvad_relay_identifier = function()
-      act.mullvad_relay_identifier_array.choose_item_and_set_active(
-        transf["nil"].mullvad_relay_identifier_array()
+      act.mullvad_relay_identifier_arr.choose_item_and_set_active(
+        transf["nil"].mullvad_relay_identifier_arr()
       )
     end,
     choose_inbox_email_and_action = function()
-      act.array.choose_item_and_action(
+      act.arr.choose_item_and_action(
         get.maildir_dir.sorted_email_paths(env.MBSYNC_INBOX, true)
       )
     end,
     choose_input_audiodevice_specifier_and_set_default = function()
-      dothis.audiodevice_specifier_array.choose_item_and_set_default(
-        transf.audiodevice_type.audiodevice_specifier_array("input")
+      dothis.audiodevice_specifier_arr.choose_item_and_set_default(
+        transf.audiodevice_type.audiodevice_specifier_arr("input")
       )
     end,
     choose_output_audiodevice_specifier_and_set_default = function()
-      dothis.audiodevice_specifier_array.choose_item_and_set_default(
-        transf.audiodevice_type.audiodevice_specifier_array("output")
+      dothis.audiodevice_specifier_arr.choose_item_and_set_default(
+        transf.audiodevice_type.audiodevice_specifier_arr("output")
       )
     end,
     choose_item_and_action_by_env_var = function()
@@ -551,14 +551,14 @@ act = {
       dothis.any.choose_action(transf["nil"].date_by_current())
     end,
     choose_login_pass_item_name_and_fill = function()
-      dothis.array.choose_item(
-        transf["nil"].passw_pass_item_name_array(),
+      dothis.arr.choose_item(
+        transf["nil"].passw_pass_item_name_arr(),
         act.login_pass_item_name.fill
       )
     end,
     choose_otp_pass_item_name_and_paste = function()
-      dothis.array.choose_item(
-        transf["nil"].otp_pass_item_name_array(),
+      dothis.arr.choose_item(
+        transf["nil"].otp_pass_item_name_arr(),
         dothis.string.paste
       )
     end,
@@ -566,10 +566,10 @@ act = {
       act.source_id_arr.activate_next(source_id_arr)
     end,
     maintain_state_stream_arr = function()
-      act.stream_created_item_specifier_array.maintain_state(stream_arr)
+      act.stream_created_item_specifier_arr.maintain_state(stream_arr)
     end,
     choose_action_on_first_running_stream = function()
-      local strm = transf.stream_created_item_specifier_array.stream_created_item_specifier_by_first_running(stream_arr)
+      local strm = transf.stream_created_item_specifier_arr.stream_created_item_specifier_by_first_running(stream_arr)
       if strm then
         dothis.any.choose_action(strm)
       else
@@ -582,42 +582,42 @@ act = {
       )
     end
   },
-  mullvad_relay_identifier_array = {
-    choose_item_and_set_active = function(array)
-      dothis.array.choose_item(
-        array,
+  mullvad_relay_identifier_arr = {
+    choose_item_and_set_active = function(arr)
+      dothis.arr.choose_item(
+        arr,
         act.mullvad_relay_identifier.set_active_mullvad_relay_dentifier
       )
     end,
   },
-  menu_item_table_array = {
-    choose_item_and_execute = function(array)
-      dothis.array.choose_item(
-        array,
+  menu_item_table_arr = {
+    choose_item_and_execute = function(arr)
+      dothis.arr.choose_item(
+        arr,
         dothis.menu_item_table.execute
       )
     end,
   },
-  array = {
-    choose_item_and_action = function(array)
-      dothis.array.choose_item(array, dothis.any.choose_action)
+  arr = {
+    choose_item_and_action = function(arr)
+      dothis.arr.choose_item(arr, dothis.any.choose_action)
     end,
-    pop = function(array)
-      local last = array[#array]
-      array[#array] = nil
+    pop = function(arr)
+      local last = arr[#arr]
+      arr[#arr] = nil
       return last
     end,
-    shift = function(array)
-      local first = array[1]
-      table.remove(array, 1)
+    shift = function(arr)
+      local first = arr[1]
+      table.remove(arr, 1)
       return first
     end,
-    to_empty_table = function(array)
-      for i, v in transf.array.index_value_stateless_iter(array) do
-        array[i] = nil
+    to_empty_table = function(arr)
+      for i, v in transf.arr.index_value_stateless_iter(arr) do
+        arr[i] = nil
       end
     end,
-    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.array.sort, {a_use, transf["nil"].random_boolean}),
+    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.arr.sort, {a_use, transf["nil"].random_boolean}),
   },
   contact_uuid = {
     edit_contact = function(uuid)
@@ -629,7 +629,7 @@ act = {
       local deduced_tags = transf.youtube_video_url.fs_tag_assoc(url)
       local edited_tags = transf.string_value_dict.string_value_dict_by_prompted_once_from_default(deduced_tags)
       local plspec = {}
-      plspec.tag = transf.two_array_or_nils.array(edited_tags, transf.string.prompted_multiple_string_pair_array_for("tag"))
+      plspec.tag = transf.two_arr_or_nils.arr(edited_tags, transf.string.prompted_multiple_string_pair_arr_for("tag"))
       plspec.path  = get.local_extant_path.dir_by_default_prompted_once(env.MAUDIOVISUAL)
       plspec.path = transf.string.prompted_once_string_from_default(plspec.path)
       plspec.extension = "m3u"
@@ -645,19 +645,19 @@ act = {
   source_id_arr = {
     activate_next = function(arr)
       act.source_id.activate(
-        transf.source_id_array.source_id_by_next_to_be_activated(arr)
+        transf.source_id_arr.source_id_by_next_to_be_activated(arr)
       )
     end,
   },
-  in_git_dir_array = {
+  in_git_dir_arr = {
     pull_all = function(paths)
-      dothis.array.each(paths, dothis.in_git_dir.pull)
+      dothis.arr.each(paths, dothis.in_git_dir.pull)
     end,
     push_all = function(paths)
-      dothis.array.each(paths, dothis.in_git_dir.push)
+      dothis.arr.each(paths, dothis.in_git_dir.push)
     end,
     fetch_all = function(paths)
-      dothis.array.each(paths, dothis.in_git_dir.fetch)
+      dothis.arr.each(paths, dothis.in_git_dir.fetch)
     end,
 
   },

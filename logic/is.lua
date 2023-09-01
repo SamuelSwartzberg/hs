@@ -140,7 +140,7 @@ is = {
       return get.string.bool_by_matches_whole_onig(str, r.g.syntax.dice)
     end,
     installed_package_name = function(str)
-      return get.array.bool_by_contains(transf.package_manager_name_or_nil.package_name_array(nil), str)
+      return get.arr.bool_by_contains(transf.package_manager_name_or_nil.package_name_arr(nil), str)
     end,
     unicode_codepoint_string = function(str)
       return get.string.bool_by_startswith(str, "U+") and transf.string.bool_by_matches_whole_eutf8(str, "^U+%x+$")
@@ -202,7 +202,7 @@ is = {
     indicated_number_string = function(str)
       return 
         get.string.bool_by_startswith(str, "0") and
-        get.array.bool_by_contains(transf.table_or_nil.kt_array(tblmap.base_letter.base), str:sub(2, 2)) and
+        get.arr.bool_by_contains(transf.table_or_nil.kt_arr(tblmap.base_letter.base), str:sub(2, 2)) and
         is.printable_ascii_string.number_string(str:sub(3))
     end,
     indicated_binary_number_string = function(str)
@@ -263,7 +263,7 @@ is = {
   },
   youtube_video_id = {
     extant = function(id)
-      return get.array.bool_by_contains(ls.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
+      return get.arr.bool_by_contains(ls.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
     end,
     private = function(id)
       return transf.youtube_video_id.privacy_status(id) == "private"
@@ -298,7 +298,7 @@ is = {
       return eutf8.find(transf.path.leaf(path), ":%d+$") ~= nil
     end,
     useless_file_leaf_path = function(path)
-      return get.array.bool_by_contains(ls.useless_files, transf.path.leaf(path))
+      return get.arr.bool_by_contains(ls.useless_files, transf.path.leaf(path))
     end,
     not_useless_file_leaf_path = function(path)
       return not is.path.useless_file_leaf_path(path)
@@ -413,7 +413,7 @@ is = {
     end,
     contains_relative_references_local_path = function(path)
       return 
-        get.string.bool_by_startswith_any_w_ascii_string_array(
+        get.string.bool_by_startswith_any_w_ascii_string_arr(
           path,
           {
             "./",
@@ -422,14 +422,14 @@ is = {
             "/../",
           }
         ) or 
-        get.string.bool_by_contains_any_w_ascii_string_array(
+        get.string.bool_by_contains_any_w_ascii_string_arr(
           path,
           {
             "/./",
             "/../",
           }
         ) or
-        get.string.bool_by_endswith_any_w_ascii_string_array(
+        get.string.bool_by_endswith_any_w_ascii_string_arr(
           path,
           {
             "/.",
@@ -471,8 +471,8 @@ is = {
       return get.string.bool_by_startswith(path, "/Volumes/")
     end,
     volume_local_extant_path = function(path)
-      return get.array.bool_by_contains(
-        transf["nil"].volume_local_extant_path_array(),
+      return get.arr.bool_by_contains(
+        transf["nil"].volume_local_extant_path_arr(),
         path
       )
     end,
@@ -596,8 +596,8 @@ is = {
   },
   dir = {
     git_root_dir = function(path)
-      return get.array.bool_by_some_pass_w_t(
-        transf.dir.children_filename_array(path),
+      return get.arr.bool_by_some_pass_w_t(
+        transf.dir.children_filename_arr(path),
         ".git"
       )
     end,
@@ -617,8 +617,8 @@ is = {
   },
   nonempty_dir = {
     grandparent_dir = function (path)
-      return get.array.bool_by_some_pass_w_fn(
-        transf.dir.absolute_path_array_by_children(path),
+      return get.arr.bool_by_some_pass_w_fn(
+        transf.dir.absolute_path_arr_by_children(path),
         is.absolute_path.dir
       )
     end,
@@ -732,7 +732,7 @@ is = {
   },
   alphanum_minus_underscore = {
     package_manager_name = function(str)
-      return get.array.bool_by_contains(transf["nil"].package_manager_name_array(), str)
+      return get.arr.bool_by_contains(transf["nil"].package_manager_name_arr(), str)
     end,
     alphanum_underscore =  function(str) 
       return get.string.bool_by_not_contains_w_string(str, "-")
@@ -773,6 +773,11 @@ is = {
     end,
     upper_alpha_string = function(str)
       return get.string.bool_by_matches_whole_onig(str, "[A-Z]+")
+    end,
+  },
+  lower_alpha_string = {
+    fs_attr_name = function(str)
+      return get.arr.bool_by_contains(ls.fs_attr_name, str)
     end,
   },
   url = {
@@ -875,7 +880,7 @@ is = {
   },
   host_url = {
     booru_url = function(url)
-      return get.array.bool_by_contains(ls.url.booru, transf.host_url.host(url))
+      return get.arr.bool_by_contains(ls.url.booru, transf.host_url.host(url))
     end,
     youtube_url = function(url)
       return transf.host_url.host(url) == "youtube.com"
@@ -992,17 +997,17 @@ is = {
     primitive = function(val)
       return not is.any.table(val)
     end,
-    arraylike = function(val)
-      return is.any.table(val) and is.table.arraylike(val)
+    arrlike = function(val)
+      return is.any.table(val) and is.table.arrlike(val)
     end,
-    array = function(val)
-      return is.any.table(val) and is.table.arraylike(val) and is.arraylike.array(val)
+    arr = function(val)
+      return is.any.table(val) and is.table.arrlike(val) and is.arrlike.arr(val)
     end,
     pair = function(val)
-      return is.any.array(val) and is.array.pair(val)
+      return is.any.arr(val) and is.arr.pair(val)
     end,
-    non_empty_table_array = function(val)
-      return is.any.table(val) and is.table.non_empty_table(val) and is.table.arraylike(val) and is.arraylike.array(val)
+    non_empty_table_arr = function(val)
+      return is.any.table(val) and is.table.non_empty_table(val) and is.table.arrlike(val) and is.arrlike.arr(val)
     end,
     is_interface = function(val)
       return 
@@ -1104,28 +1109,28 @@ is = {
     non_empty_table = function(t)
       return not is.table.empty_table(t)
     end,
-    arraylike_by_keys = function(t)
+    arrlike_by_keys = function(t)
       for k, v in transf.table.key_value_stateless_iter(t) do
         if type(k) ~= "number" then return false end
       end
       return true
     end,
-    non_empty_table_arraylike_by_keys = function(t)
-      return is.table.non_empty_table(t) and is.table.arraylike_by_keys(t)
+    non_empty_table_arrlike_by_keys = function(t)
+      return is.table.non_empty_table(t) and is.table.arrlike_by_keys(t)
     end,
-    arraylike = function(t)
+    arrlike = function(t)
       if t.isarr then return true end -- signal value to indicate that this is a list
       if t.isassoc then return false end -- signal value to indicate that this is an assoc table
-      return is.table.arraylike_by_keys(t)
+      return is.table.arrlike_by_keys(t)
     end,
-    non_arraylike = function(t)
-      return not is.table.arraylike(t)
+    non_arrlike = function(t)
+      return not is.table.arrlike(t)
     end,
-    array = function (t)
-      return is.table.arraylike(t) and is.arraylike.array(t)
+    arr = function (t)
+      return is.table.arrlike(t) and is.arrlike.arr(t)
     end,
-    hole_y_arraylike = function (t)
-      return is.table.arraylike(t) and is.arraylike.hole_y_arraylike(t)
+    hole_y_arrlike = function (t)
+      return is.table.arrlike(t) and is.arrlike.hole_y_arrlike(t)
     end,
     empty_unspecified_table = function(t)
       if t.isovtable then return false end
@@ -1134,113 +1139,113 @@ is = {
       return is.any.empty_table(t)
     end
   },
-  arraylike = {
-    --- an empty arraylike is never a hole_y_arraylike and always an array
-    hole_y_arraylike = function(arraylike)
-      if #arraylike == 0 then return false end
-      for i = 1, #arraylike do
-        if arraylike[i] == nil then return true end
+  arrlike = {
+    --- an empty arrlike is never a hole_y_arrlike and always an arr
+    hole_y_arrlike = function(arrlike)
+      if #arrlike == 0 then return false end
+      for i = 1, #arrlike do
+        if arrlike[i] == nil then return true end
       end
       return false
     end,
-    array = function(arraylike)
-      return not is.arraylike.hole_y_arraylike(arraylike)
+    arr = function(arrlike)
+      return not is.arrlike.hole_y_arrlike(arrlike)
     end,
   },
   assoclike = {
 
   },
-  hole_y_arraylike = {
+  hole_y_arrlike = {
 
   },
-  array = {
-    empty_table_array = function(array)
-      return #array == 0
+  arr = {
+    empty_table_arr = function(arr)
+      return #arr == 0
     end,
-    non_empty_table_array = function(array)
-      return #array > 0
+    non_empty_table_arr = function(arr)
+      return #arr > 0
     end,
-    string_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+    string_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.any.string
       )
     end,
-    array_of_arrays = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
-        is.any.array
+    arr_of_arrs = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
+        is.any.arr
       )
     end,
-    pair = function(array)
-      return #array == 2
+    pair = function(arr)
+      return #arr == 2
     end,
   },
-  string_array = {
-    path_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+  string_arr = {
+    path_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.string.path
       )
     end,
   },
-  path_array = {
-    absolute_path_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+  path_arr = {
+    absolute_path_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.path.absolute_path
       )
     end,
-    remote_path_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+    remote_path_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.path.remote_path
       )
     end,
-    local_path_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+    local_path_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.path.local_path
       )
     end,
   },
-  absolute_path_array = {
-    extant_path_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+  absolute_path_arr = {
+    extant_path_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.absolute_path.file
       )
     end,
   },
-  extant_path_array = {
-    dir_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+  extant_path_arr = {
+    dir_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.extant_path.dir
       )
     end,
-    file_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+    file_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.extant_path.file
       )
     end,
   },
-  dir_array = {
-    git_root_dir_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+  dir_arr = {
+    git_root_dir_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.dir.git_root_dir
       )
     end,
   },
-  git_root_dir_array = {
+  git_root_dir_arr = {
 
   },
-  file_array = {
-    plaintext_file_array = function(array)
-      return get.array.bool_by_all_pass_w_fn(
-        array,
+  file_arr = {
+    plaintext_file_arr = function(arr)
+      return get.arr.bool_by_all_pass_w_fn(
+        arr,
         is.file.plaintext_file
       )
     end,

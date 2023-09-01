@@ -23,9 +23,12 @@
 --- @field deepcopy fun(tbl: table): table
 --- @field copy fun(tbl: table): table
 --- @field zip fun(...: table[]): table[]
+--- @field find fun(tbl: table, value: any, idx?: integer): integer
+--- @field rfind fun(tbl: table, value: any, idx?: integer): integer
 
 --- @class pl.array2d
 --- @field column fun(a: any[][], col: integer): any[]
+--- @field row fun(a: any[][], row: integer): any[]
 
 --- @class pl.data.read.cnfg
 --- @field delim string a string pattern to split fields
@@ -452,7 +455,11 @@ speak = hs.speech.new()
 
 --- @class hs.window
 --- @field filter hs.window.filter
---- @field find fun(hint: string | number): hs.window
+--- @field find fun(hint: string | number): hs.window | hs.window[] | nil
+--- @field frontmostWindow fun(): hs.window
+--- @field focusedWindow fun(): hs.window
+--- @field get fun(hint: string | number): hs.window | nil
+
 
 
 --- @alias window_sort_option "created" | "focused" | "focusedLast" | "focusedMostRecent
@@ -646,6 +653,7 @@ speak = hs.speech.new()
 --- @field chdir fun(path: string): true | nil, err: string | nil
 --- @field dir fun(path): function, table, nil, table
 --- @field touch fun(filepath: string, atime?: number, mtime?: number): boolean | nil, err: string | nil
+--- @field pathToAbsolute fun(path: string): string
 
 --- @class hs.fs.volume
 --- @field didMount 0

@@ -248,8 +248,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
   }
 
   if not specifier.non_json_response then
-    dothis.array.push(curl_command, "-H")
-    dothis.array.push(curl_command, { 
+    dothis.arr.push(curl_command, "-H")
+    dothis.arr.push(curl_command, { 
       value = "Accept: " .. (specifier.accept_json_different_header or "application/json"),
       type = "quoted"}
     )
@@ -270,15 +270,15 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if specifier.token_where == "header" or specifier.token_where == "both" then
     local auth_header = specifier.auth_header .. get.string.string_by_with_suffix(specifier.auth_process or "Bearer", " ")
-    dothis.array.push(curl_command, "-H")
-    dothis.array.push(curl_command, 
+    dothis.arr.push(curl_command, "-H")
+    dothis.arr.push(curl_command, 
       transf.string.single_quoted_escaped(auth_header .. specifier.token))
   end
 
   if specifier.username_pw_where == "header" or specifier.username_pw_where == "both" then
     local auth_header = specifier.auth_header .. get.string.string_by_with_suffix(specifier.auth_process or "Basic", " ")
-    dothis.array.push(curl_command, "-H")
-    dothis.array.push(curl_command, 
+    dothis.arr.push(curl_command, "-H")
+    dothis.arr.push(curl_command, 
       transf.string.single_quoted_escaped(auth_header .. transf.string.base64_url_string(specifier.username .. ":" .. specifier.password)))
   end
 
@@ -288,8 +288,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if specifier.request_verb then
     specifier.request_verb = specifier.request_verb:upper()
-    dothis.array.push(curl_command, "--request")
-    dothis.array.push(curl_command, 
+    dothis.arr.push(curl_command, "--request")
+    dothis.arr.push(curl_command, 
       transf.string.single_quoted_escaped(specifier.request_verb)
     )
   end
@@ -300,12 +300,12 @@ function rest(specifier, do_after, have_tried_access_refresh)
     and not specifier.request_table
     and tblmap.api_name.empty_post_body[specifier.api_name]
   then
-    dothis.array.push(curl_command, "-d")
-    dothis.array.push(curl_command, 
+    dothis.arr.push(curl_command, "-d")
+    dothis.arr.push(curl_command, 
       transf.string.single_quoted_escaped(tblmap.api_name.empty_post_body[specifier.api_name])
     )
-    dothis.array.push(curl_command, "-H")
-    dothis.array.push(curl_command, 
+    dothis.arr.push(curl_command, "-H")
+    dothis.arr.push(curl_command, 
     transf.string.single_quoted_escaped("Content-Type: " .. tblmap.api_name.empty_post_body_content_type[specifier.api_name])
   )
   end
@@ -324,26 +324,26 @@ function rest(specifier, do_after, have_tried_access_refresh)
         request_string = transf.dict.url_params(specifier.request_table)
         content_type = "application/x-www-form-urlencoded"
       end
-      dothis.array.push(curl_command, "-d")
-      dothis.array.push(curl_command, 
+      dothis.arr.push(curl_command, "-d")
+      dothis.arr.push(curl_command, 
         transf.string.single_quoted_escaped(request_string)
       )
     else
       content_type = "multipart/form-data"
-      local form_field_args = transf.dict.curl_form_field_array(specifier.request_table)
-      curl_command = transf.two_arrays.array_by_appended(
+      local form_field_args = transf.dict.curl_form_field_arr(specifier.request_table)
+      curl_command = transf.two_arrs.arr_by_appended(
         curl_command,
         form_field_args
       )
     end
     
-    dothis.array.push(curl_command, "-H")
-    dothis.array.push(curl_command, 
+    dothis.arr.push(curl_command, "-H")
+    dothis.arr.push(curl_command, 
       transf.string.single_quoted_escaped("Content-Type: " .. content_type)
     )
   
   end
-  local cmd = get.string_or_number_array.string_by_joined(curl_command, " ")
+  local cmd = get.string_or_number_arr.string_by_joined(curl_command, " ")
   if not specifier.non_json_response then
     if do_after then
       dothis.string.env_bash_eval_w_table_arg_fn_string_arg_fn_fail_error_key(

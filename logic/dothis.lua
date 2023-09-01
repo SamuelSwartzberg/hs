@@ -38,7 +38,7 @@ dothis = {
       specifier = get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier, stringy.strip, is.any.string)
       local command = {"khal", "new" }
       if specifier.calendar then
-        command = transf.two_arrays.array_by_appended(
+        command = transf.two_arrs.arr_by_appended(
           command,
             "--calendar" ..
             transf.string.single_quoted_escaped(specifier.calendar)
@@ -46,7 +46,7 @@ dothis = {
       end
 
       if specifier.location then
-        command = transf.two_arrays.array_by_appended(
+        command = transf.two_arrs.arr_by_appended(
           command,
             "--location" ..
             transf.string.single_quoted_escaped(specifier.location)
@@ -54,11 +54,11 @@ dothis = {
       end
 
       if specifier.alarms then
-        local alarms_str = get.string_or_number_array.string_by_joined(
+        local alarms_str = get.string_or_number_arr.string_by_joined(
           get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier.alarms, stringy.strip, is.any.string),
           ","
         )
-        command = transf.two_arrays.array_by_appended(
+        command = transf.two_arrs.arr_by_appended(
           command,
             "--alarm" ..
             transf.string.single_quoted_escaped(alarms_str )
@@ -66,7 +66,7 @@ dothis = {
       end
 
       if specifier.url then 
-        command = transf.two_arrays.array_by_appended(
+        command = transf.two_arrs.arr_by_appended(
           command,
             "--url" ..
             transf.string.single_quoted_escaped(specifier.url)
@@ -74,30 +74,30 @@ dothis = {
       end
 
       -- needed for postcreation modifications 
-      command = transf.two_arrays.array_by_appended(
+      command = transf.two_arrs.arr_by_appended(
         command,
           "--format" ..
           transf.string.single_quoted_escaped("{uid}")
       )
 
       if specifier.start then
-        dothis.array.push(command, specifier.start)
+        dothis.arr.push(command, specifier.start)
       end
 
       if specifier["end"] then
-        dothis.array.push(command, specifier["end"])
+        dothis.arr.push(command, specifier["end"])
       end
 
       if specifier.timezone then
-        dothis.array.push(command, specifier.timezone)
+        dothis.arr.push(command, specifier.timezone)
       end
 
       if specifier.title then
-        dothis.array.push(command, specifier.title)
+        dothis.arr.push(command, specifier.title)
       end
 
       if specifier.description then
-        command = transf.two_arrays.array_by_appended(
+        command = transf.two_arrs.arr_by_appended(
           command,
             "::" ..
             transf.string.single_quoted_escaped(specifier.description)
@@ -106,18 +106,18 @@ dothis = {
 
       if do_after then
         dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-          get.string_or_number_array.string_by_joined(command, " "), 
+          get.string_or_number_arr.string_by_joined(command, " "), 
           do_after
         )
       else
         dothis.string.env_bash_eval_sync(
-          get.string_or_number_array.string_by_joined(command, " ")
+          get.string_or_number_arr.string_by_joined(command, " ")
         )
       end
     end,
     add_event_interactive = function(event_table, do_after)
       event_table = event_table or {}
-      local temp_file_contents = get.string.string_by_evaled_as_template(transf.event_table.calendar_template(event_table))
+      local temp_file_contents = get.string.string_by_evaled_as_template(transf.event_table.yaml_string_by_calendar_template(event_table))
       dothis.string.edit_temp_file_in_vscode_act_on_contents(temp_file_contents, function(cnt)
         local new_specifier = transf.yaml_string.not_userdata_or_function(cnt)
         dothis.event_table.add_event_from(new_specifier, do_after)
@@ -134,7 +134,7 @@ dothis = {
       dothis.absolute_path.write_file(temp_path, processedsource) 
       local cmd = 
         "pandoc" ..
-        "--wrap=preserve -f markdown+" .. get.string_or_number_array.string_by_joined(get.pandoc.extensions(), "+") .. " --standalone -t" ..
+        "--wrap=preserve -f markdown+" .. get.string_or_number_arr.string_by_joined(get.pandoc.extensions(), "+") .. " --standalone -t" ..
         format ..
         "-i" ..
         transf.string.single_quoted_escaped(temp_path)
@@ -251,15 +251,15 @@ dothis = {
       end
     end,
     choose_w_pair_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
-      dothis.array.choose_item(
-        transf.table.pair_array_by_sorted_smaller_key_first(tbl),
+      dothis.arr.choose_item(
+        transf.table.pair_arr_by_sorted_smaller_key_first(tbl),
         fn,
         target_item_chooser_item_specifier_name
       )
     end,
     choose_w_kt_vt_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
-      dothis.array.choose_item(
-        transf.table.pair_array_by_sorted_smaller_key_first(tbl),
+      dothis.arr.choose_item(
+        transf.table.pair_arr_by_sorted_smaller_key_first(tbl),
         function(pair)
           fn(transf.pair.key_value(pair))
         end,
@@ -267,8 +267,8 @@ dothis = {
       )
     end,
     choose_w_kt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
-      dothis.array.choose_item(
-        transf.table.pair_array_by_sorted_smaller_key_first(tbl),
+      dothis.arr.choose_item(
+        transf.table.pair_arr_by_sorted_smaller_key_first(tbl),
         function(pair)
           fn(transf.pair.key(pair))
         end,
@@ -276,8 +276,8 @@ dothis = {
       )
     end,
     choose_w_vt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
-      dothis.array.choose_item(
-        transf.table.pair_array_by_sorted_smaller_key_first(tbl),
+      dothis.arr.choose_item(
+        transf.table.pair_arr_by_sorted_smaller_key_first(tbl),
         function (pair)
           fn(transf.pair.value(pair))
         end,
@@ -285,15 +285,15 @@ dothis = {
       )
     end,
     choose_kt_w_kt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
-      dothis.array.choose_item(
-        transf.table.kt_array_by_sorted_smaller_first(tbl),
+      dothis.arr.choose_item(
+        transf.table.kt_arr_by_sorted_smaller_first(tbl),
         fn,
         target_item_chooser_item_specifier_name
       )
     end,
     choose_vt_w_vt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
-      dothis.array.choose_item(
-        transf.table.vt_array_by_sorted_smaller_first(tbl),
+      dothis.arr.choose_item(
+        transf.table.vt_arr_by_sorted_smaller_first(tbl),
         fn,
         target_item_chooser_item_specifier_name
       )
@@ -314,7 +314,7 @@ dothis = {
     paste = function(str)
       local lines = stringy.split(str, "\n")
       local is_first_line = true
-      for _, line in transf.array.index_value_stateless_iter(lines) do
+      for _, line in transf.arr.index_value_stateless_iter(lines) do
         if is_first_line then
           is_first_line = false
         else
@@ -327,13 +327,13 @@ dothis = {
       dothis.string.paste(get.string.string_by_evaled_as_template(str))
     end,
     fill_with_lines = function(str)
-      dothis.string_array.fill_with(transf.string.line_array(str))
+      dothis.string_arr.fill_with(transf.string.line_arr(str))
     end,
     fill_with_content_lines = function(path)
-      dothis.string_array.fill_with(transf.string.noempty_line_string_array(path))
+      dothis.string_arr.fill_with(transf.string.noempty_line_string_arr(path))
     end,
     fill_with_nocomment_noindent_content_lines = function(path)
-      dothis.string_array.fill_with(transf.string.nocomment_noindent_content_lines(path))
+      dothis.string_arr.fill_with(transf.string.nocomment_noindent_content_lines(path))
     end,
     search = function(str, search_engine)
       dothis.url_or_local_path.open_browser(
@@ -360,9 +360,9 @@ dothis = {
       local path = transf.string.write_to_temp_file(str)
       dothis.local_file.edit_file_in_vscode_act_on_contents(path, do_after)
     end,
-    create_url_array_as_session_in_msessions = function(str)
-      dothis.url_array.create_as_session_in_msessions(
-        transf.string.url_array(str)
+    create_url_arr_as_session_in_msessions = function(str)
+      dothis.url_arr.create_as_session_in_msessions(
+        transf.string.url_arr(str)
       )
     end,
     raw_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn = function(str, fn)
@@ -555,8 +555,8 @@ dothis = {
     end,
     serve = function(path, port)
       port = port or env.FS_HTTP_SERVER_PORT
-      dothis.created_item_specifier_array.create_or_recreate(
-        task_created_item_specifier_array,
+      dothis.created_item_specifier_arr.create_or_recreate(
+        task_created_item_specifier_arr,
         {
           type = "task",
           args = "http-server -a 127.0.0.1 -p '" .. port .. "' -c-1 '" .. path .. "'"
@@ -723,10 +723,10 @@ dothis = {
       dothis.local_extant_path.zip_to_absolute_path_and_delete(tmppath, tgt)
     end,
   },
-  remote_extant_path_array = {
+  remote_extant_path_arr = {
     zip_to_absolute_path = function(arr, tgt)
       local tmppath = transf.string.in_tmp_dir(tgt, "temp_zip")
-      dothis.extant_path_array.copy_into_absolute_path(
+      dothis.extant_path_arr.copy_into_absolute_path(
         arr,
         tmppath
       )
@@ -794,30 +794,30 @@ dothis = {
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
       dothis.local_extant_path.link_to_local_nonextant_path(path, finaltgt)
     end,
-    link_descendant_file_array_into_local_absolute_path = function(path, tgt)
-      dothis.local_extant_path_array.link_into_local_absolute_path(
-        transf.path.descendant_file_array(path),
+    link_descendant_file_arr_into_local_absolute_path = function(path, tgt)
+      dothis.local_extant_path_arr.link_into_local_absolute_path(
+        transf.path.descendant_file_arr(path),
         tgt
       )
     end,
     
   },
-  local_extant_path_array = {
+  local_extant_path_arr = {
     zip_to_local_absolute_path = function(arr, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.string.single_quoted_escaped(tgt) .. " " .. transf.string.single_quoted_escaped(get.string_or_number_array.string_by_joined(arr, " ")))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.string.single_quoted_escaped(tgt) .. " " .. transf.string.single_quoted_escaped(get.string_or_number_arr.string_by_joined(arr, " ")))
     end,
     zip_to_absolute_path = function(arr, tgt)
       local tmptgt = transf.string.in_tmp_dir(tgt, "temp_zip_target")
-      dothis.local_absolute_path_array.zip_to_local_absolute_path(arr, tmptgt)
+      dothis.local_absolute_path_arr.zip_to_local_absolute_path(arr, tmptgt)
       dothis.extant_path.move_to_absolute_path(tmptgt, tgt)
     end,
     zip_to_absolute_path_and_delete = function(arr, tgt)
-      dothis.local_absolute_path_array.zip_to_absolute_path(arr, tgt)
-      dothis.local_absolute_path_array.delete(arr)
+      dothis.local_absolute_path_arr.zip_to_absolute_path(arr, tgt)
+      dothis.local_absolute_path_arr.delete(arr)
     end,
     link_into_local_absolute_path = function(arr, tgt)
-      dothis.array.each(
+      dothis.arr.each(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(
           dothis.local_extant_path.link_into_local_absolute_path,
@@ -906,9 +906,9 @@ dothis = {
       dothis.local_extant_path.create_parent_dir(tgt)
       pldir.clonetree(path, tgt)
     end,
-    link_children_absolute_path_array_into_local_absolute_path = function(path, tgt)
-      dothis.local_absolute_path_array.link_into_local_absolute_path(
-        transf.path.children_absolute_path_array(path),
+    link_children_absolute_path_arr_into_local_absolute_path = function(path, tgt)
+      dothis.local_absolute_path_arr.link_into_local_absolute_path(
+        transf.path.children_absolute_path_arr(path),
         tgt
       )
     end,
@@ -980,9 +980,9 @@ dothis = {
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
       dothis.extant_path.copy_to_absolute_path(path, finaltgt)
     end,
-    copy_descendant_file_array_into_absolute_path = function(path, tgt)
-      dothis.extant_path_array.copy_into_absolute_path(
-        transf.extant_path.file_array_by_descendants(path),
+    copy_descendant_file_arr_into_absolute_path = function(path, tgt)
+      dothis.extant_path_arr.copy_into_absolute_path(
+        transf.extant_path.file_arr_by_descendants(path),
         tgt
       )
     end,
@@ -994,9 +994,9 @@ dothis = {
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
       dothis.extant_path.move_to_absolute_path(path, finaltgt)
     end,
-    move_descendant_file_array_into_absolute_path = function(path, tgt)
-      dothis.extant_path_array.move_into_absolute_path(
-        transf.extant_path.file_array_by_descendants(path),
+    move_descendant_file_arr_into_absolute_path = function(path, tgt)
+      dothis.extant_path_arr.move_into_absolute_path(
+        transf.extant_path.file_arr_by_descendants(path),
         tgt
       )
     end,
@@ -1015,9 +1015,9 @@ dothis = {
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
       dothis.extant_path.zip_to_absolute_path(path, finaltgt)
     end,
-    zip_descendant_file_array_to_absolute_path = function(path, tgt)
-      dothis.extant_path_array.zip_to_absolute_path(
-        transf.extant_path.file_array_by_descendants(path),
+    zip_descendant_file_arr_to_absolute_path = function(path, tgt)
+      dothis.extant_path_arr.zip_to_absolute_path(
+        transf.extant_path.file_arr_by_descendants(path),
         tgt
       )
     end,
@@ -1025,24 +1025,24 @@ dothis = {
 
     end,
   },
-  extant_path_array = {
+  extant_path_arr = {
     copy_into_absolute_path = function(arr, tgt)
-      dothis.array.each(
+      dothis.arr.each(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(dothis.extant_path.copy_into_absolute_path, {a_use, tgt})
       )
     end,
     move_into_absolute_path = function(arr, tgt)
-      dothis.array.each(
+      dothis.arr.each(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(dothis.extant_path.move_into_absolute_path, {a_use, tgt})
       )
     end,
     zip_to_absolute_path = function(arr, tgt)
-      if is.path_array.remote_path_array(arr) then
-          dothis.remote_extant_path_array.zip_to_absolute_path(arr, tgt)
-      elseif is.path_array.local_path_array(arr) then
-          dothis.local_extant_path_array.zip_to_absolute_path(arr, tgt)
+      if is.path_arr.remote_path_arr(arr) then
+          dothis.remote_extant_path_arr.zip_to_absolute_path(arr, tgt)
+      elseif is.path_arr.local_path_arr(arr) then
+          dothis.local_extant_path_arr.zip_to_absolute_path(arr, tgt)
       else
           error("Cannot currently zip mixed local & remote paths")
       end
@@ -1126,7 +1126,7 @@ dothis = {
   plaintext_file = {
     append_lines = function(path, lines)
       local contents = transf.plaintext_file.one_final_newline(path)
-      dothis.absolute_path.write_file_if_file(path, contents .. get.string_or_number_array.string_by_joined(lines, "\n"))
+      dothis.absolute_path.write_file_if_file(path, contents .. get.string_or_number_arr.string_by_joined(lines, "\n"))
     end,
     append_line = function(path, line)
       dothis.plaintext_file.append_lines(path, {line})
@@ -1145,37 +1145,37 @@ dothis = {
       )
     end,
     write_lines = function(path, lines)
-      dothis.absolute_path.write_file_if_file(path, get.string_or_number_array.string_by_joined(lines, "\n"))
+      dothis.absolute_path.write_file_if_file(path, get.string_or_number_arr.string_by_joined(lines, "\n"))
     end,
     set_line = function(path, line, line_number)
-      local lines = transf.plaintext_file.string_array_by_lines(path)
+      local lines = transf.plaintext_file.string_arr_by_lines(path)
       lines[line_number] = line
       dothis.plaintext_file.write_lines(path, lines)
     end,
     pop_line = function(path)
-      local lines = transf.plaintext_file.string_array_by_lines(path)
+      local lines = transf.plaintext_file.string_arr_by_lines(path)
       local line = table.remove(lines, #lines)
       dothis.plaintext_file.write_lines(path, lines)
       return line
     end,
     remove_line_w_pos_int = function(path, line_number)
-      local lines = transf.plaintext_file.string_array_by_lines(path)
+      local lines = transf.plaintext_file.string_arr_by_lines(path)
       table.remove(lines, line_number)
       dothis.plaintext_file.write_lines(path, lines)
     end,
     remove_line_w_fn = function(path, cond)
-      local lines = transf.plaintext_file.string_array_by_lines(path)
-      local index = get.array.pos_int_or_nil_by_first_match_w_fn(lines, cond)
+      local lines = transf.plaintext_file.string_arr_by_lines(path)
+      local index = get.arr.pos_int_or_nil_by_first_match_w_fn(lines, cond)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
     remove_line_w_string = function(path, cond)
-      local lines = transf.plaintext_file.string_array_by_lines(path)
-      local index = get.array.pos_int_or_nil_by_first_match_w_t(lines, cond)
+      local lines = transf.plaintext_file.string_arr_by_lines(path)
+      local index = get.arr.pos_int_or_nil_by_first_match_w_t(lines, cond)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
     find_remove_nocomment_noindent_line = function(path, cond)
-      local lines = transf.plaintext_file.string_array_by_lines(path)
-      local index = get.array.pos_int_or_nil_by_first_match_w_fn(lines, function(line)
+      local lines = transf.plaintext_file.string_arr_by_lines(path)
+      local index = get.arr.pos_int_or_nil_by_first_match_w_fn(lines, function(line)
         local nocomment_noindent = transf.line.nocomment_noindent(line)
         return findsingle(nocomment_noindent, cond)
       end)
@@ -1184,9 +1184,9 @@ dothis = {
 
   },
   plaintext_table_file = {
-    append_array_of_arrays_of_fields = function(path, array_of_arrays_of_fields)
-      local lines = get.array.array_by_mapped_w_t_arg_t_ret_fn(array_of_arrays_of_fields, function (arr)
-        return get.string_or_number_array.string_by_joined(arr, transf.plaintext_table_file.field_separator())
+    append_arr_of_arrs_of_fields = function(path, arr_of_arrs_of_fields)
+      local lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr_of_arrs_of_fields, function (arr)
+        return get.string_or_number_arr.string_by_joined(arr, transf.plaintext_table_file.field_separator())
       end)
       dothis.plaintext_file.append_lines(path, lines)
     end,
@@ -1194,7 +1194,7 @@ dothis = {
   },
   plaintext_url_or_local_path_file = {
     open_all = function(path, browser)
-      dothis.array.each(
+      dothis.arr.each(
         transf.plaintext_file.nocomment_noindent_content_lines(path),
         get.fn.arbitrary_args_bound_or_ignored_fn(dothis.url_or_local_path.open_browser, {a_use, browser})
       )
@@ -1213,7 +1213,7 @@ dothis = {
       )
     end,
     choose_attachment_and_download = function(path, fn)
-      dothis.array.choose_item(
+      dothis.arr.choose_item(
         transf.email_file.attachments(path),
         function(att)
           dothis.email_file.download_attachment(path, att, fn)
@@ -1287,8 +1287,8 @@ dothis = {
   },
   dir = {
     pull_all_descendants = function(path)
-      act.in_git_dir_array.pull_all(
-        transf.extant_path.git_root_dir_array_by_descendants(path)
+      act.in_git_dir_arr.pull_all(
+        transf.extant_path.git_root_dir_arr_by_descendants(path)
       )
     end,
     do_in_path = function(path, cmd, do_after)
@@ -1314,21 +1314,21 @@ dothis = {
         dothis.dir.delete_dir(path)
       end
     end,
-    copy_children_absolute_path_array_into_absolute_path = function(path, tgt)
-      dothis.extant_path_array.copy_into_absolute_path(
-        transf.dir.absolute_path_array_by_children(path),
+    copy_children_absolute_path_arr_into_absolute_path = function(path, tgt)
+      dothis.extant_path_arr.copy_into_absolute_path(
+        transf.dir.absolute_path_arr_by_children(path),
         tgt
       )
     end,
-    move_children_absolute_path_array_into_absolute_path = function(path, tgt)
-      dothis.extant_path_array.move_into_absolute_path(
-        transf.dir.absolute_path_array_by_children(path),
+    move_children_absolute_path_arr_into_absolute_path = function(path, tgt)
+      dothis.extant_path_arr.move_into_absolute_path(
+        transf.dir.absolute_path_arr_by_children(path),
         tgt
       )
     end,
-    zip_children_absolute_path_array_to_absolute_path = function(path, tgt)
-      dothis.extant_path_array.zip_to_absolute_path(
-        transf.dir.absolute_path_array_by_children(path),
+    zip_children_absolute_path_arr_to_absolute_path = function(path, tgt)
+      dothis.extant_path_arr.zip_to_absolute_path(
+        transf.dir.absolute_path_arr_by_children(path),
         tgt
       )
     end,
@@ -1346,8 +1346,8 @@ dothis = {
       )
     end,
     choose_leaf_or_dotdot_w_extant_path_arg_fn = function(path, fn)
-      dothis.array.choose_item(
-        transf.dir.leaf_or_dotdot_array(path),
+      dothis.arr.choose_item(
+        transf.dir.leaf_or_dotdot_arr(path),
         function(leaf_or_dotdot)
           local local_resolvable_path = transf.path.ending_with_slash(path) .. leaf_or_dotdot
           local local_extant_path = transf.local_resolvable_path.local_absolute_path(local_resolvable_path)
@@ -1457,10 +1457,10 @@ dothis = {
       )
     end,
   },
-  audiodevice_specifier_array = {
-    choose_item_and_set_default = function(array)
-      dothis.array.choose_item(
-        array,
+  audiodevice_specifier_arr = {
+    choose_item_and_set_default = function(arr)
+      dothis.arr.choose_item(
+        arr,
         dothis.audiodevice_specifier.set_default
       )
     end,
@@ -1494,19 +1494,19 @@ dothis = {
     end,
     link_all_hooks = function(path, type)
       local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
-      for _, hook in transf.array.index_value_stateless_iter(get.dir.files(source_hooks)) do
+      for _, hook in transf.arr.index_value_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.link_hook(path, type, hook)
       end
     end,
     copy_all_hooks = function(path, type)
       local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
-      for _, hook in transf.array.index_value_stateless_iter(get.dir.files(source_hooks)) do
+      for _, hook in transf.arr.index_value_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.copy_hook(path, type, hook)
       end
     end,
 
   },
-  git_root_dir_array = {
+  git_root_dir_arr = {
     
   },
   in_git_dir = {
@@ -1629,35 +1629,35 @@ dothis = {
       hs.timer.doAt(seconds_to_wait, fn)
     end
   },
-  string_array = {
-    join_and_paste = function(array, sep)
-      dothis.string.paste_le(transf.string.join(array, sep))
+  string_arr = {
+    join_and_paste = function(arr, sep)
+      dothis.string.paste_le(transf.string.join(arr, sep))
     end,
-    fill_with = function(array)
-      dothis.string_array.join_and_paste(array, "\t")
+    fill_with = function(arr)
+      dothis.string_arr.join_and_paste(arr, "\t")
     end
   },
-  url_array = {
-    open_all = function(url_array, browser)
-      for _, url in transf.array.index_value_stateless_iter(url_array) do
+  url_arr = {
+    open_all = function(url_arr, browser)
+      for _, url in transf.arr.index_value_stateless_iter(url_arr) do
         dothis.url_or_local_path.open_browser(url, browser)
       end
     end,
-    create_as_url_files = function(url_array, path)
-      local abs_path_dict = get.url_array.absolute_path_key_dict_of_url_files(url_array, path)
+    create_as_url_files = function(url_arr, path)
+      local abs_path_dict = get.url_arr.absolute_path_key_dict_of_url_files(url_arr, path)
       dothis.absolute_path_string_value_dict.write(abs_path_dict)
     end,
-    create_as_session = function(url_array, root)
+    create_as_session = function(url_arr, root)
       local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(root)
       path = get.string.string_by_with_suffix(path, ".session")
       dothis.absolute_path.write_file(
         path,
-        transf.url_array.session_string(url_array)
+        transf.url_arr.session_string(url_arr)
       )
     end,
     
   },
-  sgml_url_array = {
+  sgml_url_arr = {
    
   },
   absolute_path_key_dict = {
@@ -1666,8 +1666,8 @@ dothis = {
   dynamic_absolute_path_key_dict = {
     write = function(dynamic_absolute_path_key_dict)
       for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_key_dict) do
-        if is.any.array(contents) then
-          dothis.absolute_path[act.array.shift(contents)](absolute_path, table.unpack(contents))
+        if is.any.arr(contents) then
+          dothis.absolute_path[act.arr.shift(contents)](absolute_path, table.unpack(contents))
         else
           act.absolute_path[contents](absolute_path)
         end
@@ -1697,7 +1697,7 @@ dothis = {
     open_recent = function(application_name, item)
       dothis.mac_application_name.execute_full_action_path(
         application_name,
-        transf.array_and_any.array(
+        transf.arr_and_any.arr(
           tblmap.mac_application_name.recent_full_action_path[application_name],
           item
         )
@@ -1776,8 +1776,8 @@ dothis = {
   },
   path_with_intra_file_locator_specifier = {
     go_to = function(specifier)
-      dothis.input_spec_array.exec(
-        transf.path_with_intra_file_locator_specifier.input_spec_array(specifier)
+      dothis.input_spec_arr.exec(
+        transf.path_with_intra_file_locator_specifier.input_spec_arr(specifier)
       )
     end,
     open_go_to = function(specifier)
@@ -1806,7 +1806,7 @@ dothis = {
   },
   iban = {
     fill_bank_form = function(iban)
-      dothis.string_array.fill_with(transf.iban.iban_bic_bank_name_array(iban))
+      dothis.string_arr.fill_with(transf.iban.iban_bic_bank_name_arr(iban))
     end
   },
   running_application = {
@@ -1881,25 +1881,25 @@ dothis = {
       )
     end,
     pull_subtype_project_materials = function(project_dir, type, subtype)
-      dothis.dir.copy_children_absolute_path_array_into_absolute_path( 
+      dothis.dir.copy_children_absolute_path_arr_into_absolute_path( 
         get.project_dir.global_subtype_project_material_path(project_dir, type, subtype),
         get.project_dir.local_subtype_project_material_path(project_dir, type, subtype)
       )
     end,
     push_subtype_project_materials = function(project_dir, type, subtype)
-      dothis.dir.copy_children_absolute_path_array_into_absolute_path( 
+      dothis.dir.copy_children_absolute_path_arr_into_absolute_path( 
         get.project_dir.local_subtype_project_material_path(project_dir, type, subtype),
         get.project_dir.global_subtype_project_material_path(project_dir, type, subtype)
       )
     end,
     pull_universal_project_materials = function(project_dir, type)
-      dothis.dir.copy_children_absolute_path_array_into_absolute_path( 
+      dothis.dir.copy_children_absolute_path_arr_into_absolute_path( 
         get.project_dir.global_universal_project_material_path(project_dir, type),
         get.project_dir.local_universal_project_material_path(project_dir, type)
       )
     end,
     push_universal_project_materials = function(project_dir, type)
-      dothis.dir.copy_children_absolute_path_array_into_absolute_path( 
+      dothis.dir.copy_children_absolute_path_arr_into_absolute_path( 
         get.project_dir.local_universal_project_material_path(project_dir, type),
         get.project_dir.global_universal_project_material_path(project_dir, type)
       )
@@ -1915,7 +1915,7 @@ dothis = {
   },
   omegat_project_dir = {
     pull_project_materials = function(omegat_project_dir)
-      for _, type in transf.array.index_value_stateless_iter(tblmap.project_type.project_materials_list["omegat"]) do
+      for _, type in transf.arr.index_value_stateless_iter(tblmap.project_type.project_materials_list["omegat"]) do
         dothis.project_dir.pull_project_materials(
           omegat_project_dir,
           type,
@@ -1952,7 +1952,7 @@ dothis = {
       dothis.running_application.focus_main_window(running_application)
     end,
     generate_target_txts = function(dir, do_after)
-      dothis.array.each(
+      dothis.arr.each(
         transf.omegat_project_dir.target_files(dir),
         function(file)
           transf.string.string_or_nil_by_evaled_env_bash_stripped("soffice --headless --convert-to txt:Text --outdir"..
@@ -2078,8 +2078,8 @@ dothis = {
     --- @param id string
     --- @param video_ids string[]
     --- @param do_after? fun(id: string): nil
-    add_youtube_video_id_array = function(id, video_ids, do_after)
-      local next_vid = transf.array.index_value_stateful_iter(video_ids)
+    add_youtube_video_id_arr = function(id, video_ids, do_after)
+      local next_vid = transf.arr.index_value_stateful_iter(video_ids)
       local add_next_vid
       add_next_vid = function ()
         local index, video_id = next_vid()
@@ -2105,7 +2105,7 @@ dothis = {
     end
   },
   youtube_playlist_creation_specifier = {
-    --- @param spec {title?: string, description?: string, privacyStatus?: string, youtube_video_id_array?: string[]}
+    --- @param spec {title?: string, description?: string, privacyStatus?: string, youtube_video_id_arr?: string[]}
     --- @param do_after? fun(id: string): nil
     create_youtube_playlist = function(spec, do_after)
       rest({
@@ -2114,15 +2114,15 @@ dothis = {
         params = { part = "snippet,status" },
         request_table = {
           snippet = {
-            title = spec.title or string.format("Playlist from %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
-            description = spec.description or string.format("Created at %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
+            title = spec.title or get.string.string_by_formatted_w_n_anys("Playlist from %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
+            description = spec.description or get.string.string_by_formatted_w_n_anys("Created at %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
           }
         },
       }, function(result)
         local id = result.id
         hs.timer.doAfter(3, function () -- wait for playlist to be created, seems to not happen instantly
-          if spec.youtube_video_id_array then
-            dothis.youtube_playlist_id.add_youtube_video_id_array(id, spec.youtube_video_id_array, do_after)
+          if spec.youtube_video_id_arr then
+            dothis.youtube_playlist_id.add_youtube_video_id_arr(id, spec.youtube_video_id_arr, do_after)
           else
             if do_after then
               do_after(id)
@@ -2133,78 +2133,78 @@ dothis = {
     end
     
   },
-  array = {
-    choose_item = function(array, callback, target_item_chooser_item_specifier_name)
+  arr = {
+    choose_item = function(arr, callback, target_item_chooser_item_specifier_name)
       dothis.choosing_hschooser_specifier.choose_identified_item(
-        get.array.choosing_hschooser_specifier(array, target_item_chooser_item_specifier_name),
+        get.arr.choosing_hschooser_specifier(arr, target_item_chooser_item_specifier_name),
         callback
       )
     end,
-    choose_item_truncated = function(array, callback)
-      dothis.array.choose_item(array, callback, "truncated_text")
+    choose_item_truncated = function(arr, callback)
+      dothis.arr.choose_item(arr, callback, "truncated_text")
     end,
-    push = function(array, item)
-      array[#array + 1] = item
+    push = function(arr, item)
+      arr[#arr + 1] = item
       return true
     end,
-    unshift = function(array, item)
-      table.insert(array, 1, item)
+    unshift = function(arr, item)
+      table.insert(arr, 1, item)
       return true
     end,
     sort = table.sort,
     remove_by_index = table.remove,
-    revove_by_first_item_w_any = function(array, item)
-      local index = get.array.pos_int_or_nil_by_first_match_w_t(array, item)
+    revove_by_first_item_w_any = function(arr, item)
+      local index = get.arr.pos_int_or_nil_by_first_match_w_t(arr, item)
       if index then
-        dothis.array.remove_by_index(array, index)
+        dothis.arr.remove_by_index(arr, index)
       end
     end,
     insert_at_index = table.insert,
-    move_to_index_by_index = function(array, source_index, target_index)
-      local item = dothis.array.remove_by_index(array, source_index)
-      dothis.array.insert_at_index(array, target_index, item)
+    move_to_index_by_index = function(arr, source_index, target_index)
+      local item = dothis.arr.remove_by_index(arr, source_index)
+      dothis.arr.insert_at_index(arr, target_index, item)
     end,
-    move_to_index_by_item = function(array, item, index)
-      local source_index = get.array.pos_int_or_nil_by_first_match_w_t(array, item)
+    move_to_index_by_item = function(arr, item, index)
+      local source_index = get.arr.pos_int_or_nil_by_first_match_w_t(arr, item)
       if source_index then
-        dothis.array.move_to_index_by_index(array, source_index, index)
+        dothis.arr.move_to_index_by_index(arr, source_index, index)
       end
     end,
-    move_to_front_by_item = function(array, item)
-      dothis.array.move_to_index_by_item(array, item, 1)
+    move_to_front_by_item = function(arr, item)
+      dothis.arr.move_to_index_by_item(arr, item, 1)
     end,
-    move_to_front_or_unshift = function(array, item)
-      local index = get.array.pos_int_or_nil_by_first_match_w_t(array, item)
+    move_to_front_or_unshift = function(arr, item)
+      local index = get.arr.pos_int_or_nil_by_first_match_w_t(arr, item)
       if index then
-        dothis.array.move_to_index_by_index(array, index, 1)
+        dothis.arr.move_to_index_by_index(arr, index, 1)
       else
-        dothis.array.unshift(array, item)
+        dothis.arr.unshift(arr, item)
       end
     end,
-    move_to_end_by_item = function(array, item)
-      dothis.array.move_to_index_by_item(array, item, #array)
+    move_to_end_by_item = function(arr, item)
+      dothis.arr.move_to_index_by_item(arr, item, #arr)
     end,
-    move_to_end_or_push = function(array, item)
-      local index = get.array.pos_int_or_nil_by_first_match_w_t(array, item)
+    move_to_end_or_push = function(arr, item)
+      local index = get.arr.pos_int_or_nil_by_first_match_w_t(arr, item)
       if index then
-        dothis.array.move_to_index_by_index(array, index, #array)
+        dothis.arr.move_to_index_by_index(arr, index, #arr)
       else
-        dothis.array.push(array, item)
+        dothis.arr.push(arr, item)
       end
     end,
-    filter_in_place = function(array, filterfn)
+    filter_in_place = function(arr, filterfn)
       local i = 1
-      while i <= #array do
-        if not filterfn(array[i]) then
-          table.remove(array, i)
+      while i <= #arr do
+        if not filterfn(arr[i]) then
+          table.remove(arr, i)
         else
           i = i + 1
         end
       end
     end,
     each = hs.fnutils.ieach,
-    each_with_delay = function(array, delay, fn, do_after)
-      local next_item = transf.array.index_value_stateful_iter(array)
+    each_with_delay = function(arr, delay, fn, do_after)
+      local next_item = transf.arr.index_value_stateful_iter(arr)
       local do_next_item
       do_next_item = function()
         local index, item = next_item()
@@ -2234,10 +2234,10 @@ dothis = {
       dothis.any.choose_action(target)
     end
   },
-  action_specifier_array = {
+  action_specifier_arr = {
 
   },
-  chooser_item_specifier_array = {
+  chooser_item_specifier_arr = {
 
   },
   thing_name = {
@@ -2250,8 +2250,8 @@ dothis = {
       for k, v in transf.table.key_value_stateless_iter(spec.whole_chooser_style_keys) do
         hschooser[k](hschooser, v)
       end
-      local choices = get.chooser_item_specifier_array.styled_chooser_item_specifier_array(
-        spec.chooser_item_specifier_array,
+      local choices = get.chooser_item_specifier_arr.styled_chooser_item_specifier_arr(
+        spec.chooser_item_specifier_arr,
         spec.chooser_item_specifier_text_key_styledtext_attributes_specifier_dict
       )
       hschooser:placeholderText(spec.placeholder_text)
@@ -2391,7 +2391,7 @@ dothis = {
     create_inner_item = function(spec)
       local ipc_socket_id = os.time() .. "-" .. math.random(1000000)
       transf.string.string_or_nil_by_evaled_env_bash_stripped("mpv " .. transf.stream_creation_specifier.flags_string(spec) .. 
-        " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.string_array.single_quoted_escaped_string(spec.urls))
+        " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.string_arr.single_quoted_escaped_string(spec.urls))
       return {
         ipc_socket_id = ipc_socket_id,
         state = "booting"
@@ -2467,45 +2467,45 @@ dothis = {
       spec.inner_item:start()
     end,
   },
-  created_item_specifier_array = {
+  created_item_specifier_arr = {
     create = function(arr, creation_specifier)
       local itm = dothis.creation_specifier.create(creation_specifier)
-      dothis.array.push(arr, itm)
+      dothis.arr.push(arr, itm)
       return itm
     end,
     create_all = function(arr, creation_specifier_arr)
       hs.fnutils.each(creation_specifier_arr, function(creation_specifier)
-        dothis.created_item_specifier_array.create(arr, creation_specifier)
+        dothis.created_item_specifier_arr.create(arr, creation_specifier)
       end)
     end,
-    --- shouldn't I be adding them to the array too????
+    --- shouldn't I be adding them to the arr too????
     get_or_create = function(arr, creation_specifier)
-      local created_item_specifier = get.created_item_specifier_array.created_item_specifier_w_creation_specifier(arr, creation_specifier)
+      local created_item_specifier = get.created_item_specifier_arr.created_item_specifier_w_creation_specifier(arr, creation_specifier)
       if created_item_specifier then
         return created_item_specifier
       else
-        return dothis.created_item_specifier_array.create(arr, creation_specifier)
+        return dothis.created_item_specifier_arr.create(arr, creation_specifier)
       end
     end,
     create_or_recreate = function(arr, creation_specifier)
-      local idx = get.created_item_specifier_array.pos_int_w_creation_specifier(arr, creation_specifier)
+      local idx = get.created_item_specifier_arr.pos_int_w_creation_specifier(arr, creation_specifier)
       if idx then
         arr[idx] = dothis.created_item_specifier.recreate(arr[idx])
         return arr[idx]
       else
-        return dothis.created_item_specifier_array.create(arr, creation_specifier)
+        return dothis.created_item_specifier_arr.create(arr, creation_specifier)
       end
     end,
     create_or_recreate_all = function (arr, creation_specifier_arr)
-      dothis.array.each(creation_specifier_arr, function(creation_specifier)
-        dothis.created_item_specifier_array.create_or_recreate(arr, creation_specifier)
+      dothis.arr.each(creation_specifier_arr, function(creation_specifier)
+        dothis.created_item_specifier_arr.create_or_recreate(arr, creation_specifier)
       end)
     end
   },
-  hotkey_created_item_specifier_array = {
+  hotkey_created_item_specifier_arr = {
     create_or_recreate_all = function (arr, key_partial_creation_specifier_dict)
-      local creation_specifier_arr = get.table_of_assocs.array_of_assocs(key_partial_creation_specifier_dict, "key")
-      dothis.created_item_specifier_array.create_or_recreate_all(
+      local creation_specifier_arr = get.table_of_assocs.arr_of_assocs(key_partial_creation_specifier_dict, "key")
+      dothis.created_item_specifier_arr.create_or_recreate_all(
         arr,
         creation_specifier_arr
       )
@@ -2528,12 +2528,12 @@ dothis = {
       return dothis.mpv_ipc_socket_id.set_playback_seconds_relative(spec.inner_item.ipc_socket_id, seconds)
     end,
   },
-  stream_created_item_specifier_array = {
+  stream_created_item_specifier_arr = {
     create_background_stream = function(arr, spec)
       local copied_spec = get.table.table_by_copy(spec)
       copied_spec.flag_profile_name = "background"
       copied_spec.type = "stream"
-      dothis.created_item_specifier_array.create(arr, copied_spec)
+      dothis.created_item_specifier_arr.create(arr, copied_spec)
     end,
     create_background_streams = nil -- TODO
   },
@@ -2550,10 +2550,10 @@ dothis = {
       spec.largest_interval = transf.two_comparables.bool_by_larger(spec.largest_interval, transf.timer_spec.int_by_interval_left(spec))
     end,
   },
-  timer_spec_array = {
+  timer_spec_arr = {
     fire_all_if_ready_and_space_if_necessary = function(arr)
       local fired = false
-      for _, v in transf.array.index_value_stateless_iter(arr) do
+      for _, v in transf.arr.index_value_stateless_iter(arr) do
         if 
           transf.timer_spec.bool_by_ready(v) 
         then
@@ -2570,11 +2570,11 @@ dothis = {
       end
     end,
     create = function(arr, spec)
-      dothis.array.push(arr, spec)
+      dothis.arr.push(arr, spec)
       dothis.timer_spec.set_next_timestamp_s(spec)
     end,
     create_by_default_interval = function(arr, fn)
-      dothis.timer_spec_array.create(
+      dothis.timer_spec_arr.create(
         arr,
         {
           fn = fn,
@@ -2646,7 +2646,7 @@ dothis = {
   key_input_spec = {
     exec = function(spec, do_after)
       if spec.mods then
-        local mods = get.array.array_by_mapped_w_t_key_dict(spec.mods, normalize.mod)
+        local mods = get.arr.arr_by_mapped_w_t_key_dict(spec.mods, normalize.mod)
         hs.eventtap.keyStroke(mods, spec.key)
       elseif #spec.key == 1 then
         hs.eventtap.keyStroke({}, spec.key)
@@ -2669,7 +2669,7 @@ dothis = {
       ].exec(spec, do_after)
     end,
   },
-  input_spec_array = {
+  input_spec_arr = {
     exec = function(specarr, wait_time, do_after)
       wait_time = wait_time or transf.float_interval_specifier.random({start=0.10, stop=0.12})
       if #specarr == 0 then
@@ -2681,18 +2681,18 @@ dothis = {
       hs.timer.doAfter(
         wait_time, 
         function()
-          local subspecifier = act.array.shift(specarr)
+          local subspecifier = act.arr.shift(specarr)
           dothis.input_spec.exec(subspecifier, function()
-            dothis.input_spec_array.exec(subspecifier, do_after)
+            dothis.input_spec_arr.exec(subspecifier, do_after)
           end)
         end
       )
     end
   },
-  input_spec_string_array = {
+  input_spec_string_arr = {
     exec = function(strarr, wait_time, do_after)
-      dothis.input_spec_array.exec(
-        transf.input_spec_string_array.input_spec_array(strarr),
+      dothis.input_spec_arr.exec(
+        transf.input_spec_string_arr.input_spec_arr(strarr),
         wait_time,
         do_after
       )
@@ -2700,8 +2700,8 @@ dothis = {
   },
   input_spec_series_string = {
     exec = function(str, wait_time, do_after)
-      dothis.input_spec_array.exec(
-        transf.input_spec_series_string.input_spec_array(str),
+      dothis.input_spec_arr.exec(
+        transf.input_spec_series_string.input_spec_arr(str),
         wait_time,
         do_after 
       )
@@ -2852,7 +2852,7 @@ dothis = {
           )
           dothis.window.focus(window)
           dothis.window.set_hs_geometry_rect_like(window, {x = 0, y = 0, w = 800, h = 1500})
-          dothis.input_spec_array.exec({
+          dothis.input_spec_arr.exec({
             "m30 65 %tl", ".",
             "m40 395 %tl", ".",
             "m0 -300 %c", ".",
@@ -2898,7 +2898,7 @@ dothis = {
             )
             dothis.window.focus(ff_window)
             dothis.window.set_hs_geometry_rect_like(ff_window, {x = 0, y = 0, w = 1280, h = 1600})
-            dothis.input_spec_array.exec({ 
+            dothis.input_spec_arr.exec({ 
               "m-100x-410 %c", -- format open
               ".",
               "m-100x-310 %c", -- format select
@@ -2929,10 +2929,10 @@ dothis = {
       )
     end,
     facebook_preprocess_backup = function()
-      local dlchildren = transf.dir.absolute_path_array_by_children(env.DOWNLOADS)
-      local fbfiles = get.path_array.path_array_by_filter_to_filename_starting(dlchildren, "facebook-samswartzberg")
-      local fbzips = get.path_array.path_array_by_filter_to_same_extension(fbfiles, "zip")
-      local newest_fbzip = transf.extant_path_array.extant_path_by_newest_creation(fbzips)
+      local dlchildren = transf.dir.absolute_path_arr_by_children(env.DOWNLOADS)
+      local fbfiles = get.path_arr.path_arr_by_filter_to_filename_starting(dlchildren, "facebook-samswartzberg")
+      local fbzips = get.path_arr.path_arr_by_filter_to_same_extension(fbfiles, "zip")
+      local newest_fbzip = transf.extant_path_arr.extant_path_by_newest_creation(fbzips)
       local tmploc = transf.string.in_tmp_dir("facebook", "export")
       dothis.local_zip_file.unzip_to_absolute_path(newest_fbzip, tmploc)
       dothis.file.delete_file(newest_fbzip)
@@ -2960,12 +2960,12 @@ dothis = {
   },
   telegram_raw_export_dir = {
     process_to_telegram_export_dir = function(dir)
-      for _, chat_dir in transf.array.index_value_stateless_iter(transf.dir.absolute_path_array_by_children(transf.path.ending_with_slash(dir) .. "chats")) do
+      for _, chat_dir in transf.arr.index_value_stateless_iter(transf.dir.absolute_path_arr_by_children(transf.path.ending_with_slash(dir) .. "chats")) do
         local media_path = transf.path.ending_with_slash(dir) .. "media/" 
-        for _, media_type_dir in transf.array.index_value_stateless_iter(
-          transf.dir.dir_array_by_children(chat_dir)
+        for _, media_type_dir in transf.arr.index_value_stateless_iter(
+          transf.dir.dir_arr_by_children(chat_dir)
         ) do
-          dothis.dir.move_children_absolute_path_array_into_absolute_path(
+          dothis.dir.move_children_absolute_path_arr_into_absolute_path(
             media_type_dir,
             media_path
           )
@@ -2981,12 +2981,12 @@ dothis = {
   facebook_raw_export_dir = {
     process_to_facebook_export_dir = function(dir)
       local actual_dir = transf.path.ending_with_slash(dir) .. "messages/inbox/"
-      for _, chat_dir in transf.array.index_value_stateless_iter(transf.dir.absolute_path_array_by_children(actual_dir)) do
+      for _, chat_dir in transf.arr.index_value_stateless_iter(transf.dir.absolute_path_arr_by_children(actual_dir)) do
         local media_path = chat_dir .. "media/"
-        for _, media_type_dir in transf.array.index_value_stateless_iter(
-          transf.dir.dir_array_by_children(chat_dir)
+        for _, media_type_dir in transf.arr.index_value_stateless_iter(
+          transf.dir.dir_arr_by_children(chat_dir)
         ) do
-          dothis.dir.move_children_absolute_path_array_into_absolute_path(
+          dothis.dir.move_children_absolute_path_arr_into_absolute_path(
             media_type_dir,
             media_path
           )
@@ -3047,11 +3047,11 @@ dothis = {
   },
   fnname = {
     put_memo = function(fnid, opts_as_str, params, result, opts)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str, params)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_arr_or_nil(fnid, opts_as_str, params)
       dothis.absolute_path.write_file(cache_path, json.encode(result))
     end,
     reset_by_opts = function(fnid, opts_as_str)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_arr_or_nil(fnid, opts_as_str)
       dothis.absolute_path.delete(cache_path)
     end,
     reset_by_all = function(fnname)
@@ -3060,13 +3060,13 @@ dothis = {
       )
     end,
     set_timestamp_s_created_time = function(fnid, opts_as_str, created_time)
-      dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_string_and_array_or_nil(fnid, opts_as_str, "~~~created~~~"), tostring(created_time))
+      dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_string_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~"), tostring(created_time))
     end
   },
   fn_queue_specifier = {
     update = function(qspec)
       hs.alert.closeSpecific(qspec.alert)
-      if #qspec.fn_array == 0 then 
+      if #qspec.fn_arr == 0 then 
         dothis.hotkey_created_item_specifier.pause(qspec.hotkey_created_item_specifier)
       else
         qspec.alert = dothis.string.alert(
@@ -3077,11 +3077,11 @@ dothis = {
       end
     end,
     push = function(qspec, fn)
-      dothis.array.push(qspec.fn_array, fn)
+      dothis.arr.push(qspec.fn_arr, fn)
       dothis.fn_queue_specifier.update(qspec)
     end,
     pop = function(qspec)
-      local fn = act.array.pop(qspec.fn_array)
+      local fn = act.arr.pop(qspec.fn_arr)
       fn()
       dothis.fn_queue_specifier.update(qspec)
     end,
@@ -3106,7 +3106,7 @@ dothis = {
       dothis.backuped_thing_identifier.write_current_timestamp_ms(
         get.export_chat_main_object.backuped_thing_identifier(obj, typ)
       )
-      dothis.dir.move_children_absolute_path_array_into_absolute_path(
+      dothis.dir.move_children_absolute_path_arr_into_absolute_path(
         source_media_dir,
         media_dir
       )
@@ -3118,8 +3118,8 @@ dothis = {
   },
   export_dir = {
     log = function(dir, typ)
-      local arr = transf[typ .. "_export_dir"].export_chat_main_object_media_dir_pair_array(dir)
-      for _, pair in transf.array.index_value_stateless_iter(arr) do
+      local arr = transf[typ .. "_export_dir"].export_chat_main_object_media_dir_pair_arr(dir)
+      for _, pair in transf.arr.index_value_stateless_iter(arr) do
         dothis.export_chat_main_object.log(pair[1], typ, pair[2])
       end
     end

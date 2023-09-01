@@ -524,7 +524,7 @@ tblmap = {
         thing_name = "summary",
         precedence = 999
       },
-      array = {
+      arr = {
         thing_name = "summary",
         precedence = 1
       },
@@ -550,7 +550,7 @@ tblmap = {
       
     },
     initial_selected_index_partial_retriever_specifier = {
-      audiodevice_specifier_array = {
+      audiodevice_specifier_arr = {
         thing_name = "active_audiodevice_specifier_index",
         precedence = 999
       }

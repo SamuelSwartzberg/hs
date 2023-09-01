@@ -433,5 +433,22 @@ ls = {
     "volume-title",
     "volume-title-short",
     "year-suffix",
+  },
+  fs_attr_name = {
+    "dev",
+    "ino",
+    "mode",
+    "nlink",
+    "uid",
+    "gid",
+    "rdev",
+    "access",
+    "change",
+    "modification",
+    "permissions",
+    "creation",
+    "size",
+    "blocks",
+    "blksize",
   }
 }
