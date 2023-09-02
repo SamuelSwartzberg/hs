@@ -535,20 +535,20 @@ dothis = {
     open_and_reveal = function(path)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -R " .. transf.string.single_quoted_escaped(path))
     end,
-    write_nonabsolute_path_key_dict = function(path, nonabsolute_path_key_dict, extension)
-      dothis.dynamic_absolute_path_key_dict.write(
-        get.nonabsolute_path_key_dict.absolute_path_key_dict(nonabsolute_path_key_dict, path, extension)
+    write_nonabsolute_path_key_assoc = function(path, nonabsolute_path_key_assoc, extension)
+      dothis.dynamic_absolute_path_key_assoc.write(
+        get.nonabsolute_path_key_assoc.absolute_path_key_assoc(nonabsolute_path_key_assoc, path, extension)
       )
     end,
-    write_dynamic_path_dict = function(path, assoc, extension)
-      dothis.local_path.write_nonabsolute_path_key_dict(
-        transf.table.nonabsolute_path_key_dict(path), 
+    write_dynamic_path_assoc = function(path, assoc, extension)
+      dothis.local_path.write_nonabsolute_path_key_assoc(
+        transf.table.nonabsolute_path_key_assoc(path), 
         assoc, 
         extension
       )
     end,
     write_dynamic_structure = function(path, name)
-      dothis.local_path.write_dynamic_path_dict(
+      dothis.local_path.write_dynamic_path_assoc(
         path,
         tblmap.dynamic_structure_name.dynamic_structure[name]
       )
@@ -1575,20 +1575,20 @@ dothis = {
     end
   },
   logging_dir = {
-    log_nonabsolute_path_key_timestamp_ms_key_dict_value_dict_by_ymd = function(path, dict)
-      local abs_path_dict = get.nonabsolute_path_key_dict.absolute_path_key_dict(
-        dict,
+    log_nonabsolute_path_key_timestamp_ms_key_assoc_value_assoc_by_ymd = function(path, assoc)
+      local abs_path_assoc = get.nonabsolute_path_key_assoc.absolute_path_key_assoc(
+        assoc,
         path,
         ".json"
       )
-      for path, dict in abs_path_dict do 
-        dothis.json_file.merge_w_table(path, dict)
+      for path, assoc in abs_path_assoc do 
+        dothis.json_file.merge_w_table(path, assoc)
       end
     end,
-    log_timestamp_ms_key_dict_value_dict = function(path, timestamp_ms_key_dict_value_dict)
-      dothis.logging_dir.log_nonabsolute_path_key_timestamp_ms_key_dict_value_dict_by_ymd(
+    log_timestamp_ms_key_assoc_value_assoc = function(path, timestamp_ms_key_assoc_value_assoc)
+      dothis.logging_dir.log_nonabsolute_path_key_timestamp_ms_key_assoc_value_assoc_by_ymd(
         path,
-        transf.timestamp_ms_key_dict_value_dict.nonabsolute_path_key_timestamp_ms_key_dict_value_dict_by_ymd(timestamp_ms_key_dict_value_dict)
+        transf.timestamp_ms_key_assoc_value_assoc.nonabsolute_path_key_timestamp_ms_key_assoc_value_assoc_by_ymd(timestamp_ms_key_assoc_value_assoc)
       )
     end,
   },
@@ -1604,7 +1604,7 @@ dothis = {
   },
   entry_logging_dir = {
     log_string = function(path, str)
-      dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(path, {
+      dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(path, {
         [os.time() * 1000] = {
           entry = str
         }
@@ -1644,8 +1644,8 @@ dothis = {
       end
     end,
     create_as_url_files = function(url_arr, path)
-      local abs_path_dict = get.url_arr.absolute_path_key_dict_of_url_files(url_arr, path)
-      dothis.absolute_path_string_value_dict.write(abs_path_dict)
+      local abs_path_assoc = get.url_arr.absolute_path_key_assoc_of_url_files(url_arr, path)
+      dothis.absolute_path_string_value_assoc.write(abs_path_assoc)
     end,
     create_as_session = function(url_arr, root)
       local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(root)
@@ -1660,12 +1660,12 @@ dothis = {
   sgml_url_arr = {
    
   },
-  absolute_path_key_dict = {
+  absolute_path_key_assoc = {
 
   },
-  dynamic_absolute_path_key_dict = {
-    write = function(dynamic_absolute_path_key_dict)
-      for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_key_dict) do
+  dynamic_absolute_path_key_assoc = {
+    write = function(dynamic_absolute_path_key_assoc)
+      for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_key_assoc) do
         if is.any.arr(contents) then
           dothis.absolute_path[act.arr.shift(contents)](absolute_path, table.unpack(contents))
         else
@@ -1674,9 +1674,9 @@ dothis = {
       end
     end,
   },
-  absolute_path_string_value_dict = {
-    write = function(absolute_path_string_value_dict)
-      for absolute_path, contents in transf.table.key_value_stateless_iter(absolute_path_string_value_dict) do
+  absolute_path_string_value_assoc = {
+    write = function(absolute_path_string_value_assoc)
+      for absolute_path, contents in transf.table.key_value_stateless_iter(absolute_path_string_value_assoc) do
         dothis.absolute_path.write_file(absolute_path, contents)
       end
     end,
@@ -2252,7 +2252,7 @@ dothis = {
       end
       local choices = get.chooser_item_specifier_arr.styled_chooser_item_specifier_arr(
         spec.chooser_item_specifier_arr,
-        spec.chooser_item_specifier_text_key_styledtext_attributes_specifier_dict
+        spec.chooser_item_specifier_text_key_styledtext_attributes_specifier_assoc
       )
       hschooser:placeholderText(spec.placeholder_text)
       hschooser:choices(choices)
@@ -2503,8 +2503,8 @@ dothis = {
     end
   },
   hotkey_created_item_specifier_arr = {
-    create_or_recreate_all = function (arr, key_partial_creation_specifier_dict)
-      local creation_specifier_arr = get.table_of_assocs.arr_of_assocs(key_partial_creation_specifier_dict, "key")
+    create_or_recreate_all = function (arr, key_partial_creation_specifier_assoc)
+      local creation_specifier_arr = get.table_of_assocs.arr_of_assocs(key_partial_creation_specifier_assoc, "key")
       dothis.created_item_specifier_arr.create_or_recreate_all(
         arr,
         creation_specifier_arr
@@ -2646,7 +2646,7 @@ dothis = {
   key_input_spec = {
     exec = function(spec, do_after)
       if spec.mods then
-        local mods = get.arr.arr_by_mapped_w_t_key_dict(spec.mods, normalize.mod)
+        local mods = get.arr.arr_by_mapped_w_t_key_assoc(spec.mods, normalize.mod)
         hs.eventtap.keyStroke(mods, spec.key)
       elseif #spec.key == 1 then
         hs.eventtap.keyStroke({}, spec.key)
@@ -2779,11 +2779,11 @@ dothis = {
     -- expects to be called on a watcher for tachiyomi state
     tachiyomi_backup = function()
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
-        local tmst_dict = transf.tachiyomi_json_table.timestamp_ms_key_dict_value_dict(transf.json_file.not_userdata_or_function(env.TMP_TACHIYOMI_JSON))
-        tmst_dict = get.timestamp_ms_key_dict_value_dict.timestamp_ms_key_dict_value_dict_by_filtered_timestamp(tmst_dict, "tachiyomi")
-        dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_function(env.TMP_TACHIYOMI_JSON))
+        tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
+        dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
           env.MMANGA_LOGS,
-          tmst_dict
+          tmst_assoc
         )
         dothis.backuped_thing_identifier.write_current_timestamp_ms("tachiyomi")
       end)
@@ -2802,7 +2802,7 @@ dothis = {
         "WHERE visit_date > " .. timestamp * 1000 .. " " ..
         "ORDER BY timestamp DESC;",
         function(tbl)
-          dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+          dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
             env.MBROWSER_LOGS,
             tbl
           )
@@ -2821,7 +2821,7 @@ dothis = {
           "WHERE access_date > " .. timestamp  .. " " ..
           "ORDER BY timestamp DESC;",
           function(tbl)
-            dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+            dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
               env.MMEDIA_LOGS,
               tbl
             )
@@ -2838,7 +2838,7 @@ dothis = {
         commit.epoch = nil
         tbl[timestamp_s * 1000] = commit
       end
-      dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+      dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
         env.MDIARY_COMMITS,
         tbl
       )
@@ -3096,9 +3096,9 @@ dothis = {
       dothis.absolute_path.create_dir(
         media_dir
       )
-      dothis.logging_dir.log_timestamp_ms_key_dict_value_dict(
+      dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
         logging_dir,
-        get.export_chat_main_object.timestamp_ms_key_msg_spec_value_dict_by_filtered(
+        get.export_chat_main_object.timestamp_ms_key_msg_spec_value_assoc_by_filtered(
           obj,
           typ
         )

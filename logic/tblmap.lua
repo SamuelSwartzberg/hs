@@ -377,7 +377,7 @@ tblmap = {
       ["ruby_apidoc"] = "https://apidock.com/ruby/search?query=%s",
       ["python_docs"] = "https://docs.python.org/3/search.html?q=%s",
       ["merriam_webster"] = "https://www.merriam-webster.com/dictionary/%s",
-      ["dict_cc"] = "https://www.dict.cc/?s=%s",
+      ["assoc_cc"] = "https://www.assoc.cc/?s=%s",
       ["deepl_en_ja"] = "https://www.deepl.com/translator#en/ja/%s",
       ["deepl_de_en"] = "https://www.deepl.com/translator#de/en/%s",
       mdn = "https://developer.mozilla.org/en-US/search?q=%s",
@@ -529,7 +529,7 @@ tblmap = {
         precedence = 1
       },
       pair = {
-        thing_name = "dict_entry_string",
+        thing_name = "assoc_entry_string",
         precedence = 999
       },
       date = {

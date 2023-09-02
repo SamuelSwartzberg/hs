@@ -4,13 +4,12 @@ refac:
   - move/add things from dothis to act
   - add implementations of various 'get' things to 'transf'
   - clean up is & hierarchy
-  - merge dict and assoc? Seem to just be two names for the same thing
   - fix static type errors in remaining files
   - write tests with busted
-  - fix logging dirs, etc, to now use json
   - many names don't yet corrrespond to the new schema
-  - boolean -> bool, string -> str, array -> arr
+  - string -> str
   - replace package methods with my own
+  - fix logging dirs, etc, to now use json
 post 'lua is working':  
   - add/rename missing m3us
   - history

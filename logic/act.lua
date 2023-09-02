@@ -314,7 +314,7 @@ act = {
       })
     end,
   },
-  dict = {
+  assoc = {
     
   },
   volume_local_extant_path = {
@@ -428,7 +428,7 @@ act = {
     search_ruby_apidoc = function(query) dothis.search_engine.search("ruby_apidoc", query) end,
     search_python_docs = function(query) dothis.search_engine.search("python_docs", query) end,
     search_merriam_webster = function(query) dothis.search_engine.search("merriam_webster", query) end,
-    search_dict_cc = function(query) dothis.search_engine.search("dict_cc", query) end,
+    search_assoc_cc = function(query) dothis.search_engine.search("assoc_cc", query) end,
     search_deepl_en_ja = function(query) dothis.search_engine.search("deepl_en_ja", query) end,
     search_deepl_de_en = function(query) dothis.search_engine.search("deepl_de_en", query) end,
     search_mdn = function(query) dothis.search_engine.search("mdn", query) end,
@@ -627,7 +627,7 @@ act = {
   youtube_video_url = {
     add_as_m3u = function(url)
       local deduced_tags = transf.youtube_video_url.fs_tag_assoc(url)
-      local edited_tags = transf.string_value_dict.string_value_dict_by_prompted_once_from_default(deduced_tags)
+      local edited_tags = transf.string_value_assoc.string_value_assoc_by_prompted_once_from_default(deduced_tags)
       local plspec = {}
       plspec.tag = transf.two_arr_or_nils.arr(edited_tags, transf.string.prompted_multiple_string_pair_arr_for("tag"))
       plspec.path  = get.local_extant_path.dir_by_default_prompted_once(env.MAUDIOVISUAL)

@@ -544,7 +544,7 @@ transf = {
     arr_by_nolast = function(arr)
       return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(arr, 1, -2)
     end,
-    empty_string_value_dict = function(arr)
+    empty_string_value_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
         transf.any.self_and_empty_string
@@ -571,12 +571,12 @@ transf = {
     index_value_stateless_iter = ipairs,
     index_value_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.index_value_stateless_iter),
     index_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.index_value_stateless_iter, 1, 1),
-    value_bool_dict = function(arr)
+    value_bool_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(arr, function(v) return v, true end)
     end,
     set = function(arr)
       return transf.table_or_nil.kt_arr(
-        transf.arr.value_bool_dict(arr)
+        transf.arr.value_bool_assoc(arr)
       )
     end,
     permutation_arr = function(arr)
@@ -1241,21 +1241,21 @@ transf = {
     grandchildren_absolute_path_arr = function(dir)
       return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_arr_by_children(dir), transf.dir.absolute_path_arr_by_children)
     end,
-    absolute_path_key_leaf_string_or_nested_value_dict = function(path)
+    absolute_path_key_leaf_string_or_nested_value_assoc = function(path)
       local res = {}
       path = get.string.string_by_with_suffix(path, "/")
       for child_path in transf.dir.children_absolute_path_value_stateful_iter(path) do
         if is.absolute_path.dir(child_path) then
-          res[child_path] = transf.dir.absolute_path_key_leaf_string_or_nested_value_dict(child_path)
+          res[child_path] = transf.dir.absolute_path_key_leaf_string_or_nested_value_assoc(child_path)
         else
           res[child_path] = "leaf"
         end
       end
       return res
     end,
-    plaintext_dictonary_read_assoc = function(path)
-      transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc(
-        transf.dir.absolute_path_key_leaf_string_or_nested_value_dict(path)
+    plaintext_assoconary_read_assoc = function(path)
+      transf.absolute_path_key_leaf_string_or_nested_value_assoc.plaintext_assoconary_read_assoc(
+        transf.dir.absolute_path_key_leaf_string_or_nested_value_assoc(path)
       )
     end,
     string_by_ls = function(path)
@@ -1287,28 +1287,28 @@ transf = {
       return transf.path_leaf_specifier.path(path_leaf_specifier)
     end
   },
-  absolute_path_key_leaf_string_or_nested_value_dict = {
-    leaf_key_leaf_string_or_nested_value_dict = function(dict)
+  absolute_path_key_leaf_string_or_nested_value_assoc = {
+    leaf_key_leaf_string_or_nested_value_assoc = function(assoc)
       local res = {}
-      for k, v in transf.table.stateless_key_value_iter(dict) do
+      for k, v in transf.table.stateless_key_value_iter(assoc) do
         local leaf = transf.path.leaf(k)
         if is.any.table(v) then
-          res[leaf] = transf.absolute_path_key_leaf_string_or_nested_value_dict.leaf_key_leaf_string_or_nested_value_dict(v)
+          res[leaf] = transf.absolute_path_key_leaf_string_or_nested_value_assoc.leaf_key_leaf_string_or_nested_value_assoc(v)
         else
           res[leaf] = v
         end
       end
       return res
     end,
-    plaintext_dictonary_read_assoc = function(dict)
+    plaintext_assoconary_read_assoc = function(assoc)
       local res = {}
-      for k, v in transf.table.stateless_key_value_iter(dict) do
+      for k, v in transf.table.stateless_key_value_iter(assoc) do
         local filename = transf.path.filename(k)
         if is.any.table(v) then
-          res[filename] = transf.absolute_path_key_leaf_string_or_nested_value_dict.plaintext_dictonary_read_assoc(v)
+          res[filename] = transf.absolute_path_key_leaf_string_or_nested_value_assoc.plaintext_assoconary_read_assoc(v)
         else
-          if is.file.plaintext_dictionary_file(k) then
-            res[filename] = transf.plaintext_dictionary_file.table(k)
+          if is.file.plaintext_associonary_file(k) then
+            res[filename] = transf.plaintext_associonary_file.table(k)
           end
         end
       end
@@ -1446,8 +1446,8 @@ transf = {
     fs_tag_assoc = function(path_leaf_specifier)
       return path_leaf_specifier.fs_tag_assoc
     end,
-    fs_tag_string_dict = function(path_leaf_specifier)
-      return transf.fs_tag_assoc.fs_tag_string_dict(path_leaf_specifier.fs_tag_assoc)
+    fs_tag_string_assoc = function(path_leaf_specifier)
+      return transf.fs_tag_assoc.fs_tag_string_assoc(path_leaf_specifier.fs_tag_assoc)
     end,
     fs_tag_string_part_arr = function(path_leaf_specifier)
       return transf.fs_tag_assoc.fs_tag_string_part_arr(path_leaf_specifier.fs_tag_assoc)
@@ -1473,63 +1473,63 @@ transf = {
         "%"
       )
     end,
-    fs_tag_string_dict = function(fs_tag_string)
+    fs_tag_string_assoc = function(fs_tag_string)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         transf.fs_tag_string.fs_tag_string_part_arr(fs_tag_string),
         get.fn.arbitrary_args_bound_or_ignored_fn(get.string.n_strings_split, {a_use, "-", 2})
       )
     end,
     fs_tag_assoc = function(fs_tag_string)
-      transf.fs_tag_string_dict.fs_tag_assoc(
-        transf.fs_tag_string.fs_tag_string_dict(fs_tag_string)
+      transf.fs_tag_string_assoc.fs_tag_assoc(
+        transf.fs_tag_string.fs_tag_string_assoc(fs_tag_string)
       )
     end,
   },
   fs_tag_string_part_arr = {
-    fs_tag_string_dict = function(fs_tag_string_part_arr)
+    fs_tag_string_assoc = function(fs_tag_string_part_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         fs_tag_string_part_arr,
         get.fn.second_n_args_bound_fn(get.string.two_strings_split_or_nil, "-")
       )
     end,
     fs_tag_assoc = function(fs_tag_string_part_arr)
-      transf.fs_tag_string_dict.fs_tag_assoc(
-        transf.fs_tag_string_part_arr.fs_tag_string_dict(fs_tag_string_part_arr)
+      transf.fs_tag_string_assoc.fs_tag_assoc(
+        transf.fs_tag_string_part_arr.fs_tag_string_assoc(fs_tag_string_part_arr)
       )
     end,
     fs_tag_string = function(fs_tag_string_part_arr)
       return "%" .. get.string_or_number_arr.string_by_joined(fs_tag_string_part_arr, "%")
     end,
   },
-  fs_tag_string_dict = {
-    fs_tag_assoc = function(dict)
+  fs_tag_string_assoc = {
+    fs_tag_assoc = function(assoc)
       return hs.fnutils.map(
-        dict,
+        assoc,
         get.fn.arbitrary_args_bound_or_ignored_fn(stringy.split, {a_use, ","})
       )
     end,
-    fs_tag_string_part_arr = function(dict)
+    fs_tag_string_part_arr = function(assoc)
       return get.table.string_arr_by_mapped_w_fmt_string(
-        dict,
+        assoc,
         "%s-%s"
       )
     end,
-    fs_tag_string = function(dict)
+    fs_tag_string = function(assoc)
       return transf.fs_tag_string_part_arr.fs_tag_string(
-        transf.fs_tag_string_dict.fs_tag_string_part_arr(dict)
+        transf.fs_tag_string_assoc.fs_tag_string_part_arr(assoc)
       )
     end,
   },
   fs_tag_assoc = {
-    fs_tag_string_dict = function(fs_tag_assoc)
+    fs_tag_string_assoc = function(fs_tag_assoc)
       return hs.fnutils.map(
         fs_tag_assoc,
         transf.any.join_if_arr
       )
     end,
     fs_tag_string_part_arr = function(fs_tag_assoc)
-      return transf.fs_tag_string_dict.fs_tag_string_part_arr(
-        transf.fs_tag_assoc.fs_tag_string_dict(fs_tag_assoc)
+      return transf.fs_tag_string_assoc.fs_tag_string_part_arr(
+        transf.fs_tag_assoc.fs_tag_string_assoc(fs_tag_assoc)
       )
     end,
     fs_tag_string = function(fs_tag_assoc)
@@ -1539,7 +1539,7 @@ transf = {
     end,
   },
   path_leaf_specifier_arr = {
-    path_leaf_specifier_date_interval_specifier_dict = function(arr)
+    path_leaf_specifier_date_interval_specifier_assoc = function(arr)
       return get.table.table_by_mapped_w_kt_arg_kt_vt_ret_fn(
         arr,
         function(path_leaf_specifier)
@@ -1583,8 +1583,8 @@ transf = {
       )
     end,
     path_leaf_specifier_or_nil_by_earliest_start = function(arr)
-      return get.dict.kt_or_nil_by_first_match_w_vt(
-        transf.path_leaf_specifier_arr.path_leaf_specifier_date_interval_specifier_dict(arr),
+      return get.assoc.kt_or_nil_by_first_match_w_vt(
+        transf.path_leaf_specifier_arr.path_leaf_specifier_date_interval_specifier_assoc(arr),
         transf.path_leaf_specifier_arr.date_interval_specifier_or_nil_by_earliest_start(arr)
       )
     end,
@@ -1632,9 +1632,9 @@ transf = {
         "mshow -q" .. transf.string.single_quoted_escaped(path)
       )
     end,
-    useful_header_dict = function(path)
-      error("TODO: currently the way the headers are rendered contains a bunch of stuff we wouldn't want in the dict. In particular, emails without a name are rendered as <email>, which may not be what we want.")
-      return transf.header_string.dict(transf.email_file.all_useful_headers_raw(path))
+    useful_header_assoc = function(path)
+      error("TODO: currently the way the headers are rendered contains a bunch of stuff we wouldn't want in the assoc. In particular, emails without a name are rendered as <email>, which may not be what we want.")
+      return transf.header_string.assoc(transf.email_file.all_useful_headers_raw(path))
     end,
     rendered_body = function(path)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
@@ -1645,7 +1645,7 @@ transf = {
       return transf.email_file.all_useful_headers_raw(path) .. "\n\n" .. transf.email_file.rendered_body(path)
     end,
     email_specifier = function(path)
-      local specifier = transf.email_file.useful_header_dict(path)
+      local specifier = transf.email_file.useful_header_assoc(path)
       specifier.body = transf.email_file.rendered_body(path)
       return specifier
     end,
@@ -1706,7 +1706,7 @@ transf = {
       specifier.body = nil
       local non_inline_attachment_local_file_arr = specifier.non_inline_attachment_local_file_arr
       specifier.non_inline_attachment_local_file_arr = nil
-      local header = transf.dict.email_header(specifier)
+      local header = transf.assoc.email_header(specifier)
       local mail = get.string.string_by_formatted_w_n_anys("%s\n\n%s", header, body)
       if non_inline_attachment_local_file_arr then
         mail = mail .. "\n" .. transf.path_arr.attachment_string(non_inline_attachment_local_file_arr)
@@ -1819,9 +1819,9 @@ transf = {
     end,
   },
 
-  env_var_name_value_dict = {
-    key_value_and_dependency_dict = function(dict)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(dict, function(value)
+  env_var_name_value_assoc = {
+    key_value_and_dependency_assoc = function(assoc)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(assoc, function(value)
         return {
           value = value,
           dependencies = get.stateless_iter.table(
@@ -1829,22 +1829,22 @@ transf = {
         }
       end)
     end,
-    dependency_ordered_key_value_arr = function(dict)
-      return transf.key_value_and_dependency_dict.dependency_ordered_key_value_arr(
-        transf.key_value_and_dependency_dict.key_value_and_dependency_dict(dict)
+    dependency_ordered_key_value_arr = function(assoc)
+      return transf.key_value_and_dependency_assoc.dependency_ordered_key_value_arr(
+        transf.key_value_and_dependency_assoc.key_value_and_dependency_assoc(assoc)
       )
     end,
-    env_string = function(dict)
+    env_string = function(assoc)
       transf.env_line_arr.env_string(
         transf.string_pair_arr.env_line_arr(
-          transf.env_var_name_value_dict.dependency_ordered_key_value_arr(dict)
+          transf.env_var_name_value_assoc.dependency_ordered_key_value_arr(assoc)
         )
       )
     end
 
   },
-  key_value_and_dependency_dict = {
-    dependency_ordered_key_value_arr = function(dict)local result = {}  -- Table to store the sorted keys
+  key_value_and_dependency_assoc = {
+    dependency_ordered_key_value_arr = function(assoc)local result = {}  -- Table to store the sorted keys
       local visited = {}  -- Table to keep track of visited keys
       local temp_stack = {}  -- Table to detect cyclic dependencies
   
@@ -1858,18 +1858,18 @@ transf = {
               temp_stack[key] = true  -- Add key to temporary stack to detect cyclic dependencies
   
               -- Traverse dependencies recursively
-              for _, dep in transf.arr.index_value_stateless_iter(dict[key]['dependencies']) do
+              for _, dep in transf.arr.index_value_stateless_iter(assoc[key]['dependencies']) do
                   dfs(dep)
               end
   
               temp_stack[key] = nil  -- Remove key from temporary stack
               visited[key] = true  -- Mark key as visited
-              table.insert(result, { key, dict[key]['value'] })  -- Append {key, value} pair to result
+              table.insert(result, { key, assoc[key]['value'] })  -- Append {key, value} pair to result
           end
       end
   
       -- Perform DFS traversal for each key in the graph
-      for key, _ in transf.table.key_value_stateless_iter(dict) do
+      for key, _ in transf.table.key_value_stateless_iter(assoc) do
           dfs(key)
       end
   
@@ -1952,14 +1952,14 @@ transf = {
       iter() -- skip header, seems to be a bug in ftcsv
       return iter
     end,
-    dict_arr = function(path)
+    assoc_arr = function(path)
       return select(1, ftcsv.parse(path, transf.plaintext_table_file.field_separator(path)))
     end,
-    iter_of_dicts = function(path)
+    iter_of_assocs = function(path)
       return ftcsv.parseLine(path, transf.plaintext_table_file.field_separator(path))
     end,
   },
-  timestamp_s_key_dict_value_dict_json_file = {
+  timestamp_s_key_assoc_value_assoc_json_file = {
 
   },
   dated_children_dir = {
@@ -2065,7 +2065,7 @@ transf = {
     weeknumber = function(date)
       return date:getisoweeknumber()
     end,
-    full_date_component_name_value_dict = function(date)
+    full_date_component_name_value_assoc = function(date)
       local tbl = transf.two_tables.table_by_take_new(
         date:getdate(),
         date:gettime()
@@ -2086,8 +2086,8 @@ transf = {
       return get.date.string_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-time"])
     end,
     timestamp_s = function(date)
-      return transf.full_date_component_name_value_dict.timestamp_s(
-        transf.date.full_date_component_name_value_dict(date)
+      return transf.full_date_component_name_value_assoc.timestamp_s(
+        transf.date.full_date_component_name_value_assoc(date)
       )
     end,
     timestamp_ms = function(date)
@@ -2132,7 +2132,7 @@ transf = {
     
   },
   date_component_name_arr = {
-    min_date_component_name_value_dict = function(arr)
+    min_date_component_name_value_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
         function(component)
@@ -2140,7 +2140,7 @@ transf = {
         end
       )
     end,
-    max_date_component_name_value_dict = function(arr)
+    max_date_component_name_value_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
         function(component)
@@ -2165,13 +2165,13 @@ transf = {
       return transf.two_arrs.set_by_difference(ls.date.date_component_names, arr)
     end,
     rfc3339like_dt_separator_arr  = function(arr)
-      return get.arr.arr_by_mapped_w_t_key_dict(
+      return get.arr.arr_by_mapped_w_t_key_assoc(
         arr,
         tblmap.date_component_name.rfc3339like_dt_separator
       )
     end,
     rfc3339like_dt_string_format_part_arr = function(arr)
-      return get.arr.arr_by_mapped_w_t_key_dict(
+      return get.arr.arr_by_mapped_w_t_key_assoc(
         arr,
         tblmap.date_component_name.rfc3339like_dt_string_format_part
       )
@@ -2186,33 +2186,33 @@ transf = {
     end,
   },
   rfc3339like_dt = {
-    date_component_name_value_dict = function(str)
+    date_component_name_value_assoc = function(str)
       local comps = {onig.match(str, r.g.date.rfc3339like_dt)}
       return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.date.date_component_names, function(k, v)
         return v and get.string_or_number.number_or_nil(comps[k]) or nil
       end)
     end,
     date_interval_specifier = function(str)
-      return transf.date_component_name_value_dict.date_interval_specifier(transf.rfc3339like_dt.date_component_name_value_dict(str))
+      return transf.date_component_name_value_assoc.date_interval_specifier(transf.rfc3339like_dt.date_component_name_value_assoc(str))
     end,
-    min_full_date_component_name_value_dict = function(str)
-      return transf.date_component_name_value_dict.min_full_date_component_name_value_dict(
-        transf.rfc3339like_dt.date_component_name_value_dict(str)
+    min_full_date_component_name_value_assoc = function(str)
+      return transf.date_component_name_value_assoc.min_full_date_component_name_value_assoc(
+        transf.rfc3339like_dt.date_component_name_value_assoc(str)
       )
     end,
-    max_full_date_component_name_value_dict = function(str)
-      return transf.date_component_name_value_dict.max_full_date_component_name_value_dict(
-        transf.rfc3339like_dt.date_component_name_value_dict(str)
+    max_full_date_component_name_value_assoc = function(str)
+      return transf.date_component_name_value_assoc.max_full_date_component_name_value_assoc(
+        transf.rfc3339like_dt.date_component_name_value_assoc(str)
       )
     end,
     min_date = function(str)
-      return transf.full_date_component_name_value_dict.date(
-        transf.rfc3339like_dt.min_full_date_component_name_value_dict(str)
+      return transf.full_date_component_name_value_assoc.date(
+        transf.rfc3339like_dt.min_full_date_component_name_value_assoc(str)
       )
     end,
     max_date = function(str)
-      return transf.full_date_component_name_value_dict.date(
-        transf.rfc3339like_dt.max_full_date_component_name_value_dict(str)
+      return transf.full_date_component_name_value_assoc.date(
+        transf.rfc3339like_dt.max_full_date_component_name_value_assoc(str)
       )
     end,
     min_timestamp_s = function(str)
@@ -2230,8 +2230,8 @@ transf = {
   },
   full_rfc3339like_dt = {
     date = function(str)
-      transf.full_date_component_name_value_dict.date(
-        transf.rfc3339like_dt.date_component_name_value_dict(str)
+      transf.full_date_component_name_value_assoc.date(
+        transf.rfc3339like_dt.date_component_name_value_assoc(str)
       )
     end,
     timestamp_s = function(str)
@@ -2249,57 +2249,57 @@ transf = {
     start_rfc3339like_dt = function(str)
       return get.string.string_arr_split(str, "_to_")[1]
     end,
-    start_date_component_name_value_dict = function(str)
-      return transf.rfc3339like_dt.date_component_name_value_dict(
+    start_date_component_name_value_assoc = function(str)
+      return transf.rfc3339like_dt.date_component_name_value_assoc(
         transf.rfc3339like_interval.start_rfc3339like_dt(str)
       )
     end,
-    start_min_full_date_component_name_value_dict = function(str)
-      return transf.date_component_name_value_dict.min_full_date_component_name_value_dict(
-        transf.rfc3339like_interval.start_date_component_name_value_dict(str)
+    start_min_full_date_component_name_value_assoc = function(str)
+      return transf.date_component_name_value_assoc.min_full_date_component_name_value_assoc(
+        transf.rfc3339like_interval.start_date_component_name_value_assoc(str)
       )
     end,
     start_min_date = function(str)
-      return transf.full_date_component_name_value_dict.date(
-        transf.rfc3339like_interval.start_min_full_date_component_name_value_dict(str)
+      return transf.full_date_component_name_value_assoc.date(
+        transf.rfc3339like_interval.start_min_full_date_component_name_value_assoc(str)
       )
     end,
     end_rfc3339like_dt = function(str)
       return get.string.string_arr_split(str, "_to_")[2]
     end,
-    end_date_component_name_value_dict = function(str)
-      return transf.rfc3339like_dt.date_component_name_value_dict(
+    end_date_component_name_value_assoc = function(str)
+      return transf.rfc3339like_dt.date_component_name_value_assoc(
         transf.rfc3339like_interval.end_rfc3339like_dt(str)
       )
     end,
-    end_max_full_date_component_name_value_dict = function(str)
-      return transf.date_component_name_value_dict.max_full_date_component_name_value_dict(
-        transf.rfc3339like_interval.end_date_component_name_value_dict(str)
+    end_max_full_date_component_name_value_assoc = function(str)
+      return transf.date_component_name_value_assoc.max_full_date_component_name_value_assoc(
+        transf.rfc3339like_interval.end_date_component_name_value_assoc(str)
       )
     end,
-    end_min_full_date_component_name_value_dict = function(str)
-      return transf.date_component_name_value_dict.min_full_date_component_name_value_dict(
-        transf.rfc3339like_interval.end_date_component_name_value_dict(str)
+    end_min_full_date_component_name_value_assoc = function(str)
+      return transf.date_component_name_value_assoc.min_full_date_component_name_value_assoc(
+        transf.rfc3339like_interval.end_date_component_name_value_assoc(str)
       )
     end,
     end_max_date = function(str)
-      return transf.full_date_component_name_value_dict.date(
-        transf.rfc3339like_interval.end_max_full_date_component_name_value_dict(str)
+      return transf.full_date_component_name_value_assoc.date(
+        transf.rfc3339like_interval.end_max_full_date_component_name_value_assoc(str)
       )
     end,
     end_min_date = function(str)
-      return transf.full_date_component_name_value_dict.date(
-        transf.rfc3339like_interval.end_min_full_date_component_name_value_dict(str)
+      return transf.full_date_component_name_value_assoc.date(
+        transf.rfc3339like_interval.end_min_full_date_component_name_value_assoc(str)
       )
     end,
     start_smallest_date_component_set = function(str)
-      return transf.date_component_name_value_dict.smallest_date_component_set(
-        transf.rfc3339like_interval.start_date_component_name_value_dict(str)
+      return transf.date_component_name_value_assoc.smallest_date_component_set(
+        transf.rfc3339like_interval.start_date_component_name_value_assoc(str)
       )
     end,
     end_smallest_date_component_set = function(str)
-      return transf.date_component_name_value_dict.smallest_date_component_set(
-        transf.rfc3339like_interval.end_date_component_name_value_dict(str)
+      return transf.date_component_name_value_assoc.smallest_date_component_set(
+        transf.rfc3339like_interval.end_date_component_name_value_assoc(str)
       )
     end,
     smallest_date_component_both_set = function(str)
@@ -2497,30 +2497,30 @@ transf = {
     full_rfc3339like_dt_by_end = function(date_interval_specifier)
       return transf.date.full_rfc3339like_dt(date_interval_specifier.stop)
     end,
-    start_full_date_component_name_value_dict = function(date_interval_specifier)
-      return transf.date.full_date_component_name_value_dict(date_interval_specifier.start)
+    start_full_date_component_name_value_assoc = function(date_interval_specifier)
+      return transf.date.full_date_component_name_value_assoc(date_interval_specifier.start)
     end,
-    end_full_date_component_name_value_dict = function(date_interval_specifier)
-      return transf.date.full_date_component_name_value_dict(date_interval_specifier.stop)
+    end_full_date_component_name_value_assoc = function(date_interval_specifier)
+      return transf.date.full_date_component_name_value_assoc(date_interval_specifier.stop)
     end,
-    start_prefix_date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
-      return transf.date_component_name_value_dict.prefix_date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value(
-        transf.date_interval_specifier.start_full_date_component_name_value_dict(date_interval_specifier)
+    start_prefix_date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
+      return transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value(
+        transf.date_interval_specifier.start_full_date_component_name_value_assoc(date_interval_specifier)
       )
     end,
-    end_prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
-      return transf.date_component_name_value_dict.prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value(
-        transf.date_interval_specifier.end_full_date_component_name_value_dict(date_interval_specifier)
+    end_prefix_date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
+      return transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value(
+        transf.date_interval_specifier.end_full_date_component_name_value_assoc(date_interval_specifier)
       )
     end,
     start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
-      return transf.date_component_name_value_dict.rfc3339like_dt(
-        transf.date_interval_specifier.start_prefix_date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
+      return transf.date_component_name_value_assoc.rfc3339like_dt(
+        transf.date_interval_specifier.start_prefix_date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
       )
     end,
     end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
-      return transf.date_component_name_value_dict.rfc3339like_dt(
-        transf.date_interval_specifier.end_prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
+      return transf.date_component_name_value_assoc.rfc3339like_dt(
+        transf.date_interval_specifier.end_prefix_date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
       )
     end,
     rfc3339like_dt = function(date_interval_specifier)
@@ -2546,116 +2546,116 @@ transf = {
       }
     end,
   },
-  date_component_name_value_dict = {
-    date_component_name_list_set = function(date_component_name_value_dict)
-      return transf.table_or_nil.kt_arr(date_component_name_value_dict)
+  date_component_name_value_assoc = {
+    date_component_name_list_set = function(date_component_name_value_assoc)
+      return transf.table_or_nil.kt_arr(date_component_name_value_assoc)
     end,
-    date_component_value_list_set = function(date_component_name_value_dict)
-      return transf.table_or_nil.vt_arr(date_component_name_value_dict)
+    date_component_value_list_set = function(date_component_name_value_assoc)
+      return transf.table_or_nil.vt_arr(date_component_name_value_assoc)
     end,
-    date_component_name_list_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_arr.date_component_name_arr_inverse(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+    date_component_name_list_not_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_arr.date_component_name_arr_inverse(transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc))
     end,
-    date_component_value_list_not_set = function(date_component_name_value_dict)
+    date_component_value_list_not_set = function(date_component_name_value_assoc)
       return get.date_component_name_list.date_component_value_list(
-        transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict),
-        date_component_name_value_dict
+        transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc),
+        date_component_name_value_assoc
       )
     end,
-    date_component_name_ordered_list_set = function(date_component_name_value_dict)
-      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+    date_component_name_ordered_list_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc))
     end,
-    date_component_value_ordered_list_set = function(date_component_name_value_dict)
+    date_component_value_ordered_list_set = function(date_component_name_value_assoc)
       return get.date_component_name_list.date_component_value_ordered_list(
-        transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict),
-        date_component_name_value_dict
+        transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc),
+        date_component_name_value_assoc
       )
     end,
-    date_component_name_ordered_list_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+    date_component_name_ordered_list_not_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
     end,
-    largest_date_component_name_set = function(date_component_name_value_dict)
-      return transf.date_component_name_arr.largest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+    largest_date_component_name_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_arr.largest_date_component_name(transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc))
     end,
-    smallest_date_component_name_set = function(date_component_name_value_dict)
-      return transf.date_component_name_arr.smallest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_set(date_component_name_value_dict))
+    smallest_date_component_name_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_arr.smallest_date_component_name(transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc))
     end,
-    largest_date_component_name_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_arr.largest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+    largest_date_component_name_not_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_arr.largest_date_component_name(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
     end,
-    smallest_date_component_name_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_arr.smallest_date_component_name(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+    smallest_date_component_name_not_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_arr.smallest_date_component_name(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
     end,
-    min_date_component_name_value_dict_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_arr.min_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+    min_date_component_name_value_assoc_not_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_arr.min_date_component_name_value_assoc(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
     end,
-    max_date_component_name_value_dict_not_set = function(date_component_name_value_dict)
-      return transf.date_component_name_arr.max_date_component_name_value_dict(transf.date_component_name_value_dict.date_component_name_list_not_set(date_component_name_value_dict))
+    max_date_component_name_value_assoc_not_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_arr.max_date_component_name_value_assoc(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
     end,
-    min_full_date_component_name_value_dict = function(date_component_name_value_dict)
+    min_full_date_component_name_value_assoc = function(date_component_name_value_assoc)
       return transf.two_tables.table_by_take_new(
-        date_component_name_value_dict,
-        transf.date_component_name_value_dict.min_date_component_name_value_dict_not_set(date_component_name_value_dict)
+        date_component_name_value_assoc,
+        transf.date_component_name_value_assoc.min_date_component_name_value_assoc_not_set(date_component_name_value_assoc)
       )
     end,
-    max_full_date_component_name_value_dict = function(date_component_name_value_dict)
+    max_full_date_component_name_value_assoc = function(date_component_name_value_assoc)
       return transf.two_tables.table_by_take_new(
-        date_component_name_value_dict,
-        transf.date_component_name_value_dict.max_date_component_name_value_dict_not_set(date_component_name_value_dict)
+        date_component_name_value_assoc,
+        transf.date_component_name_value_assoc.max_date_component_name_value_assoc_not_set(date_component_name_value_assoc)
       )
     end,
-    date_interval_specifier = function(date_component_name_value_dict)
+    date_interval_specifier = function(date_component_name_value_assoc)
       return {
-        start = date(transf.date_component_name_value_dict.min_full_date_component_name_value_dict(date_component_name_value_dict)),
-        stop = date(transf.date_component_name_value_dict.max_full_date_component_name_value_dict(date_component_name_value_dict))
+        start = date(transf.date_component_name_value_assoc.min_full_date_component_name_value_assoc(date_component_name_value_assoc)),
+        stop = date(transf.date_component_name_value_assoc.max_full_date_component_name_value_assoc(date_component_name_value_assoc))
       }
     end, 
-    prefix_date_component_name_value_dict = function(date_component_name_value_dict)
+    prefix_date_component_name_value_assoc = function(date_component_name_value_assoc)
       local res = {}
       for _, date_component_name in transf.arr.index_value_stateless_iter(ls.date.date_component_names) do
-        if date_component_name_value_dict[date_component_name] == nil then
+        if date_component_name_value_assoc[date_component_name] == nil then
           return res
         end
-        res[date_component_name] = date_component_name_value_dict[date_component_name]
+        res[date_component_name] = date_component_name_value_assoc[date_component_name]
       end
     end,
-    prefix_date_component_name_list_set = function(date_component_name_value_dict)
-      return transf.date_component_name_value_dict.date_component_name_list_set(
-        transf.date_component_name_value_dict.prefix_date_component_name_value_dict(date_component_name_value_dict)
+    prefix_date_component_name_list_set = function(date_component_name_value_assoc)
+      return transf.date_component_name_value_assoc.date_component_name_list_set(
+        transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc(date_component_name_value_assoc)
       )
     end,
-    prefix_date_component_name_ordered_list_set = function(date_component_name_value_dict)
+    prefix_date_component_name_ordered_list_set = function(date_component_name_value_assoc)
       return transf.date_component_name_arr.date_component_name_ordered_list_set(
-        transf.date_component_name_value_dict.prefix_date_component_name_value_dict(date_component_name_value_dict)
+        transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc(date_component_name_value_assoc)
       )
     end,
-    --- gets a date_component_names_ordered_list which has all date_component_names where there is a date_component_name within the date_component_name_value_dict that is smaller and equal that is not nil
+    --- gets a date_component_names_ordered_list which has all date_component_names where there is a date_component_name within the date_component_name_value_assoc that is smaller and equal that is not nil
     --- i.e. { month = 02, hour = 12 } will return { "year", "month", "day", "hour" }
-    --- this should be equal to prefix_date_component_name_ordered_list_set if date_component_name_value_dict is a prefix_date_component_name_value_dict since prefix_ is defined as having no nil values before potential trailing nil values
-    prefix_date_component_name_ordered_list_no_trailing_nil = function(date_component_name_value_dict)
+    --- this should be equal to prefix_date_component_name_ordered_list_set if date_component_name_value_assoc is a prefix_date_component_name_value_assoc since prefix_ is defined as having no nil values before potential trailing nil values
+    prefix_date_component_name_ordered_list_no_trailing_nil = function(date_component_name_value_assoc)
       local ol = get.table.table_by_copy(ls.date.date_component_names)
-      while(date_component_name_value_dict[
+      while(date_component_name_value_assoc[
         ol[#ol]
       ] == nil) do
         ol[#ol] = nil
       end
       return ol
     end,
-    rfc3339like_dt_string_format_part_specifier_arr = function(date_component_name_value_dict)
+    rfc3339like_dt_string_format_part_specifier_arr = function(date_component_name_value_assoc)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.date_component_name_value_dict.prefix_date_component_name_ordered_list_no_trailing_nil(date_component_name_value_dict),
+        transf.date_component_name_value_assoc.prefix_date_component_name_ordered_list_no_trailing_nil(date_component_name_value_assoc),
         function(date_component_name)
           return {
             fallback = tblmap.date_component_name.rfc3339like_dt_string_format_part_fallback[date_component_name],
-            value = date_component_name_value_dict[date_component_name],
+            value = date_component_name_value_assoc[date_component_name],
             string_format_part = tblmap.date_component_name.rfc3339like_dt_string_format_part[date_component_name]
           }
         end
       )
     end,
-    rfc3339like_dt = function(date_component_name_value_dict)
+    rfc3339like_dt = function(date_component_name_value_assoc)
       local res = transf.string_format_part_specifier_arr.string(
-        transf.date_component_name_value_dict.rfc3339like_dt_string_format_part_specifier_arr(date_component_name_value_dict)
+        transf.date_component_name_value_assoc.rfc3339like_dt_string_format_part_specifier_arr(date_component_name_value_assoc)
       )
       if res:sub(-1) == "Z" then
         return res
@@ -2663,37 +2663,37 @@ transf = {
         return res:sub(1, -2) -- not full rfc3339like_dt, thus the trailing sep will be something like - or : and must be removed
       end
     end,
-    date_component_name_value_dict_where_date_component_value_is_max_date_component_value = function(date_component_name_value_dict)
-      return get.dict.dict_by_filtered_w_kt_vt_fn(
-        date_component_name_value_dict,
+    date_component_name_value_assoc_where_date_component_value_is_max_date_component_value = function(date_component_name_value_assoc)
+      return get.assoc.assoc_by_filtered_w_kt_vt_fn(
+        date_component_name_value_assoc,
         function(k, v) return v == tblmap.date_component_name.max_date_component_value[k] end
       )
     end,
-    date_component_name_value_dict_where_date_component_value_is_min_date_component_value = function(date_component_name_value_dict)
-      return get.dict.dict_by_filtered_w_kt_vt_fn(
-        date_component_name_value_dict,
+    date_component_name_value_assoc_where_date_component_value_is_min_date_component_value = function(date_component_name_value_assoc)
+      return get.assoc.assoc_by_filtered_w_kt_vt_fn(
+        date_component_name_value_assoc,
         function(k, v) return v == tblmap.date_component_name.min_date_component_value[k] end
       )
     end,
-    date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_dict)
-      return get.dict.dict_by_filtered_w_kt_vt_fn(
-        date_component_name_value_dict,
+    date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_assoc)
+      return get.assoc.assoc_by_filtered_w_kt_vt_fn(
+        date_component_name_value_assoc,
         function(k, v) return v ~= tblmap.date_component_name.max_date_component_value[k] end
       )
     end,
-    date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value = function(date_component_name_value_dict)
-      return get.dict.dict_by_filtered_w_kt_vt_fn(
-        date_component_name_value_dict,
+    date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value = function(date_component_name_value_assoc)
+      return get.assoc.assoc_by_filtered_w_kt_vt_fn(
+        date_component_name_value_assoc,
         function(k, v) return v ~= tblmap.date_component_name.min_date_component_value[k] end
       )
     end,
-    prefix_date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_dict)
-      local date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value = transf.date_component_name_value_dict.date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value(date_component_name_value_dict)
-      return transf.date_component_name_value_dict.prefix_date_component_name_value_dict(date_component_name_value_dict_where_date_component_value_is_not_max_date_component_value)
+    prefix_date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_assoc)
+      local date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value = transf.date_component_name_value_assoc.date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value(date_component_name_value_assoc)
+      return transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc(date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value)
     end,
-    prefix_date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value = function(date_component_name_value_dict)
-      local date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value = transf.date_component_name_value_dict.date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value(date_component_name_value_dict)
-      return transf.date_component_name_value_dict.prefix_date_component_name_value_dict(date_component_name_value_dict_where_date_component_value_is_not_min_date_component_value)
+    prefix_date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value = function(date_component_name_value_assoc)
+      local date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value = transf.date_component_name_value_assoc.date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value(date_component_name_value_assoc)
+      return transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc(date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value)
     end,
     
 
@@ -2725,30 +2725,30 @@ transf = {
       )
     end
   },
-  prefix_date_component_name_value_dict = {
+  prefix_date_component_name_value_assoc = {
     
     
   },
-  suffix_date_component_name_value_dict = {
+  suffix_date_component_name_value_assoc = {
 
   },
-  partial_date_component_name_value_dict = {
+  partial_date_component_name_value_assoc = {
 
   },
   -- date components are full if all components are set
-  full_date_component_name_value_dict = {
-    date = function(full_date_component_name_value_dict)
-      return date(full_date_component_name_value_dict)
+  full_date_component_name_value_assoc = {
+    date = function(full_date_component_name_value_assoc)
+      return date(full_date_component_name_value_assoc)
     end,
-    timestamp_s = function(full_date_component_name_value_dict)
-      return os.time(full_date_component_name_value_dict)
+    timestamp_s = function(full_date_component_name_value_assoc)
+      return os.time(full_date_component_name_value_assoc)
     end,
-    timestamp_ms = function(full_date_component_name_value_dict)
-      return transf.date.timestamp_s(full_date_component_name_value_dict) * 1000
+    timestamp_ms = function(full_date_component_name_value_assoc)
+      return transf.date.timestamp_s(full_date_component_name_value_assoc) * 1000
     end,
-    full_rfc3339like_dt = function(full_date_component_name_value_dict)
+    full_rfc3339like_dt = function(full_date_component_name_value_assoc)
       return transf.date.full_rfc3339like_dt(
-        transf.full_date_component_name_value_dict.date(full_date_component_name_value_dict)
+        transf.full_date_component_name_value_assoc.date(full_date_component_name_value_assoc)
       )
     end,
   },
@@ -2994,29 +2994,29 @@ transf = {
         "\n"
       )
     end,
-    vcard_type_phone_number_dict = function (contact_table)
+    vcard_type_phone_number_assoc = function (contact_table)
       return contact_table.Phone
     end,
     phone_number_arr = function (contact_table)
-      return transf.table.vt_set(transf.contact_table.vcard_type_phone_number_dict(contact_table))
+      return transf.table.vt_set(transf.contact_table.vcard_type_phone_number_assoc(contact_table))
     end,
     phone_number_string = function (contact_table)
       return get.string_or_number_arr.string_by_joined(transf.contact_table.phone_number_arr(contact_table), ", ")
     end,
-    vcard_type_email_dict = function (contact_table)
+    vcard_type_email_assoc = function (contact_table)
       return contact_table.Email
     end,
     email_arr = function (contact_table)
-      return transf.table.vt_set(transf.contact_table.vcard_type_email_dict(contact_table))
+      return transf.table.vt_set(transf.contact_table.vcard_type_email_assoc(contact_table))
     end,
     email_string = function (contact_table)
       return get.string_or_number_arr.string_by_joined(transf.contact_table.email_arr(contact_table), ", ")
     end,
-    vcard_type_address_table_dict = function (contact_table)
+    vcard_type_address_table_assoc = function (contact_table)
       return contact_table.Addresses
     end,
     address_table_arr = function (contact_table)
-      return transf.table.vt_set(transf.contact_table.vcard_type_address_table_dict(contact_table))
+      return transf.table.vt_set(transf.contact_table.vcard_type_address_table_assoc(contact_table))
     end,
     summary = function (contact_table)
       local sumstr = transf.contact_table.full_name_western(contact_table)
@@ -3049,12 +3049,12 @@ transf = {
     end
 
   },
-  vcard_type_dict = {
-    vcard_types = function (vcard_type_dict)
-      return transf.table_or_nil.kt_arr(vcard_type_dict)
+  vcard_type_assoc = {
+    vcard_types = function (vcard_type_assoc)
+      return transf.table_or_nil.kt_arr(vcard_type_assoc)
     end
   },
-  vcard_type_address_table_dict = {
+  vcard_type_address_table_assoc = {
 
   },
   address_table = {
@@ -3217,7 +3217,7 @@ transf = {
       }).items
     end,
     fs_tag_assoc = function(id)
-      local assoc = transf.form_filling_specifier.filled_string_dict({
+      local assoc = transf.form_filling_specifier.filled_string_assoc({
         in_fields = {
           title = transf.youtube_video_id.string_by_title(id),
           channel_title = transf.youtube_video_id.string_by_channel_title(id),
@@ -4049,23 +4049,23 @@ transf = {
       )
     end,
   },
-  plaintext_dictionary_file = {
+  plaintext_associonary_file = {
     table = function(file)
-      if is.plaintext_dictionary_file.yaml_file(file) then
+      if is.plaintext_associonary_file.yaml_file(file) then
         return transf.yaml_file.not_userdata_or_function(file)
-      elseif is.plaintext_dictionary_file.json_file(file) then
+      elseif is.plaintext_associonary_file.json_file(file) then
         return transf.json_file.not_userdata_or_function(file)
-      elseif is.plaintext_dictionary_file.ini_file(file) then
+      elseif is.plaintext_associonary_file.ini_file(file) then
         return transf.ini_file.assoc(file)
-      elseif is.plaintext_dictionary_file.toml_file(file) then
+      elseif is.plaintext_associonary_file.toml_file(file) then
         return transf.toml_file.assoc(file)
-      elseif is.plaintext_dictionary_file.ics_file(file) then
+      elseif is.plaintext_associonary_file.ics_file(file) then
         return transf.ics_file.arr_of_assocs(file) 
       end
     end
   },
   header_string = {
-    dict = function(str)
+    assoc = function(str)
       local lines = transf.string.noempty_line_string_arr(str)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         lines,
@@ -4185,7 +4185,7 @@ transf = {
       local trimmed_lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(lines, stringy.strip)
       return get.string_or_number_arr.string_by_joined(trimmed_lines, "\n")
     end,
-    iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_arr_value_dict_value_dict = function(raw)
+    iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_arr_value_assoc_value_assoc = function(raw)
       local raw_countries = get.string.string_arr_split_noempty(raw, "\n\n")
       local countries = {}
       for _, raw_country in transf.arr.index_value_stateless_iter(raw_countries) do
@@ -4239,7 +4239,7 @@ transf = {
     raw_syn_output = function(str)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.string.single_quoted_escaped(str) )
     end,
-    term_syn_specifier_dict = function(str)
+    term_syn_specifier_assoc = function(str)
       local synonym_parts = get.string.string_arr_split(transf.word.raw_syn_output(str), "\n\n")
       local synonym_tables = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         synonym_parts,
@@ -4328,8 +4328,8 @@ transf = {
     curl_form_field_args = function(pair)
       return transf.key_value.curl_form_field_args(pair[1], pair[2])
     end,
-    dict_entry_string = function(pair)
-      return transf.key_value.dict_entry_string(pair[1], pair[2])
+    assoc_entry_string = function(pair)
+      return transf.key_value.assoc_entry_string(pair[1], pair[2])
     end,
     larger = function(pair)
       return transf.two_comparables.comparable_by_larger(pair[1], pair[2])
@@ -4420,7 +4420,7 @@ transf = {
         transf.any.string(key) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.string(value)),
       }
     end,
-    dict_entry_string = function(key, value)
+    assoc_entry_string = function(key, value)
       return "[" .. transf.any.string(key) .. "] = " .. transf.any.string(value)
     end,
     
@@ -4438,7 +4438,7 @@ transf = {
     displayname = function(str)
       return eutf8.match(str, "^(.*) <")
     end,
-    displayname_email_dict = function(str)
+    displayname_email_assoc = function(str)
       local displayname = transf.displayname_email.displayname(str)
       local email = transf.displayname_email.email(str)
       return {
@@ -4458,7 +4458,7 @@ transf = {
     displayname = function(str)
       return transf.displayname_email.displayname(str) or nil
     end,
-    displayname_email_dict = function(str)
+    displayname_email_assoc = function(str)
       local displayname = transf.email_or_displayname_email.displayname(str)
       local email = transf.email_or_displayname_email.email(str)
       return {
@@ -4617,8 +4617,8 @@ transf = {
       end
       return res
     end,
-    dict_by_zip_stop_shortest = function(arr1, arr2)
-      return transf.pair_arr.dict(
+    assoc_by_zip_stop_shortest = function(arr1, arr2)
+      return transf.pair_arr.assoc(
         transf.two_arrs.pair_arr_by_zip_stop_shortest(arr1, arr2)
       )
     end,
@@ -4745,7 +4745,7 @@ transf = {
         "\n"
       )
     end,
-    nonabsolute_path_key_dict_of_url_files = function(url_arr)
+    nonabsolute_path_key_assoc_of_url_files = function(url_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         url_arr,
         function(url)
@@ -4791,13 +4791,13 @@ transf = {
   arr_of_event_tables = {
   },
   email_file_arr = {
-    email_file_summary_dict = function(email_file_arr)
+    email_file_summary_assoc = function(email_file_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         email_file_arr,
         transf.email_file.email_file_summary_key_value
       )
     end,
-    email_file_simple_view_dict = function(email_file_arr)
+    email_file_simple_view_assoc = function(email_file_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         email_file_arr,
         transf.email_file.email_file_simple_view_key_value
@@ -4933,15 +4933,15 @@ transf = {
         is.table.arrlike
       )
     end,
-    relative_path_key_dict_by_primitive_and_arrlike_is_leaf = function(t)
-      return get.table.string_by_joined_key_any_value_dict(
+    relative_path_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
+      return get.table.string_by_joined_key_any_value_assoc(
         t,
         is.table.arrlike,
         "/"
       )
     end,
-    dot_notation_key_dict_by_primitive_and_arrlike_is_leaf = function(t)
-      return get.table.string_by_joined_key_any_value_dict(
+    dot_notation_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
+      return get.table.string_by_joined_key_any_value_assoc(
         t,
         is.table.arrlike,
         "."
@@ -4964,7 +4964,7 @@ transf = {
       )
     end,
   },
-  dict = {
+  assoc = {
     int_by_length = function(t)
       return #transf.table.pair_arr(t)
     end,
@@ -4972,7 +4972,7 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.url_param)
     end,
     url_params = function(t)
-      return get.string_or_number_arr.string_by_joined(transf.dict.url_param_arr(t), "&")
+      return get.string_or_number_arr.string_by_joined(transf.assoc.url_param_arr(t), "&")
     end,
     --- @param t { [string]: string }
     --- @return string
@@ -5004,43 +5004,43 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.ini_line)
     end,
     ini_string = function(t)
-      return get.string_or_number_arr.string_by_joined(transf.dict.ini_line_arr(t), "\n")
+      return get.string_or_number_arr.string_by_joined(transf.assoc.ini_line_arr(t), "\n")
     end,
     envlike_line_arr = function(t)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.envlike_line)
     end,
-    dict_entry_string_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.dict_entry_string)
+    assoc_entry_string_arr = function(t)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.assoc_entry_string)
     end,
     contents_summary = function(t)
       return transf.string_arr.contents_summary(
-        transf.dict.dict_entry_string_arr(t)
+        transf.assoc.assoc_entry_string_arr(t)
       )
     end,
     summary = function(t)
-      return "dict (" .. transf.dict.int_by_length(t) .. "): " .. transf.dict.contents_summary(t)
+      return "assoc (" .. transf.assoc.int_by_length(t) .. "): " .. transf.assoc.contents_summary(t)
     end,
-    dict_entry_multiline_string = function(t)
-      return get.string_or_number_arr.string_by_joined(transf.dict.dict_entry_string_arr(t), "\n")
+    assoc_entry_multiline_string = function(t)
+      return get.string_or_number_arr.string_by_joined(transf.assoc.assoc_entry_string_arr(t), "\n")
     end,
     envlike_string = function(t)
-      return get.string_or_number_arr.string_by_joined(transf.dict.envlike_line_arr(t), "\n")
+      return get.string_or_number_arr.string_by_joined(transf.assoc.envlike_line_arr(t), "\n")
     end,
-    truthy_value_dict = function(t)
+    truthy_value_assoc = function(t)
       return get.arr.arr_by_filtered(
         t,
         transf.any.bool
       )
     end,
     truthy_value_key_arr = function(t)
-      return transf.table_or_nil.kt_arr(transf.dict.truthy_value_dict(t))
+      return transf.table_or_nil.kt_arr(transf.assoc.truthy_value_assoc(t))
     end,
   },
   table_arr = {
     table_by_take_new = function(t)
       local res = {}
-      for _, dict in transf.arr.index_value_stateless_iter(t) do
-        for k, v in transf.table.stateless_key_value_iter(dict) do
+      for _, assoc in transf.arr.index_value_stateless_iter(t) do
+        for k, v in transf.table.stateless_key_value_iter(assoc) do
           res[k] = v
         end
       end
@@ -5048,8 +5048,8 @@ transf = {
     end,
     table_by_take_old = function(t)
       local res = {}
-      for _, dict in transf.arr.index_value_stateless_iter(t) do
-        for k, v in transf.table.stateless_key_value_iter(dict) do
+      for _, assoc in transf.arr.index_value_stateless_iter(t) do
+        for k, v in transf.table.stateless_key_value_iter(assoc) do
           if not res[k] then
             res[k] = v
           end
@@ -5078,9 +5078,9 @@ transf = {
       return transf.two_tables.table_by_take_old(t1, t2)
     end,
   },
-  string_value_dict = {
-    string_value_dict_by_prompted_once_from_default = function(dict)
-      return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(dict, function(k, v)
+  string_value_assoc = {
+    string_value_assoc_by_prompted_once_from_default = function(assoc)
+      return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(assoc, function(k, v)
         return get.string.string_by_prompted_once_from_default(
           v,
           "Enter a new value for '" .. k .. "'"
@@ -5088,8 +5088,8 @@ transf = {
       end)
     end,
   },
-  string_key_dict = {
-    string_key_dict_of_string_key_dicts_or_prev_values_by_space = function(tbl)
+  string_key_assoc = {
+    string_key_assoc_of_string_key_assocs_or_prev_values_by_space = function(tbl)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(tbl) do
         local key_parts = stringy.split(k, " ")
@@ -5105,18 +5105,18 @@ transf = {
       return res
     end,
   },
-  string_key_value_dict = {
+  string_key_value_assoc = {
 
   },
-  string_bool_dict = {
-    truthy_long_flag_arr = function(dict)
+  string_bool_assoc = {
+    truthy_long_flag_arr = function(assoc)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.dict.truthy_value_key_arr(dict),
+        transf.assoc.truthy_value_key_arr(assoc),
         transf.word.long_flag
       )
     end,
-    truthy_long_flag_string = function(dict)
-      return get.string_or_number_arr.string_by_joined(transf.dict.truthy_long_flag_arr(dict), " ")
+    truthy_long_flag_string = function(assoc)
+      return get.string_or_number_arr.string_by_joined(transf.assoc.truthy_long_flag_arr(assoc), " ")
     end,
   },
   arr_of_arrs = {
@@ -5166,7 +5166,7 @@ transf = {
     end,
   },
   pair_arr = {
-    dict = function(arr)
+    assoc = function(arr)
       local res = {}
       for _, pair in transf.arr.index_value_stateless_iter(arr) do
         res[pair[1]] = pair[2]
@@ -5198,21 +5198,21 @@ transf = {
       return res
     end
   },
-  dict_of_string_value_dicts = {
+  assoc_of_string_value_assocs = {
     ini_string = function(t)
       return get.string_or_number_arr.string_by_joined(get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         t,
         function(k,v)
-          return "[" .. k .. "]\n" .. transf.dict.ini_string(v)
+          return "[" .. k .. "]\n" .. transf.assoc.ini_string(v)
         end
       ), "\n\n")
     end,
   },
-  dict_of_dicts = {
-    dict_by_space = function(dict_of_dicts)
+  assoc_of_assocs = {
+    assoc_by_space = function(assoc_of_assocs)
       local res = {}
-      for label, dict in transf.table.stateless_key_value_iter(dict_of_dicts) do
-        for k, v in transf.table.stateless_key_value_iter(dict) do
+      for label, assoc in transf.table.stateless_key_value_iter(assoc_of_assocs) do
+        for k, v in transf.table.stateless_key_value_iter(assoc) do
           res[label .. " " .. k] = v
         end
       end
@@ -5220,7 +5220,7 @@ transf = {
     end,
 
   },
-  arr_value_dict = {
+  arr_value_assoc = {
     arr_of_arrs = function(arr)
       return transf.table.vt_arr(arr)
     end,
@@ -5229,10 +5229,10 @@ transf = {
     end,
         
   },
-  timestamp_ms_key_dict_value_dict = {
-    nonabsolute_path_key_timestamp_ms_key_dict_value_dict_by_ymd = function(timestamp_key_table)
+  timestamp_ms_key_assoc_value_assoc = {
+    nonabsolute_path_key_timestamp_ms_key_assoc_value_assoc_by_ymd = function(timestamp_key_table)
       local tbl = {}
-      for timestamp_ms, dict in transf.table.key_value_stateless_iter(timestamp_key_table) do
+      for timestamp_ms, assoc in transf.table.key_value_stateless_iter(timestamp_key_table) do
         local ymd = os.date("%Y/%Y-%m/%Y-%m-%d", timestamp_ms/1000)
         if not tbl[ymd] then tbl[ymd] = {} end
         local found_unoccupied = false
@@ -5241,7 +5241,7 @@ transf = {
         -- ergo our drift will be limited to a few ms at most, and the loop will terminate
         while not found_unoccupied do
           if not tbl[ymd][timestamp_ms] then
-            tbl[ymd][timestamp_ms] = dict
+            tbl[ymd][timestamp_ms] = assoc
             found_unoccupied = true
           else
             timestamp_ms = timestamp_ms + 1
@@ -5252,12 +5252,12 @@ transf = {
     end
   },
   tachiyomi_json_table = {
-    timestamp_ms_key_dict_value_dict = function(raw_backup)
+    timestamp_ms_key_assoc_value_assoc = function(raw_backup)
       -- data we care about is in the backupManga arr in the json file
       -- each arr element is a manga which has general metadata keys such as title, author, url, etc
       -- and a chapters arr which has chapter metadata keys such as name, chapterNumber, url, etc
       -- and a history arr which has the keys url and lastRead (unix timestamp in ms)
-      -- we want to transform this into a table of our own design, where the key is a timestamp (but in seconds) and the value is a dict consisting of some of the metadata of the manga and some of the metadata of the chapter
+      -- we want to transform this into a table of our own design, where the key is a timestamp (but in seconds) and the value is a assoc consisting of some of the metadata of the manga and some of the metadata of the chapter
       -- specifically: url (of the manga), title, chapterNumber, name (of the chapter)
       -- for that, we need to match the key url in the history arr with the key url in the chapters arr, for which we will create a temporary table with the urls as keys and the chapter metadata we will use as values
 
@@ -5270,21 +5270,21 @@ transf = {
           name = chapter.name
         }
       end
-      local history_dict = {}
+      local history_assoc = {}
       for _, hist_item in transf.arr.index_value_stateless_iter(manga.history) do
         local chapter = chapter_map[hist_item.url]
-        history_dict[hist_item.lastRead] = {
+        history_assoc[hist_item.lastRead] = {
           url = manga_url,
           title = manga_title,
           chapter_number = chapter.chapterNumber,
           chapter_name = chapter.name
         }
       end
-      return history_dict
+      return history_assoc
     end,
   },
   vdirsyncer_pair_specifier = {
-    dict_of_dicts = function(specifier)
+    assoc_of_assocs = function(specifier)
       local local_name = specifier.name .. "_local"
       local remote_name = specifier.name .. "_remote"
       return {
@@ -5312,9 +5312,9 @@ transf = {
       }         
     end,
     ini_string = function(specifier)
-      return transf.dict_of_string_value_dicts.ini_string(
-        transf.dict_of_dicts.dict_by_space(
-          transf.vdirsyncer_pair_specifier.dict_of_dicts(specifier)
+      return transf.assoc_of_string_value_assocs.ini_string(
+        transf.assoc_of_assocs.assoc_by_space(
+          transf.vdirsyncer_pair_specifier.assoc_of_assocs(specifier)
         )
       )
     end
@@ -5337,7 +5337,7 @@ transf = {
       end     
       if comps.params then
         if type(comps.params) == "table" then
-          url = url .. "?" .. transf.dict.url_params(comps.params)
+          url = url .. "?" .. transf.assoc.url_params(comps.params)
         else
           url = url .. get.string.with_prefix_string(comps.params, "?")
         end
@@ -6213,13 +6213,13 @@ transf = {
         transf.csl_table.issued_date_parts_single_or_range(csl_table)
       )
     end,
-    issued_prefix_partial_date_component_name_value_dict_force_first = function(csl_table)
-      return transf.date_parts_single_or_range.prefix_partial_date_component_name_value_dict_force_first(
+    issued_prefix_partial_date_component_name_value_assoc_force_first = function(csl_table)
+      return transf.date_parts_single_or_range.prefix_partial_date_component_name_value_assoc_force_first(
         transf.csl_table.issued_date_parts_single_or_range(csl_table)
       )
     end,
     issued_year_force_first = function(csl_table)
-      return transf.csl_table.issued_prefix_partial_date_component_name_value_dict_force_first(csl_table).year
+      return transf.csl_table.issued_prefix_partial_date_component_name_value_assoc_force_first(csl_table).year
     end,
     author_arr = function(csl_table)
       return csl_table.author
@@ -6530,17 +6530,17 @@ transf = {
     rfc3339like_dt = function(date_parts)
       return get.string_or_number_arr.string_by_joined(date_parts, "-")
     end,
-    prefix_partial_date_component_name_value_dict = function(date_parts)
+    prefix_partial_date_component_name_value_assoc = function(date_parts)
       return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
     end,
-    full_full_date_component_name_value_dict = function(date_parts)
-      return transf.date_component_name_value_dict.min_full_date_component_name_value_dict(
-        transf.date_parts_single.prefix_partial_date_component_name_value_dict(date_parts)
+    full_full_date_component_name_value_assoc = function(date_parts)
+      return transf.date_component_name_value_assoc.min_full_date_component_name_value_assoc(
+        transf.date_parts_single.prefix_partial_date_component_name_value_assoc(date_parts)
       )
     end,
     date = function(date_parts)
-      return transf.full_date_component_name_value_dict.date(
-        transf.date_parts_single.full_full_date_component_name_value_dict(date_parts)
+      return transf.full_date_component_name_value_assoc.date(
+        transf.date_parts_single.full_full_date_component_name_value_assoc(date_parts)
       )
     end,
   },
@@ -6550,8 +6550,8 @@ transf = {
     end,
     date_interval_specifier = function(date_parts_range)
       return {
-        start = transf.date_parts_single.full_full_date_component_name_value_dict(date_parts_range[1]),
-        stop = transf.date_parts_single.full_full_date_component_name_value_dict(date_parts_range[2])
+        start = transf.date_parts_single.full_full_date_component_name_value_assoc(date_parts_range[1]),
+        stop = transf.date_parts_single.full_full_date_component_name_value_assoc(date_parts_range[2])
       }
     end
   },
@@ -6567,11 +6567,11 @@ transf = {
     rf3339like_dt_force_first = function(date_parts)
       return transf.date_parts_single.rfc3339like_dt(date_parts[1])
     end,
-    prefix_partial_date_component_name_value_dict_force_first = function(date_parts)
-      return transf.date_parts_single.prefix_partial_date_component_name_value_dict(date_parts[1])
+    prefix_partial_date_component_name_value_assoc_force_first = function(date_parts)
+      return transf.date_parts_single.prefix_partial_date_component_name_value_assoc(date_parts[1])
     end,
-    full_full_date_component_name_value_dict_force_first = function(date_parts)
-      return transf.date_parts_single.full_full_date_component_name_value_dict(date_parts[1])
+    full_full_date_component_name_value_assoc_force_first = function(date_parts)
+      return transf.date_parts_single.full_full_date_component_name_value_assoc(date_parts[1])
     end,
     date_force_first = function(date_parts)
       return transf.date_parts_single.date(date_parts[1])
@@ -6678,7 +6678,7 @@ transf = {
       return env.XDG_STATE_HOME .. "/vdirsyncer/" .. transf.url.string_by_webcal_name(url)
     end,
     ini_string_by_khal_config_section = function(url)
-      return transf.dict_of_string_value_dicts.ini_string({
+      return transf.assoc_of_string_value_assocs.ini_string({
         ["[ro:".. transf.url.sld(url) .. "]"] = {
           path = transf.url.absolute_path_by_webcal_storage_location(url),
           priority = 0,
@@ -7114,10 +7114,10 @@ transf = {
   },
   mod_name_arr = {
     mod_symbol_arr = function(mod_arr)
-      return get.arr.arr_by_mapped_w_t_key_dict(mod_arr, transf.mod.mod_symbol)
+      return get.arr.arr_by_mapped_w_t_key_assoc(mod_arr, transf.mod.mod_symbol)
     end,
     mod_char_arr = function(mod_arr)
-      return get.arr.arr_by_mapped_w_t_key_dict(mod_arr, transf.mod.mod_char)
+      return get.arr.arr_by_mapped_w_t_key_assoc(mod_arr, transf.mod.mod_char)
     end,
   },
   shortcut_specifier = {
@@ -7134,7 +7134,7 @@ transf = {
       )
     end,
     shortcut_string = function(shortcut_specifier)
-      local modstr = plstringx.join("", get.arr.arr_by_mapped_w_t_key_dict(shortcut_specifier.mod_name_arr, tblmap.mod_name.mod_symbol))
+      local modstr = plstringx.join("", get.arr.arr_by_mapped_w_t_key_assoc(shortcut_specifier.mod_name_arr, tblmap.mod_name.mod_symbol))
       if modstr == "" then
         return shortcut_specifier.key
       else
@@ -7165,10 +7165,10 @@ transf = {
       return audiodevice:name()
     end,
   },
-  env_var_name_env_node_dict = {
-    env_string = function(env_var_name_env_node_dict)
-      return transf.env_var_name_value_dict.env_string(
-        get.env_var_name_env_node_dict.env_var_name_value_dict(env_var_name_env_node_dict)
+  env_var_name_env_node_assoc = {
+    env_string = function(env_var_name_env_node_assoc)
+      return transf.env_var_name_value_assoc.env_string(
+        get.env_var_name_env_node_assoc.env_var_name_value_assoc(env_var_name_env_node_assoc)
       )
     end
 
@@ -7177,12 +7177,12 @@ transf = {
     env_string = function(env_yaml_file_container)
       local files = transf.extant_path.file_arr_by_descendants(env_yaml_file_container)
       local yaml_files = get.path_arr.path_arr_by_filter_to_same_extension(files, "yaml")
-      local env_var_name_env_node_dict_arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      local env_var_name_env_node_assoc_arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         yaml_files,
         transf.yaml_file.not_userdata_or_function
       )
-      local env_var_name_env_node_dict = transf.table_arr.table_by_take_new(env_var_name_env_node_dict_arr)
-      return transf.env_var_name_env_node_dict.env_string(env_var_name_env_node_dict)
+      local env_var_name_env_node_assoc = transf.table_arr.table_by_take_new(env_var_name_env_node_assoc_arr)
+      return transf.env_var_name_env_node_assoc.env_string(env_var_name_env_node_assoc)
     end,
   },
   country_identifier_string = {
@@ -7293,7 +7293,7 @@ transf = {
       return transf.string.bool_by_evaled_env_bash_success("pgrep -x rec")
     end,
     pandoc_full_md_extension_set = function()
-      return transf.arr_value_dict.arr_by_flatten(
+      return transf.arr_value_assoc.arr_by_flatten(
         ls.markdown_extensions
       )
     end,
@@ -7338,7 +7338,7 @@ transf = {
     mullvad_relay_identifier_arr = function()
       return 
         transf.table.arr_by_nested_value_primitive_and_arrlike_is_leaf(
-          transf.multiline_string.iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_arr_value_dict_value_dict(
+          transf.multiline_string.iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_arr_value_assoc_value_assoc(
             transf["nil"].mullvad_relay_list_string()
           )
       )
@@ -7559,7 +7559,7 @@ transf = {
   },
   thing_name_arr = {
     arr_of_action_specifier_arrs = function(thing_name_arr)
-      return get.arr.arr_by_mapped_w_t_key_dict(
+      return get.arr.arr_by_mapped_w_t_key_assoc(
         thing_name_arr,
         tblmap.thing_name.action_specifier_arr
       )
@@ -7723,14 +7723,14 @@ transf = {
         
   },
   stream_creation_specifier = {
-    flag_dict_by_with_default = function(stream_creation_specifier)
+    flag_assoc_by_with_default = function(stream_creation_specifier)
       return transf.two_tables.table_by_take_new(
         tblmap.stream_creation_specifier_flag_profile_name.stream_creation_specifier_flag_profile[stream_creation_specifier.flag_profile_name or "foreground"],
         stream_creation_specifier.flags 
       )
     end,
     flags_string = function(stream_creation_specifier)
-      return transf.string_bool_dict.truthy_long_flag_string(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
+      return transf.string_bool_assoc.truthy_long_flag_string(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
     end,
     source_path = function(stream_created_item_specifier)
       return stream_created_item_specifier.source_path
@@ -7977,10 +7977,10 @@ transf = {
     ---   }, ...
     --- )
     --- ```
-    filled_string_dict = function(spec)
+    filled_string_assoc = function(spec)
       local query = get.string.string_by_evaled_as_template(lemap.gpt.fill_template, spec)
       local res = gpt(query,  { temperature = 0})
-      return get.form_field_specifier_arr.filled_string_dict_from_string(spec.form_field_specifier_arr, res)
+      return get.form_field_specifier_arr.filled_string_assoc_from_string(spec.form_field_specifier_arr, res)
     end,
   },
   position_change_state_spec = {

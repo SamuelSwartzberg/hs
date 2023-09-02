@@ -684,8 +684,8 @@ is = {
     binary_file = function(path)
       return not is.file.plaintext_file(path)
     end,
-    plaintext_dictionary_file = function(path)
-      return is.file.plaintext_file(path) and is.plaintext_file.plaintext_dictionary_file(path)
+    plaintext_associonary_file = function(path)
+      return is.file.plaintext_file(path) and is.plaintext_file.plaintext_associonary_file(path)
     end,
     shellscript_file = function(path)
       return get.path.usable_as_filetype(path, "shell-script") 
@@ -726,7 +726,7 @@ is = {
     end,
   },
   plaintext_file = {
-    plaintext_dictionary_file = function(path)
+    plaintext_associonary_file = function(path)
       get.path.is_standartized_extension_in(
         path,
         ls.filetype["plaintext-dictionary"]
@@ -754,7 +754,7 @@ is = {
       return get.path.is_standartized_extension(path, "md")
     end,
   },
-  plaintext_dictionary_file = {
+  plaintext_associonary_file = {
     yaml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "yaml"}),
     json_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "json"}),
     toml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "toml"}),
