@@ -902,12 +902,12 @@ get = {
     end
   },
   str = {
-    str_by_sub_lua = str.sub,
+    str_by_sub_lua = string.sub,
     str_by_sub_eutf8 = get.str.str_by_sub_eutf8,
-    str_by_formatted_w_n_anys = str.format,
+    str_by_formatted_w_n_anys = string.format,
     str_by_repeated = get.str.str_by_repeated,
-    str_arr_split_single_char = stry.split,
-    str_arr_split_single_char_noempty = function(str, sep)
+    str_arr_by_split_w_ascii_char = stringy.split,
+    not_empty_str_arr_by_split_w_ascii_char = function(str, sep)
       return transf.str_arr.noemtpy_str_arr(
         transf.str.str_arr_split_single_char(str, sep)
       )
@@ -917,7 +917,7 @@ get = {
         transf.str.split_single_char(str, sep)
       )
     end,
-    str_arr_split = plstrx.split,
+    str_arr_by_split_w_str = plstringx.split,
     str_arr_split_noempty = function(str, sep)
       return transf.str_arr.noemtpy_str_arr(
         transf.str.str_arr_split(str, sep)
@@ -935,10 +935,10 @@ get = {
       return res
     end,
     n_strs_split = function(str, sep, n)
-      return transf.arr.n_anys(get.str.str_arr_split(str, sep, n))
+      return transf.arr.n_anys(get.str.str_arr_by_split_w_str(str, sep, n))
     end,
     str_pair_split_or_nil = function(str, sep)
-      local arr = get.str.str_arr_split(str, sep, 2)
+      local arr = get.str.str_arr_by_split_w_str(str, sep, 2)
       if #arr ~= 2 then
         return nil
       else
@@ -946,7 +946,7 @@ get = {
       end
     end,
     two_strs_split_or_nil = function(str, sep)
-      local arr = get.str.str_arr_split(str, sep, 2)
+      local arr = get.str.str_arr_by_split_w_str(str, sep, 2)
       if #arr ~= 2 then
         return nil
       else
@@ -965,8 +965,8 @@ get = {
     noempty_line_arr_by_head = function(path, n)
       return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.noempty_line_str_arr(path), 1, n or 10)
     end,
-    bool_by_startswith = stry.startswith,
-    bool_by_endswith = stry.endswith,
+    bool_by_startswith = stringy.startswith,
+    bool_by_endswith = stringy.endswith,
     bool_by_not_startswith = function(str, prefix)
       return not transf.str.bool_startswith(str, prefix)
     end,
@@ -975,7 +975,7 @@ get = {
     end,
     bool_by_startswith_any_w_ascii_str_arr = function(str, anyof)
       for i = 1, #anyof do
-        local res = stry.startswith(str, anyof[i])
+        local res = get.str.bool_by_startswith(str, anyof[i])
         if res then
           return true
         end
@@ -991,7 +991,7 @@ get = {
       end
       return false
     end,
-    bool_by_contains_w_ascii_str = stry.find,
+    bool_by_contains_w_ascii_str = stringy.find,
     bool_by_not_contains_w_ascii_str = function(str, substr)
       return not transf.str.bool_by_contains_w_str(str, substr)
     end,
@@ -1202,24 +1202,25 @@ get = {
       end
       return res
     end,
+    str_by_replaced_w_ascii_str = plstringx.replace,
     str_by_replaced_all_w_ascii_str_arr = function(str, ascii_str_arr, replacement)
       local res = str
       for _, ascii_str in transf.arr.key_value_stateless_iter(ascii_str_arr) do
-        res = plstrx.replace(res, ascii_str, replacement)
+        res = get.str.str_by_replaced_w_ascii_str(res, ascii_str, replacement)
       end
       return res
     end,
     str_by_prepended_all_w_ascii_str_arr = function(str, ascii_str_arr, prepend)
       local res = str
       for _, ascii_str in transf.arr.key_value_stateless_iter(ascii_str_arr) do
-        res = plstrx.replace(res, ascii_str, prepend .. ascii_str)
+        res = get.str.str_by_replaced_w_ascii_str(res, ascii_str, prepend .. ascii_str)
       end
       return res
     end,
     str_by_appended_all_w_ascii_str_arr = function(str, ascii_str_arr, append)
       local res = str
       for _, ascii_str in transf.arr.key_value_stateless_iter(ascii_str_arr) do
-        res = plstrx.replace(res, ascii_str, ascii_str .. append)
+        res = get.str.str_by_replaced_w_ascii_str(res, ascii_str, ascii_str .. append)
       end
       return res
     end,
@@ -1422,16 +1423,16 @@ get = {
       end
     end,
     str_by_shortened_start_ellipsis = function(str, len)
-      return plstrx.shorten(str, len)
+      return plstringx.shorten(str, len)
     end,
     str_by_shortened_end_ellipsis = function(str, len)
-      return plstrx.shorten(str, len, true)
+      return plstringx.shorten(str, len, true)
     end,
     str_by_with_yaml_metadata = function(str, tbl)
       if not str then return transf.table.yaml_metadata(tbl) end
       if not tbl then return str end
       if transf.table.pos_int_by_num_keys(tbl) == 0 then return str end
-      local stripped_str = stry.strip(str)
+      local stripped_str = transf.str.not_starting_or_ending_with_whitespace_str(str)
       local final_metadata, final_contents
       if get.str.bool_by_startswith(stripped_str, "---") then
         -- splice in the metadata
@@ -1470,7 +1471,7 @@ get = {
       )(str, key)
     end,
     str_or_err_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
-      return stry.strip(get.str.str_or_err_by_evaled_env_bash_parsed_json_in_key(str, key))
+      return transf.str.not_starting_or_ending_with_whitespace_str(get.str.str_or_err_by_evaled_env_bash_parsed_json_in_key(str, key))
     end,
     str_or_nil_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
@@ -1480,7 +1481,8 @@ get = {
     str_by_percent_encoded = function(str, as_path)
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
       else return transf.str.encoded_query_param_value_by_folded(str) end
-    end
+    end,
+    not_starting_or_ending_with_whitespace_str = stringy.strip
   },
   nonindicated_number_str_arr = {
     number_arr = function(arr, base)
@@ -1549,7 +1551,7 @@ get = {
   },
   str_arr = {
     resplit_by_oldnew = function(arr, sep)
-      return get.str.str_arr_split(
+      return get.str.str_arr_by_split_w_str(
         get.str_arr.str_joined(
           arr,
           sep
@@ -1558,7 +1560,7 @@ get = {
       )
     end,
     resplit_by_new = function(arr, sep)
-      return get.str.str_arr_split(
+      return get.str.str_arr_by_split_w_str(
         get.str_arr.str_joined(
           arr,
           ""
@@ -1567,7 +1569,7 @@ get = {
       )
     end,
     resplit_by_oldnew_single_char = function(arr, sep)
-      return get.str.str_arr_split_single_char(
+      return get.str.str_arr_by_split_w_ascii_char(
         get.str_arr.str_joined(
           arr,
           sep
@@ -1576,7 +1578,7 @@ get = {
       )
     end,
     resplit_by_oldnew_single_char_noempty = function(arr, sep)
-      return get.str.str_arr_split_single_char_noempty(
+      return get.str.not_empty_str_arr_by_split_w_ascii_char(
         get.str_arr.str_joined(
           arr,
           sep
@@ -1585,7 +1587,7 @@ get = {
       )
     end,
     resplit_by_new_single_char = function(arr, sep)
-      return get.str.str_arr_split_single_char(
+      return get.str.str_arr_by_split_w_ascii_char(
         get.str_arr.str_joined(
           arr,
           ""

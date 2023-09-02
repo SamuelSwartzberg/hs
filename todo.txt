@@ -7,7 +7,6 @@ refac:
   - fix static type errors in remaining files
   - write tests with busted
   - many names don't yet corrrespond to the new schema
-  - string -> str
   - replace package methods with my own
   - fix logging dirs, etc, to now use json
 post 'lua is working':  

@@ -115,7 +115,7 @@ transf = {
       return unicode_prop_table.plane
     end,
     utf8_hex_str = function(unicode_prop_table)
-      return transf.str.nowhitespace_str(unicode_prop_table.utf8)
+      return transf.str.not_whitespace_str(unicode_prop_table.utf8)
     end,
     summary = function(unicode_prop_table)
       return transf.unicode_prop_table.char(unicode_prop_table) .. ": "
@@ -675,7 +675,7 @@ transf = {
         end
 
         -- split into components
-        return get.str.str_arr_split_single_char(path, "/")
+        return get.str.str_arr_by_split_w_ascii_char(path, "/")
       end
     end,
     pos_int_by_path_component_arr_length = function(path)
@@ -791,7 +791,7 @@ transf = {
 
   path_with_intra_file_locator = {
     path_with_intra_file_locator_specifier = function(path)
-      local parts = stry.split(path, ":")
+      local parts = get.str.str_arr_by_split_w_ascii_char(path, ":")
       local final_part = act.arr.pop(parts)
       local specifier = {}
       if is.str.number_str(parts[#parts]) then
@@ -1466,7 +1466,7 @@ transf = {
   },
   fs_tag_str = {
     fs_tag_str_part_arr = function(fs_tag_str)
-      return stry.split(
+      return get.str.str_arr_by_split_w_ascii_char(
         fs_tag_str:sub(2),
         "%"
       )
@@ -1503,7 +1503,7 @@ transf = {
     fs_tag_assoc = function(assoc)
       return hs.fnutils.map(
         assoc,
-        get.fn.arbitrary_args_bound_or_ignored_fn(stry.split, {a_use, ","})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.str.str_arr_by_split_w_ascii_char, {a_use, ","})
       )
     end,
     fs_tag_str_part_arr = function(assoc)
@@ -2245,7 +2245,7 @@ transf = {
   },
   rfc3339like_interval = {
     start_rfc3339like_dt = function(str)
-      return get.str.str_arr_split(str, "_to_")[1]
+      return get.str.str_arr_by_split_w_string(str, "_to_")[1]
     end,
     start_date_component_name_value_assoc = function(str)
       return transf.rfc3339like_dt.date_component_name_value_assoc(
@@ -2263,7 +2263,7 @@ transf = {
       )
     end,
     end_rfc3339like_dt = function(str)
-      return get.str.str_arr_split(str, "_to_")[2]
+      return get.str.str_arr_by_split_w_string(str, "_to_")[2]
     end,
     end_date_component_name_value_assoc = function(str)
       return transf.rfc3339like_dt.date_component_name_value_assoc(
@@ -2358,7 +2358,7 @@ transf = {
   },
   basic_interval_str = {
     start_stop = function(str)
-      return stry.split(str, "-")
+      return get.str.str_arr_by_split_w_ascii_char(str, "-")
     end,
     interval_specifier = function(str)
       local start, stop = transf.basic_interval_str.start_stop(str)
@@ -2820,7 +2820,7 @@ transf = {
               -- We split the type_list into individual vcard_types. This is done because 
               -- each vcard_type might need to be processed independently in the future. 
               -- It also makes the data more structured and easier to handle.
-              local vcard_types = get.str.str_arr_split(type_list, ", ")
+              local vcard_types = get.str.str_arr_by_split_w_string(type_list, ", ")
         
               -- For each vcard_type, we create a new key-value pair in the contact_table. 
               -- This way, we can access the value directly by vcard_type, 
@@ -3350,16 +3350,16 @@ transf = {
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.str.str_by_single_quoted_escaped(str) )
     end,
     term_syn_specifier_assoc = function(str)
-      local synonym_parts = get.str.str_arr_split(transf.str.raw_syn_output(str), "\n\n")
+      local synonym_parts = get.str.str_arr_by_split_w_string(transf.str.raw_syn_output(str), "\n\n")
       local synonym_tables = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         synonym_parts,
         function (synonym_part)
-          local synonym_part_lines = stry.split(synonym_part, "\n")
+          local synonym_part_lines = get.str.str_arr_by_split_w_ascii_char(synonym_part, "\n")
           local synonym_term = get.str.str_by_sub_eutf8(synonym_part_lines[1], 2) -- syntax: ❯<term>
           local synonyms_raw = get.str.str_by_sub_eutf8(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
           local antonyms_raw = get.str.str_by_sub_eutf8(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
-          local synonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stry.split(synonyms_raw, ", "), stry.strip)
-          local antonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stry.split(antonyms_raw, ", "), stry.strip)
+          local synonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(synonyms_raw, ", "), transf.str.not_starting_or_ending_with_whitespace_str)
+          local antonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(antonyms_raw, ", "), transf.str.not_starting_or_ending_with_whitespace_str)
           return synonym_term, {
             synonyms = synonyms,
             antonyms = antonyms,
@@ -3386,12 +3386,12 @@ transf = {
       return "--" .. word
     end,
     synonym_str_arr = function(str)
-      local items = stry.split(transf.str.raw_av_output(str), "\t")
+      local items = get.str.str_arr_by_split_w_ascii_char(transf.str.raw_av_output(str), "\t")
       items = get.arr.arr_by_filtered(items, function(itm)
         if itm == nil then
           return false
         end
-        itm = stry.strip(itm)
+        itm = transf.str.not_starting_or_ending_with_whitespace_str(itm)
         return #itm > 0
       end)
       return items
@@ -3421,7 +3421,7 @@ transf = {
     end,
     str_or_str_and_8_bit_pos_int_by_evaled_raw_bash_stripped = function(str)
       local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_raw_bash(str)
-      res = stry.strip(res)
+      res = transf.str.not_starting_or_ending_with_whitespace_str(res)
       return res, code
     end,
     str_or_nil_by_evaled_raw_bash_stripped = function(str)
@@ -3455,7 +3455,7 @@ transf = {
     end,
     str_or_str_and_8_bit_pos_int_by_evaled_env_bash_stripped = function(str)
       local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_env_bash(str)
-      res = stry.strip(res)
+      res = transf.str.not_starting_or_ending_with_whitespace_str(res)
       return res, code
     end,
     str_or_nil_by_evaled_env_bash_stripped = function(str)
@@ -3600,7 +3600,7 @@ transf = {
       return transf.str.str_by_all_eutf8_upper(transf.str.alphanum_underscore(str))
     end,
     alphanum_array = function(str) -- word separation is notoriously tricky. For now, we'll just use the same logic as in the snake_case function
-      return stry.split(transf.str.alphanum_underscore(str), "_")
+      return get.str.str_arr_by_split_w_ascii_char(transf.str.alphanum_underscore(str), "_")
     end,
     upper_camel_snake_case = function(str)
       local parts = transf.str.alphanum_array(str)
@@ -3739,7 +3739,7 @@ transf = {
     whitespace_collapsed_str = function(str)
       return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", " ")
     end,
-    nowhitespace_str = function(str)
+    not_whitespace_str = function(str)
       return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", "")
     end,
     --- @param str str
@@ -3770,8 +3770,8 @@ transf = {
     --- @param str str
     --- @return str[]
     line_arr = function(str)
-      return stry.split(
-        stry.strip(str),
+      return get.str.str_arr_by_split_w_ascii_char(
+        transf.str.not_starting_or_ending_with_whitespace_str(str),
         "\n"
       )
     end,
@@ -3834,16 +3834,16 @@ transf = {
       return contact
     end,
     event_table = function(str)
-      local components = get.str.str_arr_split(str, fixedstr.unique_field_separator)
+      local components = get.str.str_arr_by_split_w_string(str, fixedstr.unique_field_separator)
       local parsed = ovtable.new()
       for i, component in transf.arr.index_value_stateless_iter(components) do
         local key = ls.khal.parseable_format_components[i]
         if key == "alarms" then
-          parsed[key] = stry.split(component, ",")
+          parsed[key] = get.str.str_arr_by_split_w_ascii_char(component, ",")
         elseif key == "description" then
           parsed[key] = component
         else
-          parsed[key] = plstrx.replace(component, "\n", "")
+          parsed[key] = get.str.str_by_replaced_w_ascii_str(component, "\n", "")
         end
       end
       return parsed
@@ -3887,11 +3887,10 @@ transf = {
       return res
     end,
     email_quoted = function(str)
-      return plstrx.join(
-        "\n",
+      return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
           get.str.str_arr_splitlines(
-            stry.strip(str)
+            transf.str.not_starting_or_ending_with_whitespace_str(str)
           ),
           function(v)
             if get.str.bool_by_startswith(v, ">") then
@@ -3900,7 +3899,8 @@ transf = {
               return ">" .. " " .. v
             end
           end
-        )
+        ),
+        "\n"
       )
     end,
     url_arr = function(str)
@@ -3938,7 +3938,7 @@ transf = {
     prompted_once_alphanum_minus_underscore_str_from_default = function(str)
       return get.str.alphanum_minus_underscore_str_by_prompted_once_from_default(str, "Enter a str (alphanum, minus, underscore)...")
     end,
-    nowhitespace_str_arr = function(str)
+    not_whitespace_str_arr = function(str)
       return get.str.str_arr_split_single_char_stripped(
         transf.str.whitespace_collapsed_str(str),
         " "
@@ -3956,13 +3956,13 @@ transf = {
       return get.str.n_strs_by_extracted_eutf8(str, "^%s*(.*)$")
     end,
     nocomment_line = function(str)
-      return get.str.str_arr_split(str, " # ")[1]
+      return get.str.str_arr_by_split_w_string(str, " # ")[1]
     end,
     nocomment_noindent = function(str)
       return transf.line.noindent_line(transf.line.nocomment_line(str))
     end,
     line_by_comment = function(str)
-      return get.str.str_arr_split(str, " # ")[2]
+      return get.str.str_arr_by_split_w_string(str, " # ")[2]
     end,
   },
   potentially_atpath = {
@@ -4131,7 +4131,7 @@ transf = {
   },
   base64 = {
     decoded_str = function(b64)
-      if is.printable_ascii_nowhitespace_str.base64_gen_str(b64) then
+      if is.printable_ascii_not_whitespace_str.base64_gen_str(b64) then
         return transf.base64_gen_str.decoded_str(b64)
       else
         return transf.base64_url_str.decoded_str(b64)
@@ -4140,7 +4140,7 @@ transf = {
   },
   base32 = {
     decoded_str = function(b32)
-      if is.printable_ascii_nowhitespace_str.base32_gen_str(b32) then
+      if is.printable_ascii_not_whitespace_str.base32_gen_str(b32) then
         return transf.base32_gen_str.decoded_str(b32)
       else
         return transf.base32_crock_str.decoded_str(b32)
@@ -4225,15 +4225,15 @@ transf = {
   },
   multiline_str = {
     trimmed_lines_multiline_str = function(str)
-      local lines = get.str.str_arr_split(str, "\n")
-      local trimmed_lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(lines, stry.strip)
+      local lines = get.str.str_arr_by_split_w_string(str, "\n")
+      local trimmed_lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(lines, transf.str.not_starting_or_ending_with_whitespace_str)
       return get.str_or_number_arr.str_by_joined(trimmed_lines, "\n")
     end,
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_str_arr_value_assoc_value_assoc = function(raw)
       local raw_countries = get.str.str_arr_split_noempty(raw, "\n\n")
       local countries = {}
       for _, raw_country in transf.arr.index_value_stateless_iter(raw_countries) do
-        local raw_country_lines = get.str.str_arr_split_single_char_noempty(raw_country, "\n")
+        local raw_country_lines = get.str.not_empty_str_arr_by_split_w_ascii_char(raw_country, "\n")
         local country_header = raw_country_lines[1]
         local country_code = get.str.n_strs_by_extracted_onig(country_header, "\\(([^\\)]+\\)")
         if country_code == nil then error("could not find country code in header. header was " .. country_header) end
@@ -4485,7 +4485,7 @@ transf = {
       )
     end,
     noemtpy_str_arr = function(arr)
-      return get.arr.arr_by_filtered(arr, is.str.noempty_str)
+      return get.arr.arr_by_filtered(arr, is.str.not_empty_str)
     end,
     noindent_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent_line)
@@ -4521,7 +4521,7 @@ transf = {
       )
     end,
     stripped_str_arr = function(arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, stry.strip)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.not_starting_or_ending_with_whitespace_str)
     end,
     multiline_str = function(arr)
       return get.str_or_number_arr.str_by_joined(arr, "\n")
@@ -4548,7 +4548,7 @@ transf = {
   },
   slice_notation = {
     three_pos_int_or_nils = function(notation)
-      local stripped_str = stry.strip(notation)
+      local stripped_str = transf.str.not_starting_or_ending_with_whitespace_str(notation)
       local start_str, stop_str, step_str = get.str.n_strs_by_extracted_onig(
         stripped_str, 
         "^\\[?(-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
@@ -5073,7 +5073,7 @@ transf = {
     str_key_assoc_of_str_key_assocs_or_prev_values_by_space = function(tbl)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(tbl) do
-        local key_parts = stry.split(k, " ")
+        local key_parts = get.str.str_arr_by_split_w_ascii_char(k, " ")
         local label = key_parts[1]
         local key = key_parts[2]
         if not key then
@@ -5434,7 +5434,7 @@ transf = {
       return get.str.n_strs_by_extracted_onig(id, "^[^:]+:(.*)$")
     end,
     citable_object_indicator = function(id)
-      return stry.split(id, ":")[1]
+      return get.str.str_arr_by_split_w_ascii_char(id, ":")[1]
     end,
     filename_safe_indicated_citable_object_id = function(id)
       return transf.str.encoded_query_param_value(id)
@@ -5491,7 +5491,7 @@ transf = {
   },
   citable_filename = {
     filename_safe_indicated_citable_object_id = function(filename)
-      return get.str.str_arr_split(filename, "!citid:")[2]
+      return get.str.str_arr_by_split_w_string(filename, "!citid:")[2]
     end,
     indicated_citable_object_id = function(filename)
       return transf.str.str_by_percent_decoded_also_plus(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
@@ -6620,11 +6620,11 @@ transf = {
     end,
     param_table = function(url)
       local params = {}
-      local url_parts = stry.split(url, "?")
+      local url_parts = get.str.str_arr_by_split_w_ascii_char(url, "?")
       if #url_parts > 1 then
-        local param_parts = stry.split(url_parts[2], "&")
+        local param_parts = get.str.str_arr_by_split_w_ascii_char(url_parts[2], "&")
         for _, param_part in transf.arr.index_value_stateless_iter(param_parts) do
-          local param_parts = stry.split(param_part, "=")
+          local param_parts = get.str.str_arr_by_split_w_ascii_char(param_part, "=")
           local key = param_parts[1]
           local value = param_parts[2]
           params[key] = transf.str.str_by_percent_decoded_also_plus(value)
@@ -6633,7 +6633,7 @@ transf = {
       return params
     end,
     no_scheme = function(url)
-      local parts = stry.split(url, ":")
+      local parts = get.str.str_arr_by_split_w_ascii_char(url, ":")
       act.arr.shift(parts)
       local rejoined = get.str_or_number_arr.str_by_joined(parts, ":")
       return get.str.no_prefix_str(rejoined, "//")
@@ -6763,7 +6763,7 @@ transf = {
     response_text = function(result)
       local first_choice = result.choices[1]
       local response = first_choice.text or first_choice.message.content
-      return stry.strip(response)
+      return transf.str.not_starting_or_ending_with_whitespace_str(response)
     end
   },
   not_userdata_or_function = {
@@ -6811,7 +6811,7 @@ transf = {
     --- @return str
     yaml_str = function(tbl)
       local raw_yaml = yaml.dump({tbl})
-      local lines = stry.split(raw_yaml, "\n")
+      local lines = get.str.str_arr_by_split_w_ascii_char(raw_yaml, "\n")
       return get.str_or_number_arr.str_by_joined(lines, "\n", 2, #lines - 2)
     end,
     json_here_str = function(t)
@@ -6945,7 +6945,7 @@ transf = {
   str_and_n_anys = {
     str_and_n_anys_by_stripped = function(...)
       local arg1 = select(1, ...)
-      return stry.strip(arg1), select(2, ...)
+      return transf.str.not_starting_or_ending_with_whitespace_str(arg1), select(2, ...)
     end
   },
   n_bool_functions = {
@@ -6976,9 +6976,9 @@ transf = {
    
     emails = function(mailto_url)
       local no_scheme = transf.url.no_scheme(mailto_url)
-      local emails_part = stry.split(no_scheme, "?")[1]
-      local emails = stry.split(emails_part, ",")
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(emails, stry.strip)
+      local emails_part = get.str.str_arr_by_split_w_ascii_char(no_scheme, "?")[1]
+      local emails = get.str.str_arr_by_split_w_ascii_char(emails_part, ",")
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(emails, transf.str.not_starting_or_ending_with_whitespace_str)
     end,
     first_email = function(mailto_url)
       return transf.mailto_url.emails(mailto_url)[1]
@@ -7002,20 +7002,20 @@ transf = {
   },
   otpauth_url = {
     type = function(otpauth_url)
-      return stry.split(transf.url.no_scheme(otpauth_url), "/")[1]
+      return get.str.str_arr_by_split_w_ascii_char(transf.url.no_scheme(otpauth_url), "/")[1]
     end,
     label = function(otpauth_url)
-      local part = stry.split(transf.url.no_scheme(otpauth_url), "/")[2]
-      return stry.split(part, "?")[1]
+      local part = get.str.str_arr_by_split_w_ascii_char(transf.url.no_scheme(otpauth_url), "/")[2]
+      return get.str.str_arr_by_split_w_ascii_char(part, "?")[1]
     end,
     
   },
   data_url = {
     raw_type = function(data_url)
-      return stry.split(transf.url.no_scheme(data_url), ";")[1]
+      return get.str.str_arr_by_split_w_ascii_char(transf.url.no_scheme(data_url), ";")[1]
     end,
     header_part = function(data_url) -- the non-data part will either be separated from the rest of the url by `;,` or `;base64,`, so we need to split on `,`, then find the first part that ends `;` or `base64;`, and then join and return all parts before that part
-      local parts = stry.split(transf.url.no_scheme(data_url), ",")
+      local parts = get.str.str_arr_by_split_w_ascii_char(transf.url.no_scheme(data_url), ",")
       local non_data_part = ""
       for _, part in transf.arr.index_value_stateless_iter(parts) do
         non_data_part = non_data_part .. part
@@ -7032,11 +7032,11 @@ transf = {
     end,
       
     raw_type_param_table = function(data_url)
-      local parts = stry.split(transf.data_url.header_part(data_url), ";")
+      local parts = get.str.str_arr_by_split_w_ascii_char(transf.data_url.header_part(data_url), ";")
       act.arr.shift(parts) -- this is the content type
       act.arr.pop(parts) -- this is the base64, or ""
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(parts, function(part)
-        local kv = stry.split(part, "=")
+        local kv = get.str.str_arr_by_split_w_ascii_char(part, "=")
         return kv[1], kv[2]
       end)
     end
@@ -7048,7 +7048,7 @@ transf = {
   },
   source_id = {
     language = function(source_id)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(stry.split(source_id, "."), -1, -1)[1]
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(get.str.str_arr_by_split_w_ascii_char(source_id, "."), -1, -1)[1]
     end,
   },
   source_id_arr = {
@@ -7115,7 +7115,7 @@ transf = {
       )
     end,
     shortcut_str = function(shortcut_specifier)
-      local modstr = plstrx.join("", get.arr.arr_by_mapped_w_t_key_assoc(shortcut_specifier.mod_name_arr, tblmap.mod_name.mod_symbol))
+      local modstr = get.str_or_number_arr.str_by_joined(get.arr.arr_by_mapped_w_t_key_assoc(shortcut_specifier.mod_name_arr, tblmap.mod_name.mod_symbol), "")
       if modstr == "" then
         return shortcut_specifier.key
       else
@@ -7349,9 +7349,9 @@ transf = {
     end,
     contact_uuid_arr = function()
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        stry.split(transf["nil"].str_by_khard_list_output(), "\n"), 
+        get.str.str_arr_by_split_w_ascii_char(transf["nil"].str_by_khard_list_output(), "\n"), 
         function (line)
-          return stry.split(line, "\t")[1]
+          return get.str.str_arr_by_split_w_ascii_char(line, "\t")[1]
         end
       )
     end,
@@ -8073,7 +8073,7 @@ transf = {
         end
       elseif get.str.bool_by_startswith(str, ":") then
         input_spec.mode = "key"
-        local parts = transf.hole_y_arrlike.arr(stry.split(get.str.str_by_sub_lua(str, 2), "+")) -- separating modifier keys with `+`
+        local parts = transf.hole_y_arrlike.arr(get.str.str_arr_by_split_w_ascii_char(get.str.str_by_sub_lua(str, 2), "+")) -- separating modifier keys with `+`
         if #parts > 1 then
           input_spec.key = act.arr.pop(parts)
           input_spec.mods = parts

@@ -35,7 +35,7 @@ dothis = {
   event_table = {
     add_event_from = function(specifier, do_after)
       specifier = specifier or {}
-      specifier = get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier, stry.strip, is.any.str)
+      specifier = get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier, transf.str.not_starting_or_ending_with_whitespace_str, is.any.str)
       local command = {"khal", "new" }
       if specifier.calendar then
         command = transf.two_arrs.arr_by_appended(
@@ -55,7 +55,7 @@ dothis = {
 
       if specifier.alarms then
         local alarms_str = get.str_or_number_arr.str_by_joined(
-          get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier.alarms, stry.strip, is.any.str),
+          get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier.alarms, transf.str.not_starting_or_ending_with_whitespace_str, is.any.str),
           ","
         )
         command = transf.two_arrs.arr_by_appended(
@@ -312,7 +312,7 @@ dothis = {
       speak:voice(tblmap.lang.voice[lang]):speak(transf.str.singleline_str_by_folded(str))
     end,
     paste = function(str)
-      local lines = stry.split(str, "\n")
+      local lines = get.str.str_arr_by_split_w_ascii_char(str, "\n")
       local is_first_line = true
       for _, line in transf.arr.index_value_stateless_iter(lines) do
         if is_first_line then

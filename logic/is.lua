@@ -17,9 +17,6 @@ is = {
     empty_str = function(str)
       return str == ""
     end,
-    noempty_str = function(str)
-      return not is.str.empty_str(str)
-    end,
     line = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "[\n\r]")
     end,
@@ -29,7 +26,7 @@ is = {
     whitespace_str = function(str)
       return get.str.bool_by_matches_part_eutf8(str, "%s")
     end,
-    nowhitespace_str = function(str)
+    not_whitespace_str = function(str)
       return not is.str.whitespace_str(str)
     end,
     starting_with_dot_str = function(str)
@@ -42,8 +39,11 @@ is = {
       return get.str.bool_by_matches_part_eutf8(str, "%s$")
     end,
 
-
     -- combined conditions
+
+    starting_or_ending_with_whitespace_str = function(str)
+      return is.str.starting_with_whitespace_str(str) or is.str.ending_with_whitespace_str(str)
+    end,
 
   },
   line = {
@@ -69,7 +69,7 @@ is = {
       return is.str.not_ending_with_whitespace_str(str)
     end,
     noempty_line = function(str)
-      return is.str.noempty_str(str)
+      return is.str.not_empty_str(str)
     end,
     noweirdwhitespace_line = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
@@ -118,11 +118,11 @@ is = {
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
     end,
     alphanum_minus_underscore = function(str)
-      return is.ascii_str.printable_ascii_str(str) and is.printable_ascii_nowhitespace_str.alphanum_minus_underscore(str)
+      return is.ascii_str.printable_ascii_str(str) and is.printable_ascii_not_whitespace_str.alphanum_minus_underscore(str)
     end,
   },
   printable_ascii_str = {
-    printable_ascii_nowhitespace_str = function(str)
+    printable_ascii_not_whitespace_str = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "%s")
     end,
     url = function(str)
@@ -135,7 +135,7 @@ is = {
     end,
     iban = function(str)
       local cleaned_iban = transf.iban.cleaned_iban(str)
-      return #cleaned_iban <= 34 and is.printable_ascii_nowhitespace_str.alphanum(cleaned_iban)
+      return #cleaned_iban <= 34 and is.printable_ascii_not_whitespace_str.alphanum(cleaned_iban)
     end,
     citable_filename = function(str)
       return 
@@ -143,7 +143,7 @@ is = {
         get.str.bool_by_contains_w_ascii_str(str, "!citid:")
     end
   },
-  printable_ascii_nowhitespace_str = {
+  printable_ascii_not_whitespace_str = {
     base32_gen_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.gen)
     end,
@@ -157,10 +157,10 @@ is = {
       return get.str.bool_by_matches_whole_onig(str, r.g.id.b64.url)
     end,
     base32_str = function(str)
-      return is.printable_ascii_nowhitespace_str.base32_gen_str(str) or is.printable_ascii_nowhitespace_str.base32_crock_str(str)
+      return is.printable_ascii_not_whitespace_str.base32_gen_str(str) or is.printable_ascii_not_whitespace_str.base32_crock_str(str)
     end,
     base64_str = function(str)
-      return is.printable_ascii_nowhitespace_str.base64_gen_str(str) or is.printable_ascii_nowhitespace_str.base64_url_str(str)
+      return is.printable_ascii_not_whitespace_str.base64_gen_str(str) or is.printable_ascii_not_whitespace_str.base64_url_str(str)
     end,
     handle = function(str)
       return get.str.bool_by_startswith(str, "@")
@@ -187,7 +187,7 @@ is = {
       return get.str.bool_by_not_matches_part_eutf8(str, "[^%w%-_:.]")
     end,
     indicated_isbn = function(str)
-      return get.str.bool_by_startswith(str, "isbn:") -- gonna trust that if it's printable_ascii_nowhitespace_str and starts with isbn: it's an isbn, similarly for the following
+      return get.str.bool_by_startswith(str, "isbn:") -- gonna trust that if it's printable_ascii_not_whitespace_str and starts with isbn: it's an isbn, similarly for the following
     end,
     indicated_pmid = function(str)
       return get.str.bool_by_startswith(str, "pmid:")
@@ -212,14 +212,14 @@ is = {
     end,
     indicated_citable_object_id = function(str)
       return
-        is.printable_ascii_nowhitespace_str.indicated_isbn(str) or
-        is.printable_ascii_nowhitespace_str.indicated_pmid(str) or
-        is.printable_ascii_nowhitespace_str.indicated_doi(str) or
-        is.printable_ascii_nowhitespace_str.indicated_isbn_part_identifier(str) or
-        is.printable_ascii_nowhitespace_str.indicated_pcmid(str) or
-        is.printable_ascii_nowhitespace_str.indicated_accession(str) or
-        is.printable_ascii_nowhitespace_str.indicated_issn_full_identifier(str) or
-        is.printable_ascii_nowhitespace_str.indicated_urlmd5(str)
+        is.printable_ascii_not_whitespace_str.indicated_isbn(str) or
+        is.printable_ascii_not_whitespace_str.indicated_pmid(str) or
+        is.printable_ascii_not_whitespace_str.indicated_doi(str) or
+        is.printable_ascii_not_whitespace_str.indicated_isbn_part_identifier(str) or
+        is.printable_ascii_not_whitespace_str.indicated_pcmid(str) or
+        is.printable_ascii_not_whitespace_str.indicated_accession(str) or
+        is.printable_ascii_not_whitespace_str.indicated_issn_full_identifier(str) or
+        is.printable_ascii_not_whitespace_str.indicated_urlmd5(str)
     end
   },
   colon_period_alphanum_minus_underscore = {
