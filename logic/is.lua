@@ -1,54 +1,60 @@
 is = {
   str = {
 
-    -- old 
-
-    path = function(str)
-      return 
-        is.str.line(str) and
-        is.line.path(str)
-    end,
-
     -- simple conditions
 
-    ascii_str = function(str)
-      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.ascii)
-    end,
     empty_str = function(str)
       return str == ""
+    end,
+    not_empty_str = function(str)
+      return not is.str.empty_str(str)
+    end,
+    not_starting_with_whitespace_str = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "^%s")
+    end,
+    not_ending_with_whitespace_str = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "%s$")
+    end,
+    ascii_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.ascii)
     end,
     line = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "[\n\r]")
     end,
+
+  },
+  not_empty_str = {
+    
     multiline_str = function(str)
-      return not is.str.line(str)
+      return get.str.bool_by_matches_part_eutf8(str, "[\n\r]")
     end,
     whitespace_str = function(str)
       return get.str.bool_by_matches_part_eutf8(str, "%s")
     end,
-    not_whitespace_str = function(str)
-      return not is.str.whitespace_str(str)
-    end,
     starting_with_dot_str = function(str)
       return get.str.bool_by_startswith(str, ".")
     end,
+    
+    
+  },
+  whitespace_str = {
     starting_with_whitespace_str = function(str)
       return get.str.bool_by_matches_part_eutf8(str, "^%s")
     end,
     ending_with_whitespace_str = function(str)
       return get.str.bool_by_matches_part_eutf8(str, "%s$")
     end,
-
-    -- combined conditions
-
     starting_or_ending_with_whitespace_str = function(str)
-      return is.str.starting_with_whitespace_str(str) or is.str.ending_with_whitespace_str(str)
+      return is.whitespace_str.starting_with_whitespace_str(str) or is.whitespace_str.ending_with_whitespace_str(str)
     end,
-
+    starting_and_ending_with_whitespace_str = function(str)
+      return is.whitespace_str.starting_with_whitespace_str(str) and is.whitespace_str.ending_with_whitespace_str(str)
+    end,
   },
   line = {
-
-    -- simple conditions
+    not_whitespace_str = function(str)
+      return not is.not_empty_str.whitespace_str(str)
+    end,
 
     indent_line = function(str)
       return is.str.starting_with_whitespace_str(str)
@@ -86,20 +92,24 @@ is = {
     trimmed_line = function(str)
       return is.line.noindent_line(str) and is.line.notrailing_whitespace_line(str)
     end,
-    trimmed_noweirdwhitespace_line = function(str)
-      return is.line.trimmed_line(str) and is.line.noweirdwhitespace_line(str)
-    end,
 
   },
   noweirdwhitespace_line = {
     leaflike = function(str)
       return get.str.bool_by_not_contains_w_ascii_str(str, "/")
     end,
+    trimmed_noweirdwhitespace_line = function(str)
+      return is.line.trimmed_line(str)
+    end,
   },
   leaflike = {
     extension = function(str)
       return get.str.bool_by_not_contains_w_ascii_str(str, ".") -- I consider e.g. .tar.gz files to have an extension of 'gz'
     end,
+    citable_filename = function(str)
+      return 
+        get.str.bool_by_contains_w_ascii_str(str, "!citid:")
+    end
   },
   trimmed_line = {
     
@@ -110,15 +120,10 @@ is = {
       return get.str.bool_by_contains_w_ascii_str(str, "/")
     end
   },
-  multiline_str = {
 
-  },
   ascii_str = {
     printable_ascii_str = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
-    end,
-    alphanum_minus_underscore = function(str)
-      return is.ascii_str.printable_ascii_str(str) and is.printable_ascii_not_whitespace_str.alphanum_minus_underscore(str)
     end,
   },
   printable_ascii_str = {
@@ -137,27 +142,13 @@ is = {
       local cleaned_iban = transf.iban.cleaned_iban(str)
       return #cleaned_iban <= 34 and is.printable_ascii_not_whitespace_str.alphanum(cleaned_iban)
     end,
-    citable_filename = function(str)
-      return 
-        get.str.bool_by_not_contains_w_ascii_str(str, "/") and
-        get.str.bool_by_contains_w_ascii_str(str, "!citid:")
-    end
   },
   printable_ascii_not_whitespace_str = {
-    base32_gen_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.gen)
-    end,
-    base32_crock_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.crockford)
-    end,
     base64_gen_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.b64.gen)
     end,
     base64_url_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.b64.url)
-    end,
-    base32_str = function(str)
-      return is.printable_ascii_not_whitespace_str.base32_gen_str(str) or is.printable_ascii_not_whitespace_str.base32_crock_str(str)
     end,
     base64_str = function(str)
       return is.printable_ascii_not_whitespace_str.base64_gen_str(str) or is.printable_ascii_not_whitespace_str.base64_url_str(str)
@@ -176,9 +167,6 @@ is = {
     end,
     installed_package_name = function(str)
       return get.arr.bool_by_contains(transf.package_manager_name_or_nil.package_name_arr(nil), str)
-    end,
-    unicode_codepoint_str = function(str)
-      return get.str.bool_by_startswith(str, "U+") and transf.str.bool_by_matches_whole_eutf8(str, "^U+%x+$")
     end,
     doi = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.doi)
@@ -222,6 +210,22 @@ is = {
         is.printable_ascii_not_whitespace_str.indicated_urlmd5(str)
     end
   },
+  base64_gen_str = {
+    unicode_codepoint_str = function(str)
+      return get.str.bool_by_startswith(str, "U+") and transf.str.bool_by_matches_whole_eutf8(str, "^U+%x+$")
+    end,
+  },
+  base64_url_str = {
+    youtube_video_id = function(str)
+      return #str == 11 -- not officially specified, but b/c 64^11 > 2^64 > 64^10 and 64 chars in base64, allowing for billions of ids per living person, unlikely to change
+    end,
+    youtube_playlist_id = function(str)
+      return get.str.bool_by_startswith(str, "PL") and #str == 34
+    end,
+    youtube_channel_id = function(str)
+      return get.str.bool_by_startswith(str, "UC") and #str == 24
+    end,
+  },
   colon_period_alphanum_minus_underscore = {
     colon_alphanum_minus_underscore = function(str)
       return get.str.bool_by_not_contains_w_str(str, ".")
@@ -257,8 +261,11 @@ is = {
     alphanum_minus_underscore = function(str)
       return get.str.bool_by_not_contains_w_str(str, ":")
     end,
-    alphanum = function(str)
-      return is.colon_alphanum_minus_underscore.alphanum_minus_underscore(str) and is.alphanum_minus_underscore.alphanum(str)
+    calendar_name = function(str)
+      return get.arr.bool_by_contains(
+        transf["nil"].calendar_name_arr(),
+        str
+      )
     end,
   },
   calendar_name = {
@@ -297,13 +304,18 @@ is = {
     end
   },
   youtube_video_id = {
-    extant = function(id)
+    actual_youtube_video_id = function(id)
+      return transf.youtube_video_id.youtube_video_item(id) ~= nil
+    end
+  },
+  actual_youtube_video_id = {
+    extant_youtube_video_id = function(id)
       return get.arr.bool_by_contains(ls.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
     end,
-    private = function(id)
+    private_youtube_video_id = function(id)
       return transf.youtube_video_id.privacy_status(id) == "private"
     end,
-    unavailable = function(id)
+    unavailable_youtube_video_id = function(id)
       return 
         not transf.youtube_video_id.extant(id) or
         transf.youtube_video_id.private(id)
@@ -326,9 +338,6 @@ is = {
         is.path.local_path(path) and is.local_path.local_absolute_path()
       )
     end,
-    extant_path = function(path)
-      return is.path.absolute_path(path) and is.absolute_path.extant_path(path)
-    end,
     path_with_intra_file_locator = function(path)
       return get.str.bool_by_matches_part_eutf8(transf.path.leaf(path), ":%d+$")
     end,
@@ -340,7 +349,7 @@ is = {
     end,
     citable_path = function(path)
       return 
-        is.printable_ascii_str.citable_filename(transf.path.leaf(path)) 
+        is.leaflike.citable_filename(transf.path.leaf(path)) 
     end,
     dotfilename_path = function(path)
       return 
@@ -778,15 +787,6 @@ is = {
     alphanum = function(str)
       return is.alphanum_minus_underscore.alphanum_underscore(str) and is.alphanum_minus_underscore.alphanum_minus(str)
     end,
-    youtube_video_id = function(str)
-      return #str == 11 -- not officially specified, but b/c 64^11 > 2^64 > 64^10 and 64 chars in base64, allowing for billions of ids per living person, unlikely to change
-    end,
-    youtube_playlist_id = function(str)
-      return get.str.bool_by_startswith(str, "PL") and #str == 34
-    end,
-    youtube_channel_id = function(str)
-      return get.str.bool_by_startswith(str, "UC") and #str == 24
-    end,
     pass_item_name = function(str)
       return get.extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
     end,
@@ -800,6 +800,15 @@ is = {
     end,
     digit_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, "\\d+")
+    end,
+    base32_gen_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.gen)
+    end,
+    base32_crock_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.crockford)
+    end,
+    base32_str = function(str)
+      return is.printable_ascii_not_whitespace_str.base32_gen_str(str) or is.printable_ascii_not_whitespace_str.base32_crock_str(str)
     end,
   },
   digit_str = {
@@ -1303,39 +1312,23 @@ is = {
 }
 
 -- to allow for is.<type1>.<type2> where type2 is a descendant but not childtype of type1, we will use a metatable to search for the path from type1 to type2 by using thing_name_hierarchy, and then create a dynamic function that tests is.<type1>.<subtype> and is.<subtype>.<subtype2> and so on until we reach type2
--- also resolve is.<t1>.not_<t2> to not is.<t1>.<t2> 
 
 for type1, v in pairs(is) do
   local mt = {
     __index = function(t, type2)
-      local invert = false
-      if get.str.bool_by_startswith(type2, "not_") then
-        type2 = get.str.str_by_sub_lua(type2, 5)
-        invert = true
-      end
+
       local fn = rawget(t, type2)
+      -- here might be a good point to add a 1 second or so default memoization if performance is an issue
       if fn then 
-        if invert then 
-          return function(arg)
-            return not fn(arg)
-          end
-        else
-          return fn
-        end
+        return fn
       end
       local path = get.table.arr_or_nil_by_find_path_between_two_keys(
         thing_name_hierarchy,
         type1,
         type2
       )
-      if invert then
-        return function(arg)
-          return not get.thing_name_arr.bool_by_chained_and(path, arg)
-        end
-      else
-        return function(arg)
-          return get.thing_name_arr.bool_by_chained_and(path, arg)
-        end
+      return function(arg)
+        return get.thing_name_arr.bool_by_chained_and(path, arg)
       end
     end
   }

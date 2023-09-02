@@ -7073,7 +7073,7 @@ transf = {
         key = transf.menu_item_table.hotkey(menu_item_table)
       } )
     end,
-    title = function(menu_item_table)
+    str_by_title = function(menu_item_table)
       return menu_item_table.AXTitle
     end,
     full_action_path = function(menu_item_table)
@@ -7085,7 +7085,7 @@ transf = {
     running_application = function(menu_item_table)
       return menu_item_table.application
     end,
-    summary = function(menu_item_table)
+    str_by_summary = function(menu_item_table)
       if transf.menu_item_table.hotkey(menu_item_table) then
         return transf.menu_item_table.full_action_path_str(menu_item_table) .. " (" .. transf.menu_item_table.shortcut_str(menu_item_table) .. ")"
       else
