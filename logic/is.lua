@@ -35,21 +35,13 @@ is = {
     starting_with_dot_string = function(str)
       return get.string.bool_by_startswith(str, ".")
     end,
-    not_starting_with_dot_string = function(str)
-      return not is.string.starting_with_dot_string(str)
-    end,
     starting_with_whitespace_string = function(str)
       return get.string.bool_by_matches_part_eutf8(str, "^%s")
-    end,
-    not_starting_with_whitespace_string = function(str)
-      return not is.line.indent_line(str)
     end,
     ending_with_whitespace_string = function(str)
       return get.string.bool_by_matches_part_eutf8(str, "%s$")
     end,
-    not_ending_with_whitespace_string = function(str)
-      return not is.line.trailing_whitespace_line(str)
-    end,
+
 
     -- combined conditions
 
@@ -1017,13 +1009,10 @@ is = {
   },
   any = {
     fn = function(val)
-      return type(val) == "function"
+      return  type(val) == "function"
     end,
     number = function(val)
       return type(val) == "number"
-    end,
-    int = function(val)
-      return is.any.number(val) and is.number.int(val)
     end,
     pos_int = function(val)
       return is.any.int(val) and is.number.pos_number(val)
@@ -1043,31 +1032,8 @@ is = {
     primitive = function(val)
       return not is.any.table(val)
     end,
-    arrlike = function(val)
-      return is.any.table(val) and is.table.arrlike(val)
-    end,
-    arr = function(val)
-      return is.any.table(val) and is.table.arrlike(val) and is.arrlike.arr(val)
-    end,
-    pair = function(val)
-      return is.any.arr(val) and is.arr.pair(val)
-    end,
     non_empty_table_arr = function(val)
       return is.any.table(val) and is.table.non_empty_table(val) and is.table.arrlike(val) and is.arrlike.arr(val)
-    end,
-    is_interface = function(val)
-      return 
-        is.any.table(val) and
-        is.table.interface(val)
-    end,
-    is_not_interface = function(val)
-      return not is.any.is_interface(val)
-    end,
-    stream_created_item_specifier = function(val)
-      return is.any.table(val) and is.table.stream_created_item_specifier(val)
-    end,
-    empty_table = function(val)
-      return is.any.table(val) and is.table.empty_Table(val)
     end,
   },
   pass_item_name = {
@@ -1141,7 +1107,7 @@ is = {
         t.created_item and t.creation_specifier
     end,
     date = function(t)
-      return type(t.addyears) == "function" -- arbitrary prop of date object
+      return is.any.fn(t.addyears) -- arbitrary prop of date object
     end,
     native_table = function(t)
       return not t.isovtable
@@ -1157,7 +1123,7 @@ is = {
     end,
     arrlike_by_keys = function(t)
       for k, v in transf.table.key_value_stateless_iter(t) do
-        if type(k) ~= "number" then return false end
+        if is.any.not_number(k) then return false end
       end
       return true
     end,
@@ -1337,18 +1303,40 @@ is = {
 }
 
 -- to allow for is.<type1>.<type2> where type2 is a descendant but not childtype of type1, we will use a metatable to search for the path from type1 to type2 by using thing_name_hierarchy, and then create a dynamic function that tests is.<type1>.<subtype> and is.<subtype>.<subtype2> and so on until we reach type2
+-- also resolve is.<t1>.not_<t2> to not is.<t1>.<t2> 
 
 for type1, v in pairs(is) do
   local mt = {
     __index = function(t, type2)
+      local invert = false
+      if get.string.bool_by_startswith(type2, "not_") then
+        type2 = get.string.string_by_sub_lua(type2, 5)
+        invert = true
+      end
       local fn = rawget(t, type2)
-      if fn then return fn end
+      if fn then 
+        if invert then 
+          return function(arg)
+            return not fn(arg)
+          end
+        else
+          return fn
+        end
+      end
       local path = get.table.arr_or_nil_by_find_path_between_two_keys(
         thing_name_hierarchy,
         type1,
         type2
       )
-      return get.thing_name_arr.bool_by_chained_and(path)
+      if invert then
+        return function(arg)
+          return not get.thing_name_arr.bool_by_chained_and(path, arg)
+        end
+      else
+        return function(arg)
+          return get.thing_name_arr.bool_by_chained_and(path, arg)
+        end
+      end
     end
   }
   setmetatable(v, mt)

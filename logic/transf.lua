@@ -2874,7 +2874,7 @@ transf = {
     role = function(contact_table) return contact_table["Role"] end,
     homepage_raw = function(contact_table) return contact_table["Webpage"] end,
     homepages = function(contact_table) 
-      if type(contact_table.homepage_raw) == "table" then
+      if is.any.table(contact_table.homepage_raw) then
         return contact_table.homepage_raw
       else
         return {contact_table.homepage_raw}
@@ -3496,7 +3496,7 @@ transf = {
     end,
     table_or_err_by_evaled_env_bash_parsed_json = function(str)
       local res = transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json(str)
-      if type(res) == "table" then
+      if is.any.table(res) then
         return res
       else
         error("Result for command " .. str .. " is not a table")
@@ -3536,7 +3536,7 @@ transf = {
     end,
     window_arr_by_pattern = function(str)
       local res = hs.window.find(str)
-      if type(res) == "table" then return res 
+      if is.any.table(res) then return res 
       else return {res} end
     end,
     window_or_nil_by_title = hs.window.get,
@@ -4040,7 +4040,7 @@ transf = {
   },
   styledtext_or_string = {
     string = function(st_or_str)
-      if type(st_or_str) == "string" then
+      if is.any.string(st_or_str) then
         return st_or_str
       else
         return transf.styledtext.string(st_or_str)
@@ -4065,7 +4065,7 @@ transf = {
     end,
     table_or_nil = function(str)
       local res =  transf.not_userdata_or_function.json_string(str)
-      if type(res) == "table" then
+      if is.any.table(res) then
         return res
       else
         return nil
@@ -5317,7 +5317,7 @@ transf = {
         end   
       end     
       if comps.params then
-        if type(comps.params) == "table" then
+        if is.any.table(comps.params) then
           url = url .. "?" .. transf.assoc.url_params(comps.params)
         else
           url = url .. get.string.with_prefix_string(comps.params, "?")
@@ -6768,7 +6768,7 @@ transf = {
   },
   not_userdata_or_function = {
     md5_hex_string = function(thing)
-      if type(thing) ~= "string" then 
+      if is.any.not_string(thing) then 
         thing = json.encode(thing) 
       end
       local md5 = hashings("md5")
@@ -6776,7 +6776,7 @@ transf = {
       return md5:hexdigest()
     end,
     md5_base32_crock_string = function(thing)
-      if type(thing) ~= "string" then 
+      if is.any.not_string(thing) then 
         thing = json.encode(thing) 
       end
       local md5 = hashings("md5")
@@ -6823,9 +6823,9 @@ transf = {
       return hs.inspect(thing, {depth = 5})
     end,
     string = function(stringable)
-      if type(stringable) == "string" then
+      if is.any.string(stringable) then
         return stringable
-      elseif type(stringable) ~= "table" then
+      elseif is.any.not_table(stringable) then
         return tostring(stringable)
       else
         if stringable.get then
@@ -6852,7 +6852,7 @@ transf = {
       return not not any
     end,
     n_anys_if_table = function(any)
-      if type(any) == "table" then
+      if is.any.table(any) then
         return transf.arr.n_anys(any)
       else
         return any
@@ -6903,14 +6903,14 @@ transf = {
       }
     end,
     t_by_with_1_added_if_number = function(any)
-      if type(any) == "number" then
+      if is.any.number(any) then
         return any + 1
       else
         return any
       end
     end,
     t_by_with_1_subtracted_if_number = function(any)
-      if type(any) == "number" then
+      if is.any.number(any) then
         return any - 1
       else
         return any
@@ -7880,15 +7880,15 @@ transf = {
       start = get.any.default_if_nil(start, 1)
     
       local mode
-      if type(start) == "number" then
+      if is.any.number(start) then
         mode = "number"
-      elseif type(start) == "table" then
+      elseif is.any.table(start) then
         if start.adddays then
           mode = "date"
         elseif start.xy then
           mode = "point"
         end
-      elseif type(start) == "string" then
+      elseif is.any.string(start) then
         mode = "string"
       end
     
@@ -8464,7 +8464,7 @@ transf = {
       for i=1, #params do
         local param = params[i]
         if param == nil then param = nil_singleton 
-        elseif opts.stringify_table_params and type(param) == "table" then
+        elseif opts.stringify_table_params and is.any.table(param) then
           if opts.table_param_subset == "json" then
             param = json.encode(param)
           elseif opts.table_param_subset == "no-fn-userdata-loops" then

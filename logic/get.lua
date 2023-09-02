@@ -1,14 +1,14 @@
 get = {
   string_or_number = {
     number_or_nil = function(t, base)
-      if type(t) == "string" then
+      if is.any.string(t) then
         return get.string.number_or_nil(t, base)
       else
         return t
       end
     end,
     int_by_rounded_or_nil = function(t, base)
-      if type(t) == "string" then
+      if is.any.string(t) then
         return get.string.int_by_rounded_or_nil(t, base)
       else
         return t
@@ -173,10 +173,10 @@ get = {
         local pre_padding_length = depth * 2
         local key_length = #value_k
         local key_padding_length = keystop - (key_length + pre_padding_length)
-        if type(value_v) == "table" and not (value_v.value or value_v.comment) then 
+        if is.any.table(value_v) and not (value_v.value or value_v.comment) then 
           dothis.arr.push(lines, get.string.string_by_repeated(" ", depth * 2) .. value_k .. ":" .. get.string.string_by_repeated(" ", key_padding_length) .. " ")
           lines = transf.two_arrs.arr_by_appended(lines, get.table.yaml_lines_aligned_with_predetermined_stops(value_v, keystop, valuestop, depth + 1))
-        elseif type(value_v) == "table" and (value_v.value or value_v.comment) then 
+        elseif is.any.table(value_v) and (value_v.value or value_v.comment) then 
           local key_part = get.string.string_by_repeated(" ", pre_padding_length) .. value_k .. ":" .. get.string.string_by_repeated(" ", key_padding_length) .. " "
           local value_length = 0
           local value_part = ""
@@ -208,14 +208,14 @@ get = {
     --- @param deep? boolean
     --- @return T
     table_by_copy = function(t, deep, copied_tables)
-      if type(t) ~= "table" then return t end -- non-tables don't need to be copied
+      if is.any.not_table(t) then return t end -- non-tables don't need to be copied
       deep = get.any.default_if_nil(deep, true)
       copied_tables = get.any.default_if_nil(copied_tables, {})
       if not t then return t end
       local new = {}
       copied_tables[tostring(t)] = new
       for k, v in transf.table.stateless_key_value_iter(t) do
-        if type(v) == "table" and deep then
+        if is.any.table(v) and deep then
           if copied_tables[tostring(v)] then -- we've already copied this table, so just reference it
             new[k] = copied_tables[tostring(v)]
           else -- we haven't copied this table yet, so copy it and reference it
@@ -1458,7 +1458,7 @@ get = {
     string_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
       local tbl = transf.string.table_or_err_by_evaled_env_bash_parsed_json(str)
       local res = get.table.vt_or_err(tbl, key)
-      if type(res) == "string" then
+      if is.any.string(res) then
         return res
       else
         error("Not a string.")
@@ -1503,14 +1503,14 @@ get = {
   },
   string_or_styledtext = {
     styledtext_ignore_styled = function(str, styledtext_attributes_specifier)
-      if type(str) == "string" then
+      if is.any.string(str) then
         return hs.styledtext.new(str, styledtext_attributes_specifier)
       else
         return str
       end
     end,
     styledtext_merge = function(str, styledtext_attributes_specifier)
-      if type(str) == "string" then
+      if is.any.string(str) then
         return hs.styledtext.new(str, styledtext_attributes_specifier)
       else
         return transf.styledtext.styledtext_merge(str, styledtext_attributes_specifier)
@@ -1807,7 +1807,7 @@ get = {
               extant_paths[#extant_paths + 1] = file_path
             end
             local shouldRecurse = opts.recursion
-            if type(opts.recursion) == "number" then
+            if is.any.number(opts.recursion) then
               if depth and depth >= opts.recursion then
                 shouldRecurse = false
               end
@@ -2601,7 +2601,7 @@ get = {
       if prev_key then prev_key = prev_key .. "/" else prev_key = "" end
       local values = {}
       for key, value in transf.table.key_value_stateless_iter(assoc) do
-        if type(value) == "string" then
+        if is.any.string(value) then
           values[key] = prev_key .. value
         else
           local subvalues = get.detailed_env_node.env_var_name_value_assoc(value, prev_key, key)
@@ -2743,7 +2743,7 @@ get = {
       for thing_name, child_thing_name_hierarchy_or_leaf_indication_string in transf.table.key_value_stateless_iter(thing_name_hierarchy) do
         local passes = is[parent][thing_name](any)
         if passes then
-          if type(child_thing_name_hierarchy_or_leaf_indication_string) == "table" then
+          if is.any.table(child_thing_name_hierarchy_or_leaf_indication_string) then
             res[thing_name] = get.any.applicable_thing_name_hierarchy(any, child_thing_name_hierarchy_or_leaf_indication_string, thing_name)
           else
             res[thing_name] = child_thing_name_hierarchy_or_leaf_indication_string
@@ -3020,7 +3020,7 @@ get = {
       end
     end,
     string_or_bool_by_inverted = function(binary_specifier, str_or_bool)
-      if type(str_or_bool) == "string" then
+      if is.any.string(str_or_bool) then
         return get.binary_specifier.string_by_inverted(binary_specifier, str_or_bool)
       else
         return get.binary_specifier.bool_by_inverted(binary_specifier, str_or_bool)

@@ -3022,7 +3022,7 @@ dothis = {
       for i=1, #params do
         local param = params[i]
         if param == nil then param = nil_singleton 
-        elseif opts.stringify_table_params and type(param) == "table" then
+        elseif opts.stringify_table_params and is.any.table(param) then
           if opts.table_param_subset == "json" then
             param = json.encode(param)
           elseif opts.table_param_subset == "no-fn-userdata-loops" then
