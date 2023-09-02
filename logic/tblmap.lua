@@ -10,7 +10,7 @@ tblmap = {
       ["\0"] = "\\0"
     },
   },
-  mouse_button_string = {
+  mouse_button_str = {
     mouse_button_function_name = {
       l = "leftClick",
       r = "rightClick",
@@ -92,7 +92,7 @@ tblmap = {
       month = "%m",
       year = "%Y",
     },
-    rfc3339like_dt_string_format_part = {
+    rfc3339like_dt_str_format_part = {
       sec = "%02d",
       min = "%02d",
       hour = "%02d",
@@ -101,7 +101,7 @@ tblmap = {
       month = "%02d",
       year = "%04d",
     },
-    rfc3339like_dt_string_format_part_fallback = {
+    rfc3339like_dt_str_format_part_fallback = {
       sec = "??",
       min = "??",
       hour = "??",
@@ -126,7 +126,7 @@ tblmap = {
       min = ":",
       sec = ":",
     },
-    rfc3339like_dt_format_string = {
+    rfc3339like_dt_format_str = {
       year = "%Y",
       month = "%Y-%m",
       day = "%Y-%m-%d",
@@ -501,8 +501,8 @@ tblmap = {
       },
     },
     chooser_text_partial_retriever_specifier = {
-      string = {
-        thing_name = "singleline_string_by_folded",
+      str = {
+        thing_name = "singleline_str_by_folded",
         precedence = -999
       },
       audiodevice_specifier = {
@@ -513,7 +513,7 @@ tblmap = {
         thing_name = "summary_line"
       },
       csl_table = {
-        thing_name = "apa_string",
+        thing_name = "apa_str",
         precedence = 999
       },
       menu_item_table = {
@@ -529,7 +529,7 @@ tblmap = {
         precedence = 1
       },
       pair = {
-        thing_name = "assoc_entry_string",
+        thing_name = "assoc_entry_str",
         precedence = 999
       },
       date = {

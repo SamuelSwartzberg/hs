@@ -1,22 +1,22 @@
 dothis = {
   package_manager_name = {
     install = function(mgr, pkg)
-      dothis.string.env_bash_eval("upkg " .. mgr .. " install " .. transf.string.string_by_single_quoted_escaped(pkg))
+      dothis.str.env_bash_eval("upkg " .. mgr .. " install " .. transf.str.str_by_single_quoted_escaped(pkg))
     end,
     remove = function(mgr, pkg)
-      dothis.string.env_bash_eval("upkg " .. mgr .. " remove " .. transf.string.string_by_single_quoted_escaped(pkg))
+      dothis.str.env_bash_eval("upkg " .. mgr .. " remove " .. transf.str.str_by_single_quoted_escaped(pkg))
     end,
     upgrade = function(mgr, pkg)
       local target
-      if pkg then target = transf.string.string_by_single_quoted_escaped(pkg)
+      if pkg then target = transf.str.str_by_single_quoted_escaped(pkg)
       else target = "" end
-      dothis.string.env_bash_eval("upkg " .. mgr .. " upgrade " .. target)
+      dothis.str.env_bash_eval("upkg " .. mgr .. " upgrade " .. target)
     end,
     link = function(mgr, pkg)
-      dothis.string.env_bash_eval("upkg " .. mgr .. " link " .. transf.string.string_by_single_quoted_escaped(pkg))
+      dothis.str.env_bash_eval("upkg " .. mgr .. " link " .. transf.str.str_by_single_quoted_escaped(pkg))
     end,
     do_backup_and_commit = function(mgr, action, msg)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("upkg " .. mgr .. " " .. action, function()
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("upkg " .. mgr .. " " .. action, function()
         local message = msg or action
         
         if mgr then
@@ -35,13 +35,13 @@ dothis = {
   event_table = {
     add_event_from = function(specifier, do_after)
       specifier = specifier or {}
-      specifier = get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier, stringy.strip, is.any.string)
+      specifier = get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier, stry.strip, is.any.str)
       local command = {"khal", "new" }
       if specifier.calendar then
         command = transf.two_arrs.arr_by_appended(
           command,
             "--calendar" ..
-            transf.string.string_by_single_quoted_escaped(specifier.calendar)
+            transf.str.str_by_single_quoted_escaped(specifier.calendar)
         )
       end
 
@@ -49,19 +49,19 @@ dothis = {
         command = transf.two_arrs.arr_by_appended(
           command,
             "--location" ..
-            transf.string.string_by_single_quoted_escaped(specifier.location)
+            transf.str.str_by_single_quoted_escaped(specifier.location)
         )
       end
 
       if specifier.alarms then
-        local alarms_str = get.string_or_number_arr.string_by_joined(
-          get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier.alarms, stringy.strip, is.any.string),
+        local alarms_str = get.str_or_number_arr.str_by_joined(
+          get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier.alarms, stry.strip, is.any.str),
           ","
         )
         command = transf.two_arrs.arr_by_appended(
           command,
             "--alarm" ..
-            transf.string.string_by_single_quoted_escaped(alarms_str )
+            transf.str.str_by_single_quoted_escaped(alarms_str )
         )
       end
 
@@ -69,7 +69,7 @@ dothis = {
         command = transf.two_arrs.arr_by_appended(
           command,
             "--url" ..
-            transf.string.string_by_single_quoted_escaped(specifier.url)
+            transf.str.str_by_single_quoted_escaped(specifier.url)
         )
       end
 
@@ -77,7 +77,7 @@ dothis = {
       command = transf.two_arrs.arr_by_appended(
         command,
           "--format" ..
-          transf.string.string_by_single_quoted_escaped("{uid}")
+          transf.str.str_by_single_quoted_escaped("{uid}")
       )
 
       if specifier.start then
@@ -100,26 +100,26 @@ dothis = {
         command = transf.two_arrs.arr_by_appended(
           command,
             "::" ..
-            transf.string.string_by_single_quoted_escaped(specifier.description)
+            transf.str.str_by_single_quoted_escaped(specifier.description)
         )
       end
 
       if do_after then
-        dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-          get.string_or_number_arr.string_by_joined(command, " "), 
+        dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+          get.str_or_number_arr.str_by_joined(command, " "), 
           do_after
         )
       else
-        dothis.string.env_bash_eval_sync(
-          get.string_or_number_arr.string_by_joined(command, " ")
+        dothis.str.env_bash_eval_sync(
+          get.str_or_number_arr.str_by_joined(command, " ")
         )
       end
     end,
     add_event_interactive = function(event_table, do_after)
       event_table = event_table or {}
-      local temp_file_contents = get.string.string_by_evaled_as_template(transf.event_table.yaml_string_by_calendar_template(event_table))
-      dothis.string.edit_temp_file_in_vscode_act_on_contents(temp_file_contents, function(cnt)
-        local new_specifier = transf.yaml_string.not_userdata_or_function(cnt)
+      local temp_file_contents = get.str.str_by_evaled_as_template(transf.event_table.yaml_str_by_calendar_template(event_table))
+      dothis.str.edit_temp_file_in_vscode_act_on_contents(temp_file_contents, function(cnt)
+        local new_specifier = transf.yaml_str.not_userdata_or_function(cnt)
         dothis.event_table.add_event_from(new_specifier, do_after)
       end)
     end,
@@ -127,20 +127,20 @@ dothis = {
   md_file = {
     to_file_in_same_dir = function(source, format, metadata, do_after)
       local target = transf.path.path_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
-      local rawsource = transf.file.string_by_contents(source)
-      local processedsource = get.string.string_by_with_yaml_metadata(rawsource, metadata)
-      rawsource = get.string.string_and_int_by_replaced_eutf8_w_regex_string(rawsource, "\n +\n", "\n&nbsp;\n")
+      local rawsource = transf.file.str_by_contents(source)
+      local processedsource = get.str.str_by_with_yaml_metadata(rawsource, metadata)
+      rawsource = get.str.str_and_int_by_replaced_eutf8_w_regex_str(rawsource, "\n +\n", "\n&nbsp;\n")
       local temp_path = source .. ".tmp"
       dothis.absolute_path.write_file(temp_path, processedsource) 
       local cmd = 
         "pandoc" ..
-        "--wrap=preserve -f markdown+" .. get.string_or_number_arr.string_by_joined(get.pandoc.extensions(), "+") .. " --standalone -t" ..
+        "--wrap=preserve -f markdown+" .. get.str_or_number_arr.str_by_joined(get.pandoc.extensions(), "+") .. " --standalone -t" ..
         format ..
         "-i" ..
-        transf.string.string_by_single_quoted_escaped(temp_path)
+        transf.str.str_by_single_quoted_escaped(temp_path)
         "-o" ..
-        transf.string.string_by_single_quoted_escaped(target)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(cmd, function ()
+        transf.str.str_by_single_quoted_escaped(target)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(cmd, function ()
         dothis.absolute_path.delete(temp_path)
         if do_after then
           do_after(target)
@@ -162,20 +162,20 @@ dothis = {
       dothis.alphanum_minus_underscore.set_pass_json(uuid, type, data)
     end,
     edit_contact = function(uuid, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("khard edit " .. uuid, do_after or function() end)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("khard edit " .. uuid, do_after or function() end)
     end,
   },
   pass_item_name = {
     replace = function(name, type, data)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("pass rm " .. type .. "/" .. name, function()
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("pass rm " .. type .. "/" .. name, function()
         dothis.alphanum_minus_underscore.add_as_pass_item_name(name, type, data)
       end)
     end,
     rename = function(name, type, new_name)
-      dothis.string.env_bash_eval("pass mv " .. type .. "/" .. name .. " " .. type .. "/" .. new_name)
+      dothis.str.env_bash_eval("pass mv " .. type .. "/" .. name .. " " .. type .. "/" .. new_name)
     end,
     remove = function(name, type)
-      dothis.string.env_bash_eval("pass rm " .. type .. "/" .. name)
+      dothis.str.env_bash_eval("pass rm " .. type .. "/" .. name)
     end,
   },
   alphanum_minus_underscore = {
@@ -183,7 +183,7 @@ dothis = {
       dothis.alphanum_minus_underscore.add_as_pass_item_name(name, type, json.encode(data))
     end,
     add_as_pass_item_name = function(name, type, data)
-      dothis.string.env_bash_eval("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
+      dothis.str.env_bash_eval("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
     end,
     add_as_passw_pass_item_name = function(name, password)
       dothis.alphanum_minus_underscore.add_as_pass_item_name(name, "passw", password)
@@ -208,28 +208,28 @@ dothis = {
   },
   url = {
     download_to_async = function(url, target)
-      dothis.string.env_bash_eval_async("curl -L " .. transf.string.string_by_single_quoted_escaped(url) .. " -o " .. transf.string.string_by_single_quoted_escaped(target))
+      dothis.str.env_bash_eval_async("curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -o " .. transf.str.str_by_single_quoted_escaped(target))
     end,
     download_to_sync = function(url, target)
-      dothis.string.env_bash_eval_sync("curl -L " .. transf.string.string_by_single_quoted_escaped(url) .. " -o " .. transf.string.string_by_single_quoted_escaped(target))
+      dothis.str.env_bash_eval_sync("curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -o " .. transf.str.str_by_single_quoted_escaped(target))
     end,
     download_into_async = function(url, target_dir)
-      dothis.string.env_bash_eval_async("cd " .. transf.string.string_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.string.string_by_single_quoted_escaped(url) .. " -O")
+      dothis.str.env_bash_eval_async("cd " .. transf.str.str_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -O")
     end,
     download_into_sync = function(url, target_dir)
-      dothis.string.env_bash_eval_sync("cd " .. transf.string.string_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.string.string_by_single_quoted_escaped(url) .. " -O")
+      dothis.str.env_bash_eval_sync("cd " .. transf.str.str_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -O")
     end,
       
     add_event_from_url = function(url, calendar)
-      local temp_path_arg = transf.string.string_by_single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
-      dothis.string.env_bash_eval('curl' .. transf.string.string_by_single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg)
+      local temp_path_arg = transf.str.str_by_single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
+      dothis.str.env_bash_eval('curl' .. transf.str.str_by_single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg)
     end,
   },
   otp_url = {
     add_otp_pass_item = function(url, name)
-      dothis.string.env_bash_eval_async(
+      dothis.str.env_bash_eval_async(
         "echo" ..
-        transf.string.string_by_single_quoted_escaped(url) ..
+        transf.str.str_by_single_quoted_escaped(url) ..
         "| pass otp insert otp/" .. name
       )
     end,
@@ -239,10 +239,10 @@ dothis = {
       local tmpdir_json_path = transf.not_userdata_or_function.in_tmp_dir(tbl) .. ".json"
       local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(tbl) .. ".ics"
       dothis.absolute_path.write_file(tmpdir_json_path, json.encode(tbl))
-      dothis.string.env_bash_eval_sync(
+      dothis.str.env_bash_eval_sync(
         "ical2json" ..
         "-r" ..
-        transf.string.string_by_single_quoted_escaped(tmpdir_ics_path)
+        transf.str.str_by_single_quoted_escaped(tmpdir_ics_path)
       )
       dothis.absolute_path.delete(tmpdir_json_path)
       if path then
@@ -299,20 +299,20 @@ dothis = {
       )
     end,
   },
-  string = {
+  str = {
     generate_qr_png = function(data, path)
       if not is.path.extant_path(path) then
-        transf.string.string_or_nil_by_evaled_env_bash_stripped("qrencode -l M -m 2 -t PNG -o" .. transf.string.string_by_single_quoted_escaped(path) .. transf.string.string_by_single_quoted_escaped(data))
+        transf.str.str_or_nil_by_evaled_env_bash_stripped("qrencode -l M -m 2 -t PNG -o" .. transf.str.str_by_single_quoted_escaped(path) .. transf.str.str_by_single_quoted_escaped(data))
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
     end,
     alert = function(str, duration)
       return hs.alert.show(str, {textSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3}, duration)
     end,
     say = function(str, lang)
-      speak:voice(tblmap.lang.voice[lang]):speak(transf.string.singleline_string_by_folded(str))
+      speak:voice(tblmap.lang.voice[lang]):speak(transf.str.singleline_str_by_folded(str))
     end,
     paste = function(str)
-      local lines = stringy.split(str, "\n")
+      local lines = stry.split(str, "\n")
       local is_first_line = true
       for _, line in transf.arr.index_value_stateless_iter(lines) do
         if is_first_line then
@@ -324,63 +324,63 @@ dothis = {
       end
     end,
     paste_le = function(str)
-      dothis.string.paste(get.string.string_by_evaled_as_template(str))
+      dothis.str.paste(get.str.str_by_evaled_as_template(str))
     end,
     fill_with_lines = function(str)
-      dothis.string_arr.fill_with(transf.string.line_arr(str))
+      dothis.str_arr.fill_with(transf.str.line_arr(str))
     end,
     fill_with_content_lines = function(path)
-      dothis.string_arr.fill_with(transf.string.noempty_line_string_arr(path))
+      dothis.str_arr.fill_with(transf.str.noempty_line_str_arr(path))
     end,
     fill_with_nocomment_noindent_content_lines = function(path)
-      dothis.string_arr.fill_with(transf.string.nocomment_noindent_content_lines(path))
+      dothis.str_arr.fill_with(transf.str.nocomment_noindent_content_lines(path))
     end,
     search = function(str, search_engine)
       dothis.url_or_local_path.open_browser(
-        get.string.search_engine_search_url(search_engine, str)
+        get.str.search_engine_search_url(search_engine, str)
       )
     end,
     write_to_temp_file = function(str)
-      local path = transf.string.in_tmp_dir(os.time(), "temp_file")
+      local path = transf.str.in_tmp_dir(os.time(), "temp_file")
       dothis.absolute_path.write_file(path, str)
       return path
     end,
     open_temp_file = function(str, do_after)
       dothis.local_path.open_app(
-        transf.string.write_to_temp_file(str),
+        transf.str.write_to_temp_file(str),
         env.GUI_EDITOR,
         do_after
       )
     end,
     edit_temp_file_in_vscode_act_on_path = function(str, do_after)
-      local path = transf.string.write_to_temp_file(str)
+      local path = transf.str.write_to_temp_file(str)
       dothis.local_file.edit_file_in_vscode_act_on_path(path, do_after)
     end,
     edit_temp_file_in_vscode_act_on_contents = function(str, do_after)
-      local path = transf.string.write_to_temp_file(str)
+      local path = transf.str.write_to_temp_file(str)
       dothis.local_file.edit_file_in_vscode_act_on_contents(path, do_after)
     end,
     create_url_arr_as_session_in_msessions = function(str)
       dothis.url_arr.create_as_session_in_msessions(
-        transf.string.url_arr(str)
+        transf.str.url_arr(str)
       )
     end,
-    raw_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn = function(str, fn)
+    raw_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn = function(str, fn)
       local task = hs.task.new(
         "/opt/homebrew/bin/bash",
         function (...) fn(transf.number_and_two_anys.any_or_any_and_number_by_zero(...)) end,
-        { "-c", transf.string.string_by_minimal_locale_setter_commands_prepended(
+        { "-c", transf.str.str_by_minimal_locale_setter_commands_prepended(
           str
         )}
       )
       task:start()
       return task
     end,
-    env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn = function(str, fn)
+    env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn = function(str, fn)
       local task = hs.task.new(
         "/opt/homebrew/bin/bash",
         function (...) fn(transf.number_and_two_anys.any_or_any_and_number_by_zero(...)) end,
-        { "-c", transf.string.string_by_env_getter_comamnds_prepended(
+        { "-c", transf.str.str_by_env_getter_comamnds_prepended(
           str
         )}
       )
@@ -391,7 +391,7 @@ dothis = {
       local task = hs.task.new(
         "/opt/homebrew/bin/bash",
         transf["nil"]["nil"],
-        { "-c", transf.string.string_by_env_getter_comamnds_prepended(
+        { "-c", transf.str.str_by_env_getter_comamnds_prepended(
           str
         )}
       )
@@ -400,25 +400,25 @@ dothis = {
     end,
     env_bash_eval_sync = function(str)
       hs.execute(
-        transf.string.string_by_env_getter_comamnds_prepended(
+        transf.str.str_by_env_getter_comamnds_prepended(
           str
         )
       )
     end,
-    env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn_by_stripped = function(str, fn)
-      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn(
+    env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn_by_stripped = function(str, fn)
+      dothis.str.env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn(
         str,
-        get.n_any_arg_fn.n_t_arg_fn_w_n_any_arg_n_t_ret_fn(fn, transf.string_and_n_anys.string_and_n_anys_by_stripped)
+        get.n_any_arg_fn.n_t_arg_fn_w_n_any_arg_n_t_ret_fn(fn, transf.str_and_n_anys.str_and_n_anys_by_stripped)
       )
     end,
-    env_bash_eval_w_string_or_nil_arg_fn_by_stripped = function(str, fn)
-      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn_by_stripped(
+    env_bash_eval_w_str_or_nil_arg_fn_by_stripped = function(str, fn)
+      dothis.str.env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn_by_stripped(
         str,
-        get.n_any_arg_fn.n_t_arg_fn_w_n_any_arg_n_t_ret_fn(fn, transf.string_and_number_or_nil.string_or_nil_by_number)
+        get.n_any_arg_fn.n_t_arg_fn_w_n_any_arg_n_t_ret_fn(fn, transf.str_and_number_or_nil.str_or_nil_by_number)
       )
     end,
-    env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped = function(str, succfn, failfn)
-      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn_by_stripped(
+    env_bash_eval_w_str_arg_fn_str_arg_fn_by_stripped = function(str, succfn, failfn)
+      dothis.str.env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn_by_stripped(
         str,
         function(res, code)
           if code then
@@ -429,8 +429,8 @@ dothis = {
         end
       )
     end,
-    env_bash_eval_w_string_or_nil_arg_fn_by_stripped_noempty = function(str,fn)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+    env_bash_eval_w_str_or_nil_arg_fn_by_stripped_noempty = function(str,fn)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         str,
         function(str_or_nil)
           if str_or_nil == "" then str_or_nil = nil end
@@ -438,29 +438,29 @@ dothis = {
         end
       )
     end,
-    env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped_noempty = function(str, succfn, failfn)
-      dothis.string.env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped(
+    env_bash_eval_w_str_arg_fn_str_arg_fn_by_stripped_noempty = function(str, succfn, failfn)
+      dothis.str.env_bash_eval_w_str_arg_fn_str_arg_fn_by_stripped(
         str,
         function(str)
-          if str == "" then failfn("Empty string for command " .. str) else succfn(str) end
+          if str == "" then failfn("Empty str for command " .. str) else succfn(str) end
         end,
         failfn
       )
     end,
     env_bash_eval_w_not_userdata_or_function_or_nil_arg_fn_by_parsed_json = function(str, fn)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped_noempty(
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped_noempty(
         str,
         function(str_or_nil)
-          str_or_nil = transf.fn.rt_or_nil_fn_by_pcall(transf.json_string.not_userdata_or_function)(str_or_nil)
+          str_or_nil = transf.fn.rt_or_nil_fn_by_pcall(transf.json_str.not_userdata_or_function)(str_or_nil)
           fn(str_or_nil)
         end
       )
     end,
-    env_bash_eval_w_not_userdata_or_function_arg_fn_string_arg_fn_by_parsed_json = function(str, succfn, failfn)
-      dothis.string.env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped_noempty(
+    env_bash_eval_w_not_userdata_or_function_arg_fn_str_arg_fn_by_parsed_json = function(str, succfn, failfn)
+      dothis.str.env_bash_eval_w_str_arg_fn_str_arg_fn_by_stripped_noempty(
         str,
         function(str)
-          local succ, res = pcall(transf.json_string.not_userdata_or_function, str)
+          local succ, res = pcall(transf.json_str.not_userdata_or_function, str)
           if succ then
             succfn(res)
           else
@@ -471,7 +471,7 @@ dothis = {
       )
     end,
     env_bash_eval_w_table_or_nil_arg_fn_by_parsed_json = function(str, fn)
-      dothis.string.env_bash_eval_w_not_userdata_or_function_or_nil_arg_fn_by_parsed_json(
+      dothis.str.env_bash_eval_w_not_userdata_or_function_or_nil_arg_fn_by_parsed_json(
         str,
         function(arg)
           if not is.any.table(arg) then arg = nil end
@@ -479,8 +479,8 @@ dothis = {
         end
       )
     end,
-    env_bash_eval_w_table_arg_fn_string_arg_fn = function(str, succfn, failfn)
-      dothis.string.env_bash_eval_w_not_userdata_or_function_arg_fn_string_arg_fn_by_parsed_json(
+    env_bash_eval_w_table_arg_fn_str_arg_fn = function(str, succfn, failfn)
+      dothis.str.env_bash_eval_w_not_userdata_or_function_arg_fn_str_arg_fn_by_parsed_json(
         str,
         function(arg)
           if not is.any.table(arg) then failfn("Not a table: " .. arg) else succfn(arg) end
@@ -489,7 +489,7 @@ dothis = {
       )
     end,
     env_bash_eval_w_table_or_nil_arg_fn_by_parsed_json_nil_error_key = function(str, fn)
-      dothis.string.env_bash_eval_w_table_or_nil_arg_fn_by_parsed_json(
+      dothis.str.env_bash_eval_w_table_or_nil_arg_fn_by_parsed_json(
         str,
         function(arg)
           if arg.error then arg = nil end
@@ -497,8 +497,8 @@ dothis = {
         end
       )
     end,
-    env_bash_eval_w_table_arg_fn_string_arg_fn_fail_error_key = function(str, succfn, failfn)
-      dothis.string.env_bash_eval_w_table_arg_fn_string_arg_fn(
+    env_bash_eval_w_table_arg_fn_str_arg_fn_fail_error_key = function(str, succfn, failfn)
+      dothis.str.env_bash_eval_w_table_arg_fn_str_arg_fn(
         str,
         function(arg)
           if arg.error then failfn(arg.error) else succfn(arg) end
@@ -515,25 +515,25 @@ dothis = {
       url = transf.url.url_by_ensure_scheme(url)
       browser = browser or "Firefox"
       if do_after then -- if we're opening an url, typically, we would exit immediately, negating the need for a callback. Therefore, we want to wait. The only easy way to do this is to use a completely different browser. 
-        transf.string.string_or_nil_by_evaled_env_bash_stripped("open -a Safari -W" .. transf.string.string_by_single_quoted_escaped(url), do_after)
+        transf.str.str_or_nil_by_evaled_env_bash_stripped("open -a Safari -W" .. transf.str.str_by_single_quoted_escaped(url), do_after)
         -- Annoyingly, due to a 15 (!) year old bug, Firefox will open the url as well, even if we specify a different browser. I've tried various fixes, but for now we'll just have to live with it and click the tab away manually.
       else
-        transf.string.string_or_nil_by_evaled_env_bash_stripped("open -a" .. transf.string.string_by_single_quoted_escaped(browser))
+        transf.str.str_or_nil_by_evaled_env_bash_stripped("open -a" .. transf.str.str_by_single_quoted_escaped(browser))
       end
     end,
   },
   local_path = {
     open_default = function(path, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open " .. transf.string.string_by_single_quoted_escaped(path), do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open " .. transf.str.str_by_single_quoted_escaped(path), do_after)
     end,
     open_app = function(path, app, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -a " .. transf.string.string_by_single_quoted_escaped(app) .. " " .. transf.string.string_by_single_quoted_escaped(path), do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open -a " .. transf.str.str_by_single_quoted_escaped(app) .. " " .. transf.str.str_by_single_quoted_escaped(path), do_after)
     end,
     open_gui_editor = function(path, do_after)
       dothis.local_path.open_app(path, env.GUI_EDITOR, do_after)
     end,
     open_and_reveal = function(path)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -R " .. transf.string.string_by_single_quoted_escaped(path))
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open -R " .. transf.str.str_by_single_quoted_escaped(path))
     end,
     write_nonabsolute_path_key_assoc = function(path, nonabsolute_path_key_assoc, extension)
       dothis.dynamic_absolute_path_key_assoc.write(
@@ -568,8 +568,8 @@ dothis = {
     write_template = function(path, template_path)
       dothis.absolute_path.write_file(
         path,
-        get.string.string_by_evaled_as_template(
-          get.string.evaled_as_lua(template_path),
+        get.str.str_by_evaled_as_template(
+          get.str.evaled_as_lua(template_path),
           path
         )
       )
@@ -675,7 +675,7 @@ dothis = {
   local_absolute_path = {
     start_recording_to = function(path, do_after)
       dothis.absolute_path.create_parent_dir(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rec " .. transf.string.string_by_single_quoted_escaped(path), function()
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rec " .. transf.str.str_by_single_quoted_escaped(path), function()
         if do_after then
           do_after(path)
         end
@@ -684,7 +684,7 @@ dothis = {
   },
   local_nonextant_path = {
     create_dir = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("mkdir -p " .. transf.string.string_by_single_quoted_escaped(path))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("mkdir -p " .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
   local_nonabsolute_path_relative_to_home = {
@@ -707,7 +707,7 @@ dothis = {
   },
   labelled_remote_nonextant_path = {
     create_dir = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone mkdir " .. transf.string.string_by_single_quoted_escaped(path))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone mkdir " .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
   remote_absolute_path = {
@@ -715,7 +715,7 @@ dothis = {
   },
   remote_extant_path = {
     zip_to_absolute_path = function(path, tgt)
-      local tmppath = transf.string.in_tmp_dir(tgt, "temp_zip")
+      local tmppath = transf.str.in_tmp_dir(tgt, "temp_zip")
       dothis.extant_path.copy_to_absolute_path(
         path,
         tmppath
@@ -725,7 +725,7 @@ dothis = {
   },
   remote_extant_path_arr = {
     zip_to_absolute_path = function(arr, tgt)
-      local tmppath = transf.string.in_tmp_dir(tgt, "temp_zip")
+      local tmppath = transf.str.in_tmp_dir(tgt, "temp_zip")
       dothis.extant_path_arr.copy_into_absolute_path(
         arr,
         tmppath
@@ -749,7 +749,7 @@ dothis = {
   },
   local_extant_path = {
     make_executable = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("chmod +x " .. transf.string.string_by_single_quoted_escaped(path))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("chmod +x " .. transf.str.str_by_single_quoted_escaped(path))
     end,
     do_in_path = function(path, cmd, do_after)
       if is.path.dir(path) then
@@ -765,10 +765,10 @@ dothis = {
     end,
     zip_to_local_absolute_path = function(path, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.string.string_by_single_quoted_escaped(tgt) .. " " .. transf.string.string_by_single_quoted_escaped(path))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.str.str_by_single_quoted_escaped(tgt) .. " " .. transf.str.str_by_single_quoted_escaped(path))
     end,
     zip_to_absolute_path = function(path, tgt)
-      local tmptgt = transf.string.in_tmp_dir(tgt, "temp_zip_target")
+      local tmptgt = transf.str.in_tmp_dir(tgt, "temp_zip_target")
       dothis.local_extant_path.zip_to_local_absolute_path(path, tmptgt)
       dothis.extant_path.move_to_absolute_path(tmptgt, tgt)
     end,
@@ -782,8 +782,8 @@ dothis = {
     end,
     link_to_local_nonextant_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
-      dothis.string.env_bash_eval_sync(
-        "pass passw/os | sudo -S ln -s " .. transf.string.string_by_single_quoted_escaped(path) .. transf.string.string_by_single_quoted_escaped(tgt)
+      dothis.str.env_bash_eval_sync(
+        "pass passw/os | sudo -S ln -s " .. transf.str.str_by_single_quoted_escaped(path) .. transf.str.str_by_single_quoted_escaped(tgt)
       )
     end,
     link_to_local_absolute_path = function(path, tgt)
@@ -805,10 +805,10 @@ dothis = {
   local_extant_path_arr = {
     zip_to_local_absolute_path = function(arr, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.string.string_by_single_quoted_escaped(tgt) .. " " .. transf.string.string_by_single_quoted_escaped(get.string_or_number_arr.string_by_joined(arr, " ")))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.str.str_by_single_quoted_escaped(tgt) .. " " .. transf.str.str_by_single_quoted_escaped(get.str_or_number_arr.str_by_joined(arr, " ")))
     end,
     zip_to_absolute_path = function(arr, tgt)
-      local tmptgt = transf.string.in_tmp_dir(tgt, "temp_zip_target")
+      local tmptgt = transf.str.in_tmp_dir(tgt, "temp_zip_target")
       dothis.local_absolute_path_arr.zip_to_local_absolute_path(arr, tmptgt)
       dothis.extant_path.move_to_absolute_path(tmptgt, tgt)
     end,
@@ -829,15 +829,15 @@ dothis = {
   
   labelled_remote_file = {
     write_file = function(path, contents)
-      local temp_file = transf.string.in_tmp_dir(path, "labelled_remote_temp_file")
+      local temp_file = transf.str.in_tmp_dir(path, "labelled_remote_temp_file")
       dothis.local_extant_path.write_file(temp_file, contents)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone copyto" .. transf.string.string_by_single_quoted_escaped(temp_file) .. " " .. transf.string.string_by_single_quoted_escaped(path))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone copyto" .. transf.str.str_by_single_quoted_escaped(temp_file) .. " " .. transf.str.str_by_single_quoted_escaped(path))
       dothis.absolute_path.delete(temp_file)
     end,
     append_or_write_file = function(path, contents)
-      local temp_file = transf.string.in_tmp_dir(path, "labelled_remote_temp_file")
+      local temp_file = transf.str.in_tmp_dir(path, "labelled_remote_temp_file")
       dothis.local_extant_path.append_or_write_file(temp_file, contents)
-      dothis.labelled_remote_file.write_file(path, transf.local_file.string_by_contents(temp_file))
+      dothis.labelled_remote_file.write_file(path, transf.local_file.str_by_contents(temp_file))
     end,
   },
   labelled_remote_dir = {
@@ -846,7 +846,7 @@ dothis = {
       dothis.labelled_remote_nonextant_path.create_dir(path)
     end,
     delete_dir = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone purge " .. transf.string.string_by_single_quoted_escaped(path))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone purge " .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
   remote_file = {
@@ -881,7 +881,7 @@ dothis = {
       plfile.copy(path, tgt)
     end,
     edit_file_in_vscode_act_on_path = function(path, do_after)
-      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.string.string_by_single_quoted_escaped(path), function()
+      dothis.str.env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.str.str_by_single_quoted_escaped(path), function()
         if do_after then
           do_after(path)
         end
@@ -889,8 +889,8 @@ dothis = {
       end)
     end,
     edit_file_in_vscode_act_on_contents = function(path, do_after)
-      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.string.string_by_single_quoted_escaped(path), function()
-        local contents = transf.file.string_by_contents(path)
+      dothis.str.env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.str.str_by_single_quoted_escaped(path), function()
+        local contents = transf.file.str_by_contents(path)
         dothis.absolute_path.delete(path)
         do_after(contents)
       end)
@@ -898,7 +898,7 @@ dothis = {
   },
   local_dir = {
     empty_dir = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rm -rf " .. transf.string.string_by_single_quoted_escaped(
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rm -rf " .. transf.str.str_by_single_quoted_escaped(
         transf.path.ending_with_slash(path) .. "*"
       ) .. "/*")
     end,
@@ -974,7 +974,7 @@ dothis = {
     end,
     copy_to_absolute_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone copyto " .. transf.string.string_by_single_quoted_escaped(path) .. " " .. transf.string.string_by_single_quoted_escaped(tgt))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone copyto " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
     end,
     copy_into_absolute_path = function(path, tgt)
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
@@ -988,7 +988,7 @@ dothis = {
     end,
     move_to_absolute_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone moveto " .. transf.string.string_by_single_quoted_escaped(path) .. " " .. transf.string.string_by_single_quoted_escaped(tgt))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone moveto " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
     end,
     move_into_absolute_path = function(path, tgt)
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
@@ -1050,16 +1050,16 @@ dothis = {
   },
   file = {
     do_in_path = function(path, cmd, do_after)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.string_by_single_quoted_escaped(transf.path.parent_path(path)) .. " && " .. cmd, do_after)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("cd " .. transf.str.str_by_single_quoted_escaped(transf.path.parent_path(path)) .. " && " .. cmd, do_after)
     end,
     write_file = function(path, contents)
       dothis[
-        transf.path.local_or_remote_string(path) .. "_extant_path"
+        transf.path.local_or_remote_str(path) .. "_extant_path"
       ].write_file(path, contents)
     end,
     append_or_write_file = function(path, contents)
       dothis[
-        transf.path.local_or_remote_string(path) .. "_extant_path"
+        transf.path.local_or_remote_str(path) .. "_extant_path"
       ].append_or_write_file(path, contents)
     end,
     write_file_if_file = function(path, contents)
@@ -1070,7 +1070,7 @@ dothis = {
     end,
     delete_file = function(path)
       dothis[
-        transf.path.local_or_remote_string(path) .. "_extant_path"
+        transf.path.local_or_remote_str(path) .. "_extant_path"
       ].delete_file(path)
     end,
     delete_file_if_empty_file = function(path)
@@ -1082,7 +1082,7 @@ dothis = {
   },
   audio_file = {
     play = function(path, do_after)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("play " .. transf.string.string_by_single_quoted_escaped(path), do_after)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("play " .. transf.str.str_by_single_quoted_escaped(path), do_after)
     end
   },
   local_image_file = {
@@ -1106,7 +1106,7 @@ dothis = {
   local_zip_file = {
     unzip_to_absolute_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("unzip " .. transf.string.string_by_single_quoted_escaped(path) .. " -d " .. transf.string.string_by_single_quoted_escaped(tgt))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("unzip " .. transf.str.str_by_single_quoted_escaped(path) .. " -d " .. transf.str.str_by_single_quoted_escaped(tgt))
     end,
     unzip_into_absolute_path = function(path, tgt)
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.filename(path)
@@ -1126,7 +1126,7 @@ dothis = {
   plaintext_file = {
     append_lines = function(path, lines)
       local contents = transf.plaintext_file.one_final_newline(path)
-      dothis.absolute_path.write_file_if_file(path, contents .. get.string_or_number_arr.string_by_joined(lines, "\n"))
+      dothis.absolute_path.write_file_if_file(path, contents .. get.str_or_number_arr.str_by_joined(lines, "\n"))
     end,
     append_line = function(path, line)
       dothis.plaintext_file.append_lines(path, {line})
@@ -1138,43 +1138,43 @@ dothis = {
     append_line_and_commit_by_prompted = function(path)
       dothis.plaintext_file.append_line_and_commit(
         path,
-        get.string.string_by_prompted_once_from_default(
+        get.str.str_by_prompted_once_from_default(
           "",
           "Enter line to add to " .. path
         )
       )
     end,
     write_lines = function(path, lines)
-      dothis.absolute_path.write_file_if_file(path, get.string_or_number_arr.string_by_joined(lines, "\n"))
+      dothis.absolute_path.write_file_if_file(path, get.str_or_number_arr.str_by_joined(lines, "\n"))
     end,
     set_line = function(path, line, line_number)
-      local lines = transf.plaintext_file.string_arr_by_lines(path)
+      local lines = transf.plaintext_file.str_arr_by_lines(path)
       lines[line_number] = line
       dothis.plaintext_file.write_lines(path, lines)
     end,
     pop_line = function(path)
-      local lines = transf.plaintext_file.string_arr_by_lines(path)
+      local lines = transf.plaintext_file.str_arr_by_lines(path)
       local line = dothis.arr.remove_by_index(lines, #lines)
       dothis.plaintext_file.write_lines(path, lines)
       return line
     end,
     remove_line_w_pos_int = function(path, line_number)
-      local lines = transf.plaintext_file.string_arr_by_lines(path)
+      local lines = transf.plaintext_file.str_arr_by_lines(path)
       dothis.arr.remove_by_index(lines, line_number)
       dothis.plaintext_file.write_lines(path, lines)
     end,
     remove_line_w_fn = function(path, cond)
-      local lines = transf.plaintext_file.string_arr_by_lines(path)
+      local lines = transf.plaintext_file.str_arr_by_lines(path)
       local index = get.arr.pos_int_or_nil_by_first_match_w_fn(lines, cond)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
-    remove_line_w_string = function(path, cond)
-      local lines = transf.plaintext_file.string_arr_by_lines(path)
+    remove_line_w_str = function(path, cond)
+      local lines = transf.plaintext_file.str_arr_by_lines(path)
       local index = get.arr.pos_int_or_nil_by_first_match_w_t(lines, cond)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
     find_remove_nocomment_noindent_line = function(path, cond)
-      local lines = transf.plaintext_file.string_arr_by_lines(path)
+      local lines = transf.plaintext_file.str_arr_by_lines(path)
       local index = get.arr.pos_int_or_nil_by_first_match_w_fn(lines, function(line)
         local nocomment_noindent = transf.line.nocomment_noindent(line)
         return findsingle(nocomment_noindent, cond)
@@ -1186,7 +1186,7 @@ dothis = {
   plaintext_table_file = {
     append_arr_of_arrs_of_fields = function(path, arr_of_arrs_of_fields)
       local lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr_of_arrs_of_fields, function (arr)
-        return get.string_or_number_arr.string_by_joined(arr, transf.plaintext_table_file.field_separator())
+        return get.str_or_number_arr.str_by_joined(arr, transf.plaintext_table_file.field_separator())
       end)
       dothis.plaintext_file.append_lines(path, lines)
     end,
@@ -1204,9 +1204,9 @@ dothis = {
     download_attachment = function(path, name, do_after)
       local cache_path = env.XDG_CACHE_HOME .. '/hs/email_attachments'
       local att_path = cache_path .. '/' .. name
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         'cd ' .. transf.single_quoted_escaped(cache_path) .. ' && mshow -x'
-        .. transf.string.string_by_single_quoted_escaped(path) .. transf.string.string_by_single_quoted_escaped(name),
+        .. transf.str.str_by_single_quoted_escaped(path) .. transf.str.str_by_single_quoted_escaped(name),
         function()
           do_after(att_path)
         end
@@ -1221,19 +1221,19 @@ dothis = {
       )
     end,
     send = function(path, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-        "msmtp -t <" .. transf.string.string_by_single_quoted_escaped(path),
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "msmtp -t <" .. transf.str.str_by_single_quoted_escaped(path),
         function(res)
           if not res then
-            dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.string_by_contents(path))
+            dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.str_by_contents(path))
             dothis.absolute_path.delete(path)
           else
-            dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+            dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
               "cat" ..
-              transf.string.string_by_single_quoted_escaped(path) .. "| msed" ..
-              transf.string.string_by_single_quoted_escaped("/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time())) ..
-              "| msed".. transf.string.string_by_single_quoted_escaped("/Status/a/S/") ..
-              "| mdeliver -c" .. transf.string.string_by_single_quoted_escaped(env.MBSYNC_ARCHIVE),
+              transf.str.str_by_single_quoted_escaped(path) .. "| msed" ..
+              transf.str.str_by_single_quoted_escaped("/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time())) ..
+              "| msed".. transf.str.str_by_single_quoted_escaped("/Status/a/S/") ..
+              "| mdeliver -c" .. transf.str.str_by_single_quoted_escaped(env.MBSYNC_ARCHIVE),
               function()
                 dothis.absolute_path.delete(path)
                 if do_after then
@@ -1247,7 +1247,7 @@ dothis = {
     end,
     edit_then_send = function(path, do_after)
       dothis.local_file.edit_file_in_vscode_act_on_contents(path, function(str)
-        dothis.absolute_path.write_file(path, get.string.string_by_evaled_as_template(str)) -- re-eval
+        dothis.absolute_path.write_file(path, get.str.str_by_evaled_as_template(str)) -- re-eval
         dothis.email_file.send(path, do_after)
       end)
     end,
@@ -1266,15 +1266,15 @@ dothis = {
       dothis.email_specifier.edit_then_send(transf.email_file.forward_email_specifier(path), do_after)
     end,
     move = function(source, target)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-        "mdeliver" .. transf.string.string_by_single_quoted_escaped(target) ..
-        "<" .. transf.string.string_by_single_quoted_escaped(source),
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "mdeliver" .. transf.str.str_by_single_quoted_escaped(target) ..
+        "<" .. transf.str.str_by_single_quoted_escaped(source),
         function()
-          dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-            "minc" .. transf.string.string_by_single_quoted_escaped(target), -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
+          dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+            "minc" .. transf.str.str_by_single_quoted_escaped(target), -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
             function ()
-              dothis.string.env_bash_eval_async(
-                "rm" .. transf.string.string_by_single_quoted_escaped(source)
+              dothis.str.env_bash_eval_async(
+                "rm" .. transf.str.str_by_single_quoted_escaped(source)
               )
             end
           )
@@ -1292,7 +1292,7 @@ dothis = {
       )
     end,
     do_in_path = function(path, cmd, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("cd " .. transf.string.string_by_single_quoted_escaped(path) .. " && " .. cmd, do_after or function() end)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("cd " .. transf.str.str_by_single_quoted_escaped(path) .. " && " .. cmd, do_after or function() end)
     end,
     delete_child_with_leaf_ending = function(path, ending)
       dothis.absolute_path.delete(
@@ -1301,12 +1301,12 @@ dothis = {
     end,
     empty_dir = function(path)
       dothis[
-        transf.path.local_or_remote_string(path) .. "_extant_path"
+        transf.path.local_or_remote_str(path) .. "_extant_path"
       ].empty_dir(path)
     end,
     delete_dir = function(path)
       dothis[
-        transf.path.local_or_remote_string(path) .. "_extant_path"
+        transf.path.local_or_remote_str(path) .. "_extant_path"
       ].delete_dir(path)
     end,
     delete_dir_if_empty_dir = function(path)
@@ -1386,20 +1386,20 @@ dothis = {
 
   },
   sqlite_file = {
-    query_w_csv_string_arg_fn = function(sqlite_file, query, fn)
-      dothis.string.env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped(
+    query_w_csv_str_arg_fn = function(sqlite_file, query, fn)
+      dothis.str.env_bash_eval_w_str_arg_fn_str_arg_fn_by_stripped(
         "sqlite3" ..
-        transf.string.string_by_single_quoted_escaped(sqlite_file) ..
+        transf.str.str_by_single_quoted_escaped(sqlite_file) ..
         "-csv" ..
-        transf.string.string_by_single_quoted_escaped(query)
+        transf.str.str_by_single_quoted_escaped(query)
       , fn, error)
     end,
     query_w_table_arg_fn = function(sqlite_file, query, fn)
-      dothis.string.env_bash_eval_w_table_arg_fn_string_arg_fn(
+      dothis.str.env_bash_eval_w_table_arg_fn_str_arg_fn(
         "sqlite3" ..
-        transf.string.string_by_single_quoted_escaped(sqlite_file) ..
+        transf.str.str_by_single_quoted_escaped(sqlite_file) ..
         "-json" ..
-        transf.string.string_by_single_quoted_escaped(query),
+        transf.str.str_by_single_quoted_escaped(query),
         fn, error)
     end,
   },
@@ -1434,7 +1434,7 @@ dothis = {
         env.NEWSBOAT_URLS,
         {
           url = url,
-          title = transf.sgml_url.string_or_nil_by_title(url),
+          title = transf.sgml_url.str_or_nil_by_title(url),
           category = category,
         }
       )
@@ -1442,7 +1442,7 @@ dothis = {
   },
   audiodevice = {
     set_default = function(device, type)
-      device["setDefault" .. transf.string.string_by_first_eutf8_upper(type) .. "Device"](device)
+      device["setDefault" .. transf.str.str_by_first_eutf8_upper(type) .. "Device"](device)
     end,
     ensure_sound_will_be_played = function(device)
       device:setOutputMuted(false)
@@ -1467,13 +1467,13 @@ dothis = {
   },
   ics_file = {
     add_events_from_file = function(path, calendar)
-      dothis.string.env_bash_eval("khal import --include-calendar " .. calendar .. " " .. transf.string.string_by_single_quoted_escaped(path))
+      dothis.str.env_bash_eval("khal import --include-calendar " .. calendar .. " " .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
   git_root_dir = {
     run_hook =  function(path, hook)
       local hook_path = get.git_root_dir.hook_path(path, hook)
-      dothis.string.env_bash_eval(hook_path)
+      dothis.str.env_bash_eval(hook_path)
     end,
     add_hook = function(path, hook_path, name)
       name = name or transf.path.filename(hook_path)
@@ -1520,12 +1520,12 @@ dothis = {
       dothis.local_extant_path.do_in_path(path, "git fetch")
     end,
     add_self = function(path, do_after)
-      dothis.local_extant_path.do_in_path(path, "git add" .. transf.string.string_by_single_quoted_escaped(path), do_after)
+      dothis.local_extant_path.do_in_path(path, "git add" .. transf.str.str_by_single_quoted_escaped(path), do_after)
     end,
     commit_self = function(path, message, do_after)
       dothis.local_extant_path.do_in_path(
         path, 
-        "git commit -m" .. transf.string.string_by_single_quoted_escaped(message or ("Programmatic commit of " .. path .. " at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        "git commit -m" .. transf.str.str_by_single_quoted_escaped(message or ("Programmatic commit of " .. path .. " at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
       )
     end,
@@ -1539,7 +1539,7 @@ dothis = {
     commit_staged = function(path, message, do_after)
       dothis.local_extant_path.do_in_path(
         path, 
-        "git commit -m" .. transf.string.string_by_single_quoted_escaped(message or ("Programmatic commit of staged files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        "git commit -m" .. transf.str.str_by_single_quoted_escaped(message or ("Programmatic commit of staged files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
       )
     end,
@@ -1556,7 +1556,7 @@ dothis = {
     commit_all_root_no_untracked = function(path, message, do_after)
       dothis.local_extant_path.do_in_path(
         transf.in_git_dir.git_root_dir(path), 
-        "git commit -am" .. transf.string.string_by_single_quoted_escaped(message or ("Programmatic commit of all tracked files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        "git commit -am" .. transf.str.str_by_single_quoted_escaped(message or ("Programmatic commit of all tracked files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
       )
     end
@@ -1569,7 +1569,7 @@ dothis = {
       dothis.table.choose_w_vt_fn(
         tblmap.date_format_name.date_format,
         function(date_format)
-          fn(get.date.string_w_date_format_indicator(dt, date_format))
+          fn(get.date.str_w_date_format_indicator(dt, date_format))
         end
       )
     end
@@ -1598,12 +1598,12 @@ dothis = {
       local newcnt = transf.two_table_or_nils.table_by_take_new(tblcnt, table)
       dothis.local_file.write_file(
         path,
-        transf.not_userdata_or_function.json_string(newcnt)
+        transf.not_userdata_or_function.json_str(newcnt)
       )
     end
   },
   entry_logging_dir = {
-    log_string = function(path, str)
+    log_str = function(path, str)
       dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(path, {
         [os.time() * 1000] = {
           entry = str
@@ -1629,12 +1629,12 @@ dothis = {
       hs.timer.doAt(seconds_to_wait, fn)
     end
   },
-  string_arr = {
+  str_arr = {
     join_and_paste = function(arr, sep)
-      dothis.string.paste_le(transf.string.join(arr, sep))
+      dothis.str.paste_le(transf.str.join(arr, sep))
     end,
     fill_with = function(arr)
-      dothis.string_arr.join_and_paste(arr, "\t")
+      dothis.str_arr.join_and_paste(arr, "\t")
     end
   },
   url_arr = {
@@ -1645,14 +1645,14 @@ dothis = {
     end,
     create_as_url_files = function(url_arr, path)
       local abs_path_assoc = get.url_arr.absolute_path_key_assoc_of_url_files(url_arr, path)
-      dothis.absolute_path_string_value_assoc.write(abs_path_assoc)
+      dothis.absolute_path_str_value_assoc.write(abs_path_assoc)
     end,
     create_as_session = function(url_arr, root)
       local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(root)
-      path = get.string.string_by_with_suffix(path, ".session")
+      path = get.str.str_by_with_suffix(path, ".session")
       dothis.absolute_path.write_file(
         path,
-        transf.url_arr.session_string(url_arr)
+        transf.url_arr.session_str(url_arr)
       )
     end,
     
@@ -1674,9 +1674,9 @@ dothis = {
       end
     end,
   },
-  absolute_path_string_value_assoc = {
-    write = function(absolute_path_string_value_assoc)
-      for absolute_path, contents in transf.table.key_value_stateless_iter(absolute_path_string_value_assoc) do
+  absolute_path_str_value_assoc = {
+    write = function(absolute_path_str_value_assoc)
+      for absolute_path, contents in transf.table.key_value_stateless_iter(absolute_path_str_value_assoc) do
         dothis.absolute_path.write_file(absolute_path, contents)
       end
     end,
@@ -1760,14 +1760,14 @@ dothis = {
   },
   jxa_tab_specifier = {
     make_main = function(jxa_tab_specifier)
-      get.string.evaled_js_osa( ("Application('%s').windows()[%d].activeTabIndex = %d"):format(
+      get.str.evaled_js_osa( ("Application('%s').windows()[%d].activeTabIndex = %d"):format(
         jxa_tab_specifier.application_name,
         jxa_tab_specifier.window_index,
         jxa_tab_specifier.tab_index
       ))
     end,
     close = function(jxa_tab_specifier)
-      get.string.evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].close()"):format(
+      get.str.evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].close()"):format(
         jxa_tab_specifier.application_name,
         jxa_tab_specifier.window_index,
         jxa_tab_specifier.tab_index
@@ -1806,7 +1806,7 @@ dothis = {
   },
   iban = {
     fill_bank_form = function(iban)
-      dothis.string_arr.fill_with(transf.iban.iban_bic_bank_name_arr(iban))
+      dothis.str_arr.fill_with(transf.iban.iban_bic_bank_name_arr(iban))
     end
   },
   running_application = {
@@ -1828,16 +1828,16 @@ dothis = {
       )
     end,
   },
-  env_string = {
+  env_str = {
     write_and_check = function(str, path)
       dothis.absolute_path.write_file(path, str)
-      local errors = transf.shellscript_file.gcc_string_errors(path)
+      local errors = transf.shellscript_file.gcc_str_errors(path)
       if errors then
         error("env file " .. path .. " has errors:\n" .. errors)
       end
     end,
     write_env_and_check = function(str)
-      dothis.env_string.write_and_check(
+      dothis.env_str.write_and_check(
         str,
         env.ENVFILE
       )
@@ -1848,7 +1848,7 @@ dothis = {
       local csl_table = transf[indication].csl_table_by_online(citable_object_id)
       dothis.absolute_path.write_file(
         env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table) .. ".json",
-        transf.not_userdata_or_function.json_string(csl_table)
+        transf.not_userdata_or_function.json_str(csl_table)
       )
     end,
   },
@@ -1856,7 +1856,7 @@ dothis = {
     write_bib = function(citations_file, path)
       dothis.absolute_path.write_file(
         path,
-        transf.citations_file.bib_string(citations_file)
+        transf.citations_file.bib_str(citations_file)
       )
     end,
     add_indicated_citable_object_id = function(citations_file, indicated_citable_object_id)
@@ -1955,11 +1955,11 @@ dothis = {
       dothis.arr.each(
         transf.omegat_project_dir.target_files(dir),
         function(file)
-          transf.string.string_or_nil_by_evaled_env_bash_stripped("soffice --headless --convert-to txt:Text --outdir"..
-          transf.string.string_by_single_quoted_escaped(
+          transf.str.str_or_nil_by_evaled_env_bash_stripped("soffice --headless --convert-to txt:Text --outdir"..
+          transf.str.str_by_single_quoted_escaped(
             transf.omegat_project_dir.target_txt_dir(dir)
           ) ..
-          transf.string.string_by_single_quoted_escaped(file))
+          transf.str.str_by_single_quoted_escaped(file))
         end
       )
       error("TODO: Watch dir, count files every second or so until they are all there, then do_after. Perhaps refactor this into a general function")
@@ -2041,8 +2041,8 @@ dothis = {
     end,
   },
   youtube_playlist_id = {
-    --- @param id string
-    --- @param do_after? fun(result: string): nil
+    --- @param id str
+    --- @param do_after? fun(result: str): nil
     delete = function(id, do_after)
       rest({
         api_name = "youtube",
@@ -2051,8 +2051,8 @@ dothis = {
         request_verb = "DELETE",
       }, do_after)
     end,
-    --- @param id string
-    --- @param video_id string
+    --- @param id str
+    --- @param video_id str
     --- @param index? number
     --- @param do_after? fun(): nil
     add_youtube_video_id = function(id, video_id, index, do_after)
@@ -2075,9 +2075,9 @@ dothis = {
       end
       rest(req, do_after)
     end,
-    --- @param id string
-    --- @param video_ids string[]
-    --- @param do_after? fun(id: string): nil
+    --- @param id str
+    --- @param video_ids str[]
+    --- @param do_after? fun(id: str): nil
     add_youtube_video_id_arr = function(id, video_ids, do_after)
       local next_vid = transf.arr.index_value_stateful_iter(video_ids)
       local add_next_vid
@@ -2105,8 +2105,8 @@ dothis = {
     end
   },
   youtube_playlist_creation_specifier = {
-    --- @param spec {title?: string, description?: string, privacyStatus?: string, youtube_video_id_arr?: string[]}
-    --- @param do_after? fun(id: string): nil
+    --- @param spec {title?: str, description?: str, privacyStatus?: str, youtube_video_id_arr?: str[]}
+    --- @param do_after? fun(id: str): nil
     create_youtube_playlist = function(spec, do_after)
       rest({
         api_name = "youtube",
@@ -2114,8 +2114,8 @@ dothis = {
         params = { part = "snippet,status" },
         request_table = {
           snippet = {
-            title = spec.title or get.string.string_by_formatted_w_n_anys("Playlist from %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
-            description = spec.description or get.string.string_by_formatted_w_n_anys("Created at %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
+            title = spec.title or get.str.str_by_formatted_w_n_anys("Playlist from %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
+            description = spec.description or get.str.str_by_formatted_w_n_anys("Created at %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
           }
         },
       }, function(result)
@@ -2307,9 +2307,9 @@ dothis = {
       dothis.mpv_ipc_socket_id.set(
         id, 
         key,
-        get.binary_specifier.string_or_bool_by_inverted(
+        get.binary_specifier.str_or_bool_by_inverted(
           tblmap.binary_specifier_name.binary_specifier["inf_no"],
-          get.mpv_ipc_socket_id.string(id, key)
+          get.mpv_ipc_socket_id.str(id, key)
         )
       )
     end,
@@ -2390,8 +2390,8 @@ dothis = {
   stream_creation_specifier = {
     create_inner_item = function(spec)
       local ipc_socket_id = os.time() .. "-" .. math.random(1000000)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("mpv " .. transf.stream_creation_specifier.flags_string(spec) .. 
-        " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.string_arr.single_quoted_escaped_string(spec.urls))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("mpv " .. transf.stream_creation_specifier.flags_str(spec) .. 
+        " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.str_arr.single_quoted_escaped_str(spec.urls))
       return {
         ipc_socket_id = ipc_socket_id,
         state = "booting"
@@ -2418,7 +2418,7 @@ dothis = {
   },
   task_creation_specifier = {
     create_inner_item = function(spec)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         spec.opts
       )
     end,
@@ -2539,7 +2539,7 @@ dothis = {
   },
   timer_spec = {
     set_next_timestamp_s = function(spec)
-      spec.next_timestamp_s = transf.cronspec_string.timestamp_s_by_next(spec.cronspec_string)
+      spec.next_timestamp_s = transf.cronspec_str.timestamp_s_by_next(spec.cronspec_str)
     end,
     postpone_next_timestamp_s = function(spec, s)
       spec.next_timestamp_s = spec.next_timestamp_s + s
@@ -2578,14 +2578,14 @@ dothis = {
         arr,
         {
           fn = fn,
-          cronspec_string = "*/10 * * * *",
+          cronspec_str = "*/10 * * * *",
         }
       )
     end
   },
-  preference_domain_string = {
+  preference_domain_str = {
     write_default = function(domain, key, value, type)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("defaults write" .. transf.string.string_by_single_quoted_escaped(domain) .. transf.string.string_by_single_quoted_escaped(key) .. " -" .. type .. " " .. transf.string.string_by_single_quoted_escaped(value))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("defaults write" .. transf.str.str_by_single_quoted_escaped(domain) .. transf.str.str_by_single_quoted_escaped(key) .. " -" .. type .. " " .. transf.str.str_by_single_quoted_escaped(value))
     end
 
   },
@@ -2689,19 +2689,19 @@ dothis = {
       )
     end
   },
-  input_spec_string_arr = {
+  input_spec_str_arr = {
     exec = function(strarr, wait_time, do_after)
       dothis.input_spec_arr.exec(
-        transf.input_spec_string_arr.input_spec_arr(strarr),
+        transf.input_spec_str_arr.input_spec_arr(strarr),
         wait_time,
         do_after
       )
     end
   },
-  input_spec_series_string = {
+  input_spec_series_str = {
     exec = function(str, wait_time, do_after)
       dothis.input_spec_arr.exec(
-        transf.input_spec_series_string.input_spec_arr(str),
+        transf.input_spec_series_str.input_spec_arr(str),
         wait_time,
         do_after 
       )
@@ -2710,16 +2710,16 @@ dothis = {
   },
   ["nil"] = {
     vdirsyncer_sync = function()
-      dothis.string.env_bash_eval_async("vdirsyncer sync")
+      dothis.str.env_bash_eval_async("vdirsyncer sync")
     end,
     newsboat_reload = function()
-      dothis.string.env_bash_eval_async("newsboat -x reload")
+      dothis.str.env_bash_eval_async("newsboat -x reload")
     end,
     sox_rec_start_cache = function(do_after)
-      dothis.local_absolute_path.start_recording_to(transf.string.in_cache_dir(os.time(), "recording"), do_after)
+      dothis.local_absolute_path.start_recording_to(transf.str.in_cache_dir(os.time(), "recording"), do_after)
     end,
     sox_rec_stop = function(do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("killall rec", do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("killall rec", do_after)
     end,
     sox_rec_toggle_cache = function(do_after)
       if transf["nil"].sox_is_recording() then
@@ -2729,10 +2729,10 @@ dothis = {
       end
     end,
     mullvad_connect = function()
-      dothis.string.env_bash_eval_async("mullvad connect")
+      dothis.str.env_bash_eval_async("mullvad connect")
     end,
     mullvad_disconnect = function()
-      dothis.string.env_bash_eval_async("mullvad disconnect")
+      dothis.str.env_bash_eval_async("mullvad disconnect")
     end,
     mullvad_toggle = function()
       if transf["nil"].mullvad_bool_connected() then
@@ -2742,7 +2742,7 @@ dothis = {
       end
     end,
     mbsync_sync  = function()
-      dothis.string.env_bash_eval('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel')
+      dothis.str.env_bash_eval('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel')
     end,
     purge_memstore_cache = function()
       memstore = {}
@@ -2753,10 +2753,10 @@ dothis = {
       )
     end,
     firefox_dump_state = function(do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
     end,
     newpipe_extract_backup = function(do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
     end,
     omegat_create_all_translated_documents = function()
       dothis.mac_application_name.execute_full_action_path(
@@ -2778,7 +2778,7 @@ dothis = {
     end,
     -- expects to be called on a watcher for tachiyomi state
     tachiyomi_backup = function()
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
         local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_function(env.TMP_TACHIYOMI_JSON))
         tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
         dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
@@ -2876,13 +2876,13 @@ dothis = {
       )
     end,
     signal_generate_backup = function(_, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "sigtop export-messages -f json" ..
-        transf.string.string_by_single_quoted_escaped(
-          transf.string.in_cache_dir("signal", "export") .. "/chats"
+        transf.str.str_by_single_quoted_escaped(
+          transf.str.in_cache_dir("signal", "export") .. "/chats"
         ) .. "&& sigtop export-attachments" ..
-        transf.string.string_by_single_quoted_escaped(
-          transf.string.in_cache_dir("signal", "export") .. "/media"
+        transf.str.str_by_single_quoted_escaped(
+          transf.str.in_cache_dir("signal", "export") .. "/media"
         ),
         do_after
       )
@@ -2890,8 +2890,8 @@ dothis = {
     facebook_generate_backup = function(_, do_after)
       dothis.fn_queue_specifier.push(main_qspec,
       function()
-        dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -a Firefox" .. 
-          transf.string.string_by_single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings") " && sleep 1", function()
+        dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open -a Firefox" .. 
+          transf.str.str_by_single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings") " && sleep 1", function()
             hs.eventtap.keyStroke({"cmd"}, "0") -- reset zoom
             local ff_window = transf.running_application.main_window(
               transf.mac_application_name.running_application("Firefox")
@@ -2921,9 +2921,9 @@ dothis = {
       )
     end,
     discord_generate_backup = function(_, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-        "dscexport exportdm --media --reuse-media -f json --dateformat unix -o" .. transf.string.string_by_single_quoted_escaped(
-          transf.string.in_cache_dir("discord", "export")
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "dscexport exportdm --media --reuse-media -f json --dateformat unix -o" .. transf.str.str_by_single_quoted_escaped(
+          transf.str.in_cache_dir("discord", "export")
         ),
         do_after
       )
@@ -2933,7 +2933,7 @@ dothis = {
       local fbfiles = get.path_arr.path_arr_by_filter_to_filename_starting(dlchildren, "facebook-samswartzberg")
       local fbzips = get.path_arr.path_arr_by_filter_to_same_extension(fbfiles, "zip")
       local newest_fbzip = transf.extant_path_arr.extant_path_by_newest_creation(fbzips)
-      local tmploc = transf.string.in_tmp_dir("facebook", "export")
+      local tmploc = transf.str.in_tmp_dir("facebook", "export")
       dothis.local_zip_file.unzip_to_absolute_path(newest_fbzip, tmploc)
       dothis.file.delete_file(newest_fbzip)
       dothis.facebook_raw_export_dir.process_to_facebook_export_dir(tmploc)
@@ -2973,7 +2973,7 @@ dothis = {
       end
       dothis.extant_path.move_to_absolute_path(
         dir,
-        transf.string.in_cache_dir("telegram", "export")
+        transf.str.in_cache_dir("telegram", "export")
       )
 
     end,
@@ -2994,7 +2994,7 @@ dothis = {
       end
       dothis.extant_path.move_to_absolute_path(
         actual_dir,
-        transf.string.in_cache_dir("facebook", "export")
+        transf.str.in_cache_dir("facebook", "export")
       )
     end
   },
@@ -3022,7 +3022,7 @@ dothis = {
       for i=1, #params do
         local param = params[i]
         if param == nil then param = nil_singleton 
-        elseif opts.stringify_table_params and is.any.table(param) then
+        elseif opts.strify_table_params and is.any.table(param) then
           if opts.table_param_subset == "json" then
             param = json.encode(param)
           elseif opts.table_param_subset == "no-fn-userdata-loops" then
@@ -3047,11 +3047,11 @@ dothis = {
   },
   fnname = {
     put_memo = function(fnid, opts_as_str, params, result, opts)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_arr_or_nil(fnid, opts_as_str, params)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, params)
       dothis.absolute_path.write_file(cache_path, json.encode(result))
     end,
     reset_by_opts = function(fnid, opts_as_str)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_arr_or_nil(fnid, opts_as_str)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str)
       dothis.absolute_path.delete(cache_path)
     end,
     reset_by_all = function(fnname)
@@ -3060,7 +3060,7 @@ dothis = {
       )
     end,
     set_timestamp_s_created_time = function(fnid, opts_as_str, created_time)
-      dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_string_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~"), tostring(created_time))
+      dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~"), tostr(created_time))
     end
   },
   fn_queue_specifier = {
@@ -3069,8 +3069,8 @@ dothis = {
       if #qspec.fn_arr == 0 then 
         dothis.hotkey_created_item_specifier.pause(qspec.hotkey_created_item_specifier)
       else
-        qspec.alert = dothis.string.alert(
-          transf.fn_queue_specifier.string_by_waiting_message(qspec),
+        qspec.alert = dothis.str.alert(
+          transf.fn_queue_specifier.str_by_waiting_message(qspec),
           "indefinite"
         )
         dothis.hotkey_created_item_specifier.resume(qspec.hotkey_created_item_specifier)
@@ -3127,14 +3127,14 @@ dothis = {
   backup_type = {
     log = function(typ)
       dothis.export_dir.log(
-        transf.string.in_cache_dir(typ, "export"),
+        transf.str.in_cache_dir(typ, "export"),
         typ
       )
     end
   },
   search_engine = {
     search = function(engine, query)
-      dothis.string.search(query, engine)
+      dothis.str.search(query, engine)
     end
   }
 }

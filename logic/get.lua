@@ -1,33 +1,33 @@
 get = {
-  string_or_number = {
+  str_or_number = {
     number_or_nil = function(t, base)
-      if is.any.string(t) then
-        return get.string.number_or_nil(t, base)
+      if is.any.str(t) then
+        return get.str.number_or_nil(t, base)
       else
         return t
       end
     end,
     int_by_rounded_or_nil = function(t, base)
-      if is.any.string(t) then
-        return get.string.int_by_rounded_or_nil(t, base)
+      if is.any.str(t) then
+        return get.str.int_by_rounded_or_nil(t, base)
       else
         return t
       end
     end,
     pos_int_or_nil = function(t, base)
       return transf.number.pos_int_or_nil(
-        get.string_or_number.number_or_nil(t, base)
+        get.str_or_number.number_or_nil(t, base)
       )
     end,
   },
   int_or_nil = {
     prompted_once_int_from_default = function(int, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_bool,
-        transformer = get.string.int_by_rounded_or_nil,
+        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        transformer = get.str.int_by_rounded_or_nil,
         prompt_args = {
           message = message or "Enter an int...",
-          default = transf.number.nonindicated_decimal_number_string(int or 0),
+          default = transf.number.nonindicated_decimal_number_str(int or 0),
         }
       })
     end,
@@ -35,48 +35,48 @@ get = {
   number_or_nil = {
     prompted_once_number_from_default = function(no, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_bool,
-        transformer = get.string.number_or_nil,
+        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        transformer = get.str.number_or_nil,
         prompt_args = {
           message = message or "Enter a number...",
-          default = transf.number.nonindicated_decimal_number_string(no or 0),
+          default = transf.number.nonindicated_decimal_number_str(no or 0),
         }
       })
     end,
   },
 
   package_manager_name_or_nil = {
-    package_name_semver_compound_string_arr = function(mgr, arg) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
-    package_name_semver_package_manager_name_compound_string_arr = function(mgr, arg) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
-    package_name_package_manager_name_compound_string = function(mgr, arg) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
-    semver_string_arr = function(mgr, arg) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
-    absolute_path_arr = function(mgr, arg) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
+    package_name_semver_compound_str_arr = function(mgr, arg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
+    package_name_semver_package_manager_name_compound_str_arr = function(mgr, arg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
+    package_name_package_manager_name_compound_str = function(mgr, arg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-package-manager " .. (arg or ""))) end,
+    semver_str_arr = function(mgr, arg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
+    absolute_path_arr = function(mgr, arg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
-    bool_arr_installed = function(mgr, arg) return transf.string.bool_by_evaled_env_bash_success( "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
+    bool_arr_installed = function(mgr, arg) return transf.str.bool_by_evaled_env_bash_success( "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
   },
   calendar_name = {
    
   },
   khal = {
     parseable_format_specifier = function()
-      return get.string_or_number_arr.string_by_joined(
-        get.arr.string_arr_by_mapped_values_w_fmt_string(
+      return get.str_or_number_arr.str_by_joined(
+        get.arr.str_arr_by_mapped_values_w_fmt_str(
           ls.khal.parseable_format_component_arr,
           "{%s}"
         ), fixedstr.unique_field_separator
       ) .. fixedstr.unique_record_separator
     end,
     basic_command_parts = function(include, exclude)
-      local command = " --format=" .. transf.string.string_by_single_quoted_escaped(get.khal.parseable_format_specifier())
-      if include then command = command .. transf.string_arr.repeated_option_string(include, "--include-calendar") end
-      if exclude then command = command .. transf.string_arr.repeated_option_string(exclude, "--exclude-calendar") end
+      local command = " --format=" .. transf.str.str_by_single_quoted_escaped(get.khal.parseable_format_specifier())
+      if include then command = command .. transf.str_arr.repeated_option_str(include, "--include-calendar") end
+      if exclude then command = command .. transf.str_arr.repeated_option_str(exclude, "--exclude-calendar") end
       return command
     end,
        
     search_event_tables = function(searchstr, include, exclude)
       local command = "khal search" .. get.khal.basic_command_parts(include, exclude)
-      command = command .. " " .. transf.string.string_by_single_quoted_escaped(searchstr)
-      return transf.multirecord_string.arr_of_event_tables(transf.string.string_or_nil_by_evaled_env_bash_stripped(command))
+      command = command .. " " .. transf.str.str_by_single_quoted_escaped(searchstr)
+      return transf.multirecord_str.arr_of_event_tables(transf.str.str_or_nil_by_evaled_env_bash_stripped(command))
     end,
     list_event_tables = function(specifier, include, exclude)
       local command = {
@@ -91,18 +91,18 @@ get = {
       end
       specifier.start = specifier.start or "today"
       specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
-      dothis.arr.push(command, transf.string.string_by_single_quoted_escaped(specifier.start))
-      dothis.arr.push(command, transf.string.string_by_single_quoted_escaped(specifier["end"]))
-      return transf.multirecord_string.arr_of_event_tables(
-        transf.string.string_or_nil_by_evaled_env_bash_stripped(
-          get.string_or_number_arr.string_by_joined(command, " ")
+      dothis.arr.push(command, transf.str.str_by_single_quoted_escaped(specifier.start))
+      dothis.arr.push(command, transf.str.str_by_single_quoted_escaped(specifier["end"]))
+      return transf.multirecord_str.arr_of_event_tables(
+        transf.str.str_or_nil_by_evaled_env_bash_stripped(
+          get.str_or_number_arr.str_by_joined(command, " ")
         )
       )
     end,
   },
   pass_item_name = {
     value = function(item, type)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.string.string_or_nil_by_evaled_env_bash_stripped)("pass show " .. type .. "/" .. item)
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped)("pass show " .. type .. "/" .. item)
     end,
     path = function(item, type, ext)
       return env.PASSWORD_STORE_DIR .. "/" .. type .. "/" .. item .. "." .. (ext or "gpg")
@@ -111,7 +111,7 @@ get = {
       return is.absolute_path.extant_path(get.pass_item_name.path(item, type, ext))
     end,
     json = function(item, type)
-      return transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json("pass show " .. type .. "/" .. item)
+      return transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json("pass show " .. type .. "/" .. item)
     end,
     contact_json = function(item, type)
       return get.pass_item_name.json(item, "contacts/" .. type)
@@ -166,7 +166,7 @@ get = {
     ---@param keystop integer
     ---@param valuestop integer
     ---@param depth integer
-    ---@return string[]
+    ---@return str[]
     yaml_lines_aligned_with_predetermined_stops = function(table, keystop, valuestop, depth)
       local lines = {}
       for value_k, value_v in transf.table.stateless_key_value_iter(table) do
@@ -174,10 +174,10 @@ get = {
         local key_length = #value_k
         local key_padding_length = keystop - (key_length + pre_padding_length)
         if is.any.table(value_v) and not (value_v.value or value_v.comment) then 
-          dothis.arr.push(lines, get.string.string_by_repeated(" ", depth * 2) .. value_k .. ":" .. get.string.string_by_repeated(" ", key_padding_length) .. " ")
+          dothis.arr.push(lines, get.str.str_by_repeated(" ", depth * 2) .. value_k .. ":" .. get.str.str_by_repeated(" ", key_padding_length) .. " ")
           lines = transf.two_arrs.arr_by_appended(lines, get.table.yaml_lines_aligned_with_predetermined_stops(value_v, keystop, valuestop, depth + 1))
         elseif is.any.table(value_v) and (value_v.value or value_v.comment) then 
-          local key_part = get.string.string_by_repeated(" ", pre_padding_length) .. value_k .. ":" .. get.string.string_by_repeated(" ", key_padding_length) .. " "
+          local key_part = get.str.str_by_repeated(" ", pre_padding_length) .. value_k .. ":" .. get.str.str_by_repeated(" ", key_padding_length) .. " "
           local value_length = 0
           local value_part = ""
           if value_v.value then
@@ -187,7 +187,7 @@ get = {
           local comment_part = ""
           if value_v.comment then
             local value_padding_length = valuestop - value_length
-            comment_part = get.string.string_by_repeated(" ", value_padding_length) .. " # " .. value_v.comment
+            comment_part = get.str.str_by_repeated(" ", value_padding_length) .. " # " .. value_v.comment
           end
           dothis.arr.push(lines, key_part .. value_part .. comment_part)
         else
@@ -213,11 +213,11 @@ get = {
       copied_tables = get.any.default_if_nil(copied_tables, {})
       if not t then return t end
       local new = {}
-      copied_tables[tostring(t)] = new
+      copied_tables[tostr(t)] = new
       for k, v in transf.table.stateless_key_value_iter(t) do
         if is.any.table(v) and deep then
-          if copied_tables[tostring(v)] then -- we've already copied this table, so just reference it
-            new[k] = copied_tables[tostring(v)]
+          if copied_tables[tostr(v)] then -- we've already copied this table, so just reference it
+            new[k] = copied_tables[tostr(v)]
           else -- we haven't copied this table yet, so copy it and reference it
             new[k] = get.table.table_by_copy(v, deep, copied_tables)
           end
@@ -324,8 +324,8 @@ get = {
         return get.table.arr_or_nil_by_find_key_path(start_tbl, stop)
       end
     end,
-    string_by_joined_key_any_value_assoc = function(t, table_arg_bool_by_is_leaf_ret_fn, joiner)
-      return get.arr_of_arrs.string_by_joined_key_any_value_assoc(
+    str_by_joined_key_any_value_assoc = function(t, table_arg_bool_by_is_leaf_ret_fn, joiner)
+      return get.arr_of_arrs.str_by_joined_key_any_value_assoc(
         get.table.arr_of_arrs_by_label_root_to_leaf(t, table_arg_bool_by_is_leaf_ret_fn),
         joiner
       )
@@ -377,11 +377,11 @@ get = {
     arr_by_mapped_w_vt_arg_vt_ret_fn = function(t, fn)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(t, function(k, v) return fn(v) end)
     end,
-    string_arr_by_mapped_w_fmt_string = function(t, fmt_str)
+    str_arr_by_mapped_w_fmt_str = function(t, fmt_str)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
         function(k,v)
-          return get.string.string_by_formatted_w_n_anys(fmt_str, k, v)
+          return get.str.str_by_formatted_w_n_anys(fmt_str, k, v)
         end
       )
     end,
@@ -709,15 +709,15 @@ get = {
       end
       return passes, fails
     end,
-    string_by_joined = function(arr, joiner)
-      return get.string_or_number_arr.string_by_joined(
-        transf.arr.string_arr(arr),
+    str_by_joined = function(arr, joiner)
+      return get.str_or_number_arr.str_by_joined(
+        transf.arr.str_arr(arr),
         joiner
       )
     end,
-    string_by_joined_any_pair = function(arr, joiner)
+    str_by_joined_any_pair = function(arr, joiner)
       local any = act.arr.pop(arr)
-      local str = get.string_or_number_arr.string_by_joined(arr, joiner)
+      local str = get.str_or_number_arr.str_by_joined(arr, joiner)
       return { str, any }
     end,
     bool_by_some_pass_w_fn = function(arr, fn)
@@ -871,10 +871,10 @@ get = {
         function(v) return assoc[v] end
       )
     end,
-    string_arr_by_mapped_values_w_fmt_string = function(arr, fmt_str)
+    str_arr_by_mapped_values_w_fmt_str = function(arr, fmt_str)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.first_n_args_bound_fn(get.string.string_by_formatted_w_n_anys, fmt_str)
+        get.fn.first_n_args_bound_fn(get.str.str_by_formatted_w_n_anys, fmt_str)
       )
     end,
     arr_by_mapped_w_t_arg_t_ret_fn_and_t_arg_bool_ret_fn = function(arr, mapfn, condfn)
@@ -901,31 +901,31 @@ get = {
       )
     end
   },
-  string = {
-    string_by_sub_lua = string.sub,
-    string_by_sub_eutf8 = get.string.string_by_sub_eutf8,
-    string_by_formatted_w_n_anys = string.format,
-    string_by_repeated = get.string.string_by_repeated,
-    string_arr_split_single_char = stringy.split,
-    string_arr_split_single_char_noempty = function(str, sep)
-      return transf.string_arr.noemtpy_string_arr(
-        transf.string.string_arr_split_single_char(str, sep)
+  str = {
+    str_by_sub_lua = str.sub,
+    str_by_sub_eutf8 = get.str.str_by_sub_eutf8,
+    str_by_formatted_w_n_anys = str.format,
+    str_by_repeated = get.str.str_by_repeated,
+    str_arr_split_single_char = stry.split,
+    str_arr_split_single_char_noempty = function(str, sep)
+      return transf.str_arr.noemtpy_str_arr(
+        transf.str.str_arr_split_single_char(str, sep)
       )
     end,
-    string_arr_split_single_char_stripped = function(str, sep)
-      return transf.string_arr.stripped_string_arr(
-        transf.string.split_single_char(str, sep)
+    str_arr_split_single_char_stripped = function(str, sep)
+      return transf.str_arr.stripped_str_arr(
+        transf.str.split_single_char(str, sep)
       )
     end,
-    string_arr_split = plstringx.split,
-    string_arr_split_noempty = function(str, sep)
-      return transf.string_arr.noemtpy_string_arr(
-        transf.string.string_arr_split(str, sep)
+    str_arr_split = plstrx.split,
+    str_arr_split_noempty = function(str, sep)
+      return transf.str_arr.noemtpy_str_arr(
+        transf.str.str_arr_split(str, sep)
       )
     end,
-    --- don't split on the edge of the string, i.e. don't return empty strings at the start or end
-    string_arr_split_noedge = function(str, sep)
-      local res = transf.string.string_arr_split(str, sep)
+    --- don't split on the edge of the str, i.e. don't return empty strs at the start or end
+    str_arr_split_noedge = function(str, sep)
+      local res = transf.str.str_arr_split(str, sep)
       if res[1] == "" then
         act.arr.shift(res)
       end
@@ -934,19 +934,19 @@ get = {
       end
       return res
     end,
-    n_strings_split = function(str, sep, n)
-      return transf.arr.n_anys(get.string.string_arr_split(str, sep, n))
+    n_strs_split = function(str, sep, n)
+      return transf.arr.n_anys(get.str.str_arr_split(str, sep, n))
     end,
-    string_pair_split_or_nil = function(str, sep)
-      local arr = get.string.string_arr_split(str, sep, 2)
+    str_pair_split_or_nil = function(str, sep)
+      local arr = get.str.str_arr_split(str, sep, 2)
       if #arr ~= 2 then
         return nil
       else
         return arr
       end
     end,
-    two_strings_split_or_nil = function(str, sep)
-      local arr = get.string.string_arr_split(str, sep, 2)
+    two_strs_split_or_nil = function(str, sep)
+      local arr = get.str.str_arr_split(str, sep, 2)
       if #arr ~= 2 then
         return nil
       else
@@ -954,56 +954,56 @@ get = {
       end
     end,
     line_arr_by_tail = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.string.line_arr(path), -(n or 10))
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.line_arr(path), -(n or 10))
     end,
     line_arr_by_head = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.string.line_arr(path), 1, n or 10)
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.line_arr(path), 1, n or 10)
     end,
     noempty_line_arr_by_tail = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.string.noempty_line_string_arr(path), -(n or 10))
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.noempty_line_str_arr(path), -(n or 10))
     end,
     noempty_line_arr_by_head = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.string.noempty_line_string_arr(path), 1, n or 10)
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.noempty_line_str_arr(path), 1, n or 10)
     end,
-    bool_by_startswith = stringy.startswith,
-    bool_by_endswith = stringy.endswith,
+    bool_by_startswith = stry.startswith,
+    bool_by_endswith = stry.endswith,
     bool_by_not_startswith = function(str, prefix)
-      return not transf.string.bool_startswith(str, prefix)
+      return not transf.str.bool_startswith(str, prefix)
     end,
     bool_by_not_endswith = function(str, suffix)
-      return not transf.string.bool_endswith(str, suffix)
+      return not transf.str.bool_endswith(str, suffix)
     end,
-    bool_by_startswith_any_w_ascii_string_arr = function(str, anyof)
+    bool_by_startswith_any_w_ascii_str_arr = function(str, anyof)
       for i = 1, #anyof do
-        local res = stringy.startswith(str, anyof[i])
+        local res = stry.startswith(str, anyof[i])
         if res then
           return true
         end
       end
       return false
     end,
-    bool_by_endswith_any_w_ascii_string_arr = function(str, anyof)
+    bool_by_endswith_any_w_ascii_str_arr = function(str, anyof)
       for i = 1, #anyof do
-        local res = get.string.bool_by_endswith(str, anyof[i])
+        local res = get.str.bool_by_endswith(str, anyof[i])
         if res then
           return true
         end
       end
       return false
     end,
-    bool_by_contains_w_ascii_string = stringy.find,
-    bool_by_not_contains_w_ascii_string = function(str, substr)
-      return not transf.string.bool_by_contains_w_string(str, substr)
+    bool_by_contains_w_ascii_str = stry.find,
+    bool_by_not_contains_w_ascii_str = function(str, substr)
+      return not transf.str.bool_by_contains_w_str(str, substr)
     end,
-    arr_of_string_arrs_by_split = function(str, upper_sep, lower_sep)
-      local upper = transf.string.split(str, upper_sep)
+    arr_of_str_arrs_by_split = function(str, upper_sep, lower_sep)
+      local upper = transf.str.split(str, upper_sep)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(upper, function(v)
-        return transf.string.split(v, lower_sep)
+        return transf.str.split(v, lower_sep)
       end)
     end,
     search_engine_search_url = function(str, search_engine)
       return tblmap.search_engine.url[search_engine]:format(
-        get.string.string_by_percent_encoded(str, tblmap.search_engine.param_is_path[search_engine])
+        get.str.str_by_percent_encoded(str, tblmap.search_engine.param_is_path[search_engine])
       )
     end,
     window_arr_by_pattern = function(str, app_name)
@@ -1021,18 +1021,18 @@ get = {
     styledtext = function(str, styledtext_attributes_specifier)
       return hs.styledtext.new(str, styledtext_attributes_specifier)
     end,
-    bool_by_contains_any_w_ascii_string_arr = function(str, anyof)
+    bool_by_contains_any_w_ascii_str_arr = function(str, anyof)
       for i = 1, #anyof do
-        local res = get.string.bool_by_contains_w_ascii_string(str, anyof[i])
+        local res = get.str.bool_by_contains_w_ascii_str(str, anyof[i])
         if res then
           return true
         end
       end
       return false
     end,
-    bool_by_contains_all_w_ascii_string_arr = function(str, allof)
+    bool_by_contains_all_w_ascii_str_arr = function(str, allof)
       for i = 1, #allof do
-        local res = get.string.bool_by_contains_w_ascii_string(str, allof[i])
+        local res = get.str.bool_by_contains_w_ascii_str(str, allof[i])
         if not res then
           return false
         end
@@ -1040,194 +1040,194 @@ get = {
       return true
     end,
     bool_by_starts_ends = function(str, start, ends)
-      return transf.string.startswith(str, start) and transf.string.endswith(str, ends)
+      return transf.str.startswith(str, start) and transf.str.endswith(str, ends)
     end,
-    bool_by_matches_whole_eutf8 = function(str, regex_string)
-      return get.string.bool_by_matches_part_eutf8(str, transf.string.string_by_whole_regex(regex_string))
+    bool_by_matches_whole_eutf8 = function(str, regex_str)
+      return get.str.bool_by_matches_part_eutf8(str, transf.str.str_by_whole_regex(regex_str))
     end,
-    bool_by_matches_whole_onig = function(str, regex_string)
-      return get.string.bool_by_matches_part_onig(str, transf.string.string_by_whole_regex(regex_string))
+    bool_by_matches_whole_onig = function(str, regex_str)
+      return get.str.bool_by_matches_part_onig(str, transf.str.str_by_whole_regex(regex_str))
     end,
-    bool_by_matches_part_eutf8 = function(str, regex_string)
-      return get.string.two_integer_or_nils_by_eutf8_regex_match(str, regex_string) ~= nil
+    bool_by_matches_part_eutf8 = function(str, regex_str)
+      return get.str.two_integer_or_nils_by_eutf8_regex_match(str, regex_str) ~= nil
     end,
-    bool_by_matches_part_onig = function(str, regex_string)
-      return get.string.two_integer_or_nils_by_onig_regex_match(str, regex_string) ~= nil
+    bool_by_matches_part_onig = function(str, regex_str)
+      return get.str.two_integer_or_nils_by_onig_regex_match(str, regex_str) ~= nil
     end,
-    bool_by_not_matches_whole_eutf8 = function(str, regex_string)
-      return not transf.string.bool_by_matches_whole_eutf8(str, regex_string)
+    bool_by_not_matches_whole_eutf8 = function(str, regex_str)
+      return not transf.str.bool_by_matches_whole_eutf8(str, regex_str)
     end,
-    bool_by_not_matches_whole_onig = function(str, regex_string)
-      return not transf.string.bool_by_matches_whole_onig(str, regex_string)
+    bool_by_not_matches_whole_onig = function(str, regex_str)
+      return not transf.str.bool_by_matches_whole_onig(str, regex_str)
     end,
-    bool_by_not_matches_part_eutf8 = function(str, regex_string)
-      return not transf.string.bool_by_matches_part_eutf8(str, regex_string)
+    bool_by_not_matches_part_eutf8 = function(str, regex_str)
+      return not transf.str.bool_by_matches_part_eutf8(str, regex_str)
     end,
-    bool_by_not_matches_part_onig = function(str, regex_string)
-      return not transf.string.bool_by_matches_part_onig(str, regex_string)
+    bool_by_not_matches_part_onig = function(str, regex_str)
+      return not transf.str.bool_by_matches_part_onig(str, regex_str)
     end,
     bool_by_matches_whole_onig_w_regex_quantifiable = function(str, regex_quantifiable)
-      return transf.string.bool_by_matches_whole_onig(str, regex_quantifiable .. "*")
+      return transf.str.bool_by_matches_whole_onig(str, regex_quantifiable .. "*")
     end,
     bool_by_matches_whole_onig_w_regex_character_class_innards = function(str, regex_character_class_innards)
-      return transf.string.bool_by_matches_whole_onig_w_regex_quantifiable(str, "[" .. regex_character_class_innards .. "]")
+      return transf.str.bool_by_matches_whole_onig_w_regex_quantifiable(str, "[" .. regex_character_class_innards .. "]")
     end,
     bool_by_matches_whole_onig_inverted_w_regex_character_class_innards = function(str, regex_character_class_innards)
-      return transf.string.bool_by_matches_whole_onig(str, "[^" .. regex_character_class_innards .. "]")
+      return transf.str.bool_by_matches_whole_onig(str, "[^" .. regex_character_class_innards .. "]")
     end,
-    string_by_no_prefix = function(str, prefix)
-      if get.string.bool_by_startswith(str, prefix) then
+    str_by_no_prefix = function(str, prefix)
+      if get.str.bool_by_startswith(str, prefix) then
         return str:sub(#prefix + 1)
       else
         return str
       end
     end,
-    string_by_no_suffix = function(str, suffix)
-      if get.string.bool_by_endswith(str, suffix) then
+    str_by_no_suffix = function(str, suffix)
+      if get.str.bool_by_endswith(str, suffix) then
         return str:sub(1, #str - #suffix)
       else
         return str
       end
     end,
-    string_by_with_prefix = function(str, prefix)
-      if get.string.bool_by_startswith(str, prefix) then
+    str_by_with_prefix = function(str, prefix)
+      if get.str.bool_by_startswith(str, prefix) then
         return str
       else
         return prefix .. str
       end
     end,
-    string_by_with_suffix = function(str, suffix)
-      if get.string.bool_by_endswith(str, suffix) then
+    str_by_with_suffix = function(str, suffix)
+      if get.str.bool_by_endswith(str, suffix) then
         return str
       else
         return str .. suffix
       end
     end,
-    string_by_no_adfix = function(str, adfix)
-      return transf.string.string_by_no_prefix(
-        transf.string.string_by_no_suffix(str, adfix),
+    str_by_no_adfix = function(str, adfix)
+      return transf.str.str_by_no_prefix(
+        transf.str.str_by_no_suffix(str, adfix),
         adfix
       )
     end,
-    string_by_with_adfix = function(str, adfix)
-      return transf.string.string_by_with_prefix(
-        transf.string.string_by_with_suffix(str, adfix),
+    str_by_with_adfix = function(str, adfix)
+      return transf.str.str_by_with_prefix(
+        transf.str.str_by_with_suffix(str, adfix),
         adfix
       )
     end,
-    string_and_int_by_replaced_eutf8_w_regex_string = get.string.string_and_int_by_replaced_eutf8_w_regex_string,
-    string_by_replaced_onig_w_regex_string = onig.gsub,
-    string_by_continuous_collapsed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
-      return get.string.string_by_replaced_onig_w_regex_string(
+    str_and_int_by_replaced_eutf8_w_regex_str = get.str.str_and_int_by_replaced_eutf8_w_regex_str,
+    str_by_replaced_onig_w_regex_str = onig.gsub,
+    str_by_continuous_collapsed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.str.str_by_replaced_onig_w_regex_str(
         str,
         "(" .. regex_quantifiable .. "){2,}", -- using {2,} instead of + saves us some performance, given a match of length 1 just gets replaced with itself. However, this is not available in eutf8, so we have to use + there
         "%1"
       )
     end,
-    string_by_continuous_collapsed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
-      return get.string.string_and_int_by_replaced_eutf8_w_regex_string(
+    str_by_continuous_collapsed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.str.str_and_int_by_replaced_eutf8_w_regex_str(
         str,
         "(" .. regex_quantifiable .. ")+",
         "%1"
       )
     end,
-    string_by_final_continuous_collapsed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
-      return get.string.string_by_replaced_onig_w_regex_string(
+    str_by_final_continuous_collapsed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.str.str_by_replaced_onig_w_regex_str(
         str,
         "(" .. regex_quantifiable .. ")+$",
         "%1"
       )
     end,
-    string_by_final_continuous_collapsed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
-      return get.string.string_and_int_by_replaced_eutf8_w_regex_string(
+    str_by_final_continuous_collapsed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.str.str_and_int_by_replaced_eutf8_w_regex_str(
         str,
         "(" .. regex_quantifiable .. ")+$",
         "%1"
       )
     end,
-    string_by_continuous_replaced_onig_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
-      return get.string.string_by_replaced_onig_w_regex_string(
+    str_by_continuous_replaced_onig_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
+      return get.str.str_by_replaced_onig_w_regex_str(
         str,
         regex_quantifiable .. "+",
         replacement
       )
     end,
-    string_by_continuous_replaced_eutf8_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
-      return get.string.string_and_int_by_replaced_eutf8_w_regex_string(
+    str_by_continuous_replaced_eutf8_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
+      return get.str.str_and_int_by_replaced_eutf8_w_regex_str(
         str,
         regex_quantifiable .. "+",
         replacement
       )
     end,
-    string_by_final_continuous_replaced_onig_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
-      return get.string.string_by_replaced_onig_w_regex_string(
+    str_by_final_continuous_replaced_onig_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
+      return get.str.str_by_replaced_onig_w_regex_str(
         str,
         regex_quantifiable .. "+$",
         replacement
       )
     end,
-    string_by_final_continuous_replaced_eutf8_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
-      return get.string.string_and_int_by_replaced_eutf8_w_regex_string(
+    str_by_final_continuous_replaced_eutf8_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
+      return get.str.str_and_int_by_replaced_eutf8_w_regex_str(
         str,
         regex_quantifiable .. "+$",
         replacement
       )
     end,
-    string_by_removed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
-      return get.string.string_by_continuous_replaced_onig_w_regex_quantifiable(str, regex_quantifiable, "")
+    str_by_removed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.str.str_by_continuous_replaced_onig_w_regex_quantifiable(str, regex_quantifiable, "")
     end,
-    string_by_removed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
-      return get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, regex_quantifiable, "")
+    str_by_removed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, regex_quantifiable, "")
     end,
-    string_by_final_removed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
-      return get.string.string_by_final_continuous_replaced_onig_w_regex_quantifiable(str, regex_quantifiable, "")
+    str_by_final_removed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.str.str_by_final_continuous_replaced_onig_w_regex_quantifiable(str, regex_quantifiable, "")
     end,
-    string_by_final_removed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
-      return get.string.string_by_final_continuous_replaced_eutf8_w_regex_quantifiable(str, regex_quantifiable, "")
+    str_by_final_removed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.str.str_by_final_continuous_replaced_eutf8_w_regex_quantifiable(str, regex_quantifiable, "")
     end,
-    string_by_removed_onig_w_regex_character_class_innards = function(str, regex_character_class_innards)
-      return transf.string.string_by_removed_onig_w_regex_quantifiable(str, "[" .. regex_character_class_innards .. "]")
+    str_by_removed_onig_w_regex_character_class_innards = function(str, regex_character_class_innards)
+      return transf.str.str_by_removed_onig_w_regex_quantifiable(str, "[" .. regex_character_class_innards .. "]")
     end,
-    string_by_removed_onig_inverted_w_regex_character_class_innards = function(str, regex_character_class_innards)
-      return transf.string.string_by_removed_onig_w_regex_quantifiable(str, "[^" .. regex_character_class_innards .. "]")
+    str_by_removed_onig_inverted_w_regex_character_class_innards = function(str, regex_character_class_innards)
+      return transf.str.str_by_removed_onig_w_regex_quantifiable(str, "[^" .. regex_character_class_innards .. "]")
     end,
-    string_by_replaced_all_eutf8_w_regex_string_arr = function(str, regex_string_arr, replacement)
+    str_by_replaced_all_eutf8_w_regex_str_arr = function(str, regex_str_arr, replacement)
       local res = str
-      for _, regex_string in transf.arr.key_value_stateless_iter(regex_string_arr) do
-        res = get.string.string_and_int_by_replaced_eutf8_w_regex_string(
+      for _, regex_str in transf.arr.key_value_stateless_iter(regex_str_arr) do
+        res = get.str.str_and_int_by_replaced_eutf8_w_regex_str(
           res,
-          regex_string,
+          regex_str,
           replacement
         )
       end
       return res
     end,
-    string_by_replaced_all_w_ascii_string_arr = function(str, ascii_string_arr, replacement)
+    str_by_replaced_all_w_ascii_str_arr = function(str, ascii_str_arr, replacement)
       local res = str
-      for _, ascii_string in transf.arr.key_value_stateless_iter(ascii_string_arr) do
-        res = plstringx.replace(res, ascii_string, replacement)
+      for _, ascii_str in transf.arr.key_value_stateless_iter(ascii_str_arr) do
+        res = plstrx.replace(res, ascii_str, replacement)
       end
       return res
     end,
-    string_by_prepended_all_w_ascii_string_arr = function(str, ascii_string_arr, prepend)
+    str_by_prepended_all_w_ascii_str_arr = function(str, ascii_str_arr, prepend)
       local res = str
-      for _, ascii_string in transf.arr.key_value_stateless_iter(ascii_string_arr) do
-        res = plstringx.replace(res, ascii_string, prepend .. ascii_string)
+      for _, ascii_str in transf.arr.key_value_stateless_iter(ascii_str_arr) do
+        res = plstrx.replace(res, ascii_str, prepend .. ascii_str)
       end
       return res
     end,
-    string_by_appended_all_w_ascii_string_arr = function(str, ascii_string_arr, append)
+    str_by_appended_all_w_ascii_str_arr = function(str, ascii_str_arr, append)
       local res = str
-      for _, ascii_string in transf.arr.key_value_stateless_iter(ascii_string_arr) do
-        res = plstringx.replace(res, ascii_string, ascii_string .. append)
+      for _, ascii_str in transf.arr.key_value_stateless_iter(ascii_str_arr) do
+        res = plstrx.replace(res, ascii_str, ascii_str .. append)
       end
       return res
     end,
-    string_by_replaced_first_eutf8_w_regex_string_arr = function(str, regex_string_arr, replacement)
-      for _, regex_string in transf.arr.key_value_stateless_iter(regex_string_arr) do
-        local res, matches = get.string.string_and_int_by_replaced_eutf8_w_regex_string(
+    str_by_replaced_first_eutf8_w_regex_str_arr = function(str, regex_str_arr, replacement)
+      for _, regex_str in transf.arr.key_value_stateless_iter(regex_str_arr) do
+        local res, matches = get.str.str_and_int_by_replaced_eutf8_w_regex_str(
           str,
-          regex_string,
+          regex_str,
           replacement,
           1
         )
@@ -1236,10 +1236,10 @@ get = {
         end
       end
     end,
-    n_strings_by_extracted_onig = onig.match,
-    n_strings_by_extracted_eutf8 = eutf8.match,
-    n_string_stateful_iter_by_extracted_onig = onig.gmatch,
-    n_string_stateful_iter_by_extracted_eutf8 = eutf8.gmatch,
+    n_strs_by_extracted_onig = onig.match,
+    n_strs_by_extracted_eutf8 = eutf8.match,
+    n_str_stateful_iter_by_extracted_onig = onig.gmatch,
+    n_str_stateful_iter_by_extracted_eutf8 = eutf8.gmatch,
     evaled_js_osa = function(str)
       local succ, parsed_res = hs.osascript.javascript(str)
       if succ then
@@ -1257,7 +1257,7 @@ get = {
       end
     end,
     evaled_as_lua = function(str, d)
-      if d then -- add d to global namespace so that it can be accessed in the string
+      if d then -- add d to global namespace so that it can be accessed in the str
         _G.d = d
       end
       local luaExecutable = load("return " .. str, "chunk", "t", _G)
@@ -1272,14 +1272,14 @@ get = {
         end
       end
     end,
-    string_by_evaled_as_template = function(str, d)
-      local res = get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, "{{%[(.-)%]}}", function(item)
-        return get.string.string_by_evaled_as_template(item, d)
+    str_by_evaled_as_template = function(str, d)
+      local res = get.str.str_and_int_by_replaced_eutf8_w_regex_str(str, "{{%[(.-)%]}}", function(item)
+        return get.str.str_by_evaled_as_template(item, d)
       end)
       return res
     end,
-    llm_response_string_freeform = function(str, temperature, max_tokens)
-      return get.role_content_message_spec_arr.llm_response_string(
+    llm_response_str_freeform = function(str, temperature, max_tokens)
+      return get.role_content_message_spec_arr.llm_response_str(
         {{
           content = str,
           role = "user"
@@ -1288,8 +1288,8 @@ get = {
         max_tokens
       )
     end,
-    llm_response_string_stringent = function(str, temperature, max_tokens)
-      return get.role_content_message_spec_arr.llm_response_string(
+    llm_response_str_strent = function(str, temperature, max_tokens)
+      return get.role_content_message_spec_arr.llm_response_str(
         transf.role_content_message_spec_arr.api_role_content_message_spec_arr({{
           content = str,
           role = "user"
@@ -1298,88 +1298,88 @@ get = {
         max_tokens
       )
     end,
-    string_by_prompted_once_from_default = function(str, message)
+    str_by_prompted_once_from_default = function(str, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_bool,
+        prompter = transf.prompt_args_str.str_or_nil_and_bool,
         prompt_args = {
           message = message,
           default = str,
         }
       })
     end,
-    alphanum_minus_underscore_string_by_prompted_once_from_default = function(str, message)
+    alphanum_minus_underscore_str_by_prompted_once_from_default = function(str, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_bool,
-        transformed_validator = is.string.alphanum_minus_underscore,
+        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        transformed_validator = is.str.alphanum_minus_underscore,
         prompt_args = {
           message = message,
           default = str,
         }
       })
     end,
-    string_arr_groups_ascii_fron_start = function(str, n)
+    str_arr_groups_ascii_fron_start = function(str, n)
       local res = {}
       for i = 1, #str, n do
         dothis.arr.push(res, str:sub(i, i + n - 1))
       end
       return res
     end,
-    string_with_separator_grouped_ascii_from_start = function(str, n, sep)
-      return get.string_or_number_arr.string_by_joined(get.string.string_arr_groups_ascii_fron_start(str, n), sep)
+    str_with_separator_grouped_ascii_from_start = function(str, n, sep)
+      return get.str_or_number_arr.str_by_joined(get.str.str_arr_groups_ascii_fron_start(str, n), sep)
     end,
-    string_arr_groups_ascii_from_end = function(str, n)
+    str_arr_groups_ascii_from_end = function(str, n)
       local res = {}
       for i = #str, 1, -n do
         dothis.arr.push(res, str:sub(i - n + 1, i))
       end
       return res
     end,
-    string_with_separator_grouped_ascii_from_end = function(str, n, sep)
-      return get.string_or_number_arr.string_by_joined(get.string.string_arr_groups_ascii_from_end(str, n), sep)
+    str_with_separator_grouped_ascii_from_end = function(str, n, sep)
+      return get.str_or_number_arr.str_by_joined(get.str.str_arr_groups_ascii_from_end(str, n), sep)
     end,
-    string_arr_groups_utf8_from_start = function(str, n)
+    str_arr_groups_utf8_from_start = function(str, n)
       local res = {}
-      for i = 1, transf.string.pos_int_by_len_utf8_chars(str), n do
-        dothis.arr.push(res, get.string.string_by_sub_eutf8(str, i, i + n - 1))
+      for i = 1, transf.str.pos_int_by_len_utf8_chars(str), n do
+        dothis.arr.push(res, get.str.str_by_sub_eutf8(str, i, i + n - 1))
       end
       return res
     end,
-    string_with_separator_grouped_utf8_from_start = function(str, n, sep)
-      return get.string_or_number_arr.string_by_joined(get.string.string_arr_groups_utf8_from_start(str, n), sep)
+    str_with_separator_grouped_utf8_from_start = function(str, n, sep)
+      return get.str_or_number_arr.str_by_joined(get.str.str_arr_groups_utf8_from_start(str, n), sep)
     end,
-    string_arr_groups_utf8_from_end = function(str, n)
+    str_arr_groups_utf8_from_end = function(str, n)
       local res = {}
-      for i = transf.string.pos_int_by_len_utf8_chars(str), 1, -n do
-        dothis.arr.push(res, get.string.string_by_sub_eutf8(str, i - n + 1, i))
+      for i = transf.str.pos_int_by_len_utf8_chars(str), 1, -n do
+        dothis.arr.push(res, get.str.str_by_sub_eutf8(str, i - n + 1, i))
       end
       return res
     end,
-    string_with_separator_grouped_utf8_from_end = function(str, n, sep)
-      return get.string_or_number_arr.string_by_joined(get.string.string_arr_groups_utf8_from_end(str, n), sep)
+    str_with_separator_grouped_utf8_from_end = function(str, n, sep)
+      return get.str_or_number_arr.str_by_joined(get.str.str_arr_groups_utf8_from_end(str, n), sep)
     end,
     number_or_nil = function(str,  base)
-      local nonindicated_number_string = transf.string.nonindicated_number_string(str)
-      return get.nonindicated_number_string.number_or_nil(nonindicated_number_string, base)
+      local nonindicated_number_str = transf.str.nonindicated_number_str(str)
+      return get.nonindicated_number_str.number_or_nil(nonindicated_number_str, base)
     end,
     int_by_rounded_or_nil = function(str, base)
-      local nonindicated_number_string = transf.string.nonindicated_number_string(str)
-      return get.nonindicated_number_string.int_by_rounded_or_nil(nonindicated_number_string, base)
+      local nonindicated_number_str = transf.str.nonindicated_number_str(str)
+      return get.nonindicated_number_str.int_by_rounded_or_nil(nonindicated_number_str, base)
     end,
     two_integer_or_nils_by_onig_regex_match = onig.find,
     two_integer_or_nils_by_eutf8_regex_match = eutf8.find,
-    string_arr_by_onig_regex_match = function(str, regex)
+    str_arr_by_onig_regex_match = function(str, regex)
       local res = {}
-      for match in get.string.n_string_stateful_iter_by_extracted_onig(str, regex) do
+      for match in get.str.n_str_stateful_iter_by_extracted_onig(str, regex) do
         dothis.arr.push(res, match)
       end
       return res
     end,
-    two_string_arrs_by_onig_regex_match_nomatch = function(str, regex)
+    two_str_arrs_by_onig_regex_match_nomatch = function(str, regex)
       local matches = {}
       local nomatches = {}
       local prev_index = 1
       while true do
-        local start, stop = get.string.two_integer_or_nils_by_onig_regex_match(str, regex, prev_index)
+        local start, stop = get.str.two_integer_or_nils_by_onig_regex_match(str, regex, prev_index)
         if start == nil then
           if prev_index <= #str then
             dothis.arr.push(nomatches, str:sub(prev_index))
@@ -1394,123 +1394,123 @@ get = {
         end
       end
     end,
-    string_arr_by_eutf8_regex_match = function(str, regex)
+    str_arr_by_eutf8_regex_match = function(str, regex)
       local res = {}
-      for match in get.string.n_string_stateful_iter_by_extracted_eutf8(str, regex) do
+      for match in get.str.n_str_stateful_iter_by_extracted_eutf8(str, regex) do
         dothis.arr.push(res, match)
       end
       return res
     end,
-    two_string_arrs_by_eutf8_regex_match_nomatch = function(str, regex)
+    two_str_arrs_by_eutf8_regex_match_nomatch = function(str, regex)
       local matches = {}
       local nomatches = {}
       local prev_index = 1
       while true do
-        local start, stop = get.string.two_integer_or_nils_by_eutf8_regex_match(str, regex, prev_index)
+        local start, stop = get.str.two_integer_or_nils_by_eutf8_regex_match(str, regex, prev_index)
         if start == nil then
-          if prev_index <= transf.string.pos_int_by_len_utf8_chars(str) then
-            dothis.arr.push(nomatches, get.string.string_by_sub_eutf8(str, prev_index))
+          if prev_index <= transf.str.pos_int_by_len_utf8_chars(str) then
+            dothis.arr.push(nomatches, get.str.str_by_sub_eutf8(str, prev_index))
           end          
           return matches, nomatches
         else
-          dothis.arr.push(matches, get.string.string_by_sub_eutf8(str, start, stop))
+          dothis.arr.push(matches, get.str.str_by_sub_eutf8(str, start, stop))
           if start > prev_index then
-            dothis.arr.push(nomatches, get.string.string_by_sub_eutf8(str, prev_index, start - 1))
+            dothis.arr.push(nomatches, get.str.str_by_sub_eutf8(str, prev_index, start - 1))
           end
           prev_index = stop + 1
         end
       end
     end,
-    string_by_shortened_start_ellipsis = function(str, len)
-      return plstringx.shorten(str, len)
+    str_by_shortened_start_ellipsis = function(str, len)
+      return plstrx.shorten(str, len)
     end,
-    string_by_shortened_end_ellipsis = function(str, len)
-      return plstringx.shorten(str, len, true)
+    str_by_shortened_end_ellipsis = function(str, len)
+      return plstrx.shorten(str, len, true)
     end,
-    string_by_with_yaml_metadata = function(str, tbl)
+    str_by_with_yaml_metadata = function(str, tbl)
       if not str then return transf.table.yaml_metadata(tbl) end
       if not tbl then return str end
       if transf.table.pos_int_by_num_keys(tbl) == 0 then return str end
-      local stripped_str = stringy.strip(str)
+      local stripped_str = stry.strip(str)
       local final_metadata, final_contents
-      if get.string.bool_by_startswith(stripped_str, "---") then
+      if get.str.bool_by_startswith(stripped_str, "---") then
         -- splice in the metadata
-        local parts = get.string.string_arr_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
+        local parts = get.str.str_arr_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
         local extant_metadata = act.arr.shift(parts)
-        final_metadata = extant_metadata .. "\n" .. transf.not_userdata_or_string.yaml_string(tbl)
-        final_contents = get.string_or_number_arr.string_by_joined(parts)
+        final_metadata = extant_metadata .. "\n" .. transf.not_userdata_or_str.yaml_str(tbl)
+        final_contents = get.str_or_number_arr.str_by_joined(parts)
         final_contents = final_contents .. "---"
       else
-        final_metadata = transf.not_userdata_or_string.yaml_string(tbl)
+        final_metadata = transf.not_userdata_or_str.yaml_str(tbl)
         final_contents = str
       end
       return "---\n" .. final_metadata .. "\n---\n" .. final_contents
     end,
     not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
-      local tbl = transf.string.table_or_err_by_evaled_env_bash_parsed_json(str)
+      local tbl = transf.str.table_or_err_by_evaled_env_bash_parsed_json(str)
       return get.table.vt_or_err(tbl, key)
     end,
     not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key = function(str, key)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
-        get.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json_in_key
+        get.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json_in_key
       )(str, key)
     end,
-    string_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
-      local tbl = transf.string.table_or_err_by_evaled_env_bash_parsed_json(str)
+    str_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+      local tbl = transf.str.table_or_err_by_evaled_env_bash_parsed_json(str)
       local res = get.table.vt_or_err(tbl, key)
-      if is.any.string(res) then
+      if is.any.str(res) then
         return res
       else
-        error("Not a string.")
+        error("Not a str.")
       end
     end,
-    string_or_nil_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+    str_or_nil_by_evaled_env_bash_parsed_json_in_key = function(str, key)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
-        get.string.string_or_err_by_evaled_env_bash_parsed_json_in_key
+        get.str.str_or_err_by_evaled_env_bash_parsed_json_in_key
       )(str, key)
     end,
-    string_or_err_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
-      return stringy.strip(get.string.string_or_err_by_evaled_env_bash_parsed_json_in_key(str, key))
+    str_or_err_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
+      return stry.strip(get.str.str_or_err_by_evaled_env_bash_parsed_json_in_key(str, key))
     end,
-    string_or_nil_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
+    str_or_nil_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
-        get.string.string_or_err_by_evaled_env_bash_parsed_json_in_key_stripped
+        get.str.str_or_err_by_evaled_env_bash_parsed_json_in_key_stripped
       )(str, key)
     end,
-    string_by_percent_encoded = function(str, as_path)
+    str_by_percent_encoded = function(str, as_path)
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
-      else return transf.string.encoded_query_param_value_by_folded(str) end
+      else return transf.str.encoded_query_param_value_by_folded(str) end
     end
   },
-  nonindicated_number_string_arr = {
+  nonindicated_number_str_arr = {
     number_arr = function(arr, base)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(
-          get.nonindicated_number_string.number_or_nil,
+          get.nonindicated_number_str.number_or_nil,
           {a_use, base}
         )
       )
     end,
   },
-  nonindicated_number_string = {
+  nonindicated_number_str = {
     number_or_nil = tonumber,
     int_by_rounded_or_nil = function(num, base)
       return transf.number.int_by_rounded(
-        get.nonindicated_number_string.number_or_nil(num, base)
+        get.nonindicated_number_str.number_or_nil(num, base)
       )
     end,
   },
-  string_or_styledtext = {
+  str_or_styledtext = {
     styledtext_ignore_styled = function(str, styledtext_attributes_specifier)
-      if is.any.string(str) then
+      if is.any.str(str) then
         return hs.styledtext.new(str, styledtext_attributes_specifier)
       else
         return str
       end
     end,
     styledtext_merge = function(str, styledtext_attributes_specifier)
-      if is.any.string(str) then
+      if is.any.str(str) then
         return hs.styledtext.new(str, styledtext_attributes_specifier)
       else
         return transf.styledtext.styledtext_merge(str, styledtext_attributes_specifier)
@@ -1520,8 +1520,8 @@ get = {
   styledtext = {
     styledtext_merge = function(styledtext, styledtext_attributes_specifier)
       local existing_style = styledtext:asTable()
-      local text_string, style = get.arr.two_arrs_by_slice_w_3_pos_int_any_or_nils(existing_style, 1, 1)
-      local new_styledtext = hs.styledtext.new(text_string, styledtext_attributes_specifier)
+      local text_str, style = get.arr.two_arrs_by_slice_w_3_pos_int_any_or_nils(existing_style, 1, 1)
+      local new_styledtext = hs.styledtext.new(text_str, styledtext_attributes_specifier)
       for _, v in transf.arr.index_value_stateless_iter(style) do
         new_styledtext = new_styledtext:setStyle(v.styledtext_attributes_specifier, v.starts, v.ends)
       end
@@ -1536,21 +1536,21 @@ get = {
       return styledtext:copy():setStyle(style, start, stop)
     end,
   },
-  string_or_styledtext_arr = {
+  str_or_styledtext_arr = {
     styledtext_arr_merge = function(arr, styledtext_attributes_specifier)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.string_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.str_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
       )
     end,
   },
-  string_or_number_arr = {
-    string_by_joined = table.concat,
+  str_or_number_arr = {
+    str_by_joined = table.concat,
   },
-  string_arr = {
+  str_arr = {
     resplit_by_oldnew = function(arr, sep)
-      return get.string.string_arr_split(
-        get.string_arr.string_joined(
+      return get.str.str_arr_split(
+        get.str_arr.str_joined(
           arr,
           sep
         ),
@@ -1558,8 +1558,8 @@ get = {
       )
     end,
     resplit_by_new = function(arr, sep)
-      return get.string.string_arr_split(
-        get.string_arr.string_joined(
+      return get.str.str_arr_split(
+        get.str_arr.str_joined(
           arr,
           ""
         ),
@@ -1567,8 +1567,8 @@ get = {
       )
     end,
     resplit_by_oldnew_single_char = function(arr, sep)
-      return get.string.string_arr_split_single_char(
-        get.string_arr.string_joined(
+      return get.str.str_arr_split_single_char(
+        get.str_arr.str_joined(
           arr,
           sep
         ),
@@ -1576,8 +1576,8 @@ get = {
       )
     end,
     resplit_by_oldnew_single_char_noempty = function(arr, sep)
-      return get.string.string_arr_split_single_char_noempty(
-        get.string_arr.string_joined(
+      return get.str.str_arr_split_single_char_noempty(
+        get.str_arr.str_joined(
           arr,
           sep
         ),
@@ -1585,56 +1585,56 @@ get = {
       )
     end,
     resplit_by_new_single_char = function(arr, sep)
-      return get.string.string_arr_split_single_char(
-        get.string_arr.string_joined(
+      return get.str.str_arr_split_single_char(
+        get.str_arr.str_joined(
           arr,
           ""
         ),
         sep
       )
     end,
-    pos_int_or_nil_by_first_match_nocomment_noindent_w_string = function(arr, str)
+    pos_int_or_nil_by_first_match_nocomment_noindent_w_str = function(arr, str)
       return get.arr.pos_int_or_nil_by_first_match_w_t(
-        transf.string_arr.nocomment_noindent_string_arr(arr),
+        transf.str_arr.nocomment_noindent_str_arr(arr),
         str
       )
     end,
-    pos_int_or_nil_by_first_match_ending_w_string = function(arr, str)
+    pos_int_or_nil_by_first_match_ending_w_str = function(arr, str)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(
         arr,
         get.fn.first_n_args_bound_fn(
-          get.string.bool_by_endswith,
+          get.str.bool_by_endswith,
           str
         )
       )
     end,
-    string_or_nil_by_first_match_ending_w_string = function(arr, str)
+    str_or_nil_by_first_match_ending_w_str = function(arr, str)
       return arr[
-        get.arr.pos_int_or_nil_by_first_match_ending_w_string(arr, str)
+        get.arr.pos_int_or_nil_by_first_match_ending_w_str(arr, str)
       ]
     end,
-    pos_int_or_nil_by_first_match_starting_w_string = function(arr, str)
+    pos_int_or_nil_by_first_match_starting_w_str = function(arr, str)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(
         arr,
         get.fn.first_n_args_bound_fn(
-          get.string.bool_by_startswith,
+          get.str.bool_by_startswith,
           str
         )
       )
     end,
-    string_or_nil_by_first_match_starting_w_string = function(arr, str)
+    str_or_nil_by_first_match_starting_w_str = function(arr, str)
       return arr[
-        get.arr.pos_int_or_nil_by_first_match_starting_w_string(arr, str)
+        get.arr.pos_int_or_nil_by_first_match_starting_w_str(arr, str)
       ]
     end,
 
   },
-  arr_of_string_arrs = {
-    arr_of_string_records = function(arr, field_sep)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return get.string_or_number_arr.string_by_joined(x, field_sep) end)
+  arr_of_str_arrs = {
+    arr_of_str_records = function(arr, field_sep)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return get.str_or_number_arr.str_by_joined(x, field_sep) end)
     end,
-    string_table = function(arr, field_sep, record_sep)
-      return get.string_or_number_arr.string_by_joined(get.arr_of_string_arrs.arr_of_string_records(arr, field_sep), record_sep)
+    str_table = function(arr, field_sep, record_sep)
+      return get.str_or_number_arr.str_by_joined(get.arr_of_str_arrs.arr_of_str_records(arr, field_sep), record_sep)
     end,
     
   },
@@ -1648,7 +1648,7 @@ get = {
       return transf.path_leaf_specifier.fs_tag_assoc(parts)[key]
     end,
     tag_raw_value = function(parts, key)
-      return transf.path_leaf_specifier.fs_tag_string_assoc(parts)[key]
+      return transf.path_leaf_specifier.fs_tag_str_assoc(parts)[key]
     end,
   },
   path = {
@@ -1664,7 +1664,7 @@ get = {
       return transf.path.path_without_extension(path) .. "." .. ext
     end,
     leaf_starts_with = function(path, str)
-      return get.string.bool_by_startswith(transf.path.leaf(path), str)
+      return get.str.bool_by_startswith(transf.path.leaf(path), str)
     end,
     is_extension = function(path, ext)
       return transf.path.extension(path) == ext
@@ -1685,7 +1685,7 @@ get = {
       return transf.path.leaf(path) == leaf
     end,
     window_with_leaf_as_title = function(path, app_name)
-      return get.string.window_by_title(
+      return get.str.window_by_title(
         transf.path.leaf(path),
         app_name
       )
@@ -1701,7 +1701,7 @@ get = {
     path_from_sliced_path_component_arr = function(path, spec)
       local sliced_path_component_arr = transf.path.sliced_path_component_arr(path, spec)
       dothis.arr.push(sliced_path_component_arr, "")
-      return get.string_or_number_arr.string_by_joined(sliced_path_component_arr, "/")
+      return get.str_or_number_arr.str_by_joined(sliced_path_component_arr, "/")
     end,
     path_from_sliced_path_segment_arr = function(path, spec)
       local sliced_path_segment_arr = transf.path.sliced_path_segment_arr(path, spec)
@@ -1717,14 +1717,14 @@ get = {
       if #sliced_path_segment_arr == 0 then
         return leaf
       else
-        return get.string_or_number_arr.string_by_joined(sliced_path_segment_arr, "/") .. "/" .. leaf
+        return get.str_or_number_arr.str_by_joined(sliced_path_segment_arr, "/") .. "/" .. leaf
       end
     end,
     path_arr_from_sliced_path_component_arr = function(path, spec)
       local sliced_path_component_arr = transf.path.sliced_path_component_arr(path, spec)
       local whole_path_component_arr = transf.path.path_component_arr(path)
       local res = {}
-      local started_with_slash = get.string.bool_by_startswith(path, "/")
+      local started_with_slash = get.str.bool_by_startswith(path, "/")
       
       -- Create a map for quick lookup of the index of each path component
       local path_component_index_map = {}
@@ -1738,9 +1738,9 @@ get = {
         if rawi then
           local relevant_path_components = get.arr.arr_by_slice_w_slice_spec(whole_path_component_arr, { start = 1, stop = rawi })
           if started_with_slash then
-            dothis.arr.insert_at_index(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
+            dothis.arr.insert_at_index(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty str at the beginning so that it will start with a slash again once we rejoin
           end
-          res[i] = get.string_or_number_arr.string_by_joined(relevant_path_components, "/")
+          res[i] = get.str_or_number_arr.str_by_joined(relevant_path_components, "/")
         end
       end
       
@@ -1749,7 +1749,7 @@ get = {
   },
   absolute_path = {
     relative_path_from = function(path, starting_point)
-      return get.string.string_by_no_prefix(path, get.string.string_by_with_suffix(starting_point, "/"))
+      return get.str.str_by_no_prefix(path, get.str.str_by_with_suffix(starting_point, "/"))
     end,
   },
   extant_path = {
@@ -1759,12 +1759,12 @@ get = {
     --- @field include_files? boolean Whether to include files in the returned table. Default true
     --- @field follow_links? boolean Whether to follow symlinks. Default false
 
-    --- @param path string
+    --- @param path str
     --- @param opts? itemsInPathOpts
     --- @param is_recursive_call? boolean Whether this is a recursive call. Allows us to avoid some duplicate work.
     --- @param depth? integer Internal use only. The current depth of recursion.  
-    --- @param seen_paths? string[] Internal use only. A table of paths we have already seen. Used to avoid infinite recursion
-    --- @return string[] #A table of all things in the directory
+    --- @param seen_paths? str[] Internal use only. A table of paths we have already seen. Used to avoid infinite recursion
+    --- @return str[] #A table of all things in the directory
     absolute_path_arr = function(path, opts, is_recursive_call, depth, seen_paths)
       if is.absolute_path.file(path) then 
         if not opts or opts.include_files then
@@ -1801,7 +1801,7 @@ get = {
     
       for file_name in transf.dir.children_absolute_path_value_stateful_iter(path) do
         if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" then
-          local file_path = path .. get.string.string_by_no_suffix(file_name, "/")
+          local file_path = path .. get.str.str_by_no_suffix(file_name, "/")
           if is.extant_path.dir(file_name) then 
             if opts.include_dirs then
               extant_paths[#extant_paths + 1] = file_path
@@ -1870,7 +1870,7 @@ get = {
       return get.arr.pos_int_or_nil_by_first_match_w_fn(transf.extant_path.absolute_path_arr_by_descendants(path), cond)
     end,
     find_descendant_ending_with = function(path, ending)
-      return get.path_arr.path_or_nil_by_first_ending_find_ending_w_string(transf.extant_path.absolute_path_arr_by_descendants(path), ending)
+      return get.path_arr.path_or_nil_by_first_ending_find_ending_w_str(transf.extant_path.absolute_path_arr_by_descendants(path), ending)
     end,
     find_leaf_of_descendant = function(path, filename)
       return get.path_arr.bool_by_contains_leaf(transf.extant_path.absolute_path_arr_by_descendants(path), filename)
@@ -1915,7 +1915,7 @@ get = {
     end,
   },
   local_extant_path = {
-    string_w_fs_attr_name = function(path, attr)
+    str_w_fs_attr_name = function(path, attr)
       return hs.fs.attributes(hs.fs.pathToAbsolute(path), attr)
     end,
     local_absolute_path_by_default_prompted_once = function(path, message)
@@ -1950,7 +1950,7 @@ get = {
       return get.arr.pos_int_or_nil_by_first_match_w_fn(transf.dir.absolute_path_arr_by_children(dir), fn)
     end,
     extant_path_by_child_ending = function(dir, ending)
-      return get.path_arr.path_or_nil_by_first_ending_find_ending_w_string(transf.dir.absolute_path_arr_by_children(dir), ending)
+      return get.path_arr.path_or_nil_by_first_ending_find_ending_w_str(transf.dir.absolute_path_arr_by_children(dir), ending)
     end,
     bool_by_leaf_of_child = function(dir, filename)
       return get.path_arr.bool_by_contains_leaf(transf.dir.absolute_path_arr_by_children(dir), filename)
@@ -1968,7 +1968,7 @@ get = {
       return get.path_arr.path_or_nil_by_first_having_leaf_ending(transf.dir.absolute_path_arr_by_children(dir), leaf_ending)
     end,
     cmd_output_from_path = function(path, cmd)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.string_by_single_quoted_escaped(path) .. " && " .. cmd)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("cd " .. transf.str.str_by_single_quoted_escaped(path) .. " && " .. cmd)
     end
   },
   git_root_dir = {
@@ -1977,7 +1977,7 @@ get = {
     end,
     hook_res = function(path, hook)
       local hook_path = get.git_root_dir.hook_path(path, hook)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(hook_path)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(hook_path)
     end,
   },
   in_git_dir = {
@@ -2012,33 +2012,33 @@ get = {
   },
   plaintext_file = {
     lines_tail = function(path, n)
-      return get.string.line_arr_by_tail(transf.plaintext_file.string_by_contents(path), n)
+      return get.str.line_arr_by_tail(transf.plaintext_file.str_by_contents(path), n)
     end,
     lines_head = function(path, n)
-      return get.string.line_arr_by_head(transf.plaintext_file.string_by_contents(path), n)
+      return get.str.line_arr_by_head(transf.plaintext_file.str_by_contents(path), n)
     end,
     nth_line = function(path, n)
-      return transf.plaintext_file.string_arr_by_lines(path)[n]
+      return transf.plaintext_file.str_arr_by_lines(path)[n]
     end,
     contents_lines_appended = function(path, lines)
-      local extlines = transf.plaintext_file.string_arr_by_lines(path)
+      local extlines = transf.plaintext_file.str_arr_by_lines(path)
       return transf.two_arrs.arr_by_appended(extlines, lines)
     end,
     contents_line_appended = function(path, line)
       return dothis.plaintext_file.contents_lines_appended(path, {line})
     end,
-    contents_lines_appended_to_string = function(path, lines)
-      return get.string_or_number_arr.string_by_joined(dothis.plaintext_file.contents_lines_appended(path, lines), "\n")
+    contents_lines_appended_to_str = function(path, lines)
+      return get.str_or_number_arr.str_by_joined(dothis.plaintext_file.contents_lines_appended(path, lines), "\n")
     end,
-    contents_line_appended_to_string = function(path, line)
-      return dothis.plaintext_file.content_lines_appended_to_string(path, {line})
+    contents_line_appended_to_str = function(path, line)
+      return dothis.plaintext_file.content_lines_appended_to_str(path, {line})
     end,
   },
   m3u_file = {
     stream_creation_specifier = function(path, flag_profile_name)
       return {
         source_path = path,
-        urls = transf.plaintext_file.string_arr_by_content_lines(path),
+        urls = transf.plaintext_file.str_arr_by_content_lines(path),
         type = "stream",
         flag_profile_name = flag_profile_name,
       }
@@ -2051,8 +2051,8 @@ get = {
   },
   csl_table_or_csl_table_arr = {
     raw_citations = function(csl_table, style)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_function.json_here_string(csl_table)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_function.json_here_str(csl_table)
       )
     end,
     
@@ -2090,10 +2090,10 @@ get = {
   },
   shellscript_file = {
     lint_table = function(path, severity)
-      return transf.string.table_or_err_by_evaled_env_bash_parsed_json("shellcheck --format=json --severity=" .. severity .. transf.string.string_by_single_quoted_escaped(path))
+      return transf.str.table_or_err_by_evaled_env_bash_parsed_json("shellcheck --format=json --severity=" .. severity .. transf.str.str_by_single_quoted_escaped(path))
     end,
-    lint_gcc_string = function(path, severity)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("shellcheck --format=gcc --severity=" .. severity .. transf.string.string_by_single_quoted_escaped(path))
+    lint_gcc_str = function(path, severity)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("shellcheck --format=gcc --severity=" .. severity .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
   email_file = {
@@ -2101,13 +2101,13 @@ get = {
       return response .. "\n\n" .. transf.email_file.quoted_body(path)
     end,
     prefixed_header = function(path, header)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "mshow -qh" .. transf.string.string_by_single_quoted_escaped(header) .. transf.string.string_by_single_quoted_escaped(path)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "mshow -qh" .. transf.str.str_by_single_quoted_escaped(header) .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
     header = function(path, header)
       local prefixed_header = transf.email_file.prefixed_header(path, header)
-      return get.string.string_by_sub_eutf8(prefixed_header, #header + 2) -- +2 for the colon and the space
+      return get.str.str_by_sub_eutf8(prefixed_header, #header + 2) -- +2 for the colon and the space
     end,
     addresses = function(path, header, only)
       if not get.arr.bool_by_contains(ls.email_headers_containin_emails, header) then
@@ -2116,12 +2116,12 @@ get = {
       only = get.any.default_if_nil(only, true)
       local headerpart
       if header then
-        headerpart = "-h" .. transf.string.string_by_single_quoted_escaped(header)
+        headerpart = "-h" .. transf.str.str_by_single_quoted_escaped(header)
       else
         headerpart = ""
       end
-      local res = transf.string.string_or_nil_by_evaled_env_bash_stripped("maddr " .. (only and "-a" or "")  .. headerpart .. transf.string.string_by_single_quoted_escaped(path))
-      return transf.arr.set(transf.string.line_arr(res))
+      local res = transf.str.str_or_nil_by_evaled_env_bash_stripped("maddr " .. (only and "-a" or "")  .. headerpart .. transf.str.str_by_single_quoted_escaped(path))
+      return transf.arr.set(transf.str.line_arr(res))
     end,
     displayname_addresses_assoc_of_assocs = function(path, header)
       local w_displaynames = transf.email_file.addresses(path, header, false)
@@ -2130,26 +2130,26 @@ get = {
 
   },
   maildir_dir = {
-    --- @param path string
+    --- @param path str
     --- @param reverse? boolean
-    --- @param magrep? string
-    --- @param mpick? string
-    --- @return string[]
+    --- @param magrep? str
+    --- @param mpick? str
+    --- @return str[]
     sorted_email_paths = function(path, reverse, magrep, mpick)
       local flags = "-d"
       if reverse then
         flags = flags .. "r"
       end
-      local cmd = "mlist" .. transf.string.string_by_single_quoted_escaped(path)
+      local cmd = "mlist" .. transf.str.str_by_single_quoted_escaped(path)
       if magrep then
-        cmd = cmd .. " | magrep -i" .. transf.string.string_by_single_quoted_escaped(magrep)
+        cmd = cmd .. " | magrep -i" .. transf.str.str_by_single_quoted_escaped(magrep)
       end
       if mpick then
-        cmd = cmd .. " | mpick -i" .. transf.string.string_by_single_quoted_escaped(mpick)
+        cmd = cmd .. " | mpick -i" .. transf.str.str_by_single_quoted_escaped(mpick)
       end
       cmd = cmd .. " | msort " .. flags
 
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped(cmd))
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped(cmd))
     end
 
   },
@@ -2161,10 +2161,10 @@ get = {
   },
   sqlite_file = {
     csv_or_nil_by_query = function(path, query)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("sqlite3 -csv " .. transf.string.string_by_single_quoted_escaped(path) .. " " .. transf.string.string_by_single_quoted_escaped(query))
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("sqlite3 -csv " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(query))
     end,
     json_or_nil_by_query = function(path, query)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("sqlite3 -json " .. transf.string.string_by_single_quoted_escaped(path) .. " " .. transf.string.string_by_single_quoted_escaped(query))
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("sqlite3 -json " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(query))
     end,
   },
   timestamp_ms_key_assoc_value_assoc = {
@@ -2203,17 +2203,17 @@ get = {
     end,
     path_arr_by_filter_to_filename_ending = function(path_arr, leaf_ending)
       return get.arr.arr_by_filtered(path_arr, function(path)
-        return get.string.bool_by_endswith(transf.path.filename(path), leaf_ending)
+        return get.str.bool_by_endswith(transf.path.filename(path), leaf_ending)
       end)
     end,
     path_arr_by_filter_to_filename_starting = function(path_arr, leaf_starting)
       return get.arr.arr_by_filtered(path_arr, function(path)
-        return get.string.bool_by_startswith(transf.path.filename(path), leaf_starting)
+        return get.str.bool_by_startswith(transf.path.filename(path), leaf_starting)
       end)
     end,
 
-    path_or_nil_by_first_ending_find_ending_w_string = function(path_arr, ending)
-      return get.string_arr.string_or_nil_by_first_match_ending_w_string(path_arr, ending)
+    path_or_nil_by_first_ending_find_ending_w_str = function(path_arr, ending)
+      return get.str_arr.str_or_nil_by_first_match_ending_w_str(path_arr, ending)
     end,
     bool_by_contains_leaf = function(path_arr, leaf)
       return get.arr.bool_by_contains(transf.path_arr.leaves_arr(path_arr), leaf)
@@ -2233,7 +2233,7 @@ get = {
     end,
     path_or_nil_by_first_having_leaf_ending = function(path_arr, leaf_ending)
       return get.arr.t_or_nil_by_first_match_w_fn(path_arr, function(path)
-        return get.string.bool_by_endswith(get.path.leaf(path), leaf_ending)
+        return get.str.bool_by_endswith(get.path.leaf(path), leaf_ending)
       end)
     end,
     path_or_nil_by_first_having_filename = function(path_arr, filename)
@@ -2243,7 +2243,7 @@ get = {
     end,
     path_or_nil_by_first_having_filename_ending = function(path_arr, filename_ending)
       return get.arr.t_or_nil_by_first_match_w_fn(path_arr, function(path)
-        return get.string.bool_by_endswith(get.path.filename(path), filename_ending)
+        return get.str.bool_by_endswith(get.path.filename(path), filename_ending)
       end)
     end,
   },
@@ -2308,26 +2308,26 @@ get = {
       )
     end,
     --- date_format_indicator = date_format or date_format_name
-    string_w_date_format_indicator = function(date, format)
+    str_w_date_format_indicator = function(date, format)
       local retrieved_format = tblmap.date_format_name.date_format[format]
       return date:fmt(retrieved_format or format)
     end,
     rfc3339like_dt_of_precision = function(date, precision)
-      return get.date.string_w_date_format_indicator(date, tblmap.date_component_name.rfc3339like_dt_format_string[precision])
+      return get.date.str_w_date_format_indicator(date, tblmap.date_component_name.rfc3339like_dt_format_str[precision])
     end,
 
   },
   timestamp_s = {
-    string_w_date_format_indicator = function(timestamp_s, format)
-      return get.date.string_w_date_format_indicator(
+    str_w_date_format_indicator = function(timestamp_s, format)
+      return get.date.str_w_date_format_indicator(
         transf.timestamp_s.date(timestamp_s),
         format
       )
     end,
   },
   timestamp_ms = {
-    string_w_date_format_indicator = function(timestamp_s, format)
-      return get.date.string_w_date_format_indicator(
+    str_w_date_format_indicator = function(timestamp_s, format)
+      return get.date.str_w_date_format_indicator(
         transf.timestamp_s.date(timestamp_s),
         format
       )
@@ -2444,15 +2444,15 @@ get = {
         end
       )
     end,
-    string_by_joined_any_pair_arr = function(arr, joiner)
+    str_by_joined_any_pair_arr = function(arr, joiner)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.n_string_or_number_any_arr.string_by_joined_any_pair, {a_use, joiner})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.n_str_or_number_any_arr.str_by_joined_any_pair, {a_use, joiner})
       )
     end,
-    string_by_joined_key_any_value_assoc = function(arr, joiner)
+    str_by_joined_key_any_value_assoc = function(arr, joiner)
       return transf.pair_arr.assoc(
-        get.arr_of_n_string_or_number_any_arrs.string_by_joined_any_pair_arr(arr, joiner)
+        get.arr_of_n_str_or_number_any_arrs.str_by_joined_any_pair_arr(arr, joiner)
       )
     end,
     arr_of_assocs_by_arr = function(arr_of_arr, arr2)
@@ -2526,7 +2526,7 @@ get = {
       }
     end,
     property = function(window_specifier, property)
-      return get.string.evaled_js_osa( ("Application('%s').windows()[%d].%s()"):format(
+      return get.str.evaled_js_osa( ("Application('%s').windows()[%d].%s()"):format(
         window_specifier.application_name,
         window_specifier.window_index,
         property
@@ -2535,7 +2535,7 @@ get = {
   },
   jxa_tab_specifier = {
     property = function(tab_specifier, property)
-      return get.string.evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(
+      return get.str.evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(
         tab_specifier.application_name,
         tab_specifier.window_index,
         tab_specifier.tab_index,
@@ -2565,8 +2565,8 @@ get = {
       if node.value then
         local value = node.value
         if type(node.value) == 'table' then -- list value
-          value = get.string_or_number_arr.string_by_joined(
-            get.arr.string_arr_by_mapped_values_w_fmt_string(node.value,  prev_key .. "%s"), -- todo: currently refactoring and I'm not sure that node.value is an arr, but I can't check rn. potentially needs replacing with a get.table call
+          value = get.str_or_number_arr.str_by_joined(
+            get.arr.str_arr_by_mapped_values_w_fmt_str(node.value,  prev_key .. "%s"), -- todo: currently refactoring and I'm not sure that node.value is an arr, but I can't check rn. potentially needs replacing with a get.table call
             ":"
           )
         else
@@ -2601,7 +2601,7 @@ get = {
       if prev_key then prev_key = prev_key .. "/" else prev_key = "" end
       local values = {}
       for key, value in transf.table.key_value_stateless_iter(assoc) do
-        if is.any.string(value) then
+        if is.any.str(value) then
           values[key] = prev_key .. value
         else
           local subvalues = get.detailed_env_node.env_var_name_value_assoc(value, prev_key, key)
@@ -2614,40 +2614,40 @@ get = {
   url = {
 
   },
-  sgml_string = {
-    sgml_string_or_nil_by_query_selector_all = function(str, selector)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "htmlq" .. transf.string.string_by_single_quoted_escaped(selector) .. transf.string.here_string(str)
+  sgml_str = {
+    sgml_str_or_nil_by_query_selector_all = function(str, selector)
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+        "htmlq" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_str(str)
       )
     end,
-    string_or_nil_by_query_selector_all = function(str, selector)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "htmlq --text" .. transf.string.string_by_single_quoted_escaped(selector) .. transf.string.here_string(str)
+    str_or_nil_by_query_selector_all = function(str, selector)
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+        "htmlq --text" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_str(str)
       )
     end,
-    string_or_nil_by_attribute_query_selector_all = function(str, selector, attribute)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "htmlq --attribute " .. transf.string.string_by_single_quoted_escaped(attribute) .. transf.string.string_by_single_quoted_escaped(selector) .. transf.string.here_string(str)
+    str_or_nil_by_attribute_query_selector_all = function(str, selector, attribute)
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+        "htmlq --attribute " .. transf.str.str_by_single_quoted_escaped(attribute) .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_str(str)
       )
     end,
     -- non-all seems to not be possible with htmlq. At least for html_, it would be possible if we parsed the html, but for text_, there seems to be no indication of when each result ends.
   },
   sgml_url = {
-    sgml_string_or_nil_by_query_selector_all = function(url, selector)
-      return get.sgml_string.sgml_string_or_nil_by_query_selector_all(
-        transf.sgml_url.sgml_string(url),
+    sgml_str_or_nil_by_query_selector_all = function(url, selector)
+      return get.sgml_str.sgml_str_or_nil_by_query_selector_all(
+        transf.sgml_url.sgml_str(url),
         selector
       )
     end,
-    string_or_nil_by_query_selector_all = function(url, selector)
-      return get.sgml_string.string_or_nil_by_query_selector_all(
-        transf.sgml_url.sgml_string(url),
+    str_or_nil_by_query_selector_all = function(url, selector)
+      return get.sgml_str.str_or_nil_by_query_selector_all(
+        transf.sgml_url.sgml_str(url),
         selector
       )
     end,
-    string_or_nil_by_attribute_query_selector_all = function(url, selector, attribute)
-      return get.sgml_string.string_or_nil_by_attribute_query_selector_all(
-        transf.sgml_url.sgml_string(url),
+    str_or_nil_by_attribute_query_selector_all = function(url, selector, attribute)
+      return get.sgml_str.str_or_nil_by_attribute_query_selector_all(
+        transf.sgml_url.sgml_str(url),
         selector,
         attribute
       )
@@ -2704,16 +2704,16 @@ get = {
   },
   iso_3366_1_alpha_2_code = {
     --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_full_name instead
-    full_name_in_language_string = function(code, language_identifier_string)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
-        query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
+    full_name_in_language_str = function(code, language_identifier_str)
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+        query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_str .. "'",
         input = code
       })
     end,
     --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_short_name instead
-    short_name_in_language_string = function(code, language_identifier_string)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
-        query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_string .. "'",
+    short_name_in_language_str = function(code, language_identifier_str)
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+        query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_str .. "'",
         input = code
       })
     end,
@@ -2721,7 +2721,7 @@ get = {
   any = {
     join_if_arr = function(arg, separator)
       if is.any.arr(arg) then
-        return get.string_or_number_arr.string_by_joined(arg, separator)
+        return get.str_or_number_arr.str_by_joined(arg, separator)
       else
         return arg
       end
@@ -2740,13 +2740,13 @@ get = {
       local_thing_name_hierarchy = local_thing_name_hierarchy or get.table.table_by_copy(thing_name_hierarchy, true)
       parent = parent or "any"
       local res = {}
-      for thing_name, child_thing_name_hierarchy_or_leaf_indication_string in transf.table.key_value_stateless_iter(thing_name_hierarchy) do
+      for thing_name, child_thing_name_hierarchy_or_leaf_indication_str in transf.table.key_value_stateless_iter(thing_name_hierarchy) do
         local passes = is[parent][thing_name](any)
         if passes then
-          if is.any.table(child_thing_name_hierarchy_or_leaf_indication_string) then
-            res[thing_name] = get.any.applicable_thing_name_hierarchy(any, child_thing_name_hierarchy_or_leaf_indication_string, thing_name)
+          if is.any.table(child_thing_name_hierarchy_or_leaf_indication_str) then
+            res[thing_name] = get.any.applicable_thing_name_hierarchy(any, child_thing_name_hierarchy_or_leaf_indication_str, thing_name)
           else
-            res[thing_name] = child_thing_name_hierarchy_or_leaf_indication_string
+            res[thing_name] = child_thing_name_hierarchy_or_leaf_indication_str
           end
         end
       end
@@ -2802,7 +2802,7 @@ get = {
       )
     end,
     result_joined = function(arr, value)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         get.retriever_specifier.result_arr(arr, value),
         " | "
       )
@@ -2887,11 +2887,11 @@ get = {
           font = {size = 12 },
           color = { red = 0, green = 0, blue = 0, alpha = 0.5 },
         }, chooser_item_specifier_text_key_styledtext_attributes_specifier_assoc.styledtext_attribute_specifier.subtext)
-        res[i].text = get.string_or_styledtext.styledtext_merge(
+        res[i].text = get.str_or_styledtext.styledtext_merge(
           chooser_item_specifier.text,
           text_styledtext_attribute_specifier
         )
-        res[i].subText = get.string_or_styledtext.styledtext_merge(
+        res[i].subText = get.str_or_styledtext.styledtext_merge(
           chooser_item_specifier.subText,
           subtext_styledtext_attribute_specifier
         )
@@ -2900,25 +2900,25 @@ get = {
   },
   ipc_socket_id = {
     response_table_or_nil = function(ipc_socket_id, request_table)
-      return get.string.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key(
+      return get.str.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key(
         "echo '" .. json.encode(request_table) .. "' | /opt/homebrew/bin/socat UNIX-CONNECT:" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " STDIO",
         "data"
       )
     end
   },
   mpv_ipc_socket_id = {
-    string = function(id, key)
+    str = function(id, key)
       return get.ipc_socket_id.response_table_or_nil(id, {
         command = { "get_property", key }
       } )
     end,
     int = function(id, key)
-      return get.string_or_number.int_by_rounded_or_nil(
-        get.mpv_ipc_socket_id.string(id, key)
+      return get.str_or_number.int_by_rounded_or_nil(
+        get.mpv_ipc_socket_id.str(id, key)
       )
     end,
     bool_emoji = function(id, key)
-      local res = get.mpv_ipc_socket_id.string(id, key)
+      local res = get.mpv_ipc_socket_id.str(id, key)
       if res then return tblmap.stream_attribute.true_emoji[key]
       else return tblmap.stream_attribute.false_emoji[key] end
     end,
@@ -2991,7 +2991,7 @@ get = {
     end
   },
   binary_specifier = {
-    string = function(binary_specifier, bool)
+    str = function(binary_specifier, bool)
       if bool then
         return binary_specifier.vt
       else
@@ -3007,8 +3007,8 @@ get = {
         error("invalid argument")
       end
     end,
-    string_by_inverted = function(binary_specifier, bool)
-      return get.binary_specifier.string(binary_specifier, not bool)
+    str_by_inverted = function(binary_specifier, bool)
+      return get.binary_specifier.str(binary_specifier, not bool)
     end,
     bool_by_inverted = function(binary_specifier, str)
       if str == binary_specifier.vt then
@@ -3019,9 +3019,9 @@ get = {
         error("invalid argument")
       end
     end,
-    string_or_bool_by_inverted = function(binary_specifier, str_or_bool)
-      if is.any.string(str_or_bool) then
-        return get.binary_specifier.string_by_inverted(binary_specifier, str_or_bool)
+    str_or_bool_by_inverted = function(binary_specifier, str_or_bool)
+      if is.any.str(str_or_bool) then
+        return get.binary_specifier.str_by_inverted(binary_specifier, str_or_bool)
       else
         return get.binary_specifier.bool_by_inverted(binary_specifier, str_or_bool)
       end
@@ -3055,11 +3055,11 @@ get = {
   },
   youtube_video_id = {
     get_extracted_attr_assoc_via_ai = function(video_id, do_after)
-      return get.form_filling_specifier.filled_string_assoc({
+      return get.form_filling_specifier.filled_str_assoc({
         in_fields = {
-          title = transf.youtube_video_id.string_by_title(video_id),
-          channel_title = transf.youtube_video_id.string_by_channel_title(video_id),
-          description = get.string.string_by_shortened_start_ellipsis(transf.youtube_video_id.description(video_id)),
+          title = transf.youtube_video_id.str_by_title(video_id),
+          channel_title = transf.youtube_video_id.str_by_channel_title(video_id),
+          description = get.str.str_by_shortened_start_ellipsis(transf.youtube_video_id.description(video_id)),
         },
         form_field_specifier_arr = {
           {
@@ -3152,17 +3152,17 @@ get = {
     --- @field is_async? boolean whether we are memoizing an async function. Defaults to false
     --- @field invalidation_mode? "invalidate" | "reset" | "none" whether and in what way to invalidate the cache. Defaults to "none"
     --- @field interval? number how often to invalidate the cache, in seconds. Defaults to 0
-    --- @field stringify_table_params? boolean whether to stringify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to stringify the params to use them as a path
-    --- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be stringified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
+    --- @field strify_table_params? boolean whether to strify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to strify the params to use them as a path
+    --- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be strified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
 
     --- memoize a function if it's not already memoized, or return the memoized version if it is
     --- @generic I, O
     --- @param fn fun(...: I): O
     --- @param opts? memoOpts
-    --- @param fnname? string the name of the function. Optional, but required for fsmemoization and switches to fsmemoization if provided, since we need to use the function name to create a unique cache path. We can't rely on an automatically generated identifier, since this may change between sessions
+    --- @param fnname? str the name of the function. Optional, but required for fsmemoization and switches to fsmemoization if provided, since we need to use the function name to create a unique cache path. We can't rely on an automatically generated identifier, since this may change between sessions
     --- @return fun(...: I): (O), hs.timer?
     rt_or_nil_by_memoized = function(fn, opts, fnname)
-      local fnid = fnname or transf.fn.fnid(fn) -- get a unique id for the function, using lua's tostring function, which uses the memory address of the function and thus is unique for each function
+      local fnid = fnname or transf.fn.fnid(fn) -- get a unique id for the function, using lua's tostr function, which uses the memory address of the function and thus is unique for each function
     
       local opts_as_str_or_nil
       if memoized[fnid] then 
@@ -3195,7 +3195,7 @@ get = {
       opts.is_async = get.any.default_if_nil(opts.is_async, false)
       opts.invalidation_mode = opts.invalidation_mode or "none"
       opts.interval = opts.interval or 0
-      opts.stringify_table_params = get.any.default_if_nil(opts.stringify_table_params, false)
+      opts.strify_table_params = get.any.default_if_nil(opts.strify_table_params, false)
       opts.table_param_subset = opts.table_param_subset or "json"
     
       -- initialize the cache if using memory
@@ -3295,11 +3295,11 @@ get = {
     rt_or_nil_by_memoized_invalidate_5_minutes = function(fn, fnname)
       return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 5, fnname)
     end,
-    rt_or_nil_by_memoized_invalidate_stringify_json = function(fn, interval, fnname)
+    rt_or_nil_by_memoized_invalidate_strify_json = function(fn, interval, fnname)
       return get.fn.rt_or_nil_by_memoized(fn, {
         invalidation_mode = "invalidate",
         interval = interval,
-        stringify_table_params = true,
+        strify_table_params = true,
         table_param_subset = "json"
       }, fnname)
     end,
@@ -3313,7 +3313,7 @@ get = {
     end,
   },
   fnname = {
-    local_absolute_path_by_in_cache_w_string_and_arr_or_nil = function(fnname, optsstr, args)
+    local_absolute_path_by_in_cache_w_str_and_arr_or_nil = function(fnname, optsstr, args)
       local path = transf.fnname.local_absolute_path_by_in_cache(fnname)
 
       if optsstr then
@@ -3321,7 +3321,7 @@ get = {
       end
       if args then 
         -- encode args to json and hash it, to use as the key for the cache
-        local hash = transf.not_userdata_or_function.md5_hex_string(args)
+        local hash = transf.not_userdata_or_function.md5_hex_str(args)
         path = path .. hash
       end
       return path
@@ -3334,18 +3334,18 @@ get = {
         in_fields = in_fields
       }
     end,
-    filled_string_assoc_from_string = function(specarr, str)
+    filled_str_assoc_from_str = function(specarr, str)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         specarr,
         function (form_field_specifier)
           return 
             form_field_specifier.alias or form_field_specifier.value, 
-            get.string.n_strings_by_extracted_eutf8(str, form_field_specifier.value .. "[^\n]-: *(.-)\n") or get.string.n_strings_by_extracted_eutf8(str, form_field_specifier.value .. "[^\n]-: *(.-)$")
+            get.str.n_strs_by_extracted_eutf8(str, form_field_specifier.value .. "[^\n]-: *(.-)\n") or get.str.n_strs_by_extracted_eutf8(str, form_field_specifier.value .. "[^\n]-: *(.-)$")
         end
       )
     end,
-    filled_string_assoc_from_string_arr = function(specarr, in_fields)
-      return get.form_filling_specifier.filled_string_assoc(
+    filled_str_assoc_from_str_arr = function(specarr, in_fields)
+      return get.form_filling_specifier.filled_str_assoc(
         get.form_field_specifier_arr.form_filling_specifier(
           specarr,
           in_fields
@@ -3407,7 +3407,7 @@ get = {
     end,
   },
   role_content_message_spec_arr = {
-    llm_response_string = function(arr, temperature, max_tokens)
+    llm_response_str = function(arr, temperature, max_tokens)
       local request = {
         endpoint = "chat/completions",
         api_name = "openai",
@@ -3429,8 +3429,8 @@ get = {
     end,
   },
   n_shot_llm_spec = {
-    n_shot_api_query_llm_response_string = function(spec, temperature, max_tokens)
-      local res = get.role_content_message_spec_arr.llm_response_string(
+    n_shot_api_query_llm_response_str = function(spec, temperature, max_tokens)
+      local res = get.role_content_message_spec_arr.llm_response_str(
         transf.n_shot_llm_spec.n_shot_api_query_role_content_message_spec_arr(spec),
         temperature,
         max_tokens
@@ -3443,13 +3443,13 @@ get = {
     end,
   },
   not_userdata_or_function = {
-    md5_base32_crock_string_of_length = function(any, length)
-      return transf.not_userdata_or_function.md5_base32_crock_string(any):sub(1, length)
+    md5_base32_crock_str_of_length = function(any, length)
+      return transf.not_userdata_or_function.md5_base32_crock_str(any):sub(1, length)
     end,
   },
   export_chat_main_object = {
     backuped_thing_identifier = function(obj, typ)
-      return typ .. "/" .. transf[typ .. "_export_chat_main_object"].string_by_id(obj)
+      return typ .. "/" .. transf[typ .. "_export_chat_main_object"].str_by_id(obj)
     end,
     timestamp_ms_last_backup = function(obj, typ)
       return transf.backuped_thing_identifier.timestamp_ms(
@@ -3484,12 +3484,12 @@ get = {
     msg_spec = function(msg, typ, obj)
       local export_chat_message_type = typ .. "_export_chat_message"
       return {
-        author = transf[export_chat_message_type].string_by_author(msg),
-        content = transf[export_chat_message_type].string_by_content(msg),
+        author = transf[export_chat_message_type].str_by_author(msg),
+        content = transf[export_chat_message_type].str_by_content(msg),
         attachments = transf[export_chat_message_type].absolute_path_arr_by_attachments(msg),
         reactions = transf[export_chat_message_type].reaction_spec_arr(msg),
         call_duration = transf[export_chat_message_type].int_or_nil_by_call_duration(msg),
-        sticker_emoji = transf[export_chat_message_type].string_or_nil_by_sticker_emoji(msg),
+        sticker_emoji = transf[export_chat_message_type].str_or_nil_by_sticker_emoji(msg),
         replying_to_timestamp = get[export_chat_message_type].timestamp_ms_or_nil_by_replying_to(msg, obj),
       }
     end,

@@ -1,30 +1,30 @@
 --- @alias header_or_param "header" | "param" | "both"
 
 --- @class RESTApiSpecifier
---- @field url? string The URL to send the request to. This is used if not making use of the scheme, host and endpoint params fields.
---- @field scheme? string The scheme to use for the request. If nil, it will be fetched from a stored default for the api, or default to "https://".
---- @field host? string The host of the API server. If nil, tries to fetch it from a stored default for the api.
---- @field endpoint? string The API endpoint to call.
+--- @field url? str The URL to send the request to. This is used if not making use of the scheme, host and endpoint params fields.
+--- @field scheme? str The scheme to use for the request. If nil, it will be fetched from a stored default for the api, or default to "https://".
+--- @field host? str The host of the API server. If nil, tries to fetch it from a stored default for the api.
+--- @field endpoint? str The API endpoint to call.
 --- @field params? table Any URL parameters to include in the request.
---- @field request_table? { [string]: any } | nil The body of the request. This is used for POST/PUT/PATCH requests.
+--- @field request_table? { [str]: any } | nil The body of the request. This is used for POST/PUT/PATCH requests.
 --- @field request_table_type? "json" | "form" | "form-urlencoded" The format to use for the request body. Defaults to JSON.
---- @field request_verb? string The HTTP verb to use for the request. Defaults to GET, or POST if request_table is specified.
---- @field auth_process? string The type of authentication process to use. Will be Bearer/Basic for token/username-password if not specified.
---- @field token? string The authentication token to use. If not specified, it will be fetched automatically.
---- @field username? string The username for Basic authentication. It can be retrieved from disk for the specified API or default to env.MAIN_EMAIL.
---- @field password? string The password for Basic authentication. It can be retrieved from disk for the specified API.
---- @field auth_header? string The header to use for authentication. If nil, it will be fetched from a stored default for the api, or default to "Authorization".
---- @field api_name? string The name of the API. This is used for retrieving tokens and usernames/passwords.
---- @field token_param? string The parameter name for the token when it's passed as a parameter. Defaults to "access_token" if token_type is "oauth2" and "api_key" if token_type is "simple".
+--- @field request_verb? str The HTTP verb to use for the request. Defaults to GET, or POST if request_table is specified.
+--- @field auth_process? str The type of authentication process to use. Will be Bearer/Basic for token/username-password if not specified.
+--- @field token? str The authentication token to use. If not specified, it will be fetched automatically.
+--- @field username? str The username for Basic authentication. It can be retrieved from disk for the specified API or default to env.MAIN_EMAIL.
+--- @field password? str The password for Basic authentication. It can be retrieved from disk for the specified API.
+--- @field auth_header? str The header to use for authentication. If nil, it will be fetched from a stored default for the api, or default to "Authorization".
+--- @field api_name? str The name of the API. This is used for retrieving tokens and usernames/passwords.
+--- @field token_param? str The parameter name for the token when it's passed as a parameter. Defaults to "access_token" if token_type is "oauth2" and "api_key" if token_type is "simple".
 --- @field token_where? header_or_param | boolean Where to specify the token, if at all. If nil, it will  be fetched from a stored default for the api, or default to false/nil.
---- @field username_param? string The parameter name for the username when it's passed as a parameter.
---- @field password_param? string The parameter name for the password when it's passed as a parameter.
+--- @field username_param? str The parameter name for the username when it's passed as a parameter.
+--- @field password_param? str The parameter name for the password when it's passed as a parameter.
 --- @field username_pw_where? header_or_param | boolean Where to specify the username/password, if at all. If nil, it will  be fetched from a stored default for the api, or default to false/nil.
 --- @field token_type? "simple" | "oauth2" | "telegram" The type of token to use. If nil, it will be fetched from a stored default for the api, or default to "simple".
---- @field oauth2_url? string The URL to send the OAuth2 request to. If nil but required, tries to fetch it from a stored default for the api.
---- @field oauth2_authorization_url? string The URL to send the OAuth2 authorization request to. If not specified, it will default to oauth2_url. If nil but required, tries to fetch it from a stored default for the api.
+--- @field oauth2_url? str The URL to send the OAuth2 request to. If nil but required, tries to fetch it from a stored default for the api.
+--- @field oauth2_authorization_url? str The URL to send the OAuth2 authorization request to. If not specified, it will default to oauth2_url. If nil but required, tries to fetch it from a stored default for the api.
 --- @field non_json_response? boolean Indicates whether the response is not JSON. Some REST apis may return non-JSON responses in certain cases, this is used to handle those cases. Defaults to false. If using this, oauth2 token refresh with a refresh token will not work.
---- @field accept_json_different_header? string Some data may be sent as JSON but not have the content type "application/json", for example vnd.citationstyles.csl+json. This is used to handle those cases.
+--- @field accept_json_different_header? str Some data may be sent as JSON but not have the content type "application/json", for example vnd.citationstyles.csl+json. This is used to handle those cases.
 
 --- @param specifier? RESTApiSpecifier
 --- @param do_after? fun(result: table): nil Function to execute after the request is completed. This is used to make the request synchronous or asynchronous.
@@ -68,7 +68,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
       elseif specifier.token_type == "telegram" then
         -- todo
       end
-      specifier.token = transf.file.string_by_contents(keyloc)
+      specifier.token = transf.file.str_by_contents(keyloc)
     end
 
     if specifier.token_type == "oauth2"  then
@@ -85,12 +85,12 @@ function rest(specifier, do_after, have_tried_access_refresh)
         end
       end
 
-      local clientid = transf.file.string_by_contents(api_keys_location .. "clientid")
-      local clientsecret = transf.file.string_by_contents(api_keys_location .. "clientsecret")
+      local clientid = transf.file.str_by_contents(api_keys_location .. "clientid")
+      local clientsecret = transf.file.str_by_contents(api_keys_location .. "clientsecret")
       if not clientid or not clientsecret then
         error("Failed to get clientid or clientsecret from " .. api_keys_location ". Oauth2 apis must have these. Are you sure you've already set up the api?")
       end
-      local refresh_token = transf.file.string_by_contents(api_keys_location .. "refresh_token")
+      local refresh_token = transf.file.str_by_contents(api_keys_location .. "refresh_token")
 
       specifier.oauth2_url = specifier.oauth2_url or tblmap.api_name.oauth2_url[specifier.api_name]
       specifier.oauth2_authorization_url = specifier.oauth2_authorization_url or tblmap.api_name.oauth2_authorization_url[specifier.api_name] or specifier.oauth2_url
@@ -115,7 +115,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
         end
         
         dothis.url_components.open_browser(open_spec, nil, function() -- our server listening on the above port will save the authorization code to the proper location
-          local authorization_code = transf.file.string_by_contents(api_keys_location .. "authorization_code")
+          local authorization_code = transf.file.str_by_contents(api_keys_location .. "authorization_code")
           dothis.absolute_path.delete(api_keys_location .. "authorization_code") -- this lost it's argument during refactor, i've added it back in, but I'm not sure if it's correct
           if not authorization_code then
             error("Failed to get authorization code from server")
@@ -184,8 +184,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
   -- fetch username/password
 
   if specifier.username_pw_where then
-    specifier.username = specifier.username or transf.file.string_by_contents(env.MPASSUSERNAME .. "/" .. specifier.api_name .. ".txt") or env.MAIN_EMAIL
-    specifier.password = specifier.password or transf.string.string_or_nil_by_evaled_env_bash_stripped("pass passw/" .. specifier.api_name )
+    specifier.username = specifier.username or transf.file.str_by_contents(env.MPASSUSERNAME .. "/" .. specifier.api_name .. ".txt") or env.MAIN_EMAIL
+    specifier.password = specifier.password or transf.str.str_or_nil_by_evaled_env_bash_stripped("pass passw/" .. specifier.api_name )
     if not specifier.username then
       error("Username required but could not be fetched. Specifier: " .. json.encode(specifier))
     end
@@ -222,7 +222,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
   end
 
   if secondary_api_name and tblmap.secondary_api_name.endpoint_prefix[secondary_api_name] and specifier.endpoint then
-    specifier.endpoint = get.string.string_by_with_suffix(tblmap.secondary_api_name.endpoint_prefix[secondary_api_name], "/") .. get.string.string_by_no_prefix(specifier.endpoint, "/")
+    specifier.endpoint = get.str.str_by_with_suffix(tblmap.secondary_api_name.endpoint_prefix[secondary_api_name], "/") .. get.str.str_by_no_prefix(specifier.endpoint, "/")
   end
 
   if secondary_api_name and tblmap.secondary_api_name.default_params[secondary_api_name] then
@@ -260,7 +260,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
   end
 
   specifier.auth_header = specifier.auth_header or "Authorization"
-  specifier.auth_header = get.string.string_by_with_suffix(specifier.auth_header, ": ")
+  specifier.auth_header = get.str.str_by_with_suffix(specifier.auth_header, ": ")
 
   -- add auth to curl command
 
@@ -269,17 +269,17 @@ function rest(specifier, do_after, have_tried_access_refresh)
   end
 
   if specifier.token_where == "header" or specifier.token_where == "both" then
-    local auth_header = specifier.auth_header .. get.string.string_by_with_suffix(specifier.auth_process or "Bearer", " ")
+    local auth_header = specifier.auth_header .. get.str.str_by_with_suffix(specifier.auth_process or "Bearer", " ")
     dothis.arr.push(curl_command, "-H")
     dothis.arr.push(curl_command, 
-      transf.string.string_by_single_quoted_escaped(auth_header .. specifier.token))
+      transf.str.str_by_single_quoted_escaped(auth_header .. specifier.token))
   end
 
   if specifier.username_pw_where == "header" or specifier.username_pw_where == "both" then
-    local auth_header = specifier.auth_header .. get.string.string_by_with_suffix(specifier.auth_process or "Basic", " ")
+    local auth_header = specifier.auth_header .. get.str.str_by_with_suffix(specifier.auth_process or "Basic", " ")
     dothis.arr.push(curl_command, "-H")
     dothis.arr.push(curl_command, 
-      transf.string.string_by_single_quoted_escaped(auth_header .. transf.string.base64_url_string_by_utf8(specifier.username .. ":" .. specifier.password)))
+      transf.str.str_by_single_quoted_escaped(auth_header .. transf.str.base64_url_str_by_utf8(specifier.username .. ":" .. specifier.password)))
   end
 
   -- assembole other parts of curl commmand
@@ -290,7 +290,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     specifier.request_verb = specifier.request_verb:upper()
     dothis.arr.push(curl_command, "--request")
     dothis.arr.push(curl_command, 
-      transf.string.string_by_single_quoted_escaped(specifier.request_verb)
+      transf.str.str_by_single_quoted_escaped(specifier.request_verb)
     )
   end
 
@@ -302,31 +302,31 @@ function rest(specifier, do_after, have_tried_access_refresh)
   then
     dothis.arr.push(curl_command, "-d")
     dothis.arr.push(curl_command, 
-      transf.string.string_by_single_quoted_escaped(tblmap.api_name.empty_post_body[specifier.api_name])
+      transf.str.str_by_single_quoted_escaped(tblmap.api_name.empty_post_body[specifier.api_name])
     )
     dothis.arr.push(curl_command, "-H")
     dothis.arr.push(curl_command, 
-    transf.string.string_by_single_quoted_escaped("Content-Type: " .. tblmap.api_name.empty_post_body_content_type[specifier.api_name])
+    transf.str.str_by_single_quoted_escaped("Content-Type: " .. tblmap.api_name.empty_post_body_content_type[specifier.api_name])
   )
   end
 
   if specifier.request_table then
     specifier.request_verb = specifier.request_verb or "POST"
-    local request_string, content_type
+    local request_str, content_type
 
     specifier.request_table_type = specifier.request_table_type or "json"
 
     if specifier.request_table_type ~= "form" then
       if specifier.request_table_type == "json" then
-        request_string = json.encode(specifier.request_table)
+        request_str = json.encode(specifier.request_table)
         content_type = "application/json"
       elseif specifier.request_table_type == "form-urlencoded" then
-        request_string = transf.assoc.url_params(specifier.request_table)
+        request_str = transf.assoc.url_params(specifier.request_table)
         content_type = "application/x-www-form-urlencoded"
       end
       dothis.arr.push(curl_command, "-d")
       dothis.arr.push(curl_command, 
-        transf.string.string_by_single_quoted_escaped(request_string)
+        transf.str.str_by_single_quoted_escaped(request_str)
       )
     else
       content_type = "multipart/form-data"
@@ -339,20 +339,20 @@ function rest(specifier, do_after, have_tried_access_refresh)
     
     dothis.arr.push(curl_command, "-H")
     dothis.arr.push(curl_command, 
-      transf.string.string_by_single_quoted_escaped("Content-Type: " .. content_type)
+      transf.str.str_by_single_quoted_escaped("Content-Type: " .. content_type)
     )
   
   end
-  local cmd = get.string_or_number_arr.string_by_joined(curl_command, " ")
+  local cmd = get.str_or_number_arr.str_by_joined(curl_command, " ")
   if not specifier.non_json_response then
     if do_after then
-      dothis.string.env_bash_eval_w_table_arg_fn_string_arg_fn_fail_error_key(
+      dothis.str.env_bash_eval_w_table_arg_fn_str_arg_fn_fail_error_key(
         cmd,
         do_after,
         catch_auth_error
       )
     else 
-      local succ,res = pcall(transf.string.table_or_err_by_evaled_env_bash_parsed_json_err_error_key,cmd)
+      local succ,res = pcall(transf.str.table_or_err_by_evaled_env_bash_parsed_json_err_error_key,cmd)
       if succ then
         return res
       else
@@ -360,6 +360,6 @@ function rest(specifier, do_after, have_tried_access_refresh)
       end
     end
   else 
-    return dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(cmd, do_after)
+    return dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(cmd, do_after)
   end
 end

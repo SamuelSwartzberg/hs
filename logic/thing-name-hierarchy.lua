@@ -1,5 +1,5 @@
 thing_name_hierarchy = {
-  string = {
+  str = {
     printable_ascii = {
       url = {},
       alphanum_minus_underscore = {
@@ -19,9 +19,9 @@ thing_name_hierarchy = {
         },
         package_manager = {}
       },
-      number_string = {
-        indicated_number_string = "leaf",
-        nonindicated_number_string = "leaf"
+      number_str = {
+        indicated_number_str = "leaf",
+        nonindicated_number_str = "leaf"
       }
     },
     path = {

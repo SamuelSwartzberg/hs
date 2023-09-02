@@ -1,36 +1,36 @@
 --- maps one thing_name to another thing_name
 --- so transf.<thing_name1>.<thing_name2>(<thing1>) -> <thing2>
 transf = {
-  nonindicated_number_string_arr = {
+  nonindicated_number_str_arr = {
     number_base_2_arr = function(hex_arr)
-      return get.nonindicated_number_string_arr.number_arr(hex_arr, 2)
+      return get.nonindicated_number_str_arr.number_arr(hex_arr, 2)
     end,
     number_base_8_arr = function(hex_arr)
-      return get.nonindicated_number_string_arr.number_arr(hex_arr, 8)
+      return get.nonindicated_number_str_arr.number_arr(hex_arr, 8)
     end,
     number_base_10_arr = function(hex_arr)
-      return get.nonindicated_number_string_arr.number_arr(hex_arr, 10)
+      return get.nonindicated_number_str_arr.number_arr(hex_arr, 10)
     end,
     number_base_16_arr = function(hex_arr)
-      return get.nonindicated_number_string_arr.number_arr(hex_arr, 16)
+      return get.nonindicated_number_str_arr.number_arr(hex_arr, 16)
     end,
   },
-  nonindicated_number_string = {
+  nonindicated_number_str = {
     number_base_2 = function(num)
-      return get.nonindicated_number_string.number_or_nil(num, 2)
+      return get.nonindicated_number_str.number_or_nil(num, 2)
     end,
     number_base_8 = function(num)
-      return get.nonindicated_number_string.number_or_nil(num, 8)
+      return get.nonindicated_number_str.number_or_nil(num, 8)
     end,
     number_base_10 = function(num)
-      return get.nonindicated_number_string.number_or_nil(num, 10)
+      return get.nonindicated_number_str.number_or_nil(num, 10)
     end,
     number_base_16 = function(num)
-      return get.nonindicated_number_string.number_or_nil(num, 16)
+      return get.nonindicated_number_str.number_or_nil(num, 16)
     end,
   },
-  indicated_number_string = {
-    nonindicated_number_string = function(indicated_number)
+  indicated_number_str = {
+    nonindicated_number_str = function(indicated_number)
       return indicated_number:sub(3)
     end,
     base_letter = function(indicated_number)
@@ -38,50 +38,50 @@ transf = {
     end,
     base = function(indicated_number)
       return tblmap.base_letter.base[
-        transf.indicated_number_string.base_letter(indicated_number)
+        transf.indicated_number_str.base_letter(indicated_number)
         ]
     end,
     number = function(indicated_number)
-      return get.nonindicated_number_string.number_or_nil(
+      return get.nonindicated_number_str.number_or_nil(
         indicated_number:sub(3),
-        transf.indicated_number_string.base(indicated_number)
+        transf.indicated_number_str.base(indicated_number)
       )
     end,
   },
   percent_encoded_octet = {
     char = function(percent)
       local num = percent:sub(2, 3)
-      return transf.eight_bit_pos_int.ascii_char(get.string_or_number.number_or_nil(num, 16))
+      return transf.eight_bit_pos_int.ascii_char(get.str_or_number.number_or_nil(num, 16))
     end,
   },
-  unicode_codepoint_string = { -- U+X...`
+  unicode_codepoint_str = { -- U+X...`
     number = function(codepoint)
-      return get.nonindicated_number_string.number_or_nil(transf.unicode_codepoint_string.nonindicated_hex_number_string(codepoint), 16)
+      return get.nonindicated_number_str.number_or_nil(transf.unicode_codepoint_str.nonindicated_hex_number_str(codepoint), 16)
     end,
-    nonindicated_hex_number_string = function(codepoint)
+    nonindicated_hex_number_str = function(codepoint)
       return codepoint:sub(3)
     end,
     unicode_prop_table = function(codepoint)
-      return get.fn.rt_or_nil_by_memoized(transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_or_nil_by_memoized(transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
-        .. transf.string.string_by_single_quoted_escaped(
+        .. transf.str.str_by_single_quoted_escaped(
           codepoint
         )
       )[1]
     end
   },
-  indicated_utf8_hex_string = {
+  indicated_utf8_hex_str = {
     unicode_prop_table = function(str)
-      return get.fn.rt_or_nil_by_memoized(transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_or_nil_by_memoized(transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
-        .. transf.string.string_by_single_quoted_escaped(
+        .. transf.str.str_by_single_quoted_escaped(
           str
         )
       )[1]
     end
   },
   unicode_prop_table = {
-    unicode_codepoint_binary_string = function(unicode_prop_table)
+    unicode_codepoint_binary_str = function(unicode_prop_table)
       return unicode_prop_table.bin
     end,
     unicode_block_name = function(unicode_prop_table)
@@ -96,13 +96,13 @@ transf = {
     unicode_codepoint = function(unicode_prop_table)
       return unicode_prop_table.cpoint
     end,
-    unicode_codepoint_decimal_string = function(unicode_prop_table)
+    unicode_codepoint_decimal_str = function(unicode_prop_table)
       return unicode_prop_table.dec
     end,
-    unicode_codepoint_hex_string = function(unicode_prop_table)
+    unicode_codepoint_hex_str = function(unicode_prop_table)
       return unicode_prop_table.hex
     end,
-    unicode_codepoint_octal_string = function(unicode_prop_table)
+    unicode_codepoint_octal_str = function(unicode_prop_table)
       return unicode_prop_table.oct
     end,
     html_entity = function(unicode_prop_table)
@@ -114,8 +114,8 @@ transf = {
     unicode_plane = function(unicode_prop_table)
       return unicode_prop_table.plane
     end,
-    utf8_hex_string = function(unicode_prop_table)
-      return transf.string.nowhitespace_string(unicode_prop_table.utf8)
+    utf8_hex_str = function(unicode_prop_table)
+      return transf.str.nowhitespace_str(unicode_prop_table.utf8)
     end,
     summary = function(unicode_prop_table)
       return transf.unicode_prop_table.char(unicode_prop_table) .. ": "
@@ -132,56 +132,56 @@ transf = {
       end
     end,
     
-    nonindicated_decimal_number_string = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_decimal_number_string(transf.number.pos_number(num))
+    nonindicated_decimal_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_decimal_number_str(transf.number.pos_number(num))
     end,
-    separated_nonindicated_decimal_number_string = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_decimal_number_string(transf.number.pos_number(num))
+    separated_nonindicated_decimal_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_decimal_number_str(transf.number.pos_number(num))
     end,
-    indicated_decimal_number_string = function(num)
-      return transf.number.sign_indicator(num) .. "0d" .. transf.pos_number.nonindicated_decimal_number_string(transf.number.pos_number(num))
+    indicated_decimal_number_str = function(num)
+      return transf.number.sign_indicator(num) .. "0d" .. transf.pos_number.nonindicated_decimal_number_str(transf.number.pos_number(num))
     end,
-    nonindicated_hex_number_string = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_hex_number_string(transf.number.pos_number(num))
+    nonindicated_hex_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_hex_number_str(transf.number.pos_number(num))
     end,
-    separated_nonindicated_hex_number_string = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_hex_number_string(transf.number.pos_number(num))
+    separated_nonindicated_hex_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_hex_number_str(transf.number.pos_number(num))
     end,
-    indicated_hex_number_string = function(num)
-      return transf.number.sign_indicator(num) .. "0x" .. transf.pos_number.nonindicated_hex_number_string(transf.number.pos_number(num))
+    indicated_hex_number_str = function(num)
+      return transf.number.sign_indicator(num) .. "0x" .. transf.pos_number.nonindicated_hex_number_str(transf.number.pos_number(num))
     end,
-    byte_hex_number_string_arr = function(num)
-      return  get.string.string_arr_groups_ascii_from_end(
-        transf.number.nonindicated_hex_number_string(num),
+    byte_hex_number_str_arr = function(num)
+      return  get.str.str_arr_groups_ascii_from_end(
+        transf.number.nonindicated_hex_number_str(num),
         2
       )
     end,
-    two_byte_hex_number_string_arr = function(num)
-      return  get.string.string_arr_groups_ascii_from_end(
-        transf.number.nonindicated_hex_number_string(num),
+    two_byte_hex_number_str_arr = function(num)
+      return  get.str.str_arr_groups_ascii_from_end(
+        transf.number.nonindicated_hex_number_str(num),
         4
       )
     end,
     
-    noninciated_octal_number_string = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.noninciated_octal_number_string(transf.number.pos_number(num))
+    noninciated_octal_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.noninciated_octal_number_str(transf.number.pos_number(num))
     end,
 
-    separated_nonindicated_octal_number_string = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_octal_number_string(transf.number.pos_number(num))
+    separated_nonindicated_octal_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_octal_number_str(transf.number.pos_number(num))
     end,
-    indicated_octal_number_string = function(num)
-      return transf.number.sign_indicator(num) .. "0o" .. transf.pos_number.noninciated_octal_number_string(transf.number.pos_number(num))
+    indicated_octal_number_str = function(num)
+      return transf.number.sign_indicator(num) .. "0o" .. transf.pos_number.noninciated_octal_number_str(transf.number.pos_number(num))
     end,
 
-    nonindicated_binary_number_string = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_binary_number_string(transf.number.pos_number(num))
+    nonindicated_binary_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_binary_number_str(transf.number.pos_number(num))
     end,
-    separated_nonindicated_binary_number_string = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_binary_number_string(transf.number.pos_number(num))
+    separated_nonindicated_binary_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_binary_number_str(transf.number.pos_number(num))
     end,
-    indicated_binary_number_string = function(num)
-      return transf.number.sign_indicator(num) .. "0b" .. transf.pos_number.nonindicated_binary_number_string(transf.number.pos_number(num))
+    indicated_binary_number_str = function(num)
+      return transf.number.sign_indicator(num) .. "0b" .. transf.pos_number.nonindicated_binary_number_str(transf.number.pos_number(num))
     end,
     int_by_rounded = function(num)
       return math.floor(num + 0.5)
@@ -230,8 +230,8 @@ transf = {
       return transf.number.pos_number(num) - transf.number.pos_int_part(num)
     end,
     pos_int_float_part = function(num)
-      return transf.nonindicated_number_string.number_base_10(
-        tostring(
+      return transf.nonindicated_number_str.number_base_10(
+        tostr(
           transf.number.pos_float_part(num)
         ):sub(3)
       )
@@ -244,107 +244,107 @@ transf = {
     end,
   },
   pos_number = { 
-    nonindicated_decimal_number_string = function(num)
+    nonindicated_decimal_number_str = function(num)
       return 
-        transf.pos_int.nonindicated_decimal_number_string(
+        transf.pos_int.nonindicated_decimal_number_str(
           transf.number.pos_int_part(num)
         ) .. 
         (
           transf.number.pos_float_part(num) == 0 and "" or 
           (
-            "." .. transf.pos_int.nonindicated_decimal_number_string(
+            "." .. transf.pos_int.nonindicated_decimal_number_str(
               transf.number.pos_int_float_part(num)
             )
           )
         )
       end,
-    separated_nonindicated_decimal_number_string = function(num)
+    separated_nonindicated_decimal_number_str = function(num)
       return 
-        transf.pos_int.separated_nonindicated_decimal_number_string(
+        transf.pos_int.separated_nonindicated_decimal_number_str(
           transf.number.pos_int_part(num)
         ) .. 
         (
           transf.number.pos_float_part(num) == 0 and "" or 
           (
-            "." .. transf.pos_int.separated_nonindicated_decimal_number_string(
+            "." .. transf.pos_int.separated_nonindicated_decimal_number_str(
               transf.number.pos_int_float_part(num)
             )
           )
         )
       end,
-    nonindicated_hex_number_string = function(num)
-      return transf.pos_int.nonindicated_hex_number_string(
+    nonindicated_hex_number_str = function(num)
+      return transf.pos_int.nonindicated_hex_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.nonindicated_hex_number_string(
+          "." .. transf.pos_int.nonindicated_hex_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
       )
     end,
-    separated_nonindicated_hex_number_string = function(num)
-      return transf.pos_int.separated_nonindicated_hex_number_string(
+    separated_nonindicated_hex_number_str = function(num)
+      return transf.pos_int.separated_nonindicated_hex_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.separated_nonindicated_hex_number_string(
+          "." .. transf.pos_int.separated_nonindicated_hex_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
       )
     end,
-    noninciated_octal_number_string = function(num)
-      return transf.pos_int.noninciated_octal_number_string(
+    noninciated_octal_number_str = function(num)
+      return transf.pos_int.noninciated_octal_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.noninciated_octal_number_string(
+          "." .. transf.pos_int.noninciated_octal_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
       )
     end,
-    separated_nonindicated_octal_number_string = function(num)
-      return transf.pos_int.separated_nonindicated_octal_number_string(
+    separated_nonindicated_octal_number_str = function(num)
+      return transf.pos_int.separated_nonindicated_octal_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.separated_nonindicated_octal_number_string(
+          "." .. transf.pos_int.separated_nonindicated_octal_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
       )
     end,
-    nonindicated_binary_number_string = function(num)
-      return transf.pos_int.nonindicated_binary_number_string(
+    nonindicated_binary_number_str = function(num)
+      return transf.pos_int.nonindicated_binary_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.nonindicated_binary_number_string(
+          "." .. transf.pos_int.nonindicated_binary_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
       )
     end,
-    separated_nonindicated_binary_number_string = function(num)
-      return transf.pos_int.separated_nonindicated_binary_number_string(
+    separated_nonindicated_binary_number_str = function(num)
+      return transf.pos_int.separated_nonindicated_binary_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.separated_nonindicated_binary_number_string(
+          "." .. transf.pos_int.separated_nonindicated_binary_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
@@ -364,7 +364,7 @@ transf = {
   
   int = {
     length = function(int)
-      return #tostring(int)
+      return #tostr(int)
     end,
     pos_int_or_nil = function(int)
       if int > 0 then
@@ -388,51 +388,51 @@ transf = {
     end,
   },
   pos_int = {
-    random_base64_gen_string_of_length = function(int)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. tostring(transf.number.int_by_rounded(int * 3/4))) -- 3/4 because base64 takes the int to be the input length, but we want to specify the output length (which is 4/3 the input length in case of base64)
+    random_base64_gen_str_of_length = function(int)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. tostr(transf.number.int_by_rounded(int * 3/4))) -- 3/4 because base64 takes the int to be the input length, but we want to specify the output length (which is 4/3 the input length in case of base64)
     end,
-    nonindicated_decimal_number_string = function(num)
-      return tostring(num)
+    nonindicated_decimal_number_str = function(num)
+      return tostr(num)
     end,
-    separated_nonindicated_decimal_number_string = function(num)
-      return get.string.string_with_separator_grouped_ascii_from_end(
-        transf.pos_int.nonindicated_decimal_number_string(num),
+    separated_nonindicated_decimal_number_str = function(num)
+      return get.str.str_with_separator_grouped_ascii_from_end(
+        transf.pos_int.nonindicated_decimal_number_str(num),
         3,
         " "
       )
     end,
-    nonindicated_hex_number_string = function(num)
-      return get.string.string_by_formatted_w_n_anys("%X", num)
+    nonindicated_hex_number_str = function(num)
+      return get.str.str_by_formatted_w_n_anys("%X", num)
     end,
-    separated_nonindicated_hex_number_string = function(num)
-      return get.string.string_with_separator_grouped_ascii_from_end(
-        transf.pos_int.nonindicated_hex_number_string(num),
+    separated_nonindicated_hex_number_str = function(num)
+      return get.str.str_with_separator_grouped_ascii_from_end(
+        transf.pos_int.nonindicated_hex_number_str(num),
         2,
         " "
       )
     end,
-    noninciated_octal_number_string = function(num)
-      return get.string.string_by_formatted_w_n_anys("%o", num)
+    noninciated_octal_number_str = function(num)
+      return get.str.str_by_formatted_w_n_anys("%o", num)
     end,
-    separated_nonindicated_octal_number_string = function(num)
-      return get.string.string_with_separator_grouped_ascii_from_end(
-        transf.pos_int.noninciated_octal_number_string(num),
+    separated_nonindicated_octal_number_str = function(num)
+      return get.str.str_with_separator_grouped_ascii_from_end(
+        transf.pos_int.noninciated_octal_number_str(num),
         3,
         " "
       )
     end,
-    nonindicated_binary_number_string = function(num)
-      return get.string.string_by_formatted_w_n_anys("%b", num)
+    nonindicated_binary_number_str = function(num)
+      return get.str.str_by_formatted_w_n_anys("%b", num)
     end,
-    separated_nonindicated_binary_number_string = function(num)
-      return get.string.string_with_separator_grouped_ascii_from_end(
-        transf.pos_int.nonindicated_binary_number_string(num),
+    separated_nonindicated_binary_number_str = function(num)
+      return get.str.str_with_separator_grouped_ascii_from_end(
+        transf.pos_int.nonindicated_binary_number_str(num),
         4,
         " "
       )
     end,
-    indicated_utf8_hex_string = function(int)
-      return "utf8:" .. transf.pos_int.nonindicated_hex_number_string(int)
+    indicated_utf8_hex_str = function(int)
+      return "utf8:" .. transf.pos_int.nonindicated_hex_number_str(int)
     end,
     int_by_largest_of_length = function(int)
       return 10^int - 1
@@ -443,14 +443,14 @@ transf = {
     int_by_center_of_length = function(int)
       return (transf.pos_int.int_by_largest_of_length(int)+1) / 2
     end,
-    unicode_codepoint_string = function(num)
-      return "U+" .. transf.pos_int.nonindicated_hex_number_string(num)
+    unicode_codepoint_str = function(num)
+      return "U+" .. transf.pos_int.nonindicated_hex_number_str(num)
     end,
     unicode_prop_table_from_unicde_codepoint = function(num)
-      return transf.unicode_codepoint_string.unicode_prop_table(transf.pos_int.unicode_codepoint_string(num))
+      return transf.unicode_codepoint_str.unicode_prop_table(transf.pos_int.unicode_codepoint_str(num))
     end,
     unicode_prop_table_from_utf8 = function(num)
-      return  transf.indicated_utf8_hex_string.unicode_prop_table(transf.pos_int.indicated_utf8_hex_string(num))
+      return  transf.indicated_utf8_hex_str.unicode_prop_table(transf.pos_int.indicated_utf8_hex_str(num))
     end,
     gelbooru_post_url = function(pos_int)
       return "https://gelbooru.com/index.php?page=post&s=view&id=" .. pos_int
@@ -460,13 +460,13 @@ transf = {
     end,
   },
   eight_bit_pos_int = {
-    ascii_char = string.char,
+    ascii_char = str.char,
   },
   pos_int_arr = {
-    unicode_codepoint_string_arr = function(arr)
+    unicode_codepoint_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        transf.pos_int.unicode_codepoint_string
+        transf.pos_int.unicode_codepoint_str
       )
     end,
     ascii_char_arr = function(arr)
@@ -475,34 +475,34 @@ transf = {
         transf.pos_int.ascii_char
       )
     end,
-    string_from_ascii_char_arr = function(arr)
-      return get.string_or_number_arr.string_by_joined(
+    str_from_ascii_char_arr = function(arr)
+      return get.str_or_number_arr.str_by_joined(
         transf.pos_int.ascii_char_arr(arr)
       )
     end,
     unicode_prop_table_arr_from_unicode_codepoint_arr = function(arr)
-      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_or_nil_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
-        .. transf.string.string_by_single_quoted_escaped(
-          get.string_or_number_arr.string_by_joined(
-            transf.pos_int.unicode_codepoint_string_arr(arr),
+        .. transf.str.str_by_single_quoted_escaped(
+          get.str_or_number_arr.str_by_joined(
+            transf.pos_int.unicode_codepoint_str_arr(arr),
             " "
           )
         )
       )
     end,
-    indicated_utf8_hex_string_arr = function(arr)
+    indicated_utf8_hex_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        transf.pos_int.indicated_utf8_hex_string
+        transf.pos_int.indicated_utf8_hex_str
       )
     end,
     unicode_prop_table_arr_from_utf8_arr = function(arr)
-      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_or_nil_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
-        .. transf.string.string_by_single_quoted_escaped(
-          get.string_or_number_arr.string_by_joined(
-            transf.pos_int.indicated_utf8_hex_string_arr(arr),
+        .. transf.str.str_by_single_quoted_escaped(
+          get.str_or_number_arr.str_by_joined(
+            transf.pos_int.indicated_utf8_hex_str_arr(arr),
             " "
           )
         )
@@ -510,11 +510,11 @@ transf = {
     end,
   },
   not_nil = {
-    string = function(arg)
+    str = function(arg)
       if arg == nil then
         return nil
       else
-        return transf.any.string(arg)
+        return transf.any.str(arg)
       end
     end,
   },
@@ -544,28 +544,28 @@ transf = {
     arr_by_nolast = function(arr)
       return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(arr, 1, -2)
     end,
-    empty_string_value_assoc = function(arr)
+    empty_str_value_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
-        transf.any.self_and_empty_string
+        transf.any.self_and_empty_str
       )
     end,
-    string_arr = function(arr)
+    str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        transf.any.string
+        transf.any.str
       )
     end,
     contents_summary = function(arr)
-      return transf.string_arr.contents_summary(
-        transf.arr.string_arr(arr)
+      return transf.str_arr.contents_summary(
+        transf.arr.str_arr(arr)
       )
     end,
     summary = function(arr)
       return "arr ("..#arr.."):" .. transf.arr.contents_summary(arr)
     end,
-    multiline_string = function(arr)
-      return transf.string_arr.multiline_string(transf.arr.string_arr(arr))
+    multiline_str = function(arr)
+      return transf.str_arr.multiline_str(transf.arr.str_arr(arr))
     end,
     
     index_value_stateless_iter = ipairs,
@@ -628,21 +628,21 @@ transf = {
   },
   char = {
     unicode_prop_table = function(char)
-      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.string.string_by_single_quoted_escaped(char))[1]
+      return get.fn.rt_or_nil_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.str.str_by_single_quoted_escaped(char))[1]
     end
   },
   ascii_char = {
-    eight_bit_pos_int = string.byte,
-    indicated_hex_number_string = function(char)
-      return get.string.string_by_formatted_w_n_anys("0x%02X", transf.ascii_char.eight_bit_pos_int(char))
+    eight_bit_pos_int = str.byte,
+    indicated_hex_number_str = function(char)
+      return get.str.str_by_formatted_w_n_anys("0x%02X", transf.ascii_char.eight_bit_pos_int(char))
     end,
     percent_encoded_octet = function(char)
-      return get.string.string_by_formatted_w_n_anys("%%%02X", transf.ascii_char.eight_bit_pos_int(char))
+      return get.str.str_by_formatted_w_n_anys("%%%02X", transf.ascii_char.eight_bit_pos_int(char))
     end,
   },
   leaf = {
-    rf3339like_dt_or_interval_general_name_fs_tag_string = function(leaf)
-      return get.string.n_strings_by_extracted_onig(
+    rf3339like_dt_or_interval_general_name_fs_tag_str = function(leaf)
+      return get.str.n_strs_by_extracted_onig(
         leaf,
         ("^(%s(?:_to_%s)?--)?([^%%]*)(%%.*)?$"):format(
           r.g.date.rfc3339like_dt,
@@ -651,9 +651,9 @@ transf = {
       )
     end,
   },
-  ascii_string = {
+  ascii_str = {
     printable_ascii_by_remove = function(str)
-      return get.string.string_by_removed_onig_inverted_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
+      return get.str.str_by_removed_onig_inverted_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
     end,
   },
   path = {
@@ -667,15 +667,15 @@ transf = {
         return {"/"}
       else
         -- remove leading and trailing slashes
-        if get.string.string_by_sub_eutf8(path, 1, 1) == "/" then
-          path = get.string.string_by_sub_eutf8(path, 2)
+        if get.str.str_by_sub_eutf8(path, 1, 1) == "/" then
+          path = get.str.str_by_sub_eutf8(path, 2)
         end
-        if get.string.string_by_sub_eutf8(path, -1) == "/" then
-          path = get.string.string_by_sub_eutf8(path, 1, -2)
+        if get.str.str_by_sub_eutf8(path, -1) == "/" then
+          path = get.str.str_by_sub_eutf8(path, 1, -2)
         end
 
         -- split into components
-        return get.string.string_arr_split_single_char(path, "/")
+        return get.str.str_arr_split_single_char(path, "/")
       end
     end,
     pos_int_by_path_component_arr_length = function(path)
@@ -694,14 +694,14 @@ transf = {
       local extension = ""
       if leaf == "" then
         -- already both empty, nothing to do
-      elseif get.string.bool_by_startswith(leaf, ".") then -- dotfile
+      elseif get.str.bool_by_startswith(leaf, ".") then -- dotfile
         without_extension = leaf
-      elseif get.string.bool_by_endswith(leaf, ".") then -- file that ends with a dot, does not count as having an extension
+      elseif get.str.bool_by_endswith(leaf, ".") then -- file that ends with a dot, does not count as having an extension
         without_extension = leaf
-      elseif get.string.bool_by_not_contains_w_ascii_string(leaf, ".") then
+      elseif get.str.bool_by_not_contains_w_ascii_str(leaf, ".") then
         without_extension = leaf
       else -- in case of multiple dots, everything after the last dot is considered the extension
-        without_extension, extension = get.string.n_strings_by_extracted_eutf8(leaf, transf.string.string_by_whole_regex(r.lua.without_extension_and_extension))
+        without_extension, extension = get.str.n_strs_by_extracted_eutf8(leaf, transf.str.str_by_whole_regex(r.lua.without_extension_and_extension))
       end
       dothis.arr.push(path_components, without_extension)
       dothis.arr.push(path_components, extension)
@@ -730,7 +730,7 @@ transf = {
       return psegments[#psegments]
     end,
     ending_with_slash = function(path)
-      return get.string.string_by_with_suffix(path or "", "/")
+      return get.str.str_by_with_suffix(path or "", "/")
     end,
     initial_path_component = function(path)
       return transf.path.path_component_arr(path)[1]
@@ -761,19 +761,19 @@ transf = {
       )
     end,
     path_leaf_specifier = function(path)
-      local rf3339like_dt_or_interval, general_name, fs_tag_string = transf.leaf.rf3339like_dt_or_interval_general_name_fs_tag_string(transf.path.leaf(path))
+      local rf3339like_dt_or_interval, general_name, fs_tag_str = transf.leaf.rf3339like_dt_or_interval_general_name_fs_tag_str(transf.path.leaf(path))
       return {
         extension = transf.path.extension(path),
         path = transf.path.parent_path(path),
         rfc3339like_dt_or_interval = rf3339like_dt_or_interval,
         general_name = general_name,
-        fs_tag_assoc = transf.fs_tag_string.fs_tag_assoc(fs_tag_string),
+        fs_tag_assoc = transf.fs_tag_str.fs_tag_assoc(fs_tag_str),
       }
     end,
     window_with_leaf_as_title = function(path)
-      return transf.string.window_or_nil_by_title(transf.path.leaf(path))
+      return transf.str.window_or_nil_by_title(transf.path.leaf(path))
     end,
-    local_or_remote_string = function(path)
+    local_or_remote_str = function(path)
       if is.path.remote_path(path) then
         return "remote"
       else
@@ -791,19 +791,19 @@ transf = {
 
   path_with_intra_file_locator = {
     path_with_intra_file_locator_specifier = function(path)
-      local parts = stringy.split(path, ":")
+      local parts = stry.split(path, ":")
       local final_part = act.arr.pop(parts)
       local specifier = {}
-      if is.string.number_string(parts[#parts]) then
+      if is.str.number_str(parts[#parts]) then
         specifier = {
           column = final_part,
           line = act.arr.pop(parts),
-          path = get.string_or_number_arr.string_by_joined(parts, ":")
+          path = get.str_or_number_arr.str_by_joined(parts, ":")
         }
       else
         specifier = {
           line = final_part,
-          path = get.string_or_number_arr.string_by_joined(parts, ":")
+          path = get.str_or_number_arr.str_by_joined(parts, ":")
         }
       end
       return specifier
@@ -846,9 +846,9 @@ transf = {
     file_url = function(path)
       return transf.local_absolute_path.file_url(transf.absolute_path.local_absolute_path(path))
     end,
-    string_or_nil_by_file_contents = function(path)
+    str_or_nil_by_file_contents = function(path)
       if is.absolute_path.file(path) then
-        return transf.file.string_by_contents(path)
+        return transf.file.str_by_contents(path)
       else
         return nil
       end
@@ -860,7 +860,7 @@ transf = {
     end,
     prompted_multiple_local_absolute_path_from_default = function(path)
       return transf.prompt_spec.any_arr({
-        prompter = transf.prompt_args_string.string_or_nil_and_bool,
+        prompter = transf.prompt_args_str.str_or_nil_and_bool,
         prompt_args = {
           message =  "Enter a subdirectory (or file, if last) (started with: " .. path .. ")",
         }
@@ -868,7 +868,7 @@ transf = {
     end,
     prompted_once_local_absolute_path_from_default = function(path)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_bool,
+        prompter = transf.prompt_args_str.str_or_nil_and_bool,
         prompt_args = {
           message =  "Enter a directory or file as a child of " .. path,
         }
@@ -1095,10 +1095,10 @@ transf = {
   },
   labelled_remote_dir = {
     children_absolute_path_arr = function(remote_extant_path)
-      local output = transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone lsf" .. transf.string.string_by_single_quoted_escaped(remote_extant_path))
+      local output = transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone lsf" .. transf.str.str_by_single_quoted_escaped(remote_extant_path))
       if output then
-        items = transf.string.noempty_line_string_arr(output)
-        items = transf.string_arr.stripped_string_arr(items)
+        items = transf.str.noempty_line_str_arr(output)
+        items = transf.str_arr.stripped_str_arr(items)
       else
         items = {}
       end
@@ -1119,7 +1119,7 @@ transf = {
     end,
   },
   local_file = {
-    string_by_contents = function(path)
+    str_by_contents = function(path)
       local file = io.open(path, "r")
       if file ~= nil then
         local contents = file:read("*a")
@@ -1129,7 +1129,7 @@ transf = {
         error("Couldn't read file at " .. path .. "!")
       end
     end,
-    attachment_string = function(path)
+    attachment_str = function(path)
       local mimetype = mimetypes.guess(path) or "text/plain"
       return "#" .. mimetype .. " " .. path
     end,
@@ -1141,10 +1141,10 @@ transf = {
   },
   local_file_arr = {
     attachment_arr = function(path_arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.local_file.attachment_string)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.local_file.attachment_str)
     end,
-    attachment_string = function(path_arr)
-      return get.string_or_number_arr.string_by_joined(transf.path_arr.attachment_arr(path_arr), "\n")
+    attachment_str = function(path_arr)
+      return get.str_or_number_arr.str_by_joined(transf.path_arr.attachment_arr(path_arr), "\n")
     end,
     email_specifier = function(path_arr)
       return {
@@ -1153,21 +1153,21 @@ transf = {
     end,
   },
   labelled_remote_file = {
-    string_by_contents = function(path)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone cat" .. transf.string.string_by_single_quoted_escaped(path))
+    str_by_contents = function(path)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone cat" .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
   remote_file = {
-    string_by_contents = function(path)
-      return transf.labelled_remote_file.string_by_contents(path)
+    str_by_contents = function(path)
+      return transf.labelled_remote_file.str_by_contents(path)
     end,
   },
   file = {
-    string_by_contents = function(path)
+    str_by_contents = function(path)
       if is.path.remote_path(path) then
-        return transf.remote_file.string_by_contents(path)
+        return transf.remote_file.str_by_contents(path)
       else
-        return transf.local_file.string_by_contents(path)
+        return transf.local_file.str_by_contents(path)
       end
     end,
   },
@@ -1239,12 +1239,12 @@ transf = {
     grandchildren_absolute_path_arr = function(dir)
       return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_arr_by_children(dir), transf.dir.absolute_path_arr_by_children)
     end,
-    absolute_path_key_leaf_string_or_nested_value_assoc = function(path)
+    absolute_path_key_leaf_str_or_nested_value_assoc = function(path)
       local res = {}
-      path = get.string.string_by_with_suffix(path, "/")
+      path = get.str.str_by_with_suffix(path, "/")
       for child_path in transf.dir.children_absolute_path_value_stateful_iter(path) do
         if is.absolute_path.dir(child_path) then
-          res[child_path] = transf.dir.absolute_path_key_leaf_string_or_nested_value_assoc(child_path)
+          res[child_path] = transf.dir.absolute_path_key_leaf_str_or_nested_value_assoc(child_path)
         else
           res[child_path] = "leaf"
         end
@@ -1252,15 +1252,15 @@ transf = {
       return res
     end,
     plaintext_assoconary_read_assoc = function(path)
-      transf.absolute_path_key_leaf_string_or_nested_value_assoc.plaintext_assoconary_read_assoc(
-        transf.dir.absolute_path_key_leaf_string_or_nested_value_assoc(path)
+      transf.absolute_path_key_leaf_str_or_nested_value_assoc.plaintext_assoconary_read_assoc(
+        transf.dir.absolute_path_key_leaf_str_or_nested_value_assoc(path)
       )
     end,
-    string_by_ls = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("ls -F -1" .. transf.string.string_by_single_quoted_escaped(path))
+    str_by_ls = function(path)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("ls -F -1" .. transf.str.str_by_single_quoted_escaped(path))
     end,
-    string_by_tree = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("tree -F --noreport" .. transf.string.string_by_single_quoted_escaped(path))
+    str_by_tree = function(path)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("tree -F --noreport" .. transf.str.str_by_single_quoted_escaped(path))
     end,
     path_leaf_specifier_arr_by_children = function(path)
       return transf.path_arr.path_leaf_specifier_arr(
@@ -1285,13 +1285,13 @@ transf = {
       return transf.path_leaf_specifier.path(path_leaf_specifier)
     end
   },
-  absolute_path_key_leaf_string_or_nested_value_assoc = {
-    leaf_key_leaf_string_or_nested_value_assoc = function(assoc)
+  absolute_path_key_leaf_str_or_nested_value_assoc = {
+    leaf_key_leaf_str_or_nested_value_assoc = function(assoc)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc) do
         local leaf = transf.path.leaf(k)
         if is.any.table(v) then
-          res[leaf] = transf.absolute_path_key_leaf_string_or_nested_value_assoc.leaf_key_leaf_string_or_nested_value_assoc(v)
+          res[leaf] = transf.absolute_path_key_leaf_str_or_nested_value_assoc.leaf_key_leaf_str_or_nested_value_assoc(v)
         else
           res[leaf] = v
         end
@@ -1303,7 +1303,7 @@ transf = {
       for k, v in transf.table.stateless_key_value_iter(assoc) do
         local filename = transf.path.filename(k)
         if is.any.table(v) then
-          res[filename] = transf.absolute_path_key_leaf_string_or_nested_value_assoc.plaintext_assoconary_read_assoc(v)
+          res[filename] = transf.absolute_path_key_leaf_str_or_nested_value_assoc.plaintext_assoconary_read_assoc(v)
         else
           if is.file.plaintext_associonary_file(k) then
             res[filename] = transf.plaintext_associonary_file.table(k)
@@ -1341,8 +1341,8 @@ transf = {
         path,
         "git config --get remote.origin.url"
       )
-      raw = get.string.string_by_no_suffix(raw, ".git")
-      raw = get.string.string_by_no_suffix(raw, "/")
+      raw = get.str.str_by_no_suffix(raw, ".git")
+      raw = get.str.str_by_no_suffix(raw, "/")
       return raw
     end,
     remote_owner_item = function(path)
@@ -1382,7 +1382,7 @@ transf = {
         path,
         "git log --branches --not --remotes --pretty=format:'%h'"
       )
-      return transf.string.noempty_line_string_arr(raw_hashes)
+      return transf.str.noempty_line_str_arr(raw_hashes)
     end
 
 
@@ -1444,14 +1444,14 @@ transf = {
     fs_tag_assoc = function(path_leaf_specifier)
       return path_leaf_specifier.fs_tag_assoc
     end,
-    fs_tag_string_assoc = function(path_leaf_specifier)
-      return transf.fs_tag_assoc.fs_tag_string_assoc(path_leaf_specifier.fs_tag_assoc)
+    fs_tag_str_assoc = function(path_leaf_specifier)
+      return transf.fs_tag_assoc.fs_tag_str_assoc(path_leaf_specifier.fs_tag_assoc)
     end,
-    fs_tag_string_part_arr = function(path_leaf_specifier)
-      return transf.fs_tag_assoc.fs_tag_string_part_arr(path_leaf_specifier.fs_tag_assoc)
+    fs_tag_str_part_arr = function(path_leaf_specifier)
+      return transf.fs_tag_assoc.fs_tag_str_part_arr(path_leaf_specifier.fs_tag_assoc)
     end,
-    fs_tag_string = function(path_leaf_specifier)
-      return transf.fs_tag_assoc.fs_tag_string(path_leaf_specifier.fs_tag_assoc)
+    fs_tag_str = function(path_leaf_specifier)
+      return transf.fs_tag_assoc.fs_tag_str(path_leaf_specifier.fs_tag_assoc)
     end,
     fs_tag_keys = function(path_leaf_specifier)
       return transf.table_or_nil.kt_arr(path_leaf_specifier.fs_tag_assoc)
@@ -1460,79 +1460,79 @@ transf = {
       return transf.path.ending_with_slash(path_leaf_specifier.path) 
       .. transf.path_leaf_specifier.rf3339like_dt_or_interval_part(path_leaf_specifier)
       .. transf.path_leaf_specifier.general_name_part(path_leaf_specifier)
-      .. transf.path_leaf_specifier.fs_tag_string(path_leaf_specifier)
+      .. transf.path_leaf_specifier.fs_tag_str(path_leaf_specifier)
       .. transf.path_leaf_specifier.extension_part(path_leaf_specifier)
     end
   },
-  fs_tag_string = {
-    fs_tag_string_part_arr = function(fs_tag_string)
-      return stringy.split(
-        fs_tag_string:sub(2),
+  fs_tag_str = {
+    fs_tag_str_part_arr = function(fs_tag_str)
+      return stry.split(
+        fs_tag_str:sub(2),
         "%"
       )
     end,
-    fs_tag_string_assoc = function(fs_tag_string)
+    fs_tag_str_assoc = function(fs_tag_str)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        transf.fs_tag_string.fs_tag_string_part_arr(fs_tag_string),
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.string.n_strings_split, {a_use, "-", 2})
+        transf.fs_tag_str.fs_tag_str_part_arr(fs_tag_str),
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.str.n_strs_split, {a_use, "-", 2})
       )
     end,
-    fs_tag_assoc = function(fs_tag_string)
-      transf.fs_tag_string_assoc.fs_tag_assoc(
-        transf.fs_tag_string.fs_tag_string_assoc(fs_tag_string)
+    fs_tag_assoc = function(fs_tag_str)
+      transf.fs_tag_str_assoc.fs_tag_assoc(
+        transf.fs_tag_str.fs_tag_str_assoc(fs_tag_str)
       )
     end,
   },
-  fs_tag_string_part_arr = {
-    fs_tag_string_assoc = function(fs_tag_string_part_arr)
+  fs_tag_str_part_arr = {
+    fs_tag_str_assoc = function(fs_tag_str_part_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        fs_tag_string_part_arr,
-        get.fn.second_n_args_bound_fn(get.string.two_strings_split_or_nil, "-")
+        fs_tag_str_part_arr,
+        get.fn.second_n_args_bound_fn(get.str.two_strs_split_or_nil, "-")
       )
     end,
-    fs_tag_assoc = function(fs_tag_string_part_arr)
-      transf.fs_tag_string_assoc.fs_tag_assoc(
-        transf.fs_tag_string_part_arr.fs_tag_string_assoc(fs_tag_string_part_arr)
+    fs_tag_assoc = function(fs_tag_str_part_arr)
+      transf.fs_tag_str_assoc.fs_tag_assoc(
+        transf.fs_tag_str_part_arr.fs_tag_str_assoc(fs_tag_str_part_arr)
       )
     end,
-    fs_tag_string = function(fs_tag_string_part_arr)
-      return "%" .. get.string_or_number_arr.string_by_joined(fs_tag_string_part_arr, "%")
+    fs_tag_str = function(fs_tag_str_part_arr)
+      return "%" .. get.str_or_number_arr.str_by_joined(fs_tag_str_part_arr, "%")
     end,
   },
-  fs_tag_string_assoc = {
+  fs_tag_str_assoc = {
     fs_tag_assoc = function(assoc)
       return hs.fnutils.map(
         assoc,
-        get.fn.arbitrary_args_bound_or_ignored_fn(stringy.split, {a_use, ","})
+        get.fn.arbitrary_args_bound_or_ignored_fn(stry.split, {a_use, ","})
       )
     end,
-    fs_tag_string_part_arr = function(assoc)
-      return get.table.string_arr_by_mapped_w_fmt_string(
+    fs_tag_str_part_arr = function(assoc)
+      return get.table.str_arr_by_mapped_w_fmt_str(
         assoc,
         "%s-%s"
       )
     end,
-    fs_tag_string = function(assoc)
-      return transf.fs_tag_string_part_arr.fs_tag_string(
-        transf.fs_tag_string_assoc.fs_tag_string_part_arr(assoc)
+    fs_tag_str = function(assoc)
+      return transf.fs_tag_str_part_arr.fs_tag_str(
+        transf.fs_tag_str_assoc.fs_tag_str_part_arr(assoc)
       )
     end,
   },
   fs_tag_assoc = {
-    fs_tag_string_assoc = function(fs_tag_assoc)
+    fs_tag_str_assoc = function(fs_tag_assoc)
       return hs.fnutils.map(
         fs_tag_assoc,
         transf.any.join_if_arr
       )
     end,
-    fs_tag_string_part_arr = function(fs_tag_assoc)
-      return transf.fs_tag_string_assoc.fs_tag_string_part_arr(
-        transf.fs_tag_assoc.fs_tag_string_assoc(fs_tag_assoc)
+    fs_tag_str_part_arr = function(fs_tag_assoc)
+      return transf.fs_tag_str_assoc.fs_tag_str_part_arr(
+        transf.fs_tag_assoc.fs_tag_str_assoc(fs_tag_assoc)
       )
     end,
-    fs_tag_string = function(fs_tag_assoc)
-      return transf.fs_tag_string_part_arr.fs_tag_string(
-        transf.fs_tag_assoc.fs_tag_string_part_arr(fs_tag_assoc)
+    fs_tag_str = function(fs_tag_assoc)
+      return transf.fs_tag_str_part_arr.fs_tag_str(
+        transf.fs_tag_assoc.fs_tag_str_part_arr(fs_tag_assoc)
       )
     end,
   },
@@ -1602,41 +1602,41 @@ transf = {
   },
   local_image_file = {
     qr_data = function(path)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("zbarimg -q --raw " .. transf.string.string_by_single_quoted_escaped(path))
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("zbarimg -q --raw " .. transf.str.str_by_single_quoted_escaped(path))
     end,
     hs_image = function(path)
       return get.fn.rt_or_nil_by_memoized_invalidate_1_week(hs.image.imageFromPath, "hs.image.imageFromPath")(path)
     end,
     booru_post_url = function(path)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         "saucenao --file" ..
-        transf.string.string_by_single_quoted_escaped(path)
+        transf.str.str_by_single_quoted_escaped(path)
         .. "--output-properties booru-url"
       )
     end,
     data_url = function(path)
       local ext = transf.path.extension(path)
-      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
+      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLstr)(transf.local_image_file.hs_image(path), ext)
     end,
   },
   email_file = {
     all_headers_raw = function(path)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "mshow -L" .. transf.string.string_by_single_quoted_escaped(path)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "mshow -L" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
     all_useful_headers_raw = function(path)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "mshow -q" .. transf.string.string_by_single_quoted_escaped(path)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "mshow -q" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
     useful_header_assoc = function(path)
       error("TODO: currently the way the headers are rendered contains a bunch of stuff we wouldn't want in the assoc. In particular, emails without a name are rendered as <email>, which may not be what we want.")
-      return transf.header_string.assoc(transf.email_file.all_useful_headers_raw(path))
+      return transf.header_str.assoc(transf.email_file.all_useful_headers_raw(path))
     end,
     rendered_body = function(path)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "mshow -R" .. transf.string.string_by_single_quoted_escaped(path)
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+        "mshow -R" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
     simple_view = function(path)
@@ -1654,7 +1654,7 @@ transf = {
       return transf.email_specifier.forward_email_specifier(transf.email_file.email_specifier(path))
     end,
     quoted_body = function(path)
-      transf.string.email_quoted(transf.email_file.rendered_body(path))
+      transf.str.email_quoted(transf.email_file.rendered_body(path))
     end,
     from = function(path)
       return get.email_file.header(path, "from")
@@ -1666,15 +1666,15 @@ transf = {
       return get.email_file.header(path, "subject")
     end,
     mime_parts_raw = function(path)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "mshow -t" .. transf.string.string_by_single_quoted_escaped(path)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "mshow -t" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
     attachments = function(path)
       return transf.mime_parts_raw.attachments(transf.email_file.mime_parts_raw(path))
     end,
     summary = function(path)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.string.string_by_single_quoted_escaped(path))
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.str.str_by_single_quoted_escaped(path))
     end,
     email_file_summary_key_value = function(path)
       return path, transf.email_file.summary(path)
@@ -1689,25 +1689,25 @@ transf = {
       return {
         to = specifier.from,
         subject = "Re: " .. specifier.subject,
-        body = "\n\n" .. transf.string.email_quoted(specifier.body)
+        body = "\n\n" .. transf.str.email_quoted(specifier.body)
       }
     end,
     forward_email_specifier = function(specifier)
       return {
         subject = "Fwd: " .. specifier.subject,
-        body = "\n\n" .. transf.string.email_quoted(specifier.body)
+        body = "\n\n" .. transf.str.email_quoted(specifier.body)
       }
     end,
-    email_string = function(specifier)
+    email_str = function(specifier)
       specifier = get.table.table_by_copy(specifier)
       local body = specifier.body or ""
       specifier.body = nil
       local non_inline_attachment_local_file_arr = specifier.non_inline_attachment_local_file_arr
       specifier.non_inline_attachment_local_file_arr = nil
       local header = transf.assoc.email_header(specifier)
-      local mail = get.string.string_by_formatted_w_n_anys("%s\n\n%s", header, body)
+      local mail = get.str.str_by_formatted_w_n_anys("%s\n\n%s", header, body)
       if non_inline_attachment_local_file_arr then
-        mail = mail .. "\n" .. transf.path_arr.attachment_string(non_inline_attachment_local_file_arr)
+        mail = mail .. "\n" .. transf.path_arr.attachment_str(non_inline_attachment_local_file_arr)
       end
       return mail
     end,
@@ -1715,11 +1715,11 @@ transf = {
     draft_email_file = function(specifier)
       
 
-      local mail = join.string.table.email(body, specifier)
-      local evaled_mail = get.string.string_by_evaled_as_template(mail)
+      local mail = join.str.table.email(body, specifier)
+      local evaled_mail = get.str.str_by_evaled_as_template(mail)
       local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
       local outpath = temppath .. "_out"
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("mmime < " .. transf.string.string_by_single_quoted_escaped(temppath) .. " > " .. transf.string.string_by_single_quoted_escaped(outpath))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("mmime < " .. transf.str.str_by_single_quoted_escaped(temppath) .. " > " .. transf.str.str_by_single_quoted_escaped(outpath))
       dothis.absolute_path.delete(temppath)
       return outpath
     end
@@ -1727,7 +1727,7 @@ transf = {
   mime_parts_raw = {
     attachments = function(mime_parts_raw)
       local attachments = {}
-      for line in transf.string.line_arr(mime_parts_raw) do
+      for line in transf.str.line_arr(mime_parts_raw) do
         local name = line:match("name=\"(.-)\"")
         if name then
           dothis.arr.insert_at_index(attachments, name)
@@ -1738,8 +1738,8 @@ transf = {
   },
   bib_file = {
     arr_of_csl_tables = function(path)
-      return transf.string.table_or_err_by_evaled_env_bash_parsed_json({
-        "citation-js --input" .. transf.string.string_by_single_quoted_escaped(path) ..
+      return transf.str.table_or_err_by_evaled_env_bash_parsed_json({
+        "citation-js --input" .. transf.str.str_by_single_quoted_escaped(path) ..
         "--output-language json"
       })
     end,
@@ -1748,11 +1748,11 @@ transf = {
 
   ics_file = {
     arr_of_assocs = function(path)
-      local temppath = transf.string.in_tmp_dir(transf.path.filename(path) .. ".ics")
+      local temppath = transf.str.in_tmp_dir(transf.path.filename(path) .. ".ics")
       dothis.extant_path.copy_to_absolute_path(path, temppath)
       act.ics_file.generate_json_file(temppath)
-      local jsonpath = transf.file.string_by_contents(get.path.with_different_extension(temppath, "json"))
-      local res = json.decode(transf.file.string_by_contents(jsonpath))
+      local jsonpath = transf.file.str_by_contents(get.path.with_different_extension(temppath, "json"))
+      local res = json.decode(transf.file.str_by_contents(jsonpath))
       dothis.absolute_path.delete(temppath)
       dothis.absolute_path.delete(jsonpath)
       return res
@@ -1760,25 +1760,25 @@ transf = {
   },
   json_file = {
     not_userdata_or_function = function(path)
-      return transf.json_string.not_userdata_or_function(transf.file.string_by_contents(path))
+      return transf.json_str.not_userdata_or_function(transf.file.str_by_contents(path))
     end,
     table_or_nil = function(path)
-      return transf.json_string.table_or_nil(transf.file.string_by_contents(path))
+      return transf.json_str.table_or_nil(transf.file.str_by_contents(path))
     end,
   },
   ini_file = {
     assoc = function(path)
-      return transf.ini_string.assoc(transf.file.string_by_contents(path))
+      return transf.ini_str.assoc(transf.file.str_by_contents(path))
     end,
   },
   toml_file = {
     assoc = function(path)
-      return transf.toml_string.assoc(transf.file.string_by_contents(path))
+      return transf.toml_str.assoc(transf.file.str_by_contents(path))
     end,
   },
   backuped_thing_identifier = {
     timestamp_ms = function(identifier)
-      return  transf.absolute_path.string_or_nil_by_file_contents(
+      return  transf.absolute_path.str_or_nil_by_file_contents(
         transf.path.ending_with_slash(env.MLAST_BACKUP) .. identifier
       ) or 0
     end
@@ -1823,7 +1823,7 @@ transf = {
         return {
           value = value,
           dependencies = get.stateless_iter.table(
-            get.string.n_string_stateful_iter_by_extracted_eutf8(value, "%$([A-Z0-9_]+)")), {tolist=true, ret="v"}
+            get.str.n_str_stateful_iter_by_extracted_eutf8(value, "%$([A-Z0-9_]+)")), {tolist=true, ret="v"}
         }
       end)
     end,
@@ -1832,9 +1832,9 @@ transf = {
         transf.key_value_and_dependency_assoc.key_value_and_dependency_assoc(assoc)
       )
     end,
-    env_string = function(assoc)
-      transf.env_line_arr.env_string(
-        transf.string_pair_arr.env_line_arr(
+    env_str = function(assoc)
+      transf.env_line_arr.env_str(
+        transf.str_pair_arr.env_line_arr(
           transf.env_var_name_value_assoc.dependency_ordered_key_value_arr(assoc)
         )
       )
@@ -1876,56 +1876,56 @@ transf = {
   },
 
   shellscript_file = {
-    gcc_string_errors = function(path)
-      return get.shellscript_file.lint_gcc_string(path, "errors")
+    gcc_str_errors = function(path)
+      return get.shellscript_file.lint_gcc_str(path, "errors")
     end,
-    gcc_string_warnings = function(path)
-      return get.shellscript_file.lint_gcc_string(path, "warnings")
+    gcc_str_warnings = function(path)
+      return get.shellscript_file.lint_gcc_str(path, "warnings")
     end,
   },
 
   plaintext_file = {
-    string_by_contents = function(path)
-      return transf.file.string_by_contents(path)
+    str_by_contents = function(path)
+      return transf.file.str_by_contents(path)
     end,
-    string_arr_by_lines = function(path)
-      return transf.string.line_arr(transf.plaintext_file.string_by_contents(path))
+    str_arr_by_lines = function(path)
+      return transf.str.line_arr(transf.plaintext_file.str_by_contents(path))
     end,
-    string_arr_by_content_lines = function(path)
-      return transf.string.noempty_line_string_arr(transf.plaintext_file.string_by_contents(path))
+    str_arr_by_content_lines = function(path)
+      return transf.str.noempty_line_str_arr(transf.plaintext_file.str_by_contents(path))
     end,
     noindent_content_lines = function(path)
-      return transf.string.noindent_content_lines(transf.plaintext_file.string_by_contents(path))
+      return transf.str.noindent_content_lines(transf.plaintext_file.str_by_contents(path))
     end,
     nocomment_noindent_content_lines = function(path)
-      return transf.string.nocomment_noindent_content_lines(transf.plaintext_file.string_by_contents(path))
+      return transf.str.nocomment_noindent_content_lines(transf.plaintext_file.str_by_contents(path))
     end,
     first_line = function(path)
-      return transf.string.line_by_first(transf.plaintext_file.string_by_contents(path))
+      return transf.str.line_by_first(transf.plaintext_file.str_by_contents(path))
     end,
     last_line = function(path)
-      return transf.string.line_by_last(transf.plaintext_file.string_by_contents(path))
+      return transf.str.line_by_last(transf.plaintext_file.str_by_contents(path))
     end,
     byte_char_arr = function(path)
-      return transf.string.byte_char_arr(transf.plaintext_file.string_by_contents(path))
+      return transf.str.byte_char_arr(transf.plaintext_file.str_by_contents(path))
     end,
     utf8_char_arr = function(path)
-      return transf.string.utf8_char_arr(transf.plaintext_file.string_by_contents(path))
+      return transf.str.utf8_char_arr(transf.plaintext_file.str_by_contents(path))
     end,
     no_final_newlines = function(path)
-      return transf.string.string_by_no_final_newlines(transf.plaintext_file.string_by_contents(path))
+      return transf.str.str_by_no_final_newlines(transf.plaintext_file.str_by_contents(path))
     end,
     one_final_newline = function(path)
-      return transf.string.string_by_one_final_newline(transf.plaintext_file.string_by_contents(path))
+      return transf.str.str_by_one_final_newline(transf.plaintext_file.str_by_contents(path))
     end,
     len_lines = function(path)
-      return transf.string.pos_int_by_len_lines(transf.plaintext_file.string_by_contents(path))
+      return transf.str.pos_int_by_len_lines(transf.plaintext_file.str_by_contents(path))
     end,
     pos_int_by_len_utf8_chars = function(path)
-      return transf.string.pos_int_by_len_utf8_chars(transf.plaintext_file.string_by_contents(path))
+      return transf.str.pos_int_by_len_utf8_chars(transf.plaintext_file.str_by_contents(path))
     end,
     pos_int_by_len_byte_chars = function(path)
-      return transf.string.pos_int_by_len_byte_chars(transf.plaintext_file.string_by_contents(path))
+      return transf.str.pos_int_by_len_byte_chars(transf.plaintext_file.str_by_contents(path))
     end,
 
     
@@ -1984,62 +1984,62 @@ transf = {
       )
     end
   },
-  semver_string = {
+  semver_str = {
     semver_component_specifier = function(str)
-      local major, minor, patch, prerelease, build = get.string.n_strings_by_extracted_onig(str, r.g.version.semver)
+      local major, minor, patch, prerelease, build = get.str.n_strs_by_extracted_onig(str, r.g.version.semver)
       return {
-        major = get.string_or_number.number_or_nil(major),
-        minor = get.string_or_number.number_or_nil(minor),
-        patch = get.string_or_number.number_or_nil(patch),
+        major = get.str_or_number.number_or_nil(major),
+        minor = get.str_or_number.number_or_nil(minor),
+        patch = get.str_or_number.number_or_nil(patch),
         prerelease = prerelease,
         build = build
       }
     end,
   },
-  package_name_semver_compound_string = {
-    package_name_semver_string_arr = function(str)
-      return get.string.string_arr_split_noedge(str, "@")
+  package_name_semver_compound_str = {
+    package_name_semver_str_arr = function(str)
+      return get.str.str_arr_split_noedge(str, "@")
     end,
     package_name = function(str)
-      return transf.package_name_semver_compound_string.package_name_semver_string_arr(str)[1]
+      return transf.package_name_semver_compound_str.package_name_semver_str_arr(str)[1]
     end,
-    semver_string = function(str)
-      return transf.package_name_semver_compound_string.package_name_semver_string_arr(str)[2]
+    semver_str = function(str)
+      return transf.package_name_semver_compound_str.package_name_semver_str_arr(str)[2]
     end,
   },
-  package_name_semver_package_manager_name_compound_string = {
-    package_name_semver_compound_string = function(str)
-      return get.string.string_arr_split_noedge(str, ":")[1]
+  package_name_semver_package_manager_name_compound_str = {
+    package_name_semver_compound_str = function(str)
+      return get.str.str_arr_split_noedge(str, ":")[1]
     end,
     package_name = function(str)
-      return transf.package_name_semver_compound_string.package_name(
-        transf.package_name_semver_package_manager_name_compound_string.package_name_semver_compound_string(str)
+      return transf.package_name_semver_compound_str.package_name(
+        transf.package_name_semver_package_manager_name_compound_str.package_name_semver_compound_str(str)
       )
     end,
-    semver_string = function(str)
-      return transf.package_name_semver_compound_string.semver_string(
-        transf.package_name_semver_package_manager_name_compound_string.package_name_semver_compound_string(str)
+    semver_str = function(str)
+      return transf.package_name_semver_compound_str.semver_str(
+        transf.package_name_semver_package_manager_name_compound_str.package_name_semver_compound_str(str)
       )
     end,
     package_manager_name = function(str)
-      return get.string.string_arr_split_noedge(str, ":")[2]
+      return get.str.str_arr_split_noedge(str, ":")[2]
     end,
   },
-  package_name_package_manager_name_compound_string = {
+  package_name_package_manager_name_compound_str = {
     package_name = function(str)
-      return get.string.string_arr_split_noedge(str, ":")[1]
+      return get.str.str_arr_split_noedge(str, ":")[1]
     end,
     package_manager_name = function(str)
-      return get.string.string_arr_split_noedge(str, ":")[2]
+      return get.str.str_arr_split_noedge(str, ":")[2]
     end,
   },
   dice_notation = {
-    nonindicated_decimal_number_string_result = function(dice_notation)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("roll" .. transf.string.string_by_single_quoted_escaped(dice_notation))
+    nonindicated_decimal_number_str_result = function(dice_notation)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("roll" .. transf.str.str_by_single_quoted_escaped(dice_notation))
     end,
     int_result = function(dice_notation)
-      return transf.nonindicated_number_string.number_base_10(
-        transf.dice_notation.nonindicated_decimal_number_string_result(dice_notation)
+      return transf.nonindicated_number_str.number_base_10(
+        transf.dice_notation.nonindicated_decimal_number_str_result(dice_notation)
       )
     end,
   },
@@ -2052,7 +2052,7 @@ transf = {
       }
     end,
     y_ym_ymd_path = function(date)
-      return get.string_or_number_arr.string_by_joined(transf.date.y_ym_ymd_table(date), "/")
+      return get.str_or_number_arr.str_by_joined(transf.date.y_ym_ymd_table(date), "/")
     end,
     weekday_number_start_1 = function(date)
       return date:getisoweekday()
@@ -2078,10 +2078,10 @@ transf = {
       return get.date.date_sequence_specifier_of_lower_component(date, 15, "day")
     end,
     full_rfc3339like_dt = function(date)
-      return get.date.string_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
+      return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
     end,
     full_rfc3339like_time = function(date)
-      return get.date.string_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-time"])
+      return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-time"])
     end,
     timestamp_s = function(date)
       return transf.full_date_component_name_value_assoc.timestamp_s(
@@ -2097,7 +2097,7 @@ transf = {
       }
     end,
     summary = function(date)
-      return get.date.string_w_date_format_indicator(date, "detailed")
+      return get.date.str_w_date_format_indicator(date, "detailed")
     end
 
   },
@@ -2168,10 +2168,10 @@ transf = {
         tblmap.date_component_name.rfc3339like_dt_separator
       )
     end,
-    rfc3339like_dt_string_format_part_arr = function(arr)
+    rfc3339like_dt_str_format_part_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_key_assoc(
         arr,
-        tblmap.date_component_name.rfc3339like_dt_string_format_part
+        tblmap.date_component_name.rfc3339like_dt_str_format_part
       )
     end,
   },
@@ -2185,9 +2185,9 @@ transf = {
   },
   rfc3339like_dt = {
     date_component_name_value_assoc = function(str)
-      local comps = {get.string.n_strings_by_extracted_onig(str, r.g.date.rfc3339like_dt)}
+      local comps = {get.str.n_strs_by_extracted_onig(str, r.g.date.rfc3339like_dt)}
       return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.date.date_component_names, function(k, v)
-        return v and get.string_or_number.number_or_nil(comps[k]) or nil
+        return v and get.str_or_number.number_or_nil(comps[k]) or nil
       end)
     end,
     date_interval_specifier = function(str)
@@ -2245,7 +2245,7 @@ transf = {
   },
   rfc3339like_interval = {
     start_rfc3339like_dt = function(str)
-      return get.string.string_arr_split(str, "_to_")[1]
+      return get.str.str_arr_split(str, "_to_")[1]
     end,
     start_date_component_name_value_assoc = function(str)
       return transf.rfc3339like_dt.date_component_name_value_assoc(
@@ -2263,7 +2263,7 @@ transf = {
       )
     end,
     end_rfc3339like_dt = function(str)
-      return get.string.string_arr_split(str, "_to_")[2]
+      return get.str.str_arr_split(str, "_to_")[2]
     end,
     end_date_component_name_value_assoc = function(str)
       return transf.rfc3339like_dt.date_component_name_value_assoc(
@@ -2329,7 +2329,7 @@ transf = {
   },
   rf3339like_dt_or_interval = {
     dt_or_interval = function(str)
-      if get.string.bool_by_contains_w_ascii_string(str, "_to_") then
+      if get.str.bool_by_contains_w_ascii_str(str, "_to_") then
         return "rfc3339like_interval"
       else
         return "rfc3339like_dt"
@@ -2356,22 +2356,22 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(rf3339like_dt_or_interval_arr, transf.rf3339like_dt_or_interval.date_interval_specifier)
     end,
   },
-  basic_interval_string = {
+  basic_interval_str = {
     start_stop = function(str)
-      return stringy.split(str, "-")
+      return stry.split(str, "-")
     end,
     interval_specifier = function(str)
-      local start, stop = transf.basic_interval_string.start_stop(str)
+      local start, stop = transf.basic_interval_str.start_stop(str)
       return {
         start = start,
         stop = stop,
       }
     end,
   },
-  single_value_or_basic_interval_string = {
+  single_value_or_basic_interval_str = {
     interval_specifier = function(str)
-      if get.string.bool_by_contains_w_ascii_string(str, "-") then
-        return transf.basic_interval_string.interval_specifier(str)
+      if get.str.bool_by_contains_w_ascii_str(str, "-") then
+        return transf.basic_interval_str.interval_specifier(str)
       else
         return {
           start = str,
@@ -2639,21 +2639,21 @@ transf = {
       end
       return ol
     end,
-    rfc3339like_dt_string_format_part_specifier_arr = function(date_component_name_value_assoc)
+    rfc3339like_dt_str_format_part_specifier_arr = function(date_component_name_value_assoc)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.date_component_name_value_assoc.prefix_date_component_name_ordered_list_no_trailing_nil(date_component_name_value_assoc),
         function(date_component_name)
           return {
-            fallback = tblmap.date_component_name.rfc3339like_dt_string_format_part_fallback[date_component_name],
+            fallback = tblmap.date_component_name.rfc3339like_dt_str_format_part_fallback[date_component_name],
             value = date_component_name_value_assoc[date_component_name],
-            string_format_part = tblmap.date_component_name.rfc3339like_dt_string_format_part[date_component_name]
+            str_format_part = tblmap.date_component_name.rfc3339like_dt_str_format_part[date_component_name]
           }
         end
       )
     end,
     rfc3339like_dt = function(date_component_name_value_assoc)
-      local res = transf.string_format_part_specifier_arr.string(
-        transf.date_component_name_value_assoc.rfc3339like_dt_string_format_part_specifier_arr(date_component_name_value_assoc)
+      local res = transf.str_format_part_specifier_arr.str(
+        transf.date_component_name_value_assoc.rfc3339like_dt_str_format_part_specifier_arr(date_component_name_value_assoc)
       )
       if res:sub(-1) == "Z" then
         return res
@@ -2696,28 +2696,28 @@ transf = {
     
 
   },
-  string_format_part_specifier = {
-    string = function(string_format_part_specifier)
-      local succ, res = pcall(string_format_part_specifier.string_format_part, string_format_part_specifier.value)
+  str_format_part_specifier = {
+    str = function(str_format_part_specifier)
+      local succ, res = pcall(str_format_part_specifier.str_format_part, str_format_part_specifier.value)
       local finalres 
       if succ then
         finalres = res
       else
-        finalres = string_format_part_specifier.fallback
+        finalres = str_format_part_specifier.fallback
       end
       if finalres then
-        return finalres .. (string_format_part_specifier.suffix or "")
+        return finalres .. (str_format_part_specifier.suffix or "")
       else
         return ""
       end
     end
   },
-  string_format_part_specifier_arr = {
-    string = function(string_format_part_specifier_arr)
-      return get.string_or_number_arr.string_by_joined(
+  str_format_part_specifier_arr = {
+    str = function(str_format_part_specifier_arr)
+      return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-          string_format_part_specifier_arr,
-          transf.string_format_part_specifier.string
+          str_format_part_specifier_arr,
+          transf.str_format_part_specifier.str
         ),
         ""
       )
@@ -2752,7 +2752,7 @@ transf = {
   },
   iban = {
     cleaned_iban = function(iban)
-      return select(1, get.string.string_and_int_by_replaced_eutf8_w_regex_string(iban, "[ %-_]", ""))
+      return select(1, get.str.str_and_int_by_replaced_eutf8_w_regex_str(iban, "[ %-_]", ""))
     end,
     bic = function(iban)
       return transf.cleaned_iban.bic(transf.iban.cleaned_iban(iban))
@@ -2763,8 +2763,8 @@ transf = {
     iban_bic_bank_name_arr = function(iban)
       return {iban, transf.iban.bic(iban), transf.iban.bank_name(iban)}
     end,
-    bank_details_string = function(iban)
-      return get.string_or_number_arr.string_by_joined(
+    bank_details_str = function(iban)
+      return get.str_or_number_arr.str_by_joined(
         transf.iban.iban_bic_bank_name_arr(iban),
         "\n"
       )
@@ -2790,8 +2790,8 @@ transf = {
       return transf.cleaned_iban.data(iban).bankName
     end,
     separated_iban = function(iban)
-      return get.string_or_number_arr.string_by_joined(
-        get.string.string_arr_groups_utf8_from_end(
+      return get.str_or_number_arr.str_by_joined(
+        get.str.str_arr_groups_utf8_from_end(
           transf.iban.cleaned_iban(iban),
           4
         ),
@@ -2803,9 +2803,9 @@ transf = {
     -- Function for transforming a raw contact data into a structured table
     contact_table = function(raw_contact)
 
-      -- The raw contact data, which is in yaml string format, is transformed into a table. 
+      -- The raw contact data, which is in yaml str format, is transformed into a table. 
       -- This is done because table format is easier to handle and manipulate in Lua.
-      local contact_table = transf.yaml_string.not_userdata_or_function(raw_contact)
+      local contact_table = transf.yaml_str.not_userdata_or_function(raw_contact)
 
       -- In the vCard standard, some properties can have vcard_types. 
       -- For example, a phone number can be 'work' or 'home'. 
@@ -2813,14 +2813,14 @@ transf = {
       for _, vcard_key in transf.arr.index_value_stateless_iter(ls.vcard.keys_with_vcard_type) do
       
           -- We iterate over each of these keys. Each key can have multiple vcard_types, 
-          -- which we get as a comma-separated string (type_list). 
+          -- which we get as a comma-separated str (type_list). 
           -- We also get the corresponding value for these vcard_types.
           for type_list, value in transf.arr.index_value_stateless_iter(contact_table[vcard_key]) do
           
               -- We split the type_list into individual vcard_types. This is done because 
               -- each vcard_type might need to be processed independently in the future. 
               -- It also makes the data more structured and easier to handle.
-              local vcard_types = get.string.string_arr_split(type_list, ", ")
+              local vcard_types = get.str.str_arr_split(type_list, ", ")
         
               -- For each vcard_type, we create a new key-value pair in the contact_table. 
               -- This way, we can access the value directly by vcard_type, 
@@ -2847,7 +2847,7 @@ transf = {
   },
   uuid = {
     raw_contact = function(uuid)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)( "khard show --format=yaml uid:" .. uuid)
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "khard show --format=yaml uid:" .. uuid)
     end,
     contact_table = function(uuid)
       local raw_contact = transf.uuid.raw_contact(uuid)
@@ -2889,7 +2889,7 @@ transf = {
       )
     end,
     translation_rate = function(contact_table)
-      return get.string_or_number.number_or_nil(contact_table.Private["translation-rate"])
+      return get.str_or_number.number_or_nil(contact_table.Private["translation-rate"])
     end,
     iban = function (contact_table)
       return get.contact_table.encrypted_data(contact_table, "iban")
@@ -2900,8 +2900,8 @@ transf = {
     bank_name = function (contact_table)
       return transf.iban.bank_name(transf.contact_table.iban(contact_table))
     end,
-    bank_details_string = function (contact_table)
-      return transf.iban.bank_details_string(transf.contact_table.iban(contact_table))
+    bank_details_str = function (contact_table)
+      return transf.iban.bank_details_str(transf.contact_table.iban(contact_table))
     end,
     personal_tax_number = function (contact_table)
       return get.contact_table.tax_number(contact_table, "personal")
@@ -2916,7 +2916,7 @@ transf = {
       })
     end,
     full_name_western = function(contact_table)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         transf.contact_table.full_name_western_arr(contact_table),
         " "
       )
@@ -2928,7 +2928,7 @@ transf = {
       })
     end,
     normal_name_western = function(contact_table)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         transf.contact_table.normal_name_western_arr(contact_table),
         " "
       )
@@ -2945,7 +2945,7 @@ transf = {
       })
     end,
     full_name_eastern = function(contact_table)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         transf.contact_table.full_name_eastern_arr(contact_table),
         " "
       )
@@ -2957,7 +2957,7 @@ transf = {
       })
     end,
     normal_name_eastern = function(contact_table)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         transf.contact_table.normal_name_eastern_arr(contact_table),
         " "
       )
@@ -2970,7 +2970,7 @@ transf = {
       })
     end,
     name_additions = function(contact_table)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         transf.contact_table.name_additions_arr(contact_table),
         ", "
       )
@@ -2986,8 +2986,8 @@ transf = {
         transf.contact_table.bank_name(contact_table),
       }
     end,
-    name_bank_details_string = function(contact_table)
-      return get.string_or_number_arr.string_by_joined(
+    name_bank_details_str = function(contact_table)
+      return get.str_or_number_arr.str_by_joined(
         transf.contact_table.main_name_iban_bic_bank_name_arr(contact_table),
         "\n"
       )
@@ -2998,8 +2998,8 @@ transf = {
     phone_number_arr = function (contact_table)
       return transf.table.vt_set(transf.contact_table.vcard_type_phone_number_assoc(contact_table))
     end,
-    phone_number_string = function (contact_table)
-      return get.string_or_number_arr.string_by_joined(transf.contact_table.phone_number_arr(contact_table), ", ")
+    phone_number_str = function (contact_table)
+      return get.str_or_number_arr.str_by_joined(transf.contact_table.phone_number_arr(contact_table), ", ")
     end,
     vcard_type_email_assoc = function (contact_table)
       return contact_table.Email
@@ -3007,8 +3007,8 @@ transf = {
     email_arr = function (contact_table)
       return transf.table.vt_set(transf.contact_table.vcard_type_email_assoc(contact_table))
     end,
-    email_string = function (contact_table)
-      return get.string_or_number_arr.string_by_joined(transf.contact_table.email_arr(contact_table), ", ")
+    email_str = function (contact_table)
+      return get.str_or_number_arr.str_by_joined(transf.contact_table.email_arr(contact_table), ", ")
     end,
     vcard_type_address_table_assoc = function (contact_table)
       return contact_table.Addresses
@@ -3024,11 +3024,11 @@ transf = {
       if transf.contact_table.name_additions(contact_table) then
         sumstr = sumstr .. " (" .. transf.contact_table.name_additions(contact_table) .. ")"
       end
-      if transf.contact_table.phone_number_string(contact_table) ~= "" then
-        sumstr = sumstr .. " [" .. transf.contact_table.phone_number_string(contact_table) .. "]"
+      if transf.contact_table.phone_number_str(contact_table) ~= "" then
+        sumstr = sumstr .. " [" .. transf.contact_table.phone_number_str(contact_table) .. "]"
       end
-      if transf.contact_table.email_string(contact_table) ~= "" then
-        sumstr = sumstr .. " <" .. transf.contact_table.email_string(contact_table) .. ">"
+      if transf.contact_table.email_str(contact_table) ~= "" then
+        sumstr = sumstr .. " <" .. transf.contact_table.email_str(contact_table) .. ">"
       end
     end,
     main_email = function (contact_table)
@@ -3068,12 +3068,12 @@ transf = {
     region = function(single_address_table)
       return single_address_table.Region
     end,
-    country_identifier_string = function(single_address_table)
+    country_identifier_str = function(single_address_table)
       return single_address_table.Country
     end,
     iso_3366_1_alpha_2_country_code = function(single_address_table)
-      return transf.country_identifier_string.iso_3366_1_alpha_2_country_code(
-        transf.address_table.country_identifier_string(single_address_table)
+      return transf.country_identifier_str.iso_3366_1_alpha_2_country_code(
+        transf.address_table.country_identifier_str(single_address_table)
       )
     end,
     street = function(single_address_table)
@@ -3142,13 +3142,13 @@ transf = {
     end,
     in_country_address_label = function(single_address_table)
       return 
-        get.string_or_number_arr.string_by_joined(transf.address_table.addressee_arr(single_address_table), "\n") .. "\n" ..
+        get.str_or_number_arr.str_by_joined(transf.address_table.addressee_arr(single_address_table), "\n") .. "\n" ..
         transf.address_table.street(single_address_table) .. "\n" ..
         transf.address_table.postal_code_city_line(single_address_table)
     end,
     international_address_label = function(single_address_table)
       return 
-        get.string_or_number_arr.string_by_joined(transf.address_table.addressee_arr(single_address_table), "\n") .. "\n" ..
+        get.str_or_number_arr.str_by_joined(transf.address_table.addressee_arr(single_address_table), "\n") .. "\n" ..
         transf.address_table.street(single_address_table) .. "\n" ..
         transf.address_table.postal_code_city_line(single_address_table) .. "\n" ..
         transf.address_table.region_country_line(single_address_table)
@@ -3173,20 +3173,20 @@ transf = {
         },
       }).items[1]
     end,
-    string_by_title = function(id)
+    str_by_title = function(id)
       return transf.youtube_video_id.youtube_video_item(id).snippet.title
     end,
-    string_by_cleaned_title = function(id)
-      return transf.string.string_by_cleaned_youtube_video_title(
-        transf.youtube_video_id.string_by_title(id)
+    str_by_cleaned_title = function(id)
+      return transf.str.str_by_cleaned_youtube_video_title(
+        transf.youtube_video_id.str_by_title(id)
       )
     end,
-    string_by_channel_title = function(id)
+    str_by_channel_title = function(id)
       return transf.youtube_video_id.youtube_video_item(id).snippet.channelTitle
     end,
-    string_by_cleaned_channel_title = function(id)
-      return transf.string.string_by_cleaned_youtube_video_channel_title(
-        transf.youtube_video_id.string_by_channel_title(id)
+    str_by_cleaned_channel_title = function(id)
+      return transf.str.str_by_cleaned_youtube_video_channel_title(
+        transf.youtube_video_id.str_by_channel_title(id)
       )
     end,
     youtube_channel_id = function(id)
@@ -3215,10 +3215,10 @@ transf = {
       }).items
     end,
     fs_tag_assoc = function(id)
-      local assoc = transf.form_filling_specifier.filled_string_assoc({
+      local assoc = transf.form_filling_specifier.filled_str_assoc({
         in_fields = {
-          title = transf.youtube_video_id.string_by_title(id),
-          channel_title = transf.youtube_video_id.string_by_channel_title(id),
+          title = transf.youtube_video_id.str_by_title(id),
+          channel_title = transf.youtube_video_id.str_by_channel_title(id),
         },
         form_field_specifier_arr = {
           {
@@ -3242,7 +3242,7 @@ transf = {
       })
       return get.table.table_by_mapped_w_vt_arg_vt_ret_fn(
         assoc,
-        transf.string.lower_alphanum_underscore_string_by_romanized
+        transf.str.lower_alphanum_underscore_str_by_romanized
       )
     end
   },
@@ -3283,10 +3283,10 @@ transf = {
       return transf.url.param_table(url).v
     end,
     title = function(url)
-      return transf.youtube_video_id.string_by_title(transf.youtube_video_url.youtube_video_id(url))
+      return transf.youtube_video_id.str_by_title(transf.youtube_video_url.youtube_video_id(url))
     end,
     channel_title = function(url)
-      return transf.youtube_video_id.string_by_channel_title(transf.youtube_video_url.youtube_video_id(url))
+      return transf.youtube_video_id.str_by_channel_title(transf.youtube_video_url.youtube_video_id(url))
     end,
     fs_tag_assoc = function(url)
       return transf.youtube_video_id.fs_tag_assoc(transf.youtube_video_url.youtube_video_id(url))
@@ -3331,12 +3331,12 @@ transf = {
       return transf.youtube_channel_id.feed_url(transf.handle.youtube_channel_id(handle))
     end,
     raw_handle = function(handle)
-      return get.string.string_by_sub_eutf8(handle, 2)
+      return get.str.str_by_sub_eutf8(handle, 2)
     end,
   },
   youtube_channel_url = {
     handle = function(url)
-      return get.string.string_by_no_adfix(
+      return get.str.str_by_no_adfix(
         transf.url.path(url),
         "/"
       )
@@ -3345,21 +3345,21 @@ transf = {
       return transf.handle.youtube_channel_id(transf.youtube_channel_url.handle(url))
     end,
   },
-  string = {
+  str = {
     raw_syn_output = function(str)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.string.string_by_single_quoted_escaped(str) )
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.str.str_by_single_quoted_escaped(str) )
     end,
     term_syn_specifier_assoc = function(str)
-      local synonym_parts = get.string.string_arr_split(transf.string.raw_syn_output(str), "\n\n")
+      local synonym_parts = get.str.str_arr_split(transf.str.raw_syn_output(str), "\n\n")
       local synonym_tables = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         synonym_parts,
         function (synonym_part)
-          local synonym_part_lines = stringy.split(synonym_part, "\n")
-          local synonym_term = get.string.string_by_sub_eutf8(synonym_part_lines[1], 2) -- syntax: ❯<term>
-          local synonyms_raw = get.string.string_by_sub_eutf8(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
-          local antonyms_raw = get.string.string_by_sub_eutf8(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
-          local synonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stringy.split(synonyms_raw, ", "), stringy.strip)
-          local antonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stringy.split(antonyms_raw, ", "), stringy.strip)
+          local synonym_part_lines = stry.split(synonym_part, "\n")
+          local synonym_term = get.str.str_by_sub_eutf8(synonym_part_lines[1], 2) -- syntax: ❯<term>
+          local synonyms_raw = get.str.str_by_sub_eutf8(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
+          local antonyms_raw = get.str.str_by_sub_eutf8(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
+          local synonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stry.split(synonyms_raw, ", "), stry.strip)
+          local antonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stry.split(antonyms_raw, ", "), stry.strip)
           return synonym_term, {
             synonyms = synonyms,
             antonyms = antonyms,
@@ -3369,8 +3369,8 @@ transf = {
       return synonym_tables
     end,
     raw_av_output = function (str)
-      get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "synonym" .. transf.string.string_by_single_quoted_escaped(str)
+      get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+        "synonym" .. transf.str.str_by_single_quoted_escaped(str)
       )
     end,
     title_case_policy = function(word)
@@ -3379,19 +3379,19 @@ transf = {
       elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
         return word
       else
-        return transf.string.string_by_first_eutf8_upper(word)
+        return transf.str.str_by_first_eutf8_upper(word)
       end
     end,
     long_flag = function(word)
       return "--" .. word
     end,
-    synonym_string_arr = function(str)
-      local items = stringy.split(transf.string.raw_av_output(str), "\t")
+    synonym_str_arr = function(str)
+      local items = stry.split(transf.str.raw_av_output(str), "\t")
       items = get.arr.arr_by_filtered(items, function(itm)
         if itm == nil then
           return false
         end
-        itm = stringy.strip(itm)
+        itm = stry.strip(itm)
         return #itm > 0
       end)
       return items
@@ -3399,19 +3399,19 @@ transf = {
     consonants = function(str)
       error("todo")
     end,
-    string_by_env_getter_comamnds_prepended = function(str)
-      return get.string.string_by_formatted_w_n_anys(
+    str_by_env_getter_comamnds_prepended = function(str)
+      return get.str.str_by_formatted_w_n_anys(
         "base64 -d <<< '%s' | /opt/homebrew/bin/bash -s",
-        transf.string.base64_gen_string_by_utf8(
+        transf.str.base64_gen_str_by_utf8(
           "cd && source \"$HOME/.target/envfile\" && " ..  str
         )
       )
     end,
-    string_by_minimal_locale_setter_commands_prepended = function(str)
+    str_by_minimal_locale_setter_commands_prepended = function(str)
       return "LC_ALL=en_US.UTF-8 && LANG=en_US.UTF-8 && LANGUAGE=en_US.UTF-8 && " .. str
     end,
-    string_or_string_and_8_bit_pos_int_by_evaled_raw_bash = function(str)
-      local command = transf.string.string_by_minimal_locale_setter_commands_prepended(str)
+    str_or_str_and_8_bit_pos_int_by_evaled_raw_bash = function(str)
+      local command = transf.str.str_by_minimal_locale_setter_commands_prepended(str)
       local output, status, reason, code = hs.execute(command)
       if status then
         return output -- stdout
@@ -3419,29 +3419,29 @@ transf = {
         return output, code -- stderr, exit code
       end
     end,
-    string_or_string_and_8_bit_pos_int_by_evaled_raw_bash_stripped = function(str)
-      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_raw_bash(str)
-      res = stringy.strip(res)
+    str_or_str_and_8_bit_pos_int_by_evaled_raw_bash_stripped = function(str)
+      local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_raw_bash(str)
+      res = stry.strip(res)
       return res, code
     end,
-    string_or_nil_by_evaled_raw_bash_stripped = function(str)
-      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_raw_bash_stripped(str)
+    str_or_nil_by_evaled_raw_bash_stripped = function(str)
+      local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_raw_bash_stripped(str)
       if code == 0 then
         return res
       else
         return nil
       end
     end,
-    string_or_err_by_evaled_raw_bash_stripped = function(str)
-      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_raw_bash_stripped(str)
+    str_or_err_by_evaled_raw_bash_stripped = function(str)
+      local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_raw_bash_stripped(str)
       if code == 0 then
         return res
       else
         error("Exit code " .. code .. " for command " .. str ". Stderr:\n\n" .. res)
       end
     end,
-    string_or_string_and_8_bit_pos_int_by_evaled_env_bash = function(str)
-      local command = transf.string.string_by_env_getter_comamnds_prepended(str)
+    str_or_str_and_8_bit_pos_int_by_evaled_env_bash = function(str)
+      local command = transf.str.str_by_env_getter_comamnds_prepended(str)
       local output, status, reason, code = hs.execute(command)
       if status then
         return output -- stdout
@@ -3450,40 +3450,40 @@ transf = {
       end
     end,
     bool_by_evaled_env_bash_success = function(str)
-      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash(str)
+      local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_env_bash(str)
       return code == 0
     end,
-    string_or_string_and_8_bit_pos_int_by_evaled_env_bash_stripped = function(str)
-      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash(str)
-      res = stringy.strip(res)
+    str_or_str_and_8_bit_pos_int_by_evaled_env_bash_stripped = function(str)
+      local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_env_bash(str)
+      res = stry.strip(res)
       return res, code
     end,
-    string_or_nil_by_evaled_env_bash_stripped = function(str)
-      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash_stripped(str)
+    str_or_nil_by_evaled_env_bash_stripped = function(str)
+      local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_env_bash_stripped(str)
       if code == 0 then
         return res
       else
         return nil
       end
     end,
-    string_or_err_by_evaled_env_bash_stripped = function(str)
-      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash_stripped(str)
+    str_or_err_by_evaled_env_bash_stripped = function(str)
+      local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_env_bash_stripped(str)
       if code == 0 then
         return res
       else
         error("Exit code " .. code .. " for command " .. str ". Stderr:\n\n" .. res)
       end
     end,
-    string_or_err_by_evaled_env_bash = function(str)
-      local res, code = transf.string.string_or_string_and_8_bit_pos_int_by_evaled_env_bash(str)
+    str_or_err_by_evaled_env_bash = function(str)
+      local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_env_bash(str)
       if code == 0 then
         return res
       else
         error("Exit code " .. code .. " for command " .. str ". Stderr:\n\n" .. res)
       end
     end,
-    string_or_err_by_evaled_env_bash_stripped_noempty = function(str)
-      local res = transf.string.string_or_err_by_evaled_env_bash_stripped(str)
+    str_or_err_by_evaled_env_bash_stripped_noempty = function(str)
+      local res = transf.str.str_or_err_by_evaled_env_bash_stripped(str)
       if res == "" then
         error("Empty result for command " .. str)
       else
@@ -3491,11 +3491,11 @@ transf = {
       end
     end,
     not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json = function(str)
-      local res = transf.string.string_or_err_by_evaled_env_bash_stripped_noempty(str)
-      return transf.json_string.not_userdata_or_function(res)
+      local res = transf.str.str_or_err_by_evaled_env_bash_stripped_noempty(str)
+      return transf.json_str.not_userdata_or_function(res)
     end,
     table_or_err_by_evaled_env_bash_parsed_json = function(str)
-      local res = transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json(str)
+      local res = transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json(str)
       if is.any.table(res) then
         return res
       else
@@ -3504,31 +3504,31 @@ transf = {
     end,
     table_or_nil_by_evaled_env_bash_parsed_json = function(str)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
-        transf.string.table_or_err_by_evaled_env_bash_parsed_json
+        transf.str.table_or_err_by_evaled_env_bash_parsed_json
       )(str)
     end,
     table_or_err_by_evaled_env_bash_parsed_json_err_error_key = function(str)
-      local res = transf.string.table_or_err_by_evaled_env_bash_parsed_json(str)
+      local res = transf.str.table_or_err_by_evaled_env_bash_parsed_json(str)
       if res.error then
-        error("Error for command " .. str .. ":\n\n" .. transf.not_userdata_or_function.json_string_pretty(res.error))
+        error("Error for command " .. str .. ":\n\n" .. transf.not_userdata_or_function.json_str_pretty(res.error))
       else
         return res
       end
     end,
     table_or_nil_by_evaled_env_bash_parsed_json_nil_error_key = function(str)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
-        transf.string.table_or_err_by_evaled_env_bash_parsed_json_err_error_key
+        transf.str.table_or_err_by_evaled_env_bash_parsed_json_err_error_key
       )(str)
     end,
     escaped_lua_regex = function(str)
-      return get.string.string_by_prepended_all_w_ascii_string_arr(
+      return get.str.str_by_prepended_all_w_ascii_str_arr(
         str,
         ls.lua_regex_metacharacters,
         "%"
       )
     end,
     escaped_general_regex = function(str)
-      return get.string.string_by_prepended_all_w_ascii_string_arr(
+      return get.str.str_by_prepended_all_w_ascii_str_arr(
         str,
         ls.general_regex_metacharacters,
         "%"
@@ -3541,38 +3541,38 @@ transf = {
     end,
     window_or_nil_by_title = hs.window.get,
     in_cache_dir = function(data, type)
-      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.string.safe_filename(data)
+      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.str.safe_filename(data)
     end,
     in_tmp_dir = function(data, type) -- in contrast to the above method, we also ensure that it's unique by using a timestamp
-      return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.string.safe_filename(data)
+      return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.str.safe_filename(data)
     end,
     qr_utf8_image_bow = function(data)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.string.string_by_single_quoted_escaped(data))
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.str.str_by_single_quoted_escaped(data))
     end,
     qr_utf8_image_wob = function(data)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_err_by_evaled_env_bash, {
-        stringify_table_params = true,
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_err_by_evaled_env_bash, {
+        strify_table_params = true,
         table_param_subset = "json"
-      })("qrencode -l M -m 2 -t UTF8i " .. transf.string.string_by_single_quoted_escaped(data))
+      })("qrencode -l M -m 2 -t UTF8i " .. transf.str.str_by_single_quoted_escaped(data))
     end,
     qr_png_in_cache = function(data)
-      local path = transf.string.in_cache_dir(data, "qr")
-      dothis.string.generate_qr_png(data, path)
+      local path = transf.str.in_cache_dir(data, "qr")
+      dothis.str.generate_qr_png(data, path)
       return path
     end,
-    --- does the minimum to make a string safe for use as a filename, but doesn't impose any policy
+    --- does the minimum to make a str safe for use as a filename, but doesn't impose any policy
     safe_filename = function(filename)
       -- Replace forward slash ("/") with underscore
-      filename = get.string.string_and_int_by_replaced_eutf8_w_regex_string(filename, "/", "_")
+      filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, "/", "_")
 
       -- Replace control characters (ASCII values 0 - 31 and 127)
       for i = 0, 31 do
-        filename = get.string.string_and_int_by_replaced_eutf8_w_regex_string(filename, transf.eight_bit_pos_int.ascii_char(i), "_")
+        filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, transf.eight_bit_pos_int.ascii_char(i), "_")
       end
-      filename = get.string.string_and_int_by_replaced_eutf8_w_regex_string(filename, transf.eight_bit_pos_int.ascii_char(127), "_")
+      filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, transf.eight_bit_pos_int.ascii_char(127), "_")
 
       -- Replace sequences of whitespace characters with a single underscore
-      filename = get.string.string_and_int_by_replaced_eutf8_w_regex_string(filename, "%s+", "_")
+      filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, "%s+", "_")
 
       if filename == "." then
         filename = "_"
@@ -3581,7 +3581,7 @@ transf = {
       end
 
       if #filename > 255 then
-        filename = get.string.string_by_sub_eutf8(filename, 1, 255)
+        filename = get.str.str_by_sub_eutf8(filename, 1, 255)
       elseif #filename == 0 then
         filename = "_"
       end
@@ -3589,161 +3589,161 @@ transf = {
       return filename
     end,
     alphanum_underscore = function(str)
-      local naive_alphanum_underscore = get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[^%w%d]+", "_")
-      local multi_cleaned_alphanum_underscore = get.string.string_by_continuous_collapsed_eutf8_w_regex_quantifiable(naive_alphanum_underscore, "_")
-      return get.string.string_by_no_adfix(multi_cleaned_alphanum_underscore, "_")
+      local naive_alphanum_underscore = get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[^%w%d]+", "_")
+      local multi_cleaned_alphanum_underscore = get.str.str_by_continuous_collapsed_eutf8_w_regex_quantifiable(naive_alphanum_underscore, "_")
+      return get.str.str_by_no_adfix(multi_cleaned_alphanum_underscore, "_")
     end,
     lower_alphanum_underscore = function(str)
-      return transf.string.string_by_all_eutf8_lower(transf.string.alphanum_underscore(str))
+      return transf.str.str_by_all_eutf8_lower(transf.str.alphanum_underscore(str))
     end,
     upper_alphanum_underscore = function(str)
-      return transf.string.string_by_all_eutf8_upper(transf.string.alphanum_underscore(str))
+      return transf.str.str_by_all_eutf8_upper(transf.str.alphanum_underscore(str))
     end,
     alphanum_array = function(str) -- word separation is notoriously tricky. For now, we'll just use the same logic as in the snake_case function
-      return stringy.split(transf.string.alphanum_underscore(str), "_")
+      return stry.split(transf.str.alphanum_underscore(str), "_")
     end,
     upper_camel_snake_case = function(str)
-      local parts = transf.string.alphanum_array(str)
-      local upper_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(parts, transf.string.string_by_first_eutf8_upper)
-      return get.string_or_number_arr.string_by_joined(upper_parts, "_")
+      local parts = transf.str.alphanum_array(str)
+      local upper_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
+      return get.str_or_number_arr.str_by_joined(upper_parts, "_")
     end,
     lower_camel_snake_case = function(str)
-      return transf.string.string_by_all_eutf8_lower(transf.string.upper_camel_snake_case(str))
+      return transf.str.str_by_all_eutf8_lower(transf.str.upper_camel_snake_case(str))
     end,
     upper_camel_case = function(str)
-      local parts = transf.string.alphanum_array(str)
-      local upper_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(parts, transf.string.string_by_first_eutf8_upper)
-      return get.string_or_number_arr.string_by_joined(upper_parts, "")
+      local parts = transf.str.alphanum_array(str)
+      local upper_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
+      return get.str_or_number_arr.str_by_joined(upper_parts, "")
     end,
     lower_camel_case = function(str)
-      return transf.string.string_by_all_eutf8_lower(transf.string.upper_camel_case(str))
+      return transf.str.str_by_all_eutf8_lower(transf.str.upper_camel_case(str))
     end,
     kebap_case = function(str)
-      local naive_kebap_case = get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[^%w%d]+", "-")
-      local multi_cleaned_kebap_case = get.string.string_by_continuous_collapsed_eutf8_w_regex_quantifiable(naive_kebap_case, "-")
-      return get.string.string_by_no_adfix(multi_cleaned_kebap_case, "-")
+      local naive_kebap_case = get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[^%w%d]+", "-")
+      local multi_cleaned_kebap_case = get.str.str_by_continuous_collapsed_eutf8_w_regex_quantifiable(naive_kebap_case, "-")
+      return get.str.str_by_no_adfix(multi_cleaned_kebap_case, "-")
     end,
     lower_kebap_case = function(str)
-      return transf.string.string_by_all_eutf8_lower(transf.string.kebap_case(str))
+      return transf.str.str_by_all_eutf8_lower(transf.str.kebap_case(str))
     end,
     upper_kebap_case = function(str)
-      return transf.string.string_by_all_eutf8_upper(transf.string.kebap_case(str))
+      return transf.str.str_by_all_eutf8_upper(transf.str.kebap_case(str))
     end,
-    string_by_all_eutf8_lower = eutf8.lower,
-    string_by_all_eutf8_upper = eutf8.upper,
-    string_by_first_eutf8_upper = function(str)
-      return transf.string.string_by_all_eutf8_upper(get.string.string_by_sub_eutf8(str, 1, 1)) .. get.string.string_by_sub_eutf8(str, 2)
+    str_by_all_eutf8_lower = eutf8.lower,
+    str_by_all_eutf8_upper = eutf8.upper,
+    str_by_first_eutf8_upper = function(str)
+      return transf.str.str_by_all_eutf8_upper(get.str.str_by_sub_eutf8(str, 1, 1)) .. get.str.str_by_sub_eutf8(str, 2)
     end,
-    string_by_first_eutf8_lower = function(str)
-      return transf.string.string_by_all_eutf8_lower(get.string.string_by_sub_eutf8(str, 1, 1)) .. get.string.string_by_sub_eutf8(str, 2)
+    str_by_first_eutf8_lower = function(str)
+      return transf.str.str_by_all_eutf8_lower(get.str.str_by_sub_eutf8(str, 1, 1)) .. get.str.str_by_sub_eutf8(str, 2)
     end,
     alphanum = function(str)
-      return get.string.string_by_removed_eutf8_w_regex_quantifiable(str, "[^%w%d]")
+      return get.str.str_by_removed_eutf8_w_regex_quantifiable(str, "[^%w%d]")
     end,
     encoded_query_param_value = function(str)
       return plurl.quote(str, true)
     end,
     encoded_query_param_value_by_folded = function(str)
-      local folded = transf.string.singleline_string_by_folded(str)
-      return transf.string.encoded_query_param_value(folded)
+      local folded = transf.str.singleline_str_by_folded(str)
+      return transf.str.encoded_query_param_value(folded)
     end,
-    string_by_percent_decoded_also_plus = plurl.unquote,
-    string_by_percent_decoded_no_plus = function(str)
-      return transf.string.string_by_percent_decoded_also_plus(
-        get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, "%+", "%%2B") -- encode plus sign as %2B, so that it then gets decoded as a plus sign
+    str_by_percent_decoded_also_plus = plurl.unquote,
+    str_by_percent_decoded_no_plus = function(str)
+      return transf.str.str_by_percent_decoded_also_plus(
+        get.str.str_and_int_by_replaced_eutf8_w_regex_str(str, "%+", "%%2B") -- encode plus sign as %2B, so that it then gets decoded as a plus sign
       )
     end,
     escaped_csv_field = function(field)
-      local escaped = get.string.string_and_int_by_replaced_eutf8_w_regex_string(field, '"', '""')
+      local escaped = get.str.str_and_int_by_replaced_eutf8_w_regex_str(field, '"', '""')
       return '"' .. escaped  .. '"'
     end,
     unicode_prop_table_arr = function(str)
-      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.string.string_by_single_quoted_escaped(str))
+      return get.fn.rt_or_nil_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.str.str_by_single_quoted_escaped(str))
     end,
     unicode_prop_table_item_arr = function(str)
       return transf.unicode_prop_table_arr.unicode_prop_table_item_arr(
-        transf.string.unicode_prop_table_arr(str)
+        transf.str.unicode_prop_table_arr(str)
       )
     end,
-    string_by_single_quoted_escaped = function(str)
-      return " '" .. get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, "'", "\\'") .. "'"
+    str_by_single_quoted_escaped = function(str)
+      return " '" .. get.str.str_and_int_by_replaced_eutf8_w_regex_str(str, "'", "\\'") .. "'"
     end,
-    string_by_double_quoted_escaped = function(str)
-      return ' "' .. get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, '"', '\\"') .. '"'
+    str_by_double_quoted_escaped = function(str)
+      return ' "' .. get.str.str_and_int_by_replaced_eutf8_w_regex_str(str, '"', '\\"') .. '"'
     end,
-    string_by_envsubsted = function(str)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("echo " .. transf.string.string_by_single_quoted_escaped(str) .. " | envsubst")
+    str_by_envsubsted = function(str)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("echo " .. transf.str.str_by_single_quoted_escaped(str) .. " | envsubst")
     end,
-    nonindicated_binary_number_string_by_utf8 = basexx.to_bit,
-    nonindicated_hex_number_string_by_utf8 = basexx.to_hex,
-    base64_gen_string_by_utf8 = basexx.to_base64,
-    base64_url_string_by_utf8 = basexx.to_url64,
-    base32_gen_string_by_utf8 = basexx.to_base32,
-    base32_crock_string_by_utf8 = basexx.to_crockford,
-    string_by_html_entities_encoded = function(str)
-      return transf.string.string_or_err_by_evaled_env_bash_stripped(
-        "he --encode --use-named-refs" .. transf.string.here_string(str)
+    nonindicated_binary_number_str_by_utf8 = basexx.to_bit,
+    nonindicated_hex_number_str_by_utf8 = basexx.to_hex,
+    base64_gen_str_by_utf8 = basexx.to_base64,
+    base64_url_str_by_utf8 = basexx.to_url64,
+    base32_gen_str_by_utf8 = basexx.to_base32,
+    base32_crock_str_by_utf8 = basexx.to_crockford,
+    str_by_html_entities_encoded = function(str)
+      return transf.str.str_or_err_by_evaled_env_bash_stripped(
+        "he --encode --use-named-refs" .. transf.str.here_str(str)
       )
     end,
-    string_by_html_entities_decoded = function(str)
-      return transf.string.string_or_err_by_evaled_env_bash_stripped(
-        "he --decode" .. transf.string.here_string(str)
+    str_by_html_entities_decoded = function(str)
+      return transf.str.str_or_err_by_evaled_env_bash_stripped(
+        "he --decode" .. transf.str.here_str(str)
       )
     end,
-    two_strings_by_split_header = function(str)
-      local k, v = get.string.n_strings_by_extracted_eutf8(str, "^([^:]+):%s*(.+)$")
-      return transf.string.string_by_initial_lower(k), v
+    two_strs_by_split_header = function(str)
+      local k, v = get.str.n_strs_by_extracted_eutf8(str, "^([^:]+):%s*(.+)$")
+      return transf.str.str_by_initial_lower(k), v
     end,
-    two_string_or_nils_by_split_envlike = function(str)
-      return get.string.two_strings_split_or_nil(str, "=")
+    two_str_or_nils_by_split_envlike = function(str)
+      return get.str.two_strs_split_or_nil(str, "=")
     end,
-    two_string_or_nils_by_split_ini = function(str)
-      return get.string.two_strings_split_or_nil(str, " = ")
+    two_str_or_nils_by_split_ini = function(str)
+      return get.str.two_strs_split_or_nil(str, " = ")
     end,
-    string_by_title_case = function(str)
-      local words, removed = get.string.two_string_arrs_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
-      local title_cased_words = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(words, transf.string.title_case_policy)
-      title_cased_words[1] = transf.string.string_by_first_eutf8_upper(title_cased_words[1])
-      title_cased_words[#title_cased_words] = transf.string.string_by_first_eutf8_upper(title_cased_words[#title_cased_words])
+    str_by_title_case = function(str)
+      local words, removed = get.str.two_str_arrs_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
+      local title_cased_words = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(words, transf.str.title_case_policy)
+      title_cased_words[1] = transf.str.str_by_first_eutf8_upper(title_cased_words[1])
+      title_cased_words[#title_cased_words] = transf.str.str_by_first_eutf8_upper(title_cased_words[#title_cased_words])
       local arr = transf.two_arrs.arr_by_interleaved_stop_a1(title_cased_words, removed)
-      return get.string_or_number_arr.string_by_joined(arr, "")
+      return get.str_or_number_arr.str_by_joined(arr, "")
     end, 
     romanized_deterministic = function(str)
-      local raw_romanized = transf.string.string_or_nil_by_evaled_env_bash_stripped(
-         "echo -n" .. transf.string.string_by_single_quoted_escaped(str) .. "| kakasi -iutf8 -outf8 -ka -Ea -Ka -Ha -Ja -s -ga" 
+      local raw_romanized = transf.str.str_or_nil_by_evaled_env_bash_stripped(
+         "echo -n" .. transf.str.str_by_single_quoted_escaped(str) .. "| kakasi -iutf8 -outf8 -ka -Ea -Ka -Ha -Ja -s -ga" 
       )
-      local is_ok, romanized = pcall(get.string.string_and_int_by_replaced_eutf8_w_regex_string, raw_romanized, "(%w)%^", "%1%1")
+      local is_ok, romanized = pcall(get.str.str_and_int_by_replaced_eutf8_w_regex_str, raw_romanized, "(%w)%^", "%1%1")
       if not is_ok then
-        return str -- if there's an error, just return the original string
+        return str -- if there's an error, just return the original str
       end
       replace(romanized, {{"(kigou)", "'"}, {}}, {
         mode = "remove",
       })
       return romanized
     end,
-    lower_alphanum_underscore_string_by_romanized = function(str)
-      str = get.string.string_by_removed_eutf8_w_regex_quantifiable(str, "[%^']")
-      str = transf.string.romanized_deterministic(str)
-      str = transf.string.string_by_all_eutf8_lower(str)
-      str = transf.string.alphanum_underscore(str)
+    lower_alphanum_underscore_str_by_romanized = function(str)
+      str = get.str.str_by_removed_eutf8_w_regex_quantifiable(str, "[%^']")
+      str = transf.str.romanized_deterministic(str)
+      str = transf.str.str_by_all_eutf8_lower(str)
+      str = transf.str.alphanum_underscore(str)
       return str
     end,
     romanized_gpt = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query =  "Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)", shots = {
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query =  "Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)", shots = {
         {"こっち", "kocchi"}
       }})
     end,
-    singleline_string_by_folded = function(str)
-      return get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[\n\r\v\f]", " ")
+    singleline_str_by_folded = function(str)
+      return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[\n\r\v\f]", " ")
     end,
-    whitespace_collapsed_string = function(str)
-      return get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", " ")
+    whitespace_collapsed_str = function(str)
+      return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", " ")
     end,
-    nowhitespace_string = function(str)
-      return get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", "")
+    nowhitespace_str = function(str)
+      return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", "")
     end,
-    --- @param str string
-    --- @return string[]
+    --- @param str str
+    --- @return str[]
     byte_char_arr = function(str)
       local t = {}
       for i = 1, #str do
@@ -3752,133 +3752,133 @@ transf = {
       return t
     end,
 
-    pos_int_by_len_byte_chars = string.len,
+    pos_int_by_len_byte_chars = str.len,
 
 
-    --- @param str string
-    --- @return string[]
+    --- @param str str
+    --- @return str[]
     utf8_char_arr = function(str)
       local t = {}
-      for i = 1, transf.string.pos_int_by_len_utf8_chars(str) do
-        t[i] = get.string.string_by_sub_eutf8(str, i, i)
+      for i = 1, transf.str.pos_int_by_len_utf8_chars(str) do
+        t[i] = get.str.str_by_sub_eutf8(str, i, i)
       end
       return t
     end,
 
     pos_int_by_len_utf8_chars = eutf8.len,
 
-    --- @param str string
-    --- @return string[]
+    --- @param str str
+    --- @return str[]
     line_arr = function(str)
-      return stringy.split(
-        stringy.strip(str),
+      return stry.split(
+        stry.strip(str),
         "\n"
       )
     end,
 
     pos_int_by_len_lines = function(str)
-      return #transf.string.line_arr(str)
+      return #transf.str.line_arr(str)
     end,
 
 
-    noempty_line_string_arr = function(str)
-      return transf.string_arr.noemtpy_string_arr(
-        transf.string.line_arr(str)
+    noempty_line_str_arr = function(str)
+      return transf.str_arr.noemtpy_str_arr(
+        transf.str.line_arr(str)
       )
     end,
     noindent_content_lines = function(str)
-      return transf.string_arr.noindent_string_arr(transf.string.noempty_line_string_arr(str))
+      return transf.str_arr.noindent_str_arr(transf.str.noempty_line_str_arr(str))
     end,
     nocomment_noindent_content_lines = function(str)
-      return transf.string_arr.nocomment_noindent_string_arr(transf.string.noempty_line_string_arr(str))
+      return transf.str_arr.nocomment_noindent_str_arr(transf.str.noempty_line_str_arr(str))
     end,
 
     line_by_first = function(str)
-      return transf.string.line_arr(str)[1]
+      return transf.str.line_arr(str)[1]
     end,
     noempty_line_by_first = function(str)
-      return transf.string.noempty_line_string_arr(str)[1]
+      return transf.str.noempty_line_str_arr(str)[1]
     end,
     line_by_last = function(str)
-      local lines = transf.string.line_arr(str)
+      local lines = transf.str.line_arr(str)
       return lines[#lines]
     end,
     noempty_line_by_last = function(str)
-      local lines = transf.string.noempty_line_string_arr(str)
+      local lines = transf.str.noempty_line_str_arr(str)
       return lines[#lines]
     end,
     char_by_first = function(str)
-      return get.string.string_by_sub_eutf8(str, 1, 1)
+      return get.str.str_by_sub_eutf8(str, 1, 1)
     end,
     char_by_last = function(str)
-      return get.string.string_by_sub_eutf8(str, -1)
+      return get.str.str_by_sub_eutf8(str, -1)
     end,
-    string_by_no_final_newlines = function(str)
-      return get.string.string_by_final_removed_eutf8_w_regex_quantifiable(str, "\n")
+    str_by_no_final_newlines = function(str)
+      return get.str.str_by_final_removed_eutf8_w_regex_quantifiable(str, "\n")
     end,
-    string_by_one_final_newline = function(str)
-      return get.string.string_by_final_continuous_collapsed_eutf8_w_regex_quantifiable(str, "\n")
+    str_by_one_final_newline = function(str)
+      return get.str.str_by_final_continuous_collapsed_eutf8_w_regex_quantifiable(str, "\n")
     end,
-    here_string = function(str)
+    here_str = function(str)
       return " <<EOF\n" .. str .. "\nEOF"
     end,
     rfc3339like_dt = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified."})
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified."})
     end,
     raw_contact = function(searchstr)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("khard show --format=yaml " .. searchstr )
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("khard show --format=yaml " .. searchstr )
     end,
     contact_table = function(searchstr)
-      local raw_contact = transf.string.raw_contact(searchstr)
+      local raw_contact = transf.str.raw_contact(searchstr)
       local contact = transf.raw_contact.contact_table(raw_contact)
       return contact
     end,
     event_table = function(str)
-      local components = get.string.string_arr_split(str, fixedstr.unique_field_separator)
+      local components = get.str.str_arr_split(str, fixedstr.unique_field_separator)
       local parsed = ovtable.new()
       for i, component in transf.arr.index_value_stateless_iter(components) do
         local key = ls.khal.parseable_format_components[i]
         if key == "alarms" then
-          parsed[key] = stringy.split(component, ",")
+          parsed[key] = stry.split(component, ",")
         elseif key == "description" then
           parsed[key] = component
         else
-          parsed[key] = plstringx.replace(component, "\n", "")
+          parsed[key] = plstrx.replace(component, "\n", "")
         end
       end
       return parsed
     end,
     kana_inner = function(argstr)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("kana --vowel-shortener x " .. argstr )
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("kana --vowel-shortener x " .. argstr )
     end,
     kana_inner_nospaces = function(argstr)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("kana --vowel-shortener x " .. argstr .. "| tr -d ' '")
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("kana --vowel-shortener x " .. argstr .. "| tr -d ' '")
     end,
     hiragana_only = function(str)
-      return transf.string.kana_inner(transf.string.string_by_single_quoted_escaped(str))
+      return transf.str.kana_inner(transf.str.str_by_single_quoted_escaped(str))
     end,
     katakana_only = function(str)
-      return transf.string.kana_inner("--katakana --extended" .. transf.string.string_by_single_quoted_escaped(str))
+      return transf.str.kana_inner("--katakana --extended" .. transf.str.str_by_single_quoted_escaped(str))
     end,
     hiragana_punct = function(str)
-      return transf.string.kana_inner_nospaces("--punctuation" .. transf.string.string_by_single_quoted_escaped(str))
+      return transf.str.kana_inner_nospaces("--punctuation" .. transf.str.str_by_single_quoted_escaped(str))
     end,
     katakana_punct = function(str)
-      return transf.string.kana_inner_nospaces("--katakana --extended --punctuation" .. transf.string.string_by_single_quoted_escaped(str))
+      return transf.str.kana_inner_nospaces("--katakana --extended --punctuation" .. transf.str.str_by_single_quoted_escaped(str))
     end,
     kana_mixed = function(str)
-      return transf.string.kana_inner("--extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.string.string_by_single_quoted_escaped(str))
+      return transf.str.kana_inner("--extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.str.str_by_single_quoted_escaped(str))
     end,
     japanese_writing = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query =  "You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:"})
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query =  "You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:"})
     end,
     kana_readings = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query =  "Provide kana readings for:"})
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query =  "Provide kana readings for:"})
     end,
     ruby_annotated_kana = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query =  "Add kana readings to this text as <ruby> annotations, including <rp> fallback:"})
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query =  "Add kana readings to this text as <ruby> annotations, including <rp> fallback:"})
     end,
-    --- @param str string
+    --- @param str str
     --- @return hs.styledtext
     with_styled_start_end_markers = function(str)
       local res =  hs.styledtext.new("^" .. str .. "$")
@@ -3887,14 +3887,14 @@ transf = {
       return res
     end,
     email_quoted = function(str)
-      return plstringx.join(
+      return plstrx.join(
         "\n",
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-          get.string.string_arr_splitlines(
-            stringy.strip(str)
+          get.str.str_arr_splitlines(
+            stry.strip(str)
           ),
           function(v)
-            if get.string.bool_by_startswith(v, ">") then
+            if get.str.bool_by_startswith(v, ">") then
               return ">" .. v
             else
               return ">" .. " " .. v
@@ -3904,71 +3904,71 @@ transf = {
       )
     end,
     url_arr = function(str)
-      return transf.string_arr.filter_nocomment_noindent_to_url_arr(
-        transf.string.line_arr(str)
+      return transf.str_arr.filter_nocomment_noindent_to_url_arr(
+        transf.str.line_arr(str)
       )
     end,
-    string_by_whole_regex = function(str)
+    str_by_whole_regex = function(str)
       return "^" .. str .. "$"
     end,
-    string_pair_split_by_minus_or_nil = function(str)
-      return get.string.string_pair_split_or_nil(str, "-")
+    str_pair_split_by_minus_or_nil = function(str)
+      return get.str.str_pair_split_or_nil(str, "-")
     end,
-    prompted_once_string_pair_for = function(str)
+    prompted_once_str_pair_for = function(str)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_string.string_or_nil_and_bool,
-        transformer = transf.string.string_pair_split_by_minus_or_nil,
+        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        transformer = transf.str.str_pair_split_by_minus_or_nil,
         prompt_args = {
-          message = "Please enter a string pair for " .. str .. " (e.g. 'foo-bar')",
+          message = "Please enter a str pair for " .. str .. " (e.g. 'foo-bar')",
         }
       })
     end,
-    prompted_multiple_string_pair_arr_for = function(str)
+    prompted_multiple_str_pair_arr_for = function(str)
       return transf.prompt_spec.any_arr({
-        prompter = transf.prompt_args_string.string_or_nil_and_bool,
-        transformer = transf.string.string_pair_split_by_minus_or_nil,
+        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        transformer = transf.str.str_pair_split_by_minus_or_nil,
         prompt_args = {
-          message = "Please enter a string pair for " .. str .. " (e.g. 'foo-bar')",
+          message = "Please enter a str pair for " .. str .. " (e.g. 'foo-bar')",
         }
       })
     end,
-    prompted_once_string_from_default = function(str)
-      return get.string.string_by_prompted_once_from_default(str, "Enter a string...")
+    prompted_once_str_from_default = function(str)
+      return get.str.str_by_prompted_once_from_default(str, "Enter a str...")
     end,
-    prompted_once_alphanum_minus_underscore_string_from_default = function(str)
-      return get.string.alphanum_minus_underscore_string_by_prompted_once_from_default(str, "Enter a string (alphanum, minus, underscore)...")
+    prompted_once_alphanum_minus_underscore_str_from_default = function(str)
+      return get.str.alphanum_minus_underscore_str_by_prompted_once_from_default(str, "Enter a str (alphanum, minus, underscore)...")
     end,
-    nowhitespace_string_arr = function(str)
-      return get.string.string_arr_split_single_char_stripped(
-        transf.string.whitespace_collapsed_string(str),
+    nowhitespace_str_arr = function(str)
+      return get.str.str_arr_split_single_char_stripped(
+        transf.str.whitespace_collapsed_str(str),
         " "
       )
     end,
-    nonindicated_number_string = function(str)
+    nonindicated_number_str = function(str)
       local res = str
-      res = get.string.string_and_int_by_replaced_eutf8_w_regex_string(res, ",", ".")
-      res = get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, "^[0-9a-zA-Z]+", "")
+      res = get.str.str_and_int_by_replaced_eutf8_w_regex_str(res, ",", ".")
+      res = get.str.str_and_int_by_replaced_eutf8_w_regex_str(str, "^[0-9a-zA-Z]+", "")
       return res
     end
   },
   line = {
     noindent_line = function(str)
-      return get.string.n_strings_by_extracted_eutf8(str, "^%s*(.*)$")
+      return get.str.n_strs_by_extracted_eutf8(str, "^%s*(.*)$")
     end,
     nocomment_line = function(str)
-      return get.string.string_arr_split(str, " # ")[1]
+      return get.str.str_arr_split(str, " # ")[1]
     end,
     nocomment_noindent = function(str)
       return transf.line.noindent_line(transf.line.nocomment_line(str))
     end,
     line_by_comment = function(str)
-      return get.string.string_arr_split(str, " # ")[2]
+      return get.str.str_arr_split(str, " # ")[2]
     end,
   },
   potentially_atpath = {
     potentially_atpath_resolved = function(str)
-      if get.string.bool_by_startswith(str, "@") then
-        local valpath = get.string.string_by_sub_eutf8(str, 2)
+      if get.str.bool_by_startswith(str, "@") then
+        local valpath = get.str.str_by_sub_eutf8(str, 2)
         valpath = hs.fs.pathToAbsolute(valpath, true)
         str = "@" .. valpath
       end
@@ -3977,12 +3977,12 @@ transf = {
   },
   alphanum_minus = {
     alphanum_by_remove = function(str)
-      return get.string.string_by_removed_onig_w_regex_quantifiable(str, "-")
+      return get.str.str_by_removed_onig_w_regex_quantifiable(str, "-")
     end,
   },
   alphanum_underscore = {
     evaled_shell_var = function(str)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("echo $" .. str)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("echo $" .. str)
     end,
   },
   alphanum_minus_underscore = {
@@ -4019,7 +4019,7 @@ transf = {
       return get.pass_item_name.path(pass_item_name, "username")
     end,
     otp = function(item)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("pass otp otp/" .. item)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("pass otp otp/" .. item)
     end,
     otp_absolute_path = function(item)
       return "otp/" .. item
@@ -4034,61 +4034,61 @@ transf = {
     end,
   },
   styledtext = {
-    string = function(st)
-      return st:getString()
+    str = function(st)
+      return st:getstr()
     end,
   },
-  styledtext_or_string = {
-    string = function(st_or_str)
-      if is.any.string(st_or_str) then
+  styledtext_or_str = {
+    str = function(st_or_str)
+      if is.any.str(st_or_str) then
         return st_or_str
       else
-        return transf.styledtext.string(st_or_str)
+        return transf.styledtext.str(st_or_str)
       end
     end,
   },
-  yaml_string = {
+  yaml_str = {
     not_userdata_or_function = function(str)
       local res = yaml.load(str)
       null2nil(res)
       return res
     end,
-    json_string = function(str)
-      return transf.not_userdata_or_function.json_string(
-        transf.yaml_string.not_userdata_or_function(str)
+    json_str = function(str)
+      return transf.not_userdata_or_function.json_str(
+        transf.yaml_str.not_userdata_or_function(str)
       )
     end,
   },
-  json_string = {
+  json_str = {
     not_userdata_or_function = function(str)
       return transf.fn.rt_or_nil_fn_by_pcall(json.decode)(str)
     end,
     table_or_nil = function(str)
-      local res =  transf.not_userdata_or_function.json_string(str)
+      local res =  transf.not_userdata_or_function.json_str(str)
       if is.any.table(res) then
         return res
       else
         return nil
       end
     end,
-    yaml_string = function(str)
-      return transf.not_userdata_or_function.yaml_string(
-        transf.json_string.not_userdata_or_function(str)
+    yaml_str = function(str)
+      return transf.not_userdata_or_function.yaml_str(
+        transf.json_str.not_userdata_or_function(str)
       )
     end,
   },
-  toml_string = {
+  toml_str = {
     assoc = toml.decode
   },
   yaml_file = {
     not_userdata_or_function = function(path)
-      return transf.yaml_string.not_userdata_or_function(transf.plaintext_file.string_by_contents(path))
+      return transf.yaml_str.not_userdata_or_function(transf.plaintext_file.str_by_contents(path))
     end
   },
   
-  ini_string = {
+  ini_str = {
     assoc = function(str)
-      return transf.string.table_or_err_by_evaled_env_bash_parsed_json(
+      return transf.str.table_or_err_by_evaled_env_bash_parsed_json(
         "jc --ini <<EOF " .. str .. "EOF"
       )
     end,
@@ -4108,47 +4108,47 @@ transf = {
       end
     end
   },
-  header_string = {
+  header_str = {
     assoc = function(str)
-      local lines = transf.string.noempty_line_string_arr(str)
+      local lines = transf.str.noempty_line_str_arr(str)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         lines,
-        transf.string.two_strings_by_split_header
+        transf.str.two_strs_by_split_header
       )
     end
   },
-  base64_gen_string = {
-    decoded_string = basexx.from_base64,
+  base64_gen_str = {
+    decoded_str = basexx.from_base64,
   },
-  base64_url_string = {
-    decoded_string = basexx.from_url64,
+  base64_url_str = {
+    decoded_str = basexx.from_url64,
   },
-  base32_gen_string = {
-    decoded_string = basexx.from_base32,
+  base32_gen_str = {
+    decoded_str = basexx.from_base32,
   },
-  base32_crock_string = {
-    decoded_string = basexx.from_crockford,
+  base32_crock_str = {
+    decoded_str = basexx.from_crockford,
   },
   base64 = {
-    decoded_string = function(b64)
-      if is.printable_ascii_nowhitespace_string.base64_gen_string(b64) then
-        return transf.base64_gen_string.decoded_string(b64)
+    decoded_str = function(b64)
+      if is.printable_ascii_nowhitespace_str.base64_gen_str(b64) then
+        return transf.base64_gen_str.decoded_str(b64)
       else
-        return transf.base64_url_string.decoded_string(b64)
+        return transf.base64_url_str.decoded_str(b64)
       end
     end
   },
   base32 = {
-    decoded_string = function(b32)
-      if is.printable_ascii_nowhitespace_string.base32_gen_string(b32) then
-        return transf.base32_gen_string.decoded_string(b32)
+    decoded_str = function(b32)
+      if is.printable_ascii_nowhitespace_str.base32_gen_str(b32) then
+        return transf.base32_gen_str.decoded_str(b32)
       else
-        return transf.base32_crock_string.decoded_string(b32)
+        return transf.base32_crock_str.decoded_str(b32)
       end
     end
   },
   event_table = {
-    yaml_string_by_calendar_template = function(event_table)
+    yaml_str_by_calendar_template = function(event_table)
       local template = transf["nil"].calendar_template_table_by_empty()
       for key, value in transf.table.stateless_key_value_iter(event_table) do
         if template[key] then
@@ -4162,13 +4162,13 @@ transf = {
         end
       end
       if template.alarms.value then 
-        template.alarms.value = get.string_or_number_arr.string_by_joined(template.alarms.value, ",")
+        template.alarms.value = get.str_or_number_arr.str_by_joined(template.alarms.value, ",")
       end
       --- in refactoring, the key order maintaining mechanism was removed. I'm not sure how my current aligment mechanism handles key order, so for now I'm just gonna leave it as is, but if it turns out that it's not working, I'll have to add it back in.
-      return transf.table.yaml_string_by_aligned(template)
+      return transf.table.yaml_str_by_aligned(template)
 
     end,
-    string_by_event_tagline = function(event_table)
+    str_by_event_tagline = function(event_table)
       local str = event_table.start
       if event_table["end"] then
         str = str .. " - " .. event_table["end"]
@@ -4223,29 +4223,29 @@ transf = {
       }
     end,
   },
-  multiline_string = {
-    trimmed_lines_multiline_string = function(str)
-      local lines = get.string.string_arr_split(str, "\n")
-      local trimmed_lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(lines, stringy.strip)
-      return get.string_or_number_arr.string_by_joined(trimmed_lines, "\n")
+  multiline_str = {
+    trimmed_lines_multiline_str = function(str)
+      local lines = get.str.str_arr_split(str, "\n")
+      local trimmed_lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(lines, stry.strip)
+      return get.str_or_number_arr.str_by_joined(trimmed_lines, "\n")
     end,
-    iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_arr_value_assoc_value_assoc = function(raw)
-      local raw_countries = get.string.string_arr_split_noempty(raw, "\n\n")
+    iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_str_arr_value_assoc_value_assoc = function(raw)
+      local raw_countries = get.str.str_arr_split_noempty(raw, "\n\n")
       local countries = {}
       for _, raw_country in transf.arr.index_value_stateless_iter(raw_countries) do
-        local raw_country_lines = get.string.string_arr_split_single_char_noempty(raw_country, "\n")
+        local raw_country_lines = get.str.str_arr_split_single_char_noempty(raw_country, "\n")
         local country_header = raw_country_lines[1]
-        local country_code = get.string.n_strings_by_extracted_onig(country_header, "\\(([^\\)]+\\)")
+        local country_code = get.str.n_strs_by_extracted_onig(country_header, "\\(([^\\)]+\\)")
         if country_code == nil then error("could not find country code in header. header was " .. country_header) end
         local payload_lines = transf.arr.arr_by_nofirst(raw_country_lines)
         countries[country_code] = {}
         local city_code
         for _, payload_line in transf.arr.index_value_stateless_iter(payload_lines) do
-          if get.string.bool_by_startswith(payload_line, "\t\t") then -- line specifying a single relay
+          if get.str.bool_by_startswith(payload_line, "\t\t") then -- line specifying a single relay
             local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
             dothis.arr.push(countries[country_code][city_code], relay_code)
-          elseif get.string.bool_by_startswith(payload_line, "\t") then -- line specifying an entire city
-            city_code = get.string.n_strings_by_extracted_onig(payload_line," \\(([^\\)]+\\) " ) -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
+          elseif get.str.bool_by_startswith(payload_line, "\t") then -- line specifying an entire city
+            city_code = get.str.n_strs_by_extracted_onig(payload_line," \\(([^\\)]+\\) " ) -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
             countries[country_code][city_code] = {}
           end
         end
@@ -4256,17 +4256,17 @@ transf = {
     end,
     
   },
-  multirecord_string = {
-    arr_of_record_strings = function(str)
-      return get.string.string_arr_split_noempty(
+  multirecord_str = {
+    arr_of_record_strs = function(str)
+      return get.str.str_arr_split_noempty(
         str,
         fixedstr.unique_record_separator
       )
     end,
     arr_of_event_tables = function(str)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.multirecord_string.arr_of_record_strings(str),
-        transf.string.event_table
+        transf.multirecord_str.arr_of_record_strs(str),
+        transf.str.event_table
       )
     end,
   },
@@ -4314,8 +4314,8 @@ transf = {
     curl_form_field_args = function(pair)
       return transf.two_anys.curl_form_field_args(pair[1], pair[2])
     end,
-    assoc_entry_string = function(pair)
-      return transf.two_anys.assoc_entry_string(pair[1], pair[2])
+    assoc_entry_str = function(pair)
+      return transf.two_anys.assoc_entry_str(pair[1], pair[2])
     end,
     larger = function(pair)
       return transf.two_comparables.comparable_by_larger(pair[1], pair[2])
@@ -4328,8 +4328,8 @@ transf = {
     bool_by_or = function(a, b)
       return a or b
     end,
-    string_two_anys = function(a, b)
-      return transf.any.string(a), transf.any.string(b)
+    str_two_anys = function(a, b)
+      return transf.any.str(a), transf.any.str(b)
     end,
     pair = function(key, value)
       return {key, value}
@@ -4341,28 +4341,28 @@ transf = {
       return value
     end,
     header = function(k, v)
-      return transf.string.string_by_first_eutf8_upper(transf.any.string(k)) .. ": " .. transf.any.string(v)
+      return transf.str.str_by_first_eutf8_upper(transf.any.str(k)) .. ": " .. transf.any.str(v)
     end,
     email_header = function(key, value)
-      return transf.string.string_by_first_eutf8_upper(transf.any.string(key)) .. ": " .. get.string.string_by_evaled_as_template(transf.any.string(value))
+      return transf.str.str_by_first_eutf8_upper(transf.any.str(key)) .. ": " .. get.str.str_by_evaled_as_template(transf.any.str(value))
     end,
     url_param = function(key, value)
-      return transf.any.string(key) .. "=" .. transf.string.encoded_query_param_value(transf.any.string(value))
+      return transf.any.str(key) .. "=" .. transf.str.encoded_query_param_value(transf.any.str(value))
     end,
     ini_line = function(key, value)
-      return transf.any.string(key) .. " = " .. transf.any.string(value)
+      return transf.any.str(key) .. " = " .. transf.any.str(value)
     end,
     envlike_line = function(key, value)
-      return transf.any.string(key) .. "=" .. transf.any.string(value)
+      return transf.any.str(key) .. "=" .. transf.any.str(value)
     end,
     curl_form_field_args = function(key, value)
       return {
         "-F",
-        transf.any.string(key) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.string(value)),
+        transf.any.str(key) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.str(value)),
       }
     end,
-    assoc_entry_string = function(key, value)
-      return "[" .. transf.any.string(key) .. "] = " .. transf.any.string(value)
+    assoc_entry_str = function(key, value)
+      return "[" .. transf.any.str(key) .. "] = " .. transf.any.str(value)
     end,
   },
   two_comparables = {
@@ -4414,10 +4414,10 @@ transf = {
   },
   displayname_email = {
     email = function(str)
-      return get.string.n_strings_by_extracted_eutf8(str, " <(.*)> *$")
+      return get.str.n_strs_by_extracted_eutf8(str, " <(.*)> *$")
     end,
     displayname = function(str)
-      return get.string.n_strings_by_extracted_eutf8(str, "^(.*) <")
+      return get.str.n_strs_by_extracted_eutf8(str, "^(.*) <")
     end,
     displayname_email_assoc = function(str)
       local displayname = transf.displayname_email.displayname(str)
@@ -4451,9 +4451,9 @@ transf = {
   phone_number = {
 
   },
-  string_arr = {
-    repeated_option_string = function(arr, opt)
-      return get.string_or_number_arr.string_by_joined(
+  str_arr = {
+    repeated_option_str = function(arr, opt)
+      return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
           arr,
           function (itm)
@@ -4463,71 +4463,71 @@ transf = {
         ""
       )
     end,
-    single_quoted_escaped_string_arr = function(arr)
+    single_quoted_escaped_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        transf.string.string_by_single_quoted_escaped
+        transf.str.str_by_single_quoted_escaped
       )
     end,
-    single_quoted_escaped_string = function(arr)
-      return get.string_or_number_arr.string_by_joined(
-        transf.string_arr.single_quoted_escaped_string_arr(arr),
+    single_quoted_escaped_str = function(arr)
+      return get.str_or_number_arr.str_by_joined(
+        transf.str_arr.single_quoted_escaped_str_arr(arr),
         " "
       )
     end,
-    action_path_string = function(arr)
-      return get.string_or_number_arr.string_by_joined(arr, " > ")
+    action_path_str = function(arr)
+      return get.str_or_number_arr.str_by_joined(arr, " > ")
     end,
     path = function(arr)
-      return get.string_or_number_arr.string_by_joined(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.string.safe_filename), 
+      return get.str_or_number_arr.str_by_joined(
+        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.safe_filename), 
         "/"
       )
     end,
-    noemtpy_string_arr = function(arr)
-      return get.arr.arr_by_filtered(arr, is.string.noempty_string)
+    noemtpy_str_arr = function(arr)
+      return get.arr.arr_by_filtered(arr, is.str.noempty_str)
     end,
-    noindent_string_arr = function(arr)
+    noindent_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent_line)
     end,
-    nocomment_line_filtered_string_arr = function(arr)
+    nocomment_line_filtered_str_arr = function(arr)
       return get.arr.arr_by_filtered(
         arr,
-        is.string.nocomment_line
+        is.str.nocomment_line
       )
     end,
-    nocomment_string_arr = function(arr)
+    nocomment_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.string_arr.nocomment_line_filtered_string_arr(arr),
+        transf.str_arr.nocomment_line_filtered_str_arr(arr),
         transf.line.nocomment_line
       )
     end,
-    nocomment_line_filtered_noindent_string_arr = function(arr)
-      return transf.string_arr.noindent_string_arr(
-        transf.string_arr.nocomment_line_filtered_string_arr(arr)
+    nocomment_line_filtered_noindent_str_arr = function(arr)
+      return transf.str_arr.noindent_str_arr(
+        transf.str_arr.nocomment_line_filtered_str_arr(arr)
       )
     end,
-    nocomment_noindent_string_arr = function(arr)
-      return transf.string_arr.noindent_string_arr(
-        transf.string_arr.nocomment_string_arr(arr)
+    nocomment_noindent_str_arr = function(arr)
+      return transf.str_arr.noindent_str_arr(
+        transf.str_arr.nocomment_str_arr(arr)
       )
     end,
     filter_to_url_arr = function(arr)
-      return get.arr.arr_by_filtered(arr, is.string.url)
+      return get.arr.arr_by_filtered(arr, is.str.url)
     end,
     filter_nocomment_noindent_to_url_arr = function(arr)
-      return transf.string_arr.filter_to_url_arr(
-        transf.string_arr.nocomment_noindent_string_arr(arr)
+      return transf.str_arr.filter_to_url_arr(
+        transf.str_arr.nocomment_noindent_str_arr(arr)
       )
     end,
-    stripped_string_arr = function(arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, stringy.strip)
+    stripped_str_arr = function(arr)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, stry.strip)
     end,
-    multiline_string = function(arr)
-      return get.string_or_number_arr.string_by_joined(arr, "\n")
+    multiline_str = function(arr)
+      return get.str_or_number_arr.str_by_joined(arr, "\n")
     end,
     contents_summary = function(arr)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_slice_removed_indicator_and_flatten_w_slice_spec(arr, {
           start = 1,
           stop = 10,
@@ -4538,25 +4538,25 @@ transf = {
     
   },
   env_line_arr = {
-    env_string = function(arr)
-      local env_string_inner = get.string_or_number_arr.string_by_joined(arr, "\n")
+    env_str = function(arr)
+      local env_str_inner = get.str_or_number_arr.str_by_joined(arr, "\n")
       return "#!/usr/bin/env bash\n\n" ..
           "set -u\n\n" .. 
-          env_string_inner .. 
+          env_str_inner .. 
           "\n\nset +u\n"
     end,
   },
   slice_notation = {
     three_pos_int_or_nils = function(notation)
-      local stripped_str = stringy.strip(notation)
-      local start_str, stop_str, step_str = get.string.n_strings_by_extracted_onig(
+      local stripped_str = stry.strip(notation)
+      local start_str, stop_str, step_str = get.str.n_strs_by_extracted_onig(
         stripped_str, 
         "^\\[?(-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
       )
       return
-        start_str == "" and nil or get.string.number_or_nil(start_str),
-        stop_str == "" and nil or get.string.number_or_nil(stop_str),
-        step_str == "" and nil or get.string.number_or_nil(step_str)
+        start_str == "" and nil or get.str.number_or_nil(start_str),
+        stop_str == "" and nil or get.str.number_or_nil(stop_str),
+        step_str == "" and nil or get.str.number_or_nil(step_str)
     end,
   },
   two_arrs = {
@@ -4710,7 +4710,7 @@ transf = {
       return transf.arr_and_any.arr(arr, any)
     end,
   },
-  arr_of_string_arrs = {
+  arr_of_str_arrs = {
 
   },
   url_arr = {
@@ -4720,8 +4720,8 @@ transf = {
         transf.url.url_potentially_with_title_comment
       )
     end,
-    session_string = function(sgml_url_arr)
-      return get.string_or_number_arr.string_by_joined(
+    session_str = function(sgml_url_arr)
+      return get.str_or_number_arr.str_by_joined(
         transf.url.url_potentially_with_title_comment_arr(sgml_url_arr),
         "\n"
       )
@@ -4750,20 +4750,20 @@ transf = {
 
   },
   plaintext_file_arr = {
-    string_arr_by_contents = function(arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.plaintext_file.string_by_contents)
+    str_arr_by_contents = function(arr)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.plaintext_file.str_by_contents)
     end,
-    string_arr_by_lines = function(arr)
-      return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.string_arr_by_lines)
+    str_arr_by_lines = function(arr)
+      return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_lines)
     end,
-    string_arr_by_content_lines = function(arr)
-      return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.string_arr_by_content_lines)
+    str_arr_by_content_lines = function(arr)
+      return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_content_lines)
     end,
     m3u_file_arr = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, is.plaintext_file.m3u_file)
     end,
     url_or_local_path_arr_by_m3u_file_content_lines = function(arr)
-      return transf.plaintext_file_arr.string_arr_by_content_lines(
+      return transf.plaintext_file_arr.str_arr_by_content_lines(
         transf.plaintext_file_arr.m3u_file_arr(arr)
       )
     end,
@@ -4861,33 +4861,33 @@ transf = {
     key_value_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateless_iter),
     key_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateful_iter, 1, 1),
     value_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateful_iter, 2, 2),
-    toml_string = toml.encode,
-    yaml_string_by_aligned = function(tbl)
-      local tmp = transf.string.in_tmp_dir(
-        transf.not_userdata_or_function.yaml_string(tbl),
+    toml_str = toml.encode,
+    yaml_str_by_aligned = function(tbl)
+      local tmp = transf.str.in_tmp_dir(
+        transf.not_userdata_or_function.yaml_str(tbl),
         "shell-input"
       )
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("align " .. transf.string.string_by_single_quoted_escaped(tmp))
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("align " .. transf.str.str_by_single_quoted_escaped(tmp))
       local res = transf.yaml_file.not_userdata_or_function(tmp)
       dothis.local_extant_path.delete(tmp)
       return res
     end,
     yaml_metadata = function(t)
-      local string_contents = transf.not_userdata_or_string.yaml_string(t)
-      return "---\n" .. string_contents .. "\n---\n"
+      local str_contents = transf.not_userdata_or_str.yaml_str(t)
+      return "---\n" .. str_contents .. "\n---\n"
     end,
     
-    ics_string = function(t)
+    ics_str = function(t)
       local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
       dothis.table.write_ics_file(t, tmpdir_ics_path)
-      local contents = transf.file.string_by_contents(tmpdir_ics_path)
+      local contents = transf.file.str_by_contents(tmpdir_ics_path)
       dothis.absolute_path.delete(tmpdir_ics_path)
       return contents
     end,
     vt_set = function(t)
       return transf.arr.set(transf.table_or_nil.vt_arr(t))
     end,
-    json_string_by_pretty = function(t)
+    json_str_by_pretty = function(t)
       return hs.json.encode(t, true)
     end,
     arr_of_arrs_by_label_root_to_leaf_only_primitive_is_leaf = function(t)
@@ -4915,14 +4915,14 @@ transf = {
       )
     end,
     relative_path_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
-      return get.table.string_by_joined_key_any_value_assoc(
+      return get.table.str_by_joined_key_any_value_assoc(
         t,
         is.table.arrlike,
         "/"
       )
     end,
     dot_notation_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
-      return get.table.string_by_joined_key_any_value_assoc(
+      return get.table.str_by_joined_key_any_value_assoc(
         t,
         is.table.arrlike,
         "."
@@ -4953,10 +4953,10 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.url_param)
     end,
     url_params = function(t)
-      return get.string_or_number_arr.string_by_joined(transf.assoc.url_param_arr(t), "&")
+      return get.str_or_number_arr.str_by_joined(transf.assoc.url_param_arr(t), "&")
     end,
-    --- @param t { [string]: string }
-    --- @return string
+    --- @param t { [str]: str }
+    --- @return str
     email_header = function(t)
       local header_lines = {}
       local initial_headers = ls.initial_headers
@@ -4974,7 +4974,7 @@ transf = {
           transf.pair.email_header
         )
       )
-      return get.string_or_number_arr.string_by_joined(header_lines, "\n")
+      return get.str_or_number_arr.str_by_joined(header_lines, "\n")
     end,
     curl_form_field_arr = function(t)
       return transf.arr_of_arrs.arr_by_flatten(
@@ -4984,28 +4984,28 @@ transf = {
     ini_line_arr = function(t)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.ini_line)
     end,
-    ini_string = function(t)
-      return get.string_or_number_arr.string_by_joined(transf.assoc.ini_line_arr(t), "\n")
+    ini_str = function(t)
+      return get.str_or_number_arr.str_by_joined(transf.assoc.ini_line_arr(t), "\n")
     end,
     envlike_line_arr = function(t)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.envlike_line)
     end,
-    assoc_entry_string_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.assoc_entry_string)
+    assoc_entry_str_arr = function(t)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.assoc_entry_str)
     end,
     contents_summary = function(t)
-      return transf.string_arr.contents_summary(
-        transf.assoc.assoc_entry_string_arr(t)
+      return transf.str_arr.contents_summary(
+        transf.assoc.assoc_entry_str_arr(t)
       )
     end,
     summary = function(t)
       return "assoc (" .. transf.assoc.int_by_length(t) .. "): " .. transf.assoc.contents_summary(t)
     end,
-    assoc_entry_multiline_string = function(t)
-      return get.string_or_number_arr.string_by_joined(transf.assoc.assoc_entry_string_arr(t), "\n")
+    assoc_entry_multiline_str = function(t)
+      return get.str_or_number_arr.str_by_joined(transf.assoc.assoc_entry_str_arr(t), "\n")
     end,
-    envlike_string = function(t)
-      return get.string_or_number_arr.string_by_joined(transf.assoc.envlike_line_arr(t), "\n")
+    envlike_str = function(t)
+      return get.str_or_number_arr.str_by_joined(transf.assoc.envlike_line_arr(t), "\n")
     end,
     truthy_value_assoc = function(t)
       return get.arr.arr_by_filtered(
@@ -5059,21 +5059,21 @@ transf = {
       return transf.two_tables.table_by_take_old(t1, t2)
     end,
   },
-  string_value_assoc = {
-    string_value_assoc_by_prompted_once_from_default = function(assoc)
+  str_value_assoc = {
+    str_value_assoc_by_prompted_once_from_default = function(assoc)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(assoc, function(k, v)
-        return get.string.string_by_prompted_once_from_default(
+        return get.str.str_by_prompted_once_from_default(
           v,
           "Enter a new value for '" .. k .. "'"
         )
       end)
     end,
   },
-  string_key_assoc = {
-    string_key_assoc_of_string_key_assocs_or_prev_values_by_space = function(tbl)
+  str_key_assoc = {
+    str_key_assoc_of_str_key_assocs_or_prev_values_by_space = function(tbl)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(tbl) do
-        local key_parts = stringy.split(k, " ")
+        local key_parts = stry.split(k, " ")
         local label = key_parts[1]
         local key = key_parts[2]
         if not key then
@@ -5086,18 +5086,18 @@ transf = {
       return res
     end,
   },
-  string_key_value_assoc = {
+  str_key_value_assoc = {
 
   },
-  string_bool_assoc = {
+  str_bool_assoc = {
     truthy_long_flag_arr = function(assoc)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.assoc.truthy_value_key_arr(assoc),
-        transf.string.long_flag
+        transf.str.long_flag
       )
     end,
-    truthy_long_flag_string = function(assoc)
-      return get.string_or_number_arr.string_by_joined(transf.assoc.truthy_long_flag_arr(assoc), " ")
+    truthy_long_flag_str = function(assoc)
+      return get.str_or_number_arr.str_by_joined(transf.assoc.truthy_long_flag_arr(assoc), " ")
     end,
   },
   arr_of_arrs = {
@@ -5155,12 +5155,12 @@ transf = {
       return res
     end,
   },
-  string_pair_arr = {
+  str_pair_arr = {
     env_line_arr = function (arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(pair)
-          return "export " .. pair[1] .. "=" .. transf.string.string_by_double_quoted_escaped(pair[2])
+          return "export " .. pair[1] .. "=" .. transf.str.str_by_double_quoted_escaped(pair[2])
         end
       )
     end,
@@ -5179,12 +5179,12 @@ transf = {
       return res
     end
   },
-  assoc_of_string_value_assocs = {
-    ini_string = function(t)
-      return get.string_or_number_arr.string_by_joined(get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
+  assoc_of_str_value_assocs = {
+    ini_str = function(t)
+      return get.str_or_number_arr.str_by_joined(get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
         function(k,v)
-          return "[" .. k .. "]\n" .. transf.assoc.ini_string(v)
+          return "[" .. k .. "]\n" .. transf.assoc.ini_str(v)
         end
       ), "\n\n")
     end,
@@ -5292,8 +5292,8 @@ transf = {
         }
       }         
     end,
-    ini_string = function(specifier)
-      return transf.assoc_of_string_value_assocs.ini_string(
+    ini_str = function(specifier)
+      return transf.assoc_of_str_value_assocs.ini_str(
         transf.assoc_of_assocs.assoc_by_space(
           transf.vdirsyncer_pair_specifier.assoc_of_assocs(specifier)
         )
@@ -5311,16 +5311,16 @@ transf = {
         else
           url = "https://"
         end
-        url = url .. get.string.string_by_with_suffix(comps.host, "/")
+        url = url .. get.str.str_by_with_suffix(comps.host, "/")
         if comps.endpoint then
-          url = url .. (get.string.no_prefix_string(comps.endpoint, "/") or "/")
+          url = url .. (get.str.no_prefix_str(comps.endpoint, "/") or "/")
         end   
       end     
       if comps.params then
         if is.any.table(comps.params) then
           url = url .. "?" .. transf.assoc.url_params(comps.params)
         else
-          url = url .. get.string.with_prefix_string(comps.params, "?")
+          url = url .. get.str.with_prefix_str(comps.params, "?")
         end
       end
       return url
@@ -5349,7 +5349,7 @@ transf = {
   },
   doi_url = {
     doi = function(url)
-      return get.string.n_strings_by_extracted_onig(url, r.g.id.doi_prefix .. "(.+)/?$")
+      return get.str.n_strs_by_extracted_onig(url, r.g.id.doi_prefix .. "(.+)/?$")
     end,
     indicated_doi = function(url)
       return transf.doi.indicated_doi(transf.doi_url.doi(url))
@@ -5358,8 +5358,8 @@ transf = {
   indicated_doi = {
     doi = function(urnlike)
       doi = urnlike:lower()
-      doi = get.string.no_prefix_string(urnlike, "urn:")
-      doi = get.string.no_prefix_string(urnlike, "doi:")
+      doi = get.str.no_prefix_str(urnlike, "urn:")
+      doi = get.str.no_prefix_str(urnlike, "doi:")
       return doi
     end,
     doi_url = function(urnlike)
@@ -5374,8 +5374,8 @@ transf = {
       return "doi:" .. doi
     end,
     online_bib = function(doi)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "curl -LH Accept: application/x-bibtex" .. transf.string.string_by_single_quoted_escaped(
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "curl -LH Accept: application/x-bibtex" .. transf.str.str_by_single_quoted_escaped(
           transf.doi.doi_url(doi)
         )
       )
@@ -5392,13 +5392,13 @@ transf = {
   },
   isbn = {
     online_bib = function(isbn)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "isbn_meta" .. transf.string.string_by_single_quoted_escaped(isbn) .. " bibtex"
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "isbn_meta" .. transf.str.str_by_single_quoted_escaped(isbn) .. " bibtex"
       )
     end,
     csl_table_by_online = function(isbn)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "isbn_meta" .. transf.string.string_by_single_quoted_escaped(isbn) .. " csl"
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "isbn_meta" .. transf.str.str_by_single_quoted_escaped(isbn) .. " csl"
       )
     end,
     indicated_citable_object_id = function(isbn)
@@ -5407,37 +5407,37 @@ transf = {
   },
   isbn10 = {
     isbn13 = function(isbn10)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "to_isbn13" .. transf.string.string_by_single_quoted_escaped(isbn10)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "to_isbn13" .. transf.str.str_by_single_quoted_escaped(isbn10)
       )
     end,
   },
   isbn13 = {
     isbn10 = function(isbn13)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "to_isbn10" .. transf.string.string_by_single_quoted_escaped(isbn13)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "to_isbn10" .. transf.str.str_by_single_quoted_escaped(isbn13)
       )
     end,
   },
   indicated_citable_object_id = {
     mcitations_csl_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.mcitations_csl_file_or_nil(
-        transf.string.encoded_query_param_value(id)
+        transf.str.encoded_query_param_value(id)
       )
     end,
     local_csl_table = function(id)
       return transf.filename_safe_indicated_citable_object_id.csl_table_or_nil(
-        transf.string.encoded_query_param_value(id)
+        transf.str.encoded_query_param_value(id)
       )
     end,
     citable_object_id = function(id)
-      return get.string.n_strings_by_extracted_onig(id, "^[^:]+:(.*)$")
+      return get.str.n_strs_by_extracted_onig(id, "^[^:]+:(.*)$")
     end,
     citable_object_indicator = function(id)
-      return stringy.split(id, ":")[1]
+      return stry.split(id, ":")[1]
     end,
     filename_safe_indicated_citable_object_id = function(id)
-      return transf.string.encoded_query_param_value(id)
+      return transf.str.encoded_query_param_value(id)
     end,
     csl_table_by_online = function(id)
       return transf[
@@ -5448,12 +5448,12 @@ transf = {
     end,
     mpapers_citable_object_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.mpapers_citable_object_file_or_nil(
-        transf.string.encoded_query_param_value(id)
+        transf.str.encoded_query_param_value(id)
       )
     end,
     mpapernotes_citable_object_notes_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.mpapernotes_citable_object_notes_file_or_nil(
-        transf.string.encoded_query_param_value(id)
+        transf.str.encoded_query_param_value(id)
       )
     end,
     citations_file_line = function(id)
@@ -5465,7 +5465,7 @@ transf = {
   },
   filename_safe_indicated_citable_object_id = {
     indicated_citable_object_id = function(id)
-      return transf.string.string_by_percent_decoded_also_plus(
+      return transf.str.str_by_percent_decoded_also_plus(
         id
       )
     end,
@@ -5491,10 +5491,10 @@ transf = {
   },
   citable_filename = {
     filename_safe_indicated_citable_object_id = function(filename)
-      return get.string.string_arr_split(filename, "!citid:")[2]
+      return get.str.str_arr_split(filename, "!citid:")[2]
     end,
     indicated_citable_object_id = function(filename)
-      return transf.string.string_by_percent_decoded_also_plus(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
+      return transf.str.str_by_percent_decoded_also_plus(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
     end,
     csl_table = function(filename)
       return transf.indicated_citable_object_id.local_csl_table(
@@ -5539,13 +5539,13 @@ transf = {
         transf.citations_file.indicated_citable_object_id_arr(file)
       )
     end,
-    bib_string = function(file)
-      return transf.indicated_citable_object_id_arr.bib_string(
+    bib_str = function(file)
+      return transf.indicated_citable_object_id_arr.bib_str(
         transf.citations_file.indicated_citable_object_id_arr(file)
       )
     end,
-    json_string = function(file)
-      return transf.indicated_citable_object_id_arr.json_string(
+    json_str = function(file)
+      return transf.indicated_citable_object_id_arr.json_str(
         transf.citations_file.indicated_citable_object_id_arr(file)
       )
     end,
@@ -5557,15 +5557,15 @@ transf = {
         transf.indicated_citable_object_id.local_csl_table
       )
     end,
-    bib_string = function(arr)
-      return transf.csl_table_arr.bib_string(
+    bib_str = function(arr)
+      return transf.csl_table_arr.bib_str(
         transf.indicated_citable_object_id_arr.local_csl_table_arr(
           arr
         )
       )
     end,
-    json_string = function(arr)
-      return transf.csl_table_arr.json_string(
+    json_str = function(arr)
+      return transf.csl_table_arr.json_str(
         transf.indicated_citable_object_id_arr.local_csl_table_arr(
           arr
         )
@@ -5577,8 +5577,8 @@ transf = {
         transf.csl_table.citations_file_line
       )
     end,
-    citations_file_string = function(arr)
-      return get.string_or_number_arr.string_by_joined(
+    citations_file_str = function(arr)
+      return get.str_or_number_arr.str_by_joined(
         transf.indicated_citable_object_id_arr.citations_file_line_arr(arr), 
         "\n"
       )
@@ -5607,8 +5607,8 @@ transf = {
         transf.latex_project_dir.citations_file(dir)
       )
     end,
-    bib_string_from_citations = function(dir)
-      return transf.citations_file.bib_string(
+    bib_str_from_citations = function(dir)
+      return transf.citations_file.bib_str(
         transf.latex_project_dir.citations_file(dir)
       )
     end,
@@ -5679,8 +5679,8 @@ transf = {
         "translation"
       )
     end,
-    creator_bank_details_string = function(dir)
-      return get.contact_table.bank_details_string(
+    creator_bank_details_str = function(dir)
+      return get.contact_table.bank_details_str(
         transf.omegat_project_dir.creator_contact_table(dir)
       )
     end,
@@ -5745,9 +5745,9 @@ transf = {
       return transf.omegat_project_dir.tm_dir(dir) .. "/" .. transf.path.leaf(dir) .. "-omegat.tmx"
     end,
     rechnung_filename = function(dir)
-      return get.timestamp_s.string_by_date_format_indicator(
+      return get.timestamp_s.str_by_date_format_indicator(
         os.time(),
-        tblmap.date_component_name.rfc3339like_dt_format_string["day"]
+        tblmap.date_component_name.rfc3339like_dt_format_str["day"]
       ) .. "--" .. transf.omegat_project_dir.client_name(dir) .. "_" .. transf.omegat_project_dir.rechnung_number(dir)
     end,
     rechnung_pdf_path = function(dir)
@@ -5791,14 +5791,14 @@ transf = {
     end,
     rechnung_email_specifier = function(dir)
       return {
-        body = get.string.string_by_evaled_as_template(lemap.translation.rechnung_email_de, dir),
+        body = get.str.str_by_evaled_as_template(lemap.translation.rechnung_email_de, dir),
         non_inline_attachment_local_file_arr = {
           transf.omegat_project_dir.rechnung_pdf_path(dir)
         }
       }
     end,
     raw_rechnung = function(dir)
-      return get.string.string_by_evaled_as_template(lemap.translation.rechnung_de, dir)
+      return get.str.str_by_evaled_as_template(lemap.translation.rechnung_de, dir)
     end,
 
   },
@@ -5817,7 +5817,7 @@ transf = {
   translation_price_specifier = {
     translation_price_block_german = function(spec)
       return 
-        get.string_or_number_arr.string_by_joined(
+        get.str_or_number_arr.str_by_joined(
           get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
             spec.translation_price_specifier_arr,
             function(v)
@@ -5938,7 +5938,7 @@ transf = {
       return transf.window.hs_geometry_rect(window).center
     end,
     summary = function(window)
-      return get.string.string_by_formatted_w_n_anys(
+      return get.str.str_by_formatted_w_n_anys(
         "%s (%s)",
         transf.window.title(window),
         transf.window.mac_application_name(window)
@@ -5963,7 +5963,7 @@ transf = {
       )
     end,
     jxa_window_index = function(window)
-      return get.string.evaled_js_osa(
+      return get.str.evaled_js_osa(
         "Application('" .. transf.window.mac_application_name(window) .. "')" ..
           ".windows().findIndex(" ..
             "window => window.title() == '" .. transf.window.filtered_title(window) .. "'" ..
@@ -6000,7 +6000,7 @@ transf = {
   },
   tabbable_jxa_window_specifier = {
     amount_of_tabs = function(window_spec)
-      return get.string.evaled_js_osa( 
+      return get.str.evaled_js_osa( 
         "Application('" .. window_spec.application_name .. "')" ..
           ".windows().[" ..
             window_spec.window_index ..
@@ -6019,7 +6019,7 @@ transf = {
       return tab_spec_arr
     end,
     active_tab_index = function(window_spec)
-      return get.string.evaled_js_osa( 
+      return get.str.evaled_js_osa( 
         "Application('" .. window_spec.application_name .. "')" ..
           ".windows().[" ..
             window_spec.window_index ..
@@ -6114,7 +6114,7 @@ transf = {
   },
   chat_mac_application_name = {
     chat_storage_dir = function(app_name)
-      return env.MCHATS .. "/" .. transf.string.string_by_all_eutf8_lower(app_name)
+      return env.MCHATS .. "/" .. transf.str.str_by_all_eutf8_lower(app_name)
     end,
     chat_media_dir = function(app_name)
       return transf.chat_mac_application_name.chat_storage_dir(app_name) .. "/media"
@@ -6123,38 +6123,38 @@ transf = {
       return transf.chat_mac_application_name.chat_storage_dir(app_name) .. "/chats"
     end,
   },
-  bib_string = {
+  bib_str = {
     csl_table_arr = function(str)
-      return transf.string.table_or_err_by_evaled_env_bash_parsed_json("pandoc -f biblatex -t csljson" .. transf.string.here_string(str))
+      return transf.str.table_or_err_by_evaled_env_bash_parsed_json("pandoc -f biblatex -t csljson" .. transf.str.here_str(str))
     end,
     urls = function(str)
       return transf.csl_table_arr.url_arr(
-        transf.bib_string.csl_table_arr(str)
+        transf.bib_str.csl_table_arr(str)
       )
     end
   },
   csl_table_arr = {
-    bib_string_arr = function(arr)
+    bib_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        transf.csl_table.bib_string
+        transf.csl_table.bib_str
       )
     end,
-    bib_string = function(arr)
-      return get.string_or_number_arr.string_by_joined(
-        transf.csl_table_arr.bib_string_arr(arr),
+    bib_str = function(arr)
+      return get.str_or_number_arr.str_by_joined(
+        transf.csl_table_arr.bib_str_arr(arr),
         "\n"
       )
     end,
-    json_string = transf.not_userdata_or_function.json_string,
+    json_str = transf.not_userdata_or_function.json_str,
     indicated_citable_object_id_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.csl_table.indicated_citable_object_id
       )
     end,
-    citations_file_string = function(arr)
-      return transf.indicated_citable_object_id_arr.citations_file_string(
+    citations_file_str = function(arr)
+      return transf.indicated_citable_object_id_arr.citations_file_str(
         transf.csl_table_arr.indicated_citable_object_id_arr(arr)
       )
     end,
@@ -6206,7 +6206,7 @@ transf = {
       return csl_table.author
     end,
     naive_author_summary = function(csl_table)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
           transf.csl_table.author_arr(csl_table),
           transf.csl_person.naive_name
@@ -6227,22 +6227,22 @@ transf = {
         "et_al"
       )
     end,
-    authors_et_al_string = function(csl_table)
-      return get.string_or_number_arr.string_by_joined(
+    authors_et_al_str = function(csl_table)
+      return get.str_or_number_arr.str_by_joined(
         transf.csl_table.authors_et_al_arr(csl_table),
         ", "
       )
     end,
     main_title_filenamized = function(csl_table)
-      return transf.string.upper_camel_snake_case(
+      return transf.str.upper_camel_snake_case(
         transf.csl_table.main_title(csl_table)
       )
     end,
     filename = function(csl_table)
-      return get.string.string_by_sub_lua(
-        get.string_or_number_arr.string_by_joined(
+      return get.str.str_by_sub_lua(
+        get.str_or_number_arr.str_by_joined(
           {
-            transf.csl_table.authors_et_al_string(csl_table),
+            transf.csl_table.authors_et_al_str(csl_table),
             get.csl_table.key_year_force_first(csl_table, "issued"),
             transf.csl_table.main_title_filenamized(csl_table)
           },
@@ -6255,7 +6255,7 @@ transf = {
     volume = function(csl_table)
       return csl_table.volume
     end,
-    indicated_volume_string = function(csl_table)
+    indicated_volume_str = function(csl_table)
       local volume = transf.csl_table.volume(csl_table)
       if volume then
         return "vol. " .. volume
@@ -6264,7 +6264,7 @@ transf = {
     jssue = function(csl_table)
       return csl_table.issue
     end,
-    indicated_issue_string = function(csl_table)
+    indicated_issue_str = function(csl_table)
       local issue = transf.csl_table.issue(csl_table)
       if issue then
         return "no. " .. issue
@@ -6274,7 +6274,7 @@ transf = {
       return csl_table.page
     end,
     page_interal_specifier = function(csl_table)
-      return transf.single_value_or_basic_interval_string.interval_specifier(
+      return transf.single_value_or_basic_interval_str.interval_specifier(
         transf.csl_table.page(csl_table)
       )
     end,
@@ -6284,10 +6284,10 @@ transf = {
         1 -- afaik there is never a case where pages don't increase by 1 (there is no notation that says 'every other page', for example)
       )
     end,
-    indicated_page_string = function(csl_table)
+    indicated_page_str = function(csl_table)
       local page = transf.csl_table.page(csl_table)
       if page then
-        if get.string.bool_by_contains_w_ascii_string(page, "-") then
+        if get.str.bool_by_contains_w_ascii_str(page, "-") then
           return "pp. " .. page
         else
           return "p. " .. page
@@ -6386,7 +6386,7 @@ transf = {
       return csl_table.URL
     end,
     urlmd5 = function(csl_table)
-      return transf.not_userdata_or_function.md5_hex_string(transf.csl_table.url(csl_table))
+      return transf.not_userdata_or_function.md5_hex_str(transf.csl_table.url(csl_table))
     end,
     indicated_urlmd5 = function(csl_table)
       local urlmd5 = transf.csl_table.urlmd5(csl_table)
@@ -6447,10 +6447,10 @@ transf = {
     end,
     citations_file_line = function(csl_table)
       return transf.csl_table.indicated_citable_object_id(csl_table) 
-      .. " # " .. transf.csl_table.apa_string(csl_table)
+      .. " # " .. transf.csl_table.apa_str(csl_table)
     end,
     filename_safe_citable_object_id = function(csl_table)
-      return transf.string.encoded_query_param_value(transf.csl_table.citable_object_id(csl_table))
+      return transf.str.encoded_query_param_value(transf.csl_table.citable_object_id(csl_table))
     end,
     filename_safe_indicated_citable_object_id = function(csl_table)
       return transf.indicated_citable_object_id.filename_safe_indicated_citable_object_id(transf.csl_table.indicated_citable_object_id(csl_table))
@@ -6460,12 +6460,12 @@ transf = {
         transf.csl_table.filename(csl_table) ..
         "!citid:" .. transf.csl_table.filename_safe_indicated_citable_object_id(csl_table)
     end,
-    bib_string = function(csl_table)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "pandoc -f csljson -t biblatex" .. transf.string.here_string(transf.not_userdata_or_function.json_string(csl_table))
+    bib_str = function(csl_table)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "pandoc -f csljson -t biblatex" .. transf.str.here_str(transf.not_userdata_or_function.json_str(csl_table))
       )
     end,
-    apa_string = function(csl_table)
+    apa_str = function(csl_table)
       return get.csl_table_or_csl_table_arr.raw_citations(csl_table, "apa-6th-edition")
     end,
   },
@@ -6489,7 +6489,7 @@ transf = {
       return csl_person.literal
     end,
     naive_name = function(csl_person)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         transf.hole_y_arrlike.arr({
           transf.csl_person.given(csl_person),
           transf.csl_person.dropping_particle(csl_person),
@@ -6509,7 +6509,7 @@ transf = {
   },
   date_parts_single = {
     rfc3339like_dt = function(date_parts)
-      return get.string_or_number_arr.string_by_joined(date_parts, "-")
+      return get.str_or_number_arr.str_by_joined(date_parts, "-")
     end,
     prefix_partial_date_component_name_value_assoc = function(date_parts)
       return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
@@ -6570,19 +6570,19 @@ transf = {
       return "https://web.archive.org/web/*/" .. transf.url.url_by_ensure_scheme(url)
     end,
     default_negotiation_url_contents = function(url)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.string.string_or_nil_by_evaled_env_bash_stripped, "run")
-          "curl -L" .. transf.string.string_by_single_quoted_escaped(url)
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
+          "curl -L" .. transf.str.str_by_single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
       return transf.not_userdata_or_function.in_cache_dir(transf.url.url_by_ensure_scheme(url), "url")
     end,
     url_table = function(url)
       return get.fn.rt_or_nil_by_memoized(
-        transf.string.table_or_nil_by_evaled_env_bash_parsed_json,
+        transf.str.table_or_nil_by_evaled_env_bash_parsed_json,
         {},
-        "transf.string.table_or_nil_by_evaled_env_bash_parsed_json"
+        "transf.str.table_or_nil_by_evaled_env_bash_parsed_json"
       )(
-        "url_parser_cli --json" .. transf.string.string_by_single_quoted_escaped(url)
+        "url_parser_cli --json" .. transf.str.str_by_single_quoted_escaped(url)
       )
     end,
     scheme = function(url)
@@ -6592,13 +6592,13 @@ transf = {
       return transf.url.url_table(url).host
     end,
     sld_and_tld = function(url)
-      return get.string.n_strings_by_extracted_eutf8(transf.url.host(url), "(%w+%.%w+)$")
+      return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "(%w+%.%w+)$")
     end,
     sld = function(url)
-      return get.string.n_strings_by_extracted_eutf8(transf.url.host(url), "(%w+)%.%w+$") 
+      return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "(%w+)%.%w+$") 
     end,
     tld = function(url)
-      return get.string.n_strings_by_extracted_eutf8(transf.url.host(url), "%w+%.(%w+)$")
+      return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "%w+%.(%w+)$")
     end,
     path = function(url)
       return transf.url.url_table(url).path
@@ -6620,29 +6620,29 @@ transf = {
     end,
     param_table = function(url)
       local params = {}
-      local url_parts = stringy.split(url, "?")
+      local url_parts = stry.split(url, "?")
       if #url_parts > 1 then
-        local param_parts = stringy.split(url_parts[2], "&")
+        local param_parts = stry.split(url_parts[2], "&")
         for _, param_part in transf.arr.index_value_stateless_iter(param_parts) do
-          local param_parts = stringy.split(param_part, "=")
+          local param_parts = stry.split(param_part, "=")
           local key = param_parts[1]
           local value = param_parts[2]
-          params[key] = transf.string.string_by_percent_decoded_also_plus(value)
+          params[key] = transf.str.str_by_percent_decoded_also_plus(value)
         end
       end
       return params
     end,
     no_scheme = function(url)
-      local parts = stringy.split(url, ":")
+      local parts = stry.split(url, ":")
       act.arr.shift(parts)
-      local rejoined = get.string_or_number_arr.string_by_joined(parts, ":")
-      return get.string.no_prefix_string(rejoined, "//")
+      local rejoined = get.str_or_number_arr.str_by_joined(parts, ":")
+      return get.str.no_prefix_str(rejoined, "//")
     end,
-    string_by_webcal_name = function(url)
-      return "webcal_readonly_" .. transf.not_userdata_or_function.md5_hex_string(url)
+    str_by_webcal_name = function(url)
+      return "webcal_readonly_" .. transf.not_userdata_or_function.md5_hex_str(url)
     end,
     vdirsyncer_pair_specifier = function(url)
-      local name = transf.url.string_by_webcal_name(url)
+      local name = transf.url.str_by_webcal_name(url)
       local local_storage_path =  env.XDG_STATE_HOME .. "/vdirsyncer/" .. name
       return  {
         name = name,
@@ -6656,10 +6656,10 @@ transf = {
       }
     end,
     absolute_path_by_webcal_storage_location = function(url)
-      return env.XDG_STATE_HOME .. "/vdirsyncer/" .. transf.url.string_by_webcal_name(url)
+      return env.XDG_STATE_HOME .. "/vdirsyncer/" .. transf.url.str_by_webcal_name(url)
     end,
-    ini_string_by_khal_config_section = function(url)
-      return transf.assoc_of_string_value_assocs.ini_string({
+    ini_str_by_khal_config_section = function(url)
+      return transf.assoc_of_str_value_assocs.ini_str({
         ["[ro:".. transf.url.sld(url) .. "]"] = {
           path = transf.url.absolute_path_by_webcal_storage_location(url),
           priority = 0,
@@ -6667,7 +6667,7 @@ transf = {
       })
     end,
     url_potentially_with_title_comment = function(url)
-      local title = transf.sgml_url.string_or_nil_by_title(url)
+      local title = transf.sgml_url.str_or_nil_by_title(url)
       if title and title ~= "" then
         return url .. " # " .. title
       else
@@ -6675,11 +6675,11 @@ transf = {
       end
     end,
     title_or_url_as_filename = function(url)
-      local title = transf.sgml_url.string_or_nil_by_title(url)
+      local title = transf.sgml_url.str_or_nil_by_title(url)
       if title and title ~= "" then
-        return transf.string.safe_filename(title) .. ".url2"
+        return transf.str.safe_filename(title) .. ".url2"
       else
-        return transf.string.safe_filename(url) .. ".url2"
+        return transf.str.safe_filename(url) .. ".url2"
       end
     end,
 
@@ -6693,15 +6693,15 @@ transf = {
     end,
   },
   sgml_url = {
-    sgml_string = transf.url.default_negotiation_url_contents, -- ideally we would reject non-html responses, but currently, that's too much work
-    string_or_nil_by_title = function(url)
-      return get.sgml_url.string_or_nil_by_query_selector_all(url, "title")
+    sgml_str = transf.url.default_negotiation_url_contents, -- ideally we would reject non-html responses, but currently, that's too much work
+    str_or_nil_by_title = function(url)
+      return get.sgml_url.str_or_nil_by_query_selector_all(url, "title")
     end,
-    string_or_nil_by_description = function(url)
-      return get.sgml_url.string_or_nil_by_query_selector_all(url, "meta[name=description]")
+    str_or_nil_by_description = function(url)
+      return get.sgml_url.str_or_nil_by_query_selector_all(url, "meta[name=description]")
     end,
     sgml_url_with_title_comment = function(url)
-      return url .. " # " .. transf.sgml_url.string_or_nil_by_title(url)
+      return url .. " # " .. transf.sgml_url.str_or_nil_by_title(url)
     end
   },
   owner_item_url = {
@@ -6722,9 +6722,9 @@ transf = {
   },
   image_url = {
     booru_post_url = function(url)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped(
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         "saucenao --url" ..
-        transf.string.string_by_single_quoted_escaped(url)
+        transf.str.str_by_single_quoted_escaped(url)
         .. "--output-properties booru-url"
       )
     end,
@@ -6738,111 +6738,111 @@ transf = {
     end,
     data_url = function(url)
       local ext = transf.path.extension(url)
-      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.image_url.hs_image(url), ext)
+      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLstr)(transf.image_url.hs_image(url), ext)
     end,
   },
   gelbooru_style_post_url = {
-    nonindicated_number_string_by_booru_post_id = function(url)
+    nonindicated_number_str_by_booru_post_id = function(url)
       return transf.url.param_table(url).id
     end,
     pos_int_by_booru_post_id = function(url)
-      return transf.nonindicated_number_string.number_base_10(transf.gelbooru_style_post_url.nonindicated_number_string_by_booru_post_id(url))
+      return transf.nonindicated_number_str.number_base_10(transf.gelbooru_style_post_url.nonindicated_number_str_by_booru_post_id(url))
     end,
   },
   yandere_style_post_url = {
-    nonindicated_number_string_by_booru_post_id = function(url)
-      return get.string.n_strings_by_extracted_eutf8(transf.url.path(url), "/post/show/(%d+)")
+    nonindicated_number_str_by_booru_post_id = function(url)
+      return get.str.n_strs_by_extracted_eutf8(transf.url.path(url), "/post/show/(%d+)")
     end
   },
   danbooru_style_post_url = {
-    nonindicated_number_string_by_booru_post_id = function(url)
-      return get.string.n_strings_by_extracted_eutf8(transf.url.path(url), "/posts/(%d+)")
+    nonindicated_number_str_by_booru_post_id = function(url)
+      return get.str.n_strs_by_extracted_eutf8(transf.url.path(url), "/posts/(%d+)")
     end
   },
   gpt_response_table = {
     response_text = function(result)
       local first_choice = result.choices[1]
       local response = first_choice.text or first_choice.message.content
-      return stringy.strip(response)
+      return stry.strip(response)
     end
   },
   not_userdata_or_function = {
-    md5_hex_string = function(thing)
-      if is.any.not_string(thing) then 
+    md5_hex_str = function(thing)
+      if is.any.not_str(thing) then 
         thing = json.encode(thing) 
       end
       local md5 = hashings("md5")
       md5:update(thing)
       return md5:hexdigest()
     end,
-    md5_base32_crock_string = function(thing)
-      if is.any.not_string(thing) then 
+    md5_base32_crock_str = function(thing)
+      if is.any.not_str(thing) then 
         thing = json.encode(thing) 
       end
       local md5 = hashings("md5")
       md5:update(thing)
-      return transf.string.base32_crock_string_by_utf8(md5:digest())
+      return transf.str.base32_crock_str_by_utf8(md5:digest())
     end,
     in_cache_dir = function(data, type)
-      return transf.string.in_cache_dir(
-        transf.not_userdata_or_function.md5_hex_string(data),
+      return transf.str.in_cache_dir(
+        transf.not_userdata_or_function.md5_hex_str(data),
         type
       )
     end,
     in_tmp_dir = function(data, type)
-      return transf.string.in_tmp_dir(
-        transf.not_userdata_or_function.md5_hex_string(data),
+      return transf.str.in_tmp_dir(
+        transf.not_userdata_or_function.md5_hex_str(data),
         type
       )
     end,
     single_quoted_escaped_json = function(t)
-      return transf.string.string_by_single_quoted_escaped(json.encode(t))
+      return transf.str.str_by_single_quoted_escaped(json.encode(t))
     end,
-    json_string = json.encode,
-    json_string_pretty = function(t)
+    json_str = json.encode,
+    json_str_pretty = function(t)
       if is.any.table(t) then
-        return transf.table.json_string_by_pretty(t)
+        return transf.table.json_str_by_pretty(t)
       else
-        return transf.not_userdata_or_function.json_string(t)
+        return transf.not_userdata_or_function.json_str(t)
       end
     end,
     --- wraps yaml.dump into a more intuitive form which always encodes a single document
     --- @param tbl any
-    --- @return string
-    yaml_string = function(tbl)
+    --- @return str
+    yaml_str = function(tbl)
       local raw_yaml = yaml.dump({tbl})
-      local lines = stringy.split(raw_yaml, "\n")
-      return get.string_or_number_arr.string_by_joined(lines, "\n", 2, #lines - 2)
+      local lines = stry.split(raw_yaml, "\n")
+      return get.str_or_number_arr.str_by_joined(lines, "\n", 2, #lines - 2)
     end,
-    json_here_string = function(t)
-      return transf.string.here_string(json.encode(t))
+    json_here_str = function(t)
+      return transf.str.here_str(json.encode(t))
     end,
   },
   any = {
-    string_by_inspect = function(thing)
+    str_by_inspect = function(thing)
       return hs.inspect(thing, {depth = 5})
     end,
-    string = function(stringable)
-      if is.any.string(stringable) then
-        return stringable
-      elseif is.any.not_table(stringable) then
-        return tostring(stringable)
+    str = function(strable)
+      if is.any.str(strable) then
+        return strable
+      elseif is.any.not_table(strable) then
+        return tostr(strable)
       else
-        if stringable.get then
-          local got_tostring = stringable:get("to-string")
-          if got_tostring then
-            return got_tostring
+        if strable.get then
+          local got_tostr = strable:get("to-str")
+          if got_tostr then
+            return got_tostr
           end
         end
-        local succ, json = pcall(transf.not_userdata_or_function.json_string, stringable)
+        local succ, json = pcall(transf.not_userdata_or_function.json_str, strable)
         if succ then
           return json
         else
-          return transf.any.string_by_inspect(stringable)
+          return transf.any.str_by_inspect(strable)
         end
       end
     end,
-    self_and_empty_string = function(any)
+    self_and_empty_str = function(any)
       return any, ""
     end,
     t_by_self = function(any)
@@ -6897,7 +6897,7 @@ transf = {
     item_chooser_item_specifier = function(any)
       local applicable_thing_name_arr = transf.any.applicable_thing_name_arr(any)
       return {
-        text = transf.string.with_styled_start_end_markers(get.thing_name_arr.chooser_text(applicable_thing_name_arr, any)),
+        text = transf.str.with_styled_start_end_markers(get.thing_name_arr.chooser_text(applicable_thing_name_arr, any)),
         subText = get.thing_name_arr.chooser_subtext(applicable_thing_name_arr, any),
         image = get.thing_name_arr.chooser_image(applicable_thing_name_arr, any),
       }
@@ -6923,11 +6923,11 @@ transf = {
   item_chooser_item_specifier = {
     truncated_text_item_chooser_item_specifier = function(item_chooser_item_specifier)
       local copied_spec = get.table.table_by_copy(item_chooser_item_specifier)
-      local rawstr =  transf.styledtext.string(
+      local rawstr =  transf.styledtext.str(
         copied_spec.text
       )
-      local truncated = get.string.string_by_shortened_start_ellipsis(rawstr, 250)
-      copied_spec.text = transf.string.with_styled_start_end_markers(truncated)
+      local truncated = get.str.str_by_shortened_start_ellipsis(rawstr, 250)
+      copied_spec.text = transf.str.with_styled_start_end_markers(truncated)
       return copied_spec
     end
   },
@@ -6942,10 +6942,10 @@ transf = {
       return #{...}
     end,
   },
-  string_and_n_anys = {
-    string_and_n_anys_by_stripped = function(...)
+  str_and_n_anys = {
+    str_and_n_anys_by_stripped = function(...)
       local arg1 = select(1, ...)
-      return stringy.strip(arg1), select(2, ...)
+      return stry.strip(arg1), select(2, ...)
     end
   },
   n_bool_functions = {
@@ -6976,9 +6976,9 @@ transf = {
    
     emails = function(mailto_url)
       local no_scheme = transf.url.no_scheme(mailto_url)
-      local emails_part = stringy.split(no_scheme, "?")[1]
-      local emails = stringy.split(emails_part, ",")
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(emails, stringy.strip)
+      local emails_part = stry.split(no_scheme, "?")[1]
+      local emails = stry.split(emails_part, ",")
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(emails, stry.strip)
     end,
     first_email = function(mailto_url)
       return transf.mailto_url.emails(mailto_url)[1]
@@ -7002,24 +7002,24 @@ transf = {
   },
   otpauth_url = {
     type = function(otpauth_url)
-      return stringy.split(transf.url.no_scheme(otpauth_url), "/")[1]
+      return stry.split(transf.url.no_scheme(otpauth_url), "/")[1]
     end,
     label = function(otpauth_url)
-      local part = stringy.split(transf.url.no_scheme(otpauth_url), "/")[2]
-      return stringy.split(part, "?")[1]
+      local part = stry.split(transf.url.no_scheme(otpauth_url), "/")[2]
+      return stry.split(part, "?")[1]
     end,
     
   },
   data_url = {
     raw_type = function(data_url)
-      return stringy.split(transf.url.no_scheme(data_url), ";")[1]
+      return stry.split(transf.url.no_scheme(data_url), ";")[1]
     end,
     header_part = function(data_url) -- the non-data part will either be separated from the rest of the url by `;,` or `;base64,`, so we need to split on `,`, then find the first part that ends `;` or `base64;`, and then join and return all parts before that part
-      local parts = stringy.split(transf.url.no_scheme(data_url), ",")
+      local parts = stry.split(transf.url.no_scheme(data_url), ",")
       local non_data_part = ""
       for _, part in transf.arr.index_value_stateless_iter(parts) do
         non_data_part = non_data_part .. part
-        if get.string.bool_by_endswith(part, ";") or get.string.bool_by_endswith(part, "base64;") then
+        if get.str.bool_by_endswith(part, ";") or get.str.bool_by_endswith(part, "base64;") then
           break
         else
           non_data_part = non_data_part .. ","
@@ -7028,15 +7028,15 @@ transf = {
       return non_data_part
     end,
     payload_part = function(data_url)
-      return get.string.no_prefix_string(transf.url.no_scheme(data_url), transf.data_url.header_part(data_url))
+      return get.str.no_prefix_str(transf.url.no_scheme(data_url), transf.data_url.header_part(data_url))
     end,
       
     raw_type_param_table = function(data_url)
-      local parts = stringy.split(transf.data_url.header_part(data_url), ";")
+      local parts = stry.split(transf.data_url.header_part(data_url), ";")
       act.arr.shift(parts) -- this is the content type
       act.arr.pop(parts) -- this is the base64, or ""
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(parts, function(part)
-        local kv = stringy.split(part, "=")
+        local kv = stry.split(part, "=")
         return kv[1], kv[2]
       end)
     end
@@ -7048,7 +7048,7 @@ transf = {
   },
   source_id = {
     language = function(source_id)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(stringy.split(source_id, "."), -1, -1)[1]
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(stry.split(source_id, "."), -1, -1)[1]
     end,
   },
   source_id_arr = {
@@ -7067,8 +7067,8 @@ transf = {
     hotkey = function(menu_item_table)
       return menu_item_table.AXMenuItemCmdChar
     end,
-    shortcut_string = function(menu_item_table)
-      return transf.shortcut_specifier.shortcut_string({
+    shortcut_str = function(menu_item_table)
+      return transf.shortcut_specifier.shortcut_str({
         mod_arr = transf.menu_item_table.mod_name_arr(menu_item_table),
         key = transf.menu_item_table.hotkey(menu_item_table)
       } )
@@ -7079,17 +7079,17 @@ transf = {
     full_action_path = function(menu_item_table)
       return transf.arr_and_any.arr(menu_item_table.path, menu_item_table.AXTitle)
     end,
-    full_action_path_string = function(menu_item_table)
-      return transf.string_arr.action_path_string(transf.menu_item_table.full_action_path(menu_item_table))
+    full_action_path_str = function(menu_item_table)
+      return transf.str_arr.action_path_str(transf.menu_item_table.full_action_path(menu_item_table))
     end,
     running_application = function(menu_item_table)
       return menu_item_table.application
     end,
     summary = function(menu_item_table)
       if transf.menu_item_table.hotkey(menu_item_table) then
-        return transf.menu_item_table.full_action_path_string(menu_item_table) .. " (" .. transf.menu_item_table.shortcut_string(menu_item_table) .. ")"
+        return transf.menu_item_table.full_action_path_str(menu_item_table) .. " (" .. transf.menu_item_table.shortcut_str(menu_item_table) .. ")"
       else
-        return transf.menu_item_table.full_action_path_string(menu_item_table)
+        return transf.menu_item_table.full_action_path_str(menu_item_table)
       end
     end
   },
@@ -7114,8 +7114,8 @@ transf = {
         shortcut_specifier.key
       )
     end,
-    shortcut_string = function(shortcut_specifier)
-      local modstr = plstringx.join("", get.arr.arr_by_mapped_w_t_key_assoc(shortcut_specifier.mod_name_arr, tblmap.mod_name.mod_symbol))
+    shortcut_str = function(shortcut_specifier)
+      local modstr = plstrx.join("", get.arr.arr_by_mapped_w_t_key_assoc(shortcut_specifier.mod_name_arr, tblmap.mod_name.mod_symbol))
       if modstr == "" then
         return shortcut_specifier.key
       else
@@ -7147,15 +7147,15 @@ transf = {
     end,
   },
   env_var_name_env_node_assoc = {
-    env_string = function(env_var_name_env_node_assoc)
-      return transf.env_var_name_value_assoc.env_string(
+    env_str = function(env_var_name_env_node_assoc)
+      return transf.env_var_name_value_assoc.env_str(
         get.env_var_name_env_node_assoc.env_var_name_value_assoc(env_var_name_env_node_assoc)
       )
     end
 
   },
   env_yaml_file_container = {
-    env_string = function(env_yaml_file_container)
+    env_str = function(env_yaml_file_container)
       local files = transf.extant_path.file_arr_by_descendants(env_yaml_file_container)
       local yaml_files = get.path_arr.path_arr_by_filter_to_same_extension(files, "yaml")
       local env_var_name_env_node_assoc_arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
@@ -7163,20 +7163,20 @@ transf = {
         transf.yaml_file.not_userdata_or_function
       )
       local env_var_name_env_node_assoc = transf.table_arr.table_by_take_new(env_var_name_env_node_assoc_arr)
-      return transf.env_var_name_env_node_assoc.env_string(env_var_name_env_node_assoc)
+      return transf.env_var_name_env_node_assoc.env_str(env_var_name_env_node_assoc)
     end,
   },
-  country_identifier_string = {
+  country_identifier_str = {
     iso_3366_1_alpha_2_country_code = function(country_identifier)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
         input = country_identifier, 
         query = "Suppose the following identifies a country. Return its ISO 3166-1 Alpha-2 country code."
       }):lower()
     end,
   },
-  language_identifier_string = {
+  language_identifier_str = {
     bcp_47_language_tag = function(country_identifier)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
         input = country_identifier, 
         query = "Suppose the following identifies a language or variety. Return its BCP 47 language tag. Be conservative and only add information that is present in the input, or is necessary to make it into a valid BCP 47 language tag."
       })
@@ -7184,7 +7184,7 @@ transf = {
   },
   bcp_47_language_tag = {
     summary = function(bcp_47_language_tag)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
         input = bcp_47_language_tag, 
         query = "Suppose the following is a BCP 47 language tag. Return a natural language description of it."
       })
@@ -7192,13 +7192,13 @@ transf = {
   },
   iso_3366_1_alpha_2_country_code = {
     iso_3366_1_full_name = function(iso_3366_1_alpha_2)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
         input = iso_3366_1_alpha_2, 
         query = "Get the ISO 3366-1 full name of the country identified by the following ISO 3366-1 Alpha-2 country code."
       })
     end,
     iso_3366_1_short_name = function(iso_3366_1_alpha_2)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({
+      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
         input = iso_3366_1_alpha_2, 
         query = "Get the ISO 3366-1 short name of the country identified by the following ISO 3366-1 Alpha-2 country code."
       })
@@ -7219,7 +7219,7 @@ transf = {
     ["nil"] = function()
       return nil
     end,
-    empty_string = function()
+    empty_str = function()
       return ""
     end,
     empty_table = function()
@@ -7239,7 +7239,7 @@ transf = {
       local returnfn
       returnfn = function(...)
         if dirty then
-          error("poisoned " .. tostring(returnfn))
+          error("poisoned " .. tostr(returnfn))
         end
         dirty = true
         return {...}
@@ -7271,7 +7271,7 @@ transf = {
       return transf.dir.children_filename_arr("/Applications")
     end,
     sox_is_recording = function()
-      return transf.string.bool_by_evaled_env_bash_success("pgrep -x rec")
+      return transf.str.bool_by_evaled_env_bash_success("pgrep -x rec")
     end,
     pandoc_full_md_extension_set = function()
       return transf.arr_value_assoc.arr_by_flatten(
@@ -7296,36 +7296,36 @@ transf = {
       )
     end,
     package_manager_name_arr = function()
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg list-package-managers"))
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg list-package-managers"))
     end,
     package_manager_name_arr_with_missing_packages = function()
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg missing-package-manager"))
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg missing-package-manager"))
     end,
-    semver_string_arr_of_installed_package_managers = function ()
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg package-manager-version"))
+    semver_str_arr_of_installed_package_managers = function ()
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg package-manager-version"))
     end,
     absolute_path_arr_of_installed_package_managers = function()
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg which-package-manager"))
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg which-package-manager"))
     end,
-    mullvad_status_string = function()
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("mullvad status")
+    mullvad_status_str = function()
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("mullvad status")
     end,
     mullvad_bool_connected = function()
-      return get.string.bool_by_startswith(transf["nil"].mullvad_status_string(),"Connected")
+      return get.str.bool_by_startswith(transf["nil"].mullvad_status_str(),"Connected")
     end,
-    mullvad_relay_list_string = function()
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("mullvad relay list")
+    mullvad_relay_list_str = function()
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mullvad relay list")
     end,
     mullvad_relay_identifier_arr = function()
       return 
         transf.table.arr_by_nested_value_primitive_and_arrlike_is_leaf(
-          transf.multiline_string.iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_string_arr_value_assoc_value_assoc(
-            transf["nil"].mullvad_relay_list_string()
+          transf.multiline_str.iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_str_arr_value_assoc_value_assoc(
+            transf["nil"].mullvad_relay_list_str()
           )
       )
     end,
     active_mullvad_relay_identifier = function()
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("mullvad relay get"):match("hostname ([^ ]+)")
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("mullvad relay get"):match("hostname ([^ ]+)")
     end,
     volume_local_extant_path_arr = function()
       return get.arr.arr_by_filtered(
@@ -7334,7 +7334,7 @@ transf = {
       )
     end,
     calendar_name_arr = function()
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("khal printcalendars"))
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("khal printcalendars"))
     end,
     writeable_calendar_name_arr = function()
       return get.arr.arr_by_filtered(
@@ -7342,16 +7342,16 @@ transf = {
         is.calendar_name.writeable_calendar_name
       )
     end,
-    string_by_khard_list_output = function()
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
+    str_by_khard_list_output = function()
+      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "khard list --parsable"
       )
     end,
     contact_uuid_arr = function()
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        stringy.split(transf["nil"].string_by_khard_list_output(), "\n"), 
+        stry.split(transf["nil"].str_by_khard_list_output(), "\n"), 
         function (line)
-          return stringy.split(line, "\t")[1]
+          return stry.split(line, "\t")[1]
         end
       )
     end,
@@ -7364,7 +7364,7 @@ transf = {
       )
     end,
     telegram_raw_export_dir_by_current = function()
-      return env.DOWNLOADS .. "/Telegram Desktop/DataExport_" .. get.date.string_w_date_format_indicator(
+      return env.DOWNLOADS .. "/Telegram Desktop/DataExport_" .. get.date.str_w_date_format_indicator(
         transf["nil"].date_by_current(),
         "%Y-%m-%d"
       )
@@ -7379,11 +7379,11 @@ transf = {
   },
   audiodevice_type = {
     default_audiodevice = function(type)
-      return hs.audiodevice["default" .. transf.string.string_by_first_eutf8_upper(type) .. "Device"]()
+      return hs.audiodevice["default" .. transf.str.str_by_first_eutf8_upper(type) .. "Device"]()
     end,
     audiodevice_specifier_arr = function(type)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        hs.audiodevice["all" .. transf.string.string_by_first_eutf8_upper(type) .. "Devices"](),
+        hs.audiodevice["all" .. transf.str.str_by_first_eutf8_upper(type) .. "Devices"](),
         function (device)
           return get.audiodevice.audiodevice_specifier(device, type)
         end
@@ -7391,36 +7391,36 @@ transf = {
     end,
   },
   package_manager_name = {
-    semver_string = function(mgr)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. mgr .. " package-manager-version")
+    semver_str = function(mgr)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. mgr .. " package-manager-version")
     end,
     absolute_path = function(mgr)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. mgr .. " which-package-manager")
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. mgr .. " which-package-manager")
     end,
   },
   package_manager_name_or_nil = {
     backed_up_package_name_arr = function(mgr)
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " read-backup"))
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " read-backup"))
     end,
     missing_package_name_arr = function(mgr)
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " missing"))
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " missing"))
     end,
     added_package_name_arr = function(mgr)
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " added"))
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " added"))
     end,
     difference_package_name_arr = function(mgr)
-      return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " difference"))
+      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " difference"))
     end,
-    package_name_or_package_name_semver_compound_string_arr = function(mgr) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list ")) end,
-    package_name_semver_compound_string_arr = function(mgr) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version ")) end,
-    package_name_arr = function(mgr) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-no-version ")) end,
-    package_name_semver_package_manager_name_compound_string_arr = function(mgr) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
-    package_name_package_manager_name_compound_string = function(mgr) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
-    nonindicated_decimal_string_arr_installed = function(mgr) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " count ")) end,
+    package_name_or_package_name_semver_compound_str_arr = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list ")) end,
+    package_name_semver_compound_str_arr = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version ")) end,
+    package_name_arr = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-no-version ")) end,
+    package_name_semver_package_manager_name_compound_str_arr = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
+    package_name_package_manager_name_compound_str = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
+    nonindicated_decimal_str_arr_installed = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " count ")) end,
     calendar_template_table_by_empty = function()
       CALENDAR_TEMPLATE_SPECIFIER = {}
       CALENDAR_TEMPLATE_SPECIFIER.calendar = { 
-        comment = 'one of: {{[ transf["nil"].writeable_calendar_string() ]}}' ,
+        comment = 'one of: {{[ transf["nil"].writeable_calendar_str() ]}}' ,
         value = "default"
       }
       CALENDAR_TEMPLATE_SPECIFIER.start = {
@@ -7472,13 +7472,13 @@ transf = {
     end
   },
   package_name = {
-    installed_package_manager = function(pkg) return transf.string.line_arr(transf.string.string_or_nil_by_evaled_env_bash_stripped("upkg installed_package_manager " .. pkg)) end,
+    installed_package_manager = function(pkg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg installed_package_manager " .. pkg)) end,
   },
   action_specifier = {
     action_chooser_item_specifier = function(action_specifier)
       if action_specifier.text then error("old action_specifier format, contains action_specifier.text") end
-      local str = get.string.string_by_with_suffix(action_specifier.d, ".")
-      str = str .. " #" .. get.not_userdata_or_function.md5_base32_crock_string_of_length(action_specifier.d, 3) -- shortcode for easy use
+      local str = get.str.str_by_with_suffix(action_specifier.d, ".")
+      str = str .. " #" .. get.not_userdata_or_function.md5_base32_crock_str_of_length(action_specifier.d, 3) -- shortcode for easy use
       return {text = str}
     end
   },
@@ -7634,10 +7634,10 @@ transf = {
   },
   mpv_ipc_socket_id = {
     current_url = function (mpv_ipc_socket_id)
-      return get.mpv_ipc_socket_id.string(mpv_ipc_socket_id, "stream-open-filename")
+      return get.mpv_ipc_socket_id.str(mpv_ipc_socket_id, "stream-open-filename")
     end,
     title = function(mpv_ipc_socket_id)
-      return get.mpv_ipc_socket_id.string(mpv_ipc_socket_id, "media-title")
+      return get.mpv_ipc_socket_id.str(mpv_ipc_socket_id, "media-title")
     end,
     playback_seconds_int = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "time-pos")
@@ -7651,8 +7651,8 @@ transf = {
     chapter_int = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "chapter")
     end,
-    playback_string = function(mpv_ipc_socket_id)
-      return get.string.string_by_formatted_w_n_anys(
+    playback_str = function(mpv_ipc_socket_id)
+      return get.str.str_by_formatted_w_n_anys(
         "(%i/%is - %s%%)",
         get.mpv_ipc_socket_id.play_time_seconds_int(mpv_ipc_socket_id) or -1,
         get.mpv_ipc_socket_id.duration_seconds_int(mpv_ipc_socket_id) or -1,
@@ -7665,23 +7665,23 @@ transf = {
     playlist_length_int = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "playlist-count")
     end,
-    playlist_progress_string = function(mpv_ipc_socket_id)
-      return get.string.string_by_formatted_w_n_anys(
+    playlist_progress_str = function(mpv_ipc_socket_id)
+      return get.str.str_by_formatted_w_n_anys(
         "[%i/%i]",
         get.mpv_ipc_socket_id.playlist_position_int(mpv_ipc_socket_id) or -1,
         get.mpv_ipc_socket_id.playlist_length_int(mpv_ipc_socket_id) or -1
       )
     end,
     summary_line_basics = function(mpv_ipc_socket_id)
-      return get.string.string_by_formatted_w_n_anys(
+      return get.str.str_by_formatted_w_n_anys(
         "%s %s %s",
-        transf.mpv_ipc_socket_id.playback_string(mpv_ipc_socket_id),
-        transf.mpv_ipc_socket_id.playlist_progress_string(mpv_ipc_socket_id),
+        transf.mpv_ipc_socket_id.playback_str(mpv_ipc_socket_id),
+        transf.mpv_ipc_socket_id.playlist_progress_str(mpv_ipc_socket_id),
         get.mpv_ipc_socket_id.title(mpv_ipc_socket_id) or "<no title>"
       )
     end,
     summary_line_emoji = function(mpv_ipc_socket_id)
-      return get.string_or_number_arr.string_by_joined(
+      return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
           {"pause", "loop", "shuffle", "video"},
           get.fn.first_n_args_bound_fn(get.mpv_ipc_socket_id.bool_emoji, mpv_ipc_socket_id)
@@ -7690,7 +7690,7 @@ transf = {
       )
     end,
     summary_line = function(mpv_ipc_socket_id)
-      return get.string.string_by_formatted_w_n_anys(
+      return get.str.str_by_formatted_w_n_anys(
         "%s %s",
         transf.mpv_ipc_socket_id.summary_line_emoji(mpv_ipc_socket_id),
         transf.mpv_ipc_socket_id.summary_line_basics(mpv_ipc_socket_id)
@@ -7698,7 +7698,7 @@ transf = {
     end,
     is_running = function(mpv_ipc_socket_id)
       return transf.any.bool(
-        get.mpv_ipc_socket_id.string(mpv_ipc_socket_id, "pause")
+        get.mpv_ipc_socket_id.str(mpv_ipc_socket_id, "pause")
       )
     end,
         
@@ -7710,8 +7710,8 @@ transf = {
         stream_creation_specifier.flags 
       )
     end,
-    flags_string = function(stream_creation_specifier)
-      return transf.string_bool_assoc.truthy_long_flag_string(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
+    flags_str = function(stream_creation_specifier)
+      return transf.str_bool_assoc.truthy_long_flag_str(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
     end,
     source_path = function(stream_created_item_specifier)
       return stream_created_item_specifier.source_path
@@ -7757,14 +7757,14 @@ transf = {
     mnemonic = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.mnemonic
     end,
-    mnemonic_string = function(hotkey_created_item_specifier)
-      return transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier) and get.string.string_by_formatted_w_n_anys("[%s] ", transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier)) or ""
+    mnemonic_str = function(hotkey_created_item_specifier)
+      return transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier) and get.str.str_by_formatted_w_n_anys("[%s] ", transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier)) or ""
     end,
     shortcut_specifier = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.shortcut_specifier
     end,
-    shortcut_string = function(hotkey_created_item_specifier)
-      return transf.shortcut_specifier.shortcut_string(transf.hotkey_created_item_specifier.shortcut_specifier(hotkey_created_item_specifier))
+    shortcut_str = function(hotkey_created_item_specifier)
+      return transf.shortcut_specifier.shortcut_str(transf.hotkey_created_item_specifier.shortcut_specifier(hotkey_created_item_specifier))
     end,
     mod_arr = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.shortcut_specifier.mod_arr
@@ -7776,10 +7776,10 @@ transf = {
       return hotkey_created_item_specifier.creation_specifier.fn
     end,
     summary = function(hotkey_created_item_specifier)
-      return get.string.string_by_formatted_w_n_anys(
+      return get.str.str_by_formatted_w_n_anys(
         "%s%s: %s",
-        transf.hotkey_created_item_specifier.shortcut_string(hotkey_created_item_specifier),
-        transf.hotkey_created_item_specifier.mnemonic_string(hotkey_created_item_specifier),
+        transf.hotkey_created_item_specifier.shortcut_str(hotkey_created_item_specifier),
+        transf.hotkey_created_item_specifier.mnemonic_str(hotkey_created_item_specifier),
         transf.hotkey_created_item_specifier.explanation(hotkey_created_item_specifier)
       )
     end,
@@ -7855,12 +7855,12 @@ transf = {
       return transf.two_sets.bool_by_is_subset(set1, set2) and transf.two_sets.bool_by_is_superset(set1, set2)
     end,
   },
-  cronspec_string = {
-    timestamp_s_string_by_next = function(cronspec_string)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("ncron" .. transf.string.string_by_single_quoted_escaped(cronspec_string))
+  cronspec_str = {
+    timestamp_s_str_by_next = function(cronspec_str)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("ncron" .. transf.str.str_by_single_quoted_escaped(cronspec_str))
     end,
-    timestamp_s_by_next = function(cronspec_string)
-      return get.string_or_number.number_or_nil(transf.cronspec_string.timestamp_s_string_by_next(cronspec_string))
+    timestamp_s_by_next = function(cronspec_str)
+      return get.str_or_number.number_or_nil(transf.cronspec_str.timestamp_s_str_by_next(cronspec_str))
     end,
   },
   timer_spec = {
@@ -7888,7 +7888,7 @@ transf = {
         elseif start.xy then
           mode = "point"
         end
-      elseif is.any.string(start) then
+      elseif is.any.str(start) then
         mode = "string"
       end
     
@@ -7934,12 +7934,12 @@ transf = {
   },
   form_filling_specifier = {
     --- @class form_field_specifier  
-    --- @field value string The field to fill, as we want GPT to see it (i.e. chosing a name that GPT will understand)
-    --- @field alias? string The field to fill, as we want the user to see it (i.e. chosing a name that the user will understand). May often be unset, in which case the value field is used.
-    --- @field explanation? string The explanation to show to GPT for the field. May be unset if the field is self-explanatory.
+    --- @field value str The field to fill, as we want GPT to see it (i.e. chosing a name that GPT will understand)
+    --- @field alias? str The field to fill, as we want the user to see it (i.e. chosing a name that the user will understand). May often be unset, in which case the value field is used.
+    --- @field explanation? str The explanation to show to GPT for the field. May be unset if the field is self-explanatory.
 
     --- @class form_filling_specifier
-    --- @field in_fields {[string]: string} The fields to take the data from
+    --- @field in_fields {[str]: str} The fields to take the data from
     --- @field form_field_specifier_arr form_field_specifier[] The fields (i.e. the template) to fill
     --- fills a template using GPT
     --- example use-case: Imagine trying to get the metadata of some song from a youtube video, where the artist name may be in the title, or the channel name, or not present at all, where the title may contain a bunch of other stuff besides the song title
@@ -7958,10 +7958,10 @@ transf = {
     ---   }, ...
     --- )
     --- ```
-    filled_string_assoc = function(spec)
-      local query = get.string.string_by_evaled_as_template(lemap.gpt.fill_template, spec)
+    filled_str_assoc = function(spec)
+      local query = get.str.str_by_evaled_as_template(lemap.gpt.fill_template, spec)
       local res = gpt(query,  { temperature = 0})
-      return get.form_field_specifier_arr.filled_string_assoc_from_string(spec.form_field_specifier_arr, res)
+      return get.form_field_specifier_arr.filled_str_assoc_from_str(spec.form_field_specifier_arr, res)
     end,
   },
   position_change_state_spec = {
@@ -8044,36 +8044,36 @@ transf = {
   click_input_spec = {
     click_fn = function(spec)
       return hs.eventtap[
-        tblmap.mouse_button_string.mouse_button_function_name[spec.mouse_button_string]
+        tblmap.mouse_button_str.mouse_button_function_name[spec.mouse_button_str]
       ]
     end,
   },
 
-  -- <input_spec_string> ::= <click_spec_string> | <key_spec_string> | <move_scroll_spec_string>
-  -- <click_spec_string> ::= "." <mouse_button>
+  -- <input_spec_str> ::= <click_spec_str> | <key_spec_str> | <move_scroll_spec_str>
+  -- <click_spec_str> ::= "." <mouse_button>
   -- <mouse_button> ::= "l" | "r" | "m" | ... -- l for left, r for right, m for middle, etc.
-  -- <key_spec_string> ::= ":" <keys>
+  -- <key_spec_str> ::= ":" <keys>
   -- <keys> ::= <key> | <key> "+" <keys>
   -- <key> ::= <any_valid_key_representation>
-  -- <move_scroll_spec_string> ::= <mode> <target_point> [<relative_position_spec_string>]
+  -- <move_scroll_spec_str> ::= <mode> <target_point> [<relative_position_spec_str>]
   -- <mode> ::= "m" | "s" -- m for move, s for scroll
   -- <target_point> ::= <coordinate> "," <coordinate>
   -- <coordinate> ::= <number>
-  -- <relative_position_spec_string> ::= " " <relative_position>
+  -- <relative_position_spec_str> ::= " " <relative_position>
   -- <relative_position> ::= "tl" | "tr" | "bl" | "br" | "c" | "curpos" -- tl for top-left, tr for top-right, bl for bottom-left, br for bottom-right, c for center, curpos for current position.
-  input_spec_string = {
+  input_spec_str = {
     input_spec = function(str)
       local input_spec = {}
-      if get.string.bool_by_startswith(str, ".") then
+      if get.str.bool_by_startswith(str, ".") then
         input_spec.mode = "click"
         if #str == 1 then
-          input_spec.mouse_button_string = "l"
+          input_spec.mouse_button_str = "l"
         else
-          input_spec.mouse_button_string = get.string.string_by_sub_lua(str, 2, 2)
+          input_spec.mouse_button_str = get.str.str_by_sub_lua(str, 2, 2)
         end
-      elseif get.string.bool_by_startswith(str, ":") then
+      elseif get.str.bool_by_startswith(str, ":") then
         input_spec.mode = "key"
-        local parts = transf.hole_y_arrlike.arr(stringy.split(get.string.string_by_sub_lua(str, 2), "+")) -- separating modifier keys with `+`
+        local parts = transf.hole_y_arrlike.arr(stry.split(get.str.str_by_sub_lua(str, 2), "+")) -- separating modifier keys with `+`
         if #parts > 1 then
           input_spec.key = act.arr.pop(parts)
           input_spec.mods = parts
@@ -8081,9 +8081,9 @@ transf = {
           input_spec.key = parts[1]
         end
       else
-        local mode_char, x, y, optional_relative_specifier = get.string.n_strings_by_extracted_onig(str, "^(.)"..r.g.syntax.point.."( %[a-zA-Z]+)?$")
+        local mode_char, x, y, optional_relative_specifier = get.str.n_strs_by_extracted_onig(str, "^(.)"..r.g.syntax.point.."( %[a-zA-Z]+)?$")
         if not mode_char or not x or not y then
-          error("Tried to parse string series_specifier, but it didn't match any known format:\n\n" .. str)
+          error("Tried to parse str series_specifier, but it didn't match any known format:\n\n" .. str)
         end
         if mode_char == "m" then
           input_spec.mode = "move"
@@ -8093,62 +8093,62 @@ transf = {
           error("doInput: invalid mode character `" .. mode_char .. "` in series specifier:\n\n" .. str)
         end
         input_spec.target_point = hs.geometry.new({
-          x = get.string_or_number.number_or_nil(x),
-          y = get.string_or_number.number_or_nil(y)
+          x = get.str_or_number.number_or_nil(x),
+          y = get.str_or_number.number_or_nil(y)
         })
         if optional_relative_specifier and #optional_relative_specifier > 0 then
-          input_spec.relative_to = get.string.string_by_sub_lua(optional_relative_specifier, 3)
+          input_spec.relative_to = get.str.str_by_sub_lua(optional_relative_specifier, 3)
         end
       end
       return input_spec
     end
   },
-  input_spec_string_arr = {
+  input_spec_str_arr = {
     input_spec_arr = function(str_arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         str_arr,
-        transf.input_spec_string.input_spec
+        transf.input_spec_str.input_spec
       )
     end,
   },
-  input_spec_series_string = {
-    input_spec_string_arr = function(str)
-      return transf.hole_y_arrlike.arr(get.string.string_arr_split_single_char_stripped(str, "\n"))
+  input_spec_series_str = {
+    input_spec_str_arr = function(str)
+      return transf.hole_y_arrlike.arr(get.str.str_arr_split_single_char_stripped(str, "\n"))
     end,
     input_spec_arr = function(str)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.input_spec_series_string.input_spec_string_arr(str),
-        transf.input_spec_string.input_spec
+        transf.input_spec_series_str.input_spec_str_arr(str),
+        transf.input_spec_str.input_spec
       )
     end,
   },
-  prompt_args_string = {
+  prompt_args_str = {
     --- @class prompt_args
     --- @field message? any Message to display in the prompt.
     --- @field default? any Default value for the prompt.
 
-    --- @class prompt_args_string : prompt_args
+    --- @class prompt_args_str : prompt_args
     --- @field informative_text? any Additional text to display in the prompt.
     --- @field buttonA? any Label for the first button.
     --- @field buttonB? any Label for the second button.
 
-    --- @param prompt_args? prompt_args_string
-    --- @return (string|nil), boolean
-    string_or_nil_and_bool = function(prompt_args)
+    --- @param prompt_args? prompt_args_str
+    --- @return (str|nil), boolean
+    str_or_nil_and_bool = function(prompt_args)
 
-      -- set up default values, make sure provided values are strings
+      -- set up default values, make sure provided values are strs
 
       prompt_args = prompt_args or {}
-      prompt_args.message = transf.not_nil.string(prompt_args.message) or "Enter a string."
-      prompt_args.informative_text = transf.not_nil.string(prompt_args.informative_text) or ""
-      prompt_args.default = transf.not_nil.string(prompt_args.default) or ""
-      prompt_args.buttonA = transf.not_nil.string(prompt_args.buttonA) or "OK"
-      prompt_args.buttonB = transf.not_nil.string(prompt_args.buttonB) or "Cancel"
+      prompt_args.message = transf.not_nil.str(prompt_args.message) or "Enter a str."
+      prompt_args.informative_text = transf.not_nil.str(prompt_args.informative_text) or ""
+      prompt_args.default = transf.not_nil.str(prompt_args.default) or ""
+      prompt_args.buttonA = transf.not_nil.str(prompt_args.buttonA) or "OK"
+      prompt_args.buttonB = transf.not_nil.str(prompt_args.buttonB) or "Cancel"
 
       -- show prompt
 
       dothis.mac_application_name.activate("Hammerspoon")
-      --- @type string, string|nil
+      --- @type str, str|nil
       local button_pressed, raw_return = hs.dialog.textPrompt(prompt_args.message, prompt_args.informative_text, prompt_args.default,
       prompt_args.buttonA, prompt_args.buttonB)
 
@@ -8156,8 +8156,8 @@ transf = {
 
       local ok_button_pressed = button_pressed == prompt_args.buttonA
 
-      if get.string.bool_by_startswith(raw_return, " ") then -- space triggers lua eval mode
-        raw_return = get.string.evaled_as_lua(raw_return)
+      if get.str.bool_by_startswith(raw_return, " ") then -- space triggers lua eval mode
+        raw_return = get.str.evaled_as_lua(raw_return)
       end
       if raw_return == "" then
         raw_return = nil
@@ -8175,18 +8175,18 @@ transf = {
     --- @field can_choose_files? boolean 
     --- @field can_choose_directories? boolean
     --- @field multiple? boolean
-    --- @field allowed_file_types? string[]
+    --- @field allowed_file_types? str[]
     --- @field resolves_aliases? boolean
 
     --- @param prompt_args prompt_args_path
-    --- @return (string|string[]|nil), boolean
+    --- @return (str|str[]|nil), boolean
     local_absolute_path_or_local_absolute_path_arr_and_bool = function(prompt_args)
 
-      -- set up default values, make sure message and default are strings
+      -- set up default values, make sure message and default are strs
   
       prompt_args                        = prompt_args or {}
-      prompt_args.message                = get.any.default_if_nil(transf.not_nil.string(prompt_args.message), "Choose a file or folder.")
-      prompt_args.default                = get.any.default_if_nil(transf.not_nil.string(prompt_args.default), env.HOME)
+      prompt_args.message                = get.any.default_if_nil(transf.not_nil.str(prompt_args.message), "Choose a file or folder.")
+      prompt_args.default                = get.any.default_if_nil(transf.not_nil.str(prompt_args.default), env.HOME)
       prompt_args.can_choose_files       = get.any.default_if_nil(prompt_args.can_choose_files, true)
       prompt_args.can_choose_directories = get.any.default_if_nil(prompt_args.can_choose_directories, true)
       prompt_args.multiple  = get.any.default_if_nil(prompt_args.multiple, false)
@@ -8249,7 +8249,7 @@ transf = {
 
       -- set defaults for all prompt_spec fields
       prompt_spec = get.table.table_by_copy(prompt_spec)
-      prompt_spec.prompter = prompt_spec.prompter or transf.prompt_args_string.string_or_nil_and_bool
+      prompt_spec.prompter = prompt_spec.prompter or transf.prompt_args_str.str_or_nil_and_bool
       prompt_spec.transformer = prompt_spec.transformer or function(x) return x end
       prompt_spec.raw_validator = prompt_spec.raw_validator or function(x) return x ~= nil end
       prompt_spec.transformed_validator = prompt_spec.transformed_validator or function(x) return x ~= nil end
@@ -8259,7 +8259,7 @@ transf = {
       prompt_spec.prompt_args = prompt_spec.prompt_args or {}
       prompt_spec.prompt_args.message = prompt_spec.prompt_args.message or "Enter a value."
 
-      -- generate some informative text mainly used when prompter is promptStringInner, though other prompters can consume this too
+      -- generate some informative text mainly used when prompter is promptstrInner, though other prompters can consume this too
       local validation_extra
       local original_informative_text = prompt_spec.prompt_args.informative_text
       local info_on_reactions = "c: " ..
@@ -8299,12 +8299,12 @@ transf = {
               elseif prompt_spec.on_transformed_invalid == "return_nil" then
                 return nil
               elseif prompt_spec.on_transformed_invalid == "reprompt" then
-                local has_string_eqviv, string_eqviv = pcall(tostring, raw_return)
-                local transformed_has_string_eqviv, transformed_string_eqviv = pcall(tostring, transformed_return)
+                local has_str_eqviv, str_eqviv = pcall(tostr, raw_return)
+                local transformed_has_str_eqviv, transformed_str_eqviv = pcall(tostr, transformed_return)
                 validation_extra =
                     "Invalid input:\n" ..
-                    "  Original: " .. (has_string_eqviv and string_eqviv or "<not tostringable>") .. "\n" ..
-                    "  Transformed: " .. (transformed_has_string_eqviv and transformed_string_eqviv or "<not tostringable>")
+                    "  Original: " .. (has_str_eqviv and str_eqviv or "<not tostrable>") .. "\n" ..
+                    "  Transformed: " .. (transformed_has_str_eqviv and transformed_str_eqviv or "<not tostrable>")
               end
             end
           else -- raw input was invalid, handle according to prompt_spec.on_raw_invalid
@@ -8313,8 +8313,8 @@ transf = {
             elseif prompt_spec.on_raw_invalid == "return_nil" then
               return nil
             elseif prompt_spec.on_raw_invalid == "reprompt" then
-              local has_string_eqviv, string_eqviv = pcall(tostring, raw_return)
-              validation_extra = "Invalid input: " .. (has_string_eqviv and string_eqviv or "<not tostringable>")
+              local has_str_eqviv, str_eqviv = pcall(tostr, raw_return)
+              validation_extra = "Invalid input: " .. (has_str_eqviv and str_eqviv or "<not tostrable>")
             end
           end
         else -- cancelled, handle according to prompt_spec.on_cancel
@@ -8373,7 +8373,7 @@ transf = {
               content = "If you are unable to fulfill the request, return 'IMPOSSIBLE'."
             }
           },
-          transf.string_pair_arr.n_shot_role_content_message_spec_arr(spec.shots), 
+          transf.str_pair_arr.n_shot_role_content_message_spec_arr(spec.shots), 
           {
             {
               role = "user",
@@ -8405,8 +8405,8 @@ transf = {
     end,
   },
   fn_queue_specifier = {
-    string_by_waiting_message  = function(qspec)
-      return "Waiting to proceed (" .. #qspec.fn_arr .. " waiting in queue) ... (Press " .. transf.hotkey_created_item_specifier.shortcut_string(qspec.hotkey_created_item_specifier) .. " to continue.)"
+    str_by_waiting_message  = function(qspec)
+      return "Waiting to proceed (" .. #qspec.fn_arr .. " waiting in queue) ... (Press " .. transf.hotkey_created_item_specifier.shortcut_str(qspec.hotkey_created_item_specifier) .. " to continue.)"
     end,
       
   },
@@ -8447,8 +8447,8 @@ transf = {
       end
     end,
   },
-  string_and_number_or_nil = {
-    string_or_nil_by_number = function(str, num)
+  str_and_number_or_nil = {
+    str_or_nil_by_number = function(str, num)
       if num then
         return nil
       else
@@ -8464,7 +8464,7 @@ transf = {
       for i=1, #params do
         local param = params[i]
         if param == nil then param = nil_singleton 
-        elseif opts.stringify_table_params and is.any.table(param) then
+        elseif opts.strify_table_params and is.any.table(param) then
           if opts.table_param_subset == "json" then
             param = json.encode(param)
           elseif opts.table_param_subset == "no-fn-userdata-loops" then
@@ -8484,17 +8484,17 @@ transf = {
   },
   fnname = {
     local_absolute_path_by_in_cache = function(fnname)
-      return transf.string.in_cache_dir(fnname, "fsmemoize")
+      return transf.str.in_cache_dir(fnname, "fsmemoize")
     end,
     rt_by_memo = function(fnid, opts_as_str, params, opts)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_arr_or_nil(fnid, opts_as_str, params)
-      local raw_cnt = transf.file.string_by_contents(cache_path)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, params)
+      local raw_cnt = transf.file.str_by_contents(cache_path)
       if not raw_cnt then return nil end
       return json.decode(raw_cnt)
     end,
     timestamp_s_by_created_time = function(fnid, opts_as_str)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_string_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
-      return get.string_or_number.number_or_nil(transf.file.string_by_contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
+      return get.str_or_number.number_or_nil(transf.file.str_by_contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
     end,
     
   },
@@ -8519,10 +8519,10 @@ transf = {
     discord_export_chat_message_arr = function(main_object)
       return main_object.messages
     end,
-    string_by_author = function(main_object)
+    str_by_author = function(main_object)
       return main_object.channel.name
     end,
-    string_by_id = function(main_object)
+    str_by_id = function(main_object)
       return main_object.channel.id
     end,
   },
@@ -8532,11 +8532,11 @@ transf = {
         date(msg.timestamp)
       )
     end,
-    string_by_author = function(msg)
+    str_by_author = function(msg)
       error("The code I'm migrating still assumed #discriminators, but discord has since migrated to handles. I'll need to update this code to reflect that.")
       return
     end,
-    string_by_content = function(msg)
+    str_by_content = function(msg)
       return msg.content
     end,
     reaction_spec_arr = function(msg)
@@ -8555,7 +8555,7 @@ transf = {
         return msg.callEndedTimestamp - transf.discord_export_chat_message.timestamp_ms(msg)
       end
     end,
-    string_or_nil_by_sticker_emoji = function(msg)
+    str_or_nil_by_sticker_emoji = function(msg)
       return nil
     end
   },
@@ -8581,10 +8581,10 @@ transf = {
     facebook_export_chat_message_arr = function(main_object)
       return main_object.messages
     end,
-    string_by_author = function(main_object)
+    str_by_author = function(main_object)
       return main_object.title
     end,
-    string_by_id = function(main_object)
+    str_by_id = function(main_object)
       return main_object.thread_path:match("_(%d+)$")
     end,
   },
@@ -8592,10 +8592,10 @@ transf = {
     timestamp_ms = function(msg)
       return msg.timestamp_ms
     end,
-    string_by_author = function(msg)
+    str_by_author = function(msg)
       return msg.sender_name
     end,
-    string_by_content = function(msg)
+    str_by_content = function(msg)
       return msg.content
     end,
     reaction_spec_arr = function(msg)
@@ -8618,7 +8618,7 @@ transf = {
         return msg.call_log.duration 
       end
     end,
-    string_or_nil_by_sticker_emoji = function(msg)
+    str_or_nil_by_sticker_emoji = function(msg)
       return nil
     end
   },
@@ -8648,10 +8648,10 @@ transf = {
     signal_export_chat_message_arr = function(main_object)
       return main_object.messages
     end,
-    string_by_author = function(main_object)
+    str_by_author = function(main_object)
       return main_object.author
     end,
-    string_by_id = function(main_object)
+    str_by_id = function(main_object)
       return main_object[1].conversationId
     end,
   },
@@ -8659,14 +8659,14 @@ transf = {
     timestamp_ms = function(msg)
       return msg.sent_at
     end,
-    string_by_author = function(msg)
+    str_by_author = function(msg)
       if msg.type == "outgoing" then
         return "me"
       else
         return msg.global_author
       end
     end,
-    string_by_content = function(msg)
+    str_by_content = function(msg)
       return msg.body
     end,
     reaction_spec_arr = function(msg)
@@ -8685,7 +8685,7 @@ transf = {
         return msg.callHistoryDetails.endedTime - transf.signal_export_chat_message.timestamp_ms(msg)
       end 
     end,
-    string_or_nil_by_sticker_emoji = function(msg)
+    str_or_nil_by_sticker_emoji = function(msg)
       return nil
     end
   },
@@ -8713,10 +8713,10 @@ transf = {
     telegram_export_chat_message_arr = function(main_object)
       return main_object.messages
     end,
-    string_by_author = function(main_object)
+    str_by_author = function(main_object)
       return main_object.name
     end,
-    string_by_id = function(main_object)
+    str_by_id = function(main_object)
       return main_object.id
     end,
   },
@@ -8724,10 +8724,10 @@ transf = {
     timestamp_ms = function(msg)
       return msg.date_unixtime * 1000
     end,
-    string_by_author = function(msg)
+    str_by_author = function(msg)
       return msg.from
     end,
-    string_by_content = function(msg)
+    str_by_content = function(msg)
       return msg.text
     end,
     reaction_spec_arr = function(msg)
@@ -8748,7 +8748,7 @@ transf = {
     int_or_nil_by_call_duration = function(msg)
       error("TODO")
     end,
-    string_or_nil_by_sticker_emoji = function(msg)
+    str_or_nil_by_sticker_emoji = function(msg)
       return msg.sticker_emoji
     end
 

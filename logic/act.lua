@@ -5,18 +5,18 @@
 act = {
   mullvad_relay_identifier = {
     set_active_mullvad_relay_dentifier = function(id)
-      dothis.string.env_bash_eval("mullvad relay set hostname " .. id)
+      dothis.str.env_bash_eval("mullvad relay set hostname " .. id)
     end,
   },
   package_manager_name = {
     install_self = function(mgr)
-      dothis.string.env_bash_eval_async("upkg " .. mgr .. " install-self")
+      dothis.str.env_bash_eval_async("upkg " .. mgr .. " install-self")
     end,
     install_missing = function(mgr)
-      dothis.string.env_bash_eval_async("upkg " .. mgr .. " install-missing")
+      dothis.str.env_bash_eval_async("upkg " .. mgr .. " install-missing")
     end,
     upgrade_all = function(mgr)
-      dothis.string.env_bash_eval_async("upkg " .. mgr .. " upgrade-all")
+      dothis.str.env_bash_eval_async("upkg " .. mgr .. " upgrade-all")
     end,
     backup = function(mgr)
       dothis.package_manager_name.do_backup_and_commit(mgr, "backup", "backup packages")
@@ -40,8 +40,8 @@ act = {
 
     delete_event = function(event_search_specifier)
       local command = 
-        "echo $'D\ny\n' | khal edit " .. get.khal.basic_command_parts(event_search_specifier.include, event_search_specifier.exclude) .. transf.string.string_by_single_quoted_escaped(event_search_specifier.searchstr)
-      dothis.string.env_bash_eval(command)
+        "echo $'D\ny\n' | khal edit " .. get.khal.basic_command_parts(event_search_specifier.include, event_search_specifier.exclude) .. transf.str.str_by_single_quoted_escaped(event_search_specifier.searchstr)
+      dothis.str.env_bash_eval(command)
     end,
   },
   event_table = {
@@ -65,22 +65,22 @@ act = {
     write_to_config = function(spec)
       dothis.absolute_path.append_file_if_file(
         env.VDIRSYNCER_CONFIG .. "/config",
-        "\n\n" .. transf.vdirsyncer_pair_specifier.ini_string(spec)
+        "\n\n" .. transf.vdirsyncer_pair_specifier.ini_str(spec)
       )
       dothis.absolute_path.append_file_if_file(
         env.KHAL_CONFIG .. "/config",
-        "\n\n" .. transf.url.ini_string_by_khal_config_section(spec.remote_storage_url)
+        "\n\n" .. transf.url.ini_str_by_khal_config_section(spec.remote_storage_url)
       )
       dothis.absolute_path.create_dir(
         transf.url.absolute_path_by_webcal_storage_location(spec.remote_storage_url)
       )
-      local name = transf.url.string_by_webcal_name(spec.remote_storage_url)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
+      local name = transf.url.str_by_webcal_name(spec.remote_storage_url)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "vdirsyncer discover" ..
-        transf.string.string_by_single_quoted_escaped(name),
+        transf.str.str_by_single_quoted_escaped(name),
         get.fn.first_n_args_bound_fn(
-          dothis.string.env_bash_eval_async,
-          "vdirsyncer sync" .. transf.string.string_by_single_quoted_escaped(name)
+          dothis.str.env_bash_eval_async,
+          "vdirsyncer sync" .. transf.str.str_by_single_quoted_escaped(name)
         )
       )
       dothis.in_git_dir.commit_self(
@@ -119,8 +119,8 @@ act = {
       end)
     end,
     generate_json_file = function(path)
-      return dothis.string.env_bash_eval_async(
-        "ical2json" .. transf.string.string_by_single_quoted_escaped(path)
+      return dothis.str.env_bash_eval_async(
+        "ical2json" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
   },
@@ -271,7 +271,7 @@ act = {
   },
   otp_url = {
     add_otp_pass_item_with_prompted_name = function(url)
-      local name = get.string.alphanum_minus_underscore_string_by_prompted_once_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
+      local name = get.str.alphanum_minus_underscore_str_by_prompted_once_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
       dothis.otp_url.add_otp_pass_item(url, name)
     end,
   },
@@ -287,8 +287,8 @@ act = {
   },
   env_yaml_file_container = {
     write_env_and_check = function(env_yaml_file_container)
-      dothis.env_string.write_env_and_check(
-        transf.env_yaml_file_container.env_string(env_yaml_file_container)
+      dothis.env_str.write_env_and_check(
+        transf.env_yaml_file_container.env_str(env_yaml_file_container)
       )
     end,
   },
@@ -308,7 +308,7 @@ act = {
   },
   login_pass_item_name = {
     fill = function(name)
-      dothis.string_arr.fill_with({
+      dothis.str_arr.fill_with({
         transf.pass_item_name.username_or_default(name),
         transf.pass_item_name.password(name),
       })
@@ -325,18 +325,18 @@ act = {
       end
     end,
     eject_or_msg = function(path)
-      act.string.alert("Ejecting volume...")
+      act.str.alert("Ejecting volume...")
       local succ, res = pcall(act.volume_local_extant_path.eject_or_err, path)
       if succ then
-        act.string.alert("Volume ejected successfully.")
+        act.str.alert("Volume ejected successfully.")
       else
-        act.string.alert(res)
+        act.str.alert(res)
       end
     end
   },
   otpauth_url = {
     add_as_otp_by_prompted_name = function(url)
-      local name = get.string.alphanum_minus_underscore_string_by_prompted_once_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
+      local name = get.str.alphanum_minus_underscore_str_by_prompted_once_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
       dothis.otpauth_url.add_as_otp(url, name)
     end,
   },
@@ -357,8 +357,8 @@ act = {
     add_as_passw_pass_item_name_by_prompted_password = function(name)
       dothis.alphanum_minus_underscore.add_as_pass_item_name(
         name,
-        get.string.string_by_prompted_once_from_default(
-          transf.pos_int.random_base64_gen_string_of_length(32),
+        get.str.str_by_prompted_once_from_default(
+          transf.pos_int.random_base64_gen_str_of_length(32),
           "Enter a password, or confirm the generated 32-character base64 pregenerated one:"
         )
       )
@@ -366,7 +366,7 @@ act = {
     add_as_username_pass_item_name_by_prompted_username = function(name)
       dothis.alphanum_minus_underscore.add_as_username_pass_item_name(
         name,
-        get.string.string_by_prompted_once_from_default(
+        get.str.str_by_prompted_once_from_default(
           "",
           "Enter a username:"
         )
@@ -381,15 +381,15 @@ act = {
       )
     end,
   },
-  string = {
+  str = {
     say_ja = function(str)
-      dothis.string.say(str, "ja")
+      dothis.str.say(str, "ja")
     end,
     say_en = function(str)
-      dothis.string.say(str, "en")
+      dothis.str.say(str, "en")
     end,
     log_in_diary = function(str)
-      dothis.entry_logging_dir.log_string(
+      dothis.entry_logging_dir.log_str(
         env.MENTRY_LOGS,
         str
       )
@@ -418,7 +418,7 @@ act = {
       )
     end,
     alert = function(str)
-      dothis.string.alert(str, 10)
+      dothis.str.alert(str, 10)
     end,
     search_wiktionary = function(query) dothis.search_engine.search("wiktionary", query) end,
     search_wikipedia = function(query) dothis.search_engine.search("wikipedia", query) end,
@@ -559,7 +559,7 @@ act = {
     choose_otp_pass_item_name_and_paste = function()
       dothis.arr.choose_item(
         transf["nil"].otp_pass_item_name_arr(),
-        dothis.string.paste
+        dothis.str.paste
       )
     end,
     activate_next_source_id = function()
@@ -573,7 +573,7 @@ act = {
       if strm then
         dothis.any.choose_action(strm)
       else
-        act.string.alert("No running streams.")
+        act.str.alert("No running streams.")
       end
     end,
     choose_action_on_first_item_in_pasteboard_arr = function()
@@ -625,11 +625,11 @@ act = {
   youtube_video_url = {
     add_as_m3u = function(url)
       local deduced_tags = transf.youtube_video_url.fs_tag_assoc(url)
-      local edited_tags = transf.string_value_assoc.string_value_assoc_by_prompted_once_from_default(deduced_tags)
+      local edited_tags = transf.str_value_assoc.str_value_assoc_by_prompted_once_from_default(deduced_tags)
       local plspec = {}
-      plspec.tag = transf.two_arr_or_nils.arr(edited_tags, transf.string.prompted_multiple_string_pair_arr_for("tag"))
+      plspec.tag = transf.two_arr_or_nils.arr(edited_tags, transf.str.prompted_multiple_str_pair_arr_for("tag"))
       plspec.path  = get.local_extant_path.dir_by_default_prompted_once(env.MAUDIOVISUAL)
-      plspec.path = transf.string.prompted_once_string_from_default(plspec.path)
+      plspec.path = transf.str.prompted_once_str_from_default(plspec.path)
       plspec.extension = "m3u"
       dothis.absolute_path.write_file(transf.path_leaf_specifier.path(plspec), url)
     end,

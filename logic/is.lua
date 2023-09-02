@@ -1,45 +1,45 @@
 is = {
-  string = {
+  str = {
 
     -- old 
 
     path = function(str)
       return 
-        is.string.line(str) and
+        is.str.line(str) and
         is.line.path(str)
     end,
 
     -- simple conditions
 
-    ascii_string = function(str)
-      return get.string.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.ascii)
+    ascii_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.ascii)
     end,
-    empty_string = function(str)
+    empty_str = function(str)
       return str == ""
     end,
-    noempty_string = function(str)
-      return not is.string.empty_string(str)
+    noempty_str = function(str)
+      return not is.str.empty_str(str)
     end,
     line = function(str)
-      return get.string.bool_by_not_matches_part_eutf8(str, "[\n\r]")
+      return get.str.bool_by_not_matches_part_eutf8(str, "[\n\r]")
     end,
-    multiline_string = function(str)
-      return not is.string.line(str)
+    multiline_str = function(str)
+      return not is.str.line(str)
     end,
-    whitespace_string = function(str)
-      return get.string.bool_by_matches_part_eutf8(str, "%s")
+    whitespace_str = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "%s")
     end,
-    nowhitespace_string = function(str)
-      return not is.string.whitespace_string(str)
+    nowhitespace_str = function(str)
+      return not is.str.whitespace_str(str)
     end,
-    starting_with_dot_string = function(str)
-      return get.string.bool_by_startswith(str, ".")
+    starting_with_dot_str = function(str)
+      return get.str.bool_by_startswith(str, ".")
     end,
-    starting_with_whitespace_string = function(str)
-      return get.string.bool_by_matches_part_eutf8(str, "^%s")
+    starting_with_whitespace_str = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "^%s")
     end,
-    ending_with_whitespace_string = function(str)
-      return get.string.bool_by_matches_part_eutf8(str, "%s$")
+    ending_with_whitespace_str = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "%s$")
     end,
 
 
@@ -51,28 +51,28 @@ is = {
     -- simple conditions
 
     indent_line = function(str)
-      return is.string.starting_with_whitespace_string(str)
+      return is.str.starting_with_whitespace_str(str)
     end,
     noindent_line = function(str)
-      return is.string.not_starting_with_whitespace_string(str)
+      return is.str.not_starting_with_whitespace_str(str)
     end,
     comment_line = function(str)
-      return get.string.bool_by_matches_part_eutf8(str, "^%s*#")
+      return get.str.bool_by_matches_part_eutf8(str, "^%s*#")
     end,
     nocomment_line = function(str)
       return not is.line.comment_line(str)
     end,
     trailing_whitespace_line = function(str)
-      return is.string.ending_with_whitespace_string(str)
+      return is.str.ending_with_whitespace_str(str)
     end,
     notrailing_whitespace_line = function(str)
-      return is.string.not_ending_with_whitespace_string(str)
+      return is.str.not_ending_with_whitespace_str(str)
     end,
     noempty_line = function(str)
-      return is.string.noempty_string(str)
+      return is.str.noempty_str(str)
     end,
     noweirdwhitespace_line = function(str)
-      return get.string.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
+      return get.str.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
     end,
 
     -- combined conditions
@@ -93,12 +93,12 @@ is = {
   },
   noweirdwhitespace_line = {
     leaflike = function(str)
-      return get.string.bool_by_not_contains_w_ascii_string(str, "/")
+      return get.str.bool_by_not_contains_w_ascii_str(str, "/")
     end,
   },
   leaflike = {
     extension = function(str)
-      return get.string.bool_by_not_contains_w_ascii_string(str, ".") -- I consider e.g. .tar.gz files to have an extension of 'gz'
+      return get.str.bool_by_not_contains_w_ascii_str(str, ".") -- I consider e.g. .tar.gz files to have an extension of 'gz'
     end,
   },
   trimmed_line = {
@@ -107,155 +107,155 @@ is = {
   },
   trimmed_noweirdwhitespace_line = {
     path = function(str)
-      return get.string.bool_by_contains_w_ascii_string(str, "/")
+      return get.str.bool_by_contains_w_ascii_str(str, "/")
     end
   },
-  multiline_string = {
+  multiline_str = {
 
   },
-  ascii_string = {
-    printable_ascii_string = function(str)
-      return get.string.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
+  ascii_str = {
+    printable_ascii_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
     end,
     alphanum_minus_underscore = function(str)
-      return is.ascii_string.printable_ascii_string(str) and is.printable_ascii_nowhitespace_string.alphanum_minus_underscore(str)
+      return is.ascii_str.printable_ascii_str(str) and is.printable_ascii_nowhitespace_str.alphanum_minus_underscore(str)
     end,
   },
-  printable_ascii_string = {
-    printable_ascii_nowhitespace_string = function(str)
-      return get.string.bool_by_not_matches_part_eutf8(str, "%s")
+  printable_ascii_str = {
+    printable_ascii_nowhitespace_str = function(str)
+      return get.str.bool_by_not_matches_part_eutf8(str, "%s")
     end,
     url = function(str)
       return get.fn.rt_or_nil_by_memoized(
-        transf.string.bool_by_evaled_env_bash_success,
+        transf.str.bool_by_evaled_env_bash_success,
         {},
-        "is.printable_ascii_string.url")(
-        "url_parser_cli " .. transf.string.string_by_single_quoted_escaped(str)
+        "is.printable_ascii_str.url")(
+        "url_parser_cli " .. transf.str.str_by_single_quoted_escaped(str)
       )
     end,
     iban = function(str)
       local cleaned_iban = transf.iban.cleaned_iban(str)
-      return #cleaned_iban <= 34 and is.printable_ascii_nowhitespace_string.alphanum(cleaned_iban)
+      return #cleaned_iban <= 34 and is.printable_ascii_nowhitespace_str.alphanum(cleaned_iban)
     end,
     citable_filename = function(str)
       return 
-        get.string.bool_by_not_contains_w_ascii_string(str, "/") and
-        get.string.bool_by_contains_w_ascii_string(str, "!citid:")
+        get.str.bool_by_not_contains_w_ascii_str(str, "/") and
+        get.str.bool_by_contains_w_ascii_str(str, "!citid:")
     end
   },
-  printable_ascii_nowhitespace_string = {
-    base32_gen_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, r.g.id.b32.gen)
+  printable_ascii_nowhitespace_str = {
+    base32_gen_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.gen)
     end,
-    base32_crock_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, r.g.id.b32.crockford)
+    base32_crock_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.crockford)
     end,
-    base64_gen_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, r.g.id.b64.gen)
+    base64_gen_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.b64.gen)
     end,
-    base64_url_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, r.g.id.b64.url)
+    base64_url_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.b64.url)
     end,
-    base32_string = function(str)
-      return is.printable_ascii_nowhitespace_string.base32_gen_string(str) or is.printable_ascii_nowhitespace_string.base32_crock_string(str)
+    base32_str = function(str)
+      return is.printable_ascii_nowhitespace_str.base32_gen_str(str) or is.printable_ascii_nowhitespace_str.base32_crock_str(str)
     end,
-    base64_string = function(str)
-      return is.printable_ascii_nowhitespace_string.base64_gen_string(str) or is.printable_ascii_nowhitespace_string.base64_url_string(str)
+    base64_str = function(str)
+      return is.printable_ascii_nowhitespace_str.base64_gen_str(str) or is.printable_ascii_nowhitespace_str.base64_url_str(str)
     end,
     handle = function(str)
-      return get.string.bool_by_startswith(str, "@")
+      return get.str.bool_by_startswith(str, "@")
     end,
-    --- trying to determine what string is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
+    --- trying to determine what str is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
     email_address = function(str)
       return 
-        get.string.bool_by_contains_w_ascii_string(str, "@") and
-        get.string.bool_by_contains_w_ascii_string(str, ".")
+        get.str.bool_by_contains_w_ascii_str(str, "@") and
+        get.str.bool_by_contains_w_ascii_str(str, ".")
     end,
     dice_notation = function(str)
-      return get.string.bool_by_matches_whole_onig(str, r.g.syntax.dice)
+      return get.str.bool_by_matches_whole_onig(str, r.g.syntax.dice)
     end,
     installed_package_name = function(str)
       return get.arr.bool_by_contains(transf.package_manager_name_or_nil.package_name_arr(nil), str)
     end,
-    unicode_codepoint_string = function(str)
-      return get.string.bool_by_startswith(str, "U+") and transf.string.bool_by_matches_whole_eutf8(str, "^U+%x+$")
+    unicode_codepoint_str = function(str)
+      return get.str.bool_by_startswith(str, "U+") and transf.str.bool_by_matches_whole_eutf8(str, "^U+%x+$")
     end,
     doi = function(str)
-      return get.string.bool_by_matches_whole_onig(str, r.g.id.doi)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.doi)
     end,
     colon_period_alphanum_minus_underscore = function(str)
-      return get.string.bool_by_not_matches_part_eutf8(str, "[^%w%-_:.]")
+      return get.str.bool_by_not_matches_part_eutf8(str, "[^%w%-_:.]")
     end,
     indicated_isbn = function(str)
-      return get.string.bool_by_startswith(str, "isbn:") -- gonna trust that if it's printable_ascii_nowhitespace_string and starts with isbn: it's an isbn, similarly for the following
+      return get.str.bool_by_startswith(str, "isbn:") -- gonna trust that if it's printable_ascii_nowhitespace_str and starts with isbn: it's an isbn, similarly for the following
     end,
     indicated_pmid = function(str)
-      return get.string.bool_by_startswith(str, "pmid:")
+      return get.str.bool_by_startswith(str, "pmid:")
     end,
     indicated_doi = function(str)
-      return get.string.bool_by_startswith(str, "doi:")
+      return get.str.bool_by_startswith(str, "doi:")
     end,
     indicated_isbn_part_identifier = function(str)
-      return get.string.bool_by_startswith(str, "isbn_part:")
+      return get.str.bool_by_startswith(str, "isbn_part:")
     end,
     indicated_pcmid = function(str)
-      return get.string.bool_by_startswith(str, "pmcid:")
+      return get.str.bool_by_startswith(str, "pmcid:")
     end,
     indicated_accession = function(str)
-      return get.string.bool_by_startswith(str, "accession:")
+      return get.str.bool_by_startswith(str, "accession:")
     end,
     indicated_issn_full_identifier = function(str)
-      return get.string.bool_by_startswith(str, "issn_full:")
+      return get.str.bool_by_startswith(str, "issn_full:")
     end,
     indicated_urlmd5 = function(str)
-      return get.string.bool_by_startswith(str, "urlmd5:")
+      return get.str.bool_by_startswith(str, "urlmd5:")
     end,
     indicated_citable_object_id = function(str)
       return
-        is.printable_ascii_nowhitespace_string.indicated_isbn(str) or
-        is.printable_ascii_nowhitespace_string.indicated_pmid(str) or
-        is.printable_ascii_nowhitespace_string.indicated_doi(str) or
-        is.printable_ascii_nowhitespace_string.indicated_isbn_part_identifier(str) or
-        is.printable_ascii_nowhitespace_string.indicated_pcmid(str) or
-        is.printable_ascii_nowhitespace_string.indicated_accession(str) or
-        is.printable_ascii_nowhitespace_string.indicated_issn_full_identifier(str) or
-        is.printable_ascii_nowhitespace_string.indicated_urlmd5(str)
+        is.printable_ascii_nowhitespace_str.indicated_isbn(str) or
+        is.printable_ascii_nowhitespace_str.indicated_pmid(str) or
+        is.printable_ascii_nowhitespace_str.indicated_doi(str) or
+        is.printable_ascii_nowhitespace_str.indicated_isbn_part_identifier(str) or
+        is.printable_ascii_nowhitespace_str.indicated_pcmid(str) or
+        is.printable_ascii_nowhitespace_str.indicated_accession(str) or
+        is.printable_ascii_nowhitespace_str.indicated_issn_full_identifier(str) or
+        is.printable_ascii_nowhitespace_str.indicated_urlmd5(str)
     end
   },
   colon_period_alphanum_minus_underscore = {
     colon_alphanum_minus_underscore = function(str)
-      return get.string.bool_by_not_contains_w_string(str, ".")
+      return get.str.bool_by_not_contains_w_str(str, ".")
     end,
     period_alphanum_minus_underscore = function(str)
-      return get.string.bool_by_not_contains_w_string(str, ":")
+      return get.str.bool_by_not_contains_w_str(str, ":")
     end,
   },
   period_alphanum_minus_underscore = {
-    number_string = function(str)
-      return get.nonindicated_number_string.number_or_nil(str, 16) ~= nil -- this may not return the correct value for non-hex strings, but that doesn't matter, we're only checking if it is a digit string of whatever kind, so what value exactly it returns doesn't matter
+    number_str = function(str)
+      return get.nonindicated_number_str.number_or_nil(str, 16) ~= nil -- this may not return the correct value for non-hex strs, but that doesn't matter, we're only checking if it is a digit str of whatever kind, so what value exactly it returns doesn't matter
     end,
-    indicated_number_string = function(str)
+    indicated_number_str = function(str)
       return 
-        get.string.bool_by_startswith(str, "0") and
+        get.str.bool_by_startswith(str, "0") and
         get.arr.bool_by_contains(transf.table_or_nil.kt_arr(tblmap.base_letter.base), str:sub(2, 2)) and
-        is.printable_ascii_string.number_string(str:sub(3))
+        is.printable_ascii_str.number_str(str:sub(3))
     end,
-    indicated_binary_number_string = function(str)
-      return get.string.bool_by_startswith(str, "0b") and is.printable_ascii_string.binary_string(str:sub(3))
+    indicated_binary_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0b") and is.printable_ascii_str.binary_str(str:sub(3))
     end,
-    indicated_hex_number_string = function(str)
-      return get.string.bool_by_startswith(str, "0x") and is.printable_ascii_string.hex_string(str:sub(3))
+    indicated_hex_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0x") and is.printable_ascii_str.hex_str(str:sub(3))
     end,
-    indicated_octal_number_string = function(str)
-      return get.string.bool_by_startswith(str, "0o") and is.printable_ascii_string.octal_string(str:sub(3))
+    indicated_octal_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0o") and is.printable_ascii_str.octal_str(str:sub(3))
     end,
-    indicated_decimal_number_string = function(str)
-      return get.string.bool_by_startswith(str, "0d") and is.printable_ascii_string.decimal_string(str:sub(3))
+    indicated_decimal_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0d") and is.printable_ascii_str.decimal_str(str:sub(3))
     end,
   },
   colon_alphanum_minus_underscore = {
     alphanum_minus_underscore = function(str)
-      return get.string.bool_by_not_contains_w_string(str, ":")
+      return get.str.bool_by_not_contains_w_str(str, ":")
     end,
     alphanum = function(str)
       return is.colon_alphanum_minus_underscore.alphanum_minus_underscore(str) and is.alphanum_minus_underscore.alphanum(str)
@@ -263,27 +263,27 @@ is = {
   },
   calendar_name = {
     writeable_calendar_name = function(name)
-      return get.string.bool_by_not_startswith(name, "r-:")
+      return get.str.bool_by_not_startswith(name, "r-:")
     end,
   },
   alphanum_minus = {
     isbn10 = function(str)
-      return get.string.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.id.isbn10)
+      return get.str.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.id.isbn10)
     end,
     isbn13 = function(str)
-      return get.string.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.id.isbn13)
+      return get.str.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.id.isbn13)
     end,
     isbn = function(str)
       return is.alphanum_minus.isbn10(str) or is.alphanum_minus.isbn13(str)
     end,
     issn = function(str) 
-      return get.string.bool_by_matches_whole_onig(str, r.g.id.issn)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.issn)
     end,
     uuid = function(str)
-      return get.string.bool_by_matches_whole_onig(transf.string.string_by_all_eutf8_lower(str), r.g.id.uuid)
+      return get.str.bool_by_matches_whole_onig(transf.str.str_by_all_eutf8_lower(str), r.g.id.uuid)
     end,
     relay_identifier = function(str)
-      return get.string.bool_by_matches_whole_onig(str, r.g.id.relay_identifier)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.relay_identifier)
     end,
     
   },
@@ -330,7 +330,7 @@ is = {
       return is.path.absolute_path(path) and is.absolute_path.extant_path(path)
     end,
     path_with_intra_file_locator = function(path)
-      return get.string.bool_by_matches_part_eutf8(transf.path.leaf(path), ":%d+$")
+      return get.str.bool_by_matches_part_eutf8(transf.path.leaf(path), ":%d+$")
     end,
     useless_file_leaf_path = function(path)
       return get.arr.bool_by_contains(ls.useless_files, transf.path.leaf(path))
@@ -340,11 +340,11 @@ is = {
     end,
     citable_path = function(path)
       return 
-        is.printable_ascii_string.citable_filename(transf.path.leaf(path)) 
+        is.printable_ascii_str.citable_filename(transf.path.leaf(path)) 
     end,
     dotfilename_path = function(path)
       return 
-        is.string.starting_with_dot_string(transf.path.leaf(path))
+        is.str.starting_with_dot_str(transf.path.leaf(path))
     end,
     not_dotfilename_path = function(path)
       return not is.path.dotfilename_path(path)
@@ -352,13 +352,13 @@ is = {
   },
   citable_path = {
     mpapers_citable_local_absolute_path = function(path)
-      return get.string.bool_by_startswith(path, env.MPAPERS)
+      return get.str.bool_by_startswith(path, env.MPAPERS)
     end,
     mcitations_citable_local_absolute_path = function(path)
-      return get.string.bool_by_startswith(path, env.MCITATIONS)
+      return get.str.bool_by_startswith(path, env.MCITATIONS)
     end,
     mpapernotes_citable_local_absolute_path = function(path)
-      return get.string.bool_by_startswith(path, env.MPAPERNOTES)
+      return get.str.bool_by_startswith(path, env.MPAPERNOTES)
     end,
     mpapers_citable_object_file = function(path)
       return is.citable_path.mpapers_citable_local_absolute_path(path) and is.local_absolute_path.local_file(path)
@@ -374,7 +374,7 @@ is = {
     labelled_remote_path = function(path)
       return not not path:find("^[^/:]-:/") 
     end,
-    -- url_remote_path = is.string.url,
+    -- url_remote_path = is.str.url,
     remote_absolute_path = transf["nil"]["true"] -- remote paths are always absolute
   },
   remote_absolute_path = {
@@ -384,7 +384,7 @@ is = {
   },
   labelled_remote_absolute_path = {
     labelled_remote_extant_path = function(path)
-      return transf.string.bool_by_evaled_env_bash_success("rclone ls " .. transf.string.string_by_single_quoted_escaped(path))
+      return transf.str.bool_by_evaled_env_bash_success("rclone ls " .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
   remote_extant_path = {
@@ -397,7 +397,7 @@ is = {
   },
   labelled_remote_extant_path = {
     labelled_remote_dir = function(path)
-      return get.string.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key("rclone lsjson --stat" .. transf.string.string_by_single_quoted_escaped(path))
+      return get.str.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key("rclone lsjson --stat" .. transf.str.str_by_single_quoted_escaped(path))
     end,
     labelled_remote_file = function(path)
       return not is.labelled_remote_extant_path.labelled_remote_dir(path)
@@ -405,7 +405,7 @@ is = {
   },
   labelled_remote_file = {
     empty_labelled_remote_file = function(path)
-      local contents = transf.labelled_remote_file.string_by_contents(path)
+      local contents = transf.labelled_remote_file.str_by_contents(path)
       return contents == nil or contents == ""
     end,
     nonempty_labelled_remote_file = function(path)
@@ -438,7 +438,7 @@ is = {
   },
   local_path = {
     local_naive_absolute_path = function(path)
-      return get.string.bool_by_startswith(path, "/")
+      return get.str.bool_by_startswith(path, "/")
     end,
     local_absolute_path = function(path)
        return is.local_path.local_naive_absolute_path(path) and is.local_path.not_contains_relative_references_local_path(path)
@@ -448,7 +448,7 @@ is = {
     end,
     contains_relative_references_local_path = function(path)
       return 
-        get.string.bool_by_startswith_any_w_ascii_string_arr(
+        get.str.bool_by_startswith_any_w_ascii_str_arr(
           path,
           {
             "./",
@@ -457,14 +457,14 @@ is = {
             "/../",
           }
         ) or 
-        get.string.bool_by_contains_any_w_ascii_string_arr(
+        get.str.bool_by_contains_any_w_ascii_str_arr(
           path,
           {
             "/./",
             "/../",
           }
         ) or
-        get.string.bool_by_endswith_any_w_ascii_string_arr(
+        get.str.bool_by_endswith_any_w_ascii_str_arr(
           path,
           {
             "/.",
@@ -484,7 +484,7 @@ is = {
   },
   local_nonabsolute_path = {
     local_tilde_path = function(path)
-      return get.string.bool_by_startswith(path, "~/")
+      return get.str.bool_by_startswith(path, "~/")
     end,
   },
   local_absolute_path = {
@@ -503,7 +503,7 @@ is = {
       return path == "/"
     end,
     in_volume_local_absolute_path = function(path)
-      return get.string.bool_by_startswith(path, "/Volumes/")
+      return get.str.bool_by_startswith(path, "/Volumes/")
     end,
     volume_local_extant_path = function(path)
       return get.arr.bool_by_contains(
@@ -512,20 +512,20 @@ is = {
       )
     end,
     in_home_local_absolute_path = function(path)
-      return get.string.bool_by_startswith(path, env.HOME)
+      return get.str.bool_by_startswith(path, env.HOME)
     end,
   },
   in_home_local_absolute_path = {
     in_me_local_absolute_path = function(path)
-      return get.string.bool_by_startswith(path, env.ME)
+      return get.str.bool_by_startswith(path, env.ME)
     end,
   },
   in_me_local_absolute_path = {
     in_mcitations_absolute_path = function(path)
-      return get.string.bool_by_startswith(path, env.MCITATIONS)
+      return get.str.bool_by_startswith(path, env.MCITATIONS)
     end,
     in_mpapers_absolute_path = function(path)
-      return get.string.bool_by_startswith(path, env.MPAPERS)
+      return get.str.bool_by_startswith(path, env.MPAPERS)
     end,
   },
   in_volume_local_absolute_path = {
@@ -534,7 +534,7 @@ is = {
   volume_local_extant_path = {
     
     dynamic_time_machine_volume_local_extant_path = function(path)
-      return get.string.bool_by_startswith(
+      return get.str.bool_by_startswith(
         path,
         "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. get.fn.rt_or_nil_by_memoized(hs.host.localizedName)() .. "/" .. os.date("%Y-%m-%d-%H")
       )
@@ -554,7 +554,7 @@ is = {
   },
   local_file = {
     empty_local_file = function(path)
-      local contents =  transf.local_file.string_by_contents(path)
+      local contents =  transf.local_file.str_by_contents(path)
       return contents == nil or contents == ""
     end,
     nonempty_local_file = function(path)
@@ -647,7 +647,7 @@ is = {
       return not is.dir.empty_dir(path)
     end,
     logging_dir = function(path)
-      return get.string.bool_by_endswith(transf.path.leaf(path), "_logs")
+      return get.str.bool_by_endswith(transf.path.leaf(path), "_logs")
     end,
   },
   nonempty_dir = {
@@ -681,8 +681,8 @@ is = {
     end,
     shellscript_file = function(path)
       return get.path.usable_as_filetype(path, "shell-script") 
-      or get.string.bool_by_matches_part_onig(
-        transf.file.string_by_contents(path),
+      or get.str.bool_by_matches_part_onig(
+        transf.file.str_by_contents(path),
         "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+"
       )
     end,
@@ -711,10 +711,10 @@ is = {
   },
   shellscript_file = {
     errors = function(path)
-      return transf.shellscript_file.gcc_string_errors(path) ~= ""
+      return transf.shellscript_file.gcc_str_errors(path) ~= ""
     end,
     warnings = function(path)
-      return transf.shellscript_file.gcc_string_warnings(path) ~= ""
+      return transf.shellscript_file.gcc_str_warnings(path) ~= ""
     end,
   },
   plaintext_file = {
@@ -757,7 +757,7 @@ is = {
     timestamp_first_column_plaintext_table_file = function(path)
       local line = get.plaintext_file.nth_line(path, 1)
       if not line then return false end
-      local leading_number = get.string.n_strings_by_extracted_eutf8(line, "^(%d+)%D")
+      local leading_number = get.str.n_strs_by_extracted_eutf8(line, "^(%d+)%D")
       if leading_number and #leading_number < 11 then -- a unix timestamp will only be larger than 10 digits starting at 2286-11-20, at which point this code will need to be updated
         return true
       else
@@ -770,10 +770,10 @@ is = {
       return get.arr.bool_by_contains(transf["nil"].package_manager_name_arr(), str)
     end,
     alphanum_underscore =  function(str) 
-      return get.string.bool_by_not_contains_w_string(str, "-")
+      return get.str.bool_by_not_contains_w_str(str, "-")
     end,
     alphanum_minus = function(str)
-      return get.string.bool_by_not_contains_w_string(str, "_")
+      return get.str.bool_by_not_contains_w_str(str, "_")
     end,
     alphanum = function(str)
       return is.alphanum_minus_underscore.alphanum_underscore(str) and is.alphanum_minus_underscore.alphanum_minus(str)
@@ -782,10 +782,10 @@ is = {
       return #str == 11 -- not officially specified, but b/c 64^11 > 2^64 > 64^10 and 64 chars in base64, allowing for billions of ids per living person, unlikely to change
     end,
     youtube_playlist_id = function(str)
-      return get.string.bool_by_startswith(str, "PL") and #str == 34
+      return get.str.bool_by_startswith(str, "PL") and #str == 34
     end,
     youtube_channel_id = function(str)
-      return get.string.bool_by_startswith(str, "UC") and #str == 24
+      return get.str.bool_by_startswith(str, "UC") and #str == 24
     end,
     pass_item_name = function(str)
       return get.extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
@@ -795,32 +795,32 @@ is = {
 
   },
   alphanum = {
-    alpha_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, "\\w+")
+    alpha_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\w+")
     end,
-    digit_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, "\\d+")
+    digit_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d+")
     end,
   },
-  digit_string = {
+  digit_str = {
 
   },
-  alpha_string = {
-    lower_alpha_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, "[a-z]+")
+  alpha_str = {
+    lower_alpha_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "[a-z]+")
     end,
-    upper_alpha_string = function(str)
-      return get.string.bool_by_matches_whole_onig(str, "[A-Z]+")
+    upper_alpha_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "[A-Z]+")
     end,
   },
-  lower_alpha_string = {
+  lower_alpha_str = {
     fs_attr_name = function(str)
       return get.arr.bool_by_contains(ls.fs_attr_name, str)
     end,
   },
   url = {
     scheme_url = function(url)
-      return get.string.bool_by_matches_part_onig(url, r.g.url.scheme)
+      return get.str.bool_by_matches_part_onig(url, r.g.url.scheme)
     end,
     path_url = function(url)
       return transf.url.path(url) ~= nil
@@ -840,33 +840,33 @@ is = {
         ))
     end,
     github_url = function(url)
-      return get.string.bool_by_startswith(url, "https://github.com/")
+      return get.str.bool_by_startswith(url, "https://github.com/")
     end
 
   },
   scheme_url = {
     mailto_url = function(url)
-      return get.string.bool_by_startswith(url, "mailto:")
+      return get.str.bool_by_startswith(url, "mailto:")
     end,
     tel_url = function(url)
-      return get.string.bool_by_startswith(url, "tel:")
+      return get.str.bool_by_startswith(url, "tel:")
     end,
     otpauth_url = function(url)
-      return get.string.bool_by_startswith(url, "otpauth:")
+      return get.str.bool_by_startswith(url, "otpauth:")
     end,
     data_url = function(url)
-      return get.string.bool_by_startswith(url, "data:")
+      return get.str.bool_by_startswith(url, "data:")
     end,
     http_protocol_url = function(url)
-      return get.string.bool_by_startswith(url, "http://") or get.string.bool_by_startswith(url, "https://")
+      return get.str.bool_by_startswith(url, "http://") or get.str.bool_by_startswith(url, "https://")
     end,
   },
   http_protocol_url = {
     http_url = function(url)
-      return get.string.bool_by_startswith(url, "http://")
+      return get.str.bool_by_startswith(url, "http://")
     end,
     https_url = function(url)
-      return get.string.bool_by_startswith(url, "https://")
+      return get.str.bool_by_startswith(url, "https://")
     end,
   },
   path_url = {
@@ -877,16 +877,16 @@ is = {
       return is.path.extension_path(transf.path_url.path(url))
     end,
     danbooru_style_post_url = function(url)
-      return get.string.bool_by_matches_whole_eutf8(transf.path_url.path(url), "/posts/%d+/?")
+      return get.str.bool_by_matches_whole_eutf8(transf.path_url.path(url), "/posts/%d+/?")
     end,
     yandere_style_post_url = function(url)
-      return get.string.bool_by_matches_whole_eutf8(transf.path_url.path(url), "/post/show/%d+/?")
+      return get.str.bool_by_matches_whole_eutf8(transf.path_url.path(url), "/post/show/%d+/?")
     end,
   },
   query_url = {
     gelbooru_style_post_url = function(url)
       local paramtbl = transf.url.param_table(url)
-      return is.any.int_string(paramtbl["id"]) and paramtbl["page"] == "post"
+      return is.any.int_str(paramtbl["id"]) and paramtbl["page"] == "post"
     end
   },
   extension_url = {
@@ -948,7 +948,7 @@ is = {
   },
   data_url = {
     base64_data_url = function(url)
-      return get.string.bool_by_endswith(transf.data_url.header_part(url), ";base64")
+      return get.str.bool_by_endswith(transf.data_url.header_part(url), ";base64")
     end,
     image_data_url = function(url)
       return  s.media_type.image_media_type(transf.data_url.content_type(url))
@@ -956,7 +956,7 @@ is = {
   },
   media_type = {
     image_media_type = function(media_type)
-      return get.string.bool_by_startswith(media_type, "image/")
+      return get.str.bool_by_startswith(media_type, "image/")
     end,
   },
   source_id = {
@@ -1023,7 +1023,7 @@ is = {
     float = function(val)
       return is.any.number(val) and is.number.float(val)
     end,
-    string = function(val)
+    str = function(val)
       return type(val) == "string"
     end,
     table = function(val)
@@ -1091,11 +1091,11 @@ is = {
     b_larger = function(a, b)
       return a < b
     end,
-    a_larger_as_string = function(a, b)
-      return tostring(a) > tostring(b)
+    a_larger_as_str = function(a, b)
+      return tostr(a) > tostr(b)
     end,
-    b_larger_as_string = function(a, b)
-      return tostring(a) < tostring(b)
+    b_larger_as_str = function(a, b)
+      return tostr(a) < tostr(b)
     end,
     equal = function(a, b)
       return a == b
@@ -1177,10 +1177,10 @@ is = {
     non_empty_table_arr = function(arr)
       return #arr > 0
     end,
-    string_arr = function(arr)
+    str_arr = function(arr)
       return get.arr.bool_by_all_pass_w_fn(
         arr,
-        is.any.string
+        is.any.str
       )
     end,
     arr_of_arrs = function(arr)
@@ -1193,11 +1193,11 @@ is = {
       return #arr == 2
     end,
   },
-  string_arr = {
+  str_arr = {
     path_arr = function(arr)
       return get.arr.bool_by_all_pass_w_fn(
         arr,
-        is.string.path
+        is.str.path
       )
     end,
   },
@@ -1309,8 +1309,8 @@ for type1, v in pairs(is) do
   local mt = {
     __index = function(t, type2)
       local invert = false
-      if get.string.bool_by_startswith(type2, "not_") then
-        type2 = get.string.string_by_sub_lua(type2, 5)
+      if get.str.bool_by_startswith(type2, "not_") then
+        type2 = get.str.str_by_sub_lua(type2, 5)
         invert = true
       end
       local fn = rawget(t, type2)
