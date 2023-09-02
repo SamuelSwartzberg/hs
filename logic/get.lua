@@ -777,7 +777,7 @@ get = {
     end,
     arr_by_sorted = function(list, comp)
       local new_list = get.table.table_by_copy(list, false)
-      table.sort(new_list, comp)
+      dothis.arr.sort(new_list, comp)
       return new_list
     end,
     t_by_min = function(list, comp)
@@ -797,7 +797,7 @@ get = {
     median = function (list, comp, if_even)
       if_even = if_even or "lower"
       list = get.table.table_by_copy(list, false) -- don't modify the original list
-      table.sort(list, comp)
+      dothis.arr.sort(list, comp)
       local mid = math.floor(#list / 2)
       if #list % 2 == 0 then
         if if_even == "lower" then
@@ -902,6 +902,7 @@ get = {
     end
   },
   string = {
+    string_by_sub = string.sub,
     string_by_formatted_w_n_anys = string.format,
     string_by_repeated = get.string.string_by_repeated,
     string_arr_split_single_char = stringy.split,
@@ -1402,7 +1403,7 @@ get = {
       if get.string.bool_by_startswith(stripped_str, "---") then
         -- splice in the metadata
         local parts = get.string.string_arr_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
-        local extant_metadata = table.remove(parts, 1)
+        local extant_metadata = act.arr.shift(parts)
         final_metadata = extant_metadata .. "\n" .. transf.not_userdata_or_string.yaml_string(tbl)
         final_contents = get.string_or_number_arr.string_by_joined(parts)
         final_contents = final_contents .. "---"
@@ -1704,7 +1705,7 @@ get = {
         if rawi then
           local relevant_path_components = get.arr.arr_by_slice_w_slice_spec(whole_path_component_arr, { start = 1, stop = rawi })
           if started_with_slash then
-            table.insert(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
+            dothis.arr.insert_at_index(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty string at the beginning so that it will start with a slash again once we rejoin
           end
           res[i] = get.string_or_number_arr.string_by_joined(relevant_path_components, "/")
         end
@@ -2215,7 +2216,7 @@ get = {
   },
   extant_path_arr = {
     extant_path_arr_by_sorted_via_attr = function(arr, attr)
-      return table.sort(arr, function(a, b)
+      return dothis.arr.sort(arr, function(a, b)
         return get.extant_path.attr(a, attr) < get.extant_path.attr(b, attr)
       end)
     end,
@@ -2695,12 +2696,12 @@ get = {
     arr_repeated = function(arg, times)
       local result = {}
       for i = 1, times do
-        table.insert(result, arg)
+        dothis.arr.insert_at_index(result, arg)
       end
       return result
     end,
     repeated = function(arr, times)
-      return table.unpack(get.any.arr_repeated(arr, times))
+      return transf.arr.n_anys(get.any.arr_repeated(arr, times))
     end,
     applicable_thing_name_hierarchy = function(any, local_thing_name_hierarchy, parent)
       local_thing_name_hierarchy = local_thing_name_hierarchy or get.table.table_by_copy(thing_name_hierarchy, true)
@@ -2922,7 +2923,7 @@ get = {
           if control_var == nil then
             return nil
           else
-            return table.unpack(res, start_res_at, end_res_at)
+            return transf.arr.n_anys(res, start_res_at, end_res_at)
           end
         end
       end
@@ -2951,7 +2952,7 @@ get = {
         if #val == 0 then
           break
         end
-        table.insert(res, val)
+        dothis.arr.insert_at_index(res, val)
       end
       return res
     end
@@ -3085,22 +3086,22 @@ get = {
       -- initialize inner_func to the original function
       local inner_func = function(...)
         local args = {...}
-        table.sort(ignore_spec, function(a, b) return a > b end)
+        dothis.arr.sort(ignore_spec, function(a, b) return a > b end)
         for _, index in transf.arr.index_value_stateless_iter(ignore_spec) do
-          table.remove(args, index)
+          dothis.arr.remove_by_index(args, index)
         end
         local new_args = {}
         for index, arg in transf.arr.index_value_stateless_iter(arg_spec) do -- for all arg_lists to bind
           if arg == a_use then
-            new_args[index] = table.remove(args, 1)
+            new_args[index] = act.arr.shift(args)
           else
             new_args[index] = arg
           end
         end
         for _, arg in transf.arr.index_value_stateless_iter(args) do -- for all remaining args
-          table.insert(new_args, arg)
+          dothis.arr.insert_at_index(new_args, arg)
         end
-        return func(table.unpack(new_args))
+        return func(transf.arr.n_anys(new_args))
       end
 
       return inner_func
@@ -3219,16 +3220,16 @@ get = {
             -- print("cache hit for", fnid)
             -- inspPrint(result)
           end
-          return table.unpack(result) -- we're sure to have a result now, so we can return it
+          return transf.arr.n_anys(result) -- we're sure to have a result now, so we can return it
         else
           --- @cast callback fun(...: any)
           if result then -- if we have a result, we can call the callback immediately
-            callback(table.unpack(result))
+            callback(transf.arr.n_anys(result))
           else -- else we need to call the original function and wrap the callback to store the result in the cache before calling it
-            fn(table.unpack(params), function(...)
+            fn(transf.arr.n_anys(params), function(...)
               local result = {...}
               dothis[fnidentifier_type].put_memo(fnid, opts_as_str, params, result, opts)
-              callback(table.unpack(result))
+              callback(transf.arr.n_anys(result))
             end)
           end
         end

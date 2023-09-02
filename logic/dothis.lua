@@ -1154,13 +1154,13 @@ dothis = {
     end,
     pop_line = function(path)
       local lines = transf.plaintext_file.string_arr_by_lines(path)
-      local line = table.remove(lines, #lines)
+      local line = dothis.arr.remove_by_index(lines, #lines)
       dothis.plaintext_file.write_lines(path, lines)
       return line
     end,
     remove_line_w_pos_int = function(path, line_number)
       local lines = transf.plaintext_file.string_arr_by_lines(path)
-      table.remove(lines, line_number)
+      dothis.arr.remove_by_index(lines, line_number)
       dothis.plaintext_file.write_lines(path, lines)
     end,
     remove_line_w_fn = function(path, cond)
@@ -1667,7 +1667,7 @@ dothis = {
     write = function(dynamic_absolute_path_key_assoc)
       for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_key_assoc) do
         if is.any.arr(contents) then
-          dothis.absolute_path[act.arr.shift(contents)](absolute_path, table.unpack(contents))
+          dothis.absolute_path[act.arr.shift(contents)](absolute_path, transf.arr.n_anys(contents))
         else
           act.absolute_path[contents](absolute_path)
         end
@@ -1720,7 +1720,7 @@ dothis = {
       dothis.mac_application_name.activate(application_name)
       local retval = {fn()}
       dothis.running_application.activate(prev_app)
-      return table.unpack(retval)
+      return transf.arr.n_anys(retval)
     end,
       
   },
@@ -2148,7 +2148,7 @@ dothis = {
       return true
     end,
     unshift = function(arr, item)
-      table.insert(arr, 1, item)
+      dothis.arr.insert_at_index(arr, 1, item)
       return true
     end,
     sort = table.sort,
@@ -2196,7 +2196,7 @@ dothis = {
       local i = 1
       while i <= #arr do
         if not filterfn(arr[i]) then
-          table.remove(arr, i)
+          dothis.arr.remove_by_index(arr, i)
         else
           i = i + 1
         end

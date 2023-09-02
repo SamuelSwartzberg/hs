@@ -69,12 +69,12 @@ act = {
       )
       dothis.absolute_path.append_file_if_file(
         env.KHAL_CONFIG .. "/config",
-        "\n\n" .. transf.url.ini_string_by_khal_config_section(url)
+        "\n\n" .. transf.url.ini_string_by_khal_config_section(spec.remote_storage_url)
       )
       dothis.absolute_path.create_dir(
-        transf.url.absolute_path_by_webcal_storage_location(url)
+        transf.url.absolute_path_by_webcal_storage_location(spec.remote_storage_url)
       )
-      local name = transf.url.string_by_webcal_name(url)
+      local name = transf.url.string_by_webcal_name(spec.remote_storage_url)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
         "vdirsyncer discover" ..
         transf.string.single_quoted_escaped(name),
@@ -608,9 +608,7 @@ act = {
       return last
     end,
     shift = function(arr)
-      local first = arr[1]
-      table.remove(arr, 1)
-      return first
+      return table.remove(arr, 1)
     end,
     to_empty_table = function(arr)
       for i, v in transf.arr.index_value_stateless_iter(arr) do

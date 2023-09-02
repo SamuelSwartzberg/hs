@@ -1,4 +1,9 @@
 --- @alias primitive string | number | boolean | nil | function
+--- @alias str string
+--- @alias num number
+--- @alias bool boolean
+--- @alias int integer
+--- @alias tbl table
 
 --- @class pl.stringx
 --- @field lines fun(s: string): string[]
@@ -27,8 +32,10 @@
 --- @field rfind fun(tbl: table, value: any, idx?: integer): integer
 
 --- @class pl.array2d
+--- @field size fun(a: any[][]): integer, integer Returns: #a, #a[1]
 --- @field column fun(a: any[][], col: integer): any[]
 --- @field row fun(a: any[][], row: integer): any[]
+--- @field flatten fun(a: any[][]): any[]
 
 --- @class pl.data.read.cnfg
 --- @field delim string a string pattern to split fields
@@ -265,6 +272,7 @@
 --- @field math hs.math
 --- @field speech hs.speech
 --- @field grid hs.grid
+--- @field json hs.json
 
 
 --- @alias urltable { url: string }
@@ -285,6 +293,55 @@
 --- @field interval fun(value: number): number
 
 --- @class hs.audiodevice
+--- @field watcher hs.audiodevice.watcher
+--- @field datasource hs.audiodevice.datasource
+--- @field allDevices fun(): hs.audiodevice[]
+--- @field allInputDevices fun(): hs.audiodevice[]
+--- @field allOutputDevices fun(): hs.audiodevice[]
+--- @field current fun(output?: boolean): table
+--- @field defaultEffectDevice fun(): hs.audiodevice | nil
+--- @field defaultInputDevice fun(): hs.audiodevice | nil
+--- @field defaultOutputDevice fun(): hs.audiodevice | nil
+--- @field findDeviceByName fun(name: string): hs.audiodevice | nil
+--- @field findDeviceByUID fun(uid: string): hs.audiodevice | nil
+--- @field findInputByName fun(name: string): hs.audiodevice | nil
+--- @field findOutputByName fun(name: string): hs.audiodevice | nil
+--- @field findInputByUID fun(uid: string): hs.audiodevice | nil
+--- @field findOutputByUID fun(uid: string): hs.audiodevice | nil
+--- @field allInputDataSources fun(self: hs.audiodevice): hs.audiodevice.datasource[] | nil
+--- @field allOutputDataSources fun(self: hs.audiodevice): hs.audiodevice.datasource[] | nil
+--- @field balance fun(self: hs.audiodevice): number | nil
+--- @field currentInputDataSource fun(self: hs.audiodevice): hs.audiodevice.datasource | nil
+--- @field currentOutputDataSource fun(self: hs.audiodevice): hs.audiodevice.datasource | nil
+--- @field inputMuted fun(self: hs.audiodevice): boolean | nil
+--- @field inputVolume fun(self: hs.audiodevice): number | nil
+--- @field inUse fun(self: hs.audiodevice): boolean | nil
+--- @field isInputDevice fun(self: hs.audiodevice): boolean | nil
+--- @field isOutputDevice fun(self: hs.audiodevice): boolean | nil
+--- @field jackConnected fun(self: hs.audiodevice): boolean | nil
+--- @field muted fun(self: hs.audiodevice): boolean | nil
+--- @field name fun(self: hs.audiodevice): string | nil
+--- @field outputMuted fun(self: hs.audiodevice): boolean | nil
+--- @field outputVolume fun(self: hs.audiodevice): number | nil
+--- @field setBalance fun(self: hs.audiodevice, level: number): boolean
+--- @field setDefaultEffectDevice fun(self: hs.audiodevice): boolean
+--- @field setDefaultInputDevice fun(self: hs.audiodevice): boolean
+--- @field setDefaultOutputDevice fun(self: hs.audiodevice): boolean
+--- @field setInputMuted fun(self: hs.audiodevice, state: boolean): boolean
+--- @field setInputVolume fun(self: hs.audiodevice, level: number): boolean
+--- @field setMuted fun(self: hs.audiodevice, state: boolean): boolean
+--- @field setOutputMuted fun(self: hs.audiodevice, state: boolean): boolean
+--- @field setOutputVolume fun(self: hs.audiodevice, level: number): boolean
+--- @field setVolume fun(self: hs.audiodevice, level: number): boolean
+--- @field supportsInputDataSources fun(self: hs.audiodevice): boolean
+--- @field supportsOutputDataSources fun(self: hs.audiodevice): boolean
+--- @field transportType fun(self: hs.audiodevice): string
+--- @field uid fun(self: hs.audiodevice): string | nil
+--- @field volume fun(self: hs.audiodevice): number | nil
+
+--- @class hs.audiodevice.watcher
+
+--- @class hs.audiodevice.datasource
 
 --- @class hs.http
 --- @field asyncGet fun(url: string, headers?: {[string]: any}, callback: fun(status: integer, body: string, headers: {[string]: any}): nil): nil
@@ -761,3 +818,9 @@ speak = hs.speech.new()
 --- @class hs.grid
 --- @field setGrid fun(grid: hs_geometry_size_like, screen?: hs.screen, frame?: hs_geometry_rect_like): hs.grid
 --- @field show fun(exitedCallback?: fun(): (nil), multipleWindows?: boolean): hs.grid
+
+--- @class hs.json
+--- @field encode fun(val: table, prettyprint?: boolean): string
+--- @field decode fun(val: string): table
+--- @field read fun(path: string): table | nil
+--- @field write fun(data: table, path: string, prettyprint?: boolean, replace?: boolean): boolean

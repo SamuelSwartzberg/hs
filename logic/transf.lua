@@ -594,9 +594,7 @@ transf = {
         return output
       end
     end,
-    n_anys = function(t)
-      return table.unpack(t)
-    end,
+    n_anys = table.unpack,
     initial_selected_index = function(arr)
       return get.thing_name_arr.initial_selected_index(
         transf.any.applicable_thing_name_arr(arr)
@@ -1732,7 +1730,7 @@ transf = {
       for line in transf.string.line_arr(mime_parts_raw) do
         local name = line:match("name=\"(.-)\"")
         if name then
-          table.insert(attachments, name)
+          dothis.arr.insert_at_index(attachments, name)
         end
       end
       return attachments
@@ -1864,7 +1862,7 @@ transf = {
   
               temp_stack[key] = nil  -- Remove key from temporary stack
               visited[key] = true  -- Mark key as visited
-              table.insert(result, { key, assoc[key]['value'] })  -- Append {key, value} pair to result
+              dothis.arr.insert_at_index(result, { key, assoc[key]['value'] })  -- Append {key, value} pair to result
           end
       end
   
@@ -4982,7 +4980,7 @@ transf = {
       for _, header_name in transf.arr.index_value_stateless_iter(initial_headers) do
         local header_value = t[header_name]
         if header_value then
-          table.insert(header_lines, transf.pair.email_header({header_name, header_value}))
+          dothis.arr.insert_at_index(header_lines, transf.pair.email_header({header_name, header_value}))
           t[header_name] = nil
         end
       end
@@ -5200,7 +5198,7 @@ transf = {
   },
   assoc_of_string_value_assocs = {
     ini_string = function(t)
-      return get.string_or_number_arr.string_by_joined(get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.string_or_number_arr.string_by_joined(get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
         function(k,v)
           return "[" .. k .. "]\n" .. transf.assoc.ini_string(v)
@@ -6029,7 +6027,7 @@ transf = {
     jxa_tab_specifier_arr = function(window_spec)
       local tab_spec_arr = {}
       for i = 0, transf.tabbable_jxa_window_specifier.amount_of_tabs(window_spec) - 1 do
-        table.insert(tab_spec_arr, {
+        dothis.arr.insert_at_index(tab_spec_arr, {
           application_name = window_spec.application_name,
           window_index = window_spec.window_index,
           tab_index = i
@@ -6258,7 +6256,7 @@ transf = {
       )
     end,
     filename = function(csl_table)
-      return string.sub(
+      return get.string.string_by_sub(
         get.string_or_number_arr.string_by_joined(
           {
             transf.csl_table.authors_et_al_string(csl_table),
@@ -6653,7 +6651,7 @@ transf = {
     end,
     no_scheme = function(url)
       local parts = stringy.split(url, ":")
-      table.remove(parts, 1)
+      act.arr.shift(parts)
       local rejoined = get.string_or_number_arr.string_by_joined(parts, ":")
       return get.string.no_prefix_string(rejoined, "//")
     end,
@@ -6872,7 +6870,7 @@ transf = {
     end,
     n_anys_if_table = function(any)
       if type(any) == "table" then
-        return table.unpack(any)
+        return transf.arr.n_anys(any)
       else
         return any
       end
@@ -7052,8 +7050,8 @@ transf = {
       
     raw_type_param_table = function(data_url)
       local parts = stringy.split(transf.data_url.header_part(data_url), ";")
-      table.remove(parts, 1) -- this is the content type
-      table.remove(parts, #parts) -- this is the base64, or ""
+      act.arr.shift(parts) -- this is the content type
+      act.arr.pop(parts) -- this is the base64, or ""
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(parts, function(part)
         local kv = stringy.split(part, "=")
         return kv[1], kv[2]
@@ -7943,7 +7941,7 @@ transf = {
       local range = {}
       local current = start
       while current <= stop do
-        table.insert(range, current)
+        dothis.arr.insert_at_index(range, current)
         current = addmethod(current, step)
       end
     
@@ -8088,11 +8086,11 @@ transf = {
         if #str == 1 then
           input_spec.mouse_button_string = "l"
         else
-          input_spec.mouse_button_string = string.sub(str, 2, 2)
+          input_spec.mouse_button_string = get.string.string_by_sub(str, 2, 2)
         end
       elseif get.string.bool_by_startswith(str, ":") then
         input_spec.mode = "key"
-        local parts = transf.hole_y_arrlike.arr(stringy.split(string.sub(str, 2), "+")) -- separating modifier keys with `+`
+        local parts = transf.hole_y_arrlike.arr(stringy.split(get.string.string_by_sub(str, 2), "+")) -- separating modifier keys with `+`
         if #parts > 1 then
           input_spec.key = act.arr.pop(parts)
           input_spec.mods = parts
@@ -8116,7 +8114,7 @@ transf = {
           y = get.string_or_number.number_or_nil(y)
         })
         if optional_relative_specifier and #optional_relative_specifier > 0 then
-          input_spec.relative_to = string.sub(optional_relative_specifier, 3)
+          input_spec.relative_to = get.string.string_by_sub(optional_relative_specifier, 3)
         end
       end
       return input_spec
@@ -8379,7 +8377,7 @@ transf = {
   n_shot_llm_spec = {
     n_shot_api_query_role_content_message_spec_arr = function(spec)
       return transf.role_content_message_spec_arr.api_role_content_message_spec_arr(
-        transf.arr_of_arrs.arr_by_flatten(
+        transf.arr_of_arrs.arr_by_flatten({
           {
             {
               role = "user",
@@ -8399,6 +8397,8 @@ transf = {
               content = spec.input
             }
           }
+        }
+          
         )
       )
     end,
@@ -8429,11 +8429,14 @@ transf = {
   },
   n_anys_or_err_ret_fn = {
     n_anys_or_nil_ret_fn_by_pcall = function(fn)
+      --- @generic T
+      --- @param ... `T`
+      --- @return T|nil
       return function(...)
         local rets = {pcall(fn, ...)}
         local succ = act.arr.shift(rets)
         if succ then
-          return table.unpack(rets)
+          return transf.arr.n_anys(rets)
         else
           return nil
         end
@@ -8447,7 +8450,7 @@ transf = {
         if rets[1] == nil then
           return error("Function returned nil.")
         else
-          return table.unpack(rets)
+          return transf.arr.n_anys(rets)
         end
       end
     end,
