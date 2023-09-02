@@ -174,10 +174,10 @@ get = {
         local key_length = #value_k
         local key_padding_length = keystop - (key_length + pre_padding_length)
         if type(value_v) == "table" and not (value_v.value or value_v.comment) then 
-          dothis.arr.push(lines, string.rep(" ", depth * 2) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " ")
+          dothis.arr.push(lines, get.string.string_by_repeated(" ", depth * 2) .. value_k .. ":" .. get.string.string_by_repeated(" ", key_padding_length) .. " ")
           lines = transf.two_arrs.arr_by_appended(lines, get.table.yaml_lines_aligned_with_predetermined_stops(value_v, keystop, valuestop, depth + 1))
         elseif type(value_v) == "table" and (value_v.value or value_v.comment) then 
-          local key_part = string.rep(" ", pre_padding_length) .. value_k .. ":" .. string.rep(" ", key_padding_length) .. " "
+          local key_part = get.string.string_by_repeated(" ", pre_padding_length) .. value_k .. ":" .. get.string.string_by_repeated(" ", key_padding_length) .. " "
           local value_length = 0
           local value_part = ""
           if value_v.value then
@@ -187,7 +187,7 @@ get = {
           local comment_part = ""
           if value_v.comment then
             local value_padding_length = valuestop - value_length
-            comment_part = string.rep(" ", value_padding_length) .. " # " .. value_v.comment
+            comment_part = get.string.string_by_repeated(" ", value_padding_length) .. " # " .. value_v.comment
           end
           dothis.arr.push(lines, key_part .. value_part .. comment_part)
         else
@@ -242,7 +242,7 @@ get = {
       visited = get.any.default_if_nil(visited, {})
       local arr_o_arrs = {}
       for k, v in transf.table.stateless_key_value_iter(t) do
-        local path = transf.arr_and_any.arr(path, k)
+        local path = transf.arr_or_nil_and_any.arr(path, k)
         if not is.any.table(v) or table_arg_bool_by_is_leaf_ret_fn(v) then -- this is inherently a leaf, or we've been told to treat it as one
           dothis.arr.push(
             arr_o_arrs, 
@@ -268,7 +268,7 @@ get = {
       visited = get.any.default_if_nil(visited, {})
       local arr_o_arrs = {}
       for k, v in transf.table.stateless_key_value_iter(t) do
-        local path = transf.arr_and_any.arr(path, k)
+        local path = transf.arr_or_nil_and_any.arr(path, k)
         dothis.arr.push(
           arr_o_arrs, 
           path
@@ -288,6 +288,41 @@ get = {
         end
       end
       return arr_o_arrs
+    end,
+    arr_or_nil_by_find_key_path = function(t, key_to_find, visited, path)
+      visited = get.any.default_if_nil(visited, {})
+      local key_path = nil
+      for k, v in pairs(t) do
+        local path = transf.arr_or_nil_and_any.arr(path, k)
+        if k == key_to_find then
+          key_path = path
+          break
+        end
+        if is.any.table(v) then -- if v is a table, recursively search it
+          if not get.arr.bool_by_contains(visited, v) then -- only if we've not seen this yet, to avoid infinite loops
+            visited = transf.two_arrs.arr_by_appended(visited, v)
+            key_path = get.table.arr_or_nil_by_find_key_path(v, key_to_find, visited, path)
+            if key_path then
+              break
+            end
+          end
+        end
+      end
+      return key_path
+    end,
+    any_by_key_path = function(t, key_path)
+      local current = t
+      for _, key in ipairs(key_path) do
+        current = current[key]
+      end
+      return current
+    end,
+    arr_or_nil_by_find_path_between_two_keys = function(t, start, stop)
+      local start_path = get.table.arr_or_nil_by_find_key_path(t, start)
+      local start_tbl = get.table.any_by_key_path(t, start_path)
+      if start_tbl then
+        return get.table.arr_or_nil_by_find_key_path(start_tbl, stop)
+      end
     end,
     string_by_joined_key_any_value_dict = function(t, table_arg_bool_by_is_leaf_ret_fn, joiner)
       return get.arr_of_arrs.string_by_joined_key_any_value_dict(
@@ -372,7 +407,7 @@ get = {
       dothis.arr.sort(vt_arr, fn)
       return vt_arr
     end,
-    
+    dot_notation_str_by_path_to_key = pltablex.search,    
   },
   
   dict = {
@@ -868,6 +903,7 @@ get = {
   },
   string = {
     string_by_formatted_w_n_anys = string.format,
+    string_by_repeated = get.string.string_by_repeated,
     string_arr_split_single_char = stringy.split,
     string_arr_split_single_char_noempty = function(str, sep)
       return transf.string_arr.noemtpy_string_arr(
@@ -2739,6 +2775,23 @@ get = {
     end,
   },
   thing_name_arr = {
+    bool_by_chained_and = function(arr, value)
+      local previous_thing_name = nil
+      for _, thing_name in transf.arr.index_value_stateless_iter(arr) do
+        if previous_thing_name then
+          local fn = rawget(rawget(is, previous_thing_name), thing_name)
+          if fn then
+            if not fn(value) then
+              return false
+            end
+          else
+            error("No such function: is." .. previous_thing_name .. "." .. thing_name)
+          end
+        end
+        previous_thing_name = thing_name
+      end
+      return true
+    end,
     chooser_text = function(arr, value)
       return get.retriever_specifier_arr.result_highest_precedence(
         transf.thing_name_arr.chooser_text_retriever_specifier_arr(arr),

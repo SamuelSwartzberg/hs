@@ -605,7 +605,7 @@ transf = {
   },
   hole_y_arrlike = {
     arr = function(tbl)
-      local new_tbl = transf.table.determined_arr_table({})
+      local new_tbl = {}
       for i = 1, #tbl do
         if tbl[i] ~= nil then
           new_tbl[#new_tbl + 1] = tbl[i]
@@ -2998,7 +2998,7 @@ transf = {
       return contact_table.Phone
     end,
     phone_number_arr = function (contact_table)
-      return transf.table.value_set(transf.contact_table.vcard_type_phone_number_dict(contact_table))
+      return transf.table.vt_set(transf.contact_table.vcard_type_phone_number_dict(contact_table))
     end,
     phone_number_string = function (contact_table)
       return get.string_or_number_arr.string_by_joined(transf.contact_table.phone_number_arr(contact_table), ", ")
@@ -3007,7 +3007,7 @@ transf = {
       return contact_table.Email
     end,
     email_arr = function (contact_table)
-      return transf.table.value_set(transf.contact_table.vcard_type_email_dict(contact_table))
+      return transf.table.vt_set(transf.contact_table.vcard_type_email_dict(contact_table))
     end,
     email_string = function (contact_table)
       return get.string_or_number_arr.string_by_joined(transf.contact_table.email_arr(contact_table), ", ")
@@ -3016,7 +3016,7 @@ transf = {
       return contact_table.Addresses
     end,
     address_table_arr = function (contact_table)
-      return transf.table.value_set(transf.contact_table.vcard_type_address_table_dict(contact_table))
+      return transf.table.vt_set(transf.contact_table.vcard_type_address_table_dict(contact_table))
     end,
     summary = function (contact_table)
       local sumstr = transf.contact_table.full_name_western(contact_table)
@@ -4277,24 +4277,12 @@ transf = {
     long_flag = function(word)
       return "--" .. word
     end,
-    determinant_metatable_creator_fn = function(word)
-      return function(tbl)
-        tbl = get.table.table_by_copy(tbl, true)
-        local metatbl = {
-            __index = {
-            }
-        }
-        metatbl.__index["is" .. word] = true
-        setmetatable(tbl, metatbl)
-        return tbl
-      end
-    end
   },
   syn_specifier = {
-    synoynms_arr = function (syn_specifier)
+    str_arr_by_synonyms = function (syn_specifier)
       return syn_specifier.synonyms
     end,
-    antonyms_arr = function (syn_specifier)
+    str_arr_by_antonyms = function (syn_specifier)
       return syn_specifier.antonyms
     end,
     synonyms_string = function (syn_specifier)
@@ -4735,6 +4723,12 @@ transf = {
       return res
     end,
   },
+  arr_or_nil_and_any = {
+    arr = function(arr, any)
+      if arr == nil then arr = {} end
+      return transf.arr_and_any.arr(arr, any)
+    end,
+  },
   arr_of_string_arrs = {
 
   },
@@ -4909,16 +4903,10 @@ transf = {
       dothis.absolute_path.delete(tmpdir_ics_path)
       return contents
     end,
-    value_set = function(t)
+    vt_set = function(t)
       return transf.arr.set(transf.table_or_nil.vt_arr(t))
     end,
-    determined_arr_table = function(t)
-      return transf.word.determinant_metatable_creator_fn("arr")(t)
-    end,
-    determined_assoc_table = function(t)
-      return transf.word.determinant_metatable_creator_fn("assoc")(t)
-    end,
-    json_string_pretty = function(t)
+    json_string_by_pretty = function(t)
       return hs.json.encode(t, true)
     end,
     arr_of_arrs_by_label_root_to_leaf_only_primitive_is_leaf = function(t)
@@ -4977,7 +4965,7 @@ transf = {
     end,
   },
   dict = {
-    length = function(t)
+    int_by_length = function(t)
       return #transf.table.pair_arr(t)
     end,
     url_param_arr = function(t)
@@ -5030,7 +5018,7 @@ transf = {
       )
     end,
     summary = function(t)
-      return "dict (" .. transf.dict.length(t) .. "): " .. transf.dict.contents_summary(t)
+      return "dict (" .. transf.dict.int_by_length(t) .. "): " .. transf.dict.contents_summary(t)
     end,
     dict_entry_multiline_string = function(t)
       return get.string_or_number_arr.string_by_joined(transf.dict.dict_entry_string_arr(t), "\n")
@@ -6832,7 +6820,7 @@ transf = {
     json_string = json.encode,
     json_string_pretty = function(t)
       if is.any.table(t) then
-        return transf.table.json_string_pretty(t)
+        return transf.table.json_string_by_pretty(t)
       else
         return transf.not_userdata_or_function.json_string(t)
       end

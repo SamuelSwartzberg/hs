@@ -1,25 +1,18 @@
 is = {
   string = {
-    potentially_phone_number = function(str)
-      if #str > 16 then return false end
-      local _, amount_of_digits = eutf8.gsub(str, "%d", "")
-      local _, amount_of_non_digits = eutf8.gsub(str, "%D", "")
-      local digit_non_digit_ratio = amount_of_digits / amount_of_non_digits
-      return digit_non_digit_ratio > 0.5
-    end,
+
+    -- old 
+
     path = function(str)
       return 
         is.string.line(str) and
         is.line.path(str)
     end,
+
+    -- simple conditions
+
     ascii_string = function(str)
       return get.string.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.ascii)
-    end,
-    alphanum_minus_underscore = function(str)
-      return is.string.ascii_string(str) and is.ascii_string.alphanum_minus_underscore(str)
-    end,
-    url = function(str)
-      return is.string.ascii_string(str) and is.printable_ascii_string.url(str)
     end,
     empty_string = function(str)
       return str == ""
@@ -33,11 +26,11 @@ is = {
     multiline_string = function(str)
       return not is.string.line(str)
     end,
-    nocomment_line = function(str)
-      return is.string.line(str) and is.line.nocomment_line(str)
+    whitespace_string = function(str)
+      return get.string.bool_by_matches_part_eutf8(str, "%s")
     end,
     nowhitespace_string = function(str)
-      return get.string.bool_by_not_matches_part_eutf8(str, "%s")
+      return not is.string.whitespace_string(str)
     end,
     starting_with_dot_string = function(str)
       return get.string.bool_by_startswith(str, ".")
@@ -45,32 +38,53 @@ is = {
     not_starting_with_dot_string = function(str)
       return not is.string.starting_with_dot_string(str)
     end,
+    starting_with_whitespace_string = function(str)
+      return get.string.bool_by_matches_part_eutf8(str, "^%s")
+    end,
+    not_starting_with_whitespace_string = function(str)
+      return not is.line.indent_line(str)
+    end,
+    ending_with_whitespace_string = function(str)
+      return get.string.bool_by_matches_part_eutf8(str, "%s$")
+    end,
+    not_ending_with_whitespace_string = function(str)
+      return not is.line.trailing_whitespace_line(str)
+    end,
+
+    -- combined conditions
+
   },
   line = {
+
+    -- simple conditions
+
+    indent_line = function(str)
+      return is.string.starting_with_whitespace_string(str)
+    end,
+    noindent_line = function(str)
+      return is.string.not_starting_with_whitespace_string(str)
+    end,
     comment_line = function(str)
       return get.string.bool_by_matches_part_eutf8(str, "^%s*#")
     end,
     nocomment_line = function(str)
       return not is.line.comment_line(str)
     end,
-    indent_line = function(str)
-      return get.string.bool_by_matches_part_eutf8(str, "^%s")
-    end,
-    noindent_line = function(str)
-      return not is.line.indent_line(str)
-    end,
     trailing_whitespace_line = function(str)
-      return get.string.bool_by_matches_part_eutf8(str, "%s$")
+      return is.string.ending_with_whitespace_string(str)
     end,
     notrailing_whitespace_line = function(str)
-      return not is.line.trailing_whitespace_line(str)
+      return is.string.not_ending_with_whitespace_string(str)
     end,
     noempty_line = function(str)
       return is.string.noempty_string(str)
     end,
-    empty_line = function(str)
-      return not is.line.noempty_line(str)
+    noweirdwhitespace_line = function(str)
+      return get.string.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
     end,
+
+    -- combined conditions
+
     noempty_nocomment_line = function(str)
       return is.line.noempty_line(str) and is.line.nocomment_line(str)
     end,
@@ -79,12 +93,6 @@ is = {
     end,
     trimmed_line = function(str)
       return is.line.noindent_line(str) and is.line.notrailing_whitespace_line(str)
-    end,
-    path = function(str)
-      return is.line.trimmed_noweirdwhitespace_line(str) and is.trimmed_noweirdwhitespace_line.path(str)
-    end,
-    noweirdwhitespace_line = function(str)
-      return get.string.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
     end,
     trimmed_noweirdwhitespace_line = function(str)
       return is.line.trimmed_line(str) and is.line.noweirdwhitespace_line(str)
@@ -1327,3 +1335,21 @@ is = {
     end,
   }
 }
+
+-- to allow for is.<type1>.<type2> where type2 is a descendant but not childtype of type1, we will use a metatable to search for the path from type1 to type2 by using thing_name_hierarchy, and then create a dynamic function that tests is.<type1>.<subtype> and is.<subtype>.<subtype2> and so on until we reach type2
+
+for type1, v in pairs(is) do
+  local mt = {
+    __index = function(t, type2)
+      local fn = rawget(t, type2)
+      if fn then return fn end
+      local path = get.table.arr_or_nil_by_find_path_between_two_keys(
+        thing_name_hierarchy,
+        type1,
+        type2
+      )
+      return get.thing_name_arr.bool_by_chained_and(path)
+    end
+  }
+  setmetatable(v, mt)
+end
