@@ -138,7 +138,7 @@ is = {
         transf.string.bool_by_evaled_env_bash_success,
         {},
         "is.printable_ascii_string.url")(
-        "url_parser_cli " .. transf.string.single_quoted_escaped(str)
+        "url_parser_cli " .. transf.string.string_by_single_quoted_escaped(str)
       )
     end,
     iban = function(str)
@@ -338,7 +338,7 @@ is = {
       return is.path.absolute_path(path) and is.absolute_path.extant_path(path)
     end,
     path_with_intra_file_locator = function(path)
-      return eutf8.find(transf.path.leaf(path), ":%d+$") ~= nil
+      return get.string.bool_by_matches_part_eutf8(transf.path.leaf(path), ":%d+$")
     end,
     useless_file_leaf_path = function(path)
       return get.arr.bool_by_contains(ls.useless_files, transf.path.leaf(path))
@@ -392,7 +392,7 @@ is = {
   },
   labelled_remote_absolute_path = {
     labelled_remote_extant_path = function(path)
-      return transf.string.bool_by_evaled_env_bash_success("rclone ls " .. transf.string.single_quoted_escaped(path))
+      return transf.string.bool_by_evaled_env_bash_success("rclone ls " .. transf.string.string_by_single_quoted_escaped(path))
     end,
   },
   remote_extant_path = {
@@ -405,7 +405,7 @@ is = {
   },
   labelled_remote_extant_path = {
     labelled_remote_dir = function(path)
-      return get.string.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key("rclone lsjson --stat" .. transf.string.single_quoted_escaped(path))
+      return get.string.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key("rclone lsjson --stat" .. transf.string.string_by_single_quoted_escaped(path))
     end,
     labelled_remote_file = function(path)
       return not is.labelled_remote_extant_path.labelled_remote_dir(path)
@@ -765,7 +765,7 @@ is = {
     timestamp_first_column_plaintext_table_file = function(path)
       local line = get.plaintext_file.nth_line(path, 1)
       if not line then return false end
-      local leading_number = eutf8.match(line, "^(%d+)%D")
+      local leading_number = get.string.n_strings_by_extracted_eutf8(line, "^(%d+)%D")
       if leading_number and #leading_number < 11 then -- a unix timestamp will only be larger than 10 digits starting at 2286-11-20, at which point this code will need to be updated
         return true
       else
@@ -885,10 +885,10 @@ is = {
       return is.path.extension_path(transf.path_url.path(url))
     end,
     danbooru_style_post_url = function(url)
-      return eutf8.find(transf.path_url.path(url), "^/posts/%d+/?$") ~= nil
+      return get.string.bool_by_matches_whole_eutf8(transf.path_url.path(url), "/posts/%d+/?")
     end,
     yandere_style_post_url = function(url)
-      return eutf8.find(transf.path_url.path(url), "^/post/show/%d+/?$") ~= nil
+      return get.string.bool_by_matches_whole_eutf8(transf.path_url.path(url), "/post/show/%d+/?")
     end,
   },
   query_url = {

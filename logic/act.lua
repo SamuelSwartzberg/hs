@@ -40,7 +40,7 @@ act = {
 
     delete_event = function(event_search_specifier)
       local command = 
-        "echo $'D\ny\n' | khal edit " .. get.khal.basic_command_parts(event_search_specifier.include, event_search_specifier.exclude) .. transf.string.single_quoted_escaped(event_search_specifier.searchstr)
+        "echo $'D\ny\n' | khal edit " .. get.khal.basic_command_parts(event_search_specifier.include, event_search_specifier.exclude) .. transf.string.string_by_single_quoted_escaped(event_search_specifier.searchstr)
       dothis.string.env_bash_eval(command)
     end,
   },
@@ -77,10 +77,10 @@ act = {
       local name = transf.url.string_by_webcal_name(spec.remote_storage_url)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
         "vdirsyncer discover" ..
-        transf.string.single_quoted_escaped(name),
+        transf.string.string_by_single_quoted_escaped(name),
         get.fn.first_n_args_bound_fn(
           dothis.string.env_bash_eval_async,
-          "vdirsyncer sync" .. transf.string.single_quoted_escaped(name)
+          "vdirsyncer sync" .. transf.string.string_by_single_quoted_escaped(name)
         )
       )
       dothis.in_git_dir.commit_self(
@@ -120,7 +120,7 @@ act = {
     end,
     generate_json_file = function(path)
       return dothis.string.env_bash_eval_async(
-        "ical2json" .. transf.string.single_quoted_escaped(path)
+        "ical2json" .. transf.string.string_by_single_quoted_escaped(path)
       )
     end,
   },

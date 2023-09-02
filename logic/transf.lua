@@ -64,7 +64,7 @@ transf = {
     unicode_prop_table = function(codepoint)
       return get.fn.rt_or_nil_by_memoized(transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
-        .. transf.string.single_quoted_escaped(
+        .. transf.string.string_by_single_quoted_escaped(
           codepoint
         )
       )[1]
@@ -74,7 +74,7 @@ transf = {
     unicode_prop_table = function(str)
       return get.fn.rt_or_nil_by_memoized(transf.string.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
-        .. transf.string.single_quoted_escaped(
+        .. transf.string.string_by_single_quoted_escaped(
           str
         )
       )[1]
@@ -483,7 +483,7 @@ transf = {
     unicode_prop_table_arr_from_unicode_codepoint_arr = function(arr)
       return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
-        .. transf.string.single_quoted_escaped(
+        .. transf.string.string_by_single_quoted_escaped(
           get.string_or_number_arr.string_by_joined(
             transf.pos_int.unicode_codepoint_string_arr(arr),
             " "
@@ -500,7 +500,7 @@ transf = {
     unicode_prop_table_arr_from_utf8_arr = function(arr)
       return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
-        .. transf.string.single_quoted_escaped(
+        .. transf.string.string_by_single_quoted_escaped(
           get.string_or_number_arr.string_by_joined(
             transf.pos_int.indicated_utf8_hex_string_arr(arr),
             " "
@@ -628,7 +628,7 @@ transf = {
   },
   char = {
     unicode_prop_table = function(char)
-      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(char))[1]
+      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.string.string_by_single_quoted_escaped(char))[1]
     end
   },
   ascii_char = {
@@ -701,7 +701,7 @@ transf = {
       elseif get.string.bool_by_not_contains_w_ascii_string(leaf, ".") then
         without_extension = leaf
       else -- in case of multiple dots, everything after the last dot is considered the extension
-        without_extension, extension = eutf8.match(leaf, transf.string.string_by_whole_regex(r.lua.without_extension_and_extension))
+        without_extension, extension = get.string.n_strings_by_extracted_eutf8(leaf, transf.string.string_by_whole_regex(r.lua.without_extension_and_extension))
       end
       dothis.arr.push(path_components, without_extension)
       dothis.arr.push(path_components, extension)
@@ -1095,7 +1095,7 @@ transf = {
   },
   labelled_remote_dir = {
     children_absolute_path_arr = function(remote_extant_path)
-      local output = transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone lsf" .. transf.string.single_quoted_escaped(remote_extant_path))
+      local output = transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone lsf" .. transf.string.string_by_single_quoted_escaped(remote_extant_path))
       if output then
         items = transf.string.noempty_line_string_arr(output)
         items = transf.string_arr.stripped_string_arr(items)
@@ -1154,7 +1154,7 @@ transf = {
   },
   labelled_remote_file = {
     string_by_contents = function(path)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone cat" .. transf.string.single_quoted_escaped(path))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone cat" .. transf.string.string_by_single_quoted_escaped(path))
     end,
   },
   remote_file = {
@@ -1257,10 +1257,10 @@ transf = {
       )
     end,
     string_by_ls = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("ls -F -1" .. transf.string.single_quoted_escaped(path))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("ls -F -1" .. transf.string.string_by_single_quoted_escaped(path))
     end,
     string_by_tree = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("tree -F --noreport" .. transf.string.single_quoted_escaped(path))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("tree -F --noreport" .. transf.string.string_by_single_quoted_escaped(path))
     end,
     path_leaf_specifier_arr_by_children = function(path)
       return transf.path_arr.path_leaf_specifier_arr(
@@ -1602,7 +1602,7 @@ transf = {
   },
   local_image_file = {
     qr_data = function(path)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("zbarimg -q --raw " .. transf.string.single_quoted_escaped(path))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("zbarimg -q --raw " .. transf.string.string_by_single_quoted_escaped(path))
     end,
     hs_image = function(path)
       return get.fn.rt_or_nil_by_memoized_invalidate_1_week(hs.image.imageFromPath, "hs.image.imageFromPath")(path)
@@ -1610,7 +1610,7 @@ transf = {
     booru_post_url = function(path)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "saucenao --file" ..
-        transf.string.single_quoted_escaped(path)
+        transf.string.string_by_single_quoted_escaped(path)
         .. "--output-properties booru-url"
       )
     end,
@@ -1622,12 +1622,12 @@ transf = {
   email_file = {
     all_headers_raw = function(path)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "mshow -L" .. transf.string.single_quoted_escaped(path)
+        "mshow -L" .. transf.string.string_by_single_quoted_escaped(path)
       )
     end,
     all_useful_headers_raw = function(path)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "mshow -q" .. transf.string.single_quoted_escaped(path)
+        "mshow -q" .. transf.string.string_by_single_quoted_escaped(path)
       )
     end,
     useful_header_assoc = function(path)
@@ -1636,7 +1636,7 @@ transf = {
     end,
     rendered_body = function(path)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "mshow -R" .. transf.string.single_quoted_escaped(path)
+        "mshow -R" .. transf.string.string_by_single_quoted_escaped(path)
       )
     end,
     simple_view = function(path)
@@ -1667,14 +1667,14 @@ transf = {
     end,
     mime_parts_raw = function(path)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "mshow -t" .. transf.string.single_quoted_escaped(path)
+        "mshow -t" .. transf.string.string_by_single_quoted_escaped(path)
       )
     end,
     attachments = function(path)
       return transf.mime_parts_raw.attachments(transf.email_file.mime_parts_raw(path))
     end,
     summary = function(path)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.string.single_quoted_escaped(path))
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.string.string_by_single_quoted_escaped(path))
     end,
     email_file_summary_key_value = function(path)
       return path, transf.email_file.summary(path)
@@ -1719,7 +1719,7 @@ transf = {
       local evaled_mail = get.string.string_by_evaled_as_template(mail)
       local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
       local outpath = temppath .. "_out"
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("mmime < " .. transf.string.single_quoted_escaped(temppath) .. " > " .. transf.string.single_quoted_escaped(outpath))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("mmime < " .. transf.string.string_by_single_quoted_escaped(temppath) .. " > " .. transf.string.string_by_single_quoted_escaped(outpath))
       dothis.absolute_path.delete(temppath)
       return outpath
     end
@@ -1739,7 +1739,7 @@ transf = {
   bib_file = {
     arr_of_csl_tables = function(path)
       return transf.string.table_or_err_by_evaled_env_bash_parsed_json({
-        "citation-js --input" .. transf.string.single_quoted_escaped(path) ..
+        "citation-js --input" .. transf.string.string_by_single_quoted_escaped(path) ..
         "--output-language json"
       })
     end,
@@ -1823,7 +1823,7 @@ transf = {
         return {
           value = value,
           dependencies = get.stateless_iter.table(
-            eutf8.gmatch(value, "%$([A-Z0-9_]+)")), {tolist=true, ret="v"}
+            get.string.n_string_stateful_iter_by_extracted_eutf8(value, "%$([A-Z0-9_]+)")), {tolist=true, ret="v"}
         }
       end)
     end,
@@ -1901,10 +1901,10 @@ transf = {
       return transf.string.nocomment_noindent_content_lines(transf.plaintext_file.string_by_contents(path))
     end,
     first_line = function(path)
-      return transf.string.first_line(transf.plaintext_file.string_by_contents(path))
+      return transf.string.line_by_first(transf.plaintext_file.string_by_contents(path))
     end,
     last_line = function(path)
-      return transf.string.last_line(transf.plaintext_file.string_by_contents(path))
+      return transf.string.line_by_last(transf.plaintext_file.string_by_contents(path))
     end,
     byte_char_arr = function(path)
       return transf.string.byte_char_arr(transf.plaintext_file.string_by_contents(path))
@@ -1913,13 +1913,13 @@ transf = {
       return transf.string.utf8_char_arr(transf.plaintext_file.string_by_contents(path))
     end,
     no_final_newlines = function(path)
-      return transf.string.no_final_newlines(transf.plaintext_file.string_by_contents(path))
+      return transf.string.string_by_no_final_newlines(transf.plaintext_file.string_by_contents(path))
     end,
     one_final_newline = function(path)
-      return transf.string.one_final_newline(transf.plaintext_file.string_by_contents(path))
+      return transf.string.string_by_one_final_newline(transf.plaintext_file.string_by_contents(path))
     end,
     len_lines = function(path)
-      return transf.string.len_lines(transf.plaintext_file.string_by_contents(path))
+      return transf.string.pos_int_by_len_lines(transf.plaintext_file.string_by_contents(path))
     end,
     pos_int_by_len_utf8_chars = function(path)
       return transf.string.pos_int_by_len_utf8_chars(transf.plaintext_file.string_by_contents(path))
@@ -2035,7 +2035,7 @@ transf = {
   },
   dice_notation = {
     nonindicated_decimal_number_string_result = function(dice_notation)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("roll" .. transf.string.single_quoted_escaped(dice_notation))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("roll" .. transf.string.string_by_single_quoted_escaped(dice_notation))
     end,
     int_result = function(dice_notation)
       return transf.nonindicated_number_string.number_base_10(
@@ -2752,7 +2752,7 @@ transf = {
   },
   iban = {
     cleaned_iban = function(iban)
-      return select(1, eutf8.gsub(iban, "[ %-_]", ""))
+      return select(1, get.string.string_and_int_by_replaced_eutf8_w_regex_string(iban, "[ %-_]", ""))
     end,
     bic = function(iban)
       return transf.cleaned_iban.bic(transf.iban.cleaned_iban(iban))
@@ -3346,13 +3346,63 @@ transf = {
     end,
   },
   string = {
+    raw_syn_output = function(str)
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.string.string_by_single_quoted_escaped(str) )
+    end,
+    term_syn_specifier_assoc = function(str)
+      local synonym_parts = get.string.string_arr_split(transf.string.raw_syn_output(str), "\n\n")
+      local synonym_tables = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
+        synonym_parts,
+        function (synonym_part)
+          local synonym_part_lines = stringy.split(synonym_part, "\n")
+          local synonym_term = get.string.string_by_sub_eutf8(synonym_part_lines[1], 2) -- syntax: ❯<term>
+          local synonyms_raw = get.string.string_by_sub_eutf8(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
+          local antonyms_raw = get.string.string_by_sub_eutf8(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
+          local synonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stringy.split(synonyms_raw, ", "), stringy.strip)
+          local antonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stringy.split(antonyms_raw, ", "), stringy.strip)
+          return synonym_term, {
+            synonyms = synonyms,
+            antonyms = antonyms,
+          }
+        end
+      )
+      return synonym_tables
+    end,
+    raw_av_output = function (str)
+      get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
+        "synonym" .. transf.string.string_by_single_quoted_escaped(str)
+      )
+    end,
+    title_case_policy = function(word)
+      if get.arr.bool_by_contains(ls.small_words, word) then
+        return word
+      elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
+        return word
+      else
+        return transf.string.string_by_first_eutf8_upper(word)
+      end
+    end,
+    long_flag = function(word)
+      return "--" .. word
+    end,
+    synonym_string_arr = function(str)
+      local items = stringy.split(transf.string.raw_av_output(str), "\t")
+      items = get.arr.arr_by_filtered(items, function(itm)
+        if itm == nil then
+          return false
+        end
+        itm = stringy.strip(itm)
+        return #itm > 0
+      end)
+      return items
+    end,
     consonants = function(str)
       error("todo")
     end,
     string_by_env_getter_comamnds_prepended = function(str)
       return get.string.string_by_formatted_w_n_anys(
         "base64 -d <<< '%s' | /opt/homebrew/bin/bash -s",
-        transf.string.base64_gen_string(
+        transf.string.base64_gen_string_by_utf8(
           "cd && source \"$HOME/.target/envfile\" && " ..  str
         )
       )
@@ -3497,13 +3547,13 @@ transf = {
       return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.string.safe_filename(data)
     end,
     qr_utf8_image_bow = function(data)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.string.single_quoted_escaped(data))
+      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.string.string_by_single_quoted_escaped(data))
     end,
     qr_utf8_image_wob = function(data)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_err_by_evaled_env_bash, {
         stringify_table_params = true,
         table_param_subset = "json"
-      })("qrencode -l M -m 2 -t UTF8i " .. transf.string.single_quoted_escaped(data))
+      })("qrencode -l M -m 2 -t UTF8i " .. transf.string.string_by_single_quoted_escaped(data))
     end,
     qr_png_in_cache = function(data)
       local path = transf.string.in_cache_dir(data, "qr")
@@ -3513,16 +3563,16 @@ transf = {
     --- does the minimum to make a string safe for use as a filename, but doesn't impose any policy
     safe_filename = function(filename)
       -- Replace forward slash ("/") with underscore
-      filename = eutf8.gsub(filename, "/", "_")
+      filename = get.string.string_and_int_by_replaced_eutf8_w_regex_string(filename, "/", "_")
 
       -- Replace control characters (ASCII values 0 - 31 and 127)
       for i = 0, 31 do
-        filename = eutf8.gsub(filename, transf.eight_bit_pos_int.ascii_char(i), "_")
+        filename = get.string.string_and_int_by_replaced_eutf8_w_regex_string(filename, transf.eight_bit_pos_int.ascii_char(i), "_")
       end
-      filename = eutf8.gsub(filename, transf.eight_bit_pos_int.ascii_char(127), "_")
+      filename = get.string.string_and_int_by_replaced_eutf8_w_regex_string(filename, transf.eight_bit_pos_int.ascii_char(127), "_")
 
       -- Replace sequences of whitespace characters with a single underscore
-      filename = eutf8.gsub(filename, "%s+", "_")
+      filename = get.string.string_and_int_by_replaced_eutf8_w_regex_string(filename, "%s+", "_")
 
       if filename == "." then
         filename = "_"
@@ -3544,10 +3594,10 @@ transf = {
       return get.string.string_by_no_adfix(multi_cleaned_alphanum_underscore, "_")
     end,
     lower_alphanum_underscore = function(str)
-      return eutf8.lower(transf.string.alphanum_underscore(str))
+      return transf.string.string_by_all_eutf8_lower(transf.string.alphanum_underscore(str))
     end,
     upper_alphanum_underscore = function(str)
-      return eutf8.upper(transf.string.alphanum_underscore(str))
+      return transf.string.string_by_all_eutf8_upper(transf.string.alphanum_underscore(str))
     end,
     alphanum_array = function(str) -- word separation is notoriously tricky. For now, we'll just use the same logic as in the snake_case function
       return stringy.split(transf.string.alphanum_underscore(str), "_")
@@ -3558,7 +3608,7 @@ transf = {
       return get.string_or_number_arr.string_by_joined(upper_parts, "_")
     end,
     lower_camel_snake_case = function(str)
-      return eutf8.lower(transf.string.upper_camel_snake_case(str))
+      return transf.string.string_by_all_eutf8_lower(transf.string.upper_camel_snake_case(str))
     end,
     upper_camel_case = function(str)
       local parts = transf.string.alphanum_array(str)
@@ -3566,7 +3616,7 @@ transf = {
       return get.string_or_number_arr.string_by_joined(upper_parts, "")
     end,
     lower_camel_case = function(str)
-      return eutf8.lower(transf.string.upper_camel_case(str))
+      return transf.string.string_by_all_eutf8_lower(transf.string.upper_camel_case(str))
     end,
     kebap_case = function(str)
       local naive_kebap_case = get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[^%w%d]+", "-")
@@ -3574,18 +3624,18 @@ transf = {
       return get.string.string_by_no_adfix(multi_cleaned_kebap_case, "-")
     end,
     lower_kebap_case = function(str)
-      return eutf8.lower(transf.string.kebap_case(str))
+      return transf.string.string_by_all_eutf8_lower(transf.string.kebap_case(str))
     end,
     upper_kebap_case = function(str)
-      return eutf8.upper(transf.string.kebap_case(str))
+      return transf.string.string_by_all_eutf8_upper(transf.string.kebap_case(str))
     end,
     string_by_all_eutf8_lower = eutf8.lower,
     string_by_all_eutf8_upper = eutf8.upper,
     string_by_first_eutf8_upper = function(str)
-      return eutf8.upper(get.string.string_by_sub_eutf8(str, 1, 1)) .. get.string.string_by_sub_eutf8(str, 2)
+      return transf.string.string_by_all_eutf8_upper(get.string.string_by_sub_eutf8(str, 1, 1)) .. get.string.string_by_sub_eutf8(str, 2)
     end,
     string_by_first_eutf8_lower = function(str)
-      return eutf8.lower(get.string.string_by_sub_eutf8(str, 1, 1)) .. get.string.string_by_sub_eutf8(str, 2)
+      return transf.string.string_by_all_eutf8_lower(get.string.string_by_sub_eutf8(str, 1, 1)) .. get.string.string_by_sub_eutf8(str, 2)
     end,
     alphanum = function(str)
       return get.string.string_by_removed_eutf8_w_regex_quantifiable(str, "[^%w%d]")
@@ -3600,36 +3650,36 @@ transf = {
     string_by_percent_decoded_also_plus = plurl.unquote,
     string_by_percent_decoded_no_plus = function(str)
       return transf.string.string_by_percent_decoded_also_plus(
-        eutf8.gsub(str, "%+", "%%2B") -- encode plus sign as %2B, so that it then gets decoded as a plus sign
+        get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, "%+", "%%2B") -- encode plus sign as %2B, so that it then gets decoded as a plus sign
       )
     end,
     escaped_csv_field = function(field)
-      local escaped = eutf8.gsub(field, '"', '""')
+      local escaped = get.string.string_and_int_by_replaced_eutf8_w_regex_string(field, '"', '""')
       return '"' .. escaped  .. '"'
     end,
     unicode_prop_table_arr = function(str)
-      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.string.single_quoted_escaped(str))
+      return get.fn.rt_or_nil_by_memoized(transf.string.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.string.string_by_single_quoted_escaped(str))
     end,
     unicode_prop_table_item_arr = function(str)
       return transf.unicode_prop_table_arr.unicode_prop_table_item_arr(
         transf.string.unicode_prop_table_arr(str)
       )
     end,
-    single_quoted_escaped = function(str)
-      return " '" .. eutf8.gsub(str, "'", "\\'") .. "'"
+    string_by_single_quoted_escaped = function(str)
+      return " '" .. get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, "'", "\\'") .. "'"
     end,
-    double_quoted_escaped = function(str)
-      return ' "' .. eutf8.gsub(str, '"', '\\"') .. '"'
+    string_by_double_quoted_escaped = function(str)
+      return ' "' .. get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, '"', '\\"') .. '"'
     end,
     string_by_envsubsted = function(str)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("echo " .. transf.string.single_quoted_escaped(str) .. " | envsubst")
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("echo " .. transf.string.string_by_single_quoted_escaped(str) .. " | envsubst")
     end,
-    binary_string = basexx.to_bit,
-    hex_string = basexx.to_hex,
-    base64_gen_string = basexx.to_base64,
-    base64_url_string = basexx.to_url64,
-    base32_gen_string = basexx.to_base32,
-    base32_crock_string = basexx.to_crockford,
+    nonindicated_binary_number_string_by_utf8 = basexx.to_bit,
+    nonindicated_hex_number_string_by_utf8 = basexx.to_hex,
+    base64_gen_string_by_utf8 = basexx.to_base64,
+    base64_url_string_by_utf8 = basexx.to_url64,
+    base32_gen_string_by_utf8 = basexx.to_base32,
+    base32_crock_string_by_utf8 = basexx.to_crockford,
     string_by_html_entities_encoded = function(str)
       return transf.string.string_or_err_by_evaled_env_bash_stripped(
         "he --encode --use-named-refs" .. transf.string.here_string(str)
@@ -3641,7 +3691,7 @@ transf = {
       )
     end,
     two_strings_by_split_header = function(str)
-      local k, v = eutf8.match(str, "^([^:]+):%s*(.+)$")
+      local k, v = get.string.n_strings_by_extracted_eutf8(str, "^([^:]+):%s*(.+)$")
       return transf.string.string_by_initial_lower(k), v
     end,
     two_string_or_nils_by_split_envlike = function(str)
@@ -3650,9 +3700,9 @@ transf = {
     two_string_or_nils_by_split_ini = function(str)
       return get.string.two_strings_split_or_nil(str, " = ")
     end,
-    title_case = function(str)
+    string_by_title_case = function(str)
       local words, removed = get.string.two_string_arrs_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
-      local title_cased_words = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(words, transf.word.title_case_policy)
+      local title_cased_words = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(words, transf.string.title_case_policy)
       title_cased_words[1] = transf.string.string_by_first_eutf8_upper(title_cased_words[1])
       title_cased_words[#title_cased_words] = transf.string.string_by_first_eutf8_upper(title_cased_words[#title_cased_words])
       local arr = transf.two_arrs.arr_by_interleaved_stop_a1(title_cased_words, removed)
@@ -3660,9 +3710,9 @@ transf = {
     end, 
     romanized_deterministic = function(str)
       local raw_romanized = transf.string.string_or_nil_by_evaled_env_bash_stripped(
-         "echo -n" .. transf.string.single_quoted_escaped(str) .. "| kakasi -iutf8 -outf8 -ka -Ea -Ka -Ha -Ja -s -ga" 
+         "echo -n" .. transf.string.string_by_single_quoted_escaped(str) .. "| kakasi -iutf8 -outf8 -ka -Ea -Ka -Ha -Ja -s -ga" 
       )
-      local is_ok, romanized = pcall(eutf8.gsub, raw_romanized, "(%w)%^", "%1%1")
+      local is_ok, romanized = pcall(get.string.string_and_int_by_replaced_eutf8_w_regex_string, raw_romanized, "(%w)%^", "%1%1")
       if not is_ok then
         return str -- if there's an error, just return the original string
       end
@@ -3672,9 +3722,9 @@ transf = {
       return romanized
     end,
     lower_alphanum_underscore_string_by_romanized = function(str)
-      str = eutf8.gsub(str, "[%^']", "")
+      str = get.string.string_by_removed_eutf8_w_regex_quantifiable(str, "[%^']")
       str = transf.string.romanized_deterministic(str)
-      str = eutf8.lower(str)
+      str = transf.string.string_by_all_eutf8_lower(str)
       str = transf.string.alphanum_underscore(str)
       return str
     end,
@@ -3702,24 +3752,20 @@ transf = {
       return t
     end,
 
-    pos_int_by_len_byte_chars = function(str)
-      return #transf.string.byte_char_arr(str)
-    end,
+    pos_int_by_len_byte_chars = string.len,
 
 
     --- @param str string
     --- @return string[]
     utf8_char_arr = function(str)
       local t = {}
-      for i = 1, eutf8.len(str) do
+      for i = 1, transf.string.pos_int_by_len_utf8_chars(str) do
         t[i] = get.string.string_by_sub_eutf8(str, i, i)
       end
       return t
     end,
 
-    pos_int_by_len_utf8_chars = function(str)
-      return #transf.string.utf8_char_arr(str)
-    end,
+    pos_int_by_len_utf8_chars = eutf8.len,
 
     --- @param str string
     --- @return string[]
@@ -3730,7 +3776,7 @@ transf = {
       )
     end,
 
-    len_lines = function(str)
+    pos_int_by_len_lines = function(str)
       return #transf.string.line_arr(str)
     end,
 
@@ -3747,31 +3793,31 @@ transf = {
       return transf.string_arr.nocomment_noindent_string_arr(transf.string.noempty_line_string_arr(str))
     end,
 
-    first_line = function(str)
+    line_by_first = function(str)
       return transf.string.line_arr(str)[1]
     end,
-    first_content_line = function(str)
+    noempty_line_by_first = function(str)
       return transf.string.noempty_line_string_arr(str)[1]
     end,
-    last_line = function(str)
+    line_by_last = function(str)
       local lines = transf.string.line_arr(str)
       return lines[#lines]
     end,
-    last_content_line = function(str)
+    noempty_line_by_last = function(str)
       local lines = transf.string.noempty_line_string_arr(str)
       return lines[#lines]
     end,
-    first_char = function(str)
+    char_by_first = function(str)
       return get.string.string_by_sub_eutf8(str, 1, 1)
     end,
-    last_char = function(str)
+    char_by_last = function(str)
       return get.string.string_by_sub_eutf8(str, -1)
     end,
-    no_final_newlines = function(str)
-      return eutf8.gsub(str, "\n+$", "")
+    string_by_no_final_newlines = function(str)
+      return get.string.string_by_final_removed_eutf8_w_regex_quantifiable(str, "\n")
     end,
-    one_final_newline = function(str)
-      return eutf8.gsub(str, "\n+$", "\n")
+    string_by_one_final_newline = function(str)
+      return get.string.string_by_final_continuous_collapsed_eutf8_w_regex_quantifiable(str, "\n")
     end,
     here_string = function(str)
       return " <<EOF\n" .. str .. "\nEOF"
@@ -3809,19 +3855,19 @@ transf = {
       return transf.string.string_or_nil_by_evaled_env_bash_stripped("kana --vowel-shortener x " .. argstr .. "| tr -d ' '")
     end,
     hiragana_only = function(str)
-      return transf.string.kana_inner(transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner(transf.string.string_by_single_quoted_escaped(str))
     end,
     katakana_only = function(str)
-      return transf.string.kana_inner("--katakana --extended" .. transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner("--katakana --extended" .. transf.string.string_by_single_quoted_escaped(str))
     end,
     hiragana_punct = function(str)
-      return transf.string.kana_inner_nospaces("--punctuation" .. transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner_nospaces("--punctuation" .. transf.string.string_by_single_quoted_escaped(str))
     end,
     katakana_punct = function(str)
-      return transf.string.kana_inner_nospaces("--katakana --extended --punctuation" .. transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner_nospaces("--katakana --extended --punctuation" .. transf.string.string_by_single_quoted_escaped(str))
     end,
     kana_mixed = function(str)
-      return transf.string.kana_inner("--extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.string.single_quoted_escaped(str))
+      return transf.string.kana_inner("--extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.string.string_by_single_quoted_escaped(str))
     end,
     japanese_writing = function(str)
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_string({input = str, query =  "You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:"})
@@ -3900,14 +3946,14 @@ transf = {
     end,
     nonindicated_number_string = function(str)
       local res = str
-      res = eutf8.gsub(res, ",", ".")
-      res = eutf8.gsub(str, "^[0-9a-zA-Z]+", "")
+      res = get.string.string_and_int_by_replaced_eutf8_w_regex_string(res, ",", ".")
+      res = get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, "^[0-9a-zA-Z]+", "")
       return res
     end
   },
   line = {
     noindent_line = function(str)
-      return eutf8.match(str, "^%s*(.*)$")
+      return get.string.n_strings_by_extracted_eutf8(str, "^%s*(.*)$")
     end,
     nocomment_line = function(str)
       return get.string.string_arr_split(str, " # ")[1]
@@ -4224,70 +4270,12 @@ transf = {
       )
     end,
   },
-  word = {
-    title_case_policy = function(word)
-      if get.arr.bool_by_contains(ls.small_words, word) then
-        return word
-      elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
-        return word
-      else
-        return transf.string.string_by_first_eutf8_upper(word)
-      end
-    end,
-    raw_syn_output = function(str)
-      return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.string.single_quoted_escaped(str) )
-    end,
-    term_syn_specifier_assoc = function(str)
-      local synonym_parts = get.string.string_arr_split(transf.word.raw_syn_output(str), "\n\n")
-      local synonym_tables = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        synonym_parts,
-        function (synonym_part)
-          local synonym_part_lines = stringy.split(synonym_part, "\n")
-          local synonym_term = get.string.string_by_sub_eutf8(synonym_part_lines[1], 2) -- syntax: ❯<term>
-          local synonyms_raw = get.string.string_by_sub_eutf8(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
-          local antonyms_raw = get.string.string_by_sub_eutf8(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
-          local synonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stringy.split(synonyms_raw, ", "), stringy.strip)
-          local antonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stringy.split(antonyms_raw, ", "), stringy.strip)
-          return synonym_term, {
-            synonyms = synonyms,
-            antonyms = antonyms,
-          }
-        end
-      )
-      return synonym_tables
-    end,
-    raw_av_output = function (str)
-      get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "synonym" .. transf.string.single_quoted_escaped(str)
-      )
-    end,
-    synonym_string_arr = function(str)
-      local items = stringy.split(transf.word.raw_av_output(str), "\t")
-      items = get.arr.arr_by_filtered(items, function(itm)
-        if itm == nil then
-          return false
-        end
-        itm = stringy.strip(itm)
-        return #itm > 0
-      end)
-      return items
-    end,
-    long_flag = function(word)
-      return "--" .. word
-    end,
-  },
   syn_specifier = {
     str_arr_by_synonyms = function (syn_specifier)
       return syn_specifier.synonyms
     end,
     str_arr_by_antonyms = function (syn_specifier)
       return syn_specifier.antonyms
-    end,
-    synonyms_string = function (syn_specifier)
-      return get.string_or_number_arr.string_by_joined(syn_specifier.synonyms, ", ")
-    end,
-    antonyms_string = function (syn_specifier)
-      return get.string_or_number_arr.string_by_joined(syn_specifier.antonyms, ", ")
     end,
     summary = function (syn_specifier)
       return 
@@ -4309,39 +4297,72 @@ transf = {
       return pair[2]
     end,
     header = function(pair)
-      return transf.key_value.header(pair[1], pair[2])
+      return transf.two_anys.header(pair[1], pair[2])
     end,
     email_header = function(pair)
-      return transf.key_value.email_header(pair[1], pair[2])
+      return transf.two_anys.email_header(pair[1], pair[2])
     end,
     url_param = function(pair)
-      return transf.key_value.url_param(pair[1], pair[2])
+      return transf.two_anys.url_param(pair[1], pair[2])
     end,
     ini_line = function(pair)
-      return transf.key_value.ini_line(pair[1], pair[2])
+      return transf.two_anys.ini_line(pair[1], pair[2])
     end,
     envlike_line = function(pair)
-      return transf.key_value.envlike_line(pair[1], pair[2])
+      return transf.two_anys.envlike_line(pair[1], pair[2])
     end,
     curl_form_field_args = function(pair)
-      return transf.key_value.curl_form_field_args(pair[1], pair[2])
+      return transf.two_anys.curl_form_field_args(pair[1], pair[2])
     end,
     assoc_entry_string = function(pair)
-      return transf.key_value.assoc_entry_string(pair[1], pair[2])
+      return transf.two_anys.assoc_entry_string(pair[1], pair[2])
     end,
     larger = function(pair)
       return transf.two_comparables.comparable_by_larger(pair[1], pair[2])
     end,
   },
   two_anys = {
-    bool_and = function(a, b)
+    bool_by_and = function(a, b)
       return a and b
     end,
-    bool_or = function(a, b)
+    bool_by_or = function(a, b)
       return a or b
     end,
     string_two_anys = function(a, b)
       return transf.any.string(a), transf.any.string(b)
+    end,
+    pair = function(key, value)
+      return {key, value}
+    end,
+    key = function(key, value)
+      return key
+    end,
+    value = function(key, value)
+      return value
+    end,
+    header = function(k, v)
+      return transf.string.string_by_first_eutf8_upper(transf.any.string(k)) .. ": " .. transf.any.string(v)
+    end,
+    email_header = function(key, value)
+      return transf.string.string_by_first_eutf8_upper(transf.any.string(key)) .. ": " .. get.string.string_by_evaled_as_template(transf.any.string(value))
+    end,
+    url_param = function(key, value)
+      return transf.any.string(key) .. "=" .. transf.string.encoded_query_param_value(transf.any.string(value))
+    end,
+    ini_line = function(key, value)
+      return transf.any.string(key) .. " = " .. transf.any.string(value)
+    end,
+    envlike_line = function(key, value)
+      return transf.any.string(key) .. "=" .. transf.any.string(value)
+    end,
+    curl_form_field_args = function(key, value)
+      return {
+        "-F",
+        transf.any.string(key) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.string(value)),
+      }
+    end,
+    assoc_entry_string = function(key, value)
+      return "[" .. transf.any.string(key) .. "] = " .. transf.any.string(value)
     end,
   },
   two_comparables = {
@@ -4386,44 +4407,6 @@ transf = {
       end
     end,
   },
-  -- TODO: many things in key_value should be in two_anys, since key_value is a special case of two_anys where they are semantically keys and values of a table
-  key_value = {
-    pair = function(key, value)
-      return {key, value}
-    end,
-    key = function(key, value)
-      return key
-    end,
-    value = function(key, value)
-      return value
-    end,
-    header = function(k, v)
-      return transf.string.string_by_first_eutf8_upper(transf.any.string(k)) .. ": " .. transf.any.string(v)
-    end,
-    email_header = function(key, value)
-      return transf.string.string_by_first_eutf8_upper(transf.any.string(key)) .. ": " .. get.string.string_by_evaled_as_template(transf.any.string(value))
-    end,
-    url_param = function(key, value)
-      return transf.any.string(key) .. "=" .. transf.string.encoded_query_param_value(transf.any.string(value))
-    end,
-    ini_line = function(key, value)
-      return transf.any.string(key) .. " = " .. transf.any.string(value)
-    end,
-    envlike_line = function(key, value)
-      return transf.any.string(key) .. "=" .. transf.any.string(value)
-    end,
-    curl_form_field_args = function(key, value)
-      return {
-        "-F",
-        transf.any.string(key) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.string(value)),
-      }
-    end,
-    assoc_entry_string = function(key, value)
-      return "[" .. transf.any.string(key) .. "] = " .. transf.any.string(value)
-    end,
-    
-    
-  },
   email = {
     mailto_url = function(str)
       return "mailto:" .. str
@@ -4431,10 +4414,10 @@ transf = {
   },
   displayname_email = {
     email = function(str)
-      return eutf8.match(str, " <(.*)> *$")
+      return get.string.n_strings_by_extracted_eutf8(str, " <(.*)> *$")
     end,
     displayname = function(str)
-      return eutf8.match(str, "^(.*) <")
+      return get.string.n_strings_by_extracted_eutf8(str, "^(.*) <")
     end,
     displayname_email_assoc = function(str)
       local displayname = transf.displayname_email.displayname(str)
@@ -4483,7 +4466,7 @@ transf = {
     single_quoted_escaped_string_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        transf.string.single_quoted_escaped
+        transf.string.string_by_single_quoted_escaped
       )
     end,
     single_quoted_escaped_string = function(arr)
@@ -4832,7 +4815,7 @@ transf = {
     pair_arr = function(t)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
-        transf.key_value.pair
+        transf.two_anys.pair
       )
     end,
     pair_arr_by_sorted_larger_key_first = function(t)
@@ -4884,7 +4867,7 @@ transf = {
         transf.not_userdata_or_function.yaml_string(tbl),
         "shell-input"
       )
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("align " .. transf.string.single_quoted_escaped(tmp))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("align " .. transf.string.string_by_single_quoted_escaped(tmp))
       local res = transf.yaml_file.not_userdata_or_function(tmp)
       dothis.local_extant_path.delete(tmp)
       return res
@@ -5110,7 +5093,7 @@ transf = {
     truthy_long_flag_arr = function(assoc)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.assoc.truthy_value_key_arr(assoc),
-        transf.word.long_flag
+        transf.string.long_flag
       )
     end,
     truthy_long_flag_string = function(assoc)
@@ -5177,7 +5160,7 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(pair)
-          return "export " .. pair[1] .. "=" .. transf.string.double_quoted_escaped(pair[2])
+          return "export " .. pair[1] .. "=" .. transf.string.string_by_double_quoted_escaped(pair[2])
         end
       )
     end,
@@ -5392,7 +5375,7 @@ transf = {
     end,
     online_bib = function(doi)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "curl -LH Accept: application/x-bibtex" .. transf.string.single_quoted_escaped(
+        "curl -LH Accept: application/x-bibtex" .. transf.string.string_by_single_quoted_escaped(
           transf.doi.doi_url(doi)
         )
       )
@@ -5410,12 +5393,12 @@ transf = {
   isbn = {
     online_bib = function(isbn)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " bibtex"
+        "isbn_meta" .. transf.string.string_by_single_quoted_escaped(isbn) .. " bibtex"
       )
     end,
     csl_table_by_online = function(isbn)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "isbn_meta" .. transf.string.single_quoted_escaped(isbn) .. " csl"
+        "isbn_meta" .. transf.string.string_by_single_quoted_escaped(isbn) .. " csl"
       )
     end,
     indicated_citable_object_id = function(isbn)
@@ -5425,14 +5408,14 @@ transf = {
   isbn10 = {
     isbn13 = function(isbn10)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "to_isbn13" .. transf.string.single_quoted_escaped(isbn10)
+        "to_isbn13" .. transf.string.string_by_single_quoted_escaped(isbn10)
       )
     end,
   },
   isbn13 = {
     isbn10 = function(isbn13)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "to_isbn10" .. transf.string.single_quoted_escaped(isbn13)
+        "to_isbn10" .. transf.string.string_by_single_quoted_escaped(isbn13)
       )
     end,
   },
@@ -6588,7 +6571,7 @@ transf = {
     end,
     default_negotiation_url_contents = function(url)
       return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.string.string_or_nil_by_evaled_env_bash_stripped, "run")
-          "curl -L" .. transf.string.single_quoted_escaped(url)
+          "curl -L" .. transf.string.string_by_single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
       return transf.not_userdata_or_function.in_cache_dir(transf.url.url_by_ensure_scheme(url), "url")
@@ -6599,7 +6582,7 @@ transf = {
         {},
         "transf.string.table_or_nil_by_evaled_env_bash_parsed_json"
       )(
-        "url_parser_cli --json" .. transf.string.single_quoted_escaped(url)
+        "url_parser_cli --json" .. transf.string.string_by_single_quoted_escaped(url)
       )
     end,
     scheme = function(url)
@@ -6609,13 +6592,13 @@ transf = {
       return transf.url.url_table(url).host
     end,
     sld_and_tld = function(url)
-      return eutf8.match(transf.url.host(url), "(%w+%.%w+)$")
+      return get.string.n_strings_by_extracted_eutf8(transf.url.host(url), "(%w+%.%w+)$")
     end,
     sld = function(url)
-      return eutf8.match(transf.url.host(url), "(%w+)%.%w+$") 
+      return get.string.n_strings_by_extracted_eutf8(transf.url.host(url), "(%w+)%.%w+$") 
     end,
     tld = function(url)
-      return eutf8.match(transf.url.host(url), "%w+%.(%w+)$")
+      return get.string.n_strings_by_extracted_eutf8(transf.url.host(url), "%w+%.(%w+)$")
     end,
     path = function(url)
       return transf.url.url_table(url).path
@@ -6741,7 +6724,7 @@ transf = {
     booru_post_url = function(url)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
         "saucenao --url" ..
-        transf.string.single_quoted_escaped(url)
+        transf.string.string_by_single_quoted_escaped(url)
         .. "--output-properties booru-url"
       )
     end,
@@ -6768,12 +6751,12 @@ transf = {
   },
   yandere_style_post_url = {
     nonindicated_number_string_by_booru_post_id = function(url)
-      return eutf8.match(transf.url.path(url), "/post/show/(%d+)")
+      return get.string.n_strings_by_extracted_eutf8(transf.url.path(url), "/post/show/(%d+)")
     end
   },
   danbooru_style_post_url = {
     nonindicated_number_string_by_booru_post_id = function(url)
-      return eutf8.match(transf.url.path(url), "/posts/(%d+)")
+      return get.string.n_strings_by_extracted_eutf8(transf.url.path(url), "/posts/(%d+)")
     end
   },
   gpt_response_table = {
@@ -6798,7 +6781,7 @@ transf = {
       end
       local md5 = hashings("md5")
       md5:update(thing)
-      return transf.string.base32_crock_string(md5:digest())
+      return transf.string.base32_crock_string_by_utf8(md5:digest())
     end,
     in_cache_dir = function(data, type)
       return transf.string.in_cache_dir(
@@ -6813,7 +6796,7 @@ transf = {
       )
     end,
     single_quoted_escaped_json = function(t)
-      return transf.string.single_quoted_escaped(json.encode(t))
+      return transf.string.string_by_single_quoted_escaped(json.encode(t))
     end,
     json_string = json.encode,
     json_string_pretty = function(t)
@@ -7874,7 +7857,7 @@ transf = {
   },
   cronspec_string = {
     timestamp_s_string_by_next = function(cronspec_string)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("ncron" .. transf.string.single_quoted_escaped(cronspec_string))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("ncron" .. transf.string.string_by_single_quoted_escaped(cronspec_string))
     end,
     timestamp_s_by_next = function(cronspec_string)
       return get.string_or_number.number_or_nil(transf.cronspec_string.timestamp_s_string_by_next(cronspec_string))

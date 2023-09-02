@@ -1,19 +1,19 @@
 dothis = {
   package_manager_name = {
     install = function(mgr, pkg)
-      dothis.string.env_bash_eval("upkg " .. mgr .. " install " .. transf.string.single_quoted_escaped(pkg))
+      dothis.string.env_bash_eval("upkg " .. mgr .. " install " .. transf.string.string_by_single_quoted_escaped(pkg))
     end,
     remove = function(mgr, pkg)
-      dothis.string.env_bash_eval("upkg " .. mgr .. " remove " .. transf.string.single_quoted_escaped(pkg))
+      dothis.string.env_bash_eval("upkg " .. mgr .. " remove " .. transf.string.string_by_single_quoted_escaped(pkg))
     end,
     upgrade = function(mgr, pkg)
       local target
-      if pkg then target = transf.string.single_quoted_escaped(pkg)
+      if pkg then target = transf.string.string_by_single_quoted_escaped(pkg)
       else target = "" end
       dothis.string.env_bash_eval("upkg " .. mgr .. " upgrade " .. target)
     end,
     link = function(mgr, pkg)
-      dothis.string.env_bash_eval("upkg " .. mgr .. " link " .. transf.string.single_quoted_escaped(pkg))
+      dothis.string.env_bash_eval("upkg " .. mgr .. " link " .. transf.string.string_by_single_quoted_escaped(pkg))
     end,
     do_backup_and_commit = function(mgr, action, msg)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("upkg " .. mgr .. " " .. action, function()
@@ -41,7 +41,7 @@ dothis = {
         command = transf.two_arrs.arr_by_appended(
           command,
             "--calendar" ..
-            transf.string.single_quoted_escaped(specifier.calendar)
+            transf.string.string_by_single_quoted_escaped(specifier.calendar)
         )
       end
 
@@ -49,7 +49,7 @@ dothis = {
         command = transf.two_arrs.arr_by_appended(
           command,
             "--location" ..
-            transf.string.single_quoted_escaped(specifier.location)
+            transf.string.string_by_single_quoted_escaped(specifier.location)
         )
       end
 
@@ -61,7 +61,7 @@ dothis = {
         command = transf.two_arrs.arr_by_appended(
           command,
             "--alarm" ..
-            transf.string.single_quoted_escaped(alarms_str )
+            transf.string.string_by_single_quoted_escaped(alarms_str )
         )
       end
 
@@ -69,7 +69,7 @@ dothis = {
         command = transf.two_arrs.arr_by_appended(
           command,
             "--url" ..
-            transf.string.single_quoted_escaped(specifier.url)
+            transf.string.string_by_single_quoted_escaped(specifier.url)
         )
       end
 
@@ -77,7 +77,7 @@ dothis = {
       command = transf.two_arrs.arr_by_appended(
         command,
           "--format" ..
-          transf.string.single_quoted_escaped("{uid}")
+          transf.string.string_by_single_quoted_escaped("{uid}")
       )
 
       if specifier.start then
@@ -100,7 +100,7 @@ dothis = {
         command = transf.two_arrs.arr_by_appended(
           command,
             "::" ..
-            transf.string.single_quoted_escaped(specifier.description)
+            transf.string.string_by_single_quoted_escaped(specifier.description)
         )
       end
 
@@ -129,7 +129,7 @@ dothis = {
       local target = transf.path.path_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
       local rawsource = transf.file.string_by_contents(source)
       local processedsource = get.string.string_by_with_yaml_metadata(rawsource, metadata)
-      rawsource = eutf8.gsub(rawsource, "\n +\n", "\n&nbsp;\n")
+      rawsource = get.string.string_and_int_by_replaced_eutf8_w_regex_string(rawsource, "\n +\n", "\n&nbsp;\n")
       local temp_path = source .. ".tmp"
       dothis.absolute_path.write_file(temp_path, processedsource) 
       local cmd = 
@@ -137,9 +137,9 @@ dothis = {
         "--wrap=preserve -f markdown+" .. get.string_or_number_arr.string_by_joined(get.pandoc.extensions(), "+") .. " --standalone -t" ..
         format ..
         "-i" ..
-        transf.string.single_quoted_escaped(temp_path)
+        transf.string.string_by_single_quoted_escaped(temp_path)
         "-o" ..
-        transf.string.single_quoted_escaped(target)
+        transf.string.string_by_single_quoted_escaped(target)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(cmd, function ()
         dothis.absolute_path.delete(temp_path)
         if do_after then
@@ -208,28 +208,28 @@ dothis = {
   },
   url = {
     download_to_async = function(url, target)
-      dothis.string.env_bash_eval_async("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
+      dothis.string.env_bash_eval_async("curl -L " .. transf.string.string_by_single_quoted_escaped(url) .. " -o " .. transf.string.string_by_single_quoted_escaped(target))
     end,
     download_to_sync = function(url, target)
-      dothis.string.env_bash_eval_sync("curl -L " .. transf.string.single_quoted_escaped(url) .. " -o " .. transf.string.single_quoted_escaped(target))
+      dothis.string.env_bash_eval_sync("curl -L " .. transf.string.string_by_single_quoted_escaped(url) .. " -o " .. transf.string.string_by_single_quoted_escaped(target))
     end,
     download_into_async = function(url, target_dir)
-      dothis.string.env_bash_eval_async("cd " .. transf.string.single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.string.single_quoted_escaped(url) .. " -O")
+      dothis.string.env_bash_eval_async("cd " .. transf.string.string_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.string.string_by_single_quoted_escaped(url) .. " -O")
     end,
     download_into_sync = function(url, target_dir)
-      dothis.string.env_bash_eval_sync("cd " .. transf.string.single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.string.single_quoted_escaped(url) .. " -O")
+      dothis.string.env_bash_eval_sync("cd " .. transf.string.string_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.string.string_by_single_quoted_escaped(url) .. " -O")
     end,
       
     add_event_from_url = function(url, calendar)
-      local temp_path_arg = transf.string.single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
-      dothis.string.env_bash_eval('curl' .. transf.string.single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg)
+      local temp_path_arg = transf.string.string_by_single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
+      dothis.string.env_bash_eval('curl' .. transf.string.string_by_single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg)
     end,
   },
   otp_url = {
     add_otp_pass_item = function(url, name)
       dothis.string.env_bash_eval_async(
         "echo" ..
-        transf.string.single_quoted_escaped(url) ..
+        transf.string.string_by_single_quoted_escaped(url) ..
         "| pass otp insert otp/" .. name
       )
     end,
@@ -242,7 +242,7 @@ dothis = {
       dothis.string.env_bash_eval_sync(
         "ical2json" ..
         "-r" ..
-        transf.string.single_quoted_escaped(tmpdir_ics_path)
+        transf.string.string_by_single_quoted_escaped(tmpdir_ics_path)
       )
       dothis.absolute_path.delete(tmpdir_json_path)
       if path then
@@ -302,7 +302,7 @@ dothis = {
   string = {
     generate_qr_png = function(data, path)
       if not is.path.extant_path(path) then
-        transf.string.string_or_nil_by_evaled_env_bash_stripped("qrencode -l M -m 2 -t PNG -o" .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(data))
+        transf.string.string_or_nil_by_evaled_env_bash_stripped("qrencode -l M -m 2 -t PNG -o" .. transf.string.string_by_single_quoted_escaped(path) .. transf.string.string_by_single_quoted_escaped(data))
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
     end,
     alert = function(str, duration)
@@ -515,25 +515,25 @@ dothis = {
       url = transf.url.url_by_ensure_scheme(url)
       browser = browser or "Firefox"
       if do_after then -- if we're opening an url, typically, we would exit immediately, negating the need for a callback. Therefore, we want to wait. The only easy way to do this is to use a completely different browser. 
-        transf.string.string_or_nil_by_evaled_env_bash_stripped("open -a Safari -W" .. transf.string.single_quoted_escaped(url), do_after)
+        transf.string.string_or_nil_by_evaled_env_bash_stripped("open -a Safari -W" .. transf.string.string_by_single_quoted_escaped(url), do_after)
         -- Annoyingly, due to a 15 (!) year old bug, Firefox will open the url as well, even if we specify a different browser. I've tried various fixes, but for now we'll just have to live with it and click the tab away manually.
       else
-        transf.string.string_or_nil_by_evaled_env_bash_stripped("open -a" .. transf.string.single_quoted_escaped(browser))
+        transf.string.string_or_nil_by_evaled_env_bash_stripped("open -a" .. transf.string.string_by_single_quoted_escaped(browser))
       end
     end,
   },
   local_path = {
     open_default = function(path, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open " .. transf.string.single_quoted_escaped(path), do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open " .. transf.string.string_by_single_quoted_escaped(path), do_after)
     end,
     open_app = function(path, app, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -a " .. transf.string.single_quoted_escaped(app) .. " " .. transf.string.single_quoted_escaped(path), do_after)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -a " .. transf.string.string_by_single_quoted_escaped(app) .. " " .. transf.string.string_by_single_quoted_escaped(path), do_after)
     end,
     open_gui_editor = function(path, do_after)
       dothis.local_path.open_app(path, env.GUI_EDITOR, do_after)
     end,
     open_and_reveal = function(path)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -R " .. transf.string.single_quoted_escaped(path))
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -R " .. transf.string.string_by_single_quoted_escaped(path))
     end,
     write_nonabsolute_path_key_assoc = function(path, nonabsolute_path_key_assoc, extension)
       dothis.dynamic_absolute_path_key_assoc.write(
@@ -675,7 +675,7 @@ dothis = {
   local_absolute_path = {
     start_recording_to = function(path, do_after)
       dothis.absolute_path.create_parent_dir(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rec " .. transf.string.single_quoted_escaped(path), function()
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("rec " .. transf.string.string_by_single_quoted_escaped(path), function()
         if do_after then
           do_after(path)
         end
@@ -684,7 +684,7 @@ dothis = {
   },
   local_nonextant_path = {
     create_dir = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("mkdir -p " .. transf.string.single_quoted_escaped(path))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("mkdir -p " .. transf.string.string_by_single_quoted_escaped(path))
     end,
   },
   local_nonabsolute_path_relative_to_home = {
@@ -707,7 +707,7 @@ dothis = {
   },
   labelled_remote_nonextant_path = {
     create_dir = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone mkdir " .. transf.string.single_quoted_escaped(path))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone mkdir " .. transf.string.string_by_single_quoted_escaped(path))
     end,
   },
   remote_absolute_path = {
@@ -749,7 +749,7 @@ dothis = {
   },
   local_extant_path = {
     make_executable = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("chmod +x " .. transf.string.single_quoted_escaped(path))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("chmod +x " .. transf.string.string_by_single_quoted_escaped(path))
     end,
     do_in_path = function(path, cmd, do_after)
       if is.path.dir(path) then
@@ -765,7 +765,7 @@ dothis = {
     end,
     zip_to_local_absolute_path = function(path, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.string.single_quoted_escaped(tgt) .. " " .. transf.string.single_quoted_escaped(path))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.string.string_by_single_quoted_escaped(tgt) .. " " .. transf.string.string_by_single_quoted_escaped(path))
     end,
     zip_to_absolute_path = function(path, tgt)
       local tmptgt = transf.string.in_tmp_dir(tgt, "temp_zip_target")
@@ -783,7 +783,7 @@ dothis = {
     link_to_local_nonextant_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
       dothis.string.env_bash_eval_sync(
-        "pass passw/os | sudo -S ln -s " .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(tgt)
+        "pass passw/os | sudo -S ln -s " .. transf.string.string_by_single_quoted_escaped(path) .. transf.string.string_by_single_quoted_escaped(tgt)
       )
     end,
     link_to_local_absolute_path = function(path, tgt)
@@ -805,7 +805,7 @@ dothis = {
   local_extant_path_arr = {
     zip_to_local_absolute_path = function(arr, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.string.single_quoted_escaped(tgt) .. " " .. transf.string.single_quoted_escaped(get.string_or_number_arr.string_by_joined(arr, " ")))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.string.string_by_single_quoted_escaped(tgt) .. " " .. transf.string.string_by_single_quoted_escaped(get.string_or_number_arr.string_by_joined(arr, " ")))
     end,
     zip_to_absolute_path = function(arr, tgt)
       local tmptgt = transf.string.in_tmp_dir(tgt, "temp_zip_target")
@@ -831,7 +831,7 @@ dothis = {
     write_file = function(path, contents)
       local temp_file = transf.string.in_tmp_dir(path, "labelled_remote_temp_file")
       dothis.local_extant_path.write_file(temp_file, contents)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone copyto" .. transf.string.single_quoted_escaped(temp_file) .. " " .. transf.string.single_quoted_escaped(path))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone copyto" .. transf.string.string_by_single_quoted_escaped(temp_file) .. " " .. transf.string.string_by_single_quoted_escaped(path))
       dothis.absolute_path.delete(temp_file)
     end,
     append_or_write_file = function(path, contents)
@@ -846,7 +846,7 @@ dothis = {
       dothis.labelled_remote_nonextant_path.create_dir(path)
     end,
     delete_dir = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone purge " .. transf.string.single_quoted_escaped(path))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone purge " .. transf.string.string_by_single_quoted_escaped(path))
     end,
   },
   remote_file = {
@@ -881,7 +881,7 @@ dothis = {
       plfile.copy(path, tgt)
     end,
     edit_file_in_vscode_act_on_path = function(path, do_after)
-      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
+      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.string.string_by_single_quoted_escaped(path), function()
         if do_after then
           do_after(path)
         end
@@ -889,7 +889,7 @@ dothis = {
       end)
     end,
     edit_file_in_vscode_act_on_contents = function(path, do_after)
-      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.string.single_quoted_escaped(path), function()
+      dothis.string.env_bash_eval_w_string_or_string_and_8_bit_pos_int_arg_fn("code --wait --disable-extensions " .. transf.string.string_by_single_quoted_escaped(path), function()
         local contents = transf.file.string_by_contents(path)
         dothis.absolute_path.delete(path)
         do_after(contents)
@@ -898,7 +898,7 @@ dothis = {
   },
   local_dir = {
     empty_dir = function(path)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rm -rf " .. transf.string.single_quoted_escaped(
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("rm -rf " .. transf.string.string_by_single_quoted_escaped(
         transf.path.ending_with_slash(path) .. "*"
       ) .. "/*")
     end,
@@ -974,7 +974,7 @@ dothis = {
     end,
     copy_to_absolute_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone copyto " .. transf.string.single_quoted_escaped(path) .. " " .. transf.string.single_quoted_escaped(tgt))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone copyto " .. transf.string.string_by_single_quoted_escaped(path) .. " " .. transf.string.string_by_single_quoted_escaped(tgt))
     end,
     copy_into_absolute_path = function(path, tgt)
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
@@ -988,7 +988,7 @@ dothis = {
     end,
     move_to_absolute_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone moveto " .. transf.string.single_quoted_escaped(path) .. " " .. transf.string.single_quoted_escaped(tgt))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("rclone moveto " .. transf.string.string_by_single_quoted_escaped(path) .. " " .. transf.string.string_by_single_quoted_escaped(tgt))
     end,
     move_into_absolute_path = function(path, tgt)
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
@@ -1050,7 +1050,7 @@ dothis = {
   },
   file = {
     do_in_path = function(path, cmd, do_after)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.single_quoted_escaped(transf.path.parent_path(path)) .. " && " .. cmd, do_after)
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.string_by_single_quoted_escaped(transf.path.parent_path(path)) .. " && " .. cmd, do_after)
     end,
     write_file = function(path, contents)
       dothis[
@@ -1082,7 +1082,7 @@ dothis = {
   },
   audio_file = {
     play = function(path, do_after)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("play " .. transf.string.single_quoted_escaped(path), do_after)
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("play " .. transf.string.string_by_single_quoted_escaped(path), do_after)
     end
   },
   local_image_file = {
@@ -1106,7 +1106,7 @@ dothis = {
   local_zip_file = {
     unzip_to_absolute_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("unzip " .. transf.string.single_quoted_escaped(path) .. " -d " .. transf.string.single_quoted_escaped(tgt))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("unzip " .. transf.string.string_by_single_quoted_escaped(path) .. " -d " .. transf.string.string_by_single_quoted_escaped(tgt))
     end,
     unzip_into_absolute_path = function(path, tgt)
       local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.filename(path)
@@ -1206,7 +1206,7 @@ dothis = {
       local att_path = cache_path .. '/' .. name
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
         'cd ' .. transf.single_quoted_escaped(cache_path) .. ' && mshow -x'
-        .. transf.string.single_quoted_escaped(path) .. transf.string.single_quoted_escaped(name),
+        .. transf.string.string_by_single_quoted_escaped(path) .. transf.string.string_by_single_quoted_escaped(name),
         function()
           do_after(att_path)
         end
@@ -1222,7 +1222,7 @@ dothis = {
     end,
     send = function(path, do_after)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-        "msmtp -t <" .. transf.string.single_quoted_escaped(path),
+        "msmtp -t <" .. transf.string.string_by_single_quoted_escaped(path),
         function(res)
           if not res then
             dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.string_by_contents(path))
@@ -1230,10 +1230,10 @@ dothis = {
           else
             dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
               "cat" ..
-              transf.string.single_quoted_escaped(path) .. "| msed" ..
-              transf.string.single_quoted_escaped("/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time())) ..
-              "| msed".. transf.string.single_quoted_escaped("/Status/a/S/") ..
-              "| mdeliver -c" .. transf.string.single_quoted_escaped(env.MBSYNC_ARCHIVE),
+              transf.string.string_by_single_quoted_escaped(path) .. "| msed" ..
+              transf.string.string_by_single_quoted_escaped("/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time())) ..
+              "| msed".. transf.string.string_by_single_quoted_escaped("/Status/a/S/") ..
+              "| mdeliver -c" .. transf.string.string_by_single_quoted_escaped(env.MBSYNC_ARCHIVE),
               function()
                 dothis.absolute_path.delete(path)
                 if do_after then
@@ -1267,14 +1267,14 @@ dothis = {
     end,
     move = function(source, target)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-        "mdeliver" .. transf.string.single_quoted_escaped(target) ..
-        "<" .. transf.string.single_quoted_escaped(source),
+        "mdeliver" .. transf.string.string_by_single_quoted_escaped(target) ..
+        "<" .. transf.string.string_by_single_quoted_escaped(source),
         function()
           dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-            "minc" .. transf.string.single_quoted_escaped(target), -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
+            "minc" .. transf.string.string_by_single_quoted_escaped(target), -- incorporate the message (/cur -> /new, rename in accordance with the mblaze rules and maildir spec)
             function ()
               dothis.string.env_bash_eval_async(
-                "rm" .. transf.string.single_quoted_escaped(source)
+                "rm" .. transf.string.string_by_single_quoted_escaped(source)
               )
             end
           )
@@ -1292,7 +1292,7 @@ dothis = {
       )
     end,
     do_in_path = function(path, cmd, do_after)
-      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd, do_after or function() end)
+      dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("cd " .. transf.string.string_by_single_quoted_escaped(path) .. " && " .. cmd, do_after or function() end)
     end,
     delete_child_with_leaf_ending = function(path, ending)
       dothis.absolute_path.delete(
@@ -1389,17 +1389,17 @@ dothis = {
     query_w_csv_string_arg_fn = function(sqlite_file, query, fn)
       dothis.string.env_bash_eval_w_string_arg_fn_string_arg_fn_by_stripped(
         "sqlite3" ..
-        transf.string.single_quoted_escaped(sqlite_file) ..
+        transf.string.string_by_single_quoted_escaped(sqlite_file) ..
         "-csv" ..
-        transf.string.single_quoted_escaped(query)
+        transf.string.string_by_single_quoted_escaped(query)
       , fn, error)
     end,
     query_w_table_arg_fn = function(sqlite_file, query, fn)
       dothis.string.env_bash_eval_w_table_arg_fn_string_arg_fn(
         "sqlite3" ..
-        transf.string.single_quoted_escaped(sqlite_file) ..
+        transf.string.string_by_single_quoted_escaped(sqlite_file) ..
         "-json" ..
-        transf.string.single_quoted_escaped(query),
+        transf.string.string_by_single_quoted_escaped(query),
         fn, error)
     end,
   },
@@ -1467,7 +1467,7 @@ dothis = {
   },
   ics_file = {
     add_events_from_file = function(path, calendar)
-      dothis.string.env_bash_eval("khal import --include-calendar " .. calendar .. " " .. transf.string.single_quoted_escaped(path))
+      dothis.string.env_bash_eval("khal import --include-calendar " .. calendar .. " " .. transf.string.string_by_single_quoted_escaped(path))
     end,
   },
   git_root_dir = {
@@ -1520,12 +1520,12 @@ dothis = {
       dothis.local_extant_path.do_in_path(path, "git fetch")
     end,
     add_self = function(path, do_after)
-      dothis.local_extant_path.do_in_path(path, "git add" .. transf.string.single_quoted_escaped(path), do_after)
+      dothis.local_extant_path.do_in_path(path, "git add" .. transf.string.string_by_single_quoted_escaped(path), do_after)
     end,
     commit_self = function(path, message, do_after)
       dothis.local_extant_path.do_in_path(
         path, 
-        "git commit -m" .. transf.string.single_quoted_escaped(message or ("Programmatic commit of " .. path .. " at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        "git commit -m" .. transf.string.string_by_single_quoted_escaped(message or ("Programmatic commit of " .. path .. " at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
       )
     end,
@@ -1539,7 +1539,7 @@ dothis = {
     commit_staged = function(path, message, do_after)
       dothis.local_extant_path.do_in_path(
         path, 
-        "git commit -m" .. transf.string.single_quoted_escaped(message or ("Programmatic commit of staged files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        "git commit -m" .. transf.string.string_by_single_quoted_escaped(message or ("Programmatic commit of staged files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
       )
     end,
@@ -1556,7 +1556,7 @@ dothis = {
     commit_all_root_no_untracked = function(path, message, do_after)
       dothis.local_extant_path.do_in_path(
         transf.in_git_dir.git_root_dir(path), 
-        "git commit -am" .. transf.string.single_quoted_escaped(message or ("Programmatic commit of all tracked files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        "git commit -am" .. transf.string.string_by_single_quoted_escaped(message or ("Programmatic commit of all tracked files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
         do_after
       )
     end
@@ -1956,10 +1956,10 @@ dothis = {
         transf.omegat_project_dir.target_files(dir),
         function(file)
           transf.string.string_or_nil_by_evaled_env_bash_stripped("soffice --headless --convert-to txt:Text --outdir"..
-          transf.string.single_quoted_escaped(
+          transf.string.string_by_single_quoted_escaped(
             transf.omegat_project_dir.target_txt_dir(dir)
           ) ..
-          transf.string.single_quoted_escaped(file))
+          transf.string.string_by_single_quoted_escaped(file))
         end
       )
       error("TODO: Watch dir, count files every second or so until they are all there, then do_after. Perhaps refactor this into a general function")
@@ -2585,7 +2585,7 @@ dothis = {
   },
   preference_domain_string = {
     write_default = function(domain, key, value, type)
-      transf.string.string_or_nil_by_evaled_env_bash_stripped("defaults write" .. transf.string.single_quoted_escaped(domain) .. transf.string.single_quoted_escaped(key) .. " -" .. type .. " " .. transf.string.single_quoted_escaped(value))
+      transf.string.string_or_nil_by_evaled_env_bash_stripped("defaults write" .. transf.string.string_by_single_quoted_escaped(domain) .. transf.string.string_by_single_quoted_escaped(key) .. " -" .. type .. " " .. transf.string.string_by_single_quoted_escaped(value))
     end
 
   },
@@ -2878,10 +2878,10 @@ dothis = {
     signal_generate_backup = function(_, do_after)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
         "sigtop export-messages -f json" ..
-        transf.string.single_quoted_escaped(
+        transf.string.string_by_single_quoted_escaped(
           transf.string.in_cache_dir("signal", "export") .. "/chats"
         ) .. "&& sigtop export-attachments" ..
-        transf.string.single_quoted_escaped(
+        transf.string.string_by_single_quoted_escaped(
           transf.string.in_cache_dir("signal", "export") .. "/media"
         ),
         do_after
@@ -2891,7 +2891,7 @@ dothis = {
       dothis.fn_queue_specifier.push(main_qspec,
       function()
         dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped("open -a Firefox" .. 
-          transf.string.single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings") " && sleep 1", function()
+          transf.string.string_by_single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings") " && sleep 1", function()
             hs.eventtap.keyStroke({"cmd"}, "0") -- reset zoom
             local ff_window = transf.running_application.main_window(
               transf.mac_application_name.running_application("Firefox")
@@ -2922,7 +2922,7 @@ dothis = {
     end,
     discord_generate_backup = function(_, do_after)
       dothis.string.env_bash_eval_w_string_or_nil_arg_fn_by_stripped(
-        "dscexport exportdm --media --reuse-media -f json --dateformat unix -o" .. transf.string.single_quoted_escaped(
+        "dscexport exportdm --media --reuse-media -f json --dateformat unix -o" .. transf.string.string_by_single_quoted_escaped(
           transf.string.in_cache_dir("discord", "export")
         ),
         do_after

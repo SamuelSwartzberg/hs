@@ -67,7 +67,7 @@ get = {
       ) .. fixedstr.unique_record_separator
     end,
     basic_command_parts = function(include, exclude)
-      local command = " --format=" .. transf.string.single_quoted_escaped(get.khal.parseable_format_specifier())
+      local command = " --format=" .. transf.string.string_by_single_quoted_escaped(get.khal.parseable_format_specifier())
       if include then command = command .. transf.string_arr.repeated_option_string(include, "--include-calendar") end
       if exclude then command = command .. transf.string_arr.repeated_option_string(exclude, "--exclude-calendar") end
       return command
@@ -75,7 +75,7 @@ get = {
        
     search_event_tables = function(searchstr, include, exclude)
       local command = "khal search" .. get.khal.basic_command_parts(include, exclude)
-      command = command .. " " .. transf.string.single_quoted_escaped(searchstr)
+      command = command .. " " .. transf.string.string_by_single_quoted_escaped(searchstr)
       return transf.multirecord_string.arr_of_event_tables(transf.string.string_or_nil_by_evaled_env_bash_stripped(command))
     end,
     list_event_tables = function(specifier, include, exclude)
@@ -91,8 +91,8 @@ get = {
       end
       specifier.start = specifier.start or "today"
       specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
-      dothis.arr.push(command, transf.string.single_quoted_escaped(specifier.start))
-      dothis.arr.push(command, transf.string.single_quoted_escaped(specifier["end"]))
+      dothis.arr.push(command, transf.string.string_by_single_quoted_escaped(specifier.start))
+      dothis.arr.push(command, transf.string.string_by_single_quoted_escaped(specifier["end"]))
       return transf.multirecord_string.arr_of_event_tables(
         transf.string.string_or_nil_by_evaled_env_bash_stripped(
           get.string_or_number_arr.string_by_joined(command, " ")
@@ -1043,16 +1043,16 @@ get = {
       return transf.string.startswith(str, start) and transf.string.endswith(str, ends)
     end,
     bool_by_matches_whole_eutf8 = function(str, regex_string)
-      return eutf8.find(str, transf.string.string_by_whole_regex(regex_string)) ~= nil
+      return get.string.bool_by_matches_part_eutf8(str, transf.string.string_by_whole_regex(regex_string))
     end,
     bool_by_matches_whole_onig = function(str, regex_string)
-      return onig.find(str, transf.string.string_by_whole_regex(regex_string)) ~= nil
+      return get.string.bool_by_matches_part_onig(str, transf.string.string_by_whole_regex(regex_string))
     end,
     bool_by_matches_part_eutf8 = function(str, regex_string)
-      return eutf8.find(str, regex_string) ~= nil
+      return get.string.two_integer_or_nils_by_eutf8_regex_match(str, regex_string) ~= nil
     end,
     bool_by_matches_part_onig = function(str, regex_string)
-      return onig.find(str, regex_string) ~= nil
+      return get.string.two_integer_or_nils_by_onig_regex_match(str, regex_string) ~= nil
     end,
     bool_by_not_matches_whole_eutf8 = function(str, regex_string)
       return not transf.string.bool_by_matches_whole_eutf8(str, regex_string)
@@ -1115,47 +1115,75 @@ get = {
         adfix
       )
     end,
+    string_and_int_by_replaced_eutf8_w_regex_string = get.string.string_and_int_by_replaced_eutf8_w_regex_string,
+    string_by_replaced_onig_w_regex_string = onig.gsub,
     string_by_continuous_collapsed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
-      return onig.gsub(
+      return get.string.string_by_replaced_onig_w_regex_string(
         str,
         "(" .. regex_quantifiable .. "){2,}", -- using {2,} instead of + saves us some performance, given a match of length 1 just gets replaced with itself. However, this is not available in eutf8, so we have to use + there
         "%1"
       )
     end,
     string_by_continuous_collapsed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
-      return eutf8.gsub(
+      return get.string.string_and_int_by_replaced_eutf8_w_regex_string(
         str,
         "(" .. regex_quantifiable .. ")+",
         "%1"
       )
     end,
+    string_by_final_continuous_collapsed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.string.string_by_replaced_onig_w_regex_string(
+        str,
+        "(" .. regex_quantifiable .. ")+$",
+        "%1"
+      )
+    end,
+    string_by_final_continuous_collapsed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.string.string_and_int_by_replaced_eutf8_w_regex_string(
+        str,
+        "(" .. regex_quantifiable .. ")+$",
+        "%1"
+      )
+    end,
     string_by_continuous_replaced_onig_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
-      return onig.gsub(
+      return get.string.string_by_replaced_onig_w_regex_string(
         str,
         regex_quantifiable .. "+",
         replacement
       )
     end,
     string_by_continuous_replaced_eutf8_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
-      return eutf8.gsub(
+      return get.string.string_and_int_by_replaced_eutf8_w_regex_string(
         str,
         regex_quantifiable .. "+",
         replacement
       )
     end,
-    string_by_removed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
-      return onig.gsub(
+    string_by_final_continuous_replaced_onig_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
+      return get.string.string_by_replaced_onig_w_regex_string(
         str,
-        regex_quantifiable,
-        ""
+        regex_quantifiable .. "+$",
+        replacement
       )
     end,
-    string_by_removed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
-      return eutf8.gsub(
+    string_by_final_continuous_replaced_eutf8_w_regex_quantifiable = function(str, regex_quantifiable, replacement)
+      return get.string.string_and_int_by_replaced_eutf8_w_regex_string(
         str,
-        regex_quantifiable,
-        ""
+        regex_quantifiable .. "+$",
+        replacement
       )
+    end,
+    string_by_removed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.string.string_by_continuous_replaced_onig_w_regex_quantifiable(str, regex_quantifiable, "")
+    end,
+    string_by_removed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.string.string_by_continuous_replaced_eutf8_w_regex_quantifiable(str, regex_quantifiable, "")
+    end,
+    string_by_final_removed_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.string.string_by_final_continuous_replaced_onig_w_regex_quantifiable(str, regex_quantifiable, "")
+    end,
+    string_by_final_removed_eutf8_w_regex_quantifiable = function(str, regex_quantifiable)
+      return get.string.string_by_final_continuous_replaced_eutf8_w_regex_quantifiable(str, regex_quantifiable, "")
     end,
     string_by_removed_onig_w_regex_character_class_innards = function(str, regex_character_class_innards)
       return transf.string.string_by_removed_onig_w_regex_quantifiable(str, "[" .. regex_character_class_innards .. "]")
@@ -1166,7 +1194,7 @@ get = {
     string_by_replaced_all_eutf8_w_regex_string_arr = function(str, regex_string_arr, replacement)
       local res = str
       for _, regex_string in transf.arr.key_value_stateless_iter(regex_string_arr) do
-        res = eutf8.gsub(
+        res = get.string.string_and_int_by_replaced_eutf8_w_regex_string(
           res,
           regex_string,
           replacement
@@ -1197,7 +1225,7 @@ get = {
     end,
     string_by_replaced_first_eutf8_w_regex_string_arr = function(str, regex_string_arr, replacement)
       for _, regex_string in transf.arr.key_value_stateless_iter(regex_string_arr) do
-        local res, matches = eutf8.gsub(
+        local res, matches = get.string.string_and_int_by_replaced_eutf8_w_regex_string(
           str,
           regex_string,
           replacement,
@@ -1245,7 +1273,7 @@ get = {
       end
     end,
     string_by_evaled_as_template = function(str, d)
-      local res = eutf8.gsub(str, "{{%[(.-)%]}}", function(item)
+      local res = get.string.string_and_int_by_replaced_eutf8_w_regex_string(str, "{{%[(.-)%]}}", function(item)
         return get.string.string_by_evaled_as_template(item, d)
       end)
       return res
@@ -1311,7 +1339,7 @@ get = {
     end,
     string_arr_groups_utf8_from_start = function(str, n)
       local res = {}
-      for i = 1, eutf8.len(str), n do
+      for i = 1, transf.string.pos_int_by_len_utf8_chars(str), n do
         dothis.arr.push(res, get.string.string_by_sub_eutf8(str, i, i + n - 1))
       end
       return res
@@ -1321,7 +1349,7 @@ get = {
     end,
     string_arr_groups_utf8_from_end = function(str, n)
       local res = {}
-      for i = eutf8.len(str), 1, -n do
+      for i = transf.string.pos_int_by_len_utf8_chars(str), 1, -n do
         dothis.arr.push(res, get.string.string_by_sub_eutf8(str, i - n + 1, i))
       end
       return res
@@ -1368,7 +1396,7 @@ get = {
     end,
     string_arr_by_eutf8_regex_match = function(str, regex)
       local res = {}
-      for match in eutf8.gmatch(str, regex) do
+      for match in get.string.n_string_stateful_iter_by_extracted_eutf8(str, regex) do
         dothis.arr.push(res, match)
       end
       return res
@@ -1380,7 +1408,7 @@ get = {
       while true do
         local start, stop = get.string.two_integer_or_nils_by_eutf8_regex_match(str, regex, prev_index)
         if start == nil then
-          if prev_index <= eutf8.len(str) then
+          if prev_index <= transf.string.pos_int_by_len_utf8_chars(str) then
             dothis.arr.push(nomatches, get.string.string_by_sub_eutf8(str, prev_index))
           end          
           return matches, nomatches
@@ -1940,7 +1968,7 @@ get = {
       return get.path_arr.path_or_nil_by_first_having_leaf_ending(transf.dir.absolute_path_arr_by_children(dir), leaf_ending)
     end,
     cmd_output_from_path = function(path, cmd)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.single_quoted_escaped(path) .. " && " .. cmd)
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("cd " .. transf.string.string_by_single_quoted_escaped(path) .. " && " .. cmd)
     end
   },
   git_root_dir = {
@@ -2062,10 +2090,10 @@ get = {
   },
   shellscript_file = {
     lint_table = function(path, severity)
-      return transf.string.table_or_err_by_evaled_env_bash_parsed_json("shellcheck --format=json --severity=" .. severity .. transf.string.single_quoted_escaped(path))
+      return transf.string.table_or_err_by_evaled_env_bash_parsed_json("shellcheck --format=json --severity=" .. severity .. transf.string.string_by_single_quoted_escaped(path))
     end,
     lint_gcc_string = function(path, severity)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("shellcheck --format=gcc --severity=" .. severity .. transf.string.single_quoted_escaped(path))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("shellcheck --format=gcc --severity=" .. severity .. transf.string.string_by_single_quoted_escaped(path))
     end,
   },
   email_file = {
@@ -2074,7 +2102,7 @@ get = {
     end,
     prefixed_header = function(path, header)
       return transf.string.string_or_nil_by_evaled_env_bash_stripped(
-        "mshow -qh" .. transf.string.single_quoted_escaped(header) .. transf.string.single_quoted_escaped(path)
+        "mshow -qh" .. transf.string.string_by_single_quoted_escaped(header) .. transf.string.string_by_single_quoted_escaped(path)
       )
     end,
     header = function(path, header)
@@ -2088,11 +2116,11 @@ get = {
       only = get.any.default_if_nil(only, true)
       local headerpart
       if header then
-        headerpart = "-h" .. transf.string.single_quoted_escaped(header)
+        headerpart = "-h" .. transf.string.string_by_single_quoted_escaped(header)
       else
         headerpart = ""
       end
-      local res = transf.string.string_or_nil_by_evaled_env_bash_stripped("maddr " .. (only and "-a" or "")  .. headerpart .. transf.string.single_quoted_escaped(path))
+      local res = transf.string.string_or_nil_by_evaled_env_bash_stripped("maddr " .. (only and "-a" or "")  .. headerpart .. transf.string.string_by_single_quoted_escaped(path))
       return transf.arr.set(transf.string.line_arr(res))
     end,
     displayname_addresses_assoc_of_assocs = function(path, header)
@@ -2112,12 +2140,12 @@ get = {
       if reverse then
         flags = flags .. "r"
       end
-      local cmd = "mlist" .. transf.string.single_quoted_escaped(path)
+      local cmd = "mlist" .. transf.string.string_by_single_quoted_escaped(path)
       if magrep then
-        cmd = cmd .. " | magrep -i" .. transf.string.single_quoted_escaped(magrep)
+        cmd = cmd .. " | magrep -i" .. transf.string.string_by_single_quoted_escaped(magrep)
       end
       if mpick then
-        cmd = cmd .. " | mpick -i" .. transf.string.single_quoted_escaped(mpick)
+        cmd = cmd .. " | mpick -i" .. transf.string.string_by_single_quoted_escaped(mpick)
       end
       cmd = cmd .. " | msort " .. flags
 
@@ -2133,10 +2161,10 @@ get = {
   },
   sqlite_file = {
     csv_or_nil_by_query = function(path, query)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("sqlite3 -csv " .. transf.string.single_quoted_escaped(path) .. " " .. transf.string.single_quoted_escaped(query))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("sqlite3 -csv " .. transf.string.string_by_single_quoted_escaped(path) .. " " .. transf.string.string_by_single_quoted_escaped(query))
     end,
     json_or_nil_by_query = function(path, query)
-      return transf.string.string_or_nil_by_evaled_env_bash_stripped("sqlite3 -json " .. transf.string.single_quoted_escaped(path) .. " " .. transf.string.single_quoted_escaped(query))
+      return transf.string.string_or_nil_by_evaled_env_bash_stripped("sqlite3 -json " .. transf.string.string_by_single_quoted_escaped(path) .. " " .. transf.string.string_by_single_quoted_escaped(query))
     end,
   },
   timestamp_ms_key_assoc_value_assoc = {
@@ -2589,17 +2617,17 @@ get = {
   sgml_string = {
     sgml_string_or_nil_by_query_selector_all = function(str, selector)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "htmlq" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
+        "htmlq" .. transf.string.string_by_single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
     string_or_nil_by_query_selector_all = function(str, selector)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "htmlq --text" .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
+        "htmlq --text" .. transf.string.string_by_single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
     string_or_nil_by_attribute_query_selector_all = function(str, selector, attribute)
       return get.fn.rt_or_nil_by_memoized(transf.string.string_or_nil_by_evaled_env_bash_stripped)(
-        "htmlq --attribute " .. transf.string.single_quoted_escaped(attribute) .. transf.string.single_quoted_escaped(selector) .. transf.string.here_string(str)
+        "htmlq --attribute " .. transf.string.string_by_single_quoted_escaped(attribute) .. transf.string.string_by_single_quoted_escaped(selector) .. transf.string.here_string(str)
       )
     end,
     -- non-all seems to not be possible with htmlq. At least for html_, it would be possible if we parsed the html, but for text_, there seems to be no indication of when each result ends.
@@ -3312,7 +3340,7 @@ get = {
         function (form_field_specifier)
           return 
             form_field_specifier.alias or form_field_specifier.value, 
-            eutf8.match(str, form_field_specifier.value .. "[^\n]-: *(.-)\n") or eutf8.match(str, form_field_specifier.value .. "[^\n]-: *(.-)$")
+            get.string.n_strings_by_extracted_eutf8(str, form_field_specifier.value .. "[^\n]-: *(.-)\n") or get.string.n_strings_by_extracted_eutf8(str, form_field_specifier.value .. "[^\n]-: *(.-)$")
         end
       )
     end,
