@@ -902,7 +902,8 @@ get = {
     end
   },
   string = {
-    string_by_sub = string.sub,
+    string_by_sub_lua = string.sub,
+    string_by_sub_eutf8 = get.string.string_by_sub_eutf8,
     string_by_formatted_w_n_anys = string.format,
     string_by_repeated = get.string.string_by_repeated,
     string_arr_split_single_char = stringy.split,
@@ -1207,6 +1208,10 @@ get = {
         end
       end
     end,
+    n_strings_by_extracted_onig = onig.match,
+    n_strings_by_extracted_eutf8 = eutf8.match,
+    n_string_stateful_iter_by_extracted_onig = onig.gmatch,
+    n_string_stateful_iter_by_extracted_eutf8 = eutf8.gmatch,
     evaled_js_osa = function(str)
       local succ, parsed_res = hs.osascript.javascript(str)
       if succ then
@@ -1307,7 +1312,7 @@ get = {
     string_arr_groups_utf8_from_start = function(str, n)
       local res = {}
       for i = 1, eutf8.len(str), n do
-        dothis.arr.push(res, eutf8.sub(str, i, i + n - 1))
+        dothis.arr.push(res, get.string.string_by_sub_eutf8(str, i, i + n - 1))
       end
       return res
     end,
@@ -1317,7 +1322,7 @@ get = {
     string_arr_groups_utf8_from_end = function(str, n)
       local res = {}
       for i = eutf8.len(str), 1, -n do
-        dothis.arr.push(res, eutf8.sub(str, i - n + 1, i))
+        dothis.arr.push(res, get.string.string_by_sub_eutf8(str, i - n + 1, i))
       end
       return res
     end,
@@ -1336,7 +1341,7 @@ get = {
     two_integer_or_nils_by_eutf8_regex_match = eutf8.find,
     string_arr_by_onig_regex_match = function(str, regex)
       local res = {}
-      for match in onig.gmatch(str, regex) do
+      for match in get.string.n_string_stateful_iter_by_extracted_onig(str, regex) do
         dothis.arr.push(res, match)
       end
       return res
@@ -1376,13 +1381,13 @@ get = {
         local start, stop = get.string.two_integer_or_nils_by_eutf8_regex_match(str, regex, prev_index)
         if start == nil then
           if prev_index <= eutf8.len(str) then
-            dothis.arr.push(nomatches, eutf8.sub(str, prev_index))
+            dothis.arr.push(nomatches, get.string.string_by_sub_eutf8(str, prev_index))
           end          
           return matches, nomatches
         else
-          dothis.arr.push(matches, eutf8.sub(str, start, stop))
+          dothis.arr.push(matches, get.string.string_by_sub_eutf8(str, start, stop))
           if start > prev_index then
-            dothis.arr.push(nomatches, eutf8.sub(str, prev_index, start - 1))
+            dothis.arr.push(nomatches, get.string.string_by_sub_eutf8(str, prev_index, start - 1))
           end
           prev_index = stop + 1
         end
@@ -2074,7 +2079,7 @@ get = {
     end,
     header = function(path, header)
       local prefixed_header = transf.email_file.prefixed_header(path, header)
-      return eutf8.sub(prefixed_header, #header + 2) -- +2 for the colon and the space
+      return get.string.string_by_sub_eutf8(prefixed_header, #header + 2) -- +2 for the colon and the space
     end,
     addresses = function(path, header, only)
       if not get.arr.bool_by_contains(ls.email_headers_containin_emails, header) then
@@ -3307,7 +3312,7 @@ get = {
         function (form_field_specifier)
           return 
             form_field_specifier.alias or form_field_specifier.value, 
-            string.match(str, form_field_specifier.value .. "[^\n]-: *(.-)\n") or string.match(str, form_field_specifier.value .. "[^\n]-: *(.-)$")
+            eutf8.match(str, form_field_specifier.value .. "[^\n]-: *(.-)\n") or eutf8.match(str, form_field_specifier.value .. "[^\n]-: *(.-)$")
         end
       )
     end,

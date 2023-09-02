@@ -689,7 +689,7 @@ is = {
     end,
     shellscript_file = function(path)
       return get.path.usable_as_filetype(path, "shell-script") 
-      or onig.find(
+      or get.string.bool_by_matches_part_onig(
         transf.file.string_by_contents(path),
         "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+"
       )
@@ -828,7 +828,7 @@ is = {
   },
   url = {
     scheme_url = function(url)
-      return onig.match(url, r.g.url.scheme) ~= nil
+      return get.string.bool_by_matches_part_onig(url, r.g.url.scheme)
     end,
     path_url = function(url)
       return transf.url.path(url) ~= nil

@@ -51,7 +51,7 @@ transf = {
   percent_encoded_octet = {
     char = function(percent)
       local num = percent:sub(2, 3)
-      return string.char(get.string_or_number.number_or_nil(num, 16))
+      return transf.eight_bit_pos_int.ascii_char(get.string_or_number.number_or_nil(num, 16))
     end,
   },
   unicode_codepoint_string = { -- U+X...`
@@ -382,8 +382,8 @@ transf = {
     end,
     random_int_of_length = function(int)
       return math.random(
-        transf.pos_int.smallest_int_of_length(int),
-        transf.pos_int.largest_int_of_length(int)
+        transf.pos_int.int_by_smallest_of_length(int),
+        transf.pos_int.int_by_largest_of_length(int)
       )
     end,
   },
@@ -434,14 +434,14 @@ transf = {
     indicated_utf8_hex_string = function(int)
       return "utf8:" .. transf.pos_int.nonindicated_hex_number_string(int)
     end,
-    largest_int_of_length = function(int)
+    int_by_largest_of_length = function(int)
       return 10^int - 1
     end,
-    smallest_int_of_length = function(int)
-      return (transf.pos_int.largest_int_of_length(int)+1) / 10
+    int_by_smallest_of_length = function(int)
+      return (transf.pos_int.int_by_largest_of_length(int)+1) / 10
     end,
-    center_int_of_length = function(int)
-      return (transf.pos_int.largest_int_of_length(int)+1) / 2
+    int_by_center_of_length = function(int)
+      return (transf.pos_int.int_by_largest_of_length(int)+1) / 2
     end,
     unicode_codepoint_string = function(num)
       return "U+" .. transf.pos_int.nonindicated_hex_number_string(num)
@@ -452,15 +452,15 @@ transf = {
     unicode_prop_table_from_utf8 = function(num)
       return  transf.indicated_utf8_hex_string.unicode_prop_table(transf.pos_int.indicated_utf8_hex_string(num))
     end,
-    ascii_char = function(num)
-      return string.char(num)
-    end,
     gelbooru_post_url = function(pos_int)
       return "https://gelbooru.com/index.php?page=post&s=view&id=" .. pos_int
     end,
     danbooru_post_url = function(pos_int)
       return "https://danbooru.donmai.us/posts/" .. pos_int
     end,
+  },
+  eight_bit_pos_int = {
+    ascii_char = string.char,
   },
   pos_int_arr = {
     unicode_codepoint_string_arr = function(arr)
@@ -634,15 +634,15 @@ transf = {
   ascii_char = {
     eight_bit_pos_int = string.byte,
     indicated_hex_number_string = function(char)
-      return get.string.string_by_formatted_w_n_anys("0x%02X", string.byte(char))
+      return get.string.string_by_formatted_w_n_anys("0x%02X", transf.ascii_char.eight_bit_pos_int(char))
     end,
     percent_encoded_octet = function(char)
-      return get.string.string_by_formatted_w_n_anys("%%%02X", string.byte(char))
+      return get.string.string_by_formatted_w_n_anys("%%%02X", transf.ascii_char.eight_bit_pos_int(char))
     end,
   },
   leaf = {
     rf3339like_dt_or_interval_general_name_fs_tag_string = function(leaf)
-      return onig.match(
+      return get.string.n_strings_by_extracted_onig(
         leaf,
         ("^(%s(?:_to_%s)?--)?([^%%]*)(%%.*)?$"):format(
           r.g.date.rfc3339like_dt,
@@ -667,11 +667,11 @@ transf = {
         return {"/"}
       else
         -- remove leading and trailing slashes
-        if eutf8.sub(path, 1, 1) == "/" then
-          path = eutf8.sub(path, 2)
+        if get.string.string_by_sub_eutf8(path, 1, 1) == "/" then
+          path = get.string.string_by_sub_eutf8(path, 2)
         end
-        if eutf8.sub(path, -1) == "/" then
-          path = eutf8.sub(path, 1, -2)
+        if get.string.string_by_sub_eutf8(path, -1) == "/" then
+          path = get.string.string_by_sub_eutf8(path, 1, -2)
         end
 
         -- split into components
@@ -1986,7 +1986,7 @@ transf = {
   },
   semver_string = {
     semver_component_specifier = function(str)
-      local major, minor, patch, prerelease, build = onig.match(str, r.g.version.semver)
+      local major, minor, patch, prerelease, build = get.string.n_strings_by_extracted_onig(str, r.g.version.semver)
       return {
         major = get.string_or_number.number_or_nil(major),
         minor = get.string_or_number.number_or_nil(minor),
@@ -2185,7 +2185,7 @@ transf = {
   },
   rfc3339like_dt = {
     date_component_name_value_assoc = function(str)
-      local comps = {onig.match(str, r.g.date.rfc3339like_dt)}
+      local comps = {get.string.n_strings_by_extracted_onig(str, r.g.date.rfc3339like_dt)}
       return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.date.date_component_names, function(k, v)
         return v and get.string_or_number.number_or_nil(comps[k]) or nil
       end)
@@ -2752,7 +2752,7 @@ transf = {
   },
   iban = {
     cleaned_iban = function(iban)
-      return select(1, string.gsub(iban, "[ %-_]", ""))
+      return select(1, eutf8.gsub(iban, "[ %-_]", ""))
     end,
     bic = function(iban)
       return transf.cleaned_iban.bic(transf.iban.cleaned_iban(iban))
@@ -3331,7 +3331,7 @@ transf = {
       return transf.youtube_channel_id.feed_url(transf.handle.youtube_channel_id(handle))
     end,
     raw_handle = function(handle)
-      return eutf8.sub(handle, 2)
+      return get.string.string_by_sub_eutf8(handle, 2)
     end,
   },
   youtube_channel_url = {
@@ -3517,9 +3517,9 @@ transf = {
 
       -- Replace control characters (ASCII values 0 - 31 and 127)
       for i = 0, 31 do
-        filename = eutf8.gsub(filename, string.char(i), "_")
+        filename = eutf8.gsub(filename, transf.eight_bit_pos_int.ascii_char(i), "_")
       end
-      filename = eutf8.gsub(filename, string.char(127), "_")
+      filename = eutf8.gsub(filename, transf.eight_bit_pos_int.ascii_char(127), "_")
 
       -- Replace sequences of whitespace characters with a single underscore
       filename = eutf8.gsub(filename, "%s+", "_")
@@ -3531,7 +3531,7 @@ transf = {
       end
 
       if #filename > 255 then
-        filename = eutf8.sub(filename, 1, 255)
+        filename = get.string.string_by_sub_eutf8(filename, 1, 255)
       elseif #filename == 0 then
         filename = "_"
       end
@@ -3582,10 +3582,10 @@ transf = {
     string_by_all_eutf8_lower = eutf8.lower,
     string_by_all_eutf8_upper = eutf8.upper,
     string_by_first_eutf8_upper = function(str)
-      return eutf8.upper(eutf8.sub(str, 1, 1)) .. eutf8.sub(str, 2)
+      return eutf8.upper(get.string.string_by_sub_eutf8(str, 1, 1)) .. get.string.string_by_sub_eutf8(str, 2)
     end,
     string_by_first_eutf8_lower = function(str)
-      return eutf8.lower(eutf8.sub(str, 1, 1)) .. eutf8.sub(str, 2)
+      return eutf8.lower(get.string.string_by_sub_eutf8(str, 1, 1)) .. get.string.string_by_sub_eutf8(str, 2)
     end,
     alphanum = function(str)
       return get.string.string_by_removed_eutf8_w_regex_quantifiable(str, "[^%w%d]")
@@ -3712,7 +3712,7 @@ transf = {
     utf8_char_arr = function(str)
       local t = {}
       for i = 1, eutf8.len(str) do
-        t[i] = eutf8.sub(str, i, i)
+        t[i] = get.string.string_by_sub_eutf8(str, i, i)
       end
       return t
     end,
@@ -3762,10 +3762,10 @@ transf = {
       return lines[#lines]
     end,
     first_char = function(str)
-      return eutf8.sub(str, 1, 1)
+      return get.string.string_by_sub_eutf8(str, 1, 1)
     end,
     last_char = function(str)
-      return eutf8.sub(str, -1)
+      return get.string.string_by_sub_eutf8(str, -1)
     end,
     no_final_newlines = function(str)
       return eutf8.gsub(str, "\n+$", "")
@@ -3922,7 +3922,7 @@ transf = {
   potentially_atpath = {
     potentially_atpath_resolved = function(str)
       if get.string.bool_by_startswith(str, "@") then
-        local valpath = eutf8.sub(str, 2)
+        local valpath = get.string.string_by_sub_eutf8(str, 2)
         valpath = hs.fs.pathToAbsolute(valpath, true)
         str = "@" .. valpath
       end
@@ -4189,7 +4189,7 @@ transf = {
       for _, raw_country in transf.arr.index_value_stateless_iter(raw_countries) do
         local raw_country_lines = get.string.string_arr_split_single_char_noempty(raw_country, "\n")
         local country_header = raw_country_lines[1]
-        local country_code = onig.match(country_header, "\\(([^\\)]+\\)")
+        local country_code = get.string.n_strings_by_extracted_onig(country_header, "\\(([^\\)]+\\)")
         if country_code == nil then error("could not find country code in header. header was " .. country_header) end
         local payload_lines = transf.arr.arr_by_nofirst(raw_country_lines)
         countries[country_code] = {}
@@ -4199,7 +4199,7 @@ transf = {
             local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
             dothis.arr.push(countries[country_code][city_code], relay_code)
           elseif get.string.bool_by_startswith(payload_line, "\t") then -- line specifying an entire city
-            city_code = onig.match(payload_line," \\(([^\\)]+\\) " ) -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
+            city_code = get.string.n_strings_by_extracted_onig(payload_line," \\(([^\\)]+\\) " ) -- lines look like this: \tHelsinki (hel) @ 60.19206°N, 24.94583°W
             countries[country_code][city_code] = {}
           end
         end
@@ -4243,9 +4243,9 @@ transf = {
         synonym_parts,
         function (synonym_part)
           local synonym_part_lines = stringy.split(synonym_part, "\n")
-          local synonym_term = eutf8.sub(synonym_part_lines[1], 2) -- syntax: ❯<term>
-          local synonyms_raw = eutf8.sub(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
-          local antonyms_raw = eutf8.sub(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
+          local synonym_term = get.string.string_by_sub_eutf8(synonym_part_lines[1], 2) -- syntax: ❯<term>
+          local synonyms_raw = get.string.string_by_sub_eutf8(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
+          local antonyms_raw = get.string.string_by_sub_eutf8(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
           local synonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stringy.split(synonyms_raw, ", "), stringy.strip)
           local antonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(stringy.split(antonyms_raw, ", "), stringy.strip)
           return synonym_term, {
@@ -4566,7 +4566,7 @@ transf = {
   slice_notation = {
     three_pos_int_or_nils = function(notation)
       local stripped_str = stringy.strip(notation)
-      local start_str, stop_str, step_str = onig.match(
+      local start_str, stop_str, step_str = get.string.n_strings_by_extracted_onig(
         stripped_str, 
         "^\\[?(-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
       )
@@ -5366,7 +5366,7 @@ transf = {
   },
   doi_url = {
     doi = function(url)
-      return onig.match(url, r.g.id.doi_prefix .. "(.+)/?$")
+      return get.string.n_strings_by_extracted_onig(url, r.g.id.doi_prefix .. "(.+)/?$")
     end,
     indicated_doi = function(url)
       return transf.doi.indicated_doi(transf.doi_url.doi(url))
@@ -5448,7 +5448,7 @@ transf = {
       )
     end,
     citable_object_id = function(id)
-      return onig.match(id, "^[^:]+:(.*)$")
+      return get.string.n_strings_by_extracted_onig(id, "^[^:]+:(.*)$")
     end,
     citable_object_indicator = function(id)
       return stringy.split(id, ":")[1]
@@ -6256,7 +6256,7 @@ transf = {
       )
     end,
     filename = function(csl_table)
-      return get.string.string_by_sub(
+      return get.string.string_by_sub_lua(
         get.string_or_number_arr.string_by_joined(
           {
             transf.csl_table.authors_et_al_string(csl_table),
@@ -7934,7 +7934,7 @@ transf = {
         stop = get.any.default_if_nil(stop, "z")
         step = get.any.default_if_nil(step, 1)
         addmethod = function(a, b)
-          return string.char(string.byte(a) + b)
+          return transf.eight_bit_pos_int.ascii_char(transf.ascii_char.eight_bit_pos_int(a) + b)
         end
       end
     
@@ -8086,11 +8086,11 @@ transf = {
         if #str == 1 then
           input_spec.mouse_button_string = "l"
         else
-          input_spec.mouse_button_string = get.string.string_by_sub(str, 2, 2)
+          input_spec.mouse_button_string = get.string.string_by_sub_lua(str, 2, 2)
         end
       elseif get.string.bool_by_startswith(str, ":") then
         input_spec.mode = "key"
-        local parts = transf.hole_y_arrlike.arr(stringy.split(get.string.string_by_sub(str, 2), "+")) -- separating modifier keys with `+`
+        local parts = transf.hole_y_arrlike.arr(stringy.split(get.string.string_by_sub_lua(str, 2), "+")) -- separating modifier keys with `+`
         if #parts > 1 then
           input_spec.key = act.arr.pop(parts)
           input_spec.mods = parts
@@ -8098,7 +8098,7 @@ transf = {
           input_spec.key = parts[1]
         end
       else
-        local mode_char, x, y, optional_relative_specifier = onig.match(str, "^(.)"..r.g.syntax.point.."( %[a-zA-Z]+)?$")
+        local mode_char, x, y, optional_relative_specifier = get.string.n_strings_by_extracted_onig(str, "^(.)"..r.g.syntax.point.."( %[a-zA-Z]+)?$")
         if not mode_char or not x or not y then
           error("Tried to parse string series_specifier, but it didn't match any known format:\n\n" .. str)
         end
@@ -8114,7 +8114,7 @@ transf = {
           y = get.string_or_number.number_or_nil(y)
         })
         if optional_relative_specifier and #optional_relative_specifier > 0 then
-          input_spec.relative_to = get.string.string_by_sub(optional_relative_specifier, 3)
+          input_spec.relative_to = get.string.string_by_sub_lua(optional_relative_specifier, 3)
         end
       end
       return input_spec
