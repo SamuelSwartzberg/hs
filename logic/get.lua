@@ -3385,6 +3385,42 @@ get = {
       end
       return path
     end,
+    rt_by_memo = function(fnid, opts_as_str, params, opts)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, params)
+      local raw_cnt = transf.file.str_by_contents(cache_path)
+      if not raw_cnt then return nil end
+      return json.decode(raw_cnt)
+    end,
+    timestamp_s_by_created_time = function(fnid, opts_as_str)
+      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
+      return get.str_or_number.number_or_nil(transf.file.str_by_contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
+    end,
+  },
+  fnid = {
+    rt_by_memo = function(fnid, opts_as_str, params, opts)
+      memstore[fnid] = memstore[fnid] or {}
+      memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
+      local node = memstore[fnid][opts_as_str]
+      for i=1, #params do
+        local param = params[i]
+        if param == nil then param = nil_singleton 
+        elseif opts.strify_table_params and is.any.table(param) then
+          if opts.table_param_subset == "json" then
+            param = json.encode(param)
+          elseif opts.table_param_subset == "no-fn-userdata-loops" then
+            param = shelve.marshal(param)
+          elseif opts.table_param_subset == "any" then
+            param = hs.inspect(param, { depth = 4 })
+          end
+        end
+        node = node.children and node.children[param]
+        if not node then return nil end
+      end
+      return get.table.table_by_copy(node.results, true)
+    end,
+    timestamp_s_by_created_time = function() -- no special functionality here, just needs to exist for polymorphic implementation with fscache
+      return os.time()
+    end
   },
   form_field_specifier_arr = {
     form_filling_specifier = function(specarr, in_fields)

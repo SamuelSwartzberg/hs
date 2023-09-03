@@ -2,30 +2,30 @@
 --- so transf.<thing_name1>.<thing_name2>(<thing1>) -> <thing2>
 transf = {
   nonindicated_number_str_arr = {
-    number_base_2_arr = function(hex_arr)
+    number_arr_by_base_2 = function(hex_arr)
       return get.nonindicated_number_str_arr.number_arr(hex_arr, 2)
     end,
-    number_base_8_arr = function(hex_arr)
+    number_arr_by_base_8 = function(hex_arr)
       return get.nonindicated_number_str_arr.number_arr(hex_arr, 8)
     end,
-    number_base_10_arr = function(hex_arr)
+    number_arr_by_base_10 = function(hex_arr)
       return get.nonindicated_number_str_arr.number_arr(hex_arr, 10)
     end,
-    number_base_16_arr = function(hex_arr)
+    number_arr_by_base_16 = function(hex_arr)
       return get.nonindicated_number_str_arr.number_arr(hex_arr, 16)
     end,
   },
   nonindicated_number_str = {
-    number_base_2 = function(num)
+    number_by_base_2 = function(num)
       return get.nonindicated_number_str.number_or_nil(num, 2)
     end,
-    number_base_8 = function(num)
+    number_by_base_8 = function(num)
       return get.nonindicated_number_str.number_or_nil(num, 8)
     end,
-    number_base_10 = function(num)
+    number_by_base_10 = function(num)
       return get.nonindicated_number_str.number_or_nil(num, 10)
     end,
-    number_base_16 = function(num)
+    number_by_base_16 = function(num)
       return get.nonindicated_number_str.number_or_nil(num, 16)
     end,
   },
@@ -36,20 +36,20 @@ transf = {
     base_letter = function(indicated_number)
       return indicated_number:sub(2, 2)
     end,
-    base = function(indicated_number)
-      return tblmap.base_letter.base[
+    pos_int_by_base = function(indicated_number)
+      return tblmap.base_letter.pos_int_by_base[
         transf.indicated_number_str.base_letter(indicated_number)
         ]
     end,
     number = function(indicated_number)
       return get.nonindicated_number_str.number_or_nil(
         indicated_number:sub(3),
-        transf.indicated_number_str.base(indicated_number)
+        transf.indicated_number_str.pos_int_by_base(indicated_number)
       )
     end,
   },
   percent_encoded_octet = {
-    char = function(percent)
+    ascii_char = function(percent)
       local num = percent:sub(2, 3)
       return transf.eight_bit_pos_int.ascii_char(get.str_or_number.number_or_nil(num, 16))
     end,
@@ -230,7 +230,7 @@ transf = {
       return transf.number.pos_number(num) - transf.number.pos_int_part(num)
     end,
     pos_int_float_part = function(num)
-      return transf.nonindicated_number_str.number_base_10(
+      return transf.nonindicated_number_str.number_by_base_10(
         transf.any.str(
           transf.number.pos_float_part(num)
         ):sub(3)
@@ -2048,7 +2048,7 @@ transf = {
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("roll" .. transf.str.str_by_single_quoted_escaped(dice_notation))
     end,
     int_result = function(dice_notation)
-      return transf.nonindicated_number_str.number_base_10(
+      return transf.nonindicated_number_str.number_by_base_10(
         transf.dice_notation.nonindicated_decimal_number_str_result(dice_notation)
       )
     end,
@@ -2157,7 +2157,7 @@ transf = {
       )
     end,
     date_component_name_ordered_arr = function(arr)
-      return get.arr.arr_by_sorted(arr, transf.two_date_component_names.larger)
+      return get.arr.arr_by_sorted(arr, transf.two_date_component_names.date_component_name_by_larger)
     end,
     largest_date_component_name = function(arr)
       return transf.date_component_name_arr.date_component_name_ordered_arr(
@@ -4402,12 +4402,12 @@ transf = {
     end,
   },
   two_numbers ={
-    sum = function(a, b)
+    number_by_sum = function(a, b)
       return a + b
     end,
   },
   two_date_component_names = {
-    larger = function(a, b)
+    date_component_name_by_larger = function(a, b)
       return tblmap.date_component_name.date_component_index[a] > tblmap.ddate_component_name.date_component_index[b]
     end,
     larger_date_component_name = function(a, b)
@@ -6764,7 +6764,7 @@ transf = {
       return transf.url.param_table(url).id
     end,
     pos_int_by_booru_post_id = function(url)
-      return transf.nonindicated_number_str.number_base_10(transf.gelbooru_style_post_url.nonindicated_number_str_by_booru_post_id(url))
+      return transf.nonindicated_number_str.number_by_base_10(transf.gelbooru_style_post_url.nonindicated_number_str_by_booru_post_id(url))
     end,
   },
   yandere_style_post_url = {
@@ -8480,44 +8480,11 @@ transf = {
     end,
   },
   fnid = {
-    rt_by_memo = function(fnid, opts_as_str, params, opts)
-      memstore[fnid] = memstore[fnid] or {}
-      memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
-      local node = memstore[fnid][opts_as_str]
-      for i=1, #params do
-        local param = params[i]
-        if param == nil then param = nil_singleton 
-        elseif opts.strify_table_params and is.any.table(param) then
-          if opts.table_param_subset == "json" then
-            param = json.encode(param)
-          elseif opts.table_param_subset == "no-fn-userdata-loops" then
-            param = shelve.marshal(param)
-          elseif opts.table_param_subset == "any" then
-            param = hs.inspect(param, { depth = 4 })
-          end
-        end
-        node = node.children and node.children[param]
-        if not node then return nil end
-      end
-      return get.table.table_by_copy(node.results, true)
-    end,
-    timestamp_s_by_created_time = function() -- no special functionality here, just needs to exist for polymorphic implementation with fscache
-      return os.time()
-    end
+    
   },
   fnname = {
     local_absolute_path_by_in_cache = function(fnname)
       return transf.str.in_cache_dir(fnname, "fsmemoize")
-    end,
-    rt_by_memo = function(fnid, opts_as_str, params, opts)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, params)
-      local raw_cnt = transf.file.str_by_contents(cache_path)
-      if not raw_cnt then return nil end
-      return json.decode(raw_cnt)
-    end,
-    timestamp_s_by_created_time = function(fnid, opts_as_str)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
-      return get.str_or_number.number_or_nil(transf.file.str_by_contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
     end,
     
   },

@@ -125,6 +125,14 @@ is = {
     printable_ascii_str = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
     end,
+    ascii_char = function(str)
+      return #str == 1
+    end,
+  },
+  ascii_char = {
+    base_letter = function(str)
+      return get.arr.bool_by_contains(ls.base_letters, str)
+    end
   },
   printable_ascii_str = {
     printable_ascii_no_nonspace_whitespace_str = function(str)
@@ -136,6 +144,7 @@ is = {
     end,
   },
   printable_ascii_no_nonspace_whitespace_str = {
+    fnname = transf["nil"]["true"](),
     printable_ascii_not_whitespace_str = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "%s")
     end,
@@ -158,6 +167,9 @@ is = {
     end,
   },
   printable_ascii_not_whitespace_str = {
+    percent_encoded_octet = function(str)
+      return #str == 3 and get.str.bool_by_startswith(str, "%") and is.printable_ascii_not_whitespace_str.number_str(str:sub(2, 3))
+    end,
     media_type = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.media_type)
     end,
@@ -250,6 +262,9 @@ is = {
     period_alphanum_minus_underscore = function(str)
       return get.str.bool_by_not_contains_w_str(str, ":")
     end,
+    indicated_utf8_hex_str = function(str)
+      return get.str.bool_by_startswith(str, "utf8:") -- we're gonna trust that everything after is a valid hex str
+    end
   },
   period_alphanum_minus_underscore = {
     number_str = function(str)
@@ -258,7 +273,7 @@ is = {
     indicated_number_str = function(str)
       return 
         get.str.bool_by_startswith(str, "0") and
-        get.arr.bool_by_contains(transf.table_or_nil.kt_arr(tblmap.base_letter.base), str:sub(2, 2)) and
+        get.arr.bool_by_contains(transf.table_or_nil.kt_arr(tblmap.base_letter.pos_int_by_base), str:sub(2, 2)) and
         is.printable_ascii_str.number_str(str:sub(3))
     end,
     indicated_binary_number_str = function(str)
@@ -1145,6 +1160,18 @@ is = {
     audiodevice_specifier = function(t)
       return
         t.device and t.subtype
+    end,
+    csl_table = function(t)
+      return
+       
+    end,
+    input_spec = function(t)
+      return
+        
+    end,
+    unicode_prop_table = function(t)
+      return
+        t.cpoint
     end,
   },
   audiodevice_specifier = {

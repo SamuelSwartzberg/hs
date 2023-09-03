@@ -183,8 +183,12 @@ thing_name_hierarchy = {
         
       },
       ascii_str = {
+        ascii_char = {
+
+        },
         printable_ascii_str = {
           printable_ascii_no_nonspace_whitespace_str = {
+            fnname = "leaf",
             application_name = {
               mac_application_name = "leaf",
             },
@@ -221,7 +225,9 @@ thing_name_hierarchy = {
               indicated_issn_full_identifier = "leaf",
               indicated_urlmd5 = "leaf",
               indicated_citable_object_id = "leaf",
+              percent_encoded_octet = "leaf",
               colon_period_alphanum_minus_underscore = {
+                indicated_utf8_hex_str = "leaf",
                 colon_alphanum_minus_underscore = {
                   calendar_name = {
                     writeable_calendar_name = "leaf",
@@ -283,11 +289,6 @@ thing_name_hierarchy = {
                     }
                   }
                 },
-                
-                number_str = {
-                  indicated_number_str = "leaf",
-                  nonindicated_number_str = "leaf"
-                }
               },
             },
             url = {
@@ -367,7 +368,8 @@ thing_name_hierarchy = {
             declared_move_input_spec = "leaf",
             declared_scroll_input_spec = "leaf",
             declared_position_change_input_spec = "leaf",
-          }
+          },
+          unicode_prop_table = "leaf",
         }
       }
     },

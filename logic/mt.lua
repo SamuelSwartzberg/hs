@@ -459,5 +459,11 @@ ls = {
       "device",
       "subtype"
     }
+  },
+  base_letters = {
+    "b",
+    "o",
+    "d",
+    "x",
   }
 }

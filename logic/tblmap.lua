@@ -431,7 +431,7 @@ tblmap = {
     },
   },
   base_letter = {
-    base = {
+    pos_int_by_base = {
       b = 2,
       o = 8,
       d = 10,
