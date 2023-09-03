@@ -358,7 +358,7 @@ act = {
       dothis.alphanum_minus_underscore.add_as_pass_item_name(
         name,
         get.str.str_by_prompted_once_from_default(
-          transf.pos_int.random_base64_gen_str_of_length(32),
+          transf.pos_int.base64_gen_str_by_random_of_length(32),
           "Enter a password, or confirm the generated 32-character base64 pregenerated one:"
         )
       )
@@ -611,7 +611,7 @@ act = {
       return table.remove(arr, 1)
     end,
     to_empty_table = function(arr)
-      for i, v in transf.arr.index_value_stateless_iter(arr) do
+      for i, v in transf.arr.pos_int_vt_stateless_iter(arr) do
         arr[i] = nil
       end
     end,

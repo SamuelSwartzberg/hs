@@ -22,6 +22,7 @@ is = {
       return get.str.bool_by_not_matches_part_eutf8(str, "[\n\r]")
     end,
 
+
   },
   not_empty_str = {
     
@@ -95,11 +96,16 @@ is = {
 
   },
   noweirdwhitespace_line = {
-    leaflike = function(str)
-      return get.str.bool_by_not_contains_w_ascii_str(str, "/")
+    path_component = function(str)
+      return str == "/" or get.str.bool_by_not_contains_w_ascii_str(str, "/") 
     end,
     trimmed_noweirdwhitespace_line = function(str)
       return is.line.trimmed_line(str)
+    end,
+  },
+  path_component = {
+    leaflike = function(str)
+      return str ~= "/"
     end,
   },
   leaflike = {
@@ -144,7 +150,7 @@ is = {
     end,
   },
   printable_ascii_no_nonspace_whitespace_str = {
-    fnname = transf["nil"]["true"](),
+    fnname = transf["nil"]["true"],
     printable_ascii_not_whitespace_str = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "%s")
     end,
@@ -157,6 +163,33 @@ is = {
       )
     end,
     application_name = transf["nil"]["true"], -- no way to tell if a str is an application name of some application
+    separated_nonindicated_number_str = function(str)
+      return is.printable_ascii_not_whitespace_str.nonindicated_number_str(
+        transf.str.not_whitespace_str(str)
+      )
+    end
+  },
+  separated_nonindicated_number_str = {
+    separated_nonindicated_bin_number_str = function(str)
+      return is.printable_ascii_not_whitespace_str.nonindicated_bin_number_str(
+        transf.str.not_whitespace_str(str)
+      )
+    end,
+    separated_nonindicated_oct_number_str = function(str)
+      return is.printable_ascii_not_whitespace_str.nonindicated_oct_number_str(
+        transf.str.not_whitespace_str(str)
+      )
+    end,
+    separated_nonindicated_dec_number_str = function(str)
+      return is.printable_ascii_not_whitespace_str.nonindicated_dec_number_str(
+        transf.str.not_whitespace_str(str)
+      )
+    end,
+    separated_nonindicated_hex_number_str = function(str)
+      return is.printable_ascii_not_whitespace_str.nonindicated_hex_number_str(
+        transf.str.not_whitespace_str(str)
+      )
+    end,
   },
   application_name = {
     mac_application_name = function(str)
@@ -168,7 +201,13 @@ is = {
   },
   printable_ascii_not_whitespace_str = {
     percent_encoded_octet = function(str)
-      return #str == 3 and get.str.bool_by_startswith(str, "%") and is.printable_ascii_not_whitespace_str.number_str(str:sub(2, 3))
+      return #str == 3 and get.str.bool_by_startswith(str, "%") and is.printable_ascii_not_whitespace_str.nonindicated_number_str(str:sub(2, 3))
+    end,
+    html_entity = function(str)
+      return #str > 20 and get.str.bool_by_startswith(str, "&") and get.str.bool_by_endswith(str, ";") and get.str.bool_by_matches_whole_onig(str, r.g.html_entity) -- the earlier checks are technically unncessary but improve performance
+    end,
+    fs_tag_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.fs_tag_str)
     end,
     media_type = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.media_type)
@@ -264,32 +303,72 @@ is = {
     end,
     indicated_utf8_hex_str = function(str)
       return get.str.bool_by_startswith(str, "utf8:") -- we're gonna trust that everything after is a valid hex str
-    end
+    end,
+    rfc3339like_dt_or_interval = function(str)
+      return get.str.bool_by_matches_part_onig(str, "^" .. r.g.rfc3339like_dt)
+    end,
+  },
+  rfc3339like_dt_or_interval = {
+    rfc3339like_interval = function(str)
+      return get.string.bool_by_contains(str, "_to_")
+    end,
+    rfc3339like_dt = function(str)
+      return not is.rfc3339like_dt_or_interval.rfc3339like_interval(str)
+    end,
   },
   period_alphanum_minus_underscore = {
-    number_str = function(str)
-      return get.nonindicated_number_str.number_or_nil(str, 16) ~= nil -- this may not return the correct value for non-hex strs, but that doesn't matter, we're only checking if it is a digit str of whatever kind, so what value exactly it returns doesn't matter
+    nonindicated_number_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "-?[0-9a-fA-F]+(:?\\.[0-9a-fA-F]+)?")
     end,
     indicated_number_str = function(str)
       return 
         get.str.bool_by_startswith(str, "0") and
         get.arr.bool_by_contains(transf.table_or_nil.kt_arr(tblmap.base_letter.pos_int_by_base), str:sub(2, 2)) and
-        is.printable_ascii_str.number_str(str:sub(3))
-    end,
-    indicated_bin_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0b") and is.printable_ascii_str.bin_str(str:sub(3))
-    end,
-    indicated_hex_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0x") and is.printable_ascii_str.hex_str(str:sub(3))
-    end,
-    indicated_oct_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0o") and is.printable_ascii_str.oct_str(str:sub(3))
-    end,
-    indicated_dec_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0d") and is.printable_ascii_str.dec_str(str:sub(3))
+        is.printable_ascii_str.nonindicated_number_str(str:sub(3))
     end,
     domain_name = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.domain_name)
+    end,
+  },
+  indicated_number_str = {
+    indicated_bin_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0b")
+    end,
+    indicated_hex_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0x")
+    end,
+    indicated_oct_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0o")
+    end,
+    indicated_dec_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0d")
+    end,
+  },
+  nonindicated_number_str = {
+    nonindicated_bin_number_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "-01\\.")
+    end,
+    nonindicated_oct_number_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "-0-7\\.")
+    end,
+    nonindicated_dec_number_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "-0-9\\.")
+    end,
+    nonindicated_hex_number_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "-0-9a-fA-F\\.")
+    end,
+  },
+  nonindicated_hex_number_str = {
+    pos_int_nonindicated_hex_number_str = function(str)
+      return get.str.bool_by_not_startswith(str, "-") and get.str.bool_by_not_contains_w_ascii_str(str, ".")
+    end
+  },
+  pos_int_nonindicated_hex_number_str = {
+    byte_nonindicated_hex_number_str = function(str)
+      return #str == 2
+    end,
+    two_byte_nonindicated_hex_number_str = function(str)
+      return #str == 4
     end,
   },
   colon_alphanum_minus_underscore = {
@@ -531,6 +610,9 @@ is = {
   local_nonabsolute_path = {
     local_tilde_path = function(path)
       return get.str.bool_by_startswith(path, "~/")
+    end,
+    atpath = function(path)
+      return get.str.bool_by_startswith(path, "@")
     end,
   },
   local_absolute_path = {
@@ -815,6 +897,13 @@ is = {
     pass_item_name = function(str)
       return get.extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
     end,
+    unicode_block_name = transf["nil"]["true"],
+    unicode_category_name = transf["nil"]["true"], 
+    unicode_plane_name = transf["nil"]["true"], -- currently no real point in the performance cost of checking if the strings actually are block/category/plane names. maybe in the future
+    sign_indicator = function(str)
+      return str == "" or str == "-"
+    end
+    
   },
   alphanum_underscore = {
     lower_alphanum_underscore = function(str)
@@ -822,6 +911,11 @@ is = {
     end,
     upper_alphanum_underscore = function(str)
       return get.str.bool_by_matches_whole_onig(str, "[A-Z_]+")
+    end,
+  },
+  lower_alphanum_underscore = {
+    general_name = function(str)
+      return get.str.bool_by_not_startswith(str, "_") and get.str.bool_by_not_endswith(str, "_")
     end,
   },
   alphanum = {
@@ -1027,8 +1121,19 @@ is = {
     pos_int = function(num)
       return num > 0
     end,
-    timestamp_s = transf["nil"]["true"](), -- all integers are valid timestamps (s)
-    timestamp_ms = transf["nil"]["true"](), -- all integers are valid timestamps (ms)
+    neg_int = function(num)
+      return num < 0
+    end,
+    timestamp_s = transf["nil"]["true"], -- all integers are valid timestamps (s)
+    timestamp_ms = transf["nil"]["true"], -- all integers are valid timestamps (ms)
+  },
+  float = {
+    pos_float = function(num)
+      return num > 0
+    end,
+    neg_float = function(num)
+      return num < 0
+    end,
   },
   timestamp_s = {
     reasonable_timestamp_s = function(num)
@@ -1041,7 +1146,19 @@ is = {
     end,
   },
   pos_int = {
-    
+    halfbyte_pos_int = function(num)
+      return num < 256
+    end,
+  },
+  byte_pos_int = {
+    halfbyte_pos_int = function(num)
+      return num < 128
+    end,
+  },
+  halfbyte_pos_int = {
+    nibble_pos_int = function(num)
+      return num < 16
+    end,
   },
   n_anys = {
     any = function(...)
@@ -1141,6 +1258,21 @@ is = {
       return not is.only_int_key_table.hole_y_arrlike(only_int_key_table)
     end,
   },
+  arr = {
+    set = function(arr)
+      local seen_vals = {}
+      for k, v in transf.arr.kt_vt_stateless_iter(arr) do
+        if seen_vals[v] then return false end 
+        seen_vals[v] = true
+      end
+      return true
+    end,
+  },
+  set = {
+    set_set = function(set)
+      return is.any.set_arr(set)
+    end,
+  },
   non_empty_table = {
     str_key_non_empty_table = function(t)
       return get.table.bool_by_all_keys_pass_w_fn(
@@ -1150,6 +1282,12 @@ is = {
     end,
     date = function(t)
       return is.any.fn(t.addyears) -- arbitrary prop of date object
+    end,
+    has_id_key_assoc = function(t)
+      return t.id ~= nil
+    end,
+    has_index_key_assoc = function(t)
+      return t.index ~= nil
     end,
   },
   str_key_non_empty_table = {

@@ -31,9 +31,11 @@ thing_name_hierarchy = {
         noempty_nocomment_noindent_line = "leaf",
         trimmed_line = "leaf",
         noweirdwhitespace_line = {
-          leaflike = {
-            extension = "leaf",
-            citable_filename = "leaf"
+          path_component = {
+            leaflike = {
+              extension = "leaf",
+              citable_filename = "leaf"
+            },
           },
           trimmed_noweirdwhitespace_line = {
             path = {
@@ -132,7 +134,8 @@ thing_name_hierarchy = {
             },
             local_path = {
               local_nonabsolute_path = {
-                local_tilde_path = "leaf"
+                local_tilde_path = "leaf",
+                atpath = "leaf"
               },
               contains_relative_references_local_path = "leaf",
               not_contains_relative_references_local_path = "leaf",
@@ -192,7 +195,15 @@ thing_name_hierarchy = {
             application_name = {
               mac_application_name = "leaf",
             },
+            separated_nonindicated_number_str = {
+              separated_nonindicated_bin_number_str = "leaf",
+              separated_nonindicated_hex_number_str = "leaf",
+              separated_nonindicated_oct_number_str = "leaf",
+              separated_nonindicated_dec_number_str = "leaf",
+            },
             printable_ascii_not_whitespace_str = {
+              html_entity = "leaf",
+              fs_tag_str = "leaf",
               base64_gen_str = {
                 unicode_codepoint_str = "leaf"
               },
@@ -228,6 +239,10 @@ thing_name_hierarchy = {
               percent_encoded_octet = "leaf",
               colon_period_alphanum_minus_underscore = {
                 indicated_utf8_hex_str = "leaf",
+                rfc3339like_dt_or_interval = {
+                  rfc3339_dt = "leaf",
+                  rfc3339_interval = "leaf",
+                },
                 colon_alphanum_minus_underscore = {
                   calendar_name = {
                     writeable_calendar_name = "leaf",
@@ -254,10 +269,13 @@ thing_name_hierarchy = {
                       relay_identifier = "leaf",
                       ipc_socket_id = {
                         mpv_ipc_socket_id = "leaf",
-                      }
+                      },
+                      sign_indicator = "leaf"
                     },
                     alphanum_underscore = {
-                      lower_alphanum_underscore = "leaf",
+                      lower_alphanum_underscore = {
+                        general_name = "leaf"
+                      },
                       upper_alphanum_underscore = "leaf",
                     },
                     alphanum = {
@@ -277,12 +295,13 @@ thing_name_hierarchy = {
                   }
                 },
                 period_alphanum_minus_underscore = {
-                  number_str = "leaf",
-                  indicated_number_str = "leaf",
-                  indicated_bin_number_str = "leaf",
-                  indicated_hex_number_str = "leaf",
-                  indicated_oct_number_str = "leaf",
-                  indicated_dec_number_str = "leaf",
+                  nonindicated_number_str = "leaf",
+                  indicated_number_str = {
+                    indicated_bin_number_str = "leaf",
+                    indicated_hex_number_str = "leaf",
+                    indicated_oct_number_str = "leaf",
+                    indicated_dec_number_str = "leaf",
+                  },
                   domain_name = {
                     source_id = {
                       active_source_id = "leaf",
@@ -343,12 +362,18 @@ thing_name_hierarchy = {
     },
     table = {
       only_int_key_table = {
-        arr = { }, -- added later, see below
+        arr = { 
+          set =  {
+            set_set = "leaf",
+          }
+        }, -- partially added later, see below
         hole_y_arrlike = "leaf"
       },
       empty_table = "leaf",
       non_empty_table = {
         date = "leaf",
+        has_id_key_assoc = "leaf",
+        has_index_key_assoc = "leaf",
         str_key_non_empty_table = {
           created_item_specifier = {
             stream_created_item_specifier = {
@@ -385,13 +410,23 @@ thing_name_hierarchy = {
           reasonable_timestamp_ms = "leaf",
         },
         even_int = "leaf",
-        pos_int = "leaf",
+        pos_int = {
+          byte_pos_int = {
+            halfbyte_pos_int = {
+              nibble_pos_int = "leaf"
+            }
+          },
+        },
+        neg_int = "leaf",
       },
-      float = "leaf",
+      float = {
+        pos_float = "leaf",
+        neg_float = "leaf",
+      },
       pos_number = "leaf",
       neg_number = "leaf",
       zero = "leaf",
-    }, 
+    },
     fn = {
   
     },
@@ -402,12 +437,24 @@ thing_name_hierarchy = {
 
 -- add array versions of all other types
 
-thing_name_hierarchy.any.table.only_int_key_table.arr = transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(thing_name_hierarchy, function (k)
-  return k .. "_arr"
-end)
+thing_name_hierarchy.any.table.only_int_key_table.arr = transf.two_tables.table_by_take_old(
+  thing_name_hierarchy.any.table.only_int_key_table.arr,
+  transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
+    thing_name_hierarchy, 
+    function (k)
+      return k .. "_arr"
+    end
+  )
+)
 
 -- add nested array versions of all other types (for now, this level of nesting is what we'll leave it at)
 
-thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr = transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(thing_name_hierarchy.any.table.only_int_key_table.arr, function (k)
-  return k .. "_arr"
-end)
+thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr = transf.two_tables.table_by_take_old(
+  thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr,
+  transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
+    thing_name_hierarchy.any.table.only_int_key_table.arr, 
+    function (k)
+      return k .. "_arr"
+    end
+  )
+)

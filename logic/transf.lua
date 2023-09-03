@@ -51,7 +51,7 @@ transf = {
   percent_encoded_octet = {
     ascii_char = function(percent)
       local num = percent:sub(2, 3)
-      return transf.eight_bit_pos_int.ascii_char(get.str_or_number.number_or_nil(num, 16))
+      return transf.halfbyte_pos_int.ascii_char(get.str_or_number.number_or_nil(num, 16))
     end,
   },
   unicode_codepoint_str = { -- U+X...`
@@ -81,8 +81,8 @@ transf = {
     end
   },
   unicode_prop_table = {
-    nonindicated_bin_number_str = function(unicode_prop_table)
-      return unicode_prop_table.bin
+    indicated_bin_number_str_by_codepoint = function(unicode_prop_table)
+      return "0b" .. unicode_prop_table.bin
     end,
     unicode_block_name = function(unicode_prop_table)
       return unicode_prop_table.block
@@ -93,17 +93,17 @@ transf = {
     utf8_char = function(unicode_prop_table)
       return unicode_prop_table.char
     end,
-    unicode_codepoint = function(unicode_prop_table)
+    unicode_codepoint_str = function(unicode_prop_table)
       return unicode_prop_table.cpoint
     end,
-    unicode_codepoint_dec_str = function(unicode_prop_table)
-      return unicode_prop_table.dec
+    indicated_dec_number_str_by_codepoint = function(unicode_prop_table)
+      return "0d" .. unicode_prop_table.dec
     end,
-    unicode_codepoint_hex_str = function(unicode_prop_table)
-      return unicode_prop_table.hex
+    indicated_hex_number_str_by_codepoint = function(unicode_prop_table)
+      return "0x" .. unicode_prop_table.hex
     end,
-    unicode_codepoint_oct_str = function(unicode_prop_table)
-      return unicode_prop_table.oct
+    indicated_oct_number_str_by_codepoint = function(unicode_prop_table)
+      return "0o" .. unicode_prop_table.oct
     end,
     html_entity = function(unicode_prop_table)
       return unicode_prop_table.html
@@ -111,15 +111,15 @@ transf = {
     unicode_character_name = function(unicode_prop_table)
       return unicode_prop_table.name
     end,
-    unicode_plane = function(unicode_prop_table)
+    unicode_plane_name = function(unicode_prop_table)
       return unicode_prop_table.plane
     end,
-    utf8_hex_str = function(unicode_prop_table)
+    indicated_utf8_hex_str = function(unicode_prop_table)
       return transf.str.not_whitespace_str(unicode_prop_table.utf8)
     end,
-    summary = function(unicode_prop_table)
+    str_by_summary = function(unicode_prop_table)
       return transf.unicode_prop_table.utf8_char(unicode_prop_table) .. ": "
-        .. transf.unicode_prop_table.unicode_codepoint(unicode_prop_table) .. " "
+        .. transf.unicode_prop_table.unicode_codepoint_str(unicode_prop_table) .. " "
         .. transf.unicode_prop_table.unicode_character_name(unicode_prop_table)
     end,
   },
@@ -150,20 +150,20 @@ transf = {
     indicated_hex_number_str = function(num)
       return transf.number.sign_indicator(num) .. "0x" .. transf.pos_number.nonindicated_hex_number_str(transf.number.pos_number(num))
     end,
-    byte_hex_number_str_arr = function(num)
+    byte_nonindicated_hex_number_str_arr = function(num)
       return  get.str.str_arr_groups_ascii_from_end(
         transf.number.nonindicated_hex_number_str(num),
         2
       )
     end,
-    two_byte_hex_number_str_arr = function(num)
+    two_byte_nonindicated_hex_number_str_arr = function(num)
       return  get.str.str_arr_groups_ascii_from_end(
         transf.number.nonindicated_hex_number_str(num),
         4
       )
     end,
     
-    noninciated_oct_number_str = function(num)
+    nonindicated_oct_number_str = function(num)
       return transf.number.sign_indicator(num) .. transf.pos_number.noninciated_oct_number_str(transf.number.pos_number(num))
     end,
 
@@ -219,27 +219,27 @@ transf = {
     neg_int = function(num)
       return transf.number.pos_numbert(transf.number.int_by_rounded(num))
     end,
-    floor_int = math.floor,
-    ceil_int = math.ceil,
-    pos_int_part = function(num)
-      return transf.number.floor_int(
+    int_by_floor = math.floor,
+    int_by_ceil = math.ceil,
+    pos_int_by_abs_int_part = function(num)
+      return transf.number.int_by_floor(
         transf.number.pos_number(num)
       )
     end,
-    pos_float_part = function(num)
-      return transf.number.pos_number(num) - transf.number.pos_int_part(num)
+    pos_float_by_abs_float_part = function(num)
+      return transf.number.pos_number(num) - transf.number.pos_int_by_abs_int_part(num)
     end,
-    pos_int_float_part = function(num)
+    pos_int_by_float_part = function(num)
       return transf.nonindicated_number_str.number_by_base_10(
-        transf.any.str(
-          transf.number.pos_float_part(num)
+        transf.number.nonindicated_dec_number_str(
+          transf.number.pos_float_by_abs_float_part(num)
         ):sub(3)
       )
     end,
-    with_1_added = function(num)
+    number_by_1_added = function(num)
       return num + 1
     end,
-    with_1_subtracted = function(num)
+    number_by_1_subtracted = function(num)
       return num - 1
     end,
   },
@@ -247,13 +247,13 @@ transf = {
     nonindicated_dec_number_str = function(num)
       return 
         transf.pos_int.nonindicated_dec_number_str(
-          transf.number.pos_int_part(num)
+          transf.number.pos_int_by_abs_int_part(num)
         ) .. 
         (
-          transf.number.pos_float_part(num) == 0 and "" or 
+          transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
           (
             "." .. transf.pos_int.nonindicated_dec_number_str(
-              transf.number.pos_int_float_part(num)
+              transf.number.pos_int_by_float_part(num)
             )
           )
         )
@@ -261,91 +261,91 @@ transf = {
     separated_nonindicated_dec_number_str = function(num)
       return 
         transf.pos_int.separated_nonindicated_dec_number_str(
-          transf.number.pos_int_part(num)
+          transf.number.pos_int_by_abs_int_part(num)
         ) .. 
         (
-          transf.number.pos_float_part(num) == 0 and "" or 
+          transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
           (
             "." .. transf.pos_int.separated_nonindicated_dec_number_str(
-              transf.number.pos_int_float_part(num)
+              transf.number.pos_int_by_float_part(num)
             )
           )
         )
       end,
     nonindicated_hex_number_str = function(num)
       return transf.pos_int.nonindicated_hex_number_str(
-        transf.number.pos_int_part(num)
+        transf.number.pos_int_by_abs_int_part(num)
       ) .. 
       (
-        transf.number.pos_float_part(num) == 0 and "" or 
+        transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
         (
           "." .. transf.pos_int.nonindicated_hex_number_str(
-            transf.number.pos_int_float_part(num)
+            transf.number.pos_int_by_float_part(num)
           )
         )
       )
     end,
     separated_nonindicated_hex_number_str = function(num)
       return transf.pos_int.separated_nonindicated_hex_number_str(
-        transf.number.pos_int_part(num)
+        transf.number.pos_int_by_abs_int_part(num)
       ) .. 
       (
-        transf.number.pos_float_part(num) == 0 and "" or 
+        transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
         (
           "." .. transf.pos_int.separated_nonindicated_hex_number_str(
-            transf.number.pos_int_float_part(num)
+            transf.number.pos_int_by_float_part(num)
           )
         )
       )
     end,
     noninciated_oct_number_str = function(num)
       return transf.pos_int.noninciated_oct_number_str(
-        transf.number.pos_int_part(num)
+        transf.number.pos_int_by_abs_int_part(num)
       ) .. 
       (
-        transf.number.pos_float_part(num) == 0 and "" or 
+        transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
         (
           "." .. transf.pos_int.noninciated_oct_number_str(
-            transf.number.pos_int_float_part(num)
+            transf.number.pos_int_by_float_part(num)
           )
         )
       )
     end,
     separated_nonindicated_oct_number_str = function(num)
       return transf.pos_int.separated_nonindicated_oct_number_str(
-        transf.number.pos_int_part(num)
+        transf.number.pos_int_by_abs_int_part(num)
       ) .. 
       (
-        transf.number.pos_float_part(num) == 0 and "" or 
+        transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
         (
           "." .. transf.pos_int.separated_nonindicated_oct_number_str(
-            transf.number.pos_int_float_part(num)
+            transf.number.pos_int_by_float_part(num)
           )
         )
       )
     end,
     nonindicated_bin_number_str = function(num)
       return transf.pos_int.nonindicated_bin_number_str(
-        transf.number.pos_int_part(num)
+        transf.number.pos_int_by_abs_int_part(num)
       ) .. 
       (
-        transf.number.pos_float_part(num) == 0 and "" or 
+        transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
         (
           "." .. transf.pos_int.nonindicated_bin_number_str(
-            transf.number.pos_int_float_part(num)
+            transf.number.pos_int_by_float_part(num)
           )
         )
       )
     end,
     separated_nonindicated_bin_number_str = function(num)
       return transf.pos_int.separated_nonindicated_bin_number_str(
-        transf.number.pos_int_part(num)
+        transf.number.pos_int_by_abs_int_part(num)
       ) .. 
       (
-        transf.number.pos_float_part(num) == 0 and "" or 
+        transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
         (
           "." .. transf.pos_int.separated_nonindicated_bin_number_str(
-            transf.number.pos_int_float_part(num)
+            transf.number.pos_int_by_float_part(num)
           )
         )
       )
@@ -354,18 +354,7 @@ transf = {
   neg_number = {
 
   },
-  num_chars = {
-    normzeilen = function(num_chars)
-      return transf.number.int_by_rounded(
-        num_chars / 55
-      )
-    end,
-  },
-  
   int = {
-    length = function(int)
-      return #transf.any.str(int)
-    end,
     pos_int_or_nil = function(int)
       if int > 0 then
         return int
@@ -380,7 +369,7 @@ transf = {
         return nil
       end
     end,
-    random_int_of_length = function(int)
+    int_by_random_of_length = function(int)
       return math.random(
         transf.pos_int.int_by_smallest_of_length(int),
         transf.pos_int.int_by_largest_of_length(int)
@@ -388,7 +377,15 @@ transf = {
     end,
   },
   pos_int = {
-    random_base64_gen_str_of_length = function(int)
+    pos_int_by_dec_length = function(int)
+      return #transf.pos_int.nonindicated_dec_number_str(int)
+    end,
+    pos_int_by_normzeilen = function(pos_int)
+      return transf.number.int_by_rounded(
+        pos_int / 55
+      )
+    end,
+    base64_gen_str_by_random_of_length = function(int)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. transf.any.str(transf.number.int_by_rounded(int * 3/4))) -- 3/4 because base64 takes the int to be the input length, but we want to specify the output length (which is 4/3 the input length in case of base64)
     end,
     nonindicated_dec_number_str = function(num)
@@ -459,8 +456,8 @@ transf = {
       return "https://danbooru.donmai.us/posts/" .. pos_int
     end,
   },
-  eight_bit_pos_int = {
-    ascii_char = str.char,
+  halfbyte_pos_int = {
+    ascii_char = string.char,
   },
   pos_int_arr = {
     unicode_codepoint_str_arr = function(arr)
@@ -509,15 +506,6 @@ transf = {
       )
     end,
   },
-  not_nil = {
-    str = function(arg)
-      if arg == nil then
-        return nil
-      else
-        return transf.any.str_by_replicable(arg)
-      end
-    end,
-  },
   arr = {
     arr_by_reversed = function(arr)
       local res = {}
@@ -556,37 +544,38 @@ transf = {
         transf.any.str_by_replicable
       )
     end,
-    contents_summary = function(arr)
+    str_by_contents_summary = function(arr)
       return transf.str_arr.contents_summary(
         transf.arr.str_arr(arr)
       )
     end,
-    summary = function(arr)
-      return "arr ("..#arr.."):" .. transf.arr.contents_summary(arr)
+    str_by_summary = function(arr)
+      return "arr ("..#arr.."):" .. transf.arr.str_by_contents_summary(arr)
     end,
     multiline_str = function(arr)
       return transf.str_arr.multiline_str(transf.arr.str_arr(arr))
     end,
     
-    index_value_stateless_iter = ipairs,
-    index_vt_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.index_value_stateless_iter),
-    index_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.index_value_stateless_iter, 1, 1),
-    value_bool_assoc = function(arr)
+    pos_int_vt_stateless_iter = ipairs,
+    pos_int_vt_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.pos_int_vt_stateless_iter),
+    pos_int_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.pos_int_vt_stateless_iter, 1, 1),
+    vt_key_bool_value_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(arr, function(v) return v, true end)
     end,
     set = function(arr)
-      return transf.table_or_nil.kt_arr(
-        transf.arr.value_bool_assoc(arr)
+      return transf.table.kt_arr(
+        transf.arr.vt_key_bool_value_assoc(arr)
       )
     end,
-    permutation_arr = function(arr)
+    arr_arr_by_permutations = function(arr)
       if #arr == 0 then
         return {{}}
       else
         return get.any_stateful_generator.arr(combine.permute, arr)
       end
     end,
-    powerset = function(arr)
+    --- this may not actually work as intended on arrays, and perhaps only on sets. may thus need refactoring
+    set_set_by_powerset = function(arr)
       if #arr == 0 then
         return {{}}
       else
@@ -595,8 +584,8 @@ transf = {
       end
     end,
     n_anys = table.unpack,
-    initial_selected_index = function(arr)
-      return get.thing_name_arr.initial_selected_index(
+    pos_int_by_initial_selected_index = function(arr)
+      return get.thing_name_arr.pos_int_by_initial_selected_index(
         transf.any.applicable_thing_name_arr(arr)
       ) or 1 
     end,
@@ -612,15 +601,15 @@ transf = {
       return new_tbl
     end
   },
-  two_id_assocs = {
+  two_has_id_key_assocs = {
     bool_by_equal = function(t1, t2)
       return t1.id == t2.id
     end,
   },
   assoc_arr = {
-    assoc_with_index_as_key_arr = function(arr)
+    has_index_key_assoc_arr = function(arr)
       local res = get.table.table_by_copy(arr, true)
-      for i, v in transf.arr.index_value_stateless_iter(arr) do
+      for i, v in transf.arr.pos_int_vt_stateless_iter(arr) do
         v.index = i
       end
       return res
@@ -632,12 +621,12 @@ transf = {
     end
   },
   ascii_char = {
-    eight_bit_pos_int = str.byte,
+    halfbyte_pos_int = string.byte,
     indicated_hex_number_str = function(char)
-      return get.str.str_by_formatted_w_n_anys("0x%02X", transf.ascii_char.eight_bit_pos_int(char))
+      return get.str.str_by_formatted_w_n_anys("0x%02X", transf.ascii_char.halfbyte_pos_int(char))
     end,
     percent_encoded_octet = function(char)
-      return get.str.str_by_formatted_w_n_anys("%%%02X", transf.ascii_char.eight_bit_pos_int(char))
+      return get.str.str_by_formatted_w_n_anys("%%%02X", transf.ascii_char.halfbyte_pos_int(char))
     end,
   },
   leaf = {
@@ -645,8 +634,8 @@ transf = {
       return get.str.n_strs_by_extracted_onig(
         leaf,
         ("^(%s(?:_to_%s)?--)?([^%%]*)(%%.*)?$"):format(
-          r.g.date.rfc3339like_dt,
-          r.g.date.rfc3339like_dt
+          r.g.rfc3339like_dt,
+          r.g.rfc3339like_dt
         )
       )
     end,
@@ -661,9 +650,7 @@ transf = {
       return "@" .. path
     end,
     path_component_arr = function(path)
-      if path == "" then
-        return {""}
-      elseif path == "/" then
+      if path == "/" then
         return {"/"}
       else
         -- remove leading and trailing slashes
@@ -687,7 +674,7 @@ transf = {
         {start = 1, stop = -1}
       )
     end,
-    path_segments = function(path)
+    path_component_arr_by_split_ext = function(path)
       local path_components = transf.path.path_component_arr(path)
       local leaf = act.arr.pop(path_components)
       local without_extension = ""
@@ -707,29 +694,29 @@ transf = {
       dothis.arr.push(path_components, extension)
     end,
     extension = function(path)
-      local psegments = transf.path.path_segments(path)
+      local psegments = transf.path.path_component_arr_by_split_ext(path)
      ---@diagnostic disable-next-line: need-check-nil -- path_segments always returns a table with at least two elements for any valid path
       return psegments[#psegments]
     end,
-    normalized_extension = function(path)
+    extension_by_normalized = function(path)
       local ext = transf.path.extension(path)
       return tblmap.extension.normalized_extension[
         ext
       ] or ext
     end,
-    path_without_extension = function(path)
+    path_by_without_extension = function(path)
       return get.path.path_from_sliced_path_segment_arr(
         get.path.path_segments(path),
         {start = 1, stop = -2}
       )
     end,
-    filename = function(path)
-      local psegments = transf.path.path_segments(path)
+    leaflike_by_filename = function(path)
+      local psegments = transf.path.path_component_arr_by_split_ext(path)
       act.arr.pop(psegments)
       ---@diagnostic disable-next-line: need-check-nil -- path_segments always returns a table with at least two elements for any valid path
       return psegments[#psegments]
     end,
-    ending_with_slash = function(path)
+    path_by_ending_with_slash = function(path)
       return get.str.str_by_with_suffix(path or "", "/")
     end,
     initial_path_component = function(path)
@@ -794,7 +781,7 @@ transf = {
       local parts = get.str.str_arr_by_split_w_ascii_char(path, ":")
       local final_part = act.arr.pop(parts)
       local specifier = {}
-      if is.str.number_str(parts[#parts]) then
+      if is.str.nonindicated_number_str(parts[#parts]) then
         specifier = {
           column = final_part,
           line = act.arr.pop(parts),
@@ -1012,7 +999,7 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaf)
     end,
     filenames_arr = function(path_arr)
-      local filenames = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.filename)
+      local filenames = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_filename)
       return transf.arr.set(filenames)
     end,
     extensions_arr = function(path_arr)
@@ -1311,7 +1298,7 @@ transf = {
     plaintext_assoconary_read_assoc = function(assoc)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc) do
-        local filename = transf.path.filename(k)
+        local filename = transf.path.leaflike_by_filename(k)
         if is.any.table(v) then
           res[filename] = transf.absolute_path_key_leaf_str_or_nested_value_assoc.plaintext_assoconary_read_assoc(v)
         else
@@ -1338,7 +1325,7 @@ transf = {
       )
     end,
     absolute_path_by_root_gitignore = function(path)
-      return transf.path.ending_with_slash(transf.in_git_dir.git_root_dir(path)) .. ".gitignore"
+      return transf.path.path_by_ending_with_slash(transf.in_git_dir.git_root_dir(path)) .. ".gitignore"
     end,
     current_branch = function(path)
       return get.extant_path.cmd_output_from_path(
@@ -1407,10 +1394,10 @@ transf = {
   },
   git_root_dir = {
     dotgit_dir = function(git_root_dir)
-      return transf.path.ending_with_slash(git_root_dir) .. ".git"
+      return transf.path.path_by_ending_with_slash(git_root_dir) .. ".git"
     end,
     hooks_dir = function(git_root_dir)
-      return transf.path.ending_with_slash(git_root_dir) .. ".git/hooks"
+      return transf.path.path_by_ending_with_slash(git_root_dir) .. ".git/hooks"
     end,
     hooks_absolute_path_arr = function(git_root_dir)
       return transf.dir.absolute_path_arr_by_children(transf.git_root_dir.hooks_dir(git_root_dir))
@@ -1449,7 +1436,7 @@ transf = {
       end
     end,
     path_part = function(path_leaf_specifier)
-      return transf.path.ending_with_slash(path_leaf_specifier.path) 
+      return transf.path.path_by_ending_with_slash(path_leaf_specifier.path) 
     end,
     fs_tag_assoc = function(path_leaf_specifier)
       return path_leaf_specifier.fs_tag_assoc
@@ -1467,7 +1454,7 @@ transf = {
       return transf.table_or_nil.kt_arr(path_leaf_specifier.fs_tag_assoc)
     end,
     path = function(path_leaf_specifier)
-      return transf.path.ending_with_slash(path_leaf_specifier.path) 
+      return transf.path.path_by_ending_with_slash(path_leaf_specifier.path) 
       .. transf.path_leaf_specifier.rf3339like_dt_or_interval_part(path_leaf_specifier)
       .. transf.path_leaf_specifier.general_name_part(path_leaf_specifier)
       .. transf.path_leaf_specifier.fs_tag_str(path_leaf_specifier)
@@ -1758,7 +1745,7 @@ transf = {
 
   ics_file = {
     assoc_arr = function(path)
-      local temppath = transf.str.in_tmp_dir(transf.path.filename(path) .. ".ics")
+      local temppath = transf.str.in_tmp_dir(transf.path.leaflike_by_filename(path) .. ".ics")
       dothis.extant_path.copy_to_absolute_path(path, temppath)
       act.ics_file.generate_json_file(temppath)
       local jsonpath = transf.file.str_by_contents(get.path.with_different_extension(temppath, "json"))
@@ -1789,7 +1776,7 @@ transf = {
   backuped_thing_identifier = {
     timestamp_ms = function(identifier)
       return  transf.absolute_path.str_or_nil_by_file_contents(
-        transf.path.ending_with_slash(env.MLAST_BACKUP) .. identifier
+        transf.path.path_by_ending_with_slash(env.MLAST_BACKUP) .. identifier
       ) or 0
     end
   },
@@ -1820,7 +1807,7 @@ transf = {
   tree_node_arr = {
     arr_arr_by_label = function(arr, path, include_inner)
       local res = {}
-      for _, node in transf.arr.index_value_stateless_iter(arr) do
+      for _, node in transf.arr.pos_int_vt_stateless_iter(arr) do
         res = transf.two_arrs.arr_by_appended(res, transf.tree_node.arr_arr_by_label(node, path, include_inner))
       end
       return res
@@ -1866,7 +1853,7 @@ transf = {
               temp_stack[key] = true  -- Add key to temporary stack to detect cyclic dependencies
   
               -- Traverse dependencies recursively
-              for _, dep in transf.arr.index_value_stateless_iter(assoc[key]['dependencies']) do
+              for _, dep in transf.arr.pos_int_vt_stateless_iter(assoc[key]['dependencies']) do
                   dfs(dep)
               end
   
@@ -2195,7 +2182,7 @@ transf = {
   },
   rfc3339like_dt = {
     date_component_name_value_assoc = function(str)
-      local comps = {get.str.n_strs_by_extracted_onig(str, r.g.date.rfc3339like_dt)}
+      local comps = {get.str.n_strs_by_extracted_onig(str, r.g.rfc3339like_dt)}
       return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.date.date_component_names, function(k, v)
         return v and get.str_or_number.number_or_nil(comps[k]) or nil
       end)
@@ -2620,7 +2607,7 @@ transf = {
     end, 
     prefix_date_component_name_value_assoc = function(date_component_name_value_assoc)
       local res = {}
-      for _, date_component_name in transf.arr.index_value_stateless_iter(ls.date.date_component_names) do
+      for _, date_component_name in transf.arr.pos_int_vt_stateless_iter(ls.date.date_component_names) do
         if date_component_name_value_assoc[date_component_name] == nil then
           return res
         end
@@ -2820,12 +2807,12 @@ transf = {
       -- In the vCard standard, some properties can have vcard_types. 
       -- For example, a phone number can be 'work' or 'home'. 
       -- Here, we're iterating over the keys in the contact data that have associated vcard_types.
-      for _, vcard_key in transf.arr.index_value_stateless_iter(ls.vcard.keys_with_vcard_type) do
+      for _, vcard_key in transf.arr.pos_int_vt_stateless_iter(ls.vcard.keys_with_vcard_type) do
       
           -- We iterate over each of these keys. Each key can have multiple vcard_types, 
           -- which we get as a comma-separated str (type_list). 
           -- We also get the corresponding value for these vcard_types.
-          for type_list, value in transf.arr.index_value_stateless_iter(contact_table[vcard_key]) do
+          for type_list, value in transf.arr.pos_int_vt_stateless_iter(contact_table[vcard_key]) do
           
               -- We split the type_list into individual vcard_types. This is done because 
               -- each vcard_type might need to be processed independently in the future. 
@@ -2835,7 +2822,7 @@ transf = {
               -- For each vcard_type, we create a new key-value two_anys_arr in the contact_table. 
               -- This way, we can access the value directly by vcard_type, 
               -- without needing to parse the type_list each time.
-              for _, vcard_type in transf.arr.index_value_stateless_iter(vcard_types) do
+              for _, vcard_type in transf.arr.pos_int_vt_stateless_iter(vcard_types) do
                   contact_table[vcard_key][vcard_type] = value
               end
           end
@@ -2846,7 +2833,7 @@ transf = {
       -- This 'contact' field holds the complete contact information.
       -- This could be useful in scenarios where address tables are processed individually,
       -- and there's a need to reference back to the full contact details.
-      for _, address_table in transf.arr.index_value_stateless_iter(contact_table["Addresses"]) do
+      for _, address_table in transf.arr.pos_int_vt_stateless_iter(contact_table["Addresses"]) do
           address_table.contact = contact_table
       end
       
@@ -3577,9 +3564,9 @@ transf = {
 
       -- Replace control characters (ASCII values 0 - 31 and 127)
       for i = 0, 31 do
-        filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, transf.eight_bit_pos_int.ascii_char(i), "_")
+        filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, transf.halfbyte_pos_int.ascii_char(i), "_")
       end
-      filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, transf.eight_bit_pos_int.ascii_char(127), "_")
+      filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, transf.halfbyte_pos_int.ascii_char(127), "_")
 
       -- Replace sequences of whitespace characters with a single underscore
       filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, "%s+", "_")
@@ -3846,7 +3833,7 @@ transf = {
     event_table = function(str)
       local components = get.str.str_arr_by_split_w_string(str, fixedstr.unique_field_separator)
       local parsed = ovtable.new()
-      for i, component in transf.arr.index_value_stateless_iter(components) do
+      for i, component in transf.arr.pos_int_vt_stateless_iter(components) do
         local key = ls.khal.parseable_format_components[i]
         if key == "alarms" then
           parsed[key] = get.str.str_arr_by_split_w_ascii_char(component, ",")
@@ -4243,7 +4230,7 @@ transf = {
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_str_arr_value_assoc_value_assoc = function(raw)
       local raw_countries = get.str.str_arr_split_noempty(raw, "\n\n")
       local countries = {}
-      for _, raw_country in transf.arr.index_value_stateless_iter(raw_countries) do
+      for _, raw_country in transf.arr.pos_int_vt_stateless_iter(raw_countries) do
         local raw_country_lines = get.str.not_empty_str_arr_by_split_w_ascii_char(raw_country, "\n")
         local country_header = raw_country_lines[1]
         local country_code = get.str.n_strs_by_extracted_onig(country_header, "\\(([^\\)]+\\)")
@@ -4251,7 +4238,7 @@ transf = {
         local payload_lines = transf.arr.arr_by_nofirst(raw_country_lines)
         countries[country_code] = {}
         local city_code
-        for _, payload_line in transf.arr.index_value_stateless_iter(payload_lines) do
+        for _, payload_line in transf.arr.pos_int_vt_stateless_iter(payload_lines) do
           if get.str.bool_by_startswith(payload_line, "\t\t") then -- line specifying a single relay
             local relay_code = payload_line:match("^\t\t([%w%-]+) ") -- lines look like this: \t\tfi-hel-001 (185.204.1.171) - OpenVPN, hosted by Creanova (Mullvad-owned)
             dothis.arr.push(countries[country_code][city_code], relay_code)
@@ -4582,7 +4569,7 @@ transf = {
     end,
     arr_by_appended = function(arr1, arr2)
       local res = get.table.table_by_copy(arr1)
-      for _, v in transf.arr.index_value_stateless_iter(arr2) do
+      for _, v in transf.arr.pos_int_vt_stateless_iter(arr2) do
         res[#res + 1] = v
       end
       return res
@@ -4624,7 +4611,7 @@ transf = {
     end,
     arr_by_interleaved_stop_a1 = function(arr1, arr2)
       local res = {}
-      for i, v in transf.arr.index_value_stateless_iter(arr1) do
+      for i, v in transf.arr.pos_int_vt_stateless_iter(arr1) do
         res[#res + 1] = v
         res[#res + 1] = arr2[i]
       end
@@ -4632,7 +4619,7 @@ transf = {
     end,
     arr_by_interleaved_stop_a2 = function(arr1, arr2)
       local res = {}
-      for i, v in transf.arr.index_value_stateless_iter(arr2) do
+      for i, v in transf.arr.pos_int_vt_stateless_iter(arr2) do
         res[#res + 1] = arr1[i]
         res[#res + 1] = v
       end
@@ -4663,7 +4650,7 @@ transf = {
     end,
     set_by_intersection = function(arr1, arr2)
       local new_arr = {}
-      for _, v in transf.arr.index_value_stateless_iter(arr1) do
+      for _, v in transf.arr.pos_int_vt_stateless_iter(arr1) do
         if get.arr.bool_by_contains(arr2, v) then
           new_arr[#new_arr + 1] = v
         end
@@ -4672,7 +4659,7 @@ transf = {
     end,
     set_by_difference = function(arr1, arr2)
       local new_arr = {}
-      for _, v in transf.arr.index_value_stateless_iter(arr1) do
+      for _, v in transf.arr.pos_int_vt_stateless_iter(arr1) do
         if not get.arr.bool_by_contains(arr2, v) then
           new_arr[#new_arr + 1] = v
         end
@@ -4681,12 +4668,12 @@ transf = {
     end,
     set_by_symmetric_difference = function(arr1, arr2)
       local new_arr = {}
-      for _, v in transf.arr.index_value_stateless_iter(arr1) do
+      for _, v in transf.arr.pos_int_vt_stateless_iter(arr1) do
         if not get.arr.bool_by_contains(arr2, v) then
           new_arr[#new_arr + 1] = v
         end
       end
-      for _, v in transf.arr.index_value_stateless_iter(arr2) do
+      for _, v in transf.arr.pos_int_vt_stateless_iter(arr2) do
         if not get.arr.bool_by_contains(arr1, v) then
           new_arr[#new_arr + 1] = v
         end
@@ -4978,7 +4965,7 @@ transf = {
     email_header = function(t)
       local header_lines = {}
       local initial_headers = ls.initial_headers
-      for _, header_name in transf.arr.index_value_stateless_iter(initial_headers) do
+      for _, header_name in transf.arr.pos_int_vt_stateless_iter(initial_headers) do
         local header_value = t[header_name]
         if header_value then
           dothis.arr.insert_at_index(header_lines, transf.two_anys_arr.email_header({header_name, header_value}))
@@ -5038,7 +5025,7 @@ transf = {
   table_arr = {
     table_by_take_new = function(t)
       local res = {}
-      for _, assoc in transf.arr.index_value_stateless_iter(t) do
+      for _, assoc in transf.arr.pos_int_vt_stateless_iter(t) do
         for k, v in transf.table.stateless_key_value_iter(assoc) do
           res[k] = v
         end
@@ -5047,7 +5034,7 @@ transf = {
     end,
     table_by_take_old = function(t)
       local res = {}
-      for _, assoc in transf.arr.index_value_stateless_iter(t) do
+      for _, assoc in transf.arr.pos_int_vt_stateless_iter(t) do
         for k, v in transf.table.stateless_key_value_iter(assoc) do
           if not res[k] then
             res[k] = v
@@ -5167,7 +5154,7 @@ transf = {
   pair_arr = {
     assoc = function(arr)
       local res = {}
-      for _, two_anys_arr in transf.arr.index_value_stateless_iter(arr) do
+      for _, two_anys_arr in transf.arr.pos_int_vt_stateless_iter(arr) do
         res[two_anys_arr[1]] = two_anys_arr[2]
       end
       return res
@@ -5184,7 +5171,7 @@ transf = {
     end,
     n_shot_role_content_message_spec_arr = function(arr)
       local res = {}
-      for _, two_anys_arr in transf.arr.index_value_stateless_iter(arr) do
+      for _, two_anys_arr in transf.arr.pos_int_vt_stateless_iter(arr) do
         dothis.arr.push(res, {
           role = "user",
           content = two_anys_arr[1],
@@ -5263,14 +5250,14 @@ transf = {
       local manga = raw_backup.backupManga
       local manga_url, manga_title = manga.url, manga.title
       local chapter_map = {}
-      for _, chapter in transf.arr.index_value_stateless_iter(manga.chapters) do
+      for _, chapter in transf.arr.pos_int_vt_stateless_iter(manga.chapters) do
         chapter_map[chapter.url] = {
           chapterNumber = chapter.chapterNumber,
           name = chapter.name
         }
       end
       local history_assoc = {}
-      for _, hist_item in transf.arr.index_value_stateless_iter(manga.history) do
+      for _, hist_item in transf.arr.pos_int_vt_stateless_iter(manga.history) do
         local chapter = chapter_map[hist_item.url]
         history_assoc[hist_item.lastRead] = {
           url = manga_url,
@@ -5523,17 +5510,17 @@ transf = {
   citable_path = {
     filename_safe_indicated_citable_object_id = function(path)
       return transf.citable_filename.filename_safe_indicated_citable_object_id(
-        transf.path.filename(path)
+        transf.path.leaflike_by_filename(path)
       )
     end,
     indicated_citable_object_id = function(path)
       return transf.citable_filename.indicated_citable_object_id(
-        transf.path.filename(path)
+        transf.path.leaflike_by_filename(path)
       )
     end,
     csl_table = function(path)
       return transf.citable_filename.csl_table(
-        transf.path.filename(path)
+        transf.path.leaflike_by_filename(path)
       )
     end,
   },
@@ -5604,16 +5591,16 @@ transf = {
   },
   latex_project_dir = {
     citations_file = function(dir)
-      return transf.path.ending_with_slash(dir) .. "citations"
+      return transf.path.path_by_ending_with_slash(dir) .. "citations"
     end,
     main_tex_file = function(dir)
-      return transf.path.ending_with_slash(dir) .. "main.tex"
+      return transf.path.path_by_ending_with_slash(dir) .. "main.tex"
     end,
     main_pdf_file = function(dir)
-      return transf.path.ending_with_slash(dir) .. "main.pdf"
+      return transf.path.path_by_ending_with_slash(dir) .. "main.pdf"
     end,
     main_bib_file = function(dir)
-      return transf.path.ending_with_slash(dir) .. "main.bib"
+      return transf.path.path_by_ending_with_slash(dir) .. "main.bib"
     end,
     indicated_citable_object_id_arr_from_citations = function(dir)
       return transf.citations_file.indicated_citable_object_id_arr(
@@ -5633,7 +5620,7 @@ transf = {
   },
   omegat_project_dir = {
     metadata_file = function(dir)
-      return transf.path.ending_with_slash(dir) .. "data.yaml"
+      return transf.path.path_by_ending_with_slash(dir) .. "data.yaml"
     end,
     metadata = function(dir)
       return transf.yaml_file.not_userdata_or_function(
@@ -5729,25 +5716,25 @@ transf = {
       return transf.omegat_project_dir.rechnung(dir).delivery_date
     end,
     dictionary_dir = function(dir)
-      return transf.path.ending_with_slash(dir) .. "dictionary"
+      return transf.path.path_by_ending_with_slash(dir) .. "dictionary"
     end,
     glossary_dir = function(dir)
-      return transf.path.ending_with_slash(dir) .. "glossary"
+      return transf.path.path_by_ending_with_slash(dir) .. "glossary"
     end,
     omegat_dir = function(dir)
-      return transf.path.ending_with_slash(dir) .. "omegat"
+      return transf.path.path_by_ending_with_slash(dir) .. "omegat"
     end,
     source_dir = function(dir)
-      return transf.path.ending_with_slash(dir) .. "source"
+      return transf.path.path_by_ending_with_slash(dir) .. "source"
     end,
     target_dir = function(dir)
-      return transf.path.ending_with_slash(dir) .. "target"
+      return transf.path.path_by_ending_with_slash(dir) .. "target"
     end,
     target_txt_dir = function(dir)
-      return transf.path.ending_with_slash(dir) .. "target_txt"
+      return transf.path.path_by_ending_with_slash(dir) .. "target_txt"
     end,
     tm_dir = function(dir)
-      return transf.path.ending_with_slash(dir) .. "tm"
+      return transf.path.path_by_ending_with_slash(dir) .. "tm"
     end,
     source_files = function(dir)
       return transf.dir.absolute_path_arr_by_children(
@@ -5769,12 +5756,12 @@ transf = {
       ) .. "--" .. transf.omegat_project_dir.client_name(dir) .. "_" .. transf.omegat_project_dir.rechnung_number(dir)
     end,
     rechnung_pdf_path = function(dir)
-      return transf.path.ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".pdf"
+      return transf.path.path_by_ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".pdf"
     end,
     rechnung_md_path = function(dir)
-      return transf.path.ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".md"
+      return transf.path.path_by_ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".md"
     end,
-    target_file_num_chars_arr = function(dir)
+    target_file_pos_int_arr = function(dir)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.dir.absolute_path_arr_by_children(
           transf.omegat_project_dir.target_txt_dir(dir)
@@ -5783,11 +5770,11 @@ transf = {
       )
     end,
     translation_price_specifier_arr = function(dir)
-      local num_chars_arr = transf.omegat_project_dir.target_file_num_char_arr(dir)
+      local pos_int_arr = transf.omegat_project_dir.target_file_num_char_arr(dir)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        num_chars_arr,
-        function(num_chars)
-          local normzeilen = transf.num_chars.normzeilen(num_chars)
+        pos_int_arr,
+        function(pos_int)
+          local normzeilen = transf.pos_int.pos_int_by_normzeilen(pos_int)
           local rate = transf.omegat_project_dir.translation_rate(dir)
           return {
             price = rate *  normzeilen,
@@ -6095,7 +6082,7 @@ transf = {
   },
   dotapp_path = {
     mac_application_name = function(dotapp_path)
-      return transf.path.filename(dotapp_path)
+      return transf.path.leaflike_by_filename(dotapp_path)
     end
   },
   jxa_browser_tabbable_running_application = {
@@ -6641,7 +6628,7 @@ transf = {
       local url_parts = get.str.str_arr_by_split_w_ascii_char(url, "?")
       if #url_parts > 1 then
         local param_parts = get.str.str_arr_by_split_w_ascii_char(url_parts[2], "&")
-        for _, param_part in transf.arr.index_value_stateless_iter(param_parts) do
+        for _, param_part in transf.arr.pos_int_vt_stateless_iter(param_parts) do
           local param_parts = get.str.str_arr_by_split_w_ascii_char(param_part, "=")
           local key = param_parts[1]
           local value = param_parts[2]
@@ -6859,6 +6846,13 @@ transf = {
     self_and_empty_str = function(any)
       return any, ""
     end,
+    str_or_nil = function(arg)
+      if arg == nil then
+        return nil
+      else
+        return transf.any.str_by_replicable(arg)
+      end
+    end,
     t_by_self = function(any)
       return any
     end,
@@ -6885,7 +6879,7 @@ transf = {
       return transf.action_specifier_arr.action_chooser_item_specifier_arr(transf.any.applicable_action_specifier_arr(any))
     end,
     applicable_action_with_index_chooser_item_specifier_arr = function(any)
-      return transf.assoc_arr.assoc_with_index_as_key_arr(transf.any.applicable_action_chooser_item_specifier_arr(any))
+      return transf.assoc_arr.has_index_key_assoc_arr(transf.any.applicable_action_chooser_item_specifier_arr(any))
     end,
     placeholder_text = function(any)
       return "Choose action on: " .. (
@@ -6966,7 +6960,7 @@ transf = {
     and_bool_function = function(...)
       local functions = {...}
       return function(arg)
-        for _, fn in transf.arr.index_value_stateless_iter(functions) do
+        for _, fn in transf.arr.pos_int_vt_stateless_iter(functions) do
           if not fn(arg) then
             return false
           end
@@ -6977,7 +6971,7 @@ transf = {
     or_bool_function = function(...)
       local functions = {...}
       return function(arg)
-        for _, fn in transf.arr.index_value_stateless_iter(functions) do
+        for _, fn in transf.arr.pos_int_vt_stateless_iter(functions) do
           if fn(arg) then
             return true
           end
@@ -7031,7 +7025,7 @@ transf = {
     header_part = function(data_url) -- the non-data part will either be separated from the rest of the url by `;,` or `;base64,`, so we need to split on `,`, then find the first part that ends `;` or `base64;`, and then join and return all parts before that part
       local parts = get.str.str_arr_by_split_w_ascii_char(transf.url.no_scheme(data_url), ",")
       local non_data_part = ""
-      for _, part in transf.arr.index_value_stateless_iter(parts) do
+      for _, part in transf.arr.pos_int_vt_stateless_iter(parts) do
         non_data_part = non_data_part .. part
         if get.str.bool_by_endswith(part, ";") or get.str.bool_by_endswith(part, "base64;") then
           break
@@ -7395,7 +7389,7 @@ transf = {
     mac_application_name_arr = function()
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf["nil"].installed_app_dir_arr(),
-        transf.path.filename
+        transf.path.leaflike_by_filename
       )
     end,
 
@@ -7513,7 +7507,7 @@ transf = {
       )
     end,
     action_with_index_choose_item_specifier_arr = function(action_specifier_arr)
-      return transf.assoc_arr.assoc_with_index_as_key_arr(
+      return transf.assoc_arr.has_index_key_assoc_arr(
         transf.action_specifier.action_chooser_item_specifier_arr(action_specifier_arr)
       )
     end,
@@ -7857,6 +7851,12 @@ transf = {
       )
     end,
   },
+  set = {
+    --- this function is no different from transf.arr.arr_arr_by_permutations, but exists because I'm sure I'll otherwise forget that the permutations of a set are themselves a set, but the permutations of an array only an array (since there can be duplicates in the array, and thus also duplicates in the permutations)
+    set_set_by_permutations = function(set)
+      return transf.arr.arr_arr_by_permutations(set)
+    end,
+  },
   two_sets = {
     set_by_union = function(set1, set2)
       return transf.two_arrs.set_by_union(set1, set2)
@@ -7865,7 +7865,7 @@ transf = {
       return transf.two_arrs.set_by_intersection(set1, set2)
     end,
     bool_by_is_subset = function(set1, set2)
-      for _, v in transf.arr.index_value_stateless_iter(set1) do
+      for _, v in transf.arr.pos_int_vt_stateless_iter(set1) do
         if not get.arr.bool_by_contains(set2, v) then
           return false
         end
@@ -7940,7 +7940,7 @@ transf = {
         stop = get.any.default_if_nil(stop, "z")
         step = get.any.default_if_nil(step, 1)
         addmethod = function(a, b)
-          return transf.eight_bit_pos_int.ascii_char(transf.ascii_char.eight_bit_pos_int(a) + b)
+          return transf.halfbyte_pos_int.ascii_char(transf.ascii_char.halfbyte_pos_int(a) + b)
         end
       end
     
@@ -8162,11 +8162,11 @@ transf = {
       -- set up default values, make sure provided values are strs
 
       prompt_args = prompt_args or {}
-      prompt_args.message = transf.not_nil.str(prompt_args.message) or "Enter a str."
-      prompt_args.informative_text = transf.not_nil.str(prompt_args.informative_text) or ""
-      prompt_args.default = transf.not_nil.str(prompt_args.default) or ""
-      prompt_args.buttonA = transf.not_nil.str(prompt_args.buttonA) or "OK"
-      prompt_args.buttonB = transf.not_nil.str(prompt_args.buttonB) or "Cancel"
+      prompt_args.message = transf.any.str_or_nil(prompt_args.message) or "Enter a str."
+      prompt_args.informative_text = transf.any.str_or_nil(prompt_args.informative_text) or ""
+      prompt_args.default = transf.any.str_or_nil(prompt_args.default) or ""
+      prompt_args.buttonA = transf.any.str_or_nil(prompt_args.buttonA) or "OK"
+      prompt_args.buttonB = transf.any.str_or_nil(prompt_args.buttonB) or "Cancel"
 
       -- show prompt
 
@@ -8208,8 +8208,8 @@ transf = {
       -- set up default values, make sure message and default are strs
   
       prompt_args                        = prompt_args or {}
-      prompt_args.message                = get.any.default_if_nil(transf.not_nil.str(prompt_args.message), "Choose a file or folder.")
-      prompt_args.default                = get.any.default_if_nil(transf.not_nil.str(prompt_args.default), env.HOME)
+      prompt_args.message                = get.any.default_if_nil(transf.any.str_or_nil(prompt_args.message), "Choose a file or folder.")
+      prompt_args.default                = get.any.default_if_nil(transf.any.str_or_nil(prompt_args.default), env.HOME)
       prompt_args.can_choose_files       = get.any.default_if_nil(prompt_args.can_choose_files, true)
       prompt_args.can_choose_directories = get.any.default_if_nil(prompt_args.can_choose_directories, true)
       prompt_args.multiple  = get.any.default_if_nil(prompt_args.multiple, false)
@@ -8555,9 +8555,9 @@ transf = {
       local arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         chat_dirs,
         function(chat_dir)
-          local media_dir = transf.path.ending_with_slash(chat_dir) .. "media"
+          local media_dir = transf.path.path_by_ending_with_slash(chat_dir) .. "media"
           local main_obj = transf.json_file.not_userdata_or_function(
-            transf.path.ending_with_slash(chat_dir) .. "message_1.json"
+            transf.path.path_by_ending_with_slash(chat_dir) .. "message_1.json"
           )
           return {
             main_obj,
@@ -8618,7 +8618,7 @@ transf = {
       local arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         chat_json_files,
         function(chat_json_file)
-          local filename = transf.path.filename(chat_json_file)
+          local filename = transf.path.leaflike_by_filename(chat_json_file)
           local author = filename:match("^([^(]+)")
           local media_dir = dir .. "/media/" .. filename
           local messages = transf.json_file.not_userdata_or_function(chat_json_file)

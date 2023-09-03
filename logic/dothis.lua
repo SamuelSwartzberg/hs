@@ -126,7 +126,7 @@ dothis = {
   },
   md_file = {
     to_file_in_same_dir = function(source, format, metadata, do_after)
-      local target = transf.path.path_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
+      local target = transf.path.path_by_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
       local rawsource = transf.file.str_by_contents(source)
       local processedsource = get.str.str_by_with_yaml_metadata(rawsource, metadata)
       rawsource = get.str.str_and_int_by_replaced_eutf8_w_regex_str(rawsource, "\n +\n", "\n&nbsp;\n")
@@ -314,7 +314,7 @@ dothis = {
     paste = function(str)
       local lines = get.str.str_arr_by_split_w_ascii_char(str, "\n")
       local is_first_line = true
-      for _, line in transf.arr.index_value_stateless_iter(lines) do
+      for _, line in transf.arr.pos_int_vt_stateless_iter(lines) do
         if is_first_line then
           is_first_line = false
         else
@@ -791,7 +791,7 @@ dothis = {
       dothis.local_extant_path.link_to_local_nonextant_path(path, tgt)
     end,
     link_into_local_absolute_path = function(path, tgt)
-      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
+      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaf(path)
       dothis.local_extant_path.link_to_local_nonextant_path(path, finaltgt)
     end,
     link_descendant_file_arr_into_local_absolute_path = function(path, tgt)
@@ -899,7 +899,7 @@ dothis = {
   local_dir = {
     empty_dir = function(path)
       transf.str.str_or_nil_by_evaled_env_bash_stripped("rm -rf " .. transf.str.str_by_single_quoted_escaped(
-        transf.path.ending_with_slash(path) .. "*"
+        transf.path.path_by_ending_with_slash(path) .. "*"
       ) .. "/*")
     end,
     copy_to_local_absolute_path = function(path, tgt)
@@ -977,7 +977,7 @@ dothis = {
       transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone copyto " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
     end,
     copy_into_absolute_path = function(path, tgt)
-      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
+      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaf(path)
       dothis.extant_path.copy_to_absolute_path(path, finaltgt)
     end,
     copy_descendant_file_arr_into_absolute_path = function(path, tgt)
@@ -991,7 +991,7 @@ dothis = {
       transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone moveto " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
     end,
     move_into_absolute_path = function(path, tgt)
-      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
+      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaf(path)
       dothis.extant_path.move_to_absolute_path(path, finaltgt)
     end,
     move_descendant_file_arr_into_absolute_path = function(path, tgt)
@@ -1012,7 +1012,7 @@ dothis = {
       dothis.extant_path.delete(path)
     end,
     zip_into_absolute_path = function(path, tgt)
-      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.leaf(path)
+      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaf(path)
       dothis.extant_path.zip_to_absolute_path(path, finaltgt)
     end,
     zip_descendant_file_arr_to_absolute_path = function(path, tgt)
@@ -1109,7 +1109,7 @@ dothis = {
       transf.str.str_or_nil_by_evaled_env_bash_stripped("unzip " .. transf.str.str_by_single_quoted_escaped(path) .. " -d " .. transf.str.str_by_single_quoted_escaped(tgt))
     end,
     unzip_into_absolute_path = function(path, tgt)
-      local finaltgt = transf.path.ending_with_slash(tgt) .. transf.path.filename(path)
+      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaflike_by_filename(path)
       dothis.local_zip_file.unzip_to_absolute_path(path, finaltgt)
     end,
     
@@ -1338,7 +1338,7 @@ dothis = {
         "git init",
         function()
           dothis.absolute_path.write_file_if_nonextant_path(
-            transf.path.ending_with_slash(path) .. ".gitignore",
+            transf.path.path_by_ending_with_slash(path) .. ".gitignore",
             ""
           )
           dothis.in_git_dir.commit_all_root(path, "Initial commit")
@@ -1349,7 +1349,7 @@ dothis = {
       dothis.arr.choose_item(
         transf.dir.leaf_or_dotdot_arr(path),
         function(leaf_or_dotdot)
-          local local_resolvable_path = transf.path.ending_with_slash(path) .. leaf_or_dotdot
+          local local_resolvable_path = transf.path.path_by_ending_with_slash(path) .. leaf_or_dotdot
           local local_extant_path = transf.local_resolvable_path.local_absolute_path(local_resolvable_path)
           fn(local_extant_path)
         end
@@ -1476,7 +1476,7 @@ dothis = {
       dothis.str.env_bash_eval(hook_path)
     end,
     add_hook = function(path, hook_path, name)
-      name = name or transf.path.filename(hook_path)
+      name = name or transf.path.leaflike_by_filename(hook_path)
       dothis.extant_path.copy_to_absolute_path(hook_path, get.git_root_dir.hook_path(path, name))
       dothis.local_extant_path.make_executable(get.git_root_dir.hook_path(path, name))
     end,
@@ -1494,13 +1494,13 @@ dothis = {
     end,
     link_all_hooks = function(path, type)
       local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
-      for _, hook in transf.arr.index_value_stateless_iter(get.dir.files(source_hooks)) do
+      for _, hook in transf.arr.pos_int_vt_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.link_hook(path, type, hook)
       end
     end,
     copy_all_hooks = function(path, type)
       local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
-      for _, hook in transf.arr.index_value_stateless_iter(get.dir.files(source_hooks)) do
+      for _, hook in transf.arr.pos_int_vt_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.copy_hook(path, type, hook)
       end
     end,
@@ -1639,7 +1639,7 @@ dothis = {
   },
   url_arr = {
     open_all = function(url_arr, browser)
-      for _, url in transf.arr.index_value_stateless_iter(url_arr) do
+      for _, url in transf.arr.pos_int_vt_stateless_iter(url_arr) do
         dothis.url_or_local_path.open_browser(url, browser)
       end
     end,
@@ -1915,7 +1915,7 @@ dothis = {
   },
   omegat_project_dir = {
     pull_project_materials = function(omegat_project_dir)
-      for _, type in transf.arr.index_value_stateless_iter(tblmap.project_type.project_materials_list["omegat"]) do
+      for _, type in transf.arr.pos_int_vt_stateless_iter(tblmap.project_type.project_materials_list["omegat"]) do
         dothis.project_dir.pull_project_materials(
           omegat_project_dir,
           type,
@@ -2079,7 +2079,7 @@ dothis = {
     --- @param video_ids str[]
     --- @param do_after? fun(id: str): nil
     add_youtube_video_id_arr = function(id, video_ids, do_after)
-      local next_vid = transf.arr.index_vt_stateful_iter(video_ids)
+      local next_vid = transf.arr.pos_int_vt_stateful_iter(video_ids)
       local add_next_vid
       add_next_vid = function ()
         local index, video_id = next_vid()
@@ -2204,7 +2204,7 @@ dothis = {
     end,
     each = hs.fnutils.ieach,
     each_with_delay = function(arr, delay, fn, do_after)
-      local next_item = transf.arr.index_vt_stateful_iter(arr)
+      local next_item = transf.arr.pos_int_vt_stateful_iter(arr)
       local do_next_item
       do_next_item = function()
         local index, item = next_item()
@@ -2553,7 +2553,7 @@ dothis = {
   timer_spec_arr = {
     fire_all_if_ready_and_space_if_necessary = function(arr)
       local fired = false
-      for _, v in transf.arr.index_value_stateless_iter(arr) do
+      for _, v in transf.arr.pos_int_vt_stateless_iter(arr) do
         if 
           transf.timer_spec.bool_by_ready(v) 
         then
@@ -2960,9 +2960,9 @@ dothis = {
   },
   telegram_raw_export_dir = {
     process_to_telegram_export_dir = function(dir)
-      for _, chat_dir in transf.arr.index_value_stateless_iter(transf.dir.absolute_path_arr_by_children(transf.path.ending_with_slash(dir) .. "chats")) do
-        local media_path = transf.path.ending_with_slash(dir) .. "media/" 
-        for _, media_type_dir in transf.arr.index_value_stateless_iter(
+      for _, chat_dir in transf.arr.pos_int_vt_stateless_iter(transf.dir.absolute_path_arr_by_children(transf.path.path_by_ending_with_slash(dir) .. "chats")) do
+        local media_path = transf.path.path_by_ending_with_slash(dir) .. "media/" 
+        for _, media_type_dir in transf.arr.pos_int_vt_stateless_iter(
           transf.dir.dir_arr_by_children(chat_dir)
         ) do
           dothis.dir.move_children_absolute_path_arr_into_absolute_path(
@@ -2980,10 +2980,10 @@ dothis = {
   },
   facebook_raw_export_dir = {
     process_to_facebook_export_dir = function(dir)
-      local actual_dir = transf.path.ending_with_slash(dir) .. "messages/inbox/"
-      for _, chat_dir in transf.arr.index_value_stateless_iter(transf.dir.absolute_path_arr_by_children(actual_dir)) do
+      local actual_dir = transf.path.path_by_ending_with_slash(dir) .. "messages/inbox/"
+      for _, chat_dir in transf.arr.pos_int_vt_stateless_iter(transf.dir.absolute_path_arr_by_children(actual_dir)) do
         local media_path = chat_dir .. "media/"
-        for _, media_type_dir in transf.arr.index_value_stateless_iter(
+        for _, media_type_dir in transf.arr.pos_int_vt_stateless_iter(
           transf.dir.dir_arr_by_children(chat_dir)
         ) do
           dothis.dir.move_children_absolute_path_arr_into_absolute_path(
@@ -3001,7 +3001,7 @@ dothis = {
   backuped_thing_identifier = {
     write_current_timestamp_ms = function(identifier)
       dothis.local_file.write_file(
-        transf.path.ending_with_slash(env.MLAST_BACKUP) .. identifier,
+        transf.path.path_by_ending_with_slash(env.MLAST_BACKUP) .. identifier,
         (os.time() - 30) * 1000
       )
     end,
@@ -3119,7 +3119,7 @@ dothis = {
   export_dir = {
     log = function(dir, typ)
       local arr = transf[typ .. "_export_dir"].export_chat_main_object_and_media_dir_arr(dir)
-      for _, two_anys_arr in transf.arr.index_value_stateless_iter(arr) do
+      for _, two_anys_arr in transf.arr.pos_int_vt_stateless_iter(arr) do
         dothis.export_chat_main_object.log(two_anys_arr[1], typ, two_anys_arr[2])
       end
     end

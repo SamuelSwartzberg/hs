@@ -480,7 +480,7 @@ get = {
     end,
     kt_or_nil_by_first_match_w_kt_vt_arg_fn = function(t, fn)
       local arr = transf.table.two_anys_arr_by_sorted_larger_key_first(t)
-      for _, two_anys_arr in transf.arr.index_value_stateless_iter(arr) do
+      for _, two_anys_arr in transf.arr.pos_int_vt_stateless_iter(arr) do
         if fn(two_anys_arr[1], two_anys_arr[2]) then
           return two_anys_arr[1]
         end
@@ -871,7 +871,7 @@ get = {
       end
     end,
     bool_by_contains = function(arr, v)
-      for _, v2 in transf.arr.index_value_stateless_iter(arr) do
+      for _, v2 in transf.arr.pos_int_vt_stateless_iter(arr) do
         if v2 == v then return true end
       end
       return false
@@ -901,15 +901,15 @@ get = {
       end
     end,
     item_with_index_chooser_item_specifier_arr = function(arr, target_item_chooser_item_specifier_name)
-      return transf.assoc_arr.assoc_with_index_as_key_arr(
+      return transf.assoc_arr.has_index_key_assoc_arr(
         get.arr.item_chooser_item_specifier_arr(arr, target_item_chooser_item_specifier_name)
       )
     end,
     hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
       return {
         chooser_item_specifier_arr = get.arr.item_with_index_chooser_item_specifier_arr(arr, target_item_chooser_item_specifier_name),
-        placeholder_text = transf.arr.summary(arr),
-        initial_selected_index = transf.arr.initial_selected_index(arr),
+        placeholder_text = transf.arr.str_by_summary(arr),
+        initial_selected_index = transf.arr.pos_int_by_initial_selected_index(arr),
       }
     end,
     choosing_hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
@@ -947,12 +947,12 @@ get = {
     end,
     
   },
-  id_assoc_arr = {
-    id_assoc_by_first_match_w_id_assoc = function(arr, assoc)
+  has_id_key_assoc_arr = {
+    has_id_key_assoc_by_first_match_w_has_id_key_assoc = function(arr, assoc)
       return get.arr.t_or_nil_by_first_match_w_fn(
         arr,
         get.fn.first_n_args_bound_fn(
-          transf.two_id_assocs.bool_by_equal,
+          transf.two_has_id_key_assocs.bool_by_equal,
           assoc
         )
       )
@@ -1050,7 +1050,15 @@ get = {
     end,
     bool_by_contains_w_ascii_str = stringy.find,
     bool_by_not_contains_w_ascii_str = function(str, substr)
-      return not transf.str.bool_by_contains_w_str(str, substr)
+      return not transf.str.bool_by_contains_w_ascii_str(str, substr)
+    end,
+    bool_by_not_contains_w_ascii_str_arr = function(str, substr_arr)
+      for k, substr in transf.arr.kt_vt_stateless_iter(substr_arr) do
+        if get.str.bool_by_contains_w_str(str, substr) then
+          return false
+        end
+      end
+      return true
     end,
     str_arr_arr_by_split = function(str, upper_sep, lower_sep)
       local upper = transf.str.split(str, upper_sep)
@@ -1581,7 +1589,7 @@ get = {
       local existing_style = styledtext:asTable()
       local text_str, style = get.arr.two_arrs_by_slice_w_3_pos_int_any_or_nils(existing_style, 1, 1)
       local new_styledtext = hs.styledtext.new(text_str, styledtext_attributes_specifier)
-      for _, v in transf.arr.index_value_stateless_iter(style) do
+      for _, v in transf.arr.pos_int_vt_stateless_iter(style) do
         new_styledtext = new_styledtext:setStyle(v.styledtext_attributes_specifier, v.starts, v.ends)
       end
       return new_styledtext
@@ -1712,7 +1720,7 @@ get = {
   },
   path = {
     usable_as_filetype = function(path, filetype)
-      local extension = transf.path.normalized_extension(path)
+      local extension = transf.path.extension_by_normalized(path)
       if get.arr.contains(ls.filetype[filetype], extension) then
         return true
       else
@@ -1720,7 +1728,7 @@ get = {
       end
     end,
     with_different_extension = function(path, ext)
-      return transf.path.path_without_extension(path) .. "." .. ext
+      return transf.path.path_by_without_extension(path) .. "." .. ext
     end,
     leaf_starts_with = function(path, str)
       return get.str.bool_by_startswith(transf.path.leaf(path), str)
@@ -1729,16 +1737,16 @@ get = {
       return transf.path.extension(path) == ext
     end,
     is_standartized_extension = function(path, ext)
-      return transf.path.normalized_extension(path) == ext
+      return transf.path.extension_by_normalized(path) == ext
     end,
     is_extension_in = function(path, exts)
       return get.arr.bool_by_contains(exts, transf.path.extension(path))
     end,
     is_standartized_extension_in = function(path, exts)
-      return get.arr.bool_by_contains(exts, transf.path.normalized_extension(path))
+      return get.arr.bool_by_contains(exts, transf.path.extension_by_normalized(path))
     end,
     is_filename = function(path, filename)
-      return transf.path.filename(path) == filename
+      return transf.path.leaflike_by_filename(path) == filename
     end,
     is_leaf = function(path, leaf)
       return transf.path.leaf(path) == leaf
@@ -1787,11 +1795,11 @@ get = {
       
       -- Create a map for quick lookup of the index of each path component
       local path_component_index_map = {}
-      for rawi, rawv in transf.arr.index_value_stateless_iter(whole_path_component_arr) do
+      for rawi, rawv in transf.arr.pos_int_vt_stateless_iter(whole_path_component_arr) do
         path_component_index_map[rawv] = rawi
       end
       
-      for i, v in transf.arr.index_value_stateless_iter(sliced_path_component_arr) do
+      for i, v in transf.arr.pos_int_vt_stateless_iter(sliced_path_component_arr) do
         -- Use the map to find the index of the current path component
         local rawi = path_component_index_map[v]
         if rawi then
@@ -1846,7 +1854,7 @@ get = {
 
       --- @cast opts itemsInPathOpts
     
-      path = transf.path.ending_with_slash(path)
+      path = transf.path.path_by_ending_with_slash(path)
     
       if opts.follow_links then
         seen_paths = seen_paths or {}
@@ -1881,7 +1889,7 @@ get = {
             if shouldRecurse then
               depth = depth or 0
               local sub_files = get.extant_path.absolute_path_arr(file_path, opts, true, depth + 1, seen_paths)
-              for _, sub_file in transf.arr.index_value_stateless_iter(sub_files) do
+              for _, sub_file in transf.arr.pos_int_vt_stateless_iter(sub_files) do
                 extant_paths[#extant_paths + 1] = sub_file
               end
             end
@@ -2262,12 +2270,12 @@ get = {
     end,
     path_arr_by_filter_to_filename_ending = function(path_arr, leaf_ending)
       return get.arr.arr_by_filtered(path_arr, function(path)
-        return get.str.bool_by_endswith(transf.path.filename(path), leaf_ending)
+        return get.str.bool_by_endswith(transf.path.leaflike_by_filename(path), leaf_ending)
       end)
     end,
     path_arr_by_filter_to_filename_starting = function(path_arr, leaf_starting)
       return get.arr.arr_by_filtered(path_arr, function(path)
-        return get.str.bool_by_startswith(transf.path.filename(path), leaf_starting)
+        return get.str.bool_by_startswith(transf.path.leaflike_by_filename(path), leaf_starting)
       end)
     end,
 
@@ -2635,7 +2643,7 @@ get = {
           [key] = value
         }
         if node.aliases then
-          for _, alias in transf.arr.index_value_stateless_iter(node.aliases) do
+          for _, alias in transf.arr.pos_int_vt_stateless_iter(node.aliases) do
             values[alias] = value
           end
         end
@@ -2743,7 +2751,7 @@ get = {
   },
   project_dir = {
     local_project_material_path = function(dir, type)
-      return transf.path.ending_with_slash(dir) .. type .. "/"
+      return transf.path.path_by_ending_with_slash(dir) .. type .. "/"
     end,
     local_subtype_project_material_path = function(dir, type, subtype)
       return get.project_dir.local_project_material_path(dir, type) .. subtype .. "/"
@@ -2752,7 +2760,7 @@ get = {
       return get.project_dir.local_subtype_project_material_path(dir, type, "universal")
     end,
     global_project_material_path = function(dir, type)
-      return transf.path.ending_with_slash(env.MPROJECT_MATERIALS) .. type .. "/"
+      return transf.path.path_by_ending_with_slash(env.MPROJECT_MATERIALS) .. type .. "/"
     end,
     global_subtype_project_material_path = function(dir, type, subtype)
       return get.project_dir.global_project_material_path(dir, type) .. subtype .. "/"
@@ -2870,7 +2878,7 @@ get = {
   thing_name_arr = {
     bool_by_chained_and = function(arr, value)
       local previous_thing_name = nil
-      for _, thing_name in transf.arr.index_value_stateless_iter(arr) do
+      for _, thing_name in transf.arr.pos_int_vt_stateless_iter(arr) do
         if previous_thing_name then
           local fn = rawget(rawget(is, previous_thing_name), thing_name)
           if fn then
@@ -2909,7 +2917,7 @@ get = {
         value
       )
     end,
-    initial_selected_index = function(arr, value)
+    pos_int_by_initial_selected_index = function(arr, value)
       return get.retriever_specifier_arr.result_highest_precedence(
         transf.thing_name_arr.initial_selected_retriever_specifier_arr(arr),
         value
@@ -2937,7 +2945,7 @@ get = {
   chooser_item_specifier_arr = {
     styled_chooser_item_specifier_arr = function(arr, chooser_item_specifier_text_key_styledtext_attributes_specifier_assoc)
       local res = get.table.table_by_copy(arr)
-      for i, chooser_item_specifier in transf.arr.index_value_stateless_iter(res) do
+      for i, chooser_item_specifier in transf.arr.pos_int_vt_stateless_iter(res) do
         local text_styledtext_attribute_specifier = transf.two_table_or_nils.table_by_take_new( {
           font = {size = 14 },
           color = { red = 0, green = 0, blue = 0, alpha = 0.7 },
@@ -3179,18 +3187,18 @@ get = {
       local inner_func = function(...)
         local args = {...}
         dothis.arr.sort(ignore_spec, function(a, b) return a > b end)
-        for _, index in transf.arr.index_value_stateless_iter(ignore_spec) do
+        for _, index in transf.arr.pos_int_vt_stateless_iter(ignore_spec) do
           dothis.arr.remove_by_index(args, index)
         end
         local new_args = {}
-        for index, arg in transf.arr.index_value_stateless_iter(arg_spec) do -- for all arg_lists to bind
+        for index, arg in transf.arr.pos_int_vt_stateless_iter(arg_spec) do -- for all arg_lists to bind
           if arg == a_use then
             new_args[index] = act.arr.shift(args)
           else
             new_args[index] = arg
           end
         end
-        for _, arg in transf.arr.index_value_stateless_iter(args) do -- for all remaining args
+        for _, arg in transf.arr.pos_int_vt_stateless_iter(args) do -- for all remaining args
           dothis.arr.insert_at_index(new_args, arg)
         end
         return func(transf.arr.n_anys(new_args))
@@ -3598,7 +3606,7 @@ get = {
   export_chat_message_arr = {
     timestamp_ms_key_msg_spec_value_assoc_by_filtered = function(arr, typ, timestamp_ms)
       local res = {}
-      for _, msg in transf.arr.index_value_stateless_iter(arr) do
+      for _, msg in transf.arr.pos_int_vt_stateless_iter(arr) do
         local msg_timestamp_ms = get.export_chat_message.timestamp_ms(msg, typ)
         if msg_timestamp_ms >= timestamp_ms then
           res[msg_timestamp_ms] = get.export_chat_message.msg_spec(msg, typ)
@@ -3631,9 +3639,9 @@ get = {
       local media_dir = get.export_chat_main_object.media_dir(obj, "facebook")
       local res = {}
 
-      for _, attachment_type in transf.arr.index_value_stateless_iter({"photos", "videos", "files", "audio_files", "gifs", "share", "sticker", "animated_image_attachments"}) do
+      for _, attachment_type in transf.arr.pos_int_vt_stateless_iter({"photos", "videos", "files", "audio_files", "gifs", "share", "sticker", "animated_image_attachments"}) do
         if msg[attachment_type] then
-          for _, attachment in transf.arr.index_value_stateless_iter(msg[attachment_type]) do
+          for _, attachment in transf.arr.pos_int_vt_stateless_iter(msg[attachment_type]) do
             local attachment_path = media_dir .. "/" .. transf.path.leaf(attachment.uri)
             dothis.res.push(res, attachment_path)
           end
