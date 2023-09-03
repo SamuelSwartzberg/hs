@@ -47,7 +47,9 @@ r = {
       uuid = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
       doi = "(10\\.\\d{4,9}/[-._;()/:A-Z0-9]+)",
       doi_prefix = "^https?://[^/]+/",
-      relay_identifier = "[a-z]{2}-[a-z]{3}-(?:wg|ovpn)-\\d{3}"
+      relay_identifier = "[a-z]{2}-[a-z]{3}-(?:wg|ovpn)-\\d{3}",
+      media_type = "[-\\w.]+/[-\\w.\\+]+",
+      domain_name = "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]"
     },
     whitespace = {
       large = "[\t\r\n]"
@@ -450,5 +452,11 @@ ls = {
     "size",
     "blocks",
     "blksize",
+  },
+  keys = {
+    audiodevice_specifier = {
+      "device",
+      "subtype"
+    }
   }
 }

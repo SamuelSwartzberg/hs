@@ -231,7 +231,7 @@ transf = {
     end,
     pos_int_float_part = function(num)
       return transf.nonindicated_number_str.number_base_10(
-        tostr(
+        transf.any.str(
           transf.number.pos_float_part(num)
         ):sub(3)
       )
@@ -364,7 +364,7 @@ transf = {
   
   int = {
     length = function(int)
-      return #tostr(int)
+      return #transf.any.str(int)
     end,
     pos_int_or_nil = function(int)
       if int > 0 then
@@ -389,10 +389,10 @@ transf = {
   },
   pos_int = {
     random_base64_gen_str_of_length = function(int)
-      return transf.str.str_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. tostr(transf.number.int_by_rounded(int * 3/4))) -- 3/4 because base64 takes the int to be the input length, but we want to specify the output length (which is 4/3 the input length in case of base64)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. transf.any.str(transf.number.int_by_rounded(int * 3/4))) -- 3/4 because base64 takes the int to be the input length, but we want to specify the output length (which is 4/3 the input length in case of base64)
     end,
     nonindicated_decimal_number_str = function(num)
-      return tostr(num)
+      return transf.any.str(num)
     end,
     separated_nonindicated_decimal_number_str = function(num)
       return get.str.str_with_separator_grouped_ascii_from_end(
@@ -514,7 +514,7 @@ transf = {
       if arg == nil then
         return nil
       else
-        return transf.any.str(arg)
+        return transf.any.str_by_replicable(arg)
       end
     end,
   },
@@ -553,7 +553,7 @@ transf = {
     str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        transf.any.str
+        transf.any.str_by_replicable
       )
     end,
     contents_summary = function(arr)
@@ -681,7 +681,7 @@ transf = {
     pos_int_by_path_component_arr_length = function(path)
       return #transf.path.path_component_arr(path)
     end,
-    path_arr_of_path_component_arr = function(path)
+    path_arr_by_path_component_arr = function(path)
       return get.path.path_arr_from_sliced_path_component_arr(
         get.path.path_component_arr(path),
         {start = 1, stop = -1}
@@ -755,8 +755,8 @@ transf = {
         transf.path.parent_path(path)
       )
     end,
-    parent_path_arr_of_path_component_arr = function(path)
-      return transf.path.path_arr_of_path_component_arr(
+    path_arr_by_path_component_arr_via_parent = function(path)
+      return transf.path.path_arr_by_path_component_arr(
         transf.path.parent_path(path)
       )
     end,
@@ -981,7 +981,12 @@ transf = {
     
   },
   local_dir = {
-    absolute_path_value_stateful_iter_by_children = hs.fs.dir
+    absolute_path_value_stateful_iter_by_children = hs.fs.dir,
+    local_extant_path_arr_by_descendants = function(path)
+      return transf.local_extant_path_arr.installed_app_dir_arr_by_filter(
+        transf.extant_path.dir_arr_by_descendants(path)
+      )
+    end
   },
   in_home_local_absolute_path = {
     http_protocol_url_by_local_http_server = function(path)
@@ -1061,10 +1066,15 @@ transf = {
       return transf.dir_arr.git_root_dir_arr_by_filter(transf.extant_path_arr.dir_arr_by_filter(path_arr))
     end,
     file_arr_by_descendants = function(path_arr)
-      return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
+      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
         path_arr,
         transf.extant_path.file_arr_by_descendants
       )
+    end,
+  },
+  local_extant_path_arr = {
+    installed_app_dir_arr_by_filter = function(path_arr)
+      return get.arr.arr_by_filtered(path_arr, is.local_extant_path.installed_app_dir)
     end,
   },
   dir_arr = {
@@ -1072,7 +1082,7 @@ transf = {
       return get.arr.arr_by_filtered(path_arr, is.dir.git_root_dir)
     end,
     absolute_path_arr_by_children = function(path_arr)
-      return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
+      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
         path_arr,
         transf.dir.absolute_path_arr_by_children
       )
@@ -1237,7 +1247,7 @@ transf = {
       return transf.extant_path_arr.extant_path_by_newest_creation(transf.dir.absolute_path_arr_by_children(dir))
     end,
     grandchildren_absolute_path_arr = function(dir)
-      return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_arr_by_children(dir), transf.dir.absolute_path_arr_by_children)
+      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_arr_by_children(dir), transf.dir.absolute_path_arr_by_children)
     end,
     absolute_path_key_leaf_str_or_nested_value_assoc = function(path)
       local res = {}
@@ -1305,8 +1315,8 @@ transf = {
         if is.any.table(v) then
           res[filename] = transf.absolute_path_key_leaf_str_or_nested_value_assoc.plaintext_assoconary_read_assoc(v)
         else
-          if is.file.plaintext_associonary_file(k) then
-            res[filename] = transf.plaintext_associonary_file.table(k)
+          if is.file.plaintext_assoc_file(k) then
+            res[filename] = transf.plaintext_assoc_file.table(k)
           end
         end
       end
@@ -1737,7 +1747,7 @@ transf = {
     end,
   },
   bib_file = {
-    arr_of_csl_tables = function(path)
+    csl_table_arr = function(path)
       return transf.str.table_or_err_by_evaled_env_bash_parsed_json({
         "citation-js --input" .. transf.str.str_by_single_quoted_escaped(path) ..
         "--output-language json"
@@ -1747,7 +1757,7 @@ transf = {
   },
 
   ics_file = {
-    arr_of_assocs = function(path)
+    assoc_arr = function(path)
       local temppath = transf.str.in_tmp_dir(transf.path.filename(path) .. ".ics")
       dothis.extant_path.copy_to_absolute_path(path, temppath)
       act.ics_file.generate_json_file(temppath)
@@ -1794,7 +1804,7 @@ transf = {
 
   },
   tree_node = {
-    arr_of_arrs_by_label = function(node, path, include_inner)
+    arr_arr_by_label = function(node, path, include_inner)
       path = get.table.table_by_copy(path) or {}
       dothis.arr.push(path, node.label)
       local res = {}
@@ -1802,16 +1812,16 @@ transf = {
         res = {path}
       end
       if node.children then
-        res = transf.two_arrs.arr_by_appended(res, transf.tree_node_arr.arr_of_arrs_by_label(node.children, path, include_inner))
+        res = transf.two_arrs.arr_by_appended(res, transf.tree_node_arr.arr_arr_by_label(node.children, path, include_inner))
       end
       return res
     end
   },
   tree_node_arr = {
-    arr_of_arrs_by_label = function(arr, path, include_inner)
+    arr_arr_by_label = function(arr, path, include_inner)
       local res = {}
       for _, node in transf.arr.index_value_stateless_iter(arr) do
-        res = transf.two_arrs.arr_by_appended(res, transf.tree_node.arr_of_arrs_by_label(node, path, include_inner))
+        res = transf.two_arrs.arr_by_appended(res, transf.tree_node.arr_arr_by_label(node, path, include_inner))
       end
       return res
     end,
@@ -1938,12 +1948,12 @@ transf = {
     record_separator = function(path)
       return tblmap.extension.likely_record_separator[transf.path.extension(path)]
     end,
-    arr_of_arr_of_fields = function(path)
+    field_arr_arr = function(path)
       return ftcsv.parse(path, transf.plaintext_table_file.field_separator(path), {
         headers = false
       })
     end,
-    iter_of_arr_of_fields = function(path)
+    iter_of_field_arr = function(path)
       local iter = ftcsv.parseLine(path, transf.plaintext_table_file.field_separator(path), {
         headers = false
       })
@@ -4093,18 +4103,18 @@ transf = {
       )
     end,
   },
-  plaintext_associonary_file = {
+  plaintext_assoc_file = {
     table = function(file)
-      if is.plaintext_associonary_file.yaml_file(file) then
+      if is.plaintext_assoc_file.yaml_file(file) then
         return transf.yaml_file.not_userdata_or_function(file)
-      elseif is.plaintext_associonary_file.json_file(file) then
+      elseif is.plaintext_assoc_file.json_file(file) then
         return transf.json_file.not_userdata_or_function(file)
-      elseif is.plaintext_associonary_file.ini_file(file) then
+      elseif is.plaintext_assoc_file.ini_file(file) then
         return transf.ini_file.assoc(file)
-      elseif is.plaintext_associonary_file.toml_file(file) then
+      elseif is.plaintext_assoc_file.toml_file(file) then
         return transf.toml_file.assoc(file)
-      elseif is.plaintext_associonary_file.ics_file(file) then
-        return transf.ics_file.arr_of_assocs(file) 
+      elseif is.plaintext_assoc_file.ics_file(file) then
+        return transf.ics_file.assoc_arr(file) 
       end
     end
   },
@@ -4115,6 +4125,7 @@ transf = {
         lines,
         transf.str.two_strs_by_split_header
       )
+
     end
   },
   base64_gen_str = {
@@ -4257,15 +4268,15 @@ transf = {
     
   },
   multirecord_str = {
-    arr_of_record_strs = function(str)
+    record_str_arr = function(str)
       return get.str.str_arr_split_noempty(
         str,
         fixedstr.unique_record_separator
       )
     end,
-    arr_of_event_tables = function(str)
+    event_table_arr = function(str)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.multirecord_str.arr_of_record_strs(str),
+        transf.multirecord_str.record_str_arr(str),
         transf.str.event_table
       )
     end,
@@ -4329,7 +4340,7 @@ transf = {
       return a or b
     end,
     str_two_anys = function(a, b)
-      return transf.any.str(a), transf.any.str(b)
+      return transf.any.str_by_replicable(a), transf.any.str_by_replicable(b)
     end,
     pair = function(key, value)
       return {key, value}
@@ -4341,28 +4352,28 @@ transf = {
       return value
     end,
     header = function(k, v)
-      return transf.str.str_by_first_eutf8_upper(transf.any.str(k)) .. ": " .. transf.any.str(v)
+      return transf.str.str_by_first_eutf8_upper(transf.any.str_by_replicable(k)) .. ": " .. transf.any.str_by_replicable(v)
     end,
     email_header = function(key, value)
-      return transf.str.str_by_first_eutf8_upper(transf.any.str(key)) .. ": " .. get.str.str_by_evaled_as_template(transf.any.str(value))
+      return transf.str.str_by_first_eutf8_upper(transf.any.str_by_replicable(key)) .. ": " .. get.str.str_by_evaled_as_template(transf.any.str_by_replicable(value))
     end,
     url_param = function(key, value)
-      return transf.any.str(key) .. "=" .. transf.str.encoded_query_param_value(transf.any.str(value))
+      return transf.any.str_by_replicable(key) .. "=" .. transf.str.encoded_query_param_value(transf.any.str_by_replicable(value))
     end,
     ini_line = function(key, value)
-      return transf.any.str(key) .. " = " .. transf.any.str(value)
+      return transf.any.str_by_replicable(key) .. " = " .. transf.any.str_by_replicable(value)
     end,
     envlike_line = function(key, value)
-      return transf.any.str(key) .. "=" .. transf.any.str(value)
+      return transf.any.str_by_replicable(key) .. "=" .. transf.any.str_by_replicable(value)
     end,
     curl_form_field_args = function(key, value)
       return {
         "-F",
-        transf.any.str(key) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.str(value)),
+        transf.any.str_by_replicable(key) .. "=" .. transf.potentially_atpath.potentially_atpath_resolved(transf.any.str_by_replicable(value)),
       }
     end,
     assoc_entry_str = function(key, value)
-      return "[" .. transf.any.str(key) .. "] = " .. transf.any.str(value)
+      return "[" .. transf.any.str_by_replicable(key) .. "] = " .. transf.any.str_by_replicable(value)
     end,
   },
   two_comparables = {
@@ -4710,7 +4721,7 @@ transf = {
       return transf.arr_and_any.arr(arr, any)
     end,
   },
-  arr_of_str_arrs = {
+  str_arr_arr = {
 
   },
   url_arr = {
@@ -4754,10 +4765,10 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.plaintext_file.str_by_contents)
     end,
     str_arr_by_lines = function(arr)
-      return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_lines)
+      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_lines)
     end,
     str_arr_by_content_lines = function(arr)
-      return get.arr_of_arrs.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_content_lines)
+      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_content_lines)
     end,
     m3u_file_arr = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, is.plaintext_file.m3u_file)
@@ -4769,7 +4780,7 @@ transf = {
     end,
     
   },
-  arr_of_event_tables = {
+  event_table_arr = {
   },
   email_file_arr = {
     email_file_summary_assoc = function(email_file_arr)
@@ -4819,12 +4830,12 @@ transf = {
       )
     end,
     pair_arr_by_sorted_larger_key_first = function(t)
-      return transf.arr_of_arrs.arr_of_arrs_by_sorted_larger_first_item(
+      return transf.arr_arr.arr_arr_by_sorted_larger_first_item(
         transf.table.pair_arr(t)
       )
     end,
     pair_arr_by_sorted_smaller_key_first = function(t)
-      return transf.arr_of_arrs.arr_of_arrs_by_sorted_smaller_first_item(
+      return transf.arr_arr.arr_arr_by_sorted_smaller_first_item(
         transf.table.pair_arr(t)
       )
     end,
@@ -4890,57 +4901,57 @@ transf = {
     json_str_by_pretty = function(t)
       return hs.json.encode(t, true)
     end,
-    arr_of_arrs_by_label_root_to_leaf_only_primitive_is_leaf = function(t)
-      return get.table.arr_of_arrs_by_label_root_to_leaf(
+    arr_arr_by_label_root_to_leaf_only_primitive_is_leaf = function(t)
+      return get.table.arr_arr_by_label_root_to_leaf(
         t,
         transf["nil"]["false"]()
       )
     end,
-    arr_of_arrs_by_label_root_to_leaf_primitive_and_arrlike_is_leaf = function(t)
-      return get.table.arr_of_arrs_by_label_root_to_leaf(
+    arr_arr_by_label_root_to_leaf_primitive_and_arrlike_is_leaf = function(t)
+      return get.table.arr_arr_by_label_root_to_leaf(
         t,
-        is.table.arrlike
+        is.table.only_int_key_table
       )
     end,
-    arr_of_arrs_by_key_label_only_primitive_is_leaf = function(t)
-      return get.table.arr_of_arrs_by_key_label(
+    arr_arr_by_key_label_only_primitive_is_leaf = function(t)
+      return get.table.arr_arr_by_key_label(
         t,
         transf["nil"]["false"]()
       )
     end,
-    arr_of_arrs_by_key_label_primitive_and_arrlike_is_leaf = function(t)
-      return get.table.arr_of_arrs_by_key_label(
+    arr_arr_by_key_label_primitive_and_arrlike_is_leaf = function(t)
+      return get.table.arr_arr_by_key_label(
         t,
-        is.table.arrlike
+        is.table.only_int_key_table
       )
     end,
     relative_path_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
       return get.table.str_by_joined_key_any_value_assoc(
         t,
-        is.table.arrlike,
+        is.table.only_int_key_table,
         "/"
       )
     end,
     dot_notation_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
       return get.table.str_by_joined_key_any_value_assoc(
         t,
-        is.table.arrlike,
+        is.table.only_int_key_table,
         "."
       )
     end,
     arr_by_nested_final_key_label_by_primitive_and_arrlike_is_leaf = function(t)
-      return transf.arr_of_arrs.arr_by_map_to_last(
-        get.table.arr_of_arrs_by_key_label(
+      return transf.arr_arr.arr_by_map_to_last(
+        get.table.arr_arr_by_key_label(
           t,
-          is.table.arrlike
+          is.table.only_int_key_table
         )
       )
     end,
     arr_by_nested_value_primitive_and_arrlike_is_leaf = function(t)
       return transf.arr.arr_by_map_to_last(
-        get.table.arr_of_arrs_by_label_root_to_leaf(
+        get.table.arr_arr_by_label_root_to_leaf(
           t,
-          is.table.arrlike
+          is.table.only_int_key_table
         )
       )
     end,
@@ -4977,7 +4988,7 @@ transf = {
       return get.str_or_number_arr.str_by_joined(header_lines, "\n")
     end,
     curl_form_field_arr = function(t)
-      return transf.arr_of_arrs.arr_by_flatten(
+      return transf.arr_arr.arr_by_flatten(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.curl_form_field_args)
       )
     end,
@@ -5100,14 +5111,14 @@ transf = {
       return get.str_or_number_arr.str_by_joined(transf.assoc.truthy_long_flag_arr(assoc), " ")
     end,
   },
-  arr_of_arrs = {
-    arr_of_arrs_by_sorted_larger_first_item = function(arr)
+  arr_arr = {
+    arr_arr_by_sorted_larger_first_item = function(arr)
       return get.arr.arr_by_sorted(
         arr,
         transf.two_arrs.bool_by_larger_first_item
       )
     end,
-    arr_of_arrs_by_sorted_smaller_first_item = function(arr)
+    arr_arr_by_sorted_smaller_first_item = function(arr)
       return get.arr.arr_by_sorted(
         arr,
         transf.two_arrs.bool_by_smaller_first_item
@@ -5136,7 +5147,7 @@ transf = {
       end)
       return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(a_o_a[1], 1, last_matching_index)
     end,
-    arr_of_arrs_by_reverse = function(arr)
+    arr_arr_by_reverse = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.arr.arr_by_reverse)
     end,
     arr_by_longest_common_suffix = function(arr)
@@ -5202,11 +5213,11 @@ transf = {
 
   },
   arr_value_assoc = {
-    arr_of_arrs = function(arr)
+    arr_arr = function(arr)
       return transf.table.vt_arr(arr)
     end,
     arr_by_flatten = function(arr)
-      return transf.arr_of_arrs.arr_by_flatten(transf.table.vt_arr(arr))
+      return transf.arr_arr.arr_by_flatten(transf.table.vt_arr(arr))
     end,
         
   },
@@ -5869,7 +5880,7 @@ transf = {
       return app:bundleID()
     end,
     menu_item_table_arr = function(app)
-      local arr = get.arr_of_n_any_assoc_arrs.arr_of_assoc_leaf_labels_with_title_path(
+      local arr = get.n_any_assoc_arr_arr.assoc_leaf_labels_with_title_path_arr(
         get.tree_node_like_arr.tree_node_arr(
           app:getMenuItems(),
           { levels_of_nesting_to_skip = 1}
@@ -6822,18 +6833,14 @@ transf = {
     str_by_inspect = function(thing)
       return hs.inspect(thing, {depth = 5})
     end,
-    str = function(strable)
+    str = tostring,
+    --- avoids the use of memory addresses except for functions and userdata, where it is unavoidable. Therefore it is replicable in the sense that it should produce the same string for the same input even between different lua instances.
+    str_by_replicable = function(strable)
       if is.any.str(strable) then
         return strable
       elseif is.any.not_table(strable) then
-        return tostr(strable)
+        return transf.any.str(strable)
       else
-        if strable.get then
-          local got_tostr = strable:get("to-str")
-          if got_tostr then
-            return got_tostr
-          end
-        end
         local succ, json = pcall(transf.not_userdata_or_function.json_str, strable)
         if succ then
           return json
@@ -6938,8 +6945,8 @@ transf = {
     n_anys = function(...)
       return ...
     end,
-    amount = function(...)
-      return #{...}
+    int_by_amount = function(...)
+      return select("#", ...)
     end,
   },
   str_and_n_anys = {
@@ -7239,7 +7246,7 @@ transf = {
       local returnfn
       returnfn = function(...)
         if dirty then
-          error("poisoned " .. tostr(returnfn))
+          error("poisoned " .. transf.any.str(returnfn))
         end
         dirty = true
         return {...}
@@ -7301,10 +7308,10 @@ transf = {
     package_manager_name_arr_with_missing_packages = function()
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg missing-package-manager"))
     end,
-    semver_str_arr_of_installed_package_managers = function ()
+    semver_str_arr_by_installed_package_managers = function ()
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg package-manager-version"))
     end,
-    absolute_path_arr_of_installed_package_managers = function()
+    absolute_path_arr_by_installed_package_managers = function()
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg which-package-manager"))
     end,
     mullvad_status_str = function()
@@ -7373,6 +7380,15 @@ transf = {
     menu_item_table_arr_by_frontmost_application = function()
       return transf.menu_item_table_arr.menu_item_table_arr_by_application(
         transf["nil"].running_application_by_frontmost()
+      )
+    end,
+    installed_app_dir_arr = function()
+      return transf.local_dir.local_extant_path_arr_by_descendants(env.APPLICATIONS)
+    end,
+    mac_application_name_arr = function()
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        transf["nil"].installed_app_dir_arr(),
+        transf.path.filename
       )
     end,
 
@@ -7539,15 +7555,15 @@ transf = {
     end
   },
   thing_name_arr = {
-    arr_of_action_specifier_arrs = function(thing_name_arr)
+    action_specifier_arr_arr = function(thing_name_arr)
       return get.arr.arr_by_mapped_w_t_key_assoc(
         thing_name_arr,
         tblmap.thing_name.action_specifier_arr
       )
     end,
     action_specifier_arr = function(thing_name_arr)
-      return transf.arr_of_arrs.arr_by_flatten(
-        transf.thing_name_arr.arr_of_action_specifier_arrs(thing_name_arr)
+      return transf.arr_arr.arr_by_flatten(
+        transf.thing_name_arr.action_specifier_arr_arr(thing_name_arr)
       )
     end,
     chooser_image_retriever_specifier_arr = function(thing_name_arr)
@@ -8360,7 +8376,7 @@ transf = {
   n_shot_llm_spec = {
     n_shot_api_query_role_content_message_spec_arr = function(spec)
       return transf.role_content_message_spec_arr.api_role_content_message_spec_arr(
-        transf.arr_of_arrs.arr_by_flatten({
+        transf.arr_arr.arr_by_flatten({
           {
             {
               role = "user",

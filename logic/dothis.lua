@@ -1184,8 +1184,8 @@ dothis = {
 
   },
   plaintext_table_file = {
-    append_arr_of_arrs_of_fields = function(path, arr_of_arrs_of_fields)
-      local lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr_of_arrs_of_fields, function (arr)
+    append_arr_field_arr = function(path, arr_field_arr)
+      local lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr_field_arr, function (arr)
         return get.str_or_number_arr.str_by_joined(arr, transf.plaintext_table_file.field_separator())
       end)
       dothis.plaintext_file.append_lines(path, lines)
@@ -2504,7 +2504,7 @@ dothis = {
   },
   hotkey_created_item_specifier_arr = {
     create_or_recreate_all = function (arr, key_partial_creation_specifier_assoc)
-      local creation_specifier_arr = get.table_of_assocs.arr_of_assocs(key_partial_creation_specifier_assoc, "key")
+      local creation_specifier_arr = get.table_of_assocs.assoc_arr(key_partial_creation_specifier_assoc, "key")
       dothis.created_item_specifier_arr.create_or_recreate_all(
         arr,
         creation_specifier_arr
@@ -3060,7 +3060,7 @@ dothis = {
       )
     end,
     set_timestamp_s_created_time = function(fnid, opts_as_str, created_time)
-      dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~"), tostr(created_time))
+      dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~"), transf.any.str(created_time))
     end
   },
   fn_queue_specifier = {

@@ -127,6 +127,15 @@ is = {
     end,
   },
   printable_ascii_str = {
+    printable_ascii_no_nonspace_whitespace_str = function(str)
+      return get.str.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
+    end,
+    iban = function(str)
+      local cleaned_iban = transf.iban.cleaned_iban(str)
+      return #cleaned_iban <= 34 and is.printable_ascii_str.alphanum(cleaned_iban)
+    end,
+  },
+  printable_ascii_no_nonspace_whitespace_str = {
     printable_ascii_not_whitespace_str = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "%s")
     end,
@@ -138,17 +147,25 @@ is = {
         "url_parser_cli " .. transf.str.str_by_single_quoted_escaped(str)
       )
     end,
-    iban = function(str)
-      local cleaned_iban = transf.iban.cleaned_iban(str)
-      return #cleaned_iban <= 34 and is.printable_ascii_not_whitespace_str.alphanum(cleaned_iban)
+    application_name = transf["nil"]["true"], -- no way to tell if a str is an application name of some application
+  },
+  application_name = {
+    mac_application_name = function(str)
+      return get.arr.bool_by_contains(
+        transf["nil"].mac_application_name_arr(),
+        str
+      )
     end,
   },
   printable_ascii_not_whitespace_str = {
+    media_type = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.media_type)
+    end,
     base64_gen_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.b64.gen)
+      return get.str.bool_by_matches_whole_onig(str, r.g.b.b64.gen)
     end,
     base64_url_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.b64.url)
+      return get.str.bool_by_matches_whole_onig(str, r.g.b.b64.url)
     end,
     base64_str = function(str)
       return is.printable_ascii_not_whitespace_str.base64_gen_str(str) or is.printable_ascii_not_whitespace_str.base64_url_str(str)
@@ -255,6 +272,9 @@ is = {
     end,
     indicated_decimal_number_str = function(str)
       return get.str.bool_by_startswith(str, "0d") and is.printable_ascii_str.decimal_str(str:sub(3))
+    end,
+    domain_name = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.domain_name)
     end,
   },
   colon_alphanum_minus_underscore = {
@@ -449,11 +469,8 @@ is = {
     local_naive_absolute_path = function(path)
       return get.str.bool_by_startswith(path, "/")
     end,
-    local_absolute_path = function(path)
-       return is.local_path.local_naive_absolute_path(path) and is.local_path.not_contains_relative_references_local_path(path)
-    end,
     local_nonabsolute_path = function(path)
-      return not is.path.local_absolute_path(path)
+      return not is.local_path.local_absolute_path(path)
     end,
     contains_relative_references_local_path = function(path)
       return 
@@ -484,12 +501,14 @@ is = {
     not_contains_relative_references_local_path = function(path)
       return not is.path.contains_relative_references_path(path)
     end,
-    local_tilde_path = function(path)
-      return is.local_path.local_nonabsolute_path(path) and is.local_nonabsolute_path.local_tilde_path(path)
-    end,
     local_resolvable_path = function(path)
       return is.local_path.local_naive_absolute_path(path) or is.local_path.local_tilde_path(path)
     end
+  },
+  local_naive_absolute_path = {
+    local_absolute_path = function(path)
+      return is.local_path.local_naive_absolute_path(path) and is.local_path.not_contains_relative_references_local_path(path)
+   end,
   },
   local_nonabsolute_path = {
     local_tilde_path = function(path)
@@ -502,9 +521,6 @@ is = {
       pcall(io.close, file)
       return file ~= nil
     end,
-    local_file = function(path)
-      return is.local_absolute_path.local_extant_path(path) and is.local_extant_path.local_file(path)
-    end,
     local_nonextant_path = function(path)
       return not is.path.local_extant_path(path)
     end,
@@ -513,12 +529,6 @@ is = {
     end,
     in_volume_local_absolute_path = function(path)
       return get.str.bool_by_startswith(path, "/Volumes/")
-    end,
-    volume_local_extant_path = function(path)
-      return get.arr.bool_by_contains(
-        transf["nil"].volume_local_extant_path_arr(),
-        path
-      )
     end,
     in_home_local_absolute_path = function(path)
       return get.str.bool_by_startswith(path, env.HOME)
@@ -554,6 +564,12 @@ is = {
       
   },
   local_extant_path = {
+    volume_local_extant_path = function(path)
+      return get.arr.bool_by_contains(
+        transf["nil"].volume_local_extant_path_arr(),
+        path
+      )
+    end,
     local_dir = function(path)
       return not not hs.fs.chdir(path)
     end,
@@ -574,11 +590,16 @@ is = {
     empty_local_dir = function(path)
       return transf.local_dir.absolute_path_value_stateful_iter_by_children(path)() == nil
     end,
-    project_dir = function(path)
-      return is.local_dir.nonempty_local_dir(path) and is.nonempty_local_dir.project_dir(path)
-    end,
     nonempty_local_dir = function(path)
       return not is.path.empty_local_dir(path)
+    end,
+    dotapp_dir = function(path)
+      return get.str.bool_by_endswith(path, ".app")
+    end,
+  },
+  dotapp_dir = {
+    installed_app_dir = function(path)
+      return get.str.bool_by_startswith(path, "/Applications/")
     end,
   },
   nonempty_local_dir = {
@@ -612,16 +633,6 @@ is = {
     nonextant_path = function(path)
       return not is.path.extant_path(path)
     end,
-    dir = function(path)
-      return is.absolute_path.file(path) and is.extant_path.dir(path)
-    end,
-    file = function(path)
-      return is.absolute_path.file(path) and is.extant_path.file(path)
-    end,
-    nonempty_dir = function(path)
-      return is.absolute_path.dir(path) and is.dir.nonempty_dir(path)
-    end,
-  
   },
   extant_path = {
     dir = function(path)
@@ -640,7 +651,7 @@ is = {
   },
   dir = {
     git_root_dir = function(path)
-      return get.arr.bool_by_some_pass_w_t(
+      return get.arr.bool_by_some_equals_w_t(
         transf.dir.children_filename_arr(path),
         ".git"
       )
@@ -685,16 +696,6 @@ is = {
     binary_file = function(path)
       return not is.file.plaintext_file(path)
     end,
-    plaintext_associonary_file = function(path)
-      return is.file.plaintext_file(path) and is.plaintext_file.plaintext_associonary_file(path)
-    end,
-    shellscript_file = function(path)
-      return get.path.usable_as_filetype(path, "shell-script") 
-      or get.str.bool_by_matches_part_onig(
-        transf.file.str_by_contents(path),
-        "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+"
-      )
-    end,
     email_file = function(path)
       return 
        get.path.is_extension(path, "eml") or 
@@ -719,15 +720,22 @@ is = {
     end,
   },
   shellscript_file = {
-    errors = function(path)
+    shellscript_file_with_errors = function(path)
       return transf.shellscript_file.gcc_str_errors(path) ~= ""
     end,
-    warnings = function(path)
+    shellscript_file_with_warnings = function(path)
       return transf.shellscript_file.gcc_str_warnings(path) ~= ""
     end,
   },
   plaintext_file = {
-    plaintext_associonary_file = function(path)
+    shellscript_file = function(path)
+      return get.path.usable_as_filetype(path, "shell-script") 
+      or get.str.bool_by_matches_part_onig(
+        transf.file.str_by_contents(path),
+        "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+"
+      )
+    end,
+    plaintext_assoc_file = function(path)
       get.path.is_standartized_extension_in(
         path,
         ls.filetype["plaintext-dictionary"]
@@ -755,7 +763,7 @@ is = {
       return get.path.is_standartized_extension(path, "md")
     end,
   },
-  plaintext_associonary_file = {
+  plaintext_assoc_file = {
     yaml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "yaml"}),
     json_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "json"}),
     toml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "toml"}),
@@ -763,16 +771,7 @@ is = {
     ics_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "ics"}),
   },
   plaintext_table_file = {
-    timestamp_first_column_plaintext_table_file = function(path)
-      local line = get.plaintext_file.nth_line(path, 1)
-      if not line then return false end
-      local leading_number = get.str.n_strs_by_extracted_eutf8(line, "^(%d+)%D")
-      if leading_number and #leading_number < 11 then -- a unix timestamp will only be larger than 10 digits starting at 2286-11-20, at which point this code will need to be updated
-        return true
-      else
-        return false
-      end
-    end
+
   },
   alphanum_minus_underscore = {
     package_manager_name = function(str)
@@ -792,7 +791,12 @@ is = {
     end,
   },
   alphanum_underscore = {
-
+    lower_alphanum_underscore = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "[a-z_]+")
+    end,
+    upper_alphanum_underscore = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "[A-Z_]+")
+    end,
   },
   alphanum = {
     alpha_str = function(str)
@@ -960,7 +964,7 @@ is = {
       return get.str.bool_by_endswith(transf.data_url.header_part(url), ";base64")
     end,
     image_data_url = function(url)
-      return  s.media_type.image_media_type(transf.data_url.content_type(url))
+      return is.media_type.image_media_type(transf.data_url.content_type(url))
     end,
   },
   media_type = {
@@ -989,9 +993,6 @@ is = {
     float = function(num)
       return not is.number.int(num)
     end,
-    even_number = function(num)
-      return num % 2 == 0
-    end,
   },
   int = {
     even_int = function(num)
@@ -1016,21 +1017,28 @@ is = {
   pos_int = {
     
   },
+  n_anys = {
+    any = function(...)
+      return transf.n_anys.int_by_amount(...) == 1
+    end,
+    two_anys = function(...)
+      return transf.n_anys.int_by_amount(...) == 2
+    end,
+  },
+  two_anys = {
+    two_numbers = function(...)
+      return get.arr.bool_by_all_pass_w_fn(
+        transf.n_anys.arr(...),
+        is.any.number
+      )
+    end,
+  },
   any = {
     fn = function(val)
       return  type(val) == "function"
     end,
     number = function(val)
       return type(val) == "number"
-    end,
-    pos_int = function(val)
-      return is.any.int(val) and is.number.pos_number(val)
-    end,
-    neg_int = function(val)
-      return is.any.int(val) and is.number.neg_number(val)
-    end,
-    float = function(val)
-      return is.any.number(val) and is.number.float(val)
     end,
     str = function(val)
       return type(val) == "string"
@@ -1041,8 +1049,11 @@ is = {
     primitive = function(val)
       return not is.any.table(val)
     end,
-    non_empty_table_arr = function(val)
-      return is.any.table(val) and is.table.non_empty_table(val) and is.table.arrlike(val) and is.arrlike.arr(val)
+    ["nil"] = function(val)
+      return val == nil
+    end,
+    not_int = function(val)
+      return not is.any.int(val)
     end,
   },
   pass_item_name = {
@@ -1064,10 +1075,7 @@ is = {
     login_pass_item_name = function(name)
       return 
         is.pass_item_name.passw_pass_item_name(name) or
-        is.pass_item_name.username_pass_item_name(name) or
-        is.pass_item_name.recovery_pass_item_name(name) or
-        is.pass_item_name.otp_pass_item_name(name) or
-        is.pass_item_name.secq_pass_item_name(name)
+        is.pass_item_name.username_pass_item_name(name)
     end,
 
 
@@ -1077,50 +1085,7 @@ is = {
       return get.mac_application_name.running_application(name) ~= nil
     end,
   },
-  audiodevice_specifier = {
-    active_audiodevice_specifier = function(audiodevice_specifier)
-      return get.audiodevice.is_active_audiodevice(audiodevice_specifier.device, audiodevice_specifier.subtype)
-    end,
-  },
-  csl_table = {
-    type_whole_book = function(csl_table)
-      return csl_table.type == "book" or csl_table.type == "monograph"
-    end,
-    type_book_chapter = function(csl_table)
-      return csl_table.type == "chapter"
-    end,
-    whole_book = function(csl_table)
-      return is.csl_table.type_whole_book(csl_table) and not csl_table.chapter and not csl_table.pages
-    end
-  },
-  two_anys = {
-    a_larger = function(a, b)
-      return a > b
-    end,
-    b_larger = function(a, b)
-      return a < b
-    end,
-    a_larger_as_str = function(a, b)
-      return tostr(a) > tostr(b)
-    end,
-    b_larger_as_str = function(a, b)
-      return tostr(a) < tostr(b)
-    end,
-    equal = function(a, b)
-      return a == b
-    end,
-  },
   table = {
-    created_item_specifier = function(t)
-      return
-        t.created_item and t.creation_specifier
-    end,
-    date = function(t)
-      return is.any.fn(t.addyears) -- arbitrary prop of date object
-    end,
-    native_table = function(t)
-      return not t.isovtable
-    end,
     empty_table = function(t)
       for k, v in transf.table.key_value_stateless_iter(t) do
         return false
@@ -1130,69 +1095,51 @@ is = {
     non_empty_table = function(t)
       return not is.table.empty_table(t)
     end,
-    arrlike_by_keys = function(t)
+    only_int_key_table = function(t)
       for k, v in transf.table.key_value_stateless_iter(t) do
-        if is.any.not_number(k) then return false end
+        if is.any.not_int(k) then return false end
       end
       return true
     end,
-    non_empty_table_arrlike_by_keys = function(t)
-      return is.table.non_empty_table(t) and is.table.arrlike_by_keys(t)
-    end,
-    arrlike = function(t)
-      if t.isarr then return true end -- signal value to indicate that this is a list
-      if t.isassoc then return false end -- signal value to indicate that this is an assoc table
-      return is.table.arrlike_by_keys(t)
-    end,
-    non_arrlike = function(t)
-      return not is.table.arrlike(t)
-    end,
-    arr = function (t)
-      return is.table.arrlike(t) and is.arrlike.arr(t)
-    end,
-    hole_y_arrlike = function (t)
-      return is.table.arrlike(t) and is.arrlike.hole_y_arrlike(t)
-    end,
-    empty_unspecified_table = function(t)
-      if t.isovtable then return false end
-      if t.isarr then return false end
-      if t.isassoc then return false end
-      return is.any.empty_table(t)
-    end
   },
-  arrlike = {
-    --- an empty arrlike is never a hole_y_arrlike and always an arr
-    hole_y_arrlike = function(arrlike)
-      if #arrlike == 0 then return false end
-      for i = 1, #arrlike do
-        if arrlike[i] == nil then return true end
+  only_int_key_table = {
+    --- an empty only_int_key_table is never a hole_y_arrlike and always an arr
+    hole_y_arrlike = function(only_int_key_table)
+      if #only_int_key_table == 0 then return false end
+      for i = 1, #only_int_key_table do
+        if only_int_key_table[i] == nil then return true end
       end
       return false
     end,
-    arr = function(arrlike)
-      return not is.arrlike.hole_y_arrlike(arrlike)
+    arr = function(only_int_key_table)
+      return not is.only_int_key_table.hole_y_arrlike(only_int_key_table)
     end,
   },
-  assoclike = {
-
+  non_empty_table = {
+    str_key_non_empty_table = function(t)
+      return get.table.bool_by_all_keys_pass_w_fn(
+        t,
+        is.any.str
+      )
+    end,
+    date = function(t)
+      return is.any.fn(t.addyears) -- arbitrary prop of date object
+    end,
   },
-  hole_y_arrlike = {
-
+  str_key_non_empty_table = {
+    created_item_specifier = function(t)
+      return
+        t.created_item and t.creation_specifier
+    end,
   },
   arr = {
-    empty_table_arr = function(arr)
-      return #arr == 0
-    end,
-    non_empty_table_arr = function(arr)
-      return #arr > 0
-    end,
     str_arr = function(arr)
       return get.arr.bool_by_all_pass_w_fn(
         arr,
         is.any.str
       )
     end,
-    arr_of_arrs = function(arr)
+    arr_arr = function(arr)
       return get.arr.bool_by_all_pass_w_fn(
         arr,
         is.any.arr
@@ -1271,6 +1218,22 @@ is = {
       )
     end,
   },
+  audiodevice_specifier = {
+    active_audiodevice_specifier = function(audiodevice_specifier)
+      return get.audiodevice.is_active_audiodevice(audiodevice_specifier.device, audiodevice_specifier.subtype)
+    end,
+  },
+  csl_table = {
+    type_whole_book = function(csl_table)
+      return csl_table.type == "book" or csl_table.type == "monograph"
+    end,
+    type_book_chapter = function(csl_table)
+      return csl_table.type == "chapter"
+    end,
+    whole_book = function(csl_table)
+      return is.csl_table.type_whole_book(csl_table) and not csl_table.chapter and not csl_table.pages
+    end
+  },
   mpv_ipc_socket_id = {
     alive = function(mpv_ipc_socket_id)
       return get.ipc_socket_id.response_table_or_nil(mpv_ipc_socket_id, {
@@ -1312,8 +1275,10 @@ is = {
 }
 
 -- to allow for is.<type1>.<type2> where type2 is a descendant but not childtype of type1, we will use a metatable to search for the path from type1 to type2 by using thing_name_hierarchy, and then create a dynamic function that tests is.<type1>.<subtype> and is.<subtype>.<subtype2> and so on until we reach type2
+-- to avoid code duplication we will resolve any call is.<type_a>_arr.<type_b>_arr to a dynamically generated function that calls get.arr.bool_by_all_pass_w_fn(arr, is.<type_a>.<type_b>)
 
 for type1, v in pairs(is) do
+  local type1_ends_arr = get.str.bool_by_endswith(type1, "_arr")
   local mt = {
     __index = function(t, type2)
 
@@ -1322,6 +1287,15 @@ for type1, v in pairs(is) do
       if fn then 
         return fn
       end
+
+      if type1_ends_arr and get.str.bool_by_endswith(type2, "_arr") then
+        local type_a = string.sub(type1, 1, -5)
+        local type_b = string.sub(type2, 1, -5)
+        return function(arr)
+          return get.arr.bool_by_all_pass_w_fn(arr, is[type_a][type_b])
+        end
+      end
+      
       local path = get.table.arr_or_nil_by_find_path_between_two_keys(
         thing_name_hierarchy,
         type1,

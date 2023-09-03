@@ -76,7 +76,7 @@ get = {
     search_event_tables = function(searchstr, include, exclude)
       local command = "khal search" .. get.khal.basic_command_parts(include, exclude)
       command = command .. " " .. transf.str.str_by_single_quoted_escaped(searchstr)
-      return transf.multirecord_str.arr_of_event_tables(transf.str.str_or_nil_by_evaled_env_bash_stripped(command))
+      return transf.multirecord_str.event_table_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped(command))
     end,
     list_event_tables = function(specifier, include, exclude)
       local command = {
@@ -93,7 +93,7 @@ get = {
       specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
       dothis.arr.push(command, transf.str.str_by_single_quoted_escaped(specifier.start))
       dothis.arr.push(command, transf.str.str_by_single_quoted_escaped(specifier["end"]))
-      return transf.multirecord_str.arr_of_event_tables(
+      return transf.multirecord_str.event_table_arr(
         transf.str.str_or_nil_by_evaled_env_bash_stripped(
           get.str_or_number_arr.str_by_joined(command, " ")
         )
@@ -213,11 +213,11 @@ get = {
       copied_tables = get.any.default_if_nil(copied_tables, {})
       if not t then return t end
       local new = {}
-      copied_tables[tostr(t)] = new
+      copied_tables[transf.any.str(t)] = new
       for k, v in transf.table.stateless_key_value_iter(t) do
         if is.any.table(v) and deep then
-          if copied_tables[tostr(v)] then -- we've already copied this table, so just reference it
-            new[k] = copied_tables[tostr(v)]
+          if copied_tables[transf.any.str(v)] then -- we've already copied this table, so just reference it
+            new[k] = copied_tables[transf.any.str(v)]
           else -- we haven't copied this table yet, so copy it and reference it
             new[k] = get.table.table_by_copy(v, deep, copied_tables)
           end
@@ -231,6 +231,42 @@ get = {
     bool_by_key_equals_value = function(t, key, value)
       return t[key] == value
     end,
+    bool_by_all_keys_contained_in_w_arr = function(t, arr)
+      return get.arr.bool_by_all_contained_in_w_arr(
+        transf.table.kt_arr(t),
+        arr
+      )
+    end,
+    bool_by_some_keys_contained_in_w_arr = function(t, arr)
+      return get.arr.bool_by_some_contained_in_w_arr(
+        transf.table.kt_arr(t),
+        arr
+      )
+    end,
+    bool_by_all_keys_contained_in_w_table = function(t, table)
+      return get.table.bool_by_all_keys_contained_in_w_arr(
+        t,
+        transf.table.kt_arr(table)
+      )
+    end,
+    bool_by_all_keys_pass_w_fn = function(t, fn)
+      return get.arr.bool_by_all_pass_w_fn(
+        transf.table.kt_arr(t),
+        fn
+      )
+    end,
+    bool_by_some_keys_pass_w_fn = function(t, fn)
+      return get.arr.bool_by_some_pass_w_fn(
+        transf.table.kt_arr(t),
+        fn
+      )
+    end,
+    bool_by_none_keys_pass_w_fn = function(t, fn)
+      return get.arr.bool_by_none_pass_w_fn(
+        transf.table.kt_arr(t),
+        fn
+      )
+    end,
     vt_or_err = function(t, key)
       if t[key] then
         return t[key]
@@ -238,7 +274,7 @@ get = {
         error("Table did not contain key " .. key)
       end
     end,
-    arr_of_arrs_by_label_root_to_leaf = function(t, table_arg_bool_by_is_leaf_ret_fn, visited, path)
+    arr_arr_by_label_root_to_leaf = function(t, table_arg_bool_by_is_leaf_ret_fn, visited, path)
       visited = get.any.default_if_nil(visited, {})
       local arr_o_arrs = {}
       for k, v in transf.table.stateless_key_value_iter(t) do
@@ -252,7 +288,7 @@ get = {
           if not get.arr.bool_by_contains(visited, v) then -- only if we've not seen this yet, to avoid infinite loops
             arr_o_arrs = transf.two_arrs.arr_by_appended(
               arr_o_arrs,
-              get.table.arr_of_arrs_by_label_root_to_leaf(
+              get.table.arr_arr_by_label_root_to_leaf(
                 v,
                 table_arg_bool_by_is_leaf_ret_fn,
                 transf.two_arrs.arr_by_appended(visited, v),
@@ -264,7 +300,7 @@ get = {
       end
       return arr_o_arrs
     end,
-    arr_of_arrs_by_key_label = function(t, table_arg_bool_by_is_leaf_ret_fn, visited, path)
+    arr_arr_by_key_label = function(t, table_arg_bool_by_is_leaf_ret_fn, visited, path)
       visited = get.any.default_if_nil(visited, {})
       local arr_o_arrs = {}
       for k, v in transf.table.stateless_key_value_iter(t) do
@@ -277,7 +313,7 @@ get = {
           if not get.arr.bool_by_contains(visited, v) then -- only if we've not seen this yet, to avoid infinite loops
             arr_o_arrs = transf.two_arrs.arr_by_appended(
               arr_o_arrs,
-              get.table.arr_of_arrs_by_key_label(
+              get.table.arr_arr_by_key_label(
                 v,
                 table_arg_bool_by_is_leaf_ret_fn,
                 transf.two_arrs.arr_by_appended(visited, v),
@@ -325,8 +361,8 @@ get = {
       end
     end,
     str_by_joined_key_any_value_assoc = function(t, table_arg_bool_by_is_leaf_ret_fn, joiner)
-      return get.arr_of_arrs.str_by_joined_key_any_value_assoc(
-        get.table.arr_of_arrs_by_label_root_to_leaf(t, table_arg_bool_by_is_leaf_ret_fn),
+      return get.arr_arr.str_by_joined_key_any_value_assoc(
+        get.table.arr_arr_by_label_root_to_leaf(t, table_arg_bool_by_is_leaf_ret_fn),
         joiner
       )
     end,
@@ -407,7 +443,7 @@ get = {
       dothis.arr.sort(vt_arr, fn)
       return vt_arr
     end,
-    dot_notation_str_by_path_to_key = pltablex.search,    
+    dot_notation_str_by_path_to_key = pltablex.search,
   },
   
   assoc = {
@@ -470,7 +506,7 @@ get = {
     end,
   },
   table_of_assocs = {
-    arr_of_assocs = function(assoc, key)
+    assoc_arr = function(assoc, key)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc) do
         local copied = get.table.table_by_copy(v, true)
@@ -622,7 +658,7 @@ get = {
     end,
     two_arrs_of_arrs_by_slice_and_removed_filler_w_slice_spec = function(arr, slice_spec, fill)
       local hits, removed = get.arr.two_arrs_of_arrs_by_slice_w_slice_spec(arr, slice_spec)
-      return hits, get.arr_of_arrs.arr_of_arrs_by_mapped(
+      return hits, get.arr_arr.arr_arr_by_mapped(
         removed,
         function(arr)
           return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
@@ -634,32 +670,32 @@ get = {
         end
       )
     end,
-    arr_of_arrs_by_slice_and_removed_filler_w_slice_spec = function(arr, slice_spec, fill)
+    arr_arr_by_slice_and_removed_filler_w_slice_spec = function(arr, slice_spec, fill)
       local hits, fill = get.arr.two_arrs_of_arrs_by_slice_and_removed_filler_w_slice_spec(arr, slice_spec, fill)
       return transf.two_arrs.arr_by_interleaved_stop_longest(hits, fill)
     end,
     arr_by_slice_removed_filler_and_flatten_w_slice_spec = function(arr, slice_spec, fill)
-      return transf.arr_of_arrs.arr_by_flatten(
-        get.arr.arr_of_arrs_by_slice_and_removed_filler_w_slice_spec(arr, slice_spec, fill)
+      return transf.arr_arr.arr_by_flatten(
+        get.arr.arr_arr_by_slice_and_removed_filler_w_slice_spec(arr, slice_spec, fill)
       )
     end,
     --- the difference between this function and the _removed_filler one is that this will replace an arr of removed elements with a single element (the indicator) unless length zero, whereas the other will replace it with an arr of elements (the fill)
-    two_arr_of_arrs_by_slice_and_removed_indicator_w_slice_spec = function(arr, slice_spec, indicator)
+    two_arr_arr_by_slice_and_removed_indicator_w_slice_spec = function(arr, slice_spec, indicator)
       local hits, removed = get.arr.two_arrs_of_arrs_by_slice_w_slice_spec(arr, slice_spec)
-      return hits, get.arr_of_arrs.arr_of_arrs_by_mapped_if_not_length_0(
+      return hits, get.arr_arr.arr_arr_by_mapped_if_not_length_0(
         removed,
         function(arr)
           return {indicator}
         end
       )
     end,
-    arr_of_arrs_by_slice_and_removed_indicator_w_slice_spec = function(arr, slice_spec, indicator)
-      local hits, indicator = get.arr.two_arr_of_arrs_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
+    arr_arr_by_slice_and_removed_indicator_w_slice_spec = function(arr, slice_spec, indicator)
+      local hits, indicator = get.arr.two_arr_arr_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
       return transf.two_arrs.arr_by_interleaved_stop_longest(hits, indicator)
     end,
     arr_by_slice_removed_indicator_and_flatten_w_slice_spec = function(arr, slice_spec, indicator)
-      return transf.arr_of_arrs.arr_by_flatten(
-        get.arr.arr_of_arrs_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
+      return transf.arr_arr.arr_by_flatten(
+        get.arr.arr_arr_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
       )
     end,
     pos_int_or_nil_by_first_match_w_t = pltablex.find,
@@ -729,14 +765,23 @@ get = {
     bool_by_all_pass_w_fn = function(arr, cond)
       return get.arr.bool_by_none_pass_w_fn(arr, function(x) return not cond(x) end)
     end,
-    bool_by_some_pass_w_t = function(arr, t)
+    bool_by_some_equals_w_t = function(arr, t)
       return get.arr.some_pass_w_fn(arr, function(x) return x == t end)
     end,
-    bool_by_none_pass_w_t = function(arr, t)
+    bool_by_none_equals_w_t = function(arr, t)
       return get.arr.none_pass_w_fn(arr, function(x) return x == t end)
     end,
-    bool_by_all_pass_w_t = function(arr, t)
+    bool_by_all_equals_w_t = function(arr, t)
       return get.arr.all_pass_w_fn(arr, function(x) return x == t end)
+    end,
+    bool_by_some_contained_in_w_arr = function(arr, arr2)
+      return get.arr.some_pass_w_fn(arr, function(x) return get.arr.bool_by_contains(arr2, x) end)
+    end,
+    bool_by_none_contained_in_w_arr = function(arr, arr2)
+      return get.arr.none_pass_w_fn(arr, function(x) return get.arr.bool_by_contains(arr2, x) end)
+    end,
+    bool_by_all_contained_in_w_arr = function(arr, arr2)
+      return get.arr.all_pass_w_fn(arr, function(x) return get.arr.bool_by_contains(arr2, x) end)
     end,
     arr_by_head = function(arr, n)
       return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(arr, 1, n or 10)
@@ -995,7 +1040,7 @@ get = {
     bool_by_not_contains_w_ascii_str = function(str, substr)
       return not transf.str.bool_by_contains_w_str(str, substr)
     end,
-    arr_of_str_arrs_by_split = function(str, upper_sep, lower_sep)
+    str_arr_arr_by_split = function(str, upper_sep, lower_sep)
       local upper = transf.str.split(str, upper_sep)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(upper, function(v)
         return transf.str.split(v, lower_sep)
@@ -1631,17 +1676,17 @@ get = {
     end,
 
   },
-  arr_of_str_arrs = {
-    arr_of_str_records = function(arr, field_sep)
+  str_arr_arr = {
+    str_record_arr = function(arr, field_sep)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return get.str_or_number_arr.str_by_joined(x, field_sep) end)
     end,
     str_table = function(arr, field_sep, record_sep)
-      return get.str_or_number_arr.str_by_joined(get.arr_of_str_arrs.arr_of_str_records(arr, field_sep), record_sep)
+      return get.str_or_number_arr.str_by_joined(get.str_arr_arr.str_record_arr(arr, field_sep), record_sep)
     end,
     
   },
-  arr_of_tables = {
-    arr_of_vts_w_kt = function(arr, kt)
+  table_arr = {
+    vt_arr_w_kt = function(arr, kt)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return x[kt] end)
     end,
   },
@@ -2048,7 +2093,7 @@ get = {
   },
   bib_file = {
     raw_citations = function(path, format)
-      get.csl_table_or_csl_table_arr.raw_citations(transf.bib_file.arr_of_csl_tables(path), format)
+      get.csl_table_or_csl_table_arr.raw_citations(transf.bib_file.csl_table_arr(path), format)
     end,
   },
   csl_table_or_csl_table_arr = {
@@ -2431,12 +2476,12 @@ get = {
       )
     end,
   },
-  arr_of_arrs = {
+  arr_arr = {
     arr_by_column = plarray2d.column,
     arr_by_row = plarray2d.row,
-    arr_of_arrs_by_mapped_if_not_length_0 = function(arr_of_arr, fn)
+    arr_arr_by_mapped_if_not_length_0 = function(arr_arr, fn)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        arr_of_arr,
+        arr_arr,
         function(arr)
           if #arr == 0 then
             return arr
@@ -2454,30 +2499,30 @@ get = {
     end,
     str_by_joined_key_any_value_assoc = function(arr, joiner)
       return transf.pair_arr.assoc(
-        get.arr_of_n_str_or_number_any_arrs.str_by_joined_any_pair_arr(arr, joiner)
+        get.n_str_or_number_any_arr_arr.str_by_joined_any_pair_arr(arr, joiner)
       )
     end,
-    arr_of_assocs_by_arr = function(arr_of_arr, arr2)
+    assoc_arr_by_arr = function(arr_arr, arr2)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        arr_of_arr,
+        arr_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
       )
     end,
-    assoc_of_arrs_by_first_element = function(arr_of_arr)
+    assoc_of_arrs_by_first_element = function(arr_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        arr_of_arr,
+        arr_arr,
         transf.arr.t_and_arr_by_first_rest
       )
     end,
-    assoc_of_assocs_by_first_element_and_arr = function(arr_of_arr, arr2)
+    assoc_of_assocs_by_first_element_and_arr = function(arr_arr, arr2)
       return get.assoc_of_arrs.assoc_of_assocs_by_arr(
-        get.arr_of_arrs.assoc_of_arrs_by_first_element(arr_of_arr),
+        get.arr_arr.assoc_of_arrs_by_first_element(arr_arr),
         arr2
       )
     end,
-    arr_of_arrs_by_mapped = function(arr_of_arr, fn)
+    arr_arr_by_mapped = function(arr_arr, fn)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        arr_of_arr,
+        arr_arr,
         get.fn.second_n_args_bound_fn(get.arr.arr_by_mapped, fn)
       )
     end,
@@ -3395,13 +3440,13 @@ get = {
   n_any_assoc_arr = {
     leaf_label_with_title_path = function(arr, title_key)
       local leaf = get.table.table_by_copy(act.arr.pop(arr))
-      local title_path = get.arr_of_tables.arr_of_vts_w_kt(arr, title_key)
+      local title_path = get.table_arr.vt_arr_w_kt(arr, title_key)
       leaf.path = title_path
       return leaf
     end
   },
-  arr_of_n_any_assoc_arrs = {
-    arr_of_assoc_leaf_labels_with_title_path = function(arr, title_key)
+  n_any_assoc_arr_arr = {
+    assoc_leaf_labels_with_title_path_arr = function(arr, title_key)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.n_any_assoc_arr.leaf_label_with_title_path, {a_use, title_key})
