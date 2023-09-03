@@ -49,7 +49,8 @@ r = {
       doi_prefix = "^https?://[^/]+/",
       relay_identifier = "[a-z]{2}-[a-z]{3}-(?:wg|ovpn)-\\d{3}",
       media_type = "[-\\w.]+/[-\\w.\\+]+",
-      domain_name = "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]"
+      domain_name = "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]",
+      ipc_socket_id = "\\d+-\\d+",
     },
     whitespace = {
       large = "[\t\r\n]"

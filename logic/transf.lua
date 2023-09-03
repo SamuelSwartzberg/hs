@@ -569,7 +569,7 @@ transf = {
     end,
     
     index_value_stateless_iter = ipairs,
-    index_value_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.index_value_stateless_iter),
+    index_vt_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.index_value_stateless_iter),
     index_stateful_iter = get.stateless_generator.stateful_generator(transf.arr.index_value_stateless_iter, 1, 1),
     value_bool_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(arr, function(v) return v, true end)
@@ -981,7 +981,7 @@ transf = {
     
   },
   local_dir = {
-    absolute_path_value_stateful_iter_by_children = hs.fs.dir,
+    absolute_path_vt_stateful_iter_by_children = hs.fs.dir,
     local_extant_path_arr_by_descendants = function(path)
       return transf.local_extant_path_arr.installed_app_dir_arr_by_filter(
         transf.extant_path.dir_arr_by_descendants(path)
@@ -1114,8 +1114,8 @@ transf = {
       end
       return items
     end,
-    children_absolute_path_value_stateful_iter = function(remote_extant_path)
-      return transf.table.value_stateful_iter(
+    children_absolute_path_vt_stateful_iter = function(remote_extant_path)
+      return transf.table.vt_stateful_iter(
         transf.remote_dir.absolute_path_arr_by_children(remote_extant_path)
       )
     end,
@@ -1124,8 +1124,8 @@ transf = {
     absolute_path_arr_by_children = function(remote_extant_path)
       return transf.labelled_remote_dir.children_absolute_path_arr(remote_extant_path)
     end,
-    absolute_path_value_stateful_iter_by_children = function(remote_extant_path)
-      return transf.labelled_remote_dir.children_absolute_path_value_stateful_iter(remote_extant_path)
+    absolute_path_vt_stateful_iter_by_children = function(remote_extant_path)
+      return transf.labelled_remote_dir.children_absolute_path_vt_stateful_iter(remote_extant_path)
     end,
   },
   local_file = {
@@ -1215,11 +1215,11 @@ transf = {
         dir
       )
     end,
-    children_absolute_path_value_stateful_iter = function(dir)
+    children_absolute_path_vt_stateful_iter = function(dir)
       if is.path.remote_path(dir) then
-        return transf.remote_dir.absolute_path_value_stateful_iter_by_children(dir)
+        return transf.remote_dir.absolute_path_vt_stateful_iter_by_children(dir)
       else
-        return transf.local_dir.absolute_path_value_stateful_iter_by_children(dir)
+        return transf.local_dir.absolute_path_vt_stateful_iter_by_children(dir)
       end
     end,
     children_leaves_arr = function(dir)
@@ -1252,7 +1252,7 @@ transf = {
     absolute_path_key_leaf_str_or_nested_value_assoc = function(path)
       local res = {}
       path = get.str.str_by_with_suffix(path, "/")
-      for child_path in transf.dir.children_absolute_path_value_stateful_iter(path) do
+      for child_path in transf.dir.children_absolute_path_vt_stateful_iter(path) do
         if is.absolute_path.dir(child_path) then
           res[child_path] = transf.dir.absolute_path_key_leaf_str_or_nested_value_assoc(child_path)
         else
@@ -1844,7 +1844,7 @@ transf = {
     end,
     env_str = function(assoc)
       transf.env_line_arr.env_str(
-        transf.str_pair_arr.env_line_arr(
+        transf.two_strs_arr_arr.env_line_arr(
           transf.env_var_name_value_assoc.dependency_ordered_key_value_arr(assoc)
         )
       )
@@ -1872,12 +1872,12 @@ transf = {
   
               temp_stack[key] = nil  -- Remove key from temporary stack
               visited[key] = true  -- Mark key as visited
-              dothis.arr.insert_at_index(result, { key, assoc[key]['value'] })  -- Append {key, value} pair to result
+              dothis.arr.insert_at_index(result, { key, assoc[key]['value'] })  -- Append {key, value} two_anys_arr to result
           end
       end
   
       -- Perform DFS traversal for each key in the graph
-      for key, _ in transf.table.key_value_stateless_iter(assoc) do
+      for key, _ in transf.table.kt_vt_stateless_iter(assoc) do
           dfs(key)
       end
   
@@ -2832,7 +2832,7 @@ transf = {
               -- It also makes the data more structured and easier to handle.
               local vcard_types = get.str.str_arr_by_split_w_string(type_list, ", ")
         
-              -- For each vcard_type, we create a new key-value pair in the contact_table. 
+              -- For each vcard_type, we create a new key-value two_anys_arr in the contact_table. 
               -- This way, we can access the value directly by vcard_type, 
               -- without needing to parse the type_list each time.
               for _, vcard_type in transf.arr.index_value_stateless_iter(vcard_types) do
@@ -3921,24 +3921,24 @@ transf = {
     str_by_whole_regex = function(str)
       return "^" .. str .. "$"
     end,
-    str_pair_split_by_minus_or_nil = function(str)
-      return get.str.str_pair_split_or_nil(str, "-")
+    two_strs_arr_split_by_minus_or_nil = function(str)
+      return get.str.two_strs_arr_split_or_nil(str, "-")
     end,
-    prompted_once_str_pair_for = function(str)
+    prompted_once_two_strs_arr_for = function(str)
       return transf.prompt_spec.any({
         prompter = transf.prompt_args_str.str_or_nil_and_bool,
-        transformer = transf.str.str_pair_split_by_minus_or_nil,
+        transformer = transf.str.two_strs_arr_split_by_minus_or_nil,
         prompt_args = {
-          message = "Please enter a str pair for " .. str .. " (e.g. 'foo-bar')",
+          message = "Please enter a str two_anys_arr for " .. str .. " (e.g. 'foo-bar')",
         }
       })
     end,
-    prompted_multiple_str_pair_arr_for = function(str)
+    prompted_multiple_two_strs_arr_arr_for = function(str)
       return transf.prompt_spec.any_arr({
         prompter = transf.prompt_args_str.str_or_nil_and_bool,
-        transformer = transf.str.str_pair_split_by_minus_or_nil,
+        transformer = transf.str.two_strs_arr_split_by_minus_or_nil,
         prompt_args = {
-          message = "Please enter a str pair for " .. str .. " (e.g. 'foo-bar')",
+          message = "Please enter a str two_anys_arr for " .. str .. " (e.g. 'foo-bar')",
         }
       })
     end,
@@ -4297,39 +4297,39 @@ transf = {
         get.arr.arr_by_slice_removed_indicator_and_flatten_w_slice_spec(syn_specifier.antonyms, { stop = 2}, "...")
     end,
   },
-  pair = {
-    key_value = function(pair)
-      return pair[1], pair[2]
+  two_anys_arr = {
+    key_value = function(two_anys_arr)
+      return two_anys_arr[1], two_anys_arr[2]
     end,
-    key = function(pair)
-      return pair[1]
+    key = function(two_anys_arr)
+      return two_anys_arr[1]
     end,
-    value = function(pair)
-      return pair[2]
+    value = function(two_anys_arr)
+      return two_anys_arr[2]
     end,
-    header = function(pair)
-      return transf.two_anys.header(pair[1], pair[2])
+    header = function(two_anys_arr)
+      return transf.two_anys.header(two_anys_arr[1], two_anys_arr[2])
     end,
-    email_header = function(pair)
-      return transf.two_anys.email_header(pair[1], pair[2])
+    email_header = function(two_anys_arr)
+      return transf.two_anys.email_header(two_anys_arr[1], two_anys_arr[2])
     end,
-    url_param = function(pair)
-      return transf.two_anys.url_param(pair[1], pair[2])
+    url_param = function(two_anys_arr)
+      return transf.two_anys.url_param(two_anys_arr[1], two_anys_arr[2])
     end,
-    ini_line = function(pair)
-      return transf.two_anys.ini_line(pair[1], pair[2])
+    ini_line = function(two_anys_arr)
+      return transf.two_anys.ini_line(two_anys_arr[1], two_anys_arr[2])
     end,
-    envlike_line = function(pair)
-      return transf.two_anys.envlike_line(pair[1], pair[2])
+    envlike_line = function(two_anys_arr)
+      return transf.two_anys.envlike_line(two_anys_arr[1], two_anys_arr[2])
     end,
-    curl_form_field_args = function(pair)
-      return transf.two_anys.curl_form_field_args(pair[1], pair[2])
+    curl_form_field_args = function(two_anys_arr)
+      return transf.two_anys.curl_form_field_args(two_anys_arr[1], two_anys_arr[2])
     end,
-    assoc_entry_str = function(pair)
-      return transf.two_anys.assoc_entry_str(pair[1], pair[2])
+    assoc_entry_str = function(two_anys_arr)
+      return transf.two_anys.assoc_entry_str(two_anys_arr[1], two_anys_arr[2])
     end,
-    larger = function(pair)
-      return transf.two_comparables.comparable_by_larger(pair[1], pair[2])
+    larger = function(two_anys_arr)
+      return transf.two_comparables.comparable_by_larger(two_anys_arr[1], two_anys_arr[2])
     end,
   },
   two_anys = {
@@ -4342,7 +4342,7 @@ transf = {
     str_two_anys = function(a, b)
       return transf.any.str_by_replicable(a), transf.any.str_by_replicable(b)
     end,
-    pair = function(key, value)
+    two_anys_arr = function(key, value)
       return {key, value}
     end,
     key = function(key, value)
@@ -4809,7 +4809,7 @@ transf = {
     end,
   },
   table_or_nil = {
-    key_value_stateless_iter = function(t)
+    kt_vt_stateless_iter = function(t)
       if t == nil then t = {} end
       return transf.table.stateless_key_value_iter(t)
     end,
@@ -4823,25 +4823,25 @@ transf = {
     end,
   },
   table = {
-    pair_arr = function(t)
+    two_anys_arr = function(t)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
-        transf.two_anys.pair
+        transf.two_anys.two_anys_arr
       )
     end,
-    pair_arr_by_sorted_larger_key_first = function(t)
+    two_anys_arr_by_sorted_larger_key_first = function(t)
       return transf.arr_arr.arr_arr_by_sorted_larger_first_item(
-        transf.table.pair_arr(t)
+        transf.table.two_anys_arr(t)
       )
     end,
-    pair_arr_by_sorted_smaller_key_first = function(t)
+    two_anys_arr_by_sorted_smaller_key_first = function(t)
       return transf.arr_arr.arr_arr_by_sorted_smaller_first_item(
-        transf.table.pair_arr(t)
+        transf.table.two_anys_arr(t)
       )
     end,
     kt_arr = function(t)
       local res = {}
-      for k, _ in transf.table.key_value_stateless_iter(t) do
+      for k, _ in transf.table.kt_vt_stateless_iter(t) do
         res[#res + 1] = k
       end
       return res
@@ -4851,7 +4851,7 @@ transf = {
     end,
     vt_arr = function(t)
       local res = {}
-      for _, v in transf.table.key_value_stateless_iter(t) do
+      for _, v in transf.table.kt_vt_stateless_iter(t) do
         res[#res + 1] = v
       end
       return res
@@ -4868,10 +4868,10 @@ transf = {
     vt_arr_by_sorted_larger_first = function(t)
       return get.table.vt_arr_by_sorted(t, transf.two_comparables.bool_by_larger)
     end,
-    key_value_stateless_iter = pairs,
-    key_value_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateless_iter),
-    key_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateful_iter, 1, 1),
-    value_stateful_iter = get.stateless_generator.stateful_generator(transf.table.key_value_stateful_iter, 2, 2),
+    kt_vt_stateless_iter = pairs,
+    kt_vt_stateful_iter = get.stateless_generator.stateful_generator(transf.table.kt_vt_stateless_iter),
+    kt_stateful_iter = get.stateless_generator.stateful_generator(transf.table.kt_vt_stateful_iter, 1, 1),
+    vt_stateful_iter = get.stateless_generator.stateful_generator(transf.table.kt_vt_stateful_iter, 2, 2),
     toml_str = toml.encode,
     yaml_str_by_aligned = function(tbl)
       local tmp = transf.str.in_tmp_dir(
@@ -4955,13 +4955,20 @@ transf = {
         )
       )
     end,
+    table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf = function(t, fn)
+      return get.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn(
+        t,
+        transf["nil"]["false"](),
+        fn
+      )
+    end,
   },
   assoc = {
     int_by_length = function(t)
-      return #transf.table.pair_arr(t)
+      return #transf.table.two_anys_arr(t)
     end,
     url_param_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.url_param)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.url_param)
     end,
     url_params = function(t)
       return get.str_or_number_arr.str_by_joined(transf.assoc.url_param_arr(t), "&")
@@ -4974,35 +4981,35 @@ transf = {
       for _, header_name in transf.arr.index_value_stateless_iter(initial_headers) do
         local header_value = t[header_name]
         if header_value then
-          dothis.arr.insert_at_index(header_lines, transf.pair.email_header({header_name, header_value}))
+          dothis.arr.insert_at_index(header_lines, transf.two_anys_arr.email_header({header_name, header_value}))
           t[header_name] = nil
         end
       end
       header_lines = transf.two_arrs.arr_by_appended(
         header_lines,
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-          transf.table.pair_arr_by_sorted_larger_key_first(t),
-          transf.pair.email_header
+          transf.table.two_anys_arr_by_sorted_larger_key_first(t),
+          transf.two_anys_arr.email_header
         )
       )
       return get.str_or_number_arr.str_by_joined(header_lines, "\n")
     end,
     curl_form_field_arr = function(t)
       return transf.arr_arr.arr_by_flatten(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.curl_form_field_args)
+        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.curl_form_field_args)
       )
     end,
     ini_line_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.ini_line)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.ini_line)
     end,
     ini_str = function(t)
       return get.str_or_number_arr.str_by_joined(transf.assoc.ini_line_arr(t), "\n")
     end,
     envlike_line_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.envlike_line)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.envlike_line)
     end,
     assoc_entry_str_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.pair_arr(t), transf.pair.assoc_entry_str)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.assoc_entry_str)
     end,
     contents_summary = function(t)
       return transf.str_arr.contents_summary(
@@ -5160,31 +5167,31 @@ transf = {
   pair_arr = {
     assoc = function(arr)
       local res = {}
-      for _, pair in transf.arr.index_value_stateless_iter(arr) do
-        res[pair[1]] = pair[2]
+      for _, two_anys_arr in transf.arr.index_value_stateless_iter(arr) do
+        res[two_anys_arr[1]] = two_anys_arr[2]
       end
       return res
     end,
   },
-  str_pair_arr = {
+  two_strs_arr_arr = {
     env_line_arr = function (arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        function(pair)
-          return "export " .. pair[1] .. "=" .. transf.str.str_by_double_quoted_escaped(pair[2])
+        function(two_anys_arr)
+          return "export " .. two_anys_arr[1] .. "=" .. transf.str.str_by_double_quoted_escaped(two_anys_arr[2])
         end
       )
     end,
     n_shot_role_content_message_spec_arr = function(arr)
       local res = {}
-      for _, pair in transf.arr.index_value_stateless_iter(arr) do
+      for _, two_anys_arr in transf.arr.index_value_stateless_iter(arr) do
         dothis.arr.push(res, {
           role = "user",
-          content = pair[1],
+          content = two_anys_arr[1],
         })
         dothis.arr.push(res, {
           role = "assistant",
-          content = pair[2],
+          content = two_anys_arr[2],
         })
       end
       return res
@@ -5224,7 +5231,7 @@ transf = {
   timestamp_ms_key_assoc_value_assoc = {
     nonabsolute_path_key_timestamp_ms_key_assoc_value_assoc_by_ymd = function(timestamp_key_table)
       local tbl = {}
-      for timestamp_ms, assoc in transf.table.key_value_stateless_iter(timestamp_key_table) do
+      for timestamp_ms, assoc in transf.table.kt_vt_stateless_iter(timestamp_key_table) do
         local ymd = os.date("%Y/%Y-%m/%Y-%m-%d", timestamp_ms/1000)
         if not tbl[ymd] then tbl[ymd] = {} end
         local found_unoccupied = false
@@ -5280,7 +5287,7 @@ transf = {
       local local_name = specifier.name .. "_local"
       local remote_name = specifier.name .. "_remote"
       return {
-        pair = {
+        two_anys_arr = {
           [specifier.name] = {
             a = local_name,
             b = remote_name,
@@ -5888,7 +5895,7 @@ transf = {
         "AXTitle"
       )
       local filtered = get.arr.arr_by_filtered(arr, function (v) return v.AXTitle ~= "" end)
-      for k, v in transf.table.key_value_stateless_iter(filtered) do
+      for k, v in transf.table.kt_vt_stateless_iter(filtered) do
         v.application = app
       end
       return filtered
@@ -6417,9 +6424,9 @@ transf = {
     citable_object_id = function(csl_table)
       if csl_table.doi then
         return csl_table.doi
-      elseif csl_table.isbn and is.csl_table.whole_book(csl_table) then
+      elseif csl_table.isbn and is.csl_table.whole_book_csl_table(csl_table) then
         return csl_table.isbn
-      elseif csl_table.isbn and not is.csl_table.whole_book(csl_table) then
+      elseif csl_table.isbn and not is.csl_table.whole_book_csl_table(csl_table) then
         return transf.csl_table.isbn_part_identifier(csl_table)
       elseif csl_table.pmid then
         return csl_table.pmid
@@ -6438,9 +6445,9 @@ transf = {
     indicated_citable_object_id = function(csl_table)
       if csl_table.doi then
         return transf.csl_table.indicated_doi(csl_table)
-      elseif csl_table.isbn and is.csl_table.whole_book(csl_table) then
+      elseif csl_table.isbn and is.csl_table.whole_book_csl_table(csl_table) then
         return transf.csl_table.indicated_isbn(csl_table)
-      elseif csl_table.isbn and not is.csl_table.whole_book(csl_table) then
+      elseif csl_table.isbn and not is.csl_table.whole_book_csl_table(csl_table) then
         return transf.csl_table.indicated_isbn_part_identifier(csl_table)
       elseif csl_table.pmid then
         return transf.csl_table.indicated_pmid(csl_table)
@@ -8369,7 +8376,7 @@ transf = {
       }, arr)
     end,
   },
-  --- like a role_content_message_spec_arr, but alternating user/assistant role_content_message_specs, where a pair of user/assistant role_content_message_specs is a shot
+  --- like a role_content_message_spec_arr, but alternating user/assistant role_content_message_specs, where a two_anys_arr of user/assistant role_content_message_specs is a shot
   n_shot_role_content_message_spec_arr = {
 
   },
@@ -8389,7 +8396,7 @@ transf = {
               content = "If you are unable to fulfill the request, return 'IMPOSSIBLE'."
             }
           },
-          transf.str_pair_arr.n_shot_role_content_message_spec_arr(spec.shots), 
+          transf.two_strs_arr_arr.n_shot_role_content_message_spec_arr(spec.shots), 
           {
             {
               role = "user",
@@ -8515,7 +8522,7 @@ transf = {
     
   },
   discord_export_dir = {
-    export_chat_main_object_media_dir_pair_arr = function(dir)
+    export_chat_main_object_and_media_dir_arr = function(dir)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.dir.dir_arr_by_children(dir),
         transf.discord_export_child_dir.discord_export_chat_main_object_media_dir_pair
@@ -8576,7 +8583,7 @@ transf = {
     end
   },
   facebook_export_dir = {
-    export_chat_main_object_media_dir_pair_arr = function(dir)
+    export_chat_main_object_and_media_dir_arr = function(dir)
       local chat_dirs = transf.dir.dir_arr_by_children(dir)
       local arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         chat_dirs,
@@ -8639,7 +8646,7 @@ transf = {
     end
   },
   signal_export_dir = {
-    export_chat_main_object_media_dir_pair_arr = function(dir)
+    export_chat_main_object_and_media_dir_arr = function(dir)
       local chat_json_files = transf.dir.absolute_path_arr_by_children(dir .. "/chats")
       local arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         chat_json_files,
@@ -8706,7 +8713,7 @@ transf = {
     end
   },
   telegram_export_dir = {
-    export_chat_main_object_media_dir_pair_arr = function(dir)
+    export_chat_main_object_and_media_dir_arr = function(dir)
       local json_file = get.dir.extant_path_by_child_having_leaf(dir, "result.json")
       local export_json = transf.json_file.not_userdata_or_function(json_file)
 

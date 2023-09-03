@@ -444,6 +444,18 @@ get = {
       return vt_arr
     end,
     dot_notation_str_by_path_to_key = pltablex.search,
+    table_by_mapped_nested_w_kt_arg_kt_ret_fn = function(t, fn, table_arg_bool_by_is_leaf_ret_fn)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(
+        t,
+        function(k, v)
+          if is.any.table(v) and not table_arg_bool_by_is_leaf_ret_fn(v) then
+            return fn(k), get.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn(v, fn, table_arg_bool_by_is_leaf_ret_fn)
+          else
+            return fn(k), v
+          end
+        end
+      )
+    end,
   },
   
   assoc = {
@@ -456,9 +468,9 @@ get = {
     assoc_by_filtered_w_kt_vt_fn = function(t, fn)
       return transf.pair_arr.assoc(
         get.arr.arr_by_filtered(
-          transf.table.pair_arr(t),
-          function(pair)
-            return fn(pair[1], pair[2])
+          transf.table.two_anys_arr(t),
+          function(two_anys_arr)
+            return fn(two_anys_arr[1], two_anys_arr[2])
           end
         )
       )
@@ -467,10 +479,10 @@ get = {
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(t, function(k, v) return fn(v) end)
     end,
     kt_or_nil_by_first_match_w_kt_vt_arg_fn = function(t, fn)
-      local arr = transf.table.pair_arr_by_sorted_larger_key_first(t)
-      for _, pair in transf.arr.index_value_stateless_iter(arr) do
-        if fn(pair[1], pair[2]) then
-          return pair[1]
+      local arr = transf.table.two_anys_arr_by_sorted_larger_key_first(t)
+      for _, two_anys_arr in transf.arr.index_value_stateless_iter(arr) do
+        if fn(two_anys_arr[1], two_anys_arr[2]) then
+          return two_anys_arr[1]
         end
       end
     end,
@@ -736,7 +748,7 @@ get = {
     two_arrs_by_filtered_nonfiltered = function(arr, fn)
       local passes = {}
       local fails = {}
-      for _, v in transf.arr.key_value_stateless_iter(arr) do
+      for _, v in transf.arr.kt_vt_stateless_iter(arr) do
         if fn(v) then
           dothis.arr.push(passes, v)
         else
@@ -906,7 +918,7 @@ get = {
     arr_by_mapped_w_t_arg_t_ret_fn = hs.fnutils.imap,
     arr_by_mapped_w_pos_int_t_arg_t_ret_fn = function(arr, fn)
       local res = {}
-      for i, v in transf.arr.key_value_stateless_iter(arr) do
+      for i, v in transf.arr.kt_vt_stateless_iter(arr) do
         dothis.arr.push(res, fn(i, v))
       end
     end,
@@ -982,7 +994,7 @@ get = {
     n_strs_split = function(str, sep, n)
       return transf.arr.n_anys(get.str.str_arr_by_split_w_str(str, sep, n))
     end,
-    str_pair_split_or_nil = function(str, sep)
+    two_strs_arr_split_or_nil = function(str, sep)
       local arr = get.str.str_arr_by_split_w_str(str, sep, 2)
       if #arr ~= 2 then
         return nil
@@ -1238,7 +1250,7 @@ get = {
     end,
     str_by_replaced_all_eutf8_w_regex_str_arr = function(str, regex_str_arr, replacement)
       local res = str
-      for _, regex_str in transf.arr.key_value_stateless_iter(regex_str_arr) do
+      for _, regex_str in transf.arr.kt_vt_stateless_iter(regex_str_arr) do
         res = get.str.str_and_int_by_replaced_eutf8_w_regex_str(
           res,
           regex_str,
@@ -1250,27 +1262,27 @@ get = {
     str_by_replaced_w_ascii_str = plstringx.replace,
     str_by_replaced_all_w_ascii_str_arr = function(str, ascii_str_arr, replacement)
       local res = str
-      for _, ascii_str in transf.arr.key_value_stateless_iter(ascii_str_arr) do
+      for _, ascii_str in transf.arr.kt_vt_stateless_iter(ascii_str_arr) do
         res = get.str.str_by_replaced_w_ascii_str(res, ascii_str, replacement)
       end
       return res
     end,
     str_by_prepended_all_w_ascii_str_arr = function(str, ascii_str_arr, prepend)
       local res = str
-      for _, ascii_str in transf.arr.key_value_stateless_iter(ascii_str_arr) do
+      for _, ascii_str in transf.arr.kt_vt_stateless_iter(ascii_str_arr) do
         res = get.str.str_by_replaced_w_ascii_str(res, ascii_str, prepend .. ascii_str)
       end
       return res
     end,
     str_by_appended_all_w_ascii_str_arr = function(str, ascii_str_arr, append)
       local res = str
-      for _, ascii_str in transf.arr.key_value_stateless_iter(ascii_str_arr) do
+      for _, ascii_str in transf.arr.kt_vt_stateless_iter(ascii_str_arr) do
         res = get.str.str_by_replaced_w_ascii_str(res, ascii_str, ascii_str .. append)
       end
       return res
     end,
     str_by_replaced_first_eutf8_w_regex_str_arr = function(str, regex_str_arr, replacement)
-      for _, regex_str in transf.arr.key_value_stateless_iter(regex_str_arr) do
+      for _, regex_str in transf.arr.kt_vt_stateless_iter(regex_str_arr) do
         local res, matches = get.str.str_and_int_by_replaced_eutf8_w_regex_str(
           str,
           regex_str,
@@ -1846,7 +1858,7 @@ get = {
         end
       end
     
-      for file_name in transf.dir.children_absolute_path_value_stateful_iter(path) do
+      for file_name in transf.dir.children_absolute_path_vt_stateful_iter(path) do
         if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" then
           local file_path = path .. get.str.str_by_no_suffix(file_name, "/")
           if is.extant_path.dir(file_name) then 
@@ -2647,7 +2659,7 @@ get = {
     env_var_name_value_assoc = function(assoc, prev_key)
       if prev_key then prev_key = prev_key .. "/" else prev_key = "" end
       local values = {}
-      for key, value in transf.table.key_value_stateless_iter(assoc) do
+      for key, value in transf.table.kt_vt_stateless_iter(assoc) do
         if is.any.str(value) then
           values[key] = prev_key .. value
         else
@@ -2787,7 +2799,7 @@ get = {
       local_thing_name_hierarchy = local_thing_name_hierarchy or get.table.table_by_copy(thing_name_hierarchy, true)
       parent = parent or "any"
       local res = {}
-      for thing_name, child_thing_name_hierarchy_or_leaf_indication_str in transf.table.key_value_stateless_iter(thing_name_hierarchy) do
+      for thing_name, child_thing_name_hierarchy_or_leaf_indication_str in transf.table.kt_vt_stateless_iter(thing_name_hierarchy) do
         local passes = is[parent][thing_name](any)
         if passes then
           if is.any.table(child_thing_name_hierarchy_or_leaf_indication_str) then

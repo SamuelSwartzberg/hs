@@ -252,34 +252,34 @@ dothis = {
     end,
     choose_w_pair_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
       dothis.arr.choose_item(
-        transf.table.pair_arr_by_sorted_smaller_key_first(tbl),
+        transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
         fn,
         target_item_chooser_item_specifier_name
       )
     end,
     choose_w_kt_vt_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
       dothis.arr.choose_item(
-        transf.table.pair_arr_by_sorted_smaller_key_first(tbl),
-        function(pair)
-          fn(transf.pair.key_value(pair))
+        transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
+        function(two_anys_arr)
+          fn(transf.two_anys_arr.key_value(two_anys_arr))
         end,
         target_item_chooser_item_specifier_name
       )
     end,
     choose_w_kt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
       dothis.arr.choose_item(
-        transf.table.pair_arr_by_sorted_smaller_key_first(tbl),
-        function(pair)
-          fn(transf.pair.key(pair))
+        transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
+        function(two_anys_arr)
+          fn(transf.two_anys_arr.key(two_anys_arr))
         end,
         target_item_chooser_item_specifier_name
       )
     end,
     choose_w_vt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
       dothis.arr.choose_item(
-        transf.table.pair_arr_by_sorted_smaller_key_first(tbl),
-        function (pair)
-          fn(transf.pair.value(pair))
+        transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
+        function (two_anys_arr)
+          fn(transf.two_anys_arr.value(two_anys_arr))
         end,
         target_item_chooser_item_specifier_name
       )
@@ -1665,7 +1665,7 @@ dothis = {
   },
   dynamic_absolute_path_key_assoc = {
     write = function(dynamic_absolute_path_key_assoc)
-      for absolute_path, contents in transf.table.key_value_stateless_iter(dynamic_absolute_path_key_assoc) do
+      for absolute_path, contents in transf.table.kt_vt_stateless_iter(dynamic_absolute_path_key_assoc) do
         if is.any.arr(contents) then
           dothis.absolute_path[act.arr.shift(contents)](absolute_path, transf.arr.n_anys(contents))
         else
@@ -1676,7 +1676,7 @@ dothis = {
   },
   absolute_path_str_value_assoc = {
     write = function(absolute_path_str_value_assoc)
-      for absolute_path, contents in transf.table.key_value_stateless_iter(absolute_path_str_value_assoc) do
+      for absolute_path, contents in transf.table.kt_vt_stateless_iter(absolute_path_str_value_assoc) do
         dothis.absolute_path.write_file(absolute_path, contents)
       end
     end,
@@ -2079,7 +2079,7 @@ dothis = {
     --- @param video_ids str[]
     --- @param do_after? fun(id: str): nil
     add_youtube_video_id_arr = function(id, video_ids, do_after)
-      local next_vid = transf.arr.index_value_stateful_iter(video_ids)
+      local next_vid = transf.arr.index_vt_stateful_iter(video_ids)
       local add_next_vid
       add_next_vid = function ()
         local index, video_id = next_vid()
@@ -2204,7 +2204,7 @@ dothis = {
     end,
     each = hs.fnutils.ieach,
     each_with_delay = function(arr, delay, fn, do_after)
-      local next_item = transf.arr.index_value_stateful_iter(arr)
+      local next_item = transf.arr.index_vt_stateful_iter(arr)
       local do_next_item
       do_next_item = function()
         local index, item = next_item()
@@ -2247,7 +2247,7 @@ dothis = {
     choose = function(spec, callback)
       local hschooser = get.hschooser_specifier.partial_hschooser(spec, callback)
       hschooser:rows(spec.rows or 30)
-      for k, v in transf.table.key_value_stateless_iter(spec.whole_chooser_style_keys) do
+      for k, v in transf.table.kt_vt_stateless_iter(spec.whole_chooser_style_keys) do
         hschooser[k](hschooser, v)
       end
       local choices = get.chooser_item_specifier_arr.styled_chooser_item_specifier_arr(
@@ -2832,7 +2832,7 @@ dothis = {
     end,
     git_backup = function()
       local tbl = {}
-      for file in transf.dir.children_absolute_path_value_stateful_iter(env.TMP_GIT_LOG_PARENT) do
+      for file in transf.dir.children_absolute_path_vt_stateful_iter(env.TMP_GIT_LOG_PARENT) do
         local commit = transf.json_file.not_userdata_or_function(file)
         local timestamp_s = commit.epoch
         commit.epoch = nil
@@ -3118,9 +3118,9 @@ dothis = {
   },
   export_dir = {
     log = function(dir, typ)
-      local arr = transf[typ .. "_export_dir"].export_chat_main_object_media_dir_pair_arr(dir)
-      for _, pair in transf.arr.index_value_stateless_iter(arr) do
-        dothis.export_chat_main_object.log(pair[1], typ, pair[2])
+      local arr = transf[typ .. "_export_dir"].export_chat_main_object_and_media_dir_arr(dir)
+      for _, two_anys_arr in transf.arr.index_value_stateless_iter(arr) do
+        dothis.export_chat_main_object.log(two_anys_arr[1], typ, two_anys_arr[2])
       end
     end
   },

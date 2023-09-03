@@ -528,7 +528,7 @@ tblmap = {
         thing_name = "summary",
         precedence = 1
       },
-      pair = {
+      two_anys_arr = {
         thing_name = "assoc_entry_str",
         precedence = 999
       },

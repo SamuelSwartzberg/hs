@@ -312,6 +312,9 @@ is = {
     relay_identifier = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.relay_identifier)
     end,
+    ipc_socket_id = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.ipc_socket_id)
+    end,
     
   },
   uuid = {
@@ -451,7 +454,7 @@ is = {
   },
   labelled_remote_dir = {
     empty_labelled_remote_dir = function(path)
-      return transf.labelled_remote_dir.children_absolute_path_value_stateful_iter(path)() == nil
+      return transf.labelled_remote_dir.children_absolute_path_vt_stateful_iter(path)() == nil
     end,
     nonempty_labelled_remote_dir = function(path)
       return not is.labelled_remote_dir.empty_labelled_remote_dir(path)
@@ -533,6 +536,14 @@ is = {
     in_home_local_absolute_path = function(path)
       return get.str.bool_by_startswith(path, env.HOME)
     end,
+    in_global_tmp_path = function(path)
+      return get.str.bool_by_startswith(path, "/tmp/")
+    end,
+  },
+  in_global_tmp_path = {
+    ipc_socket_path = function(path)
+      return get.str.bool_by_startswith(path, "/tmp/sockets/")
+    end,
   },
   in_home_local_absolute_path = {
     in_me_local_absolute_path = function(path)
@@ -588,7 +599,7 @@ is = {
   },
   local_dir = {
     empty_local_dir = function(path)
-      return transf.local_dir.absolute_path_value_stateful_iter_by_children(path)() == nil
+      return transf.local_dir.absolute_path_vt_stateful_iter_by_children(path)() == nil
     end,
     nonempty_local_dir = function(path)
       return not is.path.empty_local_dir(path)
@@ -1087,7 +1098,7 @@ is = {
   },
   table = {
     empty_table = function(t)
-      for k, v in transf.table.key_value_stateless_iter(t) do
+      for k, v in transf.table.kt_vt_stateless_iter(t) do
         return false
       end
       return true
@@ -1096,7 +1107,7 @@ is = {
       return not is.table.empty_table(t)
     end,
     only_int_key_table = function(t)
-      for k, v in transf.table.key_value_stateless_iter(t) do
+      for k, v in transf.table.kt_vt_stateless_iter(t) do
         if is.any.not_int(k) then return false end
       end
       return true
@@ -1131,91 +1142,9 @@ is = {
       return
         t.created_item and t.creation_specifier
     end,
-  },
-  arr = {
-    str_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.any.str
-      )
-    end,
-    arr_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.any.arr
-      )
-    end,
-    pair = function(arr)
-      return #arr == 2
-    end,
-  },
-  str_arr = {
-    path_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.str.path
-      )
-    end,
-  },
-  path_arr = {
-    absolute_path_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.path.absolute_path
-      )
-    end,
-    remote_path_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.path.remote_path
-      )
-    end,
-    local_path_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.path.local_path
-      )
-    end,
-  },
-  absolute_path_arr = {
-    extant_path_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.absolute_path.file
-      )
-    end,
-  },
-  extant_path_arr = {
-    dir_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.extant_path.dir
-      )
-    end,
-    file_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.extant_path.file
-      )
-    end,
-  },
-  dir_arr = {
-    git_root_dir_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.dir.git_root_dir
-      )
-    end,
-  },
-  git_root_dir_arr = {
-
-  },
-  file_arr = {
-    plaintext_file_arr = function(arr)
-      return get.arr.bool_by_all_pass_w_fn(
-        arr,
-        is.file.plaintext_file
-      )
+    audiodevice_specifier = function(t)
+      return
+        t.device and t.subtype
     end,
   },
   audiodevice_specifier = {
@@ -1224,18 +1153,18 @@ is = {
     end,
   },
   csl_table = {
-    type_whole_book = function(csl_table)
+    whole_book_type_csl_table = function(csl_table)
       return csl_table.type == "book" or csl_table.type == "monograph"
     end,
-    type_book_chapter = function(csl_table)
+    book_chapter_type_csl_table = function(csl_table)
       return csl_table.type == "chapter"
     end,
-    whole_book = function(csl_table)
-      return is.csl_table.type_whole_book(csl_table) and not csl_table.chapter and not csl_table.pages
+    whole_book_csl_table = function(csl_table)
+      return is.csl_table.whole_book_type_csl_table(csl_table) and not csl_table.chapter and not csl_table.pages
     end
   },
-  mpv_ipc_socket_id = {
-    alive = function(mpv_ipc_socket_id)
+  ipc_socket_id = {
+    mpv_ipc_socket_id = function(mpv_ipc_socket_id)
       return get.ipc_socket_id.response_table_or_nil(mpv_ipc_socket_id, {
         command = {"get_property", "pid"}
       }) ~= nil
@@ -1251,8 +1180,8 @@ is = {
     end,
   },
   stream_created_item_specifier = {
-    alive = function(stream_created_item_specifier)
-      return is.mpv_ipc_socket_id.alive(stream_created_item_specifier.inner_item.ipc_socket_id)
+    alive_stream_created_item_specifier = function(stream_created_item_specifier)
+      return is.ipc_socket_id.mpv_ipc_socket_id(stream_created_item_specifier.inner_item.ipc_socket_id)
     end,
   },
   input_spec = {

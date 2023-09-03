@@ -147,6 +147,9 @@ thing_name_hierarchy = {
                       in_mpapers_local_absolute_path = "leaf",
                     }
                   },
+                  in_global_tmp_path = {
+                    ipc_socket_path = "leaf"
+                  },
                   local_nonextant_path = "leaf",
                   local_extant_path = {
                     volume_local_extant_path = {
@@ -243,6 +246,9 @@ thing_name_hierarchy = {
                         null_uuid = "leaf",
                       },
                       relay_identifier = "leaf",
+                      ipc_socket_id = {
+                        mpv_ipc_socket_id = "leaf",
+                      }
                     },
                     alphanum_underscore = {
                       lower_alphanum_underscore = "leaf",
@@ -336,16 +342,32 @@ thing_name_hierarchy = {
     },
     table = {
       only_int_key_table = {
-        arr = {
-  
-        },
+        arr = { }, -- added later, see below
         hole_y_arrlike = "leaf"
       },
       empty_table = "leaf",
       non_empty_table = {
         date = "leaf",
         str_key_non_empty_table = {
-  
+          created_item_specifier = {
+            stream_created_item_specifier = {
+              alive_stream_created_item_specifier = "leaf"
+            },
+            fireable_created_item_specifier = "leaf"
+          },
+          audiodevice_specifier = {},
+          csl_table = {
+            whole_book_type_csl_table = "leaf",
+            book_chapter_type_csl_table = "leaf",
+            whole_book_csl_table = "leaf",
+          },
+          input_spec = {
+            declared_click_input_spec = "leaf",
+            declared_key_input_spec = "leaf",
+            declared_move_input_spec = "leaf",
+            declared_scroll_input_spec = "leaf",
+            declared_position_change_input_spec = "leaf",
+          }
         }
       }
     },
@@ -375,3 +397,15 @@ thing_name_hierarchy = {
     not_int = "leaf"
   }
 }
+
+-- add array versions of all other types
+
+thing_name_hierarchy.any.table.only_int_key_table.arr = transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(thing_name_hierarchy, function (k)
+  return k .. "_arr"
+end)
+
+-- add nested array versions of all other types (for now, this level of nesting is what we'll leave it at)
+
+thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr = transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(thing_name_hierarchy.any.table.only_int_key_table.arr, function (k)
+  return k .. "_arr"
+end)
