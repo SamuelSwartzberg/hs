@@ -81,7 +81,7 @@ transf = {
     end
   },
   unicode_prop_table = {
-    unicode_codepoint_binary_str = function(unicode_prop_table)
+    nonindicated_bin_number_str = function(unicode_prop_table)
       return unicode_prop_table.bin
     end,
     unicode_block_name = function(unicode_prop_table)
@@ -90,19 +90,19 @@ transf = {
     unicode_category_name = function(unicode_prop_table)
       return unicode_prop_table.cat
     end,
-    char = function(unicode_prop_table)
+    utf8_char = function(unicode_prop_table)
       return unicode_prop_table.char
     end,
     unicode_codepoint = function(unicode_prop_table)
       return unicode_prop_table.cpoint
     end,
-    unicode_codepoint_decimal_str = function(unicode_prop_table)
+    unicode_codepoint_dec_str = function(unicode_prop_table)
       return unicode_prop_table.dec
     end,
     unicode_codepoint_hex_str = function(unicode_prop_table)
       return unicode_prop_table.hex
     end,
-    unicode_codepoint_octal_str = function(unicode_prop_table)
+    unicode_codepoint_oct_str = function(unicode_prop_table)
       return unicode_prop_table.oct
     end,
     html_entity = function(unicode_prop_table)
@@ -118,7 +118,7 @@ transf = {
       return transf.str.not_whitespace_str(unicode_prop_table.utf8)
     end,
     summary = function(unicode_prop_table)
-      return transf.unicode_prop_table.char(unicode_prop_table) .. ": "
+      return transf.unicode_prop_table.utf8_char(unicode_prop_table) .. ": "
         .. transf.unicode_prop_table.unicode_codepoint(unicode_prop_table) .. " "
         .. transf.unicode_prop_table.unicode_character_name(unicode_prop_table)
     end,
@@ -132,14 +132,14 @@ transf = {
       end
     end,
     
-    nonindicated_decimal_number_str = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_decimal_number_str(transf.number.pos_number(num))
+    nonindicated_dec_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_dec_number_str(transf.number.pos_number(num))
     end,
-    separated_nonindicated_decimal_number_str = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_decimal_number_str(transf.number.pos_number(num))
+    separated_nonindicated_dec_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_dec_number_str(transf.number.pos_number(num))
     end,
-    indicated_decimal_number_str = function(num)
-      return transf.number.sign_indicator(num) .. "0d" .. transf.pos_number.nonindicated_decimal_number_str(transf.number.pos_number(num))
+    indicated_dec_number_str = function(num)
+      return transf.number.sign_indicator(num) .. "0d" .. transf.pos_number.nonindicated_dec_number_str(transf.number.pos_number(num))
     end,
     nonindicated_hex_number_str = function(num)
       return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_hex_number_str(transf.number.pos_number(num))
@@ -163,25 +163,25 @@ transf = {
       )
     end,
     
-    noninciated_octal_number_str = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.noninciated_octal_number_str(transf.number.pos_number(num))
+    noninciated_oct_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.noninciated_oct_number_str(transf.number.pos_number(num))
     end,
 
-    separated_nonindicated_octal_number_str = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_octal_number_str(transf.number.pos_number(num))
+    separated_nonindicated_oct_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_oct_number_str(transf.number.pos_number(num))
     end,
-    indicated_octal_number_str = function(num)
-      return transf.number.sign_indicator(num) .. "0o" .. transf.pos_number.noninciated_octal_number_str(transf.number.pos_number(num))
+    indicated_oct_number_str = function(num)
+      return transf.number.sign_indicator(num) .. "0o" .. transf.pos_number.noninciated_oct_number_str(transf.number.pos_number(num))
     end,
 
-    nonindicated_binary_number_str = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_binary_number_str(transf.number.pos_number(num))
+    nonindicated_bin_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_bin_number_str(transf.number.pos_number(num))
     end,
-    separated_nonindicated_binary_number_str = function(num)
-      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_binary_number_str(transf.number.pos_number(num))
+    separated_nonindicated_bin_number_str = function(num)
+      return transf.number.sign_indicator(num) .. transf.pos_number.separated_nonindicated_bin_number_str(transf.number.pos_number(num))
     end,
-    indicated_binary_number_str = function(num)
-      return transf.number.sign_indicator(num) .. "0b" .. transf.pos_number.nonindicated_binary_number_str(transf.number.pos_number(num))
+    indicated_bin_number_str = function(num)
+      return transf.number.sign_indicator(num) .. "0b" .. transf.pos_number.nonindicated_bin_number_str(transf.number.pos_number(num))
     end,
     int_by_rounded = function(num)
       return math.floor(num + 0.5)
@@ -244,29 +244,29 @@ transf = {
     end,
   },
   pos_number = { 
-    nonindicated_decimal_number_str = function(num)
+    nonindicated_dec_number_str = function(num)
       return 
-        transf.pos_int.nonindicated_decimal_number_str(
+        transf.pos_int.nonindicated_dec_number_str(
           transf.number.pos_int_part(num)
         ) .. 
         (
           transf.number.pos_float_part(num) == 0 and "" or 
           (
-            "." .. transf.pos_int.nonindicated_decimal_number_str(
+            "." .. transf.pos_int.nonindicated_dec_number_str(
               transf.number.pos_int_float_part(num)
             )
           )
         )
       end,
-    separated_nonindicated_decimal_number_str = function(num)
+    separated_nonindicated_dec_number_str = function(num)
       return 
-        transf.pos_int.separated_nonindicated_decimal_number_str(
+        transf.pos_int.separated_nonindicated_dec_number_str(
           transf.number.pos_int_part(num)
         ) .. 
         (
           transf.number.pos_float_part(num) == 0 and "" or 
           (
-            "." .. transf.pos_int.separated_nonindicated_decimal_number_str(
+            "." .. transf.pos_int.separated_nonindicated_dec_number_str(
               transf.number.pos_int_float_part(num)
             )
           )
@@ -298,53 +298,53 @@ transf = {
         )
       )
     end,
-    noninciated_octal_number_str = function(num)
-      return transf.pos_int.noninciated_octal_number_str(
+    noninciated_oct_number_str = function(num)
+      return transf.pos_int.noninciated_oct_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.noninciated_octal_number_str(
+          "." .. transf.pos_int.noninciated_oct_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
       )
     end,
-    separated_nonindicated_octal_number_str = function(num)
-      return transf.pos_int.separated_nonindicated_octal_number_str(
+    separated_nonindicated_oct_number_str = function(num)
+      return transf.pos_int.separated_nonindicated_oct_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.separated_nonindicated_octal_number_str(
+          "." .. transf.pos_int.separated_nonindicated_oct_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
       )
     end,
-    nonindicated_binary_number_str = function(num)
-      return transf.pos_int.nonindicated_binary_number_str(
+    nonindicated_bin_number_str = function(num)
+      return transf.pos_int.nonindicated_bin_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.nonindicated_binary_number_str(
+          "." .. transf.pos_int.nonindicated_bin_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
       )
     end,
-    separated_nonindicated_binary_number_str = function(num)
-      return transf.pos_int.separated_nonindicated_binary_number_str(
+    separated_nonindicated_bin_number_str = function(num)
+      return transf.pos_int.separated_nonindicated_bin_number_str(
         transf.number.pos_int_part(num)
       ) .. 
       (
         transf.number.pos_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.separated_nonindicated_binary_number_str(
+          "." .. transf.pos_int.separated_nonindicated_bin_number_str(
             transf.number.pos_int_float_part(num)
           )
         )
@@ -391,12 +391,12 @@ transf = {
     random_base64_gen_str_of_length = function(int)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. transf.any.str(transf.number.int_by_rounded(int * 3/4))) -- 3/4 because base64 takes the int to be the input length, but we want to specify the output length (which is 4/3 the input length in case of base64)
     end,
-    nonindicated_decimal_number_str = function(num)
+    nonindicated_dec_number_str = function(num)
       return transf.any.str(num)
     end,
-    separated_nonindicated_decimal_number_str = function(num)
+    separated_nonindicated_dec_number_str = function(num)
       return get.str.str_with_separator_grouped_ascii_from_end(
-        transf.pos_int.nonindicated_decimal_number_str(num),
+        transf.pos_int.nonindicated_dec_number_str(num),
         3,
         " "
       )
@@ -411,22 +411,22 @@ transf = {
         " "
       )
     end,
-    noninciated_octal_number_str = function(num)
+    noninciated_oct_number_str = function(num)
       return get.str.str_by_formatted_w_n_anys("%o", num)
     end,
-    separated_nonindicated_octal_number_str = function(num)
+    separated_nonindicated_oct_number_str = function(num)
       return get.str.str_with_separator_grouped_ascii_from_end(
-        transf.pos_int.noninciated_octal_number_str(num),
+        transf.pos_int.noninciated_oct_number_str(num),
         3,
         " "
       )
     end,
-    nonindicated_binary_number_str = function(num)
+    nonindicated_bin_number_str = function(num)
       return get.str.str_by_formatted_w_n_anys("%b", num)
     end,
-    separated_nonindicated_binary_number_str = function(num)
+    separated_nonindicated_bin_number_str = function(num)
       return get.str.str_with_separator_grouped_ascii_from_end(
-        transf.pos_int.nonindicated_binary_number_str(num),
+        transf.pos_int.nonindicated_bin_number_str(num),
         4,
         " "
       )
@@ -2044,12 +2044,12 @@ transf = {
     end,
   },
   dice_notation = {
-    nonindicated_decimal_number_str_result = function(dice_notation)
+    nonindicated_dec_number_str_result = function(dice_notation)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("roll" .. transf.str.str_by_single_quoted_escaped(dice_notation))
     end,
     int_result = function(dice_notation)
       return transf.nonindicated_number_str.number_by_base_10(
-        transf.dice_notation.nonindicated_decimal_number_str_result(dice_notation)
+        transf.dice_notation.nonindicated_dec_number_str_result(dice_notation)
       )
     end,
   },
@@ -3684,7 +3684,7 @@ transf = {
     str_by_envsubsted = function(str)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("echo " .. transf.str.str_by_single_quoted_escaped(str) .. " | envsubst")
     end,
-    nonindicated_binary_number_str_by_utf8 = basexx.to_bit,
+    nonindicated_bin_number_str_by_utf8 = basexx.to_bit,
     nonindicated_hex_number_str_by_utf8 = basexx.to_hex,
     base64_gen_str_by_utf8 = basexx.to_base64,
     base64_url_str_by_utf8 = basexx.to_url64,
@@ -7439,7 +7439,7 @@ transf = {
     package_name_arr = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-no-version ")) end,
     package_name_semver_package_manager_name_compound_str_arr = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
     package_name_package_manager_name_compound_str = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
-    nonindicated_decimal_str_arr_installed = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " count ")) end,
+    nonindicated_dec_str_arr_installed = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " count ")) end,
     calendar_template_table_by_empty = function()
       CALENDAR_TEMPLATE_SPECIFIER = {}
       CALENDAR_TEMPLATE_SPECIFIER.calendar = { 

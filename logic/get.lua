@@ -27,7 +27,7 @@ get = {
         transformer = get.str.int_by_rounded_or_nil,
         prompt_args = {
           message = message or "Enter an int...",
-          default = transf.number.nonindicated_decimal_number_str(int or 0),
+          default = transf.number.nonindicated_dec_number_str(int or 0),
         }
       })
     end,
@@ -39,7 +39,7 @@ get = {
         transformer = get.str.number_or_nil,
         prompt_args = {
           message = message or "Enter a number...",
-          default = transf.number.nonindicated_decimal_number_str(no or 0),
+          default = transf.number.nonindicated_dec_number_str(no or 0),
         }
       })
     end,
@@ -3049,40 +3049,40 @@ get = {
       return res
     end
   },
-  binary_specifier = {
-    str = function(binary_specifier, bool)
+  bin_specifier = {
+    str = function(bin_specifier, bool)
       if bool then
-        return binary_specifier.vt
+        return bin_specifier.vt
       else
-        return binary_specifier.vf
+        return bin_specifier.vf
       end
     end,
-    bool = function(binary_specifier, str)
-      if str == binary_specifier.vt then
+    bool = function(bin_specifier, str)
+      if str == bin_specifier.vt then
         return true
-      elseif str == binary_specifier.vf then
+      elseif str == bin_specifier.vf then
         return false
       else
         error("invalid argument")
       end
     end,
-    str_by_inverted = function(binary_specifier, bool)
-      return get.binary_specifier.str(binary_specifier, not bool)
+    str_by_inverted = function(bin_specifier, bool)
+      return get.bin_specifier.str(bin_specifier, not bool)
     end,
-    bool_by_inverted = function(binary_specifier, str)
-      if str == binary_specifier.vt then
+    bool_by_inverted = function(bin_specifier, str)
+      if str == bin_specifier.vt then
         return false
-      elseif str == binary_specifier.vf then
+      elseif str == bin_specifier.vf then
         return true
       else
         error("invalid argument")
       end
     end,
-    str_or_bool_by_inverted = function(binary_specifier, str_or_bool)
+    str_or_bool_by_inverted = function(bin_specifier, str_or_bool)
       if is.any.str(str_or_bool) then
-        return get.binary_specifier.str_by_inverted(binary_specifier, str_or_bool)
+        return get.bin_specifier.str_by_inverted(bin_specifier, str_or_bool)
       else
-        return get.binary_specifier.bool_by_inverted(binary_specifier, str_or_bool)
+        return get.bin_specifier.bool_by_inverted(bin_specifier, str_or_bool)
       end
     end
   },

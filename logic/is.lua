@@ -276,17 +276,17 @@ is = {
         get.arr.bool_by_contains(transf.table_or_nil.kt_arr(tblmap.base_letter.pos_int_by_base), str:sub(2, 2)) and
         is.printable_ascii_str.number_str(str:sub(3))
     end,
-    indicated_binary_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0b") and is.printable_ascii_str.binary_str(str:sub(3))
+    indicated_bin_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0b") and is.printable_ascii_str.bin_str(str:sub(3))
     end,
     indicated_hex_number_str = function(str)
       return get.str.bool_by_startswith(str, "0x") and is.printable_ascii_str.hex_str(str:sub(3))
     end,
-    indicated_octal_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0o") and is.printable_ascii_str.octal_str(str:sub(3))
+    indicated_oct_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0o") and is.printable_ascii_str.oct_str(str:sub(3))
     end,
-    indicated_decimal_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0d") and is.printable_ascii_str.decimal_str(str:sub(3))
+    indicated_dec_number_str = function(str)
+      return get.str.bool_by_startswith(str, "0d") and is.printable_ascii_str.dec_str(str:sub(3))
     end,
     domain_name = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.domain_name)
@@ -719,7 +719,7 @@ is = {
     image_file = function(path)
       return get.path.usable_as_filetype(path, "image")
     end,
-    binary_file = function(path)
+    bin_file = function(path)
       return not is.file.plaintext_file(path)
     end,
     email_file = function(path)
@@ -729,7 +729,7 @@ is = {
        transf.path.parent_leaf(path == "cur")
      end,
   },
-  binary_file = {
+  bin_file = {
     db_file = function(path)
       return get.path.is_standartized_extension_in(
         path,
