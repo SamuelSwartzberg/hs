@@ -283,10 +283,13 @@ thing_name_hierarchy = {
                         upper_alpha_str = "leaf",
                         lower_alpha_str = {
                           fs_attr_name = "leaf",
+                          local_or_remote_str ="leaf"
                         },
                       },
+                      hex_str = "leaf",
                       digit_str = {
-    
+                        bin_str = "leaf",
+                        oct_str = "leaf",
                       },
                       base32_gen_str = "leaf",
                       base32_crock_str = "leaf",
@@ -431,7 +434,14 @@ thing_name_hierarchy = {
   
     },
     ["nil"] = "leaf",
-    not_int = "leaf"
+    not_int = "leaf",
+    userdata = {
+      full_userdata = {
+        window = "leaf",
+        running_application = "leaf"
+      },
+      light_userdata = "leaf"
+    }
   }
 }
 

@@ -456,21 +456,21 @@ is = {
       )
     end,
     path_with_intra_file_locator = function(path)
-      return get.str.bool_by_matches_part_eutf8(transf.path.leaf(path), ":%d+$")
+      return get.str.bool_by_matches_part_eutf8(transf.path.leaflike_by_leaf(path), ":%d+$")
     end,
     useless_file_leaf_path = function(path)
-      return get.arr.bool_by_contains(ls.useless_files, transf.path.leaf(path))
+      return get.arr.bool_by_contains(ls.useless_files, transf.path.leaflike_by_leaf(path))
     end,
     not_useless_file_leaf_path = function(path)
       return not is.path.useless_file_leaf_path(path)
     end,
     citable_path = function(path)
       return 
-        is.leaflike.citable_filename(transf.path.leaf(path)) 
+        is.leaflike.citable_filename(transf.path.leaflike_by_leaf(path)) 
     end,
     dotfilename_path = function(path)
       return 
-        is.str.starting_with_dot_str(transf.path.leaf(path))
+        is.str.starting_with_dot_str(transf.path.leaflike_by_leaf(path))
     end,
     not_dotfilename_path = function(path)
       return not is.path.dotfilename_path(path)
@@ -775,7 +775,7 @@ is = {
       return not is.dir.empty_dir(path)
     end,
     logging_dir = function(path)
-      return get.str.bool_by_endswith(transf.path.leaf(path), "_logs")
+      return get.str.bool_by_endswith(transf.path.leaflike_by_leaf(path), "_logs")
     end,
   },
   nonempty_dir = {
@@ -807,8 +807,8 @@ is = {
     email_file = function(path)
       return 
        get.path.is_extension(path, "eml") or 
-       transf.path.parent_leaf(path) == "new" or
-       transf.path.parent_leaf(path == "cur")
+       transf.path.path_component_or_nil_by_parent_leaf(path) == "new" or
+       transf.path.path_component_or_nil_by_parent_leaf(path == "cur")
      end,
   },
   bin_file = {
@@ -925,6 +925,9 @@ is = {
     digit_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, "\\d+")
     end,
+    hex_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "0-9a-fA-F")
+    end,
     base32_gen_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.gen)
     end,
@@ -936,7 +939,12 @@ is = {
     end,
   },
   digit_str = {
-
+    bin_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "01")
+    end,
+    oct_str = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "0-7")
+    end,
   },
   alpha_str = {
     lower_alpha_str = function(str)
@@ -949,6 +957,9 @@ is = {
   lower_alpha_str = {
     fs_attr_name = function(str)
       return get.arr.bool_by_contains(ls.fs_attr_name, str)
+    end,
+    local_or_remote_str = function(str)
+      return str == "local" or str == "remote"
     end,
   },
   url = {
@@ -1198,6 +1209,9 @@ is = {
     not_int = function(val)
       return not is.any.int(val)
     end,
+    userdata = function(val)
+      return type(val) == "userdata"
+    end,
   },
   pass_item_name = {
     passw_pass_item_name = function(name)
@@ -1311,6 +1325,12 @@ is = {
       return
         t.cpoint
     end,
+    path_leaf_specifier = function(t)
+      return t.extension or t.path or t.rfc3339like_dt_or_interval or t.general_name or t.fs_tag_assoc
+    end,
+    intra_file_location_spec = function(t)
+      return t.path and t.line
+    end,
   },
   audiodevice_specifier = {
     active_audiodevice_specifier = function(audiodevice_specifier)
@@ -1364,6 +1384,22 @@ is = {
     end,
     declared_position_change_input_spec = function(input_spec)
       return is.input_spec.declared_move_input_spec(input_spec) or is.input_spec.declared_scroll_input_spec(input_spec)
+    end,
+  },
+  userdata = {
+    full_userdata = function(val)
+      return getmetatable(val) ~= nil
+    end,
+    light_userdata = function(val)
+      return getmetatable(val) == nil
+    end,
+  },
+  full_userdata = {
+    window = function(val)
+      return transf.full_userdata.str_by_classname(val) == "hs.window"
+    end,
+    running_application = function(val)
+      return transf.full_userdata.str_by_classname(val) == "hs.application"
     end,
   }
 }

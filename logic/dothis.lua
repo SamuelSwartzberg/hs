@@ -755,7 +755,7 @@ dothis = {
       if is.path.dir(path) then
         dothis.dir.do_in_path(path, cmd, do_after)
       else
-        dothis.dir.do_in_path(transf.path.parent_path(path), cmd, do_after)
+        dothis.dir.do_in_path(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), cmd, do_after)
       end
     end,
     delete = os.remove,
@@ -791,7 +791,7 @@ dothis = {
       dothis.local_extant_path.link_to_local_nonextant_path(path, tgt)
     end,
     link_into_local_absolute_path = function(path, tgt)
-      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaf(path)
+      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaflike_by_leaf(path)
       dothis.local_extant_path.link_to_local_nonextant_path(path, finaltgt)
     end,
     link_descendant_file_arr_into_local_absolute_path = function(path, tgt)
@@ -964,20 +964,20 @@ dothis = {
       end
     end,
     move_to_parent_path = function(path)
-      dothis.extant_path.move_to_absolute_path(path, transf.path.parent_path(path))
+      dothis.extant_path.move_to_absolute_path(path, transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path))
     end,
     move_to_downloads = function(path)
       dothis.extant_path.move_to_absolute_path(path, env.DOWNLOADS)
     end,
     move_to_parent_path_with_extension_if_any = function(path)
-      dothis.extant_path.move_to_absolute_path(path, transf.path.parent_path_with_extension_if_any(path))
+      dothis.extant_path.move_to_absolute_path(path, transf.path.path_by_parent_path_with_extension_if_any(path))
     end,
     copy_to_absolute_path = function(path, tgt)
       dothis.absolute_path.create_parent_dir(tgt)
       transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone copyto " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
     end,
     copy_into_absolute_path = function(path, tgt)
-      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaf(path)
+      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaflike_by_leaf(path)
       dothis.extant_path.copy_to_absolute_path(path, finaltgt)
     end,
     copy_descendant_file_arr_into_absolute_path = function(path, tgt)
@@ -991,7 +991,7 @@ dothis = {
       transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone moveto " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
     end,
     move_into_absolute_path = function(path, tgt)
-      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaf(path)
+      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaflike_by_leaf(path)
       dothis.extant_path.move_to_absolute_path(path, finaltgt)
     end,
     move_descendant_file_arr_into_absolute_path = function(path, tgt)
@@ -1012,7 +1012,7 @@ dothis = {
       dothis.extant_path.delete(path)
     end,
     zip_into_absolute_path = function(path, tgt)
-      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaf(path)
+      local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaflike_by_leaf(path)
       dothis.extant_path.zip_to_absolute_path(path, finaltgt)
     end,
     zip_descendant_file_arr_to_absolute_path = function(path, tgt)
@@ -1050,7 +1050,7 @@ dothis = {
   },
   file = {
     do_in_path = function(path, cmd, do_after)
-      transf.str.str_or_nil_by_evaled_env_bash_stripped("cd " .. transf.str.str_by_single_quoted_escaped(transf.path.parent_path(path)) .. " && " .. cmd, do_after)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("cd " .. transf.str.str_by_single_quoted_escaped(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path)) .. " && " .. cmd, do_after)
     end,
     write_file = function(path, contents)
       dothis[
@@ -1774,24 +1774,24 @@ dothis = {
       ))
     end,
   },
-  path_with_intra_file_locator_specifier = {
+  intra_file_location_spec = {
     go_to = function(specifier)
       dothis.input_spec_arr.exec(
-        transf.path_with_intra_file_locator_specifier.input_spec_arr(specifier)
+        transf.intra_file_location_spec.input_spec_series_str(specifier)
       )
     end,
     open_go_to = function(specifier)
       dothis.local_path.open_app(
-        transf.path_with_intra_file_locator_specifier.path(specifier),
+        transf.intra_file_location_spec.path(specifier),
         env.GUI_EDITOR,
-        get.fn.first_n_args_bound_fn(dothis.path_with_intra_file_locator_specifier.go_to, specifier)
+        get.fn.first_n_args_bound_fn(dothis.intra_file_location_spec.go_to, specifier)
       )
     end
   },
   path_with_intra_file_locator = {
     open_go_to = function(path_with_intra_file_locator)
-      dothis.path_with_intra_file_locator_specifier.open_go_to(
-        transf.path_with_intra_file_locator.path_with_intra_file_locator_specifier(path_with_intra_file_locator)
+      dothis.intra_file_location_spec.open_go_to(
+        transf.path_with_intra_file_locator.intra_file_location_spec(path_with_intra_file_locator)
       )
     end
   },

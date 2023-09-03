@@ -1,6 +1,11 @@
 --- maps one thing_name to another thing_name
 --- so transf.<thing_name1>.<thing_name2>(<thing1>) -> <thing2>
 transf = {
+  full_userdata = {
+    str_by_classname = function(userdata)
+      return getmetatable(userdata).__name
+    end
+  },
   nonindicated_number_str_arr = {
     number_arr_by_base_2 = function(hex_arr)
       return get.nonindicated_number_str_arr.number_arr(hex_arr, 2)
@@ -17,16 +22,16 @@ transf = {
   },
   nonindicated_number_str = {
     number_by_base_2 = function(num)
-      return get.nonindicated_number_str.number_or_nil(num, 2)
+      return get.nonindicated_number_str.number(num, 2)
     end,
     number_by_base_8 = function(num)
-      return get.nonindicated_number_str.number_or_nil(num, 8)
+      return get.nonindicated_number_str.number(num, 8)
     end,
     number_by_base_10 = function(num)
-      return get.nonindicated_number_str.number_or_nil(num, 10)
+      return get.nonindicated_number_str.number(num, 10)
     end,
     number_by_base_16 = function(num)
-      return get.nonindicated_number_str.number_or_nil(num, 16)
+      return get.nonindicated_number_str.number(num, 16)
     end,
   },
   indicated_number_str = {
@@ -42,7 +47,7 @@ transf = {
         ]
     end,
     number = function(indicated_number)
-      return get.nonindicated_number_str.number_or_nil(
+      return get.nonindicated_number_str.number(
         indicated_number:sub(3),
         transf.indicated_number_str.pos_int_by_base(indicated_number)
       )
@@ -56,7 +61,7 @@ transf = {
   },
   unicode_codepoint_str = { -- U+X...`
     number = function(codepoint)
-      return get.nonindicated_number_str.number_or_nil(transf.unicode_codepoint_str.nonindicated_hex_number_str(codepoint), 16)
+      return get.nonindicated_number_str.number(transf.unicode_codepoint_str.nonindicated_hex_number_str(codepoint), 16)
     end,
     nonindicated_hex_number_str = function(codepoint)
       return codepoint:sub(3)
@@ -246,13 +251,13 @@ transf = {
   pos_number = { 
     nonindicated_dec_number_str = function(num)
       return 
-        transf.pos_int.nonindicated_dec_number_str(
+        transf.pos_int.digit_str(
           transf.number.pos_int_by_abs_int_part(num)
         ) .. 
         (
           transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
           (
-            "." .. transf.pos_int.nonindicated_dec_number_str(
+            "." .. transf.pos_int.digit_str(
               transf.number.pos_int_by_float_part(num)
             )
           )
@@ -273,13 +278,13 @@ transf = {
         )
       end,
     nonindicated_hex_number_str = function(num)
-      return transf.pos_int.nonindicated_hex_number_str(
+      return transf.pos_int.hex_str(
         transf.number.pos_int_by_abs_int_part(num)
       ) .. 
       (
         transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.nonindicated_hex_number_str(
+          "." .. transf.pos_int.hex_str(
             transf.number.pos_int_by_float_part(num)
           )
         )
@@ -299,13 +304,13 @@ transf = {
       )
     end,
     noninciated_oct_number_str = function(num)
-      return transf.pos_int.noninciated_oct_number_str(
+      return transf.pos_int.oct_str(
         transf.number.pos_int_by_abs_int_part(num)
       ) .. 
       (
         transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.noninciated_oct_number_str(
+          "." .. transf.pos_int.oct_str(
             transf.number.pos_int_by_float_part(num)
           )
         )
@@ -325,13 +330,13 @@ transf = {
       )
     end,
     nonindicated_bin_number_str = function(num)
-      return transf.pos_int.nonindicated_bin_number_str(
+      return transf.pos_int.bin_str(
         transf.number.pos_int_by_abs_int_part(num)
       ) .. 
       (
         transf.number.pos_float_by_abs_float_part(num) == 0 and "" or 
         (
-          "." .. transf.pos_int.nonindicated_bin_number_str(
+          "." .. transf.pos_int.bin_str(
             transf.number.pos_int_by_float_part(num)
           )
         )
@@ -378,7 +383,7 @@ transf = {
   },
   pos_int = {
     pos_int_by_dec_length = function(int)
-      return #transf.pos_int.nonindicated_dec_number_str(int)
+      return #transf.pos_int.digit_str(int)
     end,
     pos_int_by_normzeilen = function(pos_int)
       return transf.number.int_by_rounded(
@@ -388,48 +393,48 @@ transf = {
     base64_gen_str_by_random_of_length = function(int)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. transf.any.str(transf.number.int_by_rounded(int * 3/4))) -- 3/4 because base64 takes the int to be the input length, but we want to specify the output length (which is 4/3 the input length in case of base64)
     end,
-    nonindicated_dec_number_str = function(num)
+    digit_str = function(num)
       return transf.any.str(num)
     end,
     separated_nonindicated_dec_number_str = function(num)
       return get.str.str_with_separator_grouped_ascii_from_end(
-        transf.pos_int.nonindicated_dec_number_str(num),
+        transf.pos_int.digit_str(num),
         3,
         " "
       )
     end,
-    nonindicated_hex_number_str = function(num)
+    hex_str = function(num)
       return get.str.str_by_formatted_w_n_anys("%X", num)
     end,
     separated_nonindicated_hex_number_str = function(num)
       return get.str.str_with_separator_grouped_ascii_from_end(
-        transf.pos_int.nonindicated_hex_number_str(num),
+        transf.pos_int.hex_str(num),
         2,
         " "
       )
     end,
-    noninciated_oct_number_str = function(num)
+    oct_str = function(num)
       return get.str.str_by_formatted_w_n_anys("%o", num)
     end,
     separated_nonindicated_oct_number_str = function(num)
       return get.str.str_with_separator_grouped_ascii_from_end(
-        transf.pos_int.noninciated_oct_number_str(num),
+        transf.pos_int.oct_str(num),
         3,
         " "
       )
     end,
-    nonindicated_bin_number_str = function(num)
+    bin_str = function(num)
       return get.str.str_by_formatted_w_n_anys("%b", num)
     end,
     separated_nonindicated_bin_number_str = function(num)
       return get.str.str_with_separator_grouped_ascii_from_end(
-        transf.pos_int.nonindicated_bin_number_str(num),
+        transf.pos_int.bin_str(num),
         4,
         " "
       )
     end,
     indicated_utf8_hex_str = function(int)
-      return "utf8:" .. transf.pos_int.nonindicated_hex_number_str(int)
+      return "utf8:" .. transf.pos_int.hex_str(int)
     end,
     int_by_largest_of_length = function(int)
       return 10^int - 1
@@ -441,7 +446,7 @@ transf = {
       return (transf.pos_int.int_by_largest_of_length(int)+1) / 2
     end,
     unicode_codepoint_str = function(num)
-      return "U+" .. transf.pos_int.nonindicated_hex_number_str(num)
+      return "U+" .. transf.pos_int.hex_str(num)
     end,
     unicode_prop_table_from_unicde_codepoint = function(num)
       return transf.unicode_codepoint_str.unicode_prop_table(transf.pos_int.unicode_codepoint_str(num))
@@ -719,46 +724,47 @@ transf = {
     path_by_ending_with_slash = function(path)
       return get.str.str_by_with_suffix(path or "", "/")
     end,
-    initial_path_component = function(path)
+    path_component_by_initial = function(path)
       return transf.path.path_component_arr(path)[1]
     end,
-    leaf = function(path)
+    leaflike_by_leaf = function(path)
       local pcomponents = transf.path.path_component_arr(path)
       return pcomponents[#pcomponents]
     end,
-    parent_path = function(path)
+    --- not technically always guaranteed to return a path, hence the weird name
+    trimmed_noweirdwhitespace_line_by_parent_path = function(path)
       return get.path.path_from_sliced_path_component_arr(
         get.path.path_component_arr(path),
         {start = 1, stop = -2}
       )
     end,
-    parent_leaf = function(path)
+    path_component_or_nil_by_parent_leaf = function(path)
       local pcomponents = transf.path.path_component_arr(path)
       act.arr.pop(pcomponents)
       return pcomponents[#pcomponents]
     end,
-    parent_path_component_arr = function(path)
+    path_component_arr_by_parent = function(path)
       return transf.path.path_component_arr(
-        transf.path.parent_path(path)
+        transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path)
       )
     end,
     path_arr_by_path_component_arr_via_parent = function(path)
       return transf.path.path_arr_by_path_component_arr(
-        transf.path.parent_path(path)
+        transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path)
       )
     end,
     path_leaf_specifier = function(path)
-      local rf3339like_dt_or_interval, general_name, fs_tag_str = transf.leaf.rf3339like_dt_or_interval_general_name_fs_tag_str(transf.path.leaf(path))
+      local rf3339like_dt_or_interval, general_name, fs_tag_str = transf.leaf.rf3339like_dt_or_interval_general_name_fs_tag_str(transf.path.leaflike_by_leaf(path))
       return {
         extension = transf.path.extension(path),
-        path = transf.path.parent_path(path),
+        path = transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path),
         rfc3339like_dt_or_interval = rf3339like_dt_or_interval,
         general_name = general_name,
         fs_tag_assoc = transf.fs_tag_str.fs_tag_assoc(fs_tag_str),
       }
     end,
-    window_with_leaf_as_title = function(path)
-      return transf.str.window_or_nil_by_title(transf.path.leaf(path))
+    window_by_with_leaf_as_title = function(path)
+      return transf.str.window_or_nil_by_title(transf.path.leaflike_by_leaf(path))
     end,
     local_or_remote_str = function(path)
       if is.path.remote_path(path) then
@@ -767,9 +773,9 @@ transf = {
         return "local"
       end
     end,
-    parent_path_with_extension_if_any = function(path)
+    path_by_parent_path_with_extension_if_any = function(path)
       local extension = transf.path.extension(path)
-      local parent_path = transf.path.parent_path(path)
+      local parent_path = transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path)
       local new_path = parent_path .. extension
       return new_path
     end,
@@ -777,14 +783,14 @@ transf = {
   },
 
   path_with_intra_file_locator = {
-    path_with_intra_file_locator_specifier = function(path)
+    intra_file_location_spec = function(path)
       local parts = get.str.str_arr_by_split_w_ascii_char(path, ":")
-      local final_part = act.arr.pop(parts)
+      local final_part = transf.nonindicated_number_str.number_by_base_10(act.arr.pop(parts))
       local specifier = {}
       if is.str.nonindicated_number_str(parts[#parts]) then
         specifier = {
           column = final_part,
-          line = act.arr.pop(parts),
+          line = transf.nonindicated_number_str.number_by_base_10(act.arr.pop(parts)),
           path = get.str_or_number_arr.str_by_joined(parts, ":")
         }
       else
@@ -796,25 +802,36 @@ transf = {
       return specifier
     end,
   },
-  path_with_intra_file_locator_specifier = {
-    line = function(specifier)
+  intra_file_location_spec = {
+    pos_int_by_line = function(specifier)
       return specifier.line
     end,
-    column = function(specifier)
+    digit_str_by_line = function(specifier)
+      return transf.pos_int.digit_str(specifier.line)
+    end,
+    pos_int_or_nil_by_column = function(specifier)
       return specifier.column
+    end,
+    digit_str_or_nil_by_column = function(specifier)
+      local column = specifier.column
+      if column then
+        return transf.pos_int.digit_str(column)
+      else
+        return nil
+      end
     end,
     path = function(specifier)
       return specifier.path
     end,
     intra_file_locator = function(specifier)
       if specifier.column then
-        return ":" .. specifier.line .. ":" .. specifier.column
+        return ":" .. specifier.digit_str_by_line .. ":" .. specifier.digit_str_or_nil_by_column
       else
-        return ":" .. specifier.line
+        return ":" .. specifier.digit_str_by_line
       end
     end,
-    input_spec_arr = function(specifier)
-      return ":ctrl+g,:+" .. transf.path_with_intra_file_locator_specifier.intra_file_locator(specifier) .. ",:+return"
+    input_spec_series_str = function(specifier)
+      return ":ctrl+g,:+" .. transf.intra_file_location_spec.intra_file_locator(specifier) .. ",:+return"
     end,
      
   },
@@ -868,7 +885,7 @@ transf = {
   },
   extant_path = {
     absolute_path_arr_by_siblings = function(path)
-      return transf.dir.absolute_path_arr_by_children(transf.path.parent_path(path))
+      return transf.dir.absolute_path_arr_by_children(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path))
     end,
     absolute_path_arr_by_descendants = function(path)
       return get.extant_path.absolute_path_arr(
@@ -996,7 +1013,7 @@ transf = {
   },
   path_arr = {
     leaves_arr = function(path_arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaf)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_leaf)
     end,
     filenames_arr = function(path_arr)
       local filenames = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_filename)
@@ -1181,7 +1198,7 @@ transf = {
     absolute_path_arr_by_children_or_parent = function(dir)
       return transf.arr_and_any.arr(
         transf.dir.absolute_path_arr_by_children(dir),
-        transf.path.parent_path(dir)
+        transf.path.trimmed_noweirdwhitespace_line_by_parent_path(dir)
       )
     end,
     file_arr_by_children = function(dir)
@@ -1286,7 +1303,7 @@ transf = {
     leaf_key_leaf_str_or_nested_value_assoc = function(assoc)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc) do
-        local leaf = transf.path.leaf(k)
+        local leaf = transf.path.leaflike_by_leaf(k)
         if is.any.table(v) then
           res[leaf] = transf.absolute_path_key_leaf_str_or_nested_value_assoc.leaf_key_leaf_str_or_nested_value_assoc(v)
         else
@@ -5747,7 +5764,7 @@ transf = {
       )
     end,
     local_resultant_tm = function(dir)
-      return transf.omegat_project_dir.tm_dir(dir) .. "/" .. transf.path.leaf(dir) .. "-omegat.tmx"
+      return transf.omegat_project_dir.tm_dir(dir) .. "/" .. transf.path.leaflike_by_leaf(dir) .. "-omegat.tmx"
     end,
     rechnung_filename = function(dir)
       return get.timestamp_s.str_by_date_format_indicator(
@@ -6691,10 +6708,10 @@ transf = {
   },
   path_url = {
     initial_path_component = function(url)
-      return transf.path.initial_path_component(transf.url.path(url))
+      return transf.path.path_component_by_initial(transf.url.path(url))
     end,
     leaf = function(url)
-      return transf.path.leaf(transf.url.path(url))
+      return transf.path.leaflike_by_leaf(transf.url.path(url))
     end,
   },
   sgml_url = {

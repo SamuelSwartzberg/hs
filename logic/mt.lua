@@ -9,7 +9,7 @@ r = {
     },
     syntax = {
       dice = "(?:\\d+)?d\\d+(?:[/x\\*]\\d+)?(?:[+-]\\d+)?",
-      point = "([\\-\\d]+)..*?([\\-\\d]+)"
+      point = "(-?\\d+)..*?(-?\\d+)"
     },
     char_range = {
       printable_ascii = "\\x20-\\x7E",
@@ -52,6 +52,7 @@ r = {
       ipc_socket_id = "\\d+-\\d+",
     },
     html_entity = "&(?:[a-zA-Z\\d]+|#\\d+|#x[a-fA-F\\d]+);",
+    rough_input_spec_str = "(?:\\.[lrm])|(?::.*)|(?:[ms]-?\\d+..*?-?\\d+ %[a-zA-Z]+)",
     whitespace = {
       large = "[\t\r\n]"
     },

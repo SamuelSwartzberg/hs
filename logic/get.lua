@@ -1425,7 +1425,7 @@ get = {
     end,
     number_or_nil = function(str,  base)
       local nonindicated_number_str = transf.str.nonindicated_number_str(str)
-      return get.nonindicated_number_str.number_or_nil(nonindicated_number_str, base)
+      return get.nonindicated_number_str.number(nonindicated_number_str, base)
     end,
     int_by_rounded_or_nil = function(str, base)
       local nonindicated_number_str = transf.str.nonindicated_number_str(str)
@@ -1554,17 +1554,17 @@ get = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(
-          get.nonindicated_number_str.number_or_nil,
+          get.nonindicated_number_str.number,
           {a_use, base}
         )
       )
     end,
   },
   nonindicated_number_str = {
-    number_or_nil = tonumber,
+    number = tonumber,
     int_by_rounded_or_nil = function(num, base)
       return transf.number.int_by_rounded(
-        get.nonindicated_number_str.number_or_nil(num, base)
+        get.nonindicated_number_str.number(num, base)
       )
     end,
   },
@@ -1731,7 +1731,7 @@ get = {
       return transf.path.path_by_without_extension(path) .. "." .. ext
     end,
     leaf_starts_with = function(path, str)
-      return get.str.bool_by_startswith(transf.path.leaf(path), str)
+      return get.str.bool_by_startswith(transf.path.leaflike_by_leaf(path), str)
     end,
     is_extension = function(path, ext)
       return transf.path.extension(path) == ext
@@ -1749,11 +1749,11 @@ get = {
       return transf.path.leaflike_by_filename(path) == filename
     end,
     is_leaf = function(path, leaf)
-      return transf.path.leaf(path) == leaf
+      return transf.path.leaflike_by_leaf(path) == leaf
     end,
     window_with_leaf_as_title = function(path, app_name)
       return get.str.window_by_title(
-        transf.path.leaf(path),
+        transf.path.leaflike_by_leaf(path),
         app_name
       )
     end,
@@ -1909,28 +1909,28 @@ get = {
         if fn(ancestor) then
           return ancestor
         else
-          ancestor = transf.path.parent_path(ancestor)
+          ancestor = transf.path.trimmed_noweirdwhitespace_line_by_parent_path(ancestor)
         end
       end
     end,
     extant_path_by_ancestor_w_fn = function(path, fn)
-      return get.extant_path.extant_path_by_self_or_ancestor_w_fn(transf.path.parent_path(path), fn)
+      return get.extant_path.extant_path_by_self_or_ancestor_w_fn(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), fn)
     end,
     extant_path_by_self_or_ancestor_siblings_w_fn = function(path, fn)
       return get.extant_path.extant_path_by_self_or_ancestor_w_fn(path, function(x)
-        return get.arr.pos_int_or_nil_by_first_match_w_fn(transf.dir.absolute_path_arr_by_children(transf.path.parent_path(x)), fn)
+        return get.arr.pos_int_or_nil_by_first_match_w_fn(transf.dir.absolute_path_arr_by_children(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(x)), fn)
       end)
     end,
     extant_path_by_self_or_ancestor_sibling_w_leaf = function(path, leaf)
       return get.extant_path.extant_path_by_self_or_ancestor_siblings_w_fn(path, function(x)
-        return transf.path.leaf(x) == leaf
+        return transf.path.leaflike_by_leaf(x) == leaf
       end)
     end,
     cmd_output_from_path = function(path, cmd)
       if is.path.dir(path) then
         return get.dir.cmd_output_from_path(path, cmd)
       else
-        return get.dir.cmd_output_from_path(transf.path.parent_path(path), cmd)
+        return get.dir.cmd_output_from_path(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), cmd)
       end
     end,
     extant_path_by_descendant_w_fn = function(path, cond)
@@ -3626,7 +3626,7 @@ get = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         msg.attachments or {},
         function(att)
-          return media_dir .. "/" .. transf.path.leaf(att.uri)
+          return media_dir .. "/" .. transf.path.leaflike_by_leaf(att.uri)
         end
       )
     end
@@ -3642,7 +3642,7 @@ get = {
       for _, attachment_type in transf.arr.pos_int_vt_stateless_iter({"photos", "videos", "files", "audio_files", "gifs", "share", "sticker", "animated_image_attachments"}) do
         if msg[attachment_type] then
           for _, attachment in transf.arr.pos_int_vt_stateless_iter(msg[attachment_type]) do
-            local attachment_path = media_dir .. "/" .. transf.path.leaf(attachment.uri)
+            local attachment_path = media_dir .. "/" .. transf.path.leaflike_by_leaf(attachment.uri)
             dothis.res.push(res, attachment_path)
           end
         end
@@ -3681,7 +3681,7 @@ get = {
     absolute_path_arr_by_attachments = function(msg, obj)
       if msg.file then
         local media_dir = get.export_chat_main_object.media_dir(obj, "telegram")
-        return {media_dir .. "/" .. transf.path.leaf(msg.file)}
+        return {media_dir .. "/" .. transf.path.leaflike_by_leaf(msg.file)}
       else
         return {}
       end
