@@ -21,6 +21,7 @@ thing_name_hierarchy = {
         starting_with_dot_str = "leaf",
         multiline_str = {
           here_doc = "leaf",
+          raw_contact = "leaf"
         },
       },
       line = {
@@ -34,7 +35,9 @@ thing_name_hierarchy = {
         noempty_line = "leaf",
         noempty_nocomment_line = "leaf",
         noempty_nocomment_noindent_line = "leaf",
-        trimmed_line = "leaf",
+        trimmed_line = {
+          displayname_email = "leaf",
+        },
         noweirdwhitespace_line = {
           path_component = {
             leaflike = {
@@ -233,7 +236,7 @@ thing_name_hierarchy = {
               },
               base64_str = "leaf",
               handle = "leaf",
-              email_address = "leaf",
+              email = "leaf",
               dice_notation = "leaf",
               package_name = {
                 installed_package_name = "leaf",
@@ -287,7 +290,8 @@ thing_name_hierarchy = {
                       ipc_socket_id = {
                         mpv_ipc_socket_id = "leaf",
                       },
-                      sign_indicator = "leaf"
+                      sign_indicator = "leaf",
+                      github_username = "leaf"
                     },
                     alphanum_underscore = {
                       lower_alphanum_underscore = {
@@ -456,7 +460,8 @@ thing_name_hierarchy = {
               date_sequence_specifier = "leaf",
             }
           },
-          gpt_response_table = "leaf"
+          gpt_response_table = "leaf",
+          iban_data_spec = "leaf", 
         }
       }
     },

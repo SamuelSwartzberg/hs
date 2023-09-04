@@ -190,17 +190,17 @@ dothis = {
     end,
     add_as_username_pass_item_name = function(name, username)
       dothis.absolute_path.write_file(
-        get.pass_item_name.path(name, "username", "txt"),
+        get.pass_item_name.local_absolute_path(name, "username", "txt"),
         username
       )
     end,
   },
   contact_table = {
     add_iban = function(contact_table, iban)
-      dothis.contact_uuid.add_contact_data(transf.contact_table.uid(contact_table), "iban", iban)
+      dothis.contact_uuid.add_contact_data(transf.contact_table.uuid(contact_table), "iban", iban)
     end,
     edit = function(contact_table, do_after)
-      dothis.contact_uuid.edit_contact(transf.contact_table.uid(contact_table), do_after)
+      dothis.contact_uuid.edit_contact(transf.contact_table.uuid(contact_table), do_after)
     end,
   },
   youtube_video_id = {
@@ -1377,7 +1377,7 @@ dothis = {
       dothis.email_file.edit_then_send(transf.email_specifier.draft_email_file(specifier), do_after)
     end,
   },
-  email_address = {
+  email = {
     edit_then_send = function(address, do_after)
       dothis.email_specifier.edit_then_send({to = address}, do_after)
     end,
@@ -1806,7 +1806,7 @@ dothis = {
   },
   iban = {
     fill_bank_form = function(iban)
-      dothis.str_arr.fill_with(transf.iban.iban_bic_bank_name_arr(iban))
+      dothis.str_arr.fill_with(transf.iban.three_str_arr_by_iban_bic_bank_name(iban))
     end
   },
   running_application = {

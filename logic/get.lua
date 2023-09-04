@@ -101,20 +101,20 @@ get = {
     end,
   },
   pass_item_name = {
-    value = function(item, type)
+    str_or_nil_by_fetch_value = function(item, type)
       return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped)("pass show " .. type .. "/" .. item)
     end,
-    path = function(item, type, ext)
+    local_absolute_path = function(item, type, ext)
       return env.PASSWORD_STORE_DIR .. "/" .. type .. "/" .. item .. "." .. (ext or "gpg")
     end,
-    exists_as = function(item, type, ext)
-      return is.absolute_path.extant_path(get.pass_item_name.path(item, type, ext))
+    bool_by_exists_as = function(item, type, ext)
+      return is.absolute_path.extant_path(get.pass_item_name.local_absolute_path(item, type, ext))
     end,
-    json = function(item, type)
-      return transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json("pass show " .. type .. "/" .. item)
+    not_userdata_or_function_by_parsed_json = function(item, type)
+      return transf.str.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json("pass show " .. type .. "/" .. item)
     end,
     contact_json = function(item, type)
-      return get.pass_item_name.json(item, "contacts/" .. type)
+      return get.pass_item_name.not_userdata_or_function_by_parsed_json(item, "contacts/" .. type)
     end,
     
   },
@@ -123,14 +123,6 @@ get = {
       return function(...)
         return select(n, ...)
       end
-    end,
-  },
-  audiodevice_specifier = {
-    is_active_audiodevice_specifier = function (spec)
-      return get.audiodevice.is_active_audiodevice(
-        spec.device,
-        spec.type
-      )
     end,
   },
   audiodevice = {
@@ -2156,13 +2148,13 @@ get = {
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
-    key_prefix_partial_date_component_name_value_assoc_force_first = function(csl_table, key)
-      return transf.date_parts_single_or_range.prefix_partial_date_component_name_value_assoc_force_first(
+    key_prefix_partial_dcmp_assoc_force_first = function(csl_table, key)
+      return transf.date_parts_single_or_range.prefix_partial_dcmp_assoc_force_first(
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
     key_year_force_first = function(csl_table, key)
-      return transf.csl_table.key_prefix_partial_date_component_name_value_assoc_force_first(csl_table, key).year
+      return transf.csl_table.key_prefix_partial_dcmp_assoc_force_first(csl_table, key).year
     end,
   },
   shellscript_file = {
@@ -2411,24 +2403,24 @@ get = {
     end,
   },
   date_component_name_list = {
-    date_component_value_list = function(date_component_name_list, date_component_name_value_assoc)
+    date_component_value_list = function(date_component_name_list, dcmp_assoc)
       return get.arr.arr_by_mapped_w_t_key_assoc(
         date_component_name_list,
-        date_component_name_value_assoc
+        dcmp_assoc
       )
     end,
-    date_component_value_ordered_list = function(date_component_name_list, date_component_name_value_assoc)
+    date_component_value_ordered_list = function(date_component_name_list, dcmp_assoc)
       return get.arr.arr_by_mapped_w_t_key_assoc(
         transf.date_component_name_arr.date_component_name_ordered_arr(date_component_name_list),
-        date_component_name_value_assoc
+        dcmp_assoc
       )
     end,
   },
-  date_component_name_value_assoc = {
-    date_sequence_specifier = function(date_component_name_value_assoc, step, unit)
+  dcmp_assoc = {
+    date_sequence_specifier = function(dcmp_assoc, step, unit)
       return {
-        start = date(transf.date_component_name_value_assoc.min_full_dcmp_assoc(date_component_name_value_assoc)),
-        stop = date(transf.date_component_name_value_assoc.max_full_dcmp_assoc(date_component_name_value_assoc)),
+        start = date(transf.dcmp_assoc.full_dcmp_assoc_by_min(dcmp_assoc)),
+        stop = date(transf.dcmp_assoc.full_dcmp_assoc_by_max(dcmp_assoc)),
         step = step or 1,
         unit = unit or "sec"
       }
@@ -2470,22 +2462,22 @@ get = {
     end,
   },
   full_dcmp_assoc = {
-    prefix_partial_date_component_name_value_assoc = function(full_dcmp_assoc, date_component_name)
+    prefix_partial_dcmp_assoc = function(full_dcmp_assoc, date_component_name)
       return get.arr.arr_by_mapped_w_t_key_assoc(
-        transf.date_component_name.date_component_name_value_assoc_larger_or_same(date_component_name),
+        transf.date_component_name.dcmp_assoc_larger_or_same(date_component_name),
         full_dcmp_assoc
       )
     end,
     date_sequence_specifier_of_lower_component = function (full_dcmp_assoc, step, date_component_name, additional_steps_down)
-      return get.date_component_name_value_assoc.date_sequence_specifier(
-        get.full_dcmp_assoc.prefix_partial_date_component_name_value_assoc(full_dcmp_assoc, date_component_name),
+      return get.dcmp_assoc.date_sequence_specifier(
+        get.full_dcmp_assoc.prefix_partial_dcmp_assoc(full_dcmp_assoc, date_component_name),
         step,
         get.date_component_name.next(date_component_name, additional_steps_down)
       )      
     end,
     precision_full_dcmp_assoc = function(full_dcmp_assoc, date_component_name)
       return transf.full_dcmp_assoc.min_full_dcmp_assoc(
-        get.full_dcmp_assoc.prefix_partial_date_component_name_value_assoc(full_dcmp_assoc, date_component_name)
+        get.full_dcmp_assoc.prefix_partial_dcmp_assoc(full_dcmp_assoc, date_component_name)
       )
     end,
     precision_date = function(full_dcmp_assoc, date_component_name)

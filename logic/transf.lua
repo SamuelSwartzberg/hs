@@ -2153,7 +2153,7 @@ transf = {
     
   },
   date_component_name_arr = {
-    min_date_component_name_value_assoc = function(arr)
+    min_dcmp_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
         function(component)
@@ -2161,7 +2161,7 @@ transf = {
         end
       )
     end,
-    max_date_component_name_value_assoc = function(arr)
+    max_dcmp_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
         function(component)
@@ -2207,23 +2207,23 @@ transf = {
     end,
   },
   rfc3339like_dt = {
-    date_component_name_value_assoc = function(str)
+    dcmp_assoc = function(str)
       local comps = {get.str.n_strs_by_extracted_onig(str, r.g.rfc3339like_dt)}
       return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.date.date_component_names, function(k, v)
         return v and get.str_or_number.number_or_nil(comps[k]) or nil
       end)
     end,
     date_interval_specifier = function(str)
-      return transf.date_component_name_value_assoc.date_interval_specifier(transf.rfc3339like_dt.date_component_name_value_assoc(str))
+      return transf.dcmp_assoc.date_interval_specifier(transf.rfc3339like_dt.dcmp_assoc(str))
     end,
     min_full_dcmp_assoc = function(str)
-      return transf.date_component_name_value_assoc.min_full_dcmp_assoc(
-        transf.rfc3339like_dt.date_component_name_value_assoc(str)
+      return transf.dcmp_assoc.full_dcmp_assoc_by_min(
+        transf.rfc3339like_dt.dcmp_assoc(str)
       )
     end,
     max_full_dcmp_assoc = function(str)
-      return transf.date_component_name_value_assoc.max_full_dcmp_assoc(
-        transf.rfc3339like_dt.date_component_name_value_assoc(str)
+      return transf.dcmp_assoc.full_dcmp_assoc_by_max(
+        transf.rfc3339like_dt.dcmp_assoc(str)
       )
     end,
     min_date = function(str)
@@ -2252,7 +2252,7 @@ transf = {
   full_rfc3339like_dt = {
     date = function(str)
       transf.full_dcmp_assoc.date(
-        transf.rfc3339like_dt.date_component_name_value_assoc(str)
+        transf.rfc3339like_dt.dcmp_assoc(str)
       )
     end,
     timestamp_s = function(str)
@@ -2270,14 +2270,14 @@ transf = {
     start_rfc3339like_dt = function(str)
       return get.str.str_arr_by_split_w_string(str, "_to_")[1]
     end,
-    start_date_component_name_value_assoc = function(str)
-      return transf.rfc3339like_dt.date_component_name_value_assoc(
+    start_dcmp_assoc = function(str)
+      return transf.rfc3339like_dt.dcmp_assoc(
         transf.rfc3339like_interval.start_rfc3339like_dt(str)
       )
     end,
     start_min_full_dcmp_assoc = function(str)
-      return transf.date_component_name_value_assoc.min_full_dcmp_assoc(
-        transf.rfc3339like_interval.start_date_component_name_value_assoc(str)
+      return transf.dcmp_assoc.full_dcmp_assoc_by_min(
+        transf.rfc3339like_interval.start_dcmp_assoc(str)
       )
     end,
     start_min_date = function(str)
@@ -2288,19 +2288,19 @@ transf = {
     end_rfc3339like_dt = function(str)
       return get.str.str_arr_by_split_w_string(str, "_to_")[2]
     end,
-    end_date_component_name_value_assoc = function(str)
-      return transf.rfc3339like_dt.date_component_name_value_assoc(
+    end_dcmp_assoc = function(str)
+      return transf.rfc3339like_dt.dcmp_assoc(
         transf.rfc3339like_interval.end_rfc3339like_dt(str)
       )
     end,
     end_max_full_dcmp_assoc = function(str)
-      return transf.date_component_name_value_assoc.max_full_dcmp_assoc(
-        transf.rfc3339like_interval.end_date_component_name_value_assoc(str)
+      return transf.dcmp_assoc.full_dcmp_assoc_by_max(
+        transf.rfc3339like_interval.end_dcmp_assoc(str)
       )
     end,
     end_min_full_dcmp_assoc = function(str)
-      return transf.date_component_name_value_assoc.min_full_dcmp_assoc(
-        transf.rfc3339like_interval.end_date_component_name_value_assoc(str)
+      return transf.dcmp_assoc.full_dcmp_assoc_by_min(
+        transf.rfc3339like_interval.end_dcmp_assoc(str)
       )
     end,
     end_max_date = function(str)
@@ -2314,17 +2314,17 @@ transf = {
       )
     end,
     start_smallest_date_component_set = function(str)
-      return transf.date_component_name_value_assoc.smallest_date_component_set(
-        transf.rfc3339like_interval.start_date_component_name_value_assoc(str)
+      return transf.dcmp_assoc.smallest_date_component_set(
+        transf.rfc3339like_interval.start_dcmp_assoc(str)
       )
     end,
     end_smallest_date_component_set = function(str)
-      return transf.date_component_name_value_assoc.smallest_date_component_set(
-        transf.rfc3339like_interval.end_date_component_name_value_assoc(str)
+      return transf.dcmp_assoc.smallest_date_component_set(
+        transf.rfc3339like_interval.end_dcmp_assoc(str)
       )
     end,
     smallest_date_component_both_set = function(str)
-      return transf.two_date_component_names.larger_date_component_name(
+      return transf.two_date_component_names.date_component_name_by_larger(
         transf.rfc3339like_interval.start_smallest_date_component_set(str),
         transf.rfc3339like_interval.end_smallest_date_component_set(str)
       )
@@ -2343,10 +2343,10 @@ transf = {
         unit = transf.rfc3339like_interval.smallest_date_component_both_set(str)
       }
     end,
-    min_date = function(str)
+    date_by_min = function(str)
       return transf.rfc3339like_interval.start_min_date(str)
     end,
-    max_date = function(str)
+    date_by_max = function(str)
       return transf.rfc3339like_interval.end_max_date(str)
     end,
   },
@@ -2361,12 +2361,12 @@ transf = {
     max_date = function(str)
       return transf[
         transf.rf3339like_dt_or_interval.dt_or_interval(str)
-      ].max_date(str)
+      ].date_by_max(str)
     end,
     min_date = function(str)
       return transf[
         transf.rf3339like_dt_or_interval.dt_or_interval(str)
-      ].min_date(str)
+      ].date_by_min(str)
     end,
     date_interval_specifier = function(str)
       return transf[
@@ -2524,24 +2524,24 @@ transf = {
     end_full_dcmp_assoc = function(date_interval_specifier)
       return transf.date.full_dcmp_assoc(date_interval_specifier.stop)
     end,
-    start_prefix_date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
-      return transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value(
+    start_prefix_dcmp_assoc_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
+      return transf.dcmp_assoc.prefix_dcmp_assoc_where_date_component_value_is_not_min_date_component_value(
         transf.date_interval_specifier.start_full_dcmp_assoc(date_interval_specifier)
       )
     end,
-    end_prefix_date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
-      return transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value(
+    end_prefix_dcmp_assoc_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
+      return transf.dcmp_assoc.prefix_dcmp_assoc_where_date_component_value_is_not_max_date_component_value(
         transf.date_interval_specifier.end_full_dcmp_assoc(date_interval_specifier)
       )
     end,
     start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
-      return transf.date_component_name_value_assoc.rfc3339like_dt(
-        transf.date_interval_specifier.start_prefix_date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
+      return transf.dcmp_assoc.rfc3339like_dt(
+        transf.date_interval_specifier.start_prefix_dcmp_assoc_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
       )
     end,
     end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
-      return transf.date_component_name_value_assoc.rfc3339like_dt(
-        transf.date_interval_specifier.end_prefix_date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
+      return transf.dcmp_assoc.rfc3339like_dt(
+        transf.date_interval_specifier.end_prefix_dcmp_assoc_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
       )
     end,
     rfc3339like_dt = function(date_interval_specifier)
@@ -2567,116 +2567,116 @@ transf = {
       }
     end,
   },
-  date_component_name_value_assoc = {
-    date_component_name_list_set = function(date_component_name_value_assoc)
-      return transf.table_or_nil.kt_arr(date_component_name_value_assoc)
+  dcmp_assoc = {
+    date_component_name_list_set = function(dcmp_assoc)
+      return transf.table_or_nil.kt_arr(dcmp_assoc)
     end,
-    date_component_value_list_set = function(date_component_name_value_assoc)
-      return transf.table_or_nil.vt_arr(date_component_name_value_assoc)
+    date_component_value_list_set = function(dcmp_assoc)
+      return transf.table_or_nil.vt_arr(dcmp_assoc)
     end,
-    date_component_name_list_not_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_arr.date_component_name_arr_inverse(transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc))
+    date_component_name_list_not_set = function(dcmp_assoc)
+      return transf.date_component_name_arr.date_component_name_arr_inverse(transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc))
     end,
-    date_component_value_list_not_set = function(date_component_name_value_assoc)
+    date_component_value_list_not_set = function(dcmp_assoc)
       return get.date_component_name_list.date_component_value_list(
-        transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc),
-        date_component_name_value_assoc
+        transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc),
+        dcmp_assoc
       )
     end,
-    date_component_name_ordered_list_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc))
+    date_component_name_ordered_list_set = function(dcmp_assoc)
+      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc))
     end,
-    date_component_value_ordered_list_set = function(date_component_name_value_assoc)
+    date_component_value_ordered_list_set = function(dcmp_assoc)
       return get.date_component_name_list.date_component_value_ordered_list(
-        transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc),
-        date_component_name_value_assoc
+        transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc),
+        dcmp_assoc
       )
     end,
-    date_component_name_ordered_list_not_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
+    date_component_name_ordered_list_not_set = function(dcmp_assoc)
+      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
     end,
-    largest_date_component_name_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_arr.largest_date_component_name(transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc))
+    largest_date_component_name_set = function(dcmp_assoc)
+      return transf.date_component_name_arr.largest_date_component_name(transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc))
     end,
-    smallest_date_component_name_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_arr.smallest_date_component_name(transf.date_component_name_value_assoc.date_component_name_list_set(date_component_name_value_assoc))
+    smallest_date_component_name_set = function(dcmp_assoc)
+      return transf.date_component_name_arr.smallest_date_component_name(transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc))
     end,
-    largest_date_component_name_not_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_arr.largest_date_component_name(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
+    largest_date_component_name_not_set = function(dcmp_assoc)
+      return transf.date_component_name_arr.largest_date_component_name(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
     end,
-    smallest_date_component_name_not_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_arr.smallest_date_component_name(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
+    smallest_date_component_name_not_set = function(dcmp_assoc)
+      return transf.date_component_name_arr.smallest_date_component_name(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
     end,
-    min_date_component_name_value_assoc_not_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_arr.min_date_component_name_value_assoc(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
+    min_dcmp_assoc_not_set = function(dcmp_assoc)
+      return transf.date_component_name_arr.min_dcmp_assoc(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
     end,
-    max_date_component_name_value_assoc_not_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_arr.max_date_component_name_value_assoc(transf.date_component_name_value_assoc.date_component_name_list_not_set(date_component_name_value_assoc))
+    max_dcmp_assoc_not_set = function(dcmp_assoc)
+      return transf.date_component_name_arr.max_dcmp_assoc(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
     end,
-    min_full_dcmp_assoc = function(date_component_name_value_assoc)
+    full_dcmp_assoc_by_min = function(dcmp_assoc)
       return transf.two_tables.table_by_take_new(
-        date_component_name_value_assoc,
-        transf.date_component_name_value_assoc.min_date_component_name_value_assoc_not_set(date_component_name_value_assoc)
+        dcmp_assoc,
+        transf.dcmp_assoc.min_dcmp_assoc_not_set(dcmp_assoc)
       )
     end,
-    max_full_dcmp_assoc = function(date_component_name_value_assoc)
+    full_dcmp_assoc_by_max = function(dcmp_assoc)
       return transf.two_tables.table_by_take_new(
-        date_component_name_value_assoc,
-        transf.date_component_name_value_assoc.max_date_component_name_value_assoc_not_set(date_component_name_value_assoc)
+        dcmp_assoc,
+        transf.dcmp_assoc.max_dcmp_assoc_not_set(dcmp_assoc)
       )
     end,
-    date_interval_specifier = function(date_component_name_value_assoc)
+    date_interval_specifier = function(dcmp_assoc)
       return {
-        start = date(transf.date_component_name_value_assoc.min_full_dcmp_assoc(date_component_name_value_assoc)),
-        stop = date(transf.date_component_name_value_assoc.max_full_dcmp_assoc(date_component_name_value_assoc))
+        start = date(transf.dcmp_assoc.full_dcmp_assoc_by_min(dcmp_assoc)),
+        stop = date(transf.dcmp_assoc.full_dcmp_assoc_by_max(dcmp_assoc))
       }
     end, 
-    prefix_date_component_name_value_assoc = function(date_component_name_value_assoc)
+    prefix_dcmp_assoc = function(dcmp_assoc)
       local res = {}
       for _, date_component_name in transf.arr.pos_int_vt_stateless_iter(ls.date.date_component_names) do
-        if date_component_name_value_assoc[date_component_name] == nil then
+        if dcmp_assoc[date_component_name] == nil then
           return res
         end
-        res[date_component_name] = date_component_name_value_assoc[date_component_name]
+        res[date_component_name] = dcmp_assoc[date_component_name]
       end
     end,
-    prefix_date_component_name_list_set = function(date_component_name_value_assoc)
-      return transf.date_component_name_value_assoc.date_component_name_list_set(
-        transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc(date_component_name_value_assoc)
+    prefix_date_component_name_list_set = function(dcmp_assoc)
+      return transf.dcmp_assoc.date_component_name_list_set(
+        transf.dcmp_assoc.prefix_dcmp_assoc(dcmp_assoc)
       )
     end,
-    prefix_date_component_name_ordered_list_set = function(date_component_name_value_assoc)
+    prefix_date_component_name_ordered_list_set = function(dcmp_assoc)
       return transf.date_component_name_arr.date_component_name_ordered_list_set(
-        transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc(date_component_name_value_assoc)
+        transf.dcmp_assoc.prefix_dcmp_assoc(dcmp_assoc)
       )
     end,
-    --- gets a date_component_names_ordered_list which has all date_component_names where there is a date_component_name within the date_component_name_value_assoc that is smaller and equal that is not nil
+    --- gets a date_component_names_ordered_list which has all date_component_names where there is a date_component_name within the dcmp_assoc that is smaller and equal that is not nil
     --- i.e. { month = 02, hour = 12 } will return { "year", "month", "day", "hour" }
-    --- this should be equal to prefix_date_component_name_ordered_list_set if date_component_name_value_assoc is a prefix_date_component_name_value_assoc since prefix_ is defined as having no nil values before potential trailing nil values
-    prefix_date_component_name_ordered_list_no_trailing_nil = function(date_component_name_value_assoc)
+    --- this should be equal to prefix_date_component_name_ordered_list_set if dcmp_assoc is a prefix_dcmp_assoc since prefix_ is defined as having no nil values before potential trailing nil values
+    prefix_date_component_name_ordered_list_no_trailing_nil = function(dcmp_assoc)
       local ol = get.table.table_by_copy(ls.date.date_component_names)
-      while(date_component_name_value_assoc[
+      while(dcmp_assoc[
         ol[#ol]
       ] == nil) do
         ol[#ol] = nil
       end
       return ol
     end,
-    rfc3339like_dt_str_format_part_specifier_arr = function(date_component_name_value_assoc)
+    rfc3339like_dt_str_format_part_specifier_arr = function(dcmp_assoc)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.date_component_name_value_assoc.prefix_date_component_name_ordered_list_no_trailing_nil(date_component_name_value_assoc),
+        transf.dcmp_assoc.prefix_date_component_name_ordered_list_no_trailing_nil(dcmp_assoc),
         function(date_component_name)
           return {
             fallback = tblmap.date_component_name.rfc3339like_dt_str_format_part_fallback[date_component_name],
-            value = date_component_name_value_assoc[date_component_name],
+            value = dcmp_assoc[date_component_name],
             str_format_part = tblmap.date_component_name.rfc3339like_dt_str_format_part[date_component_name]
           }
         end
       )
     end,
-    rfc3339like_dt = function(date_component_name_value_assoc)
+    rfc3339like_dt = function(dcmp_assoc)
       local res = transf.str_format_part_specifier_arr.str(
-        transf.date_component_name_value_assoc.rfc3339like_dt_str_format_part_specifier_arr(date_component_name_value_assoc)
+        transf.dcmp_assoc.rfc3339like_dt_str_format_part_specifier_arr(dcmp_assoc)
       )
       if res:sub(-1) == "Z" then
         return res
@@ -2684,37 +2684,37 @@ transf = {
         return res:sub(1, -2) -- not full rfc3339like_dt, thus the trailing sep will be something like - or : and must be removed
       end
     end,
-    date_component_name_value_assoc_where_date_component_value_is_max_date_component_value = function(date_component_name_value_assoc)
+    dcmp_assoc_where_date_component_value_is_max_date_component_value = function(dcmp_assoc)
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(
-        date_component_name_value_assoc,
+        dcmp_assoc,
         function(k, v) return v == tblmap.date_component_name.pos_int_by_max_date_component_value[k] end
       )
     end,
-    date_component_name_value_assoc_where_date_component_value_is_min_date_component_value = function(date_component_name_value_assoc)
+    dcmp_assoc_where_date_component_value_is_min_date_component_value = function(dcmp_assoc)
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(
-        date_component_name_value_assoc,
+        dcmp_assoc,
         function(k, v) return v == tblmap.date_component_name.int_by_min_date_component_value[k] end
       )
     end,
-    date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_assoc)
+    dcmp_assoc_where_date_component_value_is_not_max_date_component_value = function(dcmp_assoc)
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(
-        date_component_name_value_assoc,
+        dcmp_assoc,
         function(k, v) return v ~= tblmap.date_component_name.pos_int_by_max_date_component_value[k] end
       )
     end,
-    date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value = function(date_component_name_value_assoc)
+    dcmp_assoc_where_date_component_value_is_not_min_date_component_value = function(dcmp_assoc)
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(
-        date_component_name_value_assoc,
+        dcmp_assoc,
         function(k, v) return v ~= tblmap.date_component_name.int_by_min_date_component_value[k] end
       )
     end,
-    prefix_date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value = function(date_component_name_value_assoc)
-      local date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value = transf.date_component_name_value_assoc.date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value(date_component_name_value_assoc)
-      return transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc(date_component_name_value_assoc_where_date_component_value_is_not_max_date_component_value)
+    prefix_dcmp_assoc_where_date_component_value_is_not_max_date_component_value = function(dcmp_assoc)
+      local dcmp_assoc_where_date_component_value_is_not_max_date_component_value = transf.dcmp_assoc.dcmp_assoc_where_date_component_value_is_not_max_date_component_value(dcmp_assoc)
+      return transf.dcmp_assoc.prefix_dcmp_assoc(dcmp_assoc_where_date_component_value_is_not_max_date_component_value)
     end,
-    prefix_date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value = function(date_component_name_value_assoc)
-      local date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value = transf.date_component_name_value_assoc.date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value(date_component_name_value_assoc)
-      return transf.date_component_name_value_assoc.prefix_date_component_name_value_assoc(date_component_name_value_assoc_where_date_component_value_is_not_min_date_component_value)
+    prefix_dcmp_assoc_where_date_component_value_is_not_min_date_component_value = function(dcmp_assoc)
+      local dcmp_assoc_where_date_component_value_is_not_min_date_component_value = transf.dcmp_assoc.dcmp_assoc_where_date_component_value_is_not_min_date_component_value(dcmp_assoc)
+      return transf.dcmp_assoc.prefix_dcmp_assoc(dcmp_assoc_where_date_component_value_is_not_min_date_component_value)
     end,
     
 
@@ -2746,14 +2746,14 @@ transf = {
       )
     end
   },
-  prefix_date_component_name_value_assoc = {
+  prefix_dcmp_assoc = {
     
     
   },
-  suffix_date_component_name_value_assoc = {
+  suffix_dcmp_assoc = {
 
   },
-  partial_date_component_name_value_assoc = {
+  partial_dcmp_assoc = {
 
   },
   -- date components are full if all components are set
@@ -2780,20 +2780,20 @@ transf = {
     bic = function(iban)
       return transf.cleaned_iban.bic(transf.iban.cleaned_iban(iban))
     end,
-    bank_name = function(iban)
-      return transf.cleaned_iban.bank_name(transf.iban.cleaned_iban(iban))
+    str_by_bank_name = function(iban)
+      return transf.cleaned_iban.str_by_bank_name(transf.iban.cleaned_iban(iban))
     end,
-    iban_bic_bank_name_arr = function(iban)
-      return {iban, transf.iban.bic(iban), transf.iban.bank_name(iban)}
+    three_str_arr_by_iban_bic_bank_name = function(iban)
+      return {iban, transf.iban.bic(iban), transf.iban.str_by_bank_name(iban)}
     end,
-    bank_details_str = function(iban)
+    multiline_str_by_bank_details = function(iban)
       return get.str_or_number_arr.str_by_joined(
-        transf.iban.iban_bic_bank_name_arr(iban),
+        transf.iban.three_str_arr_by_iban_bic_bank_name(iban),
         "\n"
       )
     end,
-    separated_iban = function(iban)
-      return transf.cleaned_iban.separated_iban(transf.iban.cleaned_iban(iban))
+    iban_by_separated = function(iban)
+      return transf.cleaned_iban.iban_by_separated(transf.iban.cleaned_iban(iban))
     end,
   },
   cleaned_iban = {
@@ -2805,14 +2805,15 @@ transf = {
       })
       local data = res.bankData
       data.valid = res.valid
+      return data
     end,
     bic = function(iban)
       return transf.cleaned_iban.data(iban).bic
     end,
-    bank_name = function(iban)
+    str_by_bank_name = function(iban)
       return transf.cleaned_iban.data(iban).bankName
     end,
-    separated_iban = function(iban)
+    iban_by_separated = function(iban)
       return get.str_or_number_arr.str_by_joined(
         get.str.str_arr_groups_utf8_from_end(
           transf.iban.cleaned_iban(iban),
@@ -2880,16 +2881,16 @@ transf = {
     end,
   },
   contact_table = {
-    uid = function (contact_table)
+    uuid = function (contact_table)
       return contact_table.uid
     end,
-    pref_name = function(contact_table) return contact_table["Formatted name"] end,
-    name_pre = function(contact_table) return contact_table["Prefix"] end,
-    first_name = function(contact_table) return contact_table["First name"] end,
-    middle_name = function(contact_table) return contact_table["Additional"] end,
-    last_name = function(contact_table) return contact_table["Last name"] end,
-    name_suf = function(contact_table) return contact_table["Suffix"] end,
-    nickname = function(contact_table) return contact_table["Nickname"] end,
+    str_by_pref_name = function(contact_table) return contact_table["Formatted name"] end,
+    str_by_name_pre = function(contact_table) return contact_table["Prefix"] end,
+    str_by_first_name = function(contact_table) return contact_table["First name"] end,
+    str_by_middle_name = function(contact_table) return contact_table["Additional"] end,
+    str_by_last_name = function(contact_table) return contact_table["Last name"] end,
+    str_by_name_suf = function(contact_table) return contact_table["Suffix"] end,
+    str_by_nickname = function(contact_table) return contact_table["Nickname"] end,
     anniversary = function(contact_table) return contact_table["Anniversary"] end,
     birthday = function(contact_table) return contact_table["Birthday"] end,
     organization = function(contact_table) return contact_table["Organization"] end,
@@ -2911,7 +2912,7 @@ transf = {
         transf.contact_table.github_username(contact_table)
       )
     end,
-    translation_rate = function(contact_table)
+    number_by_translation_rate = function(contact_table)
       return get.str_or_number.number_or_nil(contact_table.Private["translation-rate"])
     end,
     iban = function (contact_table)
@@ -2921,50 +2922,50 @@ transf = {
       return transf.iban.bic(transf.contact_table.iban(contact_table))
     end,
     bank_name = function (contact_table)
-      return transf.iban.bank_name(transf.contact_table.iban(contact_table))
+      return transf.iban.str_by_bank_name(transf.contact_table.iban(contact_table))
     end,
     bank_details_str = function (contact_table)
-      return transf.iban.bank_details_str(transf.contact_table.iban(contact_table))
+      return transf.iban.multiline_str_by_bank_details(transf.contact_table.iban(contact_table))
     end,
-    personal_tax_number = function (contact_table)
+    str_by_personal_tax_number = function (contact_table)
       return get.contact_table.tax_number(contact_table, "personal")
     end,
-    full_name_western_arr = function(contact_table)
+    str_arr_by_full_name_western = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
         transf.contact_table.name_pref(contact_table),
-        transf.contact_table.first_name(contact_table),
-        transf.contact_table.middle_name(contact_table),
-        transf.contact_table.last_name(contact_table),
-        transf.contact_table.name_suf(contact_table)
+        transf.contact_table.str_by_first_name(contact_table),
+        transf.contact_table.str_by_middle_name(contact_table),
+        transf.contact_table.str_by_last_name(contact_table),
+        transf.contact_table.str_by_name_suf(contact_table)
       })
     end,
-    full_name_western = function(contact_table)
+    str_by_full_name_western = function(contact_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.contact_table.full_name_western_arr(contact_table),
+        transf.contact_table.str_arr_by_full_name_western(contact_table),
         " "
       )
     end,
-    normal_name_western_arr = function(contact_table)
+    str_arr_by_normal_name_western = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
-        transf.contact_table.first_name(contact_table),
-        transf.contact_table.last_name(contact_table),
+        transf.contact_table.str_by_first_name(contact_table),
+        transf.contact_table.str_by_last_name(contact_table),
       })
     end,
-    normal_name_western = function(contact_table)
+    str_by_normal_name_western = function(contact_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.contact_table.normal_name_western_arr(contact_table),
+        transf.contact_table.str_arr_by_normal_name_western(contact_table),
         " "
       )
     end,
-    main_name = function(contact_table)
-      return transf.contact_table.pref_name(contact_table) or transf.contact_table.normal_name_western(contact_table)
+    str_by_main_name = function(contact_table)
+      return transf.contact_table.str_by_pref_name(contact_table) or transf.contact_table.str_by_normal_name_western(contact_table)
     end,
     full_name_eastern_arr = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
         transf.contact_table.name_pref(contact_table),
-        transf.contact_table.last_name(contact_table),
-        transf.contact_table.first_name(contact_table),
-        transf.contact_table.name_suf(contact_table)
+        transf.contact_table.str_by_last_name(contact_table),
+        transf.contact_table.str_by_first_name(contact_table),
+        transf.contact_table.str_by_name_suf(contact_table)
       })
     end,
     full_name_eastern = function(contact_table)
@@ -2975,8 +2976,8 @@ transf = {
     end,
     normal_name_eastern_arr = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
-        transf.contact_table.last_name(contact_table),
-        transf.contact_table.first_name(contact_table),
+        transf.contact_table.str_by_last_name(contact_table),
+        transf.contact_table.str_by_first_name(contact_table),
       })
     end,
     normal_name_eastern = function(contact_table)
@@ -2999,11 +3000,11 @@ transf = {
       )
     end,
     indicated_nickname = function(contact_table)
-      return '"' .. transf.contact_table.nickname(contact_table) .. '"'
+      return '"' .. transf.contact_table.str_by_nickname(contact_table) .. '"'
     end,
     main_name_iban_bic_bank_name_arr = function(contact_table)
       return {
-        transf.contact_table.main_name(contact_table),
+        transf.contact_table.str_by_main_name(contact_table),
         transf.contact_table.iban(contact_table),
         transf.contact_table.bic(contact_table),
         transf.contact_table.bank_name(contact_table),
@@ -3039,9 +3040,9 @@ transf = {
     address_table_arr = function (contact_table)
       return transf.table.vt_set(transf.contact_table.vcard_type_address_table_assoc(contact_table))
     end,
-    summary = function (contact_table)
-      local sumstr = transf.contact_table.full_name_western(contact_table)
-      if transf.contact_table.nickname(contact_table) then
+    str_by_summary = function (contact_table)
+      local sumstr = transf.contact_table.str_by_full_name_western(contact_table)
+      if transf.contact_table.str_by_nickname(contact_table) then
         sumstr = sumstr .. " " .. transf.contact_table.indicated_nickname(contact_table)
       end
       if transf.contact_table.name_additions(contact_table) then
@@ -3054,7 +3055,7 @@ transf = {
         sumstr = sumstr .. " <" .. transf.contact_table.email_str(contact_table) .. ">"
       end
     end,
-    main_email = function (contact_table)
+    email_by_main = function (contact_table)
       return get.contact_table.email(contact_table, "pref") or transf.contact_table.email_arr(contact_table)[1]
     end,
     main_phone_number = function (contact_table)
@@ -3117,7 +3118,7 @@ transf = {
     end,
     addressee_arr = function(single_address_table)
       return transf.hole_y_arrlike.arr({
-        transf.contact_table.main_name(single_address_table.contact),
+        transf.contact_table.str_by_main_name(single_address_table.contact),
         transf.address_table.extended(single_address_table)
       })
     end,
@@ -3516,6 +3517,11 @@ transf = {
     not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json = function(str)
       local res = transf.str.str_or_err_by_evaled_env_bash_stripped_noempty(str)
       return transf.json_str.not_userdata_or_function(res)
+    end,
+    not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json = function(str)
+      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
+        transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json
+      )(str)
     end,
     table_or_err_by_evaled_env_bash_parsed_json = function(str)
       local res = transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json(str)
@@ -4013,22 +4019,22 @@ transf = {
   },
   pass_item_name = {
     password = function(pass_item_name)
-      return get.pass_item_name.value(pass_item_name, "passw")
+      return get.pass_item_name.str_or_nil_by_fetch_value(pass_item_name, "passw")
     end,
     password_absolute_path = function(pass_item_name)
-      return get.pass_item_name.path(pass_item_name, "passw")
+      return get.pass_item_name.local_absolute_path(pass_item_name, "passw")
     end,
     recovery_key = function(pass_item_name)
-      return get.pass_item_name.value(pass_item_name, "recovery")
+      return get.pass_item_name.str_or_nil_by_fetch_value(pass_item_name, "recovery")
     end,
     recovery_key_absolute_path = function(pass_item_name)
-      return get.pass_item_name.path(pass_item_name, "recovery")
+      return get.pass_item_name.local_absolute_path(pass_item_name, "recovery")
     end,
     security_question = function(pass_item_name)
-      return get.pass_item_name.value(pass_item_name, "security_question")
+      return get.pass_item_name.str_or_nil_by_fetch_value(pass_item_name, "security_question")
     end,
     security_question_absolute_path = function(pass_item_name)
-      return get.pass_item_name.path(pass_item_name, "security_question")
+      return get.pass_item_name.local_absolute_path(pass_item_name, "security_question")
     end,
     username_or_default = function(pass_item_name)
       return transf.pass_item_name.username(pass_item_name) or env.MAIN_EMAIL
@@ -4039,7 +4045,7 @@ transf = {
       )
     end,
     username_absolute_path = function(pass_item_name)
-      return get.pass_item_name.path(pass_item_name, "username")
+      return get.pass_item_name.local_absolute_path(pass_item_name, "username")
     end,
     otp = function(item)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("pass otp otp/" .. item)
@@ -4050,10 +4056,10 @@ transf = {
   },
   cc_name = {
     cc_number = function(cc_name)
-      return get.pass_item_name.value(cc_name, "cc/nr")
+      return get.pass_item_name.str_or_nil_by_fetch_value(cc_name, "cc/nr")
     end,
     cc_expiry = function(cc_name)
-      return get.pass_item_name.value(cc_name, "cc/exp")
+      return get.pass_item_name.str_or_nil_by_fetch_value(cc_name, "cc/exp")
     end,
   },
   styledtext = {
@@ -4420,7 +4426,7 @@ transf = {
     date_component_name_by_larger = function(a, b)
       return tblmap.date_component_name.date_component_index[a] > tblmap.ddate_component_name.date_component_index[b]
     end,
-    larger_date_component_name = function(a, b)
+    date_component_name_by_larger = function(a, b)
       if tblmap.date_component_name.date_component_index[a] > tblmap.date_component_name.date_component_index[b] then
         return a
       else
@@ -4435,7 +4441,7 @@ transf = {
   },
   displayname_email = {
     email = function(str)
-      return get.str.n_strs_by_extracted_eutf8(str, " <(.*)> *$")
+      return get.str.n_strs_by_extracted_eutf8(str, " <(.*)>$")
     end,
     displayname = function(str)
       return get.str.n_strs_by_extracted_eutf8(str, "^(.*) <")
@@ -5677,7 +5683,7 @@ transf = {
       end
     end,
     client_main_name = function(dir)
-      return transf.contact_table.main_name(
+      return transf.contact_table.str_by_main_name(
         transf.omegat_project_dir.client_contact_table(dir)
       )
     end,
@@ -5687,12 +5693,12 @@ transf = {
       )
     end,
     client_translation_rate = function(dir)
-      return transf.contact_table.translation_rate(
+      return transf.contact_table.number_by_translation_rate(
         transf.omegat_project_dir.client_contact_table(dir)
       )
     end,
     creator_main_name = function(dir)
-      return transf.contact_table.main_name(
+      return transf.contact_table.str_by_main_name(
         transf.omegat_project_dir.creator_contact_table(dir)
       )
     end,
@@ -5713,7 +5719,7 @@ transf = {
       )
     end,
     creator_translation_rate = function(dir)
-      return transf.contact_table.translation_rate(
+      return transf.contact_table.number_by_translation_rate(
         transf.omegat_project_dir.creator_contact_table(dir)
       )
     end,
@@ -6222,13 +6228,13 @@ transf = {
         transf.csl_table.issued_date_parts_single_or_range(csl_table)
       )
     end,
-    issued_prefix_partial_date_component_name_value_assoc_force_first = function(csl_table)
-      return transf.date_parts_single_or_range.prefix_partial_date_component_name_value_assoc_force_first(
+    issued_prefix_partial_dcmp_assoc_force_first = function(csl_table)
+      return transf.date_parts_single_or_range.prefix_partial_dcmp_assoc_force_first(
         transf.csl_table.issued_date_parts_single_or_range(csl_table)
       )
     end,
     issued_year_force_first = function(csl_table)
-      return transf.csl_table.issued_prefix_partial_date_component_name_value_assoc_force_first(csl_table).year
+      return transf.csl_table.issued_prefix_partial_dcmp_assoc_force_first(csl_table).year
     end,
     author_arr = function(csl_table)
       return csl_table.author
@@ -6539,12 +6545,12 @@ transf = {
     rfc3339like_dt = function(date_parts)
       return get.str_or_number_arr.str_by_joined(date_parts, "-")
     end,
-    prefix_partial_date_component_name_value_assoc = function(date_parts)
+    prefix_partial_dcmp_assoc = function(date_parts)
       return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
     end,
     full_full_dcmp_assoc = function(date_parts)
-      return transf.date_component_name_value_assoc.min_full_dcmp_assoc(
-        transf.date_parts_single.prefix_partial_date_component_name_value_assoc(date_parts)
+      return transf.dcmp_assoc.full_dcmp_assoc_by_min(
+        transf.date_parts_single.prefix_partial_dcmp_assoc(date_parts)
       )
     end,
     date = function(date_parts)
@@ -6576,8 +6582,8 @@ transf = {
     rf3339like_dt_force_first = function(date_parts)
       return transf.date_parts_single.rfc3339like_dt(date_parts[1])
     end,
-    prefix_partial_date_component_name_value_assoc_force_first = function(date_parts)
-      return transf.date_parts_single.prefix_partial_date_component_name_value_assoc(date_parts[1])
+    prefix_partial_dcmp_assoc_force_first = function(date_parts)
+      return transf.date_parts_single.prefix_partial_dcmp_assoc(date_parts[1])
     end,
     full_full_dcmp_assoc_force_first = function(date_parts)
       return transf.date_parts_single.full_full_dcmp_assoc(date_parts[1])

@@ -23,6 +23,9 @@ is = {
     end,
     json_str = transf["nil"]["true"], -- figuring this out would require parsing the json, which is too expensive here
     yaml_str = transf["nil"]["true"], -- same as above
+    email_or_displayname_email = function(str)
+      return is.str.email(str) or is.str.displayname_email(str)
+    end,
 
   },
   not_empty_str = {
@@ -49,6 +52,7 @@ is = {
     here_doc = function(str)
       return get.str.bool_by_startswith(str, "<<EOF") and get.str.bool_by_endswith(str, "EOF") -- technically obviously it doesn't have to be EOF, but I'm only ever gonna use EOF
     end,
+    raw_contact = transf["nil"]["true"]
   },
   whitespace_str = {
     starting_with_whitespace_str = function(str)
@@ -130,7 +134,9 @@ is = {
     end
   },
   trimmed_line = {
-    
+    displayname_email = function(str)
+      return get.str.bool_by_matches_whole_eutf8(str, ".- <.-@.+>")
+    end,
    
   },
   trimmed_noweirdwhitespace_line = {
@@ -258,7 +264,7 @@ is = {
       return get.str.bool_by_startswith(str, "@")
     end,
     --- trying to determine what str is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
-    email_address = function(str)
+    email = function(str)
       return 
         get.str.bool_by_contains_w_ascii_str(str, "@") and
         get.str.bool_by_contains_w_ascii_str(str, ".")
@@ -471,6 +477,9 @@ is = {
     ipc_socket_id = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.ipc_socket_id)
     end,
+    github_username = function(str)
+      return get.str.bool_by_not_startswith(str, "-") and get.str.bool_by_not_endswith(str, "-") and #str <= 39
+    end
     
   },
   uuid = {
@@ -1008,6 +1017,9 @@ is = {
     base32_str = function(str)
       return is.printable_ascii_not_whitespace_str.base32_gen_str(str) or is.printable_ascii_not_whitespace_str.base32_crock_str(str)
     end,
+    bic = function(str)
+      return #str == 8 or #str == 11
+    end
   },
   digit_str = {
     bin_str = function(str)
@@ -1369,19 +1381,19 @@ is = {
   },
   pass_item_name = {
     passw_pass_item_name = function(name)
-      return get.pass_item_name.exists_as(name, "passw")
+      return get.pass_item_name.bool_by_exists_as(name, "passw")
     end,
     username_pass_item_name = function(name)
-      return get.pass_item_name.exists_as(name, "username", "txt")
+      return get.pass_item_name.bool_by_exists_as(name, "username", "txt")
     end,
     recovery_pass_item_name = function(name)
-      return get.pass_item_name.exists_as(name, "recovery")
+      return get.pass_item_name.bool_by_exists_as(name, "recovery")
     end,
     otp_pass_item_name = function(name)
-      return get.pass_item_name.exists_as(name, "otp")
+      return get.pass_item_name.bool_by_exists_as(name, "otp")
     end,
     secq_pass_item_name = function(name)
-      return get.pass_item_name.exists_as(name, "secq")
+      return get.pass_item_name.bool_by_exists_as(name, "secq")
     end,
     login_pass_item_name = function(name)
       return 
@@ -1519,6 +1531,9 @@ is = {
     syn_specifier = function(t)
       return t.synonyms or t.antonyms
     end,
+    iban_data_spec = function(t)
+      return t.bankName or t.bic 
+    end,
   },
   absolute_path_key_assoc = {
     absolute_path_key_leaf_str_or_nested_value_assoc = function(t)
@@ -1575,8 +1590,11 @@ is = {
     end
   },
   audiodevice_specifier = {
-    active_audiodevice_specifier = function(audiodevice_specifier)
-      return get.audiodevice.is_active_audiodevice(audiodevice_specifier.device, audiodevice_specifier.subtype)
+    active_audiodevice_specifier = function(spec)
+      return get.audiodevice.is_active_audiodevice(
+        spec.device,
+        spec.type
+      )
     end,
   },
   csl_table = {
