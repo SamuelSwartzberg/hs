@@ -758,7 +758,7 @@ transf = {
       return {
         extension = transf.path.extension(path),
         path = transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path),
-        rfc3339like_dt_or_interval = rf3339like_dt_or_interval,
+        rfc3339like_dt_o_interval = rf3339like_dt_or_interval,
         general_name = general_name,
         fs_tag_assoc = transf.fs_tag_str.fs_tag_assoc(fs_tag_str),
       }
@@ -766,7 +766,7 @@ transf = {
     window_by_with_leaf_as_title = function(path)
       return transf.str.window_or_nil_by_title(transf.path.leaflike_by_leaf(path))
     end,
-    local_or_remote_str = function(path)
+    local_o_remote_str = function(path)
       if is.path.remote_path(path) then
         return "remote"
       else
@@ -782,7 +782,7 @@ transf = {
 
   },
 
-  path_with_intra_file_locator = {
+  path_with_twod_locator = {
     intra_file_location_spec = function(path)
       local parts = get.str.str_arr_by_split_w_ascii_char(path, ":")
       local final_part = transf.nonindicated_number_str.number_by_base_10(act.arr.pop(parts))
@@ -823,15 +823,19 @@ transf = {
     path = function(specifier)
       return specifier.path
     end,
-    intra_file_locator = function(specifier)
+    twod_locator = function(specifier)
       if specifier.column then
         return ":" .. specifier.digit_str_by_line .. ":" .. specifier.digit_str_or_nil_by_column
       else
         return ":" .. specifier.digit_str_by_line
       end
     end,
-    input_spec_series_str = function(specifier)
-      return ":ctrl+g,:+" .. transf.intra_file_location_spec.intra_file_locator(specifier) .. ",:+return"
+    input_spec_arr = function(specifier)
+      return {
+        {mode = "key", key = "g", mods = {"ctrl"} },
+        {mode = "key", key = transf.intra_file_location_spec.twod_locator(specifier)},
+        {mode = "key", key = "enter"},
+      }
     end,
      
   },
@@ -862,17 +866,17 @@ transf = {
     file_url = function(path)
       return "file://" .. path
     end,
-    prompted_multiple_local_absolute_path_from_default = function(path)
+    local_absolute_path_by_prompted_multiple_from_default = function(path)
       return transf.prompt_spec.any_arr({
-        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         prompt_args = {
           message =  "Enter a subdirectory (or file, if last) (started with: " .. path .. ")",
         }
       })
     end,
-    prompted_once_local_absolute_path_from_default = function(path)
+    local_absolute_path_by_prompted_once_from_default = function(path)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         prompt_args = {
           message =  "Enter a directory or file as a child of " .. path,
         }
@@ -927,11 +931,11 @@ transf = {
         {recursion = true, include_files = false}
       )
     end,
-    descendants_leaves_arr = function(path)
-      return transf.path_arr.leaves_arr(transf.extant_path.absolute_path_arr_by_descendants(path))
+    leaflike_arr_by_descendant_leaves = function(path)
+      return transf.path_arr.leaflike_arr_by_leaves(transf.extant_path.absolute_path_arr_by_descendants(path))
     end,
-    descendants_filenames_arr = function(path)
-      return transf.path_arr.filenames_arr(transf.extant_path.absolute_path_arr_by_descendants(path))
+    leaflike_arr_by_descendant_filenames = function(path)
+      return transf.path_arr.leaflike_arr_by_filenames(transf.extant_path.absolute_path_arr_by_descendants(path))
     end,
     extension_arr_by_descendants = function(path)
       return transf.path_arr.extensions_arr(transf.extant_path.absolute_path_arr_by_descendants(path))
@@ -1012,10 +1016,10 @@ transf = {
     end,
   },
   path_arr = {
-    leaves_arr = function(path_arr)
+    leaflike_arr_by_leaves = function(path_arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_leaf)
     end,
-    filenames_arr = function(path_arr)
+    leaflike_arr_by_filenames = function(path_arr)
       local filenames = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_filename)
       return transf.arr.set(filenames)
     end,
@@ -1037,8 +1041,8 @@ transf = {
         transf.path_arr.path_leaf_specifier_arr(path_arr)
       )
     end,
-    rfc3339like_dt_or_interval_by_union = function(path_arr)
-      return transf.path_leaf_specifier_arr.rfc3339like_dt_or_interval_by_union(
+    rfc3339like_dt_o_interval_by_union = function(path_arr)
+      return transf.path_leaf_specifier_arr.rfc3339like_dt_o_interval_by_union(
         transf.path_arr.path_leaf_specifier_arr(path_arr)
       )
     end,
@@ -1227,7 +1231,7 @@ transf = {
       end
     end,
     children_leaves_arr = function(dir)
-      return transf.path_arr.leaves_arr(transf.dir.absolute_path_arr_by_children(dir))
+      return transf.path_arr.leaflike_arr_by_leaves(transf.dir.absolute_path_arr_by_children(dir))
     end,
     children_leaves_arr_or_dot = function(dir)
       return transf.arr_and_any.arr(
@@ -1242,7 +1246,7 @@ transf = {
       )
     end,
     children_filename_arr = function(dir)
-      return transf.path_arr.filenames_arr(transf.dir.absolute_path_arr_by_children(dir))
+      return transf.path_arr.leaflike_arr_by_filenames(transf.dir.absolute_path_arr_by_children(dir))
     end,
     children_extensions_arr = function(dir)
       return transf.path_arr.extensions_arr(transf.dir.absolute_path_arr_by_children(dir))
@@ -1281,20 +1285,20 @@ transf = {
         transf.dir.absolute_path_arr_by_children(path)
       )
     end,
-    rfc3339like_dt_or_interval_by_union_of_children = function(path)
-      return transf.path_leaf_specifier_arr.rfc3339like_dt_or_interval_by_union(
+    rfc3339like_dt_o_interval_by_union_of_children = function(path)
+      return transf.path_leaf_specifier_arr.rfc3339like_dt_o_interval_by_union(
         transf.dir.path_leaf_specifier_arr_by_children(path)
       )
     end,
     path_leaf_specifier_by_using_union_rf3339like_dt_or_interval = function(path)
       local path_leaf_specifier = transf.path.path_leaf_specifier(path)
-      local union_rf3339like_dt_or_interval = transf.dir.rfc3339like_dt_or_interval_by_union_of_children(path)
+      local union_rf3339like_dt_or_interval = transf.dir.rfc3339like_dt_o_interval_by_union_of_children(path)
       if union_rf3339like_dt_or_interval then
-        path_leaf_specifier.rfc3339like_dt_or_interval = union_rf3339like_dt_or_interval
+        path_leaf_specifier.rfc3339like_dt_o_interval = union_rf3339like_dt_or_interval
       end
       return path_leaf_specifier
     end,
-    path_by_using_union_rfc3339like_dt_or_interval = function(path)
+    path_by_using_union_rfc3339like_dt_o_interval = function(path)
       local path_leaf_specifier = transf.dir.path_leaf_specifier_by_using_union_rf3339like_dt_or_interval(path)
       return transf.path_leaf_specifier.path(path_leaf_specifier)
     end
@@ -1570,12 +1574,12 @@ transf = {
       )
     end,
     date_interval_specifier_or_nil_by_earliest_start = function(arr)
-      return transf.interval_specifier_arr.interval_specifier_with_earliest_start(
+      return transf.interval_specifier_arr.interval_specifier_by_earliest_start(
         transf.path_leaf_specifier_arr.date_interval_specifier_arr(arr)
       )
     end,
     date_by_earliest_start = function(arr)
-      return transf.interval_specifier_arr.earliest_start(
+      return transf.interval_specifier_arr.t_by_earliest_start(
         transf.path_leaf_specifier_arr.date_interval_specifier_arr(arr)
       )
     end,
@@ -1589,7 +1593,7 @@ transf = {
         transf.path_leaf_specifier_arr.date_interval_specifier_arr(arr)
       )
     end,
-    rfc3339like_dt_or_interval_by_union = function(arr)
+    rfc3339like_dt_o_interval_by_union = function(arr)
       return transf.date_interval_specifier.rf3339like_dt_or_interval(
         transf.path_leaf_specifier_arr.date_interval_specifier_by_union(arr)
       )
@@ -2397,17 +2401,17 @@ transf = {
   --- interval specifier: table of start, stop
   --- both inclusive
   interval_specifier = {
-    diff = function(interval)
+    t_by_diff = function(interval)
       return interval.stop - interval.start
     end,
   },
   int_interval_specifier = {
-    random = function(interval)
+    int_by_random = function(interval)
       return math.random(interval.start, interval.stop)
     end,
   },
-  float_interval_specifier = {
-    random = function(interval)
+  number_interval_specifer = {
+    number_by_random = function(interval)
       return math.random() * (interval.stop - interval.start) + interval.start
     end,
   },
@@ -2425,81 +2429,81 @@ transf = {
     end,
   },
   interval_specifier_arr = {
-    interval_specifier_with_earliest_start = function(interval_specifier_arr)
+    interval_specifier_by_earliest_start = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.smaller_table_by_key, {a_use, a_use, "start"})
       )
     end,
-    earliest_start = function(interval_specifier_arr)
-      return transf.interval_specifier_arr.interval_specifier_with_earliest_start(
+    t_by_earliest_start = function(interval_specifier_arr)
+      return transf.interval_specifier_arr.interval_specifier_by_earliest_start(
           interval_specifier_arr
         ).start
     end,
-    interval_specifier_with_latest_start = function(interval_specifier_arr)
+    interval_specifier_by_latest_start = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key, {a_use, a_use, "start"})
       )
     end,
-    latest_start = function(interval_specifier_arr)
-      return transf.interval_specifier_arr.interval_specifier_with_latest_start(
+    t_by_latest_start = function(interval_specifier_arr)
+      return transf.interval_specifier_arr.interval_specifier_by_latest_start(
           interval_specifier_arr
         ).start
     end,
-    interval_specifier_with_latest_stop = function(interval_specifier_arr)
+    interval_specifier_by_latest_stop = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key, {a_use, a_use, "stop"})
       )
     end,
-    latest_stop = function(interval_specifier_arr)
-      return transf.interval_specifier_arr.interval_specifier_with_latest_stop(
+    t_by_latest_stop = function(interval_specifier_arr)
+      return transf.interval_specifier_arr.interval_specifier_by_latest_stop(
           interval_specifier_arr
         ).stop
     end,
-    interval_specifier_with_earliest_stop = function(interval_specifier_arr)
+    interval_specifier_by_earliest_stop = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.smaller_table_by_key, {a_use, a_use, "stop"})
       )
     end,
-    earliest_stop = function(interval_specifier_arr)
-      return transf.interval_specifier_arr.interval_specifier_with_earliest_stop(
+    t_by_earliest_stop = function(interval_specifier_arr)
+      return transf.interval_specifier_arr.interval_specifier_by_earliest_stop(
           interval_specifier_arr
         ).stop
     end,
-    intersection_interval_specifier = function(interval_specifier_arr)
+    interval_specifier_by_intersection = function(interval_specifier_arr)
       return {
-        start = transf.interval_specifier_arr.latest_start(interval_specifier_arr),
-        stop = transf.interval_specifier_arr.earliest_stop(interval_specifier_arr),
+        start = transf.interval_specifier_arr.t_by_latest_start(interval_specifier_arr),
+        stop = transf.interval_specifier_arr.t_by_earliest_stop(interval_specifier_arr),
       }
     end,
     intrval_specifier_by_union = function(interval_specifier_arr)
       return {
-        start = transf.interval_specifier_arr.earliest_start(interval_specifier_arr),
-        stop = transf.interval_specifier_arr.latest_stop(interval_specifier_arr),
+        start = transf.interval_specifier_arr.t_by_earliest_start(interval_specifier_arr),
+        stop = transf.interval_specifier_arr.t_by_latest_stop(interval_specifier_arr),
       }
     end,
   },
   date_sequence_specifier = {
-    start_rfc3339like_dt_of_unit_precision = function(date_sequence_specifier)
+    rfc3339like_dt_by_start_of_unit_precision = function(date_sequence_specifier)
       return get.date.rfc3339like_dt_of_precision(
         date_sequence_specifier.start,
         date_sequence_specifier.unit
       )
     end,
-    end_rfc3339like_dt_of_unit_precision = function(date_sequence_specifier)
+    rfc3339like_dt_by_end_of_unit_precision = function(date_sequence_specifier)
       return get.date.rfc3339like_dt_of_precision(
         date_sequence_specifier.stop,
         date_sequence_specifier.unit
       )
     end,
-    rfc3339like_interval_of_unit_precision = function(date_sequence_specifier)
+    rfc3339like_interval_by_of_unit_precision = function(date_sequence_specifier)
       return 
-        transf.date_sequence_specifier.start_rfc3339like_dt_of_unit_precision(date_sequence_specifier) .. 
+        transf.date_sequence_specifier.rfc3339like_dt_by_start_of_unit_precision(date_sequence_specifier) .. 
         "_to_" ..
-        transf.date_sequence_specifier.end_rfc3339like_dt_of_unit_precision(date_sequence_specifier)
+        transf.date_sequence_specifier.rfc3339like_dt_by_end_of_unit_precision(date_sequence_specifier)
     end,
   },
   date_interval_specifier = {
@@ -3372,8 +3376,8 @@ transf = {
           local synonym_term = get.str.str_by_sub_eutf8(synonym_part_lines[1], 2) -- syntax: ❯<term>
           local synonyms_raw = get.str.str_by_sub_eutf8(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
           local antonyms_raw = get.str.str_by_sub_eutf8(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
-          local synonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(synonyms_raw, ", "), transf.str.not_starting_or_ending_with_whitespace_str)
-          local antonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(antonyms_raw, ", "), transf.str.not_starting_or_ending_with_whitespace_str)
+          local synonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(synonyms_raw, ", "), transf.str.not_starting_o_ending_with_whitespace_str)
+          local antonyms = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(antonyms_raw, ", "), transf.str.not_starting_o_ending_with_whitespace_str)
           return synonym_term, {
             synonyms = synonyms,
             antonyms = antonyms,
@@ -3405,7 +3409,7 @@ transf = {
         if itm == nil then
           return false
         end
-        itm = transf.str.not_starting_or_ending_with_whitespace_str(itm)
+        itm = transf.str.not_starting_o_ending_with_whitespace_str(itm)
         return #itm > 0
       end)
       return items
@@ -3435,7 +3439,7 @@ transf = {
     end,
     str_or_str_and_8_bit_pos_int_by_evaled_raw_bash_stripped = function(str)
       local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_raw_bash(str)
-      res = transf.str.not_starting_or_ending_with_whitespace_str(res)
+      res = transf.str.not_starting_o_ending_with_whitespace_str(res)
       return res, code
     end,
     str_or_nil_by_evaled_raw_bash_stripped = function(str)
@@ -3469,7 +3473,7 @@ transf = {
     end,
     str_or_str_and_8_bit_pos_int_by_evaled_env_bash_stripped = function(str)
       local res, code = transf.str.str_or_str_and_8_bit_pos_int_by_evaled_env_bash(str)
-      res = transf.str.not_starting_or_ending_with_whitespace_str(res)
+      res = transf.str.not_starting_o_ending_with_whitespace_str(res)
       return res, code
     end,
     str_or_nil_by_evaled_env_bash_stripped = function(str)
@@ -3785,7 +3789,7 @@ transf = {
     --- @return str[]
     line_arr = function(str)
       return get.str.str_arr_by_split_w_ascii_char(
-        transf.str.not_starting_or_ending_with_whitespace_str(str),
+        transf.str.not_starting_o_ending_with_whitespace_str(str),
         "\n"
       )
     end,
@@ -3904,7 +3908,7 @@ transf = {
       return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
           get.str.str_arr_splitlines(
-            transf.str.not_starting_or_ending_with_whitespace_str(str)
+            transf.str.not_starting_o_ending_with_whitespace_str(str)
           ),
           function(v)
             if get.str.bool_by_startswith(v, ">") then
@@ -3930,7 +3934,7 @@ transf = {
     end,
     prompted_once_two_strs_arr_for = function(str)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         transformer = transf.str.two_strs_arr_split_by_minus_or_nil,
         prompt_args = {
           message = "Please enter a str two_anys_arr for " .. str .. " (e.g. 'foo-bar')",
@@ -3939,7 +3943,7 @@ transf = {
     end,
     prompted_multiple_two_strs_arr_arr_for = function(str)
       return transf.prompt_spec.any_arr({
-        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         transformer = transf.str.two_strs_arr_split_by_minus_or_nil,
         prompt_args = {
           message = "Please enter a str two_anys_arr for " .. str .. " (e.g. 'foo-bar')",
@@ -4241,7 +4245,7 @@ transf = {
   multiline_str = {
     trimmed_lines_multiline_str = function(str)
       local lines = get.str.str_arr_by_split_w_string(str, "\n")
-      local trimmed_lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(lines, transf.str.not_starting_or_ending_with_whitespace_str)
+      local trimmed_lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(lines, transf.str.not_starting_o_ending_with_whitespace_str)
       return get.str_or_number_arr.str_by_joined(trimmed_lines, "\n")
     end,
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_str_arr_value_assoc_value_assoc = function(raw)
@@ -4536,7 +4540,7 @@ transf = {
       )
     end,
     stripped_str_arr = function(arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.not_starting_or_ending_with_whitespace_str)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.not_starting_o_ending_with_whitespace_str)
     end,
     multiline_str = function(arr)
       return get.str_or_number_arr.str_by_joined(arr, "\n")
@@ -4563,7 +4567,7 @@ transf = {
   },
   slice_notation = {
     three_pos_int_or_nils = function(notation)
-      local stripped_str = transf.str.not_starting_or_ending_with_whitespace_str(notation)
+      local stripped_str = transf.str.not_starting_o_ending_with_whitespace_str(notation)
       local start_str, stop_str, step_str = get.str.n_strs_by_extracted_onig(
         stripped_str, 
         "^\\[?(-?\\d*):(-?\\d*)(?::(-?\\d+))?\\]?$"
@@ -6785,7 +6789,7 @@ transf = {
     response_text = function(result)
       local first_choice = result.choices[1]
       local response = first_choice.text or first_choice.message.content
-      return transf.str.not_starting_or_ending_with_whitespace_str(response)
+      return transf.str.not_starting_o_ending_with_whitespace_str(response)
     end
   },
   not_userdata_or_function = {
@@ -6970,7 +6974,7 @@ transf = {
   str_and_n_anys = {
     str_and_n_anys_by_stripped = function(...)
       local arg1 = select(1, ...)
-      return transf.str.not_starting_or_ending_with_whitespace_str(arg1), select(2, ...)
+      return transf.str.not_starting_o_ending_with_whitespace_str(arg1), select(2, ...)
     end
   },
   n_bool_functions = {
@@ -7003,7 +7007,7 @@ transf = {
       local no_scheme = transf.url.no_scheme(mailto_url)
       local emails_part = get.str.str_arr_by_split_w_ascii_char(no_scheme, "?")[1]
       local emails = get.str.str_arr_by_split_w_ascii_char(emails_part, ",")
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(emails, transf.str.not_starting_or_ending_with_whitespace_str)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(emails, transf.str.not_starting_o_ending_with_whitespace_str)
     end,
     first_email = function(mailto_url)
       return transf.mailto_url.emails(mailto_url)[1]
@@ -8015,7 +8019,7 @@ transf = {
       next_position_change_state_spec.num_steps = position_change_state_spec.num_steps - 1
       next_position_change_state_spec.delta_hs_geometry_point = position_change_state_spec.delta_hs_geometry_point * position_change_state_spec.factor_of_deceleration
       next_position_change_state_spec.past_ideal_hs_geometry_point = position_change_state_spec.past_ideal_hs_geometry_point + position_change_state_spec.delta_hs_geometry_point
-      local jittered_delta_hs_geometry_point = next_position_change_state_spec.delta_hs_geometry_point * transf.float_interval_specifier.random({
+      local jittered_delta_hs_geometry_point = next_position_change_state_spec.delta_hs_geometry_point * transf.number_interval_specifer.number_by_random({
         start = -position_change_state_spec.jitter_factor,
         stop = position_change_state_spec.jitter_factor
       })
@@ -8043,7 +8047,7 @@ transf = {
       return declared_position_change_input_spec.jitter_factor or 0.1
     end,
     duration = function(declared_position_change_input_spec)
-      return declared_position_change_input_spec.duration or transf.float_interval_specifier.random({start=0.1, stop=0.3})
+      return declared_position_change_input_spec.duration or transf.number_interval_specifer.number_by_random({start=0.1, stop=0.3})
     end,
     factor_of_deceleration = function(declared_position_change_input_spec)
       return declared_position_change_input_spec.factor_of_deceleration or 0.95
@@ -8162,17 +8166,17 @@ transf = {
       )
     end,
   },
-  prompt_args_str = {
+  str_prompt_args_spec = {
     --- @class prompt_args
     --- @field message? any Message to display in the prompt.
     --- @field default? any Default value for the prompt.
 
-    --- @class prompt_args_str : prompt_args
+    --- @class str_prompt_args_spec : prompt_args
     --- @field informative_text? any Additional text to display in the prompt.
     --- @field buttonA? any Label for the first button.
     --- @field buttonB? any Label for the second button.
 
-    --- @param prompt_args? prompt_args_str
+    --- @param prompt_args? str_prompt_args_spec
     --- @return (str|nil), boolean
     str_or_nil_and_bool = function(prompt_args)
 
@@ -8209,16 +8213,16 @@ transf = {
     end
 
   },
-  prompt_args_path = {
+  path_prompt_args_spec = {
 
-    --- @class prompt_args_path
+    --- @class path_prompt_args_spec : prompt_args
     --- @field can_choose_files? boolean 
     --- @field can_choose_directories? boolean
     --- @field multiple? boolean
     --- @field allowed_file_types? str[]
     --- @field resolves_aliases? boolean
 
-    --- @param prompt_args prompt_args_path
+    --- @param prompt_args path_prompt_args_spec
     --- @return (str|str[]|nil), boolean
     local_absolute_path_or_local_absolute_path_arr_and_bool = function(prompt_args)
 
@@ -8259,11 +8263,11 @@ transf = {
     end,
     local_absolute_path_and_bool = function(prompt_args)
       prompt_args.multiple = false
-      return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_arr_and_bool(prompt_args)
+      return transf.path_prompt_args_spec.local_absolute_path_or_local_absolute_path_arr_and_bool(prompt_args)
     end,
     local_absolute_path_arr_and_bool = function(prompt_args)
       prompt_args.multiple = true
-      return transf.prompt_args_path.local_absolute_path_or_local_absolute_path_arr_and_bool(prompt_args)
+      return transf.path_prompt_args_spec.local_absolute_path_or_local_absolute_path_arr_and_bool(prompt_args)
     end,
   
   },
@@ -8289,7 +8293,7 @@ transf = {
 
       -- set defaults for all prompt_spec fields
       prompt_spec = get.table.table_by_copy(prompt_spec)
-      prompt_spec.prompter = prompt_spec.prompter or transf.prompt_args_str.str_or_nil_and_bool
+      prompt_spec.prompter = prompt_spec.prompter or transf.str_prompt_args_spec.str_or_nil_and_bool
       prompt_spec.transformer = prompt_spec.transformer or function(x) return x end
       prompt_spec.raw_validator = prompt_spec.raw_validator or function(x) return x ~= nil end
       prompt_spec.transformed_validator = prompt_spec.transformed_validator or function(x) return x ~= nil end

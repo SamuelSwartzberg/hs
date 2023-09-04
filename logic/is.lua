@@ -35,6 +35,12 @@ is = {
     starting_with_dot_str = function(str)
       return get.str.bool_by_startswith(str, ".")
     end,
+    input_spec_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.rough_input_spec_str) -- we're calling onig on a str which we are not sure is ascii. I'm not sure how problematic this is, since I've forgotten whether onig just doesn't implement any specific behavior for non-ascii chars, or if actually sees them as the ascii chars the utf8 corresponds to. Either way, worst comes the worst it'd result in a few false positives, which is fine.
+    end,
+    input_spec_series_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, " *(?:" .. r.g.rough_input_spec_str .. ")(?: *\\n *(?:" .. r.g.rough_input_spec_str .. "))* *")
+    end
     
     
   },
@@ -45,10 +51,10 @@ is = {
     ending_with_whitespace_str = function(str)
       return get.str.bool_by_matches_part_eutf8(str, "%s$")
     end,
-    starting_or_ending_with_whitespace_str = function(str)
+    starting_o_ending_with_whitespace_str = function(str)
       return is.whitespace_str.starting_with_whitespace_str(str) or is.whitespace_str.ending_with_whitespace_str(str)
     end,
-    starting_and_ending_with_whitespace_str = function(str)
+    starting_a_ending_with_whitespace_str = function(str)
       return is.whitespace_str.starting_with_whitespace_str(str) and is.whitespace_str.ending_with_whitespace_str(str)
     end,
   },
@@ -167,7 +173,10 @@ is = {
       return is.printable_ascii_not_whitespace_str.nonindicated_number_str(
         transf.str.not_whitespace_str(str)
       )
-    end
+    end,
+    url_or_local_path = function(str)
+      return is.printable_ascii_no_nonspace_whitespace_str.url(str) or is.printable_ascii_no_nonspace_whitespace_str.local_path(str)
+    end,
   },
   separated_nonindicated_number_str = {
     separated_nonindicated_bin_number_str = function(str)
@@ -304,16 +313,21 @@ is = {
     indicated_utf8_hex_str = function(str)
       return get.str.bool_by_startswith(str, "utf8:") -- we're gonna trust that everything after is a valid hex str
     end,
-    rfc3339like_dt_or_interval = function(str)
+    rfc3339like_dt_o_interval = function(str)
       return get.str.bool_by_matches_part_onig(str, "^" .. r.g.rfc3339like_dt)
     end,
   },
-  rfc3339like_dt_or_interval = {
+  rfc3339like_dt_o_interval = {
     rfc3339like_interval = function(str)
       return get.string.bool_by_contains(str, "_to_")
     end,
     rfc3339like_dt = function(str)
-      return not is.rfc3339like_dt_or_interval.rfc3339like_interval(str)
+      return not is.rfc3339like_dt_o_interval.rfc3339like_interval(str)
+    end,
+  },
+  rfc3339like_dt = {
+    full_rfc3339like_dt = function(str)
+      return #str >= 19 -- full for me is at least date and time, but not necessarily timezone or fractional seconds
     end,
   },
   period_alphanum_minus_underscore = {
@@ -381,6 +395,9 @@ is = {
         str
       )
     end,
+    twod_locator = function(str)
+      return get.str.bool_by_matches_whole_onig(str, ":\\d+(:?:\\d+)?")
+    end
   },
   calendar_name = {
     writeable_calendar_name = function(name)
@@ -455,7 +472,7 @@ is = {
         is.path.local_path(path) and is.local_path.local_absolute_path()
       )
     end,
-    path_with_intra_file_locator = function(path)
+    path_with_twod_locator = function(path)
       return get.str.bool_by_matches_part_eutf8(transf.path.leaflike_by_leaf(path), ":%d+$")
     end,
     useless_file_leaf_path = function(path)
@@ -958,7 +975,7 @@ is = {
     fs_attr_name = function(str)
       return get.arr.bool_by_contains(ls.fs_attr_name, str)
     end,
-    local_or_remote_str = function(str)
+    local_o_remote_str = function(str)
       return str == "local" or str == "remote"
     end,
   },
@@ -1003,6 +1020,9 @@ is = {
     end,
     http_protocol_url = function(url)
       return get.str.bool_by_startswith(url, "http://") or get.str.bool_by_startswith(url, "https://")
+    end,
+    file_url = function(url)
+      return get.str.bool_by_startswith(url, "file://")
     end,
   },
   http_protocol_url = {
@@ -1319,18 +1339,54 @@ is = {
     end,
     input_spec = function(t)
       return
-        
+        t.mode and
+        (t.mouse_button_str or t.key or t.target_point)
     end,
     unicode_prop_table = function(t)
       return
         t.cpoint
     end,
     path_leaf_specifier = function(t)
-      return t.extension or t.path or t.rfc3339like_dt_or_interval or t.general_name or t.fs_tag_assoc
+      return t.extension or t.path or t.rfc3339like_dt_o_interval or t.general_name or t.fs_tag_assoc
     end,
     intra_file_location_spec = function(t)
       return t.path and t.line
     end,
+    prompt_args_spec = function(t)
+      return t.message or t.default
+    end,
+    interval_specifier = function(t)
+      return t.start and t.stop
+    end,
+  },
+  interval_specifier = {
+    number_interval_specifier = function(t)
+      return is.any.number(t.start) and is.any.number(t.stop)
+    end,
+    date_interval_specifier = function(t)
+      return is.any.date(t.start) and is.any.date(t.stop)
+    end,
+    sequence_specifier = function(t)
+      return t.step ~= nil
+    end
+  },
+  number_interval_specifier = {
+    int_interval_specifier = function(t)
+      return is.number.int(t.start) and is.number.int(t.stop)
+    end,
+  },
+  date_interval_specifier = {
+    date_sequence_specifier = function(t)
+      return is.interval_specifier.sequence_specifier(t)
+    end,
+  },
+  prompt_args_spec = {
+    str_prompt_args_spec = function(t)
+      return t.informative_text or t.buttonA or t.buttonB
+    end,
+    path_prompt_args_spec = function(t)
+      return t.can_choose_files ~= nil or t.can_choose_directories ~= nil or t.multiple ~= nil or t.resolves_aliases ~= nil or t.allowed_file_types
+    end
   },
   audiodevice_specifier = {
     active_audiodevice_specifier = function(audiodevice_specifier)
@@ -1407,13 +1463,18 @@ is = {
 -- to allow for is.<type1>.<type2> where type2 is a descendant but not childtype of type1, we will use a metatable to search for the path from type1 to type2 by using thing_name_hierarchy, and then create a dynamic function that tests is.<type1>.<subtype> and is.<subtype>.<subtype2> and so on until we reach type2
 -- to avoid code duplication we will resolve any call is.<type_a>_arr.<type_b>_arr to a dynamically generated function that calls get.arr.bool_by_all_pass_w_fn(arr, is.<type_a>.<type_b>)
 
+local experimental_cache = {}
+
 for type1, v in pairs(is) do
+  experimental_cache[type1] = {}
+  for type2, fn in pairs(v) do
+    experimental_cache[type1][type2] = {}
+  end
   local type1_ends_arr = get.str.bool_by_endswith(type1, "_arr")
   local mt = {
     __index = function(t, type2)
 
       local fn = rawget(t, type2)
-      -- here might be a good point to add a 1 second or so default memoization if performance is an issue
       if fn then 
         return fn
       end
@@ -1426,13 +1487,21 @@ for type1, v in pairs(is) do
         end
       end
       
-      local path = get.table.arr_or_nil_by_find_path_between_two_keys(
-        thing_name_hierarchy,
-        type1,
-        type2
-      )
       return function(arg)
-        return get.thing_name_arr.bool_by_chained_and(path, arg)
+        local cache = experimental_cache[type1][type2]
+        local now = os.time()
+        if cache[now] and cache[now][arg] then
+          return cache[now][arg]
+        else
+          local path = get.table.arr_or_nil_by_find_path_between_two_keys(
+            thing_name_hierarchy,
+            type1,
+            type2
+          )
+          local res = get.thing_name_arr.bool_by_chained_and(path, arg)
+          experimental_cache[type1][type2][now] = {[arg] = res}
+          return res
+        end
       end
     end
   }

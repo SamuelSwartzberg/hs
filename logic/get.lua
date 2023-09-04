@@ -23,7 +23,7 @@ get = {
   int_or_nil = {
     prompted_once_int_from_default = function(int, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         transformer = get.str.int_by_rounded_or_nil,
         prompt_args = {
           message = message or "Enter an int...",
@@ -35,7 +35,7 @@ get = {
   number_or_nil = {
     prompted_once_number_from_default = function(no, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         transformer = get.str.number_or_nil,
         prompt_args = {
           message = message or "Enter a number...",
@@ -1366,7 +1366,7 @@ get = {
     end,
     str_by_prompted_once_from_default = function(str, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         prompt_args = {
           message = message,
           default = str,
@@ -1375,7 +1375,7 @@ get = {
     end,
     alphanum_minus_underscore_str_by_prompted_once_from_default = function(str, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_str.str_or_nil_and_bool,
+        prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         transformed_validator = is.str.alphanum_minus_underscore,
         prompt_args = {
           message = message,
@@ -1497,7 +1497,7 @@ get = {
       if not str then return transf.table.yaml_metadata(tbl) end
       if not tbl then return str end
       if transf.table.pos_int_by_num_keys(tbl) == 0 then return str end
-      local stripped_str = transf.str.not_starting_or_ending_with_whitespace_str(str)
+      local stripped_str = transf.str.not_starting_o_ending_with_whitespace_str(str)
       local final_metadata, final_contents
       if get.str.bool_by_startswith(stripped_str, "---") then
         -- splice in the metadata
@@ -1536,7 +1536,7 @@ get = {
       )(str, key)
     end,
     str_or_err_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
-      return transf.str.not_starting_or_ending_with_whitespace_str(get.str.str_or_err_by_evaled_env_bash_parsed_json_in_key(str, key))
+      return transf.str.not_starting_o_ending_with_whitespace_str(get.str.str_or_err_by_evaled_env_bash_parsed_json_in_key(str, key))
     end,
     str_or_nil_by_evaled_env_bash_parsed_json_in_key_stripped = function(str, key)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
@@ -1547,7 +1547,7 @@ get = {
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
       else return transf.str.encoded_query_param_value_by_folded(str) end
     end,
-    not_starting_or_ending_with_whitespace_str = stringy.strip
+    not_starting_o_ending_with_whitespace_str = stringy.strip
   },
   nonindicated_number_str_arr = {
     number_arr = function(arr, base)
@@ -1987,17 +1987,17 @@ get = {
     end,
     local_absolute_path_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_path.local_absolute_path_and_bool,
+        prompter = transf.path_prompt_args_spec.local_absolute_path_and_bool,
         prompt_args = {default = path, message = message or "Choose an absolute path..."}
       })
     end,
     local_absolute_path_by_default_prompted_multiple = function(path, message)
       local intermediate_path = get.local_extant_path.local_absolute_path_by_default_prompted_once(path, message)
-      return transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(intermediate_path)
+      return transf.local_absolute_path.local_absolute_path_by_prompted_multiple_from_default(intermediate_path)
     end,
     dir_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_path.local_absolute_path_and_bool,
+        prompter = transf.path_prompt_args_spec.local_absolute_path_and_bool,
         prompt_args = {
           default = path,
           can_choose_files = false,
@@ -2007,7 +2007,7 @@ get = {
     end,
     local_absolute_path_arr_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
-        prompter = transf.prompt_args_path.local_absolute_path_arr_and_bool,
+        prompter = transf.path_prompt_args_spec.local_absolute_path_arr_and_bool,
         prompt_args = {default = path, message = message or "Choose absolute paths..."}
       })
     end,
@@ -2283,7 +2283,7 @@ get = {
       return get.str_arr.str_or_nil_by_first_match_ending_w_str(path_arr, ending)
     end,
     bool_by_contains_leaf = function(path_arr, leaf)
-      return get.arr.bool_by_contains(transf.path_arr.leaves_arr(path_arr), leaf)
+      return get.arr.bool_by_contains(transf.path_arr.leaflike_arr_by_leaves(path_arr), leaf)
     end,
     bool_by_contains_extension = function(path_arr, extension)
       return get.arr.bool_by_contains(transf.path_arr.extensions_arr(path_arr), extension)

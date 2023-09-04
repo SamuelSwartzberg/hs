@@ -156,7 +156,7 @@ act = {
       dothis.url_arr.open_all(url_arr, "Firefox")
     end,
     create_as_url_files_in_murls = function(url_arr)
-      local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(env.MURLS)
+      local path = transf.local_absolute_path.local_absolute_path_by_prompted_multiple_from_default(env.MURLS)
       dothis.url_arr.create_as_url_files(url_arr, path)
     end,
     create_as_session_in_msessions = function(url_arr)

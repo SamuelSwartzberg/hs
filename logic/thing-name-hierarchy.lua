@@ -8,12 +8,13 @@ thing_name_hierarchy = {
       not_starting_with_whitespace_str = "leaf",
       not_ending_with_whitespace_str = "leaf",
       not_empty_str = {
-        
+        input_spec_str = "leaf",
+        input_spec_series_str = "leaf",
         whitespace_str = {
           starting_with_whitespace_str = "leaf",
           ending_with_whitespace_str = "leaf",
-          starting_or_ending_with_whitespace_str = "leaf",
-          starting_and_ending_with_whitespace_str = "leaf",
+          starting_o_ending_with_whitespace_str = "leaf",
+          starting_a_ending_with_whitespace_str = "leaf",
         },
         starting_with_dot_str = "leaf",
         multiline_str = "leaf"
@@ -130,7 +131,7 @@ thing_name_hierarchy = {
                 },
                 nonextant_path = "leaf"
               },
-              path_with_intra_file_locator = "leaf",
+              path_with_twod_locator = "leaf",
             },
             local_path = {
               local_nonabsolute_path = {
@@ -239,7 +240,7 @@ thing_name_hierarchy = {
               percent_encoded_octet = "leaf",
               colon_period_alphanum_minus_underscore = {
                 indicated_utf8_hex_str = "leaf",
-                rfc3339like_dt_or_interval = {
+                rfc3339like_dt_o_interval = {
                   rfc3339_dt = "leaf",
                   rfc3339_interval = "leaf",
                 },
@@ -283,7 +284,7 @@ thing_name_hierarchy = {
                         upper_alpha_str = "leaf",
                         lower_alpha_str = {
                           fs_attr_name = "leaf",
-                          local_or_remote_str ="leaf"
+                          local_o_remote_str ="leaf"
                         },
                       },
                       hex_str = "leaf",
@@ -326,6 +327,7 @@ thing_name_hierarchy = {
                   http_url = "leaf",
                   https_url = "leaf",
                 },
+                file_url = "leaf"
               },
               path_url = {
                 owner_item_url  = "leaf",
@@ -358,6 +360,7 @@ thing_name_hierarchy = {
               booru_post_url = "leaf",
               github_url = "leaf"
             },
+            url_or_local_path = "leaf"
           },
           iban = {},
         },
@@ -398,6 +401,18 @@ thing_name_hierarchy = {
             declared_position_change_input_spec = "leaf",
           },
           unicode_prop_table = "leaf",
+          prompt_args_spec = {
+            str_prompt_args_spec = "leaf",
+          },
+          interval_specifier = {
+            number_interval_specifer = {
+              int_interval_specifier = "leaf",
+            },
+            sequence_specifier = "leaf",
+            date_interval_specifier = {
+              date_sequence_specifier = "leaf",
+            }
+          }
         }
       }
     },

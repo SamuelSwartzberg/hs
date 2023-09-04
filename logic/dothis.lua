@@ -35,7 +35,7 @@ dothis = {
   event_table = {
     add_event_from = function(specifier, do_after)
       specifier = specifier or {}
-      specifier = get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier, transf.str.not_starting_or_ending_with_whitespace_str, is.any.str)
+      specifier = get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier, transf.str.not_starting_o_ending_with_whitespace_str, is.any.str)
       local command = {"khal", "new" }
       if specifier.calendar then
         command = transf.two_arrs.arr_by_appended(
@@ -55,7 +55,7 @@ dothis = {
 
       if specifier.alarms then
         local alarms_str = get.str_or_number_arr.str_by_joined(
-          get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier.alarms, transf.str.not_starting_or_ending_with_whitespace_str, is.any.str),
+          get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier.alarms, transf.str.not_starting_o_ending_with_whitespace_str, is.any.str),
           ","
         )
         command = transf.two_arrs.arr_by_appended(
@@ -1054,12 +1054,12 @@ dothis = {
     end,
     write_file = function(path, contents)
       dothis[
-        transf.path.local_or_remote_str(path) .. "_extant_path"
+        transf.path.local_o_remote_str(path) .. "_extant_path"
       ].write_file(path, contents)
     end,
     append_or_write_file = function(path, contents)
       dothis[
-        transf.path.local_or_remote_str(path) .. "_extant_path"
+        transf.path.local_o_remote_str(path) .. "_extant_path"
       ].append_or_write_file(path, contents)
     end,
     write_file_if_file = function(path, contents)
@@ -1070,7 +1070,7 @@ dothis = {
     end,
     delete_file = function(path)
       dothis[
-        transf.path.local_or_remote_str(path) .. "_extant_path"
+        transf.path.local_o_remote_str(path) .. "_extant_path"
       ].delete_file(path)
     end,
     delete_file_if_empty_file = function(path)
@@ -1301,12 +1301,12 @@ dothis = {
     end,
     empty_dir = function(path)
       dothis[
-        transf.path.local_or_remote_str(path) .. "_extant_path"
+        transf.path.local_o_remote_str(path) .. "_extant_path"
       ].empty_dir(path)
     end,
     delete_dir = function(path)
       dothis[
-        transf.path.local_or_remote_str(path) .. "_extant_path"
+        transf.path.local_o_remote_str(path) .. "_extant_path"
       ].delete_dir(path)
     end,
     delete_dir_if_empty_dir = function(path)
@@ -1648,7 +1648,7 @@ dothis = {
       dothis.absolute_path_str_value_assoc.write(abs_path_assoc)
     end,
     create_as_session = function(url_arr, root)
-      local path = transf.local_absolute_path.prompted_multiple_local_absolute_path_from_default(root)
+      local path = transf.local_absolute_path.local_absolute_path_by_prompted_multiple_from_default(root)
       path = get.str.str_by_with_suffix(path, ".session")
       dothis.absolute_path.write_file(
         path,
@@ -1777,7 +1777,7 @@ dothis = {
   intra_file_location_spec = {
     go_to = function(specifier)
       dothis.input_spec_arr.exec(
-        transf.intra_file_location_spec.input_spec_series_str(specifier)
+        transf.intra_file_location_spec.input_spec_arr(specifier)
       )
     end,
     open_go_to = function(specifier)
@@ -1788,10 +1788,10 @@ dothis = {
       )
     end
   },
-  path_with_intra_file_locator = {
-    open_go_to = function(path_with_intra_file_locator)
+  path_with_twod_locator = {
+    open_go_to = function(path_with_twod_locator)
       dothis.intra_file_location_spec.open_go_to(
-        transf.path_with_intra_file_locator.intra_file_location_spec(path_with_intra_file_locator)
+        transf.path_with_twod_locator.intra_file_location_spec(path_with_twod_locator)
       )
     end
   },
@@ -2671,7 +2671,7 @@ dothis = {
   },
   input_spec_arr = {
     exec = function(specarr, wait_time, do_after)
-      wait_time = wait_time or transf.float_interval_specifier.random({start=0.10, stop=0.12})
+      wait_time = wait_time or transf.number_interval_specifer.number_by_random({start=0.10, stop=0.12})
       if #specarr == 0 then
         if do_after then
           do_after()

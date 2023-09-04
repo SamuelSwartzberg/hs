@@ -52,7 +52,7 @@ r = {
       ipc_socket_id = "\\d+-\\d+",
     },
     html_entity = "&(?:[a-zA-Z\\d]+|#\\d+|#x[a-fA-F\\d]+);",
-    rough_input_spec_str = "(?:\\.[lrm])|(?::.*)|(?:[ms]-?\\d+..*?-?\\d+ %[a-zA-Z]+)",
+    input_spec_str = "(?:\\.[lrm])|(?::.*)|(?:[ms]-?\\d+..*?-?\\d+ %[a-zA-Z]+)",
     whitespace = {
       large = "[\t\r\n]"
     },
