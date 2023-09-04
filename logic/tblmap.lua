@@ -134,14 +134,14 @@ tblmap = {
       min = "%Y-%m-%dT%H:%M",
       sec = "%Y-%m-%dT%H:%M:%SZ",
     },
-    max_date_component_value = {
+    pos_int_by_max_date_component_value = {
       sec = 60,
       min = 60,
       hour = 24,
       day = 30,
       month = 12,
     },
-    min_date_component_value = {
+    int_by_min_date_component_value = {
       sec = 0,
       min = 0,
       hour = 0,

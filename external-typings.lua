@@ -14,6 +14,7 @@
 --- @field shorten fun(s: string, n: integer, tail?: boolean): string
 --- @field startswith fun(s: string, prefix: string | string[]): boolean
 --- @field endswith fun(s: string, suffix: string | string[]): boolean 
+--- @field count fun(s: string, substr: string, allow_overlap?: boolean): integer
 
 --- @class pl.file 
 --- @field copy fun(src: string, dest: string, flag?: boolean): boolean flag is for overwrite

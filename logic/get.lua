@@ -959,6 +959,10 @@ get = {
     end
   },
   str = {
+    int_by_amount_contained_nooverlap = plstringx.count,
+    int_by_amount_contained_overlap = function(str, substr)
+      return plstringx.count(str, substr, true)
+    end,
     str_by_sub_lua = string.sub,
     str_by_sub_eutf8 = get.str.str_by_sub_eutf8,
     str_by_formatted_w_n_anys = string.format,
@@ -1866,7 +1870,7 @@ get = {
         end
       end
     
-      for file_name in transf.dir.children_absolute_path_vt_stateful_iter(path) do
+      for file_name in transf.dir.absolute_path_stateful_iter_by_children(path) do
         if file_name ~= "." and file_name ~= ".." and file_name ~= ".DS_Store" then
           local file_path = path .. get.str.str_by_no_suffix(file_name, "/")
           if is.extant_path.dir(file_name) then 
@@ -2359,8 +2363,8 @@ get = {
       }
     end,
     date_sequence_specifier_of_lower_component = function(date, step, date_component_name)
-      return get.full_date_component_name_value_assoc.date_sequence_specifier_of_lower_component(
-        transf.date.full_date_component_name_value_assoc(date),
+      return get.full_dcmp_assoc.date_sequence_specifier_of_lower_component(
+        transf.date.full_dcmp_assoc(date),
         step,
         date_component_name
       )
@@ -2369,8 +2373,8 @@ get = {
       return get.date.date_sequence_specifier_of_lower_component(date, date_component_value, "day")
     end,
     precision_date = function(date, date_component_name)
-      return get.full_date_component_name_value_assoc.precision_date(
-        transf.date.full_date_component_name_value_assoc(date),
+      return get.full_dcmp_assoc.precision_date(
+        transf.date.full_dcmp_assoc(date),
         date_component_name
       )
     end,
@@ -2417,8 +2421,8 @@ get = {
   date_component_name_value_assoc = {
     date_sequence_specifier = function(date_component_name_value_assoc, step, unit)
       return {
-        start = date(transf.date_component_name_value_assoc.min_full_date_component_name_value_assoc(date_component_name_value_assoc)),
-        stop = date(transf.date_component_name_value_assoc.max_full_date_component_name_value_assoc(date_component_name_value_assoc)),
+        start = date(transf.date_component_name_value_assoc.min_full_dcmp_assoc(date_component_name_value_assoc)),
+        stop = date(transf.date_component_name_value_assoc.max_full_dcmp_assoc(date_component_name_value_assoc)),
         step = step or 1,
         unit = unit or "sec"
       }
@@ -2459,27 +2463,27 @@ get = {
       )
     end,
   },
-  full_date_component_name_value_assoc = {
-    prefix_partial_date_component_name_value_assoc = function(full_date_component_name_value_assoc, date_component_name)
+  full_dcmp_assoc = {
+    prefix_partial_date_component_name_value_assoc = function(full_dcmp_assoc, date_component_name)
       return get.arr.arr_by_mapped_w_t_key_assoc(
         transf.date_component_name.date_component_name_value_assoc_larger_or_same(date_component_name),
-        full_date_component_name_value_assoc
+        full_dcmp_assoc
       )
     end,
-    date_sequence_specifier_of_lower_component = function (full_date_component_name_value_assoc, step, date_component_name, additional_steps_down)
+    date_sequence_specifier_of_lower_component = function (full_dcmp_assoc, step, date_component_name, additional_steps_down)
       return get.date_component_name_value_assoc.date_sequence_specifier(
-        get.full_date_component_name_value_assoc.prefix_partial_date_component_name_value_assoc(full_date_component_name_value_assoc, date_component_name),
+        get.full_dcmp_assoc.prefix_partial_date_component_name_value_assoc(full_dcmp_assoc, date_component_name),
         step,
         get.date_component_name.next(date_component_name, additional_steps_down)
       )      
     end,
-    precision_full_date_component_name_value_assoc = function(full_date_component_name_value_assoc, date_component_name)
-      return transf.full_date_component_name_value_assoc.min_full_date_component_name_value_assoc(
-        get.full_date_component_name_value_assoc.prefix_partial_date_component_name_value_assoc(full_date_component_name_value_assoc, date_component_name)
+    precision_full_dcmp_assoc = function(full_dcmp_assoc, date_component_name)
+      return transf.full_dcmp_assoc.min_full_dcmp_assoc(
+        get.full_dcmp_assoc.prefix_partial_date_component_name_value_assoc(full_dcmp_assoc, date_component_name)
       )
     end,
-    precision_date = function(full_date_component_name_value_assoc, date_component_name)
-      return date(get.full_date_component_name_value_assoc.precision_full_date_component_name_value_assoc(full_date_component_name_value_assoc, date_component_name))
+    precision_date = function(full_dcmp_assoc, date_component_name)
+      return date(get.full_dcmp_assoc.precision_full_dcmp_assoc(full_dcmp_assoc, date_component_name))
     end,
   },
   rfc3339like_dt = {

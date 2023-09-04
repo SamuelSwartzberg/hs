@@ -2832,7 +2832,7 @@ dothis = {
     end,
     git_backup = function()
       local tbl = {}
-      for file in transf.dir.children_absolute_path_vt_stateful_iter(env.TMP_GIT_LOG_PARENT) do
+      for file in transf.dir.absolute_path_stateful_iter_by_children(env.TMP_GIT_LOG_PARENT) do
         local commit = transf.json_file.not_userdata_or_function(file)
         local timestamp_s = commit.epoch
         commit.epoch = nil

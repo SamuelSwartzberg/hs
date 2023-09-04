@@ -226,8 +226,14 @@ thing_name_hierarchy = {
               handle = "leaf",
               email_address = "leaf",
               dice_notation = "leaf",
-              installed_package_name = "leaf",
+              package_name = {
+                installed_package_name = "leaf",
+              },
+              package_name_package_manager_name_compound_str = "leaf",
+              package_name_semver_compound_str = "leaf",
+              package_name_semver_package_manager_name_compound_str = "leaf",
               doi = "leaf",
+              semver_str = "leaf",
               indicated_isbn = "leaf",
               indicated_pmid = "leaf",
               indicated_doi = "leaf",
@@ -284,7 +290,11 @@ thing_name_hierarchy = {
                         upper_alpha_str = "leaf",
                         lower_alpha_str = {
                           fs_attr_name = "leaf",
-                          local_o_remote_str ="leaf"
+                          local_o_remote_str ="leaf",
+                          date_component_name = "leaf",
+                          date_component_name_long = "leaf",
+                          mod_char = "leaf",
+                          mod_name = "leaf",
                         },
                       },
                       hex_str = "leaf",
@@ -431,7 +441,15 @@ thing_name_hierarchy = {
         pos_int = {
           byte_pos_int = {
             halfbyte_pos_int = {
-              nibble_pos_int = "leaf"
+              nibble_pos_int = {
+                sme_10_pos_int = {
+                  sme_8_pos_int = {
+                    sme_7_pos_int = {
+                      sme_6_pos_int = "leaf"
+                    }
+                  }
+                }
+              }
             }
           },
         },

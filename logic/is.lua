@@ -242,14 +242,24 @@ is = {
     dice_notation = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.syntax.dice)
     end,
-    installed_package_name = function(str)
-      return get.arr.bool_by_contains(transf.package_manager_name_or_nil.package_name_arr(nil), str)
+    package_name = transf["nil"]["true"], -- no way to tell if a str is a package name of some package
+    package_name_package_manager_name_compound_str = function(str)
+      return get.str.int_by_amount_contained_nooverlap(str, ":") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, "@")
+    end,
+    package_name_semver_compound_str = function(str)
+      return get.str.int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, ":")
+    end,
+    package_name_semver_package_manager_name_compound_str = function(str)
+      return get.str.int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.int_by_amount_contained_nooverlap(str, ":") == 1
     end,
     doi = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.doi)
     end,
     colon_period_alphanum_minus_underscore = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "[^%w%-_:.]")
+    end,
+    semver_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.version.semver)
     end,
     indicated_isbn = function(str)
       return get.str.bool_by_startswith(str, "isbn:") -- gonna trust that if it's printable_ascii_not_whitespace_str and starts with isbn: it's an isbn, similarly for the following
@@ -286,6 +296,11 @@ is = {
         is.printable_ascii_not_whitespace_str.indicated_issn_full_identifier(str) or
         is.printable_ascii_not_whitespace_str.indicated_urlmd5(str)
     end
+  },
+  package_name = {
+    installed_package_name = function(str)
+      return get.arr.bool_by_contains(transf.package_manager_name_or_nil.package_name_arr(nil), str)
+    end,
   },
   base64_gen_str = {
     unicode_codepoint_str = function(str)
@@ -565,7 +580,7 @@ is = {
   },
   labelled_remote_dir = {
     empty_labelled_remote_dir = function(path)
-      return transf.labelled_remote_dir.children_absolute_path_vt_stateful_iter(path)() == nil
+      return transf.labelled_remote_dir.absolute_path_stateful_iter_by_children(path)() == nil
     end,
     nonempty_labelled_remote_dir = function(path)
       return not is.labelled_remote_dir.empty_labelled_remote_dir(path)
@@ -978,6 +993,18 @@ is = {
     local_o_remote_str = function(str)
       return str == "local" or str == "remote"
     end,
+    date_component_name = function(str)
+      return get.arr.bool_by_contains(ls.date.date_component_names, str)
+    end,
+    date_component_name_long = function(str)
+      return get.arr.bool_by_contains(ls.date.date_component_names_long, str)
+    end,
+    mod_char = function(str)
+      return get.arr.bool_by_contains(ls.mod_char, str)
+    end,
+    mod_name = function(str)
+      return get.arr.bool_by_contains(ls.mod_name, str)
+    end,
   },
   url = {
     scheme_url = function(url)
@@ -1130,7 +1157,7 @@ is = {
   },
   number = {
     pos_number = function(num)
-      return num > 0
+      return num >= 0
     end,
     neg_number = function(num)
       return num < 0
@@ -1150,7 +1177,7 @@ is = {
       return num % 2 == 0
     end,
     pos_int = function(num)
-      return num > 0
+      return num >= 0
     end,
     neg_int = function(num)
       return num < 0
@@ -1160,7 +1187,7 @@ is = {
   },
   float = {
     pos_float = function(num)
-      return num > 0
+      return num >= 0
     end,
     neg_float = function(num)
       return num < 0
@@ -1190,6 +1217,35 @@ is = {
     nibble_pos_int = function(num)
       return num < 16
     end,
+  },
+  nibble_pos_int = {
+    sme_10_pos_int = function(num)
+      return num <= 10
+    end,
+  },
+  sme_10_pos_int = {
+    sme_8_pos_int = function(num)
+      return num <= 8
+    end,
+  },
+  sme_8_pos_int = {
+    sme_7_pos_int = function(num)
+      return num <= 7
+    end,
+  },
+  sme_7_pos_int = {
+    sme_6_pos_int = function(num)
+      return num <= 6
+    end,
+    weekday_int_start_1 = function(num)
+      return num >= 1 
+    end,
+  },
+  sme_6_pos_int = {
+    sme_5_pos_int = function(num)
+      return num <= 5
+    end,
+    weekday_int_start_0 = transf["nil"]["true"]
   },
   n_anys = {
     any = function(...)
@@ -1358,6 +1414,17 @@ is = {
     interval_specifier = function(t)
       return t.start and t.stop
     end,
+    dcmp_assoc = function(t)
+      return t.year or t.month or t.day or t.hour or t.min or t.sec
+    end,
+    semver_component_specifier = function(t)
+      return t.major
+    end
+  },
+  dcmp_assoc = {
+    full_dcmp_assoc = function(t)
+      return t.year and t.month and t.day and t.hour and t.min and t.sec
+    end
   },
   interval_specifier = {
     number_interval_specifier = function(t)

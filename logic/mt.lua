@@ -296,6 +296,8 @@ ls = {
     long_dt_seps = {" at "}
   },
   addr_key = {"Formatted name", "First name", "Last name", "Street", "Code", "City", "Region", "Country", "Box", "Extended"},
+  mod_char = {"c", "a", "s", "ct", "f"},
+  mod_name = {"cmd", "alt", "shift", "ctrl", "fn"},
   email_headers_containin_emails = {"to", "cc", "bcc", "from", "reply-to"},
   vcard = {
     phone_key = {"home", "cell", "work", "pref", "pager", "voice", "fax", "voice"}, -- only those in both vcard 3.0 and 4.0
