@@ -193,6 +193,7 @@ thing_name_hierarchy = {
         printable_ascii_str = {
           printable_ascii_no_nonspace_whitespace_str = {
             fnname = "leaf",
+            single_attachment_str = "leaf",
             application_name = {
               mac_application_name = "leaf",
             },
@@ -295,6 +296,7 @@ thing_name_hierarchy = {
                           date_component_name_long = "leaf",
                           mod_char = "leaf",
                           mod_name = "leaf",
+                          leaf_str = "leaf"
                         },
                       },
                       hex_str = "leaf",
@@ -367,6 +369,10 @@ thing_name_hierarchy = {
               query_url = {
                 gelbooru_style_post_url = "leaf",
               },
+              fragment_url = "leaf",
+              username_url = "leaf",
+              password_url = "leaf",
+              userinfo_url = "leaf",
               booru_post_url = "leaf",
               github_url = "leaf"
             },
@@ -391,6 +397,12 @@ thing_name_hierarchy = {
         has_id_key_assoc = "leaf",
         has_index_key_assoc = "leaf",
         str_key_non_empty_table = {
+          absolute_path_key_assoc = {
+            absolute_path_key_leaf_str_or_nested_value_assoc = "leaf"
+          },
+          leaflike_key_assoc = {
+            leaflike_key_leaf_str_or_nested_value_assoc = "leaf"
+          },
           created_item_specifier = {
             stream_created_item_specifier = {
               alive_stream_created_item_specifier = "leaf"
@@ -439,19 +451,28 @@ thing_name_hierarchy = {
         },
         even_int = "leaf",
         pos_int = {
-          byte_pos_int = {
-            halfbyte_pos_int = {
-              nibble_pos_int = {
-                sme_10_pos_int = {
-                  sme_8_pos_int = {
-                    sme_7_pos_int = {
-                      sme_6_pos_int = "leaf"
+          eightbyte_pos_int = {
+            fourbyte_pos_int = {
+              twobyte_pos_int = {
+                byte_pos_int = {
+                  halfbyte_pos_int = {
+                    nibble_pos_int = {
+                      sme_10_pos_int = {
+                        sme_8_pos_int = {
+                          sme_7_pos_int = {
+                            sme_6_pos_int = {
+                              weekday_int_start_0 = "leaf"
+                            },
+                            weekday_int_start_1 = "leaf",
+                          }
+                        }
+                      }
                     }
                   }
-                }
+                },
               }
             }
-          },
+          }
         },
         neg_int = "leaf",
       },

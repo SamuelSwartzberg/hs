@@ -255,6 +255,12 @@ get = {
         fn
       )
     end,
+    booL_by_all_values_pass_w_fn = function(t, fn)
+      return get.arr.bool_by_all_pass_w_fn(
+        transf.table.vt_arr(t),
+        fn
+      )
+    end,
     bool_by_some_keys_pass_w_fn = function(t, fn)
       return get.arr.bool_by_some_pass_w_fn(
         transf.table.kt_arr(t),
@@ -2054,7 +2060,7 @@ get = {
   in_git_dir = {
     remote_blob_url = function(path, branch)
       local remote_type = transf.in_git_dir.remote_type(path)
-      branch = branch or transf.in_git_dir.current_branch(path)
+      branch = branch or transf.in_git_dir.str_by_current_branch(path)
       local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
       local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(
@@ -2067,7 +2073,7 @@ get = {
     end,
     remote_raw_url = function(path, branch)
       local remote_type = transf.in_git_dir.remote_type(path)
-      branch = branch or transf.in_git_dir.current_branch(path)
+      branch = branch or transf.in_git_dir.str_by_current_branch(path)
       local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
       local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(

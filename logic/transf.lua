@@ -1147,7 +1147,7 @@ transf = {
         error("Couldn't read file at " .. path .. "!")
       end
     end,
-    attachment_str = function(path)
+    single_attachment_str = function(path)
       local mimetype = mimetypes.guess(path) or "text/plain"
       return "#" .. mimetype .. " " .. path
     end,
@@ -1158,10 +1158,10 @@ transf = {
     end,
   },
   local_file_arr = {
-    attachment_arr = function(path_arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.local_file.attachment_str)
+    single_attachment_str_arr = function(path_arr)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.local_file.single_attachment_str)
     end,
-    attachment_str = function(path_arr)
+    str_by_joined_single_attachment_strs = function(path_arr)
       return get.str_or_number_arr.str_by_joined(transf.path_arr.attachment_arr(path_arr), "\n")
     end,
     email_specifier = function(path_arr)
@@ -1230,31 +1230,31 @@ transf = {
         return transf.local_dir.absolute_path_vt_stateful_iter_by_children(dir)
       end
     end,
-    children_leaves_arr = function(dir)
+    leaflike_arr_by_children_leaves = function(dir)
       return transf.path_arr.leaflike_arr_by_leaves(transf.dir.absolute_path_arr_by_children(dir))
     end,
-    children_leaves_arr_or_dot = function(dir)
+    leaflike_arr_by_children_leaves_or_dot = function(dir)
       return transf.arr_and_any.arr(
-        transf.dir.children_leaves_arr(dir),
+        transf.dir.leaflike_arr_by_children_leaves(dir),
         "."
       )
     end,
-    children_leaves_arr_or_dotdot = function(dir)
+    leaflike_arr_by_children_leaves_or_dotdot = function(dir)
       return transf.arr_and_any.arr(
-        transf.dir.children_leaves_arr(dir),
+        transf.dir.leaflike_arr_by_children_leaves(dir),
         ".."
       )
     end,
-    children_filename_arr = function(dir)
+    leaflike_arr_by_children_filenames = function(dir)
       return transf.path_arr.leaflike_arr_by_filenames(transf.dir.absolute_path_arr_by_children(dir))
     end,
-    children_extensions_arr = function(dir)
+    extension_arr_by_children = function(dir)
       return transf.path_arr.extensions_arr(transf.dir.absolute_path_arr_by_children(dir))
     end,
-    newest_child = function(dir)
+    extant_path_by_newest_child = function(dir)
       return transf.extant_path_arr.extant_path_by_newest_creation(transf.dir.absolute_path_arr_by_children(dir))
     end,
-    grandchildren_absolute_path_arr = function(dir)
+    absolute_path_arr_by_grandchildren = function(dir)
       return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_arr_by_children(dir), transf.dir.absolute_path_arr_by_children)
     end,
     absolute_path_key_leaf_str_or_nested_value_assoc = function(path)
@@ -1269,8 +1269,8 @@ transf = {
       end
       return res
     end,
-    plaintext_assoconary_read_assoc = function(path)
-      transf.absolute_path_key_leaf_str_or_nested_value_assoc.plaintext_assoconary_read_assoc(
+    absolute_path_key_leaf_str_table_or_nested_assoc_by_read_plaintext_assoc_file = function(path)
+      transf.absolute_path_key_leaf_str_or_nested_value_assoc.absolute_path_key_leaf_str_table_or_nested_assoc_by_read_plaintext_assoc_file(
         transf.dir.absolute_path_key_leaf_str_or_nested_value_assoc(path)
       )
     end,
@@ -1298,30 +1298,30 @@ transf = {
       end
       return path_leaf_specifier
     end,
-    path_by_using_union_rfc3339like_dt_o_interval = function(path)
+    absolute_path_by_using_union_rfc3339like_dt_o_interval = function(path)
       local path_leaf_specifier = transf.dir.path_leaf_specifier_by_using_union_rf3339like_dt_or_interval(path)
       return transf.path_leaf_specifier.path(path_leaf_specifier)
     end
   },
   absolute_path_key_leaf_str_or_nested_value_assoc = {
-    leaf_key_leaf_str_or_nested_value_assoc = function(assoc)
+    leaflike_key_leaf_str_or_nested_value_assoc_by_extract_leaf = function(assoc)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc) do
         local leaf = transf.path.leaflike_by_leaf(k)
         if is.any.table(v) then
-          res[leaf] = transf.absolute_path_key_leaf_str_or_nested_value_assoc.leaf_key_leaf_str_or_nested_value_assoc(v)
+          res[leaf] = transf.absolute_path_key_leaf_str_or_nested_value_assoc.leaflike_key_leaf_str_or_nested_value_assoc_by_extract_leaf(v)
         else
           res[leaf] = v
         end
       end
       return res
     end,
-    plaintext_assoconary_read_assoc = function(assoc)
+    absolute_path_key_leaf_str_table_or_nested_assoc_by_read_plaintext_assoc_file = function(assoc)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc) do
         local filename = transf.path.leaflike_by_filename(k)
         if is.any.table(v) then
-          res[filename] = transf.absolute_path_key_leaf_str_or_nested_value_assoc.plaintext_assoconary_read_assoc(v)
+          res[filename] = transf.absolute_path_key_leaf_str_or_nested_value_assoc.absolute_path_key_leaf_str_table_or_nested_assoc_by_read_plaintext_assoc_file(v)
         else
           if is.file.plaintext_assoc_file(k) then
             res[filename] = transf.plaintext_assoc_file.table(k)
@@ -1348,7 +1348,7 @@ transf = {
     absolute_path_by_root_gitignore = function(path)
       return transf.path.path_by_ending_with_slash(transf.in_git_dir.git_root_dir(path)) .. ".gitignore"
     end,
-    current_branch = function(path)
+    str_by_current_branch = function(path)
       return get.extant_path.cmd_output_from_path(
         path,
         "git rev-parse --abbrev-ref HEAD"
@@ -3289,7 +3289,7 @@ transf = {
   },
   youtube_playlist_url = {
     youtube_playlist_id = function(url)
-      return transf.url.param_table(url).list
+      return transf.url.str_key_str_value_assoc_by_decoded_param_table(url).list
     end,
     title = function(url)
       return transf.youtube_playlist_id.title(transf.youtube_playlist_url.youtube_playlist_id(url))
@@ -3300,7 +3300,7 @@ transf = {
   },
   youtube_video_url = {
     youtube_video_id = function(url)
-      return transf.url.param_table(url).v
+      return transf.url.str_key_str_value_assoc_by_decoded_param_table(url).v
     end,
     title = function(url)
       return transf.youtube_video_id.str_by_title(transf.youtube_video_url.youtube_video_id(url))
@@ -6634,10 +6634,10 @@ transf = {
     query = function(url)
       return transf.url.url_table(url).query
     end,
-    fragment = function(url)
+    printable_ascii_by_fragment = function(url)
       return transf.url.url_table(url).fragment
     end,
-    port = function(url)
+    digit_string_by_port = function(url)
       return transf.url.url_table(url).port
     end,
     user = function(url)
@@ -6646,16 +6646,27 @@ transf = {
     password = function(url)
       return transf.url.url_table(url).password
     end,
-    param_table = function(url)
+    userinfo = function(url)
+      local user = transf.url.user(url)
+      local password = transf.url.password(url)
+      if user and password then
+        return user .. ":" .. password
+      elseif user then
+        return user
+      else
+        return nil
+      end
+    end,
+    str_key_str_value_assoc_by_decoded_param_table = function(url)
       local params = {}
       local url_parts = get.str.str_arr_by_split_w_ascii_char(url, "?")
       if #url_parts > 1 then
         local param_parts = get.str.str_arr_by_split_w_ascii_char(url_parts[2], "&")
         for _, param_part in transf.arr.pos_int_vt_stateless_iter(param_parts) do
           local param_parts = get.str.str_arr_by_split_w_ascii_char(param_part, "=")
-          local key = param_parts[1]
-          local value = param_parts[2]
-          params[key] = transf.str.str_by_percent_decoded_also_plus(value)
+          local key = transf.str.str_by_percent_decoded_also_plus(param_parts[1])
+          local value = transf.str.str_by_percent_decoded_also_plus(param_parts[2])
+          params[key] = value
         end
       end
       return params
@@ -6771,7 +6782,7 @@ transf = {
   },
   gelbooru_style_post_url = {
     nonindicated_number_str_by_booru_post_id = function(url)
-      return transf.url.param_table(url).id
+      return transf.url.str_key_str_value_assoc_by_decoded_param_table(url).id
     end,
     pos_int_by_booru_post_id = function(url)
       return transf.nonindicated_number_str.number_by_base_10(transf.gelbooru_style_post_url.nonindicated_number_str_by_booru_post_id(url))
@@ -7015,13 +7026,13 @@ transf = {
       return transf.mailto_url.emails(mailto_url)[1]
     end,
     subject = function(mailto_url)
-      return transf.url.param_table(mailto_url).subject 
+      return transf.url.str_key_str_value_assoc_by_decoded_param_table(mailto_url).subject 
     end,
     body = function(mailto_url)
-      return transf.url.param_table(mailto_url).body 
+      return transf.url.str_key_str_value_assoc_by_decoded_param_table(mailto_url).body 
     end,
     cc = function(mailto_url)
-      return transf.url.param_table(mailto_url).cc 
+      return transf.url.str_key_str_value_assoc_by_decoded_param_table(mailto_url).cc 
     end,
 
   },
@@ -7299,7 +7310,7 @@ transf = {
       return math.random() < 0.5
     end,
     all_applications = function()
-      return transf.dir.children_filename_arr("/Applications")
+      return transf.dir.leaflike_arr_by_children_filenames("/Applications")
     end,
     sox_is_recording = function()
       return transf.str.bool_by_evaled_env_bash_success("pgrep -x rec")
@@ -7310,10 +7321,10 @@ transf = {
       )
     end,
     passw_pass_item_name_arr = function()
-      return transf.dir.children_filename_arr(env.MPASSPASSW)
+      return transf.dir.leaflike_arr_by_children_filenames(env.MPASSPASSW)
     end,
     otp_pass_item_name_arr = function()
-      return transf.dir.children_filename_arr(env.MPASSOTP)
+      return transf.dir.leaflike_arr_by_children_filenames(env.MPASSOTP)
     end,
     date_by_current = function()
       return transf["nil"].date_by_current()

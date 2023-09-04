@@ -157,6 +157,11 @@ is = {
   },
   printable_ascii_no_nonspace_whitespace_str = {
     fnname = transf["nil"]["true"],
+    single_attachment_str = function(str)
+      return 
+        get.str.bool_by_startswith(str, "#") 
+        and get.str.bool_by_matches_part_onig(str, "^#" .. r.g.id.media_type .. " ")
+    end,
     printable_ascii_not_whitespace_str = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "%s")
     end,
@@ -792,7 +797,7 @@ is = {
   dir = {
     git_root_dir = function(path)
       return get.arr.bool_by_some_equals_w_t(
-        transf.dir.children_filename_arr(path),
+        transf.dir.leaflike_arr_by_children_filenames(path),
         ".git"
       )
     end,
@@ -1005,6 +1010,9 @@ is = {
     mod_name = function(str)
       return get.arr.bool_by_contains(ls.mod_name, str)
     end,
+    leaf_str = function(str)
+      return str == "leaf"
+    end,
   },
   url = {
     scheme_url = function(url)
@@ -1019,6 +1027,19 @@ is = {
     query_url = function(url)
       return transf.url.query(url) ~= nil
     end,
+    fragment_url = function(url)
+      return transf.url.printable_ascii_by_fragment(url) ~= nil
+    end,
+    username_url = function(url)
+      return transf.url.username(url) ~= nil
+    end,
+    password_url = function(url)
+      return transf.url.password(url) ~= nil
+    end,
+    userinfo_url = function(url)
+      return transf.url.userinfo(url) ~= nil
+    end,
+
     booru_post_url = function(url)
       return 
         (is.url.query_url(url) and is.query_url.gelbooru_style_post_url(url)) or
@@ -1076,7 +1097,7 @@ is = {
   },
   query_url = {
     gelbooru_style_post_url = function(url)
-      local paramtbl = transf.url.param_table(url)
+      local paramtbl = transf.url.str_key_str_value_assoc_by_decoded_param_table(url)
       return is.any.int_str(paramtbl["id"]) and paramtbl["page"] == "post"
     end
   },
@@ -1204,8 +1225,23 @@ is = {
     end,
   },
   pos_int = {
-    halfbyte_pos_int = function(num)
-      return num < 256
+    eightbyte_pos_int = function(num)
+      return num < 2^64
+    end,
+  },
+  eightbyte_pos_int = {
+    fourbyte_pos_int = function(num)
+      return num < 2^32
+    end,
+  },
+  fourbyte_pos_int = {
+    twobyte_pos_int = function(num)
+      return num < 2^16
+    end,
+  },
+  twobyte_pos_int = {
+    byte_pos_int = function(num)
+      return num < 2^8
     end,
   },
   byte_pos_int = {
@@ -1242,9 +1278,6 @@ is = {
     end,
   },
   sme_6_pos_int = {
-    sme_5_pos_int = function(num)
-      return num <= 5
-    end,
     weekday_int_start_0 = transf["nil"]["true"]
   },
   n_anys = {
@@ -1419,7 +1452,42 @@ is = {
     end,
     semver_component_specifier = function(t)
       return t.major
-    end
+    end,
+    email_specifier = function(t)
+      return t.non_inline_attachment_local_file_arr 
+    end,
+    absolute_path_key_assoc = function(t)
+      return get.table.bool_by_all_keys_pass_w_fn(
+        t,
+        is.any.absolute_path
+      )
+    end,
+    leaflike_key_assoc = function(t)
+      return get.table.bool_by_all_keys_pass_w_fn(
+        t,
+        is.any.leaflike
+      )
+    end,
+  },
+  absolute_path_key_assoc = {
+    absolute_path_key_leaf_str_or_nested_value_assoc = function(t)
+      return get.table.bool_by_all_values_pass_w_fn(
+        t,
+        function(val)
+          return is.any.leaf_str(val) or is.any.absolute_path_key_leaf_str_or_nested_value_assoc(val)
+        end
+      )
+    end,
+  },
+  leaflike_key_assoc = {
+    leaflike_key_leaf_str_or_nested_value_assoc = function(t)
+      return get.table.bool_by_all_values_pass_w_fn(
+        t,
+        function(val)
+          return is.any.leaf_str(val) or is.any.leaflike_key_leaf_str_or_nested_value_assoc(val)
+        end
+      )
+    end,
   },
   dcmp_assoc = {
     full_dcmp_assoc = function(t)
