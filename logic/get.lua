@@ -965,8 +965,8 @@ get = {
     end
   },
   str = {
-    int_by_amount_contained_nooverlap = plstringx.count,
-    int_by_amount_contained_overlap = function(str, substr)
+    pos_int_by_amount_contained_nooverlap = plstringx.count,
+    pos_int_by_amount_contained_overlap = function(str, substr)
       return plstringx.count(str, substr, true)
     end,
     str_by_sub_lua = string.sub,
@@ -2061,7 +2061,7 @@ get = {
     remote_blob_url = function(path, branch)
       local remote_type = transf.in_git_dir.remote_type(path)
       branch = branch or transf.in_git_dir.str_by_current_branch(path)
-      local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
+      local remote_owner_item = transf.in_git_dir.two_strs_arr_or_nil_by_remote_owner_item(path)
       local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(
         transf.in_git_dir.remote_blob_host(path),
@@ -2074,7 +2074,7 @@ get = {
     remote_raw_url = function(path, branch)
       local remote_type = transf.in_git_dir.remote_type(path)
       branch = branch or transf.in_git_dir.str_by_current_branch(path)
-      local remote_owner_item = transf.in_git_dir.remote_owner_item(path)
+      local remote_owner_item = transf.in_git_dir.two_strs_arr_or_nil_by_remote_owner_item(path)
       local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(
         transf.in_git_dir.remote_raw_host(path),
@@ -2129,7 +2129,7 @@ get = {
   csl_table_or_csl_table_arr = {
     raw_citations = function(csl_table, style)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
-        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_function.json_here_str(csl_table)
+        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_function.here_doc_by_json(csl_table)
       )
     end,
     
@@ -2694,17 +2694,17 @@ get = {
   sgml_str = {
     sgml_str_or_nil_by_query_selector_all = function(str, selector)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
-        "htmlq" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_str(str)
+        "htmlq" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_doc(str)
       )
     end,
     str_or_nil_by_query_selector_all = function(str, selector)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
-        "htmlq --text" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_str(str)
+        "htmlq --text" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_doc(str)
       )
     end,
     str_or_nil_by_attribute_query_selector_all = function(str, selector, attribute)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
-        "htmlq --attribute " .. transf.str.str_by_single_quoted_escaped(attribute) .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_str(str)
+        "htmlq --attribute " .. transf.str.str_by_single_quoted_escaped(attribute) .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_doc(str)
       )
     end,
     -- non-all seems to not be possible with htmlq. At least for html_, it would be possible if we parsed the html, but for text_, there seems to be no indication of when each result ends.
@@ -3398,7 +3398,7 @@ get = {
       end
       if args then 
         -- encode args to json and hash it, to use as the key for the cache
-        local hash = transf.not_userdata_or_function.md5_hex_str(args)
+        local hash = transf.not_userdata_or_function.hex_str_by_md5(args)
         path = path .. hash
       end
       return path
@@ -3557,7 +3557,7 @@ get = {
   },
   not_userdata_or_function = {
     md5_base32_crock_str_of_length = function(any, length)
-      return transf.not_userdata_or_function.md5_base32_crock_str(any):sub(1, length)
+      return transf.not_userdata_or_function.base32_crock_str_by_md5(any):sub(1, length)
     end,
   },
   export_chat_main_object = {

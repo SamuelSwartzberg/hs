@@ -1354,23 +1354,26 @@ transf = {
         "git rev-parse --abbrev-ref HEAD"
       )
     end,
-    remote_url = function(path)
-      local raw= get.extant_path.cmd_output_from_path(
+    dotgit_url_by_remote = function(path)
+      return get.extant_path.cmd_output_from_path(
         path,
         "git config --get remote.origin.url"
       )
+    end,
+    base_url_by_remote_cleaned = function(path)
+      local raw = transf.in_git_dir.dotgit_url_by_remote(path)
       raw = get.str.str_by_no_suffix(raw, ".git")
       raw = get.str.str_by_no_suffix(raw, "/")
       return raw
     end,
-    remote_owner_item = function(path)
-      return transf.owner_item_url.owner_item(transf.in_git_dir.remote_url(path))
+    two_strs_arr_or_nil_by_remote_owner_item = function(path)
+      return transf.owner_item_url.two_strs_arr(transf.in_git_dir.base_url_by_remote_cleaned(path))
     end,
     remote_host = function(path)
-      return transf.url.host(transf.in_git_dir.remote_url(path))
+      return transf.url.host(transf.in_git_dir.base_url_by_remote_cleaned(path))
     end,
     remote_sld = function(path)
-      return transf.url.sld(transf.in_git_dir.remote_url(path))
+      return transf.url.alphanum_minus_or_nil_by_sld(transf.in_git_dir.base_url_by_remote_cleaned(path))
     end,
     remote_type = function(path)
       if get.arr.bool_by_contains(ls.remote_types, transf.in_git_dir.remote_sld(path)) then
@@ -1766,7 +1769,7 @@ transf = {
 
   ics_file = {
     assoc_arr = function(path)
-      local temppath = transf.str.in_tmp_dir(transf.path.leaflike_by_filename(path) .. ".ics")
+      local temppath = transf.str.in_tmp_local_absolute_path(transf.path.leaflike_by_filename(path) .. ".ics")
       dothis.extant_path.copy_to_absolute_path(path, temppath)
       act.ics_file.generate_json_file(temppath)
       local jsonpath = transf.file.str_by_contents(get.path.with_different_extension(temppath, "json"))
@@ -3357,7 +3360,7 @@ transf = {
   youtube_channel_url = {
     handle = function(url)
       return get.str.str_by_no_adfix(
-        transf.url.path(url),
+        transf.url.absolute_path_or_nil_by_path(url),
         "/"
       )
     end,
@@ -3530,7 +3533,7 @@ transf = {
     table_or_err_by_evaled_env_bash_parsed_json_err_error_key = function(str)
       local res = transf.str.table_or_err_by_evaled_env_bash_parsed_json(str)
       if res.error then
-        error("Error for command " .. str .. ":\n\n" .. transf.not_userdata_or_function.json_str_pretty(res.error))
+        error("Error for command " .. str .. ":\n\n" .. transf.not_userdata_or_function.json_str_by_pretty(res.error))
       else
         return res
       end
@@ -3560,10 +3563,10 @@ transf = {
       else return {res} end
     end,
     window_or_nil_by_title = hs.window.get,
-    in_cache_dir = function(data, type)
+    in_cache_local_absolute_path = function(data, type)
       return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.str.safe_filename(data)
     end,
-    in_tmp_dir = function(data, type) -- in contrast to the above method, we also ensure that it's unique by using a timestamp
+    in_tmp_local_absolute_path = function(data, type) -- in contrast to the above method, we also ensure that it's unique by using a timestamp
       return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.str.safe_filename(data)
     end,
     qr_utf8_image_bow = function(data)
@@ -3575,8 +3578,8 @@ transf = {
         table_param_subset = "json"
       })("qrencode -l M -m 2 -t UTF8i " .. transf.str.str_by_single_quoted_escaped(data))
     end,
-    qr_png_in_cache = function(data)
-      local path = transf.str.in_cache_dir(data, "qr")
+    multiline_str_by_qr_png_in_cache = function(data)
+      local path = transf.str.in_cache_local_absolute_path(data, "qr")
       dothis.str.generate_qr_png(data, path)
       return path
     end,
@@ -3619,11 +3622,11 @@ transf = {
     upper_alphanum_underscore = function(str)
       return transf.str.str_by_all_eutf8_upper(transf.str.alphanum_underscore(str))
     end,
-    alphanum_array = function(str) -- word separation is notoriously tricky. For now, we'll just use the same logic as in the snake_case function
+    alphanum_arr = function(str) -- word separation is notoriously tricky. For now, we'll just use the same logic as in the snake_case function
       return get.str.str_arr_by_split_w_ascii_char(transf.str.alphanum_underscore(str), "_")
     end,
     upper_camel_snake_case = function(str)
-      local parts = transf.str.alphanum_array(str)
+      local parts = transf.str.alphanum_arr(str)
       local upper_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
       return get.str_or_number_arr.str_by_joined(upper_parts, "_")
     end,
@@ -3631,7 +3634,7 @@ transf = {
       return transf.str.str_by_all_eutf8_lower(transf.str.upper_camel_snake_case(str))
     end,
     upper_camel_case = function(str)
-      local parts = transf.str.alphanum_array(str)
+      local parts = transf.str.alphanum_arr(str)
       local upper_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
       return get.str_or_number_arr.str_by_joined(upper_parts, "")
     end,
@@ -3702,12 +3705,12 @@ transf = {
     base32_crock_str_by_utf8 = basexx.to_crockford,
     str_by_html_entities_encoded = function(str)
       return transf.str.str_or_err_by_evaled_env_bash_stripped(
-        "he --encode --use-named-refs" .. transf.str.here_str(str)
+        "he --encode --use-named-refs" .. transf.str.here_doc(str)
       )
     end,
     str_by_html_entities_decoded = function(str)
       return transf.str.str_or_err_by_evaled_env_bash_stripped(
-        "he --decode" .. transf.str.here_str(str)
+        "he --decode" .. transf.str.here_doc(str)
       )
     end,
     two_strs_by_split_header = function(str)
@@ -3839,7 +3842,7 @@ transf = {
     str_by_one_final_newline = function(str)
       return get.str.str_by_final_continuous_collapsed_eutf8_w_regex_quantifiable(str, "\n")
     end,
-    here_str = function(str)
+    here_doc = function(str)
       return " <<EOF\n" .. str .. "\nEOF"
     end,
     rfc3339like_dt = function(str)
@@ -4308,13 +4311,13 @@ transf = {
     end,
   },
   two_anys_arr = {
-    key_value = function(two_anys_arr)
+    two_ts = function(two_anys_arr)
       return two_anys_arr[1], two_anys_arr[2]
     end,
-    key = function(two_anys_arr)
+    t_by_first = function(two_anys_arr)
       return two_anys_arr[1]
     end,
-    value = function(two_anys_arr)
+    t_by_second = function(two_anys_arr)
       return two_anys_arr[2]
     end,
     header = function(two_anys_arr)
@@ -4338,9 +4341,6 @@ transf = {
     assoc_entry_str = function(two_anys_arr)
       return transf.two_anys.assoc_entry_str(two_anys_arr[1], two_anys_arr[2])
     end,
-    larger = function(two_anys_arr)
-      return transf.two_comparables.comparable_by_larger(two_anys_arr[1], two_anys_arr[2])
-    end,
   },
   two_anys = {
     bool_by_and = function(a, b)
@@ -4349,16 +4349,16 @@ transf = {
     bool_by_or = function(a, b)
       return a or b
     end,
-    str_two_anys = function(a, b)
+    two_strs = function(a, b)
       return transf.any.str_by_replicable(a), transf.any.str_by_replicable(b)
     end,
     two_anys_arr = function(key, value)
       return {key, value}
     end,
-    key = function(key, value)
+    t_by_first = function(key, value)
       return key
     end,
-    value = function(key, value)
+    t_by_second = function(key, value)
       return value
     end,
     header = function(k, v)
@@ -4738,7 +4738,7 @@ transf = {
     url_potentially_with_title_comment_arr = function(sgml_url_arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         sgml_url_arr,
-        transf.url.url_potentially_with_title_comment
+        transf.url.line_by_url_potentially_with_title_comment
       )
     end,
     session_str = function(sgml_url_arr)
@@ -4884,7 +4884,7 @@ transf = {
     vt_stateful_iter = get.stateless_generator.stateful_generator(transf.table.kt_vt_stateful_iter, 2, 2),
     toml_str = toml.encode,
     yaml_str_by_aligned = function(tbl)
-      local tmp = transf.str.in_tmp_dir(
+      local tmp = transf.str.in_tmp_local_absolute_path(
         transf.not_userdata_or_function.yaml_str(tbl),
         "shell-input"
       )
@@ -6153,7 +6153,7 @@ transf = {
   },
   bib_str = {
     csl_table_arr = function(str)
-      return transf.str.table_or_err_by_evaled_env_bash_parsed_json("pandoc -f biblatex -t csljson" .. transf.str.here_str(str))
+      return transf.str.table_or_err_by_evaled_env_bash_parsed_json("pandoc -f biblatex -t csljson" .. transf.str.here_doc(str))
     end,
     urls = function(str)
       return transf.csl_table_arr.url_arr(
@@ -6414,7 +6414,7 @@ transf = {
       return csl_table.URL
     end,
     urlmd5 = function(csl_table)
-      return transf.not_userdata_or_function.md5_hex_str(transf.csl_table.url(csl_table))
+      return transf.not_userdata_or_function.hex_str_by_md5(transf.csl_table.url(csl_table))
     end,
     indicated_urlmd5 = function(csl_table)
       local urlmd5 = transf.csl_table.urlmd5(csl_table)
@@ -6490,7 +6490,7 @@ transf = {
     end,
     bib_str = function(csl_table)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
-        "pandoc -f csljson -t biblatex" .. transf.str.here_str(transf.not_userdata_or_function.json_str(csl_table))
+        "pandoc -f csljson -t biblatex" .. transf.str.here_doc(transf.not_userdata_or_function.json_str(csl_table))
       )
     end,
     apa_str = function(csl_table)
@@ -6586,7 +6586,7 @@ transf = {
       return transf.date_parts_single.date(date_parts[1])
     end,
   },
-  url = {
+  urllike_with_no_scheme = {
     url_by_ensure_scheme = function(url)
       if is.url.scheme_url(url) then
         return url
@@ -6594,15 +6594,18 @@ transf = {
         return "https://" .. url
       end
     end,
-    in_wayback_machine = function(url)
-      return "https://web.archive.org/web/*/" .. transf.url.url_by_ensure_scheme(url)
+    
+  },
+  url = {
+    wayback_machine_url = function(url)
+      return "https://web.archive.org/web/*/" .. url
     end,
     default_negotiation_url_contents = function(url)
       return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
           "curl -L" .. transf.str.str_by_single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
-      return transf.not_userdata_or_function.in_cache_dir(transf.url.url_by_ensure_scheme(url), "url")
+      return transf.not_userdata_or_function.in_cache_dir(transf.urllike_with_no_scheme.url_by_ensure_scheme(url), "url")
     end,
     url_table = function(url)
       return get.fn.rt_or_nil_by_memoized(
@@ -6619,22 +6622,31 @@ transf = {
     host = function(url)
       return transf.url.url_table(url).host
     end,
-    sld_and_tld = function(url)
-      return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "(%w+%.%w+)$")
+    domain_name_or_nil = function(url)
+      local host = transf.url.host(url)
+      if is.printable_ascii_not_whitespace_str.domain_name(host) then
+        return host
+      end
     end,
-    sld = function(url)
-      return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "(%w+)%.%w+$") 
+    domain_name_or_nil_by_sld_and_tld = function(url)
+      local domain_name_or_nil = transf.url.domain_name_or_nil(url)
+      if domain_name_or_nil then return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "(%w+%.%w+)$") end
+    end,
+    alphanum_minus_or_nil_by_sld = function(url)
+      local domain_name_or_nil = transf.url.domain_name_or_nil(url)
+      if domain_name_or_nil then  return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "(%w+)%.%w+$") end
     end,
     tld = function(url)
-      return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "%w+%.(%w+)$")
+      local domain_name_or_nil = transf.url.domain_name_or_nil(url)
+      if domain_name_or_nil then return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "%w+%.(%w+)$") end
     end,
-    path = function(url)
+    absolute_path_or_nil_by_path = function(url)
       return transf.url.url_table(url).path
     end,
     query = function(url)
       return transf.url.url_table(url).query
     end,
-    printable_ascii_by_fragment = function(url)
+    printable_ascii_or_nil_by_fragment = function(url)
       return transf.url.url_table(url).fragment
     end,
     digit_string_by_port = function(url)
@@ -6671,14 +6683,14 @@ transf = {
       end
       return params
     end,
-    no_scheme = function(url)
+    urllike_with_no_scheme = function(url)
       local parts = get.str.str_arr_by_split_w_ascii_char(url, ":")
       act.arr.shift(parts)
       local rejoined = get.str_or_number_arr.str_by_joined(parts, ":")
       return get.str.no_prefix_str(rejoined, "//")
     end,
     str_by_webcal_name = function(url)
-      return "webcal_readonly_" .. transf.not_userdata_or_function.md5_hex_str(url)
+      return "webcal_readonly_" .. transf.not_userdata_or_function.hex_str_by_md5(url)
     end,
     vdirsyncer_pair_specifier = function(url)
       local name = transf.url.str_by_webcal_name(url)
@@ -6699,13 +6711,13 @@ transf = {
     end,
     ini_str_by_khal_config_section = function(url)
       return transf.assoc_of_str_value_assocs.ini_str({
-        ["[ro:".. transf.url.sld(url) .. "]"] = {
+        ["[ro:".. transf.url.alphanum_minus_or_nil_by_sld(url) .. "]"] = {
           path = transf.url.absolute_path_by_webcal_storage_location(url),
           priority = 0,
         }
       })
     end,
-    url_potentially_with_title_comment = function(url)
+    line_by_url_potentially_with_title_comment = function(url)
       local title = transf.sgml_url.str_or_nil_by_title(url)
       if title and title ~= "" then
         return url .. " # " .. title
@@ -6725,14 +6737,16 @@ transf = {
   },
   path_url = {
     initial_path_component = function(url)
-      return transf.path.path_component_by_initial(transf.url.path(url))
+      return transf.path.path_component_by_initial(transf.url.absolute_path_or_nil_by_path(url))
     end,
     leaf = function(url)
-      return transf.path.leaflike_by_leaf(transf.url.path(url))
+      return transf.path.leaflike_by_leaf(transf.url.absolute_path_or_nil_by_path(url))
     end,
   },
   sgml_url = {
-    sgml_str = transf.url.default_negotiation_url_contents, -- ideally we would reject non-html responses, but currently, that's too much work
+    sgml_str = function(url)
+      return transf.url.default_negotiation_url_contents(url)
+    end, -- ideally we would reject non-html responses, but currently, that's too much work
     str_or_nil_by_title = function(url)
       return get.sgml_url.str_or_nil_by_query_selector_all(url, "title")
     end,
@@ -6744,8 +6758,8 @@ transf = {
     end
   },
   owner_item_url = {
-    owner_item = function(url)
-      return get.path.path_component_arr_by_slice_w_slice_spec(transf.url.path(url), "1:2")
+    two_strs_arr = function(url)
+      return get.path.path_component_arr_by_slice_w_slice_spec(transf.url.absolute_path_or_nil_by_path(url), "1:2")
     end,
   },
   github_url = {
@@ -6790,12 +6804,12 @@ transf = {
   },
   yandere_style_post_url = {
     nonindicated_number_str_by_booru_post_id = function(url)
-      return get.str.n_strs_by_extracted_eutf8(transf.url.path(url), "/post/show/(%d+)")
+      return get.str.n_strs_by_extracted_eutf8(transf.url.absolute_path_or_nil_by_path(url), "/post/show/(%d+)")
     end
   },
   danbooru_style_post_url = {
     nonindicated_number_str_by_booru_post_id = function(url)
-      return get.str.n_strs_by_extracted_eutf8(transf.url.path(url), "/posts/(%d+)")
+      return get.str.n_strs_by_extracted_eutf8(transf.url.absolute_path_or_nil_by_path(url), "/posts/(%d+)")
     end
   },
   gpt_response_table = {
@@ -6806,7 +6820,7 @@ transf = {
     end
   },
   not_userdata_or_function = {
-    md5_hex_str = function(thing)
+    hex_str_by_md5 = function(thing)
       if is.any.not_str(thing) then 
         thing = json.encode(thing) 
       end
@@ -6814,7 +6828,7 @@ transf = {
       md5:update(thing)
       return md5:hexdigest()
     end,
-    md5_base32_crock_str = function(thing)
+    base32_crock_str_by_md5 = function(thing)
       if is.any.not_str(thing) then 
         thing = json.encode(thing) 
       end
@@ -6823,22 +6837,22 @@ transf = {
       return transf.str.base32_crock_str_by_utf8(md5:digest())
     end,
     in_cache_dir = function(data, type)
-      return transf.str.in_cache_dir(
-        transf.not_userdata_or_function.md5_hex_str(data),
+      return transf.str.in_cache_local_absolute_path(
+        transf.not_userdata_or_function.hex_str_by_md5(data),
         type
       )
     end,
     in_tmp_dir = function(data, type)
-      return transf.str.in_tmp_dir(
-        transf.not_userdata_or_function.md5_hex_str(data),
+      return transf.str.in_tmp_local_absolute_path(
+        transf.not_userdata_or_function.hex_str_by_md5(data),
         type
       )
     end,
-    single_quoted_escaped_json = function(t)
+    str_by_single_quoted_escaped_json = function(t)
       return transf.str.str_by_single_quoted_escaped(json.encode(t))
     end,
     json_str = json.encode,
-    json_str_pretty = function(t)
+    json_str_by_pretty = function(t)
       if is.any.table(t) then
         return transf.table.json_str_by_pretty(t)
       else
@@ -6853,8 +6867,8 @@ transf = {
       local lines = get.str.str_arr_by_split_w_ascii_char(raw_yaml, "\n")
       return get.str_or_number_arr.str_by_joined(lines, "\n", 2, #lines - 2)
     end,
-    json_here_str = function(t)
-      return transf.str.here_str(json.encode(t))
+    here_doc_by_json = function(t)
+      return transf.str.here_doc(json.encode(t))
     end,
   },
   any = {
@@ -7017,7 +7031,7 @@ transf = {
   mailto_url = {
    
     emails = function(mailto_url)
-      local no_scheme = transf.url.no_scheme(mailto_url)
+      local no_scheme = transf.url.urllike_with_no_scheme(mailto_url)
       local emails_part = get.str.str_arr_by_split_w_ascii_char(no_scheme, "?")[1]
       local emails = get.str.str_arr_by_split_w_ascii_char(emails_part, ",")
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(emails, transf.str.not_starting_o_ending_with_whitespace_str)
@@ -7038,26 +7052,26 @@ transf = {
   },
   tel_url = {
     phone_number = function(tel_url)
-      return transf.url.no_scheme(tel_url)
+      return transf.url.urllike_with_no_scheme(tel_url)
     end,
     
   },
   otpauth_url = {
     type = function(otpauth_url)
-      return get.str.str_arr_by_split_w_ascii_char(transf.url.no_scheme(otpauth_url), "/")[1]
+      return get.str.str_arr_by_split_w_ascii_char(transf.url.urllike_with_no_scheme(otpauth_url), "/")[1]
     end,
     label = function(otpauth_url)
-      local part = get.str.str_arr_by_split_w_ascii_char(transf.url.no_scheme(otpauth_url), "/")[2]
+      local part = get.str.str_arr_by_split_w_ascii_char(transf.url.urllike_with_no_scheme(otpauth_url), "/")[2]
       return get.str.str_arr_by_split_w_ascii_char(part, "?")[1]
     end,
     
   },
   data_url = {
     raw_type = function(data_url)
-      return get.str.str_arr_by_split_w_ascii_char(transf.url.no_scheme(data_url), ";")[1]
+      return get.str.str_arr_by_split_w_ascii_char(transf.url.urllike_with_no_scheme(data_url), ";")[1]
     end,
     header_part = function(data_url) -- the non-data part will either be separated from the rest of the url by `;,` or `;base64,`, so we need to split on `,`, then find the first part that ends `;` or `base64;`, and then join and return all parts before that part
-      local parts = get.str.str_arr_by_split_w_ascii_char(transf.url.no_scheme(data_url), ",")
+      local parts = get.str.str_arr_by_split_w_ascii_char(transf.url.urllike_with_no_scheme(data_url), ",")
       local non_data_part = ""
       for _, part in transf.arr.pos_int_vt_stateless_iter(parts) do
         non_data_part = non_data_part .. part
@@ -7070,7 +7084,7 @@ transf = {
       return non_data_part
     end,
     payload_part = function(data_url)
-      return get.str.no_prefix_str(transf.url.no_scheme(data_url), transf.data_url.header_part(data_url))
+      return get.str.no_prefix_str(transf.url.urllike_with_no_scheme(data_url), transf.data_url.header_part(data_url))
     end,
       
     raw_type_param_table = function(data_url)
@@ -8518,7 +8532,7 @@ transf = {
   },
   fnname = {
     local_absolute_path_by_in_cache = function(fnname)
-      return transf.str.in_cache_dir(fnname, "fsmemoize")
+      return transf.str.in_cache_local_absolute_path(fnname, "fsmemoize")
     end,
     
   },

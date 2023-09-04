@@ -261,7 +261,7 @@ dothis = {
       dothis.arr.choose_item(
         transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
         function(two_anys_arr)
-          fn(transf.two_anys_arr.key_value(two_anys_arr))
+          fn(transf.two_anys_arr.two_ts(two_anys_arr))
         end,
         target_item_chooser_item_specifier_name
       )
@@ -270,7 +270,7 @@ dothis = {
       dothis.arr.choose_item(
         transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
         function(two_anys_arr)
-          fn(transf.two_anys_arr.key(two_anys_arr))
+          fn(transf.two_anys_arr.t_by_first(two_anys_arr))
         end,
         target_item_chooser_item_specifier_name
       )
@@ -279,7 +279,7 @@ dothis = {
       dothis.arr.choose_item(
         transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
         function (two_anys_arr)
-          fn(transf.two_anys_arr.value(two_anys_arr))
+          fn(transf.two_anys_arr.t_by_second(two_anys_arr))
         end,
         target_item_chooser_item_specifier_name
       )
@@ -341,7 +341,7 @@ dothis = {
       )
     end,
     write_to_temp_file = function(str)
-      local path = transf.str.in_tmp_dir(os.time(), "temp_file")
+      local path = transf.str.in_tmp_local_absolute_path(os.time(), "temp_file")
       dothis.absolute_path.write_file(path, str)
       return path
     end,
@@ -512,7 +512,7 @@ dothis = {
   },
   url_or_local_path = {
     open_browser = function(url, browser, do_after)
-      url = transf.url.url_by_ensure_scheme(url)
+      url = transf.urllike_with_no_scheme.url_by_ensure_scheme(url)
       browser = browser or "Firefox"
       if do_after then -- if we're opening an url, typically, we would exit immediately, negating the need for a callback. Therefore, we want to wait. The only easy way to do this is to use a completely different browser. 
         transf.str.str_or_nil_by_evaled_env_bash_stripped("open -a Safari -W" .. transf.str.str_by_single_quoted_escaped(url), do_after)
@@ -715,7 +715,7 @@ dothis = {
   },
   remote_extant_path = {
     zip_to_absolute_path = function(path, tgt)
-      local tmppath = transf.str.in_tmp_dir(tgt, "temp_zip")
+      local tmppath = transf.str.in_tmp_local_absolute_path(tgt, "temp_zip")
       dothis.extant_path.copy_to_absolute_path(
         path,
         tmppath
@@ -725,7 +725,7 @@ dothis = {
   },
   remote_extant_path_arr = {
     zip_to_absolute_path = function(arr, tgt)
-      local tmppath = transf.str.in_tmp_dir(tgt, "temp_zip")
+      local tmppath = transf.str.in_tmp_local_absolute_path(tgt, "temp_zip")
       dothis.extant_path_arr.copy_into_absolute_path(
         arr,
         tmppath
@@ -768,7 +768,7 @@ dothis = {
       transf.str.str_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.str.str_by_single_quoted_escaped(tgt) .. " " .. transf.str.str_by_single_quoted_escaped(path))
     end,
     zip_to_absolute_path = function(path, tgt)
-      local tmptgt = transf.str.in_tmp_dir(tgt, "temp_zip_target")
+      local tmptgt = transf.str.in_tmp_local_absolute_path(tgt, "temp_zip_target")
       dothis.local_extant_path.zip_to_local_absolute_path(path, tmptgt)
       dothis.extant_path.move_to_absolute_path(tmptgt, tgt)
     end,
@@ -808,7 +808,7 @@ dothis = {
       transf.str.str_or_nil_by_evaled_env_bash_stripped("zip -r " .. transf.str.str_by_single_quoted_escaped(tgt) .. " " .. transf.str.str_by_single_quoted_escaped(get.str_or_number_arr.str_by_joined(arr, " ")))
     end,
     zip_to_absolute_path = function(arr, tgt)
-      local tmptgt = transf.str.in_tmp_dir(tgt, "temp_zip_target")
+      local tmptgt = transf.str.in_tmp_local_absolute_path(tgt, "temp_zip_target")
       dothis.local_absolute_path_arr.zip_to_local_absolute_path(arr, tmptgt)
       dothis.extant_path.move_to_absolute_path(tmptgt, tgt)
     end,
@@ -829,13 +829,13 @@ dothis = {
   
   labelled_remote_file = {
     write_file = function(path, contents)
-      local temp_file = transf.str.in_tmp_dir(path, "labelled_remote_temp_file")
+      local temp_file = transf.str.in_tmp_local_absolute_path(path, "labelled_remote_temp_file")
       dothis.local_extant_path.write_file(temp_file, contents)
       transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone copyto" .. transf.str.str_by_single_quoted_escaped(temp_file) .. " " .. transf.str.str_by_single_quoted_escaped(path))
       dothis.absolute_path.delete(temp_file)
     end,
     append_or_write_file = function(path, contents)
-      local temp_file = transf.str.in_tmp_dir(path, "labelled_remote_temp_file")
+      local temp_file = transf.str.in_tmp_local_absolute_path(path, "labelled_remote_temp_file")
       dothis.local_extant_path.append_or_write_file(temp_file, contents)
       dothis.labelled_remote_file.write_file(path, transf.local_file.str_by_contents(temp_file))
     end,
@@ -2716,7 +2716,7 @@ dothis = {
       dothis.str.env_bash_eval_async("newsboat -x reload")
     end,
     sox_rec_start_cache = function(do_after)
-      dothis.local_absolute_path.start_recording_to(transf.str.in_cache_dir(os.time(), "recording"), do_after)
+      dothis.local_absolute_path.start_recording_to(transf.str.in_cache_local_absolute_path(os.time(), "recording"), do_after)
     end,
     sox_rec_stop = function(do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("killall rec", do_after)
@@ -2879,10 +2879,10 @@ dothis = {
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "sigtop export-messages -f json" ..
         transf.str.str_by_single_quoted_escaped(
-          transf.str.in_cache_dir("signal", "export") .. "/chats"
+          transf.str.in_cache_local_absolute_path("signal", "export") .. "/chats"
         ) .. "&& sigtop export-attachments" ..
         transf.str.str_by_single_quoted_escaped(
-          transf.str.in_cache_dir("signal", "export") .. "/media"
+          transf.str.in_cache_local_absolute_path("signal", "export") .. "/media"
         ),
         do_after
       )
@@ -2923,7 +2923,7 @@ dothis = {
     discord_generate_backup = function(_, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "dscexport exportdm --media --reuse-media -f json --dateformat unix -o" .. transf.str.str_by_single_quoted_escaped(
-          transf.str.in_cache_dir("discord", "export")
+          transf.str.in_cache_local_absolute_path("discord", "export")
         ),
         do_after
       )
@@ -2933,7 +2933,7 @@ dothis = {
       local fbfiles = get.path_arr.path_arr_by_filter_to_filename_starting(dlchildren, "facebook-samswartzberg")
       local fbzips = get.path_arr.path_arr_by_filter_to_same_extension(fbfiles, "zip")
       local newest_fbzip = transf.extant_path_arr.extant_path_by_newest_creation(fbzips)
-      local tmploc = transf.str.in_tmp_dir("facebook", "export")
+      local tmploc = transf.str.in_tmp_local_absolute_path("facebook", "export")
       dothis.local_zip_file.unzip_to_absolute_path(newest_fbzip, tmploc)
       dothis.file.delete_file(newest_fbzip)
       dothis.facebook_raw_export_dir.process_to_facebook_export_dir(tmploc)
@@ -2973,7 +2973,7 @@ dothis = {
       end
       dothis.extant_path.move_to_absolute_path(
         dir,
-        transf.str.in_cache_dir("telegram", "export")
+        transf.str.in_cache_local_absolute_path("telegram", "export")
       )
 
     end,
@@ -2994,7 +2994,7 @@ dothis = {
       end
       dothis.extant_path.move_to_absolute_path(
         actual_dir,
-        transf.str.in_cache_dir("facebook", "export")
+        transf.str.in_cache_local_absolute_path("facebook", "export")
       )
     end
   },
@@ -3127,7 +3127,7 @@ dothis = {
   backup_type = {
     log = function(typ)
       dothis.export_dir.log(
-        transf.str.in_cache_dir(typ, "export"),
+        transf.str.in_cache_local_absolute_path(typ, "export"),
         typ
       )
     end

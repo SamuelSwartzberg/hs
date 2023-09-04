@@ -5,6 +5,8 @@ thing_name_hierarchy = {
   any = {
     str = {
       empty_str = "leaf",
+      json_str = "leaf",
+      yaml_str = "leaf",
       not_starting_with_whitespace_str = "leaf",
       not_ending_with_whitespace_str = "leaf",
       not_empty_str = {
@@ -17,7 +19,9 @@ thing_name_hierarchy = {
           starting_a_ending_with_whitespace_str = "leaf",
         },
         starting_with_dot_str = "leaf",
-        multiline_str = "leaf"
+        multiline_str = {
+          here_doc = "leaf",
+        },
       },
       line = {
         not_whitespace_str = "leaf",
@@ -136,7 +140,8 @@ thing_name_hierarchy = {
             local_path = {
               local_nonabsolute_path = {
                 local_tilde_path = "leaf",
-                atpath = "leaf"
+                atpath = "leaf",
+                owner_item_path = "leaf"
               },
               contains_relative_references_local_path = "leaf",
               not_contains_relative_references_local_path = "leaf",
@@ -204,6 +209,9 @@ thing_name_hierarchy = {
               separated_nonindicated_dec_number_str = "leaf",
             },
             printable_ascii_not_whitespace_str = {
+              bracketed_ipv6 = "leaf",
+              ip_host = "leaf",
+              host = "leaf",
               html_entity = "leaf",
               fs_tag_str = "leaf",
               base64_gen_str = {
@@ -252,6 +260,7 @@ thing_name_hierarchy = {
                   rfc3339_interval = "leaf",
                 },
                 colon_alphanum_minus_underscore = {
+                  ipv6 = "leaf",
                   calendar_name = {
                     writeable_calendar_name = "leaf",
                   },
@@ -299,7 +308,10 @@ thing_name_hierarchy = {
                           leaf_str = "leaf"
                         },
                       },
-                      hex_str = "leaf",
+                      hex_str = {
+                        byte_hex_str = "leaf",
+                        two_byte_hex_str = "leaf",
+                      },
                       digit_str = {
                         bin_str = "leaf",
                         oct_str = "leaf",
@@ -311,7 +323,13 @@ thing_name_hierarchy = {
                   }
                 },
                 period_alphanum_minus_underscore = {
-                  nonindicated_number_str = "leaf",
+                  ipv4 = "leaf",
+                  nonindicated_number_str = {
+                    nonindicated_bin_number_str = "leaf",
+                    nonindicated_hex_number_str = "leaf",
+                    nonindicated_oct_number_str = "leaf",
+                    nonindicated_dec_number_str = "leaf",
+                  },
                   indicated_number_str = {
                     indicated_bin_number_str = "leaf",
                     indicated_hex_number_str = "leaf",
@@ -327,6 +345,9 @@ thing_name_hierarchy = {
               },
             },
             url = {
+              base_url = {
+                dotgit_url = "leaf",
+              },
               scheme_url = {
                 mailto_url = "leaf",
                 tel_url = "leaf",
@@ -434,7 +455,8 @@ thing_name_hierarchy = {
             date_interval_specifier = {
               date_sequence_specifier = "leaf",
             }
-          }
+          },
+          gpt_response_table = "leaf"
         }
       }
     },

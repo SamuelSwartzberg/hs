@@ -21,7 +21,8 @@ is = {
     line = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "[\n\r]")
     end,
-
+    json_str = transf["nil"]["true"], -- figuring this out would require parsing the json, which is too expensive here
+    yaml_str = transf["nil"]["true"], -- same as above
 
   },
   not_empty_str = {
@@ -43,6 +44,11 @@ is = {
     end
     
     
+  },
+  multiline_str = {
+    here_doc = function(str)
+      return get.str.bool_by_startswith(str, "<<EOF") and get.str.bool_by_endswith(str, "EOF") -- technically obviously it doesn't have to be EOF, but I'm only ever gonna use EOF
+    end,
   },
   whitespace_str = {
     starting_with_whitespace_str = function(str)
@@ -173,6 +179,9 @@ is = {
         "url_parser_cli " .. transf.str.str_by_single_quoted_escaped(str)
       )
     end,
+    urllike_with_no_scheme = function(str)
+      return is.printable_ascii_no_nonspace_whitespace_str.url("https://" .. str)
+    end,
     application_name = transf["nil"]["true"], -- no way to tell if a str is an application name of some application
     separated_nonindicated_number_str = function(str)
       return is.printable_ascii_not_whitespace_str.nonindicated_number_str(
@@ -217,6 +226,16 @@ is = {
     percent_encoded_octet = function(str)
       return #str == 3 and get.str.bool_by_startswith(str, "%") and is.printable_ascii_not_whitespace_str.nonindicated_number_str(str:sub(2, 3))
     end,
+    bracketed_ipv6 = function(str)
+      return get.str.bool_by_startswith(str, "[") and get.str.bool_by_endswith(str, "]") and is.printable_ascii_not_whitespace_str.ipv6(str:sub(2, -2))
+    end,
+    host = function(str)
+      return is.printable_ascii_not_whitespace_str.domain_name(str) or is.printable_ascii_not_whitespace_str.ip(str)
+    end,
+    ip_host = function(str)
+      return is.printable_ascii_not_whitespace_str.ipv4(str) or is.printable_ascii_not_whitespace_str.ipv6(str)
+    end,
+    
     html_entity = function(str)
       return #str > 20 and get.str.bool_by_startswith(str, "&") and get.str.bool_by_endswith(str, ";") and get.str.bool_by_matches_whole_onig(str, r.g.html_entity) -- the earlier checks are technically unncessary but improve performance
     end,
@@ -249,13 +268,13 @@ is = {
     end,
     package_name = transf["nil"]["true"], -- no way to tell if a str is a package name of some package
     package_name_package_manager_name_compound_str = function(str)
-      return get.str.int_by_amount_contained_nooverlap(str, ":") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, "@")
+      return get.str.pos_int_by_amount_contained_nooverlap(str, ":") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, "@")
     end,
     package_name_semver_compound_str = function(str)
-      return get.str.int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, ":")
+      return get.str.pos_int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, ":")
     end,
     package_name_semver_package_manager_name_compound_str = function(str)
-      return get.str.int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.int_by_amount_contained_nooverlap(str, ":") == 1
+      return get.str.pos_int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.pos_int_by_amount_contained_nooverlap(str, ":") == 1
     end,
     doi = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.doi)
@@ -363,6 +382,9 @@ is = {
     domain_name = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.domain_name)
     end,
+    ipv4_address = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.ipv4)
+    end,
   },
   indicated_number_str = {
     indicated_bin_number_str = function(str)
@@ -397,11 +419,11 @@ is = {
       return get.str.bool_by_not_startswith(str, "-") and get.str.bool_by_not_contains_w_ascii_str(str, ".")
     end
   },
-  pos_int_nonindicated_hex_number_str = {
-    byte_nonindicated_hex_number_str = function(str)
+  hex_str = {
+    byte_hex_str = function(str)
       return #str == 2
     end,
-    two_byte_nonindicated_hex_number_str = function(str)
+    two_byte_hex_str = function(str)
       return #str == 4
     end,
   },
@@ -417,6 +439,9 @@ is = {
     end,
     twod_locator = function(str)
       return get.str.bool_by_matches_whole_onig(str, ":\\d+(:?:\\d+)?")
+    end,
+    ipv6 = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "a-fA-F0-9:") -- naive check because the actual regex is a monster
     end
   },
   calendar_name = {
@@ -651,6 +676,9 @@ is = {
     atpath = function(path)
       return get.str.bool_by_startswith(path, "@")
     end,
+    owner_item_path = function(path)
+      return get.str.pos_int_by_amount_contained_nooverlap(path, "@")
+    end,
   },
   local_absolute_path = {
     local_extant_path = function(path)
@@ -682,6 +710,12 @@ is = {
   in_home_local_absolute_path = {
     in_me_local_absolute_path = function(path)
       return get.str.bool_by_startswith(path, env.ME)
+    end,
+    in_cache_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME)
+    end,
+    in_tmp_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, env.TMPDIR)
     end,
   },
   in_me_local_absolute_path = {
@@ -1019,7 +1053,7 @@ is = {
       return get.str.bool_by_matches_part_onig(url, r.g.url.scheme)
     end,
     path_url = function(url)
-      return transf.url.path(url) ~= nil
+      return transf.url.absolute_path_or_nil_by_path(url) ~= nil
     end,
     authority_url = function(url)
       return transf.url.authority(url) ~= nil
@@ -1028,7 +1062,7 @@ is = {
       return transf.url.query(url) ~= nil
     end,
     fragment_url = function(url)
-      return transf.url.printable_ascii_by_fragment(url) ~= nil
+      return transf.url.printable_ascii_or_nil_by_fragment(url) ~= nil
     end,
     username_url = function(url)
       return transf.url.username(url) ~= nil
@@ -1038,6 +1072,9 @@ is = {
     end,
     userinfo_url = function(url)
       return transf.url.userinfo(url) ~= nil
+    end,
+    base_url = function(url)
+      return transf.url.absolute_path_or_nil_by_path == nil and transf.url.query == nil and transf.url.fragment == nil
     end,
 
     booru_post_url = function(url)
@@ -1050,8 +1087,16 @@ is = {
     end,
     github_url = function(url)
       return get.str.bool_by_startswith(url, "https://github.com/")
-    end
+    end,
+    wayback_machine_url = function(url)
+      return get.str.bool_by_startswith(url, "https://web.archive.org/web/")
+    end,
 
+  },
+  base_url = {
+    dotgit_url = function(url)
+      return get.str.bool_by_endswith(url, ".git")
+    end,
   },
   scheme_url = {
     mailto_url = function(url)
@@ -1083,7 +1128,7 @@ is = {
   },
   path_url = {
     owner_item_url = function(url)
-      return #transf.owner_item_url.owner_item(url) == 2
+      return #transf.owner_item_url.two_strs_arr(url) == 2
     end,
     extension_url = function(url)
       return is.path.extension_path(transf.path_url.path(url))
@@ -1467,6 +1512,12 @@ is = {
         t,
         is.any.leaflike
       )
+    end,
+    gpt_response_table = function(t)
+      return t.choices
+    end,
+    syn_specifier = function(t)
+      return t.synonyms or t.antonyms
     end,
   },
   absolute_path_key_assoc = {
