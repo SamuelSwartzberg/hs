@@ -606,13 +606,13 @@ transf = {
       return new_tbl
     end
   },
-  two_has_id_key_assocs = {
+  two_has_id_key_tables = {
     bool_by_equal = function(t1, t2)
       return t1.id == t2.id
     end,
   },
   assoc_arr = {
-    has_index_key_assoc_arr = function(arr)
+    has_index_key_table_arr = function(arr)
       local res = get.table.table_by_copy(arr, true)
       for i, v in transf.arr.pos_int_vt_stateless_iter(arr) do
         v.index = i
@@ -6956,7 +6956,7 @@ transf = {
       return transf.action_specifier_arr.action_chooser_item_specifier_arr(transf.any.applicable_action_specifier_arr(any))
     end,
     applicable_action_with_index_chooser_item_specifier_arr = function(any)
-      return transf.assoc_arr.has_index_key_assoc_arr(transf.any.applicable_action_chooser_item_specifier_arr(any))
+      return transf.assoc_arr.has_index_key_table_arr(transf.any.applicable_action_chooser_item_specifier_arr(any))
     end,
     placeholder_text = function(any)
       return "Choose action on: " .. (
@@ -7584,7 +7584,7 @@ transf = {
       )
     end,
     action_with_index_choose_item_specifier_arr = function(action_specifier_arr)
-      return transf.assoc_arr.has_index_key_assoc_arr(
+      return transf.assoc_arr.has_index_key_table_arr(
         transf.action_specifier.action_chooser_item_specifier_arr(action_specifier_arr)
       )
     end,

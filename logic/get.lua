@@ -899,7 +899,7 @@ get = {
       end
     end,
     item_with_index_chooser_item_specifier_arr = function(arr, target_item_chooser_item_specifier_name)
-      return transf.assoc_arr.has_index_key_assoc_arr(
+      return transf.assoc_arr.has_index_key_table_arr(
         get.arr.item_chooser_item_specifier_arr(arr, target_item_chooser_item_specifier_name)
       )
     end,
@@ -945,12 +945,12 @@ get = {
     end,
     
   },
-  has_id_key_assoc_arr = {
-    has_id_key_assoc_by_first_match_w_has_id_key_assoc = function(arr, assoc)
+  has_id_key_table_arr = {
+    has_id_key_table_by_first_match_w_has_id_key_table = function(arr, assoc)
       return get.arr.t_or_nil_by_first_match_w_fn(
         arr,
         get.fn.first_n_args_bound_fn(
-          transf.two_has_id_key_assocs.bool_by_equal,
+          transf.two_has_id_key_tables.bool_by_equal,
           assoc
         )
       )

@@ -189,6 +189,9 @@ is = {
   },
   printable_ascii_no_nonspace_whitespace_str = {
     fnname = transf["nil"]["true"],
+    lower_alphanum_underscore_comma = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "a-z0-9_,")
+    end,
     single_attachment_str = function(str)
       return 
         get.str.bool_by_startswith(str, "#") 
@@ -1469,6 +1472,9 @@ is = {
     userdata = function(val)
       return type(val) == "userdata"
     end,
+    lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = function(val)
+      return is.any.lower_alphanum_underscore(val) or is.any.lower_alphanum_underscore_arr(val)
+    end
   },
   pass_item_name = {
     passw_pass_item_name = function(name)
@@ -1515,6 +1521,7 @@ is = {
       end
       return true
     end,
+    assoc = transf["nil"]["true"]
   },
   only_int_key_table = {
     --- an empty only_int_key_table is never a hole_y_arrlike and always an arr
@@ -1545,23 +1552,15 @@ is = {
     end,
   },
   non_empty_table = {
-    str_key_non_empty_table = function(t)
-      return get.table.bool_by_all_keys_pass_w_fn(
-        t,
-        is.any.str
-      )
-    end,
     date = function(t)
       return is.any.fn(t.addyears) -- arbitrary prop of date object
     end,
-    has_id_key_assoc = function(t)
+    has_id_key_table = function(t)
       return t.id ~= nil
     end,
-    has_index_key_assoc = function(t)
+    has_index_key_table = function(t)
       return t.index ~= nil
     end,
-  },
-  str_key_non_empty_table = {
     created_item_specifier = function(t)
       return
         t.created_item and t.creation_specifier
@@ -1604,18 +1603,6 @@ is = {
     email_specifier = function(t)
       return t.non_inline_attachment_local_file_arr 
     end,
-    absolute_path_key_assoc = function(t)
-      return get.table.bool_by_all_keys_pass_w_fn(
-        t,
-        is.any.absolute_path
-      )
-    end,
-    leaflike_key_assoc = function(t)
-      return get.table.bool_by_all_keys_pass_w_fn(
-        t,
-        is.any.leaflike
-      )
-    end,
     gpt_response_table = function(t)
       return t.choices
     end,
@@ -1624,26 +1611,6 @@ is = {
     end,
     iban_data_spec = function(t)
       return t.bankName or t.bic 
-    end,
-  },
-  absolute_path_key_assoc = {
-    absolute_path_key_leaf_str_or_nested_value_assoc = function(t)
-      return get.table.bool_by_all_values_pass_w_fn(
-        t,
-        function(val)
-          return is.any.leaf_str(val) or is.any.absolute_path_key_leaf_str_or_nested_value_assoc(val)
-        end
-      )
-    end,
-  },
-  leaflike_key_assoc = {
-    leaflike_key_leaf_str_or_nested_value_assoc = function(t)
-      return get.table.bool_by_all_values_pass_w_fn(
-        t,
-        function(val)
-          return is.any.leaf_str(val) or is.any.leaflike_key_leaf_str_or_nested_value_assoc(val)
-        end
-      )
     end,
   },
   dcmp_assoc = {
@@ -1760,12 +1727,34 @@ is = {
 
 local experimental_cache = {}
 
+
+-- TODO this is not gonna work as-is, because we're assuming that type1 exists on `is`, but it might not. Therefore instead of iterating we need to add a __index metamethod to is
+
 for type1, v in pairs(is) do
   experimental_cache[type1] = {}
   for type2, fn in pairs(v) do
     experimental_cache[type1][type2] = {}
   end
   local type1_ends_arr = get.str.bool_by_endswith(type1, "_arr")
+  local type1_noarr
+  if type1 == "arr" then 
+    type1_noarr = "any"
+  elseif type1_ends_arr then
+    type1_noarr = string.sub(type1, 1, -5)
+  end
+
+  -- NB: assoc handling will not work for _or_nested_value_assoc types, because of prohibitive complexity. _or_nested_value_assoc types may not be checked using `is` at all. Trying to will always result in false
+
+  local type1_ends_assoc = get.str.bool_by_endswith(type1, "_assoc")
+  local assoc_keytype, assoc_valuetype
+  if type1 == "assoc" then
+    assoc_keytype = "any"
+    assoc_valuetype = "any"
+  elseif type1_ends_assoc then
+    assoc_keytype, assoc_valuetype = get.string.n_strs_by_extracted_onig(type1, r.g.extract_key_value_assoc)
+    assoc_valuetype = assoc_valuetype or "any"
+  end
+
   local mt = {
     __index = function(t, type2)
 
@@ -1775,10 +1764,24 @@ for type1, v in pairs(is) do
       end
 
       if type1_ends_arr and get.str.bool_by_endswith(type2, "_arr") then
-        local type_a = string.sub(type1, 1, -5)
         local type_b = string.sub(type2, 1, -5)
         return function(arr)
-          return get.arr.bool_by_all_pass_w_fn(arr, is[type_a][type_b])
+          return get.arr.bool_by_all_pass_w_fn(arr, is[type1_noarr][type_b])
+        end
+      elseif type1_ends_assoc and get.str.bool_by_endswith(type2, "_assoc") then
+        local assoc_keytype_b, assoc_valuetype_b = get.string.n_strs_by_extracted_onig(type2, r.g.extract_key_value_assoc)
+        return function(assoc)
+          local retval = get.table.bool_by_all_keys_pass_w_fn(
+            assoc,
+            is[assoc_keytype][assoc_keytype_b]
+          )
+          if assoc_valuetype_b then
+            retval = retval and get.table.bool_by_all_values_pass_w_fn(
+              assoc,
+              is[assoc_valuetype][assoc_valuetype_b]
+            )
+          end
+          return retval
         end
       end
       

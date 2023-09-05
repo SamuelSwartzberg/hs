@@ -3,6 +3,7 @@ thing_name_hierarchy = {
     two_numbers = "leaf"
   },
   any = {
+    lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = "leaf",
     str = {
       empty_str = "leaf",
       json_str = "leaf",
@@ -267,6 +268,7 @@ thing_name_hierarchy = {
               indicated_urlmd5 = "leaf",
               indicated_citable_object_id = "leaf",
               percent_encoded_octet = "leaf",
+              lower_alphanum_underscore_comma = "leaf",
               colon_period_alphanum_minus_underscore = {
                 indicated_utf8_hex_str = "leaf",
                 rfc3339like_dt_o_interval = {
@@ -446,18 +448,25 @@ thing_name_hierarchy = {
         hole_y_arrlike = "leaf"
       },
       empty_table = "leaf",
+      assoc =  {
+          
+        absolute_path_key_assoc = {
+          absolute_path_key_leaf_str_or_nested_value_assoc = "leaf"
+        },
+        leaflike_key_assoc = {
+          leaflike_key_leaf_str_or_nested_value_assoc = "leaf"
+        },
+        printable_ascii_str_key_assoc = {
+          lower_alphanum_underscore_key_assoc = {
+            lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = "leaf"
+          }
+        }
+      },
       non_empty_table = {
         date = "leaf",
-        has_id_key_assoc = "leaf",
-        has_index_key_assoc = "leaf",
-        str_key_non_empty_table = {
-          absolute_path_key_assoc = {
-            absolute_path_key_leaf_str_or_nested_value_assoc = "leaf"
-          },
-          leaflike_key_assoc = {
-            leaflike_key_leaf_str_or_nested_value_assoc = "leaf"
-          },
-          created_item_specifier = {
+        has_id_key_table = "leaf",
+        has_index_key_table = "leaf",
+        created_item_specifier = {
             stream_created_item_specifier = {
               alive_stream_created_item_specifier = "leaf"
             },
@@ -491,7 +500,7 @@ thing_name_hierarchy = {
           },
           gpt_response_table = "leaf",
           iban_data_spec = "leaf", 
-        }
+        
       }
     },
     primitive = {
