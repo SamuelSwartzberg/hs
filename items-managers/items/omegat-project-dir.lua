@@ -43,7 +43,7 @@ OmegatProjectDirItemSpecifier = {
         for i, odt_pair in transf.array.index_value_stateless_iter(odts) do 
           for j, odt in transf.array.index_value_stateless_iter(odt_pair) do
             local client = self:get("local-data-object").client
-            local path = transf.path_leaf_specifier.path({
+            local path = transf.path_leaf_specifier.absolute_path({
               date = os.date(tblmap.date_component_name.rfc3339like_dt_format_string["day"]),
               path = env.MDIARY .. "/i_made_this/translations/",
               ["general-name"] = -- todo filename of odt,

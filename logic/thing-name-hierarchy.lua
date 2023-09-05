@@ -21,20 +21,26 @@ thing_name_hierarchy = {
         starting_with_dot_str = "leaf",
         multiline_str = {
           here_doc = "leaf",
-          raw_contact = "leaf"
+          raw_contact = "leaf",
+          ini_section_contents_str = "leaf"
         },
       },
       line = {
         not_whitespace_str = "leaf",
         indent_line = "leaf",
         noindent_line = "leaf",
-        comment_line = "leaf",
-        nocomment_line = "leaf",
+        hashcomment_line = "leaf",
+        nohashcomment_line = "leaf",
+        semicoloncomment_line = "leaf",
+        nosemicoloncomment_line = "leaf",
         trailing_whitespace_line = "leaf",
         notrailing_whitespace_line = "leaf",
-        noempty_line = "leaf",
-        noempty_nocomment_line = "leaf",
+        noempty_line = {
+          ini_kv_line = "leaf"
+        },
+        noempty_nohashcomment_line = "leaf",
         noempty_nocomment_noindent_line = "leaf",
+        ini_section_line = "leaf",
         trimmed_line = {
           displayname_email = "leaf",
         },
@@ -95,6 +101,9 @@ thing_name_hierarchy = {
                     nonempty_dir = {
                       grandparent_dir = "leaf",
                     },
+                    non_bare_git_root_dir = "leaf",
+                    bare_git_root_dir = "leaf",
+                    git_reposity_dir = "leaf",
                     git_root_dir = "leaf",
                     logging_dir = "leaf",
                   },
@@ -133,6 +142,7 @@ thing_name_hierarchy = {
                   },
                   in_git_dir = {
                     in_has_changes_git_dir = "leaf",
+                    in_has_no_changes_git_dir = "leaf",
                     in_has_unpushed_commits_git_dir = "leaf",
                   },
                 },
@@ -212,6 +222,7 @@ thing_name_hierarchy = {
               separated_nonindicated_dec_number_str = "leaf",
             },
             printable_ascii_not_whitespace_str = {
+              fs_tag_kv = "leaf",
               bracketed_ipv6 = "leaf",
               ip_host = "leaf",
               host = "leaf",
@@ -268,6 +279,9 @@ thing_name_hierarchy = {
                     writeable_calendar_name = "leaf",
                   },
                   alphanum_minus_underscore = {
+                    lower_alphanum_minus_underscore = {
+                      
+                    },
                     package_manager_name = "leaf",
                     pass_item_name = {
                       otp_pass_item_name = "leaf",
@@ -321,6 +335,11 @@ thing_name_hierarchy = {
                       hex_str = {
                         byte_hex_str = "leaf",
                         two_byte_hex_str = "leaf",
+                        sha1_hex_str = "leaf",
+                        git_sha1_hex_str = {
+                          full_sha1_hex_str = "leaf",
+                          short_sha1_hex_str = "leaf",
+                        },
                       },
                       digit_str = {
                         bin_str = "leaf",
@@ -405,7 +424,11 @@ thing_name_hierarchy = {
               password_url = "leaf",
               userinfo_url = "leaf",
               booru_post_url = "leaf",
-              github_url = "leaf"
+              github_url = {
+                github_path_url = {
+                  github_user_url = "leaf"
+                }
+              }
             },
             url_or_local_path = "leaf"
           },

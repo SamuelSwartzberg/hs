@@ -330,7 +330,7 @@ dothis = {
       dothis.str_arr.fill_with(transf.str.line_arr(str))
     end,
     fill_with_content_lines = function(path)
-      dothis.str_arr.fill_with(transf.str.noempty_line_str_arr(path))
+      dothis.str_arr.fill_with(transf.str.noempty_line_arr(path))
     end,
     fill_with_nocomment_noindent_content_lines = function(path)
       dothis.str_arr.fill_with(transf.str.nocomment_noindent_content_lines(path))

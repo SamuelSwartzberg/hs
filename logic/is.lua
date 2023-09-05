@@ -52,7 +52,13 @@ is = {
     here_doc = function(str)
       return get.str.bool_by_startswith(str, "<<EOF") and get.str.bool_by_endswith(str, "EOF") -- technically obviously it doesn't have to be EOF, but I'm only ever gonna use EOF
     end,
-    raw_contact = transf["nil"]["true"]
+    raw_contact = transf["nil"]["true"],
+    ini_section_contents_str = function(str)
+      return get.arr.bool_by_all_pass_w_fn(
+        transf.str.noempty_line_arr(str),
+        is.line.ini_section_line
+      )
+    end,
   },
   whitespace_str = {
     starting_with_whitespace_str = function(str)
@@ -79,11 +85,17 @@ is = {
     noindent_line = function(str)
       return is.str.not_starting_with_whitespace_str(str)
     end,
-    comment_line = function(str)
+    hashcomment_line = function(str)
       return get.str.bool_by_matches_part_eutf8(str, "^%s*#")
     end,
-    nocomment_line = function(str)
-      return not is.line.comment_line(str)
+    nohashcomment_line = function(str)
+      return not is.line.hashcomment_line(str)
+    end,
+    semicoloncomment_line = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "^%s*;")
+    end,
+    nosemicoloncomment_line = function(str)
+      return not is.line.semicoloncomment_line(str)
     end,
     trailing_whitespace_line = function(str)
       return is.str.ending_with_whitespace_str(str)
@@ -100,16 +112,24 @@ is = {
 
     -- combined conditions
 
-    noempty_nocomment_line = function(str)
-      return is.line.noempty_line(str) and is.line.nocomment_line(str)
+    noempty_nohashcomment_line = function(str)
+      return is.line.noempty_line(str) and is.line.nohashcomment_line(str)
     end,
     noempty_nocomment_noindent_line = function(str)
-      return is.line.noempty_nocomment_line(str) and is.line.noindent_line(str)
+      return is.line.noempty_nohashcomment_line(str) and is.line.noindent_line(str)
     end,
     trimmed_line = function(str)
       return is.line.noindent_line(str) and is.line.notrailing_whitespace_line(str)
     end,
+    ini_section_line = function(str)
+      return is.line.semicoloncomment_line(str) or is.line.ini_kv_line(str)
+    end,
 
+  },
+  noempty_line = {
+    ini_kv_line = function(str)
+      return get.str.bool_by_not_startswith(str, "=") and get.str.bool_by_not_endswith(str, "=") and get.str.bool_by_contains_w_ascii_str(str, "=")
+    end,
   },
   noweirdwhitespace_line = {
     path_component = function(str)
@@ -229,6 +249,9 @@ is = {
     end,
   },
   printable_ascii_not_whitespace_str = {
+    fs_tag_kv = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "[a-z0-9]+-[a-z0-9,]+")
+    end,
     percent_encoded_octet = function(str)
       return #str == 3 and get.str.bool_by_startswith(str, "%") and is.printable_ascii_not_whitespace_str.nonindicated_number_str(str:sub(2, 3))
     end,
@@ -431,6 +454,17 @@ is = {
     end,
     two_byte_hex_str = function(str)
       return #str == 4
+    end,
+    git_sha1_hex_str = function(str)
+      return #str >= 7 and #str <= 40
+    end,
+  },
+  git_sha1_hex_str = {
+    full_sha1_hex_str = function(str)
+      return #str == 40
+    end,
+    short_sha1_hex_str = function(str)
+      return #str <= 40
     end,
   },
   colon_alphanum_minus_underscore = {
@@ -806,16 +840,16 @@ is = {
   },
   nonempty_local_dir = {
     latex_project_dir = function(dir)
-      return get.dir.bool_by_leaf_of_child(dir, "main.tex")
+      return get.dir.bool_by_contains_leaf_of_child(dir, "main.tex")
     end,
     omegat_project_dir = function(dir)
-      return get.dir.bool_by_leaf_of_child(dir, "omegat.project")
+      return get.dir.bool_by_contains_leaf_of_child(dir, "omegat.project")
     end,
     npm_project_dir = function(dir)
-      return get.dir.bool_by_leaf_of_child(dir, "package.json")
+      return get.dir.bool_by_contains_leaf_of_child(dir, "package.json")
     end,
     cargo_project_dir = function(dir)
-      return get.dir.bool_by_leaf_of_child(dir, "Cargo.toml")
+      return get.dir.bool_by_contains_leaf_of_child(dir, "Cargo.toml")
     end,
     sass_project_dir = function(dir)
       return get.dir.bool_by_extension_of_child(dir, "sass")
@@ -852,12 +886,21 @@ is = {
     end,
   },
   dir = {
-    git_root_dir = function(path)
-      return get.arr.bool_by_some_equals_w_t(
-        transf.dir.leaflike_arr_by_children_filenames(path),
-        ".git"
+    non_bare_git_root_dir = function(path)
+      return is.line.git_repository_dir(
+        transf.path.path_by_ending_with_slash(path) .. ".git"
       )
     end,
+    git_repository_dir = function(path)
+      return get.dir.bool_by_contains_leaf_of_child(path, "HEAD")
+    end,
+    bare_git_root_dir = function(path)
+      return is.dir.git_repository_dir(path) and not is.dir.non_bare_git_root_dir(path)
+    end,
+    git_root_dir = function(path)
+      return is.dir.non_bare_git_root_dir(path) or is.dir.git_repository_dir(path) -- not `is.dir.bare_git_root_dir(path)` since we already know that the condition is.dir.non_bare_git_root_dir(path) is false and thus checking is.dir.git_repository_dir(path) is sufficient
+    end,
+
     empty_dir = function(path)
       return (
         is.path.remote_path(path) and is.remote_dir.empty_remote_dir(path)
@@ -872,6 +915,10 @@ is = {
       return get.str.bool_by_endswith(transf.path.leaflike_by_leaf(path), "_logs")
     end,
   },
+  git_root_dir = {
+    
+    
+  },
   nonempty_dir = {
     grandparent_dir = function (path)
       return get.arr.bool_by_some_pass_w_fn(
@@ -881,11 +928,17 @@ is = {
     end,
   },
   in_git_dir = {
+    in_has_no_changes_git_dir = function(path)
+      return get.str.bool_by_contains_w_ascii_str(
+        transf.in_git_dir.multiline_str_by_status(path),
+        "nothing to commit"
+      )
+    end,
     in_has_changes_git_dir = function(path)
-      return transf.in_git_dir.str_by_status(path) ~= ""
+      return not is.in_git_dir.in_has_no_changes_git_dir(path)
     end,
     in_has_unpushed_commits_git_dir = function(path)
-      return #transf.in_git_dir.unpushed_commit_hash_list(path) > 0
+      return #transf.in_git_dir.short_sha1_hex_str_arr_by_unpushed_commits(path) > 0
     end,
   },
   file = {
@@ -976,6 +1029,9 @@ is = {
 
   },
   alphanum_minus_underscore = {
+    lower_alphanum_minus_underscore = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "A-Z")
+    end,
     package_manager_name = function(str)
       return get.arr.bool_by_contains(transf["nil"].package_manager_name_arr(), str)
     end,
@@ -1085,7 +1141,7 @@ is = {
       return get.str.bool_by_matches_part_onig(url, r.g.url.scheme)
     end,
     path_url = function(url)
-      return transf.url.absolute_path_or_nil_by_path(url) ~= nil
+      return transf.url.local_absolute_path_or_nil_by_path(url) ~= nil
     end,
     authority_url = function(url)
       return transf.url.authority(url) ~= nil
@@ -1106,7 +1162,7 @@ is = {
       return transf.url.userinfo(url) ~= nil
     end,
     base_url = function(url)
-      return transf.url.absolute_path_or_nil_by_path == nil and transf.url.query == nil and transf.url.fragment == nil
+      return transf.url.local_absolute_path_or_nil_by_path == nil and transf.url.query == nil and transf.url.fragment == nil
     end,
 
     booru_post_url = function(url)
@@ -1124,6 +1180,21 @@ is = {
       return get.str.bool_by_startswith(url, "https://web.archive.org/web/")
     end,
 
+  },
+  github_url = {
+    github_path_url = function(url)
+      return is.url.path_url(url)
+    end,
+  },
+  github_path_url = {
+    github_user_url = function(url)
+      local path = transf.url.local_nonabsolute_path_or_nil_by_path(
+        url
+      )
+      return get.str.bool_by_not_contains_w_ascii_str(
+        path, "/"
+      )
+    end,
   },
   base_url = {
     dotgit_url = function(url)
@@ -1513,7 +1584,7 @@ is = {
         t.cpoint
     end,
     path_leaf_specifier = function(t)
-      return t.extension or t.path or t.rfc3339like_dt_o_interval or t.general_name or t.fs_tag_assoc
+      return t.extension or t.path or t.rfc3339like_dt_o_interval or t.general_name or t.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc
     end,
     intra_file_location_spec = function(t)
       return t.path and t.line

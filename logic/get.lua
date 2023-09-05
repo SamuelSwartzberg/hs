@@ -1019,10 +1019,10 @@ get = {
       return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.line_arr(path), 1, n or 10)
     end,
     noempty_line_arr_by_tail = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.noempty_line_str_arr(path), -(n or 10))
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.noempty_line_arr(path), -(n or 10))
     end,
     noempty_line_arr_by_head = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.noempty_line_str_arr(path), 1, n or 10)
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.noempty_line_arr(path), 1, n or 10)
     end,
     bool_by_startswith = stringy.startswith,
     bool_by_endswith = stringy.endswith,
@@ -1720,7 +1720,7 @@ get = {
   },
   path_leaf_specifier = {
     tag_value = function(parts, key)
-      return transf.path_leaf_specifier.fs_tag_assoc(parts)[key]
+      return transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(parts)[key]
     end,
     tag_raw_value = function(parts, key)
       return transf.path_leaf_specifier.fs_tag_str_assoc(parts)[key]
@@ -2032,8 +2032,8 @@ get = {
     extant_path_by_child_ending = function(dir, ending)
       return get.path_arr.path_or_nil_by_first_ending_find_ending_w_str(transf.dir.absolute_path_arr_by_children(dir), ending)
     end,
-    bool_by_leaf_of_child = function(dir, filename)
-      return get.path_arr.bool_by_contains_leaf(transf.dir.absolute_path_arr_by_children(dir), filename)
+    bool_by_contains_leaf_of_child = function(dir, leaf)
+      return get.path_arr.bool_by_contains_leaf(transf.dir.absolute_path_arr_by_children(dir), leaf)
     end,
     bool_by_extension_of_child = function(dir, extension)
       return get.path_arr.bool_by_contains_extension(transf.dir.absolute_path_arr_by_children(dir), extension)
@@ -2050,7 +2050,7 @@ get = {
   },
   git_root_dir = {
     hook_path = function(path, hook)
-      return transf.git_root_dir.hooks_dir(path) .. "/" .. hook
+      return transf.git_root_dir.in_git_dir_by_hooks_dir(path) .. "/" .. hook
     end,
     hook_res = function(path, hook)
       local hook_path = get.git_root_dir.hook_path(path, hook)

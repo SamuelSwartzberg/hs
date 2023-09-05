@@ -760,7 +760,7 @@ transf = {
         path = transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path),
         rfc3339like_dt_o_interval = rf3339like_dt_or_interval,
         general_name = general_name,
-        fs_tag_assoc = transf.fs_tag_str.fs_tag_assoc(fs_tag_str),
+        lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = transf.fs_tag_str.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(fs_tag_str),
       }
     end,
     window_by_with_leaf_as_title = function(path)
@@ -1115,7 +1115,7 @@ transf = {
     absolute_path_arr_by_children = function(remote_extant_path)
       local output = transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone lsf" .. transf.str.str_by_single_quoted_escaped(remote_extant_path))
       if output then
-        items = transf.str.noempty_line_str_arr(output)
+        items = transf.str.noempty_line_arr(output)
         items = transf.str_arr.stripped_str_arr(items)
       else
         items = {}
@@ -1300,7 +1300,7 @@ transf = {
     end,
     absolute_path_by_using_union_rfc3339like_dt_o_interval = function(path)
       local path_leaf_specifier = transf.dir.path_leaf_specifier_by_using_union_rf3339like_dt_or_interval(path)
-      return transf.path_leaf_specifier.path(path_leaf_specifier)
+      return transf.path_leaf_specifier.absolute_path(path_leaf_specifier)
     end
   },
   absolute_path_key_leaf_str_or_nested_value_assoc = {
@@ -1393,18 +1393,18 @@ transf = {
       local remote_host = transf.in_git_dir.host_by_remote(path)
       return tblmap.host.host_by_raw_default[remote_host] or tblmap.git_remote_type.host_by_raw_default[git_remote_type]
     end,
-    str_by_status = function(path)
+    multiline_str_by_status = function(path)
       return get.local_extant_path.cmd_output_from_path(
         path,
         "git status"
       )
     end,
-    unpushed_commit_hash_list = function(path)
+    short_sha1_hex_str_arr_by_unpushed_commits = function(path)
       local raw_hashes = get.local_extant_path.cmd_output_from_path(
         path,
         "git log --branches --not --remotes --pretty=format:'%h'"
       )
-      return transf.str.noempty_line_str_arr(raw_hashes)
+      return transf.str.noempty_line_arr(raw_hashes)
     end
 
 
@@ -1417,40 +1417,54 @@ transf = {
       return get.arr.arr_by_filtered(path_arr, is.in_git_dir.in_has_unpushed_commits_git_dir)
     end,
   },
-  git_root_dir = {
-    dotgit_dir = function(git_root_dir)
+  git_repository_dir = {
+    in_git_dir_by_hooks_dir = function(git_repository_dir)
+      return transf.path.path_by_ending_with_slash(git_repository_dir) .. "hooks"
+    end,
+  },
+  non_bare_git_root_dir = {
+    git_repository_dir = function(git_root_dir)
       return transf.path.path_by_ending_with_slash(git_root_dir) .. ".git"
     end,
-    hooks_dir = function(git_root_dir)
-      return transf.path.path_by_ending_with_slash(git_root_dir) .. ".git/hooks"
+  },
+  git_root_dir = {
+    git_repository_dir = function(git_root_dir)
+      if is.dir.non_bare_git_root_dir(git_root_dir) then
+        return transf.non_bare_git_root_dir.git_repository_dir(git_root_dir)
+      else
+        return git_root_dir
+      end
     end,
-    hooks_absolute_path_arr = function(git_root_dir)
-      return transf.dir.absolute_path_arr_by_children(transf.git_root_dir.hooks_dir(git_root_dir))
+    in_git_dir_by_hooks_dir = function(git_root_dir)
+      return transf.git_repository_dir.in_git_dir_by_hooks_dir(transf.git_root_dir.git_repository_dir(git_root_dir))
+    end,
+    in_git_dir_arr_by_hooks = function(git_root_dir)
+      return transf.dir.absolute_path_arr_by_children(transf.git_root_dir.in_git_dir_by_hooks_dir(git_root_dir))
     end,
   },
 
   github_username = {
-    github_url = function(github_username)
+    github_user_url = function(github_username)
       return "https://github.com/" .. github_username
     end,
   },
   
   path_leaf_specifier = {
-    general_name_part = function(path_leaf_specifier)
+    alphanum_minus_underscore_by_general_name_part = function(path_leaf_specifier)
       if path_leaf_specifier.general_name then 
         return "--" .. path_leaf_specifier.general_name
       else
         return ""
       end
     end,
-    extension_part = function(path_leaf_specifier)
+    leaflike_by_extension_part = function(path_leaf_specifier)
       if path_leaf_specifier.extension then 
         return "." .. path_leaf_specifier.extension
       else
         return ""
       end
     end,
-    rf3339like_dt_or_interval_part = function(path_leaf_specifier)
+    str_by_rf3339like_dt_or_interval_part = function(path_leaf_specifier)
       return path_leaf_specifier.rf3339like_dt_or_interval or ""
     end,
     date_interval_specifier_or_nil = function(path_leaf_specifier)
@@ -1460,101 +1474,106 @@ transf = {
         return nil
       end
     end,
-    path_part = function(path_leaf_specifier)
+    absolute_path_by_path_part = function(path_leaf_specifier)
       return transf.path.path_by_ending_with_slash(path_leaf_specifier.path) 
     end,
-    fs_tag_assoc = function(path_leaf_specifier)
-      return path_leaf_specifier.fs_tag_assoc
+    lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(path_leaf_specifier)
+      return path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc
     end,
     fs_tag_str_assoc = function(path_leaf_specifier)
-      return transf.fs_tag_assoc.fs_tag_str_assoc(path_leaf_specifier.fs_tag_assoc)
+      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_str_assoc(path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
     end,
-    fs_tag_str_part_arr = function(path_leaf_specifier)
-      return transf.fs_tag_assoc.fs_tag_str_part_arr(path_leaf_specifier.fs_tag_assoc)
+    fs_tag_kv_arr = function(path_leaf_specifier)
+      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_kv_arr(path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
     end,
     fs_tag_str = function(path_leaf_specifier)
-      return transf.fs_tag_assoc.fs_tag_str(path_leaf_specifier.fs_tag_assoc)
+      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_str(path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
     end,
-    fs_tag_keys = function(path_leaf_specifier)
-      return transf.table_or_nil.kt_arr(path_leaf_specifier.fs_tag_assoc)
+    lower_alphanum_underscore_arr_by_fs_tag_keys = function(path_leaf_specifier)
+      return transf.table_or_nil.kt_arr(path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
     end,
-    path = function(path_leaf_specifier)
+    absolute_path = function(path_leaf_specifier)
       return transf.path.path_by_ending_with_slash(path_leaf_specifier.path) 
-      .. transf.path_leaf_specifier.rf3339like_dt_or_interval_part(path_leaf_specifier)
-      .. transf.path_leaf_specifier.general_name_part(path_leaf_specifier)
+      .. transf.path_leaf_specifier.str_by_rf3339like_dt_or_interval_part(path_leaf_specifier)
+      .. transf.path_leaf_specifier.alphanum_minus_underscore_by_general_name_part(path_leaf_specifier)
       .. transf.path_leaf_specifier.fs_tag_str(path_leaf_specifier)
-      .. transf.path_leaf_specifier.extension_part(path_leaf_specifier)
+      .. transf.path_leaf_specifier.leaflike_by_extension_part(path_leaf_specifier)
     end
   },
   fs_tag_str = {
-    fs_tag_str_part_arr = function(fs_tag_str)
+    fs_tag_kv_arr = function(fs_tag_str)
       return get.str.str_arr_by_split_w_ascii_char(
         fs_tag_str:sub(2),
         "%"
       )
     end,
-    fs_tag_str_assoc = function(fs_tag_str)
+    lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = function(fs_tag_str)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        transf.fs_tag_str.fs_tag_str_part_arr(fs_tag_str),
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.str.n_strs_split, {a_use, "-", 2})
+        transf.fs_tag_str.fs_tag_kv_arr(fs_tag_str),
+        transf.fs_tag_kv.lower_alphanum_underscore_and_lower_alphanum_underscore_comma
       )
     end,
-    fs_tag_assoc = function(fs_tag_str)
-      transf.fs_tag_str_assoc.fs_tag_assoc(
-        transf.fs_tag_str.fs_tag_str_assoc(fs_tag_str)
+    lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(fs_tag_str)
+      transf.fs_tag_str_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(
+        transf.fs_tag_str.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(fs_tag_str)
       )
     end,
   },
-  fs_tag_str_part_arr = {
-    fs_tag_str_assoc = function(fs_tag_str_part_arr)
+  fs_tag_kv = {
+    lower_alphanum_underscore_and_lower_alphanum_underscore_comma = function(fs_tag_kv)
+      return get.str.n_strs_split(fs_tag_kv, "-", 2)
+    end,
+  },
+  fs_tag_kv_arr = {
+    fs_tag_str_assoc = function(fs_tag_kv_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        fs_tag_str_part_arr,
+        fs_tag_kv_arr,
         get.fn.second_n_args_bound_fn(get.str.two_strs_split_or_nil, "-")
       )
     end,
-    fs_tag_assoc = function(fs_tag_str_part_arr)
-      transf.fs_tag_str_assoc.fs_tag_assoc(
-        transf.fs_tag_str_part_arr.fs_tag_str_assoc(fs_tag_str_part_arr)
+    lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(fs_tag_kv_arr)
+      transf.fs_tag_str_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(
+        transf.fs_tag_kv_arr.fs_tag_str_assoc(fs_tag_kv_arr)
       )
     end,
-    fs_tag_str = function(fs_tag_str_part_arr)
-      return "%" .. get.str_or_number_arr.str_by_joined(fs_tag_str_part_arr, "%")
+    fs_tag_str = function(fs_tag_kv_arr)
+      return "%" .. get.str_or_number_arr.str_by_joined(fs_tag_kv_arr, "%")
     end,
   },
   fs_tag_str_assoc = {
-    fs_tag_assoc = function(assoc)
+    lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(assoc)
       return hs.fnutils.map(
         assoc,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.str.str_arr_by_split_w_ascii_char, {a_use, ","})
       )
     end,
-    fs_tag_str_part_arr = function(assoc)
+    fs_tag_kv_arr = function(assoc)
       return get.table.str_arr_by_mapped_w_fmt_str(
         assoc,
         "%s-%s"
       )
     end,
     fs_tag_str = function(assoc)
-      return transf.fs_tag_str_part_arr.fs_tag_str(
-        transf.fs_tag_str_assoc.fs_tag_str_part_arr(assoc)
+      return transf.fs_tag_kv_arr.fs_tag_str(
+        transf.fs_tag_str_assoc.fs_tag_kv_arr(assoc)
       )
     end,
   },
-  fs_tag_assoc = {
-    fs_tag_str_assoc = function(fs_tag_assoc)
+  lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = {
+    fs_tag_str_assoc = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
       return hs.fnutils.map(
-        fs_tag_assoc,
+        lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc,
         transf.any.join_if_arr
       )
     end,
-    fs_tag_str_part_arr = function(fs_tag_assoc)
-      return transf.fs_tag_str_assoc.fs_tag_str_part_arr(
-        transf.fs_tag_assoc.fs_tag_str_assoc(fs_tag_assoc)
+    fs_tag_kv_arr = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+      return transf.fs_tag_str_assoc.fs_tag_kv_arr(
+        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_str_assoc(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
       )
     end,
-    fs_tag_str = function(fs_tag_assoc)
-      return transf.fs_tag_str_part_arr.fs_tag_str(
-        transf.fs_tag_assoc.fs_tag_str_part_arr(fs_tag_assoc)
+    fs_tag_str = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+      return transf.fs_tag_kv_arr.fs_tag_str(
+        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_kv_arr(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
       )
     end,
   },
@@ -1790,7 +1809,7 @@ transf = {
   },
   ini_file = {
     assoc = function(path)
-      return transf.ini_str.assoc(transf.file.str_by_contents(path))
+      return transf.ini_str.str_key_str_or_nested_1_value_assoc(transf.file.str_by_contents(path))
     end,
   },
   toml_file = {
@@ -1914,7 +1933,7 @@ transf = {
       return transf.str.line_arr(transf.plaintext_file.str_by_contents(path))
     end,
     str_arr_by_content_lines = function(path)
-      return transf.str.noempty_line_str_arr(transf.plaintext_file.str_by_contents(path))
+      return transf.str.noempty_line_arr(transf.plaintext_file.str_by_contents(path))
     end,
     noindent_content_lines = function(path)
       return transf.str.noindent_content_lines(transf.plaintext_file.str_by_contents(path))
@@ -2909,7 +2928,7 @@ transf = {
       return contact_table.Private["github-username"]
     end,
     github_url = function(contact_table)
-      return transf.github_username.github_url(
+      return transf.github_username.github_user_url(
         transf.contact_table.github_username(contact_table)
       )
     end,
@@ -3239,7 +3258,7 @@ transf = {
         },
       }).items
     end,
-    fs_tag_assoc = function(id)
+    lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(id)
       local assoc = transf.form_filling_specifier.filled_str_assoc({
         in_fields = {
           title = transf.youtube_video_id.str_by_title(id),
@@ -3313,8 +3332,8 @@ transf = {
     channel_title = function(url)
       return transf.youtube_video_id.str_by_channel_title(transf.youtube_video_url.youtube_video_id(url))
     end,
-    fs_tag_assoc = function(url)
-      return transf.youtube_video_id.fs_tag_assoc(transf.youtube_video_url.youtube_video_id(url))
+    lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(url)
+      return transf.youtube_video_id.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(transf.youtube_video_url.youtube_video_id(url))
     end,
   },
   youtube_channel_id = {
@@ -3362,7 +3381,7 @@ transf = {
   youtube_channel_url = {
     handle = function(url)
       return get.str.str_by_no_adfix(
-        transf.url.absolute_path_or_nil_by_path(url),
+        transf.url.local_absolute_path_or_nil_by_path(url),
         "/"
       )
     end,
@@ -3811,30 +3830,30 @@ transf = {
     end,
 
 
-    noempty_line_str_arr = function(str)
+    noempty_line_arr = function(str)
       return transf.str_arr.noemtpy_str_arr(
         transf.str.line_arr(str)
       )
     end,
     noindent_content_lines = function(str)
-      return transf.str_arr.noindent_str_arr(transf.str.noempty_line_str_arr(str))
+      return transf.str_arr.noindent_str_arr(transf.str.noempty_line_arr(str))
     end,
     nocomment_noindent_content_lines = function(str)
-      return transf.str_arr.nocomment_noindent_str_arr(transf.str.noempty_line_str_arr(str))
+      return transf.str_arr.nocomment_noindent_str_arr(transf.str.noempty_line_arr(str))
     end,
 
     line_by_first = function(str)
       return transf.str.line_arr(str)[1]
     end,
     noempty_line_by_first = function(str)
-      return transf.str.noempty_line_str_arr(str)[1]
+      return transf.str.noempty_line_arr(str)[1]
     end,
     line_by_last = function(str)
       local lines = transf.str.line_arr(str)
       return lines[#lines]
     end,
     noempty_line_by_last = function(str)
-      local lines = transf.str.noempty_line_str_arr(str)
+      local lines = transf.str.noempty_line_arr(str)
       return lines[#lines]
     end,
     char_by_first = function(str)
@@ -3985,11 +4004,11 @@ transf = {
     noindent_line = function(str)
       return get.str.n_strs_by_extracted_eutf8(str, "^%s*(.*)$")
     end,
-    nocomment_line = function(str)
+    nohashcomment_line = function(str)
       return get.str.str_arr_by_split_w_string(str, " # ")[1]
     end,
     nocomment_noindent = function(str)
-      return transf.line.noindent_line(transf.line.nocomment_line(str))
+      return transf.line.noindent_line(transf.line.nohashcomment_line(str))
     end,
     line_by_comment = function(str)
       return get.str.str_arr_by_split_w_string(str, " # ")[2]
@@ -4117,9 +4136,9 @@ transf = {
   },
   
   ini_str = {
-    assoc = function(str)
+    str_key_str_or_nested_1_value_assoc = function(str)
       return transf.str.table_or_err_by_evaled_env_bash_parsed_json(
-        "jc --ini <<EOF " .. str .. "EOF"
+        "jc --ini " .. transf.str.here_doc(str)
       )
     end,
   },
@@ -4140,7 +4159,7 @@ transf = {
   },
   header_str = {
     assoc = function(str)
-      local lines = transf.str.noempty_line_str_arr(str)
+      local lines = transf.str.noempty_line_arr(str)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         lines,
         transf.str.two_strs_by_split_header
@@ -4339,9 +4358,7 @@ transf = {
     ini_line = function(two_anys_arr)
       return transf.two_anys.ini_line(two_anys_arr[1], two_anys_arr[2])
     end,
-    envlike_line = function(two_anys_arr)
-      return transf.two_anys.envlike_line(two_anys_arr[1], two_anys_arr[2])
-    end,
+
     curl_form_field_args = function(two_anys_arr)
       return transf.two_anys.curl_form_field_args(two_anys_arr[1], two_anys_arr[2])
     end,
@@ -4380,9 +4397,6 @@ transf = {
     ini_line = function(key, value)
       return transf.any.str_by_replicable(key) .. " = " .. transf.any.str_by_replicable(value)
     end,
-    envlike_line = function(key, value)
-      return transf.any.str_by_replicable(key) .. "=" .. transf.any.str_by_replicable(value)
-    end,
     curl_form_field_args = function(key, value)
       return {
         "-F",
@@ -4392,6 +4406,11 @@ transf = {
     assoc_entry_str = function(key, value)
       return "[" .. transf.any.str_by_replicable(key) .. "] = " .. transf.any.str_by_replicable(value)
     end,
+  },
+  two_noempty_lines = {
+    ini_kv_line = function(l1, l2)
+      return l1 .. " = " .. l2
+    end
   },
   two_comparables = {
     comparable_by_larger = function(a, b)
@@ -4518,21 +4537,21 @@ transf = {
     noindent_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent_line)
     end,
-    nocomment_line_filtered_str_arr = function(arr)
+    nohashcomment_line_filtered_str_arr = function(arr)
       return get.arr.arr_by_filtered(
         arr,
-        is.str.nocomment_line
+        is.str.nohashcomment_line
       )
     end,
     nocomment_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.str_arr.nocomment_line_filtered_str_arr(arr),
-        transf.line.nocomment_line
+        transf.str_arr.nohashcomment_line_filtered_str_arr(arr),
+        transf.line.nohashcomment_line
       )
     end,
-    nocomment_line_filtered_noindent_str_arr = function(arr)
+    nohashcomment_line_filtered_noindent_str_arr = function(arr)
       return transf.str_arr.noindent_str_arr(
-        transf.str_arr.nocomment_line_filtered_str_arr(arr)
+        transf.str_arr.nohashcomment_line_filtered_str_arr(arr)
       )
     end,
     nocomment_noindent_str_arr = function(arr)
@@ -5016,15 +5035,7 @@ transf = {
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.curl_form_field_args)
       )
     end,
-    ini_line_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.ini_line)
-    end,
-    ini_str = function(t)
-      return get.str_or_number_arr.str_by_joined(transf.assoc.ini_line_arr(t), "\n")
-    end,
-    envlike_line_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.envlike_line)
-    end,
+    
     assoc_entry_str_arr = function(t)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.assoc_entry_str)
     end,
@@ -5039,9 +5050,6 @@ transf = {
     assoc_entry_multiline_str = function(t)
       return get.str_or_number_arr.str_by_joined(transf.assoc.assoc_entry_str_arr(t), "\n")
     end,
-    envlike_str = function(t)
-      return get.str_or_number_arr.str_by_joined(transf.assoc.envlike_line_arr(t), "\n")
-    end,
     truthy_value_assoc = function(t)
       return get.arr.arr_by_filtered(
         t,
@@ -5050,6 +5058,14 @@ transf = {
     end,
     truthy_value_key_arr = function(t)
       return transf.table_or_nil.kt_arr(transf.assoc.truthy_value_assoc(t))
+    end,
+  },
+  noempty_line_key_value_assoc = {
+    ini_kv_line_arr = function(t)
+      return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(t, transf.two_noempty_lines.ini_kv_line)
+    end,
+    ini_section_contents_str = function(t)
+      return get.str_or_number_arr.str_by_joined(transf.assoc.ini_line_arr(t), "\n")
     end,
   },
   table_arr = {
@@ -6647,8 +6663,14 @@ transf = {
       local domain_name_or_nil = transf.url.domain_name_or_nil(url)
       if domain_name_or_nil then return get.str.n_strs_by_extracted_eutf8(transf.url.host(url), "%w+%.(%w+)$") end
     end,
-    absolute_path_or_nil_by_path = function(url)
+    local_absolute_path_or_nil_by_path = function(url)
       return transf.url.url_table(url).path
+    end,
+    local_nonabsolute_path_or_nil_by_path = function(url)
+      local path = transf.url.local_absolute_path_or_nil_by_path(url)
+      if path then
+        return get.str.str_by_no_prefix(path, "/")
+      end
     end,
     query = function(url)
       return transf.url.url_table(url).query
@@ -6744,10 +6766,10 @@ transf = {
   },
   path_url = {
     initial_path_component = function(url)
-      return transf.path.path_component_by_initial(transf.url.absolute_path_or_nil_by_path(url))
+      return transf.path.path_component_by_initial(transf.url.local_absolute_path_or_nil_by_path(url))
     end,
     leaf = function(url)
-      return transf.path.leaflike_by_leaf(transf.url.absolute_path_or_nil_by_path(url))
+      return transf.path.leaflike_by_leaf(transf.url.local_absolute_path_or_nil_by_path(url))
     end,
   },
   sgml_url = {
@@ -6766,7 +6788,7 @@ transf = {
   },
   owner_item_url = {
     two_strs_arr = function(url)
-      return get.path.path_component_arr_by_slice_w_slice_spec(transf.url.absolute_path_or_nil_by_path(url), "1:2")
+      return get.path.path_component_arr_by_slice_w_slice_spec(transf.url.local_absolute_path_or_nil_by_path(url), "1:2")
     end,
   },
   github_url = {
@@ -6811,12 +6833,12 @@ transf = {
   },
   yandere_style_post_url = {
     nonindicated_number_str_by_booru_post_id = function(url)
-      return get.str.n_strs_by_extracted_eutf8(transf.url.absolute_path_or_nil_by_path(url), "/post/show/(%d+)")
+      return get.str.n_strs_by_extracted_eutf8(transf.url.local_absolute_path_or_nil_by_path(url), "/post/show/(%d+)")
     end
   },
   danbooru_style_post_url = {
     nonindicated_number_str_by_booru_post_id = function(url)
-      return get.str.n_strs_by_extracted_eutf8(transf.url.absolute_path_or_nil_by_path(url), "/posts/(%d+)")
+      return get.str.n_strs_by_extracted_eutf8(transf.url.local_absolute_path_or_nil_by_path(url), "/posts/(%d+)")
     end
   },
   gpt_response_table = {
