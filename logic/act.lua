@@ -420,38 +420,38 @@ act = {
     alert = function(str)
       dothis.str.alert(str, 10)
     end,
-    search_wiktionary = function(query) dothis.search_engine.search("wiktionary", query) end,
-    search_wikipedia = function(query) dothis.search_engine.search("wikipedia", query) end,
-    search_youtube = function(query) dothis.search_engine.search("youtube", query) end,
-    search_jisho = function(query) dothis.search_engine.search("jisho", query) end,
-    search_glottopedia = function(query) dothis.search_engine.search("glottopedia", query) end,
-    search_ruby_apidoc = function(query) dothis.search_engine.search("ruby_apidoc", query) end,
-    search_python_docs = function(query) dothis.search_engine.search("python_docs", query) end,
-    search_merriam_webster = function(query) dothis.search_engine.search("merriam_webster", query) end,
-    search_assoc_cc = function(query) dothis.search_engine.search("assoc_cc", query) end,
-    search_deepl_en_ja = function(query) dothis.search_engine.search("deepl_en_ja", query) end,
-    search_deepl_de_en = function(query) dothis.search_engine.search("deepl_de_en", query) end,
-    search_mdn = function(query) dothis.search_engine.search("mdn", query) end,
-    search_scihub = function(query) dothis.search_engine.search("scihub", query) end,
-    search_libgen = function(query) dothis.search_engine.search("libgen", query) end,
-    search_semantic_scholar = function(query) dothis.search_engine.search("semantic_scholar", query) end,
-    search_google_scholar = function(query) dothis.search_engine.search("google_scholar", query) end,
-    search_google_images = function(query) dothis.search_engine.search("google_images", query) end,
-    search_google_maps = function(query) dothis.search_engine.search("google_maps", query) end,
-    search_danbooru = function(query) dothis.search_engine.search("danbooru", query) end,
-    search_gelbooru = function(query) dothis.search_engine.search("gelbooru", query) end,
+    search_wiktionary = function(query) dothis.search_engine_id.search("wiktionary", query) end,
+    search_wikipedia = function(query) dothis.search_engine_id.search("wikipedia", query) end,
+    search_youtube = function(query) dothis.search_engine_id.search("youtube", query) end,
+    search_jisho = function(query) dothis.search_engine_id.search("jisho", query) end,
+    search_glottopedia = function(query) dothis.search_engine_id.search("glottopedia", query) end,
+    search_ruby_apidoc = function(query) dothis.search_engine_id.search("ruby_apidoc", query) end,
+    search_python_docs = function(query) dothis.search_engine_id.search("python_docs", query) end,
+    search_merriam_webster = function(query) dothis.search_engine_id.search("merriam_webster", query) end,
+    search_assoc_cc = function(query) dothis.search_engine_id.search("assoc_cc", query) end,
+    search_deepl_en_ja = function(query) dothis.search_engine_id.search("deepl_en_ja", query) end,
+    search_deepl_de_en = function(query) dothis.search_engine_id.search("deepl_de_en", query) end,
+    search_mdn = function(query) dothis.search_engine_id.search("mdn", query) end,
+    search_scihub = function(query) dothis.search_engine_id.search("scihub", query) end,
+    search_libgen = function(query) dothis.search_engine_id.search("libgen", query) end,
+    search_semantic_scholar = function(query) dothis.search_engine_id.search("semantic_scholar", query) end,
+    search_google_scholar = function(query) dothis.search_engine_id.search("google_scholar", query) end,
+    search_google_images = function(query) dothis.search_engine_id.search("google_images", query) end,
+    search_google_maps = function(query) dothis.search_engine_id.search("google_maps", query) end,
+    search_danbooru = function(query) dothis.search_engine_id.search("danbooru", query) end,
+    search_gelbooru = function(query) dothis.search_engine_id.search("gelbooru", query) end,
   },
   extant_path = {
     create_stream_foreground = function(path)
       dothis.created_item_specifier_arr.create(
         stream_arr,
-        get.extant_path.stream_creation_specifier(path, "foreground")
+        get.local_extant_path.stream_creation_specifier(path, "foreground")
       )
     end,
     create_stream_background = function(path)
       dothis.created_item_specifier_arr.create(
         stream_arr,
-        get.extant_path.stream_creation_specifier(path, "background")
+        get.local_extant_path.stream_creation_specifier(path, "background")
       )
     end,
     choose_item_and_action_by_descendants = function(path)

@@ -335,9 +335,9 @@ dothis = {
     fill_with_nocomment_noindent_content_lines = function(path)
       dothis.str_arr.fill_with(transf.str.nocomment_noindent_content_lines(path))
     end,
-    search = function(str, search_engine)
+    search = function(str, search_engine_id)
       dothis.url_or_local_path.open_browser(
-        get.str.search_engine_search_url(search_engine, str)
+        get.str.search_engine_id_search_url(search_engine_id, str)
       )
     end,
     write_to_temp_file = function(str)
@@ -1876,7 +1876,7 @@ dothis = {
     build = function(project_dir, project_type, do_after)
       dothis.dir.do_in_path(
         project_dir,
-        tblmap.project_type.build_command[project_type],
+        tblmap.project_type.str_by_build_command[project_type],
         do_after
       )
     end,
@@ -3132,7 +3132,7 @@ dothis = {
       )
     end
   },
-  search_engine = {
+  search_engine_id = {
     search = function(engine, query)
       dothis.str.search(query, engine)
     end

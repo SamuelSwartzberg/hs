@@ -892,19 +892,19 @@ transf = {
       return transf.dir.absolute_path_arr_by_children(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path))
     end,
     absolute_path_arr_by_descendants = function(path)
-      return get.extant_path.absolute_path_arr(
+      return get.local_extant_path.absolute_path_arr(
         path,
         {recursion = true}
       )
     end,
     absolute_path_arr_by_descendants_depth_3 = function(path)
-      return get.extant_path.absolute_path_arr(
+      return get.local_extant_path.absolute_path_arr(
         path,
         {recursion = 3}
       )
     end,
     file_arr_by_descendants = function(path)
-      return get.extant_path.absolute_path_arr(
+      return get.local_extant_path.absolute_path_arr(
         path,
         {recursion = true, include_dirs = false}
       )
@@ -926,7 +926,7 @@ transf = {
     end,
     
     dir_arr_by_descendants = function(path)
-      return get.extant_path.absolute_path_arr(
+      return get.local_extant_path.absolute_path_arr(
         path,
         {recursion = true, include_files = false}
       )
@@ -942,7 +942,7 @@ transf = {
     end,
 
     dir_arr_by_descendants_depth_3 = function(path)
-      return get.extant_path.absolute_path_arr(
+      return get.local_extant_path.absolute_path_arr(
         path,
         {recursion = 3, include_files = false}
       )
@@ -953,28 +953,28 @@ transf = {
   },
   local_extant_path = {
     int_by_size_bytes = function(path)
-      return get.extant_path.attr(path, "size")
+      return get.local_extant_path.attr(path, "size")
     end,
     timestamp_s_by_modification = function(path)
-      return get.extant_path.attr(path, "modification")
+      return get.local_extant_path.attr(path, "modification")
     end,
     date_by_modification = function(path)
       return transf.timestamp_s.date(transf.extant_path.m_timestamp_s(path))
     end,
     timestamp_s_by_creation = function(path)
-      return get.extant_path.attr(path, "creation")
+      return get.local_extant_path.attr(path, "creation")
     end,
     date_by_creation = function(path)
       return transf.timestamp_s.date(transf.extant_path.timestamp_s_by_creation(path))
     end,
     timestamp_s_by_change = function(path)
-      return get.extant_path.attr(path, "change")
+      return get.local_extant_path.attr(path, "change")
     end,
     date_by_change = function(path)
       return transf.timestamp_s.date(transf.extant_path.timestamp_s_by_change(path))
     end,
     timestamp_s_by_access = function(path)
-      return get.extant_path.attr(path, "access")
+      return get.local_extant_path.attr(path, "access")
     end,
     date_by_access = function(path)
       return transf.timestamp_s.date(transf.extant_path.timestamp_s_by_access(path))
@@ -1191,7 +1191,7 @@ transf = {
   },
   dir = {
     absolute_path_arr_by_children = function(dir)
-      return get.extant_path.absolute_path_arr(dir)
+      return get.local_extant_path.absolute_path_arr(dir)
     end,
     absolute_path_arr_by_children_or_self = function(dir)
       return transf.arr_and_any.arr(
@@ -1206,7 +1206,7 @@ transf = {
       )
     end,
     file_arr_by_children = function(dir)
-      return get.extant_path.absolute_path_arr(dir, {include_dirs = false})
+      return get.local_extant_path.absolute_path_arr(dir, {include_dirs = false})
     end,
     absolute_path_arr_by_file_children_or_self = function(dir)
       return transf.arr_and_any.arr(
@@ -1215,7 +1215,7 @@ transf = {
       )
     end,
     dir_arr_by_children = function(dir)
-      return get.extant_path.absolute_path_arr(dir, {include_files = false})
+      return get.local_extant_path.absolute_path_arr(dir, {include_files = false})
     end,
     dir_arr_by_children_or_self = function(dir)
       return transf.arr_and_any.arr(
@@ -1334,7 +1334,7 @@ transf = {
 
   in_git_dir = {
     git_root_dir = function(path)
-      return get.extant_path.extant_path_by_self_or_ancestor_w_fn(
+      return get.local_extant_path.extant_path_by_self_or_ancestor_w_fn(
         path,
         is.dir.git_root_dir
       )
@@ -1349,13 +1349,13 @@ transf = {
       return transf.path.path_by_ending_with_slash(transf.in_git_dir.git_root_dir(path)) .. ".gitignore"
     end,
     str_by_current_branch = function(path)
-      return get.extant_path.cmd_output_from_path(
+      return get.local_extant_path.cmd_output_from_path(
         path,
         "git rev-parse --abbrev-ref HEAD"
       )
     end,
     dotgit_url_by_remote = function(path)
-      return get.extant_path.cmd_output_from_path(
+      return get.local_extant_path.cmd_output_from_path(
         path,
         "git config --get remote.origin.url"
       )
@@ -1369,37 +1369,38 @@ transf = {
     two_strs_arr_or_nil_by_remote_owner_item = function(path)
       return transf.owner_item_url.two_strs_arr(transf.in_git_dir.base_url_by_remote_cleaned(path))
     end,
-    remote_host = function(path)
+    host_by_remote = function(path)
       return transf.url.host(transf.in_git_dir.base_url_by_remote_cleaned(path))
     end,
-    remote_sld = function(path)
+    alphanum_minus_or_nil_by_remote_sld = function(path)
       return transf.url.alphanum_minus_or_nil_by_sld(transf.in_git_dir.base_url_by_remote_cleaned(path))
     end,
-    remote_type = function(path)
-      if get.arr.bool_by_contains(ls.remote_types, transf.in_git_dir.remote_sld(path)) then
-        return transf.in_git_dir.remote_sld(path)
+    git_remote_type = function(path)
+      local git_remote_type = transf.in_git_dir.alphanum_minus_or_nil_by_remote_sld(path)
+      if get.arr.bool_by_contains(ls.git_remote_types, git_remote_type ) then
+        return git_remote_type
       else
-        return tblmap.host.remote_type[transf.in_git_dir.remote_host(path)] -- we'll hardcode known hosts there
+        return tblmap.host.git_remote_type[transf.in_git_dir.host_by_remote(path)] -- we'll hardcode known hosts there
       end
     end,
-    remote_blob_host = function(path)
-      local remote_type = transf.in_git_dir.remote_type(path)
-      local remote_host = transf.in_git_dir.remote_host(path)
-      return tblmap.host.blob_host[remote_host] or tblmap.remote_type.blob_default_host[remote_type]
+    host_by_remote_blob_host = function(path)
+      local git_remote_type = transf.in_git_dir.git_remote_type(path)
+      local remote_host = transf.in_git_dir.host_by_remote(path)
+      return tblmap.host.host_by_blob_default[remote_host] or tblmap.git_remote_type.host_by_blob_default[git_remote_type]
     end,
-    remote_raw_host = function(path)
-      local remote_type = transf.in_git_dir.remote_type(path)
-      local remote_host = transf.in_git_dir.remote_host(path)
-      return tblmap.host.raw_host[remote_host] or tblmap.remote_type.raw_default_host[remote_type]
+    host_by_remote_raw_host = function(path)
+      local git_remote_type = transf.in_git_dir.git_remote_type(path)
+      local remote_host = transf.in_git_dir.host_by_remote(path)
+      return tblmap.host.host_by_raw_default[remote_host] or tblmap.git_remote_type.host_by_raw_default[git_remote_type]
     end,
-    status = function(path)
-      return get.extant_path.cmd_output_from_path(
+    str_by_status = function(path)
+      return get.local_extant_path.cmd_output_from_path(
         path,
         "git status"
       )
     end,
     unpushed_commit_hash_list = function(path)
-      local raw_hashes = get.extant_path.cmd_output_from_path(
+      local raw_hashes = get.local_extant_path.cmd_output_from_path(
         path,
         "git log --branches --not --remotes --pretty=format:'%h'"
       )
@@ -5504,7 +5505,7 @@ transf = {
       )
     end,
     mcitations_csl_file_or_nil = function(id)
-      return get.extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MCITATIONS, id)
+      return get.local_extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MCITATIONS, id)
     end,
     csl_table_or_nil = function(id)
       local path = transf.filename_safe_indicated_citable_object_id.mcitations_csl_file_or_nil(id)
@@ -5517,10 +5518,10 @@ transf = {
       end
     end,
     mpapers_citable_object_file_or_nil = function(id)
-      return get.extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MPAPERS, id)
+      return get.local_extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MPAPERS, id)
     end,
     mpapernotes_citable_object_notes_file_or_nil = function(id)
-      return get.extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MPAPERNOTES, id)
+      return get.local_extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MPAPERNOTES, id)
     end,
   },
   citable_filename = {

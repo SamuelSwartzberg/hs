@@ -291,11 +291,16 @@ thing_name_hierarchy = {
                         mpv_ipc_socket_id = "leaf",
                       },
                       sign_indicator = "leaf",
-                      github_username = "leaf"
+                      github_username = "leaf",
+                      lower_alphanum_minus = {
+                        git_remote_type = "leaf",
+                      },
+                      upper_alphanum_minus ="leaf"
                     },
                     alphanum_underscore = {
                       lower_alphanum_underscore = {
-                        general_name = "leaf"
+                        general_name = "leaf",
+                        search_engine_id = "leaf"
                       },
                       upper_alphanum_underscore = "leaf",
                     },
@@ -309,7 +314,8 @@ thing_name_hierarchy = {
                           date_component_name_long = "leaf",
                           mod_char = "leaf",
                           mod_name = "leaf",
-                          leaf_str = "leaf"
+                          leaf_str = "leaf",
+                          project_type = "leaf"
                         },
                       },
                       hex_str = {

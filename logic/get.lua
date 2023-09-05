@@ -1068,9 +1068,9 @@ get = {
         return transf.str.split(v, lower_sep)
       end)
     end,
-    search_engine_search_url = function(str, search_engine)
-      return tblmap.search_engine.url[search_engine]:format(
-        get.str.str_by_percent_encoded(str, tblmap.search_engine.param_is_path[search_engine])
+    search_engine_id_search_url = function(str, search_engine_id)
+      return tblmap.search_engine_id.url[search_engine_id]:format(
+        get.str.str_by_percent_encoded(str, tblmap.search_engine_id.bool_by_param_is_path[search_engine_id])
       )
     end,
     window_arr_by_pattern = function(str, app_name)
@@ -1136,8 +1136,14 @@ get = {
     bool_by_matches_whole_onig_w_regex_quantifiable = function(str, regex_quantifiable)
       return transf.str.bool_by_matches_whole_onig(str, regex_quantifiable .. "*")
     end,
+    bool_by_not_matches_part_onig_w_regex_quantifiable = function(str, regex_quantifiable)
+      return not transf.str.bool_by_matches_part_onig(str, regex_quantifiable)
+    end,
     bool_by_matches_whole_onig_w_regex_character_class_innards = function(str, regex_character_class_innards)
       return transf.str.bool_by_matches_whole_onig_w_regex_quantifiable(str, "[" .. regex_character_class_innards .. "]")
+    end,
+    bool_by_not_matches_part_onig_w_regex_character_class_innards = function(str, regex_character_class_innards)
+      return not transf.str.bool_by_matches_part_onig_w_regex_quantifiable(str, "[" .. regex_character_class_innards .. "]")
     end,
     bool_by_matches_whole_onig_inverted_w_regex_character_class_innards = function(str, regex_character_class_innards)
       return transf.str.bool_by_matches_whole_onig(str, "[^" .. regex_character_class_innards .. "]")
@@ -1890,7 +1896,7 @@ get = {
               
             if shouldRecurse then
               depth = depth or 0
-              local sub_files = get.extant_path.absolute_path_arr(file_path, opts, true, depth + 1, seen_paths)
+              local sub_files = get.local_extant_path.absolute_path_arr(file_path, opts, true, depth + 1, seen_paths)
               for _, sub_file in transf.arr.pos_int_vt_stateless_iter(sub_files) do
                 extant_paths[#extant_paths + 1] = sub_file
               end
@@ -1916,24 +1922,17 @@ get = {
       end
     end,
     extant_path_by_ancestor_w_fn = function(path, fn)
-      return get.extant_path.extant_path_by_self_or_ancestor_w_fn(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), fn)
+      return get.local_extant_path.extant_path_by_self_or_ancestor_w_fn(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), fn)
     end,
     extant_path_by_self_or_ancestor_siblings_w_fn = function(path, fn)
-      return get.extant_path.extant_path_by_self_or_ancestor_w_fn(path, function(x)
+      return get.local_extant_path.extant_path_by_self_or_ancestor_w_fn(path, function(x)
         return get.arr.pos_int_or_nil_by_first_match_w_fn(transf.dir.absolute_path_arr_by_children(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(x)), fn)
       end)
     end,
     extant_path_by_self_or_ancestor_sibling_w_leaf = function(path, leaf)
-      return get.extant_path.extant_path_by_self_or_ancestor_siblings_w_fn(path, function(x)
+      return get.local_extant_path.extant_path_by_self_or_ancestor_siblings_w_fn(path, function(x)
         return transf.path.leaflike_by_leaf(x) == leaf
       end)
-    end,
-    cmd_output_from_path = function(path, cmd)
-      if is.path.dir(path) then
-        return get.dir.cmd_output_from_path(path, cmd)
-      else
-        return get.dir.cmd_output_from_path(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), cmd)
-      end
     end,
     extant_path_by_descendant_w_fn = function(path, cond)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(transf.extant_path.absolute_path_arr_by_descendants(path), cond)
@@ -1983,7 +1982,19 @@ get = {
       )
     end,
   },
+  local_dir = {
+    cmd_output_from_path = function(path, cmd)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("cd " .. transf.str.str_by_single_quoted_escaped(path) .. " && " .. cmd)
+    end
+  },
   local_extant_path = {
+    cmd_output_from_path = function(path, cmd)
+      if is.local_extant_path.local_dir(path) then
+        return get.local_dir.cmd_output_from_path(path, cmd)
+      else
+        return get.local_dir.cmd_output_from_path(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), cmd)
+      end
+    end,
     str_w_fs_attr_name = function(path, attr)
       return hs.fs.attributes(hs.fs.pathToAbsolute(path), attr)
     end,
@@ -2036,9 +2047,6 @@ get = {
     extant_path_by_child_having_leaf_ending = function(dir, leaf_ending)
       return get.path_arr.path_or_nil_by_first_having_leaf_ending(transf.dir.absolute_path_arr_by_children(dir), leaf_ending)
     end,
-    cmd_output_from_path = function(path, cmd)
-      return transf.str.str_or_nil_by_evaled_env_bash_stripped("cd " .. transf.str.str_by_single_quoted_escaped(path) .. " && " .. cmd)
-    end
   },
   git_root_dir = {
     hook_path = function(path, hook)
@@ -2051,26 +2059,26 @@ get = {
   },
   in_git_dir = {
     remote_blob_url = function(path, branch)
-      local remote_type = transf.in_git_dir.remote_type(path)
+      local git_remote_type = transf.in_git_dir.git_remote_type(path)
       branch = branch or transf.in_git_dir.str_by_current_branch(path)
       local remote_owner_item = transf.in_git_dir.two_strs_arr_or_nil_by_remote_owner_item(path)
       local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(
-        transf.in_git_dir.remote_blob_host(path),
-        tblmap.remote_type.blob_indicator[remote_type],
+        transf.in_git_dir.host_by_remote_blob_host(path),
+        tblmap.git_remote_type.printable_ascii_by_blob_indicator_path[git_remote_type],
         remote_owner_item,
         branch,
         relative_path
       )
     end,
     remote_raw_url = function(path, branch)
-      local remote_type = transf.in_git_dir.remote_type(path)
+      local git_remote_type = transf.in_git_dir.git_remote_type(path)
       branch = branch or transf.in_git_dir.str_by_current_branch(path)
       local remote_owner_item = transf.in_git_dir.two_strs_arr_or_nil_by_remote_owner_item(path)
       local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(
-        transf.in_git_dir.remote_raw_host(path),
-        tblmap.remote_type.raw_indicator[remote_type],
+        transf.in_git_dir.host_by_remote_raw_host(path),
+        tblmap.git_remote_type.printable_ascii_by_raw_indicator_path[git_remote_type],
         remote_owner_item,
         branch,
         relative_path
@@ -2319,7 +2327,7 @@ get = {
   extant_path_arr = {
     extant_path_arr_by_sorted_via_attr = function(arr, attr)
       return dothis.arr.sort(arr, function(a, b)
-        return get.extant_path.attr(a, attr) < get.extant_path.attr(b, attr)
+        return get.local_extant_path.attr(a, attr) < get.local_extant_path.attr(b, attr)
       end)
     end,
     extant_path_by_largest_of_attr = function(arr, attr)

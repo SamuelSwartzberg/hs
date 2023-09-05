@@ -479,8 +479,22 @@ is = {
     end,
     github_username = function(str)
       return get.str.bool_by_not_startswith(str, "-") and get.str.bool_by_not_endswith(str, "-") and #str <= 39
-    end
+    end,
+    lower_alphanum_minus = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "A-Z")
+    end,
+    upper_alphanum_minus = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "a-z")
+    end,
     
+  },
+  lower_alphanum_minus = {
+    git_remote_type = function(str)
+      return get.arr.bool_by_contains(
+        ls.git_remote_types,
+        str
+      )
+    end,
   },
   uuid = {
     contact_uuid = function(uuid)
@@ -834,7 +848,7 @@ is = {
       return not is.extant_path.dir(path)
     end,
     in_git_dir = function(path)
-      return get.extant_path.extant_path_by_self_or_ancestor_sibling_w_leaf(path, ".git")
+      return get.local_extant_path.extant_path_by_self_or_ancestor_sibling_w_leaf(path, ".git")
     end,
   },
   dir = {
@@ -868,7 +882,7 @@ is = {
   },
   in_git_dir = {
     in_has_changes_git_dir = function(path)
-      return transf.in_git_dir.status(path) ~= ""
+      return transf.in_git_dir.str_by_status(path) ~= ""
     end,
     in_has_unpushed_commits_git_dir = function(path)
       return #transf.in_git_dir.unpushed_commit_hash_list(path) > 0
@@ -975,7 +989,7 @@ is = {
       return is.alphanum_minus_underscore.alphanum_underscore(str) and is.alphanum_minus_underscore.alphanum_minus(str)
     end,
     pass_item_name = function(str)
-      return get.extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
+      return get.local_extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
     end,
     unicode_block_name = transf["nil"]["true"],
     unicode_category_name = transf["nil"]["true"], 
@@ -987,16 +1001,19 @@ is = {
   },
   alphanum_underscore = {
     lower_alphanum_underscore = function(str)
-      return get.str.bool_by_matches_whole_onig(str, "[a-z_]+")
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "A-Z")
     end,
     upper_alphanum_underscore = function(str)
-      return get.str.bool_by_matches_whole_onig(str, "[A-Z_]+")
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "a-z")
     end,
   },
   lower_alphanum_underscore = {
     general_name = function(str)
       return get.str.bool_by_not_startswith(str, "_") and get.str.bool_by_not_endswith(str, "_")
     end,
+    search_engine_id = function(str)
+      return get.arr.bool_by_contains(ls.search_engine_id, str)
+    end
   },
   alphanum = {
     alpha_str = function(str)
@@ -1058,6 +1075,9 @@ is = {
     end,
     leaf_str = function(str)
       return str == "leaf"
+    end,
+    project_type = function(str)
+      return get.arr.bool_by_contains(ls.project_type, str)
     end,
   },
   url = {

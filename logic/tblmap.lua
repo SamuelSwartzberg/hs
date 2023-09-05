@@ -367,64 +367,64 @@ tblmap = {
       LibreOffice = {"File", "Reload"}
     },
   },
-  search_engine = {
+  search_engine_id = {
     url = {
       wiktionary = "https://en.wiktionary.org/wiki/%s",
       wikipedia = "https://en.wikipedia.org/wiki/%s",
       youtube = "https://www.youtube.com/results?search_query=%s",
       jisho = "https://jisho.org/search/%s",
       glottopedia = "https://glottopedia.org/index.php?search=",
-      ["ruby_apidoc"] = "https://apidock.com/ruby/search?query=%s",
-      ["python_docs"] = "https://docs.python.org/3/search.html?q=%s",
-      ["merriam_webster"] = "https://www.merriam-webster.com/dictionary/%s",
-      ["assoc_cc"] = "https://www.assoc.cc/?s=%s",
-      ["deepl_en_ja"] = "https://www.deepl.com/translator#en/ja/%s",
-      ["deepl_de_en"] = "https://www.deepl.com/translator#de/en/%s",
+      ruby_apidoc = "https://apidock.com/ruby/search?query=%s",
+      python_docs = "https://docs.python.org/3/search.html?q=%s",
+      merriam_webster = "https://www.merriam-webster.com/dictionary/%s",
+      assoc_cc = "https://www.assoc.cc/?s=%s",
+      deepl_en_ja = "https://www.deepl.com/translator#en/ja/%s",
+      deepl_de_en = "https://www.deepl.com/translator#de/en/%s",
       mdn = "https://developer.mozilla.org/en-US/search?q=%s",
       scihub = "https://sci-hub.st/%s",
       libgen = "https://libgen.rs/search.php?req=%s",
-      ["semantic_scholar"] = "https://www.semanticscholar.org/search?q=%s",
-      ["google_scholar"] = "https://scholar.google.com/scholar?q=%s",
-      ["google_images"] = "https://www.google.com/search?tbm=isch&q=%s",
-      ["google_maps"] = "https://www.google.com/maps/search/%s",
+      semantic_scholar = "https://www.semanticscholar.org/search?q=%s",
+      google_scholar = "https://scholar.google.com/scholar?q=%s",
+      google_images = "https://www.google.com/search?tbm=isch&q=%s",
+      google_maps = "https://www.google.com/maps/search/%s",
       google = "https://www.google.com/search?q=%s",
-      ["danbooru"] = "https://danbooru.donmai.us/posts?tags=%s",
-      ["gelbooru"] = "https://gelbooru.com/index.php?page=post&s=list&tags=%s",
+      danbooru = "https://danbooru.donmai.us/posts?tags=%s",
+      gelbooru = "https://gelbooru.com/index.php?page=post&s=list&tags=%s",
     },
-    param_is_path = {
+    bool_by_param_is_path = {
       wikipedia = true,
       wiktionary = true,
       jisho = true,
-      ["merriam_webster"] = true,
-      ["deepl_en_ja"] = true,
-      ["deepl_de_en"] = true,
+      merriam_webster = true,
+      deepl_en_ja = true,
+      deepl_de_en = true,
       scihub = true,
-      ["google_maps"] = true,
+      google_maps = true,
     }
   },
   host = {
-    remote_type = {},
-    blob_host = {},
-    raw_host = {},
+    git_remote_type = {},
+    host_by_blob_default = {},
+    host_by_raw_default = {},
   },
-  remote_type = {
-    blob_indicator = {
+  git_remote_type = {
+    printable_ascii_by_blob_indicator_path = {
       github = "blob/",
       gitlab = "blob/",
       bitbucket = "src/",
     },
-    blob_default_host = {
+    host_by_blob_default = {
       github = "github.com",
       gitlab = "gitlab.com",
       bitbucket = "bitbucket.org",
     },
-    raw_indicator = {
+    printable_ascii_by_raw_indicator_path = {
       
       github = "",
       gitlab = "raw/",
       bitbucket = "raw/",
     },
-    raw_default_host = {
+    host_by_raw_default = {
       github = "raw.githubusercontent.com",
       gitlab = "gitlab.com",
       bitbucket = "bitbucket.org",
@@ -458,12 +458,12 @@ tblmap = {
     }
   },
   project_type = {
-    build_command = {
+    str_by_build_command = {
       latex =  "pdflatex main.tex && biber main && pdflatex main.tex && pdflatex main.tex",
       npm = "npm run build",
       cargo = "cargo build",
     },
-    install_command = {
+    str_by_install_command = {
       npm = "npm run install",
     },
     project_materials_list = {
