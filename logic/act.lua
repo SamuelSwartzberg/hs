@@ -265,7 +265,7 @@ act = {
     end,
     add_as_otp_with_prompted_name = function(path)
       act.otp_url.add_otp_pass_item_with_prompted_name(
-        transf.local_image_file.qr_data(path)
+        transf.local_image_file.multiline_str_by_qr_data(path)
       )
     end,
   },

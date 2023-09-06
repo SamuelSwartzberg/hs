@@ -67,7 +67,7 @@ transf = {
       return codepoint:sub(3)
     end,
     unicode_prop_table = function(codepoint)
-      return get.fn.rt_or_nil_by_memoized(transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_or_nil_by_memoized(transf.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.str.str_by_single_quoted_escaped(
           codepoint
@@ -77,7 +77,7 @@ transf = {
   },
   indicated_utf8_hex_str = {
     unicode_prop_table = function(str)
-      return get.fn.rt_or_nil_by_memoized(transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_or_nil_by_memoized(transf.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.str.str_by_single_quoted_escaped(
           str
@@ -1480,8 +1480,8 @@ transf = {
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(path_leaf_specifier)
       return path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc
     end,
-    fs_tag_str_assoc = function(path_leaf_specifier)
-      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_str_assoc(path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+    lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = function(path_leaf_specifier)
+      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
     end,
     fs_tag_kv_arr = function(path_leaf_specifier)
       return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_kv_arr(path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
@@ -1514,33 +1514,33 @@ transf = {
       )
     end,
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(fs_tag_str)
-      transf.fs_tag_str_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(
+      transf.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(
         transf.fs_tag_str.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(fs_tag_str)
       )
     end,
   },
   fs_tag_kv = {
     lower_alphanum_underscore_and_lower_alphanum_underscore_comma = function(fs_tag_kv)
-      return get.str.n_strs_split(fs_tag_kv, "-", 2)
+      return get.str.n_strs_by_split(fs_tag_kv, "-", 2)
     end,
   },
   fs_tag_kv_arr = {
-    fs_tag_str_assoc = function(fs_tag_kv_arr)
+    lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = function(fs_tag_kv_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         fs_tag_kv_arr,
         get.fn.second_n_args_bound_fn(get.str.two_strs_split_or_nil, "-")
       )
     end,
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(fs_tag_kv_arr)
-      transf.fs_tag_str_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(
-        transf.fs_tag_kv_arr.fs_tag_str_assoc(fs_tag_kv_arr)
+      transf.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(
+        transf.fs_tag_kv_arr.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(fs_tag_kv_arr)
       )
     end,
     fs_tag_str = function(fs_tag_kv_arr)
       return "%" .. get.str_or_number_arr.str_by_joined(fs_tag_kv_arr, "%")
     end,
   },
-  fs_tag_str_assoc = {
+  lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = {
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(assoc)
       return hs.fnutils.map(
         assoc,
@@ -1555,20 +1555,20 @@ transf = {
     end,
     fs_tag_str = function(assoc)
       return transf.fs_tag_kv_arr.fs_tag_str(
-        transf.fs_tag_str_assoc.fs_tag_kv_arr(assoc)
+        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc.fs_tag_kv_arr(assoc)
       )
     end,
   },
   lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = {
-    fs_tag_str_assoc = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+    lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
       return hs.fnutils.map(
         lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc,
         transf.any.join_if_arr
       )
     end,
     fs_tag_kv_arr = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
-      return transf.fs_tag_str_assoc.fs_tag_kv_arr(
-        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_str_assoc(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc.fs_tag_kv_arr(
+        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
       )
     end,
     fs_tag_str = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
@@ -1578,7 +1578,7 @@ transf = {
     end,
   },
   path_leaf_specifier_arr = {
-    path_leaf_specifier_date_interval_specifier_assoc = function(arr)
+    path_leaf_specifier_key_date_interval_specifier_value_assoc = function(arr)
       return get.table.table_by_mapped_w_kt_arg_kt_vt_ret_fn(
         arr,
         function(path_leaf_specifier)
@@ -1623,26 +1623,18 @@ transf = {
     end,
     path_leaf_specifier_or_nil_by_earliest_start = function(arr)
       return get.assoc.kt_or_nil_by_first_match_w_vt(
-        transf.path_leaf_specifier_arr.path_leaf_specifier_date_interval_specifier_assoc(arr),
+        transf.path_leaf_specifier_arr.path_leaf_specifier_key_date_interval_specifier_value_assoc(arr),
         transf.path_leaf_specifier_arr.date_interval_specifier_or_nil_by_earliest_start(arr)
       )
     end,
   },
   whisper_file = {
-    transcribed = function(path)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_year(rest, "rest")({
-        api_name = "openai",
-        endpoint = "audio/transcriptions",
-        request_table_type = "form",
-        request_table = {
-          model = "whisper-1",
-          file = transf.path.atpath(path),
-        }
-      }).text
+    str_by_transcribed = function(path)
+      return get.whisper_file.str_by_transcribed(path)
     end
   },
   local_image_file = {
-    qr_data = function(path)
+    multiline_str_by_qr_data = function(path)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("zbarimg -q --raw " .. transf.str.str_by_single_quoted_escaped(path))
     end,
     hs_image = function(path)
@@ -1655,91 +1647,98 @@ transf = {
         .. "--output-properties booru-url"
       )
     end,
-    data_url = function(path)
+    image_data_url = function(path)
       local ext = transf.path.extension(path)
-      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLstr)(transf.local_image_file.hs_image(path), ext)
+      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
     end,
   },
   email_file = {
-    all_headers_raw = function(path)
+    decoded_email_header_block_by_all = function(path)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
-        "mshow -L" .. transf.str.str_by_single_quoted_escaped(path)
+        "mshow -qL" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
-    all_useful_headers_raw = function(path)
+    decoded_email_header_block_by_all_useful = function(path)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         "mshow -q" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
-    useful_header_assoc = function(path)
+    line_key_line_value_assoc_by_useful_headers = function(path)
       error("TODO: currently the way the headers are rendered contains a bunch of stuff we wouldn't want in the assoc. In particular, emails without a name are rendered as <email>, which may not be what we want.")
-      return transf.header_str.assoc(transf.email_file.all_useful_headers_raw(path))
+      return transf.decoded_email_header_block.line_key_line_value_assoc(transf.email_file.decoded_email_header_block_by_all_useful(path))
     end,
     rendered_body = function(path)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "mshow -R" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
-    simple_view = function(path)
-      return transf.email_file.all_useful_headers_raw(path) .. "\n\n" .. transf.email_file.rendered_body(path)
+    decoded_email_by_useful_headers = function(path)
+      return transf.email_file.decoded_email_header_block_by_all_useful(path) .. "\n\n" .. transf.email_file.rendered_body(path)
     end,
     email_specifier = function(path)
-      local specifier = transf.email_file.useful_header_assoc(path)
+      local specifier = transf.email_file.line_key_line_value_assoc_by_useful_headers(path)
       specifier.body = transf.email_file.rendered_body(path)
       return specifier
     end,
-    reply_email_specifier = function(path)
-      return transf.email_specifier.reply_email_specifier(transf.email_file.email_specifier(path))
+    email_specifier_by_reply = function(path)
+      return transf.email_specifier.email_specifier_by_reply(transf.email_file.email_specifier(path))
     end,
-    forward_email_specifier = function(path)
-      return transf.email_specifier.forward_email_specifier(transf.email_file.email_specifier(path))
+    email_specifier_by_forward = function(path)
+      return transf.email_specifier.email_specifier_by_forward(transf.email_file.email_specifier(path))
     end,
-    quoted_body = function(path)
+    str_by_quoted_body = function(path)
       transf.str.email_quoted(transf.email_file.rendered_body(path))
     end,
-    from = function(path)
-      return get.email_file.header(path, "from")
+    email_or_displayname_email_by_from = function(path)
+      return get.email_file.str_by_header(path, "from")
     end,
-    to = function(path)
-      return get.email_file.header(path, "to")
+    email_or_displayname_email_by_to = function(path)
+      return get.email_file.str_by_header(path, "to")
     end,
-    subject = function(path)
-      return get.email_file.header(path, "subject")
+    str_by_subject = function(path)
+      return get.email_file.str_by_header(path, "subject")
     end,
-    mime_parts_raw = function(path)
+    mime_part_block = function(path)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         "mshow -t" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
-    attachments = function(path)
-      return transf.mime_parts_raw.attachments(transf.email_file.mime_parts_raw(path))
+    leaflike_arr_by_attachments = function(path)
+      return transf.mime_part_block.leaflike_arr_by_attachments(transf.email_file.mime_part_block(path))
     end,
-    summary = function(path)
+    line_by_summary = function(path)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.str.str_by_single_quoted_escaped(path))
     end,
-    email_file_summary_key_value = function(path)
-      return path, transf.email_file.summary(path)
+    email_file_and_summary = function(path)
+      return path, transf.email_file.line_by_summary(path)
     end,
-    email_file_simple_view_key_value = function(path)
-      return path, transf.email_file.simple_view(path)
+    email_file_and_decoded_email = function(path)
+      return path, transf.email_file.decoded_email_by_useful_headers(path)
     end,
 
   },
+  decoded_email = {
+    raw_email = function(decoded_email)
+      return transf.str.str_or_err_by_evaled_env_bash_stripped_noempty(
+        "mmime " .. transf.str.here_doc(decoded_email)
+      )
+    end,
+  },
   email_specifier = {
-    reply_email_specifier = function(specifier)
+    email_specifier_by_reply = function(specifier)
       return {
         to = specifier.from,
         subject = "Re: " .. specifier.subject,
         body = "\n\n" .. transf.str.email_quoted(specifier.body)
       }
     end,
-    forward_email_specifier = function(specifier)
+    email_specifier_by_forward = function(specifier)
       return {
         subject = "Fwd: " .. specifier.subject,
         body = "\n\n" .. transf.str.email_quoted(specifier.body)
       }
     end,
-    email_str = function(specifier)
+    decoded_email = function(specifier)
       specifier = get.table.table_by_copy(specifier)
       local body = specifier.body or ""
       specifier.body = nil
@@ -1750,28 +1749,21 @@ transf = {
       if non_inline_attachment_local_file_arr then
         mail = mail .. "\n" .. transf.path_arr.attachment_str(non_inline_attachment_local_file_arr)
       end
+      local mail = get.str.str_by_evaled_as_template(mail)
       return mail
     end,
 
-    draft_email_file = function(specifier)
-      
-
-      local mail = join.str.table.email(body, specifier)
-      local evaled_mail = get.str.str_by_evaled_as_template(mail)
-      local temppath = transf.not_userdata_or_function.in_tmp_dir(evaled_mail)
-      local outpath = temppath .. "_out"
-      transf.str.str_or_nil_by_evaled_env_bash_stripped("mmime < " .. transf.str.str_by_single_quoted_escaped(temppath) .. " > " .. transf.str.str_by_single_quoted_escaped(outpath))
-      dothis.absolute_path.delete(temppath)
-      return outpath
+    raw_email = function(specifier)
+      return transf.decoded_email.raw_email(transf.email_specifier.decoded_email(specifier))
     end
   },
-  mime_parts_raw = {
-    attachments = function(mime_parts_raw)
+  mime_part_block = {
+    leaflike_arr_by_attachments = function(mime_part_block)
       local attachments = {}
-      for line in transf.str.line_arr(mime_parts_raw) do
+      for line in transf.str.line_arr(mime_part_block) do
         local name = line:match("name=\"(.-)\"")
         if name then
-          dothis.arr.insert_at_index(attachments, name)
+          dothis.arr.push(attachments, name)
         end
       end
       return attachments
@@ -1788,7 +1780,7 @@ transf = {
   },
 
   ics_file = {
-    assoc_arr = function(path)
+    ical_spec = function(path)
       local temppath = transf.str.in_tmp_local_absolute_path(transf.path.leaflike_by_filename(path) .. ".ics")
       dothis.extant_path.copy_to_absolute_path(path, temppath)
       act.ics_file.generate_json_file(temppath)
@@ -1800,15 +1792,15 @@ transf = {
     end,
   },
   json_file = {
-    not_userdata_or_function = function(path)
-      return transf.json_str.not_userdata_or_function(transf.file.str_by_contents(path))
+    not_userdata_or_fn = function(path)
+      return transf.json_str.not_userdata_or_fn(transf.file.str_by_contents(path))
     end,
     table_or_nil = function(path)
       return transf.json_str.table_or_nil(transf.file.str_by_contents(path))
     end,
   },
   ini_file = {
-    assoc = function(path)
+    str_key_str_or_nested_1_value_assoc = function(path)
       return transf.ini_str.str_key_str_or_nested_1_value_assoc(transf.file.str_by_contents(path))
     end,
   },
@@ -1823,9 +1815,6 @@ transf = {
         transf.path.path_by_ending_with_slash(env.MLAST_BACKUP) .. identifier
       ) or 0
     end
-  },
-  xml_local_file = {
-    tree = xml.parseFile
   },
   -- a tree_node_like is a table with a key <ckey> which at some depth contains a tree_node_like_arr, and a key <lkey> which contains a thing of any type that can be seen as the label of the node (or use self), such the tree_node_like it can be transformed to a tree_node
   tree_node_like = {
@@ -2849,7 +2838,7 @@ transf = {
 
       -- The raw contact data, which is in yaml str format, is transformed into a table. 
       -- This is done because table format is easier to handle and manipulate in Lua.
-      local contact_table = transf.yaml_str.not_userdata_or_function(raw_contact)
+      local contact_table = transf.yaml_str.not_userdata_or_fn(raw_contact)
 
       -- In the vCard standard, some properties can have vcard_types. 
       -- For example, a phone number can be 'work' or 'home'. 
@@ -3534,17 +3523,17 @@ transf = {
         return res
       end
     end,
-    not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json = function(str)
+    not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json = function(str)
       local res = transf.str.str_or_err_by_evaled_env_bash_stripped_noempty(str)
-      return transf.json_str.not_userdata_or_function(res)
+      return transf.json_str.not_userdata_or_fn(res)
     end,
-    not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json = function(str)
+    not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json = function(str)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
-        transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json
+        transf.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json
       )(str)
     end,
     table_or_err_by_evaled_env_bash_parsed_json = function(str)
-      local res = transf.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json(str)
+      local res = transf.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json(str)
       if is.any.table(res) then
         return res
       else
@@ -3559,7 +3548,7 @@ transf = {
     table_or_err_by_evaled_env_bash_parsed_json_err_error_key = function(str)
       local res = transf.str.table_or_err_by_evaled_env_bash_parsed_json(str)
       if res.error then
-        error("Error for command " .. str .. ":\n\n" .. transf.not_userdata_or_function.json_str_by_pretty(res.error))
+        error("Error for command " .. str .. ":\n\n" .. transf.not_userdata_or_fn.json_str_by_pretty(res.error))
       else
         return res
       end
@@ -3738,10 +3727,6 @@ transf = {
       return transf.str.str_or_err_by_evaled_env_bash_stripped(
         "he --decode" .. transf.str.here_doc(str)
       )
-    end,
-    two_strs_by_split_header = function(str)
-      local k, v = get.str.n_strs_by_extracted_eutf8(str, "^([^:]+):%s*(.+)$")
-      return transf.str.str_by_initial_lower(k), v
     end,
     two_str_or_nils_by_split_envlike = function(str)
       return get.str.two_strs_split_or_nil(str, "=")
@@ -4097,23 +4082,23 @@ transf = {
     end,
   },
   yaml_str = {
-    not_userdata_or_function = function(str)
+    not_userdata_or_fn = function(str)
       local res = yaml.load(str)
       null2nil(res)
       return res
     end,
     json_str = function(str)
-      return transf.not_userdata_or_function.json_str(
-        transf.yaml_str.not_userdata_or_function(str)
+      return transf.not_userdata_or_fn.json_str(
+        transf.yaml_str.not_userdata_or_fn(str)
       )
     end,
   },
   json_str = {
-    not_userdata_or_function = function(str)
+    not_userdata_or_fn = function(str)
       return transf.fn.rt_or_nil_fn_by_pcall(json.decode)(str)
     end,
     table_or_nil = function(str)
-      local res =  transf.not_userdata_or_function.json_str(str)
+      local res =  transf.not_userdata_or_fn.json_str(str)
       if is.any.table(res) then
         return res
       else
@@ -4121,8 +4106,8 @@ transf = {
       end
     end,
     yaml_str = function(str)
-      return transf.not_userdata_or_function.yaml_str(
-        transf.json_str.not_userdata_or_function(str)
+      return transf.not_userdata_or_fn.yaml_str(
+        transf.json_str.not_userdata_or_fn(str)
       )
     end,
   },
@@ -4130,8 +4115,8 @@ transf = {
     assoc = toml.decode
   },
   yaml_file = {
-    not_userdata_or_function = function(path)
-      return transf.yaml_str.not_userdata_or_function(transf.plaintext_file.str_by_contents(path))
+    not_userdata_or_fn = function(path)
+      return transf.yaml_str.not_userdata_or_fn(transf.plaintext_file.str_by_contents(path))
     end
   },
   
@@ -4145,21 +4130,30 @@ transf = {
   plaintext_assoc_file = {
     table = function(file)
       if is.plaintext_assoc_file.yaml_file(file) then
-        return transf.yaml_file.not_userdata_or_function(file)
+        return transf.yaml_file.not_userdata_or_fn(file)
       elseif is.plaintext_assoc_file.json_file(file) then
-        return transf.json_file.not_userdata_or_function(file)
+        return transf.json_file.not_userdata_or_fn(file)
       elseif is.plaintext_assoc_file.ini_file(file) then
-        return transf.ini_file.assoc(file)
+        return transf.ini_file.str_key_str_or_nested_1_value_assoc(file)
       elseif is.plaintext_assoc_file.toml_file(file) then
         return transf.toml_file.assoc(file)
       elseif is.plaintext_assoc_file.ics_file(file) then
-        return transf.ics_file.assoc_arr(file) 
+        return transf.ics_file.ical_spec(file) 
       end
     end
   },
-  header_str = {
-    assoc = function(str)
-      local lines = transf.str.noempty_line_arr(str)
+  decoded_email_header_line = {
+    two_lines_by_split = function(str)
+      return get.str.n_strs_by_extracted_eutf8(str, "^([^:]+):%s*(.+)$")
+    end,
+    two_lines_by_split_lower_first = function(str)
+      local k,v = transf.decoded_email_header_line.two_lines_by_split(str)
+      return transf.str.str_by_all_eutf8_lower(k), v
+    end,
+  },
+  decoded_email_header_block = {
+    line_key_line_value_assoc = function(str)
+      local lines = transf.str.line_arr(str)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         lines,
         transf.str.two_strs_by_split_header
@@ -4822,13 +4816,13 @@ transf = {
     email_file_summary_assoc = function(email_file_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         email_file_arr,
-        transf.email_file.email_file_summary_key_value
+        transf.email_file.email_file_and_summary
       )
     end,
     email_file_simple_view_assoc = function(email_file_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         email_file_arr,
-        transf.email_file.email_file_simple_view_key_value
+        transf.email_file.email_file_and_decoded_email
       )
     end,
   },
@@ -4911,11 +4905,11 @@ transf = {
     toml_str = toml.encode,
     yaml_str_by_aligned = function(tbl)
       local tmp = transf.str.in_tmp_local_absolute_path(
-        transf.not_userdata_or_function.yaml_str(tbl),
+        transf.not_userdata_or_fn.yaml_str(tbl),
         "shell-input"
       )
       transf.str.str_or_nil_by_evaled_env_bash_stripped("align " .. transf.str.str_by_single_quoted_escaped(tmp))
-      local res = transf.yaml_file.not_userdata_or_function(tmp)
+      local res = transf.yaml_file.not_userdata_or_fn(tmp)
       dothis.local_extant_path.delete(tmp)
       return res
     end,
@@ -4925,7 +4919,7 @@ transf = {
     end,
     
     ics_str = function(t)
-      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(t) .. ".ics"
+      local tmpdir_ics_path = transf.not_userdata_or_fn.in_tmp_dir(t) .. ".ics"
       dothis.table.write_ics_file(t, tmpdir_ics_path)
       local contents = transf.file.str_by_contents(tmpdir_ics_path)
       dothis.absolute_path.delete(tmpdir_ics_path)
@@ -5526,7 +5520,7 @@ transf = {
     csl_table_or_nil = function(id)
       local path = transf.filename_safe_indicated_citable_object_id.mcitations_csl_file_or_nil(id)
       if path then
-        return transf.json_file.not_userdata_or_function(
+        return transf.json_file.not_userdata_or_fn(
           path
         )
       else
@@ -5669,7 +5663,7 @@ transf = {
       return transf.path.path_by_ending_with_slash(dir) .. "data.yaml"
     end,
     metadata = function(dir)
-      return transf.yaml_file.not_userdata_or_function(
+      return transf.yaml_file.not_userdata_or_fn(
         transf.omegat_project_dir.metadata_file(dir)
       )
     end,
@@ -6197,7 +6191,7 @@ transf = {
         "\n"
       )
     end,
-    json_str = transf.not_userdata_or_function.json_str,
+    json_str = transf.not_userdata_or_fn.json_str,
     indicated_citable_object_id_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
@@ -6437,7 +6431,7 @@ transf = {
       return csl_table.URL
     end,
     urlmd5 = function(csl_table)
-      return transf.not_userdata_or_function.hex_str_by_md5(transf.csl_table.url(csl_table))
+      return transf.not_userdata_or_fn.hex_str_by_md5(transf.csl_table.url(csl_table))
     end,
     indicated_urlmd5 = function(csl_table)
       local urlmd5 = transf.csl_table.urlmd5(csl_table)
@@ -6513,7 +6507,7 @@ transf = {
     end,
     bib_str = function(csl_table)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
-        "pandoc -f csljson -t biblatex" .. transf.str.here_doc(transf.not_userdata_or_function.json_str(csl_table))
+        "pandoc -f csljson -t biblatex" .. transf.str.here_doc(transf.not_userdata_or_fn.json_str(csl_table))
       )
     end,
     apa_str = function(csl_table)
@@ -6628,7 +6622,7 @@ transf = {
           "curl -L" .. transf.str.str_by_single_quoted_escaped(url)
     end,
     in_cache_dir = function(url)
-      return transf.not_userdata_or_function.in_cache_dir(transf.urllike_with_no_scheme.url_by_ensure_scheme(url), "url")
+      return transf.not_userdata_or_fn.in_cache_dir(transf.urllike_with_no_scheme.url_by_ensure_scheme(url), "url")
     end,
     url_table = function(url)
       return get.fn.rt_or_nil_by_memoized(
@@ -6719,7 +6713,7 @@ transf = {
       return get.str.no_prefix_str(rejoined, "//")
     end,
     str_by_webcal_name = function(url)
-      return "webcal_readonly_" .. transf.not_userdata_or_function.hex_str_by_md5(url)
+      return "webcal_readonly_" .. transf.not_userdata_or_fn.hex_str_by_md5(url)
     end,
     vdirsyncer_pair_specifier = function(url)
       local name = transf.url.str_by_webcal_name(url)
@@ -6798,7 +6792,7 @@ transf = {
     transcribed = function(url)
       local path = transf.url.in_cache_dir(url)
       dothis.url.download_to(url, path)
-      return transf.whisper_file.transcribed(path)
+      return transf.whisper_file.str_by_transcribed(path)
 
     end
   },
@@ -6816,12 +6810,15 @@ transf = {
     qr_data = function(url)
       local path = transf.url.in_cache_dir(url)
       dothis.url.download_to(url, path)
-      return transf.local_image_file.qr_data(path)
+      return transf.local_image_file.multiline_str_by_qr_data(path)
     end,
     data_url = function(url)
       local ext = transf.path.extension(url)
       return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLstr)(transf.image_url.hs_image(url), ext)
     end,
+  },
+  hs_image = {
+    
   },
   gelbooru_style_post_url = {
     nonindicated_number_str_by_booru_post_id = function(url)
@@ -6848,7 +6845,7 @@ transf = {
       return transf.str.not_starting_o_ending_with_whitespace_str(response)
     end
   },
-  not_userdata_or_function = {
+  not_userdata_or_fn = {
     hex_str_by_md5 = function(thing)
       if is.any.not_str(thing) then 
         thing = json.encode(thing) 
@@ -6867,13 +6864,13 @@ transf = {
     end,
     in_cache_dir = function(data, type)
       return transf.str.in_cache_local_absolute_path(
-        transf.not_userdata_or_function.hex_str_by_md5(data),
+        transf.not_userdata_or_fn.hex_str_by_md5(data),
         type
       )
     end,
     in_tmp_dir = function(data, type)
       return transf.str.in_tmp_local_absolute_path(
-        transf.not_userdata_or_function.hex_str_by_md5(data),
+        transf.not_userdata_or_fn.hex_str_by_md5(data),
         type
       )
     end,
@@ -6885,7 +6882,7 @@ transf = {
       if is.any.table(t) then
         return transf.table.json_str_by_pretty(t)
       else
-        return transf.not_userdata_or_function.json_str(t)
+        return transf.not_userdata_or_fn.json_str(t)
       end
     end,
     --- wraps yaml.dump into a more intuitive form which always encodes a single document
@@ -6912,7 +6909,7 @@ transf = {
       elseif is.any.not_table(strable) then
         return transf.any.str(strable)
       else
-        local succ, json = pcall(transf.not_userdata_or_function.json_str, strable)
+        local succ, json = pcall(transf.not_userdata_or_fn.json_str, strable)
         if succ then
           return json
         else
@@ -7245,7 +7242,7 @@ transf = {
       local yaml_files = get.path_arr.path_arr_by_filter_to_same_extension(files, "yaml")
       local env_var_name_env_node_assoc_arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         yaml_files,
-        transf.yaml_file.not_userdata_or_function
+        transf.yaml_file.not_userdata_or_fn
       )
       local env_var_name_env_node_assoc = transf.table_arr.table_by_take_new(env_var_name_env_node_assoc_arr)
       return transf.env_var_name_env_node_assoc.env_str(env_var_name_env_node_assoc)
@@ -7572,7 +7569,7 @@ transf = {
     action_chooser_item_specifier = function(action_specifier)
       if action_specifier.text then error("old action_specifier format, contains action_specifier.text") end
       local str = get.str.str_by_with_suffix(action_specifier.d, ".")
-      str = str .. " #" .. get.not_userdata_or_function.md5_base32_crock_str_of_length(action_specifier.d, 3) -- shortcode for easy use
+      str = str .. " #" .. get.not_userdata_or_fn.md5_base32_crock_str_of_length(action_specifier.d, 3) -- shortcode for easy use
       return {text = str}
     end
   },
@@ -8579,7 +8576,7 @@ transf = {
       local json_file = get.dir.extant_path_by_child_having_extension(dir, "json")
       local media_dir = get.dir.extant_path_by_child_having_extension(dir, "_Files")
       if not json_file or not media_dir then error("Could not find json or media dir in " .. dir) end
-      return {transf.json_file.not_userdata_or_function(json_file), media_dir}
+      return {transf.json_file.not_userdata_or_fn(json_file), media_dir}
     end,
   },
   discord_export_chat_main_object = {
@@ -8633,7 +8630,7 @@ transf = {
         chat_dirs,
         function(chat_dir)
           local media_dir = transf.path.path_by_ending_with_slash(chat_dir) .. "media"
-          local main_obj = transf.json_file.not_userdata_or_function(
+          local main_obj = transf.json_file.not_userdata_or_fn(
             transf.path.path_by_ending_with_slash(chat_dir) .. "message_1.json"
           )
           return {
@@ -8698,7 +8695,7 @@ transf = {
           local filename = transf.path.leaflike_by_filename(chat_json_file)
           local author = filename:match("^([^(]+)")
           local media_dir = dir .. "/media/" .. filename
-          local messages = transf.json_file.not_userdata_or_function(chat_json_file)
+          local messages = transf.json_file.not_userdata_or_fn(chat_json_file)
           return {
             {
               author = author,
@@ -8759,7 +8756,7 @@ transf = {
   telegram_export_dir = {
     export_chat_main_object_and_media_dir_arr = function(dir)
       local json_file = get.dir.extant_path_by_child_having_leaf(dir, "result.json")
-      local export_json = transf.json_file.not_userdata_or_function(json_file)
+      local export_json = transf.json_file.not_userdata_or_fn(json_file)
 
       local chats = export_json.chats.list
 

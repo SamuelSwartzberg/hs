@@ -23,6 +23,7 @@ is = {
     end,
     json_str = transf["nil"]["true"], -- figuring this out would require parsing the json, which is too expensive here
     yaml_str = transf["nil"]["true"], -- same as above
+    mime_part_block = transf["nil"]["true"], -- currently don't know enough about this seemingly custom format to check for it
     email_or_displayname_email = function(str)
       return is.str.email(str) or is.str.displayname_email(str)
     end,
@@ -59,6 +60,19 @@ is = {
         is.line.ini_section_line
       )
     end,
+    decoded_email_header_block = function(str)
+      return get.arr.bool_by_all_pass_w_fn(
+        transf.str.line_arr(str),
+        is.line.decoded_email_header_line
+      )
+    end,
+    decoded_email = function(str)
+      local header, body = get.str.n_strs_by_split(str, "\n\n", 2)
+      if not body then
+        return false
+      end
+      return is.multiline_str.decoded_email_header_block(header)
+    end
   },
   whitespace_str = {
     starting_with_whitespace_str = function(str)
@@ -108,6 +122,9 @@ is = {
     end,
     noweirdwhitespace_line = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
+    end,
+    decoded_email_header_line = function(str)
+      return get.str.bool_by_contains_w_ascii_str(str, ": ")
     end,
 
     -- combined conditions
@@ -179,8 +196,45 @@ is = {
     end
   },
   printable_ascii_str = {
+    printable_ascii_line = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "\r\n")
+    end,
+    printable_ascii_multiline_str = function(str)
+      return not is.printable_ascii_str.printable_ascii_line(str)
+    end,
+  },
+  printable_ascii_multiline_str = {
+    email_header_block = function(str)
+      return get.arr.bool_by_all_pass_w_fn(
+        transf.str.line_arr(str),
+        is.printable_ascii_line.email_header_line
+      )
+    end,
+    raw_email = function(str)
+      local header, body = get.str.n_strs_by_split(str, "\n\n", 2) -- todo: I'm not quite sure what implicit processing my emails may go through, but they might have \r\n, so if the tests fail, that might be why
+      if not body then
+        return false
+      end
+      return is.printable_ascii_multiline_str.email_header_block(header)
+    end,
+  },
+  printable_ascii_line = {
+    printable_ascii_no_vertical_space_str = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "\v\f")
+    end,
+  },
+  printable_ascii_no_vertical_space_str = {
     printable_ascii_no_nonspace_whitespace_str = function(str)
-      return get.str.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
+      return get.str.bool_by_not_contains_w_ascii_str(str, "\t")
+    end,
+    email_header_kv_line = function(str)
+      return get.str.bool_by_contains_w_ascii_str(str, ": ")
+    end,
+    indent_ascii_line = function(str)
+      return get.str.bool_by_startswith(str, " ") or get.str.bool_by_startswith(str, "\t")
+    end,
+    email_header_line = function(str)
+      return is.printable_ascii_no_nonspace_whitespace_str.email_header_kv_line(str) or is.printable_ascii_no_nonspace_whitespace_str.indent_ascii_line(str)
     end,
     iban = function(str)
       local cleaned_iban = transf.iban.cleaned_iban(str)
@@ -645,7 +699,7 @@ is = {
   },
   labelled_remote_extant_path = {
     labelled_remote_dir = function(path)
-      return get.str.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key("rclone lsjson --stat" .. transf.str.str_by_single_quoted_escaped(path))
+      return get.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json_in_key("rclone lsjson --stat" .. transf.str.str_by_single_quoted_escaped(path))
     end,
     labelled_remote_file = function(path)
       return not is.labelled_remote_extant_path.labelled_remote_dir(path)
@@ -1474,7 +1528,10 @@ is = {
     end,
     lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = function(val)
       return is.any.lower_alphanum_underscore(val) or is.any.lower_alphanum_underscore_arr(val)
-    end
+    end,
+    not_userdata_or_fn = function(val)
+      return not is.any.userdata(val) and not is.any.fn(val)
+    end,
   },
   pass_item_name = {
     passw_pass_item_name = function(name)
@@ -1601,7 +1658,7 @@ is = {
       return t.major
     end,
     email_specifier = function(t)
-      return t.non_inline_attachment_local_file_arr 
+      return t.non_inline_attachment_local_file_arr or t.body or t.subject or t.to or t.cc or t.bcc or t.from
     end,
     gpt_response_table = function(t)
       return t.choices
@@ -1611,6 +1668,9 @@ is = {
     end,
     iban_data_spec = function(t)
       return t.bankName or t.bic 
+    end,
+    ical_spec = function(t)
+      return t.VCALENDAR
     end,
   },
   dcmp_assoc = {
@@ -1719,6 +1779,9 @@ is = {
     running_application = function(val)
       return transf.full_userdata.str_by_classname(val) == "hs.application"
     end,
+    hs_image = function(val)
+      return transf.full_userdata.str_by_classname(val) == "hs.image"
+    end,
   }
 }
 
@@ -1730,11 +1793,8 @@ local experimental_cache = {}
 
 -- TODO this is not gonna work as-is, because we're assuming that type1 exists on `is`, but it might not. Therefore instead of iterating we need to add a __index metamethod to is
 
-for type1, v in pairs(is) do
+function get_nested_mt(type1)
   experimental_cache[type1] = {}
-  for type2, fn in pairs(v) do
-    experimental_cache[type1][type2] = {}
-  end
   local type1_ends_arr = get.str.bool_by_endswith(type1, "_arr")
   local type1_noarr
   if type1 == "arr" then 
@@ -1755,9 +1815,10 @@ for type1, v in pairs(is) do
     assoc_valuetype = assoc_valuetype or "any"
   end
 
+  local type1_ends_or_nil = get.str.bool_by_endswith(type1, "_or_nil")
+
   local mt = {
     __index = function(t, type2)
-
       local fn = rawget(t, type2)
       if fn then 
         return fn
@@ -1783,6 +1844,14 @@ for type1, v in pairs(is) do
           end
           return retval
         end
+      elseif type1 == "any" or type1_ends_or_nil and get.string.bool_by_endswith(type2, "_or_nil") then -- handle _or_nil cases automatically
+        if type1 ~= "any" then
+          type1 = string.sub(type2, 1, -8)
+        end
+        type2 = string.sub(type2, 1, -8)
+        return function(val)
+          return val == nil or is[type1][type2](val)
+        end
       end
       
       return function(arg)
@@ -1803,5 +1872,27 @@ for type1, v in pairs(is) do
       end
     end
   }
+  return mt
+end
+
+for type1, v in pairs(is) do
+  local mt = get_nested_mt(type1)
   setmetatable(v, mt)
 end
+
+local is_mt = {
+  __index = function(t, type1)
+    local nested_tbl = rawget(t, type1)
+    if nested_tbl then
+      return nested_tbl
+    else
+      local mt = get_nested_mt(type1)
+      local nested_tbl = {}
+      setmetatable(nested_tbl, mt)
+      rawset(t, type1, nested_tbl)
+      return nested_tbl
+    end
+  end
+}
+
+setmetatable(is, is_mt)

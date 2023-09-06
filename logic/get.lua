@@ -110,11 +110,11 @@ get = {
     bool_by_exists_as = function(item, type, ext)
       return is.absolute_path.extant_path(get.pass_item_name.local_absolute_path(item, type, ext))
     end,
-    not_userdata_or_function_by_parsed_json = function(item, type)
-      return transf.str.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json("pass show " .. type .. "/" .. item)
+    not_userdata_or_fn_by_parsed_json = function(item, type)
+      return transf.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json("pass show " .. type .. "/" .. item)
     end,
     contact_json = function(item, type)
-      return get.pass_item_name.not_userdata_or_function_by_parsed_json(item, "contacts/" .. type)
+      return get.pass_item_name.not_userdata_or_fn_by_parsed_json(item, "contacts/" .. type)
     end,
     
   },
@@ -874,7 +874,7 @@ get = {
       end
       return false
     end,
-    combination_arr = function(arr, k)
+    t_arr_arr_by_combinations_w_pos_int = function(arr, k)
       k = k or #arr
       if k == 0 or #arr == 0 then
         return {{}}
@@ -993,7 +993,7 @@ get = {
       end
       return res
     end,
-    n_strs_split = function(str, sep, n)
+    n_strs_by_split = function(str, sep, n)
       return transf.arr.n_anys(get.str.str_arr_by_split_w_str(str, sep, n))
     end,
     two_strs_arr_split_or_nil = function(str, sep)
@@ -1520,13 +1520,13 @@ get = {
       end
       return "---\n" .. final_metadata .. "\n---\n" .. final_contents
     end,
-    not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+    not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
       local tbl = transf.str.table_or_err_by_evaled_env_bash_parsed_json(str)
       return get.table.vt_or_err(tbl, key)
     end,
-    not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+    not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json_in_key = function(str, key)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
-        get.str.not_userdata_or_function_or_err_by_evaled_env_bash_parsed_json_in_key
+        get.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json_in_key
       )(str, key)
     end,
     str_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
@@ -1723,7 +1723,7 @@ get = {
       return transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(parts)[key]
     end,
     tag_raw_value = function(parts, key)
-      return transf.path_leaf_specifier.fs_tag_str_assoc(parts)[key]
+      return transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(parts)[key]
     end,
   },
   path = {
@@ -2129,10 +2129,32 @@ get = {
   csl_table_or_csl_table_arr = {
     raw_citations = function(csl_table, style)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
-        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_function.here_doc_by_json(csl_table)
+        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_fn.here_doc_by_json(csl_table)
       )
     end,
     
+  },
+  whisper_file = {
+    table_by_transcribed = function(path, format, prompt, iso639_1)
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_year(rest, "rest")({
+        api_name = "openai",
+        endpoint = "audio/transcriptions",
+        request_table_type = "form",
+        request_table = {
+          model = "whisper-1",
+          file = transf.path.atpath(path),
+          response_format = format,
+          prompt = prompt,
+          language = iso639_1,
+        }
+      })
+    end,
+    str_by_transcribed = function(path, prompt, iso639_1)
+      return get.whisper_file.table_by_transcribed(path, "json", prompt, iso639_1)
+    end,
+    assoc_by_transcribed_detailed = function(path, prompt, iso639_1)
+      return get.whisper_file.table_by_transcribed(path, "verbose_json", prompt, iso639_1)
+    end,
   },
   csl_table_arr = {
     
@@ -2175,14 +2197,14 @@ get = {
   },
   email_file = {
     with_body_quoted = function(path, response)
-      return response .. "\n\n" .. transf.email_file.quoted_body(path)
+      return response .. "\n\n" .. transf.email_file.str_by_quoted_body(path)
     end,
     prefixed_header = function(path, header)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         "mshow -qh" .. transf.str.str_by_single_quoted_escaped(header) .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
-    header = function(path, header)
+    str_by_header = function(path, header)
       local prefixed_header = transf.email_file.prefixed_header(path, header)
       return get.str.str_by_sub_eutf8(prefixed_header, #header + 2) -- +2 for the colon and the space
     end,
@@ -2977,7 +2999,7 @@ get = {
   },
   ipc_socket_id = {
     response_table_or_nil = function(ipc_socket_id, request_table)
-      return get.str.not_userdata_or_function_or_nil_by_evaled_env_bash_parsed_json_in_key(
+      return get.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json_in_key(
         "echo '" .. json.encode(request_table) .. "' | /opt/homebrew/bin/socat UNIX-CONNECT:" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " STDIO",
         "data"
       )
@@ -3398,7 +3420,7 @@ get = {
       end
       if args then 
         -- encode args to json and hash it, to use as the key for the cache
-        local hash = transf.not_userdata_or_function.hex_str_by_md5(args)
+        local hash = transf.not_userdata_or_fn.hex_str_by_md5(args)
         path = path .. hash
       end
       return path
@@ -3555,9 +3577,9 @@ get = {
       end
     end,
   },
-  not_userdata_or_function = {
+  not_userdata_or_fn = {
     md5_base32_crock_str_of_length = function(any, length)
-      return transf.not_userdata_or_function.base32_crock_str_by_md5(any):sub(1, length)
+      return transf.not_userdata_or_fn.base32_crock_str_by_md5(any):sub(1, length)
     end,
   },
   export_chat_main_object = {

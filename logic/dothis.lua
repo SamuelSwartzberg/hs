@@ -119,7 +119,7 @@ dothis = {
       event_table = event_table or {}
       local temp_file_contents = get.str.str_by_evaled_as_template(transf.event_table.yaml_str_by_calendar_template(event_table))
       dothis.str.edit_temp_file_in_vscode_act_on_contents(temp_file_contents, function(cnt)
-        local new_specifier = transf.yaml_str.not_userdata_or_function(cnt)
+        local new_specifier = transf.yaml_str.not_userdata_or_fn(cnt)
         dothis.event_table.add_event_from(new_specifier, do_after)
       end)
     end,
@@ -183,7 +183,7 @@ dothis = {
       dothis.alphanum_minus_underscore.add_as_pass_item_name(name, type, json.encode(data))
     end,
     add_as_pass_item_name = function(name, type, data)
-      dothis.str.env_bash_eval("yes " .. transf.not_userdata_or_function.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
+      dothis.str.env_bash_eval("yes " .. transf.not_userdata_or_fn.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
     end,
     add_as_passw_pass_item_name = function(name, password)
       dothis.alphanum_minus_underscore.add_as_pass_item_name(name, "passw", password)
@@ -236,8 +236,8 @@ dothis = {
   },
   table = {
     write_ics_file = function(tbl, path)
-      local tmpdir_json_path = transf.not_userdata_or_function.in_tmp_dir(tbl) .. ".json"
-      local tmpdir_ics_path = transf.not_userdata_or_function.in_tmp_dir(tbl) .. ".ics"
+      local tmpdir_json_path = transf.not_userdata_or_fn.in_tmp_dir(tbl) .. ".json"
+      local tmpdir_ics_path = transf.not_userdata_or_fn.in_tmp_dir(tbl) .. ".ics"
       dothis.absolute_path.write_file(tmpdir_json_path, json.encode(tbl))
       dothis.str.env_bash_eval_sync(
         "ical2json" ..
@@ -447,20 +447,20 @@ dothis = {
         failfn
       )
     end,
-    env_bash_eval_w_not_userdata_or_function_or_nil_arg_fn_by_parsed_json = function(str, fn)
+    env_bash_eval_w_not_userdata_or_fn_or_nil_arg_fn_by_parsed_json = function(str, fn)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped_noempty(
         str,
         function(str_or_nil)
-          str_or_nil = transf.fn.rt_or_nil_fn_by_pcall(transf.json_str.not_userdata_or_function)(str_or_nil)
+          str_or_nil = transf.fn.rt_or_nil_fn_by_pcall(transf.json_str.not_userdata_or_fn)(str_or_nil)
           fn(str_or_nil)
         end
       )
     end,
-    env_bash_eval_w_not_userdata_or_function_arg_fn_str_arg_fn_by_parsed_json = function(str, succfn, failfn)
+    env_bash_eval_w_not_userdata_or_fn_arg_fn_str_arg_fn_by_parsed_json = function(str, succfn, failfn)
       dothis.str.env_bash_eval_w_str_arg_fn_str_arg_fn_by_stripped_noempty(
         str,
         function(str)
-          local succ, res = pcall(transf.json_str.not_userdata_or_function, str)
+          local succ, res = pcall(transf.json_str.not_userdata_or_fn, str)
           if succ then
             succfn(res)
           else
@@ -471,7 +471,7 @@ dothis = {
       )
     end,
     env_bash_eval_w_table_or_nil_arg_fn_by_parsed_json = function(str, fn)
-      dothis.str.env_bash_eval_w_not_userdata_or_function_or_nil_arg_fn_by_parsed_json(
+      dothis.str.env_bash_eval_w_not_userdata_or_fn_or_nil_arg_fn_by_parsed_json(
         str,
         function(arg)
           if not is.any.table(arg) then arg = nil end
@@ -480,7 +480,7 @@ dothis = {
       )
     end,
     env_bash_eval_w_table_arg_fn_str_arg_fn = function(str, succfn, failfn)
-      dothis.str.env_bash_eval_w_not_userdata_or_function_arg_fn_str_arg_fn_by_parsed_json(
+      dothis.str.env_bash_eval_w_not_userdata_or_fn_arg_fn_str_arg_fn_by_parsed_json(
         str,
         function(arg)
           if not is.any.table(arg) then failfn("Not a table: " .. arg) else succfn(arg) end
@@ -1098,7 +1098,7 @@ dothis = {
     end,
     add_as_otp = function(path, name)
       dothis.otp_url.add_otp_pass_item(
-        transf.local_image_file.qr_data(path),
+        transf.local_image_file.multiline_str_by_qr_data(path),
         name
       )
     end,
@@ -1214,7 +1214,7 @@ dothis = {
     end,
     choose_attachment_and_download = function(path, fn)
       dothis.arr.choose_item(
-        transf.email_file.attachments(path),
+        transf.email_file.leaflike_arr_by_attachments(path),
         function(att)
           dothis.email_file.download_attachment(path, att, fn)
         end
@@ -1252,18 +1252,18 @@ dothis = {
       end)
     end,
     reply = function(path, specifier, do_after)
-      specifier = transf.two_tables.table_by_take_new(transf.email_file.reply_email_specifier(path), specifier)
+      specifier = transf.two_tables.table_by_take_new(transf.email_file.email_specifier_by_reply(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
     edit_then_reply = function(path, do_after)
-      dothis.email_specifier.edit_then_send(transf.email_file.reply_email_specifier(path), do_after)
+      dothis.email_specifier.edit_then_send(transf.email_file.email_specifier_by_reply(path), do_after)
     end,
     forward = function(path, specifier, do_after)
-      specifier = transf.two_tables.table_by_take_new(transf.email_file.forward_email_specifier(path), specifier)
+      specifier = transf.two_tables.table_by_take_new(transf.email_file.email_specifier_by_forward(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
     edit_then_forward = function(path, do_after)
-      dothis.email_specifier.edit_then_send(transf.email_file.forward_email_specifier(path), do_after)
+      dothis.email_specifier.edit_then_send(transf.email_file.email_specifier_by_forward(path), do_after)
     end,
     move = function(source, target)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
@@ -1371,10 +1371,10 @@ dothis = {
   },
   email_specifier = {
     send = function(specifier, do_after)
-      dothis.email_file.send(transf.email_specifier.draft_email_file(specifier), do_after)
+      dothis.email_file.send(transf.email_specifier.raw_email(specifier), do_after)
     end,
     edit_then_send = function(specifier, do_after)
-      dothis.email_file.edit_then_send(transf.email_specifier.draft_email_file(specifier), do_after)
+      dothis.email_file.edit_then_send(transf.email_specifier.raw_email(specifier), do_after)
     end,
   },
   email = {
@@ -1598,7 +1598,7 @@ dothis = {
       local newcnt = transf.two_table_or_nils.table_by_take_new(tblcnt, table)
       dothis.local_file.write_file(
         path,
-        transf.not_userdata_or_function.json_str(newcnt)
+        transf.not_userdata_or_fn.json_str(newcnt)
       )
     end
   },
@@ -1848,7 +1848,7 @@ dothis = {
       local csl_table = transf[indication].csl_table_by_online(citable_object_id)
       dothis.absolute_path.write_file(
         env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table) .. ".json",
-        transf.not_userdata_or_function.json_str(csl_table)
+        transf.not_userdata_or_fn.json_str(csl_table)
       )
     end,
   },
@@ -2779,7 +2779,7 @@ dothis = {
     -- expects to be called on a watcher for tachiyomi state
     tachiyomi_backup = function()
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
-        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_function(env.TMP_TACHIYOMI_JSON))
+        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_fn(env.TMP_TACHIYOMI_JSON))
         tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
         dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
           env.MMANGA_LOGS,
@@ -2833,7 +2833,7 @@ dothis = {
     git_backup = function()
       local tbl = {}
       for file in transf.dir.absolute_path_stateful_iter_by_children(env.TMP_GIT_LOG_PARENT) do
-        local commit = transf.json_file.not_userdata_or_function(file)
+        local commit = transf.json_file.not_userdata_or_fn(file)
         local timestamp_s = commit.epoch
         commit.epoch = nil
         tbl[timestamp_s * 1000] = commit
