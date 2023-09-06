@@ -30,7 +30,9 @@ is = {
 
   },
   not_empty_str = {
-    
+    utf8_char = function(str)
+      return transf.str.pos_int_by_len_utf8_chars(str) == 1
+    end,
     multiline_str = function(str)
       return get.str.bool_by_matches_part_eutf8(str, "[\n\r]")
     end,
@@ -148,7 +150,10 @@ is = {
     noempty_nohashcomment_line = function(str)
       return is.line.noempty_line(str) and is.line.nohashcomment_line(str)
     end,
-    noempty_nocomment_noindent_line = function(str)
+    noempty_noindent_line = function(str)
+      return is.line.noempty_line(str) and is.line.noindent_line(str)
+    end,
+    noempty_nohashcomment_noindent_line = function(str)
       return is.line.noempty_nohashcomment_line(str) and is.line.noindent_line(str)
     end,
     trimmed_line = function(str)
@@ -209,7 +214,10 @@ is = {
   ascii_char = {
     base_letter = function(str)
       return get.arr.bool_by_contains(ls.base_letters, str)
-    end
+    end,
+    rfc3339like_dt_separator = function(str)
+      return get.arr.bool_by_contains(ls.rfc3339like_dt_separators, str)
+    end,
   },
   printable_ascii_str = {
     printable_ascii_line = function(str)
@@ -555,7 +563,21 @@ is = {
     end,
     ipv6 = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "a-fA-F0-9:") -- naive check because the actual regex is a monster
+    end,
+    colon_num = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "0-9:")
     end
+  },
+  colon_num = {
+    hour = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{2}")
+    end,
+    hour_minute = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{2}:\\d{2}")
+    end,
+    hour_minute_second = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{2}:\\d{2}:\\d{2}")
+    end,
   },
   calendar_name = {
     writeable_calendar_name = function(name)
@@ -590,7 +612,24 @@ is = {
     upper_alphanum_minus = function(str)
       return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "a-z")
     end,
+    num_minus = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "-0-9")
+    end,
     
+  },
+  num_minus = {
+    year = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{4}")
+    end,
+    year_month = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{4}-\\d{2}")
+    end,
+    year_month_day = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{4}-\\d{2}-\\d{2}")
+    end,
+    digit_interval_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d+-\\d+")
+    end,
   },
   lower_alphanum_minus = {
     relay_identifier = function(str)
@@ -806,9 +845,15 @@ is = {
     atpath = function(path)
       return get.str.bool_by_startswith(path, "@")
     end,
-    owner_item_path = function(path)
-      return get.str.pos_int_by_amount_contained_nooverlap(path, "@")
+    duplex_local_nonabsolute_path = function(path)
+      return get.str.pos_int_by_amount_contained_nooverlap(path, "/") == 2
     end,
+    triplex_local_nonabsolute_path = function(path)
+      return get.str.pos_int_by_amount_contained_nooverlap(path, "/") == 3
+    end,
+  },
+  duplex_local_nonabsolute_path = {
+    owner_item_path = transf["nil"]["true"],
   },
   local_absolute_path = {
     local_extant_path = function(path)
@@ -1049,10 +1094,10 @@ is = {
   },
   shell_script_file = {
     shell_script_file_with_errors = function(path)
-      return transf.shell_script_file.gcc_str_errors(path) ~= ""
+      return transf.shell_script_file.str_or_nil_by_gcc_style_errors(path) ~= ""
     end,
     shell_script_file_with_warnings = function(path)
-      return transf.shell_script_file.gcc_str_warnings(path) ~= ""
+      return transf.shell_script_file.str_or_nil_by_gcc_style_warnings(path) ~= ""
     end,
     envlike_file = function(path)
       return is.shell_script_str.envlike_str(
@@ -1205,11 +1250,11 @@ is = {
     local_o_remote_str = function(str)
       return str == "local" or str == "remote"
     end,
-    date_component_name = function(str)
-      return get.arr.bool_by_contains(ls.date.date_component_names, str)
+    dcmp_name = function(str)
+      return get.arr.bool_by_contains(ls.date.dcmp_names, str)
     end,
-    date_component_name_long = function(str)
-      return get.arr.bool_by_contains(ls.date.date_component_names_long, str)
+    dcmp_name_long = function(str)
+      return get.arr.bool_by_contains(ls.date.dcmp_names_long, str)
     end,
     mod_char = function(str)
       return get.arr.bool_by_contains(ls.mod_char, str)
@@ -1489,6 +1534,9 @@ is = {
     nibble_pos_int = function(num)
       return num < 16
     end,
+    iso_weeknumber_int = function(num)
+      return num >= 1 and num <= 53
+    end,
   },
   nibble_pos_int = {
     sme_10_pos_int = function(num)
@@ -1514,11 +1562,15 @@ is = {
     end,
   },
   sme_6_pos_int = {
-    weekday_int_start_0 = transf["nil"]["true"]
+    weekday_int_start_0 = transf["nil"]["true"],
+    date_component_index = transf["nil"]["true"]
   },
   mult_anys = {
     two_anys = function(...)
       return transf.n_anys.int_by_amount(...) == 2
+    end,
+    three_anys = function(...)
+      return transf.n_anys.int_by_amount(...) == 3
     end,
   },
   two_anys = {
@@ -1532,6 +1584,16 @@ is = {
   two_strs = {
     shell_var_name_and_str = function(a, b)
       return is.str.shell_var_name(a)
+    end,
+  },
+  three_anys = {
+    three_strs = function(a, b, c)
+      return is.any.str(a) and is.any.str(b) and is.any.str(c)
+    end,
+  },
+  three_strs = {
+    year_and_year_month_and_year_month_day = function(a, b, c)
+      return is.str.year(a) and is.str.year_month(b) and is.str.year_month_day(c)
     end,
   },
   any = {
@@ -1636,7 +1698,32 @@ is = {
       return true
     end,
     any_arr = transf["nil"]["true"],
-    mult_anys__arr = transf["nil"]["true"]
+    mult_anys__arr = transf["nil"]["true"],
+    dcmp_name_seq = function(arr)
+      return is.any_arr.dcmp_name_arr(arr) 
+        and get.arr.bool_by_is_sorted(
+          arr,
+          transf.two_dcmp_names.bool_by_first_larger
+        )
+    end,
+  },
+  dcmp_name_seq = {
+    cont_dcmp_name_seq = function(arr)
+      local expected_idx = tblmap.dcmp_name.date_component_index[arr[1]]
+      for i = 2, #arr do
+        expected_idx = expected_idx + 1
+        if tblmap.dcmp_name.date_component_index[arr[i]] ~= expected_idx then return false end
+      end
+      return true
+    end
+  },
+  cont_dcmp_name_seq = {
+    prefix_dcmp_name_seq = function(arr)
+      return arr[1] == "year"
+    end,
+    suffix_dcmp_name_seq = function(arr)
+      return arr[#arr] == "sec"
+    end,
   },
   set = {
     set_set = function(set)
@@ -1686,7 +1773,7 @@ is = {
     interval_specifier = function(t)
       return t.start and t.stop
     end,
-    dcmp_assoc = function(t)
+    dcmp_spec = function(t)
       return t.year or t.month or t.day or t.hour or t.min or t.sec
     end,
     semver_component_specifier = function(t)
@@ -1713,11 +1800,32 @@ is = {
     val_dep_spec = function(t)
       return t.value and t.dependencies
     end,
+    newsboat_urls_specifier = function(t)
+      return t.url and t.title
+    end,
+
   },
-  dcmp_assoc = {
-    full_dcmp_assoc = function(t)
+  dcmp_spec = {
+    full_dcmp_spec = function(t)
       return t.year and t.month and t.day and t.hour and t.min and t.sec
+    end,
+    cont_dcmp_spec = function(t)
+      return is.arr.dcmp_name_seq(
+        transf.table.kt_arr(t)
+      )
     end
+  },
+  cont_dcmp_spec = {
+    prefix_dcmp_spec = function(t)
+      return is.cont_dcmp_name_seq.prefix_dcmp_name_seq(
+        transf.table.kt_arr(t)
+      )
+    end,
+    suffix_dcmp_spec = function(t)
+      return is.cont_dcmp_name_seq.suffix_dcmp_name_seq(
+        transf.table.kt_arr(t)
+      )
+    end,
   },
   interval_specifier = {
     number_interval_specifier = function(t)

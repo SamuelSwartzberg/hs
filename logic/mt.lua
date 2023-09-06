@@ -250,6 +250,9 @@ ls = {
   mullvad_states ={
     "Connected", "Disconnected"
   },
+  rfc3339like_dt_separators = {
+    "-", "T", ":", "Z"
+  },
   initial_headers = {"from", "to", "cc", "bcc", "subject"},
   datelib = {
     gettable_units  = { "date", "year", "isoyear", "month", "yearday", "weekday", "isoweekday", "weeknum", "isoweeknum", "day", "time", "hours", "minutes", "seconds", "fracs", "ticks" },
@@ -323,8 +326,8 @@ ls = {
     decoded = {"\"", "'", "<", ">", "&"}
   },
   date = {
-    date_component_names = {"year", "month", "day", "hour", "min", "sec"},
-    date_component_names_long = {"year", "month", "day", "hour", "minute", "second"},
+    dcmp_names = {"year", "month", "day", "hour", "min", "sec"},
+    dcmp_names_long = {"year", "month", "day", "hour", "minute", "second"},
     long_dt_seps = {" at "}
   },
   addr_key = {"Formatted name", "First name", "Last name", "Street", "Code", "City", "Region", "Country", "Box", "Extended"},

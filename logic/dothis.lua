@@ -332,8 +332,8 @@ dothis = {
     fill_with_content_lines = function(path)
       dothis.str_arr.fill_with(transf.str.noempty_line_arr(path))
     end,
-    fill_with_nocomment_noindent_content_lines = function(path)
-      dothis.str_arr.fill_with(transf.str.nocomment_noindent_content_lines(path))
+    fill_with_nohashcomment_noindent_content_lines = function(path)
+      dothis.str_arr.fill_with(transf.str.noempty_nohashcomment_noindent_line_arr(path))
     end,
     search = function(str, search_engine_id)
       dothis.url_or_local_path.open_browser(
@@ -1125,7 +1125,7 @@ dothis = {
   },
   plaintext_file = {
     append_lines = function(path, lines)
-      local contents = transf.plaintext_file.one_final_newline(path)
+      local contents = transf.plaintext_file.str_by_one_final_newline(path)
       dothis.absolute_path.write_file_if_file(path, contents .. get.str_or_number_arr.str_by_joined(lines, "\n"))
     end,
     append_line = function(path, line)
@@ -1148,36 +1148,36 @@ dothis = {
       dothis.absolute_path.write_file_if_file(path, get.str_or_number_arr.str_by_joined(lines, "\n"))
     end,
     set_line = function(path, line, line_number)
-      local lines = transf.plaintext_file.str_arr_by_lines(path)
+      local lines = transf.plaintext_file.line_arr(path)
       lines[line_number] = line
       dothis.plaintext_file.write_lines(path, lines)
     end,
     pop_line = function(path)
-      local lines = transf.plaintext_file.str_arr_by_lines(path)
+      local lines = transf.plaintext_file.line_arr(path)
       local line = dothis.arr.remove_by_index(lines, #lines)
       dothis.plaintext_file.write_lines(path, lines)
       return line
     end,
     remove_line_w_pos_int = function(path, line_number)
-      local lines = transf.plaintext_file.str_arr_by_lines(path)
+      local lines = transf.plaintext_file.line_arr(path)
       dothis.arr.remove_by_index(lines, line_number)
       dothis.plaintext_file.write_lines(path, lines)
     end,
     remove_line_w_fn = function(path, cond)
-      local lines = transf.plaintext_file.str_arr_by_lines(path)
+      local lines = transf.plaintext_file.line_arr(path)
       local index = get.arr.pos_int_or_nil_by_first_match_w_fn(lines, cond)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
     remove_line_w_str = function(path, cond)
-      local lines = transf.plaintext_file.str_arr_by_lines(path)
+      local lines = transf.plaintext_file.line_arr(path)
       local index = get.arr.pos_int_or_nil_by_first_match_w_t(lines, cond)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
-    find_remove_nocomment_noindent_line = function(path, cond)
-      local lines = transf.plaintext_file.str_arr_by_lines(path)
+    find_remove_nohashcomment_noindent_line = function(path, cond)
+      local lines = transf.plaintext_file.line_arr(path)
       local index = get.arr.pos_int_or_nil_by_first_match_w_fn(lines, function(line)
-        local nocomment_noindent = transf.line.nocomment_noindent(line)
-        return findsingle(nocomment_noindent, cond)
+        local nohashcomment_noindent = transf.line.nohashcomment_noindent(line)
+        return findsingle(nohashcomment_noindent, cond)
       end)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)
     end,
@@ -1186,7 +1186,7 @@ dothis = {
   plaintext_table_file = {
     append_arr_field_arr = function(path, arr_field_arr)
       local lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr_field_arr, function (arr)
-        return get.str_or_number_arr.str_by_joined(arr, transf.plaintext_table_file.field_separator())
+        return get.str_or_number_arr.str_by_joined(arr, transf.plaintext_table_file.utf8_char_by_field_separator())
       end)
       dothis.plaintext_file.append_lines(path, lines)
     end,
@@ -1195,7 +1195,7 @@ dothis = {
   plaintext_url_or_local_path_file = {
     open_all = function(path, browser)
       dothis.arr.each(
-        transf.plaintext_file.nocomment_noindent_content_lines(path),
+        transf.plaintext_file.noempty_nohashcomment_noindent_line_arr(path),
         get.fn.arbitrary_args_bound_or_ignored_fn(dothis.url_or_local_path.open_browser, {a_use, browser})
       )
     end,
@@ -1831,7 +1831,7 @@ dothis = {
   envlike_str = {
     write_and_check = function(str, path)
       dothis.absolute_path.write_file(path, str)
-      local errors = transf.shell_script_file.gcc_str_errors(path)
+      local errors = transf.shell_script_file.str_or_nil_by_gcc_style_errors(path)
       if errors then
         error("env file " .. path .. " has errors:\n" .. errors)
       end
@@ -1866,7 +1866,7 @@ dothis = {
       )
     end,
     remove_indicated_citable_object_id = function(citations_file, indicated_citable_object_id)
-      dothis.plaintext_file.find_remove_nocomment_noindent_line(
+      dothis.plaintext_file.find_remove_nohashcomment_noindent_line(
         citations_file,
         {_exactly = indicated_citable_object_id}
       )

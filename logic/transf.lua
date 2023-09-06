@@ -1851,7 +1851,7 @@ transf = {
       end)
     end,
     shell_var_name_and_str__arr_arr_by_ordered_dependencies = function(assoc)
-      return transf.shell_var_name_key_val_dep_spec_value_assoc.dependency_ordered_key_value_arr(
+      return transf.shell_var_name_key_val_dep_spec_value_assoc.shell_var_name_and_str__arr_arr_by_ordered_dependencies(
         transf.shell_var_name_key_val_dep_spec_value_assoc.shell_var_name_key_val_dep_spec_value_assoc(assoc)
       )
     end,
@@ -1873,7 +1873,7 @@ transf = {
 
 
   shell_var_name_key_val_dep_spec_value_assoc = {
-    dependency_ordered_key_value_arr = function(assoc)local result = {}  -- Table to store the sorted keys
+    shell_var_name_and_str__arr_arr_by_ordered_dependencies = function(assoc)local result = {}  -- Table to store the sorted keys
       local visited = {}  -- Table to keep track of visited keys
       local temp_stack = {}  -- Table to detect cyclic dependencies
   
@@ -1907,11 +1907,11 @@ transf = {
   },
 
   shell_script_file = {
-    gcc_str_errors = function(path)
-      return get.shell_script_file.lint_gcc_str(path, "errors")
+    str_or_nil_by_gcc_style_errors = function(path)
+      return get.shell_script_file.str_or_nil_by_lint_gcc(path, "errors")
     end,
-    gcc_str_warnings = function(path)
-      return get.shell_script_file.lint_gcc_str(path, "warnings")
+    str_or_nil_by_gcc_style_warnings = function(path)
+      return get.shell_script_file.str_or_nil_by_lint_gcc(path, "warnings")
     end,
   },
 
@@ -1919,92 +1919,74 @@ transf = {
     str_by_contents = function(path)
       return transf.file.str_by_contents(path)
     end,
-    str_arr_by_lines = function(path)
+    line_arr = function(path)
       return transf.str.line_arr(transf.plaintext_file.str_by_contents(path))
     end,
-    str_arr_by_content_lines = function(path)
+    noempty_line_arr = function(path)
       return transf.str.noempty_line_arr(transf.plaintext_file.str_by_contents(path))
     end,
-    noindent_content_lines = function(path)
-      return transf.str.noindent_content_lines(transf.plaintext_file.str_by_contents(path))
+    noempty_noindent_line_arr = function(path)
+      return transf.str.noempty_noindent_line_arr(transf.plaintext_file.str_by_contents(path))
     end,
-    nocomment_noindent_content_lines = function(path)
-      return transf.str.nocomment_noindent_content_lines(transf.plaintext_file.str_by_contents(path))
+    noempty_nohashcomment_noindent_line_arr = function(path)
+      return transf.str.noempty_nohashcomment_noindent_line_arr(transf.plaintext_file.str_by_contents(path))
     end,
-    first_line = function(path)
+    line_by_first = function(path)
       return transf.str.line_by_first(transf.plaintext_file.str_by_contents(path))
     end,
-    last_line = function(path)
+    line_by_last = function(path)
       return transf.str.line_by_last(transf.plaintext_file.str_by_contents(path))
-    end,
-    byte_char_arr = function(path)
-      return transf.str.byte_char_arr(transf.plaintext_file.str_by_contents(path))
     end,
     utf8_char_arr = function(path)
       return transf.str.utf8_char_arr(transf.plaintext_file.str_by_contents(path))
     end,
-    no_final_newlines = function(path)
+    str_by_no_final_newlines = function(path)
       return transf.str.str_by_no_final_newlines(transf.plaintext_file.str_by_contents(path))
     end,
-    one_final_newline = function(path)
+    str_by_one_final_newline = function(path)
       return transf.str.str_by_one_final_newline(transf.plaintext_file.str_by_contents(path))
     end,
-    len_lines = function(path)
+    pos_int_by_len_lines = function(path)
       return transf.str.pos_int_by_len_lines(transf.plaintext_file.str_by_contents(path))
     end,
     pos_int_by_len_utf8_chars = function(path)
       return transf.str.pos_int_by_len_utf8_chars(transf.plaintext_file.str_by_contents(path))
     end,
-    pos_int_by_len_byte_chars = function(path)
-      return transf.str.pos_int_by_len_byte_chars(transf.plaintext_file.str_by_contents(path))
+    pos_int_by_len_ascii_chars = function(path)
+      return transf.str.pos_int_by_len_ascii_chars(transf.plaintext_file.str_by_contents(path))
     end,
 
     
   },
 
   plaintext_table_file = {
-    field_separator = function(path)
-      return tblmap.extension.likely_field_separator[transf.path.extension(path)]
+    utf8_char_by_field_separator = function(path)
+      return tblmap.extension.utf8_char_by_likely_field_separator[transf.path.extension(path)]
     end,
-    record_separator = function(path)
-      return tblmap.extension.likely_record_separator[transf.path.extension(path)]
+    utf8_char_record_separator = function(path)
+      return tblmap.extension.utf8_char_by_likely_record_separator[transf.path.extension(path)]
     end,
-    field_arr_arr = function(path)
-      return ftcsv.parse(path, transf.plaintext_table_file.field_separator(path), {
+    str_arr_arr = function(path)
+      return ftcsv.parse(path, transf.plaintext_table_file.utf8_char_by_field_separator(path), {
         headers = false
       })
     end,
-    iter_of_field_arr = function(path)
-      local iter = ftcsv.parseLine(path, transf.plaintext_table_file.field_separator(path), {
+    str_arr_iter = function(path)
+      local iter = ftcsv.parseLine(path, transf.plaintext_table_file.utf8_char_by_field_separator(path), {
         headers = false
       })
       iter() -- skip header, seems to be a bug in ftcsv
       return iter
     end,
-    assoc_arr = function(path)
-      return select(1, ftcsv.parse(path, transf.plaintext_table_file.field_separator(path)))
+    str_key_str_value_assoc_arr = function(path)
+      return select(1, ftcsv.parse(path, transf.plaintext_table_file.utf8_char_by_field_separator(path)))
     end,
-    iter_of_assocs = function(path)
-      return ftcsv.parseLine(path, transf.plaintext_table_file.field_separator(path))
+    str_key_str_value_assoc_iter = function(path)
+      return ftcsv.parseLine(path, transf.plaintext_table_file.utf8_char_by_field_separator(path))
     end,
-  },
-  timestamp_s_key_assoc_value_assoc_json_file = {
-
-  },
-  dated_children_dir = {
-
-  },
-  dated_named_item_dir = {
-
   },
   logging_dir = {
    
-  },
-  dated_named_item = {
-
-  },
-  dated_grouping_dir = {
-
   },
   newsboat_url_specifier = {
     newsboat_url_line = function(specifier)
@@ -2028,14 +2010,14 @@ transf = {
     end,
   },
   package_name_semver_compound_str = {
-    package_name_semver_str_arr = function(str)
+    package_name_and_semver_str__arr = function(str)
       return get.str.str_arr_split_noedge(str, "@")
     end,
     package_name = function(str)
-      return transf.package_name_semver_compound_str.package_name_semver_str_arr(str)[1]
+      return transf.package_name_semver_compound_str.package_name_and_semver_str__arr(str)[1]
     end,
     semver_str = function(str)
-      return transf.package_name_semver_compound_str.package_name_semver_str_arr(str)[2]
+      return transf.package_name_semver_compound_str.package_name_and_semver_str__arr(str)[2]
     end,
   },
   package_name_semver_package_manager_name_compound_str = {
@@ -2065,25 +2047,25 @@ transf = {
     end,
   },
   dice_notation = {
-    nonindicated_dec_number_str_result = function(dice_notation)
+    nonindicated_dec_number_str_by_result = function(dice_notation)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("roll" .. transf.str.str_by_single_quoted_escaped(dice_notation))
     end,
-    int_result = function(dice_notation)
+    int_by_result = function(dice_notation)
       return transf.nonindicated_number_str.number_by_base_10(
-        transf.dice_notation.nonindicated_dec_number_str_result(dice_notation)
+        transf.dice_notation.nonindicated_dec_number_str_by_result(dice_notation)
       )
     end,
   },
   date = {
-    y_ym_ymd_table = function(date)
+    year_and_year_month_and_year_month_day__arr = function(date)
       return  {
         date:fmt("%Y"),
         date:fmt("%Y-%m"),
         date:fmt("%Y-%m-%d"),
       }
     end,
-    y_ym_ymd_path = function(date)
-      return get.str_or_number_arr.str_by_joined(transf.date.y_ym_ymd_table(date), "/")
+    triplex_local_nonabsolute_path_by_y_ym_ymd = function(date)
+      return get.str_or_number_arr.str_by_joined(transf.date.year_and_year_month_and_year_month_day__arr(date), "/")
     end,
     weekday_int_start_1 = function(date)
       return date:getisoweekday()
@@ -2091,10 +2073,10 @@ transf = {
     weekday_int_start_0 = function(date)
       return date:getisoweekday() - 1
     end,
-    weeknumber = function(date)
+    iso_weeknumber_int = function(date)
       return date:getisoweeknumber()
     end,
-    full_dcmp_assoc = function(date)
+    full_dcmp_spec = function(date)
       return {
         year = date:getyear(),
         month = date:getmonth(),
@@ -2104,32 +2086,32 @@ transf = {
         sec = date:getsec(),
       }
     end,
-    quarter_hours_date_sequence_specifier = function(date)
+    date_sequence_specifier_by_quarter_hours = function(date)
       return get.date.date_sequence_specifier_of_lower_component(date, 15, "hour")
     end,
-    quarter_hours_of_day_date_sequence_specifier = function(date)
+    date_sequence_specifier_by_quarter_hours_of_day = function(date)
       return get.date.date_sequence_specifier_of_lower_component(date, 15, "day")
     end,
     full_rfc3339like_dt = function(date)
       return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
     end,
-    full_rfc3339like_time = function(date)
+    hour_minute_second = function(date)
       return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-time"])
     end,
     timestamp_s = function(date)
-      return transf.full_dcmp_assoc.timestamp_s(
-        transf.date.full_dcmp_assoc(date)
+      return transf.full_dcmp_spec.timestamp_s(
+        transf.date.full_dcmp_spec(date)
       )
     end,
     timestamp_ms = function(date)
       return transf.date.timestamp_s(date) * 1000
     end,
-    event_table_with_start = function(date)
+    event_table_by_start = function(date)
       return {
         start = transf.date.full_rfc3339like_dt(date)
       }
     end,
-    summary = function(date)
+    printable_ascii_line_by_summary = function(date)
       return get.date.str_w_date_format_indicator(date, "detailed")
     end
 
@@ -2150,110 +2132,110 @@ transf = {
       return date(timestamp / 1000)
     end
   },
-  date_component_name = {
-    date_component_name_arr_larger_or_same = function(date_component_name)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.date.date_component_names, 1, date_component_name)
+  dcmp_name = {
+    prefix_dcmp_name_seq_by_larger_or_same = function(dcmp_name)
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.date.dcmp_names, 1, dcmp_name)
     end,
-    date_component_name_arr_same_or_smaller = function(date_component_name)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.date.date_component_names, date_component_name)
+    suffix_dcmp_name_seq_by_same_or_smaller = function(dcmp_name)
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.date.dcmp_names, dcmp_name)
     end,
-    date_component_index = function(date_component_name)
-      return tblmap.date_component_name.date_component_index[date_component_name]
+    date_component_index = function(dcmp_name)
+      return tblmap.dcmp_name.date_component_index[dcmp_name]
     end,
     
   },
-  date_component_name_arr = {
-    min_dcmp_assoc = function(arr)
+  dcmp_name_arr = {
+    dcmp_spec_by_min = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
         function(component)
-          return component, tblmap.date_component_name.int_by_min_date_component_value[component]
+          return component, tblmap.dcmp_name.int_by_min_date_component_value[component]
         end
       )
     end,
-    max_dcmp_assoc = function(arr)
+    dcmp_spec_by_max = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
         function(component)
-          return component, tblmap.date_component_name.pos_int_by_max_date_component_value[component]
+          return component, tblmap.dcmp_name.pos_int_by_max_date_component_value[component]
         end
       )
     end,
-    date_component_name_ordered_arr = function(arr)
-      return get.arr.arr_by_sorted(arr, transf.two_date_component_names.date_component_name_by_larger)
+    dcmp_name_seq = function(arr)
+      return get.arr.arr_by_sorted(arr, transf.two_dcmp_names.bool_by_first_larger)
     end,
-    largest_date_component_name = function(arr)
-      return transf.date_component_name_arr.date_component_name_ordered_arr(
+    dcmp_name_by_largest = function(arr)
+      return transf.dcmp_name_arr.dcmp_name_seq(
         arr
       )[1]
     end,
-    smallest_date_component_name = function(arr)
-      return transf.date_component_name_arr.date_component_name_ordered_arr(
+    dcmp_name_by_smallest = function(arr)
+      return transf.dcmp_name_arr.dcmp_name_seq(
         arr
       )[#arr]
     end,
-    date_component_name_arr_inverse = function(arr)
-      return transf.two_arrs.set_by_difference(ls.date.date_component_names, arr)
+    dcmp_name_arr_by_inverse = function(arr)
+      return transf.two_arrs.set_by_difference(ls.date.dcmp_names, arr)
     end,
     rfc3339like_dt_separator_arr  = function(arr)
       return get.arr.arr_by_mapped_w_t_key_assoc(
         arr,
-        tblmap.date_component_name.rfc3339like_dt_separator
+        tblmap.dcmp_name.rfc3339like_dt_separator
       )
     end,
     rfc3339like_dt_str_format_part_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_key_assoc(
         arr,
-        tblmap.date_component_name.rfc3339like_dt_str_format_part
+        tblmap.dcmp_name.rfc3339like_dt_str_format_part
       )
     end,
   },
-  date_component_name_ordered_list = {
-    largest_date_component_name = function(list)
+  dcmp_name_seq = {
+    dcmp_name_by_largest = function(list)
       return list[1]
     end,
-    smallest_date_component_name = function(list)
+    dcmp_name_by_smallest = function(list)
       return list[#list]
     end,
   },
   rfc3339like_dt = {
-    dcmp_assoc = function(str)
+    dcmp_spec = function(str)
       local comps = {get.str.n_strs_by_extracted_onig(str, r.g.rfc3339like_dt)}
-      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.date.date_component_names, function(k, v)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.date.dcmp_names, function(k, v)
         return v and get.str_or_number.number_or_nil(comps[k]) or nil
       end)
     end,
     date_interval_specifier = function(str)
-      return transf.dcmp_assoc.date_interval_specifier(transf.rfc3339like_dt.dcmp_assoc(str))
+      return transf.dcmp_spec.date_interval_specifier(transf.rfc3339like_dt.dcmp_spec(str))
     end,
-    min_full_dcmp_assoc = function(str)
-      return transf.dcmp_assoc.full_dcmp_assoc_by_min(
-        transf.rfc3339like_dt.dcmp_assoc(str)
+    full_dcmp_spec_by_min = function(str)
+      return transf.dcmp_spec.full_dcmp_spec_by_min(
+        transf.rfc3339like_dt.dcmp_spec(str)
       )
     end,
-    max_full_dcmp_assoc = function(str)
-      return transf.dcmp_assoc.full_dcmp_assoc_by_max(
-        transf.rfc3339like_dt.dcmp_assoc(str)
+    full_dcmp_spec_by_max = function(str)
+      return transf.dcmp_spec.full_dcmp_spec_by_max(
+        transf.rfc3339like_dt.dcmp_spec(str)
       )
     end,
-    min_date = function(str)
-      return transf.full_dcmp_assoc.date(
-        transf.rfc3339like_dt.min_full_dcmp_assoc(str)
+    date_by_min = function(str)
+      return transf.full_dcmp_spec.date(
+        transf.rfc3339like_dt.full_dcmp_spec_by_min(str)
       )
     end,
-    max_date = function(str)
-      return transf.full_dcmp_assoc.date(
-        transf.rfc3339like_dt.max_full_dcmp_assoc(str)
+    date_by_max = function(str)
+      return transf.full_dcmp_spec.date(
+        transf.rfc3339like_dt.full_dcmp_spec_by_max(str)
       )
     end,
-    min_timestamp_s = function(str)
+    timestamp_s_by_min = function(str)
       return transf.date.timestamp_s(
-        transf.rfc3339like_dt.min_date(str)
+        transf.rfc3339like_dt.date_by_min(str)
       )
     end,
-    max_timestamp_s = function(str)
+    timestamp_s_by_max = function(str)
       return transf.date.timestamp_s(
-        transf.rfc3339like_dt.max_date(str)
+        transf.rfc3339like_dt.date_by_max(str)
       )
     end,
     
@@ -2261,8 +2243,8 @@ transf = {
   },
   full_rfc3339like_dt = {
     date = function(str)
-      transf.full_dcmp_assoc.date(
-        transf.rfc3339like_dt.dcmp_assoc(str)
+      transf.full_dcmp_spec.date(
+        transf.rfc3339like_dt.dcmp_spec(str)
       )
     end,
     timestamp_s = function(str)
@@ -2277,87 +2259,87 @@ transf = {
     end,
   },
   rfc3339like_interval = {
-    start_rfc3339like_dt = function(str)
+    rfc3339like_dt_by_start = function(str)
       return get.str.str_arr_by_split_w_string(str, "_to_")[1]
     end,
-    start_dcmp_assoc = function(str)
-      return transf.rfc3339like_dt.dcmp_assoc(
-        transf.rfc3339like_interval.start_rfc3339like_dt(str)
+    dcmp_spec_by_start = function(str)
+      return transf.rfc3339like_dt.dcmp_spec(
+        transf.rfc3339like_interval.rfc3339like_dt_by_start(str)
       )
     end,
-    start_min_full_dcmp_assoc = function(str)
-      return transf.dcmp_assoc.full_dcmp_assoc_by_min(
-        transf.rfc3339like_interval.start_dcmp_assoc(str)
+    full_dcmp_spec_by_start_min = function(str)
+      return transf.dcmp_spec.full_dcmp_spec_by_min(
+        transf.rfc3339like_interval.dcmp_spec_by_start(str)
       )
     end,
-    start_min_date = function(str)
-      return transf.full_dcmp_assoc.date(
-        transf.rfc3339like_interval.start_min_full_dcmp_assoc(str)
+    date_by_start_min = function(str)
+      return transf.full_dcmp_spec.date(
+        transf.rfc3339like_interval.full_dcmp_spec_by_start_min(str)
       )
     end,
-    end_rfc3339like_dt = function(str)
+    rfc3339like_dt_by_end = function(str)
       return get.str.str_arr_by_split_w_string(str, "_to_")[2]
     end,
-    end_dcmp_assoc = function(str)
-      return transf.rfc3339like_dt.dcmp_assoc(
-        transf.rfc3339like_interval.end_rfc3339like_dt(str)
+    dcmp_spec_by_end = function(str)
+      return transf.rfc3339like_dt.dcmp_spec(
+        transf.rfc3339like_interval.rfc3339like_dt_by_end(str)
       )
     end,
-    end_max_full_dcmp_assoc = function(str)
-      return transf.dcmp_assoc.full_dcmp_assoc_by_max(
-        transf.rfc3339like_interval.end_dcmp_assoc(str)
+    full_dcmp_spec_by_end_max = function(str)
+      return transf.dcmp_spec.full_dcmp_spec_by_max(
+        transf.rfc3339like_interval.dcmp_spec_by_end(str)
       )
     end,
-    end_min_full_dcmp_assoc = function(str)
-      return transf.dcmp_assoc.full_dcmp_assoc_by_min(
-        transf.rfc3339like_interval.end_dcmp_assoc(str)
+    full_dcmp_spec_by_end_min = function(str)
+      return transf.dcmp_spec.full_dcmp_spec_by_min(
+        transf.rfc3339like_interval.dcmp_spec_by_end(str)
       )
     end,
-    end_max_date = function(str)
-      return transf.full_dcmp_assoc.date(
-        transf.rfc3339like_interval.end_max_full_dcmp_assoc(str)
+    date_by_end_max = function(str)
+      return transf.full_dcmp_spec.date(
+        transf.rfc3339like_interval.full_dcmp_spec_by_end_max(str)
       )
     end,
-    end_min_date = function(str)
-      return transf.full_dcmp_assoc.date(
-        transf.rfc3339like_interval.end_min_full_dcmp_assoc(str)
+    date_by_end_min = function(str)
+      return transf.full_dcmp_spec.date(
+        transf.rfc3339like_interval.full_dcmp_spec_by_end_min(str)
       )
     end,
-    start_smallest_date_component_set = function(str)
-      return transf.dcmp_assoc.smallest_date_component_set(
-        transf.rfc3339like_interval.start_dcmp_assoc(str)
+    dcmp_name_by_smallest_start_set = function(str)
+      return transf.dcmp_spec.smallest_date_component_set(
+        transf.rfc3339like_interval.dcmp_spec_by_start(str)
       )
     end,
-    end_smallest_date_component_set = function(str)
-      return transf.dcmp_assoc.smallest_date_component_set(
-        transf.rfc3339like_interval.end_dcmp_assoc(str)
+    dcmp_name_by_smallest_end_set = function(str)
+      return transf.dcmp_spec.smallest_date_component_set(
+        transf.rfc3339like_interval.dcmp_spec_by_end(str)
       )
     end,
-    smallest_date_component_both_set = function(str)
-      return transf.two_date_component_names.date_component_name_by_larger(
-        transf.rfc3339like_interval.start_smallest_date_component_set(str),
-        transf.rfc3339like_interval.end_smallest_date_component_set(str)
+    dcmp_name_by_smallest_both_set = function(str)
+      return transf.two_dcmp_names.dcmp_name_by_larger(
+        transf.rfc3339like_interval.dcmp_name_by_smallest_start_set(str),
+        transf.rfc3339like_interval.dcmp_name_by_smallest_end_set(str)
       )
     end,
     date_interval_specifier = function(str)
       return {
-        start = transf.rfc3339like_interval.start_min_date(str),
-        stop = transf.rfc3339like_interval.end_max_date(str),
+        start = transf.rfc3339like_interval.date_by_start_min(str),
+        stop = transf.rfc3339like_interval.date_by_end_max(str),
       }
     end,
     date_sequence_specifier = function(str)
       return {
-        start = transf.rfc3339like_interval.start_min_date(str),
-        stop = transf.rfc3339like_interval.end_max_date(str),
+        start = transf.rfc3339like_interval.date_by_start_min(str),
+        stop = transf.rfc3339like_interval.date_by_end_max(str),
         step = 1,
-        unit = transf.rfc3339like_interval.smallest_date_component_both_set(str)
+        unit = transf.rfc3339like_interval.dcmp_name_by_smallest_both_set(str)
       }
     end,
     date_by_min = function(str)
-      return transf.rfc3339like_interval.start_min_date(str)
+      return transf.rfc3339like_interval.date_by_start_min(str)
     end,
     date_by_max = function(str)
-      return transf.rfc3339like_interval.end_max_date(str)
+      return transf.rfc3339like_interval.date_by_end_max(str)
     end,
   },
   rf3339like_dt_or_interval = {
@@ -2368,12 +2350,12 @@ transf = {
         return "rfc3339like_dt"
       end
     end,
-    max_date = function(str)
+    date_by_max = function(str)
       return transf[
         transf.rf3339like_dt_or_interval.dt_or_interval(str)
       ].date_by_max(str)
     end,
-    min_date = function(str)
+    date_by_min = function(str)
       return transf[
         transf.rf3339like_dt_or_interval.dt_or_interval(str)
       ].date_by_min(str)
@@ -2389,26 +2371,34 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(rf3339like_dt_or_interval_arr, transf.rf3339like_dt_or_interval.date_interval_specifier)
     end,
   },
-  basic_interval_str = {
-    start_stop = function(str)
+  digit_interval_str = {
+    two_digit_strs = function(str)
       return get.str.str_arr_by_split_w_ascii_char(str, "-")
     end,
-    interval_specifier = function(str)
-      local start, stop = transf.basic_interval_str.start_stop(str)
+    two_pos_ints = function(str)
+      local s1, s2 = transf.digit_interval_str.two_digit_strs(str)
+      return {
+        transf.nonindicated_number_str.number_by_base_10(s1),
+        transf.nonindicated_number_str.number_by_base_10(s2), 
+      }
+    end,
+    int_interval_specifier = function(str)
+      local start, stop = transf.digit_interval_str.two_pos_ints(str)
       return {
         start = start,
         stop = stop,
       }
     end,
   },
-  single_value_or_basic_interval_str = {
-    interval_specifier = function(str)
+  digit_str_or_digit_interval_str = {
+    int_interval_specifier = function(str)
       if get.str.bool_by_contains_w_ascii_str(str, "-") then
-        return transf.basic_interval_str.interval_specifier(str)
+        return transf.digit_interval_str.int_interval_specifier(str)
       else
+        local int = transf.nonindicated_number_str.number_by_base_10(str)
         return {
-          start = str,
-          stop = str,
+          start = int,
+          stop = int,
         }
       end
     end,
@@ -2528,30 +2518,30 @@ transf = {
     full_rfc3339like_dt_by_end = function(date_interval_specifier)
       return transf.date.full_rfc3339like_dt(date_interval_specifier.stop)
     end,
-    start_full_dcmp_assoc = function(date_interval_specifier)
-      return transf.date.full_dcmp_assoc(date_interval_specifier.start)
+    full_dcmp_spec_by_start = function(date_interval_specifier)
+      return transf.date.full_dcmp_spec(date_interval_specifier.start)
     end,
-    end_full_dcmp_assoc = function(date_interval_specifier)
-      return transf.date.full_dcmp_assoc(date_interval_specifier.stop)
+    full_dcmp_spec_by_end = function(date_interval_specifier)
+      return transf.date.full_dcmp_spec(date_interval_specifier.stop)
     end,
-    start_prefix_dcmp_assoc_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
-      return transf.dcmp_assoc.prefix_dcmp_assoc_where_date_component_value_is_not_min_date_component_value(
-        transf.date_interval_specifier.start_full_dcmp_assoc(date_interval_specifier)
+    prefix_dcmp_spec_by_start_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
+      return transf.dcmp_spec.prefix_dcmp_spec_where_date_component_value_is_not_min_date_component_value(
+        transf.date_interval_specifier.full_dcmp_spec_by_start(date_interval_specifier)
       )
     end,
-    end_prefix_dcmp_assoc_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
-      return transf.dcmp_assoc.prefix_dcmp_assoc_where_date_component_value_is_not_max_date_component_value(
-        transf.date_interval_specifier.end_full_dcmp_assoc(date_interval_specifier)
+    end_prefix_dcmp_spec_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
+      return transf.dcmp_spec.prefix_dcmp_spec_where_date_component_value_is_not_max_date_component_value(
+        transf.date_interval_specifier.full_dcmp_spec_by_end(date_interval_specifier)
       )
     end,
     start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
-      return transf.dcmp_assoc.rfc3339like_dt(
-        transf.date_interval_specifier.start_prefix_dcmp_assoc_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
+      return transf.dcmp_spec.rfc3339like_dt(
+        transf.date_interval_specifier.prefix_dcmp_spec_by_start_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
       )
     end,
     end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
-      return transf.dcmp_assoc.rfc3339like_dt(
-        transf.date_interval_specifier.end_prefix_dcmp_assoc_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
+      return transf.dcmp_spec.rfc3339like_dt(
+        transf.date_interval_specifier.end_prefix_dcmp_spec_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
       )
     end,
     rfc3339like_dt = function(date_interval_specifier)
@@ -2577,116 +2567,102 @@ transf = {
       }
     end,
   },
-  dcmp_assoc = {
-    date_component_name_list_set = function(dcmp_assoc)
-      return transf.table_or_nil.kt_arr(dcmp_assoc)
+  dcmp_spec = {
+    dcmp_name_arr_by_set = function(dcmp_spec)
+      return transf.table_or_nil.kt_arr(dcmp_spec)
     end,
-    date_component_value_list_set = function(dcmp_assoc)
-      return transf.table_or_nil.vt_arr(dcmp_assoc)
+    dcmp_name_arr_by_not_set = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_name_arr_by_inverse(transf.dcmp_spec.dcmp_name_arr_by_set(dcmp_spec))
     end,
-    date_component_name_list_not_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.date_component_name_arr_inverse(transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc))
+    dcmp_name_seq_by_set = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_name_seq(transf.dcmp_spec.dcmp_name_arr_by_set(dcmp_spec))
     end,
-    date_component_value_list_not_set = function(dcmp_assoc)
-      return get.date_component_name_list.date_component_value_list(
-        transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc),
-        dcmp_assoc
-      )
+    dcmp_name_seq_by_not_set = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_name_seq(transf.dcmp_spec.dcmp_name_arr_by_not_set(dcmp_spec))
     end,
-    date_component_name_ordered_list_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc))
+    dcmp_name_by_largest_set = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_name_by_largest(transf.dcmp_spec.dcmp_name_arr_by_set(dcmp_spec))
     end,
-    date_component_value_ordered_list_set = function(dcmp_assoc)
-      return get.date_component_name_list.date_component_value_ordered_list(
-        transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc),
-        dcmp_assoc
-      )
+    dcmp_name_by_smallest_set = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_name_by_smallest(transf.dcmp_spec.dcmp_name_arr_by_set(dcmp_spec))
     end,
-    date_component_name_ordered_list_not_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.date_component_name_ordered_arr(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
+    dcmp_name_by_largest_not_set = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_name_by_largest(transf.dcmp_spec.dcmp_name_arr_by_not_set(dcmp_spec))
     end,
-    largest_date_component_name_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.largest_date_component_name(transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc))
+    dcmp_name_by_smallest_not_set = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_name_by_smallest(transf.dcmp_spec.dcmp_name_arr_by_not_set(dcmp_spec))
     end,
-    smallest_date_component_name_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.smallest_date_component_name(transf.dcmp_assoc.date_component_name_list_set(dcmp_assoc))
+    dcmp_spec_by_not_set_min = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_spec_by_min(transf.dcmp_spec.dcmp_name_arr_by_not_set(dcmp_spec))
     end,
-    largest_date_component_name_not_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.largest_date_component_name(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
+    dcmp_spec_by_not_set_max = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_spec_by_max(transf.dcmp_spec.dcmp_name_arr_by_not_set(dcmp_spec))
     end,
-    smallest_date_component_name_not_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.smallest_date_component_name(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
-    end,
-    min_dcmp_assoc_not_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.min_dcmp_assoc(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
-    end,
-    max_dcmp_assoc_not_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.max_dcmp_assoc(transf.dcmp_assoc.date_component_name_list_not_set(dcmp_assoc))
-    end,
-    full_dcmp_assoc_by_min = function(dcmp_assoc)
+    full_dcmp_spec_by_min = function(dcmp_spec)
       return transf.two_tables.table_by_take_new(
-        dcmp_assoc,
-        transf.dcmp_assoc.min_dcmp_assoc_not_set(dcmp_assoc)
+        dcmp_spec,
+        transf.dcmp_spec.dcmp_spec_by_not_set_min(dcmp_spec)
       )
     end,
-    full_dcmp_assoc_by_max = function(dcmp_assoc)
+    full_dcmp_spec_by_max = function(dcmp_spec)
       return transf.two_tables.table_by_take_new(
-        dcmp_assoc,
-        transf.dcmp_assoc.max_dcmp_assoc_not_set(dcmp_assoc)
+        dcmp_spec,
+        transf.dcmp_spec.dcmp_spec_by_not_set_max(dcmp_spec)
       )
     end,
-    date_interval_specifier = function(dcmp_assoc)
+    date_interval_specifier = function(dcmp_spec)
       return {
-        start = date(transf.dcmp_assoc.full_dcmp_assoc_by_min(dcmp_assoc)),
-        stop = date(transf.dcmp_assoc.full_dcmp_assoc_by_max(dcmp_assoc))
+        start = date(transf.dcmp_spec.full_dcmp_spec_by_min(dcmp_spec)),
+        stop = date(transf.dcmp_spec.full_dcmp_spec_by_max(dcmp_spec))
       }
     end, 
-    prefix_dcmp_assoc = function(dcmp_assoc)
+    prefix_dcmp_spec_by_filter = function(dcmp_spec)
       local res = {}
-      for _, date_component_name in transf.arr.pos_int_vt_stateless_iter(ls.date.date_component_names) do
-        if dcmp_assoc[date_component_name] == nil then
+      for _, dcmp_name in transf.arr.pos_int_vt_stateless_iter(ls.date.dcmp_names) do
+        if dcmp_spec[dcmp_name] == nil then
           return res
         end
-        res[date_component_name] = dcmp_assoc[date_component_name]
+        res[dcmp_name] = dcmp_spec[dcmp_name]
       end
+      return res
     end,
-    prefix_date_component_name_list_set = function(dcmp_assoc)
-      return transf.dcmp_assoc.date_component_name_list_set(
-        transf.dcmp_assoc.prefix_dcmp_assoc(dcmp_assoc)
+    prefix_dcmp_name_list_set = function(dcmp_spec)
+      return transf.dcmp_spec.dcmp_name_arr_by_set(
+        transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec)
       )
     end,
-    prefix_date_component_name_ordered_list_set = function(dcmp_assoc)
-      return transf.date_component_name_arr.date_component_name_ordered_list_set(
-        transf.dcmp_assoc.prefix_dcmp_assoc(dcmp_assoc)
+    prefix_dcmp_name_seq_set = function(dcmp_spec)
+      return transf.dcmp_name_arr.dcmp_name_seq_set(
+        transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec)
       )
     end,
-    --- gets a date_component_names_ordered_list which has all date_component_names where there is a date_component_name within the dcmp_assoc that is smaller and equal that is not nil
+    --- gets a dcmp_names_ordered_list which has all dcmp_names where there is a dcmp_name within the dcmp_spec that is smaller and equal that is not nil
     --- i.e. { month = 02, hour = 12 } will return { "year", "month", "day", "hour" }
-    --- this should be equal to prefix_date_component_name_ordered_list_set if dcmp_assoc is a prefix_dcmp_assoc since prefix_ is defined as having no nil values before potential trailing nil values
-    prefix_date_component_name_ordered_list_no_trailing_nil = function(dcmp_assoc)
-      local ol = get.table.table_by_copy(ls.date.date_component_names)
-      while(dcmp_assoc[
+    --- this should be equal to prefix_dcmp_name_seq_set if dcmp_spec is a prefix_dcmp_spec since prefix_ is defined as having no nil values before potential trailing nil values
+    prefix_dcmp_name_seq_no_trailing_nil = function(dcmp_spec)
+      local ol = get.table.table_by_copy(ls.date.dcmp_names)
+      while(dcmp_spec[
         ol[#ol]
       ] == nil) do
         ol[#ol] = nil
       end
       return ol
     end,
-    rfc3339like_dt_str_format_part_specifier_arr = function(dcmp_assoc)
+    rfc3339like_dt_str_format_part_specifier_arr = function(dcmp_spec)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.dcmp_assoc.prefix_date_component_name_ordered_list_no_trailing_nil(dcmp_assoc),
-        function(date_component_name)
+        transf.dcmp_spec.prefix_dcmp_name_seq_no_trailing_nil(dcmp_spec),
+        function(dcmp_name)
           return {
-            fallback = tblmap.date_component_name.rfc3339like_dt_str_format_part_fallback[date_component_name],
-            value = dcmp_assoc[date_component_name],
-            str_format_part = tblmap.date_component_name.rfc3339like_dt_str_format_part[date_component_name]
+            fallback = tblmap.dcmp_name.rfc3339like_dt_str_format_part_fallback[dcmp_name],
+            value = dcmp_spec[dcmp_name],
+            str_format_part = tblmap.dcmp_name.rfc3339like_dt_str_format_part[dcmp_name]
           }
         end
       )
     end,
-    rfc3339like_dt = function(dcmp_assoc)
+    rfc3339like_dt = function(dcmp_spec)
       local res = transf.str_format_part_specifier_arr.str(
-        transf.dcmp_assoc.rfc3339like_dt_str_format_part_specifier_arr(dcmp_assoc)
+        transf.dcmp_spec.rfc3339like_dt_str_format_part_specifier_arr(dcmp_spec)
       )
       if res:sub(-1) == "Z" then
         return res
@@ -2694,37 +2670,37 @@ transf = {
         return res:sub(1, -2) -- not full rfc3339like_dt, thus the trailing sep will be something like - or : and must be removed
       end
     end,
-    dcmp_assoc_where_date_component_value_is_max_date_component_value = function(dcmp_assoc)
+    dcmp_spec_by_filtered_max = function(dcmp_spec)
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(
-        dcmp_assoc,
-        function(k, v) return v == tblmap.date_component_name.pos_int_by_max_date_component_value[k] end
+        dcmp_spec,
+        function(k, v) return v == tblmap.dcmp_name.pos_int_by_max_date_component_value[k] end
       )
     end,
-    dcmp_assoc_where_date_component_value_is_min_date_component_value = function(dcmp_assoc)
+    dcmp_spec_by_filtered_min = function(dcmp_spec)
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(
-        dcmp_assoc,
-        function(k, v) return v == tblmap.date_component_name.int_by_min_date_component_value[k] end
+        dcmp_spec,
+        function(k, v) return v == tblmap.dcmp_name.int_by_min_date_component_value[k] end
       )
     end,
-    dcmp_assoc_where_date_component_value_is_not_max_date_component_value = function(dcmp_assoc)
+    dcmp_spec_by_filtered_not_max = function(dcmp_spec)
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(
-        dcmp_assoc,
-        function(k, v) return v ~= tblmap.date_component_name.pos_int_by_max_date_component_value[k] end
+        dcmp_spec,
+        function(k, v) return v ~= tblmap.dcmp_name.pos_int_by_max_date_component_value[k] end
       )
     end,
-    dcmp_assoc_where_date_component_value_is_not_min_date_component_value = function(dcmp_assoc)
+    dcmp_spec_by_filtered_not_min = function(dcmp_spec)
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(
-        dcmp_assoc,
-        function(k, v) return v ~= tblmap.date_component_name.int_by_min_date_component_value[k] end
+        dcmp_spec,
+        function(k, v) return v ~= tblmap.dcmp_name.int_by_min_date_component_value[k] end
       )
     end,
-    prefix_dcmp_assoc_where_date_component_value_is_not_max_date_component_value = function(dcmp_assoc)
-      local dcmp_assoc_where_date_component_value_is_not_max_date_component_value = transf.dcmp_assoc.dcmp_assoc_where_date_component_value_is_not_max_date_component_value(dcmp_assoc)
-      return transf.dcmp_assoc.prefix_dcmp_assoc(dcmp_assoc_where_date_component_value_is_not_max_date_component_value)
+    prefix_dcmp_spec_where_date_component_value_is_not_max_date_component_value = function(dcmp_spec)
+      local dcmp_spec_where_date_component_value_is_not_max_date_component_value = transf.dcmp_spec.dcmp_spec_by_filtered_not_max(dcmp_spec)
+      return transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec_where_date_component_value_is_not_max_date_component_value)
     end,
-    prefix_dcmp_assoc_where_date_component_value_is_not_min_date_component_value = function(dcmp_assoc)
-      local dcmp_assoc_where_date_component_value_is_not_min_date_component_value = transf.dcmp_assoc.dcmp_assoc_where_date_component_value_is_not_min_date_component_value(dcmp_assoc)
-      return transf.dcmp_assoc.prefix_dcmp_assoc(dcmp_assoc_where_date_component_value_is_not_min_date_component_value)
+    prefix_dcmp_spec_where_date_component_value_is_not_min_date_component_value = function(dcmp_spec)
+      local dcmp_spec_where_date_component_value_is_not_min_date_component_value = transf.dcmp_spec.dcmp_spec_by_filtered_not_min(dcmp_spec)
+      return transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec_where_date_component_value_is_not_min_date_component_value)
     end,
     
 
@@ -2756,30 +2732,30 @@ transf = {
       )
     end
   },
-  prefix_dcmp_assoc = {
+  prefix_dcmp_spec = {
     
     
   },
-  suffix_dcmp_assoc = {
+  suffix_dcmp_spec = {
 
   },
-  partial_dcmp_assoc = {
+  partial_dcmp_spec = {
 
   },
   -- date components are full if all components are set
-  full_dcmp_assoc = {
-    date = function(full_dcmp_assoc)
-      return date(full_dcmp_assoc)
+  full_dcmp_spec = {
+    date = function(full_dcmp_spec)
+      return date(full_dcmp_spec)
     end,
-    timestamp_s = function(full_dcmp_assoc)
-      return os.time(full_dcmp_assoc)
+    timestamp_s = function(full_dcmp_spec)
+      return os.time(full_dcmp_spec)
     end,
-    timestamp_ms = function(full_dcmp_assoc)
-      return transf.date.timestamp_s(full_dcmp_assoc) * 1000
+    timestamp_ms = function(full_dcmp_spec)
+      return transf.date.timestamp_s(full_dcmp_spec) * 1000
     end,
-    full_rfc3339like_dt = function(full_dcmp_assoc)
+    full_rfc3339like_dt = function(full_dcmp_spec)
       return transf.date.full_rfc3339like_dt(
-        transf.full_dcmp_assoc.date(full_dcmp_assoc)
+        transf.full_dcmp_spec.date(full_dcmp_spec)
       )
     end,
   },
@@ -3777,17 +3753,7 @@ transf = {
     not_whitespace_str = function(str)
       return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", "")
     end,
-    --- @param str str
-    --- @return str[]
-    byte_char_arr = function(str)
-      local t = {}
-      for i = 1, #str do
-        t[i] = str:sub(i, i)
-      end
-      return t
-    end,
-
-    pos_int_by_len_byte_chars = str.len,
+    pos_int_by_len_ascii_chars = string.len,
 
 
     --- @param str str
@@ -3821,11 +3787,11 @@ transf = {
         transf.str.line_arr(str)
       )
     end,
-    noindent_content_lines = function(str)
+    noempty_noindent_line_arr = function(str)
       return transf.str_arr.noindent_str_arr(transf.str.noempty_line_arr(str))
     end,
-    nocomment_noindent_content_lines = function(str)
-      return transf.str_arr.nocomment_noindent_str_arr(transf.str.noempty_line_arr(str))
+    noempty_nohashcomment_noindent_line_arr = function(str)
+      return transf.str_arr.nohashcomment_noindent_str_arr(transf.str.noempty_line_arr(str))
     end,
 
     line_by_first = function(str)
@@ -3939,7 +3905,7 @@ transf = {
       )
     end,
     url_arr = function(str)
-      return transf.str_arr.filter_nocomment_noindent_to_url_arr(
+      return transf.str_arr.filter_nohashcomment_noindent_to_url_arr(
         transf.str.line_arr(str)
       )
     end,
@@ -3993,7 +3959,7 @@ transf = {
     nohashcomment_line = function(str)
       return get.str.str_arr_by_split_w_string(str, " # ")[1]
     end,
-    nocomment_noindent = function(str)
+    nohashcomment_noindent = function(str)
       return transf.line.noindent_line(transf.line.nohashcomment_line(str))
     end,
     line_by_comment = function(str)
@@ -4046,7 +4012,7 @@ transf = {
       return transf.pass_item_name.username(pass_item_name) or env.MAIN_EMAIL
     end,
     username = function(pass_item_name)
-      return transf.plaintext_file.no_final_newlines(
+      return transf.plaintext_file.str_by_no_final_newlines(
         transf.pass_item_name.username_absolute_path(pass_item_name)
       )
     end,
@@ -4256,10 +4222,10 @@ transf = {
       return event_table["end"]
     end,
     start_date = function(event_table)
-      return transf.rfc3339like_dt.min_date(event_table.start)
+      return transf.rfc3339like_dt.date_by_min(event_table.start)
     end,
     end_date = function(event_table)
-      return transf.rfc3339like_dt.min_date(event_table["end"])
+      return transf.rfc3339like_dt.date_by_min(event_table["end"])
     end,
     date_interval_specifier = function(event_table)
       return {
@@ -4437,12 +4403,12 @@ transf = {
       return a + b
     end,
   },
-  two_date_component_names = {
-    date_component_name_by_larger = function(a, b)
-      return tblmap.date_component_name.date_component_index[a] > tblmap.ddate_component_name.date_component_index[b]
+  two_dcmp_names = {
+    bool_by_first_larger = function(a, b)
+      return tblmap.dcmp_name.date_component_index[a] > tblmap.ddcmp_name.date_component_index[b]
     end,
-    date_component_name_by_larger = function(a, b)
-      if tblmap.date_component_name.date_component_index[a] > tblmap.date_component_name.date_component_index[b] then
+    dcmp_name_by_larger = function(a, b)
+      if tblmap.dcmp_name.date_component_index[a] > tblmap.dcmp_name.date_component_index[b] then
         return a
       else
         return b
@@ -4538,7 +4504,7 @@ transf = {
         is.str.nohashcomment_line
       )
     end,
-    nocomment_str_arr = function(arr)
+    nohashcomment_str_arr = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.str_arr.nohashcomment_line_filtered_str_arr(arr),
         transf.line.nohashcomment_line
@@ -4549,17 +4515,17 @@ transf = {
         transf.str_arr.nohashcomment_line_filtered_str_arr(arr)
       )
     end,
-    nocomment_noindent_str_arr = function(arr)
+    nohashcomment_noindent_str_arr = function(arr)
       return transf.str_arr.noindent_str_arr(
-        transf.str_arr.nocomment_str_arr(arr)
+        transf.str_arr.nohashcomment_str_arr(arr)
       )
     end,
     filter_to_url_arr = function(arr)
       return get.arr.arr_by_filtered(arr, is.str.url)
     end,
-    filter_nocomment_noindent_to_url_arr = function(arr)
+    filter_nohashcomment_noindent_to_url_arr = function(arr)
       return transf.str_arr.filter_to_url_arr(
-        transf.str_arr.nocomment_noindent_str_arr(arr)
+        transf.str_arr.nohashcomment_noindent_str_arr(arr)
       )
     end,
     stripped_str_arr = function(arr)
@@ -4796,10 +4762,10 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.plaintext_file.str_by_contents)
     end,
     str_arr_by_lines = function(arr)
-      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_lines)
+      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(arr, transf.plaintext_file.line_arr)
     end,
     str_arr_by_content_lines = function(arr)
-      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_content_lines)
+      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(arr, transf.plaintext_file.noempty_line_arr)
     end,
     m3u_file_arr = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, is.plaintext_file.m3u_file)
@@ -5571,7 +5537,7 @@ transf = {
   },
   citations_file = { -- plaintext file containing one indicated_citable_object_id per line
     indicated_citable_object_id_arr = function(file)
-      return transf.plaintext_file.nocomment_noindent_content_lines(file)
+      return transf.plaintext_file.noempty_nohashcomment_noindent_line_arr(file)
     end,
     local_csl_table_arr = function(file)
       return transf.indicated_citable_object_id_arr.local_csl_table_arr(
@@ -5786,7 +5752,7 @@ transf = {
     rechnung_filename = function(dir)
       return get.timestamp_s.str_by_date_format_indicator(
         os.time(),
-        tblmap.date_component_name.rfc3339like_dt_format_str["day"]
+        tblmap.dcmp_name.rfc3339like_dt_format_str["day"]
       ) .. "--" .. transf.omegat_project_dir.client_name(dir) .. "_" .. transf.omegat_project_dir.rechnung_number(dir)
     end,
     rechnung_pdf_path = function(dir)
@@ -6233,13 +6199,13 @@ transf = {
         transf.csl_table.issued_date_parts_single_or_range(csl_table)
       )
     end,
-    issued_prefix_partial_dcmp_assoc_force_first = function(csl_table)
-      return transf.date_parts_single_or_range.prefix_partial_dcmp_assoc_force_first(
+    issued_prefix_partial_dcmp_spec_force_first = function(csl_table)
+      return transf.date_parts_single_or_range.prefix_partial_dcmp_spec_force_first(
         transf.csl_table.issued_date_parts_single_or_range(csl_table)
       )
     end,
     issued_year_force_first = function(csl_table)
-      return transf.csl_table.issued_prefix_partial_dcmp_assoc_force_first(csl_table).year
+      return transf.csl_table.issued_prefix_partial_dcmp_spec_force_first(csl_table).year
     end,
     author_arr = function(csl_table)
       return csl_table.author
@@ -6313,7 +6279,7 @@ transf = {
       return csl_table.page
     end,
     page_interal_specifier = function(csl_table)
-      return transf.single_value_or_basic_interval_str.interval_specifier(
+      return transf.digit_str_or_digit_interval_str.int_interval_specifier(
         transf.csl_table.page(csl_table)
       )
     end,
@@ -6550,17 +6516,17 @@ transf = {
     rfc3339like_dt = function(date_parts)
       return get.str_or_number_arr.str_by_joined(date_parts, "-")
     end,
-    prefix_partial_dcmp_assoc = function(date_parts)
+    prefix_partial_dcmp_spec = function(date_parts)
       return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
     end,
-    full_full_dcmp_assoc = function(date_parts)
-      return transf.dcmp_assoc.full_dcmp_assoc_by_min(
-        transf.date_parts_single.prefix_partial_dcmp_assoc(date_parts)
+    full_full_dcmp_spec = function(date_parts)
+      return transf.dcmp_spec.full_dcmp_spec_by_min(
+        transf.date_parts_single.prefix_partial_dcmp_spec(date_parts)
       )
     end,
     date = function(date_parts)
-      return transf.full_dcmp_assoc.date(
-        transf.date_parts_single.full_full_dcmp_assoc(date_parts)
+      return transf.full_dcmp_spec.date(
+        transf.date_parts_single.full_full_dcmp_spec(date_parts)
       )
     end,
   },
@@ -6570,8 +6536,8 @@ transf = {
     end,
     date_interval_specifier = function(date_parts_range)
       return {
-        start = transf.date_parts_single.full_full_dcmp_assoc(date_parts_range[1]),
-        stop = transf.date_parts_single.full_full_dcmp_assoc(date_parts_range[2])
+        start = transf.date_parts_single.full_full_dcmp_spec(date_parts_range[1]),
+        stop = transf.date_parts_single.full_full_dcmp_spec(date_parts_range[2])
       }
     end
   },
@@ -6587,11 +6553,11 @@ transf = {
     rf3339like_dt_force_first = function(date_parts)
       return transf.date_parts_single.rfc3339like_dt(date_parts[1])
     end,
-    prefix_partial_dcmp_assoc_force_first = function(date_parts)
-      return transf.date_parts_single.prefix_partial_dcmp_assoc(date_parts[1])
+    prefix_partial_dcmp_spec_force_first = function(date_parts)
+      return transf.date_parts_single.prefix_partial_dcmp_spec(date_parts[1])
     end,
-    full_full_dcmp_assoc_force_first = function(date_parts)
-      return transf.date_parts_single.full_full_dcmp_assoc(date_parts[1])
+    full_full_dcmp_spec_force_first = function(date_parts)
+      return transf.date_parts_single.full_full_dcmp_spec(date_parts[1])
     end,
     date_force_first = function(date_parts)
       return transf.date_parts_single.date(date_parts[1])

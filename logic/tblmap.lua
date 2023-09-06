@@ -17,7 +17,7 @@ tblmap = {
       m = "middleClick"
     }
   },
-  char = {
+  ascii_char = {
     name = {
       ["\t"] = "tab",
       ["\n"] = "newline",
@@ -73,7 +73,7 @@ tblmap = {
     },
   },
   
-  date_component_name = {
+  dcmp_name = {
     seconds = {
       sec = 1,
       min = 60,
@@ -118,7 +118,7 @@ tblmap = {
       min = ":",
       sec = "Z",
     },
-    prev_rfc3339like_dt_separator = {
+    rfc3339like_dt_separator_by_prev = {
       year = nil,
       month = "-",
       day = "-",
@@ -156,7 +156,7 @@ tblmap = {
       min = 5,
       sec = 6,
     },
-    date_component_name_long = {
+    dcmp_name_long = {
       year = "year",
       month = "month",
       day = "day",
@@ -167,7 +167,7 @@ tblmap = {
 
   },
   date_component_index = {
-    date_component_name = {
+    dcmp_name = {
       [1] = "year",
       [2] = "month",
       [3] = "day",
@@ -177,7 +177,7 @@ tblmap = {
     },
   },
   rfc3339like_dt_format_part = {
-    date_component_name = {
+    dcmp_name = {
       ["%Y"] = "year",
       ["%m"] = "month",
       ["%d"] = "day",
@@ -186,8 +186,8 @@ tblmap = {
       ["%S"] = "sec",
     },
   },
-  date_component_name_long = {
-    date_component_name = {
+  dcmp_name_long = {
+    dcmp_name = {
       year = "year",
       month = "month",
       day = "day",
@@ -197,7 +197,7 @@ tblmap = {
     },
   },
   seconds = {
-    date_component_name = {
+    dcmp_name = {
       sec = 1,
       min = 60,
       hour = 60 * 60,
@@ -323,11 +323,11 @@ tblmap = {
     },
   },
   extension = {
-    likely_field_separator = {
+    utf8_char_by_likely_field_separator = {
       csv = ",",
       tsv = "\t",
     },
-    likely_record_separator = {
+    utf8_char_by_likely_record_separator = {
       csv = "\n",
       tsv = "\n",
     },

@@ -6,6 +6,11 @@ thing_name_hierarchy = {
         shell_var_name_and_str = "leaf",
       }
     },
+    three_anys = {
+      three_strs = {
+        year_and_year_month_and_year_month_day = "leaf",
+      }
+    }
   },
   any = {
     lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = "leaf",
@@ -17,6 +22,7 @@ thing_name_hierarchy = {
       not_starting_with_whitespace_str = "leaf",
       not_ending_with_whitespace_str = "leaf",
       not_empty_str = {
+        utf8_char = "leaf",
         input_spec_str = "leaf",
         input_spec_series_str = "leaf",
         whitespace_str = {
@@ -54,7 +60,8 @@ thing_name_hierarchy = {
           ini_kv_line = "leaf"
         },
         noempty_nohashcomment_line = "leaf",
-        noempty_nocomment_noindent_line = "leaf",
+        noempty_noindent_line = "leaf",
+        noempty_nohashcomment_noindent_line = "leaf",
         ini_section_line = "leaf",
         trimmed_line = {
           displayname_email = "leaf",
@@ -172,7 +179,10 @@ thing_name_hierarchy = {
               local_nonabsolute_path = {
                 local_tilde_path = "leaf",
                 atpath = "leaf",
-                owner_item_path = "leaf"
+                duplex_local_nonabsolute_path = {
+                  owner_item_path = "leaf"
+                },
+                triplex_local_nonabsolute_path = "leaf"
               },
               contains_relative_references_local_path = "leaf",
               not_contains_relative_references_local_path = "leaf",
@@ -224,7 +234,7 @@ thing_name_hierarchy = {
       },
       ascii_str = {
         ascii_char = {
-
+          rfc3339like_dt_separator = "leaf",
         },
         printable_ascii_str = {
           printable_ascii_multiline_str = {
@@ -301,6 +311,11 @@ thing_name_hierarchy = {
                       rfc3339_interval = "leaf",
                     },
                     colon_alphanum_minus_underscore = {
+                      colon_num = {
+                        hour = "leaf",
+                        hour_minute = "leaf",
+                        hour_minute_second = "leaf",
+                      },
                       ipv6 = "leaf",
                       calendar_name = {
                         writeable_calendar_name = "leaf",
@@ -335,6 +350,12 @@ thing_name_hierarchy = {
                             relay_identifier = "leaf",
                             git_remote_type = "leaf",
                           },
+                          num_minus = {
+                            year = "leaf",
+                            year_month = "leaf",
+                            year_month_day = "leaf",
+                            digit_interval_str = "leaf",
+                          },
                           upper_alphanum_minus ="leaf"
                         },
                         alphanum_underscore = {
@@ -350,8 +371,8 @@ thing_name_hierarchy = {
                             lower_alpha_str = {
                               fs_attr_name = "leaf",
                               local_o_remote_str ="leaf",
-                              date_component_name = "leaf",
-                              date_component_name_long = "leaf",
+                              dcmp_name = "leaf",
+                              dcmp_name_long = "leaf",
                               mod_char = "leaf",
                               mod_name = "leaf",
                               leaf_str = "leaf",
@@ -467,6 +488,12 @@ thing_name_hierarchy = {
     table = {
       only_int_key_table = {
         arr = { 
+          dcmp_name_seq = {
+            cont_dcmp_name_seq = {
+              prefix_dcmp_name_seq = "leaf",
+              suffix_dcmp_name_seq = "leaf",
+            }
+          },
           set =  {
             set_set = "leaf",
           }
@@ -527,7 +554,19 @@ thing_name_hierarchy = {
         gpt_response_table = "leaf",
         iban_data_spec = "leaf", 
         ical_spec = "leaf",
-        tree_node = "leaf"
+        tree_node = "leaf",
+        val_dep_spec = "leaf",
+        syn_specifier = "leaf",
+        email_speciier = "leaf",
+        newsboat_urls_specifier = "leaf",
+        semver_component_specifier = "leaf",
+        dcmp_spec = {
+          full_dcmp_spec = "leaf",
+          cont_dcmp_spec = {
+            prefix_dcmp_spec = "leaf",
+            suffix_dcmp_spec = "leaf",
+          }
+        }
       }
     },
     primitive = {
@@ -548,6 +587,7 @@ thing_name_hierarchy = {
               twobyte_pos_int = {
                 byte_pos_int = {
                   halfbyte_pos_int = {
+                    iso_weeknumber_int = "leaf",
                     nibble_pos_int = {
                       sme_10_pos_int = {
                         sme_8_pos_int = {

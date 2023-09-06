@@ -824,10 +824,10 @@ get = {
       local index = get.arr.pos_int_or_nil_by_first_match_w_fn(arr, fn)
       return get.arr.any_by_next_wrapping_w_index(arr, index)
     end,
-    previous = function(arr, n)
+    t_or_nil_by_previous = function(arr, n)
       return arr[n - 1]
     end,
-    previous_wrapping = function(arr, n)
+    t_by_previous_wrapping = function(arr, n)
       return arr[(n - 2) % #arr + 1]
     end,
     arr_by_sorted = function(list, comp)
@@ -835,13 +835,21 @@ get = {
       dothis.arr.sort(new_list, comp)
       return new_list
     end,
+    bool_by_is_sorted = function(list, comp)
+      for i = 1, #list - 1 do
+        if not comp(list[i], list[i + 1]) then
+          return false
+        end
+      end
+      return true
+    end,
     t_by_min = function(list, comp)
       return get.arr.arr_by_sorted(list, comp)[1]
     end,
     t_by_max = function(list, comp)
       return get.arr.arr_by_sorted(list, comp)[#list]
     end,
-    revsorted = function(arr, comp)
+    arr_by_revsorted = function(arr, comp)
       return transf.arr.arr_by_reversed(get.arr.arr_by_sorted(arr, comp))
     end,
     --- @generic T
@@ -1668,9 +1676,9 @@ get = {
         sep
       )
     end,
-    pos_int_or_nil_by_first_match_nocomment_noindent_w_str = function(arr, str)
+    pos_int_or_nil_by_first_match_nohashcomment_noindent_w_str = function(arr, str)
       return get.arr.pos_int_or_nil_by_first_match_w_t(
-        transf.str_arr.nocomment_noindent_str_arr(arr),
+        transf.str_arr.nohashcomment_noindent_str_arr(arr),
         str
       )
     end,
@@ -2095,10 +2103,10 @@ get = {
       return get.str.line_arr_by_head(transf.plaintext_file.str_by_contents(path), n)
     end,
     nth_line = function(path, n)
-      return transf.plaintext_file.str_arr_by_lines(path)[n]
+      return transf.plaintext_file.line_arr(path)[n]
     end,
     contents_lines_appended = function(path, lines)
-      local extlines = transf.plaintext_file.str_arr_by_lines(path)
+      local extlines = transf.plaintext_file.line_arr(path)
       return transf.two_arrs.arr_by_appended(extlines, lines)
     end,
     contents_line_appended = function(path, line)
@@ -2115,7 +2123,7 @@ get = {
     stream_creation_specifier = function(path, flag_profile_name)
       return {
         source_path = path,
-        urls = transf.plaintext_file.str_arr_by_content_lines(path),
+        urls = transf.plaintext_file.noempty_line_arr(path),
         type = "stream",
         flag_profile_name = flag_profile_name,
       }
@@ -2178,20 +2186,20 @@ get = {
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
-    key_prefix_partial_dcmp_assoc_force_first = function(csl_table, key)
-      return transf.date_parts_single_or_range.prefix_partial_dcmp_assoc_force_first(
+    key_prefix_partial_dcmp_spec_force_first = function(csl_table, key)
+      return transf.date_parts_single_or_range.prefix_partial_dcmp_spec_force_first(
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
     key_year_force_first = function(csl_table, key)
-      return transf.csl_table.key_prefix_partial_dcmp_assoc_force_first(csl_table, key).year
+      return transf.csl_table.key_prefix_partial_dcmp_spec_force_first(csl_table, key).year
     end,
   },
   shell_script_file = {
     lint_table = function(path, severity)
       return transf.str.table_or_err_by_evaled_env_bash_parsed_json("shellcheck --format=json --severity=" .. severity .. transf.str.str_by_single_quoted_escaped(path))
     end,
-    lint_gcc_str = function(path, severity)
+    str_or_nil_by_lint_gcc = function(path, severity)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("shellcheck --format=gcc --severity=" .. severity .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
@@ -2276,7 +2284,7 @@ get = {
   },
   logging_dir = {
     log_path_for_date = function(path, date)
-      return hs.fs.pathToAbsolute(path) .. "/" .. transf.date.y_ym_ymd_path(date) .. ".csv"
+      return hs.fs.pathToAbsolute(path) .. "/" .. transf.date.triplex_local_nonabsolute_path_by_y_ym_ymd(date) .. ".csv"
     end,
   },
   path_arr = {
@@ -2361,26 +2369,26 @@ get = {
       return "https://" .. host .. "/" .. owner_item .. "/" .. indicator .. branch .. "/" .. relative_path
     end,
   },
-  date_component_name = {
-    next = function(component, n)
+  dcmp_name = {
+    dcmp_name_by_next = function(component, n)
       n = n or 0
-      return get.arr.any_by_next_w_index(ls.date.date_component_names, transf.date_component_name.date_component_index(component) + n)
+      return get.arr.any_by_next_w_index(ls.date.dcmp_names, transf.dcmp_name.date_component_index(component) + n)
     end,
-    previous = function(component, n)
+    dcmp_name_by_previous = function(component, n)
       n = n or 0
-      return get.arr.previous(ls.date.date_component_names, transf.date_component_name.date_component_index(component) - n)
+      return get.arr.t_or_nil_by_previous(ls.date.dcmp_names, transf.dcmp_name.date_component_index(component) - n)
     end,
   },
   date = {
-    with_date_component_value_added = function(date, date_component_value, date_component_name)
+    with_date_component_value_added = function(date, date_component_value, dcmp_name)
       local dtcp = date:copy()
-      return dtcp["add" .. tblmap.date_component_name.date_component_name_long[date_component_name] .. "s"](dtcp, date_component_value)
+      return dtcp["add" .. tblmap.dcmp_name.dcmp_name_long[dcmp_name] .. "s"](dtcp, date_component_value)
     end,
-    with_date_component_value_subtracted = function(date, date_component_value, date_component_name)
-      return get.date.with_date_component_value_added(date, -date_component_value, date_component_name)
+    with_date_component_value_subtracted = function(date, date_component_value, dcmp_name)
+      return get.date.with_date_component_value_added(date, -date_component_value, dcmp_name)
     end,
-    date_component_value = function(date, date_component_name)
-      return date["get" .. tblmap.date_component_name.date_component_name_long[date_component_name]](date)
+    date_component_value = function(date, dcmp_name)
+      return date["get" .. tblmap.dcmp_name.dcmp_name_long[dcmp_name]](date)
     end,
     surrounding_date_sequence_specifier = function(date, date_component_value, step, unit)
       return {
@@ -2390,20 +2398,20 @@ get = {
         unit = unit,
       }
     end,
-    date_sequence_specifier_of_lower_component = function(date, step, date_component_name)
-      return get.full_dcmp_assoc.date_sequence_specifier_of_lower_component(
-        transf.date.full_dcmp_assoc(date),
+    date_sequence_specifier_of_lower_component = function(date, step, dcmp_name)
+      return get.full_dcmp_spec.date_sequence_specifier_of_lower_component(
+        transf.date.full_dcmp_spec(date),
         step,
-        date_component_name
+        dcmp_name
       )
     end,
     hours_date_sequence_specifier = function(date, date_component_value)
       return get.date.date_sequence_specifier_of_lower_component(date, date_component_value, "day")
     end,
-    precision_date = function(date, date_component_name)
-      return get.full_dcmp_assoc.precision_date(
-        transf.date.full_dcmp_assoc(date),
-        date_component_name
+    precision_date = function(date, dcmp_name)
+      return get.full_dcmp_spec.precision_date(
+        transf.date.full_dcmp_spec(date),
+        dcmp_name
       )
     end,
     --- date_format_indicator = date_format or date_format_name
@@ -2412,7 +2420,7 @@ get = {
       return date:fmt(retrieved_format or format)
     end,
     rfc3339like_dt_of_precision = function(date, precision)
-      return get.date.str_w_date_format_indicator(date, tblmap.date_component_name.rfc3339like_dt_format_str[precision])
+      return get.date.str_w_date_format_indicator(date, tblmap.dcmp_name.rfc3339like_dt_format_str[precision])
     end,
 
   },
@@ -2432,25 +2440,25 @@ get = {
       )
     end,
   },
-  date_component_name_list = {
-    date_component_value_list = function(date_component_name_list, dcmp_assoc)
+  dcmp_name_list = {
+    date_component_value_list = function(dcmp_name_list, dcmp_spec)
       return get.arr.arr_by_mapped_w_t_key_assoc(
-        date_component_name_list,
-        dcmp_assoc
+        dcmp_name_list,
+        dcmp_spec
       )
     end,
-    date_component_value_ordered_list = function(date_component_name_list, dcmp_assoc)
+    date_component_value_ordered_list = function(dcmp_name_list, dcmp_spec)
       return get.arr.arr_by_mapped_w_t_key_assoc(
-        transf.date_component_name_arr.date_component_name_ordered_arr(date_component_name_list),
-        dcmp_assoc
+        transf.dcmp_name_arr.dcmp_name_seq(dcmp_name_list),
+        dcmp_spec
       )
     end,
   },
-  dcmp_assoc = {
-    date_sequence_specifier = function(dcmp_assoc, step, unit)
+  dcmp_spec = {
+    date_sequence_specifier = function(dcmp_spec, step, unit)
       return {
-        start = date(transf.dcmp_assoc.full_dcmp_assoc_by_min(dcmp_assoc)),
-        stop = date(transf.dcmp_assoc.full_dcmp_assoc_by_max(dcmp_assoc)),
+        start = date(transf.dcmp_spec.full_dcmp_spec_by_min(dcmp_spec)),
+        stop = date(transf.dcmp_spec.full_dcmp_spec_by_max(dcmp_spec)),
         step = step or 1,
         unit = unit or "sec"
       }
@@ -2491,39 +2499,39 @@ get = {
       )
     end,
   },
-  full_dcmp_assoc = {
-    prefix_partial_dcmp_assoc = function(full_dcmp_assoc, date_component_name)
+  full_dcmp_spec = {
+    prefix_partial_dcmp_spec = function(full_dcmp_spec, dcmp_name)
       return get.arr.arr_by_mapped_w_t_key_assoc(
-        transf.date_component_name.dcmp_assoc_larger_or_same(date_component_name),
-        full_dcmp_assoc
+        transf.dcmp_name.dcmp_spec_larger_or_same(dcmp_name),
+        full_dcmp_spec
       )
     end,
-    date_sequence_specifier_of_lower_component = function (full_dcmp_assoc, step, date_component_name, additional_steps_down)
-      return get.dcmp_assoc.date_sequence_specifier(
-        get.full_dcmp_assoc.prefix_partial_dcmp_assoc(full_dcmp_assoc, date_component_name),
+    date_sequence_specifier_of_lower_component = function (full_dcmp_spec, step, dcmp_name, additional_steps_down)
+      return get.dcmp_spec.date_sequence_specifier(
+        get.full_dcmp_spec.prefix_partial_dcmp_spec(full_dcmp_spec, dcmp_name),
         step,
-        get.date_component_name.next(date_component_name, additional_steps_down)
+        get.dcmp_name.dcmp_name_by_next(dcmp_name, additional_steps_down)
       )      
     end,
-    precision_full_dcmp_assoc = function(full_dcmp_assoc, date_component_name)
-      return transf.full_dcmp_assoc.min_full_dcmp_assoc(
-        get.full_dcmp_assoc.prefix_partial_dcmp_assoc(full_dcmp_assoc, date_component_name)
+    precision_full_dcmp_spec = function(full_dcmp_spec, dcmp_name)
+      return transf.full_dcmp_spec.min_full_dcmp_spec(
+        get.full_dcmp_spec.prefix_partial_dcmp_spec(full_dcmp_spec, dcmp_name)
       )
     end,
-    precision_date = function(full_dcmp_assoc, date_component_name)
-      return date(get.full_dcmp_assoc.precision_full_dcmp_assoc(full_dcmp_assoc, date_component_name))
+    precision_date = function(full_dcmp_spec, dcmp_name)
+      return date(get.full_dcmp_spec.precision_full_dcmp_spec(full_dcmp_spec, dcmp_name))
     end,
   },
   rfc3339like_dt = {
     min_date_formatted = function(str, format)
       return transf.date.formatted(
-        transf.rfc3339like_dt.min_date(str),
+        transf.rfc3339like_dt.date_by_min(str),
         format
       )
     end,
     max_date_formatted = function(str, format)
       return transf.date.formatted(
-        transf.rfc3339like_dt.max_date(str),
+        transf.rfc3339like_dt.date_by_max(str),
         format
       )
     end,
