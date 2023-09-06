@@ -53,6 +53,9 @@ is = {
     here_doc = function(str)
       return get.str.bool_by_startswith(str, "<<EOF") and get.str.bool_by_endswith(str, "EOF") -- technically obviously it doesn't have to be EOF, but I'm only ever gonna use EOF
     end,
+    script_str = function(str)
+      return get.str.bool_by_startswith(str, "#!")
+    end,
     raw_contact = transf["nil"]["true"],
     ini_section_contents_str = function(str)
       return get.arr.bool_by_all_pass_w_fn(
@@ -74,6 +77,16 @@ is = {
       return is.multiline_str.decoded_email_header_block(header)
     end
   },
+  script_str = {
+    shell_script_str = function(str)
+      return get.str.bool_by_matches_part_onig(str, r.g.shell_shebang)
+    end,
+  },
+  shell_script_str = {
+    envlike_str = function(str)
+      return get.str.bool_by_contains_w_ascii_str(str, "export ")
+    end,
+  },
   whitespace_str = {
     starting_with_whitespace_str = function(str)
       return get.str.bool_by_matches_part_eutf8(str, "^%s")
@@ -86,6 +99,9 @@ is = {
     end,
     starting_a_ending_with_whitespace_str = function(str)
       return is.whitespace_str.starting_with_whitespace_str(str) and is.whitespace_str.ending_with_whitespace_str(str)
+    end,
+    envlike_mapping = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "^%s*export%s+%w+=\\")
     end,
   },
   line = {
@@ -562,9 +578,6 @@ is = {
     uuid = function(str)
       return get.str.bool_by_matches_whole_onig(transf.str.str_by_all_eutf8_lower(str), r.g.id.uuid)
     end,
-    relay_identifier = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.relay_identifier)
-    end,
     ipc_socket_id = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.ipc_socket_id)
     end,
@@ -580,6 +593,9 @@ is = {
     
   },
   lower_alphanum_minus = {
+    relay_identifier = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.relay_identifier)
+    end,
     git_remote_type = function(str)
       return get.arr.bool_by_contains(
         ls.git_remote_types,
@@ -1031,20 +1047,23 @@ is = {
       return get.path.usable_as_filetype(path, "whisper-audio")
     end,
   },
-  shellscript_file = {
-    shellscript_file_with_errors = function(path)
-      return transf.shellscript_file.gcc_str_errors(path) ~= ""
+  shell_script_file = {
+    shell_script_file_with_errors = function(path)
+      return transf.shell_script_file.gcc_str_errors(path) ~= ""
     end,
-    shellscript_file_with_warnings = function(path)
-      return transf.shellscript_file.gcc_str_warnings(path) ~= ""
+    shell_script_file_with_warnings = function(path)
+      return transf.shell_script_file.gcc_str_warnings(path) ~= ""
+    end,
+    envlike_file = function(path)
+      return is.shell_script_str.envlike_str(
+        transf.plaintext_file.str_by_contents(path)
+      )
     end,
   },
   plaintext_file = {
-    shellscript_file = function(path)
-      return get.path.usable_as_filetype(path, "shell-script") 
-      or get.str.bool_by_matches_part_onig(
-        transf.file.str_by_contents(path),
-        "^#!.*?(?:ba|z|fi|da|k|t?c)sh\\s+"
+    script_file = function(path)
+      return is.str.script_str(
+        transf.plaintext_file.str_by_contents(path)
       )
     end,
     plaintext_assoc_file = function(path)
@@ -1075,6 +1094,13 @@ is = {
       return get.path.is_standartized_extension(path, "md")
     end,
   },
+  script_file = {
+    shell_script_file = function(path)
+      return is.str.shell_script_str(
+        transf.plaintext_file.str_by_contents(path)
+      )
+    end,
+  },
   plaintext_assoc_file = {
     yaml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "yaml"}),
     json_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "json"}),
@@ -1101,9 +1127,6 @@ is = {
     alphanum = function(str)
       return is.alphanum_minus_underscore.alphanum_underscore(str) and is.alphanum_minus_underscore.alphanum_minus(str)
     end,
-    pass_item_name = function(str)
-      return get.local_extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
-    end,
     unicode_block_name = transf["nil"]["true"],
     unicode_category_name = transf["nil"]["true"], 
     unicode_plane_name = transf["nil"]["true"], -- currently no real point in the performance cost of checking if the strings actually are block/category/plane names. maybe in the future
@@ -1112,12 +1135,20 @@ is = {
     end
     
   },
+  lower_alphanum_minus_underscore = {
+    pass_item_name = function(str)
+      return get.local_extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
+    end,
+  },
   alphanum_underscore = {
     lower_alphanum_underscore = function(str)
       return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "A-Z")
     end,
     upper_alphanum_underscore = function(str)
       return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "a-z")
+    end,
+    shell_var_name = function(str)
+      return get.str.bool_by_not_matches_part_onig(str, "^\\d")
     end,
   },
   lower_alphanum_underscore = {
@@ -1485,20 +1516,22 @@ is = {
   sme_6_pos_int = {
     weekday_int_start_0 = transf["nil"]["true"]
   },
-  n_anys = {
-    any = function(...)
-      return transf.n_anys.int_by_amount(...) == 1
-    end,
+  mult_anys = {
     two_anys = function(...)
       return transf.n_anys.int_by_amount(...) == 2
     end,
   },
   two_anys = {
-    two_numbers = function(...)
-      return get.arr.bool_by_all_pass_w_fn(
-        transf.n_anys.arr(...),
-        is.any.number
-      )
+    two_numbers = function(a, b)
+      return  is.any.number(a) and is.any.number(b)
+    end,
+    two_strs = function(a, b)
+      return  is.any.str(a) and is.any.str(b)
+    end,
+  },
+  two_strs = {
+    shell_var_name_and_str = function(a, b)
+      return is.str.shell_var_name(a)
     end,
   },
   any = {
@@ -1602,6 +1635,8 @@ is = {
       end
       return true
     end,
+    any_arr = transf["nil"]["true"],
+    mult_anys__arr = transf["nil"]["true"]
   },
   set = {
     set_set = function(set)
@@ -1671,6 +1706,12 @@ is = {
     end,
     ical_spec = function(t)
       return t.VCALENDAR
+    end,
+    tree_node = function(t)
+      return t.children and t.label
+    end,
+    val_dep_spec = function(t)
+      return t.value and t.dependencies
     end,
   },
   dcmp_assoc = {
@@ -1795,12 +1836,16 @@ local experimental_cache = {}
 
 function get_nested_mt(type1)
   experimental_cache[type1] = {}
-  local type1_ends_arr = get.str.bool_by_endswith(type1, "_arr")
+  local type1_ends__arr = get.str.bool_by_endswith(type1, "_arr")
+  local type1_ends___arr = false
   local type1_noarr
-  if type1 == "arr" then 
-    type1_noarr = "any"
-  elseif type1_ends_arr then
+  if type1_ends__arr then
     type1_noarr = string.sub(type1, 1, -5)
+    if get.str.bool_by_endswith(type1_noarr, "_") then
+      type1_noarr = string.sub(type1_noarr, 1, -2)
+      type1_ends___arr = true
+      type1_ends__arr = false
+    end
   end
 
   -- NB: assoc handling will not work for _or_nested_value_assoc types, because of prohibitive complexity. _or_nested_value_assoc types may not be checked using `is` at all. Trying to will always result in false
@@ -1824,7 +1869,12 @@ function get_nested_mt(type1)
         return fn
       end
 
-      if type1_ends_arr and get.str.bool_by_endswith(type2, "_arr") then
+      if type1_ends___arr and get.str.bool_by_endswith(type2, "__arr") then
+        local type_b = string.sub(type2, 1, -6)
+        return function(arr)
+          return is[type1_noarr][type_b](transf.arr.n_anys(arr))
+        end
+      elseif type1_ends__arr and get.str.bool_by_endswith(type2, "_arr") then
         local type_b = string.sub(type2, 1, -5)
         return function(arr)
           return get.arr.bool_by_all_pass_w_fn(arr, is[type1_noarr][type_b])

@@ -2187,7 +2187,7 @@ get = {
       return transf.csl_table.key_prefix_partial_dcmp_assoc_force_first(csl_table, key).year
     end,
   },
-  shellscript_file = {
+  shell_script_file = {
     lint_table = function(path, severity)
       return transf.str.table_or_err_by_evaled_env_bash_parsed_json("shellcheck --format=json --severity=" .. severity .. transf.str.str_by_single_quoted_escaped(path))
     end,
@@ -2579,11 +2579,18 @@ get = {
       )
     end,
     --- essentially flatMap
-    arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten = function(arr, fn)
+    arr_by_mapped_w_t_arg_t_ret_fn_and_flatten = function(arr, fn)
       return transf.arr.arr_by_flatten(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, fn)
       )
     end,
+    arr_by_mapped_w_n_t_arg_t_ret_fn = function(arr, fn)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        function(nested_arr) return fn(transf.arr.n_anys(nested_arr)) end
+      )
+    end,
+
   },
   assoc_of_arrs = {
     assoc_of_assocs_by_arr = function(assoc_of_arr, arr2)
@@ -2684,11 +2691,11 @@ get = {
         return {}
       end
     end,
-    env_var_name_value_assoc = function(node, prev_key, key)
+    shell_var_name_key_str_value_assoc = function(node, prev_key, key)
       local self_assoc = get.detailed_env_node.self_env_var_name_value_assoc(node, prev_key, key)
       local dependent_assoc
       if node.dependents then
-        dependent_assoc = get.detailed_env_node.env_var_name_value_assoc(node.dependents, key)
+        dependent_assoc = get.detailed_env_node.shell_var_name_key_str_value_assoc(node.dependents, key)
       else
         dependent_assoc = {}
       end
@@ -2696,14 +2703,14 @@ get = {
     end,
   },
   env_var_name_env_node_assoc = {
-    env_var_name_value_assoc = function(assoc, prev_key)
+    shell_var_name_key_str_value_assoc = function(assoc, prev_key)
       if prev_key then prev_key = prev_key .. "/" else prev_key = "" end
       local values = {}
       for key, value in transf.table.kt_vt_stateless_iter(assoc) do
         if is.any.str(value) then
           values[key] = prev_key .. value
         else
-          local subvalues = get.detailed_env_node.env_var_name_value_assoc(value, prev_key, key)
+          local subvalues = get.detailed_env_node.shell_var_name_key_str_value_assoc(value, prev_key, key)
           values = transf.two_table_or_nils.table_by_take_new(values, subvalues)
         end
       end
@@ -3523,6 +3530,39 @@ get = {
         tree_node_like_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.tree_node_like.tree_node, {a_use, treeify_spec})
       )
+    end,
+  },
+  tree_node = {
+    arr_arr_by_root_path = function(node, path, include_inner)
+      path = get.table.table_by_copy(path) or {}
+      dothis.arr.push(path, node.label)
+      local res = {}
+      if not node.children or include_inner then
+        res = {path}
+      end
+      if node.children then
+        res = transf.two_arrs.arr_by_appended(
+          res, 
+          get.tree_node_arr.arr_arr_by_label(
+            node.children, 
+            path, 
+            include_inner
+          )
+        )
+      end
+      return res
+    end
+  },
+  tree_node_arr = {
+    arr_arr_by_root_path = function(arr, path, include_inner)
+      local res = {}
+      for _, node in transf.arr.pos_int_vt_stateless_iter(arr) do
+        res = transf.two_arrs.arr_by_appended(
+          res, 
+          get.tree_node.arr_arr_by_label(node, path, include_inner)
+        )
+      end
+      return res
     end,
   },
   n_any_assoc_arr = {

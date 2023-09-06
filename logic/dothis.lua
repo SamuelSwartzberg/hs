@@ -1828,16 +1828,16 @@ dothis = {
       )
     end,
   },
-  env_str = {
+  envlike_str = {
     write_and_check = function(str, path)
       dothis.absolute_path.write_file(path, str)
-      local errors = transf.shellscript_file.gcc_str_errors(path)
+      local errors = transf.shell_script_file.gcc_str_errors(path)
       if errors then
         error("env file " .. path .. " has errors:\n" .. errors)
       end
     end,
     write_env_and_check = function(str)
-      dothis.env_str.write_and_check(
+      dothis.envlike_str.write_and_check(
         str,
         env.ENVFILE
       )

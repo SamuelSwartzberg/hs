@@ -1,6 +1,11 @@
 thing_name_hierarchy = {
-  two_anys = {
-    two_numbers = "leaf"
+  mult_anys = {
+    two_anys = {
+      two_numbers = "leaf",
+      two_strs = {
+        shell_var_name_and_str = "leaf",
+      }
+    },
   },
   any = {
     lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = "leaf",
@@ -27,6 +32,11 @@ thing_name_hierarchy = {
           ini_section_contents_str = "leaf",
           decoded_email_header_block = "leaf",
           decoded_email = "leaf",
+          script_str = {
+            shell_script_str = {
+              envlike_str = "leaf",
+            },
+          }
         },
       },
       line = {
@@ -118,9 +128,12 @@ thing_name_hierarchy = {
                     image_file = "leaf",
                     email_file = "leaf",
                     plaintext_file = { 
-                      shellscript_file = {
-                        shellscript_file_with_errors = "leaf",
-                        shellscript_file_with_warnings = "leaf",
+                      script_file = {
+                        shell_script_file = {
+                          shell_script_file_with_errors = "leaf",
+                          shell_script_file_with_warnings = "leaf",
+                          envlike_file = "leaf",
+                        },
                       },
                       plaintext_assoc_file = {
                         yaml_file = "leaf",
@@ -294,17 +307,16 @@ thing_name_hierarchy = {
                       },
                       alphanum_minus_underscore = {
                         lower_alphanum_minus_underscore = {
-                          
+                          pass_item_name = {
+                            otp_pass_item_name = "leaf",
+                            passw_pass_item_name = "leaf",
+                            recovery_pass_item_name = "leaf",
+                            secq_pass_item_name = "leaf",
+                            username_pass_item_name = "leaf",
+                            login_pass_item_name = "leaf"
+                          },
                         },
                         package_manager_name = "leaf",
-                        pass_item_name = {
-                          otp_pass_item_name = "leaf",
-                          passw_pass_item_name = "leaf",
-                          recovery_pass_item_name = "leaf",
-                          secq_pass_item_name = "leaf",
-                          username_pass_item_name = "leaf",
-                          login_pass_item_name = "leaf"
-                        },
                         alphanum_minus = {
                           isbn10 = "leaf",
                           isbn13 = "leaf",
@@ -314,13 +326,13 @@ thing_name_hierarchy = {
                             contact_uuid = "leaf",
                             null_uuid = "leaf",
                           },
-                          relay_identifier = "leaf",
                           ipc_socket_id = {
                             mpv_ipc_socket_id = "leaf",
                           },
                           sign_indicator = "leaf",
                           github_username = "leaf",
                           lower_alphanum_minus = {
+                            relay_identifier = "leaf",
                             git_remote_type = "leaf",
                           },
                           upper_alphanum_minus ="leaf"
@@ -515,7 +527,7 @@ thing_name_hierarchy = {
         gpt_response_table = "leaf",
         iban_data_spec = "leaf", 
         ical_spec = "leaf",
-        
+        tree_node = "leaf"
       }
     },
     primitive = {
@@ -581,24 +593,36 @@ thing_name_hierarchy = {
 
 -- add array versions of all other types
 
-thing_name_hierarchy.any.table.only_int_key_table.arr = transf.two_tables.table_by_take_old(
-  thing_name_hierarchy.any.table.only_int_key_table.arr,
+thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr =
   transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
-    thing_name_hierarchy, 
+    thing_name_hierarchy.any, 
     function (k)
       return k .. "_arr"
     end
   )
-)
+
+thing_name_hierarchy.any.table.only_int_key_table.arr.mult_anys__arr =
+  transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
+    thing_name_hierarchy.any, 
+    function (k)
+      return k .. "__arr"
+    end
+  )
 
 -- add nested array versions of all other types (for now, this level of nesting is what we'll leave it at)
 
-thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr = transf.two_tables.table_by_take_old(
-  thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr,
+thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr.any_arr_arr = 
   transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
-    thing_name_hierarchy.any.table.only_int_key_table.arr, 
+    thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr, 
     function (k)
       return k .. "_arr"
     end
   )
-)
+
+thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr.mult_anys__arr_arr =
+  transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
+    thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr, 
+    function (k)
+      return k .. "__arr"
+    end
+  )

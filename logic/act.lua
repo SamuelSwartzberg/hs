@@ -287,8 +287,8 @@ act = {
   },
   env_yaml_file_container = {
     write_env_and_check = function(env_yaml_file_container)
-      dothis.env_str.write_env_and_check(
-        transf.env_yaml_file_container.env_str(env_yaml_file_container)
+      dothis.envlike_str.write_env_and_check(
+        transf.env_yaml_file_container.envlike_str(env_yaml_file_container)
       )
     end,
   },

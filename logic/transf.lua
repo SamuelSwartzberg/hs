@@ -1074,7 +1074,7 @@ transf = {
       return transf.dir_arr.git_root_dir_arr_by_filter(transf.extant_path_arr.dir_arr_by_filter(path_arr))
     end,
     file_arr_by_descendants = function(path_arr)
-      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
+      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(
         path_arr,
         transf.extant_path.file_arr_by_descendants
       )
@@ -1090,7 +1090,7 @@ transf = {
       return get.arr.arr_by_filtered(path_arr, is.dir.git_root_dir)
     end,
     absolute_path_arr_by_children = function(path_arr)
-      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(
+      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(
         path_arr,
         transf.dir.absolute_path_arr_by_children
       )
@@ -1255,7 +1255,7 @@ transf = {
       return transf.extant_path_arr.extant_path_by_newest_creation(transf.dir.absolute_path_arr_by_children(dir))
     end,
     absolute_path_arr_by_grandchildren = function(dir)
-      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(transf.dir.absolute_path_arr_by_children(dir), transf.dir.absolute_path_arr_by_children)
+      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(transf.dir.absolute_path_arr_by_children(dir), transf.dir.absolute_path_arr_by_children)
     end,
     absolute_path_key_leaf_str_or_nested_value_assoc = function(path)
       local res = {}
@@ -1824,54 +1824,55 @@ transf = {
 
   },
   tree_node = {
-    arr_arr_by_label = function(node, path, include_inner)
-      path = get.table.table_by_copy(path) or {}
-      dothis.arr.push(path, node.label)
-      local res = {}
-      if not node.children or include_inner then
-        res = {path}
-      end
-      if node.children then
-        res = transf.two_arrs.arr_by_appended(res, transf.tree_node_arr.arr_arr_by_label(node.children, path, include_inner))
-      end
-      return res
-    end
+    arr_arr_by_root_to_leaf_path = function(node)
+      return get.tree_node.arr_arr_by_root_path(node, nil, false)
+    end,
+    arr_arr_by_root_path = function(node)
+      return get.tree_node.arr_arr_by_root_path(node, nil, true)
+    end,
   },
   tree_node_arr = {
-    arr_arr_by_label = function(arr, path, include_inner)
-      local res = {}
-      for _, node in transf.arr.pos_int_vt_stateless_iter(arr) do
-        res = transf.two_arrs.arr_by_appended(res, transf.tree_node.arr_arr_by_label(node, path, include_inner))
-      end
-      return res
+    arr_arr_by_root_to_leaf_path = function(arr)
+      return get.tree_node_arr.arr_arr_by_root_path(arr, nil, false)
+    end,
+    arr_arr_by_root_path = function(arr)
+      return get.tree_node_arr.arr_arr_by_root_path(arr, nil, true)
     end,
   },
 
-  env_var_name_value_assoc = {
-    key_value_and_dependency_assoc = function(assoc)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(assoc, function(value)
+  shell_var_name_key_str_value_assoc = {
+    shell_var_name_key_val_dep_spec_value_assoc = function(assoc)
+      return get.table.table_by_mapped_w_vt_arg_vt_ret_fn(assoc, function(value)
         return {
           value = value,
-          dependencies = get.stateless_iter.table(
-            get.str.n_str_stateful_iter_by_extracted_eutf8(value, "%$([A-Z0-9_]+)")), {tolist=true, ret="v"}
+          dependencies = get.any_stateful_generator.arr(
+            get.str.n_str_stateful_iter_by_extracted_eutf8(value, "%$([A-Z0-9_]+)"))
         }
       end)
     end,
-    dependency_ordered_key_value_arr = function(assoc)
-      return transf.key_value_and_dependency_assoc.dependency_ordered_key_value_arr(
-        transf.key_value_and_dependency_assoc.key_value_and_dependency_assoc(assoc)
+    shell_var_name_and_str__arr_arr_by_ordered_dependencies = function(assoc)
+      return transf.shell_var_name_key_val_dep_spec_value_assoc.dependency_ordered_key_value_arr(
+        transf.shell_var_name_key_val_dep_spec_value_assoc.shell_var_name_key_val_dep_spec_value_assoc(assoc)
       )
     end,
-    env_str = function(assoc)
-      transf.env_line_arr.env_str(
-        transf.two_strs_arr_arr.env_line_arr(
-          transf.env_var_name_value_assoc.dependency_ordered_key_value_arr(assoc)
+    envlike_str = function(assoc)
+      transf.envlike_mapping_arr.envlike_str(
+        get.arr_arr.arr_by_mapped_w_n_t_arg_t_ret_fn(
+          transf.shell_var_name_key_str_value_assoc.shell_var_name_and_str__arr_arr_by_ordered_dependencies(assoc),
+          transf.shell_var_name_and_str_arr.envlike_mapping
         )
       )
     end
 
   },
-  key_value_and_dependency_assoc = {
+  shell_var_name_and_str = {
+    envlike_mapping = function(shell_var_name, str)
+      return "export " .. shell_var_name .. "=" .. transf.str.str_by_double_quoted_escaped(str)
+    end
+  },
+
+
+  shell_var_name_key_val_dep_spec_value_assoc = {
     dependency_ordered_key_value_arr = function(assoc)local result = {}  -- Table to store the sorted keys
       local visited = {}  -- Table to keep track of visited keys
       local temp_stack = {}  -- Table to detect cyclic dependencies
@@ -1892,7 +1893,7 @@ transf = {
   
               temp_stack[key] = nil  -- Remove key from temporary stack
               visited[key] = true  -- Mark key as visited
-              dothis.arr.insert_at_index(result, { key, assoc[key]['value'] })  -- Append {key, value} two_anys_arr to result
+              dothis.arr.push(result, { key, assoc[key]['value'] })  -- Append {key, value} two_anys_arr to result
           end
       end
   
@@ -1905,12 +1906,12 @@ transf = {
     end
   },
 
-  shellscript_file = {
+  shell_script_file = {
     gcc_str_errors = function(path)
-      return get.shellscript_file.lint_gcc_str(path, "errors")
+      return get.shell_script_file.lint_gcc_str(path, "errors")
     end,
     gcc_str_warnings = function(path)
-      return get.shellscript_file.lint_gcc_str(path, "warnings")
+      return get.shell_script_file.lint_gcc_str(path, "warnings")
     end,
   },
 
@@ -4578,12 +4579,12 @@ transf = {
     end,
     
   },
-  env_line_arr = {
-    env_str = function(arr)
-      local env_str_inner = get.str_or_number_arr.str_by_joined(arr, "\n")
+  envlike_mapping_arr = {
+    envlike_str = function(arr)
+      local envlike_str_inner = get.str_or_number_arr.str_by_joined(arr, "\n")
       return "#!/usr/bin/env bash\n\n" ..
           "set -u\n\n" .. 
-          env_str_inner .. 
+          envlike_str_inner .. 
           "\n\nset +u\n"
     end,
   },
@@ -4795,10 +4796,10 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.plaintext_file.str_by_contents)
     end,
     str_arr_by_lines = function(arr)
-      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_lines)
+      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_lines)
     end,
     str_arr_by_content_lines = function(arr)
-      return get.arr_arr.arr_by_mapped_w_vt_arg_vt_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_content_lines)
+      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(arr, transf.plaintext_file.str_arr_by_content_lines)
     end,
     m3u_file_arr = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, is.plaintext_file.m3u_file)
@@ -5201,14 +5202,7 @@ transf = {
     end,
   },
   two_strs_arr_arr = {
-    env_line_arr = function (arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        arr,
-        function(two_anys_arr)
-          return "export " .. two_anys_arr[1] .. "=" .. transf.str.str_by_double_quoted_escaped(two_anys_arr[2])
-        end
-      )
-    end,
+    
     n_shot_role_content_message_spec_arr = function(arr)
       local res = {}
       for _, two_anys_arr in transf.arr.pos_int_vt_stateless_iter(arr) do
@@ -7229,15 +7223,15 @@ transf = {
     end,
   },
   env_var_name_env_node_assoc = {
-    env_str = function(env_var_name_env_node_assoc)
-      return transf.env_var_name_value_assoc.env_str(
-        get.env_var_name_env_node_assoc.env_var_name_value_assoc(env_var_name_env_node_assoc)
+    envlike_str = function(env_var_name_env_node_assoc)
+      return transf.shell_var_name_key_str_value_assoc.envlike_str(
+        get.env_var_name_env_node_assoc.shell_var_name_key_str_value_assoc(env_var_name_env_node_assoc)
       )
     end
 
   },
   env_yaml_file_container = {
-    env_str = function(env_yaml_file_container)
+    envlike_str = function(env_yaml_file_container)
       local files = transf.extant_path.file_arr_by_descendants(env_yaml_file_container)
       local yaml_files = get.path_arr.path_arr_by_filter_to_same_extension(files, "yaml")
       local env_var_name_env_node_assoc_arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
@@ -7245,7 +7239,7 @@ transf = {
         transf.yaml_file.not_userdata_or_fn
       )
       local env_var_name_env_node_assoc = transf.table_arr.table_by_take_new(env_var_name_env_node_assoc_arr)
-      return transf.env_var_name_env_node_assoc.env_str(env_var_name_env_node_assoc)
+      return transf.env_var_name_env_node_assoc.envlike_str(env_var_name_env_node_assoc)
     end,
   },
   country_identifier_str = {
