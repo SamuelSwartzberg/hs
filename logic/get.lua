@@ -144,7 +144,7 @@ get = {
       return get.contact_table.encrypted_data(contact_table, "taxnr/" .. type)
     end,
     email = function(contact_table, type)
-      return transf.contact_table.vcard_type_email_assoc(contact_table)[type]
+      return transf.contact_table.vcard_email_type_key_email_value_assoc(contact_table)[type]
     end,
     phone_number = function(contact_table, type)
       return transf.contact_table.vcard_type_phone_assoc(contact_table)[type]

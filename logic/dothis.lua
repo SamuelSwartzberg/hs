@@ -309,7 +309,7 @@ dothis = {
       return hs.alert.show(str, {textSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3}, duration)
     end,
     say = function(str, lang)
-      speak:voice(tblmap.lang.voice[lang]):speak(transf.str.singleline_str_by_folded(str))
+      speak:voice(tblmap.lang.voice[lang]):speak(transf.str.line_by_folded(str))
     end,
     paste = function(str)
       local lines = get.str.str_arr_by_split_w_ascii_char(str, "\n")
@@ -1806,7 +1806,7 @@ dothis = {
   },
   iban = {
     fill_bank_form = function(iban)
-      dothis.str_arr.fill_with(transf.iban.three_str_arr_by_iban_bic_bank_name(iban))
+      dothis.str_arr.fill_with(transf.iban.three_str__arr_by_iban_bic_bank_name(iban))
     end
   },
   running_application = {

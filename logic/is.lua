@@ -168,6 +168,8 @@ is = {
     ini_kv_line = function(str)
       return get.str.bool_by_not_startswith(str, "=") and get.str.bool_by_not_endswith(str, "=") and get.str.bool_by_contains_w_ascii_str(str, "=")
     end,
+    country_identifier_str = transf["nil"]["true"],
+    language_identifier_str = transf["nil"]["true"],
   },
   noweirdwhitespace_line = {
     path_component = function(str)
@@ -297,6 +299,9 @@ is = {
     end,
     url_or_local_path = function(str)
       return is.printable_ascii_no_nonspace_whitespace_str.url(str) or is.printable_ascii_no_nonspace_whitespace_str.local_path(str)
+    end,
+    phone_number = function(str)
+      return #str <= 25 and get.str.bool_by_matches_part_onig(str, "\\d{2}") -- will have many false positives, but that's fine
     end,
   },
   separated_nonindicated_number_str = {
@@ -429,7 +434,8 @@ is = {
         is.printable_ascii_not_whitespace_str.indicated_accession(str) or
         is.printable_ascii_not_whitespace_str.indicated_issn_full_identifier(str) or
         is.printable_ascii_not_whitespace_str.indicated_urlmd5(str)
-    end
+    end,
+    
   },
   package_name = {
     installed_package_name = function(str)
@@ -1242,6 +1248,12 @@ is = {
     upper_alpha_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, "[A-Z]+")
     end,
+    iso_3366_1_alpha_2_country_code = function(str)
+      return #str == 2
+    end,
+    iso_3166_1_alpha_3_country_code = function(str)
+      return #str == 3
+    end,
   },
   lower_alpha_str = {
     fs_attr_name = function(str)
@@ -1268,6 +1280,16 @@ is = {
     project_type = function(str)
       return get.arr.bool_by_contains(ls.project_type, str)
     end,
+    vcard_phone_type = function(str)
+      return get.arr.bool_by_contains(ls.vcard.vcard_phone_type, str)
+    end,
+    vcard_email_type = function(str)
+      return get.arr.bool_by_contains(ls.vcard.vcard_email_type, str)
+    end,
+    vcard_address_type = function(str)
+      return get.arr.bool_by_contains(ls.vcard.vcard_address_type, str)
+    end,
+
   },
   url = {
     scheme_url = function(url)
@@ -1803,11 +1825,23 @@ is = {
     newsboat_urls_specifier = function(t)
       return t.url and t.title
     end,
+    str_format_part_specifier = function(t)
+      return t.str_format_part or t.value or t.fallback
+    end,
+    contact_table = function(t)
+      return t.uid
+    end,
+    address_table = function(t)
+      return t.contact or t.Box or t.Extended or t.Street or t.Code or t.City or t.Region or t.Country
+    end,
 
   },
   dcmp_spec = {
     full_dcmp_spec = function(t)
       return t.year and t.month and t.day and t.hour and t.min and t.sec
+    end,
+    partial_dcmp_spec = function(t)
+      return not is.dcmp_spec.full_dcmp_spec(t)
     end,
     cont_dcmp_spec = function(t)
       return is.arr.dcmp_name_seq(
@@ -1825,6 +1859,12 @@ is = {
       return is.cont_dcmp_name_seq.suffix_dcmp_name_seq(
         transf.table.kt_arr(t)
       )
+    end,
+    prefix_partial_dcmp_spec = function(t)
+      return is.cont_dcmp_spec.prefix_dcmp_spec(t) and is.dcmp_spec.partial_dcmp_spec(t)
+    end,
+    suffix_partial_dcmp_spec = function(t)
+      return is.cont_dcmp_spec.suffix_dcmp_spec(t) and is.dcmp_spec.partial_dcmp_spec(t)
     end,
   },
   interval_specifier = {

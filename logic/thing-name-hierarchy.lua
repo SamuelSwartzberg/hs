@@ -248,6 +248,7 @@ thing_name_hierarchy = {
               printable_ascii_no_nonspace_whitespace_str = {
                 fnname = "leaf",
                 single_attachment_str = "leaf",
+                phone_number = "leaf",
                 application_name = {
                   mac_application_name = "leaf",
                 },
@@ -304,10 +305,13 @@ thing_name_hierarchy = {
                   indicated_citable_object_id = "leaf",
                   percent_encoded_octet = "leaf",
                   lower_alphanum_underscore_comma = "leaf",
+                  
                   colon_period_alphanum_minus_underscore = {
                     indicated_utf8_hex_str = "leaf",
                     rfc3339like_dt_o_interval = {
-                      rfc3339_dt = "leaf",
+                      rfc3339_dt = {
+                        full_rfc3339like_dt = "leaf",
+                      },
                       rfc3339_interval = "leaf",
                     },
                     colon_alphanum_minus_underscore = {
@@ -376,8 +380,13 @@ thing_name_hierarchy = {
                               mod_char = "leaf",
                               mod_name = "leaf",
                               leaf_str = "leaf",
-                              project_type = "leaf"
+                              project_type = "leaf",
+                              vcard_phone_type = "leaf",
+                              vcard_email_type = "leaf",
+                              vcard_address_type = "leaf",
                             },
+                            iso_3366_1_alpha_2_country_code = "leaf",
+                            iso_3366_1_alpha_3_country_code = "leaf",
                           },
                           hex_str = {
                             byte_hex_str = "leaf",
@@ -553,6 +562,7 @@ thing_name_hierarchy = {
         },
         gpt_response_table = "leaf",
         iban_data_spec = "leaf", 
+        contact_table = "leaf",
         ical_spec = "leaf",
         tree_node = "leaf",
         val_dep_spec = "leaf",
@@ -566,7 +576,8 @@ thing_name_hierarchy = {
             prefix_dcmp_spec = "leaf",
             suffix_dcmp_spec = "leaf",
           }
-        }
+        },
+        str_format_part_specifier = "leaf"
       }
     },
     primitive = {

@@ -850,6 +850,13 @@ transf = {
   remote_path = {
 
   },
+  str_or_nil = {
+    line_or_nil_by_folded = function(str)
+      if str then
+        return transf.str.line_by_folded(str)
+      end
+    end,
+  },
   absolute_path = {
     file_url = function(path)
       return transf.local_absolute_path.file_url(transf.absolute_path.local_absolute_path(path))
@@ -2524,36 +2531,36 @@ transf = {
     full_dcmp_spec_by_end = function(date_interval_specifier)
       return transf.date.full_dcmp_spec(date_interval_specifier.stop)
     end,
-    prefix_dcmp_spec_by_start_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
-      return transf.dcmp_spec.prefix_dcmp_spec_where_date_component_value_is_not_min_date_component_value(
+    prefix_dcmp_spec_by_start_filtered_not_min_or_not_prefix = function(date_interval_specifier)
+      return transf.dcmp_spec.prefix_dcmp_spec_by_filtered_not_min_or_not_prefix(
         transf.date_interval_specifier.full_dcmp_spec_by_start(date_interval_specifier)
       )
     end,
-    end_prefix_dcmp_spec_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
-      return transf.dcmp_spec.prefix_dcmp_spec_where_date_component_value_is_not_max_date_component_value(
+    prefix_dcmp_spec_by_end_filtered_not_max_or_not_prefix = function(date_interval_specifier)
+      return transf.dcmp_spec.prefix_dcmp_spec_by_filtered_not_max_or_not_prefix(
         transf.date_interval_specifier.full_dcmp_spec_by_end(date_interval_specifier)
       )
     end,
-    start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value = function(date_interval_specifier)
-      return transf.dcmp_spec.rfc3339like_dt(
-        transf.date_interval_specifier.prefix_dcmp_spec_by_start_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
+    rfc3339like_dt_by_start_filtered_not_max_or_not_prefix = function(date_interval_specifier)
+      return transf.prefix_dcmp_spec.rfc3339like_dt(
+        transf.date_interval_specifier.prefix_dcmp_spec_by_start_filtered_not_min_or_not_prefix(date_interval_specifier)
       )
     end,
-    end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
-      return transf.dcmp_spec.rfc3339like_dt(
-        transf.date_interval_specifier.end_prefix_dcmp_spec_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
+    rfc3339like_dt_by_end_filtered_not_max_or_not_prefix = function(date_interval_specifier)
+      return transf.prefix_dcmp_spec.rfc3339like_dt(
+        transf.date_interval_specifier.prefix_dcmp_spec_by_end_filtered_not_max_or_not_prefix(date_interval_specifier)
       )
     end,
     rfc3339like_dt = function(date_interval_specifier)
-      local start_rfc3339like_dt = transf.date_interval_specifier.start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
-      local end_rfc3339like_dt = transf.date_interval_specifier.end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
+      local start_rfc3339like_dt = transf.date_interval_specifier.rfc3339like_dt_by_start_filtered_not_max_or_not_prefix(date_interval_specifier)
+      local end_rfc3339like_dt = transf.date_interval_specifier.rfc3339like_dt_by_end_filtered_not_max_or_not_prefix(date_interval_specifier)
       if start_rfc3339like_dt == end_rfc3339like_dt then
         return start_rfc3339like_dt
       end
     end,
     rfc3339like_interval_where_date_component_value_is_not_max_date_component_value = function(date_interval_specifier)
-      local start_rfc3339like_dt = transf.date_interval_specifier.start_rfc3339like_dt_where_date_component_value_is_not_min_date_component_value(date_interval_specifier)
-      local end_rfc3339like_dt = transf.date_interval_specifier.end_rfc3339like_dt_where_date_component_value_is_not_max_date_component_value(date_interval_specifier)
+      local start_rfc3339like_dt = transf.date_interval_specifier.rfc3339like_dt_by_start_filtered_not_max_or_not_prefix(date_interval_specifier)
+      local end_rfc3339like_dt = transf.date_interval_specifier.rfc3339like_dt_by_end_filtered_not_max_or_not_prefix(date_interval_specifier)
       return start_rfc3339like_dt .. "_to_" .. end_rfc3339like_dt
     end,
     rf3339like_dt_or_interval = function(date_interval_specifier)
@@ -2626,20 +2633,15 @@ transf = {
       end
       return res
     end,
-    prefix_dcmp_name_list_set = function(dcmp_spec)
-      return transf.dcmp_spec.dcmp_name_arr_by_set(
-        transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec)
-      )
-    end,
-    prefix_dcmp_name_seq_set = function(dcmp_spec)
+    prefix_dcmp_name_seq_by_set = function(dcmp_spec)
       return transf.dcmp_name_arr.dcmp_name_seq_set(
         transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec)
       )
     end,
-    --- gets a dcmp_names_ordered_list which has all dcmp_names where there is a dcmp_name within the dcmp_spec that is smaller and equal that is not nil
+    --- gets a dcmp_name_seq which has all dcmp_names where there is a dcmp_name within the dcmp_spec that is smaller or equal that is not nil
     --- i.e. { month = 02, hour = 12 } will return { "year", "month", "day", "hour" }
-    --- this should be equal to prefix_dcmp_name_seq_set if dcmp_spec is a prefix_dcmp_spec since prefix_ is defined as having no nil values before potential trailing nil values
-    prefix_dcmp_name_seq_no_trailing_nil = function(dcmp_spec)
+    --- this should be equal to prefix_dcmp_name_spec_by_set if dcmp_spec is a prefix_dcmp_spec since prefix_ is defined as having no nil values before potential trailing nil values
+    dcmp_name_seq_by_no_trailing_nil = function(dcmp_spec)
       local ol = get.table.table_by_copy(ls.date.dcmp_names)
       while(dcmp_spec[
         ol[#ol]
@@ -2648,9 +2650,9 @@ transf = {
       end
       return ol
     end,
-    rfc3339like_dt_str_format_part_specifier_arr = function(dcmp_spec)
+    str_format_part_specifier_arr_by_for_rfc3339like_dt = function(dcmp_spec)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.dcmp_spec.prefix_dcmp_name_seq_no_trailing_nil(dcmp_spec),
+        transf.dcmp_spec.dcmp_name_seq_by_no_trailing_nil(dcmp_spec),
         function(dcmp_name)
           return {
             fallback = tblmap.dcmp_name.rfc3339like_dt_str_format_part_fallback[dcmp_name],
@@ -2660,9 +2662,9 @@ transf = {
         end
       )
     end,
-    rfc3339like_dt = function(dcmp_spec)
+    printable_ascii_not_whitespace_str_by_rfc3339like_dt_but_potentially_with_qmarks = function(dcmp_spec)
       local res = transf.str_format_part_specifier_arr.str(
-        transf.dcmp_spec.rfc3339like_dt_str_format_part_specifier_arr(dcmp_spec)
+        transf.dcmp_spec.str_format_part_specifier_arr_by_for_rfc3339like_dt(dcmp_spec)
       )
       if res:sub(-1) == "Z" then
         return res
@@ -2694,13 +2696,13 @@ transf = {
         function(k, v) return v ~= tblmap.dcmp_name.int_by_min_date_component_value[k] end
       )
     end,
-    prefix_dcmp_spec_where_date_component_value_is_not_max_date_component_value = function(dcmp_spec)
-      local dcmp_spec_where_date_component_value_is_not_max_date_component_value = transf.dcmp_spec.dcmp_spec_by_filtered_not_max(dcmp_spec)
-      return transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec_where_date_component_value_is_not_max_date_component_value)
+    prefix_dcmp_spec_by_filtered_not_max_or_not_prefix = function(dcmp_spec)
+      local dcmp_spec_not_max = transf.dcmp_spec.dcmp_spec_by_filtered_not_max(dcmp_spec)
+      return transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec_not_max)
     end,
-    prefix_dcmp_spec_where_date_component_value_is_not_min_date_component_value = function(dcmp_spec)
-      local dcmp_spec_where_date_component_value_is_not_min_date_component_value = transf.dcmp_spec.dcmp_spec_by_filtered_not_min(dcmp_spec)
-      return transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec_where_date_component_value_is_not_min_date_component_value)
+    prefix_dcmp_spec_by_filtered_not_min_or_not_prefix = function(dcmp_spec)
+      local dcmp_spec_not_max = transf.dcmp_spec.dcmp_spec_by_filtered_not_min(dcmp_spec)
+      return transf.dcmp_spec.prefix_dcmp_spec_by_filter(dcmp_spec_not_max)
     end,
     
 
@@ -2734,7 +2736,9 @@ transf = {
   },
   prefix_dcmp_spec = {
     
-    
+    rfc3339like_dt = function(prefix_dcmp_spec)
+      return transf.dcmp_spec.printable_ascii_not_whitespace_str_by_rfc3339like_dt_but_potentially_with_qmarks(prefix_dcmp_spec)
+    end,
   },
   suffix_dcmp_spec = {
 
@@ -2769,12 +2773,12 @@ transf = {
     str_by_bank_name = function(iban)
       return transf.cleaned_iban.str_by_bank_name(transf.iban.cleaned_iban(iban))
     end,
-    three_str_arr_by_iban_bic_bank_name = function(iban)
+    three_str__arr_by_iban_bic_bank_name = function(iban)
       return {iban, transf.iban.bic(iban), transf.iban.str_by_bank_name(iban)}
     end,
     multiline_str_by_bank_details = function(iban)
       return get.str_or_number_arr.str_by_joined(
-        transf.iban.three_str_arr_by_iban_bic_bank_name(iban),
+        transf.iban.three_str__arr_by_iban_bic_bank_name(iban),
         "\n"
       )
     end,
@@ -2783,7 +2787,7 @@ transf = {
     end,
   },
   cleaned_iban = {
-    data = function(iban)
+    iban_data_spec = function(iban)
       local res = get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest, "rest")({
         host = "openiban.com/",
         endpoint = "validate/" .. iban,
@@ -2794,10 +2798,10 @@ transf = {
       return data
     end,
     bic = function(iban)
-      return transf.cleaned_iban.data(iban).bic
+      return transf.cleaned_iban.iban_data_spec(iban).bic
     end,
     str_by_bank_name = function(iban)
-      return transf.cleaned_iban.data(iban).bankName
+      return transf.cleaned_iban.iban_data_spec(iban).bankName
     end,
     iban_by_separated = function(iban)
       return get.str_or_number_arr.str_by_joined(
@@ -2870,257 +2874,267 @@ transf = {
     uuid = function (contact_table)
       return contact_table.uid
     end,
-    str_by_pref_name = function(contact_table) return contact_table["Formatted name"] end,
-    str_by_name_pre = function(contact_table) return contact_table["Prefix"] end,
-    str_by_first_name = function(contact_table) return contact_table["First name"] end,
-    str_by_middle_name = function(contact_table) return contact_table["Additional"] end,
-    str_by_last_name = function(contact_table) return contact_table["Last name"] end,
-    str_by_name_suf = function(contact_table) return contact_table["Suffix"] end,
-    str_by_nickname = function(contact_table) return contact_table["Nickname"] end,
-    anniversary = function(contact_table) return contact_table["Anniversary"] end,
-    birthday = function(contact_table) return contact_table["Birthday"] end,
-    organization = function(contact_table) return contact_table["Organization"] end,
-    title = function(contact_table) return contact_table["Title"] end,
-    role = function(contact_table) return contact_table["Role"] end,
-    homepage_raw = function(contact_table) return contact_table["Webpage"] end,
-    homepages = function(contact_table) 
+    line_or_nil_by_pref_name = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Formatted name"]) end,
+    line_or_nil_by_name_pre = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Prefix"]) end,
+    line_or_nil_by_first_name = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["First name"]) end,
+    line_or_nil_by_middle_name = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Additional"]) end,
+    line_or_nil_by_last_name = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Last name"]) end,
+    line_or_nil_by_name_suf = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Suffix"]) end,
+    line_or_nil_by_nickname = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Nickname"]) end,
+    rfc3339like_dt_or_nil_by_anniversary = function(contact_table) return contact_table["Anniversary"] end,
+    rfc3339like_dt_or_nil_by_birthday = function(contact_table) return contact_table["Birthday"] end,
+    line_or_nil_by_organization = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Organization"]) end,
+    line_or_nil_by_title = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Title"]) end,
+    line_or_nil_by_role = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Role"]) end,
+    line_or_nil_by_homepage_raw = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Webpage"]) end,
+    url_arr_by_homepages = function(contact_table) 
       if is.any.table(contact_table.homepage_raw) then
         return contact_table.homepage_raw
       else
         return {contact_table.homepage_raw}
       end
     end,
-    github_username = function(contact_table)
+    github_username_or_nil = function(contact_table)
       return contact_table.Private["github-username"]
     end,
-    github_url = function(contact_table)
-      return transf.github_username.github_user_url(
-        transf.contact_table.github_username(contact_table)
-      )
+    github_user_url_or_nil = function(contact_table)
+      local github_username = transf.contact_table.github_username_or_nil(contact_table)
+      if github_username then
+        return transf.github_username.github_user_url(
+          github_username
+        )
+      end
     end,
-    number_by_translation_rate = function(contact_table)
+    number_or_nil_by_translation_rate = function(contact_table)
       return get.str_or_number.number_or_nil(contact_table.Private["translation-rate"])
     end,
-    iban = function (contact_table)
+    iban_or_nil = function (contact_table)
       return get.contact_table.encrypted_data(contact_table, "iban")
     end,
-    bic = function (contact_table)
-      return transf.iban.bic(transf.contact_table.iban(contact_table))
+    bic_or_nil = function (contact_table)
+      local iban = transf.contact_table.iban_or_nil(contact_table)
+      if iban then
+        return transf.iban.bic(iban)
+      end
     end,
-    bank_name = function (contact_table)
-      return transf.iban.str_by_bank_name(transf.contact_table.iban(contact_table))
+    str_or_nil_by_bank_name = function (contact_table)
+      local iban = transf.contact_table.iban_or_nil(contact_table)
+      if iban then
+        return transf.iban.str_by_bank_name(iban)
+      end
     end,
-    bank_details_str = function (contact_table)
-      return transf.iban.multiline_str_by_bank_details(transf.contact_table.iban(contact_table))
+    multiline_str_or_nil_by_bank_details = function (contact_table)
+      local iban = transf.contact_table.iban_or_nil(contact_table)
+      if iban then
+        return transf.iban.multiline_str_by_bank_details(iban)
+      end
     end,
-    str_by_personal_tax_number = function (contact_table)
+    str_or_nil_by_personal_tax_number = function (contact_table)
       return get.contact_table.tax_number(contact_table, "personal")
     end,
-    str_arr_by_full_name_western = function(contact_table)
+    line_arr_by_full_name_western = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
-        transf.contact_table.name_pref(contact_table),
-        transf.contact_table.str_by_first_name(contact_table),
-        transf.contact_table.str_by_middle_name(contact_table),
-        transf.contact_table.str_by_last_name(contact_table),
-        transf.contact_table.str_by_name_suf(contact_table)
+        transf.contact_table.line_or_nil_by_name_pre(contact_table),
+        transf.contact_table.line_or_nil_by_first_name(contact_table),
+        transf.contact_table.line_or_nil_by_middle_name(contact_table),
+        transf.contact_table.line_or_nil_by_last_name(contact_table),
+        transf.contact_table.line_or_nil_by_name_suf(contact_table)
       })
     end,
-    str_by_full_name_western = function(contact_table)
+    line_by_full_name_western = function(contact_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.contact_table.str_arr_by_full_name_western(contact_table),
+        transf.contact_table.line_arr_by_full_name_western(contact_table),
         " "
       )
     end,
-    str_arr_by_normal_name_western = function(contact_table)
+    line_arr_by_normal_name_western = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
-        transf.contact_table.str_by_first_name(contact_table),
-        transf.contact_table.str_by_last_name(contact_table),
+        transf.contact_table.line_or_nil_by_first_name(contact_table),
+        transf.contact_table.line_or_nil_by_last_name(contact_table),
       })
     end,
-    str_by_normal_name_western = function(contact_table)
+    line_by_normal_name_western = function(contact_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.contact_table.str_arr_by_normal_name_western(contact_table),
+        transf.contact_table.line_arr_by_normal_name_western(contact_table),
         " "
       )
     end,
-    str_by_main_name = function(contact_table)
-      return transf.contact_table.str_by_pref_name(contact_table) or transf.contact_table.str_by_normal_name_western(contact_table)
+    line_by_main_name = function(contact_table)
+      return transf.contact_table.line_or_nil_by_pref_name(contact_table) or transf.contact_table.line_by_normal_name_western(contact_table)
     end,
-    full_name_eastern_arr = function(contact_table)
+    line_arr_by_full_name_eastern = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
-        transf.contact_table.name_pref(contact_table),
-        transf.contact_table.str_by_last_name(contact_table),
-        transf.contact_table.str_by_first_name(contact_table),
-        transf.contact_table.str_by_name_suf(contact_table)
+        transf.contact_table.line_or_nil_by_name_pre(contact_table),
+        transf.contact_table.line_or_nil_by_last_name(contact_table),
+        transf.contact_table.line_or_nil_by_first_name(contact_table),
+        transf.contact_table.line_or_nil_by_name_suf(contact_table)
       })
     end,
-    full_name_eastern = function(contact_table)
+    line_by_full_name_eastern = function(contact_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.contact_table.full_name_eastern_arr(contact_table),
+        transf.contact_table.line_arr_by_full_name_eastern(contact_table),
         " "
       )
     end,
-    normal_name_eastern_arr = function(contact_table)
+    line_arr_by_normal_name_eastern = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
-        transf.contact_table.str_by_last_name(contact_table),
-        transf.contact_table.str_by_first_name(contact_table),
+        transf.contact_table.line_or_nil_by_last_name(contact_table),
+        transf.contact_table.line_or_nil_by_first_name(contact_table),
       })
     end,
-    normal_name_eastern = function(contact_table)
+    line_by_normal_name_eastern = function(contact_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.contact_table.normal_name_eastern_arr(contact_table),
+        transf.contact_table.line_arr_by_normal_name_eastern(contact_table),
         " "
       )
     end,
-    name_additions_arr = function(contact_table)
+    line_arr_by_name_additions = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
-        transf.contact_table.title(contact_table),
-        transf.contact_table.role(contact_table),
-        transf.contact_table.organization(contact_table),
+        transf.contact_table.line_or_nil_by_title(contact_table),
+        transf.contact_table.line_or_nil_by_role(contact_table),
+        transf.contact_table.line_or_nil_by_organization(contact_table),
       })
     end,
-    name_additions = function(contact_table)
+    line_by_name_additions = function(contact_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.contact_table.name_additions_arr(contact_table),
+        transf.contact_table.line_arr_by_name_additions(contact_table),
         ", "
       )
     end,
-    indicated_nickname = function(contact_table)
-      return '"' .. transf.contact_table.str_by_nickname(contact_table) .. '"'
+    line_or_nil_by_indicated_nickname = function(contact_table)
+      local nickname = transf.contact_table.line_or_nil_by_nickname(contact_table)
+      if nickname then
+        return '"' .. nickname .. '"'
+      end
     end,
-    main_name_iban_bic_bank_name_arr = function(contact_table)
+    line_arr_by_main_name_iban_bic_bank_name = function(contact_table)
       return {
-        transf.contact_table.str_by_main_name(contact_table),
-        transf.contact_table.iban(contact_table),
-        transf.contact_table.bic(contact_table),
-        transf.contact_table.bank_name(contact_table),
+        transf.contact_table.line_by_main_name(contact_table),
+        transf.contact_table.iban_or_nil(contact_table),
+        transf.contact_table.bic_or_nil(contact_table),
+        transf.contact_table.str_or_nil_by_bank_name(contact_table),
       }
     end,
-    name_bank_details_str = function(contact_table)
+    multiline_str_by_name_bank_details = function(contact_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.contact_table.main_name_iban_bic_bank_name_arr(contact_table),
+        transf.contact_table.line_arr_by_main_name_iban_bic_bank_name(contact_table),
         "\n"
       )
     end,
-    vcard_type_phone_number_assoc = function (contact_table)
+    vcard_phone_type_key_phone_number_value_assoc = function (contact_table)
       return contact_table.Phone
     end,
     phone_number_arr = function (contact_table)
-      return transf.table.vt_set(transf.contact_table.vcard_type_phone_number_assoc(contact_table))
+      return transf.table.vt_set(transf.contact_table.vcard_phone_type_key_phone_number_value_assoc(contact_table))
     end,
-    phone_number_str = function (contact_table)
+    printable_ascii_no_nonspace_whitespace_str_by_phone_numbers_joined = function (contact_table)
       return get.str_or_number_arr.str_by_joined(transf.contact_table.phone_number_arr(contact_table), ", ")
     end,
-    vcard_type_email_assoc = function (contact_table)
+    vcard_email_type_key_email_value_assoc = function (contact_table)
       return contact_table.Email
     end,
     email_arr = function (contact_table)
-      return transf.table.vt_set(transf.contact_table.vcard_type_email_assoc(contact_table))
+      return transf.table.vt_set(transf.contact_table.vcard_email_type_key_email_value_assoc(contact_table))
     end,
-    email_str = function (contact_table)
+    printable_ascii_not_whitespace_str_by_emails_joined = function (contact_table)
       return get.str_or_number_arr.str_by_joined(transf.contact_table.email_arr(contact_table), ", ")
     end,
-    vcard_type_address_table_assoc = function (contact_table)
+    vcard_address_type_key_address_table_value_assoc = function (contact_table)
       return contact_table.Addresses
     end,
     address_table_arr = function (contact_table)
-      return transf.table.vt_set(transf.contact_table.vcard_type_address_table_assoc(contact_table))
+      return transf.table.vt_set(transf.contact_table.vcard_address_type_key_address_table_value_assoc(contact_table))
     end,
     str_by_summary = function (contact_table)
-      local sumstr = transf.contact_table.str_by_full_name_western(contact_table)
-      if transf.contact_table.str_by_nickname(contact_table) then
-        sumstr = sumstr .. " " .. transf.contact_table.indicated_nickname(contact_table)
+      local sumstr = transf.contact_table.line_by_full_name_western(contact_table)
+      if transf.contact_table.line_or_nil_by_nickname(contact_table) then
+        sumstr = sumstr .. " " .. transf.contact_table.line_or_nil_by_indicated_nickname(contact_table)
       end
-      if transf.contact_table.name_additions(contact_table) then
-        sumstr = sumstr .. " (" .. transf.contact_table.name_additions(contact_table) .. ")"
+      if transf.contact_table.line_by_name_additions(contact_table) then
+        sumstr = sumstr .. " (" .. transf.contact_table.line_by_name_additions(contact_table) .. ")"
       end
-      if transf.contact_table.phone_number_str(contact_table) ~= "" then
-        sumstr = sumstr .. " [" .. transf.contact_table.phone_number_str(contact_table) .. "]"
+      if transf.contact_table.printable_ascii_no_nonspace_whitespace_str_by_phone_numbers_joined(contact_table) ~= "" then
+        sumstr = sumstr .. " [" .. transf.contact_table.printable_ascii_no_nonspace_whitespace_str_by_phone_numbers_joined(contact_table) .. "]"
       end
-      if transf.contact_table.email_str(contact_table) ~= "" then
-        sumstr = sumstr .. " <" .. transf.contact_table.email_str(contact_table) .. ">"
+      if transf.contact_table.printable_ascii_not_whitespace_str_by_emails_joined(contact_table) ~= "" then
+        sumstr = sumstr .. " <" .. transf.contact_table.printable_ascii_not_whitespace_str_by_emails_joined(contact_table) .. ">"
       end
     end,
-    email_by_main = function (contact_table)
+    email_or_nil_by_main = function (contact_table)
       return get.contact_table.email(contact_table, "pref") or transf.contact_table.email_arr(contact_table)[1]
     end,
-    main_phone_number = function (contact_table)
+    phone_number_or_nil_by_main = function (contact_table)
       return get.contact_table.phone_number(contact_table, "pref") or transf.contact_table.phone_number_arr(contact_table)[1]
     end,
-    main_address_table = function (contact_table)
+    address_table_or_nil_by_main = function (contact_table)
       return get.contact_table.address_table(contact_table, "pref") or transf.contact_table.address_table_arr(contact_table)[1]
     end,
-    main_relevant_address_label = function (contact_table)
-      return transf.address_table.relevant_address_label(
-        transf.contact_table.main_address_table(contact_table)
-      )
+    multiline_str_by_relevant_address_label = function (contact_table)
+      local addr_table = transf.contact_table.address_table_or_nil_by_main(contact_table)
+      if addr_table then
+        return transf.address_table.multiline_str_by_relevant_address_label(
+          addr_table
+        )
+      end
     end
-
-  },
-  vcard_type_assoc = {
-    vcard_types = function (vcard_type_assoc)
-      return transf.table_or_nil.kt_arr(vcard_type_assoc)
-    end
-  },
-  vcard_type_address_table_assoc = {
 
   },
   address_table = {
-    contact = function(single_address_table)
+    contact_table = function(single_address_table)
       return single_address_table.contact
     end,
-    extended = function(single_address_table)
-      return single_address_table.Extended
+    line_by_extended = function(single_address_table)
+      return transf.str_or_nil.line_or_nil_by_folded(single_address_table.Extended)
     end,
-    postal_code = function(single_address_table)
-      return single_address_table.Code
+    line_by_postal_code = function(single_address_table)
+      return transf.str_or_nil.line_or_nil_by_folded(single_address_table.Code)
     end,
-    region = function(single_address_table)
-      return single_address_table.Region
+    line_by_region = function(single_address_table)
+      return transf.str_or_nil.line_or_nil_by_folded(single_address_table.Region)
     end,
     country_identifier_str = function(single_address_table)
-      return single_address_table.Country
+      return transf.str_or_nil.line_or_nil_by_folded(single_address_table.Country)
     end,
     iso_3366_1_alpha_2_country_code = function(single_address_table)
       return transf.country_identifier_str.iso_3366_1_alpha_2_country_code(
         transf.address_table.country_identifier_str(single_address_table)
       )
     end,
-    street = function(single_address_table)
-      return single_address_table.Street
+    line_by_street = function(single_address_table)
+      return transf.str_or_nil.line_or_nil_by_folded(single_address_table.Street)
     end,
-    city = function(single_address_table)
-      return single_address_table.City
+    line_by_city = function(single_address_table)
+      return transf.str_or_nil.line_or_nil_by_folded(single_address_table.City)
     end,
-    postal_code_city_line = function(single_address_table)
+    str_by_postal_code_city = function(single_address_table)
       return 
-        transf.address_table.postal_code(single_address_table) .. " " ..
-        transf.address_table.city(single_address_table)
+        transf.address_table.line_by_postal_code(single_address_table) .. " " ..
+        transf.address_table.line_by_city(single_address_table)
     end,
     region_country_line = function(single_address_table)
       return 
-        transf.address_table.region(single_address_table) .. ", " ..
+        transf.address_table.line_by_region(single_address_table) .. ", " ..
         transf.address_table.country_identifier(single_address_table)
     end,
     addressee_arr = function(single_address_table)
       return transf.hole_y_arrlike.arr({
-        transf.contact_table.str_by_main_name(single_address_table.contact),
-        transf.address_table.extended(single_address_table)
+        transf.contact_table.line_by_main_name(single_address_table.contact),
+        transf.address_table.line_by_extended(single_address_table)
       })
     end,
     in_country_location_arr = function(single_address_table)
       return transf.hole_y_arrlike.arr({
-        transf.address_table.street(single_address_table),
-        transf.address_table.postal_code(single_address_table),
-        transf.address_table.city(single_address_table),
+        transf.address_table.line_by_street(single_address_table),
+        transf.address_table.line_by_postal_code(single_address_table),
+        transf.address_table.line_by_city(single_address_table),
       })
     end,
     international_location_arr = function(single_address_table)
       return transf.hole_y_arrlike.arr({
-        transf.address_table.street(single_address_table),
-        transf.address_table.postal_code(single_address_table),
-        transf.address_table.city(single_address_table),
-        transf.address_table.region(single_address_table),
+        transf.address_table.line_by_street(single_address_table),
+        transf.address_table.line_by_postal_code(single_address_table),
+        transf.address_table.line_by_city(single_address_table),
+        transf.address_table.line_by_region(single_address_table),
         transf.address_table.country_identifier(single_address_table),
       })
     end,
@@ -3153,17 +3167,17 @@ transf = {
     in_country_address_label = function(single_address_table)
       return 
         get.str_or_number_arr.str_by_joined(transf.address_table.addressee_arr(single_address_table), "\n") .. "\n" ..
-        transf.address_table.street(single_address_table) .. "\n" ..
-        transf.address_table.postal_code_city_line(single_address_table)
+        transf.address_table.line_by_street(single_address_table) .. "\n" ..
+        transf.address_table.str_by_postal_code_city(single_address_table)
     end,
     international_address_label = function(single_address_table)
       return 
         get.str_or_number_arr.str_by_joined(transf.address_table.addressee_arr(single_address_table), "\n") .. "\n" ..
-        transf.address_table.street(single_address_table) .. "\n" ..
-        transf.address_table.postal_code_city_line(single_address_table) .. "\n" ..
+        transf.address_table.line_by_street(single_address_table) .. "\n" ..
+        transf.address_table.str_by_postal_code_city(single_address_table) .. "\n" ..
         transf.address_table.region_country_line(single_address_table)
     end,
-    relevant_address_label = function(single_address_table)
+    multiline_str_by_relevant_address_label = function(single_address_table)
       if transf.address_table.iso_3366_1_alpha_2_country_code(single_address_table) == "de" then
         return transf.address_table.in_country_address_label(single_address_table)
       else
@@ -3659,7 +3673,7 @@ transf = {
       return plurl.quote(str, true)
     end,
     encoded_query_param_value_by_folded = function(str)
-      local folded = transf.str.singleline_str_by_folded(str)
+      local folded = transf.str.line_by_folded(str)
       return transf.str.encoded_query_param_value(folded)
     end,
     str_by_percent_decoded_also_plus = plurl.unquote,
@@ -3744,7 +3758,7 @@ transf = {
         {"こっち", "kocchi"}
       }})
     end,
-    singleline_str_by_folded = function(str)
+    line_by_folded = function(str)
       return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[\n\r\v\f]", " ")
     end,
     whitespace_collapsed_str = function(str)
@@ -5654,27 +5668,27 @@ transf = {
       end
     end,
     client_main_name = function(dir)
-      return transf.contact_table.str_by_main_name(
+      return transf.contact_table.line_by_main_name(
         transf.omegat_project_dir.client_contact_table(dir)
       )
     end,
     client_main_relevant_address_label = function(dir)
-      return transf.contact_table.main_relevant_address_label(
+      return transf.contact_table.multiline_str_by_relevant_address_label(
         transf.omegat_project_dir.client_contact_table(dir)
       )
     end,
     client_translation_rate = function(dir)
-      return transf.contact_table.number_by_translation_rate(
+      return transf.contact_table.number_or_nil_by_translation_rate(
         transf.omegat_project_dir.client_contact_table(dir)
       )
     end,
     creator_main_name = function(dir)
-      return transf.contact_table.str_by_main_name(
+      return transf.contact_table.line_by_main_name(
         transf.omegat_project_dir.creator_contact_table(dir)
       )
     end,
     creator_main_relevant_address_label = function(dir)
-      return transf.contact_table.main_relevant_address_label(
+      return transf.contact_table.multiline_str_by_relevant_address_label(
         transf.omegat_project_dir.creator_contact_table(dir)
       )
     end,
@@ -5690,7 +5704,7 @@ transf = {
       )
     end,
     creator_translation_rate = function(dir)
-      return transf.contact_table.number_by_translation_rate(
+      return transf.contact_table.number_or_nil_by_translation_rate(
         transf.omegat_project_dir.creator_contact_table(dir)
       )
     end,
@@ -6519,14 +6533,14 @@ transf = {
     prefix_partial_dcmp_spec = function(date_parts)
       return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
     end,
-    full_full_dcmp_spec = function(date_parts)
+    full_dmp_spec = function(date_parts)
       return transf.dcmp_spec.full_dcmp_spec_by_min(
         transf.date_parts_single.prefix_partial_dcmp_spec(date_parts)
       )
     end,
     date = function(date_parts)
       return transf.full_dcmp_spec.date(
-        transf.date_parts_single.full_full_dcmp_spec(date_parts)
+        transf.date_parts_single.full_dmp_spec(date_parts)
       )
     end,
   },
@@ -6536,8 +6550,8 @@ transf = {
     end,
     date_interval_specifier = function(date_parts_range)
       return {
-        start = transf.date_parts_single.full_full_dcmp_spec(date_parts_range[1]),
-        stop = transf.date_parts_single.full_full_dcmp_spec(date_parts_range[2])
+        start = transf.date_parts_single.full_dmp_spec(date_parts_range[1]),
+        stop = transf.date_parts_single.full_dmp_spec(date_parts_range[2])
       }
     end
   },
@@ -6557,7 +6571,7 @@ transf = {
       return transf.date_parts_single.prefix_partial_dcmp_spec(date_parts[1])
     end,
     full_full_dcmp_spec_force_first = function(date_parts)
-      return transf.date_parts_single.full_full_dcmp_spec(date_parts[1])
+      return transf.date_parts_single.full_dmp_spec(date_parts[1])
     end,
     date_force_first = function(date_parts)
       return transf.date_parts_single.date(date_parts[1])
