@@ -1,11 +1,8 @@
 r = {
   g = {
     case = {
-      snake = "[a-zA-Z0-9_]+",
-      upper_snake = "[A-Z0-9_]+",
-      lower_snake = "[a-z0-9_]+",
-      lower = "[a-z]+",
-      upper = "[A-Z]+",
+      camel_snake = "[a-zA-Z][a-zA-Z0-9]*(?:_[A-Z]+[a-zA-Z0-9]+)*",
+      camel = "[a-zA-Z][a-z0-9]*(?:[A-Z][a-z0-9]*)*",
     },
     syntax = {
       dice = "(?:\\d+)?d\\d+(?:[/x\\*]\\d+)?(?:[+-]\\d+)?",

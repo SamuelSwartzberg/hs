@@ -15,6 +15,9 @@ is = {
     not_ending_with_whitespace_str = function(str)
       return get.str.bool_by_matches_part_eutf8(str, "%s$")
     end,
+    not_starting_o_ending_with_whitespace_str = function(str)
+      return is.str.not_starting_with_whitespace_str(str) and is.str.not_ending_with_whitespace_str(str)
+    end,
     ascii_str = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.ascii)
     end,
@@ -23,6 +26,8 @@ is = {
     end,
     json_str = transf["nil"]["true"], -- figuring this out would require parsing the json, which is too expensive here
     yaml_str = transf["nil"]["true"], -- same as above
+    toml_str = transf["nil"]["true"], -- same as above
+    ini_str = transf["nil"]["true"], -- same as above
     mime_part_block = transf["nil"]["true"], -- currently don't know enough about this seemingly custom format to check for it
     email_or_displayname_email = function(str)
       return is.str.email(str) or is.str.displayname_email(str)
@@ -162,6 +167,9 @@ is = {
     ini_section_line = function(str)
       return is.line.semicoloncomment_line(str) or is.line.ini_kv_line(str)
     end,
+    noempty_trimmed_line = function(str)
+      return is.line.noempty_line(str) and is.line.trimmed_line(str)
+    end,
 
   },
   noempty_line = {
@@ -170,6 +178,12 @@ is = {
     end,
     country_identifier_str = transf["nil"]["true"],
     language_identifier_str = transf["nil"]["true"],
+    multirecord_str = function(str)
+      return get.str.bool_by_contains_w_ascii_str(str, fixedstr.unique_record_separator)
+    end,
+    record_str = function(str)
+      return get.str.bool_by_contains_w_ascii_str(str, fixedstr.unique_field_separator)
+    end,
   },
   noweirdwhitespace_line = {
     path_component = function(str)
@@ -446,6 +460,9 @@ is = {
     unicode_codepoint_str = function(str)
       return get.str.bool_by_startswith(str, "U+") and transf.str.bool_by_matches_whole_eutf8(str, "^U+%x+$")
     end,
+    my_slash_date = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{2}/\\d{2}")
+    end,
   },
   base64_url_str = {
     youtube_video_id = function(str)
@@ -622,6 +639,41 @@ is = {
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "-0-9")
     end,
     
+    kebap_case = function(str)
+      return get.str.bool_by_not_matches_part_onig(str, "^\\d")
+    end,
+  },
+  kebap_case = {
+    strict_kebap_case = function(str)
+      return 
+        get.str.bool_by_not_startswith(str, "-") and
+        get.str.bool_by_not_endswith(str, "-") and
+        get.str.bool_by_not_contains_w_str(str, "--")
+    end,
+  },
+  strict_kebap_case = {
+    upper_strict_kebap_case = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "a-z")
+    end,
+    lower_strict_kebap_case = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "A-Z")
+    end,
+    mixed_strict_kebap_case = function(str)
+      return not is.strict_kebap_case.upper_strict_kebap_case(str) and not is.strict_kebap_case.lower_strict_kebap_case(str)
+    end,
+  },
+  mixed_strict_kebap_case = {
+    camel_strict_kebap_case = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.case.camel_kebap)
+    end,
+  },
+  camel_strict_kebap_case = {
+    upper_camel_strict_kebap_case = function(str)
+      return get.str.bool_by_matches_part_onig(str, "^[A-Z]")
+    end,
+    lower_camel_strict_kebap_case = function(str)
+      return get.str.bool_by_matches_part_onig(str, "^[a-z]")
+    end,
   },
   num_minus = {
     year = function(str)
@@ -1187,8 +1239,17 @@ is = {
     
   },
   lower_alphanum_minus_underscore = {
-    pass_item_name = function(str)
-      return get.local_extant_path.absolute_path_by_descendant_with_filename(env.MPASS, str)
+    auth_pass_item_name = function(str)
+      return get.local_extant_path.absolute_path_by_descendant_with_filename(
+        transf.path.path_by_ending_with_slash(env.MPASS) .. "p", 
+        str
+      )
+    end,
+    cc_pass_item_name = function(str)
+      return get.local_extant_path.absolute_path_by_descendant_with_filename(
+        transf.path.path_by_ending_with_slash(env.MPASS) .. "cc", 
+        str
+      )
     end,
   },
   alphanum_underscore = {
@@ -1198,8 +1259,40 @@ is = {
     upper_alphanum_underscore = function(str)
       return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "a-z")
     end,
-    shell_var_name = function(str)
+    snake_case = function(str)
       return get.str.bool_by_not_matches_part_onig(str, "^\\d")
+    end,
+  },
+  snake_case = {
+    strict_snake_case = function(str)
+      return 
+        get.str.bool_by_not_startswith(str, "_") and
+        get.str.bool_by_not_endswith(str, "_") and
+        get.str.bool_by_not_contains_w_str(str, "__")
+    end,
+  },
+  strict_snake_case = {
+    upper_strict_snake_case = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "a-z")
+    end,
+    lower_strict_snake_case = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "A-Z")
+    end,
+    mixed_strict_snake_case = function(str)
+      return not is.strict_snake_case.upper_strict_snake_case(str) and not is.strict_snake_case.lower_strict_snake_case(str)
+    end,
+  },
+  mixed_strict_snake_case = {
+    camel_strict_snake_case = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.case.camel_snake)
+    end,
+  },
+  camel_strict_snake_case = {
+    upper_camel_strict_snake_case = function(str)
+      return get.str.bool_by_matches_part_onig(str, "^[A-Z]")
+    end,
+    lower_camel_strict_snake_case = function(str)
+      return get.str.bool_by_matches_part_onig(str, "^[a-z]")
     end,
   },
   lower_alphanum_underscore = {
@@ -1231,7 +1324,13 @@ is = {
     end,
     bic = function(str)
       return #str == 8 or #str == 11
-    end
+    end,
+    lower_camel_case = function(str)
+      return get.str.bool_by_matches_part_onig(str, "^[a-z]")
+    end,
+    upper_camel_case = function(str)
+      return get.str.bool_by_matches_part_onig(str, "^[A-Z]")
+    end,
   },
   digit_str = {
     bin_str = function(str)
@@ -1239,6 +1338,9 @@ is = {
     end,
     oct_str = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "0-7")
+    end,
+    cleaned_payment_card_number = function(str)
+      return #str >= 8 and #str <= 19
     end,
   },
   alpha_str = {
@@ -1252,6 +1354,9 @@ is = {
       return #str == 2
     end,
     iso_3166_1_alpha_3_country_code = function(str)
+      return #str == 3
+    end,
+    mullvad_city_code = function(str)
       return #str == 3
     end,
     youtube_upload_status = function(str)
@@ -1631,8 +1736,8 @@ is = {
     end,
   },
   two_strs = {
-    shell_var_name_and_str = function(a, b)
-      return is.str.shell_var_name(a)
+    snake_case_and_str = function(a, b)
+      return is.str.snake_case(a)
     end,
   },
   three_anys = {
@@ -1677,7 +1782,7 @@ is = {
       return not is.any.userdata(val) and not is.any.fn(val)
     end,
   },
-  pass_item_name = {
+  auth_pass_item_name = {
     passw_pass_item_name = function(name)
       return get.pass_item_name.bool_by_exists_as(name, "passw")
     end,
@@ -2015,6 +2120,9 @@ is = {
     end,
     hs_image = function(val)
       return transf.full_userdata.str_by_classname(val) == "hs.image"
+    end,
+    styledtext = function(val)
+      return transf.full_userdata.str_by_classname(val) == "hs.styledtext"
     end,
   }
 }

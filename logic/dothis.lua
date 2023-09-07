@@ -362,7 +362,7 @@ dothis = {
     end,
     create_url_arr_as_session_in_msessions = function(str)
       dothis.url_arr.create_as_session_in_msessions(
-        transf.str.url_arr(str)
+        transf.str.url_arr_by_one_per_line(str)
       )
     end,
     raw_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn = function(str, fn)
@@ -1176,7 +1176,7 @@ dothis = {
     find_remove_nohashcomment_noindent_line = function(path, cond)
       local lines = transf.plaintext_file.line_arr(path)
       local index = get.arr.pos_int_or_nil_by_first_match_w_fn(lines, function(line)
-        local nohashcomment_noindent = transf.line.nohashcomment_noindent(line)
+        local nohashcomment_noindent = transf.line.noempty_nohashcomment_line_by_extract(line)
         return findsingle(nohashcomment_noindent, cond)
       end)
       dothis.plaintext_file.remove_line_w_pos_int(path, index)

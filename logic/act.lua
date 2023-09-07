@@ -309,8 +309,8 @@ act = {
   login_pass_item_name = {
     fill = function(name)
       dothis.str_arr.fill_with({
-        transf.pass_item_name.username_or_default(name),
-        transf.pass_item_name.password(name),
+        transf.auth_pass_item_name.line_by_username_or_default(name),
+        transf.passw_pass_item_name.line_by_password(name),
       })
     end,
   },
@@ -627,9 +627,9 @@ act = {
       local deduced_tags = transf.youtube_video_url.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(url)
       local edited_tags = transf.str_value_assoc.str_value_assoc_by_prompted_once_from_default(deduced_tags)
       local plspec = {}
-      plspec.tag = transf.two_arr_or_nils.arr(edited_tags, transf.str.prompted_multiple_two_strs_arr_arr_for("tag"))
+      plspec.tag = transf.two_arr_or_nils.arr(edited_tags, transf.str.two_strs__arr_ar_by_prompted_multiple("tag"))
       plspec.path  = get.local_extant_path.dir_by_default_prompted_once(env.MAUDIOVISUAL)
-      plspec.path = transf.str.prompted_once_str_from_default(plspec.path)
+      plspec.path = transf.str.str_by_prompted_once_from_default(plspec.path)
       plspec.extension = "m3u"
       dothis.absolute_path.write_file(transf.path_leaf_specifier.absolute_path(plspec), url)
     end,

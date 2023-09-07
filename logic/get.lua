@@ -101,22 +101,33 @@ get = {
     end,
   },
   pass_item_name = {
-    str_or_nil_by_fetch_value = function(item, type)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped)("pass show " .. type .. "/" .. item)
+    str_or_nil_by_fetch_value = function(item, typepath)
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped)("pass show " .. typepath .. "/" .. item)
     end,
-    local_absolute_path = function(item, type, ext)
-      return env.PASSWORD_STORE_DIR .. "/" .. type .. "/" .. item .. "." .. (ext or "gpg")
+    local_absolute_path = function(item, typepath, ext)
+      return env.PASSWORD_STORE_DIR .. "/" .. typepath .. "/" .. item .. "." .. (ext or "gpg")
     end,
-    bool_by_exists_as = function(item, type, ext)
-      return is.absolute_path.extant_path(get.pass_item_name.local_absolute_path(item, type, ext))
+    bool_by_exists_as = function(item, typepath, ext)
+      return is.local_absolute_path.local_extant_path(get.pass_item_name.local_absolute_path(item, typepath, ext))
     end,
-    not_userdata_or_fn_by_parsed_json = function(item, type)
-      return transf.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json("pass show " .. type .. "/" .. item)
+    not_userdata_or_fn_by_parsed_json = function(item, typepath)
+      return transf.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json("pass show " .. typepath .. "/" .. item)
     end,
     contact_json = function(item, type)
       return get.pass_item_name.not_userdata_or_fn_by_parsed_json(item, "contacts/" .. type)
     end,
     
+  },
+  auth_pass_item_name = {
+    str_or_nil_by_fetch_value = function(item, type)
+      return get.pass_item_name.str_or_nil_by_fetch_value(item, "p/" .. type)
+    end,
+    local_absolute_path = function(item, type, ext)
+      return get.pass_item_name.local_absolute_path(item, "p/" .. type, ext)
+    end,
+    bool_by_exists_as = function(item, type)
+      return get.pass_item_name.bool_by_exists_as(item, "p/" .. type)
+    end,
   },
   ["nil"] = {
     nth_arg_ret_fn = function(_, n)
@@ -974,19 +985,26 @@ get = {
     str_by_formatted_w_n_anys = string.format,
     str_by_repeated = get.str.str_by_repeated,
     str_arr_by_split_w_ascii_char = stringy.split,
+    str_arr_by_split_w_ascii_char_arr = function(str, sep_arr)
+      local split_first = get.str.str_arr_by_split_w_ascii_char(str, act.arr.pop(sep_arr))
+      for _, sep in transf.arr.pos_int_vt_stateless_iter(sep_arr) do
+        res = get.str_arr.str_arr_by_also_split_w_ascii_char(split_first, sep)
+      end
+      return res
+    end,
     not_empty_str_arr_by_split_w_ascii_char = function(str, sep)
-      return transf.str_arr.noemtpy_str_arr(
+      return transf.str_arr.not_empty_str_arr(
         transf.str.str_arr_split_single_char(str, sep)
       )
     end,
     str_arr_split_single_char_stripped = function(str, sep)
-      return transf.str_arr.stripped_str_arr(
+      return transf.str_arr.not_starting_o_ending_with_whitespace_str_arr(
         transf.str.split_single_char(str, sep)
       )
     end,
     str_arr_by_split_w_str = plstringx.split,
     str_arr_by_split_noempty = function(str, sep)
-      return transf.str_arr.noemtpy_str_arr(
+      return transf.str_arr.not_empty_str_arr(
         transf.str.str_arr_split(str, sep)
       )
     end,
@@ -1004,7 +1022,7 @@ get = {
     n_strs_by_split = function(str, sep, n)
       return transf.arr.n_anys(get.str.str_arr_by_split_w_str(str, sep, n))
     end,
-    two_strs_arr_split_or_nil = function(str, sep)
+    two_strs__arr_or_nil_by_split = function(str, sep)
       local arr = get.str.str_arr_by_split_w_str(str, sep, 2)
       if #arr ~= 2 then
         return nil
@@ -1440,11 +1458,11 @@ get = {
       return get.str_or_number_arr.str_by_joined(get.str.str_arr_groups_utf8_from_end(str, n), sep)
     end,
     number_or_nil = function(str,  base)
-      local nonindicated_number_str = transf.str.nonindicated_number_str(str)
+      local nonindicated_number_str = transf.str.nonindicated_number_str_by_clean(str)
       return get.nonindicated_number_str.number(nonindicated_number_str, base)
     end,
     int_by_rounded_or_nil = function(str, base)
-      local nonindicated_number_str = transf.str.nonindicated_number_str(str)
+      local nonindicated_number_str = transf.str.nonindicated_number_str_by_clean(str)
       return get.nonindicated_number_str.int_by_rounded_or_nil(nonindicated_number_str, base)
     end,
     two_integer_or_nils_by_onig_regex_match = onig.find,
@@ -1561,7 +1579,7 @@ get = {
     end,
     str_by_percent_encoded = function(str, as_path)
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
-      else return transf.str.encoded_query_param_value_by_folded(str) end
+      else return transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value_folded(str) end
     end,
     not_starting_o_ending_with_whitespace_str = stringy.strip
   },
@@ -1631,7 +1649,7 @@ get = {
     str_by_joined = table.concat,
   },
   str_arr = {
-    resplit_by_oldnew = function(arr, sep)
+    str_arr_by_resplit_oldnew_w_str = function(arr, sep)
       return get.str.str_arr_by_split_w_str(
         get.str_arr.str_joined(
           arr,
@@ -1640,7 +1658,7 @@ get = {
         sep
       )
     end,
-    resplit_by_new = function(arr, sep)
+    str_arr_by_resplit_new_w_str = function(arr, sep)
       return get.str.str_arr_by_split_w_str(
         get.str_arr.str_joined(
           arr,
@@ -1649,7 +1667,7 @@ get = {
         sep
       )
     end,
-    resplit_by_oldnew_single_char = function(arr, sep)
+    str_arr_by_resplit_oldnew_w_ascii_char = function(arr, sep)
       return get.str.str_arr_by_split_w_ascii_char(
         get.str_arr.str_joined(
           arr,
@@ -1658,7 +1676,7 @@ get = {
         sep
       )
     end,
-    resplit_by_oldnew_single_char_noempty = function(arr, sep)
+    not_empty_str_arr_by_resplit_oldnew_w_ascii_char = function(arr, sep)
       return get.str.not_empty_str_arr_by_split_w_ascii_char(
         get.str_arr.str_joined(
           arr,
@@ -1667,13 +1685,24 @@ get = {
         sep
       )
     end,
-    resplit_by_new_single_char = function(arr, sep)
+    str_arr_by_resplit_new_w_ascii_char = function(arr, sep)
       return get.str.str_arr_by_split_w_ascii_char(
         get.str_arr.str_joined(
           arr,
           ""
         ),
         sep
+      )
+    end,
+    str_arr_by_also_split_w_ascii_char = function(arr, sep)
+      return transf.arr_arr.arr_by_flatten(
+        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+          arr,
+          function(x)
+            return get.str.str_arr_by_split_w_ascii_char(x, sep)
+          end
+          )
+        )
       )
     end,
     pos_int_or_nil_by_first_match_nohashcomment_noindent_w_str = function(arr, str)
@@ -2666,8 +2695,8 @@ get = {
   event_table = {
     date_sequence_specifier = function(event_table, step, unit)
       return {
-        start = transf.event_table.start_date(event_table),
-        stop = transf.event_table.end_date(event_table),
+        start = transf.event_table.date_by_start(event_table),
+        stop = transf.event_table.date_by_end(event_table),
         step = step or 1,
         unit = unit or "sec"
       }
@@ -2699,11 +2728,11 @@ get = {
         return {}
       end
     end,
-    shell_var_name_key_str_value_assoc = function(node, prev_key, key)
+    snake_case_key_str_value_assoc = function(node, prev_key, key)
       local self_assoc = get.detailed_env_node.self_env_var_name_value_assoc(node, prev_key, key)
       local dependent_assoc
       if node.dependents then
-        dependent_assoc = get.detailed_env_node.shell_var_name_key_str_value_assoc(node.dependents, key)
+        dependent_assoc = get.detailed_env_node.snake_case_key_str_value_assoc(node.dependents, key)
       else
         dependent_assoc = {}
       end
@@ -2711,14 +2740,14 @@ get = {
     end,
   },
   env_var_name_env_node_assoc = {
-    shell_var_name_key_str_value_assoc = function(assoc, prev_key)
+    snake_case_key_str_value_assoc = function(assoc, prev_key)
       if prev_key then prev_key = prev_key .. "/" else prev_key = "" end
       local values = {}
       for key, value in transf.table.kt_vt_stateless_iter(assoc) do
         if is.any.str(value) then
           values[key] = prev_key .. value
         else
-          local subvalues = get.detailed_env_node.shell_var_name_key_str_value_assoc(value, prev_key, key)
+          local subvalues = get.detailed_env_node.snake_case_key_str_value_assoc(value, prev_key, key)
           values = transf.two_table_or_nils.table_by_take_new(values, subvalues)
         end
       end

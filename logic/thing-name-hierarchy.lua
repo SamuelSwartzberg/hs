@@ -3,7 +3,7 @@ thing_name_hierarchy = {
     two_anys = {
       two_numbers = "leaf",
       two_strs = {
-        shell_var_name_and_str = "leaf",
+        snake_case_and_str = "leaf",
       }
     },
     three_anys = {
@@ -19,8 +19,10 @@ thing_name_hierarchy = {
       empty_str = "leaf",
       json_str = "leaf",
       yaml_str = "leaf",
+      toml_str = "leaf",
       not_starting_with_whitespace_str = "leaf",
       not_ending_with_whitespace_str = "leaf",
+      not_starting_o_ending_with_whitespace_str = "leaf",
       not_empty_str = {
         utf8_char = "leaf",
         input_spec_str = "leaf",
@@ -326,7 +328,7 @@ thing_name_hierarchy = {
                       },
                       alphanum_minus_underscore = {
                         lower_alphanum_minus_underscore = {
-                          pass_item_name = {
+                          auth_pass_item_name = {
                             otp_pass_item_name = "leaf",
                             passw_pass_item_name = "leaf",
                             recovery_pass_item_name = "leaf",
@@ -334,6 +336,7 @@ thing_name_hierarchy = {
                             username_pass_item_name = "leaf",
                             login_pass_item_name = "leaf"
                           },
+                          cc_pass_item_name = "leaf"
                         },
                         package_manager_name = "leaf",
                         alphanum_minus = {
@@ -360,7 +363,19 @@ thing_name_hierarchy = {
                             year_month_day = "leaf",
                             digit_interval_str = "leaf",
                           },
-                          upper_alphanum_minus ="leaf"
+                          upper_alphanum_minus ="leaf",
+                          kebap_case = {
+                            strict_kebap_case = {
+                              upper_strict_kebap_case = "leaf",
+                              lower_strict_kebap_case = "leaf",
+                              mixed_strict_kebap_case = {
+                                camel_strict_kebap_case = {
+                                  upper_camel_strict_kebap_case = "leaf",
+                                  lower_camel_strict_kebap_case = "leaf",
+                                }
+                              }
+                            }
+                          }
                         },
                         alphanum_underscore = {
                           lower_alphanum_underscore = {
@@ -368,6 +383,18 @@ thing_name_hierarchy = {
                             search_engine_id = "leaf"
                           },
                           upper_alphanum_underscore = "leaf",
+                          snake_case = {
+                            strict_snake_case = {
+                              upper_strict_snake_case = "leaf",
+                              lower_strict_snake_case = "leaf",
+                              mixed_strict_snake_case = {
+                                camel_strict_snake_case = {
+                                  upper_camel_strict_snake_case = "leaf",
+                                  lower_camel_strict_snake_case = "leaf",
+                                }
+                              }
+                            }
+                          }
                         },
                         alphanum = {
                           alpha_str = {
@@ -387,6 +414,7 @@ thing_name_hierarchy = {
                             },
                             iso_3366_1_alpha_2_country_code = "leaf",
                             iso_3366_1_alpha_3_country_code = "leaf",
+                            mullvad_city_code = "leaf",
                           },
                           hex_str = {
                             byte_hex_str = "leaf",
@@ -400,10 +428,13 @@ thing_name_hierarchy = {
                           digit_str = {
                             bin_str = "leaf",
                             oct_str = "leaf",
+                            cleaned_payment_card_number = "leaf"
                           },
                           base32_gen_str = "leaf",
                           base32_crock_str = "leaf",
                           base32_str = "leaf",
+                          lower_camel_case = "leaf",
+                          upper_camel_case = "leaf",
                         },
                       }
                     },
@@ -648,7 +679,9 @@ thing_name_hierarchy = {
     userdata = {
       full_userdata = {
         window = "leaf",
-        running_application = "leaf"
+        running_application = "leaf",
+        hs_image = "leaf",
+        styledtext = "leaf",
       },
       light_userdata = "leaf"
     }
