@@ -616,6 +616,7 @@ thing_name_hierarchy = {
         contact_table = "leaf",
         ical_spec = "leaf",
         tree_node = "leaf",
+        role_content_message_spec = "leaf",
         val_dep_spec = "leaf",
         syn_specifier = "leaf",
         email_speciier = "leaf",

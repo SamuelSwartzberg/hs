@@ -321,7 +321,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
         request_str = json.encode(specifier.request_table)
         content_type = "application/json"
       elseif specifier.request_table_type == "form-urlencoded" then
-        request_str = transf.assoc.url_params(specifier.request_table)
+        request_str = transf.assoc.query_str(specifier.request_table)
         content_type = "application/x-www-form-urlencoded"
       end
       dothis.arr.push(curl_command, "-d")

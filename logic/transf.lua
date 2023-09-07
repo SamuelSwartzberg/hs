@@ -3723,6 +3723,19 @@ transf = {
     line_by_folded = function(str)
       return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "[\n\r\v\f]", " ")
     end,
+    trimmed_line_by_folded = function(str)
+      return transf.str.not_starting_o_ending_with_whitespace_str(transf.str.line_by_folded(str))
+    end,
+    not_empty_str_by_default = function (str)
+      if #str == 0 then
+        return "default"
+      else
+        return str
+      end
+    end,
+    noempty_trimmed_line_by_folded_or_default = function(str)
+      return transf.str.not_empty_str_by_default(transf.str.trimmed_line_by_folded(str))
+    end,
     line_by_all_whitespace_collapsed = function(str)
       return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", " ")
     end,
@@ -4297,38 +4310,85 @@ transf = {
     bool_by_or = function(a, b)
       return a or b
     end,
-    t_by_first = function(key, value)
-      return key
+    t_by_first = function(a, b)
+      return a
     end,
-    t_by_second = function(key, value)
-      return value
+    t_by_second = function(a, b)
+      return b
     end,    
-    str_by_assoc_entry = function(key, value)
-      return "[" .. transf.any.str_by_replicable(key) .. "] = " .. transf.any.str_by_replicable(value)
+    str_by_assoc_entry = function(a, b)
+      return "[" .. transf.any.str_by_replicable(a) .. "] = " .. transf.any.str_by_replicable(b)
     end,
-  },
-  two_noempty_lines = {
-    ini_kv_line = function(l1, l2)
-      return l1 .. " = " .. l2
+    query_mapping = function(a,b)
+      local s1 = transf.any.str_by_replicable(a)
+      local s2 = transf.any.str_by_replicable(b)
+      return 
+        transf.two_strs.query_mapping(s1, s2)
     end,
-    curl_form_field_args = function(key, value)
-      return {
-        "-F",
-        key .. "=" .. value,
-      }
+    decoded_email_header_line = function(a, b)
+      local s1 = transf.any.str_by_replicable(a)
+      local s2 = transf.any.str_by_replicable(b)
+      return 
+        transf.two_strs.decoded_email_header_line(s1, s2)
+    end,
+    curl_form_field_args = function(a, b)
+      local s1 = transf.any.str_by_replicable(a)
+      local s2 = transf.any.str_by_replicable(b)
+      return 
+        transf.two_strs.curl_form_field_args(s1, s2)
+    end,
+    ini_kv_line = function(a, b)
+      local s1 = transf.any.str_by_replicable(a)
+      local s2 = transf.any.str_by_replicable(b)
+      return 
+        transf.two_strs.ini_kv_line(s1, s2)
     end,
   },
   two_strs = {
-    query_mapping = function(key, value)
+    query_mapping = function(s1, s2)
       return
-        transf.str.urlcharset_str_by_encoded_query_param_value(key) ..
+        transf.str.urlcharset_str_by_encoded_query_param_value(s1) ..
         "=" ..
-        transf.str.urlcharset_str_by_encoded_query_param_value(value)
-    end
+        transf.str.urlcharset_str_by_encoded_query_param_value(s2)
+    end,
+    decoded_email_header_line = function(s1, s2)
+      local l1 = transf.str.noempty_trimmed_line_by_folded_or_default(s1)
+      local l2 = transf.str.line_by_folded(s2)
+      return transf.noempty_trimmed_line_and_line.decoded_email_header_line(l1, l2)
+    end,
+    curl_form_field_args = function(s1, s2)
+      return {
+        "-F",
+        s1 .. "=" .. s2,
+      }
+    end,
+    ini_kv_line = function(s1, s2)
+      -- while trimming isn't necessary for ini, since the whitespace will be ignored, it's still a good idea to trim it
+      local l1 = transf.str.noempty_trimmed_line_by_folded_or_default(s1)
+      local l2 = transf.str.line_by_folded(s2)
+      return transf.noempty_trimmed_line_and_line.ini_kv_line(l1, l2)
+    end,
   },
   noempty_trimmed_line_and_line = {
     decoded_email_header_line = function(l1, l2)
       return transf.str.str_by_first_eutf8_upper(l1) .. ": " .. l2
+    end,
+    ini_kv_line = function(l1, l2)
+      return l1 .. " = " .. l2
+    end,
+  },
+  str_key_str_value_assoc = {
+    ini_kv_line_arr = function(str_key_str_value_assoc)
+      return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        str_key_str_value_assoc,
+        transf.two_strs.ini_kv_line
+      )
+    end,
+    ini_section_contents_str = function(str_key_str_value_assoc)
+      return get.str_or_number_arr.str_by_joined(
+        transf.str_key_str_value_assoc.ini_kv_line_arr(str_key_str_value_assoc),
+        "\n"
+      )
     end,
   },
   two_comparables = {
@@ -4540,7 +4600,7 @@ transf = {
       return res
     end,
     assoc_by_zip_stop_shortest = function(arr1, arr2)
-      return transf.two_anys__arr.assoc(
+      return transf.two_anys__arr_arr.assoc(
         transf.two_arrs.two_ts__arr_arr_by_zip_stop_shortest(arr1, arr2)
       )
     end,
@@ -4847,19 +4907,20 @@ transf = {
       )
     end,
     local_nonabsolute_path_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
-      return get.table.str_by_joined_key_any_value_assoc(
+      return get.table.str_key_assoc_by_joined(
         t,
         is.table.only_int_key_table,
         "/"
       )
     end,
-    dot_notation_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
-      return get.table.str_by_joined_key_any_value_assoc(
+    str_key_assoc_by_joined_dot_notation_primitive_and_arrlike_is_leaf = function(t)
+      return get.table.str_key_assoc_by_joined(
         t,
         is.table.only_int_key_table,
         "."
       )
     end,
+    
     arr_by_nested_final_key_label_by_primitive_and_arrlike_is_leaf = function(t)
       return transf.arr_arr.arr_by_map_to_last(
         get.table.arr_arr_by_key_label(
@@ -4888,14 +4949,14 @@ transf = {
     int_by_length = function(t)
       return #transf.table.two_anys__arr(t)
     end,
-    url_param_arr = function(t)
+    query_mapping_arr = function(t)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
-        transf.two_anys.url_param
+        transf.two_anys.query_mapping
       )
     end,
-    url_params = function(t)
-      return get.str_or_number_arr.str_by_joined(transf.assoc.url_param_arr(t), "&")
+    query_str = function(t)
+      return get.str_or_number_arr.str_by_joined(transf.assoc.query_mapping_arr(t), "&")
     end,
     --- @param t { [str]: str }
     --- @return str
@@ -4905,7 +4966,7 @@ transf = {
       for _, header_name in transf.arr.pos_int_vt_stateless_iter(initial_headers) do
         local header_value = t[header_name]
         if header_value then
-          dothis.arr.insert_at_index(header_lines, transf.two_anys__arr.email_header({header_name, header_value}))
+          dothis.arr.insert_at_index(header_lines, transf.two_anys.decoded_email_header_line(header_name, header_value))
           t[header_name] = nil
         end
       end
@@ -4933,40 +4994,44 @@ transf = {
         transf.two_anys.str_by_assoc_entry
       )
     end,
-    contents_summary = function(t)
+    str_by_summary = function(t)
       return transf.str_arr.str_by_summary(
         transf.assoc.assoc_entry_str_arr(t)
       )
     end,
-    summary = function(t)
-      return "assoc (" .. transf.assoc.int_by_length(t) .. "): " .. transf.assoc.contents_summary(t)
+    str_by_indicated_summary = function(t)
+      return "assoc (" .. transf.assoc.int_by_length(t) .. "): " .. transf.assoc.str_by_summary(t)
     end,
-    assoc_entry_multiline_str = function(t)
+    str_by_line_summary = function(t)
       return get.str_or_number_arr.str_by_joined(transf.assoc.assoc_entry_str_arr(t), "\n")
     end,
-    truthy_value_assoc = function(t)
-      return get.arr.arr_by_filtered(
+    kt_key_vt_value_assoc_by_truthy_values = function(t)
+      return get.assoc.assoc_by_filtered_w_vt_fn(
         t,
         transf.any.bool
       )
     end,
-    truthy_value_key_arr = function(t)
-      return transf.table_or_nil.kt_arr(transf.assoc.truthy_value_assoc(t))
+    kt_arr_by_truthy_values = function(t)
+      return transf.table_or_nil.kt_arr(transf.assoc.kt_key_vt_value_assoc_by_truthy_values(t))
     end,
-  },
-  noempty_line_key_value_assoc = {
     ini_kv_line_arr = function(t)
-      return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(t, transf.two_noempty_lines.ini_kv_line)
+      return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        t,
+        transf.two_anys.ini_kv_line
+      )
     end,
     ini_section_contents_str = function(t)
-      return get.str_or_number_arr.str_by_joined(transf.assoc.ini_line_arr(t), "\n")
+      return get.str_or_number_arr.str_by_joined(
+        transf.assoc.ini_kv_line_arr(t),
+        "\n"
+      )
     end,
   },
   table_arr = {
     table_by_take_new = function(t)
       local res = {}
-      for _, assoc in transf.arr.pos_int_vt_stateless_iter(t) do
-        for k, v in transf.table.stateless_key_value_iter(assoc) do
+      for _, tbl in transf.arr.pos_int_vt_stateless_iter(t) do
+        for k, v in transf.table.stateless_key_value_iter(tbl) do
           res[k] = v
         end
       end
@@ -4974,8 +5039,8 @@ transf = {
     end,
     table_by_take_old = function(t)
       local res = {}
-      for _, assoc in transf.arr.pos_int_vt_stateless_iter(t) do
-        for k, v in transf.table.stateless_key_value_iter(assoc) do
+      for _, tbl in transf.arr.pos_int_vt_stateless_iter(t) do
+        for k, v in transf.table.stateless_key_value_iter(tbl) do
           if not res[k] then
             res[k] = v
           end
@@ -5015,7 +5080,7 @@ transf = {
     end,
   },
   str_key_assoc = {
-    str_key_assoc_of_str_key_assocs_or_prev_values_by_space = function(tbl)
+    str_key_str_or_assoc_assoc_by_split_space = function(tbl)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(tbl) do
         local key_parts = get.str.str_arr_by_split_w_ascii_char(k, " ")
@@ -5031,17 +5096,14 @@ transf = {
       return res
     end,
   },
-  str_key_value_assoc = {
-
-  },
-  str_bool_assoc = {
-    truthy_long_flag_arr = function(assoc)
+  str_key_bool_value_assoc = {
+    str_arr_by_long_flags_for_truthies = function(assoc)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.assoc.truthy_value_key_arr(assoc),
+        transf.assoc.kt_arr_by_truthy_values(assoc),
         transf.str.str_by_long_flag
       )
     end,
-    truthy_long_flag_str = function(assoc)
+    str_by_long_flags_for_truthies = function(assoc)
       return get.str_or_number_arr.str_by_joined(transf.assoc.truthy_long_flag_arr(assoc), " ")
     end,
   },
@@ -5091,7 +5153,7 @@ transf = {
       return transf.arr_by_reversed.arr(reversed_res)
     end,
   },
-  two_anys__arr = {
+  two_anys__arr_arr = {
     assoc = function(arr)
       local res = {}
       for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
@@ -5100,9 +5162,9 @@ transf = {
       return res
     end,
   },
-  two_strs_arr_arr = {
+  two_strs__arr_arr = {
     
-    n_shot_role_content_message_spec_arr = function(arr)
+    role_content_message_spec_arr_by_alternating_user_assistant = function(arr)
       local res = {}
       for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
         dothis.arr.push(res, {
@@ -5117,39 +5179,53 @@ transf = {
       return res
     end
   },
-  assoc_of_str_value_assocs = {
+  noempty_line_and_assoc = {
+    ini_section_str = function(l,assoc)
+      return "[" .. l .. "]\n" .. transf.assoc.ini_section_contents_str(assoc)
+    end
+  },
+  str_and_assoc = {
+    ini_section_str = function(l,assoc)
+      return transf.noempty_line_and_assoc.ini_section_str(
+        transf.str.noempty_trimmed_line_by_folded_or_default(l), assoc
+      )
+    end
+  },
+  any_and_assoc = {
+    ini_section_str = function(l,assoc)
+      return transf.str_and_assoc.ini_section_str(
+        transf.any.str_by_replicable(l), assoc
+      )
+    end
+  }, 
+  assoc_value_assoc = {
     ini_str = function(t)
       return get.str_or_number_arr.str_by_joined(get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
-        function(k,v)
-          return "[" .. k .. "]\n" .. transf.assoc.ini_str(v)
-        end
+        transf.any_and_assoc.ini_section_str
       ), "\n\n")
     end,
   },
-  assoc_of_assocs = {
-    assoc_by_space = function(assoc_of_assocs)
+  noempty_trimmed_line_key_noempty_trimmed_line_key_assoc_value_assoc_value_assoc = {
+    noempty_trimmed_line_key_assoc_value_assoc = function(t)
       local res = {}
-      for label, assoc in transf.table.stateless_key_value_iter(assoc_of_assocs) do
+      for label, assoc in transf.table.stateless_key_value_iter(t) do
         for k, v in transf.table.stateless_key_value_iter(assoc) do
           res[label .. " " .. k] = v
         end
       end
       return res
     end,
-
   },
+  
   arr_value_assoc = {
-    arr_arr = function(arr)
-      return transf.table.vt_arr(arr)
-    end,
-    arr_by_flatten = function(arr)
+    t_arr_by_flatten = function(arr)
       return transf.arr_arr.arr_by_flatten(transf.table.vt_arr(arr))
     end,
         
   },
   timestamp_ms_key_assoc_value_assoc = {
-    nonabsolute_path_key_timestamp_ms_key_assoc_value_assoc_by_ymd = function(timestamp_key_table)
+    local_nonabsolute_path_key_timestamp_ms_key_assoc_value_assoc_by_ymd = function(timestamp_key_table)
       local tbl = {}
       for timestamp_ms, assoc in transf.table.kt_vt_stateless_iter(timestamp_key_table) do
         local ymd = os.date("%Y/%Y-%m/%Y-%m-%d", timestamp_ms/1000)
@@ -5207,7 +5283,7 @@ transf = {
       local local_name = specifier.name .. "_local"
       local remote_name = specifier.name .. "_remote"
       return {
-        two_anys__arr = {
+        pair = {
           [specifier.name] = {
             a = local_name,
             b = remote_name,
@@ -5231,8 +5307,8 @@ transf = {
       }         
     end,
     ini_str = function(specifier)
-      return transf.assoc_of_str_value_assocs.ini_str(
-        transf.assoc_of_assocs.assoc_by_space(
+      return transf.assoc_value_assoc.ini_str(
+        transf.noempty_trimmed_line_key_noempty_trimmed_line_key_assoc_value_assoc_value_assoc.noempty_trimmed_line_key_assoc_value_assoc(
           transf.vdirsyncer_pair_specifier.assoc_of_assocs(specifier)
         )
       )
@@ -5256,7 +5332,7 @@ transf = {
       end     
       if comps.params then
         if is.any.table(comps.params) then
-          url = url .. "?" .. transf.assoc.url_params(comps.params)
+          url = url .. "?" .. transf.assoc.query_str(comps.params)
         else
           url = url .. get.str.with_prefix_str(comps.params, "?")
         end
@@ -6626,7 +6702,7 @@ transf = {
       return env.XDG_STATE_HOME .. "/vdirsyncer/" .. transf.url.str_by_webcal_name(url)
     end,
     ini_str_by_khal_config_section = function(url)
-      return transf.assoc_of_str_value_assocs.ini_str({
+      return transf.assoc_value_assoc.ini_str({
         ["[ro:".. transf.url.alphanum_minus_or_nil_by_sld(url) .. "]"] = {
           path = transf.url.absolute_path_by_webcal_storage_location(url),
           priority = 0,
@@ -7249,7 +7325,7 @@ transf = {
       return transf.str.bool_by_evaled_env_bash_success("pgrep -x rec")
     end,
     pandoc_full_md_extension_set = function()
-      return transf.arr_value_assoc.arr_by_flatten(
+      return transf.arr_value_assoc.t_arr_by_flatten(
         ls.markdown_extensions
       )
     end,
@@ -7695,7 +7771,7 @@ transf = {
       )
     end,
     flags_str = function(stream_creation_specifier)
-      return transf.str_bool_assoc.truthy_long_flag_str(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
+      return transf.str_key_bool_value_assoc.str_by_long_flags_for_truthies(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
     end,
     source_path = function(stream_created_item_specifier)
       return stream_created_item_specifier.source_path
@@ -8363,7 +8439,7 @@ transf = {
               content = "If you are unable to fulfill the request, return 'IMPOSSIBLE'."
             }
           },
-          transf.two_strs_arr_arr.n_shot_role_content_message_spec_arr(spec.shots), 
+          transf.two_strs__arr_arr.role_content_message_spec_arr_by_alternating_user_assistant(spec.shots), 
           {
             {
               role = "user",

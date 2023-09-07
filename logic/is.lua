@@ -1980,6 +1980,9 @@ is = {
     ical_spec = function(t)
       return t.VCALENDAR
     end,
+    role_content_message_spec = function(t)
+      return t.role and t.content
+    end,
     tree_node = function(t)
       return t.children and t.label
     end,

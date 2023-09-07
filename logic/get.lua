@@ -369,8 +369,8 @@ get = {
         return get.table.arr_or_nil_by_find_key_path(start_tbl, stop)
       end
     end,
-    str_by_joined_key_any_value_assoc = function(t, table_arg_bool_by_is_leaf_ret_fn, joiner)
-      return get.arr_arr.str_by_joined_key_any_value_assoc(
+    str_key_assoc_by_joined = function(t, table_arg_bool_by_is_leaf_ret_fn, joiner)
+      return get.arr_arr.str_key_t_value_assoc(
         get.table.arr_arr_by_label_root_to_leaf(t, table_arg_bool_by_is_leaf_ret_fn),
         joiner
       )
@@ -475,7 +475,7 @@ get = {
       )
     end,
     assoc_by_filtered_w_kt_vt_fn = function(t, fn)
-      return transf.two_anys__arr.assoc(
+      return transf.two_anys__arr_arr.assoc(
         get.arr.arr_by_filtered(
           transf.table.two_anys__arr(t),
           function(two_anys__arr)
@@ -772,7 +772,7 @@ get = {
         joiner
       )
     end,
-    str_by_joined_any_pair = function(arr, joiner)
+    str_and_t_by_joined = function(arr, joiner)
       local any = act.arr.pop(arr)
       local str = get.str_or_number_arr.str_by_joined(arr, joiner)
       return { str, any }
@@ -2587,15 +2587,15 @@ get = {
         end
       )
     end,
-    str_by_joined_any_pair_arr = function(arr, joiner)
+    str_and_t__arr_arr_by_joined = function(arr, joiner)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.n_str_or_number_any_arr.str_by_joined_any_pair, {a_use, joiner})
+        get.fn.arbitrary_args_bound_or_ignored_fn(get.arr.str_and_t_by_joined, {a_use, joiner})
       )
     end,
-    str_by_joined_key_any_value_assoc = function(arr, joiner)
-      return transf.two_anys__arr.assoc(
-        get.n_str_or_number_any_arr_arr.str_by_joined_any_pair_arr(arr, joiner)
+    str_key_t_value_assoc = function(arr, joiner)
+      return transf.two_anys__arr_arr.assoc(
+        get.arr_arr.str_and_t__arr_arr_by_joined(arr, joiner)
       )
     end,
     assoc_arr_by_arr = function(arr_arr, arr2)
