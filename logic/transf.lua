@@ -2018,7 +2018,7 @@ transf = {
   },
   package_name_semver_compound_str = {
     package_name_and_semver_str__arr = function(str)
-      return get.str.str_arr_split_noedge(str, "@")
+      return get.str.str_arr_by_split_noedge(str, "@")
     end,
     package_name = function(str)
       return transf.package_name_semver_compound_str.package_name_and_semver_str__arr(str)[1]
@@ -2029,7 +2029,7 @@ transf = {
   },
   package_name_semver_package_manager_name_compound_str = {
     package_name_semver_compound_str = function(str)
-      return get.str.str_arr_split_noedge(str, ":")[1]
+      return get.str.str_arr_by_split_noedge(str, ":")[1]
     end,
     package_name = function(str)
       return transf.package_name_semver_compound_str.package_name(
@@ -2042,15 +2042,15 @@ transf = {
       )
     end,
     package_manager_name = function(str)
-      return get.str.str_arr_split_noedge(str, ":")[2]
+      return get.str.str_arr_by_split_noedge(str, ":")[2]
     end,
   },
   package_name_package_manager_name_compound_str = {
     package_name = function(str)
-      return get.str.str_arr_split_noedge(str, ":")[1]
+      return get.str.str_arr_by_split_noedge(str, ":")[1]
     end,
     package_manager_name = function(str)
-      return get.str.str_arr_split_noedge(str, ":")[2]
+      return get.str.str_arr_by_split_noedge(str, ":")[2]
     end,
   },
   dice_notation = {
@@ -3396,7 +3396,7 @@ transf = {
         "synonym" .. transf.str.str_by_single_quoted_escaped(str)
       )
     end,
-    title_case_policy = function(word)
+    str_by_title_case_policy = function(word)
       if get.arr.bool_by_contains(ls.small_words, word) then
         return word
       elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
@@ -3405,22 +3405,16 @@ transf = {
         return transf.str.str_by_first_eutf8_upper(word)
       end
     end,
-    long_flag = function(word)
+    str_by_long_flag = function(word)
       return "--" .. word
     end,
     synonym_str_arr = function(str)
       local items = get.str.str_arr_by_split_w_ascii_char(transf.str.str_or_nil_by_raw_av_output(str), "\t")
       items = get.arr.arr_by_filtered(items, function(itm)
-        if itm == nil then
-          return false
-        end
         itm = transf.str.not_starting_o_ending_with_whitespace_str(itm)
         return #itm > 0
       end)
       return items
-    end,
-    consonants = function(str)
-      error("todo")
     end,
     str_by_env_getter_comamnds_prepended = function(str)
       return get.str.str_by_formatted_w_n_anys(
@@ -3726,7 +3720,7 @@ transf = {
     end,
     str_by_title_case = function(str)
       local words, removed = get.str.two_str_arrs_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
-      local title_cased_words = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(words, transf.str.title_case_policy)
+      local title_cased_words = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(words, transf.str.str_by_title_case_policy)
       title_cased_words[1] = transf.str.str_by_first_eutf8_upper(title_cased_words[1])
       title_cased_words[#title_cased_words] = transf.str.str_by_first_eutf8_upper(title_cased_words[#title_cased_words])
       local arr = transf.two_arrs.arr_by_interleaved_stop_a1(title_cased_words, removed)
@@ -4254,7 +4248,7 @@ transf = {
       return get.str_or_number_arr.str_by_joined(trimmed_lines, "\n")
     end,
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_str_arr_value_assoc_value_assoc = function(raw)
-      local raw_countries = get.str.str_arr_split_noempty(raw, "\n\n")
+      local raw_countries = get.str.str_arr_by_split_noempty(raw, "\n\n")
       local countries = {}
       for _, raw_country in transf.arr.pos_int_vt_stateless_iter(raw_countries) do
         local raw_country_lines = get.str.not_empty_str_arr_by_split_w_ascii_char(raw_country, "\n")
@@ -4282,7 +4276,7 @@ transf = {
   },
   multirecord_str = {
     record_str_arr = function(str)
-      return get.str.str_arr_split_noempty(
+      return get.str.str_arr_by_split_noempty(
         str,
         fixedstr.unique_record_separator
       )
@@ -5118,7 +5112,7 @@ transf = {
     truthy_long_flag_arr = function(assoc)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.assoc.truthy_value_key_arr(assoc),
-        transf.str.long_flag
+        transf.str.str_by_long_flag
       )
     end,
     truthy_long_flag_str = function(assoc)

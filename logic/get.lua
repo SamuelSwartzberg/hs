@@ -985,13 +985,13 @@ get = {
       )
     end,
     str_arr_by_split_w_str = plstringx.split,
-    str_arr_split_noempty = function(str, sep)
+    str_arr_by_split_noempty = function(str, sep)
       return transf.str_arr.noemtpy_str_arr(
         transf.str.str_arr_split(str, sep)
       )
     end,
     --- don't split on the edge of the str, i.e. don't return empty strs at the start or end
-    str_arr_split_noedge = function(str, sep)
+    str_arr_by_split_noedge = function(str, sep)
       local res = transf.str.str_arr_split(str, sep)
       if res[1] == "" then
         act.arr.shift(res)
@@ -1517,7 +1517,7 @@ get = {
       local final_metadata, final_contents
       if get.str.bool_by_startswith(stripped_str, "---") then
         -- splice in the metadata
-        local parts = get.str.str_arr_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
+        local parts = get.str.str_arr_by_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
         local extant_metadata = act.arr.shift(parts)
         final_metadata = extant_metadata .. "\n" .. transf.not_userdata_or_str.yaml_str(tbl)
         final_contents = get.str_or_number_arr.str_by_joined(parts)
