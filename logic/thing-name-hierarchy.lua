@@ -466,9 +466,16 @@ thing_name_hierarchy = {
                         gelbooru_url = "leaf",
                       },
                       youtube_url = {
-                        youtube_video_url = "leaf",
-                        youtube_playlist_url = "leaf",
-                        youtube_playable_url = "leaf"
+                        youtube_path_url = {
+                          youtube_video_url = "leaf",
+                          youtube_playlist_url = "leaf",
+                          youtube_playable_url = "leaf",
+                          youtube_channel_url = "leaf",
+                          youtube_video_feed_url = {
+                            youtube_channel_video_feed_url = "leaf",
+                            youtube_playlist_video_feed_url = "leaf",
+                          }
+                        }
                       }
                     }
                   },
@@ -577,7 +584,13 @@ thing_name_hierarchy = {
             suffix_dcmp_spec = "leaf",
           }
         },
-        str_format_part_specifier = "leaf"
+        str_format_part_specifier = "leaf",
+        youtube_api_item = {
+          youtube_video_item = "leaf",
+          youtube_playlist_item = "leaf",
+          youtube_caption_item = "leaf",
+          youtube_channel_item = "leaf",
+        }
       }
     },
     primitive = {

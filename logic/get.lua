@@ -3171,9 +3171,9 @@ get = {
     get_extracted_attr_assoc_via_ai = function(video_id, do_after)
       return get.form_filling_specifier.filled_str_assoc({
         in_fields = {
-          title = transf.youtube_video_id.str_by_title(video_id),
-          channel_title = transf.youtube_video_id.str_by_channel_title(video_id),
-          description = get.str.str_by_shortened_start_ellipsis(transf.youtube_video_id.description(video_id)),
+          title = transf.youtube_video_id.line_by_title(video_id),
+          channel_title = transf.youtube_video_id.line_by_channel_title(video_id),
+          description = get.str.str_by_shortened_start_ellipsis(transf.youtube_video_id.str_by_description(video_id)),
         },
         form_field_specifier_arr = {
           {

@@ -664,7 +664,7 @@ is = {
   },
   actual_youtube_video_id = {
     extant_youtube_video_id = function(id)
-      return get.arr.bool_by_contains(ls.youtube.extant_upload_status, transf.youtube_video_id.upload_status(id))
+      return get.arr.bool_by_contains(ls.youtube.extant_upload_status, transf.youtube_video_id.youtube_upload_status(id))
     end,
     private_youtube_video_id = function(id)
       return transf.youtube_video_id.privacy_status(id) == "private"
@@ -1254,6 +1254,12 @@ is = {
     iso_3166_1_alpha_3_country_code = function(str)
       return #str == 3
     end,
+    youtube_upload_status = function(str)
+      return get.arr.bool_by_contains(ls.youtube_upload_status, str)
+    end,
+    youtube_privacy_status = function(str)
+      return get.arr.bool_by_contains(ls.youtube_privacy_status, str)
+    end,
   },
   lower_alpha_str = {
     fs_attr_name = function(str)
@@ -1451,14 +1457,35 @@ is = {
     end,
   },
   youtube_url = {
+    youtube_path_url = function(url)
+      return is.url.path_url(url)
+    end,
+  },
+  youtube_path_url = {
     youtube_video_url = function(url)
       return transf.path_url.initial_path_component(url) == "watch"
     end,
     youtube_playlist_url = function(url)
       return transf.path_url.initial_path_component(url) == "playlist"
     end,
+    youtube_channel_url = function(url)
+      return transf.path_url.initial_path_component(url) == "channel"
+    end,
     youtube_playable_url = function(url)
       return is.youtube_url.youtube_video_url(url) or is.youtube_url.youtube_playlist_url(url)
+    end,
+    youtube_video_feed_url = function(url)
+      return transf.url.local_absolute_path_or_nil_by_path(url) = "/feed/videos.xml"
+    end,
+  },
+  youtube_video_feed_url ={
+    youtube_channel_video_feed_url = function (url)
+      local params = transf.url.str_key_str_value_assoc_by_decoded_param_table(url)
+      return params.channel_id ~= nil
+    end,
+    youtube_playlist_video_feed_url = function (url)
+      local params = transf.url.str_key_str_value_assoc_by_decoded_param_table(url)
+      return params.playlist_id ~= nil
     end,
   },
   data_url = {
@@ -1834,7 +1861,25 @@ is = {
     address_table = function(t)
       return t.contact or t.Box or t.Extended or t.Street or t.Code or t.City or t.Region or t.Country
     end,
+    youtube_api_item = function(t)
+      return t.kind
+    end,
 
+  },
+
+  youtube_api_item = {
+    youtube_video_item = function(t)
+      return t.kind  == "youtube#video"
+    end,
+    youtube_caption_item = function(t)
+      return t.kind  == "youtube#caption"
+    end,
+    youtube_playlist_item = function(t)
+      return t.kind  == "youtube#playlist"
+    end,
+    youtube_channel_item = function(t)
+      return t.kind  == "youtube#channel"
+    end,
   },
   dcmp_spec = {
     full_dcmp_spec = function(t)

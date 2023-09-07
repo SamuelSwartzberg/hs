@@ -3106,30 +3106,39 @@ transf = {
     line_by_city = function(single_address_table)
       return transf.str_or_nil.line_or_nil_by_folded(single_address_table.City)
     end,
-    str_by_postal_code_city = function(single_address_table)
-      return 
-        transf.address_table.line_by_postal_code(single_address_table) .. " " ..
-        transf.address_table.line_by_city(single_address_table)
+    line_by_postal_code_city = function(single_address_table)
+      return get.str_or_number_arr.str_by_joined(
+        transf.hole_y_arrlike.arr({
+          transf.address_table.line_by_postal_code(single_address_table),
+          transf.address_table.line_by_city(single_address_table)
+        }),
+        " "
+      )
     end,
-    region_country_line = function(single_address_table)
+    line_by_region_country = function(single_address_table)
       return 
-        transf.address_table.line_by_region(single_address_table) .. ", " ..
-        transf.address_table.country_identifier(single_address_table)
+        get.str_or_number_arr.str_by_joined(
+          transf.hole_y_arrlike.arr({
+            transf.address_table.line_by_region(single_address_table),
+            transf.address_table.country_identifier_str(single_address_table)
+          }),
+          ", "
+        )
     end,
-    addressee_arr = function(single_address_table)
+    line_arr_by_addressee = function(single_address_table)
       return transf.hole_y_arrlike.arr({
         transf.contact_table.line_by_main_name(single_address_table.contact),
         transf.address_table.line_by_extended(single_address_table)
       })
     end,
-    in_country_location_arr = function(single_address_table)
+    line_arr_by_in_country_location = function(single_address_table)
       return transf.hole_y_arrlike.arr({
         transf.address_table.line_by_street(single_address_table),
         transf.address_table.line_by_postal_code(single_address_table),
         transf.address_table.line_by_city(single_address_table),
       })
     end,
-    international_location_arr = function(single_address_table)
+    line_arr_by_international_location = function(single_address_table)
       return transf.hole_y_arrlike.arr({
         transf.address_table.line_by_street(single_address_table),
         transf.address_table.line_by_postal_code(single_address_table),
@@ -3138,50 +3147,50 @@ transf = {
         transf.address_table.country_identifier(single_address_table),
       })
     end,
-    relevant_location_arr = function(single_address_table)
+    line_arr_by_relevant_location = function(single_address_table)
       if transf.address_table.iso_3366_1_alpha_2_country_code(single_address_table) == "de" then
-        return transf.address_table.in_country_location_arr(single_address_table)
+        return transf.address_table.line_arr_by_in_country_location(single_address_table)
       else
-        return transf.address_table.international_location_arr(single_address_table)
+        return transf.address_table.line_arr_by_international_location(single_address_table)
       end
     end,
-    in_country_address_arr = function(single_address_table)
+    line_arry_by_country_address = function(single_address_table)
       return transf.two_arrs.arr_by_appended(
-        transf.address_table.addressee_arr(single_address_table),
-        transf.address_table.in_country_location_arr(single_address_table)
+        transf.address_table.line_arr_by_addressee(single_address_table),
+        transf.address_table.line_arr_by_in_country_location(single_address_table)
       )
     end,
-    international_address_arr = function(single_address_table)
+    line_arr_by_international_address = function(single_address_table)
       return transf.two_arrs.arr_by_appended(
-        transf.address_table.addressee_arr(single_address_table),
-        transf.address_table.international_location_arr(single_address_table)
+        transf.address_table.line_arr_by_addressee(single_address_table),
+        transf.address_table.line_arr_by_international_location(single_address_table)
       )
     end,
-    relevant_address_arr = function(single_address_table)
+    line_arr_by_relevant_address = function(single_address_table)
       if transf.address_table.iso_3366_1_alpha_2_country_code(single_address_table) == "de" then
-        return transf.address_table.in_country_address_arr(single_address_table)
+        return transf.address_table.line_arry_by_country_address(single_address_table)
       else
-        return transf.address_table.international_address_arr(single_address_table)
+        return transf.address_table.line_arr_by_international_address(single_address_table)
       end
     end,
-    in_country_address_label = function(single_address_table)
+    multiline_str_by_in_country_address_label = function(single_address_table)
       return 
-        get.str_or_number_arr.str_by_joined(transf.address_table.addressee_arr(single_address_table), "\n") .. "\n" ..
+        get.str_or_number_arr.str_by_joined(transf.address_table.line_arr_by_addressee(single_address_table), "\n") .. "\n" ..
         transf.address_table.line_by_street(single_address_table) .. "\n" ..
-        transf.address_table.str_by_postal_code_city(single_address_table)
+        transf.address_table.line_by_postal_code_city(single_address_table)
     end,
-    international_address_label = function(single_address_table)
+    multiline_str_by_international_address_label = function(single_address_table)
       return 
-        get.str_or_number_arr.str_by_joined(transf.address_table.addressee_arr(single_address_table), "\n") .. "\n" ..
+        get.str_or_number_arr.str_by_joined(transf.address_table.line_arr_by_addressee(single_address_table), "\n") .. "\n" ..
         transf.address_table.line_by_street(single_address_table) .. "\n" ..
-        transf.address_table.str_by_postal_code_city(single_address_table) .. "\n" ..
-        transf.address_table.region_country_line(single_address_table)
+        transf.address_table.line_by_postal_code_city(single_address_table) .. "\n" ..
+        transf.address_table.line_by_region_country(single_address_table)
     end,
     multiline_str_by_relevant_address_label = function(single_address_table)
       if transf.address_table.iso_3366_1_alpha_2_country_code(single_address_table) == "de" then
-        return transf.address_table.in_country_address_label(single_address_table)
+        return transf.address_table.multiline_str_by_in_country_address_label(single_address_table)
       else
-        return transf.address_table.international_address_label(single_address_table)
+        return transf.address_table.multiline_str_by_international_address_label(single_address_table)
       end
     end,
 
@@ -3197,38 +3206,28 @@ transf = {
         },
       }).items[1]
     end,
-    str_by_title = function(id)
+    line_by_title = function(id)
       return transf.youtube_video_id.youtube_video_item(id).snippet.title
     end,
-    str_by_cleaned_title = function(id)
-      return transf.str.str_by_cleaned_youtube_video_title(
-        transf.youtube_video_id.str_by_title(id)
-      )
-    end,
-    str_by_channel_title = function(id)
+    line_by_channel_title = function(id)
       return transf.youtube_video_id.youtube_video_item(id).snippet.channelTitle
-    end,
-    str_by_cleaned_channel_title = function(id)
-      return transf.str.str_by_cleaned_youtube_video_channel_title(
-        transf.youtube_video_id.str_by_channel_title(id)
-      )
     end,
     youtube_channel_id = function(id)
       return transf.youtube_video_id.youtube_video_item(id).snippet.channelId
     end,
-    description = function(id)
+    str_by_description = function(id)
       return transf.youtube_video_id.youtube_video_item(id).snippet.description
     end,
-    upload_status = function(id)
+    youtube_upload_status = function(id)
       return transf.youtube_video_id.youtube_video_item(id).status.uploadStatus
     end,
-    privacy_status = function(id)
+    youtube_privacy_status = function(id)
       return transf.youtube_video_id.youtube_video_item(id).status.privacyStatus
     end,
     youtube_video_url = function(id)
       return "https://www.youtube.com/watch?v=" .. id
     end,
-    captions_list = function(id)
+    youtube_caption_item_arr = function(id)
       return get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest)({
         api_name = "youtube",
         endpoint = "captions",
@@ -3241,8 +3240,8 @@ transf = {
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(id)
       local assoc = transf.form_filling_specifier.filled_str_assoc({
         in_fields = {
-          title = transf.youtube_video_id.str_by_title(id),
-          channel_title = transf.youtube_video_id.str_by_channel_title(id),
+          title = transf.youtube_video_id.line_by_title(id),
+          channel_title = transf.youtube_video_id.line_by_channel_title(id),
         },
         form_field_specifier_arr = {
           {
@@ -3281,10 +3280,10 @@ transf = {
         }
       }).items[1]
     end,
-    title = function(id)
+    line_by_title = function(id)
       return transf.youtube_playlist_id.youtube_playlist_item(id).snippet.title
     end,
-    uploader = function(id)
+    line_by_uploader = function(id)
       return transf.youtube_playlist_id.youtube_playlist_item(id).snippet.channelTitle
     end,
     youtube_playlist_url = function(id)
@@ -3295,32 +3294,32 @@ transf = {
     youtube_playlist_id = function(url)
       return transf.url.str_key_str_value_assoc_by_decoded_param_table(url).list
     end,
-    title = function(url)
-      return transf.youtube_playlist_id.title(transf.youtube_playlist_url.youtube_playlist_id(url))
+    line_by_title = function(url)
+      return transf.youtube_playlist_id.line_by_title(transf.youtube_playlist_url.youtube_playlist_id(url))
     end,
-    uploader = function(url)
-      return transf.youtube_playlist_id.uploader(transf.youtube_playlist_url.youtube_playlist_id(url))
+    line_by_uploader = function(url)
+      return transf.youtube_playlist_id.line_by_uploader(transf.youtube_playlist_url.youtube_playlist_id(url))
     end,
   },
   youtube_video_url = {
     youtube_video_id = function(url)
       return transf.url.str_key_str_value_assoc_by_decoded_param_table(url).v
     end,
-    title = function(url)
-      return transf.youtube_video_id.str_by_title(transf.youtube_video_url.youtube_video_id(url))
+    line_by_title = function(url)
+      return transf.youtube_video_id.line_by_title(transf.youtube_video_url.youtube_video_id(url))
     end,
-    channel_title = function(url)
-      return transf.youtube_video_id.str_by_channel_title(transf.youtube_video_url.youtube_video_id(url))
+    line_by_channel_title = function(url)
+      return transf.youtube_video_id.line_by_channel_title(transf.youtube_video_url.youtube_video_id(url))
     end,
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(url)
       return transf.youtube_video_id.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(transf.youtube_video_url.youtube_video_id(url))
     end,
   },
   youtube_channel_id = {
-    feed_url = function(id)
+    youtube_channel_video_feed_url = function(id)
       return "https://www.youtube.com/feeds/videos.xml?channel_id=" .. id
     end,
-    channel_url = function(id)
+    youtube_channel_url = function(id)
       return "https://www.youtube.com/channel/" .. id
     end,
     youtube_channel_item = function(id)
@@ -3333,7 +3332,7 @@ transf = {
         }
       }).items[1]
     end,
-    channel_title = function(id)
+    line_by_channel_title = function(id)
       return transf.youtube_channel_id.youtube_channel_item(id).snippet.title
     end,
   },
@@ -3348,13 +3347,13 @@ transf = {
     youtube_channel_id = function(handle)
       return transf.handle.youtube_channel_item(handle).id
     end,
-    channel_title = function(handle)
-      return transf.handle.youtube_channel_item(handle).snippet.title
+    line_by_channel_title = function(handle)
+      return transf.youtube_channel_id.line_by_channel_title(transf.handle.youtube_channel_id(handle))
     end,
-    feed_url = function(handle)
-      return transf.youtube_channel_id.feed_url(transf.handle.youtube_channel_id(handle))
+    youtube_channel_video_feed_url = function(handle)
+      return transf.youtube_channel_id.youtube_channel_video_feed_url(transf.handle.youtube_channel_id(handle))
     end,
-    raw_handle = function(handle)
+    printable_ascii_not_whitespace_str_by_raw_handle = function(handle)
       return get.str.str_by_sub_eutf8(handle, 2)
     end,
   },
@@ -3370,11 +3369,11 @@ transf = {
     end,
   },
   str = {
-    raw_syn_output = function(str)
+    str_or_nil_by_raw_syn_output = function(str)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.str.str_by_single_quoted_escaped(str) )
     end,
-    term_syn_specifier_assoc = function(str)
-      local synonym_parts = get.str.str_arr_by_split_w_string(transf.str.raw_syn_output(str), "\n\n")
+    str_key_syn_specifier_value_assoc = function(str)
+      local synonym_parts = get.str.str_arr_by_split_w_string(transf.str.str_or_nil_by_raw_syn_output(str), "\n\n")
       local synonym_tables = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         synonym_parts,
         function (synonym_part)
@@ -3392,7 +3391,7 @@ transf = {
       )
       return synonym_tables
     end,
-    raw_av_output = function (str)
+    str_or_nil_by_raw_av_output = function (str)
       get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "synonym" .. transf.str.str_by_single_quoted_escaped(str)
       )
@@ -3410,7 +3409,7 @@ transf = {
       return "--" .. word
     end,
     synonym_str_arr = function(str)
-      local items = get.str.str_arr_by_split_w_ascii_char(transf.str.raw_av_output(str), "\t")
+      local items = get.str.str_arr_by_split_w_ascii_char(transf.str.str_or_nil_by_raw_av_output(str), "\t")
       items = get.arr.arr_by_filtered(items, function(itm)
         if itm == nil then
           return false

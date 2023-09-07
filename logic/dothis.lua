@@ -1413,8 +1413,8 @@ dothis = {
       dothis.newsboat_urls_file.append_newsboat_url_specifier(
         env.NEWSBOAT_URLS,
         {
-          url = transf.youtube_channel_id.feed_url(channel_id),
-          title = transf.youtube_channel_id.channel_title(channel_id),
+          url = transf.youtube_channel_id.youtube_channel_video_feed_url(channel_id),
+          title = transf.youtube_channel_id.line_by_channel_title(channel_id),
           category = category,
         }
       )

@@ -109,6 +109,18 @@ ls = {
   csl_title_keys = { "title", "title-short" },
   git_remote_types = {"github", "gitlab", "bitbucket"},
   useless_files = {".git", "node_modules", ".vscode"},
+  youtube_upload_status = {
+    "deleted",
+    "failed",
+    "processed",
+    "rejected",
+    "uploaded"
+  },
+  youtube_privacy_status = {
+    "private",
+    "public",
+    "unlisted"
+  },
   search_engine_id = {
     "wiktionary",
     "wikipedia",
