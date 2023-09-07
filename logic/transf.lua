@@ -1900,7 +1900,7 @@ transf = {
   
               temp_stack[key] = nil  -- Remove key from temporary stack
               visited[key] = true  -- Mark key as visited
-              dothis.arr.push(result, { key, assoc[key]['value'] })  -- Append {key, value} two_anys_arr to result
+              dothis.arr.push(result, { key, assoc[key]['value'] })  -- Append {key, value} two_anys__arr to result
           end
       end
   
@@ -2836,7 +2836,7 @@ transf = {
               -- It also makes the data more structured and easier to handle.
               local vcard_types = get.str.str_arr_by_split_w_str(type_list, ", ")
         
-              -- For each vcard_type, we create a new key-value two_anys_arr in the contact_table. 
+              -- For each vcard_type, we create a new key-value two_anys__arr in the contact_table. 
               -- This way, we can access the value directly by vcard_type, 
               -- without needing to parse the type_list each time.
               for _, vcard_type in transf.arr.pos_int_vt_stateless_iter(vcard_types) do
@@ -4279,34 +4279,34 @@ transf = {
         get.arr.arr_by_slice_removed_indicator_and_flatten_w_slice_spec(syn_specifier.antonyms, { stop = 2}, "...")
     end,
   },
-  two_anys_arr = {
-    two_ts = function(two_anys_arr)
-      return two_anys_arr[1], two_anys_arr[2]
+  two_anys__arr = {
+    two_ts = function(two_anys__arr)
+      return two_anys__arr[1], two_anys__arr[2]
     end,
-    t_by_first = function(two_anys_arr)
-      return two_anys_arr[1]
+    t_by_first = function(two_anys__arr)
+      return two_anys__arr[1]
     end,
-    t_by_second = function(two_anys_arr)
-      return two_anys_arr[2]
+    t_by_second = function(two_anys__arr)
+      return two_anys__arr[2]
     end,
-    header = function(two_anys_arr)
-      return transf.two_anys.header(two_anys_arr[1], two_anys_arr[2])
+    header = function(two_anys__arr)
+      return transf.two_anys.header(two_anys__arr[1], two_anys__arr[2])
     end,
-    email_header = function(two_anys_arr)
-      return transf.two_anys.email_header(two_anys_arr[1], two_anys_arr[2])
+    email_header = function(two_anys__arr)
+      return transf.two_anys.email_header(two_anys__arr[1], two_anys__arr[2])
     end,
-    url_param = function(two_anys_arr)
-      return transf.two_anys.url_param(two_anys_arr[1], two_anys_arr[2])
+    url_param = function(two_anys__arr)
+      return transf.two_anys.url_param(two_anys__arr[1], two_anys__arr[2])
     end,
-    ini_line = function(two_anys_arr)
-      return transf.two_anys.ini_line(two_anys_arr[1], two_anys_arr[2])
+    ini_line = function(two_anys__arr)
+      return transf.two_anys.ini_line(two_anys__arr[1], two_anys__arr[2])
     end,
 
-    curl_form_field_args = function(two_anys_arr)
-      return transf.two_anys.curl_form_field_args(two_anys_arr[1], two_anys_arr[2])
+    curl_form_field_args = function(two_anys__arr)
+      return transf.two_anys.curl_form_field_args(two_anys__arr[1], two_anys__arr[2])
     end,
-    assoc_entry_str = function(two_anys_arr)
-      return transf.two_anys.assoc_entry_str(two_anys_arr[1], two_anys_arr[2])
+    assoc_entry_str = function(two_anys__arr)
+      return transf.two_anys.assoc_entry_str(two_anys__arr[1], two_anys__arr[2])
     end,
   },
   two_anys = {
@@ -4319,7 +4319,7 @@ transf = {
     two_strs = function(a, b)
       return transf.any.str_by_replicable(a), transf.any.str_by_replicable(b)
     end,
-    two_anys_arr = function(key, value)
+    two_anys__arr = function(key, value)
       return {key, value}
     end,
     t_by_first = function(key, value)
@@ -4802,20 +4802,20 @@ transf = {
     end,
   },
   table = {
-    two_anys_arr = function(t)
+    two_anys__arr = function(t)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
-        transf.two_anys.two_anys_arr
+        transf.two_anys.two_anys__arr
       )
     end,
-    two_anys_arr_by_sorted_larger_key_first = function(t)
+    two_anys__arr_by_sorted_larger_key_first = function(t)
       return transf.arr_arr.arr_arr_by_sorted_larger_first_item(
-        transf.table.two_anys_arr(t)
+        transf.table.two_anys__arr(t)
       )
     end,
-    two_anys_arr_by_sorted_smaller_key_first = function(t)
+    two_anys__arr_by_sorted_smaller_key_first = function(t)
       return transf.arr_arr.arr_arr_by_sorted_smaller_first_item(
-        transf.table.two_anys_arr(t)
+        transf.table.two_anys__arr(t)
       )
     end,
     kt_arr = function(t)
@@ -4944,10 +4944,10 @@ transf = {
   },
   assoc = {
     int_by_length = function(t)
-      return #transf.table.two_anys_arr(t)
+      return #transf.table.two_anys__arr(t)
     end,
     url_param_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.url_param)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys__arr(t), transf.two_anys__arr.url_param)
     end,
     url_params = function(t)
       return get.str_or_number_arr.str_by_joined(transf.assoc.url_param_arr(t), "&")
@@ -4960,27 +4960,27 @@ transf = {
       for _, header_name in transf.arr.pos_int_vt_stateless_iter(initial_headers) do
         local header_value = t[header_name]
         if header_value then
-          dothis.arr.insert_at_index(header_lines, transf.two_anys_arr.email_header({header_name, header_value}))
+          dothis.arr.insert_at_index(header_lines, transf.two_anys__arr.email_header({header_name, header_value}))
           t[header_name] = nil
         end
       end
       header_lines = transf.two_arrs.arr_by_appended(
         header_lines,
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-          transf.table.two_anys_arr_by_sorted_larger_key_first(t),
-          transf.two_anys_arr.email_header
+          transf.table.two_anys__arr_by_sorted_larger_key_first(t),
+          transf.two_anys__arr.email_header
         )
       )
       return get.str_or_number_arr.str_by_joined(header_lines, "\n")
     end,
     curl_form_field_arr = function(t)
       return transf.arr_arr.arr_by_flatten(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.curl_form_field_args)
+        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys__arr(t), transf.two_anys__arr.curl_form_field_args)
       )
     end,
     
     assoc_entry_str_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys_arr(t), transf.two_anys_arr.assoc_entry_str)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys__arr(t), transf.two_anys__arr.assoc_entry_str)
     end,
     contents_summary = function(t)
       return transf.str_arr.contents_summary(
@@ -5143,8 +5143,8 @@ transf = {
   pair_arr = {
     assoc = function(arr)
       local res = {}
-      for _, two_anys_arr in transf.arr.pos_int_vt_stateless_iter(arr) do
-        res[two_anys_arr[1]] = two_anys_arr[2]
+      for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
+        res[two_anys__arr[1]] = two_anys__arr[2]
       end
       return res
     end,
@@ -5153,14 +5153,14 @@ transf = {
     
     n_shot_role_content_message_spec_arr = function(arr)
       local res = {}
-      for _, two_anys_arr in transf.arr.pos_int_vt_stateless_iter(arr) do
+      for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
         dothis.arr.push(res, {
           role = "user",
-          content = two_anys_arr[1],
+          content = two_anys__arr[1],
         })
         dothis.arr.push(res, {
           role = "assistant",
-          content = two_anys_arr[2],
+          content = two_anys__arr[2],
         })
       end
       return res
@@ -5256,7 +5256,7 @@ transf = {
       local local_name = specifier.name .. "_local"
       local remote_name = specifier.name .. "_remote"
       return {
-        two_anys_arr = {
+        two_anys__arr = {
           [specifier.name] = {
             a = local_name,
             b = remote_name,
@@ -8392,7 +8392,7 @@ transf = {
       }, arr)
     end,
   },
-  --- like a role_content_message_spec_arr, but alternating user/assistant role_content_message_specs, where a two_anys_arr of user/assistant role_content_message_specs is a shot
+  --- like a role_content_message_spec_arr, but alternating user/assistant role_content_message_specs, where a two_anys__arr of user/assistant role_content_message_specs is a shot
   n_shot_role_content_message_spec_arr = {
 
   },

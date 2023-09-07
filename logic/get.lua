@@ -477,9 +477,9 @@ get = {
     assoc_by_filtered_w_kt_vt_fn = function(t, fn)
       return transf.pair_arr.assoc(
         get.arr.arr_by_filtered(
-          transf.table.two_anys_arr(t),
-          function(two_anys_arr)
-            return fn(two_anys_arr[1], two_anys_arr[2])
+          transf.table.two_anys__arr(t),
+          function(two_anys__arr)
+            return fn(two_anys__arr[1], two_anys__arr[2])
           end
         )
       )
@@ -488,10 +488,10 @@ get = {
       return get.assoc.assoc_by_filtered_w_kt_vt_fn(t, function(k, v) return fn(v) end)
     end,
     kt_or_nil_by_first_match_w_kt_vt_arg_fn = function(t, fn)
-      local arr = transf.table.two_anys_arr_by_sorted_larger_key_first(t)
-      for _, two_anys_arr in transf.arr.pos_int_vt_stateless_iter(arr) do
-        if fn(two_anys_arr[1], two_anys_arr[2]) then
-          return two_anys_arr[1]
+      local arr = transf.table.two_anys__arr_by_sorted_larger_key_first(t)
+      for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
+        if fn(two_anys__arr[1], two_anys__arr[2]) then
+          return two_anys__arr[1]
         end
       end
     end,

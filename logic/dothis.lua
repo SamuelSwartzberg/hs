@@ -252,34 +252,34 @@ dothis = {
     end,
     choose_w_pair_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
       dothis.arr.choose_item(
-        transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
+        transf.table.two_anys__arr_by_sorted_smaller_key_first(tbl),
         fn,
         target_item_chooser_item_specifier_name
       )
     end,
     choose_w_kt_vt_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
       dothis.arr.choose_item(
-        transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
-        function(two_anys_arr)
-          fn(transf.two_anys_arr.two_ts(two_anys_arr))
+        transf.table.two_anys__arr_by_sorted_smaller_key_first(tbl),
+        function(two_anys__arr)
+          fn(transf.two_anys__arr.two_ts(two_anys__arr))
         end,
         target_item_chooser_item_specifier_name
       )
     end,
     choose_w_kt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
       dothis.arr.choose_item(
-        transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
-        function(two_anys_arr)
-          fn(transf.two_anys_arr.t_by_first(two_anys_arr))
+        transf.table.two_anys__arr_by_sorted_smaller_key_first(tbl),
+        function(two_anys__arr)
+          fn(transf.two_anys__arr.t_by_first(two_anys__arr))
         end,
         target_item_chooser_item_specifier_name
       )
     end,
     choose_w_vt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
       dothis.arr.choose_item(
-        transf.table.two_anys_arr_by_sorted_smaller_key_first(tbl),
-        function (two_anys_arr)
-          fn(transf.two_anys_arr.t_by_second(two_anys_arr))
+        transf.table.two_anys__arr_by_sorted_smaller_key_first(tbl),
+        function (two_anys__arr)
+          fn(transf.two_anys__arr.t_by_second(two_anys__arr))
         end,
         target_item_chooser_item_specifier_name
       )
@@ -3119,8 +3119,8 @@ dothis = {
   export_dir = {
     log = function(dir, typ)
       local arr = transf[typ .. "_export_dir"].export_chat_main_object_and_media_dir_arr(dir)
-      for _, two_anys_arr in transf.arr.pos_int_vt_stateless_iter(arr) do
-        dothis.export_chat_main_object.log(two_anys_arr[1], typ, two_anys_arr[2])
+      for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
+        dothis.export_chat_main_object.log(two_anys__arr[1], typ, two_anys__arr[2])
       end
     end
   },
