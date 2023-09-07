@@ -68,8 +68,8 @@ get = {
     end,
     basic_command_parts = function(include, exclude)
       local command = " --format=" .. transf.str.str_by_single_quoted_escaped(get.khal.parseable_format_specifier())
-      if include then command = command .. transf.str_arr.repeated_option_str(include, "--include-calendar") end
-      if exclude then command = command .. transf.str_arr.repeated_option_str(exclude, "--exclude-calendar") end
+      if include then command = command .. get.str_arr.repeated_option_str(include, "--include-calendar") end
+      if exclude then command = command .. get.str_arr.repeated_option_str(exclude, "--exclude-calendar") end
       return command
     end,
        
@@ -475,7 +475,7 @@ get = {
       )
     end,
     assoc_by_filtered_w_kt_vt_fn = function(t, fn)
-      return transf.pair_arr.assoc(
+      return transf.two_anys__arr.assoc(
         get.arr.arr_by_filtered(
           transf.table.two_anys__arr(t),
           function(two_anys__arr)
@@ -993,7 +993,7 @@ get = {
       return res
     end,
     not_empty_str_arr_by_split_w_ascii_char = function(str, sep)
-      return transf.str_arr.not_empty_str_arr(
+      return transf.str_arr.not_empty_str_arr_by_filtered(
         transf.str.str_arr_split_single_char(str, sep)
       )
     end,
@@ -1004,7 +1004,7 @@ get = {
     end,
     str_arr_by_split_w_str = plstringx.split,
     str_arr_by_split_noempty = function(str, sep)
-      return transf.str_arr.not_empty_str_arr(
+      return transf.str_arr.not_empty_str_arr_by_filtered(
         transf.str.str_arr_split(str, sep)
       )
     end,
@@ -1528,7 +1528,7 @@ get = {
       return plstringx.shorten(str, len, true)
     end,
     str_by_with_yaml_metadata = function(str, tbl)
-      if not str then return transf.table.yaml_metadata(tbl) end
+      if not str then return transf.table.multiline_str_by_yaml_metadata(tbl) end
       if not tbl then return str end
       if transf.table.pos_int_by_num_keys(tbl) == 0 then return str end
       local stripped_str = transf.str.not_starting_o_ending_with_whitespace_str(str)
@@ -1579,7 +1579,7 @@ get = {
     end,
     str_by_percent_encoded = function(str, as_path)
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
-      else return transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value_folded(str) end
+      else return transf.str.urlcharset_str_by_encoded_query_param_value_folded(str) end
     end,
     not_starting_o_ending_with_whitespace_str = stringy.strip
   },
@@ -1649,6 +1649,17 @@ get = {
     str_by_joined = table.concat,
   },
   str_arr = {
+    repeated_option_str = function(arr, opt)
+      return get.str_or_number_arr.str_by_joined(
+        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+          arr,
+          function (itm)
+            return " " .. opt .. " " .. itm
+          end
+        ),
+        ""
+      )
+    end,
     str_arr_by_resplit_oldnew_w_str = function(arr, sep)
       return get.str.str_arr_by_split_w_str(
         get.str_arr.str_joined(
@@ -1707,7 +1718,7 @@ get = {
     end,
     pos_int_or_nil_by_first_match_nohashcomment_noindent_w_str = function(arr, str)
       return get.arr.pos_int_or_nil_by_first_match_w_t(
-        transf.str_arr.nohashcomment_noindent_str_arr(arr),
+        transf.line_arr.nohashcomment_noindent_line_arr(arr),
         str
       )
     end,
@@ -1859,8 +1870,8 @@ get = {
       return res
     end
   },
-  absolute_path = {
-    relative_path_from = function(path, starting_point)
+  local_absolute_path = {
+    local_nonabsolute_path_by_from = function(path, starting_point)
       return get.str.str_by_no_prefix(path, get.str.str_by_with_suffix(starting_point, "/"))
     end,
   },
@@ -2099,26 +2110,26 @@ get = {
       local git_remote_type = transf.in_git_dir.git_remote_type(path)
       branch = branch or transf.in_git_dir.str_by_current_branch(path)
       local remote_owner_item = transf.in_git_dir.two_strs_arr_or_nil_by_remote_owner_item(path)
-      local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
+      local local_nonabsolute_path = transf.in_git_dir.local_nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(
         transf.in_git_dir.host_by_remote_blob_host(path),
         tblmap.git_remote_type.printable_ascii_by_blob_indicator_path[git_remote_type],
         remote_owner_item,
         branch,
-        relative_path
+        local_nonabsolute_path
       )
     end,
     remote_raw_url = function(path, branch)
       local git_remote_type = transf.in_git_dir.git_remote_type(path)
       branch = branch or transf.in_git_dir.str_by_current_branch(path)
       local remote_owner_item = transf.in_git_dir.two_strs_arr_or_nil_by_remote_owner_item(path)
-      local relative_path = transf.in_git_dir.nonabsolute_path_by_from_git_root_dir(path)
+      local local_nonabsolute_path = transf.in_git_dir.local_nonabsolute_path_by_from_git_root_dir(path)
       return get.git_hosting_service.file_url(
         transf.in_git_dir.host_by_remote_raw_host(path),
         tblmap.git_remote_type.printable_ascii_by_raw_indicator_path[git_remote_type],
         remote_owner_item,
         branch,
-        relative_path
+        local_nonabsolute_path
       )
     end,
   },
@@ -2259,10 +2270,6 @@ get = {
       local res = transf.str.str_or_nil_by_evaled_env_bash_stripped("maddr " .. (only and "-a" or "")  .. headerpart .. transf.str.str_by_single_quoted_escaped(path))
       return transf.arr.set(transf.str.line_arr(res))
     end,
-    displayname_addresses_assoc_of_assocs = function(path, header)
-      local w_displaynames = transf.email_file.addresses(path, header, false)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(w_displaynames, transf.email_or_displayname_email.displayname_email_assoc)
-    end,
 
   },
   maildir_dir = {
@@ -2394,8 +2401,8 @@ get = {
     end,
   },
   git_hosting_service = {
-    file_url = function(host, indicator, owner_item, branch, relative_path)
-      return "https://" .. host .. "/" .. owner_item .. "/" .. indicator .. branch .. "/" .. relative_path
+    file_url = function(host, indicator, owner_item, branch, local_nonabsolute_path)
+      return "https://" .. host .. "/" .. owner_item .. "/" .. indicator .. branch .. "/" .. local_nonabsolute_path
     end,
   },
   dcmp_name = {
@@ -2587,7 +2594,7 @@ get = {
       )
     end,
     str_by_joined_key_any_value_assoc = function(arr, joiner)
-      return transf.pair_arr.assoc(
+      return transf.two_anys__arr.assoc(
         get.n_str_or_number_any_arr_arr.str_by_joined_any_pair_arr(arr, joiner)
       )
     end,
@@ -2799,7 +2806,7 @@ get = {
   url_arr = {
     absolute_path_key_assoc_of_url_files = function(arr, root)
       return get.nonabsolute_path_key_assoc.absolute_path_key_assoc(
-        transf.url_arr.nonabsolute_path_key_assoc_of_url_files(arr),
+        transf.url_arr.leaflike_key_url_value_assoc(arr),
         root
       )
     end,

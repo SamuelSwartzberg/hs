@@ -1133,7 +1133,7 @@ dothis = {
     end,
     append_line_and_commit = function(path, line)
       dothis.plaintext_file.append_line(path, line)
-      dothis.in_git_dir.commit_self(path, "Added line " .. line .. " to " .. get.absolute_path.relative_path_from(path, transf.in_git_dir.git_root_dir(path)))
+      dothis.in_git_dir.commit_self(path, "Added line " .. line .. " to " .. get.local_absolute_path.local_nonabsolute_path_by_from(path, transf.in_git_dir.git_root_dir(path)))
     end,
     append_line_and_commit_by_prompted = function(path)
       dothis.plaintext_file.append_line_and_commit(
@@ -1652,7 +1652,7 @@ dothis = {
       path = get.str.str_by_with_suffix(path, ".session")
       dothis.absolute_path.write_file(
         path,
-        transf.url_arr.session_str(url_arr)
+        transf.url_arr.str_by_urls_potentially_with_comments(url_arr)
       )
     end,
     
@@ -2391,7 +2391,7 @@ dothis = {
     create_inner_item = function(spec)
       local ipc_socket_id = os.time() .. "-" .. math.random(1000000)
       transf.str.str_or_nil_by_evaled_env_bash_stripped("mpv " .. transf.stream_creation_specifier.flags_str(spec) .. 
-        " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.str_arr.single_quoted_escaped_str(spec.urls))
+        " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.str_arr.str_by_single_quoted_escaped_joined(spec.urls))
       return {
         ipc_socket_id = ipc_socket_id,
         state = "booting"

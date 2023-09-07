@@ -294,17 +294,7 @@ is = {
     printable_ascii_not_whitespace_str = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "%s")
     end,
-    url = function(str)
-      return get.fn.rt_or_nil_by_memoized(
-        transf.str.bool_by_evaled_env_bash_success,
-        {},
-        "is.printable_ascii_str.url")(
-        "url_parser_cli " .. transf.str.str_by_single_quoted_escaped(str)
-      )
-    end,
-    urllike_with_no_scheme = function(str)
-      return is.printable_ascii_no_nonspace_whitespace_str.url("https://" .. str)
-    end,
+    
     application_name = transf["nil"]["true"], -- no way to tell if a str is an application name of some application
     separated_nonindicated_number_str = function(str)
       return is.printable_ascii_not_whitespace_str.nonindicated_number_str(
@@ -349,8 +339,50 @@ is = {
     end,
   },
   printable_ascii_not_whitespace_str = {
+    html_entity = function(str)
+      return #str > 20 and get.str.bool_by_startswith(str, "&") and get.str.bool_by_endswith(str, ";") and get.str.bool_by_matches_whole_onig(str, r.g.html_entity) -- the earlier checks are technically unncessary but improve performance
+    end,
+    handle = function(str)
+      return get.str.bool_by_startswith(str, "@")
+    end,
+    package_name = transf["nil"]["true"], -- no way to tell if a str is a package name of some package
+    package_name_package_manager_name_compound_str = function(str)
+      return get.str.pos_int_by_amount_contained_nooverlap(str, ":") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, "@")
+    end,
+    package_name_semver_compound_str = function(str)
+      return get.str.pos_int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, ":")
+    end,
+    package_name_semver_package_manager_name_compound_str = function(str)
+      return get.str.pos_int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.pos_int_by_amount_contained_nooverlap(str, ":") == 1
+    end,
+    urlcharset_str = function(str)
+      return get.str.bool_by_matches_whole_onig_inverted_w_regex_character_class_innards(str, "\"<>`\\|\\\\^{}")
+    end,
+    
+  },
+  urlcharset_str = {
     fs_tag_kv = function(str)
       return get.str.bool_by_matches_whole_onig(str, "[a-z0-9]+-[a-z0-9,]+")
+    end,
+    url = function(str)
+      return get.fn.rt_or_nil_by_memoized(
+        transf.str.bool_by_evaled_env_bash_success,
+        {},
+        "is.printable_ascii_str.url")(
+        "url_parser_cli " .. transf.str.str_by_single_quoted_escaped(str)
+      )
+    end,
+    query_k_o_v = function(str)
+      return get.str.bool_by_not_contains_w_ascii_str_arr(str, {"=", "&"})
+    end,
+    query_mapping = function(str)
+      return get.str.bool_by_contains_w_ascii_str(str, "=") and get.str.bool_by_not_contains_w_ascii_str(str, "&")
+    end,
+    query_str = function(str)
+      return get.str.bool_by_contains_w_ascii_str(str, "=")
+    end,
+    urllike_with_no_scheme = function(str)
+      return is.printable_ascii_no_nonspace_whitespace_str.url("https://" .. str)
     end,
     percent_encoded_octet = function(str)
       return #str == 3 and get.str.bool_by_startswith(str, "%") and is.printable_ascii_not_whitespace_str.nonindicated_number_str(str:sub(2, 3))
@@ -363,10 +395,6 @@ is = {
     end,
     ip_host = function(str)
       return is.printable_ascii_not_whitespace_str.ipv4(str) or is.printable_ascii_not_whitespace_str.ipv6(str)
-    end,
-    
-    html_entity = function(str)
-      return #str > 20 and get.str.bool_by_startswith(str, "&") and get.str.bool_by_endswith(str, ";") and get.str.bool_by_matches_whole_onig(str, r.g.html_entity) -- the earlier checks are technically unncessary but improve performance
     end,
     fs_tag_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.fs_tag_str)
@@ -383,9 +411,6 @@ is = {
     base64_str = function(str)
       return is.printable_ascii_not_whitespace_str.base64_gen_str(str) or is.printable_ascii_not_whitespace_str.base64_url_str(str)
     end,
-    handle = function(str)
-      return get.str.bool_by_startswith(str, "@")
-    end,
     --- trying to determine what str is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
     email = function(str)
       return 
@@ -394,16 +419,6 @@ is = {
     end,
     dice_notation = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.syntax.dice)
-    end,
-    package_name = transf["nil"]["true"], -- no way to tell if a str is a package name of some package
-    package_name_package_manager_name_compound_str = function(str)
-      return get.str.pos_int_by_amount_contained_nooverlap(str, ":") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, "@")
-    end,
-    package_name_semver_compound_str = function(str)
-      return get.str.pos_int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.bool_by_not_contains_w_ascii_str(str, ":")
-    end,
-    package_name_semver_package_manager_name_compound_str = function(str)
-      return get.str.pos_int_by_amount_contained_nooverlap(str, "@") == 1 and get.str.pos_int_by_amount_contained_nooverlap(str, ":") == 1
     end,
     doi = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.doi)
@@ -449,7 +464,6 @@ is = {
         is.printable_ascii_not_whitespace_str.indicated_issn_full_identifier(str) or
         is.printable_ascii_not_whitespace_str.indicated_urlmd5(str)
     end,
-    
   },
   package_name = {
     installed_package_name = function(str)
@@ -581,15 +595,18 @@ is = {
         str
       )
     end,
-    twod_locator = function(str)
-      return get.str.bool_by_matches_whole_onig(str, ":\\d+(:?:\\d+)?")
-    end,
     ipv6 = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "a-fA-F0-9:") -- naive check because the actual regex is a monster
     end,
+    colon_minus_num = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "-0-9:")
+    end,
+  },
+  colon_minus_num = {
     colon_num = function(str)
-      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "0-9:")
-    end
+      return get.str.bool_by_not_contains_w_ascii_str(str, "-")
+    end,
+    slice_notationn = transf['nil']['true'], -- too lazy or now
   },
   colon_num = {
     hour = function(str)
@@ -600,6 +617,9 @@ is = {
     end,
     hour_minute_second = function(str)
       return get.str.bool_by_matches_whole_onig(str, "\\d{2}:\\d{2}:\\d{2}")
+    end,
+    twod_locator = function(str)
+      return get.str.bool_by_matches_whole_onig(str, ":\\d+(:?:\\d+)?")
     end,
   },
   calendar_name = {
@@ -1733,6 +1753,18 @@ is = {
     end,
     two_strs = function(a, b)
       return  is.any.str(a) and is.any.str(b)
+    end,
+    two_arrs = function(a, b)
+      return  is.any.arr(a) and is.any.arr(b)
+    end,
+    any_and_arr = function(a, b)
+      return is.any.arr(b)
+    end,
+    arr_and_any = function(a, b)
+      return is.any.arr(a)
+    end,
+    arr_or_nil_and_any = function(a, b)
+      return is.any.arr_or_nil(a)
     end,
   },
   two_strs = {

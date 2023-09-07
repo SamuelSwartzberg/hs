@@ -550,7 +550,7 @@ transf = {
       )
     end,
     str_by_contents_summary = function(arr)
-      return transf.str_arr.contents_summary(
+      return transf.str_arr.str_by_summary(
         transf.arr.str_arr(arr)
       )
     end,
@@ -1008,7 +1008,7 @@ transf = {
       return env.FS_HTTP_SERVER .. path
     end,
     local_nonabsolute_path_by_relative_to_home = function(path)
-      return get.absolute_path.relative_path_from(path, env.HOME)
+      return get.local_absolute_path.local_nonabsolute_path_by_from(path, env.HOME)
     end,
     labelled_remote_path = function(path)
       return transf.local_nonabsolute_path_relative_to_home.labelled_remote_absolute_path(transf.in_home_local_absolute_path.local_nonabsolute_path_by_relative_to_home(path))
@@ -1346,8 +1346,8 @@ transf = {
         is.dir.git_root_dir
       )
     end,
-    nonabsolute_path_by_from_git_root_dir = function(path)
-      return transf.path.relative_path(
+    local_nonabsolute_path_by_from_git_root_dir = function(path)
+      return get.local_absolute_path.local_nonabsolute_path_by_from(
         path,
         transf.in_git_dir.git_root_dir(path)
       )
@@ -1716,7 +1716,7 @@ transf = {
     line_by_summary = function(path)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.str.str_by_single_quoted_escaped(path))
     end,
-    email_file_and_summary = function(path)
+    email_file_and_line_by_summary = function(path)
       return path, transf.email_file.line_by_summary(path)
     end,
     email_file_and_decoded_email = function(path)
@@ -3411,7 +3411,7 @@ transf = {
     noempty_trimmed_line_arr_by_synonyms = function(str)
       local items = get.str.str_arr_by_split_w_ascii_char_arr(transf.str.str_or_nil_by_raw_av_output(str), {"\t", "\n"})
       items = transf.str_arr.not_starting_o_ending_with_whitespace_str_arr(items)
-      return transf.str_arr.not_empty_str_arr(items)
+      return transf.str_arr.not_empty_str_arr_by_filtered(items)
     end,
     str_by_env_getter_comamnds_prepended = function(str)
       return get.str.str_by_formatted_w_n_anys(
@@ -3659,12 +3659,12 @@ transf = {
     alphanum_by_remove = function(str)
       return get.str.str_by_removed_eutf8_w_regex_quantifiable(str, "[^%w%d]")
     end,
-    printable_ascii_not_whitespace_str_by_encoded_query_param_value = function(str)
+    urlcharset_str_by_encoded_query_param_value = function(str)
       return plurl.quote(str, true)
     end,
-    printable_ascii_not_whitespace_str_by_encoded_query_param_value_folded = function(str)
+    urlcharset_str_by_encoded_query_param_value_folded = function(str)
       local folded = transf.str.line_by_folded(str)
-      return transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value(folded)
+      return transf.str.urlcharset_str_by_encoded_query_param_value(folded)
     end,
     str_by_percent_decoded_also_plus = plurl.unquote,
     str_by_percent_decoded_no_plus = function(str)
@@ -3759,15 +3759,15 @@ transf = {
 
 
     noempty_line_arr = function(str)
-      return transf.str_arr.not_empty_str_arr(
+      return transf.str_arr.not_empty_str_arr_by_filtered(
         transf.str.line_arr(str)
       )
     end,
     noempty_noindent_line_arr = function(str)
-      return transf.str_arr.noindent_str_arr(transf.str.noempty_line_arr(str))
+      return transf.line_arr.noindent_line_arr(transf.str.noempty_line_arr(str))
     end,
     noempty_nohashcomment_noindent_line_arr = function(str)
-      return transf.str_arr.nohashcomment_noindent_str_arr(transf.str.noempty_line_arr(str))
+      return transf.line_arr.nohashcomment_noindent_line_arr(transf.str.noempty_line_arr(str))
     end,
 
     line_by_first = function(str)
@@ -4289,25 +4289,6 @@ transf = {
     t_by_second = function(two_anys__arr)
       return two_anys__arr[2]
     end,
-    header = function(two_anys__arr)
-      return transf.two_anys.header(two_anys__arr[1], two_anys__arr[2])
-    end,
-    email_header = function(two_anys__arr)
-      return transf.two_anys.email_header(two_anys__arr[1], two_anys__arr[2])
-    end,
-    url_param = function(two_anys__arr)
-      return transf.two_anys.url_param(two_anys__arr[1], two_anys__arr[2])
-    end,
-    ini_line = function(two_anys__arr)
-      return transf.two_anys.ini_line(two_anys__arr[1], two_anys__arr[2])
-    end,
-
-    curl_form_field_args = function(two_anys__arr)
-      return transf.two_anys.curl_form_field_args(two_anys__arr[1], two_anys__arr[2])
-    end,
-    assoc_entry_str = function(two_anys__arr)
-      return transf.two_anys.assoc_entry_str(two_anys__arr[1], two_anys__arr[2])
-    end,
   },
   two_anys = {
     bool_by_and = function(a, b)
@@ -4316,44 +4297,39 @@ transf = {
     bool_by_or = function(a, b)
       return a or b
     end,
-    two_strs = function(a, b)
-      return transf.any.str_by_replicable(a), transf.any.str_by_replicable(b)
-    end,
-    two_anys__arr = function(key, value)
-      return {key, value}
-    end,
     t_by_first = function(key, value)
       return key
     end,
     t_by_second = function(key, value)
       return value
-    end,
-    header = function(k, v)
-      return transf.str.str_by_first_eutf8_upper(transf.any.str_by_replicable(k)) .. ": " .. transf.any.str_by_replicable(v)
-    end,
-    email_header = function(key, value)
-      return transf.str.str_by_first_eutf8_upper(transf.any.str_by_replicable(key)) .. ": " .. get.str.str_by_evaled_as_template(transf.any.str_by_replicable(value))
-    end,
-    url_param = function(key, value)
-      return transf.any.str_by_replicable(key) .. "=" .. transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value(transf.any.str_by_replicable(value))
-    end,
-    ini_line = function(key, value)
-      return transf.any.str_by_replicable(key) .. " = " .. transf.any.str_by_replicable(value)
-    end,
-    curl_form_field_args = function(key, value)
-      return {
-        "-F",
-        transf.any.str_by_replicable(key) .. "=" .. transf.any.str_by_replicable(value),
-      }
-    end,
-    assoc_entry_str = function(key, value)
+    end,    
+    str_by_assoc_entry = function(key, value)
       return "[" .. transf.any.str_by_replicable(key) .. "] = " .. transf.any.str_by_replicable(value)
     end,
   },
   two_noempty_lines = {
     ini_kv_line = function(l1, l2)
       return l1 .. " = " .. l2
+    end,
+    curl_form_field_args = function(key, value)
+      return {
+        "-F",
+        key .. "=" .. value,
+      }
+    end,
+  },
+  two_strs = {
+    query_mapping = function(key, value)
+      return
+        transf.str.urlcharset_str_by_encoded_query_param_value(key) ..
+        "=" ..
+        transf.str.urlcharset_str_by_encoded_query_param_value(value)
     end
+  },
+  noempty_trimmed_line_and_line = {
+    decoded_email_header_line = function(l1, l2)
+      return transf.str.str_by_first_eutf8_upper(l1) .. ": " .. l2
+    end,
   },
   two_comparables = {
     comparable_by_larger = function(a, b)
@@ -4406,16 +4382,8 @@ transf = {
     email = function(str)
       return get.str.n_strs_by_extracted_eutf8(str, " <(.*)>$")
     end,
-    displayname = function(str)
+    trimmed_line_by_displayname = function(str)
       return get.str.n_strs_by_extracted_eutf8(str, "^(.*) <")
-    end,
-    displayname_email_assoc = function(str)
-      local displayname = transf.displayname_email.displayname(str)
-      local email = transf.displayname_email.email(str)
-      return {
-        displayname = displayname,
-        email = email,
-      }
     end,
     mailto_url = function(str)
       local email = transf.displayname_email.email(str)
@@ -4426,88 +4394,44 @@ transf = {
     email = function(str)
       return transf.displayname_email.email(str) or str
     end,
-    displayname = function(str)
-      return transf.displayname_email.displayname(str) or nil
-    end,
-    displayname_email_assoc = function(str)
-      local displayname = transf.email_or_displayname_email.displayname(str)
-      local email = transf.email_or_displayname_email.email(str)
-      return {
-        displayname = displayname,
-        email = email,
-      }
+    trimmed_line_by_displayname = function(str)
+      return transf.displayname_email.trimmed_line_by_displayname(str) or nil
     end,
   },
   phone_number = {
 
   },
   str_arr = {
-    repeated_option_str = function(arr, opt)
-      return get.str_or_number_arr.str_by_joined(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-          arr,
-          function (itm)
-            return " " .. opt .. " " .. itm
-          end
-        ),
-        ""
-      )
-    end,
-    single_quoted_escaped_str_arr = function(arr)
+    str_arr_by_mapped_single_quoted_escaped = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.str.str_by_single_quoted_escaped
       )
     end,
-    single_quoted_escaped_str = function(arr)
+    str_by_single_quoted_escaped_joined = function(arr)
       return get.str_or_number_arr.str_by_joined(
-        transf.str_arr.single_quoted_escaped_str_arr(arr),
+        transf.str_arr.str_arr_by_mapped_single_quoted_escaped(arr),
         " "
       )
     end,
-    action_path_str = function(arr)
+    str_by_action_path = function(arr)
       return get.str_or_number_arr.str_by_joined(arr, " > ")
     end,
-    path = function(arr)
+    path_by_joined = function(arr)
       return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.not_whitespace_str_by_safe_filename), 
         "/"
       )
     end,
-    not_empty_str_arr = function(arr)
+    not_empty_str_arr_by_filtered = function(arr)
       return get.arr.arr_by_filtered(arr, is.str.not_empty_str)
     end,
-    noindent_str_arr = function(arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent_line_by_extract)
-    end,
-    nohashcomment_line_filtered_str_arr = function(arr)
-      return get.arr.arr_by_filtered(
-        arr,
-        is.str.nohashcomment_line
-      )
-    end,
-    nohashcomment_str_arr = function(arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.str_arr.nohashcomment_line_filtered_str_arr(arr),
-        transf.line.nohashcomment_line_by_extract
-      )
-    end,
-    nohashcomment_line_filtered_noindent_str_arr = function(arr)
-      return transf.str_arr.noindent_str_arr(
-        transf.str_arr.nohashcomment_line_filtered_str_arr(arr)
-      )
-    end,
-    nohashcomment_noindent_str_arr = function(arr)
-      return transf.str_arr.noindent_str_arr(
-        transf.str_arr.nohashcomment_str_arr(arr)
-      )
-    end,
-    filter_to_url_arr = function(arr)
+    url_arr_by_filtered = function(arr)
       return get.arr.arr_by_filtered(arr, is.str.url)
     end,
     url_arr_by_cleaned_indent_hashcomment_and_filtered = function(arr)
-      return transf.str_arr.filter_to_url_arr(
-        transf.str_arr.nohashcomment_noindent_str_arr(arr)
+      return transf.str_arr.url_arr_by_filtered(
+        transf.line_arr.nohashcomment_noindent_line_arr(arr)
       )
     end,
     not_starting_o_ending_with_whitespace_str_arr = function(arr)
@@ -4516,7 +4440,7 @@ transf = {
     multiline_str = function(arr)
       return get.str_or_number_arr.str_by_joined(arr, "\n")
     end,
-    contents_summary = function(arr)
+    str_by_summary = function(arr)
       return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_slice_removed_indicator_and_flatten_w_slice_spec(arr, {
           start = 1,
@@ -4526,6 +4450,33 @@ transf = {
       )
     end,
     
+  },
+  line_arr = {
+    noindent_str_arr = function(arr)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent_line_by_extract)
+    end,
+    nohashcomment_line_arr = function(arr)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        transf.line_arr.nohashcomment_line_filtered_line_arr(arr),
+        transf.line.nohashcomment_line_by_extract
+      )
+    end,
+    nohashcomment_line_filtered_line_arr = function(arr)
+      return get.arr.arr_by_filtered(
+        arr,
+        is.str.nohashcomment_line
+      )
+    end,
+    nohashcomment_line_filtered_noindent_line_arr = function(arr)
+      return transf.line_arr.noindent_line_arr(
+        transf.line_arr.nohashcomment_line_filtered_line_arr(arr)
+      )
+    end,
+    nohashcomment_noindent_line_arr = function(arr)
+      return transf.line_arr.noindent_line_arr(
+        transf.line_arr.nohashcomment_line_arr(arr)
+      )
+    end,
   },
   envlike_mapping_arr = {
     envlike_str = function(arr)
@@ -4550,7 +4501,7 @@ transf = {
     end,
   },
   two_arrs = {
-    two_anys_by_first = function(arr1, arr2)
+    two_ts_by_first = function(arr1, arr2)
       return arr1[1], arr2[1]
     end,
     bool_by_larger_first_item = function(arr1, arr2)
@@ -4566,21 +4517,21 @@ transf = {
       end
       return res
     end,
-    pair_arr_by_zip_stop_a1 = function(arr1, arr2)
+    two_ts__arr_arr_by_zip_stop_a1 = function(arr1, arr2)
       local res = {}
       for i = 1, #arr1 do
         res[#res + 1] = {arr1[i], arr2[i]}
       end
       return res
     end,
-    pair_arr_by_zip_stop_a2 = function(arr1, arr2)
+    two_ts__arr_arr_by_zip_stop_a2 = function(arr1, arr2)
       local res = {}
       for i = 1, #arr2 do
         res[#res + 1] = {arr1[i], arr2[i]}
       end
       return res
     end,
-    pair_arr_by_zip_stop_shortest = function(arr1, arr2)
+    two_ts__arr_arr_by_zip_stop_shortest = function(arr1, arr2)
       local res = {}
       local shortest = transf.two_comparables.comparable_by_smaller(#arr1, #arr2)
       for i = 1, shortest do
@@ -4589,11 +4540,11 @@ transf = {
       return res
     end,
     assoc_by_zip_stop_shortest = function(arr1, arr2)
-      return transf.pair_arr.assoc(
-        transf.two_arrs.pair_arr_by_zip_stop_shortest(arr1, arr2)
+      return transf.two_anys__arr.assoc(
+        transf.two_arrs.two_ts__arr_arr_by_zip_stop_shortest(arr1, arr2)
       )
     end,
-    pair_arr_by_zip_stop_longest = function(arr1, arr2)
+    two_ts__arr_arr_by_zip_stop_longest = function(arr1, arr2)
       local res = {}
       local longest = transf.two_comparables.comparable_by_larger(#arr1, #arr2)
       for i = 1, longest do
@@ -4704,37 +4655,28 @@ transf = {
 
   },
   url_arr = {
-    url_potentially_with_title_comment_arr = function(sgml_url_arr)
+    line_arr_by_url_potentially_with_title_comment_arr = function(sgml_url_arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         sgml_url_arr,
         transf.url.line_by_url_potentially_with_title_comment
       )
     end,
-    session_str = function(sgml_url_arr)
+    str_by_urls_potentially_with_comments = function(sgml_url_arr)
       return get.str_or_number_arr.str_by_joined(
         transf.url.url_potentially_with_title_comment_arr(sgml_url_arr),
         "\n"
       )
     end,
-    nonabsolute_path_key_assoc_of_url_files = function(url_arr)
+    leaflike_key_url_value_assoc = function(url_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         url_arr,
         function(url)
           return 
-            transf.url.title_or_url_as_filename(url),
+            transf.url.leaflike_by_title_or_url_as_filename(url),
             url
         end
       )
     end,
-  },
-  sgml_url_arr = {
-    sgml_url_with_title_comment_arr = function(sgml_url_arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        sgml_url_arr,
-        transf.sgml_url.sgml_url_with_title_comment
-      )
-    end,
-    
   },
   plaintext_url_or_local_path_file = {
 
@@ -4743,17 +4685,17 @@ transf = {
     str_arr_by_contents = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.plaintext_file.str_by_contents)
     end,
-    str_arr_by_lines = function(arr)
+    line_arr = function(arr)
       return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(arr, transf.plaintext_file.line_arr)
     end,
-    str_arr_by_content_lines = function(arr)
+    noempty_line_arr = function(arr)
       return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(arr, transf.plaintext_file.noempty_line_arr)
     end,
     m3u_file_arr = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, is.plaintext_file.m3u_file)
     end,
     url_or_local_path_arr_by_m3u_file_content_lines = function(arr)
-      return transf.plaintext_file_arr.str_arr_by_content_lines(
+      return transf.plaintext_file_arr.noempty_line_arr(
         transf.plaintext_file_arr.m3u_file_arr(arr)
       )
     end,
@@ -4762,13 +4704,13 @@ transf = {
   event_table_arr = {
   },
   email_file_arr = {
-    email_file_summary_assoc = function(email_file_arr)
+    email_file_key_line_value_assoc_by_summary = function(email_file_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         email_file_arr,
-        transf.email_file.email_file_and_summary
+        transf.email_file.email_file_and_line_by_summary
       )
     end,
-    email_file_simple_view_assoc = function(email_file_arr)
+    email_file_key_decoded_email_value_assoc = function(email_file_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         email_file_arr,
         transf.email_file.email_file_and_decoded_email
@@ -4805,7 +4747,7 @@ transf = {
     two_anys__arr = function(t)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         t,
-        transf.two_anys.two_anys__arr
+        transf.n_anys.arr
       )
     end,
     two_anys__arr_by_sorted_larger_key_first = function(t)
@@ -4862,7 +4804,7 @@ transf = {
       dothis.local_extant_path.delete(tmp)
       return res
     end,
-    yaml_metadata = function(t)
+    multiline_str_by_yaml_metadata = function(t)
       local str_contents = transf.not_userdata_or_str.yaml_str(t)
       return "---\n" .. str_contents .. "\n---\n"
     end,
@@ -4904,7 +4846,7 @@ transf = {
         is.table.only_int_key_table
       )
     end,
-    relative_path_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
+    local_nonabsolute_path_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
       return get.table.str_by_joined_key_any_value_assoc(
         t,
         is.table.only_int_key_table,
@@ -4947,7 +4889,10 @@ transf = {
       return #transf.table.two_anys__arr(t)
     end,
     url_param_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys__arr(t), transf.two_anys__arr.url_param)
+      return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        t,
+        transf.two_anys.url_param
+      )
     end,
     url_params = function(t)
       return get.str_or_number_arr.str_by_joined(transf.assoc.url_param_arr(t), "&")
@@ -4975,15 +4920,21 @@ transf = {
     end,
     curl_form_field_arr = function(t)
       return transf.arr_arr.arr_by_flatten(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys__arr(t), transf.two_anys__arr.curl_form_field_args)
+        get.tbl.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
+          t, 
+          transf.two_anys.curl_form_field_args
+        )
       )
     end,
     
     assoc_entry_str_arr = function(t)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.table.two_anys__arr(t), transf.two_anys__arr.assoc_entry_str)
+      return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        t,
+        transf.two_anys.str_by_assoc_entry
+      )
     end,
     contents_summary = function(t)
-      return transf.str_arr.contents_summary(
+      return transf.str_arr.str_by_summary(
         transf.assoc.assoc_entry_str_arr(t)
       )
     end,
@@ -5140,7 +5091,7 @@ transf = {
       return transf.arr_by_reversed.arr(reversed_res)
     end,
   },
-  pair_arr = {
+  two_anys__arr = {
     assoc = function(arr)
       local res = {}
       for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
@@ -5409,12 +5360,12 @@ transf = {
   indicated_citable_object_id = {
     mcitations_csl_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.mcitations_csl_file_or_nil(
-        transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value(id)
+        transf.str.urlcharset_str_by_encoded_query_param_value(id)
       )
     end,
     local_csl_table = function(id)
       return transf.filename_safe_indicated_citable_object_id.csl_table_or_nil(
-        transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value(id)
+        transf.str.urlcharset_str_by_encoded_query_param_value(id)
       )
     end,
     citable_object_id = function(id)
@@ -5424,7 +5375,7 @@ transf = {
       return get.str.str_arr_by_split_w_ascii_char(id, ":")[1]
     end,
     filename_safe_indicated_citable_object_id = function(id)
-      return transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value(id)
+      return transf.str.urlcharset_str_by_encoded_query_param_value(id)
     end,
     csl_table_by_online = function(id)
       return transf[
@@ -5435,12 +5386,12 @@ transf = {
     end,
     mpapers_citable_object_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.mpapers_citable_object_file_or_nil(
-        transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value(id)
+        transf.str.urlcharset_str_by_encoded_query_param_value(id)
       )
     end,
     mpapernotes_citable_object_notes_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.mpapernotes_citable_object_notes_file_or_nil(
-        transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value(id)
+        transf.str.urlcharset_str_by_encoded_query_param_value(id)
       )
     end,
     citations_file_line = function(id)
@@ -6437,7 +6388,7 @@ transf = {
       .. " # " .. transf.csl_table.apa_str(csl_table)
     end,
     filename_safe_citable_object_id = function(csl_table)
-      return transf.str.printable_ascii_not_whitespace_str_by_encoded_query_param_value(transf.csl_table.citable_object_id(csl_table))
+      return transf.str.urlcharset_str_by_encoded_query_param_value(transf.csl_table.citable_object_id(csl_table))
     end,
     filename_safe_indicated_citable_object_id = function(csl_table)
       return transf.indicated_citable_object_id.filename_safe_indicated_citable_object_id(transf.csl_table.indicated_citable_object_id(csl_table))
@@ -6690,7 +6641,7 @@ transf = {
         return url
       end
     end,
-    title_or_url_as_filename = function(url)
+    leaflike_by_title_or_url_as_filename = function(url)
       local title = transf.sgml_url.str_or_nil_by_title(url)
       if title and title ~= "" then
         return transf.str.not_whitespace_str_by_safe_filename(title) .. ".url2"
@@ -7104,7 +7055,7 @@ transf = {
       return transf.arr_and_any.arr(menu_item_table.path, menu_item_table.AXTitle)
     end,
     full_action_path_str = function(menu_item_table)
-      return transf.str_arr.action_path_str(transf.menu_item_table.full_action_path(menu_item_table))
+      return transf.str_arr.str_by_action_path(transf.menu_item_table.full_action_path(menu_item_table))
     end,
     running_application = function(menu_item_table)
       return menu_item_table.application
