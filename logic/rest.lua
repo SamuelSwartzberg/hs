@@ -100,7 +100,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
         -- authorize the app by opening a browser window
         
         local open_spec ={ 
-          url = specifier.oauth2_authorization_url,
+          clean_url = specifier.oauth2_authorization_url,
           params = {
             response_type = "code",
             client_id = clientid,

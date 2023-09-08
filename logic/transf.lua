@@ -1935,8 +1935,8 @@ transf = {
     noempty_noindent_line_arr = function(path)
       return transf.str.noempty_noindent_line_arr(transf.plaintext_file.str_by_contents(path))
     end,
-    noempty_nohashcomment_noindent_line_arr = function(path)
-      return transf.str.noempty_nohashcomment_noindent_line_arr(transf.plaintext_file.str_by_contents(path))
+    noempty_noindent_nohashcomment_line_arr = function(path)
+      return transf.str.noempty_noindent_nohashcomment_line_arr(transf.plaintext_file.str_by_contents(path))
     end,
     line_by_first = function(path)
       return transf.str.line_by_first(transf.plaintext_file.str_by_contents(path))
@@ -2064,7 +2064,7 @@ transf = {
     end,
   },
   date = {
-    year_and_year_month_and_year_month_day__arr = function(date)
+    rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd__arr = function(date)
       return  {
         date:fmt("%Y"),
         date:fmt("%Y-%m"),
@@ -2072,7 +2072,7 @@ transf = {
       }
     end,
     triplex_local_nonabsolute_path_by_y_ym_ymd = function(date)
-      return get.str_or_number_arr.str_by_joined(transf.date.year_and_year_month_and_year_month_day__arr(date), "/")
+      return get.str_or_number_arr.str_by_joined(transf.date.rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd__arr(date), "/")
     end,
     weekday_int_start_1 = function(date)
       return date:getisoweekday()
@@ -2101,6 +2101,9 @@ transf = {
     end,
     full_rfc3339like_dt = function(date)
       return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
+    end,
+    rfc3339like_ymd = function(date)
+      return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-date"])
     end,
     hour_minute_second = function(date)
       return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-time"])
@@ -2905,9 +2908,6 @@ transf = {
         )
       end
     end,
-    number_or_nil_by_translation_rate = function(contact_table)
-      return get.str_or_number.number_or_nil(contact_table.Private["translation-rate"])
-    end,
     iban_or_nil = function (contact_table)
       return get.contact_table.encrypted_data(contact_table, "iban")
     end,
@@ -2930,7 +2930,7 @@ transf = {
       end
     end,
     str_or_nil_by_personal_tax_number = function (contact_table)
-      return get.contact_table.tax_number(contact_table, "personal")
+      return get.contact_table.line_or_nil_by_tax_number(contact_table, "personal")
     end,
     line_arr_by_full_name_western = function(contact_table)
       return transf.hole_y_arrlike.arr({ 
@@ -3659,12 +3659,12 @@ transf = {
     alphanum_by_remove = function(str)
       return get.str.str_by_removed_eutf8_w_regex_quantifiable(str, "[^%w%d]")
     end,
-    urlcharset_str_by_encoded_query_param_value = function(str)
+    urlcharset_str_by_encoded_query_param_part = function(str)
       return plurl.quote(str, true)
     end,
     urlcharset_str_by_encoded_query_param_value_folded = function(str)
       local folded = transf.str.line_by_folded(str)
-      return transf.str.urlcharset_str_by_encoded_query_param_value(folded)
+      return transf.str.urlcharset_str_by_encoded_query_param_part(folded)
     end,
     str_by_percent_decoded_also_plus = plurl.unquote,
     str_by_percent_decoded_no_plus = function(str)
@@ -3779,7 +3779,7 @@ transf = {
     noempty_noindent_line_arr = function(str)
       return transf.line_arr.noindent_line_arr(transf.str.noempty_line_arr(str))
     end,
-    noempty_nohashcomment_noindent_line_arr = function(str)
+    noempty_noindent_nohashcomment_line_arr = function(str)
       return transf.line_arr.nohashcomment_noindent_line_arr(transf.str.noempty_line_arr(str))
     end,
 
@@ -4347,9 +4347,9 @@ transf = {
   two_strs = {
     query_mapping = function(s1, s2)
       return
-        transf.str.urlcharset_str_by_encoded_query_param_value(s1) ..
+        transf.str.urlcharset_str_by_encoded_query_param_part(s1) ..
         "=" ..
-        transf.str.urlcharset_str_by_encoded_query_param_value(s2)
+        transf.str.urlcharset_str_by_encoded_query_param_part(s2)
     end,
     decoded_email_header_line = function(s1, s2)
       local l1 = transf.str.noempty_trimmed_line_by_folded_or_default(s1)
@@ -5279,7 +5279,7 @@ transf = {
     end,
   },
   vdirsyncer_pair_specifier = {
-    assoc_of_assocs = function(specifier)
+    noempty_trimmed_line_key_noempty_trimmed_line_key_assoc_value_assoc_value_assoc = function(specifier)
       local local_name = specifier.name .. "_local"
       local remote_name = specifier.name .. "_remote"
       return {
@@ -5309,7 +5309,7 @@ transf = {
     ini_str = function(specifier)
       return transf.assoc_value_assoc.ini_str(
         transf.noempty_trimmed_line_key_noempty_trimmed_line_key_assoc_value_assoc_value_assoc.noempty_trimmed_line_key_assoc_value_assoc(
-          transf.vdirsyncer_pair_specifier.assoc_of_assocs(specifier)
+          transf.vdirsyncer_pair_specifier.noempty_trimmed_line_key_noempty_trimmed_line_key_assoc_value_assoc_value_assoc(specifier)
         )
       )
     end
@@ -5319,65 +5319,78 @@ transf = {
       local url
       if comps.url then
         url = comps.url
-      elseif comps.host then
-        if comps.scheme then
-          url = comps.scheme
+      else
+        if comps.nofragment_url then
+          url = comps.nofragment_url
         else
-          url = "https://"
+          if comps.clean_url then
+            url = comps.clean_url
+          else
+            if comps.base_url then
+              url = comps.base_url
+            else
+              if comps.scheme then
+                url = comps.scheme
+              else
+                url = "https://"
+              end
+              if comps.host then
+                url = url .. get.str.str_by_with_suffix(comps.host, "/")
+              end
+            end
+            if comps.endpoint then
+              url = url .. (get.str.no_prefix_str(comps.endpoint, "/") or "/")
+            end
+          end
+          if comps.params then
+            if is.any.table(comps.params) then
+              url = url .. "?" .. transf.assoc.query_str(comps.params)
+            else
+              url = url .. get.str.str_by_with_prefix(comps.params, "?")
+            end
+          end
         end
-        url = url .. get.str.str_by_with_suffix(comps.host, "/")
-        if comps.endpoint then
-          url = url .. (get.str.no_prefix_str(comps.endpoint, "/") or "/")
-        end   
-      end     
-      if comps.params then
-        if is.any.table(comps.params) then
-          url = url .. "?" .. transf.assoc.query_str(comps.params)
-        else
-          url = url .. get.str.with_prefix_str(comps.params, "?")
+        if comps.fragment then
+          url = "#" .. comps.fragment
         end
       end
       return url
     end,
   },
-  doilike = {
-    doi = function(doilike)
-      local doi = transf.indicated_doi.doi(doilike)
-      doi = transf.doi_url.doi(doi)
-      return doi
+  query_str = {
+    str_key_str_value_assoc = function(query_str)
+      local params = {}
+      local param_parts = get.str.not_empty_str_arr_by_split_w_ascii_char(query_str, "&")
+      for _, param_part in transf.arr.pos_int_vt_stateless_iter(param_parts) do
+        local param_parts = get.str.str_arr_by_split_w_ascii_char(param_part, "=")
+        local key = transf.str.str_by_percent_decoded_also_plus(param_parts[1])
+        local value = transf.str.str_by_percent_decoded_also_plus(param_parts[2])
+        params[key] = value
+      end
+      return params
     end,
-    doi_url = function(doilike)
-      local doi = transf.indicated_doi.doi(doilike)
-      doi = transf.doi.doi_url(doi)
-      return doi
+  },
+  doi_url = {
+    doi = function(url)
+      return get.str.str_by_no_suffix(transf.url.local_absolute_path_or_nil_by_path_decoded(url), "/")
     end,
-    indicated_doi = function(doilike)
-      local doi = transf.doi_url.doi(doilike)
-      doi = transf.doi.indicated_doi(doi)
-      return doi
+    indicated_doi = function(url)
+      return transf.doi.indicated_doi(transf.doi_url.doi(url))
     end,
     csl_table_by_online = function(doilike)
       local doi = transf.doi_url.doi(doilike)
       return transf.doi.csl_table_by_online(doi)
     end,
   },
-  doi_url = {
-    doi = function(url)
-      return get.str.n_strs_by_extracted_onig(url, r.g.id.doi_prefix .. "(.+)/?$")
-    end,
-    indicated_doi = function(url)
-      return transf.doi.indicated_doi(transf.doi_url.doi(url))
-    end,
-  },
   indicated_doi = {
     doi = function(urnlike)
-      doi = urnlike:lower()
-      doi = get.str.no_prefix_str(urnlike, "urn:")
-      doi = get.str.no_prefix_str(urnlike, "doi:")
-      return doi
+      return transf.indicated_citable_object_id.urlcharset_str_by_citable_object_id(urnlike)
     end,
     doi_url = function(urnlike)
       return transf.doi.doi_url(transf.indicated_doi.doi(urnlike))
+    end,
+    csl_table_by_online = function(urnlike)
+      return transf.doi.csl_table_by_online(transf.indicated_doi.doi(urnlike))
     end,
   },
   doi = {
@@ -5387,7 +5400,7 @@ transf = {
     indicated_doi = function(doi)
       return "doi:" .. doi
     end,
-    online_bib = function(doi)
+    bib_str_by_online = function(doi)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         "curl -LH Accept: application/x-bibtex" .. transf.str.str_by_single_quoted_escaped(
           transf.doi.doi_url(doi)
@@ -5400,12 +5413,14 @@ transf = {
         accept_json_different_header = "application/vnd.citationstyles.csl+json",
       })
     end,
-    indicated_citable_object_id = function(doi)
-      return "doi:" .. doi
+  },
+  indicated_isbn = {
+    csl_table_by_online = function(isbn)
+      return transf.isbn.csl_table_by_online(transf.indicated_citable_object_id.urlcharset_str_by_citable_object_id(isbn))
     end,
   },
   isbn = {
-    online_bib = function(isbn)
+    bib_by_online = function(isbn)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         "isbn_meta" .. transf.str.str_by_single_quoted_escaped(isbn) .. " bibtex"
       )
@@ -5415,7 +5430,7 @@ transf = {
         "isbn_meta" .. transf.str.str_by_single_quoted_escaped(isbn) .. " csl"
       )
     end,
-    indicated_citable_object_id = function(isbn)
+    indicated_isbn = function(isbn)
       return "isbn:" .. isbn
     end,
   },
@@ -5436,43 +5451,43 @@ transf = {
   indicated_citable_object_id = {
     mcitations_csl_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.mcitations_csl_file_or_nil(
-        transf.str.urlcharset_str_by_encoded_query_param_value(id)
+        transf.str.urlcharset_str_by_encoded_query_param_part(id)
       )
     end,
-    local_csl_table = function(id)
+    csl_table_by_local = function(id)
       return transf.filename_safe_indicated_citable_object_id.csl_table_or_nil(
-        transf.str.urlcharset_str_by_encoded_query_param_value(id)
+        transf.str.urlcharset_str_by_encoded_query_param_part(id)
       )
     end,
-    citable_object_id = function(id)
+    urlcharset_str_by_citable_object_id = function(id)
       return get.str.n_strs_by_extracted_onig(id, "^[^:]+:(.*)$")
     end,
-    citable_object_indicator = function(id)
+    citable_object_id_indication_name = function(id)
       return get.str.str_arr_by_split_w_ascii_char(id, ":")[1]
     end,
     filename_safe_indicated_citable_object_id = function(id)
-      return transf.str.urlcharset_str_by_encoded_query_param_value(id)
+      return transf.str.urlcharset_str_by_encoded_query_param_part(id)
     end,
     csl_table_by_online = function(id)
       return transf[
-        transf.indicated_citable_object_id.citable_object_indicator(id)
+        "indicated_" .. transf.indicated_citable_object_id.citable_object_id_indication_name(id)
       ].csl_table_by_online(
-        transf.indicated_citable_object_id.citable_object_id(id)
+        transf.indicated_citable_object_id.urlcharset_str_by_citable_object_id(id)
       )
     end,
     mpapers_citable_object_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.mpapers_citable_object_file_or_nil(
-        transf.str.urlcharset_str_by_encoded_query_param_value(id)
+        transf.str.urlcharset_str_by_encoded_query_param_part(id)
       )
     end,
     mpapernotes_citable_object_notes_file = function(id)
       return transf.filename_safe_indicated_citable_object_id.mpapernotes_citable_object_notes_file_or_nil(
-        transf.str.urlcharset_str_by_encoded_query_param_value(id)
+        transf.str.urlcharset_str_by_encoded_query_param_part(id)
       )
     end,
-    citations_file_line = function(id)
-      return transf.csl_table.citations_file_line(
-        transf.indicated_citable_object_id.local_csl_table(id)
+    noempty_noindent_hashcomment_line_by_for_citations_file = function(id)
+      return transf.csl_table.noempty_noindent_hashcomment_line_by_for_citations_file(
+        transf.indicated_citable_object_id.csl_table_by_local(id)
       )
     end
 
@@ -5508,10 +5523,10 @@ transf = {
       return get.str.str_arr_by_split_w_str(filename, "!citid:")[2]
     end,
     indicated_citable_object_id = function(filename)
-      return transf.str.str_by_percent_decoded_also_plus(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
+      return transf.filename_safe_indicated_citable_object_id.indicated_citable_object_id(transf.citable_filename.filename_safe_indicated_citable_object_id(filename))
     end,
-    csl_table = function(filename)
-      return transf.indicated_citable_object_id.local_csl_table(
+    csl_table_by_local = function(filename)
+      return transf.indicated_citable_object_id.csl_table_by_local(
         transf.citable_filename.indicated_citable_object_id(filename)
       )
     end,
@@ -5528,7 +5543,7 @@ transf = {
       )
     end,
     csl_table = function(path)
-      return transf.citable_filename.csl_table(
+      return transf.citable_filename.csl_table_by_local(
         transf.path.leaflike_by_filename(path)
       )
     end,
@@ -5541,15 +5556,15 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, transf.citable_path.indicated_citable_object_id)
     end,
   },
-  citable_object_file ={ -- file with a citable_filename containing the data (e.g. pdf) of a citable object
+  mpapers_citable_object_file ={ -- file with a citable_filename containing the data (e.g. pdf) of a citable object
 
   },
   citations_file = { -- plaintext file containing one indicated_citable_object_id per line
     indicated_citable_object_id_arr = function(file)
-      return transf.plaintext_file.noempty_nohashcomment_noindent_line_arr(file)
+      return transf.plaintext_file.noempty_noindent_nohashcomment_line_arr(file)
     end,
-    local_csl_table_arr = function(file)
-      return transf.indicated_citable_object_id_arr.local_csl_table_arr(
+    csl_table_arr_by_local = function(file)
+      return transf.indicated_citable_object_id_arr.csl_table_arr_by_local(
         transf.citations_file.indicated_citable_object_id_arr(file)
       )
     end,
@@ -5565,35 +5580,35 @@ transf = {
     end,
   },
   indicated_citable_object_id_arr = {
-    local_csl_table_arr = function(arr)
+    csl_table_arr_by_local = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        transf.indicated_citable_object_id.local_csl_table
+        transf.indicated_citable_object_id.csl_table_by_local
       )
     end,
     bib_str = function(arr)
       return transf.csl_table_arr.bib_str(
-        transf.indicated_citable_object_id_arr.local_csl_table_arr(
+        transf.indicated_citable_object_id_arr.csl_table_arr_by_local(
           arr
         )
       )
     end,
     json_str = function(arr)
       return transf.csl_table_arr.json_str(
-        transf.indicated_citable_object_id_arr.local_csl_table_arr(
+        transf.indicated_citable_object_id_arr.csl_table_arr_by_local(
           arr
         )
       )
     end,
-    citations_file_line_arr = function(arr)
+    noempty_noindent_hashcomment_line_arr_by_for_citations_file = function(arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.indicated_citable_object_id_arr.local_csl_table_arr(arr),
-        transf.csl_table.citations_file_line
+        transf.indicated_citable_object_id_arr.csl_table_arr_by_local(arr),
+        transf.csl_table.noempty_noindent_hashcomment_line_by_for_citations_file
       )
     end,
-    citations_file_str = function(arr)
+    str_by_for_citations_file = function(arr)
       return get.str_or_number_arr.str_by_joined(
-        transf.indicated_citable_object_id_arr.citations_file_line_arr(arr), 
+        transf.indicated_citable_object_id_arr.noempty_noindent_hashcomment_line_arr_by_for_citations_file(arr), 
         "\n"
       )
     end
@@ -5602,61 +5617,61 @@ transf = {
     citations_file = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "citations"
     end,
-    main_tex_file = function(dir)
+    local_absolute_path_by_main_tex_file = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "main.tex"
     end,
-    main_pdf_file = function(dir)
+    local_absolute_path_by_main_pdf_file = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "main.pdf"
     end,
-    main_bib_file = function(dir)
+    local_absolute_path_by_main_bib_file = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "main.bib"
     end,
-    indicated_citable_object_id_arr_from_citations = function(dir)
+    indicated_citable_object_id_arr_by_from_citations = function(dir)
       return transf.citations_file.indicated_citable_object_id_arr(
         transf.latex_project_dir.citations_file(dir)
       )
     end,
-    local_csl_table_arr_from_citations = function(dir)
-      return transf.citations_file.local_csl_table_arr(
+    csl_table_arr_by_from_citations = function(dir)
+      return transf.citations_file.csl_table_arr_by_local(
         transf.latex_project_dir.citations_file(dir)
       )
     end,
-    bib_str_from_citations = function(dir)
+    bib_str_by_from_citations = function(dir)
       return transf.citations_file.bib_str(
         transf.latex_project_dir.citations_file(dir)
       )
     end,
   },
-  omegat_project_dir = {
-    metadata_file = function(dir)
-      return transf.path.path_by_ending_with_slash(dir) .. "data.yaml"
+  client_project_dir = {
+    yaml_file_by_metadata_file = function(dir)
+      return transf.path.path_by_ending_with_slash(dir) .. "client_project_data.yaml"
     end,
-    metadata = function(dir)
+    assoc_by_metadata = function(dir)
       return transf.yaml_file.not_userdata_or_fn(
-        transf.omegat_project_dir.metadata_file(dir)
+        transf.client_project_dir.yaml_file_by_metadata_file(dir)
       )
     end,
-    client_name = function(dir)
-      return transf.omegat_project_dir.metadata(dir).client
+    client_id_by_client = function(dir)
+      return transf.client_project_dir.assoc_by_metadata(dir).client
     end,
-    client_contact_uuid = function(dir)
-      return fstblmap.client_name.contact_uuid(
-        transf.omegat_project_dir.client_name(dir)
+    contact_uuid_by_client = function(dir)
+      return fstblmap.client_id.contact_uuid(
+        transf.client_project_dir.client_id_by_client(dir)
       )
     end,
-    client_contact_table = function(dir)
+    contact_table_by_client = function(dir)
       return transf.uuid.contact_table(
-        transf.omegat_project_dir.client_contact_uuid(dir)
+        transf.client_project_dir.contact_uuid_by_client(dir)
       )
     end,
     -- this will often be unset, since I'll default to my uuid within creator_contact_uuid
-    creator_name = function(dir)
-      return transf.omegat_project_dir.metadata(dir).creator
+    client_id_by_creator = function(dir)
+      return transf.client_project_dir.assoc_by_metadata(dir).creator
     end,
-    creator_contact_uuid = function(dir)
-      if transf.omegat_project_dir.creator_name(dir) then
-        return fstblmap.client_name.contact_uuid(
-          transf.omegat_project_dir.creator_name(dir)
+    contact_uuid_by_creator = function(dir)
+      if transf.client_project_dir.client_id_by_creator(dir) then
+        return fstblmap.client_id.contact_uuid(
+          transf.client_project_dir.client_id_by_creator(dir)
         )
       else
         return env.SELF_UUID
@@ -5664,66 +5679,138 @@ transf = {
     end,
     client_main_name = function(dir)
       return transf.contact_table.line_by_main_name(
-        transf.omegat_project_dir.client_contact_table(dir)
+        transf.client_project_dir.contact_table_by_client(dir)
       )
     end,
-    client_main_relevant_address_label = function(dir)
+    multiline_str_by_relevant_address_label_client = function(dir)
       return transf.contact_table.multiline_str_by_relevant_address_label(
-        transf.omegat_project_dir.client_contact_table(dir)
+        transf.client_project_dir.contact_table_by_client(dir)
       )
     end,
-    client_translation_rate = function(dir)
-      return transf.contact_table.number_or_nil_by_translation_rate(
-        transf.omegat_project_dir.client_contact_table(dir)
-      )
-    end,
-    creator_main_name = function(dir)
+    line_by_main_name_creator = function(dir)
       return transf.contact_table.line_by_main_name(
-        transf.omegat_project_dir.creator_contact_table(dir)
+        transf.client_project_dir.creator_contact_table(dir)
       )
     end,
-    creator_main_relevant_address_label = function(dir)
+    multiline_str_by_relevant_address_label_creator = function(dir)
       return transf.contact_table.multiline_str_by_relevant_address_label(
-        transf.omegat_project_dir.creator_contact_table(dir)
-      )
-    end,
-    creator_translation_tax_number = function(dir)
-      return get.contact_table.tax_number(
-        transf.omegat_project_dir.creator_contact_table(dir),
-        "translation"
+        transf.client_project_dir.creator_contact_table(dir)
       )
     end,
     creator_bank_details_str = function(dir)
-      return get.contact_table.bank_details_str(
-        transf.omegat_project_dir.creator_contact_table(dir)
+      return transf.contact_table.multiline_str_by_name_bank_details(
+        transf.client_project_dir.creator_contact_table(dir)
       )
     end,
-    creator_translation_rate = function(dir)
-      return transf.contact_table.number_or_nil_by_translation_rate(
-        transf.omegat_project_dir.creator_contact_table(dir)
+    client_project_kind = function(dir)
+      if is.project_dir.client_project_dir(dir) then
+        return "translation"
+      else
+        error("unknown client project kind")
+      end
+    end,
+    line_or_nil_by_tax_number = function(dir)
+      return get.contact_table.line_or_nil_by_tax_number(
+        transf.client_project_dir.creator_contact_table(dir),
+        transf.client_project_dir.client_project_kind(dir)
       )
     end,
-    translation_rate = function(dir)
+    number_or_nil_by_client_rate = function(dir)
+      return get.contact_table.number_or_nil_by_rate(
+        transf.client_project_dir.contact_table_by_client(dir),
+        transf.client_project_dir.client_project_kind(dir)
+      )
+    end,
+    number_or_nil_by_creator_rate = function(dir)
+      return get.contact_table.number_or_nil_by_rate(
+        transf.client_project_dir.creator_contact_table(dir),
+        transf.client_project_dir.client_project_kind(dir)
+      )
+    end,
+    number_or_nil_by_project_rate = function(dir)
       return 
-        transf.omegat_project_dir.metadata(dir).translation_rate 
-        or transf.omegat_project_dir.client_translation_rate(dir)
-        or transf.omegat_project_dir.creator_translation_rate(dir)
+      transf.client_project_dir.assoc_by_metadata(dir).rate 
+    end,
+
+    number_by_rate = function(dir)
+      return 
+      transf.client_project_dir.number_or_nil_by_project_rate(dir)
+      or transf.client_project_dir.number_or_nil_by_client_rate(dir)
+      or transf.client_project_dir.number_or_nil_by_creator_rate(dir)
+      or 0
     end,
     rechnung = function(dir)
-      return transf.omegat_project_dir.metadata(dir).rechnung
+      return transf.client_project_dir.assoc_by_metadata(dir).rechnung
     end,
     rechnung_id = function(dir)
       return
-        transf["nil"].date_by_current():fmt("%Y") .. "-" ..
-        transf.omegat_project_dir.client_name(dir):upper() .. "-" ..
-        transf.omegat_project_dir.rechnung_number(dir)
+      transf["nil"].date_by_current():fmt("%Y-%m-%d") .. "--" ..
+      transf.client_project_dir.client_id_by_client(dir):upper() .. "-" ..
+      transf.client_project_dir.rechnung_number(dir)
     end,
     rechnung_number = function(dir)
-      return transf.omegat_project_dir.rechnung(dir).nr
+      return transf.client_project_dir.rechnung(dir).nr
     end,
-    delivery_date = function(dir)
-      return transf.omegat_project_dir.rechnung(dir).delivery_date
+    rfc3339like_ymd_by_delivery_date = function(dir)
+      return transf.client_project_dir.rechnung(dir).delivery_date
     end,
+    rechnung_filename = function(dir)
+      return transf.date.rfc3339like_ymd(
+        date()
+      ) .. "--" .. transf.client_project_dir.client_id_by_client(dir) .. "_" .. transf.client_project_dir.rechnung_number(dir)
+    end,
+    rechnung_pdf_path = function(dir)
+      return transf.path.path_by_ending_with_slash(dir) .. transf.client_project_dir.rechnung_filename(dir) .. ".pdf"
+    end,
+    rechnung_md_path = function(dir)
+      return transf.path.path_by_ending_with_slash(dir) .. transf.client_project_dir.rechnung_filename(dir) .. ".md"
+    end,
+    rechnung_email_specifier = function(dir)
+      return {
+        body = get.str.str_by_evaled_as_template(lemap.translation.rechnung_email_de, dir),
+        non_inline_attachment_local_file_arr = {
+          transf.client_project_dir.rechnung_pdf_path(dir)
+        }
+      }
+    end,
+    raw_rechnung = function(dir)
+      return get.str.str_by_evaled_as_template(lemap.translation.rechnung_de, dir)
+    end,
+    price_specifier_arr = function(dir)
+      local pos_int_arr = transf[
+        transf.client_project_dir.client_project_kind(dir) .. "_project_dir"
+      ].pos_int_arr_by_amount_billing_unit(dir)
+      local rate = transf.client_project_dir.number_by_rate(dir)
+      local unit = tblmap.client_project_kind.billing_unit[
+        transf.client_project_dir.client_project_kind(dir)
+      ]
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        pos_int_arr,
+        function(pos_int)
+          return {
+            rate = rate,
+            unit = unit,
+            amount = pos_int,
+            price = pos_int * rate,
+          }
+        end
+      )
+    end,
+    total_cost_speciier = function(dir)
+      return transf.price_specifier_arr.total_cost_speciier(
+        transf.client_project_dir.price_specifier_arr(dir)
+      )
+    end,
+    price_block_german = function(dir)
+      return transf.price_specifier.translation_price_block_german(
+        transf.client_project_dir.price_specifier(dir)
+      )
+    end,
+
+  },
+  omegat_project_dir = {
+   
+
     dictionary_dir = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "dictionary"
     end,
@@ -5758,68 +5845,25 @@ transf = {
     local_resultant_tm = function(dir)
       return transf.omegat_project_dir.tm_dir(dir) .. "/" .. transf.path.leaflike_by_leaf(dir) .. "-omegat.tmx"
     end,
-    rechnung_filename = function(dir)
-      return get.timestamp_s.str_by_date_format_indicator(
-        os.time(),
-        tblmap.dcmp_name.rfc3339like_dt_format_str["day"]
-      ) .. "--" .. transf.omegat_project_dir.client_name(dir) .. "_" .. transf.omegat_project_dir.rechnung_number(dir)
-    end,
-    rechnung_pdf_path = function(dir)
-      return transf.path.path_by_ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".pdf"
-    end,
-    rechnung_md_path = function(dir)
-      return transf.path.path_by_ending_with_slash(dir) .. transf.omegat_project_dir.rechnung_filename(dir) .. ".md"
-    end,
-    target_file_pos_int_arr = function(dir)
+    pos_int_arr_by_amount_billing_unit = function(dir)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.dir.absolute_path_arr_by_children(
           transf.omegat_project_dir.target_txt_dir(dir)
         ),
-        transf.plaintext_file.utf8_char_arr
-      )
-    end,
-    translation_price_specifier_arr = function(dir)
-      local pos_int_arr = transf.omegat_project_dir.target_file_num_char_arr(dir)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        pos_int_arr,
-        function(pos_int)
-          local normzeilen = transf.pos_int.pos_int_by_normzeilen(pos_int)
-          local rate = transf.omegat_project_dir.translation_rate(dir)
-          return {
-            price = rate *  normzeilen,
-            rate = rate,
-            normzeilen = normzeilen
-          }
+        function(path)
+          return transf.pos_int.pos_int_by_normzeilen(
+            transf.plaintext_file.utf8_char_arr(path)
+          )
         end
+        
       )
-    end,
-    translation_price_specifier = function(dir)
-      return transf.translation_price_specifier_arr.translation_price_specifier(
-        transf.omegat_project_dir.translation_price_specifier_arr(dir)
-      )
-    end,
-    translation_price_block_german = function(dir)
-      return transf.translation_price_specifier.translation_price_block_german(
-        transf.omegat_project_dir.translation_price_specifier(dir)
-      )
-    end,
-    rechnung_email_specifier = function(dir)
-      return {
-        body = get.str.str_by_evaled_as_template(lemap.translation.rechnung_email_de, dir),
-        non_inline_attachment_local_file_arr = {
-          transf.omegat_project_dir.rechnung_pdf_path(dir)
-        }
-      }
-    end,
-    raw_rechnung = function(dir)
-      return get.str.str_by_evaled_as_template(lemap.translation.rechnung_de, dir)
     end,
 
   },
-  translation_price_specifier_arr = {
-    translation_price_specifier = function(arr)
+  price_specifier_arr = {
+    total_cost_speciier = function(arr)
       return {
-        translation_price_specifier_arr = arr,
+        price_specifier_arr = arr,
         total = hs.fnutils.reduce(
           arr,
           function(acc, v) return acc + v.price end,
@@ -5828,15 +5872,16 @@ transf = {
       }
     end
   },
-  translation_price_specifier = {
-    translation_price_block_german = function(spec)
+  total_cost_speciier = {
+    price_block_german = function(spec)
       return 
         get.str_or_number_arr.str_by_joined(
           get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-            spec.translation_price_specifier_arr,
+            spec.price_specifier_arr,
             function(v)
-              return ("%d Zeilen @ %.2f€ = %d€"):format(
-                v.normzeilen,
+              return ("%d %s @ %.2f€ = %d€"):format(
+                v.amount,
+                get.billing_unit.line_w_iso_639_1_language_code(v.unit, "de"),
                 v.rate,
                 v.price
               )
@@ -6168,7 +6213,7 @@ transf = {
       )
     end,
     citations_file_str = function(arr)
-      return transf.indicated_citable_object_id_arr.citations_file_str(
+      return transf.indicated_citable_object_id_arr.str_by_for_citations_file(
         transf.csl_table_arr.indicated_citable_object_id_arr(arr)
       )
     end,
@@ -6190,48 +6235,48 @@ transf = {
     main_title = function(csl_table)
       return get.assoc.vt_by_first_match_w_kv_arr(csl_table, ls.csl_title_keys)
     end,
-    issued_date_parts_single_or_range = function(csl_table)
+    dtprts__arr_arr_by_issued = function(csl_table)
       return csl_table.issued
     end,
-    issued_rf3339like_dt_or_interval = function(csl_table)
-      return transf.date_parts_single_or_range.rf3339like_dt_or_interval(
-        transf.csl_table.issued_date_parts_single_or_range(csl_table)
+    rf3339like_dt_or_interval_by_issued = function(csl_table)
+      return transf.dtprts__arr_arr.rf3339like_dt_or_interval(
+        transf.csl_table.dtprts__arr_arr_by_issued(csl_table)
       )
     end,
-    issued_rfc3339like_dt_force_first = function(csl_table)
-      return transf.date_parts_single_or_range.rfc3339like_dt_force_first(
-        transf.csl_table.issued_date_parts_single_or_range(csl_table)
+    rfc3339like_dt_by_issued_force_first = function(csl_table)
+      return transf.dtprts__arr_arr.rfc3339like_dt_force_first(
+        transf.csl_table.dtprts__arr_arr_by_issued(csl_table)
       )
     end,
     issued_date_force_first = function(csl_table)
-      return transf.date_parts_single_or_range.date_force_first(
-        transf.csl_table.issued_date_parts_single_or_range(csl_table)
+      return transf.dtprts__arr_arr.date_by_force_first(
+        transf.csl_table.dtprts__arr_arr_by_issued(csl_table)
       )
     end,
     issued_prefix_partial_dcmp_spec_force_first = function(csl_table)
-      return transf.date_parts_single_or_range.prefix_partial_dcmp_spec_force_first(
-        transf.csl_table.issued_date_parts_single_or_range(csl_table)
+      return transf.dtprts__arr_arr.prefix_partial_dcmp_spec_by_force_first(
+        transf.csl_table.dtprts__arr_arr_by_issued(csl_table)
       )
     end,
     issued_year_force_first = function(csl_table)
       return transf.csl_table.issued_prefix_partial_dcmp_spec_force_first(csl_table).year
     end,
-    author_arr = function(csl_table)
+    csl_person_arr_by_author = function(csl_table)
       return csl_table.author
     end,
     naive_author_summary = function(csl_table)
       return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-          transf.csl_table.author_arr(csl_table),
-          transf.csl_person.naive_name
+          transf.csl_table.csl_person_arr_by_author(csl_table),
+          transf.csl_person.line_by_name_naive
         ),
         ", "
       )
     end,
     author_last_name_arr = function(csl_table)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-        transf.csl_table.author_arr(csl_table),
-        transf.csl_person.family
+        transf.csl_table.csl_person_arr_by_author(csl_table),
+        transf.csl_person.line_or_nil_by_family
       )
     end,
     authors_et_al_arr = function(csl_table)
@@ -6287,14 +6332,14 @@ transf = {
     page = function(csl_table)
       return csl_table.page
     end,
-    page_interal_specifier = function(csl_table)
+    int_interval_speciier_by_page = function(csl_table)
       return transf.digit_str_or_digit_interval_str.int_interval_specifier(
         transf.csl_table.page(csl_table)
       )
     end,
-    page_sequence_specifier = function(csl_table)
+    int_sequence_specifier_by_page = function(csl_table)
       return get.interval_specifier.sequence_specifier(
-        transf.csl_table.page_interal_specifier(csl_table),
+        transf.csl_table.int_interval_speciier_by_page(csl_table),
         1 -- afaik there is never a case where pages don't increase by 1 (there is no notation that says 'every other page', for example)
       )
     end,
@@ -6308,11 +6353,8 @@ transf = {
         end
       end
     end,
-    title = function(csl_table)
+    str_by_title = function(csl_table)
       return csl_table.title
-    end,
-    author = function(csl_table)
-      return csl_table.author
     end,
     type = function(csl_table)
       return csl_table.type
@@ -6355,7 +6397,7 @@ transf = {
       end
       return isbn_part_identifier
     end,
-    indicated_isbn_part_identifier = function(csl_table)
+    indicated_isbn_part = function(csl_table)
       local isbn_part_identifier = transf.csl_table.isbn_part_identifier(csl_table)
       if isbn_part_identifier then
         return "isbn_part:" .. isbn_part_identifier
@@ -6372,7 +6414,7 @@ transf = {
         return nil
       end
     end,
-    indicated_issn_full_identifier = function(csl_table)
+    indicated_issn_full = function(csl_table)
       local issn_full_identifier = transf.csl_table.issn_full_identifier(csl_table)
       if issn_full_identifier then
         return "issn_full:" .. issn_full_identifier
@@ -6417,34 +6459,13 @@ transf = {
         return "accession:" .. accession
       end
     end,
-    citable_object_id = function(csl_table)
-      if csl_table.doi then
-        return csl_table.doi
-      elseif csl_table.isbn and is.csl_table.whole_book_csl_table(csl_table) then
-        return csl_table.isbn
-      elseif csl_table.isbn and not is.csl_table.whole_book_csl_table(csl_table) then
-        return transf.csl_table.isbn_part_identifier(csl_table)
-      elseif csl_table.pmid then
-        return csl_table.pmid
-      elseif csl_table.pmcid then
-        return csl_table.pmcid
-      elseif csl_table.accession then
-        return csl_table.accession
-      elseif transf.csl_table.issn_full_identifier(csl_table) then
-        return transf.csl_table.issn_full_identifier(csl_table)
-      elseif csl_table.url then
-        return transf.csl_table.urlmd5(csl_table)
-      else
-        return nil
-      end
-    end,
     indicated_citable_object_id = function(csl_table)
       if csl_table.doi then
         return transf.csl_table.indicated_doi(csl_table)
       elseif csl_table.isbn and is.csl_table.whole_book_csl_table(csl_table) then
         return transf.csl_table.indicated_isbn(csl_table)
       elseif csl_table.isbn and not is.csl_table.whole_book_csl_table(csl_table) then
-        return transf.csl_table.indicated_isbn_part_identifier(csl_table)
+        return transf.csl_table.indicated_isbn_part(csl_table)
       elseif csl_table.pmid then
         return transf.csl_table.indicated_pmid(csl_table)
       elseif csl_table.pmcid then
@@ -6452,19 +6473,16 @@ transf = {
       elseif csl_table.accession then
         return transf.csl_table.indicated_accession(csl_table)
       elseif transf.csl_table.issn_full_identifier(csl_table) then
-        return transf.csl_table.indicated_issn_full_identifier(csl_table)
+        return transf.csl_table.indicated_issn_full(csl_table)
       elseif csl_table.url then
         return transf.csl_table.indicated_urlmd5(csl_table)
       else
         return nil
       end
     end,
-    citations_file_line = function(csl_table)
+    noempty_noindent_hashcomment_line_by_for_citations_file = function(csl_table)
       return transf.csl_table.indicated_citable_object_id(csl_table) 
       .. " # " .. transf.csl_table.apa_str(csl_table)
-    end,
-    filename_safe_citable_object_id = function(csl_table)
-      return transf.str.urlcharset_str_by_encoded_query_param_value(transf.csl_table.citable_object_id(csl_table))
     end,
     filename_safe_indicated_citable_object_id = function(csl_table)
       return transf.indicated_citable_object_id.filename_safe_indicated_citable_object_id(transf.csl_table.indicated_citable_object_id(csl_table))
@@ -6480,62 +6498,67 @@ transf = {
       )
     end,
     apa_str = function(csl_table)
-      return get.csl_table_or_csl_table_arr.raw_citations(csl_table, "apa-6th-edition")
+      return get.csl_table_or_csl_table_arr.str_by_raw_citation(csl_table, "apa-6th-edition")
     end,
   },
   csl_person = {
-    family = function(csl_person)
-      return csl_person.family
+    line_or_nil_by_family = function(csl_person)
+      return transf.str_or_nil.line_or_nil_by_folded(csl_person.family)
     end,
-    given = function(csl_person)
-      return csl_person.given
+    line_or_nil_by_given = function(csl_person)
+      return transf.str_or_nil.line_or_nil_by_folded(csl_person.given)
     end,
-    dropping_particle = function(csl_person)
-      return csl_person["dropping-particle"]
+    line_or_nil_by_dropping_particle = function(csl_person)
+      return transf.str_or_nil.line_or_nil_by_folded(csl_person["dropping-particle"])
     end,
-    non_dropping_particle = function(csl_person)
-      return csl_person["non-dropping-particle"]
+    line_or_nil_by_non_dropping_particle = function(csl_person)
+      return transf.str_or_nil.line_or_nil_by_folded(csl_person["non-dropping-particle"])
     end,
-    suffix = function(csl_person)
-      return csl_person.suffix
+    line_or_nil_by_suffix = function(csl_person)
+      return transf.str_or_nil.line_or_nil_by_folded(csl_person.suffix)
     end,
-    literal = function(csl_person)
+    str_or_nil_by_literal = function(csl_person)
       return csl_person.literal
     end,
-    naive_name = function(csl_person)
+    line_or_nil_by_literal = function(csl_person)
+      return transf.str_or_nil.line_or_nil_by_folded(csl_person.literal)
+    end,
+    line_by_name_naive = function(csl_person)
       return get.str_or_number_arr.str_by_joined(
         transf.hole_y_arrlike.arr({
           transf.csl_person.given(csl_person),
-          transf.csl_person.dropping_particle(csl_person),
-          transf.csl_person.non_dropping_particle(csl_person),
-          transf.csl_person.family(csl_person),
-          transf.csl_person.suffix(csl_person),
-          transf.csl_person.literal(csl_person) and '"' .. transf.csl_person.literal(csl_person) .. '"' or nil,
+          transf.csl_person.line_or_nil_by_dropping_particle(csl_person),
+          transf.csl_person.line_or_nil_by_non_dropping_particle(csl_person),
+          transf.csl_person.line_or_nil_by_family(csl_person),
+          transf.csl_person.line_or_nil_by_suffix(csl_person),
+          transf.csl_person.str_or_nil_by_literal(csl_person) and '"' .. transf.csl_person.line_or_nil_by_literal(csl_person) .. '"' or nil,
         }),
         " "
       )
     end,
   },
-  csl_style = {
-    path = function(style)
+  lower_strict_snake_case = {
+    local_absolute_path_by_csl_file = function(style)
       return env.GIT_PACKAGES .. "/citation-style-language/styles/" .. style .. ".csl"
     end,
   },
-  date_parts_single = {
+  dtprts__arr = {
     rfc3339like_dt = function(date_parts)
-      return get.str_or_number_arr.str_by_joined(date_parts, "-")
+      return transf.prefix_dcmp_spec.rfc3339like_dt(
+        transf.dtprts__arr.prefix_partial_dcmp_spec(date_parts)
+      )
     end,
     prefix_partial_dcmp_spec = function(date_parts)
       return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
     end,
     full_dmp_spec = function(date_parts)
       return transf.dcmp_spec.full_dcmp_spec_by_min(
-        transf.date_parts_single.prefix_partial_dcmp_spec(date_parts)
+        transf.dtprts__arr.prefix_partial_dcmp_spec(date_parts)
       )
     end,
     date = function(date_parts)
       return transf.full_dcmp_spec.date(
-        transf.date_parts_single.full_dmp_spec(date_parts)
+        transf.dtprts__arr.full_dmp_spec(date_parts)
       )
     end,
   },
@@ -6545,31 +6568,31 @@ transf = {
     end,
     date_interval_specifier = function(date_parts_range)
       return {
-        start = transf.date_parts_single.full_dmp_spec(date_parts_range[1]),
-        stop = transf.date_parts_single.full_dmp_spec(date_parts_range[2])
+        start = transf.dtprts__arr.full_dmp_spec(date_parts_range[1]),
+        stop = transf.dtprts__arr.full_dmp_spec(date_parts_range[2])
       }
     end
   },
-  date_parts_single_or_range = {
+  dtprts__arr_arr = {
     rf3339like_dt_or_interval = function(date_parts)
       if #date_parts == 1 then
-        return transf.date_parts_single.rfc3339like_dt(date_parts[1])
+        return transf.dtprts__arr.rfc3339like_dt(date_parts[1])
       else
         return transf.date_parts_range.rfc3339like_interval(date_parts)
       end
     end,
     --- will pick the first date if there is a range
-    rf3339like_dt_force_first = function(date_parts)
-      return transf.date_parts_single.rfc3339like_dt(date_parts[1])
+    rf3339like_dt_by_force_first = function(date_parts)
+      return transf.dtprts__arr.rfc3339like_dt(date_parts[1])
     end,
-    prefix_partial_dcmp_spec_force_first = function(date_parts)
-      return transf.date_parts_single.prefix_partial_dcmp_spec(date_parts[1])
+    prefix_partial_dcmp_spec_by_force_first = function(date_parts)
+      return transf.dtprts__arr.prefix_partial_dcmp_spec(date_parts[1])
     end,
-    full_full_dcmp_spec_force_first = function(date_parts)
-      return transf.date_parts_single.full_dmp_spec(date_parts[1])
+    full_dcmp_spec_by_force_first = function(date_parts)
+      return transf.dtprts__arr.full_dmp_spec(date_parts[1])
     end,
-    date_force_first = function(date_parts)
-      return transf.date_parts_single.date(date_parts[1])
+    date_by_force_first = function(date_parts)
+      return transf.dtprts__arr.date(date_parts[1])
     end,
   },
   urllike_with_no_scheme = {
@@ -6629,13 +6652,25 @@ transf = {
     local_absolute_path_or_nil_by_path = function(url)
       return transf.url.url_table(url).path
     end,
+    local_absolute_path_or_nil_by_path_decoded = function(url)
+      local p_or_nil = transf.url.local_absolute_path_or_nil_by_path(url)
+      if p_or_nil then
+        return transf.str.str_by_percent_decoded_also_plus(p_or_nil)
+      end
+    end,
     local_nonabsolute_path_or_nil_by_path = function(url)
       local path = transf.url.local_absolute_path_or_nil_by_path(url)
       if path then
         return get.str.str_by_no_prefix(path, "/")
       end
     end,
-    query = function(url)
+    local_nonabsolute_path_or_nil_by_path_decoded = function(url)
+      local path = transf.url.local_absolute_path_or_nil_by_path_decoded(url)
+      if path then
+        return get.str.str_by_no_prefix(path, "/")
+      end
+    end,
+    query_str_or_nil = function(url)
       return transf.url.url_table(url).query
     end,
     printable_ascii_or_nil_by_fragment = function(url)
@@ -6662,18 +6697,10 @@ transf = {
       end
     end,
     str_key_str_value_assoc_by_decoded_param_table = function(url)
-      local params = {}
-      local url_parts = get.str.str_arr_by_split_w_ascii_char(url, "?")
-      if #url_parts > 1 then
-        local param_parts = get.str.str_arr_by_split_w_ascii_char(url_parts[2], "&")
-        for _, param_part in transf.arr.pos_int_vt_stateless_iter(param_parts) do
-          local param_parts = get.str.str_arr_by_split_w_ascii_char(param_part, "=")
-          local key = transf.str.str_by_percent_decoded_also_plus(param_parts[1])
-          local value = transf.str.str_by_percent_decoded_also_plus(param_parts[2])
-          params[key] = value
-        end
+      local query_str = transf.url.query_str_or_nil(url)
+      if query_str then
+        return transf.query_str.str_key_str_value_assoc(query_str)
       end
-      return params
     end,
     urllike_with_no_scheme = function(url)
       local parts = get.str.str_arr_by_split_w_ascii_char(url, ":")
@@ -6681,11 +6708,11 @@ transf = {
       local rejoined = get.str_or_number_arr.str_by_joined(parts, ":")
       return get.str.no_prefix_str(rejoined, "//")
     end,
-    str_by_webcal_name = function(url)
+    calendar_name_by_for_webcal = function(url)
       return "webcal_readonly_" .. transf.not_userdata_or_fn.hex_str_by_md5(url)
     end,
     vdirsyncer_pair_specifier = function(url)
-      local name = transf.url.str_by_webcal_name(url)
+      local name = transf.url.calendar_name_by_for_webcal(url)
       local local_storage_path =  env.XDG_STATE_HOME .. "/vdirsyncer/" .. name
       return  {
         name = name,
@@ -6698,13 +6725,13 @@ transf = {
         remote_storage_url = url,
       }
     end,
-    absolute_path_by_webcal_storage_location = function(url)
-      return env.XDG_STATE_HOME .. "/vdirsyncer/" .. transf.url.str_by_webcal_name(url)
+    local_absolute_path_by_webcal_storage_location = function(url)
+      return env.XDG_STATE_HOME .. "/vdirsyncer/" .. transf.url.calendar_name_by_for_webcal(url)
     end,
     ini_str_by_khal_config_section = function(url)
       return transf.assoc_value_assoc.ini_str({
         ["[ro:".. transf.url.alphanum_minus_or_nil_by_sld(url) .. "]"] = {
-          path = transf.url.absolute_path_by_webcal_storage_location(url),
+          path = transf.url.local_absolute_path_by_webcal_storage_location(url),
           priority = 0,
         }
       })
@@ -7179,21 +7206,21 @@ transf = {
     audiodevice = function(audiodevice_specifier)
       return audiodevice_specifier.device
     end,
-    subtype = function(audiodevice_specifier)
+    audiodevice_subtype = function(audiodevice_specifier)
       return audiodevice_specifier.subtype
     end,
-    name = function(audiodevice_specifier)
-      return transf.audiodevice.name(transf.audiodevice_specifier.audiodevice(audiodevice_specifier))
+    str_by_name = function(audiodevice_specifier)
+      return transf.audiodevice.str_by_name(transf.audiodevice_specifier.audiodevice(audiodevice_specifier))
     end
 
   },
   audiodevice_specifier_arr = {
-    active_audiodevice_specifier_index = function(arr)
+    pos_int_or_nil_by_active_audiodevice_specifier = function(arr)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(arr, is.audiodevice_specifier.active_audiodevice_specifier)
     end,
   },
   audiodevice = {
-    name = function(audiodevice)
+    str_by_name = function(audiodevice)
       return audiodevice:name()
     end,
   },
@@ -7219,10 +7246,10 @@ transf = {
   },
   country_identifier_str = {
     iso_3366_1_alpha_2_country_code = function(country_identifier)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+      return transf.str.str_by_all_eutf8_lower(get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
         input = country_identifier, 
         query = "Suppose the following identifies a country. Return its ISO 3166-1 Alpha-2 country code."
-      }):lower()
+      }))
     end,
   },
   language_identifier_str = {
@@ -7234,7 +7261,7 @@ transf = {
     end,
   },
   bcp_47_language_tag = {
-    summary = function(bcp_47_language_tag)
+    language_identifier_str = function(bcp_47_language_tag)
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
         input = bcp_47_language_tag, 
         query = "Suppose the following is a BCP 47 language tag. Return a natural language description of it."
@@ -7242,13 +7269,13 @@ transf = {
     end,
   },
   iso_3366_1_alpha_2_country_code = {
-    iso_3366_1_full_name = function(iso_3366_1_alpha_2)
+    noempty_noindent_nohashcomment_line_by_iso_3366_1_full_name = function(iso_3366_1_alpha_2)
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
         input = iso_3366_1_alpha_2, 
         query = "Get the ISO 3366-1 full name of the country identified by the following ISO 3366-1 Alpha-2 country code."
       })
     end,
-    iso_3366_1_short_name = function(iso_3366_1_alpha_2)
+    noempty_noindent_nohashcomment_line_by_iso_3366_1_short_name = function(iso_3366_1_alpha_2)
       return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
         input = iso_3366_1_alpha_2, 
         query = "Get the ISO 3366-1 short name of the country identified by the following ISO 3366-1 Alpha-2 country code."
@@ -7256,7 +7283,7 @@ transf = {
     end,
   },
   bool = {
-    negated = function(bool)
+    bool_by_negated = function(bool)
       return not bool
     end
   },

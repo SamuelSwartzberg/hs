@@ -151,8 +151,11 @@ get = {
     encrypted_data = function(contact_table, type)
       return get.pass_item_name.contact_json(contact_table.uid, type)
     end,
-    tax_number = function(contact_table, type)
-      return get.contact_table.encrypted_data(contact_table, "taxnr/" .. type)
+    line_or_nil_by_tax_number = function(contact_table, type)
+      return transf.str_or_nil.line_or_nil_by_folded(get.contact_table.encrypted_data(contact_table, "taxnr/" .. type))
+    end,
+    number_or_nil_by_rate = function(contact_table, type)
+      return transf.nonindicated_number_str.number_by_base_10(contact_table.Private[type .. "-rate"])
     end,
     email = function(contact_table, type)
       return transf.contact_table.vcard_email_type_key_email_value_assoc(contact_table)[type]
@@ -2171,13 +2174,13 @@ get = {
   },
   bib_file = {
     raw_citations = function(path, format)
-      get.csl_table_or_csl_table_arr.raw_citations(transf.bib_file.csl_table_arr(path), format)
+      get.csl_table_or_csl_table_arr.str_by_raw_citation(transf.bib_file.csl_table_arr(path), format)
     end,
   },
   csl_table_or_csl_table_arr = {
-    raw_citations = function(csl_table, style)
+    str_by_raw_citation = function(csl_table, style)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
-        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.csl_style.path(style) .. transf.not_userdata_or_fn.here_doc_by_json(csl_table)
+        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.lower_strict_snake_case.local_absolute_path_by_csl_file(style) .. transf.not_userdata_or_fn.here_doc_by_json(csl_table)
       )
     end,
     
@@ -2212,22 +2215,22 @@ get = {
       return csl_table[key]
     end,
     key_rf3339like_dt_or_interval = function(csl_table, key)
-      return transf.date_parts_single_or_range.rf3339like_dt_or_interval(
+      return transf.dtprts__arr_arr.rf3339like_dt_or_interval(
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
     key_rfc3339like_dt_force_first = function(csl_table, key)
-      return transf.date_parts_single_or_range.rfc3339like_dt_force_first(
+      return transf.dtprts__arr_arr.rfc3339like_dt_force_first(
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
     key_date_force_first = function(csl_table, key)
-      return transf.date_parts_single_or_range.date_force_first(
+      return transf.dtprts__arr_arr.date_by_force_first(
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
     key_prefix_partial_dcmp_spec_force_first = function(csl_table, key)
-      return transf.date_parts_single_or_range.prefix_partial_dcmp_spec_force_first(
+      return transf.dtprts__arr_arr.prefix_partial_dcmp_spec_by_force_first(
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
@@ -3803,4 +3806,14 @@ get = {
       end
     end
   },
+  billing_unit = {
+    line_w_iso_639_1_language_code = function(unit, lang)
+      local map = {
+        line = {
+          de = "Zeilen",
+        }
+      }
+      return map[unit][lang]
+    end
+  }
 }

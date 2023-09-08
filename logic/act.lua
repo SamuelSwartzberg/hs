@@ -72,9 +72,9 @@ act = {
         "\n\n" .. transf.url.ini_str_by_khal_config_section(spec.remote_storage_url)
       )
       dothis.absolute_path.create_dir(
-        transf.url.absolute_path_by_webcal_storage_location(spec.remote_storage_url)
+        transf.url.local_absolute_path_by_webcal_storage_location(spec.remote_storage_url)
       )
-      local name = transf.url.str_by_webcal_name(spec.remote_storage_url)
+      local name = transf.url.calendar_name_by_for_webcal(spec.remote_storage_url)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "vdirsyncer discover" ..
         transf.str.str_by_single_quoted_escaped(name),

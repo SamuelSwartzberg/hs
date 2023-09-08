@@ -333,7 +333,7 @@ dothis = {
       dothis.str_arr.fill_with(transf.str.noempty_line_arr(path))
     end,
     fill_with_nohashcomment_noindent_content_lines = function(path)
-      dothis.str_arr.fill_with(transf.str.noempty_nohashcomment_noindent_line_arr(path))
+      dothis.str_arr.fill_with(transf.str.noempty_noindent_nohashcomment_line_arr(path))
     end,
     search = function(str, search_engine_id)
       dothis.url_or_local_path.open_browser(
@@ -1195,7 +1195,7 @@ dothis = {
   plaintext_url_or_local_path_file = {
     open_all = function(path, browser)
       dothis.arr.each(
-        transf.plaintext_file.noempty_nohashcomment_noindent_line_arr(path),
+        transf.plaintext_file.noempty_noindent_nohashcomment_line_arr(path),
         get.fn.arbitrary_args_bound_or_ignored_fn(dothis.url_or_local_path.open_browser, {a_use, browser})
       )
     end,
@@ -1453,7 +1453,7 @@ dothis = {
     set_default = function(specifier)
       dothis.audiodevice.set_default(
         transf.audiodevice_specifier.audiodevice(specifier),
-        transf.audiodevice_specifier.subtype(specifier)
+        transf.audiodevice_specifier.audiodevice_subtype(specifier)
       )
     end,
   },
@@ -1862,7 +1862,7 @@ dothis = {
     add_indicated_citable_object_id = function(citations_file, indicated_citable_object_id)
       dothis.plaintext_file.append_line(
         citations_file,
-        transf.indicated_citable_object_id.citations_file_line(indicated_citable_object_id)
+        transf.indicated_citable_object_id.noempty_noindent_hashcomment_line_by_for_citations_file(indicated_citable_object_id)
       )
     end,
     remove_indicated_citable_object_id = function(citations_file, indicated_citable_object_id)
@@ -1919,7 +1919,7 @@ dothis = {
         dothis.project_dir.pull_project_materials(
           omegat_project_dir,
           type,
-          transf.omegat_project_dir.client_name(omegat_project_dir)
+          transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
         )
       end
     end,
@@ -1927,14 +1927,14 @@ dothis = {
       dothis.project_dir.push_project_materials(
         omegat_project_dir,
         "glossary",
-        transf.omegat_project_dir.client_name(omegat_project_dir)
+        transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
       )
       dothis.extant_path.copy_into_absolute_path(
         transf.omegat_project_dir.local_resultant_tm(omegat_project_dir),
         get.project_dir.global_subtype_project_material_path(
           omegat_project_dir,
           "tm",
-          transf.omegat_project_dir.client_name(omegat_project_dir)
+          transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
         )
       )
     end,
@@ -1998,7 +1998,7 @@ dothis = {
   latex_project_dir = {      
     open_pdf = function(latex_project_dir)
       dothis.local_path.open(
-        transf.latex_project_dir.main_pdf_file(latex_project_dir)
+        transf.latex_project_dir.local_absolute_path_by_main_pdf_file(latex_project_dir)
       )
     end,
     build_and_open_pdf = function(latex_project_dir)
@@ -2010,7 +2010,7 @@ dothis = {
     write_bib = function(latex_project_dir)
       dothis.citations_file.write_bib(
         transf.latex_project_dir.citations_file(latex_project_dir),
-        transf.latex_project_dir.main_bib_file(latex_project_dir)
+        transf.latex_project_dir.local_absolute_path_by_main_bib_file(latex_project_dir)
       )
     end,
     add_indicated_citable_object_id_raw = function(latex_project_dir, indicated_citable_object_id)

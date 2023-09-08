@@ -28,6 +28,7 @@ is = {
     yaml_str = transf["nil"]["true"], -- same as above
     toml_str = transf["nil"]["true"], -- same as above
     ini_str = transf["nil"]["true"], -- same as above
+    bib_str = transf["nil"]["true"], -- same as above
     mime_part_block = transf["nil"]["true"], -- currently don't know enough about this seemingly custom format to check for it
     email_or_displayname_email = function(str)
       return is.str.email(str) or is.str.displayname_email(str)
@@ -158,9 +159,7 @@ is = {
     noempty_noindent_line = function(str)
       return is.line.noempty_line(str) and is.line.noindent_line(str)
     end,
-    noempty_nohashcomment_noindent_line = function(str)
-      return is.line.noempty_nohashcomment_line(str) and is.line.noindent_line(str)
-    end,
+    
     trimmed_line = function(str)
       return is.line.noindent_line(str) and is.line.notrailing_whitespace_line(str)
     end,
@@ -183,6 +182,14 @@ is = {
     end,
     record_str = function(str)
       return get.str.bool_by_contains_w_ascii_str(str, fixedstr.unique_field_separator)
+    end,
+  },
+  noempty_noindent_line = {
+    noempty_noindent_hashcomment_line = function(str)
+      return is.line.hashcomment_line(str)
+    end,
+    noempty_noindent_nohashcomment_line = function(str)
+      return is.line.noempty_nohashcomment_line(str) and is.line.noindent_line(str)
     end,
   },
   noweirdwhitespace_line = {
@@ -438,7 +445,7 @@ is = {
     indicated_doi = function(str)
       return get.str.bool_by_startswith(str, "doi:")
     end,
-    indicated_isbn_part_identifier = function(str)
+    indicated_isbn_part = function(str)
       return get.str.bool_by_startswith(str, "isbn_part:")
     end,
     indicated_pcmid = function(str)
@@ -447,7 +454,7 @@ is = {
     indicated_accession = function(str)
       return get.str.bool_by_startswith(str, "accession:")
     end,
-    indicated_issn_full_identifier = function(str)
+    indicated_issn_full = function(str)
       return get.str.bool_by_startswith(str, "issn_full:")
     end,
     indicated_urlmd5 = function(str)
@@ -458,11 +465,16 @@ is = {
         is.printable_ascii_not_whitespace_str.indicated_isbn(str) or
         is.printable_ascii_not_whitespace_str.indicated_pmid(str) or
         is.printable_ascii_not_whitespace_str.indicated_doi(str) or
-        is.printable_ascii_not_whitespace_str.indicated_isbn_part_identifier(str) or
+        is.printable_ascii_not_whitespace_str.indicated_isbn_part(str) or
         is.printable_ascii_not_whitespace_str.indicated_pcmid(str) or
         is.printable_ascii_not_whitespace_str.indicated_accession(str) or
-        is.printable_ascii_not_whitespace_str.indicated_issn_full_identifier(str) or
+        is.printable_ascii_not_whitespace_str.indicated_issn_full(str) or
         is.printable_ascii_not_whitespace_str.indicated_urlmd5(str)
+    end,
+  },
+  indicated_citable_object_id = {
+    filename_safe_indicated_citable_object_id = function(str)
+      return transf.str.urlcharset_str_by_encoded_query_param_part(str) == str
     end,
   },
   package_name = {
@@ -514,6 +526,15 @@ is = {
   rfc3339like_dt = {
     full_rfc3339like_dt = function(str)
       return #str >= 19 -- full for me is at least date and time, but not necessarily timezone or fractional seconds
+    end,
+    rfc3339like_y = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{4}")
+    end,
+    rfc3339like_ym = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{4}-\\d{2}")
+    end,
+    rfc3339like_ymd = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "\\d{4}-\\d{2}-\\d{2}")
     end,
   },
   period_alphanum_minus_underscore = {
@@ -681,6 +702,14 @@ is = {
     mixed_strict_kebap_case = function(str)
       return not is.strict_kebap_case.upper_strict_kebap_case(str) and not is.strict_kebap_case.lower_strict_kebap_case(str)
     end,
+    bcp_47_language_tag = transf["nil"]["true"] -- too lazy for now
+  },
+  lower_strict_kebap_case = {
+    csl_style = function(str)
+      return is.local_absolute_path.local_extant_path(
+        transf.lower_strict_snake_case.local_absolute_path_by_csl_file(str)
+      )
+    end,
   },
   mixed_strict_kebap_case = {
     camel_strict_kebap_case = function(str)
@@ -696,15 +725,7 @@ is = {
     end,
   },
   num_minus = {
-    year = function(str)
-      return get.str.bool_by_matches_whole_onig(str, "\\d{4}")
-    end,
-    year_month = function(str)
-      return get.str.bool_by_matches_whole_onig(str, "\\d{4}-\\d{2}")
-    end,
-    year_month_day = function(str)
-      return get.str.bool_by_matches_whole_onig(str, "\\d{4}-\\d{2}-\\d{2}")
-    end,
+    
     digit_interval_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, "\\d+-\\d+")
     end,
@@ -1054,6 +1075,11 @@ is = {
       return is.dir.latex_project_dir(dir) or is.dir.omegat_project_dir(dir) or is.dir.npm_project_dir(dir) or is.dir.cargo_project_dir(dir) or is.dir.sass_project_dir(dir)
     end,
   },
+  project_dir = {
+    client_project_dir = function(dir)
+      return get.dir.bool_by_contains_leaf_of_child(dir, "client_project_data.yaml")
+    end,
+  },
   absolute_path = {
     extant_path = function(path)
       return (
@@ -1213,6 +1239,9 @@ is = {
     newsboat_urls_file = function(path)
       return get.path.is_leaf(path, "urls")
     end,
+    citations_file = function (path)
+      return get.path.is_leaf(path, "citations")
+    end,
     md_file = function(path)
       return get.path.is_standartized_extension(path, "md")
     end,
@@ -1302,6 +1331,20 @@ is = {
       return not is.strict_snake_case.upper_strict_snake_case(str) and not is.strict_snake_case.lower_strict_snake_case(str)
     end,
   },
+  lower_strict_snake_case = {
+    citable_object_id_indication_name = function(str)
+      return get.arr.bool_by_contains(ls.citable_object_id_indication_name, str)
+    end,
+    client_id = function(str)
+      return get.table.bool_by_has_key(fstblmap.client_id.contact_uuid, str)
+    end,
+    client_project_kind = function(str)
+      return get.arr.bool_by_contains(ls.client_project_kind, str)
+    end,
+    billing_unit = function(str)
+      return get.arr.bool_by_contains(ls.billing_unit, str)
+    end,
+  },
   mixed_strict_snake_case = {
     camel_strict_snake_case = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.case.camel_snake)
@@ -1376,6 +1419,12 @@ is = {
     iso_3166_1_alpha_3_country_code = function(str)
       return #str == 3
     end,
+    iso_639_1_language_code = function(str)
+      return #str == 2
+    end,
+    iso_639_3_language_code = function(str)
+      return #str == 3
+    end,
     mullvad_city_code = function(str)
       return #str == 3
     end,
@@ -1420,6 +1469,9 @@ is = {
     vcard_address_type = function(str)
       return get.arr.bool_by_contains(ls.vcard.vcard_address_type, str)
     end,
+    audiodevice_subtype = function(str)
+      return str == "input" or str == "output"
+    end,
 
   },
   url = {
@@ -1433,7 +1485,7 @@ is = {
       return transf.url.authority(url) ~= nil
     end,
     query_url = function(url)
-      return transf.url.query(url) ~= nil
+      return transf.url.query_str_or_nil(url) ~= nil
     end,
     fragment_url = function(url)
       return transf.url.printable_ascii_or_nil_by_fragment(url) ~= nil
@@ -1447,8 +1499,8 @@ is = {
     userinfo_url = function(url)
       return transf.url.userinfo(url) ~= nil
     end,
-    base_url = function(url)
-      return transf.url.local_absolute_path_or_nil_by_path == nil and transf.url.query == nil and transf.url.fragment == nil
+    nofragment_url = function(url)
+      return transf.url.fragment(url) == nil
     end,
 
     booru_post_url = function(url)
@@ -1480,6 +1532,16 @@ is = {
       return get.str.bool_by_not_contains_w_ascii_str(
         path, "/"
       )
+    end,
+  },
+  nofragment_url = {
+    clean_url = function(url)
+      return transf.url.query_str_or_nil(url) == nil
+    end,
+  },
+  clean_url = {
+    base_url = function(url)
+      return transf.url.local_absolute_path_or_nil_by_path(url) == nil
     end,
   },
   base_url = {
@@ -1516,7 +1578,7 @@ is = {
     end,
   },
   path_url = {
-    owner_item_url = function(url)
+    owner_item_url = function(url) 
       return #transf.owner_item_url.two_strs_arr(url) == 2
     end,
     extension_url = function(url)
@@ -1528,6 +1590,11 @@ is = {
     yandere_style_post_url = function(url)
       return get.str.bool_by_matches_whole_eutf8(transf.path_url.path(url), "/post/show/%d+/?")
     end,
+    doi_url = function(url)
+      return is.str.doi(
+        transf.url.local_absolute_path_or_nil_by_path_decoded(url)
+      )
+    end
   },
   query_url = {
     gelbooru_style_post_url = function(url)
@@ -1740,12 +1807,34 @@ is = {
     date_component_index = transf["nil"]["true"]
   },
   mult_anys = {
+    one_to_three_anys = function(...)
+      return transf.n_anys.int_by_amount(...) >= 1 and transf.n_anys.int_by_amount(...) <= 3
+    end,
+  },
+  one_to_three_anys = {
     two_anys = function(...)
       return transf.n_anys.int_by_amount(...) == 2
     end,
     three_anys = function(...)
       return transf.n_anys.int_by_amount(...) == 3
     end,
+    one_to_three_numbers = function(...)
+      return get.arr.bool_by_all(
+        transf.n_anys.arr(...),
+        is.any.number
+      )
+    end,
+  },
+  one_to_three_numbers = {
+    one_to_three_pos_ints = function(...)
+      return get.arr.bool_by_all(
+        transf.n_anys.arr(...),
+        is.number.pos_int
+      )
+    end,
+  },
+  one_to_three_pos_ints = {
+    dtprts = transf["nil"]["true"]
   },
   two_anys = {
     two_numbers = function(a, b)
@@ -1778,8 +1867,8 @@ is = {
     end,
   },
   three_strs = {
-    year_and_year_month_and_year_month_day = function(a, b, c)
-      return is.str.year(a) and is.str.year_month(b) and is.str.year_month_day(c)
+    rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd = function(a, b, c)
+      return is.str.year(a) and is.str.rfc3339like_ym(b) and is.str.rfc3339like_ymd(c)
     end,
   },
   any = {
@@ -2004,6 +2093,15 @@ is = {
     youtube_api_item = function(t)
       return t.kind
     end,
+    vdirsyncer_pair_specifier = function(t)
+      return t.local_storage_path and t.local_storage_type
+    end,
+    url_components = function(t)
+      return t.scheme or t.host or t.endpoint or t.params or t.url or t.nofragment_url or t.clean_url or t.base_url
+    end,
+    csl_person = function(t)
+      return t.family or t.given or t["dropping-particle"] or t["non-dropping-particle"] or t.suffix or t.literal
+    end
 
   },
 
@@ -2158,6 +2256,9 @@ is = {
     end,
     styledtext = function(val)
       return transf.full_userdata.str_by_classname(val) == "hs.styledtext"
+    end,
+    audiodevice = function(val)
+      return transf.full_userdata.str_by_classname(val) == "hs.audiodevice"
     end,
   }
 }

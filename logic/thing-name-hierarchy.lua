@@ -1,15 +1,22 @@
 thing_name_hierarchy = {
   mult_anys = {
-    two_anys = {
-      two_numbers = "leaf",
-      two_strs = {
-        snake_case_and_str = "leaf",
+    one_to_three_anys = {
+      two_anys = {
+        two_numbers = "leaf",
+        two_strs = {
+          snake_case_and_str = "leaf",
+        },
+        two_arrs = "leaf",
       },
-      two_arrs = "leaf",
-    },
-    three_anys = {
-      three_strs = {
-        year_and_year_month_and_year_month_day = "leaf",
+      three_anys = {
+        three_strs = {
+          rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd = "leaf",
+        }
+      },
+      one_to_three_numbers = {
+        one_to_three_pos_ints = {
+          dtprts = "leaf"
+        }
       }
     }
   },
@@ -63,8 +70,10 @@ thing_name_hierarchy = {
           ini_kv_line = "leaf"
         },
         noempty_nohashcomment_line = "leaf",
-        noempty_noindent_line = "leaf",
-        noempty_nohashcomment_noindent_line = "leaf",
+        noempty_noindent_line = {
+          noempty_noindent_hashcomment_line = "leaf",
+          noempty_noindent_nohashcomment_line = "leaf",
+        },
         ini_section_line = "leaf",
         trimmed_line = {
           displayname_email = "leaf",
@@ -212,7 +221,9 @@ thing_name_hierarchy = {
                     local_dir = {
                       empty_local_dir = "leaf",
                       nonempty_local_dir = {
-                        project_dir = "leaf",
+                        project_dir = {
+                          client_project_dir = "leaf"
+                        },
                         latex_project_dir = "leaf",
                         omegat_project_dir = "leaf",
                         npm_project_dir = "leaf",
@@ -271,8 +282,12 @@ thing_name_hierarchy = {
                   package_name_semver_package_manager_name_compound_str = "leaf",
                   urlcharset_str = {
                     url = {
-                      base_url = {
-                        dotgit_url = "leaf",
+                      nofragment_url = {
+                        clean_url = {
+                          base_url = {
+                            dotgit_url = "leaf",
+                          },
+                        },
                       },
                       scheme_url = {
                         mailto_url = "leaf",
@@ -370,22 +385,27 @@ thing_name_hierarchy = {
                     indicated_isbn = "leaf",
                     indicated_pmid = "leaf",
                     indicated_doi = "leaf",
-                    indicated_isbn_part_identifier = "leaf",
+                    indicated_isbn_part = "leaf",
                     indicated_pcmid = "leaf",
                     indicated_accession = "leaf",
-                    indicated_issn_full_identifier = "leaf",
+                    indicated_issn_full = "leaf",
                     indicated_urlmd5 = "leaf",
-                    indicated_citable_object_id = "leaf",
+                    indicated_citable_object_id = {
+                      filename_safe_indicated_citable_object_id = "leaf"
+                    },
                     percent_encoded_octet = "leaf",
                     lower_alphanum_underscore_comma = "leaf",
                     
                     colon_period_alphanum_minus_underscore = {
                       indicated_utf8_hex_str = "leaf",
                       rfc3339like_dt_o_interval = {
-                        rfc3339_dt = {
+                        rfc3339like_dt = {
                           full_rfc3339like_dt = "leaf",
+                          rfc3339like_y = "leaf",
+                          rfc3339like_ym = "leaf",
+                          rfc3339like_ymd = "leaf",
                         },
-                        rfc3339_interval = "leaf",
+                        rfc3339like_interval = "leaf",
                       },
                       colon_alphanum_minus_underscore = {
                         colon_minus_num = {
@@ -433,16 +453,15 @@ thing_name_hierarchy = {
                               git_remote_type = "leaf",
                             },
                             num_minus = {
-                              year = "leaf",
-                              year_month = "leaf",
-                              year_month_day = "leaf",
                               digit_interval_str = "leaf",
                             },
                             upper_alphanum_minus ="leaf",
                             kebap_case = {
                               strict_kebap_case = {
                                 upper_strict_kebap_case = "leaf",
-                                lower_strict_kebap_case = "leaf",
+                                lower_strict_kebap_case = {
+                                  csl_style = "leaf",
+                                },
                                 mixed_strict_kebap_case = {
                                   camel_strict_kebap_case = {
                                     upper_camel_strict_kebap_case = "leaf",
@@ -461,7 +480,11 @@ thing_name_hierarchy = {
                             snake_case = {
                               strict_snake_case = {
                                 upper_strict_snake_case = "leaf",
-                                lower_strict_snake_case = "leaf",
+                                lower_strict_snake_case = {
+                                  citable_object_id_indication_name = "leaf",
+                                  client_id = "leaf",
+                                  client_project_kind = "leaf"
+                                },
                                 mixed_strict_snake_case = {
                                   camel_strict_snake_case = {
                                     upper_camel_strict_snake_case = "leaf",
@@ -486,6 +509,7 @@ thing_name_hierarchy = {
                                 vcard_phone_type = "leaf",
                                 vcard_email_type = "leaf",
                                 vcard_address_type = "leaf",
+                                audiodevice_subtype = "leaf",
                               },
                               iso_3366_1_alpha_2_country_code = "leaf",
                               iso_3366_1_alpha_3_country_code = "leaf",
@@ -619,9 +643,12 @@ thing_name_hierarchy = {
         role_content_message_spec = "leaf",
         val_dep_spec = "leaf",
         syn_specifier = "leaf",
+        vdirsyncer_pair_specifier = "leaf",
         email_speciier = "leaf",
         newsboat_urls_specifier = "leaf",
         semver_component_specifier = "leaf",
+        url_components = "leaf",
+        csl_person = "leaf",
         dcmp_spec = {
           full_dcmp_spec = "leaf",
           cont_dcmp_spec = {

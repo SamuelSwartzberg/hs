@@ -513,5 +513,21 @@ ls = {
     "o",
     "d",
     "x",
+  },
+  citable_object_id_indication_name = {
+    "isbn",
+    "doi",
+    "isbn_part",
+    "pmid",
+    "pmcid",
+    "accession",
+    "issn_full",
+    "urlmd5"
+  },
+  client_project_kind = {
+    "translation"
+  },
+  billing_unit = {
+    "line"
   }
 }

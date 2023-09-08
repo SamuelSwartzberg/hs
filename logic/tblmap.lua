@@ -407,6 +407,11 @@ tblmap = {
     host_by_blob_default = {},
     host_by_raw_default = {},
   },
+  client_project_kind = {
+    billing_unit = {
+      translation = "line"
+    }
+  },
   git_remote_type = {
     printable_ascii_by_blob_indicator_path = {
       github = "blob/",
@@ -452,7 +457,7 @@ tblmap = {
         source = "create_dir",
         target = "create_dir",
         tm = "create_dir",
-        ["data.yaml"] = {"write_template","comp.templates.data_yaml"},
+        ["client_project_data.yaml"] = {"write_template","comp.templates.data_yaml"},
         ["omegat.project"] = {"write_template", "comp.templates.omegat"}
       },
     }
