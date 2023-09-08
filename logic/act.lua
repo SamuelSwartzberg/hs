@@ -637,7 +637,7 @@ act = {
   source_id = {
     activate = function(source_id)
       hs.keycodes.currentSourceID(source_id)
-      hs.alert.show(transf.source_id.language(source_id))
+      hs.alert.show(transf.source_id.line_by_language(source_id))
     end,
   },
   source_id_arr = {

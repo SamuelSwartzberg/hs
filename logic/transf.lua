@@ -7026,48 +7026,25 @@ transf = {
       return transf.str.not_starting_o_ending_with_whitespace_str(arg1), select(2, ...)
     end
   },
-  n_bool_functions = {
-    and_bool_function = function(...)
-      local functions = {...}
-      return function(arg)
-        for _, fn in transf.arr.pos_int_vt_stateless_iter(functions) do
-          if not fn(arg) then
-            return false
-          end
-        end
-        return true
-      end
-    end,
-    or_bool_function = function(...)
-      local functions = {...}
-      return function(arg)
-        for _, fn in transf.arr.pos_int_vt_stateless_iter(functions) do
-          if fn(arg) then
-            return true
-          end
-        end
-        return false
-      end
-    end,
-  },
   mailto_url = {
-   
-    emails = function(mailto_url)
-      local no_scheme = transf.url.urllike_with_no_scheme(mailto_url)
-      local emails_part = get.str.str_arr_by_split_w_ascii_char(no_scheme, "?")[1]
+    line_by_emails = function(mailto_url)
+      return transf.url.local_nonabsolute_path_or_nil_by_path_decoded(mailto_url)
+    end,
+    email_arr = function(mailto_url)
+      local emails_part = transf.mailto_url.line_by_emails(mailto_url)
       local emails = get.str.str_arr_by_split_w_ascii_char(emails_part, ",")
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(emails, transf.str.not_starting_o_ending_with_whitespace_str)
     end,
-    first_email = function(mailto_url)
-      return transf.mailto_url.emails(mailto_url)[1]
+    email_by_first = function(mailto_url)
+      return transf.mailto_url.email_arr(mailto_url)[1]
     end,
-    subject = function(mailto_url)
+    str_by_subject = function(mailto_url)
       return transf.url.str_key_str_value_assoc_by_decoded_param_table(mailto_url).subject 
     end,
-    body = function(mailto_url)
+    str_by_body = function(mailto_url)
       return transf.url.str_key_str_value_assoc_by_decoded_param_table(mailto_url).body 
     end,
-    cc = function(mailto_url)
+    str_by_cc = function(mailto_url)
       return transf.url.str_key_str_value_assoc_by_decoded_param_table(mailto_url).cc 
     end,
 
@@ -7079,20 +7056,19 @@ transf = {
     
   },
   otpauth_url = {
-    type = function(otpauth_url)
-      return get.str.str_arr_by_split_w_ascii_char(transf.url.urllike_with_no_scheme(otpauth_url), "/")[1]
+    otp_type = function(otpauth_url)
+      return transf.url.host(otpauth_url)
     end,
-    label = function(otpauth_url)
-      local part = get.str.str_arr_by_split_w_ascii_char(transf.url.urllike_with_no_scheme(otpauth_url), "/")[2]
-      return get.str.str_arr_by_split_w_ascii_char(part, "?")[1]
+    urlcharset_str_by_label = function(otpauth_url)
+      return transf.url.local_absolute_path_or_nil_by_path_decoded(otpauth_url)
     end,
     
   },
   data_url = {
-    raw_type = function(data_url)
+    media_type = function(data_url)
       return get.str.str_arr_by_split_w_ascii_char(transf.url.urllike_with_no_scheme(data_url), ";")[1]
     end,
-    header_part = function(data_url) -- the non-data part will either be separated from the rest of the url by `;,` or `;base64,`, so we need to split on `,`, then find the first part that ends `;` or `base64;`, and then join and return all parts before that part
+    urlcharset_str_by_header_part = function(data_url) -- the non-data part will either be separated from the rest of the url by `;,` or `;base64,`, so we need to split on `,`, then find the first part that ends `;` or `base64;`, and then join and return all parts before that part
       local parts = get.str.str_arr_by_split_w_ascii_char(transf.url.urllike_with_no_scheme(data_url), ",")
       local non_data_part = ""
       for _, part in transf.arr.pos_int_vt_stateless_iter(parts) do
@@ -7105,12 +7081,12 @@ transf = {
       end
       return non_data_part
     end,
-    payload_part = function(data_url)
-      return get.str.no_prefix_str(transf.url.urllike_with_no_scheme(data_url), transf.data_url.header_part(data_url))
+    urlcharset_str_by_payload_part = function(data_url)
+      return get.str.no_prefix_str(transf.url.urllike_with_no_scheme(data_url), transf.data_url.urlcharset_str_by_header_part(data_url))
     end,
       
-    raw_type_param_table = function(data_url)
-      local parts = get.str.str_arr_by_split_w_ascii_char(transf.data_url.header_part(data_url), ";")
+    urlcharset_str_key_urlcharset_str_value_assoc = function(data_url)
+      local parts = get.str.str_arr_by_split_w_ascii_char(transf.data_url.urlcharset_str_by_header_part(data_url), ";")
       act.arr.shift(parts) -- this is the content type
       act.arr.pop(parts) -- this is the base64, or ""
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(parts, function(part)
@@ -7125,7 +7101,7 @@ transf = {
     end,
   },
   source_id = {
-    language = function(source_id)
+    line_by_language = function(source_id)
       return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(get.str.str_arr_by_split_w_ascii_char(source_id, "."), -1, -1)[1]
     end,
   },
@@ -7142,62 +7118,67 @@ transf = {
     mod_symbol_arr = function(menu_item_table)
       return transf.mod_name_arr.mod_symbol_arr(transf.menu_item_table.mod_name_arr(menu_item_table))
     end,
-    hotkey = function(menu_item_table)
+    utf8_char_by_hotkey = function(menu_item_table)
       return menu_item_table.AXMenuItemCmdChar
     end,
-    shortcut_str = function(menu_item_table)
-      return transf.shortcut_specifier.shortcut_str({
+    key_input_spec = function(menu_item_table)
+      return {
         mod_arr = transf.menu_item_table.mod_name_arr(menu_item_table),
-        key = transf.menu_item_table.hotkey(menu_item_table)
-      } )
+        key = transf.menu_item_table.utf8_char_by_hotkey(menu_item_table)
+      } 
+    end,
+    str_by_shortcut = function(menu_item_table)
+      return transf.key_input_spec.str_by_shortcut(
+        transf.menu_item_table.key_input_spec(menu_item_table)
+      )
     end,
     str_by_title = function(menu_item_table)
       return menu_item_table.AXTitle
     end,
-    full_action_path = function(menu_item_table)
+    str_arr_by_action_path = function(menu_item_table)
       return transf.arr_and_any.arr(menu_item_table.path, menu_item_table.AXTitle)
     end,
-    full_action_path_str = function(menu_item_table)
-      return transf.str_arr.str_by_action_path(transf.menu_item_table.full_action_path(menu_item_table))
+    str_by_action_path = function(menu_item_table)
+      return transf.str_arr.str_by_action_path(transf.menu_item_table.str_arr_by_action_path(menu_item_table))
     end,
     running_application = function(menu_item_table)
       return menu_item_table.application
     end,
     str_by_summary = function(menu_item_table)
-      if transf.menu_item_table.hotkey(menu_item_table) then
-        return transf.menu_item_table.full_action_path_str(menu_item_table) .. " (" .. transf.menu_item_table.shortcut_str(menu_item_table) .. ")"
+      if transf.menu_item_table.utf8_char_by_hotkey(menu_item_table) then
+        return transf.menu_item_table.str_by_action_path(menu_item_table) .. " (" .. transf.menu_item_table.str_by_shortcut(menu_item_table) .. ")"
       else
-        return transf.menu_item_table.full_action_path_str(menu_item_table)
+        return transf.menu_item_table.str_by_action_path(menu_item_table)
       end
     end
   },
   mod_name_arr = {
     mod_symbol_arr = function(mod_arr)
-      return get.arr.arr_by_mapped_w_t_key_assoc(mod_arr, transf.mod.mod_symbol)
+      return get.arr.arr_by_mapped_w_t_key_assoc(mod_arr, transf.mod_name.mod_symbol)
     end,
     mod_char_arr = function(mod_arr)
-      return get.arr.arr_by_mapped_w_t_key_assoc(mod_arr, transf.mod.mod_char)
+      return get.arr.arr_by_mapped_w_t_key_assoc(mod_arr, transf.mod_name.mod_char)
     end,
   },
-  shortcut_specifier = {
-    mod_name_arr = function(shortcut_specifier)
-      return shortcut_specifier.mod_name_arr
+  key_input_spec = {
+    mod_name_arr = function(spec)
+      return spec.mod_name_arr
     end,
-    key = function(shortcut_specifier)
-      return shortcut_specifier.key
+    str_by_key = function(spec)
+      return spec.key
     end,
-    shortcut_arr = function(shortcut_specifier)
+    str_arr_by_parts = function(spec)
       return transf.arr_and_any.arr(
-        shortcut_specifier.mod_name_arr,
-        shortcut_specifier.key
+        spec.mod_name_arr,
+        spec.key
       )
     end,
-    shortcut_str = function(shortcut_specifier)
-      local modstr = get.str_or_number_arr.str_by_joined(get.arr.arr_by_mapped_w_t_key_assoc(shortcut_specifier.mod_name_arr, tblmap.mod_name.mod_symbol), "")
+    str_by_shortcut = function(spec)
+      local modstr = get.str_or_number_arr.str_by_joined(get.arr.arr_by_mapped_w_t_key_assoc(spec.mod_name_arr, tblmap.mod_name.mod_symbol), "")
       if modstr == "" then
-        return shortcut_specifier.key
+        return spec.key
       else
-        return modstr .. " " .. shortcut_specifier.key
+        return modstr .. " " .. spec.key
       end
     end,
 
@@ -7847,17 +7828,17 @@ transf = {
     mnemonic_str = function(hotkey_created_item_specifier)
       return transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier) and get.str.str_by_formatted_w_n_anys("[%s] ", transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier)) or ""
     end,
-    shortcut_specifier = function(hotkey_created_item_specifier)
-      return hotkey_created_item_specifier.creation_specifier.shortcut_specifier
+    key_input_spec = function(hotkey_created_item_specifier)
+      return hotkey_created_item_specifier.creation_specifier.key_input_spec
     end,
     shortcut_str = function(hotkey_created_item_specifier)
-      return transf.shortcut_specifier.shortcut_str(transf.hotkey_created_item_specifier.shortcut_specifier(hotkey_created_item_specifier))
+      return transf.key_input_spec.str_by_shortcut(transf.hotkey_created_item_specifier.key_input_spec(hotkey_created_item_specifier))
     end,
     mod_arr = function(hotkey_created_item_specifier)
-      return hotkey_created_item_specifier.creation_specifier.shortcut_specifier.mod_arr
+      return hotkey_created_item_specifier.creation_specifier.key_input_spec.mod_arr
     end,
     key = function(hotkey_created_item_specifier)
-      return hotkey_created_item_specifier.creation_specifier.shortcut_specifier.key
+      return hotkey_created_item_specifier.creation_specifier.key_input_spec.key
     end,
     fn = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.fn

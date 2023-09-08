@@ -1824,7 +1824,7 @@ dothis = {
     execute = function(menu_item_table)
       dothis.running_application.execute_full_action_path(
         transf.menu_item_table.running_application(menu_item_table),
-        transf.menu_item_table.full_action_path(menu_item_table)
+        transf.menu_item_table.str_arr_by_action_path(menu_item_table)
       )
     end,
   },

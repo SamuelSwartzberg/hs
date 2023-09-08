@@ -554,6 +554,11 @@ is = {
       return get.str.bool_by_matches_whole_onig(str, r.g.ipv4)
     end,
   },
+  domain_name = {
+    source_id = function(str)
+      return get.str.bool_by_startswith(str, "com.apple.inputmethod") or get.str.bool_by_startswith(str, "com.apple.keylayout")
+    end,
+  },
   indicated_number_str = {
     indicated_bin_number_str = function(str)
       return get.str.bool_by_startswith(str, "0b")
@@ -1472,6 +1477,9 @@ is = {
     audiodevice_subtype = function(str)
       return str == "input" or str == "output"
     end,
+    otp_type = function(str)
+      return str == "totp" or str == "hotp"
+    end,
 
   },
   url = {
@@ -1682,7 +1690,7 @@ is = {
   },
   data_url = {
     base64_data_url = function(url)
-      return get.str.bool_by_endswith(transf.data_url.header_part(url), ";base64")
+      return get.str.bool_by_endswith(transf.data_url.urlcharset_str_by_header_part(url), ";base64")
     end,
     image_data_url = function(url)
       return is.media_type.image_media_type(transf.data_url.content_type(url))
@@ -2029,8 +2037,7 @@ is = {
     end,
     input_spec = function(t)
       return
-        t.mode and
-        (t.mouse_button_str or t.key or t.target_point)
+        t.mouse_button_str or t.key or t.target_point
     end,
     unicode_prop_table = function(t)
       return
@@ -2220,6 +2227,20 @@ is = {
     end,
   },
   input_spec = {
+    declared_input_spec = function(t)
+      return t.mode
+    end,
+    click_input_spec = function(t)
+      return t.mouse_button_str
+    end,
+    key_input_spec = function(t)
+      return t.key
+    end,
+    position_change_input_spec = function(t)
+      return t.target_point
+    end,
+  },
+  declared_input_spec = {
     declared_click_input_spec = function(input_spec)
       return input_spec.mode == "click"
     end,
