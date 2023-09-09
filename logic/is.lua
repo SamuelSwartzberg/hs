@@ -1524,6 +1524,9 @@ is = {
     otp_type = function(str)
       return str == "totp" or str == "hotp"
     end,
+    llm_chat_role = function(str)
+      return get.arr.bool_by_contains(ls.llm_chat_role, str)
+    end,
 
   },
   url = {
@@ -1766,6 +1769,14 @@ is = {
     float = function(num)
       return not is.number.int(num)
     end,
+    inclusive_proper_fraction = function(num)
+      return num >= 0 and num <= 1
+    end,
+  },
+  inclusive_proper_fraction = {
+    proper_fraction = function(num)
+      return num > 0 and num < 1
+    end,
   },
   int = {
     even_int = function(num)
@@ -1956,6 +1967,29 @@ is = {
     end,
     not_userdata_or_fn = function(val)
       return not is.any.userdata(val) and not is.any.fn(val)
+    end,
+    having_metatable = function(val)
+      return getmetatable(val) ~= nil
+    end,
+    operational_comparable = function(val)
+      return is.any.number(val) or is.any.metatable_comparable(val) 
+    end,
+    operational_addable = function(val)
+      return is.any.number(val) or is.any.metatable_addable(val)
+    end,
+    operational_addcompable = function(val)
+      return is.any.operational_addable(val) and is.any.operational_comparable(val)
+    end,
+
+  },
+  having_metatable = {
+    metatable_comparable = function(val)
+      local mt = getmetatable(val)
+      return mt.__lt and mt.__le and mt.__eq -- currently we're not distinguishing between subtypes of operational_comparable (partially ordered, totally ordered, etc), and so we require all three relations to be defined
+    end,
+    metatable_addable = function(val)
+      local mt = getmetatable(val)
+      return mt.__add
     end,
   },
   auth_pass_item_name = {
@@ -2177,7 +2211,66 @@ is = {
     fn_queue_specifier = function(t)
       return t.fn_arr and t.hotkey_created_item_specifier
     end,
+    n_shot_llm_spec = function(t)
+      return t.query and t.input
+    end,
+    prompt_spec = function(t)
+      return t.prompter
+    end,
+    hs_geometry_point_like = function(t)
+      return t.x and t.y
+    end,
+    hs_geometry_size_like = function(t)
+      return t.w and t.h
+    end,
+    hs_geometry_rect_like = function(t)
+      return t.x and t.y and t.w and t.h
+    end,
+    hs_geometry = function(t)
+      return t.angleTo
+    end,
+    form_filling_specifier = function(t)
+      return t.in_fields and t.form_fields and t.explanations
+    end,
 
+  },
+  hs_geometry_point_like = {
+    hs_geometry_point = function(t)
+      return is.non_empty_table.hs_geometry(t)
+    end,
+    point_spec = function(t)
+      return not is.hs_geometry_point(t)
+    end,
+  },
+  hs_geometry_size_like = {
+    hs_geometry_size = function(t)
+      return is.non_empty_table.hs_geometry(t)
+    end,
+    size_spec = function(t)
+      return not is.hs_geometry_size(t)
+    end,
+  },
+  hs_geometry_rect_like = {
+    hs_geometry_rect = function(t)
+      return is.non_empty_table.hs_geometry(t)
+    end,
+    rect_spec = function(t)
+      return not is.hs_geometry_rect(t)
+    end,
+  },
+  role_content_message_spec = {
+    system_role_content_message_spec = function(t)
+      return t.role == "system"
+    end,
+    user_role_content_message_spec = function(t)
+      return t.role == "user"
+    end,
+    assistant_role_content_message_spec = function(t)
+      return t.role == "assistant"
+    end,
+    function_role_content_message_spec = function(t)
+      return t.role == "function"
+    end,
   },
   export_chat_main_object = {
     telegram_export_chat_main_object = function(t)
@@ -2243,9 +2336,6 @@ is = {
     number_interval_specifier = function(t)
       return is.any.number(t.start) and is.any.number(t.stop)
     end,
-    date_interval_specifier = function(t)
-      return is.any.date(t.start) and is.any.date(t.stop)
-    end,
     sequence_specifier = function(t)
       return t.step ~= nil
     end
@@ -2254,9 +2344,7 @@ is = {
     int_interval_specifier = function(t)
       return is.number.int(t.start) and is.number.int(t.stop)
     end,
-  },
-  date_interval_specifier = {
-    date_sequence_specifier = function(t)
+    number_sequence_specifier = function(t)
       return is.interval_specifier.sequence_specifier(t)
     end,
   },

@@ -576,8 +576,8 @@ get = {
 
       -- clamp indices to ensure we don't go out of bounds (+/-1 because we want over/underindexing to produce an empty thing, not the last element)
 
-      spec.start = get.comparable.comparable_by_clamped(spec.start, 1, transf.indexable.length(arr) + 1)
-      spec.stop = get.comparable.comparable_by_clamped(spec.stop, 1-1, transf.indexable.length(arr))
+      spec.start = get.operational_comparable.operational_comparable_by_clamped(spec.start, 1, transf.indexable.length(arr) + 1)
+      spec.stop = get.operational_comparable.operational_comparable_by_clamped(spec.stop, 1-1, transf.indexable.length(arr))
 
       -- handle cases where users have passed conditions that will result in an infinite loop
 
@@ -1382,7 +1382,7 @@ get = {
       return res
     end,
     llm_response_str_freeform = function(str, temperature, max_tokens)
-      return get.role_content_message_spec_arr.llm_response_str(
+      return get.role_content_message_spec_arr.str_by_llm_response(
         {{
           content = str,
           role = "user"
@@ -1392,8 +1392,8 @@ get = {
       )
     end,
     llm_response_str_strent = function(str, temperature, max_tokens)
-      return get.role_content_message_spec_arr.llm_response_str(
-        transf.role_content_message_spec_arr.api_role_content_message_spec_arr({{
+      return get.role_content_message_spec_arr.str_by_llm_response(
+        transf.role_content_message_spec_arr.role_content_message_spec_arr_by_with_api_system_message({{
           content = str,
           role = "user"
         }}),
@@ -2418,58 +2418,37 @@ get = {
       return get.arr.t_or_nil_by_previous(ls.date.dcmp_names, transf.dcmp_name.date_component_index(component) - n)
     end,
   },
-  date = {
-    with_date_component_value_added = function(date, date_component_value, dcmp_name)
-      local dtcp = date:copy()
-      return dtcp["add" .. tblmap.dcmp_name.dcmp_name_long[dcmp_name] .. "s"](dtcp, date_component_value)
-    end,
-    with_date_component_value_subtracted = function(date, date_component_value, dcmp_name)
-      return get.date.with_date_component_value_added(date, -date_component_value, dcmp_name)
-    end,
-    date_component_value = function(date, dcmp_name)
-      return date["get" .. tblmap.dcmp_name.dcmp_name_long[dcmp_name]](date)
-    end,
-    surrounding_date_sequence_specifier = function(date, date_component_value, step, unit)
-      return {
-        start = get.date.with_date_component_value_subtracted(date, date_component_value, step),
-        stop = get.date.with_date_component_value_added(date, date_component_value, step),
-        step = step,
-        unit = unit,
-      }
-    end,
-    date_sequence_specifier_of_lower_component = function(date, step, dcmp_name)
-      return get.full_dcmp_spec.date_sequence_specifier_of_lower_component(
-        transf.date.full_dcmp_spec(date),
-        step,
-        dcmp_name
-      )
-    end,
-    hours_date_sequence_specifier = function(date, date_component_value)
-      return get.date.date_sequence_specifier_of_lower_component(date, date_component_value, "day")
-    end,
-    precision_date = function(date, dcmp_name)
-      return get.full_dcmp_spec.precision_date(
-        transf.date.full_dcmp_spec(date),
-        dcmp_name
-      )
-    end,
-    --- date_format_indicator = date_format or date_format_name
-    str_w_date_format_indicator = function(date, format)
-      local retrieved_format = tblmap.date_format_name.date_format[format]
-      return date:fmt(retrieved_format or format)
-    end,
-    rfc3339like_dt_of_precision = function(date, precision)
-      return get.date.str_w_date_format_indicator(date, tblmap.dcmp_name.rfc3339like_dt_format_str[precision])
-    end,
-
-  },
   timestamp_s = {
     str_w_date_format_indicator = function(timestamp_s, format)
-      return get.date.str_w_date_format_indicator(
-        transf.timestamp_s.date(timestamp_s),
-        format
-      )
+      return os.date(format, timestamp_s)
     end,
+    timestamp_s_by_added = function(ts, amount, dcmp_name)
+      return ts + (tblmap.dcmp_name.timestamp_s[dcmp_name] * amount)
+    end,
+    timestamp_s_by_subtracted = function(ts, amount, dcmp_name)
+      return get.timestamp_s.timestamp_s_by_added(ts, -amount, dcmp_name)
+    end,
+    number_interval_specifier_by_surrounding = function(ts, amount, dcmp_name)
+      return {
+        start = get.timestamp_s.timestamp_s_by_subtracted(ts, amount, dcmp_name),
+        stop = get.timestamp_s.timestamp_s_by_added(ts, amount, dcmp_name),
+      }
+    end,
+    number_sequence_specifier_by_surrounding = function(ts, interval_amount, interval_dcmp_name, step_amount, step_dcmp_name)
+      local ivl = get.timestamp_s.number_interval_specifier_by_surrounding(ts, interval_amount, interval_dcmp_name)
+      ivl.step = tblmap.dcmp_name.timestamp_s[step_dcmp_name] * step_amount
+      return ivl
+    end,
+    number_sequence_specifier_of_lower_component = function(date, step, dcmp_name)
+      error("TODO")
+    end,
+    hours_date_sequence_specifier = function(date, date_component_value)
+      error("TODO")
+    end,
+    rfc3339like_dt_by_precison_w_dcmp_name = function(date, dcmp_name)
+      return get.timestamp_s.str_w_date_format_indicator(date, tblmap.dcmp_name.rfc3339like_dt_format_str[dcmp_name])
+    end,
+
   },
   timestamp_ms = {
     str_w_date_format_indicator = function(timestamp_s, format)
@@ -2858,14 +2837,14 @@ get = {
   iso_3366_1_alpha_2_code = {
     --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_full_name instead
     full_name_in_language_str = function(code, language_identifier_str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+      return get.n_shot_llm_spec.str_or_nil_by_response({
         query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_str .. "'",
         input = code
       })
     end,
     --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_short_name instead
     short_name_in_language_str = function(code, language_identifier_str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+      return get.n_shot_llm_spec.str_or_nil_by_response({
         query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_str .. "'",
         input = code
       })
@@ -3188,19 +3167,19 @@ get = {
       return (a - b) % n
     end,
   },
-  comparable = {
-    comparable_by_clamped = function(comparable, min, max)
-      if comparable < min then
+  operational_comparable = {
+    operational_comparable_by_clamped = function(operational_comparable, min, max)
+      if operational_comparable < min then
         return min
-      elseif comparable > max then
+      elseif operational_comparable > max then
         return max
       else
-        return comparable
+        return operational_comparable
       end
     end,
   },
-  two_comparables = {
-    is_close = function(a, b, distance)
+  two_operational_addcompables = {
+    bool_by_is_close = function(a, b, distance)
       return math.abs(a - b) < distance
     end,
   },
@@ -3516,32 +3495,6 @@ get = {
       return os.time()
     end
   },
-  form_field_specifier_arr = {
-    form_filling_specifier = function(specarr, in_fields)
-      return {
-        form_field_specifier_arr = specarr,
-        in_fields = in_fields
-      }
-    end,
-    filled_str_assoc_from_str = function(specarr, str)
-      return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        specarr,
-        function (form_field_specifier)
-          return 
-            form_field_specifier.alias or form_field_specifier.value, 
-            get.str.n_strs_by_extracted_eutf8(str, form_field_specifier.value .. "[^\n]-: *(.-)\n") or get.str.n_strs_by_extracted_eutf8(str, form_field_specifier.value .. "[^\n]-: *(.-)$")
-        end
-      )
-    end,
-    filled_str_assoc_from_str_arr = function(specarr, in_fields)
-      return get.form_filling_specifier.filled_str_assoc(
-        get.form_field_specifier_arr.form_filling_specifier(
-          specarr,
-          in_fields
-        )
-      )
-    end
-  },
   input_spec = {
     declared_input_spec = function(input_spec, type)
       local cpy = get.table.table_by_copy(input_spec)
@@ -3629,7 +3582,7 @@ get = {
     end,
   },
   role_content_message_spec_arr = {
-    llm_response_str = function(arr, temperature, max_tokens)
+    str_by_llm_response = function(arr, temperature, max_tokens)
       local request = {
         endpoint = "chat/completions",
         api_name = "openai",
@@ -3643,17 +3596,25 @@ get = {
       local res = rest(request)
       return transf.gpt_response_table.response_text(res)
     end,
-  },
-  n_shot_role_content_message_spec_arr = {
-    n_shot_llm_spec = function(arr)
-
-
+    str_by_llm_response_with_api_system_message = function(arr, temperature, max_tokens)
+      local request = {
+        endpoint = "chat/completions",
+        api_name = "openai",
+        request_table = {
+          temperature = temperature or 0,
+          max_tokens = max_tokens or 1000,
+          model = "gpt-4",
+          messages = transf.role_content_message_spec_arr.role_content_message_spec_arr_by_with_api_system_message(arr)
+        }
+      }
+      local res = rest(request)
+      return transf.gpt_response_table.response_text(res)
     end,
   },
   n_shot_llm_spec = {
-    n_shot_api_query_llm_response_str = function(spec, temperature, max_tokens)
-      local res = get.role_content_message_spec_arr.llm_response_str(
-        transf.n_shot_llm_spec.n_shot_api_query_role_content_message_spec_arr(spec),
+    str_or_nil_by_response = function(spec, temperature, max_tokens)
+      local res = get.role_content_message_spec_arr.str_by_llm_response(
+        transf.n_shot_llm_spec.role_content_message_spec_arr_by_api_query(spec),
         temperature,
         max_tokens
       )
@@ -3815,5 +3776,6 @@ get = {
       }
       return map[unit][lang]
     end
-  }
+  },
+
 }

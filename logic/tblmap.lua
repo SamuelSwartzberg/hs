@@ -74,7 +74,7 @@ tblmap = {
   },
   
   dcmp_name = {
-    seconds = {
+    timestamp_s = {
       sec = 1,
       min = 60,
       hour = 60 * 60,
@@ -82,6 +82,15 @@ tblmap = {
       week = 60 * 60 * 24 * 7,
       month = 60 * 60 * 24 * 30,
       year = 60 * 60 * 24 * 365,
+    },
+    timestamp_ms = {
+      sec = 1000,
+      min = 1000 * 60,
+      hour = 1000 * 60 * 60,
+      day = 1000 * 60 * 60 * 24,
+      week = 1000 * 60 * 60 * 24 * 7,
+      month = 1000 * 60 * 60 * 24 * 30,
+      year = 1000 * 60 * 60 * 24 * 365,
     },
     rfc3339like_dt_format_part = {
       sec = "%S",
@@ -194,32 +203,6 @@ tblmap = {
       hour = "hour",
       minute = "min",
       second = "sec",
-    },
-  },
-  seconds = {
-    dcmp_name = {
-      sec = 1,
-      min = 60,
-      hour = 60 * 60,
-      day = 60 * 60 * 24,
-      week = 60 * 60 * 24 * 7,
-      month = 60 * 60 * 24 * 30,
-      year = 60 * 60 * 24 * 365,
-    },
-  },
-  date_format_name = {
-    date_format = {
-      ["rfc3339-date"] = "%Y-%m-%d",
-      ["rfc3339-time"] = "%H:%M:%S",
-      ["rfc3339-datetime"] = "%Y-%m-%dT%H:%M:%SZ",
-      ["american-date"] = "%m/%d/%Y",
-      ["american-time"] = "%I:%M:%S %p",
-      ["american-datetime"] = "%m/%d/%Y %I:%M:%S %p",
-      ["german-date"] = "%d.%m.%Y",
-      ["german-time"] = "%H:%M:%S",
-      ["german-datetime"] = "%d.%m.%Y %H:%M:%S",
-      ["email"] = "%a, %d %b %Y %H:%M:%S %z",
-      ["detailed"] = "%A, %Y-%m-%d %H:%M:%S"
     },
   },
   int = {

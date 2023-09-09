@@ -529,5 +529,11 @@ ls = {
   },
   billing_unit = {
     "line"
+  },
+  llm_chat_role = {
+    "system",
+    "user",
+    "assistant",
+    "function"
   }
 }

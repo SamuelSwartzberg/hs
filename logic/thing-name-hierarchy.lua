@@ -22,6 +22,12 @@ thing_name_hierarchy = {
     }
   },
   any = {
+    having_metatable = {
+      metatable_comparable = "leaf",
+      metatable_addable = "leaf",
+    },
+    operational_comparable = "leaf",
+    operational_addable = "leaf",
     lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = "leaf",
     str = {
       email_or_displayname_email = "leaf",
@@ -525,6 +531,7 @@ thing_name_hierarchy = {
                                 vcard_address_type = "leaf",
                                 audiodevice_subtype = "leaf",
                                 otp_type = "leaf",
+                                llm_chat_role = "leaf",
                               },
                               iso_3366_1_alpha_2_country_code = "leaf",
                               iso_3366_1_alpha_3_country_code = "leaf",
@@ -666,8 +673,14 @@ thing_name_hierarchy = {
         contact_table = "leaf",
         ical_spec = "leaf",
         tree_node = "leaf",
-        role_content_message_spec = "leaf",
+        role_content_message_spec = {
+          system_role_content_message_spec = "leaf",
+          user_role_content_message_spec = "leaf",
+          assistant_role_content_message_spec = "leaf",
+          function_role_content_message_spec = "leaf",
+        },
         val_dep_spec = "leaf",
+        n_shot_llm_spec = "leaf",
         syn_specifier = "leaf",
         vdirsyncer_pair_specifier = "leaf",
         email_speciier = "leaf",
@@ -701,13 +714,31 @@ thing_name_hierarchy = {
           youtube_channel_item = "leaf",
         },
         fn_queue_specifier = "leaf",
-
+        prompt_spec = "leaf",
+        hs_geometry = "leaf",
+        hs_geometry_point_like = {
+          hs_geometry_point = "leaf",
+          point_spec = "leaf",
+        },
+        hs_geometry_rect_like = {
+          hs_geometry_rect = "leaf",
+          rect_spec = "leaf",
+        },
+        hs_geometry_size_like = {
+          hs_geometry_size = "leaf",
+          size_spec = "leaf",
+        },
+        form_filling_specifier = "leaf",
+        form_field_specifier = "leaf",
       }
     },
     primitive = {
   
     },
     number = {
+      inclusive_proper_fraction = {
+        proper_fraction = "leaf",
+      },
       int = {
         timestamp_s  = {
           reasonable_timestamp_s = "leaf",

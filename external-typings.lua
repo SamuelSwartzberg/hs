@@ -619,16 +619,16 @@ speak = hs.speech.new()
 --- @alias fs_attributes { dev: number, ino: number, mode:string, nlink: number, uid: number, gid: number, rdev: number, access: number, change: number, modification: number, permissions: string, creation: number, size: number, blocks: number, blksize: number }
 
 
---- @alias hs_geometry_point_table { x: number, y: number }
---- @alias hs_geometry_size_table { w: number, h: number }
---- @alias hs_geometry_rect_table { x: number, y: number, w: number, h: number }
---- @alias hs_geometry_point_like hs_geometry_point_table | hs.geometry.point
---- @alias hs_geometry_size_like hs_geometry_size_table | hs.geometry.size
---- @alias hs_geometry_rect_like hs_geometry_rect_table | hs.geometry.rect
+--- @alias point_spec { x: number, y: number }
+--- @alias size_spec { w: number, h: number }
+--- @alias rect_spec { x: number, y: number, w: number, h: number }
+--- @alias hs_geometry_point_like point_spec | hs.geometry.point
+--- @alias hs_geometry_size_like size_spec | hs.geometry.size
+--- @alias hs_geometry_rect_like rect_spec | hs.geometry.rect
 
 --- @alias coords_table { x1: number, y1: number, x2: number, y2: number }
 
---- @alias hs_geometry_table hs_geometry_point_table | hs_geometry_size_table | hs_geometry_rect_table
+--- @alias hs_geometry_table point_spec | size_spec | rect_spec
 
 --- @alias hs_geometry_like hs_geometry_point_like | hs_geometry_size_like | hs_geometry_rect_like
 
@@ -636,12 +636,12 @@ speak = hs.speech.new()
 --- @alias hs_geometry_size_constructor fun(x: nil, y: nil, w: number, h: number): hs.geometry.size
 --- @alias hs_geometry_rect_constructor fun(x: number, y: number, w: number, h: number): hs.geometry.rect
 --- @alias hs_geometry_list_constructor fun(list: number[]): hs.geometry must be either {x, y} or {x, y, w, h}
---- @alias hs_geometry_point_table_constructor fun(table: hs_geometry_point_table): hs.geometry.point
---- @alias hs_geometry_size_table_constructor fun(table: hs_geometry_size_table): hs.geometry.size
---- @alias hs_geometry_rect_table_constructor fun(table: hs_geometry_rect_table): hs.geometry.rect
+--- @alias point_spec_constructor fun(table: point_spec): hs.geometry.point
+--- @alias size_spec_constructor fun(table: size_spec): hs.geometry.size
+--- @alias rect_spec_constructor fun(table: rect_spec): hs.geometry.rect
 --- @alias hs_geometry_coord_table_constructor fun(table: coords_table): hs.geometry.rect
 --- @alias hs_geometry_string_constructor fun(string: string): hs.geometry
---- @alias hs_geometry_constructor hs_geometry_point_constructor | hs_geometry_size_constructor | hs_geometry_rect_constructor | hs_geometry_list_constructor | hs_geometry_point_table_constructor | hs_geometry_size_table_constructor | hs_geometry_rect_table_constructor | hs_geometry_coord_table_constructor | hs_geometry_string_constructor
+--- @alias hs_geometry_constructor hs_geometry_point_constructor | hs_geometry_size_constructor | hs_geometry_rect_constructor | hs_geometry_list_constructor | point_spec_constructor | size_spec_constructor | rect_spec_constructor | hs_geometry_coord_table_constructor | hs_geometry_string_constructor
 
 --- a vector2 is a hs.geometry.point that represents a vector in 2D space from the origin
 
@@ -671,7 +671,7 @@ speak = hs.speech.new()
 --- @field x number
 --- @field y number
 --- @field xy hs.geometry.point
---- @field table hs_geometry_point_table
+--- @field table point_spec
 --- @field type fun(): "point"
 --- @field distance fun(self: hs.geometry.point | hs.geometry.rect, other: hs_geometry_point_like | hs_geometry_rect_like): number Finds the distance between this point or rect's center and another point or rect's center
 --- @field move fun(self: hs.geometry.point, point: hs_geometry_point_like): hs.geometry.point Moves this point by the given point
@@ -679,13 +679,13 @@ speak = hs.speech.new()
 --- @field vector fun(self: hs.geometry.point, other: hs_geometry_point_like | hs_geometry_rect_like): hs.geometry.point Returns the vector2 from this point to another point or rect's center
 
 --- @class hs.geometry.size : hs.geometry.sizeandrect
---- @field table hs_geometry_size_table
+--- @field table size_spec
 --- @field type fun(): "size"
 
 --- @class hs.geometry.rect : hs.geometry.sizeandrect
 --- @field x number
 --- @field y number
---- @field table hs_geometry_rect_table
+--- @field table rect_spec
 --- @field center hs.geometry.point
 --- @field bottomright hs.geometry.point
 --- @field topleft hs.geometry.point
@@ -794,7 +794,7 @@ speak = hs.speech.new()
 --- @field getTouches fun(self: hs.eventtap.event.event): table|nil
 --- @field getType fun(self: hs.eventtap.event.event, nsSpecificType?: boolean): integer
 --- @field getUnicodeString fun(self: hs.eventtap.event.event): string
---- @field location fun(self: hs.eventtap.event.event, pointTable: hs_geometry_point_like): (hs.eventtap.event.event) | fun(self: hs.eventtap.event.event): hs_geometry_point_table
+--- @field location fun(self: hs.eventtap.event.event, pointTable: hs_geometry_point_like): (hs.eventtap.event.event) | fun(self: hs.eventtap.event.event): point_spec
 --- @field post fun(self: hs.eventtap.event.event, app?: hs.application): hs.eventtap.event.event
 --- @field rawFlags fun(self: hs.eventtap.event.event, flags: integer): (hs.eventtap.event.event) | fun(self: hs.eventtap.event.event): integer
 --- @field setFlags fun(self: hs.eventtap.event.event, table: table) : hs.eventtap.event.event
@@ -814,7 +814,7 @@ speak = hs.speech.new()
 --- @field localizedName fun(): string
 
 --- @class hs.mouse
---- @field absolutePosition fun(): (hs_geometry_point_table) | fun(point: hs_geometry_point_like): hs_geometry_point_table 
+--- @field absolutePosition fun(): (point_spec) | fun(point: hs_geometry_point_like): point_spec 
 
 --- @class hs.grid
 --- @field setGrid fun(grid: hs_geometry_size_like, screen?: hs.screen, frame?: hs_geometry_rect_like): hs.grid

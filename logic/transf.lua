@@ -2070,83 +2070,82 @@ transf = {
       )
     end,
   },
-  date = {
-    rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd__arr = function(date)
+  timestamp_s = {
+    timestamp_ms = function(timestamp)
+      return timestamp * 1000
+    end,
+    full_dcmp_spec = function(timestamp)
+      return os.date("*t", timestamp)
+    end,
+    weekday_int_start_1 = function(timestamp)
+      return os.date("*t", timestamp).wday
+    end,
+    weekday_int_start_0 = function(timestamp)
+      return get.two_numbers.number_by_sum_modulo_n(
+        transf.timestamp_s.weekday_int_start_1(timestamp),
+        6,
+        7
+      )
+    end,
+    rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd__arr = function(timestamp)
       return  {
-        date:fmt("%Y"),
-        date:fmt("%Y-%m"),
-        date:fmt("%Y-%m-%d"),
+        get.timestamp_s.rfc3339like_dt_by_precison_w_dcmp_name(timestamp, "year"),
+        get.timestamp_s.rfc3339like_dt_by_precison_w_dcmp_name(timestamp, "month"),
+        get.timestamp_s.rfc3339like_dt_by_precison_w_dcmp_name(timestamp, "day")
       }
     end,
     triplex_local_nonabsolute_path_by_y_ym_ymd = function(date)
       return get.str_or_number_arr.str_by_joined(transf.date.rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd__arr(date), "/")
     end,
-    weekday_int_start_1 = function(date)
-      return date:getisoweekday()
+    number_sequence_specifier_by_quarter_hours = function(timestamp_s)
+      return get.timestamp_s.number_sequence_specifier_of_lower_component(timestamp_s, 15, "hour")
     end,
-    weekday_int_start_0 = function(date)
-      return date:getisoweekday() - 1
+    number_sequence_specifier_by_quarter_hours_of_day = function(timestamp_s)
+      return get.timestamp_s.number_sequence_specifier_of_lower_component(timestamp_s, 15, "day")
     end,
-    iso_weeknumber_int = function(date)
-      return date:getisoweeknumber()
+    full_rfc3339like_dt = function(timestamp_s)
+      return get.timestamp_s.rfc3339like_dt_by_precison_w_dcmp_name(timestamp_s, "sec")
     end,
-    full_dcmp_spec = function(date)
-      return {
-        year = date:getyear(),
-        month = date:getmonth(),
-        day = date:getday(),
-        hour = date:gethour(),
-        min = date:getmin(),
-        sec = date:getsec(),
-      }
+    rfc3339like_ymd = function(timestamp_s)
+      return get.timestamp_s.rfc3339like_dt_by_precison_w_dcmp_name(timestamp_s, "day")
     end,
-    date_sequence_specifier_by_quarter_hours = function(date)
-      return get.date.date_sequence_specifier_of_lower_component(date, 15, "hour")
+    hour_minute_second = function(timestamp_s)
+      return get.timestamp_s.str_w_date_format_indicator(timestamp_s, "%H:%M:%S")
     end,
-    date_sequence_specifier_by_quarter_hours_of_day = function(date)
-      return get.date.date_sequence_specifier_of_lower_component(date, 15, "day")
+    urlcharset_str_by_email_dt = function(timestamp_s)
+      return get.timestamp_s.str_w_date_format_indicator(timestamp_s, "%a, %d %b %Y %H:%M:%S %z")
     end,
-    full_rfc3339like_dt = function(date)
-      return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-datetime"])
+    period_alphanum_minus_underscore_by_german_date = function(timestamp_s)
+      return get.timestamp_s.str_w_date_format_indicator(timestamp_s, "%d.%m.%Y")
     end,
-    rfc3339like_ymd = function(date)
-      return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-date"])
+    colon_period_alphanum_minus_underscore_by_german_dt = function(timestamp_s)
+      return get.timestamp_s.str_w_date_format_indicator(timestamp_s, "%d.%m.%Y %H:%M:%S")
     end,
-    hour_minute_second = function(date)
-      return get.date.str_w_date_format_indicator(date, tblmap.date_format_name.date_format["rfc3339-time"])
+    urlcharset_str_by_american_date = function(timestamp_s)
+      return get.timestamp_s.str_w_date_format_indicator(timestamp_s, "%m/%d/%Y")
     end,
-    timestamp_s = function(date)
-      return transf.full_dcmp_spec.timestamp_s(
-        transf.date.full_dcmp_spec(date)
-      )
+    urlcharset_str_by_american_dt = function(timestamp_s)
+      return get.timestamp_s.str_w_date_format_indicator(timestamp_s, "%m/%d/%Y %I:%M:%S %p")
     end,
-    timestamp_ms = function(date)
-      return transf.date.timestamp_s(date) * 1000
+    urlcharset_str_by_american_time = function(timestamp_s)
+      return get.timestamp_s.str_w_date_format_indicator(timestamp_s, "%I:%M:%S %p")
     end,
-    event_table_by_start = function(date)
-      return {
-        start = transf.date.full_rfc3339like_dt(date)
-      }
-    end,
-    printable_ascii_line_by_summary = function(date)
-      return get.date.str_w_date_format_indicator(date, "detailed")
-    end
 
-  },
-  timestamp_s = {
-    timestamp_ms = function(timestamp)
-      return timestamp * 1000
+    event_table_by_start = function(timestamp_s)
+      return {
+        start = transf.timestamp_s.full_rfc3339like_dt(timestamp_s)
+      }
     end,
-    date = function(timestamp)
-      return date(timestamp)
+    urlcharset_str_by_detailed_summary = function(timestamp_s)
+      return get.timestamp_s.str_w_date_format_indicator(timestamp_s, "%A, %Y-%m-%d %H:%M:%S")
     end
   },
   timestamp_ms = {
     timestamp_s = function(timestamp)
       return timestamp / 1000
     end,
-    date = function(timestamp)
-      return date(timestamp / 1000)
+    full_dcmp_spec = function(timestamp)
+      return transf.timestamp_s.full_dcmp_spec(transf.timestamp_ms.timestamp_s(timestamp))
     end
   },
   dcmp_name = {
@@ -2158,6 +2157,12 @@ transf = {
     end,
     date_component_index = function(dcmp_name)
       return tblmap.dcmp_name.date_component_index[dcmp_name]
+    end,
+    timestamp_s = function(dcmp_name)
+      return tblmap.dcmp_name.timestamp_s[dcmp_name]
+    end,
+    timestamp_ms = function(dcmp_name)
+      return tblmap.dcmp_name.timestamp_ms[dcmp_name]
     end,
     
   },
@@ -2348,8 +2353,9 @@ transf = {
       return {
         start = transf.rfc3339like_interval.date_by_start_min(str),
         stop = transf.rfc3339like_interval.date_by_end_max(str),
-        step = 1,
-        unit = transf.rfc3339like_interval.dcmp_name_by_smallest_both_set(str)
+        step = transf.dcmp_name.timestamp_s(
+          transf.rfc3339like_interval.dcmp_name_by_smallest_both_set(str)
+        ),
       }
     end,
     date_by_min = function(str)
@@ -2437,11 +2443,11 @@ transf = {
       return math.random() * (interval.stop - interval.start) + interval.start
     end,
   },
-  --- sequence specifier: table of start, stop, step, unit?
+  --- sequence specifier: table of start, stop, step
   --- sequence specifiers can use all methods of interval specifiers 
   sequence_specifier = {
     arr = function(sequence)
-      return transf.start_stop_step_unit.arr(sequence.start, sequence.stop, sequence.step, sequence.unit)
+      return transf.three_operational_addcompable_or_nils.arr(sequence.start, sequence.stop, sequence.step)
     end,
     interval_specifier = function(sequence)
       return {
@@ -2510,13 +2516,13 @@ transf = {
   },
   date_sequence_specifier = {
     rfc3339like_dt_by_start_of_unit_precision = function(date_sequence_specifier)
-      return get.date.rfc3339like_dt_of_precision(
+      return get.date.rfc3339like_dt_by_precison_w_dcmp_name(
         date_sequence_specifier.start,
         date_sequence_specifier.unit
       )
     end,
     rfc3339like_dt_by_end_of_unit_precision = function(date_sequence_specifier)
-      return get.date.rfc3339like_dt_of_precision(
+      return get.date.rfc3339like_dt_by_precison_w_dcmp_name(
         date_sequence_specifier.stop,
         date_sequence_specifier.unit
       )
@@ -2758,9 +2764,6 @@ transf = {
   },
   -- date components are full if all components are set
   full_dcmp_spec = {
-    date = function(full_dcmp_spec)
-      return date(full_dcmp_spec)
-    end,
     timestamp_s = function(full_dcmp_spec)
       return os.time(full_dcmp_spec)
     end,
@@ -3245,7 +3248,7 @@ transf = {
       }).items
     end,
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(id)
-      local assoc = transf.form_filling_specifier.filled_str_assoc({
+      local assoc = transf.form_filling_specifier.str_key_str_value_assoc_by_filled({
         in_fields = {
           title = transf.youtube_video_id.line_by_title(id),
           channel_title = transf.youtube_video_id.line_by_channel_title(id),
@@ -3723,7 +3726,7 @@ transf = {
       return str
     end,
     str_by_romanized_wapuro_gpt = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query =  "Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)", shots = {
+      return get.n_shot_llm_spec.str_or_nil_by_response({input = str, query =  "Please romanize the following text with wapuro-like romanization, where:\n\nっ -> duplicated letter (e.g. っち -> cchi)\nlong vowel mark -> duplicated letter (e.g. ローマ -> roomaji)\nづ -> du\nんま -> nma\nじ -> ji\nを -> wo\nち -> chi\nparticles are separated by spaces (e.g. これに -> kore ni)\nbut morphemes aren't (真っ赤 -> makka)", shots = {
         {"こっち", "kocchi"}
       }})
     end,
@@ -3820,7 +3823,7 @@ transf = {
       return " <<EOF\n" .. str .. "\nEOF"
     end,
     rfc3339like_dt_by_guess_gpt = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified."})
+      return get.n_shot_llm_spec.str_or_nil_by_response({input = str, query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified."})
     end,
     raw_contact_or_nil = function(searchstr)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("khard show --format=yaml " .. searchstr )
@@ -3846,16 +3849,16 @@ transf = {
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("kana --vowel-shortener x --extended --punctuation --kana-toggle 'Δ' --raw-toggle '†'" .. transf.str.here_doc(str))
     end,
     str_by_ime_general = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query =  "You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:"})
+      return get.n_shot_llm_spec.str_or_nil_by_response({input = str, query =  "You're a dropin IME for already written text. Please transform the following into its Japanese writing system equivalent:"})
     end,
     str_by_hiraganaify_everything = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query =  "Transform the following into hiragana:"})
+      return get.n_shot_llm_spec.str_or_nil_by_response({input = str, query =  "Transform the following into hiragana:"})
     end,
     str_by_katakananaify_everything = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query =  "Transform the following into katakana:"})
+      return get.n_shot_llm_spec.str_or_nil_by_response({input = str, query =  "Transform the following into katakana:"})
     end,
     ruby_annotated_kana = function(str)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({input = str, query =  "Add kana readings to this text as <ruby> annotations, including <rp> fallback:"})
+      return get.n_shot_llm_spec.str_or_nil_by_response({input = str, query =  "Add kana readings to this text as <ruby> annotations, including <rp> fallback:"})
     end,
     --- @param str str
     --- @return hs.styledtext
@@ -4398,15 +4401,15 @@ transf = {
       )
     end,
   },
-  two_comparables = {
-    comparable_by_larger = function(a, b)
+  two_operational_comparables = {
+    operational_comparable_by_larger = function(a, b)
       if a > b then
         return a
       else
         return b
       end
     end,
-    comparable_by_smaller = function(a, b)
+    operational_comparable_by_smaller = function(a, b)
       if a < b then
         return a
       else
@@ -4572,10 +4575,10 @@ transf = {
       return arr1[1], arr2[1]
     end,
     bool_by_larger_first_item = function(arr1, arr2)
-      return transf.two_comparables.bool_by_larger(arr1[1], arr2[1])
+      return transf.two_operational_comparables.bool_by_larger(arr1[1], arr2[1])
     end,
     bool_by_smaller_first_item = function(arr1, arr2)
-      return transf.two_comparables.bool_by_smaller(arr1[1], arr2[1])
+      return transf.two_operational_comparables.bool_by_smaller(arr1[1], arr2[1])
     end,
     arr_by_appended = function(arr1, arr2)
       local res = get.table.table_by_copy(arr1)
@@ -4600,7 +4603,7 @@ transf = {
     end,
     two_ts__arr_arr_by_zip_stop_shortest = function(arr1, arr2)
       local res = {}
-      local shortest = transf.two_comparables.comparable_by_smaller(#arr1, #arr2)
+      local shortest = transf.two_operational_comparables.operational_comparable_by_smaller(#arr1, #arr2)
       for i = 1, shortest do
         res[#res + 1] = {arr1[i], arr2[i]}
       end
@@ -4613,7 +4616,7 @@ transf = {
     end,
     two_ts__arr_arr_by_zip_stop_longest = function(arr1, arr2)
       local res = {}
-      local longest = transf.two_comparables.comparable_by_larger(#arr1, #arr2)
+      local longest = transf.two_operational_comparables.operational_comparable_by_larger(#arr1, #arr2)
       for i = 1, longest do
         res[#res + 1] = {arr1[i], arr2[i]}
       end
@@ -4637,7 +4640,7 @@ transf = {
     end,
     arr_by_interleaved_stop_shortest = function(arr1, arr2)
       local res = {}
-      local shortest = transf.two_comparables.comparable_by_smaller(#arr1, #arr2)
+      local shortest = transf.two_operational_comparables.operational_comparable_by_smaller(#arr1, #arr2)
       for i = 1, shortest do
         res[#res + 1] = arr1[i]
         res[#res + 1] = arr2[i]
@@ -4646,7 +4649,7 @@ transf = {
     end,
     arr_by_interleaved_stop_longest = function(arr1, arr2)
       local res = {}
-      local longest = transf.two_comparables.comparable_by_larger(#arr1, #arr2)
+      local longest = transf.two_operational_comparables.operational_comparable_by_larger(#arr1, #arr2)
       for i = 1, longest do
         res[#res + 1] = arr1[i]
         res[#res + 1] = arr2[i]
@@ -4845,16 +4848,16 @@ transf = {
       return res
     end,
     kt_arr_by_sorted_smaller_first = function(t)
-      return get.table.kt_arr_by_sorted(t, transf.two_comparables.bool_by_smaller)
+      return get.table.kt_arr_by_sorted(t, transf.two_operational_comparables.bool_by_smaller)
     end,
     kt_arr_by_sorted_larger_first = function(t)
-      return get.table.kt_arr_by_sorted(t, transf.two_comparables.bool_by_larger)
+      return get.table.kt_arr_by_sorted(t, transf.two_operational_comparables.bool_by_larger)
     end,
     vt_arr_by_sorted_smaller_first = function(t)
-      return get.table.vt_arr_by_sorted(t, transf.two_comparables.bool_by_smaller)
+      return get.table.vt_arr_by_sorted(t, transf.two_operational_comparables.bool_by_smaller)
     end,
     vt_arr_by_sorted_larger_first = function(t)
-      return get.table.vt_arr_by_sorted(t, transf.two_comparables.bool_by_larger)
+      return get.table.vt_arr_by_sorted(t, transf.two_operational_comparables.bool_by_larger)
     end,
     kt_vt_stateless_iter = pairs,
     kt_vt_stateful_iter = get.stateless_generator.stateful_generator(transf.table.kt_vt_stateless_iter),
@@ -7234,7 +7237,7 @@ transf = {
   },
   country_identifier_str = {
     iso_3366_1_alpha_2_country_code = function(country_identifier)
-      return transf.str.str_by_all_eutf8_lower(get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+      return transf.str.str_by_all_eutf8_lower(get.n_shot_llm_spec.str_or_nil_by_response({
         input = country_identifier, 
         query = "Suppose the following identifies a country. Return its ISO 3166-1 Alpha-2 country code."
       }))
@@ -7242,7 +7245,7 @@ transf = {
   },
   language_identifier_str = {
     bcp_47_language_tag = function(country_identifier)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+      return get.n_shot_llm_spec.str_or_nil_by_response({
         input = country_identifier, 
         query = "Suppose the following identifies a language or variety. Return its BCP 47 language tag. Be conservative and only add information that is present in the input, or is necessary to make it into a valid BCP 47 language tag."
       })
@@ -7250,7 +7253,7 @@ transf = {
   },
   bcp_47_language_tag = {
     language_identifier_str = function(bcp_47_language_tag)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+      return get.n_shot_llm_spec.str_or_nil_by_response({
         input = bcp_47_language_tag, 
         query = "Suppose the following is a BCP 47 language tag. Return a natural language description of it."
       })
@@ -7258,13 +7261,13 @@ transf = {
   },
   iso_3366_1_alpha_2_country_code = {
     noempty_noindent_nohashcomment_line_by_iso_3366_1_full_name = function(iso_3366_1_alpha_2)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+      return get.n_shot_llm_spec.str_or_nil_by_response({
         input = iso_3366_1_alpha_2, 
         query = "Get the ISO 3366-1 full name of the country identified by the following ISO 3366-1 Alpha-2 country code."
       })
     end,
     noempty_noindent_nohashcomment_line_by_iso_3366_1_short_name = function(iso_3366_1_alpha_2)
-      return get.n_shot_llm_spec.n_shot_api_query_llm_response_str({
+      return get.n_shot_llm_spec.str_or_nil_by_response({
         input = iso_3366_1_alpha_2, 
         query = "Get the ISO 3366-1 short name of the country identified by the following ISO 3366-1 Alpha-2 country code."
       })
@@ -7353,10 +7356,19 @@ transf = {
     date_by_current = function()
       return transf["nil"].date_by_current()
     end,
+    full_dcmp_spec_by_current = function()
+      return os.date("*t")
+    end,
+    timestamp_s_by_current = function()
+      return os.time()
+    end,
+    full_rfc3339like_dt_by_current = function()
+      return transf.timestamp_s.full_rfc3339like_dt(transf["nil"].timestamp_s_by_current())
+    end,
     timestamp_s_last_midnight = function()
       return transf.date.timestamp_s(
-        get.date.precision_date(
-          transf["nil"].date_by_current(),
+        get.full_dcmp_spec.precision_date(
+          transf["nil"].full_dcmp_spec_by_current(),
           "day"
         )
       )
@@ -7956,102 +7968,104 @@ transf = {
     end
 
   },
-  start_stop_step_unit = {
-    arr = function(start, stop, step, unit)
-      start = get.any.default_if_nil(start, 1)
-    
-      local mode
-      if is.any.number(start) then
-        mode = "number"
-      elseif is.any.table(start) then
-        if start.adddays then
-          mode = "date"
-        elseif start.xy then
-          mode = "point"
-        end
-      elseif is.any.str(start) then
-        mode = "string"
+  two_operational_addables = {
+    operantional_addable_by_sum = function(addable1, addable2)
+      return addable1 + addable2
+    end,
+  },
+  operational_addcompable = {
+    thing_name = function(functional_addable)
+      if is.any.number(functional_addable) then
+        return "number"
+      elseif is.any.hs_geometry_point(functional_addable) then
+        return "hs_geometry_point"
       end
-    
-      local addmethod = function(a, b) 
-        return a + b 
-      end
-    
-      if mode == "number" then
-        stop = get.any.default_if_nil(stop, 10)
-        step = get.any.default_if_nil(step, 1)
-      elseif mode == "date" then
-        if start then start = start:copy() else start = transf["nil"].date_by_current() end
-        if stop then stop = stop:copy() else stop = transf["nil"].date_by_current():addays(10) end
-        step = get.any.default_if_nil(step, 1)
-        unit = get.any.default_if_nil(unit, "days")
-        addmethod = function(a, b) 
-          local a_copy = a:copy()
-          return a_copy["add" .. unit](a_copy, b) 
-        end
-      elseif mode == "point" then
-        start = get.any.default_if_nil(start, hs.geometry.point(0, 0))
-        stop = get.any.default_if_nil(stop, hs.geometry.point(10, 10))
-        step = get.any.default_if_nil(step, hs.geometry.point(1, 1))
-      elseif mode == "string" then
-        start = get.any.default_if_nil(start, "a")
-        stop = get.any.default_if_nil(stop, "z")
-        step = get.any.default_if_nil(step, 1)
-        addmethod = function(a, b)
-          return transf.halfbyte_pos_int.ascii_char(transf.ascii_char.halfbyte_pos_int(a) + b)
-        end
-      end
-    
+    end,
+  },
+  hs_geometry_point_or_nil = {
+    operational_addcompable_by_default_low = function(pt)
+      return pt or hs.geometry.point(1, 1)
+    end,
+    operational_addcompable_by_default_high = function(pt)
+      return pt or hs.geometry.point(10, 10)
+    end,
+    operational_addcompable_by_default_step = function(pt)
+      return pt or hs.geometry.point(1, 1)
+    end,
+  },
+  number_or_nil = {
+    operational_addcompable_by_default_low = function(num)
+      return num or 1
+    end,
+    operational_addcompable_by_default_high = function(num)
+      return num or 10
+    end,
+    operational_addcompable_by_default_step = function(num)
+      return num or 1
+    end,
+  },
+  date_or_nil = {
+    operational_addcompable_by_default_low = function(date)
+      return date or transf["nil"].date_by_current()
+    end,
+    operational_addcompable_by_default_high = function(date)
+      return date or transf["nil"].date_by_current():addays(10)
+    end,
+    operational_addcompable_by_default_step = function(date)
+      return date or transf["nil"].date_by_current():addays(1)
+    end,
+  },
+  three_operational_addcompable_or_nils = {
+    operational_addcompable_arr = function(start, stop, step)
+      local thing_name = transf.operational_addcompable.thing_name(start)
+      start = transf[thing_name].operational_addcompable_by_default_low(start)
+      stop = transf[thing_name].operational_addcompable_by_default_high(stop)
+      step = transf[thing_name].operational_addcompable_by_default_step(step)
+
       local range = {}
       local current = start
       while current <= stop do
-        dothis.arr.insert_at_index(range, current)
-        current = addmethod(current, step)
+        dothis.arr.push(range, current)
+        current = current + step
       end
     
       return range
-    end
+    end,
     
   },
   form_filling_specifier = {
-    --- @class form_field_specifier  
-    --- @field value str The field to fill, as we want GPT to see it (i.e. chosing a name that GPT will understand)
-    --- @field alias? str The field to fill, as we want the user to see it (i.e. chosing a name that the user will understand). May often be unset, in which case the value field is used.
-    --- @field explanation? str The explanation to show to GPT for the field. May be unset if the field is self-explanatory.
-
-    --- @class form_filling_specifier
-    --- @field in_fields {[str]: str} The fields to take the data from
-    --- @field form_field_specifier_arr form_field_specifier[] The fields (i.e. the template) to fill
-    --- fills a template using GPT
-    --- example use-case: Imagine trying to get the metadata of some song from a youtube video, where the artist name may be in the title, or the channel name, or not present at all, where the title may contain a bunch of other stuff besides the song title
-    --- in this case you could call this function as
-    --- ```
-    --- fillTemplateGPT(
-    ---   {
-    ---     in_fields = {
-    ---       channel_name = "XxAimerLoverxX",
-    ---       video_title = "XxAimerLoverxX - Aimer - Last Stardust",
-    ---     },
-    ---     form_field_specifier_arr = {
-    ---       {value = "artist"},
-    ---       {value = "song_title"},
-    ---     }
-    ---   }, ...
-    --- )
-    --- ```
-    filled_str_assoc = function(spec)
-      local query = get.str.str_by_evaled_as_template(lemap.gpt.fill_template, spec)
-      local res = gpt(query,  { temperature = 0})
-      return get.form_field_specifier_arr.filled_str_assoc_from_str(spec.form_field_specifier_arr, res)
+    str_key_str_value_assoc_by_filled = function(spec)
+      local res = get.role_content_message_spec_arr.str_by_llm_response_with_api_system_message({
+        { 
+          role = "user",
+          content = "Return a json object. The field names will be those listed in the first message. The information is to be extracted from the dictionary in the third message. The second message contains explanations for what the fields mean/should contain, and may be empty. If there seems to be no data for a field, just leave it blank."
+        }, {
+          role = "user",
+          content = transf.not_userdata_or_fn.json_str_by_pretty(
+            spec.form_fields
+          )
+        }, {
+          role = "user",
+          content = transf.not_userdata_or_fn.json_str_by_pretty(
+            spec.explanations
+          )
+        }, {
+          role = "user",
+          content = transf.not_userdata_or_fn.json_str_by_pretty(
+            spec.in_fields
+          )
+        }
+      })
+      return transf.json_str.not_userdata_or_fn(res)
     end,
   },
   position_change_state_spec = {
-    should_continue = function(position_change_state_spec)
+    bool_by_should_continue = function(position_change_state_spec)
       return position_change_state_spec.num_steps > 0
         and (position_change_state_spec.delta_hs_geometry_point.x > 0.1
           or position_change_state_spec.delta_hs_geometry_point.y > 0.1)
     end,
-    next_position_change_state_spec = function(position_change_state_spec)
+    position_change_state_spec_by_next = function(position_change_state_spec)
       local next_position_change_state_spec  = {}
       next_position_change_state_spec.num_steps = position_change_state_spec.num_steps - 1
       next_position_change_state_spec.delta_hs_geometry_point = position_change_state_spec.delta_hs_geometry_point * position_change_state_spec.factor_of_deceleration
@@ -8066,7 +8080,7 @@ transf = {
     end,
   },
   declared_position_change_input_spec = {
-    target_hs_geometry_point = function(declared_position_change_input_spec)
+    hs_geometry_point_by_start = function(declared_position_change_input_spec)
       local target_point = declared_position_change_input_spec.target_hs_geometry_point or hs.geometry.point(0, 0)
       if declared_position_change_input_spec.relative_to then
         if declared_position_change_input_spec.relative_to ~= "curpos" then
@@ -8075,28 +8089,28 @@ transf = {
         else
           target_point = target_point + transf[
             declared_position_change_input_spec.mode .. "_input_spec"
-          ].starting_hs_geometry_point(declared_position_change_input_spec)
+          ].hs_geometry_point_by_start(declared_position_change_input_spec)
         end
       end
       return target_point
     end,
-    jitter_factor = function(declared_position_change_input_spec)
+    inclusive_proper_fraction_by_jitter_factor = function(declared_position_change_input_spec)
       return declared_position_change_input_spec.jitter_factor or 0.1
     end,
-    duration = function(declared_position_change_input_spec)
+    pos_number_by_duration = function(declared_position_change_input_spec)
       return declared_position_change_input_spec.duration or transf.number_interval_specifer.number_by_random({start=0.1, stop=0.3})
     end,
-    factor_of_deceleration = function(declared_position_change_input_spec)
+    inclusive_proper_fraction_by_factor_of_deceleration = function(declared_position_change_input_spec)
       return declared_position_change_input_spec.factor_of_deceleration or 0.95
     end,
-    starting_position_change_state_spec = function(declared_position_change_input_spec)
+    position_change_state_spec_by_start = function(declared_position_change_input_spec)
       local starting_point = transf[
         declared_position_change_input_spec.mode .. "_input_spec"
-      ].starting_hs_geometry_point(declared_position_change_input_spec)
-      local total_delta = transf.declared_position_change_input_spec.target_hs_geometry_point(declared_position_change_input_spec) - starting_point
+      ].hs_geometry_point_by_start(declared_position_change_input_spec)
+      local total_delta = transf.declared_position_change_input_spec.hs_geometry_point_by_start(declared_position_change_input_spec) - starting_point
       local starting_position_change_state_spec = {}
       starting_position_change_state_spec.num_steps = math.ceil(
-        transf.declared_position_change_input_spec.duration(declared_position_change_input_spec) / POLLING_INTERVAL
+        transf.declared_position_change_input_spec.pos_number_by_duration(declared_position_change_input_spec) / POLLING_INTERVAL
       )
 
       --- Function that calculates the initial delta value given a certain distance, factor of deceleration and number of steps.
@@ -8114,10 +8128,10 @@ transf = {
 
       starting_position_change_state_spec.past_ideal_hs_geometry_point = hs.geometry.new(starting_point)
       starting_position_change_state_spec.delta_hs_geometry_point = hs.geometry.point(
-        getStartingDelta(total_delta.x, transf.declared_position_change_input_spec.factor_of_deceleration(declared_position_change_input_spec), starting_position_change_state_spec.num_steps),
-        getStartingDelta(total_delta.y, transf.declared_position_change_input_spec.factor_of_deceleration(declared_position_change_input_spec), starting_position_change_state_spec.num_steps)
+        getStartingDelta(total_delta.x, transf.declared_position_change_input_spec.inclusive_proper_fraction_by_factor_of_deceleration(declared_position_change_input_spec), starting_position_change_state_spec.num_steps),
+        getStartingDelta(total_delta.y, transf.declared_position_change_input_spec.inclusive_proper_fraction_by_factor_of_deceleration(declared_position_change_input_spec), starting_position_change_state_spec.num_steps)
       )
-      starting_position_change_state_spec.jitter_factor = transf.declared_position_change_input_spec.jitter_factor(declared_position_change_input_spec)
+      starting_position_change_state_spec.jitter_factor = transf.declared_position_change_input_spec.inclusive_proper_fraction_by_jitter_factor(declared_position_change_input_spec)
       return starting_position_change_state_spec
     end,
   },
@@ -8313,7 +8327,7 @@ transf = {
     --- @alias failure_action "error" | "return_nil" | "reprompt"
 
     --- @class prompt_spec
-    --- @field prompter? fun(prompt_args: table): any, boolean The function that implements prompting. Must return nil on the equivalent of an empty value.
+    --- @field prompter fun(prompt_args: table): any, boolean The function that implements prompting. Must return nil on the equivalent of an empty value.
     --- @field prompt_args? table Arguments to pass to `prompter`.
     --- @field transformer? fun(rawReturn: any): any transforms the raw return value into the transformed return value. Default is the identity function.
     --- @field raw_validator? fun(rawReturn: any): boolean validates before application of `transformer`. Default is ensuring the return value is not nil.
@@ -8330,7 +8344,6 @@ transf = {
 
       -- set defaults for all prompt_spec fields
       prompt_spec = get.table.table_by_copy(prompt_spec)
-      prompt_spec.prompter = prompt_spec.prompter or transf.str_prompt_args_spec.str_or_nil_and_bool
       prompt_spec.transformer = prompt_spec.transformer or function(x) return x end
       prompt_spec.raw_validator = prompt_spec.raw_validator or function(x) return x ~= nil end
       prompt_spec.transformed_validator = prompt_spec.transformed_validator or function(x) return x ~= nil end
@@ -8427,20 +8440,21 @@ transf = {
 
   },
   role_content_message_spec_arr = {
-    api_role_content_message_spec_arr = function(arr)
+    role_content_message_spec_arr_by_with_api_system_message = function(arr)
       return transf.any_and_arr.arr({
         role = "system",
         content = "You are a helpful assistant being queried through an API. Your output will be parsed, so adhere to any instructions given as to the format or content of the output. Only output the result."
       }, arr)
     end,
   },
-  --- like a role_content_message_spec_arr, but alternating user/assistant role_content_message_specs, where a two_anys__arr of user/assistant role_content_message_specs is a shot
-  n_shot_role_content_message_spec_arr = {
-
-  },
   n_shot_llm_spec = {
-    n_shot_api_query_role_content_message_spec_arr = function(spec)
-      return transf.role_content_message_spec_arr.api_role_content_message_spec_arr(
+    role_content_message_spec_arr_or_nil_by_shots = function(spec)
+      if spec.shots then
+        return transf.two_strs__arr_arr.role_content_message_spec_arr_by_alternating_user_assistant(spec.shots)
+      end
+    end,
+    role_content_message_spec_arr_by_api_query = function(spec)
+      return transf.role_content_message_spec_arr.role_content_message_spec_arr_by_with_api_system_message(
         transf.arr_arr.arr_by_flatten({
           {
             {
@@ -8454,7 +8468,7 @@ transf = {
               content = "If you are unable to fulfill the request, return 'IMPOSSIBLE'."
             }
           },
-          transf.two_strs__arr_arr.role_content_message_spec_arr_by_alternating_user_assistant(spec.shots), 
+          transf.n_shot_llm_spec.role_content_message_spec_arr_or_nil_by_shots(spec) or {},
           {
             {
               role = "user",

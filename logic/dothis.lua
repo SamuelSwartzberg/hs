@@ -1231,7 +1231,12 @@ dothis = {
             dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
               "cat" ..
               transf.str.str_by_single_quoted_escaped(path) .. "| msed" ..
-              transf.str.str_by_single_quoted_escaped("/Date/a/"..os.date(tblmap.date_format_name.date_format.email, os.time())) ..
+              transf.str.str_by_single_quoted_escaped(
+                "/Date/a/"..
+                transf.timestamp_s.urlcharset_str_by_email_dt(
+                  transf["nil"].timestamp_s_by_current()
+                )
+              ) ..
               "| msed".. transf.str.str_by_single_quoted_escaped("/Status/a/S/") ..
               "| mdeliver -c" .. transf.str.str_by_single_quoted_escaped(env.MBSYNC_ARCHIVE),
               function()
@@ -1525,7 +1530,14 @@ dothis = {
     commit_self = function(path, message, do_after)
       dothis.local_extant_path.do_in_path(
         path, 
-        "git commit -m" .. transf.str.str_by_single_quoted_escaped(message or ("Programmatic commit of " .. path .. " at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        "git commit -m" ..
+        transf.str.str_by_single_quoted_escaped(
+          message or 
+          (
+            "Programmatic commit of " .. path .. " at " .. 
+            transf["nil"].full_rfc3339like_dt_by_current()
+          )
+        ),
         do_after
       )
     end,
@@ -1539,7 +1551,14 @@ dothis = {
     commit_staged = function(path, message, do_after)
       dothis.local_extant_path.do_in_path(
         path, 
-        "git commit -m" .. transf.str.str_by_single_quoted_escaped(message or ("Programmatic commit of staged files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        "git commit -m" .. 
+        transf.str.str_by_single_quoted_escaped(
+          message or 
+          (
+            "Programmatic commit of staged files at " .. 
+            transf["nil"].full_rfc3339like_dt_by_current()
+          )
+        ),
         do_after
       )
     end,
@@ -1556,21 +1575,15 @@ dothis = {
     commit_all_root_no_untracked = function(path, message, do_after)
       dothis.local_extant_path.do_in_path(
         transf.in_git_dir.git_root_dir(path), 
-        "git commit -am" .. transf.str.str_by_single_quoted_escaped(message or ("Programmatic commit of all tracked files at " .. os.date(tblmap.date_format_name.date_format["rfc3339-datetime"]))),
+        "git commit -am" .. 
+        transf.str.str_by_single_quoted_escaped(
+          message or 
+          (
+            "Programmatic commit of all tracked files at " .. 
+            transf["nil"].full_rfc3339like_dt_by_current()
+          )
+        ),
         do_after
-      )
-    end
-  },
-  date = {
-    create_log_entry = function(date, path, contents)
-      error("todo")
-    end,
-    choose_format = function(dt, fn)
-      dothis.table.choose_w_vt_fn(
-        tblmap.date_format_name.date_format,
-        function(date_format)
-          fn(get.date.str_w_date_format_indicator(dt, date_format))
-        end
       )
     end
   },
@@ -2547,7 +2560,7 @@ dothis = {
     fire = function(spec)
       spec.fn()
       dothis.timer_spec.set_next_timestamp_s(spec)
-      spec.largest_interval = transf.two_comparables.bool_by_larger(spec.largest_interval, transf.timer_spec.int_by_interval_left(spec))
+      spec.largest_interval = transf.two_operational_comparables.bool_by_larger(spec.largest_interval, transf.timer_spec.int_by_interval_left(spec))
     end,
   },
   timer_spec_arr = {
@@ -2592,7 +2605,7 @@ dothis = {
   move_input_spec = {
     final_exec = function(spec)
       hs.mouse.absolutePosition(
-        transf.declared_position_change_input_spec.target_hs_geometry_point(spec)
+        transf.declared_position_change_input_spec.hs_geometry_point_by_start(spec)
       )
     end,
     exec_position_change_state_spec = function(spec, position_change_state_spec)
@@ -2619,7 +2632,7 @@ dothis = {
   },
   declared_position_change_input_spec = {
     exec = function(spec, do_after)
-      local position_change_state_spec = transf.declared_position_change_input_spec.starting_position_change_state_spec(spec)
+      local position_change_state_spec = transf.declared_position_change_input_spec.position_change_state_spec_by_start(spec)
       local timer = hs.timer.doWhile(function() 
         if 
           not transf.position_change_state_spec.should_continue(position_change_state_spec)
@@ -2632,7 +2645,7 @@ dothis = {
           end
           return false
         else
-          position_change_state_spec = transf.position_change_state_spec.next_position_change_state_spec(position_change_state_spec)
+          position_change_state_spec = transf.position_change_state_spec.position_change_state_spec_by_next(position_change_state_spec)
           return true
         end
       end, function()
