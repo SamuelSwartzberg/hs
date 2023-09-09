@@ -11,7 +11,8 @@ thing_name_hierarchy = {
       three_anys = {
         three_strs = {
           rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd = "leaf",
-        }
+        },
+        number_and_two_anys = "leaf",
       },
       one_to_three_numbers = {
         one_to_three_pos_ints = {
@@ -207,7 +208,20 @@ thing_name_hierarchy = {
                     in_me_local_absolute_path = {
                       in_mcitations_local_absolute_path = "leaf",
                       in_mpapers_local_absolute_path = "leaf",
-                    }
+                    },
+                    in_cache_local_absolute_path = {
+                      in_hs_cache_local_absolute_path = {
+                        in_cache_export_local_absolute_path = {
+                          telegram_export_dir = "leaf",
+                          discord_export_dir = "leaf",
+                          facebook_export_dir = "leaf",
+                          signal_export_dir = "leaf",
+                          discord_export_child_dir = "leaf",
+                        }
+                      }
+                      
+                    },
+                    in_tmp_local_absolute_path = "leaf",
                   },
                   in_global_tmp_path = {
                     ipc_socket_path = "leaf"
@@ -535,6 +549,12 @@ thing_name_hierarchy = {
                             base32_str = "leaf",
                             lower_camel_case = "leaf",
                             upper_camel_case = "leaf",
+                            indicated_hex_str = {
+                              fnid = "leaf"
+                            },
+                            indicated_bin_str = "leaf",
+                            indicated_oct_str = "leaf",
+                            indicated_dec_str = "leaf",
                           },
                         }
                       },
@@ -653,6 +673,17 @@ thing_name_hierarchy = {
         email_speciier = "leaf",
         newsboat_urls_specifier = "leaf",
         semver_component_specifier = "leaf",
+        reaction_spec = "leaf",
+        export_chat_main_object = {
+          telegram_export_chat_main_object = "leaf",
+          discord_export_chat_main_object = "leaf",
+          facebook_export_chat_main_object = "leaf",
+          signal_export_chat_main_object = "leaf",
+        },
+        telegram_export_chat_message = "leaf",
+        discord_export_chat_message = "leaf",
+        facebook_export_chat_message = "leaf",
+        signal_export_chat_message = "leaf",
         url_components = "leaf",
         csl_person = "leaf",
         dcmp_spec = {
@@ -668,7 +699,9 @@ thing_name_hierarchy = {
           youtube_playlist_item = "leaf",
           youtube_caption_item = "leaf",
           youtube_channel_item = "leaf",
-        }
+        },
+        fn_queue_specifier = "leaf",
+
       }
     },
     primitive = {

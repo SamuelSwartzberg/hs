@@ -36,10 +36,17 @@ transf = {
   },
   indicated_number_str = {
     nonindicated_number_str = function(indicated_number)
-      return indicated_number:sub(3)
+      return get.str.str_by_replaced_onig_w_regex_str(
+        indicated_number,
+        "^(-?)0[boxd](.+)$",
+        "$1$2"
+      )
     end,
     base_letter = function(indicated_number)
-      return indicated_number:sub(2, 2)
+      return get.str.n_strs_by_extracted_onig(
+        indicated_number,
+        "^-?0([dbox])"
+      )
     end,
     pos_int_by_base = function(indicated_number)
       return tblmap.base_letter.pos_int_by_base[
@@ -48,7 +55,7 @@ transf = {
     end,
     number = function(indicated_number)
       return get.nonindicated_number_str.number(
-        indicated_number:sub(3),
+        transf.indicated_number_str.nonindicated_number_str(indicated_number),
         transf.indicated_number_str.pos_int_by_base(indicated_number)
       )
     end,
@@ -4055,7 +4062,7 @@ transf = {
   },
   json_str = {
     not_userdata_or_fn = function(str)
-      return transf.fn.rt_or_nil_fn_by_pcall(json.decode)(str)
+      return transf.fn.rt_or_nil_ret_fn_by_pcall(json.decode)(str)
     end,
     table_or_nil = function(str)
       local res =  transf.not_userdata_or_fn.json_str(str)
@@ -8461,7 +8468,7 @@ transf = {
     end,
   },
   fn = {
-    rt_or_nil_fn_by_pcall = function(fn)
+    rt_or_nil_ret_fn_by_pcall = function(fn)
       return function(...)
         local succ, res = pcall(fn, ...)
         if succ then
@@ -8540,16 +8547,16 @@ transf = {
     
   },
   discord_export_dir = {
-    export_chat_main_object_and_media_dir_arr = function(dir)
+    export_chat_main_object_and_local_dir__arr_arr_by_media_dir = function(dir)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         transf.dir.dir_arr_by_children(dir),
-        transf.discord_export_child_dir.discord_export_chat_main_object_media_dir_pair
+        transf.discord_export_child_dir.export_chat_main_object_and_local_dir__arr_by_media_dir
       )
     end,
     
   },
   discord_export_child_dir = {
-    discord_export_chat_main_object_media_dir_pair = function(dir)
+    export_chat_main_object_and_local_dir__arr_by_media_dir = function(dir)
       local json_file = get.dir.extant_path_by_child_having_extension(dir, "json")
       local media_dir = get.dir.extant_path_by_child_having_extension(dir, "_Files")
       if not json_file or not media_dir then error("Could not find json or media dir in " .. dir) end
@@ -8601,7 +8608,7 @@ transf = {
     end
   },
   facebook_export_dir = {
-    export_chat_main_object_and_media_dir_arr = function(dir)
+    export_chat_main_object_and_local_dir__arr_arr_by_media_dir = function(dir)
       local chat_dirs = transf.dir.dir_arr_by_children(dir)
       local arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         chat_dirs,
@@ -8664,7 +8671,7 @@ transf = {
     end
   },
   signal_export_dir = {
-    export_chat_main_object_and_media_dir_arr = function(dir)
+    export_chat_main_object_and_local_dir__arr_arr_by_media_dir = function(dir)
       local chat_json_files = transf.dir.absolute_path_arr_by_children(dir .. "/chats")
       local arr = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         chat_json_files,
@@ -8693,7 +8700,7 @@ transf = {
       return main_object.author
     end,
     str_by_id = function(main_object)
-      return main_object[1].conversationId
+      return main_object.messages[1].conversationId
     end,
   },
   signal_export_chat_message  = {
@@ -8731,7 +8738,7 @@ transf = {
     end
   },
   telegram_export_dir = {
-    export_chat_main_object_and_media_dir_arr = function(dir)
+    export_chat_main_object_and_local_dir__arr_arr_by_media_dir = function(dir)
       local json_file = get.dir.extant_path_by_child_having_leaf(dir, "result.json")
       local export_json = transf.json_file.not_userdata_or_fn(json_file)
 

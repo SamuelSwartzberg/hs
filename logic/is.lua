@@ -542,10 +542,10 @@ is = {
       return get.str.bool_by_matches_whole_onig(str, "-?[0-9a-fA-F]+(:?\\.[0-9a-fA-F]+)?")
     end,
     indicated_number_str = function(str)
-      return 
-        get.str.bool_by_startswith(str, "0") and
-        get.arr.bool_by_contains(transf.table_or_nil.kt_arr(tblmap.base_letter.pos_int_by_base), str:sub(2, 2)) and
-        is.printable_ascii_str.nonindicated_number_str(str:sub(3))
+      return get.str.bool_by_matches_whole_onig(
+        str,
+        "-?0[boxd][0-9a-fA-F]+(:?\\.[0-9a-fA-F]+)?"
+      )
     end,
     domain_name = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.domain_name)
@@ -561,16 +561,16 @@ is = {
   },
   indicated_number_str = {
     indicated_bin_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0b")
+      return get.str.bool_by_startswith(str, "0b") or get.str.bool_by_startswith(str, "-0b")
     end,
     indicated_hex_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0x")
+      return get.str.bool_by_startswith(str, "0x") or get.str.bool_by_startswith(str, "-0x")
     end,
     indicated_oct_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0o")
+      return get.str.bool_by_startswith(str, "0o") or get.str.bool_by_startswith(str, "-0o")
     end,
     indicated_dec_number_str = function(str)
-      return get.str.bool_by_startswith(str, "0d")
+      return get.str.bool_by_startswith(str, "0d") or get.str.bool_by_startswith(str, "-0d")
     end,
   },
   nonindicated_number_str = {
@@ -1005,6 +1005,33 @@ is = {
       return get.str.bool_by_startswith(path, env.MPAPERS)
     end,
   },
+  in_cache_local_absolute_path = {
+    in_hs_cache_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME .. "/hs")
+    end,
+  },
+  in_hs_cache_local_absolute_path = {
+    in_cache_export_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME .. "/export/")
+    end,
+  },
+  in_cache_export_local_absolute_path = {
+    telegram_export_dir = function(path)
+      return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/telegram/"
+    end,
+    discord_export_dir = function(path)
+      return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/discord/"
+    end,
+    facebook_export_dir = function(path)
+      return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/facebook/"
+    end,
+    signal_export_dir = function(path)
+      return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/signal/"
+    end,
+    discord_export_child_dir = function(path)
+      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME .. "/hs/export/discord/")
+    end,
+  },
   in_volume_local_absolute_path = {
     
   },
@@ -1381,6 +1408,18 @@ is = {
     hex_str = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "0-9a-fA-F")
     end,
+    indicated_hex_str = function(str)
+      return get.str.bool_by_startswith(str, "0x") and is.alphanum.hex_str(str:sub(3))
+    end,
+    indicated_bin_str = function(str)
+      return get.str.bool_by_startswith(str, "0b") and is.alphanum.bin_str(str:sub(3))
+    end,
+    indicated_oct_str = function(str)
+      return get.str.bool_by_startswith(str, "0o") and is.alphanum.oct_str(str:sub(3))
+    end,
+    indicated_dec_str = function(str)
+      return get.str.bool_by_startswith(str, "0d") and is.alphanum.digit_str(str:sub(3))
+    end,
     base32_gen_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.gen)
     end,
@@ -1398,6 +1437,11 @@ is = {
     end,
     upper_camel_case = function(str)
       return get.str.bool_by_matches_part_onig(str, "^[A-Z]")
+    end,
+  },
+  indicated_hex_str = {
+    fnid = function(str)
+      return #str == 14
     end,
   },
   digit_str = {
@@ -1873,6 +1917,9 @@ is = {
     three_strs = function(a, b, c)
       return is.any.str(a) and is.any.str(b) and is.any.str(c)
     end,
+    number_and_two_anys = function(a, b, c)
+      return is.any.number(a)
+    end,
   },
   three_strs = {
     rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd = function(a, b, c)
@@ -2108,8 +2155,43 @@ is = {
     end,
     csl_person = function(t)
       return t.family or t.given or t["dropping-particle"] or t["non-dropping-particle"] or t.suffix or t.literal
-    end
+    end,
+    reaction_spec = function(t)
+      return t.emoji and t.count
+    end,
+    export_chat_main_object = function(t)
+      return t.messages
+    end,
+    telegram_export_chat_message = function(t)
+      return t.date_unixtime and t.from and t.text
+    end,
+    discord_export_chat_message = function(t)
+      return t.timestamp and t.bar and t.content -- bar is still here as a placeholder because str_by_author isn't implemented yet
+    end,
+    facebook_export_chat_message = function(t)
+      return t.timestamp_ms and t.sender_name and t.content
+    end,
+    signal_export_chat_message = function(t)
+      return t.sent_at and t.body
+    end,
+    fn_queue_specifier = function(t)
+      return t.fn_arr and t.hotkey_created_item_specifier
+    end,
 
+  },
+  export_chat_main_object = {
+    telegram_export_chat_main_object = function(t)
+      return t.name and t.id
+    end,
+    discord_export_chat_main_object = function(t)
+      return t.channel
+    end,
+    facebook_export_chat_main_object = function(t)
+      return t.title and t.thread_path
+    end,
+    signal_export_chat_main_object = function(t)
+      return t.author
+    end,
   },
 
   youtube_api_item = {

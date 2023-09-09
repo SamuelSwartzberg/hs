@@ -451,7 +451,7 @@ dothis = {
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped_noempty(
         str,
         function(str_or_nil)
-          str_or_nil = transf.fn.rt_or_nil_fn_by_pcall(transf.json_str.not_userdata_or_fn)(str_or_nil)
+          str_or_nil = transf.fn.rt_or_nil_ret_fn_by_pcall(transf.json_str.not_userdata_or_fn)(str_or_nil)
           fn(str_or_nil)
         end
       )
@@ -3118,7 +3118,7 @@ dothis = {
   },
   export_dir = {
     log = function(dir, typ)
-      local arr = transf[typ .. "_export_dir"].export_chat_main_object_and_media_dir_arr(dir)
+      local arr = transf[typ .. "_export_dir"].export_chat_main_object_and_local_dir__arr_arr_by_media_dir(dir)
       for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
         dothis.export_chat_main_object.log(two_anys__arr[1], typ, two_anys__arr[2])
       end
