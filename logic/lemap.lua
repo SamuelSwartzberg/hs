@@ -20,7 +20,7 @@ Liefertermin: {{[
   transf.omegat_project_dir.delivery_date(d)
 ]}} 
 Rechnungstermin: {{[
-  transf["nil"].date_by_current():fmt("%d.%m.%Y")
+  transf.timestamp_s.period_alphanum_minus_underscore_by_german_date(transf["nil"].timestamp_s_by_current())
 ]}}
  
 

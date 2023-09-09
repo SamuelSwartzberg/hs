@@ -173,7 +173,7 @@ local keymap = {
   },
   t = {
     explanation = "Choose an action on the current date.",
-    fn = act["nil"].choose_action_on_current_date
+    fn = act["nil"].choose_action_on_current_timestamp_s
   },
   y = {
     explanation = "Choose action on tag name and value in MAUDIOVISUAL (mostly for interacting with streams)",

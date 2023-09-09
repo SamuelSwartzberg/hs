@@ -662,13 +662,12 @@ thing_name_hierarchy = {
         interval_specifier = {
           number_interval_specifier = {
             int_interval_specifier = {
-              timestamp_s_interval_specifier = "leaf",
+              timestamp_s_interval_specifier = {
+                timestamp_s_sequence_specifier = "leaf",
+              },
             }
           },
           sequence_specifier = "leaf",
-          date_interval_specifier = {
-            date_sequence_specifier = "leaf",
-          }
         },
         gpt_response_table = "leaf",
         iban_data_spec = "leaf", 

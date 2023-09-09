@@ -539,8 +539,8 @@ act = {
     sox_rec_toggle_and_act = function()
       dothis.sox.sox_rec_toggle_cache(dothis.any.choose_action)
     end,
-    choose_action_on_current_date = function()
-      dothis.any.choose_action(transf["nil"].date_by_current())
+    choose_action_on_current_timestamp_s = function()
+      dothis.any.choose_action(transf["nil"].timestamp_s_by_current())
     end,
     choose_login_pass_item_name_and_fill = function()
       dothis.arr.choose_item(

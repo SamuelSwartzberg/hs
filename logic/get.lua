@@ -2217,30 +2217,30 @@ get = {
     
   },
   csl_table = {
-    key_date_parts_single_or_range = function(csl_table, key)
+    dtprts__arr_arr = function(csl_table, key)
       return csl_table[key]
     end,
-    key_rf3339like_dt_or_interval = function(csl_table, key)
+    rf3339like_dt_or_interval_by_key = function(csl_table, key)
       return transf.dtprts__arr_arr.rf3339like_dt_or_interval(
-        transf.csl_table.key_date_parts_single_or_range(csl_table, key)
+        get.csl_table.dtprts__arr_arr(csl_table, key)
       )
     end,
-    key_rfc3339like_dt_force_first = function(csl_table, key)
+    rfc3339like_dt_by_key_force_first = function(csl_table, key)
       return transf.dtprts__arr_arr.rfc3339like_dt_force_first(
-        transf.csl_table.key_date_parts_single_or_range(csl_table, key)
+         get.csl_table.dtprts__arr_arr(csl_table, key)
       )
     end,
-    key_date_force_first = function(csl_table, key)
+    timestamp_s_by_key_force_first = function(csl_table, key)
       return transf.dtprts__arr_arr.timestamp_s_by_force_first(
-        transf.csl_table.key_date_parts_single_or_range(csl_table, key)
+         get.csl_table.dtprts__arr_arr(csl_table, key)
       )
     end,
-    key_prefix_partial_dcmp_spec_force_first = function(csl_table, key)
+    prefix_partial_dcmp_spec_by_key_force_first = function(csl_table, key)
       return transf.dtprts__arr_arr.prefix_partial_dcmp_spec_by_force_first(
-        transf.csl_table.key_date_parts_single_or_range(csl_table, key)
+         get.csl_table.dtprts__arr_arr(csl_table, key)
       )
     end,
-    key_year_force_first = function(csl_table, key)
+    pos_int_by_key_year_force_first = function(csl_table, key)
       return transf.csl_table.key_prefix_partial_dcmp_spec_force_first(csl_table, key).year
     end,
   },
@@ -2425,7 +2425,7 @@ get = {
     end,
   },
   timestamp_s = {
-    str_w_date_format_indicator = function(timestamp_s, format)
+    str_by_formatted = function(timestamp_s, format)
       return os.date(format, timestamp_s)
     end,
     timestamp_s_by_added = function(ts, amount, dcmp_name)
@@ -2448,38 +2448,24 @@ get = {
     number_sequence_specifier_of_lower_component = function(date, step, dcmp_name)
       error("TODO")
     end,
-    hours_date_sequence_specifier = function(date, date_component_value)
+    hours_date_sequence_specifier = function(date, dcmp_val)
       error("TODO")
     end,
     rfc3339like_dt_by_precison_w_dcmp_name = function(date, dcmp_name)
-      return get.timestamp_s.str_w_date_format_indicator(date, tblmap.dcmp_name.rfc3339like_dt_format_str[dcmp_name])
+      return get.timestamp_s.str_by_formatted(date, tblmap.dcmp_name.rfc3339like_dt_format_str[dcmp_name])
     end,
 
   },
   timestamp_ms = {
-    str_w_date_format_indicator = function(timestamp_s, format)
-      return get.timestamp_s.str_w_date_format_indicator(
+    str_by_formatted = function(timestamp_s, format)
+      return get.timestamp_s.str_by_formatted(
         transf.timestamp_ms.timestamp_s(timestamp_s),
         format
       )
     end,
   },
-  dcmp_name_list = {
-    date_component_value_list = function(dcmp_name_list, dcmp_spec)
-      return get.arr.arr_by_mapped_w_t_key_assoc(
-        dcmp_name_list,
-        dcmp_spec
-      )
-    end,
-    date_component_value_ordered_list = function(dcmp_name_list, dcmp_spec)
-      return get.arr.arr_by_mapped_w_t_key_assoc(
-        transf.dcmp_name_arr.dcmp_name_seq(dcmp_name_list),
-        dcmp_spec
-      )
-    end,
-  },
   dcmp_spec = {
-    number_sequence_specifier = function(dcmp_spec, step, unit)
+    timestamp_s_sequence_specifier = function(dcmp_spec, step, unit)
       return {
         start = transf.dcmp_spec.timestamp_s_by_full_min(dcmp_spec),
         stop = transf.dcmp_spec.timestamp_s_by_full_max(dcmp_spec),
@@ -2512,9 +2498,9 @@ get = {
   sequence_specifier = {
 
   },
-  date_interval_specifier = {
-    event_tables_within_range = function(date_interval_specifier, specifier, include, exclude)
-      specifier = transf.two_tables.table_by_take_new(transf.date_interval_specifier.event_table(date_interval_specifier), specifier)
+  timestamp_s_interval_specifier = {
+    event_tables_within_range = function(ivspec, specifier, include, exclude)
+      specifier = transf.two_tables.table_by_take_new(transf.timestamp_s_interval_specifier.event_table(ivspec), specifier)
       return get.khal.list_event_tables(
         specifier,
         include,
@@ -2529,8 +2515,8 @@ get = {
         full_dcmp_spec
       )
     end,
-    date_sequence_specifier_of_lower_component = function (full_dcmp_spec, step, dcmp_name, additional_steps_down)
-      return get.dcmp_spec.number_sequence_specifier(
+    timestamp_s_sequence_specifier_by_lower_component = function (full_dcmp_spec, step, dcmp_name, additional_steps_down)
+      return get.dcmp_spec.timestamp_s_sequence_specifier(
         get.full_dcmp_spec.prefix_partial_dcmp_spec(full_dcmp_spec, dcmp_name),
         step,
         get.dcmp_name.dcmp_name_by_next(dcmp_name, additional_steps_down)
@@ -2675,12 +2661,11 @@ get = {
     end,
   },
   event_table = {
-    date_sequence_specifier = function(event_table, step, unit)
+    timestamp_s_sequence_specifier = function(event_table, step, unit)
       return {
-        start = transf.event_table.date_by_start(event_table),
-        stop = transf.event_table.date_by_end(event_table),
-        step = step or 1,
-        unit = unit or "sec"
+        start = transf.event_table.timestamp_s_by_start(event_table),
+        stop = transf.event_table.timestamp_s_by_end(event_table),
+        step = (step or 1) * tblmap.dcmp_name.timestamp_s[unit or "sec"],
       }
     end,
   },
