@@ -90,7 +90,13 @@ get = {
         dothis.arr.push(command, "--notstarted")
       end
       specifier.start = specifier.start or "today"
-      specifier["end"] = specifier["end"] or date(os.time()):adddays(60):fmt("%Y-%m-%d")
+      specifier["end"] = specifier["end"] or transf.timestamp_s.rfc3339like_ymd(
+        get.timestamp_s.timestamp_s_by_added(
+          transf["nil"].timestamp_s_by_current(),
+          60,
+          "day"
+        )
+      )
       dothis.arr.push(command, transf.str.str_by_single_quoted_escaped(specifier.start))
       dothis.arr.push(command, transf.str.str_by_single_quoted_escaped(specifier["end"]))
       return transf.multirecord_str.event_table_arr(
@@ -2225,7 +2231,7 @@ get = {
       )
     end,
     key_date_force_first = function(csl_table, key)
-      return transf.dtprts__arr_arr.date_by_force_first(
+      return transf.dtprts__arr_arr.timestamp_s_by_force_first(
         transf.csl_table.key_date_parts_single_or_range(csl_table, key)
       )
     end,
@@ -2322,8 +2328,8 @@ get = {
     end,
   },
   logging_dir = {
-    log_path_for_date = function(path, date)
-      return hs.fs.pathToAbsolute(path) .. "/" .. transf.date.triplex_local_nonabsolute_path_by_y_ym_ymd(date) .. ".csv"
+    local_absolute_path_w_timestamp_s = function(path, date)
+      return hs.fs.pathToAbsolute(path) .. "/" .. transf.timestamp_s.triplex_local_nonabsolute_path_by_y_ym_ymd(date) .. ".csv"
     end,
   },
   path_arr = {
@@ -2428,14 +2434,14 @@ get = {
     timestamp_s_by_subtracted = function(ts, amount, dcmp_name)
       return get.timestamp_s.timestamp_s_by_added(ts, -amount, dcmp_name)
     end,
-    number_interval_specifier_by_surrounding = function(ts, amount, dcmp_name)
+    timestamp_s_interval_specifier_by_surrounding = function(ts, amount, dcmp_name)
       return {
         start = get.timestamp_s.timestamp_s_by_subtracted(ts, amount, dcmp_name),
         stop = get.timestamp_s.timestamp_s_by_added(ts, amount, dcmp_name),
       }
     end,
     number_sequence_specifier_by_surrounding = function(ts, interval_amount, interval_dcmp_name, step_amount, step_dcmp_name)
-      local ivl = get.timestamp_s.number_interval_specifier_by_surrounding(ts, interval_amount, interval_dcmp_name)
+      local ivl = get.timestamp_s.timestamp_s_interval_specifier_by_surrounding(ts, interval_amount, interval_dcmp_name)
       ivl.step = tblmap.dcmp_name.timestamp_s[step_dcmp_name] * step_amount
       return ivl
     end,
@@ -2452,8 +2458,8 @@ get = {
   },
   timestamp_ms = {
     str_w_date_format_indicator = function(timestamp_s, format)
-      return get.date.str_w_date_format_indicator(
-        transf.timestamp_s.date(timestamp_s),
+      return get.timestamp_s.str_w_date_format_indicator(
+        transf.timestamp_ms.timestamp_s(timestamp_s),
         format
       )
     end,
@@ -2473,12 +2479,11 @@ get = {
     end,
   },
   dcmp_spec = {
-    date_sequence_specifier = function(dcmp_spec, step, unit)
+    number_sequence_specifier = function(dcmp_spec, step, unit)
       return {
-        start = date(transf.dcmp_spec.full_dcmp_spec_by_min(dcmp_spec)),
-        stop = date(transf.dcmp_spec.full_dcmp_spec_by_max(dcmp_spec)),
-        step = step or 1,
-        unit = unit or "sec"
+        start = transf.dcmp_spec.timestamp_s_by_full_min(dcmp_spec),
+        stop = transf.dcmp_spec.timestamp_s_by_full_max(dcmp_spec),
+        step = (step or 1) * tblmap.dcmp_name.timestamp_s[unit or "sec"],
       }
     end,
   },
@@ -2525,32 +2530,20 @@ get = {
       )
     end,
     date_sequence_specifier_of_lower_component = function (full_dcmp_spec, step, dcmp_name, additional_steps_down)
-      return get.dcmp_spec.date_sequence_specifier(
+      return get.dcmp_spec.number_sequence_specifier(
         get.full_dcmp_spec.prefix_partial_dcmp_spec(full_dcmp_spec, dcmp_name),
         step,
         get.dcmp_name.dcmp_name_by_next(dcmp_name, additional_steps_down)
       )      
     end,
-    precision_full_dcmp_spec = function(full_dcmp_spec, dcmp_name)
+    full_dcmp_spec_by_min_for_precision_w_dcmp_name = function(full_dcmp_spec, dcmp_name)
       return transf.full_dcmp_spec.min_full_dcmp_spec(
         get.full_dcmp_spec.prefix_partial_dcmp_spec(full_dcmp_spec, dcmp_name)
       )
     end,
-    precision_date = function(full_dcmp_spec, dcmp_name)
-      return date(get.full_dcmp_spec.precision_full_dcmp_spec(full_dcmp_spec, dcmp_name))
-    end,
-  },
-  rfc3339like_dt = {
-    min_date_formatted = function(str, format)
-      return transf.date.formatted(
-        transf.rfc3339like_dt.timestamp_s_by_min(str),
-        format
-      )
-    end,
-    max_date_formatted = function(str, format)
-      return transf.date.formatted(
-        transf.rfc3339like_dt.timestamp_s_by_max(str),
-        format
+    timestamp_s_by_precision_w_dcmp_name = function(full_dcmp_spec, dcmp_name)
+      return transf.full_dcmp_spec.timestamp_s(
+        get.full_dcmp_spec.full_dcmp_spec_by_min_for_precision_w_dcmp_name(full_dcmp_spec, dcmp_name)
       )
     end,
   },

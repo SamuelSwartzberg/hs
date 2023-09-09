@@ -972,26 +972,14 @@ transf = {
     timestamp_s_by_modification = function(path)
       return get.local_extant_path.attr(path, "modification")
     end,
-    date_by_modification = function(path)
-      return transf.timestamp_s.date(transf.extant_path.m_timestamp_s(path))
-    end,
     timestamp_s_by_creation = function(path)
       return get.local_extant_path.attr(path, "creation")
-    end,
-    date_by_creation = function(path)
-      return transf.timestamp_s.date(transf.extant_path.timestamp_s_by_creation(path))
     end,
     timestamp_s_by_change = function(path)
       return get.local_extant_path.attr(path, "change")
     end,
-    date_by_change = function(path)
-      return transf.timestamp_s.date(transf.extant_path.timestamp_s_by_change(path))
-    end,
     timestamp_s_by_access = function(path)
       return get.local_extant_path.attr(path, "access")
-    end,
-    date_by_access = function(path)
-      return transf.timestamp_s.date(transf.extant_path.timestamp_s_by_access(path))
     end,
     project_dir_arr_by_descendants_depth_3 = function(path)
       return transf.local_dir_arr.project_dir_arr_by_filter(
@@ -1050,8 +1038,8 @@ transf = {
     path_leaf_specifier_arr = function(path_arr)
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.path_leaf_specifier)
     end,
-    date_interval_specifier_arr = function(path_arr)
-      return transf.path_leaf_specifier_arr.date_interval_specifier_arr(
+    timestamp_s_interval_specifier_arr = function(path_arr)
+      return transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_arr(
         transf.path_arr.path_leaf_specifier_arr(path_arr)
       )
     end,
@@ -1604,41 +1592,41 @@ transf = {
         end
       )
     end,
-    date_interval_specifier_arr = function(arr)
+    timestamp_s_interval_specifier_arr = function(arr)
       return get.table.arr_by_mapped_w_vt_arg_vt_ret_fn(
         arr,
         transf.path_leaf_specifier.date_interval_specifier_or_nil
       )
     end,
-    date_interval_specifier_or_nil_by_earliest_start = function(arr)
+    timestamp_s_interval_specifier_or_nil_by_earliest_start = function(arr)
       return transf.interval_specifier_arr.interval_specifier_by_earliest_start(
-        transf.path_leaf_specifier_arr.date_interval_specifier_arr(arr)
+        transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_arr(arr)
       )
     end,
     date_by_earliest_start = function(arr)
       return transf.interval_specifier_arr.t_by_earliest_start(
-        transf.path_leaf_specifier_arr.date_interval_specifier_arr(arr)
+        transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_arr(arr)
       )
     end,
     date_by_latest_end = function(arr)
       return transf.interval_specifier_arr.latest_end(
-        transf.path_leaf_specifier_arr.date_interval_specifier_arr(arr)
+        transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_arr(arr)
       )
     end,
-    date_interval_specifier_by_union = function(arr)
+    timestamp_s_interval_specifier_by_union = function(arr)
       return transf.interval_specifier_arr.interval_specifier_by_union(
-        transf.path_leaf_specifier_arr.date_interval_specifier_arr(arr)
+        transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_arr(arr)
       )
     end,
     rfc3339like_dt_o_interval_by_union = function(arr)
       return transf.date_interval_specifier.rf3339like_dt_or_interval(
-        transf.path_leaf_specifier_arr.date_interval_specifier_by_union(arr)
+        transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_by_union(arr)
       )
     end,
     path_leaf_specifier_or_nil_by_earliest_start = function(arr)
       return get.assoc.kt_or_nil_by_first_match_w_vt(
         transf.path_leaf_specifier_arr.path_leaf_specifier_key_date_interval_specifier_value_assoc(arr),
-        transf.path_leaf_specifier_arr.date_interval_specifier_or_nil_by_earliest_start(arr)
+        transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_or_nil_by_earliest_start(arr)
       )
     end,
   },
@@ -2095,7 +2083,7 @@ transf = {
       }
     end,
     triplex_local_nonabsolute_path_by_y_ym_ymd = function(date)
-      return get.str_or_number_arr.str_by_joined(transf.date.rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd__arr(date), "/")
+      return get.str_or_number_arr.str_by_joined(transf.timestamp_s.rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd__arr(date), "/")
     end,
     number_sequence_specifier_by_quarter_hours = function(timestamp_s)
       return get.timestamp_s.number_sequence_specifier_of_lower_component(timestamp_s, 15, "hour")
@@ -2227,8 +2215,8 @@ transf = {
         return v and get.str_or_number.number_or_nil(comps[k]) or nil
       end)
     end,
-    date_interval_specifier = function(str)
-      return transf.dcmp_spec.date_interval_specifier(transf.rfc3339like_dt.dcmp_spec(str))
+    timestamp_s_interval_specifier = function(str)
+      return transf.dcmp_spec.timestamp_s_interval_specifier(transf.rfc3339like_dt.dcmp_spec(str))
     end,
     full_dcmp_spec_by_min = function(str)
       return transf.dcmp_spec.full_dcmp_spec_by_min(
@@ -2328,16 +2316,16 @@ transf = {
         transf.rfc3339like_interval.dcmp_name_by_smallest_end_set(str)
       )
     end,
-    date_interval_specifier = function(str)
+    timestamp_s_interval_specifier = function(str)
       return {
-        start = transf.rfc3339like_interval.date_by_start_min(str),
-        stop = transf.rfc3339like_interval.date_by_end_max(str),
+        start = transf.rfc3339like_interval.timestamp_s_by_start_min(str),
+        stop = transf.rfc3339like_interval.timestamp_s_by_end_max(str),
       }
     end,
-    date_sequence_specifier = function(str)
+    number_sequence_specifier = function(str)
       return {
-        start = transf.rfc3339like_interval.date_by_start_min(str),
-        stop = transf.rfc3339like_interval.date_by_end_max(str),
+        start = transf.rfc3339like_interval.timestamp_s_by_start_min(str),
+        stop = transf.rfc3339like_interval.timestamp_s_by_end_max(str),
         step = transf.dcmp_name.timestamp_s(
           transf.rfc3339like_interval.dcmp_name_by_smallest_both_set(str)
         ),
@@ -2423,7 +2411,7 @@ transf = {
       return math.random(interval.start, interval.stop)
     end,
   },
-  number_interval_specifer = {
+  number_interval_specifier = {
     number_by_random = function(interval)
       return math.random() * (interval.stop - interval.start) + interval.start
     end,
@@ -2492,64 +2480,44 @@ transf = {
         stop = transf.interval_specifier_arr.t_by_earliest_stop(interval_specifier_arr),
       }
     end,
-    intrval_specifier_by_union = function(interval_specifier_arr)
+    interval_specifier_by_union = function(interval_specifier_arr)
       return {
         start = transf.interval_specifier_arr.t_by_earliest_start(interval_specifier_arr),
         stop = transf.interval_specifier_arr.t_by_latest_stop(interval_specifier_arr),
       }
     end,
   },
-  date_sequence_specifier = {
-    rfc3339like_dt_by_start_of_unit_precision = function(date_sequence_specifier)
-      return get.date.rfc3339like_dt_by_precison_w_dcmp_name(
-        date_sequence_specifier.start,
-        date_sequence_specifier.unit
-      )
-    end,
-    rfc3339like_dt_by_end_of_unit_precision = function(date_sequence_specifier)
-      return get.date.rfc3339like_dt_by_precison_w_dcmp_name(
-        date_sequence_specifier.stop,
-        date_sequence_specifier.unit
-      )
-    end,
-    rfc3339like_interval_by_of_unit_precision = function(date_sequence_specifier)
-      return 
-        transf.date_sequence_specifier.rfc3339like_dt_by_start_of_unit_precision(date_sequence_specifier) .. 
-        "_to_" ..
-        transf.date_sequence_specifier.rfc3339like_dt_by_end_of_unit_precision(date_sequence_specifier)
-    end,
-  },
   date_interval_specifier = {
     full_rfc3339like_dt_by_start = function(date_interval_specifier)
-      return transf.date.full_rfc3339like_dt(date_interval_specifier.start)
+      return transf.timestamp_s.full_rfc3339like_dt(date_interval_specifier.start)
     end,
     full_rfc3339like_dt_by_end = function(date_interval_specifier)
-      return transf.date.full_rfc3339like_dt(date_interval_specifier.stop)
+      return transf.timestamp_s.full_rfc3339like_dt(date_interval_specifier.stop)
     end,
     full_dcmp_spec_by_start = function(date_interval_specifier)
-      return transf.date.full_dcmp_spec(date_interval_specifier.start)
+      return transf.timestamp_s.full_dcmp_spec(date_interval_specifier.start)
     end,
     full_dcmp_spec_by_end = function(date_interval_specifier)
-      return transf.date.full_dcmp_spec(date_interval_specifier.stop)
+      return transf.timestamp_s.full_dcmp_spec(date_interval_specifier.stop)
     end,
-    prefix_dcmp_spec_by_start_filtered_not_min_or_not_prefix = function(date_interval_specifier)
+    prefix_dcmp_spec_by_start_filtered_not_min = function(date_interval_specifier)
       return transf.dcmp_spec.prefix_dcmp_spec_by_filtered_not_min_or_not_prefix(
         transf.date_interval_specifier.full_dcmp_spec_by_start(date_interval_specifier)
       )
     end,
-    prefix_dcmp_spec_by_end_filtered_not_max_or_not_prefix = function(date_interval_specifier)
+    prefix_dcmp_spec_by_end_filtered_not_max = function(date_interval_specifier)
       return transf.dcmp_spec.prefix_dcmp_spec_by_filtered_not_max_or_not_prefix(
         transf.date_interval_specifier.full_dcmp_spec_by_end(date_interval_specifier)
       )
     end,
     rfc3339like_dt_by_start_filtered_not_max_or_not_prefix = function(date_interval_specifier)
       return transf.prefix_dcmp_spec.rfc3339like_dt(
-        transf.date_interval_specifier.prefix_dcmp_spec_by_start_filtered_not_min_or_not_prefix(date_interval_specifier)
+        transf.date_interval_specifier.prefix_dcmp_spec_by_start_filtered_not_min(date_interval_specifier)
       )
     end,
     rfc3339like_dt_by_end_filtered_not_max_or_not_prefix = function(date_interval_specifier)
       return transf.prefix_dcmp_spec.rfc3339like_dt(
-        transf.date_interval_specifier.prefix_dcmp_spec_by_end_filtered_not_max_or_not_prefix(date_interval_specifier)
+        transf.date_interval_specifier.prefix_dcmp_spec_by_end_filtered_not_max(date_interval_specifier)
       )
     end,
     rfc3339like_dt = function(date_interval_specifier)
@@ -2570,8 +2538,8 @@ transf = {
     end,
     event_table = function(date_interval_specifier)
       return {
-        start = transf.date.full_rfc3339like_dt(date_interval_specifier.start),
-        ["end"] = transf.date.full_rfc3339like_dt(date_interval_specifier.stop),
+        start = transf.date_interval_specifier.rfc3339like_dt_by_start_filtered_not_max_or_not_prefix(date_interval_specifier.start),
+        ["end"] = transf.date_interval_specifier.rfc3339like_dt_by_end_filtered_not_max_or_not_prefix(date_interval_specifier.stop),
       }
     end,
   },
@@ -2607,21 +2575,31 @@ transf = {
       return transf.dcmp_name_arr.dcmp_spec_by_max(transf.dcmp_spec.dcmp_name_arr_by_not_set(dcmp_spec))
     end,
     full_dcmp_spec_by_min = function(dcmp_spec)
-      return transf.two_tables.table_by_take_new(
+      return transf.two_tables.table_by_take_old(
         dcmp_spec,
         transf.dcmp_spec.dcmp_spec_by_not_set_min(dcmp_spec)
       )
     end,
     full_dcmp_spec_by_max = function(dcmp_spec)
-      return transf.two_tables.table_by_take_new(
+      return transf.two_tables.table_by_take_old(
         dcmp_spec,
         transf.dcmp_spec.dcmp_spec_by_not_set_max(dcmp_spec)
       )
     end,
-    date_interval_specifier = function(dcmp_spec)
+    timestamp_s_by_full_min = function(dcmp_spec)
+      return transf.full_dcmp_spec.timestamp_s(
+        transf.dcmp_spec.full_dcmp_spec_by_min(dcmp_spec)
+      )
+    end,
+    timestamp_s_by_full_max = function(dcmp_spec)
+      return transf.full_dcmp_spec.timestamp_s(
+        transf.dcmp_spec.full_dcmp_spec_by_max(dcmp_spec)
+      )
+    end,
+    timestamp_s_interval_specifier = function(dcmp_spec)
       return {
-        start = date(transf.dcmp_spec.full_dcmp_spec_by_min(dcmp_spec)),
-        stop = date(transf.dcmp_spec.full_dcmp_spec_by_max(dcmp_spec))
+        start = transf.dcmp_spec.timestamp_s_by_full_min(dcmp_spec),
+        stop = transf.dcmp_spec.timestamp_s_by_full_max(dcmp_spec),
       }
     end, 
     prefix_dcmp_spec_by_filter = function(dcmp_spec)
@@ -2753,11 +2731,11 @@ transf = {
       return os.time(full_dcmp_spec)
     end,
     timestamp_ms = function(full_dcmp_spec)
-      return transf.date.timestamp_s(full_dcmp_spec) * 1000
+      return transf.full_dcmp_spec.timestamp_s(full_dcmp_spec) * 1000
     end,
     full_rfc3339like_dt = function(full_dcmp_spec)
-      return transf.date.full_rfc3339like_dt(
-        transf.full_dcmp_spec.date(full_dcmp_spec)
+      return transf.timestamp_s.full_rfc3339like_dt(
+        transf.full_dcmp_spec.timestamp_s(full_dcmp_spec)
       )
     end,
   },
@@ -5750,9 +5728,7 @@ transf = {
       return transf.client_project_dir.rechnung(dir).delivery_date
     end,
     rechnung_filename = function(dir)
-      return transf.date.rfc3339like_ymd(
-        date()
-      ) .. "--" .. transf.client_project_dir.client_id_by_client(dir) .. "_" .. transf.client_project_dir.rechnung_number(dir)
+      return transf["nil"].full_rfc3339like_dt_by_current() .. "--" .. transf.client_project_dir.client_id_by_client(dir) .. "_" .. transf.client_project_dir.rechnung_number(dir)
     end,
     rechnung_pdf_path = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. transf.client_project_dir.rechnung_filename(dir) .. ".pdf"
@@ -6243,8 +6219,8 @@ transf = {
         transf.csl_table.dtprts__arr_arr_by_issued(csl_table)
       )
     end,
-    issued_date_force_first = function(csl_table)
-      return transf.dtprts__arr_arr.date_by_force_first(
+    timestamp_s_by_issued_force_first = function(csl_table)
+      return transf.dtprts__arr_arr.timestamp_s_by_force_first(
         transf.csl_table.dtprts__arr_arr_by_issued(csl_table)
       )
     end,
@@ -6546,14 +6522,14 @@ transf = {
     prefix_partial_dcmp_spec = function(date_parts)
       return { year = date_parts[1], month = date_parts[2], day = date_parts[3] }
     end,
-    full_dmp_spec = function(date_parts)
+    full_dcmp_spec = function(date_parts)
       return transf.dcmp_spec.full_dcmp_spec_by_min(
         transf.dtprts__arr.prefix_partial_dcmp_spec(date_parts)
       )
     end,
-    date = function(date_parts)
-      return transf.full_dcmp_spec.date(
-        transf.dtprts__arr.full_dmp_spec(date_parts)
+    timestamp_s = function(date_parts)
+      return transf.full_dcmp_spec.timestamp_s(
+        transf.dtprts__arr.full_dcmp_spec(date_parts)
       )
     end,
   },
@@ -6563,8 +6539,8 @@ transf = {
     end,
     date_interval_specifier = function(date_parts_range)
       return {
-        start = transf.dtprts__arr.full_dmp_spec(date_parts_range[1]),
-        stop = transf.dtprts__arr.full_dmp_spec(date_parts_range[2])
+        start = transf.dtprts__arr.full_dcmp_spec(date_parts_range[1]),
+        stop = transf.dtprts__arr.full_dcmp_spec(date_parts_range[2])
       }
     end
   },
@@ -6584,10 +6560,10 @@ transf = {
       return transf.dtprts__arr.prefix_partial_dcmp_spec(date_parts[1])
     end,
     full_dcmp_spec_by_force_first = function(date_parts)
-      return transf.dtprts__arr.full_dmp_spec(date_parts[1])
+      return transf.dtprts__arr.full_dcmp_spec(date_parts[1])
     end,
-    date_by_force_first = function(date_parts)
-      return transf.dtprts__arr.date(date_parts[1])
+    timestamp_s_by_force_first = function(date_parts)
+      return transf.dtprts__arr.timestamp_s(date_parts[1])
     end,
   },
   urllike_with_no_scheme = {
@@ -7351,12 +7327,11 @@ transf = {
       return transf.timestamp_s.full_rfc3339like_dt(transf["nil"].timestamp_s_by_current())
     end,
     timestamp_s_last_midnight = function()
-      return transf.date.timestamp_s(
-        get.full_dcmp_spec.precision_date(
+      return 
+        get.full_dcmp_spec.timestamp_s_by_precision_w_dcmp_name(
           transf["nil"].full_dcmp_spec_by_current(),
           "day"
         )
-      )
     end,
     package_manager_name_arr = function()
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg list-package-managers"))
@@ -7427,9 +7402,8 @@ transf = {
       )
     end,
     telegram_raw_export_dir_by_current = function()
-      return env.DOWNLOADS .. "/Telegram Desktop/DataExport_" .. get.date.str_w_date_format_indicator(
-        transf["nil"].date_by_current(),
-        "%Y-%m-%d"
+      return env.DOWNLOADS .. "/Telegram Desktop/DataExport_" .. transf.timestamp_s.rfc3339like_ymd(
+        transf["nil"].timestamp_s_by_current()
       )
     end,
     running_application_by_frontmost = hs.application.frontmostApplication,
@@ -8055,7 +8029,7 @@ transf = {
       next_position_change_state_spec.num_steps = position_change_state_spec.num_steps - 1
       next_position_change_state_spec.delta_hs_geometry_point = position_change_state_spec.delta_hs_geometry_point * position_change_state_spec.factor_of_deceleration
       next_position_change_state_spec.past_ideal_hs_geometry_point = position_change_state_spec.past_ideal_hs_geometry_point + position_change_state_spec.delta_hs_geometry_point
-      local jittered_delta_hs_geometry_point = next_position_change_state_spec.delta_hs_geometry_point * transf.number_interval_specifer.number_by_random({
+      local jittered_delta_hs_geometry_point = next_position_change_state_spec.delta_hs_geometry_point * transf.number_interval_specifier.number_by_random({
         start = -position_change_state_spec.jitter_factor,
         stop = position_change_state_spec.jitter_factor
       })
@@ -8083,7 +8057,7 @@ transf = {
       return declared_position_change_input_spec.jitter_factor or 0.1
     end,
     pos_number_by_duration = function(declared_position_change_input_spec)
-      return declared_position_change_input_spec.duration or transf.number_interval_specifer.number_by_random({start=0.1, stop=0.3})
+      return declared_position_change_input_spec.duration or transf.number_interval_specifier.number_by_random({start=0.1, stop=0.3})
     end,
     inclusive_proper_fraction_by_factor_of_deceleration = function(declared_position_change_input_spec)
       return declared_position_change_input_spec.factor_of_deceleration or 0.95
@@ -8575,8 +8549,8 @@ transf = {
   },
   discord_export_chat_message  = {
     timestamp_ms = function(msg)
-      return transf.date.timestamp_ms(
-        date(msg.timestamp)
+      return transf.timestamp_s.timestamp_ms(
+        msg.timestamp
       )
     end,
     str_by_author = function(msg)

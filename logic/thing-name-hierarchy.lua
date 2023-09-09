@@ -660,8 +660,10 @@ thing_name_hierarchy = {
           str_prompt_args_spec = "leaf",
         },
         interval_specifier = {
-          number_interval_specifer = {
-            int_interval_specifier = "leaf",
+          number_interval_specifier = {
+            int_interval_specifier = {
+              timestamp_s_interval_specifier = "leaf",
+            }
           },
           sequence_specifier = "leaf",
           date_interval_specifier = {

@@ -373,14 +373,6 @@ act = {
       )
     end,
   },
-  date = {
-    choose_format_and_action = function(dt)
-      dothis.date.choose_format(
-        dt,
-        dothis.any.choose_action
-      )
-    end,
-  },
   str = {
     say_ja = function(str)
       dothis.str.say(str, "ja")

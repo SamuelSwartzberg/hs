@@ -1225,7 +1225,10 @@ dothis = {
         "msmtp -t <" .. transf.str.str_by_single_quoted_escaped(path),
         function(res)
           if not res then
-            dothis.absolute_path.write_file(env.FAILED_EMAILS .. "/" .. os.date("%Y-%m-%dT%H:%M:%S"), transf.file.str_by_contents(path))
+            dothis.absolute_path.write_file(
+              env.FAILED_EMAILS .. "/" .. transf["nil"].full_rfc3339like_dt_by_current(), 
+              transf.file.str_by_contents(path)
+            )
             dothis.absolute_path.delete(path)
           else
             dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
@@ -2127,8 +2130,8 @@ dothis = {
         params = { part = "snippet,status" },
         request_table = {
           snippet = {
-            title = spec.title or get.str.str_by_formatted_w_n_anys("Playlist from %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
-            description = spec.description or get.str.str_by_formatted_w_n_anys("Created at %s", os.date("%Y-%m-%dT%H:%M:%S%Z")),
+            title = spec.title or get.str.str_by_formatted_w_n_anys("Playlist from %s", transf["nil"].full_rfc3339like_dt_by_current()),
+            description = spec.description or get.str.str_by_formatted_w_n_anys("Created at %s", transf["nil"].full_rfc3339like_dt_by_current()),
           }
         },
       }, function(result)
@@ -2684,7 +2687,7 @@ dothis = {
   },
   input_spec_arr = {
     exec = function(specarr, wait_time, do_after)
-      wait_time = wait_time or transf.number_interval_specifer.number_by_random({start=0.10, stop=0.12})
+      wait_time = wait_time or transf.number_interval_specifier.number_by_random({start=0.10, stop=0.12})
       if #specarr == 0 then
         if do_after then
           do_after()

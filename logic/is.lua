@@ -2348,6 +2348,9 @@ is = {
       return is.interval_specifier.sequence_specifier(t)
     end,
   },
+  int_interval_specifier = {
+    timestamp_s_interval_specifier = transf["nil"]["true"],
+  },
   prompt_args_spec = {
     str_prompt_args_spec = function(t)
       return t.informative_text or t.buttonA or t.buttonB
