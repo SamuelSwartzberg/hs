@@ -334,11 +334,9 @@ ls = {
     encoded = {"&", ";"},
     decoded = {"\"", "'", "<", ">", "&"}
   },
-  date = {
-    dcmp_names = {"year", "month", "day", "hour", "min", "sec"},
-    dcmp_names_long = {"year", "month", "day", "hour", "minute", "second"},
-    long_dt_seps = {" at "}
-  },
+  dcmp_names = {"year", "month", "day", "hour", "min", "sec"},
+  dcmp_names_long = {"year", "month", "day", "hour", "minute", "second"},
+  long_dt_seps = {" at "},
   addr_key = {"Formatted name", "First name", "Last name", "Street", "Code", "City", "Region", "Country", "Box", "Extended"},
   mod_char = {"c", "a", "s", "ct", "f"},
   mod_name = {"cmd", "alt", "shift", "ctrl", "fn"},

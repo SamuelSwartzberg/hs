@@ -2411,11 +2411,11 @@ get = {
   dcmp_name = {
     dcmp_name_by_next = function(component, n)
       n = n or 0
-      return get.arr.any_by_next_w_index(ls.date.dcmp_names, transf.dcmp_name.date_component_index(component) + n)
+      return get.arr.any_by_next_w_index(ls.dcmp_names, transf.dcmp_name.date_component_index(component) + n)
     end,
     dcmp_name_by_previous = function(component, n)
       n = n or 0
-      return get.arr.t_or_nil_by_previous(ls.date.dcmp_names, transf.dcmp_name.date_component_index(component) - n)
+      return get.arr.t_or_nil_by_previous(ls.dcmp_names, transf.dcmp_name.date_component_index(component) - n)
     end,
   },
   timestamp_s = {
@@ -2543,13 +2543,13 @@ get = {
   rfc3339like_dt = {
     min_date_formatted = function(str, format)
       return transf.date.formatted(
-        transf.rfc3339like_dt.date_by_min(str),
+        transf.rfc3339like_dt.timestamp_s_by_min(str),
         format
       )
     end,
     max_date_formatted = function(str, format)
       return transf.date.formatted(
-        transf.rfc3339like_dt.date_by_max(str),
+        transf.rfc3339like_dt.timestamp_s_by_max(str),
         format
       )
     end,

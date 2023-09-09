@@ -2150,10 +2150,10 @@ transf = {
   },
   dcmp_name = {
     prefix_dcmp_name_seq_by_larger_or_same = function(dcmp_name)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.date.dcmp_names, 1, dcmp_name)
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.dcmp_names, 1, dcmp_name)
     end,
     suffix_dcmp_name_seq_by_same_or_smaller = function(dcmp_name)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.date.dcmp_names, dcmp_name)
+      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.dcmp_names, dcmp_name)
     end,
     date_component_index = function(dcmp_name)
       return tblmap.dcmp_name.date_component_index[dcmp_name]
@@ -2197,7 +2197,7 @@ transf = {
       )[#arr]
     end,
     dcmp_name_arr_by_inverse = function(arr)
-      return transf.two_arrs.set_by_difference(ls.date.dcmp_names, arr)
+      return transf.two_arrs.set_by_difference(ls.dcmp_names, arr)
     end,
     rfc3339like_dt_separator_arr  = function(arr)
       return get.arr.arr_by_mapped_w_t_key_assoc(
@@ -2223,7 +2223,7 @@ transf = {
   rfc3339like_dt = {
     dcmp_spec = function(str)
       local comps = {get.str.n_strs_by_extracted_onig(str, r.g.rfc3339like_dt)}
-      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.date.dcmp_names, function(k, v)
+      return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(ls.dcmp_names, function(k, v)
         return v and get.str_or_number.number_or_nil(comps[k]) or nil
       end)
     end,
@@ -2240,43 +2240,28 @@ transf = {
         transf.rfc3339like_dt.dcmp_spec(str)
       )
     end,
-    date_by_min = function(str)
-      return transf.full_dcmp_spec.date(
+    timestamp_s_by_min = function(str)
+      return transf.full_dcmp_spec.timestamp_s(
         transf.rfc3339like_dt.full_dcmp_spec_by_min(str)
       )
     end,
-    date_by_max = function(str)
-      return transf.full_dcmp_spec.date(
-        transf.rfc3339like_dt.full_dcmp_spec_by_max(str)
-      )
-    end,
-    timestamp_s_by_min = function(str)
-      return transf.date.timestamp_s(
-        transf.rfc3339like_dt.date_by_min(str)
-      )
-    end,
     timestamp_s_by_max = function(str)
-      return transf.date.timestamp_s(
-        transf.rfc3339like_dt.date_by_max(str)
+      return transf.full_dcmp_spec.timestamp_s(
+        transf.rfc3339like_dt.full_dcmp_spec_by_max(str)
       )
     end,
     
 
   },
   full_rfc3339like_dt = {
-    date = function(str)
-      transf.full_dcmp_spec.date(
+    timestamp_s = function(str)
+      return transf.full_dcmp_spec.timestamp_s(
         transf.rfc3339like_dt.dcmp_spec(str)
       )
     end,
-    timestamp_s = function(str)
-      return transf.date.timestamp_s(
-        transf.full_rfc3339like_dt.date(str)
-      )
-    end,
     timestamp_ms = function(str)
-      return transf.date.timestamp_ms(
-        transf.full_rfc3339like_dt.date(str)
+      return transf.full_dcmp_spec.timestamp_ms(
+        transf.rfc3339like_dt.dcmp_spec(str)
       )
     end,
   },
@@ -2294,8 +2279,8 @@ transf = {
         transf.rfc3339like_interval.dcmp_spec_by_start(str)
       )
     end,
-    date_by_start_min = function(str)
-      return transf.full_dcmp_spec.date(
+    timestamp_s_by_start_min = function(str)
+      return transf.full_dcmp_spec.timestamp_s(
         transf.rfc3339like_interval.full_dcmp_spec_by_start_min(str)
       )
     end,
@@ -2317,13 +2302,13 @@ transf = {
         transf.rfc3339like_interval.dcmp_spec_by_end(str)
       )
     end,
-    date_by_end_max = function(str)
-      return transf.full_dcmp_spec.date(
+    timestamp_s_by_end_max = function(str)
+      return transf.full_dcmp_spec.timestamp_s(
         transf.rfc3339like_interval.full_dcmp_spec_by_end_max(str)
       )
     end,
-    date_by_end_min = function(str)
-      return transf.full_dcmp_spec.date(
+    timestamp_s_by_end_min = function(str)
+      return transf.full_dcmp_spec.timestamp_s(
         transf.rfc3339like_interval.full_dcmp_spec_by_end_min(str)
       )
     end,
@@ -2358,11 +2343,11 @@ transf = {
         ),
       }
     end,
-    date_by_min = function(str)
-      return transf.rfc3339like_interval.date_by_start_min(str)
+    timestamp_s_by_min = function(str)
+      return transf.rfc3339like_interval.timestamp_s_by_start_min(str)
     end,
-    date_by_max = function(str)
-      return transf.rfc3339like_interval.date_by_end_max(str)
+    timestamp_s_by_max = function(str)
+      return transf.rfc3339like_interval.timestamp_s_by_end_max(str)
     end,
   },
   rf3339like_dt_or_interval = {
@@ -2373,15 +2358,15 @@ transf = {
         return "rfc3339like_dt"
       end
     end,
-    date_by_max = function(str)
+    timestamp_s_by_max = function(str)
       return transf[
         transf.rf3339like_dt_or_interval.dt_or_interval(str)
-      ].date_by_max(str)
+      ].timestamp_s_by_max(str)
     end,
-    date_by_min = function(str)
+    timestamp_s_by_min = function(str)
       return transf[
         transf.rf3339like_dt_or_interval.dt_or_interval(str)
-      ].date_by_min(str)
+      ].timestamp_s_by_min(str)
     end,
     date_interval_specifier = function(str)
       return transf[
@@ -2641,7 +2626,7 @@ transf = {
     end, 
     prefix_dcmp_spec_by_filter = function(dcmp_spec)
       local res = {}
-      for _, dcmp_name in transf.arr.pos_int_vt_stateless_iter(ls.date.dcmp_names) do
+      for _, dcmp_name in transf.arr.pos_int_vt_stateless_iter(ls.dcmp_names) do
         if dcmp_spec[dcmp_name] == nil then
           return res
         end
@@ -2658,7 +2643,7 @@ transf = {
     --- i.e. { month = 02, hour = 12 } will return { "year", "month", "day", "hour" }
     --- this should be equal to prefix_dcmp_name_spec_by_set if dcmp_spec is a prefix_dcmp_spec since prefix_ is defined as having no nil values before potential trailing nil values
     dcmp_name_seq_by_no_trailing_nil = function(dcmp_spec)
-      local ol = get.table.table_by_copy(ls.date.dcmp_names)
+      local ol = get.table.table_by_copy(ls.dcmp_names)
       while(dcmp_spec[
         ol[#ol]
       ] == nil) do
@@ -4210,10 +4195,10 @@ transf = {
       return event_table["end"]
     end,
     date_by_start = function(event_table)
-      return transf.rfc3339like_dt.date_by_min(event_table.start)
+      return transf.rfc3339like_dt.timestamp_s_by_min(event_table.start)
     end,
     date_by_end = function(event_table)
-      return transf.rfc3339like_dt.date_by_min(event_table["end"])
+      return transf.rfc3339like_dt.timestamp_s_by_min(event_table["end"])
     end,
     date_interval_specifier = function(event_table)
       return {

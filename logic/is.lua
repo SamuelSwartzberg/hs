@@ -1492,10 +1492,10 @@ is = {
       return str == "local" or str == "remote"
     end,
     dcmp_name = function(str)
-      return get.arr.bool_by_contains(ls.date.dcmp_names, str)
+      return get.arr.bool_by_contains(ls.dcmp_names, str)
     end,
     dcmp_name_long = function(str)
-      return get.arr.bool_by_contains(ls.date.dcmp_names_long, str)
+      return get.arr.bool_by_contains(ls.dcmp_names_long, str)
     end,
     mod_char = function(str)
       return get.arr.bool_by_contains(ls.mod_char, str)
