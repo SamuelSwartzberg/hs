@@ -2420,7 +2420,7 @@ transf = {
   --- sequence specifiers can use all methods of interval specifiers 
   sequence_specifier = {
     arr = function(sequence)
-      return transf.three_operational_addcompable_or_nils.arr(sequence.start, sequence.stop, sequence.step)
+      return transf.three_operational_addcompable_or_nils.operational_addcompable_arr(sequence.start, sequence.stop, sequence.step)
     end,
     interval_specifier = function(sequence)
       return {
@@ -7604,7 +7604,7 @@ transf = {
       return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         thing_name_arr,
         function(thing_name)
-          local spec = tblmap.thing_name.chooser_image_partial_retriever_specifier(thing_name)
+          local spec = tblmap.thing_name.partial_retriever_specifier_by_chooser_image[thing_name]
           local newspec = {}
           newspec.thing_name = spec.thing_name
           newspec.precedence = spec.precedence or 1
@@ -7613,10 +7613,10 @@ transf = {
       )
     end,
     chooser_text_retriever_specifier_arr = function(thing_name_arr)
-      return hs.fnutils.map(
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         thing_name_arr,
         function(thing_name)
-          local spec = tblmap.thing_name.chooser_text_partial_retriever_specifier(thing_name)
+          local spec = tblmap.thing_name.partial_retriever_specifier_by_chooser_text[thing_name]
           local newspec = {}
           newspec.thing_name = spec.thing_name
           newspec.precedence = spec.precedence or 1
@@ -7625,10 +7625,10 @@ transf = {
       )
     end,
     placeholder_text_retriever_specifier_arr = function(thing_name_arr)
-      return hs.fnutils.map(
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         thing_name_arr,
         function(thing_name)
-          local spec = tblmap.thing_name.placeholder_text_partial_retriever_specifier(thing_name)
+          local spec = tblmap.thing_name.partial_retriever_specifier_by_placeholder_text[thing_name]
           local newspec = {}
           newspec.thing_name = spec.thing_name
           newspec.precedence = spec.precedence or 1
@@ -7637,10 +7637,10 @@ transf = {
       )
     end,
     chooser_subtext_retriever_specifier_arr = function(thing_name_arr)
-      return hs.fnutils.map(
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         thing_name_arr,
         function(thing_name)
-          local spec = tblmap.thing_name.chooser_subtext_partial_retriever_specifier(thing_name)
+          local spec = tblmap.thing_name.partial_retriever_specifier_by_chooser_subtext[thing_name]
           local newspec = {}
           newspec.thing_name = spec.thing_name
           newspec.precedence = spec.precedence or 1
@@ -7649,10 +7649,10 @@ transf = {
       )
     end,
     chooser_initial_selected_index_retriever_specifier_arr = function(thing_name_arr)
-      return hs.fnutils.map(
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
         thing_name_arr,
         function(thing_name)
-          local spec = tblmap.thing_name.chooser_initial_selected_index_partial_retriever_specifier(thing_name)
+          local spec = tblmap.thing_name.chooser_initial_selected_index_partial_retriever_specifier[thing_name]
           local newspec = {}
           newspec.thing_name = spec.thing_name
           newspec.precedence = spec.precedence or 1
@@ -7665,13 +7665,13 @@ transf = {
 
   },
   retriever_specifier_arr = {
-    highest_precedence_retriever_specifier = function(retriever_specifier_arr)
+    retriever_specifier_by_highest_precedence = function(retriever_specifier_arr)
       return hs.fnutils.reduce(
         retriever_specifier_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key {a_use, a_use, "precedence"})
       )
     end,
-    precedence_ordered_retriever_specifier_arr = function(retriever_specifier_arr)
+    retriever_specifier_arr_by_precedence_ordered = function(retriever_specifier_arr)
       return get.arr.arr_by_sorted(
         retriever_specifier_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key) {a_use, a_use, "precedence"})
@@ -7683,54 +7683,54 @@ transf = {
     end,
   },
   mpv_ipc_socket_id = {
-    current_url = function (mpv_ipc_socket_id)
+    url_or_local_path_by_current = function (mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.str(mpv_ipc_socket_id, "stream-open-filename")
     end,
-    title = function(mpv_ipc_socket_id)
+    str_by_title = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.str(mpv_ipc_socket_id, "media-title")
     end,
-    playback_seconds_int = function(mpv_ipc_socket_id)
+    pos_int_by_playback_seconds = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "time-pos")
     end,
-    duration_seconds_int = function(mpv_ipc_socket_id)
+    pos_int_by_duration_seconds = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "duration")
     end,
-    playback_percent_int = function(mpv_ipc_socket_id)
+    percentage_pos_int_by_playback_percent = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "percent-pos")
     end,
-    chapter_int = function(mpv_ipc_socket_id)
+    pos_int_by_chapter = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "chapter")
     end,
-    playback_str = function(mpv_ipc_socket_id)
+    urlcharset_str_by_playback = function(mpv_ipc_socket_id)
       return get.str.str_by_formatted_w_n_anys(
         "(%i/%is - %s%%)",
-        get.mpv_ipc_socket_id.play_time_seconds_int(mpv_ipc_socket_id) or -1,
-        get.mpv_ipc_socket_id.duration_seconds_int(mpv_ipc_socket_id) or -1,
-        get.mpv_ipc_socket_id.playback_percent_int(mpv_ipc_socket_id) or -1
+        transf.mpv_ipc_socket_id.pos_int_by_playback_seconds(mpv_ipc_socket_id) or -1,
+        transf.mpv_ipc_socket_id.pos_int_by_duration_seconds(mpv_ipc_socket_id) or -1,
+        transf.mpv_ipc_socket_id.percentage_pos_int_by_playback_percent(mpv_ipc_socket_id) or -1
       )
     end,
-    playlist_index_int = function(mpv_ipc_socket_id)
+    pos_int_by_playlist_index = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "playlist-pos")
     end,
-    playlist_length_int = function(mpv_ipc_socket_id)
+    pos_int_by_playlist_length = function(mpv_ipc_socket_id)
       return get.mpv_ipc_socket_id.int(mpv_ipc_socket_id, "playlist-count")
     end,
-    playlist_progress_str = function(mpv_ipc_socket_id)
+    urlcharset_str_by_playlist = function(mpv_ipc_socket_id)
       return get.str.str_by_formatted_w_n_anys(
         "[%i/%i]",
-        get.mpv_ipc_socket_id.playlist_position_int(mpv_ipc_socket_id) or -1,
-        get.mpv_ipc_socket_id.playlist_length_int(mpv_ipc_socket_id) or -1
+        transf.mpv_ipc_socket_id.pos_int_by_playlist_index(mpv_ipc_socket_id) or -1,
+        transf.mpv_ipc_socket_id.pos_int_by_playlist_length(mpv_ipc_socket_id) or -1
       )
     end,
-    summary_line_basics = function(mpv_ipc_socket_id)
+    str_by_summary_basci = function(mpv_ipc_socket_id)
       return get.str.str_by_formatted_w_n_anys(
         "%s %s %s",
-        transf.mpv_ipc_socket_id.playback_str(mpv_ipc_socket_id),
-        transf.mpv_ipc_socket_id.playlist_progress_str(mpv_ipc_socket_id),
+        transf.mpv_ipc_socket_id.urlcharset_str_by_playback(mpv_ipc_socket_id),
+        transf.mpv_ipc_socket_id.urlcharset_str_by_playlist(mpv_ipc_socket_id),
         get.mpv_ipc_socket_id.title(mpv_ipc_socket_id) or "<no title>"
       )
     end,
-    summary_line_emoji = function(mpv_ipc_socket_id)
+    str_by_summary_emoji = function(mpv_ipc_socket_id)
       return get.str_or_number_arr.str_by_joined(
         get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
           {"pause", "loop", "shuffle", "video"},
@@ -7739,14 +7739,14 @@ transf = {
         ""
       )
     end,
-    summary_line = function(mpv_ipc_socket_id)
+    str_by_summary = function(mpv_ipc_socket_id)
       return get.str.str_by_formatted_w_n_anys(
         "%s %s",
-        transf.mpv_ipc_socket_id.summary_line_emoji(mpv_ipc_socket_id),
-        transf.mpv_ipc_socket_id.summary_line_basics(mpv_ipc_socket_id)
+        transf.mpv_ipc_socket_id.str_by_summary_emoji(mpv_ipc_socket_id),
+        transf.mpv_ipc_socket_id.str_by_summary_basci(mpv_ipc_socket_id)
       )
     end,
-    is_running = function(mpv_ipc_socket_id)
+    bool_by_is_running = function(mpv_ipc_socket_id)
       return transf.any.bool(
         get.mpv_ipc_socket_id.str(mpv_ipc_socket_id, "pause")
       )
@@ -7754,16 +7754,16 @@ transf = {
         
   },
   stream_creation_specifier = {
-    flag_assoc_by_with_default = function(stream_creation_specifier)
+    lower_strict_kebap_case_key_bool_value_assoc_by_flags_with_default = function(stream_creation_specifier)
       return transf.two_tables.table_by_take_new(
-        tblmap.stream_creation_specifier_flag_profile_name.stream_creation_specifier_flag_profile[stream_creation_specifier.flag_profile_name or "foreground"],
+        tblmap.flag_profile_name.lower_strict_kebap_case_key_bool_value_assoc[stream_creation_specifier.flag_profile_name or "foreground"],
         stream_creation_specifier.flags 
       )
     end,
-    flags_str = function(stream_creation_specifier)
+    str_by_flags = function(stream_creation_specifier)
       return transf.str_key_bool_value_assoc.str_by_long_flags_for_truthies(get.stream_creation_specifier.flags_with_default(stream_creation_specifier))
     end,
-    source_path = function(stream_created_item_specifier)
+    absolute_path_by_source = function(stream_created_item_specifier)
       return stream_created_item_specifier.source_path
     end,
   },
@@ -7771,66 +7771,75 @@ transf = {
     stream_state = function(stream_created_item_specifier)
       return stream_created_item_specifier.inner_item.state
     end,
-    transitioned_stream_state = function(stream_created_item_specifier)
-      return tblmap.state_type.state_transition_table.stream_state[transf.stream_created_item_specifier.stream_state(stream_created_item_specifier)][is.stream_created_item_specifier.alive(stream_created_item_specifier)]
+    stream_state_by_transitioned = function(stream_created_item_specifier)
+      return tblmap.stream_state.bool_key_stream_state_value_assoc[
+        transf.stream_created_item_specifier.stream_state(stream_created_item_specifier)
+      ][
+        is.stream_created_item_specifier.alive_stream_created_item_specifier(stream_created_item_specifier)
+      ]
     end,
-    is_valid = function(stream_created_item_specifier)
+    bool_by_is_valid = function(stream_created_item_specifier)
       return stream_created_item_specifier.inner_item.state ~= "ended"
     end,
-    source_path = function(stream_created_item_specifier)
-      return transf.stream_creation_specifier.source_path(stream_created_item_specifier.creation_specifier)
+    absolute_path_by_source = function(stream_created_item_specifier)
+      return transf.stream_creation_specifier.absolute_path_by_source(stream_created_item_specifier.creation_specifier)
     end,
-    summary_line = function(stream_created_item_specifier)
-      return transf.mpv_ipc_socket_id.summary_line(stream_created_item_specifier.mpv_ipc_socket_id)
+    str_by_summary = function(stream_created_item_specifier)
+      return transf.mpv_ipc_socket_id.str_by_summary(stream_created_item_specifier.mpv_ipc_socket_id)
     end,
-    title = function(stream_created_item_specifier)
-      return get.mpv_ipc_socket_id.title(stream_created_item_specifier.mpv_ipc_socket_id)
+    str_by_title = function(stream_created_item_specifier)
+      return transf.mpv_ipc_socket_id.str_by_title(stream_created_item_specifier.mpv_ipc_socket_id)
     end,
-    current_url = function(stream_created_item_specifier)
-      return get.mpv_ipc_socket_id.current_url(stream_created_item_specifier.mpv_ipc_socket_id)
+    url_or_local_path_by_current = function(stream_created_item_specifier)
+      return transf.mpv_ipc_socket_id.url_or_local_path_by_current(stream_created_item_specifier.mpv_ipc_socket_id)
     end,
-    creation_urls = function(stream_created_item_specifier)
+    url_or_local_paths_by_creation = function(stream_created_item_specifier)
       return stream_created_item_specifier.creation_specifier.urls
     end,
     bool_by_is_running = function(stream_created_item_specifier)
-      return transf.mpv_ipc_socket_id.is_running(stream_created_item_specifier.mpv_ipc_socket_id)
+      return transf.mpv_ipc_socket_id.bool_by_is_running(stream_created_item_specifier.mpv_ipc_socket_id)
     end,
 
   },
   hotkey_created_item_specifier = {
-    hshotkey = function(hotkey_created_item_specifier)
+    hs_hotkey = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.inner_item
     end,
-    explanation = function(hotkey_created_item_specifier)
+    str_by_explanation = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.explanation
     end,
-    mnemonic = function(hotkey_created_item_specifier)
+    str_or_nil_by_mnemonic = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.mnemonic
     end,
-    mnemonic_str = function(hotkey_created_item_specifier)
-      return transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier) and get.str.str_by_formatted_w_n_anys("[%s] ", transf.hotkey_created_item_specifier.mnemonic(hotkey_created_item_specifier)) or ""
+    str_by_mnemonic = function(hotkey_created_item_specifier)
+      local mnemonic = transf.hotkey_created_item_specifier.str_or_nil_by_mnemonic(hotkey_created_item_specifier)
+      if mnemonic then
+        return get.str.str_by_formatted_w_n_anys("[%s] ", mnemonic)
+      else
+        return ""
+      end
     end,
     key_input_spec = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.key_input_spec
     end,
-    shortcut_str = function(hotkey_created_item_specifier)
+    str_by_shortcut = function(hotkey_created_item_specifier)
       return transf.key_input_spec.str_by_shortcut(transf.hotkey_created_item_specifier.key_input_spec(hotkey_created_item_specifier))
     end,
-    mod_arr = function(hotkey_created_item_specifier)
+    mod_name_arr = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.key_input_spec.mod_arr
     end,
-    key = function(hotkey_created_item_specifier)
+    str_by_key = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.key_input_spec.key
     end,
     fn = function(hotkey_created_item_specifier)
       return hotkey_created_item_specifier.creation_specifier.fn
     end,
-    summary = function(hotkey_created_item_specifier)
+    str_by_summary = function(hotkey_created_item_specifier)
       return get.str.str_by_formatted_w_n_anys(
         "%s%s: %s",
-        transf.hotkey_created_item_specifier.shortcut_str(hotkey_created_item_specifier),
-        transf.hotkey_created_item_specifier.mnemonic_str(hotkey_created_item_specifier),
-        transf.hotkey_created_item_specifier.explanation(hotkey_created_item_specifier)
+        transf.hotkey_created_item_specifier.str_by_shortcut(hotkey_created_item_specifier),
+        transf.hotkey_created_item_specifier.str_by_mnemonic(hotkey_created_item_specifier),
+        transf.hotkey_created_item_specifier.str_by_explanation(hotkey_created_item_specifier)
       )
     end,
 
@@ -7839,22 +7848,16 @@ transf = {
     fn = function(watcher_created_item_specifier)
       return watcher_created_item_specifier.creation_specifier.fn
     end,
-    watcher_type = function(watcher_created_item_specifier)
-      return watcher_created_item_specifier.creation_specifier.watcher_type
-    end,
-    hswatcher = function(watcher_created_item_specifier)
+    watcher = function(watcher_created_item_specifier)
       return watcher_created_item_specifier.inner_item
     end,
-    running = function(watcher_created_item_specifier)
+    bool_by_running = function(watcher_created_item_specifier)
       return watcher_created_item_specifier.inner_item:running()
     end,
   },
   watcher_creation_specifier = {
-    watcher_type = function(watcher_creation_specifier)
-      return watcher_creation_specifier.watcher_type
-    end,
-    hswatcher_creation_fn = function(watcher_creation_specifier)
-      return transf.watcher_creation_specifier.watcher_type(watcher_creation_specifier).new
+    watcher_ret_fn = function(watcher_creation_specifier)
+      return watcher_creation_specifier.watcher_container.new
     end,
   },
   creation_specifier = {
@@ -7912,11 +7915,11 @@ transf = {
     end,
   },
   cronspec_str = {
-    timestamp_s_str_by_next = function(cronspec_str)
+    digit_str_by_next = function(cronspec_str)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("ncron" .. transf.str.str_by_single_quoted_escaped(cronspec_str))
     end,
     timestamp_s_by_next = function(cronspec_str)
-      return get.str_or_number.number_or_nil(transf.cronspec_str.timestamp_s_str_by_next(cronspec_str))
+      return transf.nonindicated_number_str.number_by_base_10(transf.cronspec_str.digit_str_by_next(cronspec_str))
     end,
   },
   timer_spec = {
@@ -8453,7 +8456,7 @@ transf = {
   },
   fn_queue_specifier = {
     str_by_waiting_message  = function(qspec)
-      return "Waiting to proceed (" .. #qspec.fn_arr .. " waiting in queue) ... (Press " .. transf.hotkey_created_item_specifier.shortcut_str(qspec.hotkey_created_item_specifier) .. " to continue.)"
+      return "Waiting to proceed (" .. #qspec.fn_arr .. " waiting in queue) ... (Press " .. transf.hotkey_created_item_specifier.str_by_shortcut(qspec.hotkey_created_item_specifier) .. " to continue.)"
     end,
       
   },

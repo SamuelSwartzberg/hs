@@ -474,7 +474,7 @@ tblmap = {
     }
   },
   thing_name = {
-    chooser_image_partial_retriever_specifier = {
+    partial_retriever_specifier_by_chooser_image = {
       local_image_file = {
         thing_name = "hs_image",
         precedence = 999
@@ -488,7 +488,7 @@ tblmap = {
         precedence = 999
       },
     },
-    chooser_text_partial_retriever_specifier = {
+    partial_retriever_specifier_by_chooser_text = {
       str = {
         thing_name = "singleline_str_by_folded",
         precedence = -999
@@ -529,36 +529,34 @@ tblmap = {
         precedence = 999
       }
     },
-    chooser_subtext_partial_retriever_specifier = {
+    partial_retriever_specifier_by_chooser_subtext = {
       stream_created_item_specifier = {
         thing_name = "source_path"
       }
     },
-    placeholder_text_partial_retriever_specifier = {
+    partial_retriever_specifier_by_placeholder_text = {
       
     },
-    initial_selected_index_partial_retriever_specifier = {
+    partial_retriever_specifier_by_initial_selected_index = {
       audiodevice_specifier_arr = {
         thing_name = "active_audiodevice_specifier_index",
         precedence = 999
       }
     },
   },
-  state_type = {
-    state_transition_table = {
-      stream_state = {
-        booting = {
-          [true] = 'active',
-          [false] = 'booting'
-        },
-        active = {
-          [true] = 'active',
-          [false] = 'ended'
-        },
-        ended = {
-          [true] = 'ended',
-          [false] = 'ended'
-        }
+  stream_state = {
+    bool_key_stream_state_value_assoc = {
+      booting = {
+        [true] = 'active',
+        [false] = 'booting'
+      },
+      active = {
+        [true] = 'active',
+        [false] = 'ended'
+      },
+      ended = {
+        [true] = 'ended',
+        [false] = 'ended'
       }
     }
   },
@@ -570,8 +568,8 @@ tblmap = {
       }
     }
   },
-  stream_creation_specifier_flag_profile_name ={
-    stream_creation_specifier_flag_profile = {
+  flag_profile_name ={
+    lower_strict_kebap_case_key_bool_value_assoc = {
       foreground = {
         ["loop-playlist"] = false,
         shuffle = false,

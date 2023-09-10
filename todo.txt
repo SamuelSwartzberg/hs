@@ -9,6 +9,7 @@ refac:
   - many names don't yet corrrespond to the new schema
   - replace package methods with my own
   - fix logging dirs, etc, to now use json
+  - update tblmap with a few changes from other files
 post 'lua is working':  
   - add/rename missing m3us
   - history

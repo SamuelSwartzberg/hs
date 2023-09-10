@@ -368,6 +368,9 @@ is = {
     
   },
   urlcharset_str = {
+    cronspec_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.cronspec)
+    end,
     fs_tag_kv = function(str)
       return get.str.bool_by_matches_whole_onig(str, "[a-z0-9]+-[a-z0-9,]+")
     end,
@@ -1398,6 +1401,9 @@ is = {
       return get.arr.bool_by_contains(ls.search_engine_id, str)
     end
   },
+  general_name = {
+    thing_name = transf["nil"]["true"]
+  },
   alphanum = {
     alpha_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, "\\w+")
@@ -1526,6 +1532,12 @@ is = {
     end,
     llm_chat_role = function(str)
       return get.arr.bool_by_contains(ls.llm_chat_role, str)
+    end,
+    stream_state = function(str)
+      return get.arr.bool_by_contains(ls.stream_state, str)
+    end,
+    flag_profile_name = function(str)
+      return get.arr.bool_by_contains(ls.flag_profile_name, str)
     end,
 
   },
@@ -1835,6 +1847,11 @@ is = {
     end,
   },
   halfbyte_pos_int = {
+    percentage_pos_int = function(num)
+      return num <= 100
+    end,
+  },
+  percentage_pos_int = {
     nibble_pos_int = function(num)
       return num < 16
     end,
@@ -2095,9 +2112,6 @@ is = {
     end,
   },
   non_empty_table = {
-    date = function(t)
-      return is.any.fn(t.addyears) -- arbitrary prop of date object
-    end,
     has_id_key_table = function(t)
       return t.id ~= nil
     end,
@@ -2106,7 +2120,11 @@ is = {
     end,
     created_item_specifier = function(t)
       return
-        t.created_item and t.creation_specifier
+        t.inner_item and t.creation_specifier
+    end,
+    creation_specifier = function(t)
+      return
+        t.type
     end,
     audiodevice_specifier = function(t)
       return
@@ -2232,7 +2250,34 @@ is = {
     form_filling_specifier = function(t)
       return t.in_fields and t.form_fields and t.explanations
     end,
+    timer_spec = function(t)
+      return t.next_timestamp_s
+    end,
+    retriever_specifier = function(t)
+      return t.thing_name
+    end,
 
+  },
+  retriever_specifier = {
+    partial_retriever_specifer = function(t)
+      return t.target == nil
+    end,
+  },
+  creation_specifier = {
+    fireable_creation_specifier = function(t)
+      return t.fn ~= nil
+    end,
+  },
+  fireable_creation_specifier = {
+    hotkey_creation_specifier = function(t)
+      return t.key_input_spec
+    end,
+    watcher_creation_specifier = function(t)
+      return t.watcher_container
+    end,
+    stream_creation_specifier = function(t)
+      return t.urls
+    end
   },
   hs_geometry_point_like = {
     hs_geometry_point = function(t)
@@ -2399,6 +2444,14 @@ is = {
       return t.creation_specifier.fn ~= nil
     end,
   },
+  fireable_created_item_specifier = {
+    hotkey_created_item_specifier = function(t)
+      return t.creation_specifier.key_input_spec ~= nil
+    end,
+    watcher_created_item_specifier = function(t)
+      return t.creation_specifier.watcher_container ~= nil
+    end,
+  },
   stream_created_item_specifier = {
     alive_stream_created_item_specifier = function(stream_created_item_specifier)
       return is.ipc_socket_id.mpv_ipc_socket_id(stream_created_item_specifier.inner_item.ipc_socket_id)
@@ -2458,6 +2511,12 @@ is = {
     end,
     audiodevice = function(val)
       return transf.full_userdata.str_by_classname(val) == "hs.audiodevice"
+    end,
+    watcher = function(val)
+      return val.start and val.stop
+    end,
+    hs_hotkey = function(val)
+      return transf.full_userdata.str_by_classname(val) == "hs.hotkey"
     end,
   }
 }

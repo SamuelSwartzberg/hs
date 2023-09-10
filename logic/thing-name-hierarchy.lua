@@ -493,7 +493,9 @@ thing_name_hierarchy = {
                           },
                           alphanum_underscore = {
                             lower_alphanum_underscore = {
-                              general_name = "leaf",
+                              general_name = {
+                                thing_name = "leaf"
+                              },
                               search_engine_id = "leaf"
                             },
                             upper_alphanum_underscore = "leaf",
@@ -532,6 +534,8 @@ thing_name_hierarchy = {
                                 audiodevice_subtype = "leaf",
                                 otp_type = "leaf",
                                 llm_chat_role = "leaf",
+                                stream_state = "leaf",
+                                flag_profile_name = "leaf",
                               },
                               iso_3366_1_alpha_2_country_code = "leaf",
                               iso_3366_1_alpha_3_country_code = "leaf",
@@ -628,14 +632,21 @@ thing_name_hierarchy = {
         }
       },
       non_empty_table = {
-        date = "leaf",
         has_id_key_table = "leaf",
         has_index_key_table = "leaf",
         created_item_specifier = {
           stream_created_item_specifier = {
             alive_stream_created_item_specifier = "leaf"
           },
-          fireable_created_item_specifier = "leaf"
+          fireable_created_item_specifier = {
+            hotkey_created_item_specifier = "leaf",
+            watcher_created_item_specifier = "leaf",
+          }
+        },
+        creation_specifier = {
+          watcher_creation_specifier = "leaf",
+          hotkey_creation_specifier = "leaf",
+          stream_creation_specifier = "leaf",
         },
         audiodevice_specifier = {},
         csl_table = {
@@ -731,6 +742,7 @@ thing_name_hierarchy = {
         },
         form_filling_specifier = "leaf",
         form_field_specifier = "leaf",
+        timer_spec = "leaf",
       }
     },
     primitive = {
@@ -754,15 +766,17 @@ thing_name_hierarchy = {
               twobyte_pos_int = {
                 byte_pos_int = {
                   halfbyte_pos_int = {
-                    iso_weeknumber_int = "leaf",
-                    nibble_pos_int = {
-                      sme_10_pos_int = {
-                        sme_8_pos_int = {
-                          sme_7_pos_int = {
-                            sme_6_pos_int = {
-                              weekday_int_start_0 = "leaf"
-                            },
-                            weekday_int_start_1 = "leaf",
+                    percentage_pos_int = {
+                      iso_weeknumber_int = "leaf",
+                      nibble_pos_int = {
+                        sme_10_pos_int = {
+                          sme_8_pos_int = {
+                            sme_7_pos_int = {
+                              sme_6_pos_int = {
+                                weekday_int_start_0 = "leaf"
+                              },
+                              weekday_int_start_1 = "leaf",
+                            }
                           }
                         }
                       }
@@ -794,6 +808,9 @@ thing_name_hierarchy = {
         running_application = "leaf",
         hs_image = "leaf",
         styledtext = "leaf",
+        audiodevice = "leaf",
+        watcher = "leaf",
+        hs_hotkey = "leaf",
       },
       light_userdata = "leaf"
     }

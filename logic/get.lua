@@ -942,6 +942,11 @@ get = {
       return get.hschooser_specifier.choosing_hschooser_specifier(transf.arr.hschooser_specifier(arr, target_item_chooser_item_specifier_name), "index", arr)
     end,
     arr_by_mapped_w_t_arg_t_ret_fn = hs.fnutils.imap,
+    arr_by_mapped_w_t_arg_t_ret_fn2 = function(arr, fn)
+      return transf.hole_y_arrlike.arr(
+        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, fn)
+      )
+    end,
     arr_by_mapped_w_pos_int_t_arg_t_ret_fn = function(arr, fn)
       local res = {}
       for i, v in transf.arr.kt_vt_stateless_iter(arr) do
@@ -2889,6 +2894,17 @@ get = {
       end
     end,
   },
+  thing_name = {
+    partial_retriever_specifier_or_nil = function(thing_name, typ)
+      local spec = tblmap.thing_name["partial_retriever_specifier_by_" .. typ][thing_name]
+      if spec then 
+        local newspec = {}
+        newspec.thing_name = spec.thing_name
+        newspec.precedence = spec.precedence or 1
+        return newspec
+      end
+    end,
+  },
   retriever_specifier = {
     result = function(retriever_specifier, value)
       return transf[
@@ -2901,7 +2917,7 @@ get = {
   retriever_specifier_arr = {
     result_highest_precedence = function(arr, value)
       return get.retriever_specifier.result(
-        transf.retriever_specifier_arr.highest_precedence_retriever_specifier(arr),
+        transf.retriever_specifier_arr.retriever_specifier_by_highest_precedence(arr),
         value
       )
     end,
@@ -2919,6 +2935,11 @@ get = {
     end,
   },
   thing_name_arr = {
+    partial_retriever_specifier_arr = function(arr, typ)
+      return transf.hole_y_arrlike.arr(
+        get.arr.arr_by_mapped_w_t_arg_t_ret_fn
+      )
+    end,
     bool_by_chained_and = function(arr, value)
       local previous_thing_name = nil
       for _, thing_name in transf.arr.pos_int_vt_stateless_iter(arr) do

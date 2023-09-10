@@ -188,7 +188,7 @@ act = {
     set_playback_percent_plus_5 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_percent, {a_use, 5}),
     set_playback_percent_minus_5 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_percent, {a_use, -5}),
     set_state_transitioned_state = function(spec)
-      spec.inner_item.state = transf.stream_created_item_specifier.transitioned_stream_state(spec)
+      spec.inner_item.state = transf.stream_created_item_specifier.stream_state_by_transitioned(spec)
     end,
     cycle_loop_playlist = function(spec)
       return dothis.mpv_ipc_socket_id.cycle_loop_playlist(spec.inner_item.ipc_socket_id)
@@ -238,7 +238,7 @@ act = {
       dothis.arr.each(arr, act.stream_created_item_specifier.set_state_transitioned_state)
     end,
     filter_in_place_valid = function(arr)
-      dothis.arr.filter_in_place(arr, transf.stream_created_item_specifier.is_valid)
+      dothis.arr.filter_in_place(arr, transf.stream_created_item_specifier.bool_by_is_valid)
     end,
     maintain_state = function(arr)
       act.stream_created_item_specifier_arr.set_state_transitioned_state_all(arr)

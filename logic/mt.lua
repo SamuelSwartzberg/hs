@@ -36,6 +36,7 @@ r = {
         crockford = "[0-9A-HJKMNP-TV-Z=]+"
       }
     },
+    cronspec = "(?:@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(?:@every (\\d+(ns|us|µs|ms|s|m|h))+)|((((\\d+,)+\\d+|(\\d+(\\/|-)\\d+)|\\d+|\\*) ?){5,7})",
     id = {
       issn = "[0-9]{4}-?[0-9]{3}[0-9xX]",
       isbn10 = "[0-9]{9}[0-9xX]",
@@ -333,6 +334,20 @@ ls = {
   html_entity_indicator = {
     encoded = {"&", ";"},
     decoded = {"\"", "'", "<", ">", "&"}
+  },
+  creation_specifier_type = {
+    "watcher",
+    "hotkey",
+    "stream"
+  },
+  stream_state = {
+    "booting",
+    "active",
+    "ended"
+  },
+  flag_profile_name = {
+    "foreground",
+    "background"
   },
   dcmp_names = {"year", "month", "day", "hour", "min", "sec"},
   dcmp_names_long = {"year", "month", "day", "hour", "minute", "second"},

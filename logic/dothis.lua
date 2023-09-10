@@ -2354,7 +2354,7 @@ dothis = {
       dothis.mpv_ipc_socket_id.set(id, "playlist-pos", 0)
     end,
     set_playlist_last = function(id)
-      dothis.mpv_ipc_socket_id.set(id, "playlist-pos", transf.mpv_ipc_socket_id.playlist_length_int(id))
+      dothis.mpv_ipc_socket_id.set(id, "playlist-pos", transf.mpv_ipc_socket_id.pos_int_by_playlist_length(id))
     end,
     set_playback_seconds = function(id, seconds)
       dothis.mpv_ipc_socket_id.set(id, "time-pos", seconds)
@@ -2368,7 +2368,7 @@ dothis = {
     set_playback_seconds_relative = function(id, seconds)
       dothis.mpv_ipc_socket_id.set_playback_seconds(
         id,
-        transf.mpv_ipc_socket_id.playback_seconds_int(id) + seconds
+        transf.mpv_ipc_socket_id.pos_int_by_playback_seconds(id) + seconds
       )
     end,
     set_chapter = function(id, chapter)
@@ -2406,7 +2406,7 @@ dothis = {
   stream_creation_specifier = {
     create_inner_item = function(spec)
       local ipc_socket_id = os.time() .. "-" .. math.random(1000000)
-      transf.str.str_or_nil_by_evaled_env_bash_stripped("mpv " .. transf.stream_creation_specifier.flags_str(spec) .. 
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("mpv " .. transf.stream_creation_specifier.str_by_flags(spec) .. 
         " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.str_arr.str_by_single_quoted_escaped_joined(spec.urls))
       return {
         ipc_socket_id = ipc_socket_id,
@@ -2427,7 +2427,7 @@ dothis = {
   },
   watcher_creation_specifier = {
     create_inner_item = function(spec)
-      local watcher = transf.watcher_creation_specifier.hswatcher_creation_fn(spec)(spec.fn)
+      local watcher = transf.watcher_creation_specifier.watcher_ret_fn(spec)(spec.fn)
       watcher:start()
       return watcher
     end,
