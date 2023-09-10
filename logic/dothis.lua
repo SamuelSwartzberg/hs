@@ -1185,7 +1185,7 @@ dothis = {
   },
   plaintext_table_file = {
     append_arr_field_arr = function(path, arr_field_arr)
-      local lines = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr_field_arr, function (arr)
+      local lines = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr_field_arr, function (arr)
         return get.str_or_number_arr.str_by_joined(arr, transf.plaintext_table_file.utf8_char_by_field_separator())
       end)
       dothis.plaintext_file.append_lines(path, lines)

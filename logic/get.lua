@@ -691,7 +691,7 @@ get = {
       return hits, get.arr_arr.arr_arr_by_mapped(
         removed,
         function(arr)
-          return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+          return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
             arr,
             function()
               return fill
@@ -911,14 +911,14 @@ get = {
       end
     end,
     raw_item_chooser_item_specifier_arr = function(arr)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.any.item_chooser_item_specifier
       )
     end,
     item_chooser_item_specifier_arr = function(arr, target_item_chooser_item_specifier_name)
       if target_item_chooser_item_specifier_name then
-        return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           get.arr.raw_item_chooser_item_specifier_arr(arr),
           transf.item_chooser_item_specifier[target_item_chooser_item_specifier_name .. "_item_chooser_item_specifier"]
         )
@@ -941,10 +941,10 @@ get = {
     choosing_hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
       return get.hschooser_specifier.choosing_hschooser_specifier(transf.arr.hschooser_specifier(arr, target_item_chooser_item_specifier_name), "index", arr)
     end,
-    arr_by_mapped_w_t_arg_t_ret_fn = hs.fnutils.imap,
+    only_int_key_table_by_mapped_w_t_arg_t_ret_fn = hs.fnutils.imap,
     arr_by_mapped_w_t_arg_t_ret_fn2 = function(arr, fn)
       return transf.hole_y_arrlike.arr(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, fn)
+        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, fn)
       )
     end,
     arr_by_mapped_w_pos_int_t_arg_t_ret_fn = function(arr, fn)
@@ -954,19 +954,19 @@ get = {
       end
     end,
     arr_by_mapped_w_t_key_assoc = function(arr, assoc)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(v) return assoc[v] end
       )
     end,
     str_arr_by_mapped_values_w_fmt_str = function(arr, fmt_str)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.first_n_args_bound_fn(get.str.str_by_formatted_w_n_anys, fmt_str)
       )
     end,
     arr_by_mapped_w_t_arg_t_ret_fn_and_t_arg_bool_ret_fn = function(arr, mapfn, condfn)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(v)
           if condfn(v) then
@@ -1104,7 +1104,7 @@ get = {
     end,
     str_arr_arr_by_split = function(str, upper_sep, lower_sep)
       local upper = transf.str.split(str, upper_sep)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(upper, function(v)
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(upper, function(v)
         return transf.str.split(v, lower_sep)
       end)
     end,
@@ -1599,7 +1599,7 @@ get = {
   },
   nonindicated_number_str_arr = {
     number_arr = function(arr, base)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(
           get.nonindicated_number_str.number,
@@ -1653,7 +1653,7 @@ get = {
   },
   str_or_styledtext_arr = {
     styledtext_arr_merge = function(arr, styledtext_attributes_specifier)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.str_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
       )
@@ -1665,7 +1665,7 @@ get = {
   str_arr = {
     repeated_option_str = function(arr, opt)
       return get.str_or_number_arr.str_by_joined(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           arr,
           function (itm)
             return " " .. opt .. " " .. itm
@@ -1721,7 +1721,7 @@ get = {
     end,
     str_arr_by_also_split_w_ascii_char = function(arr, sep)
       return transf.arr_arr.arr_by_flatten(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           arr,
           function(x)
             return get.str.str_arr_by_split_w_ascii_char(x, sep)
@@ -1768,7 +1768,7 @@ get = {
   },
   str_arr_arr = {
     str_record_arr = function(arr, field_sep)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return get.str_or_number_arr.str_by_joined(x, field_sep) end)
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return get.str_or_number_arr.str_by_joined(x, field_sep) end)
     end,
     str_table = function(arr, field_sep, record_sep)
       return get.str_or_number_arr.str_by_joined(get.str_arr_arr.str_record_arr(arr, field_sep), record_sep)
@@ -1777,7 +1777,7 @@ get = {
   },
   table_arr = {
     vt_arr_w_kt = function(arr, kt)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return x[kt] end)
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return x[kt] end)
     end,
   },
   path_leaf_specifier = {
@@ -2035,7 +2035,7 @@ get = {
       }
     end,
     stream_creation_specifier_arr = function(path, flag_profile_name)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.extant_path.m3u_file_arr_by_descendants(path),
         get.fn.arbitrary_args_bound_or_ignored_fn(
           get.m3u_file.stream_creation_specifier,
@@ -2542,7 +2542,7 @@ get = {
     arr_by_column = plarray2d.column,
     arr_by_row = plarray2d.row,
     arr_arr_by_mapped_if_not_length_0 = function(arr_arr, fn)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
         function(arr)
           if #arr == 0 then
@@ -2554,7 +2554,7 @@ get = {
       )
     end,
     str_and_t__arr_arr_by_joined = function(arr, joiner)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.arr.str_and_t_by_joined, {a_use, joiner})
       )
@@ -2565,7 +2565,7 @@ get = {
       )
     end,
     assoc_arr_by_arr = function(arr_arr, arr2)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
       )
@@ -2583,7 +2583,7 @@ get = {
       )
     end,
     arr_arr_by_mapped = function(arr_arr, fn)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
         get.fn.second_n_args_bound_fn(get.arr.arr_by_mapped, fn)
       )
@@ -2591,11 +2591,11 @@ get = {
     --- essentially flatMap
     arr_by_mapped_w_t_arg_t_ret_fn_and_flatten = function(arr, fn)
       return transf.arr.arr_by_flatten(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(arr, fn)
+        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, fn)
       )
     end,
     arr_by_mapped_w_n_t_arg_t_ret_fn = function(arr, fn)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(nested_arr) return fn(transf.arr.n_anys(nested_arr)) end
       )
@@ -2922,7 +2922,7 @@ get = {
       )
     end,
     result_arr = function(arr, value)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr, 
         get.fn.arbitrary_args_bound_or_ignored_fn(get.retriever_specifier.result, {a_use, value})
       )
@@ -2937,7 +2937,7 @@ get = {
   thing_name_arr = {
     partial_retriever_specifier_arr = function(arr, typ)
       return transf.hole_y_arrlike.arr(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn
+        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn
       )
     end,
     bool_by_chained_and = function(arr, value)
@@ -3525,7 +3525,7 @@ get = {
   },
   tree_node_like_arr = {
     tree_node_arr = function(tree_node_like_arr, treeify_spec)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         tree_node_like_arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.tree_node_like.tree_node, {a_use, treeify_spec})
       )
@@ -3574,7 +3574,7 @@ get = {
   },
   n_any_assoc_arr_arr = {
     assoc_leaf_labels_with_title_path_arr = function(arr, title_key)
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.arbitrary_args_bound_or_ignored_fn(get.n_any_assoc_arr.leaf_label_with_title_path, {a_use, title_key})
       )
@@ -3702,7 +3702,7 @@ get = {
     end,
     absolute_path_arr_by_attachments = function(msg, obj)
       local media_dir = get.export_chat_main_object.media_dir(obj, "discord")
-      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         msg.attachments or {},
         function(att)
           return media_dir .. "/" .. transf.path.leaflike_by_leaf(att.uri)
@@ -3739,7 +3739,7 @@ get = {
     absolute_path_arr_by_attachments = function(msg, obj)
       if msg.attachments then
         local media_dir = get.export_chat_main_object.media_dir(obj, "signal")
-        return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           msg.attachments,
           function(att)
             return media_dir .. "/" .. att.fileName
