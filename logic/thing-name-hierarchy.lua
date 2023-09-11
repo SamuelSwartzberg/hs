@@ -22,6 +22,10 @@ thing_name_hierarchy = {
     }
   },
   any = {
+    bool = {
+      ["true"] = "leaf",
+      ["false"] = "leaf",
+    },
     having_metatable = {
       metatable_comparable = "leaf",
       metatable_addable = "leaf",
@@ -30,6 +34,12 @@ thing_name_hierarchy = {
     operational_addable = "leaf",
     lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = "leaf",
     str = {
+      content_starting_lt_ending_gt_str = {
+        doctype_starting_str = "leaf",
+        xml_declaration_starting_str = "leaf",
+        html_starting_str = "leaf",
+        sgml_document = "leaf",
+      },
       email_or_displayname_email = "leaf",
       empty_str = "leaf",
       json_str = "leaf",
@@ -214,6 +224,7 @@ thing_name_hierarchy = {
                     in_me_local_absolute_path = {
                       in_mcitations_local_absolute_path = "leaf",
                       in_mpapers_local_absolute_path = "leaf",
+                      in_menv_absolute_path = "leaf",
                     },
                     in_cache_local_absolute_path = {
                       in_hs_cache_local_absolute_path = {
@@ -284,7 +295,12 @@ thing_name_hierarchy = {
                 single_attachment_str = "leaf",
                 phone_number = "leaf",
                 application_name = {
-                  mac_application_name = "leaf",
+                  mac_application_name = {
+                    running_mac_application_name = "leaf",
+                    jxa_browser_name = "leaf",
+                    jxa_tabbable_name = "leaf",
+                    jxa_browser_tabbable_name = "leaf",
+                  },
                 },
                 separated_nonindicated_number_str = {
                   separated_nonindicated_bin_number_str = "leaf",
@@ -416,178 +432,197 @@ thing_name_hierarchy = {
                     percent_encoded_octet = "leaf",
                     lower_alphanum_underscore_comma = "leaf",
                     
-                    colon_period_alphanum_minus_underscore = {
-                      indicated_utf8_hex_str = "leaf",
-                      rfc3339like_dt_o_interval = {
-                        rfc3339like_dt = {
-                          full_rfc3339like_dt = "leaf",
-                          rfc3339like_y = "leaf",
-                          rfc3339like_ym = "leaf",
-                          rfc3339like_ymd = "leaf",
-                        },
-                        rfc3339like_interval = "leaf",
-                      },
-                      colon_alphanum_minus_underscore = {
-                        colon_minus_num = {
-                          colon_num = {
-                            hour = "leaf",
-                            hour_minute = "leaf",
-                            hour_minute_second = "leaf",
-                            twod_locator = "leaf"
+                    pcp_alphanum_minus_underscore = {
+                      url_scheme = "leaf",
+                      colon_period_alphanum_minus_underscore = {
+                        indicated_utf8_hex_str = "leaf",
+                        rfc3339like_dt_o_interval = {
+                          rfc3339like_dt = {
+                            full_rfc3339like_dt = "leaf",
+                            rfc3339like_y = "leaf",
+                            rfc3339like_ym = "leaf",
+                            rfc3339like_ymd = "leaf",
                           },
-                          slice_notation = "leaf",  
+                          rfc3339like_interval = "leaf",
                         },
-                        ipv6 = "leaf",
-                        calendar_name = {
-                          writeable_calendar_name = "leaf",
-                        },
-                        alphanum_minus_underscore = {
-                          lower_alphanum_minus_underscore = {
-                            auth_pass_item_name = {
-                              otp_pass_item_name = "leaf",
-                              passw_pass_item_name = "leaf",
-                              recovery_pass_item_name = "leaf",
-                              secq_pass_item_name = "leaf",
-                              username_pass_item_name = "leaf",
-                              login_pass_item_name = "leaf"
-                            },
-                            cc_pass_item_name = "leaf"
+                        colon_alphanum_minus_underscore = {
+                          calendar_name = {
+                            writeable_calendar_name = "leaf",
                           },
-                          package_manager_name = "leaf",
-                          alphanum_minus = {
-                            isbn10 = "leaf",
-                            isbn13 = "leaf",
-                            issn = "leaf",
-                            isbn = "leaf",
-                            uuid = {
-                              contact_uuid = "leaf",
-                              null_uuid = "leaf",
+                          colon_alphanum_minus = {
+                            colon_minus_num = {
+                              colon_num = {
+                                hour = "leaf",
+                                hour_minute = "leaf",
+                                hour_minute_second = "leaf",
+                                twod_locator = "leaf"
+                              },
+                              slice_notation = "leaf",  
                             },
-                            ipc_socket_id = {
-                              mpv_ipc_socket_id = "leaf",
+                            ipv6 = "leaf",
+                          },
+                          alphanum_minus_underscore = {
+                            lower_alphanum_minus_underscore = {
+                              
                             },
-                            sign_indicator = "leaf",
-                            github_username = "leaf",
-                            lower_alphanum_minus = {
-                              relay_identifier = "leaf",
-                              git_remote_type = "leaf",
+                            snakekebap_case = {
+                              strict_snakekebap_case = {
+                                lower_strict_snakekebap_case = {
+                                  auth_pass_item_name = {
+                                    otp_pass_item_name = "leaf",
+                                    passw_pass_item_name = "leaf",
+                                    recovery_pass_item_name = "leaf",
+                                    secq_pass_item_name = "leaf",
+                                    username_pass_item_name = "leaf",
+                                    login_pass_item_name = "leaf"
+                                  },
+                                  cc_pass_item_name = "leaf",
+                                  csl_type = "leaf",
+                                }
+                              }
                             },
-                            num_minus = {
-                              digit_interval_str = "leaf",
-                            },
-                            upper_alphanum_minus ="leaf",
-                            kebap_case = {
-                              strict_kebap_case = {
-                                upper_strict_kebap_case = "leaf",
-                                lower_strict_kebap_case = {
-                                  csl_style = "leaf",
-                                },
-                                mixed_strict_kebap_case = {
-                                  camel_strict_kebap_case = {
-                                    upper_camel_strict_kebap_case = "leaf",
-                                    lower_camel_strict_kebap_case = "leaf",
+                            package_manager_name = "leaf",
+                            alphanum_minus = {
+                              isbn10 = "leaf",
+                              isbn13 = "leaf",
+                              issn = "leaf",
+                              isbn = "leaf",
+                              uuid = {
+                                contact_uuid = "leaf",
+                                null_uuid = "leaf",
+                              },
+                              ipc_socket_id = {
+                                mpv_ipc_socket_id = "leaf",
+                              },
+                              sign_indicator = "leaf",
+                              github_username = "leaf",
+                              lower_alphanum_minus = {
+                                relay_identifier = "leaf",
+                                git_remote_type = "leaf",
+                              },
+                              num_minus = {
+                                digit_interval_str = "leaf",
+                              },
+                              upper_alphanum_minus ="leaf",
+                              kebap_case = {
+                                strict_kebap_case = {
+                                  upper_strict_kebap_case = "leaf",
+                                  lower_strict_kebap_case = {
+                                    csl_style = "leaf",
+                                  },
+                                  mixed_strict_kebap_case = {
+                                    camel_strict_kebap_case = {
+                                      upper_camel_strict_kebap_case = "leaf",
+                                      lower_camel_strict_kebap_case = "leaf",
+                                    }
                                   }
                                 }
                               }
-                            }
-                          },
-                          alphanum_underscore = {
-                            lower_alphanum_underscore = {
-                              general_name = {
-                                thing_name = "leaf"
-                              },
-                              search_engine_id = "leaf"
                             },
-                            upper_alphanum_underscore = "leaf",
-                            snake_case = {
-                              strict_snake_case = {
-                                upper_strict_snake_case = "leaf",
-                                lower_strict_snake_case = {
-                                  citable_object_id_indication_name = "leaf",
-                                  client_id = "leaf",
-                                  client_project_kind = "leaf"
+                            alphanum_underscore = {
+                              lower_alphanum_underscore = {
+                                general_name = {
+                                  thing_name = "leaf"
                                 },
-                                mixed_strict_snake_case = {
-                                  camel_strict_snake_case = {
-                                    upper_camel_strict_snake_case = "leaf",
-                                    lower_camel_strict_snake_case = "leaf",
+                                search_engine_id = "leaf"
+                              },
+                              upper_alphanum_underscore = "leaf",
+                              snake_case = {
+                                strict_snake_case = {
+                                  upper_strict_snake_case = "leaf",
+                                  lower_strict_snake_case = {
+                                    citable_object_id_indication_name = "leaf",
+                                    client_id = "leaf",
+                                    client_project_kind = "leaf",
+                                    billing_unit = "leaf",
+                                    markdown_extension_name = "leaf"
+                                  },
+                                  mixed_strict_snake_case = {
+                                    camel_strict_snake_case = {
+                                      upper_camel_strict_snake_case = "leaf",
+                                      lower_camel_strict_snake_case = "leaf",
+                                    }
                                   }
                                 }
                               }
-                            }
-                          },
-                          alphanum = {
-                            alpha_str = {
-                              upper_alpha_str = "leaf",
-                              lower_alpha_str = {
-                                fs_attr_name = "leaf",
-                                local_o_remote_str ="leaf",
-                                dcmp_name = "leaf",
-                                dcmp_name_long = "leaf",
-                                mod_char = "leaf",
-                                mod_name = "leaf",
-                                leaf_str = "leaf",
-                                project_type = "leaf",
-                                vcard_phone_type = "leaf",
-                                vcard_email_type = "leaf",
-                                vcard_address_type = "leaf",
-                                audiodevice_subtype = "leaf",
-                                otp_type = "leaf",
-                                llm_chat_role = "leaf",
-                                stream_state = "leaf",
-                                flag_profile_name = "leaf",
+                            },
+                            alphanum = {
+                              alpha_str = {
+                                upper_alpha_str = "leaf",
+                                lower_alpha_str = {
+                                  fs_attr_name = "leaf",
+                                  local_o_remote_str ="leaf",
+                                  dcmp_name = "leaf",
+                                  dcmp_name_long = "leaf",
+                                  mod_char = "leaf",
+                                  mod_name = "leaf",
+                                  leaf_str = "leaf",
+                                  project_type = "leaf",
+                                  vcard_phone_type = "leaf",
+                                  vcard_email_type = "leaf",
+                                  vcard_address_type = "leaf",
+                                  audiodevice_subtype = "leaf",
+                                  otp_type = "leaf",
+                                  llm_chat_role = "leaf",
+                                  stream_state = "leaf",
+                                  flag_profile_name = "leaf",
+                                  markdown_extension_set_name = "leaf",
+                                },
+                                iso_3366_1_alpha_2_country_code = "leaf",
+                                iso_3366_1_alpha_3_country_code = "leaf",
+                                mullvad_city_code = "leaf",
                               },
-                              iso_3366_1_alpha_2_country_code = "leaf",
-                              iso_3366_1_alpha_3_country_code = "leaf",
-                              mullvad_city_code = "leaf",
-                            },
-                            hex_str = {
-                              byte_hex_str = "leaf",
-                              two_byte_hex_str = "leaf",
-                              sha1_hex_str = "leaf",
-                              git_sha1_hex_str = {
-                                full_sha1_hex_str = "leaf",
-                                short_sha1_hex_str = "leaf",
+                              hex_str = {
+                                byte_hex_str = "leaf",
+                                two_byte_hex_str = "leaf",
+                                sha1_hex_str = "leaf",
+                                git_sha1_hex_str = {
+                                  full_sha1_hex_str = "leaf",
+                                  short_sha1_hex_str = "leaf",
+                                },
                               },
+                              digit_str = {
+                                bin_str = "leaf",
+                                oct_str = "leaf",
+                                cleaned_payment_card_number = "leaf"
+                              },
+                              base32_gen_str = "leaf",
+                              base32_crock_str = "leaf",
+                              base32_str = "leaf",
+                              lower_camel_case = "leaf",
+                              upper_camel_case = "leaf",
+                              indicated_hex_str = {
+                                fnid = "leaf"
+                              },
+                              indicated_bin_str = "leaf",
+                              indicated_oct_str = "leaf",
+                              indicated_dec_str = "leaf",
                             },
-                            digit_str = {
-                              bin_str = "leaf",
-                              oct_str = "leaf",
-                              cleaned_payment_card_number = "leaf"
-                            },
-                            base32_gen_str = "leaf",
-                            base32_crock_str = "leaf",
-                            base32_str = "leaf",
-                            lower_camel_case = "leaf",
-                            upper_camel_case = "leaf",
-                            indicated_hex_str = {
-                              fnid = "leaf"
-                            },
-                            indicated_bin_str = "leaf",
-                            indicated_oct_str = "leaf",
-                            indicated_dec_str = "leaf",
-                          },
-                        }
-                      },
-                      period_alphanum_minus_underscore = {
-                        ipv4 = "leaf",
-                        nonindicated_number_str = {
-                          nonindicated_bin_number_str = "leaf",
-                          nonindicated_hex_number_str = "leaf",
-                          nonindicated_oct_number_str = "leaf",
-                          nonindicated_dec_number_str = "leaf",
-                        },
-                        indicated_number_str = {
-                          indicated_bin_number_str = "leaf",
-                          indicated_hex_number_str = "leaf",
-                          indicated_oct_number_str = "leaf",
-                          indicated_dec_number_str = "leaf",
-                        },
-                        domain_name = {
-                          source_id = {
-                            active_source_id = "leaf",
                           }
-                        }
+                        },
+                        period_alphanum_minus_underscore = {
+                          period_alphanum_minus = {
+                            ipv4 = "leaf",
+                            nonindicated_number_str = {
+                              nonindicated_bin_number_str = "leaf",
+                              nonindicated_hex_number_str = "leaf",
+                              nonindicated_oct_number_str = "leaf",
+                              nonindicated_dec_number_str = "leaf",
+                            },
+                            indicated_number_str = {
+                              indicated_bin_number_str = "leaf",
+                              indicated_hex_number_str = "leaf",
+                              indicated_oct_number_str = "leaf",
+                              indicated_dec_number_str = "leaf",
+                            },
+                            domain_name = {
+                              source_id = {
+                                active_source_id = "leaf",
+                              },
+                              bundle_id = "leaf",
+                            }
+                          }
+                        },
                       },
                     },
                   },
@@ -743,6 +778,28 @@ thing_name_hierarchy = {
         form_filling_specifier = "leaf",
         form_field_specifier = "leaf",
         timer_spec = "leaf",
+        retriever_specifier = {
+          partial_retiever_specifier = "leaf",
+        },
+        chooser_item_specifier = {
+          index_chooser_item_specifier = "leaf",
+        },
+        menu_item_table = "leaf",
+        jxa_windowlike_specifier = {
+          jxa_tab_specifier = {
+            browser_jxa_tab_specifier = "leaf"
+          },
+          jxa_window_specifier = {
+            tabbable_jxa_window_specifier = {
+              browser_tabbable_jxa_window_specifier = "leaf"
+            }
+          },
+          browser_jxa_windowlike_specifier = "leaf"
+        },
+        detailed_env_node = "leaf",
+        hschooser_specifier = "leaf",
+        choosing_hschooser_specifier = "leaf",
+        url_table = "leaf"
       }
     },
     primitive = {
@@ -773,7 +830,10 @@ thing_name_hierarchy = {
                           sme_8_pos_int = {
                             sme_7_pos_int = {
                               sme_6_pos_int = {
-                                weekday_int_start_0 = "leaf"
+                                weekday_int_start_0 = "leaf",
+                                date_component_index = "leaf",
+                                zero = "leaf",
+                                one = "leaf",
                               },
                               weekday_int_start_1 = "leaf",
                             }
@@ -811,6 +871,8 @@ thing_name_hierarchy = {
         audiodevice = "leaf",
         watcher = "leaf",
         hs_hotkey = "leaf",
+        hs_screen = "leaf",
+        window_filter = "leaf",
       },
       light_userdata = "leaf"
     }

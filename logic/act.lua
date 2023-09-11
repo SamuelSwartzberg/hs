@@ -285,10 +285,10 @@ act = {
       dothis.local_extant_path.do_in_path(path, "git init")
     end,
   },
-  env_yaml_file_container = {
-    write_env_and_check = function(env_yaml_file_container)
+  in_menv_absolute_path = {
+    write_env_and_check = function(in_menv_absolute_path)
       dothis.envlike_str.write_env_and_check(
-        transf.env_yaml_file_container.envlike_str(env_yaml_file_container)
+        transf.in_menv_absolute_path.envlike_str(in_menv_absolute_path)
       )
     end,
   },
@@ -513,7 +513,7 @@ act = {
     end,
     choose_item_and_set_active_mullvad_relay_identifier = function()
       act.mullvad_relay_identifier_arr.choose_item_and_set_active(
-        transf["nil"].mullvad_relay_identifier_arr()
+        transf["nil"].relay_identifier_arr()
       )
     end,
     choose_inbox_email_and_action = function()
@@ -607,7 +607,7 @@ act = {
         arr[i] = nil
       end
     end,
-    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.arr.sort, {a_use, transf["nil"].random_bool}),
+    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.arr.sort, {a_use, transf["nil"].bool_by_random}),
   },
   contact_uuid = {
     edit_contact = function(uuid)

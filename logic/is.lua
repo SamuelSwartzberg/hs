@@ -33,6 +33,25 @@ is = {
     email_or_displayname_email = function(str)
       return is.str.email(str) or is.str.displayname_email(str)
     end,
+    content_starting_lt_ending_gt_str = function(str)
+      local cnt = transf.str.not_starting_o_ending_with_whitespace_str(str)
+      return get.str.bool_by_startswith(cnt, "<") and get.str.bool_by_endswith(cnt, ">")
+    end,
+
+  },
+  content_starting_lt_ending_gt_str = {
+    doctype_starting_str = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "^%s*<!DOCTYPE")
+    end,
+    xml_declaration_starting_str = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "^%s*<%?xml")
+    end,
+    html_starting_str = function(str)
+      return get.str.bool_by_matches_part_eutf8(str, "^%s*<html")
+    end,
+    sgml_document = function(str)
+      return is.content_starting_lt_ending_gt_str.doctype_starting_str(str) or is.content_starting_lt_ending_gt_str.xml_declaration_starting_str(str) or is.content_starting_lt_ending_gt_str.html_starting_str(str)
+    end,
 
   },
   not_empty_str = {
@@ -178,10 +197,10 @@ is = {
     country_identifier_str = transf["nil"]["true"],
     language_identifier_str = transf["nil"]["true"],
     multirecord_str = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, fixedstr.unique_record_separator)
+      return get.str.bool_by_contains_w_ascii_str(str, consts.unique_record_separator)
     end,
     record_str = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, fixedstr.unique_field_separator)
+      return get.str.bool_by_contains_w_ascii_str(str, consts.unique_field_separator)
     end,
   },
   noempty_noindent_line = {
@@ -290,9 +309,6 @@ is = {
   },
   printable_ascii_no_nonspace_whitespace_str = {
     fnname = transf["nil"]["true"],
-    lower_alphanum_underscore_comma = function(str)
-      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "a-z0-9_,")
-    end,
     single_attachment_str = function(str)
       return 
         get.str.bool_by_startswith(str, "#") 
@@ -300,6 +316,9 @@ is = {
     end,
     printable_ascii_not_whitespace_str = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "%s")
+    end,
+    indicated_page_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "pp?\\. *\\d+")
     end,
     
     application_name = transf["nil"]["true"], -- no way to tell if a str is an application name of some application
@@ -433,8 +452,11 @@ is = {
     doi = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.id.doi)
     end,
-    colon_period_alphanum_minus_underscore = function(str)
-      return get.str.bool_by_not_matches_part_eutf8(str, "[^%w%-_:.]")
+    lower_alphanum_underscore_comma = function(str)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "a-z0-9_,")
+    end,
+    pcp_alphanum_minus_underscore = function(str)
+      return get.str.bool_by_not_matches_part_eutf8(str, "[^%w%-_:\\+.]")
     end,
     semver_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.version.semver)
@@ -504,6 +526,14 @@ is = {
       return get.str.bool_by_startswith(str, "UC") and #str == 24
     end,
   },
+  pcp_alphanum_minus_underscore = {
+    url_scheme = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.url_scheme)
+    end,
+    colon_period_alphanum_minus_underscore = function(str)
+      return get.str.bool_by_not_contains_w_str(str, "+")
+    end,
+  },
   colon_period_alphanum_minus_underscore = {
     colon_alphanum_minus_underscore = function(str)
       return get.str.bool_by_not_contains_w_str(str, ".")
@@ -541,6 +571,11 @@ is = {
     end,
   },
   period_alphanum_minus_underscore = {
+    period_alphanum_minus = function(str)
+      return get.str.bool_by_not_contains_w_str(str, "_")
+    end,
+  },
+  period_alphanum_minus = {
     nonindicated_number_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, "-?[0-9a-fA-F]+(:?\\.[0-9a-fA-F]+)?")
     end,
@@ -561,6 +596,7 @@ is = {
     source_id = function(str)
       return get.str.bool_by_startswith(str, "com.apple.inputmethod") or get.str.bool_by_startswith(str, "com.apple.keylayout")
     end,
+    bundle_id = transf["nil"]["true"] -- any (reverse) domain name can be a bundle id
   },
   indicated_number_str = {
     indicated_bin_number_str = function(str)
@@ -624,11 +660,19 @@ is = {
         str
       )
     end,
+    colon_alphanum_minus = function(str)
+      return get.str.bool_by_not_contains_w_str(str, "_")
+    end,
+  },
+  colon_alphanum_minus = {
     ipv6 = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "a-fA-F0-9:") -- naive check because the actual regex is a monster
     end,
     colon_minus_num = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "-0-9:")
+    end,
+    issn_full = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.issn .. "::\\d+::\\d+")
     end,
   },
   colon_minus_num = {
@@ -749,9 +793,14 @@ is = {
       )
     end,
   },
+  relay_identifier = {
+    active_relay_identifier = function(str)
+      return str == transf["nil"].active_relay_identifier()
+    end,
+  },
   uuid = {
     contact_uuid = function(uuid)
-      local succ, res = pcall(transf.uuid.raw_contact, uuid)
+      local succ, res = pcall(transf.uuid.raw_contact_or_nil, uuid)
       return succ 
     end,
     null_uuid = function(uuid)
@@ -999,6 +1048,14 @@ is = {
     in_tmp_local_absolute_path = function(path)
       return get.str.bool_by_startswith(path, env.TMPDIR)
     end,
+    in_downloads_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, env.DOWNLOADS)
+    end,
+  },
+  in_downloads_local_absolute_path = {
+    telegram_raw_export_dir = function(path)
+      return get.str.bool_by_startswith(path, env.DOWNLOADS .. "/Telegram Desktop/DataExport_")
+    end,
   },
   in_me_local_absolute_path = {
     in_mcitations_absolute_path = function(path)
@@ -1006,6 +1063,9 @@ is = {
     end,
     in_mpapers_absolute_path = function(path)
       return get.str.bool_by_startswith(path, env.MPAPERS)
+    end,
+    in_menv_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, env.MENV)
     end,
   },
   in_cache_local_absolute_path = {
@@ -1319,10 +1379,31 @@ is = {
     unicode_plane_name = transf["nil"]["true"], -- currently no real point in the performance cost of checking if the strings actually are block/category/plane names. maybe in the future
     sign_indicator = function(str)
       return str == "" or str == "-"
-    end
+    end,
+    snakekebap_case = function(str)
+      return get.str.bool_by_not_matches_part_onig(str, "^\\d")
+    end,
     
   },
   lower_alphanum_minus_underscore = {
+   
+    
+    
+  },
+  snakekebap_case = {
+    strict_snakekebap_case = function(str)
+      return 
+        get.str.bool_by_not_startswith(str, "_") and
+        get.str.bool_by_not_endswith(str, "_") and
+        get.str.bool_by_not_contains_w_str(str, "__")
+    end,
+  },
+  strict_snakekebap_case = {
+    lower_strict_snakekebap_case = function(str)
+      return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "A-Z")
+    end,
+  },
+  lower_strict_snakekebap_case = {
     auth_pass_item_name = function(str)
       return get.local_extant_path.absolute_path_by_descendant_with_filename(
         transf.path.path_by_ending_with_slash(env.MPASS) .. "p", 
@@ -1334,6 +1415,9 @@ is = {
         transf.path.path_by_ending_with_slash(env.MPASS) .. "cc", 
         str
       )
+    end,
+    csl_type = function(str)
+      return get.arr.bool_by_contains(ls.csl_type, str)
     end,
   },
   alphanum_underscore = {
@@ -1378,6 +1462,9 @@ is = {
     end,
     billing_unit = function(str)
       return get.arr.bool_by_contains(ls.billing_unit, str)
+    end,
+    markdown_extension_name = function(str)
+      return get.arr.bool_by_contains(ls.markdown_extension_name, str)
     end,
   },
   mixed_strict_snake_case = {
@@ -1539,6 +1626,9 @@ is = {
     flag_profile_name = function(str)
       return get.arr.bool_by_contains(ls.flag_profile_name, str)
     end,
+    markdown_extension_set_name = function(str)
+      return get.arr.bool_by_contains(ls.markdown_extension_set_name, str)
+    end,
 
   },
   url = {
@@ -1555,16 +1645,16 @@ is = {
       return transf.url.query_str_or_nil(url) ~= nil
     end,
     fragment_url = function(url)
-      return transf.url.printable_ascii_or_nil_by_fragment(url) ~= nil
+      return transf.url.urlcharset_str_or_nil_by_fragment(url) ~= nil
     end,
     username_url = function(url)
       return transf.url.username(url) ~= nil
     end,
     password_url = function(url)
-      return transf.url.password(url) ~= nil
+      return transf.url.urlcharset_str_or_nil_by_password(url) ~= nil
     end,
     userinfo_url = function(url)
-      return transf.url.userinfo(url) ~= nil
+      return transf.url.urlcharset_str_or_nil_by_userinfo(url) ~= nil
     end,
     nofragment_url = function(url)
       return transf.url.fragment(url) == nil
@@ -1646,7 +1736,7 @@ is = {
   },
   path_url = {
     owner_item_url = function(url) 
-      return #transf.owner_item_url.two_strs_arr(url) == 2
+      return #transf.owner_item_url.two_strs__arr(url) == 2
     end,
     extension_url = function(url)
       return is.path.extension_path(transf.path_url.path(url))
@@ -1722,13 +1812,13 @@ is = {
   },
   youtube_path_url = {
     youtube_video_url = function(url)
-      return transf.path_url.initial_path_component(url) == "watch"
+      return transf.path_url.path_component_by_initial(url) == "watch"
     end,
     youtube_playlist_url = function(url)
-      return transf.path_url.initial_path_component(url) == "playlist"
+      return transf.path_url.path_component_by_initial(url) == "playlist"
     end,
     youtube_channel_url = function(url)
-      return transf.path_url.initial_path_component(url) == "channel"
+      return transf.path_url.path_component_by_initial(url) == "channel"
     end,
     youtube_playable_url = function(url)
       return is.youtube_url.youtube_video_url(url) or is.youtube_url.youtube_playlist_url(url)
@@ -1884,7 +1974,13 @@ is = {
   },
   sme_6_pos_int = {
     weekday_int_start_0 = transf["nil"]["true"],
-    date_component_index = transf["nil"]["true"]
+    date_component_index = transf["nil"]["true"],
+    zero = function(num)
+      return num == 0
+    end,
+    one = function(num)
+      return num == 1
+    end,
   },
   mult_anys = {
     one_to_three_anys = function(...)
@@ -1979,6 +2075,9 @@ is = {
     userdata = function(val)
       return type(val) == "userdata"
     end,
+    bool = function(val)
+      return type(val) == "boolean"
+    end,
     lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = function(val)
       return is.any.lower_alphanum_underscore(val) or is.any.lower_alphanum_underscore_arr(val)
     end,
@@ -1998,6 +2097,14 @@ is = {
       return is.any.operational_addable(val) and is.any.operational_comparable(val)
     end,
 
+  },
+  bool = {
+    ["true"] = function(val)
+      return val == true
+    end,
+    ["false"] = function(val)
+      return val == false
+    end,
   },
   having_metatable = {
     metatable_comparable = function(val)
@@ -2034,8 +2141,17 @@ is = {
 
   },
   mac_application_name = {
-    running = function(name)
+    running_mac_application_name = function(name)
       return get.mac_application_name.running_application(name) ~= nil
+    end,
+    jxa_browser_name = function(name)
+      return get.arr.bool_by_contains(ls.jxa_browser_name, name)
+    end,
+    jxa_tabbable_name = function(name)
+      return get.arr.bool_by_contains(ls.jxa_tabbable_name, name)
+    end,
+    jxa_browser_tabbable_name = function(name)
+      return is.mac_application_name.jxa_browser_name(name) and is.mac_application_name.jxa_tabbable_name(name)
     end,
   },
   table = {
@@ -2054,7 +2170,10 @@ is = {
       end
       return true
     end,
-    assoc = transf["nil"]["true"]
+    assoc = transf["nil"]["true"],
+    thing_name_hierarchy = function(t)
+      return t == thing_name_hierarchy
+    end
   },
   only_int_key_table = {
     --- an empty only_int_key_table is never a hole_y_arrlike and always an arr
@@ -2245,7 +2364,7 @@ is = {
       return t.x and t.y and t.w and t.h
     end,
     hs_geometry = function(t)
-      return t.angleTo
+      return t.angleTo ~= nil
     end,
     form_filling_specifier = function(t)
       return t.in_fields and t.form_fields and t.explanations
@@ -2256,7 +2375,65 @@ is = {
     retriever_specifier = function(t)
       return t.thing_name
     end,
-
+    action_specifier = function(t)
+      return t.d and (t.getfn or t.dothis)
+    end,
+    chooser_item_specifier = function(t)
+      return t.text
+    end,
+    menu_item_table = function(t)
+      return t.AXTitle
+    end,
+    jxa_windowlike_specifier = function(t)
+      return t.application_name and t.window_index
+    end,
+    detailed_env_node = function(t)
+      return t.value
+    end,
+    hschooser_specifier = function(t)
+      return t.chooser_item_specifier_arr
+    end,
+    choosing_hschooser_specifier = function(t)
+      return t.key_name and t.tbl and t.hschooser_specifier
+    end,
+    url_table = function(t)
+      return t.scheme
+    end
+  },
+  jxa_windowlike_specifier = {
+    jxa_tab_specifier = function(t)
+      return t.tab_index
+    end,
+    jxa_window_specifier = function(t)
+      return not is.jxa_windowlike_specifier.jxa_tab_specifier(t)
+    end,
+    browser_jxa_windowlike_specifier = function(t)
+      return is.mac_application_name.jxa_browser_name(
+        t.application_name
+      )
+    end,
+  },
+  jxa_tab_specifier = {
+    browser_jxa_tab_specifier = function(t)
+      return is.jxa_windowlike_specifier.browser_jxa_windowlike_specifier(t)
+    end,
+  },
+  jxa_window_specifier = {
+    tabbable_jxa_window_specifier = function(t)
+      return is.mac_application_name.jxa_tabbable_name(
+        t.application_name
+      )
+    end,
+  },
+  tabbable_jxa_window_specifier = {
+    browser_tabbable_jxa_window_specifier = function(t)
+      return is.jxa_windowlike_specifier.browser_jxa_windowlike_specifier(t)
+    end,
+  },
+  chooser_item_specifier = {
+    index_chooser_item_specifier = function(t)
+      return t.index
+    end,
   },
   retriever_specifier = {
     partial_retriever_specifer = function(t)
@@ -2518,7 +2695,13 @@ is = {
     hs_hotkey = function(val)
       return transf.full_userdata.str_by_classname(val) == "hs.hotkey"
     end,
-  }
+    hs_screen = function(val)
+      return transf.full_userdata.str_by_classname(val) == "hs.screen"
+    end,
+    window_filter = function(val)
+      return transf.full_userdata.str_by_classname(val) == "hs.window.filter"
+    end,
+  },
 }
 
 -- to allow for is.<type1>.<type2> where type2 is a descendant but not childtype of type1, we will use a metatable to search for the path from type1 to type2 by using thing_name_hierarchy, and then create a dynamic function that tests is.<type1>.<subtype> and is.<subtype>.<subtype2> and so on until we reach type2

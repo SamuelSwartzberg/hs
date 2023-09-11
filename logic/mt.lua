@@ -54,6 +54,7 @@ r = {
     whitespace = {
       large = "[\t\r\n]"
     },
+    url_scheme = "[a-zA-Z][a-zA-Z0-9+.-]*-:",
     ipv4 = "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)",
     extract_key_value_assoc = "^(\\w+)_key(?:_(\\w+)_value)?_assoc$",
     shell_shebang = "^#!\\s*/.*?(?:ba|z|fi|da|k|t?c)sh\\s+",
@@ -79,7 +80,7 @@ r = {
   }
 }
 
-fixedstr = {
+consts = {
   unique_record_separator  = "__ENDOFRECORD5579__",
   unique_field_separator = "Y:z:Y"
 }
@@ -104,6 +105,53 @@ ls = {
     "sass"
   },
   apis_that_dont_support_authorization_code_fetch = {"google"},
+  csl_type = {
+    "article",
+    "article-journal",
+    "article-magazine",
+    "article-newspaper",
+    "bill",
+    "book",
+    "broadcast",
+    "chapter",
+    "classic",
+    "collection",
+    "dataset",
+    "document",
+    "entry",
+    "entry-dictionary",
+    "entry-encyclopedia",
+    "event",
+    "figure",
+    "graphic",
+    "hearing",
+    "interview",
+    "legal_case",
+    "legislation",
+    "manuscript",
+    "map",
+    "motion_picture",
+    "musical_score",
+    "pamphlet",
+    "paper-conference",
+    "patent",
+    "performance",
+    "periodical",
+    "personal_communication",
+    "post",
+    "post-weblog",
+    "regulation",
+    "report",
+    "review",
+    "review-book",
+    "software",
+    "song",
+    "speech",
+    "standard",
+    "thesis",
+    "treaty",
+    "webpage",
+  },
   csl_title_keys = { "title", "title-short" },
   git_remote_types = {"github", "gitlab", "bitbucket"},
   useless_files = {".git", "node_modules", ".vscode"},
@@ -267,51 +315,6 @@ ls = {
   datelib = {
     gettable_units  = { "date", "year", "isoyear", "month", "yearday", "weekday", "isoweekday", "weeknum", "isoweeknum", "day", "time", "hours", "minutes", "seconds", "fracs", "ticks" },
     addable_units = { "years", "months", "days", "hours", "minutes", "seconds", "ticks" }
-  },
-  markdown_extensions = {
-    basic = {
-      "yaml_metadata_block"
-    },
-    featureful = {
-      "fenced_code_blocks",
-      "backtick_code_blocks",
-      "fenced_code_attributes",
-      "line_blocks",
-      "fancy_lists",
-      "startnum",
-      "definition_lists",
-      "task_lists",
-      "example_lists",
-      "table_captions",
-      "pipe_tables",
-      "all_symbols_escapable",
-      "strikeout",
-      "superscript",
-      "subscript",
-      "tex_math_dollars",
-      "raw_html",
-      "footnotes",
-      "inline_notes",
-      "implicit_figures",
-      "mark",
-      "angle_brackets_escapable",
-      "hard_line_breaks",
-      "emoji",
-      "autolink_bare_uris",
-    },
-    navigable = {
-      "implicit_header_references"
-    },
-    citing = {
-      "citations",
-    },
-    styleable = {
-      "header_attributes",
-      "auto_identifiers",
-      "gfm_auto_identifiers",
-      "link_attributes",
-      "fenced_divs"
-    }
   },
   khal = {
     parseable_format_components = {
@@ -548,5 +551,53 @@ ls = {
     "user",
     "assistant",
     "function"
+  },
+  jxa_browser_name = {
+    "Google Chrome"
+  },
+  jxa_tabbable_name = {
+    "Google Chrome",
+  },
+  markdown_extension_set_name = {
+    "basic",
+    "featureful",
+    "navigable",
+    "citing",
+    "styleable"
+  },
+  markdown_extension_name = {
+    "yaml_metadata_block",
+    "fenced_code_blocks",
+    "backtick_code_blocks",
+    "fenced_code_attributes",
+    "line_blocks",
+    "fancy_lists",
+    "startnum",
+    "definition_lists",
+    "task_lists",
+    "example_lists",
+    "table_captions",
+    "pipe_tables",
+    "all_symbols_escapable",
+    "strikeout",
+    "superscript",
+    "subscript",
+    "tex_math_dollars",
+    "raw_html",
+    "footnotes",
+    "inline_notes",
+    "implicit_figures",
+    "mark",
+    "angle_brackets_escapable",
+    "hard_line_breaks",
+    "emoji",
+    "autolink_bare_uris",
+    "implicit_header_references",
+    "citations",
+    "header_attributes",
+    "auto_identifiers",
+    "gfm_auto_identifiers",
+    "link_attributes",
+    "fenced_divs"
   }
 }

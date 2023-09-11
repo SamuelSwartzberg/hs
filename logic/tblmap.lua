@@ -335,7 +335,7 @@ tblmap = {
   sql_history_using_application_name = {
     backup_condition = {
       Firefox = function()
-        return not is.mac_application_name.running("Firefox")
+        return not is.mac_application_name.running_mac_application_name("Firefox")
       end,
       Newpipe = function()
         return is.path.extant_path(tblmap.sql_history_using_application_name.history_file_path.Newpipe)
@@ -583,5 +583,52 @@ tblmap = {
         ["no-video"] = true,
       }
     }
-  }
+  },
+  markdown_extension_set_name = {
+    markdown_extension_name_arr = {
+      basic = {
+        "yaml_metadata_block"
+      },
+      featureful = {
+        "fenced_code_blocks",
+        "backtick_code_blocks",
+        "fenced_code_attributes",
+        "line_blocks",
+        "fancy_lists",
+        "startnum",
+        "definition_lists",
+        "task_lists",
+        "example_lists",
+        "table_captions",
+        "pipe_tables",
+        "all_symbols_escapable",
+        "strikeout",
+        "superscript",
+        "subscript",
+        "tex_math_dollars",
+        "raw_html",
+        "footnotes",
+        "inline_notes",
+        "implicit_figures",
+        "mark",
+        "angle_brackets_escapable",
+        "hard_line_breaks",
+        "emoji",
+        "autolink_bare_uris",
+      },
+      navigable = {
+        "implicit_header_references"
+      },
+      citing = {
+        "citations",
+      },
+      styleable = {
+        "header_attributes",
+        "auto_identifiers",
+        "gfm_auto_identifiers",
+        "link_attributes",
+        "fenced_divs"
+      }
+    }
+  },
 }

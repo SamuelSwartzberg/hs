@@ -115,14 +115,6 @@ dothis = {
         )
       end
     end,
-    add_event_interactive = function(event_table, do_after)
-      event_table = event_table or {}
-      local temp_file_contents = get.str.str_by_evaled_as_template(transf.event_table.yaml_str_by_calendar_template(event_table))
-      dothis.str.edit_temp_file_in_vscode_act_on_contents(temp_file_contents, function(cnt)
-        local new_specifier = transf.yaml_str.not_userdata_or_fn(cnt)
-        dothis.event_table.add_event_from(new_specifier, do_after)
-      end)
-    end,
   },
   md_file = {
     to_file_in_same_dir = function(source, format, metadata, do_after)
@@ -236,8 +228,8 @@ dothis = {
   },
   table = {
     write_ics_file = function(tbl, path)
-      local tmpdir_json_path = transf.not_userdata_or_fn.in_tmp_dir(tbl) .. ".json"
-      local tmpdir_ics_path = transf.not_userdata_or_fn.in_tmp_dir(tbl) .. ".ics"
+      local tmpdir_json_path = transf.not_userdata_or_fn.in_tmp_local_absolute_path(tbl) .. ".json"
+      local tmpdir_ics_path = transf.not_userdata_or_fn.in_tmp_local_absolute_path(tbl) .. ".ics"
       dothis.absolute_path.write_file(tmpdir_json_path, json.encode(tbl))
       dothis.str.env_bash_eval_sync(
         "ical2json" ..
@@ -1442,7 +1434,7 @@ dothis = {
         env.NEWSBOAT_URLS,
         {
           url = url,
-          title = transf.sgml_url.str_or_nil_by_title(url),
+          title = transf.url.str_or_nil_by_sgml_title(url),
           category = category,
         }
       )
@@ -1629,7 +1621,7 @@ dothis = {
   },
   timestamp_s = {
     do_at = function(timestamp, fn)
-      local last_midnight = transf["nil"].timestamp_s_last_midnight()
+      local last_midnight = transf["nil"].timestamp_s_by_last_midnight()
       local seconds_to_wait = timestamp - last_midnight
       if seconds_to_wait < 0 then
         error("Timestamp is in the past by " .. -seconds_to_wait .. " seconds")
@@ -1700,7 +1692,7 @@ dothis = {
   mac_application_name = {
     execute_full_action_path = function(application_name, full_action_path)
       dothis.running_application.execute_full_action_path(
-        transf.mac_application_name.running_application(application_name),
+        transf.mac_application_name.running_application_or_nil(application_name),
         full_action_path
       )
     end,
@@ -1721,17 +1713,17 @@ dothis = {
     end,
     focus_main_window = function(application_name)
       dothis.running_application.focus_main_window(
-        transf.mac_application_name.running_application(application_name)
+        transf.mac_application_name.running_application_or_nil(application_name)
       )
     end,
     activate = function(application_name)
       dothis.running_application.activate(
-        transf.mac_application_name.running_application(application_name)
+        transf.mac_application_name.running_application_or_nil(application_name)
       )
     end,
     --- if you need `fn` to take args, bind them beforehand
     do_with_activated = function(application_name, fn)
-      local app = transf.mac_application_name.running_application(application_name)
+      local app = transf.mac_application_name.running_application_or_nil(application_name)
       local prev_app = hs.application.frontmostApplication()
       dothis.mac_application_name.activate(application_name)
       local retval = {fn()}
@@ -1776,14 +1768,14 @@ dothis = {
   },
   jxa_tab_specifier = {
     make_main = function(jxa_tab_specifier)
-      get.str.evaled_js_osa( ("Application('%s').windows()[%d].activeTabIndex = %d"):format(
+      get.str.any_by_evaled_js_osa( ("Application('%s').windows()[%d].activeTabIndex = %d"):format(
         jxa_tab_specifier.application_name,
         jxa_tab_specifier.window_index,
         jxa_tab_specifier.tab_index
       ))
     end,
     close = function(jxa_tab_specifier)
-      get.str.evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].close()"):format(
+      get.str.any_by_evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].close()"):format(
         jxa_tab_specifier.application_name,
         jxa_tab_specifier.window_index,
         jxa_tab_specifier.tab_index
@@ -1963,7 +1955,7 @@ dothis = {
       )
     end,
     open_project = function(omegat_project_dir)
-      local running_application = transf.mac_application_name.ensure_running_application("OmegaT")
+      local running_application = transf.mac_application_name.running_application_by_ensure("OmegaT")
       dothis.mac_application_name.open_recent("OmegaT", omegat_project_dir)
       dothis.running_application.focus_main_window(running_application)
     end,
@@ -2738,7 +2730,7 @@ dothis = {
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("killall rec", do_after)
     end,
     sox_rec_toggle_cache = function(do_after)
-      if transf["nil"].sox_is_recording() then
+      if transf["nil"].bool_by_sox_is_recording() then
         dothis.sox.sox_rec_stop()
       else
         dothis.sox.sox_rec_start_cache(do_after)
@@ -2751,7 +2743,7 @@ dothis = {
       dothis.str.env_bash_eval_async("mullvad disconnect")
     end,
     mullvad_toggle = function()
-      if transf["nil"].mullvad_bool_connected() then
+      if transf["nil"].bool_by_mullvad_connected() then
         dothis["nil"].mullvad_disconnect()
       else
         dothis["nil"].mullvad_connect()
@@ -2864,7 +2856,7 @@ dothis = {
       dothis.fn_queue_specifier.push(main_qspec,
         function()
           local window = transf.running_application.main_window(
-            transf.mac_application_name.running_application("Telegram")
+            transf.mac_application_name.running_application_or_nil("Telegram")
           )
           dothis.window.focus(window)
           dothis.window.set_hs_geometry_rect_like(window, {x = 0, y = 0, w = 800, h = 1500})
@@ -2910,7 +2902,7 @@ dothis = {
           transf.str.str_by_single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings") " && sleep 1", function()
             hs.eventtap.keyStroke({"cmd"}, "0") -- reset zoom
             local ff_window = transf.running_application.main_window(
-              transf.mac_application_name.running_application("Firefox")
+              transf.mac_application_name.running_application_or_nil("Firefox")
             )
             dothis.window.focus(ff_window)
             dothis.window.set_hs_geometry_rect_like(ff_window, {x = 0, y = 0, w = 1280, h = 1600})

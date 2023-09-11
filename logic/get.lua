@@ -63,8 +63,8 @@ get = {
         get.arr.str_arr_by_mapped_values_w_fmt_str(
           ls.khal.parseable_format_component_arr,
           "{%s}"
-        ), fixedstr.unique_field_separator
-      ) .. fixedstr.unique_record_separator
+        ), consts.unique_field_separator
+      ) .. consts.unique_record_separator
     end,
     basic_command_parts = function(include, exclude)
       local command = " --format=" .. transf.str.str_by_single_quoted_escaped(get.khal.parseable_format_specifier())
@@ -144,7 +144,7 @@ get = {
   },
   audiodevice = {
     is_active_audiodevice = function (device, type)
-      return device == transf.audiodevice_type.default_audiodevice(type)
+      return device == transf.audiodevice_type.udiodevice_by_default(type)
     end,
     audiodevice_specifier = function (device, type)
       return {
@@ -913,14 +913,14 @@ get = {
     raw_item_chooser_item_specifier_arr = function(arr)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        transf.any.item_chooser_item_specifier
+        transf.any.chooser_item_specifier
       )
     end,
     item_chooser_item_specifier_arr = function(arr, target_item_chooser_item_specifier_name)
       if target_item_chooser_item_specifier_name then
         return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           get.arr.raw_item_chooser_item_specifier_arr(arr),
-          transf.item_chooser_item_specifier[target_item_chooser_item_specifier_name .. "_item_chooser_item_specifier"]
+          transf.chooser_item_specifier[target_item_chooser_item_specifier_name .. "_item_chooser_item_specifier"]
         )
       else
         return get.arr.raw_item_chooser_item_specifier_arr(arr)
@@ -942,7 +942,7 @@ get = {
       return get.hschooser_specifier.choosing_hschooser_specifier(transf.arr.hschooser_specifier(arr, target_item_chooser_item_specifier_name), "index", arr)
     end,
     only_int_key_table_by_mapped_w_t_arg_t_ret_fn = hs.fnutils.imap,
-    arr_by_mapped_w_t_arg_t_ret_fn2 = function(arr, fn)
+    arr_by_mapped_w_t_arg_t_ret_fn = function(arr, fn)
       return transf.hole_y_arrlike.arr(
         get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, fn)
       )
@@ -1115,13 +1115,13 @@ get = {
     end,
     window_arr_by_pattern = function(str, app_name)
       return get.running_application.window_arr_by_pattern(
-        transf.mac_application_name.running_application(app_name),
+        transf.mac_application_name.running_application_or_nil(app_name),
         str
       )
     end,
     window_by_title = function(str, app_name)
       return get.running_application.window_by_title(
-        transf.mac_application_name.running_application(app_name),
+        transf.mac_application_name.running_application_or_nil(app_name),
         str
       )
     end,
@@ -1354,7 +1354,7 @@ get = {
     n_strs_by_extracted_eutf8 = eutf8.match,
     n_str_stateful_iter_by_extracted_onig = onig.gmatch,
     n_str_stateful_iter_by_extracted_eutf8 = eutf8.gmatch,
-    evaled_js_osa = function(str)
+    any_by_evaled_js_osa = function(str)
       local succ, parsed_res = hs.osascript.javascript(str)
       if succ then
         return parsed_res
@@ -2615,9 +2615,6 @@ get = {
   },
   firefox = {
   },
-  chat_mac_application_name = {
-
-  },
   running_application = {
     window_by_title = function(app, title)
       return app:getWindow(title)
@@ -2629,11 +2626,11 @@ get = {
   window = {
     hs_geometry_point_with_offset = function(window, from, delta)
       return transf.window[
-        "hs_geometry_point_" .. from
-      ]:move(delta)
+        "hs_geometry_point_by_" .. from
+      ](window):move(delta)
     end,
   },
-  jxa_window_specifier = {
+  jxa_windowlike_specifier = {
     jxa_tab_specifier = function(window_specifier, tab_index)
       return {
         application_name = window_specifier.application_name,
@@ -2642,7 +2639,7 @@ get = {
       }
     end,
     property = function(window_specifier, property)
-      return get.str.evaled_js_osa( ("Application('%s').windows()[%d].%s()"):format(
+      return get.str.any_by_evaled_js_osa( ("Application('%s').windows()[%d].%s()"):format(
         window_specifier.application_name,
         window_specifier.window_index,
         property
@@ -2651,7 +2648,7 @@ get = {
   },
   jxa_tab_specifier = {
     property = function(tab_specifier, property)
-      return get.str.evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(
+      return get.str.any_by_evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(
         tab_specifier.application_name,
         tab_specifier.window_index,
         tab_specifier.tab_index,
@@ -2675,7 +2672,7 @@ get = {
     end,
   },
   detailed_env_node = {
-    self_env_var_name_value_assoc = function(node, prev_key, key)
+    self_snake_case_value_assoc = function(node, prev_key, key)
       prev_key = prev_key or ""
       if node.value then
         local value = node.value
@@ -2701,7 +2698,7 @@ get = {
       end
     end,
     snake_case_key_str_value_assoc = function(node, prev_key, key)
-      local self_assoc = get.detailed_env_node.self_env_var_name_value_assoc(node, prev_key, key)
+      local self_assoc = get.detailed_env_node.self_snake_case_value_assoc(node, prev_key, key)
       local dependent_assoc
       if node.dependents then
         dependent_assoc = get.detailed_env_node.snake_case_key_str_value_assoc(node.dependents, key)
@@ -2711,7 +2708,7 @@ get = {
       return transf.two_table_or_nils.table_by_take_new(self_assoc, dependent_assoc)
     end,
   },
-  env_var_name_env_node_assoc = {
+  snake_case_key_detailed_env_node_or_str_value_assoc = {
     snake_case_key_str_value_assoc = function(assoc, prev_key)
       if prev_key then prev_key = prev_key .. "/" else prev_key = "" end
       local values = {}
@@ -2729,7 +2726,7 @@ get = {
   url = {
 
   },
-  sgml_str = {
+  sgml_document = {
     sgml_str_or_nil_by_query_selector_all = function(str, selector)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "htmlq" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_doc(str)
@@ -2749,20 +2746,20 @@ get = {
   },
   sgml_url = {
     sgml_str_or_nil_by_query_selector_all = function(url, selector)
-      return get.sgml_str.sgml_str_or_nil_by_query_selector_all(
-        transf.sgml_url.sgml_str(url),
+      return get.sgml_document.sgml_str_or_nil_by_query_selector_all(
+        transf.url.sgml_document_or_nil(url),
         selector
       )
     end,
     str_or_nil_by_query_selector_all = function(url, selector)
-      return get.sgml_str.str_or_nil_by_query_selector_all(
-        transf.sgml_url.sgml_str(url),
+      return get.sgml_document.str_or_nil_by_query_selector_all(
+        transf.url.sgml_document_or_nil(url),
         selector
       )
     end,
     str_or_nil_by_attribute_query_selector_all = function(url, selector, attribute)
-      return get.sgml_str.str_or_nil_by_attribute_query_selector_all(
-        transf.sgml_url.sgml_str(url),
+      return get.sgml_document.str_or_nil_by_attribute_query_selector_all(
+        transf.url.sgml_document_or_nil(url),
         selector,
         attribute
       )
@@ -2851,7 +2848,7 @@ get = {
     repeated = function(arr, times)
       return transf.arr.n_anys(get.any.arr_repeated(arr, times))
     end,
-    applicable_thing_name_hierarchy = function(any, local_thing_name_hierarchy, parent)
+    assoc_by_applicable_thing_name_hierarchy = function(any, local_thing_name_hierarchy, parent)
       local_thing_name_hierarchy = local_thing_name_hierarchy or get.table.table_by_copy(thing_name_hierarchy, true)
       parent = parent or "any"
       local res = {}
@@ -2859,7 +2856,7 @@ get = {
         local passes = is[parent][thing_name](any)
         if passes then
           if is.any.table(child_thing_name_hierarchy_or_leaf_indication_str) then
-            res[thing_name] = get.any.applicable_thing_name_hierarchy(any, child_thing_name_hierarchy_or_leaf_indication_str, thing_name)
+            res[thing_name] = get.any.assoc_by_applicable_thing_name_hierarchy(any, child_thing_name_hierarchy_or_leaf_indication_str, thing_name)
           else
             res[thing_name] = child_thing_name_hierarchy_or_leaf_indication_str
           end
@@ -2936,8 +2933,9 @@ get = {
   },
   thing_name_arr = {
     partial_retriever_specifier_arr = function(arr, typ)
-      return transf.hole_y_arrlike.arr(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        function(thing_name) return get.thing_name.partial_retriever_specifier_or_nil(thing_name, typ) end
       )
     end,
     bool_by_chained_and = function(arr, value)
@@ -2957,25 +2955,25 @@ get = {
       end
       return true
     end,
-    chooser_text = function(arr, value)
+    str_or_nil_by_chooser_text = function(arr, value)
       return get.retriever_specifier_arr.result_highest_precedence(
-        transf.thing_name_arr.chooser_text_retriever_specifier_arr(arr),
+        transf.thing_name_arr.partial_retriever_specifier_arr_by_chooser_text(arr),
         value
       )
     end,
-    placeholder_text = function(arr, value)
+    str_or_nil_by_placeholder_text = function(arr, value)
       return get.retriever_specifier_arr.result_highest_precedence(
-        transf.thing_name_arr.placeholder_text_retriever_specifier_arr(arr),
+        transf.thing_name_arr.partial_retriever_specifier_arr_by_placeholder_text(arr),
         value
       )
     end,
-    chooser_image = function(arr, value)
+    hs_image_or_nil_by_chooser_image = function(arr, value)
       return get.retriever_specifier_arr.result_highest_precedence(
-        transf.thing_name_arr.chooser_image_retriever_specifier_arr(arr),
+        transf.thing_name_arr.partial_retriever_specifier_arr_by_chooser_image(arr),
         value
       )
     end,
-    chooser_subtext = function(arr, value)
+    str_or_nil_by_chooser_subtext = function(arr, value)
       return get.retriever_specifier_arr.result_joined(
         transf.thing_name_arr.chooser_subtext_retriever_specifier_arr(arr),
         value
@@ -3593,7 +3591,7 @@ get = {
         }
       }
       local res = rest(request)
-      return transf.gpt_response_table.response_text(res)
+      return transf.gpt_response_table.str_by_response(res)
     end,
     str_by_llm_response_with_api_system_message = function(arr, temperature, max_tokens)
       local request = {
@@ -3607,7 +3605,7 @@ get = {
         }
       }
       local res = rest(request)
-      return transf.gpt_response_table.response_text(res)
+      return transf.gpt_response_table.str_by_response(res)
     end,
   },
   n_shot_llm_spec = {

@@ -598,7 +598,7 @@ transf = {
     n_anys = table.unpack,
     pos_int_by_initial_selected_index = function(arr)
       return get.thing_name_arr.pos_int_by_initial_selected_index(
-        transf.any.applicable_thing_name_arr(arr)
+        transf.any.thing_name_arr_by_applicable(arr)
       ) or 1 
     end,
   },
@@ -964,6 +964,21 @@ transf = {
     git_root_dir_arr_by_descendants = function(dir)
       return transf.dir_arr.git_root_dir_arr_by_filter(transf.extant_path.absolute_path_arr_by_descendants(dir))
     end,
+    yaml_file_arr_by_descendants = function(path)
+      return transf.extant_path_arr.yaml_file_arr(
+        transf.extant_path.file_arr_by_descendants(path)
+      )
+    end,
+    plaintext_assoc_file_arr_by_descendants = function(path)
+      return transf.extant_path_arr.plaintext_assoc_file_arr(
+        transf.extant_path.file_arr_by_descendants(path)
+      )
+    end,
+    not_userdata_or_fn_arr_by_descendants = function(path)
+      return transf.plaintext_assoc_file_arr.not_userdata_or_fn_arr(
+        transf.extant_path.plaintext_assoc_file_arr_by_descendants(path)
+      )
+    end,
   },
   local_extant_path = {
     int_by_size_bytes = function(path)
@@ -1067,10 +1082,10 @@ transf = {
       return get.extant_path_arr.extant_by_largest_of_attr(path_arr, "creation")
     end,
     dir_arr_by_filter = function(path_arr)
-      return get.arr.arr_by_filtered(path_arr, is.path.dir)
+      return get.arr.arr_by_filtered(path_arr, is.extant_path.dir)
     end,
     file_arr_by_filter = function(path_arr)
-      return get.arr.arr_by_filtered(path_arr, is.path.file)
+      return get.arr.arr_by_filtered(path_arr, is.extant_path.file)
     end,
     git_root_dir_arr_by_filter = function(path_arr)
       return transf.dir_arr.git_root_dir_arr_by_filter(transf.extant_path_arr.dir_arr_by_filter(path_arr))
@@ -1080,6 +1095,12 @@ transf = {
         path_arr,
         transf.extant_path.file_arr_by_descendants
       )
+    end,
+    plaintext_assoc_file_arr_by_filter = function(path_arr)
+      return get.arr.arr_by_filtered(path_arr, is.extant_path.plaintext_assoc_file)
+    end,
+    yaml_file_arr_by_filter = function(path_arr)
+      return get.arr.arr_by_filtered(path_arr, is.extant_path.yaml_file)
     end,
   },
   local_extant_path_arr = {
@@ -1369,7 +1390,7 @@ transf = {
       return raw
     end,
     two_strs_arr_or_nil_by_remote_owner_item = function(path)
-      return transf.owner_item_url.two_strs_arr(transf.in_git_dir.base_url_by_remote_cleaned(path))
+      return transf.owner_item_url.two_strs__arr(transf.in_git_dir.base_url_by_remote_cleaned(path))
     end,
     host_by_remote = function(path)
       return transf.url.host(transf.in_git_dir.base_url_by_remote_cleaned(path))
@@ -2836,14 +2857,16 @@ transf = {
 
   },
   uuid = {
-    raw_contact = function(uuid)
+    raw_contact_or_nil = function(uuid)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "khard show --format=yaml uid:" .. uuid)
     end,
-    contact_table = function(uuid)
-      local raw_contact = transf.uuid.raw_contact(uuid)
-      local contact_table = transf.raw_contact.contact_table(raw_contact)
-      contact_table.uid = uuid
-      return contact_table
+    contact_table_or_nil = function(uuid)
+      local raw_contact = transf.uuid.raw_contact_or_nil(uuid)
+      if raw_contact then
+        local contact_table = transf.raw_contact.contact_table(raw_contact)
+        contact_table.uid = uuid
+        return contact_table
+      end
     end,
   },
   contact_table = {
@@ -3533,10 +3556,10 @@ transf = {
     end,
     window_or_nil_by_title = hs.window.get,
     in_cache_local_absolute_path = function(data, type)
-      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.str.not_whitespace_str_by_safe_filename(data)
+      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.str.leaflike_by_safe_filename(data)
     end,
     in_tmp_local_absolute_path = function(data, type) -- in contrast to the above method, we also ensure that it's unique by using a timestamp
-      return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.str.not_whitespace_str_by_safe_filename(data)
+      return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.str.leaflike_by_safe_filename(data)
     end,
     multiline_str_by_qr_utf8_image_bow = function(data)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.str.str_by_single_quoted_escaped(data))
@@ -3553,7 +3576,7 @@ transf = {
       return path
     end,
     --- does the minimum to make a str safe for use as a filename, but doesn't impose any policy
-    not_whitespace_str_by_safe_filename  = function(filename)
+    leaflike_by_safe_filename  = function(filename)
       -- Replace forward slash ("/") with underscore
       filename = get.str.str_and_int_by_replaced_eutf8_w_regex_str(filename, "/", "_")
 
@@ -4075,6 +4098,14 @@ transf = {
       end
     end
   },
+  plaintext_assoc_file_arr ={
+    not_userdata_or_fn_arr = function(arr)
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        transf.plaintext_assoc_file.not_userdata_or_fn
+      )
+    end
+  },
   decoded_email_header_line = {
     two_lines_by_split = function(str)
       return get.str.n_strs_by_extracted_eutf8(str, "^([^:]+):%s*(.+)$")
@@ -4107,26 +4138,6 @@ transf = {
     str_by_decode_to_utf8 = basexx.from_crockford,
   },
   event_table = {
-    yaml_str_by_calendar_template = function(event_table)
-      local template = transf["nil"].calendar_template_table_by_empty()
-      for key, value in transf.table.stateless_key_value_iter(event_table) do
-        if template[key] then
-          if key == "repeat" then
-            for subkey, subvalue in transf.table.stateless_key_value_iter(value) do
-              template[key][subkey].value = subvalue
-            end
-          else
-            template[key].value = value
-          end
-        end
-      end
-      if template.alarms.value then 
-        template.alarms.value = get.str_or_number_arr.str_by_joined(template.alarms.value, ",")
-      end
-      --- in refactoring, the key order maintaining mechanism was removed. I'm not sure how my current aligment mechanism handles key order, so for now I'm just gonna leave it as is, but if it turns out that it's not working, I'll have to add it back in.
-      return transf.table.yaml_str_by_aligned(template)
-
-    end,
     str_by_event_tagline = function(event_table)
       local str = event_table.start
       if event_table["end"] then
@@ -4222,7 +4233,7 @@ transf = {
     record_str_arr = function(str)
       return get.str.str_arr_by_split_noempty(
         str,
-        fixedstr.unique_record_separator
+        consts.unique_record_separator
       )
     end,
     event_table_arr = function(str)
@@ -4234,7 +4245,7 @@ transf = {
   },
   record_str = {
     event_table = function(str)
-      local components = get.str.str_arr_by_split_w_str(str, fixedstr.unique_field_separator)
+      local components = get.str.str_arr_by_split_w_str(str, consts.unique_field_separator)
       local parsed = {}
       for i, component in transf.arr.pos_int_vt_stateless_iter(components) do
         local key = ls.khal.parseable_format_components[i]
@@ -4452,7 +4463,7 @@ transf = {
     end,
     path_by_joined = function(arr)
       return get.str_or_number_arr.str_by_joined(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.not_whitespace_str_by_safe_filename), 
+        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.leaflike_by_safe_filename), 
         "/"
       )
     end,
@@ -4843,7 +4854,7 @@ transf = {
     end,
     
     ics_str = function(t)
-      local tmpdir_ics_path = transf.not_userdata_or_fn.in_tmp_dir(t) .. ".ics"
+      local tmpdir_ics_path = transf.not_userdata_or_fn.in_tmp_local_absolute_path(t) .. ".ics"
       dothis.table.write_ics_file(t, tmpdir_ics_path)
       local contents = transf.file.str_by_contents(tmpdir_ics_path)
       dothis.absolute_path.delete(tmpdir_ics_path)
@@ -5633,7 +5644,7 @@ transf = {
       )
     end,
     contact_table_by_client = function(dir)
-      return transf.uuid.contact_table(
+      return transf.uuid.contact_table_or_nil(
         transf.client_project_dir.contact_uuid_by_client(dir)
       )
     end,
@@ -5913,7 +5924,7 @@ transf = {
       return filtered
     end,
     icon_hs_image = function(app)
-      return transf.bundle_id.icon_hs_image(
+      return transf.bundle_id.hs_image_by_icon(
         transf.running_application.bundle_id(app)
       )
     end
@@ -5922,18 +5933,18 @@ transf = {
     running_application = function(window)
       return window:application()
     end,
-    title = function(window)
+    line_by_title = function(window)
       return window:title()
     end,
-    filtered_title = function(window)
-      return transf.window.title(window):gsub(" - " .. transf.window.mac_application_name(window), "")
+    line_by_filtered_title = function(window)
+      return transf.window.line_by_title(window):gsub(" - " .. transf.window.mac_application_name(window), "")
     end,
     mac_application_name = function(window)
       return transf.running_application.mac_application_name(
         transf.window.running_application(window)
       )
     end,
-    screenshot_hs_image = function(window)
+    hs_image_by_screenshot = function(window)
       return window:snapshot()
     end,
     ax_uielement = function(window)
@@ -5942,47 +5953,47 @@ transf = {
     hs_geometry_rect = function(window)
       return window:frame()
     end,
-    hs_geometry_point_tl = function(window)
+    hs_geometry_point_by_tl = function(window)
       return window:topLeft()
     end,
-    hs_geometry_point_tr = function(window)
+    hs_geometry_point_by_tr = function(window)
       local rect = transf.window.hs_geometry_rect(window)
       rect.x = rect.x + rect.w -- move by width
       return rect.topleft -- new top left is old top right
     end,
-    hs_geometry_point_bl = function(window)
+    hs_geometry_point_by_bl = function(window)
       local rect = transf.window.hs_geometry_rect(window)
       rect.y = rect.y + rect.h -- move by height
       return rect.topleft -- new top left is old bottom left
     end,
-    hs_geometry_point_br = function(window)
+    hs_geometry_point_by_br = function(window)
       return transf.window.hs_geometry_rect(window).bottomright
     end,
     hs_geometry_size = function(window)
       return window:size()
     end,
-    hs_geometry_point_relative_center = function(window)
+    hs_geometry_point_by_relative_center = function(window)
       return transf.window.hs_geometry_size(window).center
     end,
-    hs_geometry_point_c = function(window)
+    hs_geometry_point_by_c = function(window)
       return transf.window.hs_geometry_rect(window).center
     end,
-    summary = function(window)
+    line_by_summary = function(window)
       return get.str.str_by_formatted_w_n_anys(
         "%s (%s)",
-        transf.window.title(window),
+        transf.window.line_by_title(window),
         transf.window.mac_application_name(window)
       )
     end,
     hs_screen = function(window)
       return window:screen()
     end,
-    app_icon_hs_image = function(window)
+    hs_image_by_app_icon = function(window)
       return transf.running_application.icon_hs_image(
         transf.window.running_application(window)
       )
     end,
-    native_window_index = function(window)
+    pos_int_by_native_window_index = function(window)
       local running_application = transf.window.running_application(window)
       local window_arr = transf.running_application.window_arr(running_application)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(
@@ -5992,18 +6003,18 @@ transf = {
         end
       )
     end,
-    jxa_window_index = function(window)
-      return get.str.evaled_js_osa(
+    pos_int_by_jxa_window_index = function(window)
+      return get.str.any_by_evaled_js_osa(
         "Application('" .. transf.window.mac_application_name(window) .. "')" ..
           ".windows().findIndex(" ..
-            "window => window.title() == '" .. transf.window.filtered_title(window) .. "'" ..
+            "window => window.title() == '" .. transf.window.line_by_filtered_title(window) .. "'" ..
           ")"
       )
     end,
     jxa_window_specifier = function(window)
       return {
         application_name = transf.window.mac_application_name(window),
-        window_index = transf.window.jxa_window_index(window)
+        window_index = transf.window.pos_int_by_jxa_window_index(window)
       }
     end,
   },
@@ -6012,25 +6023,36 @@ transf = {
       return window_filter:getWindows()
     end,
   },
-  jxa_window_specifier = {
-    title = function(window_spec)
-      return get.jxa_window_specifier.property(window_spec, "title")
+  jxa_windowlike_specifier = {
+    line_by_title = function(window_spec)
+      return get.jxa_windowlike_specifier.property(window_spec, "title")
     end,
     window = function(window_spec)
       return get.running_application.window_by_title(
-        transf.jxa_window_specifier.title(window_spec) .. " - " .. 
+        transf.jxa_windowlike_specifier.line_by_title(window_spec) .. " - " .. 
         window_spec.application_name
       )
     end,
-    filtered_title = function(window_spec)
-      return transf.window.filtered_title(
-        transf.jxa_window_specifier.window(window_spec)
+    line_by_filtered_title = function(window_spec)
+      return transf.window.line_by_filtered_title(
+        transf.jxa_windowlike_specifier.window(window_spec)
       )
     end,
+    mac_application_name = function(tab_spec)
+      return tab_spec.application_name
+    end,
+    running_application = function(tab_spec)
+      return transf.mac_application_name.running_application_or_nil(
+        tab_spec.application_name
+      )
+    end,
+    pos_int_by_window_index = function(tab_spec)
+      return tab_spec.window_index
+    end,
   },
-  tabbable_jxa_window_specifier = {
-    amount_of_tabs = function(window_spec)
-      return get.str.evaled_js_osa( 
+  tabbable_jxa_windowlike_specifier = {
+    pos_int_by_amount_of_tabs = function(window_spec)
+      return get.str.any_by_evaled_js_osa( 
         "Application('" .. window_spec.application_name .. "')" ..
           ".windows().[" ..
             window_spec.window_index ..
@@ -6039,7 +6061,7 @@ transf = {
     end,
     jxa_tab_specifier_arr = function(window_spec)
       local tab_spec_arr = {}
-      for i = 0, transf.tabbable_jxa_window_specifier.amount_of_tabs(window_spec) - 1 do
+      for i = 0, transf.tabbable_jxa_windowlike_specifier.pos_int_by_amount_of_tabs(window_spec) - 1 do
         dothis.arr.insert_at_index(tab_spec_arr, {
           application_name = window_spec.application_name,
           window_index = window_spec.window_index,
@@ -6048,47 +6070,36 @@ transf = {
       end
       return tab_spec_arr
     end,
-    active_tab_index = function(window_spec)
-      return get.str.evaled_js_osa( 
+    pos_int_by_active_tab_index = function(window_spec)
+      return get.str.any_by_evaled_js_osa( 
         "Application('" .. window_spec.application_name .. "')" ..
           ".windows().[" ..
             window_spec.window_index ..
           "].activeTabIndex()"
       )
     end,
-    active_jxa_tab_specifier = function(window_spec)
-      return get.jxa_window_specifier.jxa_tab_specifier(
+    jxa_tab_specifier_by_active = function(window_spec)
+      return get.jxa_windowlike_specifier.jxa_tab_specifier(
         window_spec,
-        transf.tabbable_jxa_window_specifier.active_tab_index(window_spec)
+        transf.tabbable_jxa_windowlike_specifier.pos_int_by_active_tab_index(window_spec)
       )
     end,
   },
   browser_tabbable_jxa_window_specifier = {
     url = function(window_spec)
       return transf.browser_jxa_tab_specifier.url(
-        transf.tabbable_jxa_window_specifier.active_jxa_tab_specifier(window_spec)
+        transf.tabbable_jxa_windowlike_specifier.jxa_tab_specifier_by_active(window_spec)
       )
     end
   },
   jxa_tab_specifier = {
-    application_name = function(tab_spec)
-      return tab_spec.application_name
-    end,
-    running_application = function(tab_spec)
-      return transf.mac_application_name.running_application(
-        tab_spec.application_name
-      )
-    end,
-    window_index = function(tab_spec)
-      return tab_spec.window_index
-    end,
-    tab_index = function(tab_spec)
+    pos_int_by_tab_index = function(tab_spec)
       return tab_spec.tab_index
     end,
-    title = function(tab_spec)
+    line_by_title = function(tab_spec)
       return get.jxa_tab_specifier.property(tab_spec, "title")
     end,
-    jxa_window_specifier = function(tab_spec)
+    tabbable_jxa_window_specifier = function(tab_spec)
       return {
         application_name = tab_spec.application_name,
         window_index = tab_spec.window_index
@@ -6101,63 +6112,40 @@ transf = {
     end,
   },
   bundle_id = {
-    icon_hs_image = function(bundle_id)
+    hs_image_by_icon = function(bundle_id)
       return hs.image.imageFromAppBundle(bundle_id)
     end,
   },
-  dotapp_path = {
-    mac_application_name = function(dotapp_path)
-      return transf.path.leaflike_by_filename(dotapp_path)
-    end
-  },
-  jxa_browser_tabbable_running_application = {
-    url = function(app)
-      return transf.browser_tabbable_jxa_window_specifier.url(
-        transf.running_application.focused_window_jxa_window_specifier(app)
-      )
-    end,
-  },
   mac_application_name = {
-    application_support_dir_path = function(app_name)
+    local_absolute_path_by_application_support_dir = function(app_name)
       return env.MAC_APPLICATION_SUPPORT .. "/" .. app_name
     end,
-    app_dir = function(app_name)
+    installed_app_dir = function(app_name)
       return "/Applications/" .. app_name .. ".app"
     end,
-    running_application = function(app_name)
+    running_application_or_nil = function(app_name)
       return hs.application.get(app_name)
     end,
     bool_by_running_application = function(app_name)
-      return transf.mac_application_name.running_application(app_name) ~= nil
+      return transf.mac_application_name.running_application_or_nil(app_name) ~= nil
     end,
-    ensure_running_application = function(app_name)
-      local app = transf.mac_application_name.running_application(app_name)
+    running_application_by_ensure = function(app_name)
+      local app = transf.mac_application_name.running_application_or_nil(app_name)
       if app == nil then
         return hs.application.open(app_name, 5)
       end
       return app
     end,
     menu_item_table_arr = function(app_name)
-      return transf.running_application.menu_item_table_arr(transf.mac_application_name.running_application(app_name))
+      return transf.running_application.menu_item_table_arr(transf.mac_application_name.running_application_or_nil(app_name))
     end,
     
-  },
-  chat_mac_application_name = {
-    chat_storage_dir = function(app_name)
-      return env.MCHATS .. "/" .. transf.str.str_by_all_eutf8_lower(app_name)
-    end,
-    chat_media_dir = function(app_name)
-      return transf.chat_mac_application_name.chat_storage_dir(app_name) .. "/media"
-    end,
-    chat_chats_dir = function(app_name)
-      return transf.chat_mac_application_name.chat_storage_dir(app_name) .. "/chats"
-    end,
   },
   bib_str = {
     csl_table_arr = function(str)
       return transf.str.table_or_err_by_evaled_env_bash_parsed_json("pandoc -f biblatex -t csljson" .. transf.str.here_doc(str))
     end,
-    urls = function(str)
+    url_arr = function(str)
       return transf.csl_table_arr.url_arr(
         transf.bib_str.csl_table_arr(str)
       )
@@ -6189,7 +6177,7 @@ transf = {
       )
     end,
     url_arr = function(csl_table_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(csl_table_arr, transf.csl_table.url)
+      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(csl_table_arr, transf.csl_table.url_or_nil)
     end,
 
   },
@@ -6198,12 +6186,12 @@ transf = {
       if is.any.arr(csl_table_or_csl_table_arr) then
         return transf.csl_table_arr.url_arr(csl_table_or_csl_table_arr)
       else
-        return {transf.csl_table.url(csl_table_or_csl_table_arr)}
+        return {transf.csl_table.url_or_nil(csl_table_or_csl_table_arr)}
       end
     end,
   },
   csl_table = {
-    main_title = function(csl_table)
+    str_or_nil_by_main_title = function(csl_table)
       return get.assoc.vt_by_first_match_w_kv_arr(csl_table, ls.csl_title_keys)
     end,
     dtprts__arr_arr_by_issued = function(csl_table)
@@ -6235,7 +6223,7 @@ transf = {
     csl_person_arr_by_author = function(csl_table)
       return csl_table.author
     end,
-    naive_author_summary = function(csl_table)
+    line_by_naive_author_summary = function(csl_table)
       return get.str_or_number_arr.str_by_joined(
         get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           transf.csl_table.csl_person_arr_by_author(csl_table),
@@ -6244,37 +6232,37 @@ transf = {
         ", "
       )
     end,
-    author_last_name_arr = function(csl_table)
+    line_arr_by_author_family = function(csl_table)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.csl_table.csl_person_arr_by_author(csl_table),
         transf.csl_person.line_or_nil_by_family
       )
     end,
-    authors_et_al_arr = function(csl_table)
+    line_arr_by_author_family_et_al = function(csl_table)
       return get.arr.arr_by_slice_removed_indicator_and_flatten_w_slice_spec(
-        transf.csl_table.author_last_name_arr(csl_table),
+        transf.csl_table.line_arr_by_author_family(csl_table),
         { stop = 5 },
         "et_al"
       )
     end,
-    authors_et_al_str = function(csl_table)
+    line_by_author_family_et_al = function(csl_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.csl_table.authors_et_al_arr(csl_table),
+        transf.csl_table.line_arr_by_author_family_et_al(csl_table),
         ", "
       )
     end,
-    main_title_filenamized = function(csl_table)
-      return transf.str.upper_camel_strict_snake_case(
-        transf.csl_table.main_title(csl_table)
+    lower_strict_snake_case_by_main_title_filenamized = function(csl_table)
+      return transf.str.lower_strict_snake_case(
+        transf.csl_table.str_or_nil_by_main_title(csl_table) or "Untitled work"
       )
     end,
-    filename = function(csl_table)
+    leaflike_by_filename = function(csl_table)
       return get.str.str_by_sub_lua(
         get.str_or_number_arr.str_by_joined(
           {
-            transf.csl_table.authors_et_al_str(csl_table),
+            transf.csl_table.line_by_author_family_et_al(csl_table),
             get.csl_table.pos_int_by_key_year_force_first(csl_table, "issued"),
-            transf.csl_table.main_title_filenamized(csl_table)
+            transf.csl_table.lower_strict_snake_case_by_main_title_filenamized(csl_table)
           },
           "__"
         ),
@@ -6282,40 +6270,40 @@ transf = {
         200 -- max filename length, with some space for other stuff
       )
     end,
-    volume = function(csl_table)
+    digit_str_or_nil_by_volume = function(csl_table)
       return csl_table.volume
     end,
-    indicated_volume_str = function(csl_table)
-      local volume = transf.csl_table.volume(csl_table)
+    printable_ascii_no_nonspace_whitespace_str_or_nil_by_indicated_volume = function(csl_table)
+      local volume = transf.csl_table.digit_str_or_nil_by_volume(csl_table)
       if volume then
         return "vol. " .. volume
       end
     end,
-    jssue = function(csl_table)
+    digit_str_or_nil_by_issue = function(csl_table)
       return csl_table.issue
     end,
-    indicated_issue_str = function(csl_table)
+    printable_ascii_no_nonspace_whitespace_str_or_nil_by_indicated_issue = function(csl_table)
       local issue = transf.csl_table.issue(csl_table)
       if issue then
         return "no. " .. issue
       end
     end,
-    page = function(csl_table)
+    digit_str_or_digit_interval_str_or_nil_by_page = function(csl_table)
       return csl_table.page
     end,
-    int_interval_speciier_by_page = function(csl_table)
+    int_interval_specifier_by_page = function(csl_table)
       return transf.digit_str_or_digit_interval_str.int_interval_specifier(
-        transf.csl_table.page(csl_table)
+        transf.csl_table.digit_str_or_digit_interval_str_or_nil_by_page(csl_table)
       )
     end,
     int_sequence_specifier_by_page = function(csl_table)
       return get.interval_specifier.sequence_specifier(
-        transf.csl_table.int_interval_speciier_by_page(csl_table),
+        transf.csl_table.int_interval_specifier_by_page(csl_table),
         1 -- afaik there is never a case where pages don't increase by 1 (there is no notation that says 'every other page', for example)
       )
     end,
     indicated_page_str = function(csl_table)
-      local page = transf.csl_table.page(csl_table)
+      local page = transf.csl_table.digit_str_or_digit_interval_str_or_nil_by_page(csl_table)
       if page then
         if get.str.bool_by_contains_w_ascii_str(page, "-") then
           return "pp. " .. page
@@ -6327,38 +6315,38 @@ transf = {
     str_by_title = function(csl_table)
       return csl_table.title
     end,
-    type = function(csl_table)
+    csl_type = function(csl_table)
       return csl_table.type
     end,
-    doi = function(csl_table)
+    doi_or_nil = function(csl_table)
       return csl_table.doi
     end,
-    indicated_doi = function(csl_table)
-      local doi = transf.csl_table.doi(csl_table)
+    indicated_doi_or_nil = function(csl_table)
+      local doi = transf.csl_table.doi_or_nil(csl_table)
       if doi then
         return "doi:" .. doi
       end
     end,
-    isbn = function(csl_table)
+    isbn_or_nil = function(csl_table)
       return csl_table.isbn
     end,
-    indicated_isbn = function(csl_table)
-      local isbn = transf.csl_table.isbn(csl_table)
+    indicated_isbn_or_nil = function(csl_table)
+      local isbn = transf.csl_table.isbn_or_nil(csl_table)
       if isbn then
         return "isbn:" .. isbn
       end
     end,
-    chapter = function(csl_table)
+    digit_str_or_nil_by_chapter = function(csl_table)
       return csl_table.chapter
     end,
-    publisher = function(csl_table)
-      return csl_table.publisher
+    line_by_publisher = function(csl_table)
+      return transf.str_or_nil.line_or_nil_by_folded(csl_table.publisher)
     end,
-    publisher_place = function(csl_table)
-      return csl_table["publisher-place"]
+    line_by_publisher_place = function(csl_table)
+      return transf.str_or_nil.line_or_nil_by_folded(csl_table["publisher-place"])
     end,
     isbn_part_identifier = function(csl_table)
-      local isbn_part_identifier = transf.csl_table.isbn(csl_table)
+      local isbn_part_identifier = transf.csl_table.isbn_or_nil(csl_table)
       if csl_table.chapter then
         isbn_part_identifier = isbn_part_identifier .. "::c=" .. csl_table.chapter
       elseif csl_table.page then
@@ -6374,93 +6362,96 @@ transf = {
         return "isbn_part:" .. isbn_part_identifier
       end
     end,
-    issn = function(csl_table)
+    issn_or_nil = function(csl_table)
       return csl_table.ISSN
     end,
-    issn_full_identifier = function(csl_table)
-      local issn_full_identifier = transf.csl_table.issn(csl_table)
+    issn_full_identifier_or_nil = function(csl_table)
+      local issn_full_identifier = transf.csl_table.issn_or_nil(csl_table)
       if csl_table.volumen and csl_table.issue then
         return issn_full_identifier .. "::" .. csl_table.volume .. "::" .. csl_table.issue
       else
         return nil
       end
     end,
-    indicated_issn_full = function(csl_table)
-      local issn_full_identifier = transf.csl_table.issn_full_identifier(csl_table)
+    indicated_issn_full_or_nil = function(csl_table)
+      local issn_full_identifier = transf.csl_table.issn_full_identifier_or_nil(csl_table)
       if issn_full_identifier then
         return "issn_full:" .. issn_full_identifier
       end
     end,
-    pmid = function(csl_table)
+    urlcharset_str_or_nil_by_pmid = function(csl_table)
       return csl_table.pmid
     end,
-    indicated_pmid = function(csl_table)
-      local pmid = transf.csl_table.pmid(csl_table)
+    indicated_pmid_or_nil = function(csl_table)
+      local pmid = transf.csl_table.urlcharset_str_or_nil_by_pmid(csl_table)
       if pmid then
         return "pmid:" .. pmid
       end
     end,
-    pmcid = function(csl_table)
+    urlcharset_str_or_nil_by_pmcid = function(csl_table)
       return csl_table.pmcid
     end,
-    indicated_pmcid = function(csl_table)
-      local pmcid = transf.csl_table.pmcid(csl_table)
+    indicated_pmcid_or_nil = function(csl_table)
+      local pmcid = transf.csl_table.urlcharset_str_or_nil_by_pmcid(csl_table)
       if pmcid then
         return "pmcid:" .. pmcid
       end
     end,
-    url = function(csl_table)
+    url_or_nil = function(csl_table)
       return csl_table.URL
     end,
-    urlmd5 = function(csl_table)
-      return transf.not_userdata_or_fn.hex_str_by_md5(transf.csl_table.url(csl_table))
+    hex_str_or_nil_by_urlmd5 = function(csl_table)
+      local url = transf.csl_table.url_or_nil(csl_table)
+      if url then
+        return transf.not_userdata_or_fn.hex_str_by_md5(url)
+      end
     end,
-    indicated_urlmd5 = function(csl_table)
-      local urlmd5 = transf.csl_table.urlmd5(csl_table)
+    indicated_urlmd5_or_nil = function(csl_table)
+      local urlmd5 = transf.csl_table.hex_str_or_nil_by_urlmd5(csl_table)
       if urlmd5 then
         return "urlmd5:" .. urlmd5
       end
     end,
-    accession = function(csl_table)
+    urlcharset_str_or_nil_by_accession = function(csl_table)
       return csl_table.accession
     end,
-    indicated_accession = function(csl_table)
-      local accession = transf.csl_table.accession(csl_table)
+    indicated_accession_or_nil = function(csl_table)
+      local accession = transf.csl_table.urlcharset_str_or_nil_by_accession(csl_table)
       if accession then
         return "accession:" .. accession
       end
     end,
     indicated_citable_object_id = function(csl_table)
       if csl_table.doi then
-        return transf.csl_table.indicated_doi(csl_table)
+        return transf.csl_table.indicated_doi_or_nil(csl_table)
       elseif csl_table.isbn and is.csl_table.whole_book_csl_table(csl_table) then
-        return transf.csl_table.indicated_isbn(csl_table)
+        return transf.csl_table.indicated_isbn_or_nil(csl_table)
       elseif csl_table.isbn and not is.csl_table.whole_book_csl_table(csl_table) then
         return transf.csl_table.indicated_isbn_part(csl_table)
       elseif csl_table.pmid then
-        return transf.csl_table.indicated_pmid(csl_table)
+        return transf.csl_table.indicated_pmid_or_nil(csl_table)
       elseif csl_table.pmcid then
-        return transf.csl_table.indicated_pmcid(csl_table)
+        return transf.csl_table.indicated_pmcid_or_nil(csl_table)
       elseif csl_table.accession then
-        return transf.csl_table.indicated_accession(csl_table)
-      elseif transf.csl_table.issn_full_identifier(csl_table) then
-        return transf.csl_table.indicated_issn_full(csl_table)
+        return transf.csl_table.indicated_accession_or_nil(csl_table)
+      elseif transf.csl_table.issn_full_identifier_or_nil(csl_table) then
+        return transf.csl_table.indicated_issn_full_or_nil(csl_table)
       elseif csl_table.url then
-        return transf.csl_table.indicated_urlmd5(csl_table)
+        return transf.csl_table.indicated_urlmd5_or_nil(csl_table)
       else
         return nil
       end
     end,
     noempty_noindent_hashcomment_line_by_for_citations_file = function(csl_table)
       return transf.csl_table.indicated_citable_object_id(csl_table) 
-      .. " # " .. transf.csl_table.apa_str(csl_table)
+      .. " # " .. transf.csl_table.str_by_apa_citation(csl_table)
     end,
     filename_safe_indicated_citable_object_id = function(csl_table)
       return transf.indicated_citable_object_id.filename_safe_indicated_citable_object_id(transf.csl_table.indicated_citable_object_id(csl_table))
     end,
     citable_filename = function(csl_table)
       return 
-        transf.csl_table.filename(csl_table) ..
+        transf.csl_table.leaflike_by_filename(csl_table) ..
         "!citid:" .. transf.csl_table.filename_safe_indicated_citable_object_id(csl_table)
     end,
     bib_str = function(csl_table)
@@ -6468,7 +6459,7 @@ transf = {
         "pandoc -f csljson -t biblatex" .. transf.str.here_doc(transf.not_userdata_or_fn.json_str(csl_table))
       )
     end,
-    apa_str = function(csl_table)
+    str_by_apa_citation = function(csl_table)
       return get.csl_table_or_csl_table_arr.str_by_raw_citation(csl_table, "apa-6th-edition")
     end,
   },
@@ -6580,12 +6571,28 @@ transf = {
     wayback_machine_url = function(url)
       return "https://web.archive.org/web/*/" .. url
     end,
-    default_negotiation_url_contents = function(url)
+    str_or_nil_by_default_negotiation_contents = function(url)
       return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
           "curl -L" .. transf.str.str_by_single_quoted_escaped(url)
     end,
-    in_cache_dir = function(url)
-      return transf.not_userdata_or_fn.in_cache_dir(transf.urllike_with_no_scheme.url_by_ensure_scheme(url), "url")
+    str_or_nil_by_default_negotiation_contents_safer = function(url)
+      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
+          "curl -Lf" .. transf.str.str_by_single_quoted_escaped(url)
+    end,
+    sgml_document_or_nil = function(url)
+      local raw = transf.url.str_or_nil_by_default_negotiation_contents_safer(url)
+      if is.str.sgml_document(raw) then
+        return raw
+      end
+    end,
+    str_or_nil_by_title = function(url)
+      return get.sgml_url.str_or_nil_by_query_selector_all(url, "title")
+    end,
+    str_or_nil_by_description = function(url)
+      return get.sgml_url.str_or_nil_by_query_selector_all(url, "meta[name=description]")
+    end,
+    in_cache_local_absolute_path = function(url)
+      return transf.not_userdata_or_fn.in_cache_local_absolute_path(transf.urllike_with_no_scheme.url_by_ensure_scheme(url), "url")
     end,
     url_table = function(url)
       return get.fn.rt_or_nil_by_memoized(
@@ -6596,7 +6603,7 @@ transf = {
         "url_parser_cli --json" .. transf.str.str_by_single_quoted_escaped(url)
       )
     end,
-    scheme = function(url)
+    url_scheme = function(url)
       return transf.url.url_table(url).scheme
     end,
     host = function(url)
@@ -6604,7 +6611,7 @@ transf = {
     end,
     domain_name_or_nil = function(url)
       local host = transf.url.host(url)
-      if is.printable_ascii_not_whitespace_str.domain_name(host) then
+      if is.urlcharset_str.domain_name(host) then
         return host
       end
     end,
@@ -6644,21 +6651,21 @@ transf = {
     query_str_or_nil = function(url)
       return transf.url.url_table(url).query
     end,
-    printable_ascii_or_nil_by_fragment = function(url)
+    urlcharset_str_or_nil_by_fragment = function(url)
       return transf.url.url_table(url).fragment
     end,
     digit_str_by_port = function(url)
       return transf.url.url_table(url).port
     end,
-    user = function(url)
+    urlcharset_str_or_nil_by_user = function(url)
       return transf.url.url_table(url).username
     end,
-    password = function(url)
+    urlcharset_str_or_nil_by_password = function(url)
       return transf.url.url_table(url).password
     end,
-    userinfo = function(url)
-      local user = transf.url.user(url)
-      local password = transf.url.password(url)
+    urlcharset_str_or_nil_by_userinfo = function(url)
+      local user = transf.url.urlcharset_str_or_nil_by_user(url)
+      local password = transf.url.urlcharset_str_or_nil_by_password(url)
       if user and password then
         return user .. ":" .. password
       elseif user then
@@ -6708,7 +6715,7 @@ transf = {
       })
     end,
     line_by_url_potentially_with_title_comment = function(url)
-      local title = transf.sgml_url.str_or_nil_by_title(url)
+      local title = transf.url.str_or_nil_by_sgml_title(url)
       if title and title ~= "" then
         return url .. " # " .. title
       else
@@ -6716,48 +6723,31 @@ transf = {
       end
     end,
     leaflike_by_title_or_url_as_filename = function(url)
-      local title = transf.sgml_url.str_or_nil_by_title(url)
+      local title = transf.url.str_or_nil_by_sgml_title(url)
       if title and title ~= "" then
-        return transf.str.not_whitespace_str_by_safe_filename(title) .. ".url2"
+        return transf.str.leaflike_by_safe_filename(title) .. ".url2"
       else
-        return transf.str.not_whitespace_str_by_safe_filename(url) .. ".url2"
+        return transf.str.leaflike_by_safe_filename(url) .. ".url2"
       end
     end,
 
   },
   path_url = {
-    initial_path_component = function(url)
+    path_component_by_initial = function(url)
       return transf.path.path_component_by_initial(transf.url.local_absolute_path_or_nil_by_path(url))
     end,
-    leaf = function(url)
+    leaflike_by_leaf = function(url)
       return transf.path.leaflike_by_leaf(transf.url.local_absolute_path_or_nil_by_path(url))
     end,
   },
-  sgml_url = {
-    sgml_str = function(url)
-      return transf.url.default_negotiation_url_contents(url)
-    end, -- ideally we would reject non-html responses, but currently, that's too much work
-    str_or_nil_by_title = function(url)
-      return get.sgml_url.str_or_nil_by_query_selector_all(url, "title")
-    end,
-    str_or_nil_by_description = function(url)
-      return get.sgml_url.str_or_nil_by_query_selector_all(url, "meta[name=description]")
-    end,
-    sgml_url_with_title_comment = function(url)
-      return url .. " # " .. transf.sgml_url.str_or_nil_by_title(url)
-    end
-  },
   owner_item_url = {
-    two_strs_arr = function(url)
+    two_strs__arr = function(url)
       return get.path.path_component_arr_by_slice_w_slice_spec(transf.url.local_absolute_path_or_nil_by_path(url), "1:2")
     end,
   },
-  github_url = {
-
-  },
   whisper_url = {
-    transcribed = function(url)
-      local path = transf.url.in_cache_dir(url)
+    str_by_transcribed = function(url)
+      local path = transf.url.in_cache_local_absolute_path(url)
       dothis.url.download_to(url, path)
       return transf.whisper_file.str_by_transcribed(path)
 
@@ -6774,8 +6764,8 @@ transf = {
     hs_image = function(url)
       return get.fn.rt_or_nil_by_memoized_invalidate_1_week(hs.image.imageFromURL, "hs.image.imageFromURL")(url)
     end,
-    qr_data = function(url)
-      local path = transf.url.in_cache_dir(url)
+    multiline_str_by_qr_data = function(url)
+      local path = transf.url.in_cache_local_absolute_path(url)
       dothis.url.download_to(url, path)
       return transf.local_image_file.multiline_str_by_qr_data(path)
     end,
@@ -6788,25 +6778,25 @@ transf = {
     
   },
   gelbooru_style_post_url = {
-    nonindicated_number_str_by_booru_post_id = function(url)
+    digit_str_by_booru_post_id = function(url)
       return transf.url.str_key_str_value_assoc_by_decoded_param_table(url).id
     end,
     pos_int_by_booru_post_id = function(url)
-      return transf.nonindicated_number_str.number_by_base_10(transf.gelbooru_style_post_url.nonindicated_number_str_by_booru_post_id(url))
+      return transf.nonindicated_number_str.number_by_base_10(transf.gelbooru_style_post_url.digit_str_by_booru_post_id(url))
     end,
   },
   yandere_style_post_url = {
-    nonindicated_number_str_by_booru_post_id = function(url)
+    digit_str_by_booru_post_id = function(url)
       return get.str.n_strs_by_extracted_eutf8(transf.url.local_absolute_path_or_nil_by_path(url), "/post/show/(%d+)")
     end
   },
   danbooru_style_post_url = {
-    nonindicated_number_str_by_booru_post_id = function(url)
+    digit_str_by_booru_post_id = function(url)
       return get.str.n_strs_by_extracted_eutf8(transf.url.local_absolute_path_or_nil_by_path(url), "/posts/(%d+)")
     end
   },
   gpt_response_table = {
-    response_text = function(result)
+    str_by_response = function(result)
       local first_choice = result.choices[1]
       local response = first_choice.text or first_choice.message.content
       return transf.str.not_starting_o_ending_with_whitespace_str(response)
@@ -6829,13 +6819,13 @@ transf = {
       md5:update(thing)
       return transf.str.base32_crock_str_by_utf8(md5:digest())
     end,
-    in_cache_dir = function(data, type)
+    in_cache_local_absolute_path = function(data, type)
       return transf.str.in_cache_local_absolute_path(
         transf.not_userdata_or_fn.hex_str_by_md5(data),
         type
       )
     end,
-    in_tmp_dir = function(data, type)
+    in_tmp_local_absolute_path = function(data, type)
       return transf.str.in_tmp_local_absolute_path(
         transf.not_userdata_or_fn.hex_str_by_md5(data),
         type
@@ -6900,38 +6890,38 @@ transf = {
     bool = function(any)
       return not not any
     end,
-    n_anys_if_table = function(any)
+    n_anys_by_unpack_if_arr = function(any)
       if is.any.table(any) then
         return transf.arr.n_anys(any)
       else
         return any
       end
     end,
-    applicable_thing_name_hierarchy = function(any)
-      return get.any.applicable_thing_name_hierarchy(any)
+    assoc_by_applicable_thing_name_hierarchy = function(any)
+      return get.any.assoc_by_applicable_thing_name_hierarchy(any)
     end,
-    applicable_thing_name_arr = function(any)
-      return transf.thing_name_hierarchy.thing_name_arr(transf.any.applicable_thing_name_hierarchy(any))
+    thing_name_arr_by_applicable = function(any)
+      return transf.thing_name_hierarchy.thing_name_arr(transf.any.assoc_by_applicable_thing_name_hierarchy(any))
     end,
-    applicable_action_specifier_arr = function(any)
-      return transf.thing_name_arr.action_specifier_arr(transf.any.applicable_thing_name_arr(any))
+    action_specifier_arr_by_applicable = function(any)
+      return transf.thing_name_arr.action_specifier_arr(transf.any.thing_name_arr_by_applicable(any))
     end,
-    applicable_action_chooser_item_specifier_arr = function(any)
-      return transf.action_specifier_arr.action_chooser_item_specifier_arr(transf.any.applicable_action_specifier_arr(any))
+    chooser_item_specifier_arr_by_applicable_for_action = function(any)
+      return transf.action_specifier_arr.chooser_item_specifier_arr(transf.any.action_specifier_arr_by_applicable(any))
     end,
-    applicable_action_with_index_chooser_item_specifier_arr = function(any)
-      return transf.assoc_arr.has_index_key_table_arr(transf.any.applicable_action_chooser_item_specifier_arr(any))
+    index_chooser_item_specifier_arr_by_applicable_for_action = function(any)
+      return transf.assoc_arr.has_index_key_table_arr(transf.any.chooser_item_specifier_arr_by_applicable_for_action(any))
     end,
-    placeholder_text = function(any)
+    str_by_placeholder_text = function(any)
       return "Choose action on: " .. (
-        get.thing_name_arr.placeholder_text(transf.any.applicable_thing_name_arr(any), any) or
-        get.thing_name_arr.chooser_text(transf.any.applicable_thing_name_arr(any), any)
+        get.thing_name_arr.str_or_nil_by_placeholder_text(transf.any.thing_name_arr_by_applicable(any), any) or
+        get.thing_name_arr.str_or_nil_by_chooser_text(transf.any.thing_name_arr_by_applicable(any), any)
       )
     end,
     hschooser_specifier = function(any)
       return {
-        chooser_item_specifier_arr = transf.any.applicable_action_with_index_chooser_item_specifier_arr(any),
-        placeholder_text = transf.any.placeholder_text(any),
+        chooser_item_specifier_arr = transf.any.index_chooser_item_specifier_arr_by_applicable_for_action(any),
+        placeholder_text = transf.any.str_by_placeholder_text(any),
       }
     end,
     choosing_hschooser_specifier = function(any)
@@ -6940,15 +6930,15 @@ transf = {
     any_and_applicable_thing_name_arr_specifier = function(any)
       return {
         any = any,
-        applicable_thing_name_arr = transf.any.applicable_thing_name_arr(any)
+        applicable_thing_name_arr = transf.any.thing_name_arr_by_applicable(any)
       }
     end,
-    item_chooser_item_specifier = function(any)
-      local applicable_thing_name_arr = transf.any.applicable_thing_name_arr(any)
+    chooser_item_specifier = function(any)
+      local applicable_thing_name_arr = transf.any.thing_name_arr_by_applicable(any)
       return {
-        text = transf.str.styledtext_by_with_styled_start_end_markers(get.thing_name_arr.chooser_text(applicable_thing_name_arr, any)),
-        subText = get.thing_name_arr.chooser_subtext(applicable_thing_name_arr, any),
-        image = get.thing_name_arr.chooser_image(applicable_thing_name_arr, any),
+        text = transf.str.styledtext_by_with_styled_start_end_markers(get.thing_name_arr.str_or_nil_by_chooser_text(applicable_thing_name_arr, any)),
+        subText = get.thing_name_arr.str_or_nil_by_chooser_subtext(applicable_thing_name_arr, any),
+        image = get.thing_name_arr.hs_image_or_nil_by_chooser_image(applicable_thing_name_arr, any),
       }
     end,
     t_by_with_1_added_if_number = function(any)
@@ -6969,8 +6959,8 @@ transf = {
       return {any}
     end
   },
-  item_chooser_item_specifier = {
-    truncated_text_item_chooser_item_specifier = function(item_chooser_item_specifier)
+  chooser_item_specifier = {
+    chooser_item_specifier_by_truncated_text = function(item_chooser_item_specifier)
       local copied_spec = get.table.table_by_copy(item_chooser_item_specifier)
       local rawstr =  transf.styledtext.str(
         copied_spec.text
@@ -6989,6 +6979,9 @@ transf = {
     end,
     int_by_amount = function(...)
       return select("#", ...)
+    end,
+    nt2 = function(...)
+      return select(2, ...)
     end,
   },
   str_and_n_anys = {
@@ -7176,24 +7169,19 @@ transf = {
       return audiodevice:name()
     end,
   },
-  env_var_name_env_node_assoc = {
-    envlike_str = function(env_var_name_env_node_assoc)
+  snake_case_key_detailed_env_node_or_str_value_assoc = {
+    envlike_str = function(snake_case_key_detailed_env_node_or_str_value_assoc)
       return transf.snake_case_key_str_value_assoc.envlike_str(
-        get.env_var_name_env_node_assoc.snake_case_key_str_value_assoc(env_var_name_env_node_assoc)
+        get.snake_case_key_detailed_env_node_or_str_value_assoc.snake_case_key_str_value_assoc(snake_case_key_detailed_env_node_or_str_value_assoc)
       )
     end
 
   },
-  env_yaml_file_container = {
-    envlike_str = function(env_yaml_file_container)
-      local files = transf.extant_path.file_arr_by_descendants(env_yaml_file_container)
-      local yaml_files = get.path_arr.path_arr_by_filter_to_same_extension(files, "yaml")
-      local env_var_name_env_node_assoc_arr = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
-        yaml_files,
-        transf.yaml_file.not_userdata_or_fn
-      )
-      local env_var_name_env_node_assoc = transf.table_arr.table_by_take_new(env_var_name_env_node_assoc_arr)
-      return transf.env_var_name_env_node_assoc.envlike_str(env_var_name_env_node_assoc)
+  in_menv_absolute_path = {
+    envlike_str = function(in_menv_absolute_path)
+      local snake_case_key_detailed_env_node_or_str_value_assoc_arr = transf.extant_path.not_userdata_or_fn_arr_by_descendants(in_menv_absolute_path)
+      local snake_case_key_detailed_env_node_or_str_value_assoc = transf.table_arr.table_by_take_new(snake_case_key_detailed_env_node_or_str_value_assoc_arr)
+      return transf.snake_case_key_detailed_env_node_or_str_value_assoc.envlike_str(snake_case_key_detailed_env_node_or_str_value_assoc)
     end,
   },
   country_identifier_str = {
@@ -7261,10 +7249,7 @@ transf = {
     one = function()
       return 1
     end,
-    second_arg_ret_fn = function()
-      return get["nil"].nth_arg_ret_fn(nil, 2)
-    end,
-    poisonable = function()
+    n_anys_arg_n_anys_or_error_ret_fn_by_poisonable = function()
       local dirty = false
       local returnfn
       returnfn = function(...)
@@ -7272,7 +7257,7 @@ transf = {
           error("poisoned " .. transf.any.str(returnfn))
         end
         dirty = true
-        return {...}
+        return ...
       end
       return returnfn
     end,
@@ -7294,19 +7279,11 @@ transf = {
 
       return getIdentifier
     end,
-    random_bool = function()
+    bool_by_random = function()
       return math.random() < 0.5
     end,
-    all_applications = function()
-      return transf.dir.leaflike_arr_by_children_filenames("/Applications")
-    end,
-    sox_is_recording = function()
+    bool_by_sox_is_recording = function()
       return transf.str.bool_by_evaled_env_bash_success("pgrep -x rec")
-    end,
-    pandoc_full_md_extension_set = function()
-      return transf.arr_value_assoc.t_arr_by_flatten(
-        ls.markdown_extensions
-      )
     end,
     passw_pass_item_name_arr = function()
       return transf.dir.leaflike_arr_by_children_filenames(env.MPASSPASSW)
@@ -7327,7 +7304,7 @@ transf = {
     rfc3339like_ymd_by_current = function()
       return transf.timestamp_s.rfc3339like_ymd(transf["nil"].timestamp_s_by_current())
     end,
-    timestamp_s_last_midnight = function()
+    timestamp_s_by_last_midnight = function()
       return 
         get.full_dcmp_spec.timestamp_s_by_precision_w_dcmp_name(
           transf["nil"].full_dcmp_spec_by_current(),
@@ -7337,33 +7314,33 @@ transf = {
     package_manager_name_arr = function()
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg list-package-managers"))
     end,
-    package_manager_name_arr_with_missing_packages = function()
+    package_manager_name_arr_by_with_missing_packages = function()
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg missing-package-manager"))
     end,
     semver_str_arr_by_installed_package_managers = function ()
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg package-manager-version"))
     end,
-    absolute_path_arr_by_installed_package_managers = function()
+    local_absolute_path_arr_by_installed_package_managers = function()
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg which-package-manager"))
     end,
-    mullvad_status_str = function()
+    line_by_mullvad_status = function()
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("mullvad status")
     end,
-    mullvad_bool_connected = function()
-      return get.str.bool_by_startswith(transf["nil"].mullvad_status_str(),"Connected")
+    bool_by_mullvad_connected = function()
+      return get.str.bool_by_startswith(transf["nil"].line_by_mullvad_status(),"Connected")
     end,
-    mullvad_relay_list_str = function()
+    multiline_str_by_mullvad_relay_list = function()
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mullvad relay list")
     end,
-    mullvad_relay_identifier_arr = function()
+    relay_identifier_arr = function()
       return 
         transf.table.arr_by_nested_value_primitive_and_arrlike_is_leaf(
           transf.multiline_str.iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_str_arr_value_assoc_value_assoc(
-            transf["nil"].mullvad_relay_list_str()
+            transf["nil"].multiline_str_by_mullvad_relay_list()
           )
       )
     end,
-    active_mullvad_relay_identifier = function()
+    active_relay_identifier = function()
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("mullvad relay get"):match("hostname ([^ ]+)")
     end,
     volume_local_extant_path_arr = function()
@@ -7397,9 +7374,7 @@ transf = {
     contact_table_arr = function()
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf["nil"].contact_uuid_arr(),
-        function(uid)
-          return transf.uuid.contact_table(uid)
-        end
+        transf.uuid.contact_table_or_nil
       )
     end,
     telegram_raw_export_dir_by_current = function()
@@ -7409,7 +7384,7 @@ transf = {
     end,
     running_application_by_frontmost = hs.application.frontmostApplication,
     menu_item_table_arr_by_frontmost_application = function()
-      return transf.menu_item_table_arr.menu_item_table_arr_by_application(
+      return transf.running_application.menu_item_table_arr(
         transf["nil"].running_application_by_frontmost()
       )
     end,
@@ -7422,10 +7397,9 @@ transf = {
         transf.path.leaflike_by_filename
       )
     end,
-
   },
   audiodevice_type = {
-    default_audiodevice = function(type)
+    audiodevice_by_default = function(type)
       return hs.audiodevice["default" .. transf.str.str_by_first_eutf8_upper(type) .. "Device"]()
     end,
     audiodevice_specifier_arr = function(type)
@@ -7441,21 +7415,21 @@ transf = {
     semver_str = function(mgr)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. mgr .. " package-manager-version")
     end,
-    absolute_path = function(mgr)
+    local_absolute_path = function(mgr)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. mgr .. " which-package-manager")
     end,
   },
   package_manager_name_or_nil = {
-    backed_up_package_name_arr = function(mgr)
+    package_name_arr_by_backed_up = function(mgr)
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " read-backup"))
     end,
-    missing_package_name_arr = function(mgr)
+    package_name_arr_by_missing = function(mgr)
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " missing"))
     end,
-    added_package_name_arr = function(mgr)
+    installed_package_name_arr_by_added = function(mgr)
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " added"))
     end,
-    difference_package_name_arr = function(mgr)
+    package_name_arr_by_difference = function(mgr)
       return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " difference"))
     end,
     package_name_or_package_name_semver_compound_str_arr = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list ")) end,
@@ -7463,85 +7437,28 @@ transf = {
     package_name_arr = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-no-version ")) end,
     package_name_semver_package_manager_name_compound_str_arr = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-version-package-manager ")) end,
     package_name_package_manager_name_compound_str = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " list-with-package-manager ")) end,
-    nonindicated_dec_str_arr_installed = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " count ")) end,
-    calendar_template_table_by_empty = function()
-      CALENDAR_TEMPLATE_SPECIFIER = {}
-      CALENDAR_TEMPLATE_SPECIFIER.calendar = { 
-        comment = 'one of: {{[ transf["nil"].writeable_calendar_str() ]}}' ,
-        value = "default"
-      }
-      CALENDAR_TEMPLATE_SPECIFIER.start = {
-        value = get.timestamp_s.rfc3339like_dt_by_precison_w_dcmp_name(
-          transf["nil"].timestamp_s_by_current(),
-          "min"
-        )
-      }
-      CALENDAR_TEMPLATE_SPECIFIER.title = {}
-      CALENDAR_TEMPLATE_SPECIFIER.description = {}
-      CALENDAR_TEMPLATE_SPECIFIER.location = {}
-      CALENDAR_TEMPLATE_SPECIFIER["end"] = {
-        comment = 'end of the event, either as a date, or as a delta in the form of [<n>d][<n>h][<n>m][<n>s]'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER.alarms = {
-        comment = 'arr of alarms as deltas'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER.url = {}
-      CALENDAR_TEMPLATE_SPECIFIER.timezone = {
-        comment = 'leave empty for local timezone'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"] = {}
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"].freq = {
-        comment = 'valid values: d[aily], w[eekly], m[onthly], y[early]. leave empty for no repeat'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"].interval = {
-        comment = 'number of freq units between repeats'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"]["until"] = {
-        comment = 'date to stop repeating'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"].count = {
-        comment = 'number of times to repeat'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"].wkst = {
-        comment = 'day to start week on (MO, TU, WE, TH, FR, SA, SU)',
-        value = "MO"
-      }
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"].byday = {
-        comment = 'valid values: valid values: arr of [sign]<integer><weekday>; meaning: occurrences to repeat on within freq'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"].bymonthday = {
-        comment = 'only if freq is m[onthly]; valid values: arr of [sign]<integer>; meaning: days of month to repeat on'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"].bymonth = {
-        comment = 'only if freq is y[early]; valid values: arr of [sign]<integer>; meaning: months to repeat on'
-      }
-      CALENDAR_TEMPLATE_SPECIFIER["repeat"].byyearday = {
-        comment = 'only if freq is y[early]; valid values: arr of [sign]<integer>; meaning: days of year to repeat on'
-      }
-      return CALENDAR_TEMPLATE_SPECIFIER
-    end
+    digit_str_arr_by_installed = function(mgr) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " count ")) end,
   },
   package_name = {
     installed_package_manager = function(pkg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg installed_package_manager " .. pkg)) end,
   },
   action_specifier = {
-    action_chooser_item_specifier = function(action_specifier)
-      if action_specifier.text then error("old action_specifier format, contains action_specifier.text") end
+    chooser_item_specifier = function(action_specifier)
       local str = get.str.str_by_with_suffix(action_specifier.d, ".")
       str = str .. " #" .. get.not_userdata_or_fn.md5_base32_crock_str_of_length(action_specifier.d, 3) -- shortcode for easy use
       return {text = str}
     end
   },
   action_specifier_arr = {
-    action_chooser_item_specifier_arr = function(action_specifier_arr)
+    chooser_item_specifier_arr = function(action_specifier_arr)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         action_specifier_arr,
-        transf.action_specifier.action_chooser_item_specifier
+        transf.action_specifier.chooser_item_specifier
       )
     end,
-    action_with_index_choose_item_specifier_arr = function(action_specifier_arr)
+    index_chooser_item_specifier_arr = function(action_specifier_arr)
       return transf.assoc_arr.has_index_key_table_arr(
-        transf.action_specifier.action_chooser_item_specifier_arr(action_specifier_arr)
+        transf.action_specifier_arr.chooser_item_specifier_arr(action_specifier_arr)
       )
     end,
   },
@@ -7554,7 +7471,7 @@ transf = {
     end,
   },
   thing_name = {
-    transf_action_specifier_arr = function(thing_name)
+    action_specifier_arr_by_transf = function(thing_name)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         transf[thing_name],
         function(thing_name2, fn)
@@ -7565,7 +7482,7 @@ transf = {
         end
       )
     end,
-    act_action_specifier_arr = function(thing_name)
+    action_specifier_arr_by_act = function(thing_name)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         act[thing_name],
         function(action, fn)
@@ -7576,10 +7493,10 @@ transf = {
         end
       )
     end,
-    action_specifier_arr = function(thing_name)
+    action_specifier_arr_by_transf_act = function(thing_name)
       return transf.two_arrs.arr_by_appended(
-        transf.thing_name.act_action_specifier_arr[thing_name],
-        transf.thing_name.transf_action_specifier_arr[thing_name]
+        transf.thing_name.action_specifier_arr_by_act[thing_name],
+        transf.thing_name.action_specifier_arr_by_transf[thing_name]
       )
     end,
   },
@@ -7600,64 +7517,34 @@ transf = {
         transf.thing_name_arr.action_specifier_arr_arr(thing_name_arr)
       )
     end,
-    chooser_image_retriever_specifier_arr = function(thing_name_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+    partial_retriever_specifier_arr_by_chooser_image = function(thing_name_arr)
+      return get.thing_name_arr.partial_retriever_specifier_arr(
         thing_name_arr,
-        function(thing_name)
-          local spec = tblmap.thing_name.partial_retriever_specifier_by_chooser_image[thing_name]
-          local newspec = {}
-          newspec.thing_name = spec.thing_name
-          newspec.precedence = spec.precedence or 1
-          return newspec
-        end
+        "chooser_image"
       )
     end,
-    chooser_text_retriever_specifier_arr = function(thing_name_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+    partial_retriever_specifier_arr_by_chooser_text = function(thing_name_arr)
+      return get.thing_name_arr.partial_retriever_specifier_arr(
         thing_name_arr,
-        function(thing_name)
-          local spec = tblmap.thing_name.partial_retriever_specifier_by_chooser_text[thing_name]
-          local newspec = {}
-          newspec.thing_name = spec.thing_name
-          newspec.precedence = spec.precedence or 1
-          return newspec
-        end
+        "chooser_text"
       )
     end,
-    placeholder_text_retriever_specifier_arr = function(thing_name_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+    partial_retriever_specifier_arr_by_placeholder_text = function(thing_name_arr)
+      return get.thing_name_arr.partial_retriever_specifier_arr(
         thing_name_arr,
-        function(thing_name)
-          local spec = tblmap.thing_name.partial_retriever_specifier_by_placeholder_text[thing_name]
-          local newspec = {}
-          newspec.thing_name = spec.thing_name
-          newspec.precedence = spec.precedence or 1
-          return newspec
-        end
+        "placeholder_text"
       )
     end,
-    chooser_subtext_retriever_specifier_arr = function(thing_name_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+    partial_retriever_specifier_arr_by_chooser_subtext = function(thing_name_arr)
+      return get.thing_name_arr.partial_retriever_specifier_arr(
         thing_name_arr,
-        function(thing_name)
-          local spec = tblmap.thing_name.partial_retriever_specifier_by_chooser_subtext[thing_name]
-          local newspec = {}
-          newspec.thing_name = spec.thing_name
-          newspec.precedence = spec.precedence or 1
-          return newspec
-        end
+        "chooser_subtext"
       )
     end,
-    chooser_initial_selected_index_retriever_specifier_arr = function(thing_name_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+    partial_retriever_specifier_arr_chooser_initial_selected_index = function(thing_name_arr)
+      return get.thing_name_arr.partial_retriever_specifier_arr(
         thing_name_arr,
-        function(thing_name)
-          local spec = tblmap.thing_name.chooser_initial_selected_index_partial_retriever_specifier[thing_name]
-          local newspec = {}
-          newspec.thing_name = spec.thing_name
-          newspec.precedence = spec.precedence or 1
-          return newspec
-        end
+        "chooser_initial_selected_index"
       )
     end,
   },
