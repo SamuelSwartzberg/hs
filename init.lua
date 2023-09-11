@@ -16,7 +16,7 @@ comp = transf.dir.plaintext_dictonary_read_assoc(env.MCOMPOSITE)
 fstblmap = transf.dir.plaintext_dictonary_read_assoc(env.MDICTIONARIES .. "/mappings")
 
 timer_arr = {}
-timer_arr_refresher = hs.timer.doEvery(1, get.fn.first_n_args_bound_fn(dothis.timer_spec_array.fire_all_if_ready_and_space_if_necessary, timer_arr))
+timer_arr_refresher = hs.timer.doEvery(1, get.fn.fn_by_1st_n_bound(dothis.timer_spec_array.fire_all_if_ready_and_space_if_necessary, timer_arr))
 
 env = transf.string.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
 
@@ -62,7 +62,7 @@ dothis.created_item_specifier_array.create_all(
         elseif event == hs.fs.volume.didUnmount then
           if is.volume_local_extant_path.dynamic_time_machine_volume_local_extant_path(information.path) then
             hs.timer.doAfter(30, 
-              get.fn.first_n_args_bound_fn(act.volume_local_extant_path.eject_or_msg, env.TMBACKUPVOL)
+              get.fn.fn_by_1st_n_bound(act.volume_local_extant_path.eject_or_msg, env.TMBACKUPVOL)
             )
           end
         end

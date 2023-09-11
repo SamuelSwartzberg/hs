@@ -393,6 +393,23 @@ tblmap = {
   client_project_kind = {
     billing_unit = {
       translation = "line"
+    },
+    iso_639_1_language_code_key_line_value_assoc_by_plaintext_name_sg = {
+      translation = {
+        de = "Übersetzung"
+      }
+    },
+    iso_639_1_language_code_key_line_value_assoc_by_plaintext_name_pl = {
+      translation = {
+        de = "Übersetzungen"
+      }
+    }
+  },
+  billing_unit = {
+    iso_639_1_language_code_key_line_value_assoc = {
+      line = {
+        de = "Zeilen",
+      }
     }
   },
   git_remote_type = {
@@ -439,6 +456,7 @@ tblmap = {
         omegat = "create_dir",
         source = "create_dir",
         target = "create_dir",
+        target_txt = "create_dir",
         tm = "create_dir",
         ["client_project_data.yaml"] = {"write_template","comp.templates.data_yaml"},
         ["omegat.project"] = {"write_template", "comp.templates.omegat"}

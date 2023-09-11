@@ -7,7 +7,7 @@ get = {
         return t
       end
     end,
-    int_by_rounded_or_nil = function(t, base)
+    int_or_nil_by_rounded = function(t, base)
       if is.any.str(t) then
         return get.str.int_by_rounded_or_nil(t, base)
       else
@@ -21,7 +21,7 @@ get = {
     end,
   },
   int_or_nil = {
-    prompted_once_int_from_default = function(int, message)
+    int_by_prompted_once_from_default = function(int, message)
       return transf.prompt_spec.any({
         prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         transformer = get.str.int_by_rounded_or_nil,
@@ -33,7 +33,7 @@ get = {
     end,
   },
   number_or_nil = {
-    prompted_once_number_from_default = function(no, message)
+    number_by_prompted_once_from_default = function(no, message)
       return transf.prompt_spec.any({
         prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
         transformer = get.str.number_or_nil,
@@ -52,59 +52,7 @@ get = {
     semver_str_arr = function(mgr, arg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " version " .. (arg or ""))) end,
     absolute_path_arr = function(mgr, arg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") ..  " which " .. (arg or "")))
     end,
-    bool_arr_installed = function(mgr, arg) return transf.str.bool_by_evaled_env_bash_success( "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
-  },
-  calendar_name = {
-   
-  },
-  khal = {
-    parseable_format_specifier = function()
-      return get.str_or_number_arr.str_by_joined(
-        get.arr.str_arr_by_mapped_values_w_fmt_str(
-          ls.khal.parseable_format_component_arr,
-          "{%s}"
-        ), consts.unique_field_separator
-      ) .. consts.unique_record_separator
-    end,
-    basic_command_parts = function(include, exclude)
-      local command = " --format=" .. transf.str.str_by_single_quoted_escaped(get.khal.parseable_format_specifier())
-      if include then command = command .. get.str_arr.repeated_option_str(include, "--include-calendar") end
-      if exclude then command = command .. get.str_arr.repeated_option_str(exclude, "--exclude-calendar") end
-      return command
-    end,
-       
-    search_event_tables = function(searchstr, include, exclude)
-      local command = "khal search" .. get.khal.basic_command_parts(include, exclude)
-      command = command .. " " .. transf.str.str_by_single_quoted_escaped(searchstr)
-      return transf.multirecord_str.event_table_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped(command))
-    end,
-    list_event_tables = function(specifier, include, exclude)
-      local command = {
-        'khal list -df ""',
-        get.khal.basic_command_parts(include, exclude),
-      }
-      if specifier.once then
-        dothis.arr.push(command, "--once")
-      end
-      if specifier.notstarted then
-        dothis.arr.push(command, "--notstarted")
-      end
-      specifier.start = specifier.start or "today"
-      specifier["end"] = specifier["end"] or transf.timestamp_s.rfc3339like_ymd(
-        get.timestamp_s.timestamp_s_by_added(
-          transf["nil"].timestamp_s_by_current(),
-          60,
-          "day"
-        )
-      )
-      dothis.arr.push(command, transf.str.str_by_single_quoted_escaped(specifier.start))
-      dothis.arr.push(command, transf.str.str_by_single_quoted_escaped(specifier["end"]))
-      return transf.multirecord_str.event_table_arr(
-        transf.str.str_or_nil_by_evaled_env_bash_stripped(
-          get.str_or_number_arr.str_by_joined(command, " ")
-        )
-      )
-    end,
+    bool_arr_by_installed = function(mgr, arg) return transf.str.bool_by_evaled_env_bash_success( "upkg " .. (mgr or "") .. " is-installed " .. (arg or "")) end,
   },
   pass_item_name = {
     str_or_nil_by_fetch_value = function(item, typepath)
@@ -119,9 +67,6 @@ get = {
     not_userdata_or_fn_by_parsed_json = function(item, typepath)
       return transf.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json("pass show " .. typepath .. "/" .. item)
     end,
-    contact_json = function(item, type)
-      return get.pass_item_name.not_userdata_or_fn_by_parsed_json(item, "contacts/" .. type)
-    end,
     
   },
   auth_pass_item_name = {
@@ -131,34 +76,26 @@ get = {
     local_absolute_path = function(item, type, ext)
       return get.pass_item_name.local_absolute_path(item, "p/" .. type, ext)
     end,
-    bool_by_exists_as = function(item, type)
-      return get.pass_item_name.bool_by_exists_as(item, "p/" .. type)
+    bool_by_exists_as = function(item, type, ext)
+      return get.pass_item_name.bool_by_exists_as(item, "p/" .. type, ext)
     end,
   },
   ["nil"] = {
-    nth_arg_ret_fn = function(_, n)
-      return function(...)
-        return select(n, ...)
-      end
-    end,
   },
   audiodevice = {
-    is_active_audiodevice = function (device, type)
-      return device == transf.audiodevice_type.udiodevice_by_default(type)
-    end,
     audiodevice_specifier = function (device, type)
       return {
         device = device,
-        type = type,
+        subtype = type,
       }
     end,
   },
   contact_table = {
-    encrypted_data = function(contact_table, type)
-      return get.pass_item_name.contact_json(contact_table.uid, type)
+    not_userdata_or_fn_by_encrypted_data = function(contact_table, type)
+      return get.pass_item_name.not_userdata_or_fn_by_parsed_json(contact_table.uid, "contacts/" .. type)
     end,
     line_or_nil_by_tax_number = function(contact_table, type)
-      return transf.str_or_nil.line_or_nil_by_folded(get.contact_table.encrypted_data(contact_table, "taxnr/" .. type))
+      return transf.str_or_nil.line_or_nil_by_folded(get.contact_table.not_userdata_or_fn_by_encrypted_data(contact_table, "taxnr/" .. type))
     end,
     number_or_nil_by_rate = function(contact_table, type)
       return transf.nonindicated_number_str.number_by_base_10(contact_table.Private[type .. "-rate"])
@@ -174,41 +111,6 @@ get = {
     end,
   },
   table = {
-    ---@param table table
-    ---@param keystop integer
-    ---@param valuestop integer
-    ---@param depth integer
-    ---@return str[]
-    yaml_lines_aligned_with_predetermined_stops = function(table, keystop, valuestop, depth)
-      local lines = {}
-      for value_k, value_v in transf.table.stateless_key_value_iter(table) do
-        local pre_padding_length = depth * 2
-        local key_length = #value_k
-        local key_padding_length = keystop - (key_length + pre_padding_length)
-        if is.any.table(value_v) and not (value_v.value or value_v.comment) then 
-          dothis.arr.push(lines, get.str.str_by_repeated(" ", depth * 2) .. value_k .. ":" .. get.str.str_by_repeated(" ", key_padding_length) .. " ")
-          lines = transf.two_arrs.arr_by_appended(lines, get.table.yaml_lines_aligned_with_predetermined_stops(value_v, keystop, valuestop, depth + 1))
-        elseif is.any.table(value_v) and (value_v.value or value_v.comment) then 
-          local key_part = get.str.str_by_repeated(" ", pre_padding_length) .. value_k .. ":" .. get.str.str_by_repeated(" ", key_padding_length) .. " "
-          local value_length = 0
-          local value_part = ""
-          if value_v.value then
-            value_length = #value_v.value
-            value_part = value_v.value
-          end
-          local comment_part = ""
-          if value_v.comment then
-            local value_padding_length = valuestop - value_length
-            comment_part = get.str.str_by_repeated(" ", value_padding_length) .. " # " .. value_v.comment
-          end
-          dothis.arr.push(lines, key_part .. value_part .. comment_part)
-        else
-          -- do nothing
-        end
-      end
-      
-      return lines
-    end,
     bool_by_has_key = function(t, key)
       return t[key] ~= nil
     end,
@@ -384,10 +286,6 @@ get = {
         joiner
       )
     end,
-    stop_specifier = function(t, table_arg_bool_by_is_leaf_ret_fn)
-      error("I never finished writing this???")
-      return get 
-    end,
     table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn = function(t, fn)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(t) do
@@ -461,7 +359,7 @@ get = {
       dothis.arr.sort(vt_arr, fn)
       return vt_arr
     end,
-    dot_notation_str_by_path_to_key = pltablex.search,
+    printable_ascii_no_nonspace_whitespace_str_by_path_to_key = pltablex.search,
     table_by_mapped_nested_w_kt_arg_kt_ret_fn = function(t, fn, table_arg_bool_by_is_leaf_ret_fn)
       return get.table.table_by_mapped_w_kt_vt_arg_kt_vt_ret_fn(
         t,
@@ -526,8 +424,8 @@ get = {
     end,
 
   },
-  nonabsolute_path_key_assoc = {
-    absolute_path_key_assoc = function(nonabsolute_path_key_assoc, starting_point, extension)
+  local_nonabsolute_path_key_assoc = {
+    local_absolute_path_key_assoc = function(nonabsolute_path_key_assoc, starting_point, extension)
       return get.table.table_by_mapped_w_kt_arg_kt_ret_fn(nonabsolute_path_key_assoc, function(k)
         local ext_part = ""
         if extension then ext_part = "." .. extension end
@@ -535,7 +433,7 @@ get = {
       end)
     end,
   },
-  table_of_assocs = {
+  assoc_table = {
     assoc_arr = function(assoc, key)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc) do
@@ -547,7 +445,7 @@ get = {
     end,
   },
   complete_pos_int_slice_spec = {
-    boolen_by_is_hit_w_pos_int = function(spec, i)
+    bool_by_is_hit_w_pos_int = function(spec, i)
       return i >= spec.start and i <= spec.stop and (i - spec.start) % spec.step == 0 
     end,
   },
@@ -598,7 +496,7 @@ get = {
       local current_type = nil
 
       for i = 1, #arr do
-        if get.complete_pos_int_slice_spec.boolen_by_is_hit_w_pos_int(spec, i) then
+        if get.complete_pos_int_slice_spec.bool_by_is_hit_w_pos_int(spec, i) then
           if current_type == "misses" then
             dothis.arr.push(hits, current)
             current = {}
@@ -962,7 +860,7 @@ get = {
     str_arr_by_mapped_values_w_fmt_str = function(arr, fmt_str)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.first_n_args_bound_fn(get.str.str_by_formatted_w_n_anys, fmt_str)
+        get.fn.fn_by_1st_n_bound(get.str.str_by_formatted_w_n_anys, fmt_str)
       )
     end,
     arr_by_mapped_w_t_arg_t_ret_fn_and_t_arg_bool_ret_fn = function(arr, mapfn, condfn)
@@ -982,7 +880,7 @@ get = {
     has_id_key_table_by_first_match_w_has_id_key_table = function(arr, assoc)
       return get.arr.t_or_nil_by_first_match_w_fn(
         arr,
-        get.fn.first_n_args_bound_fn(
+        get.fn.fn_by_1st_n_bound(
           transf.two_has_id_key_tables.bool_by_equal,
           assoc
         )
@@ -1601,7 +1499,7 @@ get = {
     number_arr = function(arr, base)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(
           get.nonindicated_number_str.number,
           {a_use, base}
         )
@@ -1655,7 +1553,7 @@ get = {
     styledtext_arr_merge = function(arr, styledtext_attributes_specifier)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.str_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.str_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
       )
     end,
   },
@@ -1739,7 +1637,7 @@ get = {
     pos_int_or_nil_by_first_match_ending_w_str = function(arr, str)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(
         arr,
-        get.fn.first_n_args_bound_fn(
+        get.fn.fn_by_1st_n_bound(
           get.str.bool_by_endswith,
           str
         )
@@ -1753,7 +1651,7 @@ get = {
     pos_int_or_nil_by_first_match_starting_w_str = function(arr, str)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(
         arr,
-        get.fn.first_n_args_bound_fn(
+        get.fn.fn_by_1st_n_bound(
           get.str.bool_by_startswith,
           str
         )
@@ -2005,7 +1903,7 @@ get = {
     find_leaf_of_descendant = function(path, filename)
       return get.path_arr.bool_by_contains_leaf(transf.extant_path.absolute_path_arr_by_descendants(path), filename)
     end,
-    bool_by_descendant_with_extnesion = function(path, extension)
+    bool_by_descendant_with_extension = function(path, extension)
       return get.path_arr.bool_by_contains_extension(transf.extant_path.absolute_path_arr_by_descendants(path), extension)
     end,
     absolute_path_by_descendant_with_leaf = function(path, leaf)
@@ -2023,6 +1921,9 @@ get = {
     absolute_path_by_descendant_with_filename = function(path, filename)
       return get.path_arr.path_or_nil_by_first_having_filename(transf.extant_path.absolute_path_arr_by_descendants(path), filename)
     end,
+    absolute_path_by_file_descendant_with_filename = function(path, filename)
+      return get.path_arr.path_or_nil_by_first_having_filename(transf.extant_path.file_arr_by_descendants(path), filename)
+    end,
     bool_by_some_descendants_pass_w_fn = function(path, fn)
       return get.arr.bool_by_some_pass_w_fn(transf.extant_path.absolute_path_arr_by_descendants(path), fn)
     end,
@@ -2037,11 +1938,20 @@ get = {
     stream_creation_specifier_arr = function(path, flag_profile_name)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.extant_path.m3u_file_arr_by_descendants(path),
-        get.fn.arbitrary_args_bound_or_ignored_fn(
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(
           get.m3u_file.stream_creation_specifier,
           {a_use, flag_profile_name} 
         )
       )
+    end,
+    bool_by_file_descendants_pass_w_fn = function(path, fn)
+      return get.arr.bool_by_some_pass_w_fn(
+        transf.extant_path.file_arr_by_descendants(path),
+        fn
+      )
+    end,
+    bool_by_file_descendant_with_filename = function(path, filename)
+      return get.extant_path.absolute_path_by_file_descendant_with_filename(path, filename) ~= nil
     end,
   },
   local_dir = {
@@ -2556,7 +2466,7 @@ get = {
     str_and_t__arr_arr_by_joined = function(arr, joiner)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.arr.str_and_t_by_joined, {a_use, joiner})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.arr.str_and_t_by_joined, {a_use, joiner})
       )
     end,
     str_key_t_value_assoc = function(arr, joiner)
@@ -2567,7 +2477,7 @@ get = {
     assoc_arr_by_arr = function(arr_arr, arr2)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
       )
     end,
     assoc_of_arrs_by_first_element = function(arr_arr)
@@ -2585,7 +2495,7 @@ get = {
     arr_arr_by_mapped = function(arr_arr, fn)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
-        get.fn.second_n_args_bound_fn(get.arr.arr_by_mapped, fn)
+        get.fn.fn_by_2nd_n_bound(get.arr.arr_by_mapped, fn)
       )
     end,
     --- essentially flatMap
@@ -2606,7 +2516,7 @@ get = {
     assoc_of_assocs_by_arr = function(assoc_of_arr, arr2)
       return hs.fnutils.map(
         assoc_of_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
       )
     end,
   },
@@ -2654,21 +2564,6 @@ get = {
         tab_specifier.tab_index,
         property
       ))
-    end,
-  },
-  --- point-implementing = can be treated as a hs.geometry.point = hs.geometry.point or hs.geometry.rect but not hs.geometry.size
-  hs_geometry_point_implementing = {
-    hs_geometry_point_implementing_with_offset = function(point, delta)
-      return point:move(delta)
-    end,
-  },
-  event_table = {
-    timestamp_s_sequence_specifier = function(event_table, step, unit)
-      return {
-        start = transf.event_table.timestamp_s_by_start(event_table),
-        stop = transf.event_table.timestamp_s_by_end(event_table),
-        step = (step or 1) * tblmap.dcmp_name.timestamp_s[unit or "sec"],
-      }
     end,
   },
   detailed_env_node = {
@@ -2767,7 +2662,7 @@ get = {
   },
   url_arr = {
     absolute_path_key_assoc_of_url_files = function(arr, root)
-      return get.nonabsolute_path_key_assoc.absolute_path_key_assoc(
+      return get.local_nonabsolute_path_key_assoc.local_absolute_path_key_assoc(
         transf.url_arr.leaflike_key_url_value_assoc(arr),
         root
       )
@@ -2783,13 +2678,13 @@ get = {
   omegat_project_dir = {
     source_files_extension = function(dir, ext)
       return get.path_arr.path_arr_by_filter_to_same_extension(
-        transf.omegat_project_dir.source_files(dir),
+        transf.omegat_project_dir.file_arr_by_source(dir),
         ext
       )
     end,
     target_files_extension = function(dir, ext)
       return get.path_arr.path_arr_by_filter_to_same_extension(
-        transf.omegat_project_dir.source_files(dir),
+        transf.omegat_project_dir.file_arr_by_source(dir),
         ext
       )
     end,
@@ -2921,7 +2816,7 @@ get = {
     result_arr = function(arr, value)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr, 
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.retriever_specifier.result, {a_use, value})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.retriever_specifier.result, {a_use, value})
       )
     end,
     result_joined = function(arr, value)
@@ -3042,7 +2937,7 @@ get = {
       } )
     end,
     int = function(id, key)
-      return get.str_or_number.int_by_rounded_or_nil(
+      return get.str_or_number.int_or_nil_by_rounded(
         get.mpv_ipc_socket_id.str(id, key)
       )
     end,
@@ -3056,13 +2951,13 @@ get = {
     created_item_specifier_w_creation_specifier = function(arr, creation_specifier)
       return get.arr.t_or_nil_by_first_match_w_fn(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.table.bool_by_key_equals_value, {a_use, "creation_specifier", creation_specifier})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table.bool_by_key_equals_value, {a_use, "creation_specifier", creation_specifier})
       )
     end,
     pos_int_w_creation_specifier = function(arr, creation_specifier)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.table.bool_by_key_equals_value, {a_use, "creation_specifier", creation_specifier})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table.bool_by_key_equals_value, {a_use, "creation_specifier", creation_specifier})
       )
     end,
   },
@@ -3228,14 +3123,14 @@ get = {
     end,
   },
   fn = {
-    first_n_args_bound_fn = hs.fnutils.partial,
+    fn_by_1st_n_bound = hs.fnutils.partial,
 
     --- binds arguments to a function
     --- @param func function
     --- @param arg_spec any | any[] List of arguments to bind. Use a_use to consume an argument passed at runtime.
     --- @param ignore_spec? integer | integer[] List of arguments to ignore (by index).
     --- @return function
-    arbitrary_args_bound_or_ignored_fn = function(func, arg_spec, ignore_spec)
+    fn_by_arbitrary_args_bound_or_ignored = function(func, arg_spec, ignore_spec)
 
       -- handle shorthand
       if not is.any.arr(arg_spec) then
@@ -3268,8 +3163,8 @@ get = {
 
       return inner_func
     end,
-    second_n_args_bound_fn = function(func, ...)
-      return get.fn.arbitrary_args_bound_or_ignored_fn(
+    fn_by_2nd_n_bound = function(func, ...)
+      return get.fn.fn_by_arbitrary_args_bound_or_ignored(
         func,
         transf.any_and_arr.arr(
           a_use,
@@ -3525,7 +3420,7 @@ get = {
     tree_node_arr = function(tree_node_like_arr, treeify_spec)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         tree_node_like_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.tree_node_like.tree_node, {a_use, treeify_spec})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.tree_node_like.tree_node, {a_use, treeify_spec})
       )
     end,
   },
@@ -3562,19 +3457,19 @@ get = {
       return res
     end,
   },
-  n_any_assoc_arr = {
-    leaf_label_with_title_path = function(arr, title_key)
+  assoc_arr = {
+    path_key_haver_by_take_last = function(arr, title_key)
       local leaf = get.table.table_by_copy(act.arr.pop(arr))
       local title_path = get.table_arr.vt_arr_w_kt(arr, title_key)
       leaf.path = title_path
       return leaf
     end
   },
-  n_any_assoc_arr_arr = {
-    assoc_leaf_labels_with_title_path_arr = function(arr, title_key)
+  assoc_arr_arr = {
+    path_key_haver_arr_by_take_last = function(arr, title_key)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.n_any_assoc_arr.leaf_label_with_title_path, {a_use, title_key})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.assoc_arr.path_key_haver_by_take_last, {a_use, title_key})
       )
     end,
   },
@@ -3623,7 +3518,7 @@ get = {
     end,
   },
   not_userdata_or_fn = {
-    md5_base32_crock_str_of_length = function(any, length)
+    base32_crock_str_by_md5_w_pos_int = function(any, length)
       return transf.not_userdata_or_fn.base32_crock_str_by_md5(any):sub(1, length)
     end,
   },
@@ -3631,25 +3526,25 @@ get = {
     backuped_thing_identifier = function(obj, typ)
       return typ .. "/" .. transf[typ .. "_export_chat_main_object"].str_by_id(obj)
     end,
-    timestamp_ms_last_backup = function(obj, typ)
+    timestamp_ms_by_last_backup = function(obj, typ)
       return transf.backuped_thing_identifier.timestamp_ms(
         transf.export_chat_main_object.backuped_thing_identifier(obj, typ)
       )
     end,
-    id_key_timestamp_ms_value_assoc = function(main_object, typ)
+    any_key_timestamp_ms_value_assoc_by_id = function(main_object, typ)
       local res = {}
       for _, msg in ipairs(main_object.messages) do
         res[msg.id] = get.export_chat_message.timestamp_ms(msg, typ)
       end
       return res
     end,
-    dir_by_target_backup_location = function(obj, typ)
+    local_dir_by_target_backup_location = function(obj, typ)
       return env.MCHATS .. "/" .. transf.export_chat_main_object.backuped_thing_identifier(obj, typ)
     end,
     logging_dir = function(obj, typ)
       return transf.export_chat_main_object.dir_by_target_backup_location(obj, typ) .. "/_logs"
     end,
-    media_dir = function(obj, typ)
+    local_dir_by_media_dir = function(obj, typ)
       return transf.export_chat_main_object.dir_by_target_backup_location(obj, typ) .. "/media"
     end,
     timestamp_ms_key_msg_spec_value_assoc_by_filtered = function(obj, typ)
@@ -3695,11 +3590,11 @@ get = {
   discord_export_chat_message = {
     timestamp_ms_or_nil_by_replying_to = function(msg, obj)
       return get.fn.rt_or_nil_by_memoized(
-        get.export_chat_main_object.id_key_timestamp_ms_value_assoc
+        get.export_chat_main_object.any_key_timestamp_ms_value_assoc_by_id
       )(obj, "discord")[msg.reference.messageId]
     end,
     absolute_path_arr_by_attachments = function(msg, obj)
-      local media_dir = get.export_chat_main_object.media_dir(obj, "discord")
+      local media_dir = get.export_chat_main_object.local_dir_by_media_dir(obj, "discord")
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         msg.attachments or {},
         function(att)
@@ -3713,7 +3608,7 @@ get = {
       return nil -- facebook doesn't have replies in its export
     end,
     absolute_path_arr_by_attachments = function(msg, obj)
-      local media_dir = get.export_chat_main_object.media_dir(obj, "facebook")
+      local media_dir = get.export_chat_main_object.local_dir_by_media_dir(obj, "facebook")
       local res = {}
 
       for _, attachment_type in transf.arr.pos_int_vt_stateless_iter({"photos", "videos", "files", "audio_files", "gifs", "share", "sticker", "animated_image_attachments"}) do
@@ -3736,7 +3631,7 @@ get = {
     end,
     absolute_path_arr_by_attachments = function(msg, obj)
       if msg.attachments then
-        local media_dir = get.export_chat_main_object.media_dir(obj, "signal")
+        local media_dir = get.export_chat_main_object.local_dir_by_media_dir(obj, "signal")
         return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           msg.attachments,
           function(att)
@@ -3752,27 +3647,16 @@ get = {
   telegram_export_chat_message = {
     timestamp_ms_or_nil_by_replying_to = function(msg, obj)
       return get.fn.rt_or_nil_by_memoized(
-        get.export_chat_main_object.id_key_timestamp_ms_value_assoc
+        get.export_chat_main_object.any_key_timestamp_ms_value_assoc_by_id
       )(obj, "telegram")[msg.reply_to_message_id]
     end,
     absolute_path_arr_by_attachments = function(msg, obj)
       if msg.file then
-        local media_dir = get.export_chat_main_object.media_dir(obj, "telegram")
+        local media_dir = get.export_chat_main_object.local_dir_by_media_dir(obj, "telegram")
         return {media_dir .. "/" .. transf.path.leaflike_by_leaf(msg.file)}
       else
         return {}
       end
     end
   },
-  billing_unit = {
-    line_w_iso_639_1_language_code = function(unit, lang)
-      local map = {
-        line = {
-          de = "Zeilen",
-        }
-      }
-      return map[unit][lang]
-    end
-  },
-
 }

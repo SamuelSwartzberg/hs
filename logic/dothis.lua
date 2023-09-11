@@ -529,7 +529,7 @@ dothis = {
     end,
     write_nonabsolute_path_key_assoc = function(path, nonabsolute_path_key_assoc, extension)
       dothis.dynamic_absolute_path_key_assoc.write(
-        get.nonabsolute_path_key_assoc.absolute_path_key_assoc(nonabsolute_path_key_assoc, path, extension)
+        get.local_nonabsolute_path_key_assoc.local_absolute_path_key_assoc(nonabsolute_path_key_assoc, path, extension)
       )
     end,
     write_dynamic_path_assoc = function(path, assoc, extension)
@@ -811,7 +811,7 @@ dothis = {
     link_into_local_absolute_path = function(arr, tgt)
       dothis.arr.each(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(
           dothis.local_extant_path.link_into_local_absolute_path,
           {a_use, tgt}
         )
@@ -1021,13 +1021,13 @@ dothis = {
     copy_into_absolute_path = function(arr, tgt)
       dothis.arr.each(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(dothis.extant_path.copy_into_absolute_path, {a_use, tgt})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.extant_path.copy_into_absolute_path, {a_use, tgt})
       )
     end,
     move_into_absolute_path = function(arr, tgt)
       dothis.arr.each(
         arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(dothis.extant_path.move_into_absolute_path, {a_use, tgt})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.extant_path.move_into_absolute_path, {a_use, tgt})
       )
     end,
     zip_to_absolute_path = function(arr, tgt)
@@ -1188,7 +1188,7 @@ dothis = {
     open_all = function(path, browser)
       dothis.arr.each(
         transf.plaintext_file.noempty_noindent_nohashcomment_line_arr(path),
-        get.fn.arbitrary_args_bound_or_ignored_fn(dothis.url_or_local_path.open_browser, {a_use, browser})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.url_or_local_path.open_browser, {a_use, browser})
       )
     end,
   },
@@ -1584,7 +1584,7 @@ dothis = {
   },
   logging_dir = {
     log_nonabsolute_path_key_timestamp_ms_key_assoc_value_assoc_by_ymd = function(path, assoc)
-      local abs_path_assoc = get.nonabsolute_path_key_assoc.absolute_path_key_assoc(
+      local abs_path_assoc = get.local_nonabsolute_path_key_assoc.local_absolute_path_key_assoc(
         assoc,
         path,
         ".json"
@@ -1792,7 +1792,7 @@ dothis = {
       dothis.local_path.open_app(
         transf.intra_file_location_spec.path(specifier),
         env.GUI_EDITOR,
-        get.fn.first_n_args_bound_fn(dothis.intra_file_location_spec.go_to, specifier)
+        get.fn.fn_by_1st_n_bound(dothis.intra_file_location_spec.go_to, specifier)
       )
     end
   },
@@ -1938,7 +1938,7 @@ dothis = {
         transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
       )
       dothis.extant_path.copy_into_absolute_path(
-        transf.omegat_project_dir.local_resultant_tm(omegat_project_dir),
+        transf.omegat_project_dir.local_absolute_path_by_resultant_tm(omegat_project_dir),
         get.project_dir.global_subtype_project_material_path(
           omegat_project_dir,
           "tm",
@@ -1948,10 +1948,10 @@ dothis = {
     end,
     create_and_open_new_source_odt = function(omegat_project_dir, name) -- while we support any source file, if we manually create a file, it should be an odt
       dothis.absolute_path.write_file_if_nonextant_path(
-        transf.omegat_project_dir.source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
+        transf.omegat_project_dir.local_extant_path_by_source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
       )
       dothis.local_path.open(
-        transf.omegat_project_dir.source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
+        transf.omegat_project_dir.local_extant_path_by_source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
       )
     end,
     open_project = function(omegat_project_dir)
@@ -1961,11 +1961,11 @@ dothis = {
     end,
     generate_target_txts = function(dir, do_after)
       dothis.arr.each(
-        transf.omegat_project_dir.target_files(dir),
+        transf.omegat_project_dir.file_arr_by_target(dir),
         function(file)
           transf.str.str_or_nil_by_evaled_env_bash_stripped("soffice --headless --convert-to txt:Text --outdir"..
           transf.str.str_by_single_quoted_escaped(
-            transf.omegat_project_dir.target_txt_dir(dir)
+            transf.omegat_project_dir.local_extant_path_by_target_txt_dir(dir)
           ) ..
           transf.str.str_by_single_quoted_escaped(file))
         end
@@ -2012,7 +2012,7 @@ dothis = {
     build_and_open_pdf = function(latex_project_dir)
       dothis.latex_project_dir.build(
         latex_project_dir,
-        get.fn.first_n_args_bound_fn(dothis.latex_project_dir.open_pdf, latex_project_dir)
+        get.fn.fn_by_1st_n_bound(dothis.latex_project_dir.open_pdf, latex_project_dir)
       )
     end,
     write_bib = function(latex_project_dir)
@@ -2300,7 +2300,7 @@ dothis = {
     choose_action = function(any)
       dothis.any.choose_action_specifier(
         any, 
-        get.fn.arbitrary_args_bound_or_ignored_fn(dothis.action_specifier.execute, {a_use, any})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.action_specifier.execute, {a_use, any})
       )
     end,
   },
@@ -2512,7 +2512,7 @@ dothis = {
   },
   hotkey_created_item_specifier_arr = {
     create_or_recreate_all = function (arr, key_partial_creation_specifier_assoc)
-      local creation_specifier_arr = get.table_of_assocs.assoc_arr(key_partial_creation_specifier_assoc, "key")
+      local creation_specifier_arr = get.assoc_table.assoc_arr(key_partial_creation_specifier_assoc, "key")
       dothis.created_item_specifier_arr.create_or_recreate_all(
         arr,
         creation_specifier_arr
@@ -3100,7 +3100,7 @@ dothis = {
       dothis.absolute_path.create_dir(
         logging_dir
       )
-      local media_dir = get.export_chat_main_object.media_dir(obj, typ)
+      local media_dir = get.export_chat_main_object.local_dir_by_media_dir(obj, typ)
       dothis.absolute_path.create_dir(
         media_dir
       )

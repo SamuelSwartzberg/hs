@@ -468,15 +468,17 @@ thing_name_hierarchy = {
                             snakekebap_case = {
                               strict_snakekebap_case = {
                                 lower_strict_snakekebap_case = {
-                                  auth_pass_item_name = {
-                                    otp_pass_item_name = "leaf",
-                                    passw_pass_item_name = "leaf",
-                                    recovery_pass_item_name = "leaf",
-                                    secq_pass_item_name = "leaf",
-                                    username_pass_item_name = "leaf",
-                                    login_pass_item_name = "leaf"
+                                  pass_item_name = {
+                                    auth_pass_item_name = {
+                                      otp_pass_item_name = "leaf",
+                                      passw_pass_item_name = "leaf",
+                                      recovery_pass_item_name = "leaf",
+                                      secq_pass_item_name = "leaf",
+                                      username_pass_item_name = "leaf",
+                                      login_pass_item_name = "leaf"
+                                    },
+                                    cc_pass_item_name = "leaf",
                                   },
-                                  cc_pass_item_name = "leaf",
                                   csl_type = "leaf",
                                 }
                               }
@@ -799,7 +801,11 @@ thing_name_hierarchy = {
         detailed_env_node = "leaf",
         hschooser_specifier = "leaf",
         choosing_hschooser_specifier = "leaf",
-        url_table = "leaf"
+        url_table = "leaf",
+        total_cost_specifier = "leaf",
+        price_specifier = "leaf",
+        msg_spec = "leaf",
+        path_key_haver = "leaf"
       }
     },
     primitive = {

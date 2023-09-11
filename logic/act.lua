@@ -28,39 +28,6 @@ act = {
       dothis.package_manager_name.do_backup_and_commit(mgr, "replace-backup", "replace backup of packages")
     end,
   },
-  event_search_spec = {
-    --- edit event by adding new event and deleting old one (necessary since khal won't allow us to use a GUI editor (Don't try, I've spent hours on this, it's not possible))
-    edit_event = function(event_search_specifier)
-      local event_table = get.khal.search_event_tables(event_search_specifier.searchstr)[1]
-      local do_after = function()
-        dothis.event_search_spec.delete_event(event_search_specifier)
-      end
-      dothis.event_table.add_event_interactive(event_table, do_after)
-    end,
-
-    delete_event = function(event_search_specifier)
-      local command = 
-        "echo $'D\ny\n' | khal edit " .. get.khal.basic_command_parts(event_search_specifier.include, event_search_specifier.exclude) .. transf.str.str_by_single_quoted_escaped(event_search_specifier.searchstr)
-      dothis.str.env_bash_eval(command)
-    end,
-  },
-  event_table = {
-    delete = function(event_table)
-      act.event_search_spec.delete_event({ searchstr = event_table.uid, include = event_table.calendar})
-    end,
-    edit = function(event_table)
-      act.event_search_spec.edit_event({ searchstr = event_table.uid, include = event_table.calendar})
-    end,
-    create_similar = function(event_table)
-      act.khal.add_event_interactive(event_table)
-    end,
-    add_event_from_async = function(event_table)
-      dothis.event_table.add_event_from(event_table, function() end)
-    end,
-    add_event_interactive_async = function(event_table)
-      dothis.event_table.add_event_interactive(event_table, function() end)
-    end,
-  },
   vdirsyncer_pair_specifier = {
     write_to_config = function(spec)
       dothis.absolute_path.append_file_if_file(
@@ -78,7 +45,7 @@ act = {
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "vdirsyncer discover" ..
         transf.str.str_by_single_quoted_escaped(name),
-        get.fn.first_n_args_bound_fn(
+        get.fn.fn_by_1st_n_bound(
           dothis.str.env_bash_eval_async,
           "vdirsyncer sync" .. transf.str.str_by_single_quoted_escaped(name)
         )
@@ -181,12 +148,12 @@ act = {
     end,
   },
   stream_created_item_specifier = {
-    set_playback_seconds_plus_15 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, 15}),
-    set_playback_seconds_minus_15 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, -15}),
-    set_playback_seconds_plus_60 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, 60}),
-    set_playback_seconds_minus_60 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, -60}),
-    set_playback_percent_plus_5 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_percent, {a_use, 5}),
-    set_playback_percent_minus_5 = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.stream_created_item_specifier.set_playback_percent, {a_use, -5}),
+    set_playback_seconds_plus_15 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, 15}),
+    set_playback_seconds_minus_15 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, -15}),
+    set_playback_seconds_plus_60 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, 60}),
+    set_playback_seconds_minus_60 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, -60}),
+    set_playback_percent_plus_5 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_percent, {a_use, 5}),
+    set_playback_percent_minus_5 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_percent, {a_use, -5}),
     set_state_transitioned_state = function(spec)
       spec.inner_item.state = transf.stream_created_item_specifier.stream_state_by_transitioned(spec)
     end,
@@ -607,7 +574,7 @@ act = {
         arr[i] = nil
       end
     end,
-    shuffle = get.fn.arbitrary_args_bound_or_ignored_fn(dothis.arr.sort, {a_use, transf["nil"].bool_by_random}),
+    shuffle = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.arr.sort, {a_use, transf["nil"].bool_by_random}),
   },
   contact_uuid = {
     edit_contact = function(uuid)

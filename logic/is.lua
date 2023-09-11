@@ -1349,11 +1349,11 @@ is = {
     end,
   },
   plaintext_assoc_file = {
-    yaml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "yaml"}),
-    json_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "json"}),
-    toml_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "toml"}),
-    ini_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "ini"}),
-    ics_file = get.fn.arbitrary_args_bound_or_ignored_fn(get.path.is_standartized_extension, {a_use, "ics"}),
+    yaml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "yaml"}),
+    json_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "json"}),
+    toml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "toml"}),
+    ini_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "ini"}),
+    ics_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "ics"}),
   },
   plaintext_table_file = {
 
@@ -1405,14 +1405,20 @@ is = {
   },
   lower_strict_snakekebap_case = {
     auth_pass_item_name = function(str)
-      return get.local_extant_path.absolute_path_by_descendant_with_filename(
+      return get.extant_path.bool_by_file_descendant_with_filename(
         transf.path.path_by_ending_with_slash(env.MPASS) .. "p", 
         str
       )
     end,
     cc_pass_item_name = function(str)
-      return get.local_extant_path.absolute_path_by_descendant_with_filename(
+      return get.local_extant_path.bool_by_file_descendant_with_filename(
         transf.path.path_by_ending_with_slash(env.MPASS) .. "cc", 
+        str
+      )
+    end,
+    pass_item_name = function(str)
+      return get.local_extant_path.absolute_path_by_descendant_with_filename(
+        env.MPASS,
         str
       )
     end,
@@ -2118,19 +2124,19 @@ is = {
   },
   auth_pass_item_name = {
     passw_pass_item_name = function(name)
-      return get.pass_item_name.bool_by_exists_as(name, "passw")
+      return get.auth_pass_item_name.bool_by_exists_as(name, "passw")
     end,
     username_pass_item_name = function(name)
-      return get.pass_item_name.bool_by_exists_as(name, "username", "txt")
+      return get.auth_pass_item_name.bool_by_exists_as(name, "username", "txt")
     end,
     recovery_pass_item_name = function(name)
-      return get.pass_item_name.bool_by_exists_as(name, "recovery")
+      return get.auth_pass_item_name.bool_by_exists_as(name, "recovery")
     end,
     otp_pass_item_name = function(name)
-      return get.pass_item_name.bool_by_exists_as(name, "otp")
+      return get.auth_pass_item_name.bool_by_exists_as(name, "otp")
     end,
     secq_pass_item_name = function(name)
-      return get.pass_item_name.bool_by_exists_as(name, "secq")
+      return get.pass_iauth_pass_item_nametem_name.bool_by_exists_as(name, "secq")
     end,
     login_pass_item_name = function(name)
       return 
@@ -2398,7 +2404,19 @@ is = {
     end,
     url_table = function(t)
       return t.scheme
-    end
+    end,
+    total_cost_specifier = function(t)
+      return t.total and t.price_specifier_arr
+    end,
+    price_specifier = function(t)
+      return t.amount and t.unit and t.rate and t.price
+    end,
+    msg_spec = function(t)
+      return t.author and t.content
+    end,
+    path_key_haver = function(t)
+      return t.path
+    end,
   },
   jxa_windowlike_specifier = {
     jxa_tab_specifier = function(t)
@@ -2588,10 +2606,7 @@ is = {
   },
   audiodevice_specifier = {
     active_audiodevice_specifier = function(spec)
-      return get.audiodevice.is_active_audiodevice(
-        spec.device,
-        spec.type
-      )
+      return spec.device == transf.audiodevice_type.audiodevice_by_default(spec.subtype)
     end,
   },
   csl_table = {

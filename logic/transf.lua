@@ -1551,7 +1551,7 @@ transf = {
     lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = function(fs_tag_kv_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         fs_tag_kv_arr,
-        get.fn.second_n_args_bound_fn(get.str.two_strs_split_or_nil, "-")
+        get.fn.fn_by_2nd_n_bound(get.str.two_strs_split_or_nil, "-")
       )
     end,
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(fs_tag_kv_arr)
@@ -1567,7 +1567,7 @@ transf = {
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(assoc)
       return hs.fnutils.map(
         assoc,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.str.str_arr_by_split_w_ascii_char, {a_use, ","})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.str.str_arr_by_split_w_ascii_char, {a_use, ","})
       )
     end,
     fs_tag_kv_arr = function(assoc)
@@ -1975,6 +1975,11 @@ transf = {
     pos_int_by_len_utf8_chars = function(path)
       return transf.str.pos_int_by_len_utf8_chars(transf.plaintext_file.str_by_contents(path))
     end,
+    pos_int_by_normzeilen = function(path)
+      return transf.pos_int.pos_int_by_normzeilen(
+        transf.plaintext_file.pos_int_by_len_utf8_chars(path)
+      )
+    end,
     pos_int_by_len_ascii_chars = function(path)
       return transf.str.pos_int_by_len_ascii_chars(transf.plaintext_file.str_by_contents(path))
     end,
@@ -2138,12 +2143,6 @@ transf = {
     end,
     urlcharset_str_by_american_time = function(timestamp_s)
       return get.timestamp_s.str_by_formatted(timestamp_s, "%I:%M:%S %p")
-    end,
-
-    event_table_by_start = function(timestamp_s)
-      return {
-        start = transf.timestamp_s.full_rfc3339like_dt(timestamp_s)
-      }
     end,
     urlcharset_str_by_detailed_summary = function(timestamp_s)
       return get.timestamp_s.str_by_formatted(timestamp_s, "%A, %Y-%m-%d %H:%M:%S")
@@ -2454,7 +2453,7 @@ transf = {
     interval_specifier_by_earliest_start = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.smaller_table_by_key, {a_use, a_use, "start"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.smaller_table_by_key, {a_use, a_use, "start"})
       )
     end,
     t_by_earliest_start = function(interval_specifier_arr)
@@ -2465,7 +2464,7 @@ transf = {
     interval_specifier_by_latest_start = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key, {a_use, a_use, "start"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.larger_table_by_key, {a_use, a_use, "start"})
       )
     end,
     t_by_latest_start = function(interval_specifier_arr)
@@ -2476,7 +2475,7 @@ transf = {
     interval_specifier_by_latest_stop = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key, {a_use, a_use, "stop"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.larger_table_by_key, {a_use, a_use, "stop"})
       )
     end,
     t_by_latest_stop = function(interval_specifier_arr)
@@ -2487,7 +2486,7 @@ transf = {
     interval_specifier_by_earliest_stop = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.smaller_table_by_key, {a_use, a_use, "stop"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.smaller_table_by_key, {a_use, a_use, "stop"})
       )
     end,
     t_by_earliest_stop = function(interval_specifier_arr)
@@ -2556,12 +2555,6 @@ transf = {
     rf3339like_dt_or_interval = function(ivspec)
       local rfc3339like_dt = transf.timestamp_s_interval_specifier.rfc3339like_dt(ivspec)
       return rfc3339like_dt or transf.timestamp_s_interval_specifier.rfc3339like_interval_where_dcmp_val_is_not_max_dcmp_val(ivspec)
-    end,
-    event_table = function(ivspec)
-      return {
-        start = transf.timestamp_s_interval_specifier.rfc3339like_dt_by_start_filtered_not_max_or_not_prefix(ivspec.start),
-        ["end"] = transf.timestamp_s_interval_specifier.rfc3339like_dt_by_end_filtered_not_max_or_not_prefix(ivspec.stop),
-      }
     end,
   },
   dcmp_spec = {
@@ -2905,7 +2898,7 @@ transf = {
       end
     end,
     iban_or_nil = function (contact_table)
-      return get.contact_table.encrypted_data(contact_table, "iban")
+      return get.contact_table.not_userdata_or_fn_by_encrypted_data(contact_table, "iban")
     end,
     bic_or_nil = function (contact_table)
       local iban = transf.contact_table.iban_or_nil(contact_table)
@@ -3907,7 +3900,7 @@ transf = {
     str_by_prompted_once_from_default = function(str)
       return get.str.str_by_prompted_once_from_default(str, "Enter a str...")
     end,
-    prompted_once_alphanum_minus_underscore_str_from_default = function(str)
+    alphanum_minus_underscore_str_by_prompted_once_from_default = function(str)
       return get.str.alphanum_minus_underscore_str_by_prompted_once_from_default(str, "Enter a str (alphanum, minus, underscore)...")
     end,
     not_whitespace_str_arr = function(str)
@@ -3967,7 +3960,7 @@ transf = {
   },
   otp_pass_item_name = {
     digit_string_by_otp = function(item)
-      return transf.str.str_or_nil_by_evaled_env_bash_stripped("pass otp otp/" .. item)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("pass otp p/otp/" .. item)
     end,
     otpauth_url = function(item)
       return get.auth_pass_item_name.str_or_nil_by_fetch_value(item, "otp")
@@ -4137,65 +4130,6 @@ transf = {
   base32_crock_str = {
     str_by_decode_to_utf8 = basexx.from_crockford,
   },
-  event_table = {
-    str_by_event_tagline = function(event_table)
-      local str = event_table.start
-      if event_table["end"] then
-        str = str .. " - " .. event_table["end"]
-      end
-      str = str .. " " .. event_table.calendar .. ":"
-      if event_table.title then
-        str = str .. " " .. transf.event_table.line_or_nil_by_title(event_table)
-      end
-      if event_table.location then
-        str = str .. " @ " .. transf.event_table.line_or_nil_by_location(event_table)
-      end
-      if event_table.description then
-        str = str .. " :: " .. transf.event_table.line_or_nil_by_description(event_table)
-      end
-      if event_table.url then
-        str = str .. " Link: " .. event_table.url
-      end
-      return str
-    end,
-    calendar_name = function(event_table)
-      return event_table.calendar
-    end,
-    line_or_nil_by_title = function(event_table)
-      return transf.str_or_nil.line_or_nil_by_folded(event_table.title)
-    end,
-    line_or_nil_by_location = function(event_table)
-      return transf.str_or_nil.line_or_nil_by_folded(event_table.location)
-    end,
-    str_or_nil_by_description = function(event_table)
-      return event_table.description
-    end,
-    line_or_nil_by_description = function(event_table)
-      return transf.str_or_nil.line_or_nil_by_folded(event_table.description)
-    end,
-    url = function(event_table)
-      return event_table.url
-    end,
-
-    rfc3339like_dt_by_start = function(event_table)
-      return event_table.start
-    end,
-    rfc3339like_dt_by_end = function(event_table)
-      return event_table["end"]
-    end,
-    timestamp_s_by_start = function(event_table)
-      return transf.rfc3339like_dt.timestamp_s_by_min(event_table.start)
-    end,
-    timestamp_s_by_end = function(event_table)
-      return transf.rfc3339like_dt.timestamp_s_by_min(event_table["end"])
-    end,
-    timestamp_s_interval_specifier = function(event_table)
-      return {
-        start = transf.event_table.timestamp_s_by_start(event_table),
-        ["end"] = transf.event_table.timestamp_s_by_end(event_table),
-      }
-    end,
-  },
   multiline_str = {
     multiline_str_by_trimmed_lines = function(str)
       local lines = get.str.str_arr_by_split_w_str(str, "\n")
@@ -4236,29 +4170,8 @@ transf = {
         consts.unique_record_separator
       )
     end,
-    event_table_arr = function(str)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
-        transf.multirecord_str.record_str_arr(str),
-        transf.record_str.event_table
-      )
-    end,
   },
   record_str = {
-    event_table = function(str)
-      local components = get.str.str_arr_by_split_w_str(str, consts.unique_field_separator)
-      local parsed = {}
-      for i, component in transf.arr.pos_int_vt_stateless_iter(components) do
-        local key = ls.khal.parseable_format_components[i]
-        if key == "alarms" then
-          parsed[key] = get.str.str_arr_by_split_w_ascii_char(component, ",")
-        elseif key == "description" then
-          parsed[key] = component
-        else
-          parsed[key] = get.str.str_by_replaced_w_ascii_str(component, "\n", "")
-        end
-      end
-      return parsed
-    end,
   },
   syn_specifier = {
     str_arr_by_synonyms = function (syn_specifier)
@@ -5661,7 +5574,7 @@ transf = {
         return env.SELF_UUID
       end
     end,
-    client_main_name = function(dir)
+    line_by_main_name_client = function(dir)
       return transf.contact_table.line_by_main_name(
         transf.client_project_dir.contact_table_by_client(dir)
       )
@@ -5681,13 +5594,13 @@ transf = {
         transf.client_project_dir.creator_contact_table(dir)
       )
     end,
-    creator_bank_details_str = function(dir)
+    multiline_str_by_name_bank_details_creator = function(dir)
       return transf.contact_table.multiline_str_by_name_bank_details(
         transf.client_project_dir.creator_contact_table(dir)
       )
     end,
     client_project_kind = function(dir)
-      if is.project_dir.client_project_dir(dir) then
+      if is.project_dir.omegat_project_dir(dir) then
         return "translation"
       else
         error("unknown client project kind")
@@ -5723,49 +5636,63 @@ transf = {
       or transf.client_project_dir.number_or_nil_by_creator_rate(dir)
       or 0
     end,
-    rechnung = function(dir)
-      return transf.client_project_dir.assoc_by_metadata(dir).rechnung
-    end,
-    rechnung_id = function(dir)
+    alphanum_minus_underscore_by_rechnung_id = function(dir)
       return
       transf["nil"].rfc3339like_ymd_by_current() .. "--" ..
-      transf.client_project_dir.client_id_by_client(dir):upper() .. "-" ..
-      transf.client_project_dir.rechnung_number(dir)
+      transf.client_project_dir.client_id_by_client(dir):lower() .. "-" ..
+      transf.client_project_dir.pos_int_by_rechnung_index(dir)
     end,
-    rechnung_number = function(dir)
-      return transf.client_project_dir.rechnung(dir).nr
+    pos_int_by_rechnung_index = function(dir)
+      return transf.client_project_dir.assoc_by_metadata(dir).rechnung_index
     end,
     rfc3339like_ymd_by_delivery_date = function(dir)
-      return transf.client_project_dir.rechnung(dir).delivery_date
+      return transf.client_project_dir.assoc_by_metadata(dir).delivery_date
     end,
-    rechnung_filename = function(dir)
-      return transf["nil"].full_rfc3339like_dt_by_current() .. "--" .. transf.client_project_dir.client_id_by_client(dir) .. "_" .. transf.client_project_dir.rechnung_number(dir)
+    local_absolute_path_by_rechnung_pdf = function(dir)
+      return transf.path.path_by_ending_with_slash(dir) .. transf.client_project_dir.alphanum_minus_underscore_by_rechnung_id(dir) .. ".pdf"
     end,
-    rechnung_pdf_path = function(dir)
-      return transf.path.path_by_ending_with_slash(dir) .. transf.client_project_dir.rechnung_filename(dir) .. ".pdf"
+    local_absolute_path_by_rechnung_path = function(dir)
+      return transf.path.path_by_ending_with_slash(dir) .. transf.client_project_dir.alphanum_minus_underscore_by_rechnung_id(dir) .. ".md"
     end,
-    rechnung_md_path = function(dir)
-      return transf.path.path_by_ending_with_slash(dir) .. transf.client_project_dir.rechnung_filename(dir) .. ".md"
+    line_by_kind_plaintext_name_de = function(dir)
+      if #transf.client_project_dir.pos_int_arr_by_amount_billing_unit(dir) > 1 then
+        return tblmap.client_project_kind.iso_639_1_language_code_key_line_value_assoc_by_plaintext_name_pl[
+          transf.client_project_dir.client_project_kind(dir)
+        ].de
+      else 
+        return tblmap.client_project_kind.iso_639_1_language_code_key_line_value_assoc_by_plaintext_name_sg[
+          transf.client_project_dir.client_project_kind(dir)
+        ].de
+      end
     end,
-    rechnung_email_specifier = function(dir)
+    multiline_str_by_rechnung_email_de = function(dir)
+      return get.str.str_by_evaled_as_template(lemap.rechnung_email.de, dir)
+    end,
+    email_specifier_by_rechnung_de = function(dir)
       return {
-        body = get.str.str_by_evaled_as_template(lemap.translation.rechnung_email_de, dir),
+        body = transf.client_project_dir.multiline_str_by_rechnung_email_de(dir),
         non_inline_attachment_local_file_arr = {
-          transf.client_project_dir.rechnung_pdf_path(dir)
+          transf.client_project_dir.local_absolute_path_by_rechnung_pdf(dir)
         }
       }
     end,
-    raw_rechnung = function(dir)
+    multiline_str_by_raw_rechnung_de = function(dir)
       return get.str.str_by_evaled_as_template(lemap.translation.rechnung_de, dir)
     end,
-    price_specifier_arr = function(dir)
-      local pos_int_arr = transf[
-        transf.client_project_dir.client_project_kind(dir) .. "_project_dir"
-      ].pos_int_arr_by_amount_billing_unit(dir)
-      local rate = transf.client_project_dir.number_by_rate(dir)
-      local unit = tblmap.client_project_kind.billing_unit[
+    billing_unit = function(dir)
+      return tblmap.client_project_kind.billing_unit[
         transf.client_project_dir.client_project_kind(dir)
       ]
+    end,
+    pos_int_arr_by_amount_billing_unit = function(dir)
+      return  transf[
+        transf.client_project_dir.client_project_kind(dir) .. "_project_dir"
+      ].pos_int_arr_by_amount_billing_unit(dir)
+    end,
+    price_specifier_arr = function(dir)
+      local pos_int_arr = transf.client_project_dir.pos_int_arr_by_amount_billing_unit(dir)
+      local rate = transf.client_project_dir.number_by_rate(dir)
+      local unit = transf.client_project_dir.billing_unit(dir)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         pos_int_arr,
         function(pos_int)
@@ -5778,14 +5705,14 @@ transf = {
         end
       )
     end,
-    total_cost_speciier = function(dir)
-      return transf.price_specifier_arr.total_cost_speciier(
+    total_cost_specifier = function(dir)
+      return transf.price_specifier_arr.total_cost_specifier(
         transf.client_project_dir.price_specifier_arr(dir)
       )
     end,
-    price_block_german = function(dir)
-      return transf.price_specifier.translation_price_block_german(
-        transf.client_project_dir.price_specifier(dir)
+    multiline_str_by_price_block_german = function(dir)
+      return transf.total_cost_specifier.multiline_str_by_price_block_german(
+        transf.client_project_dir.total_cost_specifier(dir)
       )
     end,
 
@@ -5793,57 +5720,53 @@ transf = {
   omegat_project_dir = {
    
 
-    dictionary_dir = function(dir)
+    local_extant_path_by_dictionary_dir = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "dictionary"
     end,
-    glossary_dir = function(dir)
+    local_extant_path_by_glossary_dir = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "glossary"
     end,
-    omegat_dir = function(dir)
+    local_extant_path_by_omegat_dir = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "omegat"
     end,
-    source_dir = function(dir)
+    local_extant_path_by_source_dir = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "source"
     end,
-    target_dir = function(dir)
+    local_extant_path_by_target_dir = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "target"
     end,
-    target_txt_dir = function(dir)
+    local_extant_path_by_target_txt_dir = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "target_txt"
     end,
-    tm_dir = function(dir)
+    local_extant_path_by_tm_dir = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. "tm"
     end,
-    source_files = function(dir)
+    file_arr_by_source = function(dir)
       return transf.dir.absolute_path_arr_by_children(
-        transf.omegat_project_dir.source_dir(dir)
+        transf.omegat_project_dir.local_extant_path_by_source_dir(dir)
       )
     end,
-    target_files = function(dir)
+    file_arr_by_target = function(dir)
       return transf.dir.absolute_path_arr_by_children(
-        transf.omegat_project_dir.target_dir(dir)
+        transf.omegat_project_dir.local_extant_path_by_target_dir(dir)
       )
     end,
-    local_resultant_tm = function(dir)
-      return transf.omegat_project_dir.tm_dir(dir) .. "/" .. transf.path.leaflike_by_leaf(dir) .. "-omegat.tmx"
+    local_absolute_path_by_resultant_tm = function(dir)
+      return transf.omegat_project_dir.local_extant_path_by_tm_dir(dir) .. "/" .. transf.path.leaflike_by_leaf(dir) .. "-omegat.tmx"
     end,
     pos_int_arr_by_amount_billing_unit = function(dir)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.dir.absolute_path_arr_by_children(
-          transf.omegat_project_dir.target_txt_dir(dir)
+          transf.omegat_project_dir.local_extant_path_by_target_txt_dir(dir)
         ),
-        function(path)
-          return transf.pos_int.pos_int_by_normzeilen(
-            transf.plaintext_file.utf8_char_arr(path)
-          )
-        end
+        transf.plaintext_file.pos_int_by_normzeilen
         
       )
     end,
 
   },
   price_specifier_arr = {
-    total_cost_speciier = function(arr)
+    total_cost_specifier = function(arr)
       return {
         price_specifier_arr = arr,
         total = hs.fnutils.reduce(
@@ -5854,8 +5777,8 @@ transf = {
       }
     end
   },
-  total_cost_speciier = {
-    price_block_german = function(spec)
+  total_cost_specifier = {
+    multiline_str_by_price_block_german = function(spec)
       return 
         get.str_or_number_arr.str_by_joined(
           get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
@@ -5863,7 +5786,7 @@ transf = {
             function(v)
               return ("%d %s @ %.2f€ = %d€"):format(
                 v.amount,
-                get.billing_unit.line_w_iso_639_1_language_code(v.unit, "de"),
+                tblmap.billing_unit.iso_639_1_language_code_key_line_value_assoc[v.unit].de,
                 v.rate,
                 v.price
               )
@@ -5910,7 +5833,7 @@ transf = {
       return app:bundleID()
     end,
     menu_item_table_arr = function(app)
-      local arr = get.n_any_assoc_arr_arr.assoc_leaf_labels_with_title_path_arr(
+      local arr = get.assoc_arr_arr.path_key_haver_arr_by_take_last(
         get.tree_node_like_arr.tree_node_arr(
           app:getMenuItems(),
           { levels_of_nesting_to_skip = 1}
@@ -7445,7 +7368,7 @@ transf = {
   action_specifier = {
     chooser_item_specifier = function(action_specifier)
       local str = get.str.str_by_with_suffix(action_specifier.d, ".")
-      str = str .. " #" .. get.not_userdata_or_fn.md5_base32_crock_str_of_length(action_specifier.d, 3) -- shortcode for easy use
+      str = str .. " #" .. get.not_userdata_or_fn.base32_crock_str_by_md5_w_pos_int(action_specifier.d, 3) -- shortcode for easy use
       return {text = str}
     end
   },
@@ -7555,13 +7478,13 @@ transf = {
     retriever_specifier_by_highest_precedence = function(retriever_specifier_arr)
       return hs.fnutils.reduce(
         retriever_specifier_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key {a_use, a_use, "precedence"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.larger_table_by_key {a_use, a_use, "precedence"})
       )
     end,
     retriever_specifier_arr_by_precedence_ordered = function(retriever_specifier_arr)
       return get.arr.arr_by_sorted(
         retriever_specifier_arr,
-        get.fn.arbitrary_args_bound_or_ignored_fn(get.table_and_table.larger_table_by_key) {a_use, a_use, "precedence"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.larger_table_by_key) {a_use, a_use, "precedence"})
     end
   },
   ipc_socket_id = {
@@ -7621,7 +7544,7 @@ transf = {
       return get.str_or_number_arr.str_by_joined(
         get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           {"pause", "loop", "shuffle", "video"},
-          get.fn.first_n_args_bound_fn(get.mpv_ipc_socket_id.bool_emoji, mpv_ipc_socket_id)
+          get.fn.fn_by_1st_n_bound(get.mpv_ipc_socket_id.bool_emoji, mpv_ipc_socket_id)
         ),
         ""
       )
