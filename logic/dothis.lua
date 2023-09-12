@@ -1192,7 +1192,7 @@ dothis = {
       )
     end,
   },
-  email_file ={
+  maildir_file ={
     download_attachment = function(path, name, do_after)
       local cache_path = env.XDG_CACHE_HOME .. '/hs/email_attachments'
       local att_path = cache_path .. '/' .. name
@@ -1206,9 +1206,9 @@ dothis = {
     end,
     choose_attachment_and_download = function(path, fn)
       dothis.arr.choose_item(
-        transf.email_file.leaflike_arr_by_attachments(path),
+        transf.maildir_file.leaflike_arr_by_attachments(path),
         function(att)
-          dothis.email_file.download_attachment(path, att, fn)
+          dothis.maildir_file.download_attachment(path, att, fn)
         end
       )
     end,
@@ -1248,22 +1248,22 @@ dothis = {
     edit_then_send = function(path, do_after)
       dothis.local_file.edit_file_in_vscode_act_on_contents(path, function(str)
         dothis.absolute_path.write_file(path, get.str.str_by_evaled_as_template(str)) -- re-eval
-        dothis.email_file.send(path, do_after)
+        dothis.maildir_file.send(path, do_after)
       end)
     end,
     reply = function(path, specifier, do_after)
-      specifier = transf.two_tables.table_by_take_new(transf.email_file.email_specifier_by_reply(path), specifier)
+      specifier = transf.two_tables.table_by_take_new(transf.maildir_file.email_specifier_by_reply(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
     edit_then_reply = function(path, do_after)
-      dothis.email_specifier.edit_then_send(transf.email_file.email_specifier_by_reply(path), do_after)
+      dothis.email_specifier.edit_then_send(transf.maildir_file.email_specifier_by_reply(path), do_after)
     end,
     forward = function(path, specifier, do_after)
-      specifier = transf.two_tables.table_by_take_new(transf.email_file.email_specifier_by_forward(path), specifier)
+      specifier = transf.two_tables.table_by_take_new(transf.maildir_file.email_specifier_by_forward(path), specifier)
       dothis.email_specifier.send(specifier, do_after)
     end,
     edit_then_forward = function(path, do_after)
-      dothis.email_specifier.edit_then_send(transf.email_file.email_specifier_by_forward(path), do_after)
+      dothis.email_specifier.edit_then_send(transf.maildir_file.email_specifier_by_forward(path), do_after)
     end,
     move = function(source, target)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
@@ -1371,10 +1371,10 @@ dothis = {
   },
   email_specifier = {
     send = function(specifier, do_after)
-      dothis.email_file.send(transf.email_specifier.raw_email(specifier), do_after)
+      dothis.maildir_file.send(transf.email_specifier.raw_email(specifier), do_after)
     end,
     edit_then_send = function(specifier, do_after)
-      dothis.email_file.edit_then_send(transf.email_specifier.raw_email(specifier), do_after)
+      dothis.maildir_file.edit_then_send(transf.email_specifier.raw_email(specifier), do_after)
     end,
   },
   email = {
@@ -1472,25 +1472,25 @@ dothis = {
   },
   git_root_dir = {
     run_hook =  function(path, hook)
-      local hook_path = get.git_root_dir.hook_path(path, hook)
+      local hook_path = get.git_root_dir.in_git_dir_by_hook_path(path, hook)
       dothis.str.env_bash_eval(hook_path)
     end,
     add_hook = function(path, hook_path, name)
       name = name or transf.path.leaflike_by_filename(hook_path)
-      dothis.extant_path.copy_to_absolute_path(hook_path, get.git_root_dir.hook_path(path, name))
-      dothis.local_extant_path.make_executable(get.git_root_dir.hook_path(path, name))
+      dothis.extant_path.copy_to_absolute_path(hook_path, get.git_root_dir.in_git_dir_by_hook_path(path, name))
+      dothis.local_extant_path.make_executable(get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     copy_hook = function(path, type, name)
       type = type or "default"
       local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
       dothis.local_extant_path.make_executable(source_hook)
-      dothis.extant_path.copy_to_absolute_path(source_hook, get.git_root_dir.hook_path(path, name))
+      dothis.extant_path.copy_to_absolute_path(source_hook, get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     link_hook = function(path, type, name)
       type = type or "default"
       local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
       dothis.local_extant_path.make_executable(source_hook)
-      dothis.local_extant_path.link_to_nosudo_nonextant_path(source_hook, get.git_root_dir.hook_path(path, name))
+      dothis.local_extant_path.link_to_nosudo_nonextant_path(source_hook, get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     link_all_hooks = function(path, type)
       local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
@@ -1652,7 +1652,7 @@ dothis = {
       end
     end,
     create_as_url_files = function(url_arr, path)
-      local abs_path_assoc = get.url_arr.absolute_path_key_assoc_of_url_files(url_arr, path)
+      local abs_path_assoc = get.url_arr.local_absolute_path_key_url_value_assoc(url_arr, path)
       dothis.absolute_path_str_value_assoc.write(abs_path_assoc)
     end,
     create_as_session = function(url_arr, root)
@@ -1890,26 +1890,26 @@ dothis = {
     end,
     pull_subtype_project_materials = function(project_dir, type, subtype)
       dothis.dir.copy_children_absolute_path_arr_into_absolute_path( 
-        get.project_dir.global_subtype_project_material_path(project_dir, type, subtype),
-        get.project_dir.local_subtype_project_material_path(project_dir, type, subtype)
+        get.project_dir.local_absolute_path_by_global_subtype_project_material(project_dir, type, subtype),
+        get.project_dir.local_absolute_path_local_subtype_project_material(project_dir, type, subtype)
       )
     end,
     push_subtype_project_materials = function(project_dir, type, subtype)
       dothis.dir.copy_children_absolute_path_arr_into_absolute_path( 
-        get.project_dir.local_subtype_project_material_path(project_dir, type, subtype),
-        get.project_dir.global_subtype_project_material_path(project_dir, type, subtype)
+        get.project_dir.local_absolute_path_local_subtype_project_material(project_dir, type, subtype),
+        get.project_dir.local_absolute_path_by_global_subtype_project_material(project_dir, type, subtype)
       )
     end,
     pull_universal_project_materials = function(project_dir, type)
       dothis.dir.copy_children_absolute_path_arr_into_absolute_path( 
-        get.project_dir.global_universal_project_material_path(project_dir, type),
-        get.project_dir.local_universal_project_material_path(project_dir, type)
+        get.project_dir.local_absolute_path_global_by_universal_project_material(project_dir, type),
+        get.project_dir.local_absolute_path_by_local_universal_project_material(project_dir, type)
       )
     end,
     push_universal_project_materials = function(project_dir, type)
       dothis.dir.copy_children_absolute_path_arr_into_absolute_path( 
-        get.project_dir.local_universal_project_material_path(project_dir, type),
-        get.project_dir.global_universal_project_material_path(project_dir, type)
+        get.project_dir.local_absolute_path_by_local_universal_project_material(project_dir, type),
+        get.project_dir.local_absolute_path_global_by_universal_project_material(project_dir, type)
       )
     end,
     pull_project_materials = function(project_dir, type, subtype)
@@ -1939,7 +1939,7 @@ dothis = {
       )
       dothis.extant_path.copy_into_absolute_path(
         transf.omegat_project_dir.local_absolute_path_by_resultant_tm(omegat_project_dir),
-        get.project_dir.global_subtype_project_material_path(
+        get.project_dir.local_absolute_path_by_global_subtype_project_material(
           omegat_project_dir,
           "tm",
           transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
@@ -2253,12 +2253,12 @@ dothis = {
   },
   hschooser_specifier = {
     choose = function(spec, callback)
-      local hschooser = get.hschooser_specifier.partial_hschooser(spec, callback)
+      local hschooser = get.hschooser_specifier.hschooser(spec, callback)
       hschooser:rows(spec.rows or 30)
       for k, v in transf.table.kt_vt_stateless_iter(spec.whole_chooser_style_keys) do
         hschooser[k](hschooser, v)
       end
-      local choices = get.chooser_item_specifier_arr.styled_chooser_item_specifier_arr(
+      local choices = get.chooser_item_specifier_arr.chooser_item_specifier_arr_by_styled(
         spec.chooser_item_specifier_arr,
         spec.chooser_item_specifier_text_key_styledtext_attributes_specifier_assoc
       )
@@ -2306,10 +2306,10 @@ dothis = {
   },
   mpv_ipc_socket_id = {
     set = function(id, key, ...)
-      get.ipc_socket_id.response_table_or_nil(id, { command = { "set_property", key, ... } })
+      get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(id, { command = { "set_property", key, ... } })
     end,
     cycle = function(id, key)
-      get.ipc_socket_id.response_table_or_nil(id, { command = { "cycle", key } })
+      get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(id, { command = { "cycle", key } })
     end,
     cycle_inf_no = function(id, key)
       dothis.mpv_ipc_socket_id.set(
@@ -2334,7 +2334,7 @@ dothis = {
       dothis.mpv_ipc_socket_id.cycle_inf_no(id, "shuffle")
     end,
     exec = function(id, ...)
-      get.ipc_socket_id.response_table_or_nil(id, { command = { ... } })
+      get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(id, { command = { ... } })
     end,
     stop = function(id)
       dothis.mpv_ipc_socket_id.exec(id, "stop")

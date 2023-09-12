@@ -564,6 +564,12 @@ transf = {
     str_by_summary = function(arr)
       return "arr ("..#arr.."):" .. transf.arr.str_by_contents_summary(arr)
     end,
+    str_by_alternative_summary = function(arr)
+      return get.str_or_number_arr.str_by_joined(
+        transf.arr.str_arr(arr),
+        " | "
+      )
+    end,
     multiline_str = function(arr)
       return transf.str_arr.multiline_str(transf.arr.str_arr(arr))
     end,
@@ -717,8 +723,8 @@ transf = {
       ] or ext
     end,
     path_by_without_extension = function(path)
-      return get.path.path_from_sliced_path_segment_arr(
-        get.path.path_segments(path),
+      return get.path.path_by_sliced_split_ext_path_component_arr(
+        transf.path.path_component_arr_by_split_ext(path),
         {start = 1, stop = -2}
       )
     end,
@@ -740,7 +746,7 @@ transf = {
     end,
     --- not technically always guaranteed to return a path, hence the weird name
     trimmed_noweirdwhitespace_line_by_parent_path = function(path)
-      return get.path.path_from_sliced_path_component_arr(
+      return get.path.path_by_sliced_path_component_arr(
         get.path.path_component_arr(path),
         {start = 1, stop = -2}
       )
@@ -1079,7 +1085,7 @@ transf = {
   },
   extant_path_arr = {
     extant_path_by_newest_creation = function(path_arr)
-      return get.extant_path_arr.extant_by_largest_of_attr(path_arr, "creation")
+      return get.local_extant_path_arr.extant_by_largest_of_attr(path_arr, "creation")
     end,
     dir_arr_by_filter = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, is.extant_path.dir)
@@ -1362,6 +1368,9 @@ transf = {
         is.dir.git_root_dir
       )
     end,
+    git_repository_dir = function(path)
+      return transf.git_root_dir.git_repository_dir(transf.in_git_dir.git_root_dir(path))
+    end,
     local_nonabsolute_path_by_from_git_root_dir = function(path)
       return get.local_absolute_path.local_nonabsolute_path_by_from(
         path,
@@ -1371,14 +1380,43 @@ transf = {
     absolute_path_by_root_gitignore = function(path)
       return transf.path.path_by_ending_with_slash(transf.in_git_dir.git_root_dir(path)) .. ".gitignore"
     end,
-    str_by_current_branch = function(path)
-      return get.local_extant_path.cmd_output_from_path(
+    printable_ascii_not_whitespace_str_by_current_branch = function(path)
+      return get.local_extant_path.str_or_nil_by_evaled_env_bash_stripped(
         path,
         "git rev-parse --abbrev-ref HEAD"
       )
     end,
+    printable_ascii_not_whitespace_str_or_nil_by_likely_main_branch = function(path)
+      return transf.git_repository_dir.printable_ascii_not_whitespace_str_or_nil_by_likely_main_branch(
+        transf.in_git_dir.git_repository_dir(path)
+      )
+    end,
+    path_url_by_remote_blob_current_branch = function(path)
+      return get.in_git_dir.path_url_by_remote_blob(
+        path,
+        transf.in_git_dir.printable_ascii_not_whitespace_str_by_current_branch(path)
+      )
+    end,
+    path_url_by_remote_raw_current_branch = function(path)
+      return get.in_git_dir.path_url_by_remote_raw(
+        path,
+        transf.in_git_dir.printable_ascii_not_whitespace_str_by_current_branch(path)
+      )
+    end,
+    path_url_by_remote_blob_main_branch = function(path)
+      return get.in_git_dir.path_url_by_remote_blob(
+        path,
+        transf.in_git_dir.printable_ascii_not_whitespace_str_or_nil_by_likely_main_branch(path)
+      )
+    end,
+    path_url_by_remote_raw_main_branch = function(path)
+      return get.in_git_dir.path_url_by_remote_raw(
+        path,
+        transf.in_git_dir.printable_ascii_not_whitespace_str_or_nil_by_likely_main_branch(path)
+      )
+    end,
     dotgit_url_by_remote = function(path)
-      return get.local_extant_path.cmd_output_from_path(
+      return get.local_extant_path.str_or_nil_by_evaled_env_bash_stripped(
         path,
         "git config --get remote.origin.url"
       )
@@ -1417,18 +1455,18 @@ transf = {
       return tblmap.host.host_by_raw_default[remote_host] or tblmap.git_remote_type.host_by_raw_default[git_remote_type]
     end,
     multiline_str_by_status = function(path)
-      return get.local_extant_path.cmd_output_from_path(
+      return get.local_extant_path.str_or_nil_by_evaled_env_bash_stripped(
         path,
         "git status"
       )
     end,
     short_sha1_hex_str_arr_by_unpushed_commits = function(path)
-      local raw_hashes = get.local_extant_path.cmd_output_from_path(
+      local raw_hashes = get.local_extant_path.str_or_nil_by_evaled_env_bash_stripped(
         path,
         "git log --branches --not --remotes --pretty=format:'%h'"
       )
       return transf.str.noempty_line_arr(raw_hashes)
-    end
+    end,
 
 
   },
@@ -1443,6 +1481,20 @@ transf = {
   git_repository_dir = {
     in_git_dir_by_hooks_dir = function(git_repository_dir)
       return transf.path.path_by_ending_with_slash(git_repository_dir) .. "hooks"
+    end,
+    in_git_dir_by_refs_dir = function(git_repository_dir)
+      return transf.path.path_by_ending_with_slash(git_repository_dir) .. "refs"
+    end,
+    in_git_dir_by_head_refs_dir = function(git_repository_dir)
+      return transf.path.path_by_ending_with_slash(git_repository_dir) .. "refs/heads"
+    end,
+    printable_ascii_not_whitespace_str_or_nil_by_likely_main_branch = function(git_repository_dir)
+      for _, bname in transf.arr.pos_int_vt_stateless_iter(ls.likely_main_branch_name) do
+        if get.git_repository_dir.bool_by_branch_exists(git_repository_dir, bname) then
+          return bname
+        end
+      end
+      return nil
     end,
   },
   non_bare_git_root_dir = {
@@ -1544,14 +1596,14 @@ transf = {
   },
   fs_tag_kv = {
     lower_alphanum_underscore_and_lower_alphanum_underscore_comma = function(fs_tag_kv)
-      return get.str.n_strs_by_split(fs_tag_kv, "-", 2)
+      return get.str.n_strs_by_split_w_str(fs_tag_kv, "-", 2)
     end,
   },
   fs_tag_kv_arr = {
     lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = function(fs_tag_kv_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         fs_tag_kv_arr,
-        get.fn.fn_by_2nd_n_bound(get.str.two_strs_split_or_nil, "-")
+        get.fn.fn_by_2nd_n_bound(get.str.two_strs_or_nil_by_split_w_str, "-")
       )
     end,
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(fs_tag_kv_arr)
@@ -1675,7 +1727,7 @@ transf = {
       return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
     end,
   },
-  email_file = {
+  maildir_file = {
     decoded_email_header_block_by_all = function(path)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         "mshow -qL" .. transf.str.str_by_single_quoted_escaped(path)
@@ -1688,7 +1740,7 @@ transf = {
     end,
     line_key_line_value_assoc_by_useful_headers = function(path)
       error("TODO: currently the way the headers are rendered contains a bunch of stuff we wouldn't want in the assoc. In particular, emails without a name are rendered as <email>, which may not be what we want.")
-      return transf.decoded_email_header_block.line_key_line_value_assoc(transf.email_file.decoded_email_header_block_by_all_useful(path))
+      return transf.decoded_email_header_block.line_key_line_value_assoc(transf.maildir_file.decoded_email_header_block_by_all_useful(path))
     end,
     rendered_body = function(path)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
@@ -1696,30 +1748,30 @@ transf = {
       )
     end,
     decoded_email_by_useful_headers = function(path)
-      return transf.email_file.decoded_email_header_block_by_all_useful(path) .. "\n\n" .. transf.email_file.rendered_body(path)
+      return transf.maildir_file.decoded_email_header_block_by_all_useful(path) .. "\n\n" .. transf.maildir_file.rendered_body(path)
     end,
     email_specifier = function(path)
-      local specifier = transf.email_file.line_key_line_value_assoc_by_useful_headers(path)
-      specifier.body = transf.email_file.rendered_body(path)
+      local specifier = transf.maildir_file.line_key_line_value_assoc_by_useful_headers(path)
+      specifier.body = transf.maildir_file.rendered_body(path)
       return specifier
     end,
     email_specifier_by_reply = function(path)
-      return transf.email_specifier.email_specifier_by_reply(transf.email_file.email_specifier(path))
+      return transf.email_specifier.email_specifier_by_reply(transf.maildir_file.email_specifier(path))
     end,
     email_specifier_by_forward = function(path)
-      return transf.email_specifier.email_specifier_by_forward(transf.email_file.email_specifier(path))
+      return transf.email_specifier.email_specifier_by_forward(transf.maildir_file.email_specifier(path))
     end,
     str_by_quoted_body = function(path)
-      transf.str.str_by_all_prepended_quotechar(transf.email_file.rendered_body(path))
+      transf.str.str_by_all_prepended_quotechar(transf.maildir_file.rendered_body(path))
     end,
     email_or_displayname_email_by_from = function(path)
-      return get.email_file.str_by_header(path, "from")
+      return get.maildir_file.str_by_header(path, "from")
     end,
     email_or_displayname_email_by_to = function(path)
-      return get.email_file.str_by_header(path, "to")
+      return get.maildir_file.str_by_header(path, "to")
     end,
     str_by_subject = function(path)
-      return get.email_file.str_by_header(path, "subject")
+      return get.maildir_file.str_by_header(path, "subject")
     end,
     mime_part_block = function(path)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
@@ -1727,16 +1779,16 @@ transf = {
       )
     end,
     leaflike_arr_by_attachments = function(path)
-      return transf.mime_part_block.leaflike_arr_by_attachments(transf.email_file.mime_part_block(path))
+      return transf.mime_part_block.leaflike_arr_by_attachments(transf.maildir_file.mime_part_block(path))
     end,
     line_by_summary = function(path)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.str.str_by_single_quoted_escaped(path))
     end,
-    email_file_and_line_by_summary = function(path)
-      return path, transf.email_file.line_by_summary(path)
+    maildir_file_and_line_by_summary = function(path)
+      return path, transf.maildir_file.line_by_summary(path)
     end,
-    email_file_and_decoded_email = function(path)
-      return path, transf.email_file.decoded_email_by_useful_headers(path)
+    maildir_file_and_decoded_email = function(path)
+      return path, transf.maildir_file.decoded_email_by_useful_headers(path)
     end,
 
   },
@@ -1807,7 +1859,7 @@ transf = {
       local temppath = transf.str.in_tmp_local_absolute_path(transf.path.leaflike_by_filename(path) .. ".ics")
       dothis.extant_path.copy_to_absolute_path(path, temppath)
       act.ics_file.generate_json_file(temppath)
-      local jsonpath = transf.file.str_by_contents(get.path.with_different_extension(temppath, "json"))
+      local jsonpath = transf.file.str_by_contents(get.path.path_by_with_different_extension(temppath, "json"))
       local res = json.decode(transf.file.str_by_contents(jsonpath))
       dothis.absolute_path.delete(temppath)
       dothis.absolute_path.delete(jsonpath)
@@ -2039,7 +2091,7 @@ transf = {
   },
   package_name_semver_compound_str = {
     package_name_and_semver_str__arr = function(str)
-      return get.str.str_arr_by_split_noedge(str, "@")
+      return get.str.str_arr_by_split_noedge_w_str(str, "@")
     end,
     package_name = function(str)
       return transf.package_name_semver_compound_str.package_name_and_semver_str__arr(str)[1]
@@ -2050,7 +2102,7 @@ transf = {
   },
   package_name_semver_package_manager_name_compound_str = {
     package_name_semver_compound_str = function(str)
-      return get.str.str_arr_by_split_noedge(str, ":")[1]
+      return get.str.str_arr_by_split_noedge_w_str(str, ":")[1]
     end,
     package_name = function(str)
       return transf.package_name_semver_compound_str.package_name(
@@ -2063,15 +2115,15 @@ transf = {
       )
     end,
     package_manager_name = function(str)
-      return get.str.str_arr_by_split_noedge(str, ":")[2]
+      return get.str.str_arr_by_split_noedge_w_str(str, ":")[2]
     end,
   },
   package_name_package_manager_name_compound_str = {
     package_name = function(str)
-      return get.str.str_arr_by_split_noedge(str, ":")[1]
+      return get.str.str_arr_by_split_noedge_w_str(str, ":")[1]
     end,
     package_manager_name = function(str)
-      return get.str.str_arr_by_split_noedge(str, ":")[2]
+      return get.str.str_arr_by_split_noedge_w_str(str, ":")[2]
     end,
   },
   dice_notation = {
@@ -2111,11 +2163,11 @@ transf = {
     triplex_local_nonabsolute_path_by_y_ym_ymd = function(date)
       return get.str_or_number_arr.str_by_joined(transf.timestamp_s.rfc3339like_y_and_rfc3339like_ym_and_rfc3339like_ymd__arr(date), "/")
     end,
-    number_sequence_specifier_by_quarter_hours = function(timestamp_s)
-      return get.timestamp_s.number_sequence_specifier_of_lower_component(timestamp_s, 15, "hour")
+    timestamp_s_sequence_specifier_by_quarter_hours = function(timestamp_s)
+      return get.timestamp_s.timestamp_s_sequence_specifier_of_lower_component(timestamp_s, 15, "hour")
     end,
-    number_sequence_specifier_by_quarter_hours_of_day = function(timestamp_s)
-      return get.timestamp_s.number_sequence_specifier_of_lower_component(timestamp_s, 15, "day")
+    timestamp_s_sequence_specifier_by_quarter_hours_of_day = function(timestamp_s)
+      return get.timestamp_s.timestamp_s_sequence_specifier_of_lower_component(timestamp_s, 15, "day")
     end,
     full_rfc3339like_dt = function(timestamp_s)
       return get.timestamp_s.rfc3339like_dt_by_precison_w_dcmp_name(timestamp_s, "sec")
@@ -2171,6 +2223,12 @@ transf = {
     end,
     timestamp_ms = function(dcmp_name)
       return tblmap.dcmp_name.timestamp_ms[dcmp_name]
+    end,
+    dcmp_name_by_next = function(dcmp_name)
+      return get.dcmp_name.dcmp_name_by_next(dcmp_name, 1)
+    end,
+    dcmp_name_by_previous = function(dcmp_name)
+      return get.dcmp_name.dcmp_name_by_previous(dcmp_name, 1)
     end,
     
   },
@@ -2360,7 +2418,7 @@ transf = {
   },
   rf3339like_dt_or_interval = {
     dt_or_interval = function(str)
-      if get.str.bool_by_contains_w_ascii_str(str, "_to_") then
+      if get.str.bool_by_contains_w_str(str, "_to_") then
         return "rfc3339like_interval"
       else
         return "rfc3339like_dt"
@@ -2408,7 +2466,7 @@ transf = {
   },
   digit_str_or_digit_interval_str = {
     int_interval_specifier = function(str)
-      if get.str.bool_by_contains_w_ascii_str(str, "-") then
+      if get.str.bool_by_contains_w_str(str, "-") then
         return transf.digit_interval_str.int_interval_specifier(str)
       else
         local int = transf.nonindicated_number_str.number_by_base_10(str)
@@ -2453,7 +2511,7 @@ transf = {
     interval_specifier_by_earliest_start = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.smaller_table_by_key, {a_use, a_use, "start"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_smaller_key, {a_use, a_use, "start"})
       )
     end,
     t_by_earliest_start = function(interval_specifier_arr)
@@ -2464,7 +2522,7 @@ transf = {
     interval_specifier_by_latest_start = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.larger_table_by_key, {a_use, a_use, "start"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key, {a_use, a_use, "start"})
       )
     end,
     t_by_latest_start = function(interval_specifier_arr)
@@ -2475,7 +2533,7 @@ transf = {
     interval_specifier_by_latest_stop = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.larger_table_by_key, {a_use, a_use, "stop"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key, {a_use, a_use, "stop"})
       )
     end,
     t_by_latest_stop = function(interval_specifier_arr)
@@ -2486,7 +2544,7 @@ transf = {
     interval_specifier_by_earliest_stop = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.smaller_table_by_key, {a_use, a_use, "stop"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_smaller_key, {a_use, a_use, "stop"})
       )
     end,
     t_by_earliest_stop = function(interval_specifier_arr)
@@ -3231,25 +3289,15 @@ transf = {
         in_fields = {
           title = transf.youtube_video_id.line_by_title(id),
           channel_title = transf.youtube_video_id.line_by_channel_title(id),
+          description = get.str.str_by_shortened_start_ellipsis(transf.youtube_video_id.str_by_description(id)),
         },
-        form_field_specifier_arr = {
-          {
-            alias = "tcrea",
-            value = "Artist"
-          },
-          {
-            alias = "title",
-            value = "Title"
-          },
-          {
-            alias = "srs",
-            value = "Series"
-          },
-          {
-            alias = "srsrel",
-            value = "Relation to series",
-            explanation = "op, ed, ost, insert song, etc."
-          }
+        form_fields = {"tcrea", "title", "srs", "srsrel", "srsrelindex"},
+        explanations = {
+          tcrea = "Artist",
+          title = "Title",
+          srs = "Series",
+          srsrel = "Relation to series",
+          srsrelindex = "Index in the relation to series",
         }
       })
       return get.table.table_by_mapped_w_vt_arg_vt_ret_fn(
@@ -3843,13 +3891,11 @@ transf = {
     --- @return hs.styledtext
     styledtext_by_with_styled_start_end_markers = function(str)
       local res =  hs.styledtext.new("^" .. str .. "$")
-      res = get.styledtext.styledtext_with_slice_styled(res, "light", 1, 1)
-      res = get.styledtext.styledtext_with_slice_styled(res, "light", #res, #res)
+      res = get.styledtext.styledtext_by_slice_styled(res, "light", 1, 1)
+      res = get.styledtext.styledtext_by_slice_styled(res, "light", #res, #res)
       return res
     end,
-    not_starting_o_ending_with_whitespace_str = function(str)
-      return get.str.n_strs_by_extracted_eutf8(str, "^%s*(.-)%s*$")
-    end,
+    not_starting_o_ending_with_whitespace_str = stringy.strip,  -- this is not unicode-aware, but seems to work regardless, probably because no 8-bit (0-beginning) ascii char is a valid utf8 char. Here's an alternative but slower implementation if we ever need it: function(str) return get.str.n_strs_by_extracted_eutf8(str, "^%s*(.-)%s*$") end,
     str_by_all_prepended_quotechar = function(str)
       return get.str_or_number_arr.str_by_joined(
         get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
@@ -3877,7 +3923,7 @@ transf = {
       return "^" .. str .. "$"
     end,
     two_strs__arr_or_nil_by_split_minus = function(str)
-      return get.str.two_strs__arr_or_nil_by_split(str, "-")
+      return get.str.two_strs__arr_or_nil_by_split_w_str(str, "-")
     end,
     two_strs__arr_by_prompted_once = function(str)
       return transf.prompt_spec.any({
@@ -3904,7 +3950,7 @@ transf = {
       return get.str.alphanum_minus_underscore_str_by_prompted_once_from_default(str, "Enter a str (alphanum, minus, underscore)...")
     end,
     not_whitespace_str_arr = function(str)
-      return get.str.str_arr_split_single_char_stripped(
+      return get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(
         transf.str.line_by_all_whitespace_collapsed(str),
         " "
       )
@@ -4137,7 +4183,7 @@ transf = {
       return get.str_or_number_arr.str_by_joined(trimmed_lines, "\n")
     end,
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_relay_identifier_arr_value_assoc_value_assoc = function(raw)
-      local raw_countries = get.str.str_arr_by_split_noempty(raw, "\n\n")
+      local raw_countries = get.str.not_empty_str_arr_by_split_w_str(raw, "\n\n")
       local countries = {}
       for _, raw_country in transf.arr.pos_int_vt_stateless_iter(raw_countries) do
         local raw_country_lines = get.str.not_empty_str_arr_by_split_w_ascii_char(raw_country, "\n")
@@ -4165,7 +4211,7 @@ transf = {
   },
   multirecord_str = {
     record_str_arr = function(str)
-      return get.str.str_arr_by_split_noempty(
+      return get.str.not_empty_str_arr_by_split_w_str(
         str,
         consts.unique_record_separator
       )
@@ -4660,17 +4706,17 @@ transf = {
   },
   event_table_arr = {
   },
-  email_file_arr = {
-    email_file_key_line_value_assoc_by_summary = function(email_file_arr)
+  maildir_file_arr = {
+    maildir_file_key_line_value_assoc_by_summary = function(maildir_file_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        email_file_arr,
-        transf.email_file.email_file_and_line_by_summary
+        maildir_file_arr,
+        transf.maildir_file.maildir_file_and_line_by_summary
       )
     end,
-    email_file_key_decoded_email_value_assoc = function(email_file_arr)
+    maildir_file_key_decoded_email_value_assoc = function(maildir_file_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
-        email_file_arr,
-        transf.email_file.email_file_and_decoded_email
+        maildir_file_arr,
+        transf.maildir_file.maildir_file_and_decoded_email
       )
     end,
   },
@@ -5948,7 +5994,7 @@ transf = {
   },
   jxa_windowlike_specifier = {
     line_by_title = function(window_spec)
-      return get.jxa_windowlike_specifier.property(window_spec, "title")
+      return get.jxa_windowlike_specifier.any_by_property(window_spec, "title")
     end,
     window = function(window_spec)
       return get.running_application.window_by_title(
@@ -6002,7 +6048,7 @@ transf = {
       )
     end,
     jxa_tab_specifier_by_active = function(window_spec)
-      return get.jxa_windowlike_specifier.jxa_tab_specifier(
+      return get.tabbable_jxa_window_specifier.jxa_tab_specifier(
         window_spec,
         transf.tabbable_jxa_windowlike_specifier.pos_int_by_active_tab_index(window_spec)
       )
@@ -6020,7 +6066,7 @@ transf = {
       return tab_spec.tab_index
     end,
     line_by_title = function(tab_spec)
-      return get.jxa_tab_specifier.property(tab_spec, "title")
+      return get.jxa_tab_specifier.any_by_property(tab_spec, "title")
     end,
     tabbable_jxa_window_specifier = function(tab_spec)
       return {
@@ -6031,7 +6077,7 @@ transf = {
   },
   browser_jxa_tab_specifier = {
     url = function(tab_spec)
-      return get.jxa_tab_specifier.property(tab_spec, "url")
+      return get.jxa_tab_specifier.any_by_property(tab_spec, "url")
     end,
   },
   bundle_id = {
@@ -6228,7 +6274,7 @@ transf = {
     indicated_page_str = function(csl_table)
       local page = transf.csl_table.digit_str_or_digit_interval_str_or_nil_by_page(csl_table)
       if page then
-        if get.str.bool_by_contains_w_ascii_str(page, "-") then
+        if get.str.bool_by_contains_w_str(page, "-") then
           return "pp. " .. page
         else
           return "p. " .. page
@@ -6509,10 +6555,10 @@ transf = {
       end
     end,
     str_or_nil_by_title = function(url)
-      return get.sgml_url.str_or_nil_by_query_selector_all(url, "title")
+      return get.url.str_or_nil_by_query_selector_all(url, "title")
     end,
     str_or_nil_by_description = function(url)
-      return get.sgml_url.str_or_nil_by_query_selector_all(url, "meta[name=description]")
+      return get.url.str_or_nil_by_query_selector_all(url, "meta[name=description]")
     end,
     in_cache_local_absolute_path = function(url)
       return transf.not_userdata_or_fn.in_cache_local_absolute_path(transf.urllike_with_no_scheme.url_by_ensure_scheme(url), "url")
@@ -7478,13 +7524,13 @@ transf = {
     retriever_specifier_by_highest_precedence = function(retriever_specifier_arr)
       return hs.fnutils.reduce(
         retriever_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.larger_table_by_key {a_use, a_use, "precedence"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key {a_use, a_use, "precedence"})
       )
     end,
     retriever_specifier_arr_by_precedence_ordered = function(retriever_specifier_arr)
       return get.arr.arr_by_sorted(
         retriever_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.larger_table_by_key) {a_use, a_use, "precedence"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key) {a_use, a_use, "precedence"})
     end
   },
   ipc_socket_id = {
@@ -7544,7 +7590,7 @@ transf = {
       return get.str_or_number_arr.str_by_joined(
         get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           {"pause", "loop", "shuffle", "video"},
-          get.fn.fn_by_1st_n_bound(get.mpv_ipc_socket_id.bool_emoji, mpv_ipc_socket_id)
+          get.fn.fn_by_1st_n_bound(get.mpv_ipc_socket_id.line_by_emoji_for_key, mpv_ipc_socket_id)
         ),
         ""
       )
@@ -7850,7 +7896,7 @@ transf = {
       if declared_position_change_input_spec.relative_to then
         if declared_position_change_input_spec.relative_to ~= "curpos" then
           local front_window = transf.running_application.main_window(hs.application.frontmostApplication())
-          target_point = get.window.hs_geometry_point_with_offset(front_window, declared_position_change_input_spec.relative_to, target_point)
+          target_point = get.window.hs_geometry_point_by_with_offset(front_window, declared_position_change_input_spec.relative_to, target_point)
         else
           target_point = target_point + transf[
             declared_position_change_input_spec.mode .. "_input_spec"
@@ -7973,7 +8019,7 @@ transf = {
   },
   input_spec_series_str = {
     input_spec_str_arr = function(str)
-      return transf.hole_y_arrlike.arr(get.str.str_arr_split_single_char_stripped(str, "\n"))
+      return transf.hole_y_arrlike.arr(get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(str, "\n"))
     end,
     input_spec_arr = function(str)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(

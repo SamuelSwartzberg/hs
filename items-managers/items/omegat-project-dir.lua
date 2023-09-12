@@ -16,7 +16,7 @@ OmegatProjectDirItemSpecifier = {
       end,
       ["send-rechnung-email"] = function(self)
         ar(
-          get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, "from:" .. self:get("local-data-object").email)
+          get.maildir_dir.email_file_arr_by_sorted_filtered(env.MBSYNC_ARCHIVE, true, "from:" .. self:get("local-data-object").email)
         )
           :get("to-string-item-array")
           :doThis("to-summary-line-body-path-table-parallel", function(table)

@@ -162,7 +162,6 @@ thing_name_hierarchy = {
                     empty_file = "leaf",
                     nonempty_file = "leaf",
                     image_file = "leaf",
-                    email_file = "leaf",
                     plaintext_file = { 
                       script_file = {
                         shell_script_file = {
@@ -263,11 +262,13 @@ thing_name_hierarchy = {
                       },
                       dotapp_dir = {
                         installed_app_dir = "leaf",
-                      }
+                      },
+                      maildir_dir = "leaf"
                     },
                     local_file = {
                       empty_local_file = "leaf",
-                      nonempty_local_file = "leaf"
+                      nonempty_local_file = "leaf",
+                      maildir_file = "leaf",
                     }
                   }
                 },

@@ -151,9 +151,9 @@ local keymap = {
           true_val = string.format(true_val, get.string.string_by_prompted_once_from_default("", "Search for: "))
           local results
           if get.string.bool_by_startswith(val, "magrep") then
-            results = get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, true_val)
+            results = get.maildir_dir.email_file_arr_by_sorted_filtered(env.MBSYNC_ARCHIVE, true, true_val)
           elseif get.string.bool_by_startswith(val, "mpick") then
-            results = get.maildir_dir.sorted_email_paths(env.MBSYNC_ARCHIVE, true, nil, true_val)
+            results = get.maildir_dir.email_file_arr_by_sorted_filtered(env.MBSYNC_ARCHIVE, true, nil, true_val)
           end
           ar(results)
             :get("to-string-item-array")

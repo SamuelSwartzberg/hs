@@ -189,16 +189,21 @@ ls = {
     "danbooru",
     "gelbooru" 
   },
-  filetype = {
-    ["plaintext-table"] = {"csv", "tsv"},
-    ["plaintext-dictionary"] = { "", "yaml", "json", "toml", "ini", "ics"},
-    ["plaintext-tree"] = {"html", "xml", "svg", "rss", "atom"},
+  likely_main_branch_name = {
+    "main",
+    "master",
+    "trunk",
+    "develop",
+    "dev",
+  },
+  extension = {
+    plaintext_table = {"csv", "tsv"},
+    plaintext_assoc = { "", "yaml", "json", "toml", "ini", "ics"},
     xml = {"html", "xml", "svg", "rss", "atom"},
     image = {"png", "jpg", "gif", "webp", "svg"},
-    ["db"] = {"db", "dbf", "mdb", "accdb", "db3", "sdb", "sqlite", "sqlite3", "nsf", "fp7", "fp5", "fp3", "fdb", "gdb", "dta", "pdb", "mde", "adf", "mdf", "ldf", "myd", "myi", "frm", "ibd", "ndf", "db2", "dbase", "tps", "dat", "dbase3", "dbase4", "dbase5", "edb", "kdb", "kdbx", "sdf", "ora", "dbk", "rdb", "rpd", "dbc", "dbx", "btr", "btrieve", "db3", "s3db", "sl3", "db2", "s2db", "sqlite2", "sl2"},
-    ["sql"] = {"db", "sdb", "sqlite", "db3", "s3db", "sqlite3", "sl3", "db2", "s2db", "sqlite2", "sl2", "sql", "mdf", "ldf", "ndf", "myd", "frm", "ibd", "ora", "rdb"},
-    ["possibly-sqlite"] = {"db", "sdb", "sqlite", "db3", "s3db", "sqlite3", "sl3", "db2", "s2db", "sqlite2", "sl2"},
-    ["shell-script"] = { "sh", "bash", "zsh", "fish", "csh", "tcsh", "ksh", "zsh", "ash", "dash", "elvish", "ion", "nu", "oksh", "osh", "rc", "rksh", "xonsh", "yash", "zsh" },
+    db = {"db", "dbf", "mdb", "accdb", "db3", "sdb", "sqlite", "sqlite3", "nsf", "fp7", "fp5", "fp3", "fdb", "gdb", "dta", "pdb", "mde", "adf", "mdf", "ldf", "myd", "myi", "frm", "ibd", "ndf", "db2", "dbase", "tps", "dat", "dbase3", "dbase4", "dbase5", "edb", "kdb", "kdbx", "sdf", "ora", "dbk", "rdb", "rpd", "dbc", "dbx", "btr", "btrieve", "db3", "s3db", "sl3", "db2", "s2db", "sqlite2", "sl2"},
+    sql = {"db", "sdb", "sqlite", "db3", "s3db", "sqlite3", "sl3", "db2", "s2db", "sqlite2", "sl2", "sql", "mdf", "ldf", "ndf", "myd", "frm", "ibd", "ora", "rdb"},
+    sqlite = {"db", "sdb", "sqlite", "db3", "s3db", "sqlite3", "sl3", "db2", "s2db", "sqlite2", "sl2"},
     bin = {"jpg", "jpeg", "png", "gif", "pdf", "mp3", "mp4", "mov", "avi", "zip", "gz", 
     "tar", "tgz", "rar", "7z", "dmg", "exe", "app", "pkg", "m4a", "wav", "doc", 
     "docx", "xls", "xlsx", "ppt", "pptx", "psd", "ai", "mpg", "mpeg", "flv", "swf",
@@ -291,7 +296,7 @@ ls = {
       "yuv"
   },
   
-    ["whisper-audio"] = {
+    whisper_audio = {
       "mp3",
       "mp4",
       "mpeg",
@@ -312,22 +317,6 @@ ls = {
     "-", "T", ":", "Z"
   },
   initial_headers = {"from", "to", "cc", "bcc", "subject"},
-  datelib = {
-    gettable_units  = { "date", "year", "isoyear", "month", "yearday", "weekday", "isoweekday", "weeknum", "isoweeknum", "day", "time", "hours", "minutes", "seconds", "fracs", "ticks" },
-    addable_units = { "years", "months", "days", "hours", "minutes", "seconds", "ticks" }
-  },
-  khal = {
-    parseable_format_components = {
-      "uid",
-      "calendar",
-      "start",
-      "title",
-      "description",
-      "location",
-      "end",
-      "url",
-    }
-  },
   youtube = {
     extant_upload_status = {
       "processed",

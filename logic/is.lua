@@ -97,7 +97,7 @@ is = {
       )
     end,
     decoded_email = function(str)
-      local header, body = get.str.n_strs_by_split(str, "\n\n", 2)
+      local header, body = get.str.n_strs_by_split_w_str(str, "\n\n", 2)
       if not body then
         return false
       end
@@ -111,7 +111,7 @@ is = {
   },
   shell_script_str = {
     envlike_str = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, "export ")
+      return get.str.bool_by_contains_w_str(str, "export ")
     end,
   },
   whitespace_str = {
@@ -167,7 +167,7 @@ is = {
       return get.str.bool_by_not_matches_part_eutf8(str, "[\t\v\f]")
     end,
     decoded_email_header_line = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, ": ")
+      return get.str.bool_by_contains_w_str(str, ": ")
     end,
 
     -- combined conditions
@@ -192,15 +192,15 @@ is = {
   },
   noempty_line = {
     ini_kv_line = function(str)
-      return get.str.bool_by_not_startswith(str, "=") and get.str.bool_by_not_endswith(str, "=") and get.str.bool_by_contains_w_ascii_str(str, "=")
+      return get.str.bool_by_not_startswith(str, "=") and get.str.bool_by_not_endswith(str, "=") and get.str.bool_by_contains_w_str(str, "=")
     end,
     country_identifier_str = transf["nil"]["true"],
     language_identifier_str = transf["nil"]["true"],
     multirecord_str = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, consts.unique_record_separator)
+      return get.str.bool_by_contains_w_str(str, consts.unique_record_separator)
     end,
     record_str = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, consts.unique_field_separator)
+      return get.str.bool_by_contains_w_str(str, consts.unique_field_separator)
     end,
   },
   noempty_noindent_line = {
@@ -230,7 +230,7 @@ is = {
     end,
     citable_filename = function(str)
       return 
-        get.str.bool_by_contains_w_ascii_str(str, "!citid:")
+        get.str.bool_by_contains_w_str(str, "!citid:")
     end
   },
   trimmed_line = {
@@ -241,7 +241,7 @@ is = {
   },
   trimmed_noweirdwhitespace_line = {
     path = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, "/")
+      return get.str.bool_by_contains_w_str(str, "/")
     end
   },
 
@@ -277,7 +277,7 @@ is = {
       )
     end,
     raw_email = function(str)
-      local header, body = get.str.n_strs_by_split(str, "\n\n", 2) -- todo: I'm not quite sure what implicit processing my emails may go through, but they might have \r\n, so if the tests fail, that might be why
+      local header, body = get.str.n_strs_by_split_w_str(str, "\n\n", 2) -- todo: I'm not quite sure what implicit processing my emails may go through, but they might have \r\n, so if the tests fail, that might be why
       if not body then
         return false
       end
@@ -294,7 +294,7 @@ is = {
       return get.str.bool_by_not_contains_w_ascii_str(str, "\t")
     end,
     email_header_kv_line = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, ": ")
+      return get.str.bool_by_contains_w_str(str, ": ")
     end,
     indent_ascii_line = function(str)
       return get.str.bool_by_startswith(str, " ") or get.str.bool_by_startswith(str, "\t")
@@ -402,13 +402,13 @@ is = {
       )
     end,
     query_k_o_v = function(str)
-      return get.str.bool_by_not_contains_w_ascii_str_arr(str, {"=", "&"})
+      return get.str.bool_by_not_contains_w_str_arr(str, {"=", "&"})
     end,
     query_mapping = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, "=") and get.str.bool_by_not_contains_w_ascii_str(str, "&")
+      return get.str.bool_by_contains_w_str(str, "=") and get.str.bool_by_not_contains_w_ascii_str(str, "&")
     end,
     query_str = function(str)
-      return get.str.bool_by_contains_w_ascii_str(str, "=")
+      return get.str.bool_by_contains_w_str(str, "=")
     end,
     urllike_with_no_scheme = function(str)
       return is.printable_ascii_no_nonspace_whitespace_str.url("https://" .. str)
@@ -443,8 +443,8 @@ is = {
     --- trying to determine what str is and is not an email is a notoriously thorny problem. In our case, we don't care much about false positives, but want to avoid false negatives to a certain extent.
     email = function(str)
       return 
-        get.str.bool_by_contains_w_ascii_str(str, "@") and
-        get.str.bool_by_contains_w_ascii_str(str, ".")
+        get.str.bool_by_contains_w_str(str, "@") and
+        get.str.bool_by_contains_w_str(str, ".")
     end,
     dice_notation = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.syntax.dice)
@@ -958,7 +958,7 @@ is = {
     end,
     contains_relative_references_local_path = function(path)
       return 
-        get.str.bool_by_startswith_any_w_ascii_str_arr(
+        get.str.bool_by_startswith_any_w_str_arr(
           path,
           {
             "./",
@@ -1133,6 +1133,9 @@ is = {
     nonempty_local_file = function(path)
       return not is.path.empty_local_file(path)
     end,
+    maildir_file = function(path)
+      return is.local_dir.maildir_dir(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path))
+     end,
   },
   local_dir = {
     empty_local_dir = function(path)
@@ -1143,6 +1146,10 @@ is = {
     end,
     dotapp_dir = function(path)
       return get.str.bool_by_endswith(path, ".app")
+    end,
+    maildir_dir = function(path)
+      local leaf transf.path.leaflike_by_leaf(path)
+      return leaf == "cur" or leaf == "new" or leaf == "tmp"
     end,
   },
   dotapp_dir = {
@@ -1246,7 +1253,7 @@ is = {
   },
   in_git_dir = {
     in_has_no_changes_git_dir = function(path)
-      return get.str.bool_by_contains_w_ascii_str(
+      return get.str.bool_by_contains_w_str(
         transf.in_git_dir.multiline_str_by_status(path),
         "nothing to commit"
       )
@@ -1260,35 +1267,37 @@ is = {
   },
   file = {
     plaintext_file = function(path)
-      error("TODO")
+      return not is.file.bin_file(path)
     end,
     image_file = function(path)
-      return get.path.usable_as_filetype(path, "image")
+      return get.path.bool_by_extension_group(path, "image")
     end,
     bin_file = function(path)
-      return not is.file.plaintext_file(path)
+      return get.arr.bool_by_contains(ls.extension.bin, transf.path.extension_by_normalized(path))
     end,
-    email_file = function(path)
-      return 
-       get.path.is_extension(path, "eml") or 
-       transf.path.path_component_or_nil_by_parent_leaf(path) == "new" or
-       transf.path.path_component_or_nil_by_parent_leaf(path == "cur")
-     end,
   },
   bin_file = {
     db_file = function(path)
-      return get.path.is_standartized_extension_in(
+      return get.path.bool_by_is_standartized_extension_in(
         path,
-        ls.filetype["db"]
+        ls.extension.db
       )
     end,
     playable_file = function (path)
-      return get.path.usable_as_filetype(path, "audio") or get.path.usable_as_filetype(path, "video")
+      return get.path.bool_by_extension_group(path, "audio") or get.path.bool_by_extension_group(path, "video")
+    end,
+  },
+  db_file = {
+    sqlite_file = function(path)
+      return get.path.bool_by_is_standartized_extension_in(
+        path,
+        ls.extension.sqlite
+      )
     end,
   },
   playable_file = {
     whisper_file = function(path)
-      return get.path.usable_as_filetype(path, "whisper-audio")
+      return get.path.bool_by_extension_group(path, "whisper_audio")
     end,
   },
   shell_script_file = {
@@ -1311,25 +1320,25 @@ is = {
       )
     end,
     plaintext_assoc_file = function(path)
-      get.path.is_standartized_extension_in(
+      get.path.bool_by_is_standartized_extension_in(
         path,
-        ls.filetype["plaintext-dictionary"]
+        ls.extension["plaintext_assoc"]
       )
     end,
     plaintext_table_file = function(path)
-      get.path.is_standartized_extension_in(
+      get.path.bool_by_is_standartized_extension_in(
         path,
-        ls.filetype["plaintext-table"]
+        ls.extension["plaintext_table"]
       )
     end,
     m3u_file = function(path)
-      return get.path.is_extension(path, "m3u")
+      return get.path.bool_by_is_extension(path, "m3u")
     end,
     gitignore_file = function(path)
-      return get.path.is_filename(path, ".gitignore")
+      return get.path.bool_by_is_filename(path, ".gitignore")
     end,
     log_file = function(path)
-      return get.path.is_extension(path, "log")
+      return get.path.bool_by_is_extension(path, "log")
     end,
     newsboat_urls_file = function(path)
       return get.path.is_leaf(path, "urls")
@@ -1338,7 +1347,7 @@ is = {
       return get.path.is_leaf(path, "citations")
     end,
     md_file = function(path)
-      return get.path.is_standartized_extension(path, "md")
+      return get.path.bool_by_is_normalized_extension(path, "md")
     end,
   },
   script_file = {
@@ -1349,11 +1358,11 @@ is = {
     end,
   },
   plaintext_assoc_file = {
-    yaml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "yaml"}),
-    json_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "json"}),
-    toml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "toml"}),
-    ini_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "ini"}),
-    ics_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.is_standartized_extension, {a_use, "ics"}),
+    yaml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "yaml"}),
+    json_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "json"}),
+    toml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "toml"}),
+    ini_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "ini"}),
+    ics_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "ics"}),
   },
   plaintext_table_file = {
 
@@ -1767,13 +1776,13 @@ is = {
   },
   extension_url = {
     image_url = function(url)
-      return get.path.is_extension_in(transf.path_url.path(url), ls.filetype.image)
+      return get.path.bool_by_is_extension_in(transf.path_url.path(url), ls.extension.image)
     end,
     playable_url = function(url)
-      return get.path.usable_as_filetype(
+      return get.path.bool_by_extension_group(
         transf.path_url.path(url),
         "audio"
-      ) or get.path.usable_as_filetype(
+      ) or get.path.bool_by_extension_group(
         transf.path_url.path(url),
         "video"
       )
@@ -1781,9 +1790,9 @@ is = {
   },
   playable_url = {
     whisper_url = function(url)
-      return get.path.usable_as_filetype(
+      return get.path.bool_by_extension_group(
         transf.path_url.path(url),
-        "whisper-audio"
+        "whisper_audio"
       )
     end,
   },
@@ -2622,7 +2631,7 @@ is = {
   },
   ipc_socket_id = {
     mpv_ipc_socket_id = function(mpv_ipc_socket_id)
-      return get.ipc_socket_id.response_table_or_nil(mpv_ipc_socket_id, {
+      return get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(mpv_ipc_socket_id, {
         command = {"get_property", "pid"}
       }) ~= nil
     end,
@@ -2715,6 +2724,9 @@ is = {
     end,
     window_filter = function(val)
       return transf.full_userdata.str_by_classname(val) == "hs.window.filter"
+    end,
+    hschooser = function(val)
+      return transf.full_userdata.str_by_classname(val) == "hs.chooser"
     end,
   },
 }

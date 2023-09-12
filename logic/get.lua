@@ -893,9 +893,9 @@ get = {
       return plstringx.count(str, substr, true)
     end,
     str_by_sub_lua = string.sub,
-    str_by_sub_eutf8 = get.str.str_by_sub_eutf8,
+    str_by_sub_eutf8 = eutf8.sub,
     str_by_formatted_w_n_anys = string.format,
-    str_by_repeated = get.str.str_by_repeated,
+    str_by_repeated = string.rep,
     str_arr_by_split_w_ascii_char = stringy.split,
     str_arr_by_split_w_ascii_char_arr = function(str, sep_arr)
       local split_first = get.str.str_arr_by_split_w_ascii_char(str, act.arr.pop(sep_arr))
@@ -906,23 +906,23 @@ get = {
     end,
     not_empty_str_arr_by_split_w_ascii_char = function(str, sep)
       return transf.str_arr.not_empty_str_arr_by_filtered(
-        transf.str.str_arr_split_single_char(str, sep)
+        get.str.str_arr_by_split_w_str(str, sep)
       )
     end,
-    str_arr_split_single_char_stripped = function(str, sep)
+    not_starting_o_ending_with_whitespace_str_arr_by_split_w_str = function(str, sep)
       return transf.str_arr.not_starting_o_ending_with_whitespace_str_arr(
-        transf.str.split_single_char(str, sep)
+        get.str.str_arr_by_split_w_str(str, sep)
       )
     end,
     str_arr_by_split_w_str = plstringx.split,
-    str_arr_by_split_noempty = function(str, sep)
+    not_empty_str_arr_by_split_w_str = function(str, sep)
       return transf.str_arr.not_empty_str_arr_by_filtered(
-        transf.str.str_arr_split(str, sep)
+        get.str.str_arr_by_split_w_str(str, sep)
       )
     end,
     --- don't split on the edge of the str, i.e. don't return empty strs at the start or end
-    str_arr_by_split_noedge = function(str, sep)
-      local res = transf.str.str_arr_split(str, sep)
+    str_arr_by_split_noedge_w_str = function(str, sep)
+      local res = get.str.str_arr_by_split_w_str(str, sep)
       if res[1] == "" then
         act.arr.shift(res)
       end
@@ -931,10 +931,10 @@ get = {
       end
       return res
     end,
-    n_strs_by_split = function(str, sep, n)
+    n_strs_by_split_w_str = function(str, sep, n)
       return transf.arr.n_anys(get.str.str_arr_by_split_w_str(str, sep, n))
     end,
-    two_strs__arr_or_nil_by_split = function(str, sep)
+    two_strs__arr_or_nil_by_split_w_str = function(str, sep)
       local arr = get.str.str_arr_by_split_w_str(str, sep, 2)
       if #arr ~= 2 then
         return nil
@@ -942,7 +942,7 @@ get = {
         return arr
       end
     end,
-    two_strs_split_or_nil = function(str, sep)
+    two_strs_or_nil_by_split_w_str = function(str, sep)
       local arr = get.str.str_arr_by_split_w_str(str, sep, 2)
       if #arr ~= 2 then
         return nil
@@ -970,7 +970,8 @@ get = {
     bool_by_not_endswith = function(str, suffix)
       return not transf.str.bool_endswith(str, suffix)
     end,
-    bool_by_startswith_any_w_ascii_str_arr = function(str, anyof)
+    --- I'll forget, so: This does in fact work with non-ascii strs, I've tested it
+    bool_by_startswith_any_w_str_arr = function(str, anyof)
       for i = 1, #anyof do
         local res = get.str.bool_by_startswith(str, anyof[i])
         if res then
@@ -979,7 +980,7 @@ get = {
       end
       return false
     end,
-    bool_by_endswith_any_w_ascii_str_arr = function(str, anyof)
+    bool_by_endswith_any_w_str_arr = function(str, anyof)
       for i = 1, #anyof do
         local res = get.str.bool_by_endswith(str, anyof[i])
         if res then
@@ -988,11 +989,11 @@ get = {
       end
       return false
     end,
-    bool_by_contains_w_ascii_str = stringy.find,
-    bool_by_not_contains_w_ascii_str = function(str, substr)
-      return not transf.str.bool_by_contains_w_ascii_str(str, substr)
+    bool_by_contains_w_str = stringy.find,
+    bool_by_not_contains_w_str = function(str, substr)
+      return not get.str.bool_by_contains_w_str(str, substr)
     end,
-    bool_by_not_contains_w_ascii_str_arr = function(str, substr_arr)
+    bool_by_not_contains_w_str_arr = function(str, substr_arr)
       for k, substr in transf.arr.kt_vt_stateless_iter(substr_arr) do
         if get.str.bool_by_contains_w_str(str, substr) then
           return false
@@ -1000,10 +1001,10 @@ get = {
       end
       return true
     end,
-    str_arr_arr_by_split = function(str, upper_sep, lower_sep)
-      local upper = transf.str.split(str, upper_sep)
+    str_arr_arr_by_split_w_str = function(str, upper_sep, lower_sep)
+      local upper = get.str.str_arr_by_split_w_str(str, upper_sep)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(upper, function(v)
-        return transf.str.split(v, lower_sep)
+        return get.str.str_arr_by_split_w_str(v, lower_sep)
       end)
     end,
     search_engine_id_search_url = function(str, search_engine_id)
@@ -1028,7 +1029,7 @@ get = {
     end,
     bool_by_contains_any_w_ascii_str_arr = function(str, anyof)
       for i = 1, #anyof do
-        local res = get.str.bool_by_contains_w_ascii_str(str, anyof[i])
+        local res = get.str.bool_by_contains_w_str(str, anyof[i])
         if res then
           return true
         end
@@ -1037,7 +1038,7 @@ get = {
     end,
     bool_by_contains_all_w_ascii_str_arr = function(str, allof)
       for i = 1, #allof do
-        local res = get.str.bool_by_contains_w_ascii_str(str, allof[i])
+        local res = get.str.bool_by_contains_w_str(str, allof[i])
         if not res then
           return false
         end
@@ -1447,7 +1448,7 @@ get = {
       local final_metadata, final_contents
       if get.str.bool_by_startswith(stripped_str, "---") then
         -- splice in the metadata
-        local parts = get.str.str_arr_by_split_noempty(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
+        local parts = get.str.not_empty_str_arr_by_split_w_str(str, "---") -- this should now have the existing metadata as [1], and the content as [2] ... [n]
         local extant_metadata = act.arr.shift(parts)
         final_metadata = extant_metadata .. "\n" .. transf.not_userdata_or_str.yaml_str(tbl)
         final_contents = get.str_or_number_arr.str_by_joined(parts)
@@ -1493,7 +1494,7 @@ get = {
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
       else return transf.str.urlcharset_str_by_encoded_query_param_value_folded(str) end
     end,
-    not_starting_o_ending_with_whitespace_str = stringy.strip
+    not_starting_o_ending_with_whitespace_str = 
   },
   nonindicated_number_str_arr = {
     number_arr = function(arr, base)
@@ -1515,23 +1516,23 @@ get = {
     end,
   },
   str_or_styledtext = {
-    styledtext_ignore_styled = function(str, styledtext_attributes_specifier)
+    styledtext_by_style_unstyled = function(str, styledtext_attributes_specifier)
       if is.any.str(str) then
         return hs.styledtext.new(str, styledtext_attributes_specifier)
       else
         return str
       end
     end,
-    styledtext_merge = function(str, styledtext_attributes_specifier)
+    styledtext_by_merge = function(str, styledtext_attributes_specifier)
       if is.any.str(str) then
         return hs.styledtext.new(str, styledtext_attributes_specifier)
       else
-        return transf.styledtext.styledtext_merge(str, styledtext_attributes_specifier)
+        return get.styledtext.styledtext_by_merge(str, styledtext_attributes_specifier)
       end
     end,
   },
   styledtext = {
-    styledtext_merge = function(styledtext, styledtext_attributes_specifier)
+    styledtext_by_merge = function(styledtext, styledtext_attributes_specifier)
       local existing_style = styledtext:asTable()
       local text_str, style = get.arr.two_arrs_by_slice_w_3_pos_int_any_or_nils(existing_style, 1, 1)
       local new_styledtext = hs.styledtext.new(text_str, styledtext_attributes_specifier)
@@ -1540,7 +1541,7 @@ get = {
       end
       return new_styledtext
     end,
-    styledtext_with_slice_styled = function(styledtext, style, start, stop)
+    styledtext_by_slice_styled = function(styledtext, style, start, stop)
       start = start or 1
       stop = stop or #styledtext
       if style == "light" then
@@ -1550,10 +1551,10 @@ get = {
     end,
   },
   str_or_styledtext_arr = {
-    styledtext_arr_merge = function(arr, styledtext_attributes_specifier)
+    styledtext_arr_by_merge = function(arr, styledtext_attributes_specifier)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.str_or_styledtext.styledtext_merge, {a_use, styledtext_attributes_specifier})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.str_or_styledtext.styledtext_by_merge, {a_use, styledtext_attributes_specifier})
       )
     end,
   },
@@ -1561,7 +1562,7 @@ get = {
     str_by_joined = table.concat,
   },
   str_arr = {
-    repeated_option_str = function(arr, opt)
+    str_by_repeatedly_same_space_sep_prefix = function(arr, opt)
       return get.str_or_number_arr.str_by_joined(
         get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           arr,
@@ -1626,7 +1627,6 @@ get = {
           end
           )
         )
-      )
     end,
     pos_int_or_nil_by_first_match_nohashcomment_noindent_w_str = function(arr, str)
       return get.arr.pos_int_or_nil_by_first_match_w_t(
@@ -1665,13 +1665,6 @@ get = {
 
   },
   str_arr_arr = {
-    str_record_arr = function(arr, field_sep)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return get.str_or_number_arr.str_by_joined(x, field_sep) end)
-    end,
-    str_table = function(arr, field_sep, record_sep)
-      return get.str_or_number_arr.str_by_joined(get.str_arr_arr.str_record_arr(arr, field_sep), record_sep)
-    end,
-    
   },
   table_arr = {
     vt_arr_w_kt = function(arr, kt)
@@ -1679,47 +1672,47 @@ get = {
     end,
   },
   path_leaf_specifier = {
-    tag_value = function(parts, key)
+    lower_alphanum_underscore_or_lower_alphanum_underscore_arr_or_nil_by_key = function(parts, key)
       return transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(parts)[key]
     end,
-    tag_raw_value = function(parts, key)
+    lower_alphanum_underscore_comma_or_nil_by_key = function(parts, key)
       return transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(parts)[key]
     end,
   },
   path = {
-    usable_as_filetype = function(path, filetype)
+    bool_by_extension_group = function(path, filetype)
       local extension = transf.path.extension_by_normalized(path)
-      if get.arr.contains(ls.filetype[filetype], extension) then
+      if get.arr.bool_by_contains(ls.extension[filetype], extension) then
         return true
       else
         return false
       end
     end,
-    with_different_extension = function(path, ext)
+    path_by_with_different_extension = function(path, ext)
       return transf.path.path_by_without_extension(path) .. "." .. ext
     end,
-    leaf_starts_with = function(path, str)
+    bool_by_leaf_starts_with = function(path, str)
       return get.str.bool_by_startswith(transf.path.leaflike_by_leaf(path), str)
     end,
-    is_extension = function(path, ext)
+    bool_by_is_extension = function(path, ext)
       return transf.path.extension(path) == ext
     end,
-    is_standartized_extension = function(path, ext)
+    bool_by_is_normalized_extension = function(path, ext)
       return transf.path.extension_by_normalized(path) == ext
     end,
-    is_extension_in = function(path, exts)
+    bool_by_is_extension_in = function(path, exts)
       return get.arr.bool_by_contains(exts, transf.path.extension(path))
     end,
-    is_standartized_extension_in = function(path, exts)
+    bool_by_is_standartized_extension_in = function(path, exts)
       return get.arr.bool_by_contains(exts, transf.path.extension_by_normalized(path))
     end,
-    is_filename = function(path, filename)
+    bool_by_is_filename = function(path, filename)
       return transf.path.leaflike_by_filename(path) == filename
     end,
-    is_leaf = function(path, leaf)
+    bool_by_is_leaf = function(path, leaf)
       return transf.path.leaflike_by_leaf(path) == leaf
     end,
-    window_with_leaf_as_title = function(path, app_name)
+    window_by_leaf_as_title = function(path, app_name)
       return get.str.window_by_title(
         transf.path.leaflike_by_leaf(path),
         app_name
@@ -1729,17 +1722,17 @@ get = {
       local path_component_arr = transf.path.path_component_arr(path)
       return get.arr.arr_by_slice_w_slice_spec(path_component_arr, spec)
     end,
-    path_segment_arr_by_slice_w_slice_spec = function(path, spec)
-      local path_segment_arr = transf.path.path_segment_arr(path)
+    path_component_arr_by_split_ext_slice_w_slice_spec = function(path, spec)
+      local path_segment_arr = transf.path.path_component_arr_by_split_ext(path)
       return get.arr.arr_by_slice_w_slice_spec(path_segment_arr, spec)
     end,
-    path_from_sliced_path_component_arr = function(path, spec)
-      local sliced_path_component_arr = transf.path.sliced_path_component_arr(path, spec)
+    path_by_sliced_path_component_arr = function(path, spec)
+      local sliced_path_component_arr = get.path.path_component_arr_by_slice_w_slice_spec(path, spec)
       dothis.arr.push(sliced_path_component_arr, "")
       return get.str_or_number_arr.str_by_joined(sliced_path_component_arr, "/")
     end,
-    path_from_sliced_path_segment_arr = function(path, spec)
-      local sliced_path_segment_arr = transf.path.sliced_path_segment_arr(path, spec)
+    path_by_sliced_split_ext_path_component_arr = function(path, spec)
+      local sliced_path_segment_arr = get.path.path_component_arr_by_split_ext_slice_w_slice_spec(path, spec)
       dothis.arr.push(sliced_path_segment_arr, "")
       local extension = act.arr.pop(sliced_path_segment_arr)
       local filename = act.arr.pop(sliced_path_segment_arr)
@@ -1756,7 +1749,7 @@ get = {
       end
     end,
     path_arr_from_sliced_path_component_arr = function(path, spec)
-      local sliced_path_component_arr = transf.path.sliced_path_component_arr(path, spec)
+      local sliced_path_component_arr = get.path.path_component_arr_by_slice_w_slice_spec(path, spec)
       local whole_path_component_arr = transf.path.path_component_arr(path)
       local res = {}
       local started_with_slash = get.str.bool_by_startswith(path, "/")
@@ -1889,7 +1882,7 @@ get = {
         return get.arr.pos_int_or_nil_by_first_match_w_fn(transf.dir.absolute_path_arr_by_children(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(x)), fn)
       end)
     end,
-    extant_path_by_self_or_ancestor_sibling_w_leaf = function(path, leaf)
+    extant_path_by_self_or_ancestor_sibling_with_leaf = function(path, leaf)
       return get.local_extant_path.extant_path_by_self_or_ancestor_siblings_w_fn(path, function(x)
         return transf.path.leaflike_by_leaf(x) == leaf
       end)
@@ -1897,11 +1890,11 @@ get = {
     extant_path_by_descendant_w_fn = function(path, cond)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(transf.extant_path.absolute_path_arr_by_descendants(path), cond)
     end,
-    find_descendant_ending_with = function(path, ending)
+    extant_path_by_descendant_ending = function(path, ending)
       return get.path_arr.path_or_nil_by_first_ending_find_ending_w_str(transf.extant_path.absolute_path_arr_by_descendants(path), ending)
     end,
-    find_leaf_of_descendant = function(path, filename)
-      return get.path_arr.bool_by_contains_leaf(transf.extant_path.absolute_path_arr_by_descendants(path), filename)
+    bool_by_descendant_with_leaf = function(path, leaf)
+      return get.path_arr.bool_by_contains_leaf(transf.extant_path.absolute_path_arr_by_descendants(path), leaf)
     end,
     bool_by_descendant_with_extension = function(path, extension)
       return get.path_arr.bool_by_contains_extension(transf.extant_path.absolute_path_arr_by_descendants(path), extension)
@@ -1955,16 +1948,16 @@ get = {
     end,
   },
   local_dir = {
-    cmd_output_from_path = function(path, cmd)
+    str_or_nil_by_evaled_env_bash_stripped = function(path, cmd)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("cd " .. transf.str.str_by_single_quoted_escaped(path) .. " && " .. cmd)
     end
   },
   local_extant_path = {
-    cmd_output_from_path = function(path, cmd)
+    str_or_nil_by_evaled_env_bash_stripped = function(path, cmd)
       if is.local_extant_path.local_dir(path) then
-        return get.local_dir.cmd_output_from_path(path, cmd)
+        return get.local_dir.str_or_nil_by_evaled_env_bash_stripped(path, cmd)
       else
-        return get.local_dir.cmd_output_from_path(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), cmd)
+        return get.local_dir.str_or_nil_by_evaled_env_bash_stripped(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), cmd)
       end
     end,
     str_w_fs_attr_name = function(path, attr)
@@ -2021,21 +2014,27 @@ get = {
     end,
   },
   git_root_dir = {
-    hook_path = function(path, hook)
+    in_git_dir_by_hook_path = function(path, hook)
       return transf.git_root_dir.in_git_dir_by_hooks_dir(path) .. "/" .. hook
     end,
-    hook_res = function(path, hook)
-      local hook_path = get.git_root_dir.hook_path(path, hook)
+    str_or_nil_by_hook_res = function(path, hook)
+      local hook_path = get.git_root_dir.in_git_dir_by_hook_path(path, hook)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(hook_path)
     end,
   },
+  git_repository_dir = {
+    bool_by_branch_exists = function(path, branch)
+      return is.local_absolute_path.local_extant_path(
+        transf.git_repository_dir.in_git_dir_by_head_refs_dir(path) .. "/" .. branch
+      )
+    end,
+  },
   in_git_dir = {
-    remote_blob_url = function(path, branch)
+    path_url_by_remote_blob = function(path, branch)
       local git_remote_type = transf.in_git_dir.git_remote_type(path)
-      branch = branch or transf.in_git_dir.str_by_current_branch(path)
       local remote_owner_item = transf.in_git_dir.two_strs_arr_or_nil_by_remote_owner_item(path)
       local local_nonabsolute_path = transf.in_git_dir.local_nonabsolute_path_by_from_git_root_dir(path)
-      return get.git_hosting_service.file_url(
+      return get.host.url_by_git_item_url(
         transf.in_git_dir.host_by_remote_blob_host(path),
         tblmap.git_remote_type.printable_ascii_by_blob_indicator_path[git_remote_type],
         remote_owner_item,
@@ -2043,12 +2042,11 @@ get = {
         local_nonabsolute_path
       )
     end,
-    remote_raw_url = function(path, branch)
+    path_url_by_remote_raw = function(path, branch)
       local git_remote_type = transf.in_git_dir.git_remote_type(path)
-      branch = branch or transf.in_git_dir.str_by_current_branch(path)
       local remote_owner_item = transf.in_git_dir.two_strs_arr_or_nil_by_remote_owner_item(path)
       local local_nonabsolute_path = transf.in_git_dir.local_nonabsolute_path_by_from_git_root_dir(path)
-      return get.git_hosting_service.file_url(
+      return get.host.url_by_git_item_url(
         transf.in_git_dir.host_by_remote_raw_host(path),
         tblmap.git_remote_type.printable_ascii_by_raw_indicator_path[git_remote_type],
         remote_owner_item,
@@ -2167,9 +2165,9 @@ get = {
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("shellcheck --format=gcc --severity=" .. severity .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
-  email_file = {
+  maildir_file = {
     with_body_quoted = function(path, response)
-      return response .. "\n\n" .. transf.email_file.str_by_quoted_body(path)
+      return response .. "\n\n" .. transf.maildir_file.str_by_quoted_body(path)
     end,
     prefixed_header = function(path, header)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
@@ -2177,7 +2175,7 @@ get = {
       )
     end,
     str_by_header = function(path, header)
-      local prefixed_header = transf.email_file.prefixed_header(path, header)
+      local prefixed_header = transf.maildir_file.prefixed_header(path, header)
       return get.str.str_by_sub_eutf8(prefixed_header, #header + 2) -- +2 for the colon and the space
     end,
     addresses = function(path, header, only)
@@ -2202,7 +2200,7 @@ get = {
     --- @param magrep? str
     --- @param mpick? str
     --- @return str[]
-    sorted_email_paths = function(path, reverse, magrep, mpick)
+    maildir_file_arr_by_sorted_filtered = function(path, reverse, magrep, mpick)
       local flags = "-d"
       if reverse then
         flags = flags .. "r"
@@ -2216,15 +2214,9 @@ get = {
       end
       cmd = cmd .. " | msort " .. flags
 
-      return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped(cmd))
+      return transf.str.noempty_line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped(cmd))
     end
 
-  },
-  alphanum_minus_underscore = {
-    
-  },
-  email_specifier = {
-    
   },
   sqlite_file = {
     csv_or_nil_by_query = function(path, query)
@@ -2242,30 +2234,25 @@ get = {
       end)
     end,
   },
-  logging_dir = {
-    local_absolute_path_w_timestamp_s = function(path, date)
-      return hs.fs.pathToAbsolute(path) .. "/" .. transf.timestamp_s.triplex_local_nonabsolute_path_by_y_ym_ymd(date) .. ".csv"
-    end,
-  },
   path_arr = {
     path_arr_by_filter_to_same_filename = function(path_arr, filename)
       return get.arr.arr_by_filtered(path_arr, function(path)
-        return get.path.is_filename(path, filename)
+        return get.path.bool_by_is_filename(path, filename)
       end)
     end,
     path_arr_by_filter_to_different_filename = function(path_arr, filename)
       return get.arr.arr_by_filtered(path_arr, function(path)
-        return not get.path.is_filename(path, filename)
+        return not get.path.bool_by_is_filename(path, filename)
       end)
     end,
     path_arr_by_filter_to_same_extension = function(path_arr, extension)
       return get.arr.arr_by_filtered(path_arr, function(path)
-        return get.path.is_extension(path, extension)
+        return get.path.bool_by_is_extension(path, extension)
       end)
     end,
     path_arr_by_filter_to_different_extension = function(path_arr, extension)
       return get.arr.arr_by_filtered(path_arr, function(path)
-        return not get.path.is_extension(path, extension)
+        return not get.path.bool_by_is_extension(path, extension)
       end)
     end,
     path_arr_by_filter_to_filename_ending = function(path_arr, leaf_ending)
@@ -2314,28 +2301,26 @@ get = {
       end)
     end,
   },
-  extant_path_arr = {
-    extant_path_arr_by_sorted_via_attr = function(arr, attr)
+  local_extant_path_arr = {
+    local_extant_path_arr_by_sorted_via_attr = function(arr, attr)
       return dothis.arr.sort(arr, function(a, b)
         return get.local_extant_path.attr(a, attr) < get.local_extant_path.attr(b, attr)
       end)
     end,
-    extant_path_by_largest_of_attr = function(arr, attr)
-      return get.extant_path_arr.extant_path_arr_by_sorted_via_attr(arr, attr)[1]
+    local_extant_path_by_largest_of_attr = function(arr, attr)
+      return get.local_extant_path_arr.local_extant_path_arr_by_sorted_via_attr(arr, attr)[1]
     end,
   },
-  git_hosting_service = {
-    file_url = function(host, indicator, owner_item, branch, local_nonabsolute_path)
+  host = {
+    url_by_git_item_url = function(host, indicator, owner_item, branch, local_nonabsolute_path)
       return "https://" .. host .. "/" .. owner_item .. "/" .. indicator .. branch .. "/" .. local_nonabsolute_path
     end,
   },
   dcmp_name = {
     dcmp_name_by_next = function(component, n)
-      n = n or 0
       return get.arr.any_by_next_w_index(ls.dcmp_names, transf.dcmp_name.date_component_index(component) + n)
     end,
     dcmp_name_by_previous = function(component, n)
-      n = n or 0
       return get.arr.t_or_nil_by_previous(ls.dcmp_names, transf.dcmp_name.date_component_index(component) - n)
     end,
   },
@@ -2355,19 +2340,23 @@ get = {
         stop = get.timestamp_s.timestamp_s_by_added(ts, amount, dcmp_name),
       }
     end,
-    number_sequence_specifier_by_surrounding = function(ts, interval_amount, interval_dcmp_name, step_amount, step_dcmp_name)
+    timestamp_s_sequence_specifier_by_surrounding = function(ts, interval_amount, interval_dcmp_name, step_amount, step_dcmp_name)
       local ivl = get.timestamp_s.timestamp_s_interval_specifier_by_surrounding(ts, interval_amount, interval_dcmp_name)
       ivl.step = tblmap.dcmp_name.timestamp_s[step_dcmp_name] * step_amount
       return ivl
     end,
-    number_sequence_specifier_of_lower_component = function(date, step, dcmp_name)
-      error("TODO")
+    timestamp_s_sequence_specifier_of_lower_component = function(ts, step_amount, interval_dcmp_name)
+      local step_dcmp_name = transf.dcmp_name.dcmp_name_by_next(interval_dcmp_name)
+      return get.timestamp_s.timestamp_s_sequence_specifier_by_surrounding(
+        ts,
+        1,
+        interval_dcmp_name,
+        step_amount,
+        step_dcmp_name
+      )
     end,
-    hours_date_sequence_specifier = function(date, dcmp_val)
-      error("TODO")
-    end,
-    rfc3339like_dt_by_precison_w_dcmp_name = function(date, dcmp_name)
-      return get.timestamp_s.str_by_formatted(date, tblmap.dcmp_name.rfc3339like_dt_format_str[dcmp_name])
+    rfc3339like_dt_by_precison_w_dcmp_name = function(ts, dcmp_name)
+      return get.timestamp_s.str_by_formatted(ts, tblmap.dcmp_name.rfc3339like_dt_format_str[dcmp_name])
     end,
 
   },
@@ -2402,26 +2391,16 @@ get = {
         get.interval_specifier.sequence_specifier(interval_specifier, step, unit)
       )
     end,
-    is_in = function(interval_specifier, element)
+    bool_by_is_in = function(interval_specifier, element)
       return interval_specifier.start <= element and element <= interval_specifier.stop
     end,
-    is_contained_in = function(interval_specifier, other_interval_specifier)
-      return get.interval_specifier.is_in(other_interval_specifier, interval_specifier.start) and
-        get.interval_specifier.is_in(other_interval_specifier, interval_specifier.stop)
+    bool_by_is_contained_in = function(interval_specifier, other_interval_specifier)
+      return get.interval_specifier.bool_by_is_in(other_interval_specifier, interval_specifier.start) and
+        get.interval_specifier.bool_by_is_in(other_interval_specifier, interval_specifier.stop)
     end,
   },
   sequence_specifier = {
 
-  },
-  timestamp_s_interval_specifier = {
-    event_tables_within_range = function(ivspec, specifier, include, exclude)
-      specifier = transf.two_tables.table_by_take_new(transf.timestamp_s_interval_specifier.event_table(ivspec), specifier)
-      return get.khal.list_event_tables(
-        specifier,
-        include,
-        exclude
-      )
-    end,
   },
   full_dcmp_spec = {
     prefix_partial_dcmp_spec = function(full_dcmp_spec, dcmp_name)
@@ -2480,16 +2459,10 @@ get = {
         get.fn.fn_by_arbitrary_args_bound_or_ignored(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
       )
     end,
-    assoc_of_arrs_by_first_element = function(arr_arr)
+    arr_value_assoc_by_first_element = function(arr_arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr_arr,
         transf.arr.t_and_arr_by_first_rest
-      )
-    end,
-    assoc_of_assocs_by_first_element_and_arr = function(arr_arr, arr2)
-      return get.assoc_of_arrs.assoc_of_assocs_by_arr(
-        get.arr_arr.assoc_of_arrs_by_first_element(arr_arr),
-        arr2
       )
     end,
     arr_arr_by_mapped = function(arr_arr, fn)
@@ -2512,14 +2485,6 @@ get = {
     end,
 
   },
-  assoc_of_arrs = {
-    assoc_of_assocs_by_arr = function(assoc_of_arr, arr2)
-      return hs.fnutils.map(
-        assoc_of_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
-      )
-    end,
-  },
   mac_application_name = {
     
   },
@@ -2534,21 +2499,14 @@ get = {
     end,
   },
   window = {
-    hs_geometry_point_with_offset = function(window, from, delta)
+    hs_geometry_point_by_with_offset = function(window, from, delta)
       return transf.window[
         "hs_geometry_point_by_" .. from
       ](window):move(delta)
     end,
   },
   jxa_windowlike_specifier = {
-    jxa_tab_specifier = function(window_specifier, tab_index)
-      return {
-        application_name = window_specifier.application_name,
-        window_index = window_specifier.window_index,
-        tab_index = tab_index
-      }
-    end,
-    property = function(window_specifier, property)
+    any_by_property = function(window_specifier, property)
       return get.str.any_by_evaled_js_osa( ("Application('%s').windows()[%d].%s()"):format(
         window_specifier.application_name,
         window_specifier.window_index,
@@ -2556,8 +2514,17 @@ get = {
       ))
     end,
   },
+  tabbable_jxa_window_specifier = {
+    jxa_tab_specifier = function(window_specifier, tab_index)
+      return {
+        application_name = window_specifier.application_name,
+        window_index = window_specifier.window_index,
+        tab_index = tab_index
+      }
+    end,
+  },
   jxa_tab_specifier = {
-    property = function(tab_specifier, property)
+    any_by_property = function(tab_specifier, property)
       return get.str.any_by_evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].%s()"):format(
         tab_specifier.application_name,
         tab_specifier.window_index,
@@ -2567,7 +2534,7 @@ get = {
     end,
   },
   detailed_env_node = {
-    self_snake_case_value_assoc = function(node, prev_key, key)
+    snake_case_key_str_value_assoc_by_no_dependents = function(node, prev_key, key)
       prev_key = prev_key or ""
       if node.value then
         local value = node.value
@@ -2593,7 +2560,7 @@ get = {
       end
     end,
     snake_case_key_str_value_assoc = function(node, prev_key, key)
-      local self_assoc = get.detailed_env_node.self_snake_case_value_assoc(node, prev_key, key)
+      local self_assoc = get.detailed_env_node.snake_case_key_str_value_assoc_by_no_dependents(node, prev_key, key)
       local dependent_assoc
       if node.dependents then
         dependent_assoc = get.detailed_env_node.snake_case_key_str_value_assoc(node.dependents, key)
@@ -2618,11 +2585,8 @@ get = {
       return values
     end,
   },
-  url = {
-
-  },
   sgml_document = {
-    sgml_str_or_nil_by_query_selector_all = function(str, selector)
+    content_starting_lt_ending_gt_str_or_nil_by_query_selector_all = function(str, selector)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "htmlq" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_doc(str)
       )
@@ -2639,29 +2603,35 @@ get = {
     end,
     -- non-all seems to not be possible with htmlq. At least for html_, it would be possible if we parsed the html, but for text_, there seems to be no indication of when each result ends.
   },
-  sgml_url = {
-    sgml_str_or_nil_by_query_selector_all = function(url, selector)
-      return get.sgml_document.sgml_str_or_nil_by_query_selector_all(
-        transf.url.sgml_document_or_nil(url),
+  url = {
+    content_starting_lt_ending_gt_str_or_nil_by_query_selector_all = function(url, selector)
+      local doc = transf.url.sgml_document_or_nil(url)
+      if not doc then return nil end
+      return get.sgml_document.content_starting_lt_ending_gt_str_or_nil_by_query_selector_all(
+        doc,
         selector
       )
     end,
     str_or_nil_by_query_selector_all = function(url, selector)
+      local doc = transf.url.sgml_document_or_nil(url)
+      if not doc then return nil end
       return get.sgml_document.str_or_nil_by_query_selector_all(
-        transf.url.sgml_document_or_nil(url),
+        doc,
         selector
       )
     end,
     str_or_nil_by_attribute_query_selector_all = function(url, selector, attribute)
+      local doc = transf.url.sgml_document_or_nil(url)
+      if not doc then return nil end
       return get.sgml_document.str_or_nil_by_attribute_query_selector_all(
-        transf.url.sgml_document_or_nil(url),
+        doc,
         selector,
         attribute
       )
     end,
   },
   url_arr = {
-    absolute_path_key_assoc_of_url_files = function(arr, root)
+    local_absolute_path_key_url_value_assoc = function(arr, root)
       return get.local_nonabsolute_path_key_assoc.local_absolute_path_key_assoc(
         transf.url_arr.leaflike_key_url_value_assoc(arr),
         root
@@ -2676,13 +2646,13 @@ get = {
     end,
   },
   omegat_project_dir = {
-    source_files_extension = function(dir, ext)
+    file_arr_by_source_w_extension = function(dir, ext)
       return get.path_arr.path_arr_by_filter_to_same_extension(
         transf.omegat_project_dir.file_arr_by_source(dir),
         ext
       )
     end,
-    target_files_extension = function(dir, ext)
+    file_arr_by_target_w_extension = function(dir, ext)
       return get.path_arr.path_arr_by_filter_to_same_extension(
         transf.omegat_project_dir.file_arr_by_source(dir),
         ext
@@ -2690,58 +2660,42 @@ get = {
     end,
   },
   project_dir = {
-    local_project_material_path = function(dir, type)
+    local_absolute_path_by_local_project_material = function(dir, type)
       return transf.path.path_by_ending_with_slash(dir) .. type .. "/"
     end,
-    local_subtype_project_material_path = function(dir, type, subtype)
-      return get.project_dir.local_project_material_path(dir, type) .. subtype .. "/"
+    local_absolute_path_local_subtype_project_material = function(dir, type, subtype)
+      return get.project_dir.local_absolute_path_by_local_project_material(dir, type) .. subtype .. "/"
     end,
-    local_universal_project_material_path = function(dir, type)
-      return get.project_dir.local_subtype_project_material_path(dir, type, "universal")
+    local_absolute_path_by_local_universal_project_material = function(dir, type)
+      return get.project_dir.local_absolute_path_local_subtype_project_material(dir, type, "universal")
     end,
-    global_project_material_path = function(dir, type)
+    local_absolute_path_by_global_project_material = function(dir, type)
       return transf.path.path_by_ending_with_slash(env.MPROJECT_MATERIALS) .. type .. "/"
     end,
-    global_subtype_project_material_path = function(dir, type, subtype)
-      return get.project_dir.global_project_material_path(dir, type) .. subtype .. "/"
+    local_absolute_path_by_global_subtype_project_material = function(dir, type, subtype)
+      return get.project_dir.local_absolute_path_by_global_project_material(dir, type) .. subtype .. "/"
     end,
-    global_universal_project_material_path = function(dir, type)
-      return get.project_dir.global_subtype_project_material_path(dir, type, "universal")
-    end,
-  },
-  iso_3366_1_alpha_2_code = {
-    --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_full_name instead
-    full_name_in_language_str = function(code, language_identifier_str)
-      return get.n_shot_llm_spec.str_or_nil_by_response({
-        query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_str .. "'",
-        input = code
-      })
-    end,
-    --- don't use this for english, use transf.iso_3366_1_alpha_2.iso_3336_1_short_name instead
-    short_name_in_language_str = function(code, language_identifier_str)
-      return get.n_shot_llm_spec.str_or_nil_by_response({
-        query = "Get the short name of a country from its ISO 3366-1 alpha-2 code in the language '" .. language_identifier_str .. "'",
-        input = code
-      })
+    local_absolute_path_global_by_universal_project_material = function(dir, type)
+      return get.project_dir.local_absolute_path_by_global_subtype_project_material(dir, type, "universal")
     end,
   },
   any = {
-    join_if_arr = function(arg, separator)
+    any_by_join_if_arr = function(arg, separator)
       if is.any.arr(arg) then
-        return get.str_or_number_arr.str_by_joined(arg, separator)
+        return get.str_or_number_arr.str_by_joined(transf.arr.str_arr(arg), separator)
       else
         return arg
       end
     end,
-    arr_repeated = function(arg, times)
+    arr_by_repeated = function(arg, times)
       local result = {}
       for i = 1, times do
         dothis.arr.insert_at_index(result, arg)
       end
       return result
     end,
-    repeated = function(arr, times)
-      return transf.arr.n_anys(get.any.arr_repeated(arr, times))
+    n_anys_by_repeated = function(arr, times)
+      return transf.arr.n_anys(get.any.arr_by_repeated(arr, times))
     end,
     assoc_by_applicable_thing_name_hierarchy = function(any, local_thing_name_hierarchy, parent)
       local_thing_name_hierarchy = local_thing_name_hierarchy or get.table.table_by_copy(thing_name_hierarchy, true)
@@ -2771,14 +2725,14 @@ get = {
     end,
   },
   table_and_table = {
-    larger_table_by_key = function(table1, table2, key)
+    table_by_larger_key = function(table1, table2, key)
       if table1[key] > table2[key] then
         return table1
       else
         return table2
       end
     end,
-    smaller_table_by_key = function(table1, table2, key)
+    table_by_smaller_key = function(table1, table2, key)
       if table1[key] < table2[key] then
         return table1
       else
@@ -2798,7 +2752,7 @@ get = {
     end,
   },
   retriever_specifier = {
-    result = function(retriever_specifier, value)
+    any_by_result = function(retriever_specifier, value)
       return transf[
         retriever_specifier.target
       ][
@@ -2807,22 +2761,21 @@ get = {
     end,
   },
   retriever_specifier_arr = {
-    result_highest_precedence = function(arr, value)
-      return get.retriever_specifier.result(
+    any_by_result_highest_precedence = function(arr, value)
+      return get.retriever_specifier.any_by_result(
         transf.retriever_specifier_arr.retriever_specifier_by_highest_precedence(arr),
         value
       )
     end,
-    result_arr = function(arr, value)
+    any_arr_by_result = function(arr, value)
       return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr, 
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.retriever_specifier.result, {a_use, value})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.retriever_specifier.any_by_result, {a_use, value})
       )
     end,
-    result_joined = function(arr, value)
-      return get.str_or_number_arr.str_by_joined(
-        get.retriever_specifier.result_arr(arr, value),
-        " | "
+    str_by_results_joined = function(arr, value)
+      return transf.arr.str_by_alternative_summary(
+        get.retriever_specifier_arr.any_arr_by_result(arr, value),
       )
     end,
   },
@@ -2851,38 +2804,38 @@ get = {
       return true
     end,
     str_or_nil_by_chooser_text = function(arr, value)
-      return get.retriever_specifier_arr.result_highest_precedence(
+      return get.retriever_specifier_arr.any_by_result_highest_precedence(
         transf.thing_name_arr.partial_retriever_specifier_arr_by_chooser_text(arr),
         value
       )
     end,
     str_or_nil_by_placeholder_text = function(arr, value)
-      return get.retriever_specifier_arr.result_highest_precedence(
+      return get.retriever_specifier_arr.any_by_result_highest_precedence(
         transf.thing_name_arr.partial_retriever_specifier_arr_by_placeholder_text(arr),
         value
       )
     end,
     hs_image_or_nil_by_chooser_image = function(arr, value)
-      return get.retriever_specifier_arr.result_highest_precedence(
+      return get.retriever_specifier_arr.any_by_result_highest_precedence(
         transf.thing_name_arr.partial_retriever_specifier_arr_by_chooser_image(arr),
         value
       )
     end,
     str_or_nil_by_chooser_subtext = function(arr, value)
-      return get.retriever_specifier_arr.result_joined(
+      return get.retriever_specifier_arr.str_by_results_joined(
         transf.thing_name_arr.chooser_subtext_retriever_specifier_arr(arr),
         value
       )
     end,
     pos_int_by_initial_selected_index = function(arr, value)
-      return get.retriever_specifier_arr.result_highest_precedence(
+      return get.retriever_specifier_arr.any_by_result_highest_precedence(
         transf.thing_name_arr.initial_selected_retriever_specifier_arr(arr),
         value
       )
     end,
   },
   hschooser_specifier = {
-    partial_hschooser = function(spec, callback)
+    hschooser = function(spec, callback)
       return hs.chooser.new(function(chosen_chooser_item)
         if chosen_chooser_item then
           callback(chosen_chooser_item)
@@ -2900,7 +2853,7 @@ get = {
     end,
   },
   chooser_item_specifier_arr = {
-    styled_chooser_item_specifier_arr = function(arr, chooser_item_specifier_text_key_styledtext_attributes_specifier_assoc)
+    chooser_item_specifier_arr_by_styled = function(arr, chooser_item_specifier_text_key_styledtext_attributes_specifier_assoc)
       local res = get.table.table_by_copy(arr)
       for i, chooser_item_specifier in transf.arr.pos_int_vt_stateless_iter(res) do
         local text_styledtext_attribute_specifier = transf.two_table_or_nils.table_by_take_new( {
@@ -2911,11 +2864,11 @@ get = {
           font = {size = 12 },
           color = { red = 0, green = 0, blue = 0, alpha = 0.5 },
         }, chooser_item_specifier_text_key_styledtext_attributes_specifier_assoc.styledtext_attribute_specifier.subtext)
-        res[i].text = get.str_or_styledtext.styledtext_merge(
+        res[i].text = get.str_or_styledtext.styledtext_by_merge(
           chooser_item_specifier.text,
           text_styledtext_attribute_specifier
         )
-        res[i].subText = get.str_or_styledtext.styledtext_merge(
+        res[i].subText = get.str_or_styledtext.styledtext_by_merge(
           chooser_item_specifier.subText,
           subtext_styledtext_attribute_specifier
         )
@@ -2923,7 +2876,7 @@ get = {
     end
   },
   ipc_socket_id = {
-    response_table_or_nil = function(ipc_socket_id, request_table)
+    not_userdata_or_fn_or_nil_by_response = function(ipc_socket_id, request_table)
       return get.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json_in_key(
         "echo '" .. json.encode(request_table) .. "' | /opt/homebrew/bin/socat UNIX-CONNECT:" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " STDIO",
         "data"
@@ -2932,7 +2885,7 @@ get = {
   },
   mpv_ipc_socket_id = {
     str = function(id, key)
-      return get.ipc_socket_id.response_table_or_nil(id, {
+      return get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(id, {
         command = { "get_property", key }
       } )
     end,
@@ -2941,7 +2894,7 @@ get = {
         get.mpv_ipc_socket_id.str(id, key)
       )
     end,
-    bool_emoji = function(id, key)
+    line_by_emoji_for_key = function(id, key)
       local res = get.mpv_ipc_socket_id.str(id, key)
       if res then return tblmap.stream_attribute.true_emoji[key]
       else return tblmap.stream_attribute.false_emoji[key] end
@@ -3073,43 +3026,6 @@ get = {
   two_operational_addcompables = {
     bool_by_is_close = function(a, b, distance)
       return math.abs(a - b) < distance
-    end,
-  },
-  stream_creation_specifier = {
-  },
-  youtube_video_id = {
-    get_extracted_attr_assoc_via_ai = function(video_id, do_after)
-      return get.form_filling_specifier.filled_str_assoc({
-        in_fields = {
-          title = transf.youtube_video_id.line_by_title(video_id),
-          channel_title = transf.youtube_video_id.line_by_channel_title(video_id),
-          description = get.str.str_by_shortened_start_ellipsis(transf.youtube_video_id.str_by_description(video_id)),
-        },
-        form_field_specifier_arr = {
-          {
-            alias = "tcrea",
-            value = "Artist"
-          },
-          {
-            alias = "title",
-            value = "Title"
-          },
-          {
-            alias = "srs",
-            value = "Series"
-          },
-          {
-            alias = "srsrel",
-            value = "Relation to series",
-            explanation = "op, ed, ost, insert song, etc."
-          },
-          {
-            alias = "srsrelindex",
-            value = "Index in the relation to series",
-            explanation = "positive integer"
-          }
-        },
-      })
     end,
   },
   youtube_video_id_arr = {

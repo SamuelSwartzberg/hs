@@ -315,9 +315,9 @@ act = {
       dothis.md_file.to_file_in_downloads(path, "revealjs")
     end,
   },
-  email_file = {
+  maildir_file = {
     choose_attachment_and_choose_action = function(path)
-      dothis.email_file.choose_attachment_and_download(path, dothis.any.choose_action)
+      dothis.maildir_file.choose_attachment_and_download(path, dothis.any.choose_action)
     end,
   },
   alphanum_minus_underscore = {
@@ -485,7 +485,7 @@ act = {
     end,
     choose_inbox_email_and_action = function()
       act.arr.choose_item_and_action(
-        get.maildir_dir.sorted_email_paths(env.MBSYNC_INBOX, true)
+        get.maildir_dir.maildir_file_arr_by_sorted_filtered(env.MBSYNC_INBOX, true)
       )
     end,
     choose_input_audiodevice_specifier_and_set_default = function()
