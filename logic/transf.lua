@@ -163,13 +163,13 @@ transf = {
       return transf.number.sign_indicator(num) .. "0x" .. transf.pos_number.nonindicated_hex_number_str(transf.number.pos_number(num))
     end,
     byte_nonindicated_hex_number_str_arr = function(num)
-      return  get.str.str_arr_groups_ascii_from_end(
+      return  get.str.str_arr_by_grouped_ascii_from_end(
         transf.number.nonindicated_hex_number_str(num),
         2
       )
     end,
     two_byte_nonindicated_hex_number_str_arr = function(num)
-      return  get.str.str_arr_groups_ascii_from_end(
+      return  get.str.str_arr_by_grouped_ascii_from_end(
         transf.number.nonindicated_hex_number_str(num),
         4
       )
@@ -404,7 +404,7 @@ transf = {
       return transf.any.str(num)
     end,
     separated_nonindicated_dec_number_str = function(num)
-      return get.str.str_with_separator_grouped_ascii_from_end(
+      return get.str.str_by_separator_grouped_ascii_from_end(
         transf.pos_int.digit_str(num),
         3,
         " "
@@ -414,7 +414,7 @@ transf = {
       return get.str.str_by_formatted_w_n_anys("%X", num)
     end,
     separated_nonindicated_hex_number_str = function(num)
-      return get.str.str_with_separator_grouped_ascii_from_end(
+      return get.str.str_by_separator_grouped_ascii_from_end(
         transf.pos_int.hex_str(num),
         2,
         " "
@@ -424,7 +424,7 @@ transf = {
       return get.str.str_by_formatted_w_n_anys("%o", num)
     end,
     separated_nonindicated_oct_number_str = function(num)
-      return get.str.str_with_separator_grouped_ascii_from_end(
+      return get.str.str_by_separator_grouped_ascii_from_end(
         transf.pos_int.oct_str(num),
         3,
         " "
@@ -434,7 +434,7 @@ transf = {
       return get.str.str_by_formatted_w_n_anys("%b", num)
     end,
     separated_nonindicated_bin_number_str = function(num)
-      return get.str.str_with_separator_grouped_ascii_from_end(
+      return get.str.str_by_separator_grouped_ascii_from_end(
         transf.pos_int.bin_str(num),
         4,
         " "
@@ -473,13 +473,13 @@ transf = {
   },
   pos_int_arr = {
     unicode_codepoint_str_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.pos_int.unicode_codepoint_str
       )
     end,
     ascii_char_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.pos_int.ascii_char
       )
@@ -501,7 +501,7 @@ transf = {
       )
     end,
     indicated_utf8_hex_str_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.pos_int.indicated_utf8_hex_str
       )
@@ -536,13 +536,13 @@ transf = {
       return #arr
     end,
     t_and_arr_by_first_rest = function(arr)
-      return arr[1], get.arr.arr_by_slice_w_3_pos_int_any_or_nils(arr, 2)
+      return arr[1], get.arr.arr_by_slice_w_3_int_any_or_nils(arr, 2)
     end,
     arr_by_nofirst = function(arr)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(arr, 2)
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(arr, 2)
     end,
     arr_by_nolast = function(arr)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(arr, 1, -2)
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(arr, 1, -2)
     end,
     empty_str_value_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
@@ -551,7 +551,7 @@ transf = {
       )
     end,
     str_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.any.str_by_replicable
       )
@@ -648,7 +648,7 @@ transf = {
     end,
   },
   leaf = {
-    rf3339like_dt_or_interval_general_name_fs_tag_str = function(leaf)
+    rfc3339like_dt_or_interval_general_name_fs_tag_str = function(leaf)
       return get.str.n_strs_by_extracted_onig(
         leaf,
         ("^(%s(?:_to_%s)?--)?([^%%]*)(%%.*)?$"):format(
@@ -767,11 +767,11 @@ transf = {
       )
     end,
     path_leaf_specifier = function(path)
-      local rf3339like_dt_or_interval, general_name, fs_tag_str = transf.leaf.rf3339like_dt_or_interval_general_name_fs_tag_str(transf.path.leaflike_by_leaf(path))
+      local rfc3339like_dt_or_interval, general_name, fs_tag_str = transf.leaf.rfc3339like_dt_or_interval_general_name_fs_tag_str(transf.path.leaflike_by_leaf(path))
       return {
         extension = transf.path.extension(path),
         path = transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path),
-        rfc3339like_dt_o_interval = rf3339like_dt_or_interval,
+        rfc3339like_dt_o_interval = rfc3339like_dt_or_interval,
         general_name = general_name,
         lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = transf.fs_tag_str.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(fs_tag_str),
       }
@@ -1040,14 +1040,14 @@ transf = {
   },
   path_arr = {
     leaflike_arr_by_leaves = function(path_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_leaf)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_leaf)
     end,
     leaflike_arr_by_filenames = function(path_arr)
-      local filenames = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_filename)
+      local filenames = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_filename)
       return transf.arr.set(filenames)
     end,
     extensions_arr = function(path_arr)
-      local extensions = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.extension)
+      local extensions = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.extension)
       return transf.arr.set(extensions)
     end,
     extant_path_arr = function(path_arr)
@@ -1057,7 +1057,7 @@ transf = {
       return get.arr.arr_by_filtered(path_arr, is.path.not_useless_file_leaf_path)
     end,
     path_leaf_specifier_arr = function(path_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.path_leaf_specifier)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.path_leaf_specifier)
     end,
     timestamp_s_interval_specifier_arr = function(path_arr)
       return transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_arr(
@@ -1188,7 +1188,7 @@ transf = {
   },
   local_file_arr = {
     single_attachment_str_arr = function(path_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.local_file.single_attachment_str)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.local_file.single_attachment_str)
     end,
     str_by_joined_single_attachment_strs = function(path_arr)
       return get.str_or_number_arr.str_by_joined(transf.path_arr.attachment_arr(path_arr), "\n")
@@ -1319,16 +1319,16 @@ transf = {
         transf.dir.path_leaf_specifier_arr_by_children(path)
       )
     end,
-    path_leaf_specifier_by_using_union_rf3339like_dt_or_interval = function(path)
+    path_leaf_specifier_by_using_union_rfc3339like_dt_or_interval = function(path)
       local path_leaf_specifier = transf.path.path_leaf_specifier(path)
-      local union_rf3339like_dt_or_interval = transf.dir.rfc3339like_dt_o_interval_by_union_of_children(path)
-      if union_rf3339like_dt_or_interval then
-        path_leaf_specifier.rfc3339like_dt_o_interval = union_rf3339like_dt_or_interval
+      local union_rfc3339like_dt_or_interval = transf.dir.rfc3339like_dt_o_interval_by_union_of_children(path)
+      if union_rfc3339like_dt_or_interval then
+        path_leaf_specifier.rfc3339like_dt_o_interval = union_rfc3339like_dt_or_interval
       end
       return path_leaf_specifier
     end,
     absolute_path_by_using_union_rfc3339like_dt_o_interval = function(path)
-      local path_leaf_specifier = transf.dir.path_leaf_specifier_by_using_union_rf3339like_dt_or_interval(path)
+      local path_leaf_specifier = transf.dir.path_leaf_specifier_by_using_union_rfc3339like_dt_or_interval(path)
       return transf.path_leaf_specifier.absolute_path(path_leaf_specifier)
     end
   },
@@ -1539,12 +1539,12 @@ transf = {
         return ""
       end
     end,
-    str_by_rf3339like_dt_or_interval_part = function(path_leaf_specifier)
-      return path_leaf_specifier.rf3339like_dt_or_interval or ""
+    str_by_rfc3339like_dt_or_interval_part = function(path_leaf_specifier)
+      return path_leaf_specifier.rfc3339like_dt_or_interval or ""
     end,
     timestamp_s_interval_specifier_or_nil = function(path_leaf_specifier)
-      if path_leaf_specifier.rf3339like_dt_or_interval then
-        return transf.rf3339like_dt_or_interval.timestamp_s_interval_specifier(path_leaf_specifier.rf3339like_dt_or_interval)
+      if path_leaf_specifier.rfc3339like_dt_or_interval then
+        return transf.rfc3339like_dt_or_interval.timestamp_s_interval_specifier(path_leaf_specifier.rfc3339like_dt_or_interval)
       else
         return nil
       end
@@ -1569,7 +1569,7 @@ transf = {
     end,
     absolute_path = function(path_leaf_specifier)
       return transf.path.path_by_ending_with_slash(path_leaf_specifier.path) 
-      .. transf.path_leaf_specifier.str_by_rf3339like_dt_or_interval_part(path_leaf_specifier)
+      .. transf.path_leaf_specifier.str_by_rfc3339like_dt_or_interval_part(path_leaf_specifier)
       .. transf.path_leaf_specifier.alphanum_minus_underscore_by_general_name_part(path_leaf_specifier)
       .. transf.path_leaf_specifier.fs_tag_str(path_leaf_specifier)
       .. transf.path_leaf_specifier.leaflike_by_extension_part(path_leaf_specifier)
@@ -1692,7 +1692,7 @@ transf = {
       )
     end,
     rfc3339like_dt_o_interval_by_union = function(arr)
-      return transf.timestamp_s_interval_specifier.rf3339like_dt_or_interval(
+      return transf.timestamp_s_interval_specifier.rfc3339like_dt_or_interval(
         transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_by_union(arr)
       )
     end,
@@ -2065,8 +2065,98 @@ transf = {
       return ftcsv.parseLine(path, transf.plaintext_table_file.utf8_char_by_field_separator(path))
     end,
   },
+  old_media_logs_proc_dir = {
+    timestamp_ms_key_media_log_spec_value_assoc = function(path)
+      local files = transf.extant_path.file_arr_by_descendants(path)
+      local res = {}
+      for _, file in transf.arr.pos_int_vt_stateless_iter(files) do
+        local str_arr_ar = transf.plaintext_table_file.str_arr_arr(file)
+        local rfc3339like_ymd = transf.path.leaflike_by_filename(file)
+        dothis.arr.each(str_arr_ar, function(str_arr)
+          local ts = transf.full_rfc3339like_dt.timestamp_ms(
+            rfc3339like_ymd .. "T" .. str_arr[1]
+          )
+          res[ts] = {
+            title = str_arr[2],
+            url = str_arr[3],
+            timestamp_ms = ts
+          }
+        end)
+      end
+      return res
+    end,
+  },
+  git_tmp_log_dir = {
+    timestamp_ms_key_assoc_value_assoc = function(path)
+      local files = transf.dir.file_arr_by_children(path)
+      local res = {}
+      for _, file in transf.arr.pos_int_vt_stateless_iter(files) do
+        local unproc_arr = transf.json_file.table_or_nil(file)
+        if unproc_arr then
+          local assoc = unproc_arr[1] -- uselessly wrapped in an array
+          local ts = assoc.epoch_utc * 1000
+          assoc.epoch_utc = nil
+          assoc.timestamp_ms = ts
+          res[ts] = assoc
+        end
+      end
+      return res
+    end,
+  },
+  mpv_tmp_log_dir = {
+    timestamp_ms_key_media_log_spec_value_assoc = function(path)
+      local files = transf.dir.file_arr_by_children(path)
+      local res = {}
+      for _, file in transf.arr.pos_int_vt_stateless_iter(files) do
+        local lines = transf.plaintext_file.line_arr(file)
+        local ts = transf.nonindicated_number_str.number_by_base_10(
+          lines[1]
+        )
+        res[ts] = {
+          timestamp_s = ts,
+          title = lines[2],
+          url = lines[3],
+          length = transf.nonindicated_number_str.number_by_base_10(
+            lines[4]
+          ),
+          stop = transf.nonindicated_number_str.number_by_base_10(
+            lines[5]
+          ),
+          start = transf.nonindicated_number_str.number_by_base_10(
+            lines[6]
+          ),
+        }
+      end
+      return res
+    end,
+  },
   logging_dir = {
    
+  },
+  old_location_logs_proc_dir = {
+    old_location_log_spec_arr = function(path)
+      return transf.plaintext_assoc_file_arr.not_userdata_or_fn_arr(
+        transf.dir.absolute_path_arr_by_grandchildren(path)
+      )
+    end,
+    timestamp_ms_key_location_log_spec_value_assoc = function(path)
+      return transf.old_location_log_spec_arr.timestamp_ms_key_location_log_spec_value_assoc(
+        transf.old_location_logs_proc_dir.old_location_log_spec_arr(path)
+      )
+    end,
+  },
+  old_location_log_spec_arr = {
+    timestamp_ms_key_location_log_spec_value_assoc = function(arr)
+      local res = {}
+      for _, spec in ipairs(arr) do
+        res[
+          transf.full_rfc3339like_dt.timestamp_ms(
+            spec.dt
+          )
+        ] = spec
+      end
+      return res
+    end,
   },
   newsboat_url_specifier = {
     newsboat_url_line = function(specifier)
@@ -2210,10 +2300,10 @@ transf = {
   },
   dcmp_name = {
     prefix_dcmp_name_seq_by_larger_or_same = function(dcmp_name)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.dcmp_names, 1, dcmp_name)
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(ls.dcmp_names, 1, dcmp_name)
     end,
     suffix_dcmp_name_seq_by_same_or_smaller = function(dcmp_name)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(ls.dcmp_names, dcmp_name)
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(ls.dcmp_names, dcmp_name)
     end,
     date_component_index = function(dcmp_name)
       return tblmap.dcmp_name.date_component_index[dcmp_name]
@@ -2416,7 +2506,7 @@ transf = {
       return transf.rfc3339like_interval.timestamp_s_by_end_max(str)
     end,
   },
-  rf3339like_dt_or_interval = {
+  rfc3339like_dt_or_interval = {
     dt_or_interval = function(str)
       if get.str.bool_by_contains_w_str(str, "_to_") then
         return "rfc3339like_interval"
@@ -2426,23 +2516,23 @@ transf = {
     end,
     timestamp_s_by_max = function(str)
       return transf[
-        transf.rf3339like_dt_or_interval.dt_or_interval(str)
+        transf.rfc3339like_dt_or_interval.dt_or_interval(str)
       ].timestamp_s_by_max(str)
     end,
     timestamp_s_by_min = function(str)
       return transf[
-        transf.rf3339like_dt_or_interval.dt_or_interval(str)
+        transf.rfc3339like_dt_or_interval.dt_or_interval(str)
       ].timestamp_s_by_min(str)
     end,
     timestamp_s_interval_specifier = function(str)
       return transf[
-        transf.rf3339like_dt_or_interval.dt_or_interval(str)
+        transf.rfc3339like_dt_or_interval.dt_or_interval(str)
       ].timestamp_s_interval_specifier_or_nil(str)
     end,
   },
-  rf3339like_dt_or_interval_arr = {
-    timestamp_s_interval_specifier_arr = function(rf3339like_dt_or_interval_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(rf3339like_dt_or_interval_arr, transf.rf3339like_dt_or_interval.timestamp_s_interval_specifier)
+  rfc3339like_dt_or_interval_arr = {
+    timestamp_s_interval_specifier_arr = function(rfc3339like_dt_or_interval_arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(rfc3339like_dt_or_interval_arr, transf.rfc3339like_dt_or_interval.timestamp_s_interval_specifier)
     end,
   },
   digit_interval_str = {
@@ -2610,7 +2700,7 @@ transf = {
       local end_rfc3339like_dt = transf.timestamp_s_interval_specifier.rfc3339like_dt_by_end_filtered_not_max_or_not_prefix(ivspec)
       return start_rfc3339like_dt .. "_to_" .. end_rfc3339like_dt
     end,
-    rf3339like_dt_or_interval = function(ivspec)
+    rfc3339like_dt_or_interval = function(ivspec)
       local rfc3339like_dt = transf.timestamp_s_interval_specifier.rfc3339like_dt(ivspec)
       return rfc3339like_dt or transf.timestamp_s_interval_specifier.rfc3339like_interval_where_dcmp_val_is_not_max_dcmp_val(ivspec)
     end,
@@ -2702,7 +2792,7 @@ transf = {
       return ol
     end,
     str_format_part_specifier_arr_by_for_rfc3339like_dt = function(dcmp_spec)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.dcmp_spec.dcmp_name_seq_by_no_trailing_nil(dcmp_spec),
         function(dcmp_name)
           return {
@@ -2777,7 +2867,7 @@ transf = {
   str_format_part_specifier_arr = {
     str = function(str_format_part_specifier_arr)
       return get.str_or_number_arr.str_by_joined(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           str_format_part_specifier_arr,
           transf.str_format_part_specifier.str
         ),
@@ -2853,7 +2943,7 @@ transf = {
     end,
     iban_by_separated = function(iban)
       return get.str_or_number_arr.str_by_joined(
-        get.str.str_arr_groups_utf8_from_end(
+        get.str.str_arr_by_grouped_utf8_from_end(
           transf.iban.cleaned_iban(iban),
           4
         ),
@@ -2921,7 +3011,7 @@ transf = {
     end,
   },
   contact_table = {
-    uuid = function (contact_table)
+    contact_uuid = function (contact_table)
       return contact_table.uid
     end,
     line_or_nil_by_pref_name = function(contact_table) return transf.str_or_nil.line_by_folded(contact_table["Formatted name"]) end,
@@ -3123,7 +3213,24 @@ transf = {
           addr_table
         )
       end
-    end
+    end,
+    yaml_str_or_nil_by_note = function (contact_table)
+      return contact_table.Note
+    end,
+    contact_note_spec_by_note = function (contact_table)
+      return transf.yaml_str.not_userdata_or_fn(
+        transf.contact_table.yaml_str_or_nil_by_note(contact_table) or "{}"
+      )
+    end,
+    line_or_nil_by_met_context = function (contact_table)
+      return transf.contact_table.contact_note_spec_by_note(contact_table).met_context
+    end,
+    rfc3339like_dt_or_nil_by_met_dt = function (contact_table)
+      return transf.contact_table.contact_note_spec_by_note(contact_table).met_dt
+    end,
+    line_or_nil_by_met_location = function (contact_table)
+      return transf.contact_table.contact_note_spec_by_note(contact_table).met_location
+    end,
 
   },
   address_table = {
@@ -3289,7 +3396,7 @@ transf = {
         in_fields = {
           title = transf.youtube_video_id.line_by_title(id),
           channel_title = transf.youtube_video_id.line_by_channel_title(id),
-          description = get.str.str_by_shortened_start_ellipsis(transf.youtube_video_id.str_by_description(id)),
+          description = get.str.str_by_shortened_eutf8_start(transf.youtube_video_id.str_by_description(id)),
         },
         form_fields = {"tcrea", "title", "srs", "srsrel", "srsrelindex"},
         explanations = {
@@ -3418,8 +3525,8 @@ transf = {
           local synonym_term = get.str.str_by_sub_eutf8(synonym_part_lines[1], 2) -- syntax: ❯<term>
           local synonyms_raw = get.str.str_by_sub_eutf8(synonym_part_lines[2], 12) -- syntax:  ⬤synonyms: <term>{, <term>}
           local antonyms_raw = get.str.str_by_sub_eutf8(synonym_part_lines[3], 12) -- syntax:  ⬤antonyms: <term>{, <term>}
-          local synonyms = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(synonyms_raw, ", "), transf.str.not_starting_o_ending_with_whitespace_str)
-          local antonyms = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(antonyms_raw, ", "), transf.str.not_starting_o_ending_with_whitespace_str)
+          local synonyms = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(synonyms_raw, ", "), transf.str.not_starting_o_ending_with_whitespace_str)
+          local antonyms = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(get.str.str_arr_by_split_w_ascii_char(antonyms_raw, ", "), transf.str.not_starting_o_ending_with_whitespace_str)
           return synonym_term, {
             synonyms = synonyms,
             antonyms = antonyms,
@@ -3660,7 +3767,7 @@ transf = {
     end,
     upper_camel_strict_snake_case = function(str)
       local parts = transf.str.alphanum_arr_by_split_on_others(str)
-      local upper_parts = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
+      local upper_parts = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
       return get.str_or_number_arr.str_by_joined(upper_parts, "_")
     end,
     lower_camel_strict_snake_case = function(str)
@@ -3668,7 +3775,7 @@ transf = {
     end,
     upper_camel_case = function(str)
       local parts = transf.str.alphanum_arr_by_split_on_others(str)
-      local upper_parts = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
+      local upper_parts = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
       return get.str_or_number_arr.str_by_joined(upper_parts, "")
     end,
     lower_camel_case = function(str)
@@ -3739,7 +3846,7 @@ transf = {
     end,
     str_by_title_case = function(str)
       local words, removed = get.str.two_str_arrs_by_onig_regex_match_nomatch(str, "[ :–\\—\\-\\t\\n]")
-      local title_cased_words = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(words, transf.str.str_by_title_case_policy)
+      local title_cased_words = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(words, transf.str.str_by_title_case_policy)
       title_cased_words[1] = transf.str.str_by_first_eutf8_upper(title_cased_words[1])
       title_cased_words[#title_cased_words] = transf.str.str_by_first_eutf8_upper(title_cased_words[#title_cased_words])
       local arr = transf.two_arrs.arr_by_interleaved_stop_a1(title_cased_words, removed)
@@ -3898,7 +4005,7 @@ transf = {
     not_starting_o_ending_with_whitespace_str = stringy.strip,  -- this is not unicode-aware, but seems to work regardless, probably because no 8-bit (0-beginning) ascii char is a valid utf8 char. Here's an alternative but slower implementation if we ever need it: function(str) return get.str.n_strs_by_extracted_eutf8(str, "^%s*(.-)%s*$") end,
     str_by_all_prepended_quotechar = function(str)
       return get.str_or_number_arr.str_by_joined(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           transf.str.line_arr(
             transf.str.not_starting_o_ending_with_whitespace_str(str)
           ),
@@ -4139,7 +4246,7 @@ transf = {
   },
   plaintext_assoc_file_arr ={
     not_userdata_or_fn_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.plaintext_assoc_file.not_userdata_or_fn
       )
@@ -4179,7 +4286,7 @@ transf = {
   multiline_str = {
     multiline_str_by_trimmed_lines = function(str)
       local lines = get.str.str_arr_by_split_w_str(str, "\n")
-      local trimmed_lines = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(lines, transf.str.not_starting_o_ending_with_whitespace_str)
+      local trimmed_lines = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(lines, transf.str.not_starting_o_ending_with_whitespace_str)
       return get.str_or_number_arr.str_by_joined(trimmed_lines, "\n")
     end,
     iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_relay_identifier_arr_value_assoc_value_assoc = function(raw)
@@ -4229,10 +4336,10 @@ transf = {
     multiline_str_by_summary = function (syn_specifier)
       return 
         "synonyms: " ..
-        get.arr.arr_by_slice_removed_indicator_and_flatten_w_slice_spec(syn_specifier.synonyms, { stop = 2}, "...") ..
+        get.arr.arr_by_slice_removed_indicator_and_flatten_w_cut_specifier(syn_specifier.synonyms, { stop = 2}, "...") ..
         "\n" ..
         "antonyms: " ..
-        get.arr.arr_by_slice_removed_indicator_and_flatten_w_slice_spec(syn_specifier.antonyms, { stop = 2}, "...")
+        get.arr.arr_by_slice_removed_indicator_and_flatten_w_cut_specifier(syn_specifier.antonyms, { stop = 2}, "...")
     end,
   },
   two_anys__arr = {
@@ -4406,7 +4513,7 @@ transf = {
   },
   str_arr = {
     str_arr_by_mapped_single_quoted_escaped = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.str.str_by_single_quoted_escaped
       )
@@ -4422,7 +4529,7 @@ transf = {
     end,
     path_by_joined = function(arr)
       return get.str_or_number_arr.str_by_joined(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.leaflike_by_safe_filename), 
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.leaflike_by_safe_filename), 
         "/"
       )
     end,
@@ -4438,14 +4545,14 @@ transf = {
       )
     end,
     not_starting_o_ending_with_whitespace_str_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.not_starting_o_ending_with_whitespace_str)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.not_starting_o_ending_with_whitespace_str)
     end,
     multiline_str = function(arr)
       return get.str_or_number_arr.str_by_joined(arr, "\n")
     end,
     str_by_summary = function(arr)
       return get.str_or_number_arr.str_by_joined(
-        get.arr.arr_by_slice_removed_indicator_and_flatten_w_slice_spec(arr, {
+        get.arr.arr_by_slice_removed_indicator_and_flatten_w_cut_specifier(arr, {
           start = 1,
           stop = 10,
         }, "..."),
@@ -4456,10 +4563,10 @@ transf = {
   },
   line_arr = {
     noindent_str_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent_line_by_extract)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent_line_by_extract)
     end,
     nohashcomment_line_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.line_arr.nohashcomment_line_filtered_line_arr(arr),
         transf.line.nohashcomment_line_by_extract
       )
@@ -4659,7 +4766,7 @@ transf = {
   },
   url_arr = {
     line_arr_by_url_potentially_with_title_comment_arr = function(sgml_url_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         sgml_url_arr,
         transf.url.line_by_url_potentially_with_title_comment
       )
@@ -4686,7 +4793,7 @@ transf = {
   },
   plaintext_file_arr = {
     str_arr_by_contents = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.plaintext_file.str_by_contents)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.plaintext_file.str_by_contents)
     end,
     line_arr = function(arr)
       return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(arr, transf.plaintext_file.line_arr)
@@ -4834,7 +4941,7 @@ transf = {
     arr_arr_by_label_root_to_leaf_primitive_and_arrlike_is_leaf = function(t)
       return get.table.arr_arr_by_label_root_to_leaf(
         t,
-        is.table.only_int_key_table
+        is.table.only_pos_int_key_table
       )
     end,
     arr_arr_by_key_label_only_primitive_is_leaf = function(t)
@@ -4846,20 +4953,20 @@ transf = {
     arr_arr_by_key_label_primitive_and_arrlike_is_leaf = function(t)
       return get.table.arr_arr_by_key_label(
         t,
-        is.table.only_int_key_table
+        is.table.only_pos_int_key_table
       )
     end,
     local_nonabsolute_path_key_assoc_by_primitive_and_arrlike_is_leaf = function(t)
       return get.table.str_key_assoc_by_joined(
         t,
-        is.table.only_int_key_table,
+        is.table.only_pos_int_key_table,
         "/"
       )
     end,
     str_key_assoc_by_joined_dot_notation_primitive_and_arrlike_is_leaf = function(t)
       return get.table.str_key_assoc_by_joined(
         t,
-        is.table.only_int_key_table,
+        is.table.only_pos_int_key_table,
         "."
       )
     end,
@@ -4868,7 +4975,7 @@ transf = {
       return transf.arr_arr.arr_by_map_to_last(
         get.table.arr_arr_by_key_label(
           t,
-          is.table.only_int_key_table
+          is.table.only_pos_int_key_table
         )
       )
     end,
@@ -4876,7 +4983,7 @@ transf = {
       return transf.arr.arr_by_map_to_last(
         get.table.arr_arr_by_label_root_to_leaf(
           t,
-          is.table.only_int_key_table
+          is.table.only_pos_int_key_table
         )
       )
     end,
@@ -4915,7 +5022,7 @@ transf = {
       end
       header_lines = transf.two_arrs.arr_by_appended(
         header_lines,
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           transf.table.two_anys__arr_by_sorted_larger_key_first(t),
           transf.two_anys__arr.email_header
         )
@@ -5041,7 +5148,7 @@ transf = {
   },
   str_key_bool_value_assoc = {
     str_arr_by_long_flags_for_truthies = function(assoc)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.assoc.kt_arr_by_truthy_values(assoc),
         transf.str.str_by_long_flag
       )
@@ -5066,10 +5173,10 @@ transf = {
 
     arr_by_flatten = plarray2d.flatten,
     arr_by_map_to_last = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.arr.t_by_last)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.arr.t_by_last)
     end,
     arr_by_map_to_first = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.arr.t_by_first)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.arr.t_by_first)
     end,
     arr_by_longest_common_prefix = function(a_o_a)
       local last_matching_index = 0
@@ -5084,10 +5191,10 @@ transf = {
     
         return arr
       end)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(a_o_a[1], 1, last_matching_index)
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(a_o_a[1], 1, last_matching_index)
     end,
     arr_arr_by_reverse = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.arr.arr_by_reverse)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.arr.arr_by_reverse)
     end,
     arr_by_longest_common_suffix = function(arr)
       local reversed_res = transf.arr.arr_by_longest_common_prefix(
@@ -5215,7 +5322,8 @@ transf = {
           url = manga_url,
           title = manga_title,
           chapter_number = chapter.chapterNumber,
-          chapter_name = chapter.name
+          chapter_name = chapter.name,
+          timestamp_ms = hist_item.lastRead
         }
       end
       return history_assoc
@@ -5493,10 +5601,10 @@ transf = {
   },
   citable_path_arr = {
     csl_table_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.citable_path.csl_table)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.citable_path.csl_table)
     end,
     indicated_citable_object_id_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.citable_path.indicated_citable_object_id)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.citable_path.indicated_citable_object_id)
     end,
   },
   mpapers_citable_object_file ={ -- file with a citable_filename containing the data (e.g. pdf) of a citable object
@@ -5524,7 +5632,7 @@ transf = {
   },
   indicated_citable_object_id_arr = {
     csl_table_arr_by_local = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.indicated_citable_object_id.csl_table_by_local
       )
@@ -5544,7 +5652,7 @@ transf = {
       )
     end,
     noempty_noindent_hashcomment_line_arr_by_for_citations_file = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.indicated_citable_object_id_arr.csl_table_arr_by_local(arr),
         transf.csl_table.noempty_noindent_hashcomment_line_by_for_citations_file
       )
@@ -5697,7 +5805,7 @@ transf = {
     local_absolute_path_by_rechnung_pdf = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. transf.client_project_dir.alphanum_minus_underscore_by_rechnung_id(dir) .. ".pdf"
     end,
-    local_absolute_path_by_rechnung_path = function(dir)
+    local_absolute_path_by_rechnung_md = function(dir)
       return transf.path.path_by_ending_with_slash(dir) .. transf.client_project_dir.alphanum_minus_underscore_by_rechnung_id(dir) .. ".md"
     end,
     line_by_kind_plaintext_name_de = function(dir)
@@ -5739,7 +5847,7 @@ transf = {
       local pos_int_arr = transf.client_project_dir.pos_int_arr_by_amount_billing_unit(dir)
       local rate = transf.client_project_dir.number_by_rate(dir)
       local unit = transf.client_project_dir.billing_unit(dir)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         pos_int_arr,
         function(pos_int)
           return {
@@ -5801,7 +5909,7 @@ transf = {
       return transf.omegat_project_dir.local_extant_path_by_tm_dir(dir) .. "/" .. transf.path.leaflike_by_leaf(dir) .. "-omegat.tmx"
     end,
     pos_int_arr_by_amount_billing_unit = function(dir)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.dir.absolute_path_arr_by_children(
           transf.omegat_project_dir.local_extant_path_by_target_txt_dir(dir)
         ),
@@ -5827,7 +5935,7 @@ transf = {
     multiline_str_by_price_block_german = function(spec)
       return 
         get.str_or_number_arr.str_by_joined(
-          get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+          get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
             spec.price_specifier_arr,
             function(v)
               return ("%d %s @ %.2f€ = %d€"):format(
@@ -6122,7 +6230,7 @@ transf = {
   },
   csl_table_arr = {
     bib_str_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.csl_table.bib_str
       )
@@ -6135,7 +6243,7 @@ transf = {
     end,
     json_str = transf.not_userdata_or_fn.json_str,
     indicated_citable_object_id_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.csl_table.indicated_citable_object_id
       )
@@ -6146,7 +6254,7 @@ transf = {
       )
     end,
     url_arr = function(csl_table_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(csl_table_arr, transf.csl_table.url_or_nil)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(csl_table_arr, transf.csl_table.url_or_nil)
     end,
 
   },
@@ -6166,8 +6274,8 @@ transf = {
     dtprts__arr_arr_by_issued = function(csl_table)
       return csl_table.issued
     end,
-    rf3339like_dt_or_interval_by_issued = function(csl_table)
-      return transf.dtprts__arr_arr.rf3339like_dt_or_interval(
+    rfc3339like_dt_or_interval_by_issued = function(csl_table)
+      return transf.dtprts__arr_arr.rfc3339like_dt_or_interval(
         transf.csl_table.dtprts__arr_arr_by_issued(csl_table)
       )
     end,
@@ -6194,7 +6302,7 @@ transf = {
     end,
     line_by_naive_author_summary = function(csl_table)
       return get.str_or_number_arr.str_by_joined(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           transf.csl_table.csl_person_arr_by_author(csl_table),
           transf.csl_person.line_by_name_naive
         ),
@@ -6202,13 +6310,13 @@ transf = {
       )
     end,
     line_arr_by_author_family = function(csl_table)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.csl_table.csl_person_arr_by_author(csl_table),
         transf.csl_person.line_or_nil_by_family
       )
     end,
     line_arr_by_author_family_et_al = function(csl_table)
-      return get.arr.arr_by_slice_removed_indicator_and_flatten_w_slice_spec(
+      return get.arr.arr_by_slice_removed_indicator_and_flatten_w_cut_specifier(
         transf.csl_table.line_arr_by_author_family(csl_table),
         { stop = 5 },
         "et_al"
@@ -6505,7 +6613,7 @@ transf = {
     end
   },
   dtprts__arr_arr = {
-    rf3339like_dt_or_interval = function(date_parts)
+    rfc3339like_dt_or_interval = function(date_parts)
       if #date_parts == 1 then
         return transf.dtprts__arr.rfc3339like_dt(date_parts[1])
       else
@@ -6513,7 +6621,7 @@ transf = {
       end
     end,
     --- will pick the first date if there is a range
-    rf3339like_dt_by_force_first = function(date_parts)
+    rfc3339like_dt_by_force_first = function(date_parts)
       return transf.dtprts__arr.rfc3339like_dt(date_parts[1])
     end,
     prefix_partial_dcmp_spec_by_force_first = function(date_parts)
@@ -6711,7 +6819,7 @@ transf = {
   },
   owner_item_url = {
     two_strs__arr = function(url)
-      return get.path.path_component_arr_by_slice_w_slice_spec(transf.url.local_absolute_path_or_nil_by_path(url), "1:2")
+      return get.path.path_component_arr_by_slice_w_cut_specifier(transf.url.local_absolute_path_or_nil_by_path(url), "1:2")
     end,
   },
   whisper_url = {
@@ -6934,7 +7042,7 @@ transf = {
       local rawstr =  transf.styledtext.str(
         copied_spec.text
       )
-      local truncated = get.str.str_by_shortened_start_ellipsis(rawstr, 250)
+      local truncated = get.str.str_by_shortened_eutf8_start(rawstr, 250)
       copied_spec.text = transf.str.styledtext_by_with_styled_start_end_markers(truncated)
       return copied_spec
     end
@@ -6966,7 +7074,7 @@ transf = {
     email_arr = function(mailto_url)
       local emails_part = transf.mailto_url.line_by_emails(mailto_url)
       local emails = get.str.str_arr_by_split_w_ascii_char(emails_part, ",")
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(emails, transf.str.not_starting_o_ending_with_whitespace_str)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(emails, transf.str.not_starting_o_ending_with_whitespace_str)
     end,
     email_by_first = function(mailto_url)
       return transf.mailto_url.email_arr(mailto_url)[1]
@@ -7035,12 +7143,12 @@ transf = {
   },
   source_id = {
     line_by_language = function(source_id)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(get.str.str_arr_by_split_w_ascii_char(source_id, "."), -1, -1)[1]
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(get.str.str_arr_by_split_w_ascii_char(source_id, "."), -1, -1)[1]
     end,
   },
   source_id_arr = {
     source_id_by_next_to_be_activated = function(source_id_arr)
-      return get.arr.next_by_fn_wrapping(source_id_arr, is.source_id.active_source_id)
+      return get.arr.t_by_next_wrapping_w_fn(source_id_arr, is.source_id.active_source_id)
     end,
   },
   -- for future reference, since I'll forget: mod is a hypernym of mod_name, mod_symbol, and mod_char. Via the implementation in `normalize` we can be sure that no matter what we provide when we use tblmap, we will get the desired thing back.
@@ -7333,7 +7441,7 @@ transf = {
       )
     end,
     contact_uuid_arr = function()
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         get.str.str_arr_by_split_w_ascii_char(transf["nil"].str_by_khard_list_output(), "\n"), 
         function (line)
           return get.str.str_arr_by_split_w_ascii_char(line, "\t")[1]
@@ -7341,7 +7449,7 @@ transf = {
       )
     end,
     contact_table_arr = function()
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf["nil"].contact_uuid_arr(),
         transf.uuid.contact_table_or_nil
       )
@@ -7361,7 +7469,7 @@ transf = {
       return transf.local_dir.local_extant_path_arr_by_descendants(env.APPLICATIONS)
     end,
     mac_application_name_arr = function()
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf["nil"].installed_app_dir_arr(),
         transf.path.leaflike_by_filename
       )
@@ -7372,7 +7480,7 @@ transf = {
       return hs.audiodevice["default" .. transf.str.str_by_first_eutf8_upper(type) .. "Device"]()
     end,
     audiodevice_specifier_arr = function(type)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         hs.audiodevice["all" .. transf.str.str_by_first_eutf8_upper(type) .. "Devices"](),
         function (device)
           return get.audiodevice.audiodevice_specifier(device, type)
@@ -7420,7 +7528,7 @@ transf = {
   },
   action_specifier_arr = {
     chooser_item_specifier_arr = function(action_specifier_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         action_specifier_arr,
         transf.action_specifier.chooser_item_specifier
       )
@@ -7588,7 +7696,7 @@ transf = {
     end,
     str_by_summary_emoji = function(mpv_ipc_socket_id)
       return get.str_or_number_arr.str_by_joined(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           {"pause", "loop", "shuffle", "video"},
           get.fn.fn_by_1st_n_bound(get.mpv_ipc_socket_id.line_by_emoji_for_key, mpv_ipc_socket_id)
         ),
@@ -8011,7 +8119,7 @@ transf = {
   },
   input_spec_str_arr = {
     input_spec_arr = function(str_arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         str_arr,
         transf.input_spec_str.input_spec
       )
@@ -8022,7 +8130,7 @@ transf = {
       return transf.hole_y_arrlike.arr(get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(str, "\n"))
     end,
     input_spec_arr = function(str)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.input_spec_series_str.input_spec_str_arr(str),
         transf.input_spec_str.input_spec
       )
@@ -8063,7 +8171,7 @@ transf = {
       local ok_button_pressed = button_pressed == prompt_args.buttonA
 
       if get.str.bool_by_startswith(raw_return, " ") then -- space triggers lua eval mode
-        raw_return = get.str.evaled_as_lua(raw_return)
+        raw_return = get.str.any_by_evaled_as_lua(raw_return)
       end
       if raw_return == "" then
         raw_return = nil
@@ -8373,7 +8481,7 @@ transf = {
   },
   discord_export_dir = {
     export_chat_main_object_and_local_dir__arr_arr_by_media_dir = function(dir)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.dir.dir_arr_by_children(dir),
         transf.discord_export_child_dir.export_chat_main_object_and_local_dir__arr_by_media_dir
       )
@@ -8413,7 +8521,7 @@ transf = {
       return msg.content
     end,
     reaction_spec_arr = function(msg)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         msg.reactions or {},
         function(reaction)
           return {
@@ -8435,7 +8543,7 @@ transf = {
   facebook_export_dir = {
     export_chat_main_object_and_local_dir__arr_arr_by_media_dir = function(dir)
       local chat_dirs = transf.dir.dir_arr_by_children(dir)
-      local arr = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      local arr = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         chat_dirs,
         function(chat_dir)
           local media_dir = transf.path.path_by_ending_with_slash(chat_dir) .. "media"
@@ -8498,7 +8606,7 @@ transf = {
   signal_export_dir = {
     export_chat_main_object_and_local_dir__arr_arr_by_media_dir = function(dir)
       local chat_json_files = transf.dir.absolute_path_arr_by_children(dir .. "/chats")
-      local arr = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      local arr = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         chat_json_files,
         function(chat_json_file)
           local filename = transf.path.leaflike_by_filename(chat_json_file)
@@ -8543,7 +8651,7 @@ transf = {
       return msg.body
     end,
     reaction_spec_arr = function(msg)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         msg.reactions or {},
         function(emoji)
           return {

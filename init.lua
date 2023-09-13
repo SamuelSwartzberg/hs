@@ -16,7 +16,7 @@ comp = transf.dir.plaintext_dictonary_read_assoc(env.MCOMPOSITE)
 fstblmap = transf.dir.plaintext_dictonary_read_assoc(env.MDICTIONARIES .. "/mappings")
 
 timer_arr = {}
-timer_arr_refresher = hs.timer.doEvery(1, get.fn.fn_by_1st_n_bound(dothis.timer_spec_array.fire_all_if_ready_and_space_if_necessary, timer_arr))
+timer_arr_refresher = hs.timer.doEvery(1, get.fn.fn_by_1st_n_bound(act.timer_spec_array.fire_all_if_ready_and_space_if_necessary, timer_arr))
 
 env = transf.string.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
 
@@ -75,7 +75,7 @@ dothis.created_item_specifier_array.create_all(
 main_qspec = {}
 main_qspec = {
   fn_array = {},
-  hotkey_created_item_specifier = dothis.creation_specifier.create({
+  hotkey_created_item_specifier = act.creation_specifier.create({
     type = "hotkey",
     key = "/",
     fn = act["nil"].pop_main_qspec
@@ -109,7 +109,7 @@ local keymap = {
   },
   ["6"] = {
     explanation = "Enable and disable mullvad",
-    fn = dothis["nil"].mullvad_toggle
+    fn = act["nil"].mullvad_toggle
   },
   ["7"] = {
     explanation = "Switch ·to a different mullvad server",
@@ -336,14 +336,14 @@ System:get("manager", "creatable"):doThis("create-all", {
 
 
 System:get("manager", "timer"):doThis("create-all", {
-  dothis["nil"].newsboat_reload,
+  act["nil"].newsboat_reload,
   dothis.vdirsyncer.sync,
   hs.fnutils.partial(dothis.local_nonabsolute_path_relative_to_home.copy_local_to_labelled_remote, "me/state/todo"),
   st(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
   { 
-    fn = dothis["nil"].mbsync_sync, 
+    fn = act["nil"].mbsync_sync, 
     interval = "* * * * *"
   },
   {

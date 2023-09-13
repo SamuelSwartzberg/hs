@@ -444,13 +444,13 @@ get = {
       return res
     end,
   },
-  complete_pos_int_slice_spec = {
+  pos_int_sequence_specifier = {
     bool_by_is_hit_w_pos_int = function(spec, i)
       return i >= spec.start and i <= spec.stop and (i - spec.start) % spec.step == 0 
     end,
   },
   arr = {
-    two_arrs_of_arrs_by_slice_w_slice_spec = function(arr, spec)
+    two_arr_arrs_by_slice_w_cut_specifier = function(arr, spec)
       
       if spec.start and not is.any.number(spec.start) then
         spec.start = get.arr.pos_int_or_nil_by_first_match_w_t(arr, spec.start)
@@ -496,7 +496,7 @@ get = {
       local current_type = nil
 
       for i = 1, #arr do
-        if get.complete_pos_int_slice_spec.bool_by_is_hit_w_pos_int(spec, i) then
+        if get.pos_int_sequence_specifier.bool_by_is_hit_w_pos_int(spec, i) then
           if current_type == "misses" then
             dothis.arr.push(hits, current)
             current = {}
@@ -526,18 +526,18 @@ get = {
 
 
     end,
-    two_arrs_by_slice_w_slice_spec = function(arr, spec)
-      local hits, misses = get.arr.two_arrs_of_arrs_by_slice_w_slice_spec(arr, spec)
+    two_arrs_by_slice_w_cut_specifier = function(arr, spec)
+      local hits, misses = get.arr.two_arr_arrs_by_slice_w_cut_specifier(arr, spec)
       return get.arr.arr_by_flatten(hits), get.arr.arr_by_flatten(misses)
     end,
-    arr_by_slice_w_slice_spec = function(arr, slice_spec)
+    arr_by_slice_w_cut_specifier = function(arr, cut_specifier)
       return select(
         1,
-        get.arr.two_arrs_by_slice_w_slice_spec(arr, slice_spec)
+        get.arr.two_arrs_by_slice_w_cut_specifier(arr, cut_specifier)
       )
     end,
-    two_arrs_of_arrs_by_slice_w_3_int_any_or_nils = function(arr, start, stop, step)
-      return get.arr.two_arrs_of_arrs_by_slice_w_slice_spec(
+    two_arr_arrs_by_slice_w_3_int_any_or_nils = function(arr, start, stop, step)
+      return get.arr.two_arr_arrs_by_slice_w_cut_specifier(
         arr,
         {
           start = start,
@@ -547,7 +547,7 @@ get = {
       )
     end,
     two_arrs_by_slice_w_3_int_any_or_nils = function(arr, start, stop, step)
-      return get.arr.two_arrs_by_slice_w_slice_spec(
+      return get.arr.two_arrs_by_slice_w_cut_specifier(
         arr,
         {
           start = start,
@@ -556,8 +556,8 @@ get = {
         }
       )
     end,
-    arr_by_slice_w_3_pos_int_any_or_nils = function(arr, start, stop, step)
-      return get.arr.arr_by_slice_w_slice_spec(
+    arr_by_slice_w_3_int_any_or_nils = function(arr, start, stop, step)
+      return get.arr.arr_by_slice_w_cut_specifier(
         arr,
         {
           start = start,
@@ -566,8 +566,8 @@ get = {
         }
       )
     end,
-    two_arrs_of_arrs_by_slice_w_slice_notation = function(arr, notation)
-      return get.arr.two_arrs_of_arrs_by_slice_w_3_int_any_or_nils(
+    two_arr_arrs_by_slice_w_slice_notation = function(arr, notation)
+      return get.arr.two_arr_arrs_by_slice_w_3_int_any_or_nils(
         arr,
         transf.slice_notation.three_pos_int_or_nils(notation)
       )
@@ -579,17 +579,17 @@ get = {
       )
     end,
     arr_by_slice_w_slice_notation = function(arr, notation)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(
         arr,
         transf.slice_notation.three_pos_int_or_nils(notation)
       )
     end,
-    two_arrs_of_arrs_by_slice_and_removed_filler_w_slice_spec = function(arr, slice_spec, fill)
-      local hits, removed = get.arr.two_arrs_of_arrs_by_slice_w_slice_spec(arr, slice_spec)
+    two_arr_arrs_by_slice_and_removed_filler_w_cut_specifier = function(arr, cut_specifier, fill)
+      local hits, removed = get.arr.two_arr_arrs_by_slice_w_cut_specifier(arr, cut_specifier)
       return hits, get.arr_arr.arr_arr_by_mapped(
         removed,
         function(arr)
-          return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+          return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
             arr,
             function()
               return fill
@@ -598,18 +598,18 @@ get = {
         end
       )
     end,
-    arr_arr_by_slice_and_removed_filler_w_slice_spec = function(arr, slice_spec, fill)
-      local hits, fill = get.arr.two_arrs_of_arrs_by_slice_and_removed_filler_w_slice_spec(arr, slice_spec, fill)
+    arr_arr_by_slice_and_removed_filler_w_cut_specifier = function(arr, cut_specifier, fill)
+      local hits, fill = get.arr.two_arr_arrs_by_slice_and_removed_filler_w_cut_specifier(arr, cut_specifier, fill)
       return transf.two_arrs.arr_by_interleaved_stop_longest(hits, fill)
     end,
-    arr_by_slice_removed_filler_and_flatten_w_slice_spec = function(arr, slice_spec, fill)
+    arr_by_slice_removed_filler_and_flatten_w_cut_specifier = function(arr, cut_specifier, fill)
       return transf.arr_arr.arr_by_flatten(
-        get.arr.arr_arr_by_slice_and_removed_filler_w_slice_spec(arr, slice_spec, fill)
+        get.arr.arr_arr_by_slice_and_removed_filler_w_cut_specifier(arr, cut_specifier, fill)
       )
     end,
     --- the difference between this function and the _removed_filler one is that this will replace an arr of removed elements with a single element (the indicator) unless length zero, whereas the other will replace it with an arr of elements (the fill)
-    two_arr_arr_by_slice_and_removed_indicator_w_slice_spec = function(arr, slice_spec, indicator)
-      local hits, removed = get.arr.two_arrs_of_arrs_by_slice_w_slice_spec(arr, slice_spec)
+    two_arr_arrs_by_slice_and_removed_indicator_w_cut_specifier = function(arr, cut_specifier, indicator)
+      local hits, removed = get.arr.two_arr_arrs_by_slice_w_cut_specifier(arr, cut_specifier)
       return hits, get.arr_arr.arr_arr_by_mapped_if_not_length_0(
         removed,
         function(arr)
@@ -617,13 +617,13 @@ get = {
         end
       )
     end,
-    arr_arr_by_slice_and_removed_indicator_w_slice_spec = function(arr, slice_spec, indicator)
-      local hits, indicator = get.arr.two_arr_arr_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
+    arr_arr_by_slice_and_removed_indicator_w_cut_specifier = function(arr, cut_specifier, indicator)
+      local hits, indicator = get.arr.two_arr_arrs_by_slice_and_removed_indicator_w_cut_specifier(arr, cut_specifier, indicator)
       return transf.two_arrs.arr_by_interleaved_stop_longest(hits, indicator)
     end,
-    arr_by_slice_removed_indicator_and_flatten_w_slice_spec = function(arr, slice_spec, indicator)
+    arr_by_slice_removed_indicator_and_flatten_w_cut_specifier = function(arr, cut_specifier, indicator)
       return transf.arr_arr.arr_by_flatten(
-        get.arr.arr_arr_by_slice_and_removed_indicator_w_slice_spec(arr, slice_spec, indicator)
+        get.arr.arr_arr_by_slice_and_removed_indicator_w_cut_specifier(arr, cut_specifier, indicator)
       )
     end,
     pos_int_or_nil_by_first_match_w_t = pltablex.find,
@@ -712,35 +712,35 @@ get = {
       return get.arr.all_pass_w_fn(arr, function(x) return get.arr.bool_by_contains(arr2, x) end)
     end,
     arr_by_head = function(arr, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(arr, 1, n or 10)
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(arr, 1, n or 10)
     end,
     arr_by_tail = function(arr, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(arr, -(n or 10))
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(arr, -(n or 10))
     end,
-    any_w_index = function(arr, n)
+    t_or_nil_w_index = function(arr, n)
       return arr[n]
     end,
-    any_by_next_w_index = function(arr, n)
+    t_or_nil_by_next_w_index = function(arr, n)
       return arr[n + 1]
     end,
-    any_by_next_wrapping_w_index = function(arr, n)
+    t_by_next_wrapping_w_index = function(arr, n)
       return arr[(n % #arr) + 1]
     end,
-    next_by_item = function(arr, item)
+    t_or_nil_by_next_w_t = function(arr, item)
       local index = get.arr.pos_int_or_nil_by_first_match_w_t(arr, item)
-      return get.arr.any_by_next_w_index(arr, index)
+      return get.arr.t_or_nil_by_next_w_index(arr, index)
     end,
-    next_by_item_wrapping = function(arr, item)
+    t_by_next_wrapping_w_t = function(arr, item)
       local index = get.arr.pos_int_or_nil_by_first_match_w_t(arr, item)
-      return get.arr.any_by_next_wrapping_w_index(arr, index)
+      return get.arr.t_by_next_wrapping_w_index(arr, index)
     end,
-    t_by_next_w_fn = function(arr, fn)
+    t_or_nil_by_next_w_fn = function(arr, fn)
       local index = get.arr.pos_int_or_nil_by_first_match_w_fn(arr, fn)
-      return get.arr.any_by_next_w_index(arr, index)
+      return get.arr.t_or_nil_by_next_w_index(arr, index)
     end,
-    next_by_fn_wrapping = function(arr, fn)
+    t_by_next_wrapping_w_fn = function(arr, fn)
       local index = get.arr.pos_int_or_nil_by_first_match_w_fn(arr, fn)
-      return get.arr.any_by_next_wrapping_w_index(arr, index)
+      return get.arr.t_by_next_wrapping_w_index(arr, index)
     end,
     t_or_nil_by_previous = function(arr, n)
       return arr[n - 1]
@@ -775,7 +775,7 @@ get = {
     --- @param comp? fun(a: T, b: T):boolean
     --- @param if_even? "lower" | "higher" | "average" | "both"
     --- @return T
-    median = function (list, comp, if_even)
+    t_by_median = function (list, comp, if_even)
       if_even = if_even or "lower"
       list = get.table.table_by_copy(list, false) -- don't modify the original list
       dothis.arr.sort(list, comp)
@@ -786,6 +786,11 @@ get = {
         elseif if_even == "higher" then
           return list[mid + 1]
         elseif if_even == "average" then
+          local a = list[mid]
+          local b = list[mid + 1]
+          if not is.any.number(a) or not is.any.number(b) then
+            error("median: average not supported for non-numeric types")
+          end
           return (list[mid] + list[mid + 1]) / 2
         else
           return {list[mid], list[mid + 1]}
@@ -808,41 +813,41 @@ get = {
         return get.any_stateful_generator.arr(combine.combn, arr, k)
       end
     end,
-    raw_item_chooser_item_specifier_arr = function(arr)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+    chooser_item_specifier_arr_by_raw = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.any.chooser_item_specifier
       )
     end,
-    item_chooser_item_specifier_arr = function(arr, target_item_chooser_item_specifier_name)
-      if target_item_chooser_item_specifier_name then
-        return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
-          get.arr.raw_item_chooser_item_specifier_arr(arr),
-          transf.chooser_item_specifier[target_item_chooser_item_specifier_name .. "_item_chooser_item_specifier"]
+    chooser_item_specifier_arr = function(arr, chooser_item_specifier_modifier)
+      if chooser_item_specifier_modifier then
+        return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+          get.arr.chooser_item_specifier_arr_by_raw(arr),
+          transf.chooser_item_specifier["item_chooser_item_specifier_by_" .. chooser_item_specifier_modifier]
         )
       else
-        return get.arr.raw_item_chooser_item_specifier_arr(arr)
+        return get.arr.chooser_item_specifier_arr_by_raw(arr)
       end
     end,
-    item_with_index_chooser_item_specifier_arr = function(arr, target_item_chooser_item_specifier_name)
+    index_chooser_item_specifier_arr = function(arr, chooser_item_specifier_modifier)
       return transf.assoc_arr.has_index_key_table_arr(
-        get.arr.item_chooser_item_specifier_arr(arr, target_item_chooser_item_specifier_name)
+        get.arr.chooser_item_specifier_arr(arr, chooser_item_specifier_modifier)
       )
     end,
-    hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
+    hschooser_specifier = function(arr, chooser_item_specifier_modifier)
       return {
-        chooser_item_specifier_arr = get.arr.item_with_index_chooser_item_specifier_arr(arr, target_item_chooser_item_specifier_name),
+        chooser_item_specifier_arr = get.arr.index_chooser_item_specifier_arr(arr, chooser_item_specifier_modifier),
         placeholder_text = transf.arr.str_by_summary(arr),
         initial_selected_index = transf.arr.pos_int_by_initial_selected_index(arr),
       }
     end,
-    choosing_hschooser_specifier = function(arr, target_item_chooser_item_specifier_name)
-      return get.hschooser_specifier.choosing_hschooser_specifier(transf.arr.hschooser_specifier(arr, target_item_chooser_item_specifier_name), "index", arr)
+    choosing_hschooser_specifier = function(arr, chooser_item_specifier_modifier)
+      return get.hschooser_specifier.choosing_hschooser_specifier(transf.arr.hschooser_specifier(arr, chooser_item_specifier_modifier), "index", arr)
     end,
-    only_int_key_table_by_mapped_w_t_arg_t_ret_fn = hs.fnutils.imap,
+    only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn = hs.fnutils.imap,
     arr_by_mapped_w_t_arg_t_ret_fn = function(arr, fn)
       return transf.hole_y_arrlike.arr(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, fn)
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, fn)
       )
     end,
     arr_by_mapped_w_pos_int_t_arg_t_ret_fn = function(arr, fn)
@@ -852,19 +857,19 @@ get = {
       end
     end,
     arr_by_mapped_w_t_key_assoc = function(arr, assoc)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(v) return assoc[v] end
       )
     end,
     str_arr_by_mapped_values_w_fmt_str = function(arr, fmt_str)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.fn_by_1st_n_bound(get.str.str_by_formatted_w_n_anys, fmt_str)
       )
     end,
     arr_by_mapped_w_t_arg_t_ret_fn_and_t_arg_bool_ret_fn = function(arr, mapfn, condfn)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(v)
           if condfn(v) then
@@ -951,16 +956,16 @@ get = {
       end
     end,
     line_arr_by_tail = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.line_arr(path), -(n or 10))
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(transf.str.line_arr(path), -(n or 10))
     end,
     line_arr_by_head = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.line_arr(path), 1, n or 10)
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(transf.str.line_arr(path), 1, n or 10)
     end,
     noempty_line_arr_by_tail = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.noempty_line_arr(path), -(n or 10))
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(transf.str.noempty_line_arr(path), -(n or 10))
     end,
     noempty_line_arr_by_head = function(path, n)
-      return get.arr.arr_by_slice_w_3_pos_int_any_or_nils(transf.str.noempty_line_arr(path), 1, n or 10)
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(transf.str.noempty_line_arr(path), 1, n or 10)
     end,
     bool_by_startswith = stringy.startswith,
     bool_by_endswith = stringy.endswith,
@@ -1003,14 +1008,9 @@ get = {
     end,
     str_arr_arr_by_split_w_str = function(str, upper_sep, lower_sep)
       local upper = get.str.str_arr_by_split_w_str(str, upper_sep)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(upper, function(v)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(upper, function(v)
         return get.str.str_arr_by_split_w_str(v, lower_sep)
       end)
-    end,
-    search_engine_id_search_url = function(str, search_engine_id)
-      return tblmap.search_engine_id.url[search_engine_id]:format(
-        get.str.str_by_percent_encoded(str, tblmap.search_engine_id.bool_by_param_is_path[search_engine_id])
-      )
     end,
     window_arr_by_pattern = function(str, app_name)
       return get.running_application.window_arr_by_pattern(
@@ -1027,7 +1027,7 @@ get = {
     styledtext = function(str, styledtext_attributes_specifier)
       return hs.styledtext.new(str, styledtext_attributes_specifier)
     end,
-    bool_by_contains_any_w_ascii_str_arr = function(str, anyof)
+    bool_by_contains_any_w_str_arr = function(str, anyof)
       for i = 1, #anyof do
         local res = get.str.bool_by_contains_w_str(str, anyof[i])
         if res then
@@ -1036,7 +1036,7 @@ get = {
       end
       return false
     end,
-    bool_by_contains_all_w_ascii_str_arr = function(str, allof)
+    bool_by_contains_all_w_str_arr = function(str, allof)
       for i = 1, #allof do
         local res = get.str.bool_by_contains_w_str(str, allof[i])
         if not res then
@@ -1261,7 +1261,7 @@ get = {
         return nil
       end
     end,
-    evaled_as_osa = function(str)
+    any_by_evaled_as_osa = function(str)
       local succ, parsed_res = hs.osascript.applescript(str)
       if succ then
         return parsed_res
@@ -1269,7 +1269,7 @@ get = {
         return nil
       end
     end,
-    evaled_as_lua = function(str, d)
+    any_by_evaled_as_lua = function(str, d)
       if d then -- add d to global namespace so that it can be accessed in the str
         _G.d = d
       end
@@ -1291,7 +1291,7 @@ get = {
       end)
       return res
     end,
-    llm_response_str_freeform = function(str, temperature, max_tokens)
+    str_by_llm_response_freeform = function(str, temperature, max_tokens)
       return get.role_content_message_spec_arr.str_by_llm_response(
         {{
           content = str,
@@ -1301,7 +1301,7 @@ get = {
         max_tokens
       )
     end,
-    llm_response_str_strent = function(str, temperature, max_tokens)
+    str_by_llm_response_api_sys_msg = function(str, temperature, max_tokens)
       return get.role_content_message_spec_arr.str_by_llm_response(
         transf.role_content_message_spec_arr.role_content_message_spec_arr_by_with_api_system_message({{
           content = str,
@@ -1330,45 +1330,45 @@ get = {
         }
       })
     end,
-    str_arr_groups_ascii_fron_start = function(str, n)
+    str_arr_by_grouped_ascii_from_start = function(str, n)
       local res = {}
       for i = 1, #str, n do
         dothis.arr.push(res, str:sub(i, i + n - 1))
       end
       return res
     end,
-    str_with_separator_grouped_ascii_from_start = function(str, n, sep)
-      return get.str_or_number_arr.str_by_joined(get.str.str_arr_groups_ascii_fron_start(str, n), sep)
+    str_by_separator_grouped_ascii_from_start = function(str, n, sep)
+      return get.str_or_number_arr.str_by_joined(get.str.str_arr_by_grouped_ascii_from_start(str, n), sep)
     end,
-    str_arr_groups_ascii_from_end = function(str, n)
+    str_arr_by_grouped_ascii_from_end = function(str, n)
       local res = {}
       for i = #str, 1, -n do
         dothis.arr.push(res, str:sub(i - n + 1, i))
       end
       return res
     end,
-    str_with_separator_grouped_ascii_from_end = function(str, n, sep)
-      return get.str_or_number_arr.str_by_joined(get.str.str_arr_groups_ascii_from_end(str, n), sep)
+    str_by_separator_grouped_ascii_from_end = function(str, n, sep)
+      return get.str_or_number_arr.str_by_joined(get.str.str_arr_by_grouped_ascii_from_end(str, n), sep)
     end,
-    str_arr_groups_utf8_from_start = function(str, n)
+    str_arr_by_grouped_utf8_from_start = function(str, n)
       local res = {}
       for i = 1, transf.str.pos_int_by_len_utf8_chars(str), n do
         dothis.arr.push(res, get.str.str_by_sub_eutf8(str, i, i + n - 1))
       end
       return res
     end,
-    str_with_separator_grouped_utf8_from_start = function(str, n, sep)
-      return get.str_or_number_arr.str_by_joined(get.str.str_arr_groups_utf8_from_start(str, n), sep)
+    str_by_separator_grouped_utf8_from_start = function(str, n, sep)
+      return get.str_or_number_arr.str_by_joined(get.str.str_arr_by_grouped_utf8_from_start(str, n), sep)
     end,
-    str_arr_groups_utf8_from_end = function(str, n)
+    str_arr_by_grouped_utf8_from_end = function(str, n)
       local res = {}
       for i = transf.str.pos_int_by_len_utf8_chars(str), 1, -n do
         dothis.arr.push(res, get.str.str_by_sub_eutf8(str, i - n + 1, i))
       end
       return res
     end,
-    str_with_separator_grouped_utf8_from_end = function(str, n, sep)
-      return get.str_or_number_arr.str_by_joined(get.str.str_arr_groups_utf8_from_end(str, n), sep)
+    str_by_separator_grouped_utf8_from_end = function(str, n, sep)
+      return get.str_or_number_arr.str_by_joined(get.str.str_arr_by_grouped_utf8_from_end(str, n), sep)
     end,
     number_or_nil = function(str,  base)
       local nonindicated_number_str = transf.str.nonindicated_number_str_by_clean(str)
@@ -1434,11 +1434,15 @@ get = {
         end
       end
     end,
-    str_by_shortened_start_ellipsis = function(str, len)
-      return plstringx.shorten(str, len)
+    str_by_shortened_eutf8_start = function(str, len, str2)
+      str2 = str2 or "..."
+      if #str <= len then return str end
+      return get.str.str_by_sub_eutf8(str, 1, len) .. str2
     end,
-    str_by_shortened_end_ellipsis = function(str, len)
-      return plstringx.shorten(str, len, true)
+    str_by_shortened_eutf8_end = function(str, len, str2)
+      str2 = str2 or "..."
+      if #str <= len then return str end
+      return str2 .. get.str.str_by_sub_eutf8(str, #str - len + 1)
     end,
     str_by_with_yaml_metadata = function(str, tbl)
       if not str then return transf.table.multiline_str_by_yaml_metadata(tbl) end
@@ -1494,11 +1498,10 @@ get = {
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
       else return transf.str.urlcharset_str_by_encoded_query_param_value_folded(str) end
     end,
-    not_starting_o_ending_with_whitespace_str = 
   },
   nonindicated_number_str_arr = {
     number_arr = function(arr, base)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.fn_by_arbitrary_args_bound_or_ignored(
           get.nonindicated_number_str.number,
@@ -1552,7 +1555,7 @@ get = {
   },
   str_or_styledtext_arr = {
     styledtext_arr_by_merge = function(arr, styledtext_attributes_specifier)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.fn_by_arbitrary_args_bound_or_ignored(get.str_or_styledtext.styledtext_by_merge, {a_use, styledtext_attributes_specifier})
       )
@@ -1564,7 +1567,7 @@ get = {
   str_arr = {
     str_by_repeatedly_same_space_sep_prefix = function(arr, opt)
       return get.str_or_number_arr.str_by_joined(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           arr,
           function (itm)
             return " " .. opt .. " " .. itm
@@ -1620,7 +1623,7 @@ get = {
     end,
     str_arr_by_also_split_w_ascii_char = function(arr, sep)
       return transf.arr_arr.arr_by_flatten(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           arr,
           function(x)
             return get.str.str_arr_by_split_w_ascii_char(x, sep)
@@ -1668,7 +1671,7 @@ get = {
   },
   table_arr = {
     vt_arr_w_kt = function(arr, kt)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return x[kt] end)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, function(x) return x[kt] end)
     end,
   },
   path_leaf_specifier = {
@@ -1718,21 +1721,21 @@ get = {
         app_name
       )
     end,
-    path_component_arr_by_slice_w_slice_spec = function(path, spec)
+    path_component_arr_by_slice_w_cut_specifier = function(path, spec)
       local path_component_arr = transf.path.path_component_arr(path)
-      return get.arr.arr_by_slice_w_slice_spec(path_component_arr, spec)
+      return get.arr.arr_by_slice_w_cut_specifier(path_component_arr, spec)
     end,
-    path_component_arr_by_split_ext_slice_w_slice_spec = function(path, spec)
+    path_component_arr_by_split_ext_slice_w_cut_specifier = function(path, spec)
       local path_segment_arr = transf.path.path_component_arr_by_split_ext(path)
-      return get.arr.arr_by_slice_w_slice_spec(path_segment_arr, spec)
+      return get.arr.arr_by_slice_w_cut_specifier(path_segment_arr, spec)
     end,
     path_by_sliced_path_component_arr = function(path, spec)
-      local sliced_path_component_arr = get.path.path_component_arr_by_slice_w_slice_spec(path, spec)
+      local sliced_path_component_arr = get.path.path_component_arr_by_slice_w_cut_specifier(path, spec)
       dothis.arr.push(sliced_path_component_arr, "")
       return get.str_or_number_arr.str_by_joined(sliced_path_component_arr, "/")
     end,
     path_by_sliced_split_ext_path_component_arr = function(path, spec)
-      local sliced_path_segment_arr = get.path.path_component_arr_by_split_ext_slice_w_slice_spec(path, spec)
+      local sliced_path_segment_arr = get.path.path_component_arr_by_split_ext_slice_w_cut_specifier(path, spec)
       dothis.arr.push(sliced_path_segment_arr, "")
       local extension = act.arr.pop(sliced_path_segment_arr)
       local filename = act.arr.pop(sliced_path_segment_arr)
@@ -1749,7 +1752,7 @@ get = {
       end
     end,
     path_arr_from_sliced_path_component_arr = function(path, spec)
-      local sliced_path_component_arr = get.path.path_component_arr_by_slice_w_slice_spec(path, spec)
+      local sliced_path_component_arr = get.path.path_component_arr_by_slice_w_cut_specifier(path, spec)
       local whole_path_component_arr = transf.path.path_component_arr(path)
       local res = {}
       local started_with_slash = get.str.bool_by_startswith(path, "/")
@@ -1764,7 +1767,7 @@ get = {
         -- Use the map to find the index of the current path component
         local rawi = path_component_index_map[v]
         if rawi then
-          local relevant_path_components = get.arr.arr_by_slice_w_slice_spec(whole_path_component_arr, { start = 1, stop = rawi })
+          local relevant_path_components = get.arr.arr_by_slice_w_cut_specifier(whole_path_component_arr, { start = 1, stop = rawi })
           if started_with_slash then
             dothis.arr.insert_at_index(relevant_path_components, 1, "") -- if we started with a slash, we need to reinsert an empty str at the beginning so that it will start with a slash again once we rejoin
           end
@@ -1929,7 +1932,7 @@ get = {
       }
     end,
     stream_creation_specifier_arr = function(path, flag_profile_name)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.extant_path.m3u_file_arr_by_descendants(path),
         get.fn.fn_by_arbitrary_args_bound_or_ignored(
           get.m3u_file.stream_creation_specifier,
@@ -2133,8 +2136,8 @@ get = {
     dtprts__arr_arr = function(csl_table, key)
       return csl_table[key]
     end,
-    rf3339like_dt_or_interval_by_key = function(csl_table, key)
-      return transf.dtprts__arr_arr.rf3339like_dt_or_interval(
+    rfc3339like_dt_or_interval_by_key = function(csl_table, key)
+      return transf.dtprts__arr_arr.rfc3339like_dt_or_interval(
         get.csl_table.dtprts__arr_arr(csl_table, key)
       )
     end,
@@ -2318,7 +2321,7 @@ get = {
   },
   dcmp_name = {
     dcmp_name_by_next = function(component, n)
-      return get.arr.any_by_next_w_index(ls.dcmp_names, transf.dcmp_name.date_component_index(component) + n)
+      return get.arr.t_or_nil_by_next_w_index(ls.dcmp_names, transf.dcmp_name.date_component_index(component) + n)
     end,
     dcmp_name_by_previous = function(component, n)
       return get.arr.t_or_nil_by_previous(ls.dcmp_names, transf.dcmp_name.date_component_index(component) - n)
@@ -2431,7 +2434,7 @@ get = {
     arr_by_column = plarray2d.column,
     arr_by_row = plarray2d.row,
     arr_arr_by_mapped_if_not_length_0 = function(arr_arr, fn)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
         function(arr)
           if #arr == 0 then
@@ -2443,7 +2446,7 @@ get = {
       )
     end,
     str_and_t__arr_arr_by_joined = function(arr, joiner)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.fn_by_arbitrary_args_bound_or_ignored(get.arr.str_and_t_by_joined, {a_use, joiner})
       )
@@ -2454,7 +2457,7 @@ get = {
       )
     end,
     assoc_arr_by_arr = function(arr_arr, arr2)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
         get.fn.fn_by_arbitrary_args_bound_or_ignored(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
       )
@@ -2466,7 +2469,7 @@ get = {
       )
     end,
     arr_arr_by_mapped = function(arr_arr, fn)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
         get.fn.fn_by_2nd_n_bound(get.arr.arr_by_mapped, fn)
       )
@@ -2474,11 +2477,11 @@ get = {
     --- essentially flatMap
     arr_by_mapped_w_t_arg_t_ret_fn_and_flatten = function(arr, fn)
       return transf.arr.arr_by_flatten(
-        get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, fn)
+        get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, fn)
       )
     end,
     arr_by_mapped_w_n_t_arg_t_ret_fn = function(arr, fn)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         function(nested_arr) return fn(transf.arr.n_anys(nested_arr)) end
       )
@@ -2768,7 +2771,7 @@ get = {
       )
     end,
     any_arr_by_result = function(arr, value)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr, 
         get.fn.fn_by_arbitrary_args_bound_or_ignored(get.retriever_specifier.any_by_result, {a_use, value})
       )
@@ -3334,7 +3337,7 @@ get = {
   },
   tree_node_like_arr = {
     tree_node_arr = function(tree_node_like_arr, treeify_spec)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         tree_node_like_arr,
         get.fn.fn_by_arbitrary_args_bound_or_ignored(get.tree_node_like.tree_node, {a_use, treeify_spec})
       )
@@ -3383,7 +3386,7 @@ get = {
   },
   assoc_arr_arr = {
     path_key_haver_arr_by_take_last = function(arr, title_key)
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         get.fn.fn_by_arbitrary_args_bound_or_ignored(get.assoc_arr.path_key_haver_by_take_last, {a_use, title_key})
       )
@@ -3482,6 +3485,7 @@ get = {
         call_duration = transf[export_chat_message_type].int_or_nil_by_call_duration(msg),
         sticker_emoji = transf[export_chat_message_type].str_or_nil_by_sticker_emoji(msg),
         replying_to_timestamp = get[export_chat_message_type].timestamp_ms_or_nil_by_replying_to(msg, obj),
+        timestamp_ms = transf[export_chat_message_type].timestamp_ms(msg),
       }
     end,
     timestamp_ms = function(msg, typ)
@@ -3511,7 +3515,7 @@ get = {
     end,
     absolute_path_arr_by_attachments = function(msg, obj)
       local media_dir = get.export_chat_main_object.local_dir_by_media_dir(obj, "discord")
-      return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         msg.attachments or {},
         function(att)
           return media_dir .. "/" .. transf.path.leaflike_by_leaf(att.uri)
@@ -3548,7 +3552,7 @@ get = {
     absolute_path_arr_by_attachments = function(msg, obj)
       if msg.attachments then
         local media_dir = get.export_chat_main_object.local_dir_by_media_dir(obj, "signal")
-        return get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           msg.attachments,
           function(att)
             return media_dir .. "/" .. att.fileName
@@ -3575,4 +3579,11 @@ get = {
       end
     end
   },
+  search_engine_id = {
+    url_by_search = function(search_engine_id, str)
+      return tblmap.search_engine_id.url[search_engine_id]:format(
+        get.str.str_by_percent_encoded(str, tblmap.search_engine_id.bool_by_param_is_path[search_engine_id])
+      )
+    end,
+  }
 }

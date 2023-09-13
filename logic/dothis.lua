@@ -32,90 +32,6 @@ dothis = {
       end)
     end,
   },
-  event_table = {
-    add_event_from = function(specifier, do_after)
-      specifier = specifier or {}
-      specifier = get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier, transf.str.not_starting_o_ending_with_whitespace_str, is.any.str)
-      local command = {"khal", "new" }
-      if specifier.calendar then
-        command = transf.two_arrs.arr_by_appended(
-          command,
-            "--calendar" ..
-            transf.str.str_by_single_quoted_escaped(specifier.calendar)
-        )
-      end
-
-      if specifier.location then
-        command = transf.two_arrs.arr_by_appended(
-          command,
-            "--location" ..
-            transf.str.str_by_single_quoted_escaped(specifier.location)
-        )
-      end
-
-      if specifier.alarms then
-        local alarms_str = get.str_or_number_arr.str_by_joined(
-          get.table.table_by_mapped_w_vt_arg_vt_ret_fn_and_vt_arg_bool_ret_fn(specifier.alarms, transf.str.not_starting_o_ending_with_whitespace_str, is.any.str),
-          ","
-        )
-        command = transf.two_arrs.arr_by_appended(
-          command,
-            "--alarm" ..
-            transf.str.str_by_single_quoted_escaped(alarms_str )
-        )
-      end
-
-      if specifier.url then 
-        command = transf.two_arrs.arr_by_appended(
-          command,
-            "--url" ..
-            transf.str.str_by_single_quoted_escaped(specifier.url)
-        )
-      end
-
-      -- needed for postcreation modifications 
-      command = transf.two_arrs.arr_by_appended(
-        command,
-          "--format" ..
-          transf.str.str_by_single_quoted_escaped("{uid}")
-      )
-
-      if specifier.start then
-        dothis.arr.push(command, specifier.start)
-      end
-
-      if specifier["end"] then
-        dothis.arr.push(command, specifier["end"])
-      end
-
-      if specifier.timezone then
-        dothis.arr.push(command, specifier.timezone)
-      end
-
-      if specifier.title then
-        dothis.arr.push(command, specifier.title)
-      end
-
-      if specifier.description then
-        command = transf.two_arrs.arr_by_appended(
-          command,
-            "::" ..
-            transf.str.str_by_single_quoted_escaped(specifier.description)
-        )
-      end
-
-      if do_after then
-        dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
-          get.str_or_number_arr.str_by_joined(command, " "), 
-          do_after
-        )
-      else
-        dothis.str.env_bash_eval_sync(
-          get.str_or_number_arr.str_by_joined(command, " ")
-        )
-      end
-    end,
-  },
   md_file = {
     to_file_in_same_dir = function(source, format, metadata, do_after)
       local target = transf.path.path_by_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
@@ -149,9 +65,12 @@ dothis = {
     end,
   },
   contact_uuid = {
-    add_contact_data = function(uuid, data, type)
+    add_contact_data = function(uuid, type, data)
       type = "contacts/" .. type
       dothis.alphanum_minus_underscore.set_pass_json(uuid, type, data)
+    end,
+    add_iban = function(uuid, iban)
+      dothis.contact_uuid.add_contact_data(uuid, "iban", iban)
     end,
     edit_contact = function(uuid, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("khard edit " .. uuid, do_after or function() end)
@@ -178,21 +97,29 @@ dothis = {
       dothis.str.env_bash_eval("yes " .. transf.not_userdata_or_fn.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
     end,
     add_as_passw_pass_item_name = function(name, password)
-      dothis.alphanum_minus_underscore.add_as_pass_item_name(name, "passw", password)
+      dothis.alphanum_minus_underscore.add_as_pass_item_name(name, "p/passw", password)
     end,
     add_as_username_pass_item_name = function(name, username)
       dothis.absolute_path.write_file(
-        get.pass_item_name.local_absolute_path(name, "username", "txt"),
+        get.pass_item_name.local_absolute_path(name, "p/username", "txt"),
         username
       )
     end,
   },
+  auth_pass_item_name = {
+    rename = function(name, type, new_name)
+      dothis.pass_item_name.rename(name, "p/" .. type, new_name)
+    end,
+    remove = function(name, type)
+      dothis.pass_item_name.remove(name, "p/" .. type)
+    end,
+  },
   contact_table = {
     add_iban = function(contact_table, iban)
-      dothis.contact_uuid.add_contact_data(transf.contact_table.uuid(contact_table), "iban", iban)
+      dothis.contact_uuid.add_iban(transf.contact_table.contact_uuid(contact_table), iban)
     end,
     edit = function(contact_table, do_after)
-      dothis.contact_uuid.edit_contact(transf.contact_table.uuid(contact_table), do_after)
+      dothis.contact_uuid.edit_contact(transf.contact_table.contact_uuid(contact_table), do_after)
     end,
   },
   youtube_video_id = {
@@ -242,52 +169,52 @@ dothis = {
         dothis.absolute_path.delete(tmpdir_ics_path)
       end
     end,
-    choose_w_pair_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+    choose_w_pair_arg_fn = function(tbl, fn, chooser_item_specifier_modifier)
       dothis.arr.choose_item(
         transf.table.two_anys__arr_by_sorted_smaller_key_first(tbl),
         fn,
-        target_item_chooser_item_specifier_name
+        chooser_item_specifier_modifier
       )
     end,
-    choose_w_kt_vt_arg_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+    choose_w_kt_vt_arg_fn = function(tbl, fn, chooser_item_specifier_modifier)
       dothis.arr.choose_item(
         transf.table.two_anys__arr_by_sorted_smaller_key_first(tbl),
         function(two_anys__arr)
           fn(transf.two_anys__arr.two_ts(two_anys__arr))
         end,
-        target_item_chooser_item_specifier_name
+        chooser_item_specifier_modifier
       )
     end,
-    choose_w_kt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+    choose_w_kt_fn = function(tbl, fn, chooser_item_specifier_modifier)
       dothis.arr.choose_item(
         transf.table.two_anys__arr_by_sorted_smaller_key_first(tbl),
         function(two_anys__arr)
           fn(transf.two_anys__arr.t_by_first(two_anys__arr))
         end,
-        target_item_chooser_item_specifier_name
+        chooser_item_specifier_modifier
       )
     end,
-    choose_w_vt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+    choose_w_vt_fn = function(tbl, fn, chooser_item_specifier_modifier)
       dothis.arr.choose_item(
         transf.table.two_anys__arr_by_sorted_smaller_key_first(tbl),
         function (two_anys__arr)
           fn(transf.two_anys__arr.t_by_second(two_anys__arr))
         end,
-        target_item_chooser_item_specifier_name
+        chooser_item_specifier_modifier
       )
     end,
-    choose_kt_w_kt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+    choose_kt_w_kt_fn = function(tbl, fn, chooser_item_specifier_modifier)
       dothis.arr.choose_item(
         transf.table.kt_arr_by_sorted_smaller_first(tbl),
         fn,
-        target_item_chooser_item_specifier_name
+        chooser_item_specifier_modifier
       )
     end,
-    choose_vt_w_vt_fn = function(tbl, fn, target_item_chooser_item_specifier_name)
+    choose_vt_w_vt_fn = function(tbl, fn, chooser_item_specifier_modifier)
       dothis.arr.choose_item(
         transf.table.vt_arr_by_sorted_smaller_first(tbl),
         fn,
-        target_item_chooser_item_specifier_name
+        chooser_item_specifier_modifier
       )
     end,
   },
@@ -303,33 +230,9 @@ dothis = {
     say = function(str, lang)
       speak:voice(tblmap.lang.voice[lang]):speak(transf.str.line_by_folded(str))
     end,
-    paste = function(str)
-      local lines = get.str.str_arr_by_split_w_ascii_char(str, "\n")
-      local is_first_line = true
-      for _, line in transf.arr.pos_int_vt_stateless_iter(lines) do
-        if is_first_line then
-          is_first_line = false
-        else
-          hs.eventtap.keyStroke({}, "return")
-        end
-        hs.eventtap.keyStrokes(line)
-      end
-    end,
-    paste_le = function(str)
-      dothis.str.paste(get.str.str_by_evaled_as_template(str))
-    end,
-    fill_with_lines = function(str)
-      dothis.str_arr.fill_with(transf.str.line_arr(str))
-    end,
-    fill_with_content_lines = function(path)
-      dothis.str_arr.fill_with(transf.str.noempty_line_arr(path))
-    end,
-    fill_with_nohashcomment_noindent_content_lines = function(path)
-      dothis.str_arr.fill_with(transf.str.noempty_noindent_nohashcomment_line_arr(path))
-    end,
     search = function(str, search_engine_id)
       dothis.url_or_local_path.open_browser(
-        get.str.search_engine_id_search_url(search_engine_id, str)
+        get.search_engine_id.url_by_search(search_engine_id, str)
       )
     end,
     write_to_temp_file = function(str)
@@ -561,7 +464,7 @@ dothis = {
       dothis.absolute_path.write_file(
         path,
         get.str.str_by_evaled_as_template(
-          get.str.evaled_as_lua(template_path),
+          get.str.any_by_evaled_as_lua(template_path),
           path
         )
       )
@@ -1177,7 +1080,7 @@ dothis = {
   },
   plaintext_table_file = {
     append_arr_field_arr = function(path, arr_field_arr)
-      local lines = get.arr.only_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr_field_arr, function (arr)
+      local lines = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr_field_arr, function (arr)
         return get.str_or_number_arr.str_by_joined(arr, transf.plaintext_table_file.utf8_char_by_field_separator())
       end)
       dothis.plaintext_file.append_lines(path, lines)
@@ -1612,9 +1515,11 @@ dothis = {
   },
   entry_logging_dir = {
     log_str = function(path, str)
+      local ts = os.time() * 1000
       dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(path, {
-        [os.time() * 1000] = {
-          entry = str
+        [ts] = {
+          entry = str,
+          timestamp_ms = ts
         }
       })
     end,
@@ -1639,7 +1544,7 @@ dothis = {
   },
   str_arr = {
     join_and_paste = function(arr, sep)
-      dothis.str.paste_le(transf.str.join(arr, sep))
+      act.str.paste_le(transf.str.join(arr, sep))
     end,
     fill_with = function(arr)
       dothis.str_arr.join_and_paste(arr, "\t")
@@ -1972,23 +1877,17 @@ dothis = {
       )
       error("TODO: Watch dir, count files every second or so until they are all there, then do_after. Perhaps refactor this into a general function")
     end,
-    generate_rechnung_md = function(omegat_project_dir)
-      dothis.absolute_path.write_file(
-        transf.omegat_project_dir.rechnung_md_path(omegat_project_dir),
-        transf.omegat_project_dir.raw_rechnung(omegat_project_dir)
-      )
-    end,
-    generate_rechnung_pdf = function(omegat_project_dir, do_after)
+    generate_rechnung_pdf = function(dir, do_after)
       dothis.md_file.to_file_in_same_dir(
-        transf.omegat_project_dir.rechnung_md_path(omegat_project_dir),
+        transf.client_project_dir.local_absolute_path_by_rechnung_md(dir),
         "pdf",
-        transf.omegat_project_dir.rechnung_pdf_path(omegat_project_dir),
+        transf.client_project_dir.local_absolute_path_by_rechnung_pdf(dir),
         do_after
       )
     end,
     generate_rechnung = function(path, do_after)
       dothis.omegat_project_dir.generate_target_txts(path, function()
-        dothis.omegat_project_dir.generate_rechnung_md(path)
+        act.client_project_dir.generate_rechnung_de_md(path)
         dothis.omegat_project_dir.generate_rechnung_pdf(path, do_after)
       end)
     end,
@@ -2004,23 +1903,6 @@ dothis = {
       
   },
   latex_project_dir = {      
-    open_pdf = function(latex_project_dir)
-      dothis.local_path.open(
-        transf.latex_project_dir.local_absolute_path_by_main_pdf_file(latex_project_dir)
-      )
-    end,
-    build_and_open_pdf = function(latex_project_dir)
-      dothis.latex_project_dir.build(
-        latex_project_dir,
-        get.fn.fn_by_1st_n_bound(dothis.latex_project_dir.open_pdf, latex_project_dir)
-      )
-    end,
-    write_bib = function(latex_project_dir)
-      dothis.citations_file.write_bib(
-        transf.latex_project_dir.citations_file(latex_project_dir),
-        transf.latex_project_dir.local_absolute_path_by_main_bib_file(latex_project_dir)
-      )
-    end,
     add_indicated_citable_object_id_raw = function(latex_project_dir, indicated_citable_object_id)
       dothis.citations_file.add_indicated_citable_object_id(
         transf.latex_project_dir.citations_file(latex_project_dir),
@@ -2038,14 +1920,14 @@ dothis = {
         latex_project_dir,
         indicated_citable_object_id
       )
-      dothis.latex_project_dir.write_bib(latex_project_dir)
+      act.latex_project_dir.write_bib(latex_project_dir)
     end,
     remove_indicated_citable_object_id = function(latex_project_dir, indicated_citable_object_id)
       dothis.latex_project_dir.remove_indicated_citable_object_id_raw(
         latex_project_dir,
         indicated_citable_object_id
       )
-      dothis.latex_project_dir.write_bib(latex_project_dir)
+      act.latex_project_dir.write_bib(latex_project_dir)
     end,
   },
   youtube_playlist_id = {
@@ -2142,9 +2024,9 @@ dothis = {
     
   },
   arr = {
-    choose_item = function(arr, callback, target_item_chooser_item_specifier_name)
+    choose_item = function(arr, callback, chooser_item_specifier_modifier)
       dothis.choosing_hschooser_specifier.choose_identified_item(
-        get.arr.choosing_hschooser_specifier(arr, target_item_chooser_item_specifier_name),
+        get.arr.choosing_hschooser_specifier(arr, chooser_item_specifier_modifier),
         callback
       )
     end,
@@ -2239,7 +2121,7 @@ dothis = {
         spec.dothis(target)
       end
 
-      dothis.any.choose_action(target)
+      act.any.choose_action(target)
     end
   },
   action_specifier_arr = {
@@ -2297,12 +2179,6 @@ dothis = {
         callback
       )
     end,
-    choose_action = function(any)
-      dothis.any.choose_action_specifier(
-        any, 
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.action_specifier.execute, {a_use, any})
-      )
-    end,
   },
   mpv_ipc_socket_id = {
     set = function(id, key, ...)
@@ -2321,41 +2197,17 @@ dothis = {
         )
       )
     end,
-    cycle_loop_playlist = function(id)
-      dothis.mpv_ipc_socket_id.cycle_inf_no(id, "loop-playlist")
-    end,
-    cycle_loop_playback = function(id)
-      dothis.mpv_ipc_socket_id.cycle_inf_no(id, "loop-file")
-    end,
-    cycle_pause = function(id)
-      dothis.mpv_ipc_socket_id.cycle(id, "pause")
-    end,
-    cycle_shuffle = function(id)
-      dothis.mpv_ipc_socket_id.cycle_inf_no(id, "shuffle")
-    end,
     exec = function(id, ...)
       get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(id, { command = { ... } })
     end,
-    stop = function(id)
-      dothis.mpv_ipc_socket_id.exec(id, "stop")
-    end,
     set_playlist_index = function(id, index)
       dothis.mpv_ipc_socket_id.set(id, "playlist-pos", index)
-    end,
-    set_playlist_first = function(id)
-      dothis.mpv_ipc_socket_id.set(id, "playlist-pos", 0)
-    end,
-    set_playlist_last = function(id)
-      dothis.mpv_ipc_socket_id.set(id, "playlist-pos", transf.mpv_ipc_socket_id.pos_int_by_playlist_length(id))
     end,
     set_playback_seconds = function(id, seconds)
       dothis.mpv_ipc_socket_id.set(id, "time-pos", seconds)
     end,
     set_playback_percent = function(id, percent)
       dothis.mpv_ipc_socket_id.set(id, "percent-pos", percent)
-    end,
-    set_playback_first = function(id)
-      dothis.mpv_ipc_socket_id.set_playback_seconds(id, 0)
     end,
     set_playback_seconds_relative = function(id, seconds)
       dothis.mpv_ipc_socket_id.set_playback_seconds(
@@ -2366,118 +2218,10 @@ dothis = {
     set_chapter = function(id, chapter)
       dothis.mpv_ipc_socket_id.set(id, "chapter", chapter)
     end,
-    chapter_backwards = function(id)
-      dothis.mpv_ipc_socket_id.set_chapter(
-        id,
-        transf.ipc_socket_id.chapter_int(id) - 1
-      )
-    end,
-    chapter_forwards = function(id)
-      dothis.mpv_ipc_socket_id.set_chapter(
-        id,
-        transf.ipc_socket_id.chapter_int(id) + 1
-      )
-    end,
-    playlist_backwards = function(id)
-      dothis.mpv_ipc_socket_id.set_playlist_index(
-        id,
-        transf.ipc_socket_id.playlist_index_int(id) - 1
-      )
-    end,
-    playlist_forwards = function(id)
-      dothis.mpv_ipc_socket_id.set_playlist_index(
-        id,
-        transf.ipc_socket_id.playlist_index_int(id) + 1
-      )
-    end,
-    restart = function(id)
-      dothis.mpv_ipc_socket_id.set_playlist_first(id)
-      dothis.mpv_ipc_socket_id.set_playback_first(id)
-    end,
-  },
-  stream_creation_specifier = {
-    create_inner_item = function(spec)
-      local ipc_socket_id = os.time() .. "-" .. math.random(1000000)
-      transf.str.str_or_nil_by_evaled_env_bash_stripped("mpv " .. transf.stream_creation_specifier.str_by_flags(spec) .. 
-        " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.str_arr.str_by_single_quoted_escaped_joined(spec.urls))
-      return {
-        ipc_socket_id = ipc_socket_id,
-        state = "booting"
-      }
-    end,
-  },
-  hotkey_creation_specifier = {
-    create_inner_item = function(spec)
-      local hotkey = hs.hotkey.new(
-        spec.modifiers or {"cmd", "shift", "alt"},
-        spec.key, 
-        spec.fn
-      )
-      hotkey:enable()
-      return hotkey
-    end,
-  },
-  watcher_creation_specifier = {
-    create_inner_item = function(spec)
-      local watcher = transf.watcher_creation_specifier.watcher_ret_fn(spec)(spec.fn)
-      watcher:start()
-      return watcher
-    end,
-  },
-  task_creation_specifier = {
-    create_inner_item = function(spec)
-      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
-        spec.opts
-      )
-    end,
-  },
-  creation_specifier = {
-    create = function(spec)
-      return {
-        inner_item = dothis[
-          transf.creation_specifier.creation_specifier_type(spec) .. "_creation_specifier"
-        ].create_inner_item(spec),
-        creation_specifier = spec,
-      }
-    end,
-  },
-  created_item_specifier = {
-    recreate = function(spec)
-      return dothis.creation_specifier.create(spec.creation_specifier)
-    end,
-  },
-  fireable_created_item_specifier = {
-    fire = function(spec)
-      spec.creation_specifier.fn()
-    end,
-  },
-  task_created_item_specifier = {
-    pause = function(spec)
-      spec.inner_item:pause()
-    end,
-    resume = function(spec)
-      spec.inner_item:resume()
-    end,
-  },
-  hotkey_created_item_specifier = {
-    pause = function(spec)
-      spec.inner_item:disable()
-    end,
-    resume = function(spec)
-      spec.inner_item:enable()
-    end,
-  },
-  watcher_created_item_specifier = {
-    pause = function(spec)
-      spec.inner_item:stop()
-    end,
-    resume = function(spec)
-      spec.inner_item:start()
-    end,
   },
   created_item_specifier_arr = {
     create = function(arr, creation_specifier)
-      local itm = dothis.creation_specifier.create(creation_specifier)
+      local itm = act.creation_specifier.create(creation_specifier)
       dothis.arr.push(arr, itm)
       return itm
     end,
@@ -2498,7 +2242,7 @@ dothis = {
     create_or_recreate = function(arr, creation_specifier)
       local idx = get.created_item_specifier_arr.pos_int_w_creation_specifier(arr, creation_specifier)
       if idx then
-        arr[idx] = dothis.created_item_specifier.recreate(arr[idx])
+        arr[idx] = act.created_item_specifier.recreate(arr[idx])
         return arr[idx]
       else
         return dothis.created_item_specifier_arr.create(arr, creation_specifier)
@@ -2546,40 +2290,14 @@ dothis = {
     create_background_streams = nil -- TODO
   },
   timer_spec = {
-    set_next_timestamp_s = function(spec)
-      spec.next_timestamp_s = transf.cronspec_str.timestamp_s_by_next(spec.cronspec_str)
-    end,
     postpone_next_timestamp_s = function(spec, s)
       spec.next_timestamp_s = spec.next_timestamp_s + s
     end,
-    fire = function(spec)
-      spec.fn()
-      dothis.timer_spec.set_next_timestamp_s(spec)
-      spec.largest_interval = transf.two_operational_comparables.bool_by_larger(spec.largest_interval, transf.timer_spec.int_by_interval_left(spec))
-    end,
   },
   timer_spec_arr = {
-    fire_all_if_ready_and_space_if_necessary = function(arr)
-      local fired = false
-      for _, v in transf.arr.pos_int_vt_stateless_iter(arr) do
-        if 
-          transf.timer_spec.bool_by_ready(v) 
-        then
-          if 
-            not fired or
-            not transf.timer_spec.bool_by_long_timer(v)
-          then
-            dothis.timer_spec.fire(v)
-            fired = true
-          else
-            dothis.timer_spec.postpone_next_timestamp_s(v, 1)
-          end
-        end
-      end
-    end,
     create = function(arr, spec)
       dothis.arr.push(arr, spec)
-      dothis.timer_spec.set_next_timestamp_s(spec)
+      act.timer_spec.set_next_timestamp_s(spec)
     end,
     create_by_default_interval = function(arr, fn)
       dothis.timer_spec_arr.create(
@@ -2717,141 +2435,26 @@ dothis = {
 
   },
   ["nil"] = {
-    vdirsyncer_sync = function()
-      dothis.str.env_bash_eval_async("vdirsyncer sync")
-    end,
-    newsboat_reload = function()
-      dothis.str.env_bash_eval_async("newsboat -x reload")
-    end,
-    sox_rec_start_cache = function(do_after)
+    sox_rec_start_cache = function(_, do_after)
       dothis.local_absolute_path.start_recording_to(transf.str.in_cache_local_absolute_path(os.time(), "recording"), do_after)
     end,
-    sox_rec_stop = function(do_after)
+    sox_rec_stop = function(_, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("killall rec", do_after)
     end,
-    sox_rec_toggle_cache = function(do_after)
+    sox_rec_toggle_cache = function(_, do_after)
       if transf["nil"].bool_by_sox_is_recording() then
-        dothis.sox.sox_rec_stop()
+        dothis["nil"].sox_rec_stop()
       else
-        dothis.sox.sox_rec_start_cache(do_after)
+        dothis["nil"].sox_rec_start_cache(_, do_after)
       end
     end,
-    mullvad_connect = function()
-      dothis.str.env_bash_eval_async("mullvad connect")
-    end,
-    mullvad_disconnect = function()
-      dothis.str.env_bash_eval_async("mullvad disconnect")
-    end,
-    mullvad_toggle = function()
-      if transf["nil"].bool_by_mullvad_connected() then
-        dothis["nil"].mullvad_disconnect()
-      else
-        dothis["nil"].mullvad_connect()
-      end
-    end,
-    mbsync_sync  = function()
-      dothis.str.env_bash_eval('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel')
-    end,
-    purge_memstore_cache = function()
-      memstore = {}
-    end,
-    purge_fsmemoize_cache = function()
-      dothis.absolute_path.delete(
-        dothis.absolute_path.empty_dir(env.XDG_CACHE_HOME .. "/hs/fsmemoize")
-      )
-    end,
-    firefox_dump_state = function(do_after)
+    firefox_dump_state = function(_, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
     end,
-    newpipe_extract_backup = function(do_after)
+    newpipe_extract_backup = function(_, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
     end,
-    omegat_create_all_translated_documents = function()
-      dothis.mac_application_name.execute_full_action_path(
-        "OmegaT",
-        {
-          "Project",
-          "Create Translated Documents"
-        }
-      )
-    end,
-    omegat_create_current_translated_document = function()
-      dothis.mac_application_name.execute_full_action_path(
-        "OmegaT",
-        {
-          "Project",
-          "Create Current Translated Document"
-        }
-      )
-    end,
-    -- expects to be called on a watcher for tachiyomi state
-    tachiyomi_backup = function()
-      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
-        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_fn(env.TMP_TACHIYOMI_JSON))
-        tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
-        dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-          env.MMANGA_LOGS,
-          tmst_assoc
-        )
-        dothis.backuped_thing_identifier.write_current_timestamp_ms("tachiyomi")
-      end)
-    end,
-    --- do once ff is quit
-    ff_backup = function()
-      local timestamp = transf.backuped_thing_identifier.timestamp_ms("firefox")
-      if transf.mac_application_name.bool_by_running_application("Firefox") then
-        return -- don't try to backup while firefox is running
-      end
-      dothis.sqlite_file.query_w_table_arg_fn(
-        env.MAC_FIREFOX_PLACES_SQULITE,
-        "SELECT json_group_object(visit_date/1000, json_object('title', title, 'url', url))" .. 
-        "FROM moz_places " ..
-        "INNER JOIN moz_historyvisits ON moz_places.id = moz_historyvisits.place_id " ..
-        "WHERE visit_date > " .. timestamp * 1000 .. " " ..
-        "ORDER BY timestamp DESC;",
-        function(tbl)
-          dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-            env.MBROWSER_LOGS,
-            tbl
-          )
-          dothis.backuped_thing_identifier.write_current_timestamp_ms("firefox")
-        end
-      )
-    end,
-    newpipe_backup = function()
-      dothis["nil"].newpipe_extract_backup(function()
-        local timestamp = transf.backuped_thing_identifier.timestamp_ms("newpipe")
-        dothis.sqlite_file.query_w_table_arg_fn(
-          env.env.NEWPIPE_STATE_DIR .. "/history.db",
-          "SELECT json_group_object(access_date, json_object('title', title, 'url', url))" .. 
-          "FROM stream_history " ..
-          "INNER JOIN streams ON stream_history.stream_id = streams.uid " ..
-          "WHERE access_date > " .. timestamp  .. " " ..
-          "ORDER BY timestamp DESC;",
-          function(tbl)
-            dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-              env.MMEDIA_LOGS,
-              tbl
-            )
-            dothis.backuped_thing_identifier.write_current_timestamp_ms("newpipe")
-          end
-        )
-      end)
-    end,
-    git_backup = function()
-      local tbl = {}
-      for file in transf.dir.absolute_path_stateful_iter_by_children(env.TMP_GIT_LOG_PARENT) do
-        local commit = transf.json_file.not_userdata_or_fn(file)
-        local timestamp_s = commit.epoch
-        commit.epoch = nil
-        tbl[timestamp_s * 1000] = commit
-      end
-      dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-        env.MDIARY_COMMITS,
-        tbl
-      )
-      dothis.extant_path.empty_dir(env.TMP_GIT_LOG_PARENT)
-    end,
+   
     telegram_generate_backup = function(_, do_after)
       dothis.fn_queue_specifier.push(main_qspec,
         function()
@@ -2936,91 +2539,9 @@ dothis = {
         do_after
       )
     end,
-    facebook_preprocess_backup = function()
-      local dlchildren = transf.dir.absolute_path_arr_by_children(env.DOWNLOADS)
-      local fbfiles = get.path_arr.path_arr_by_filter_to_filename_starting(dlchildren, "facebook-samswartzberg")
-      local fbzips = get.path_arr.path_arr_by_filter_to_same_extension(fbfiles, "zip")
-      local newest_fbzip = transf.extant_path_arr.extant_path_by_newest_creation(fbzips)
-      local tmploc = transf.str.in_tmp_local_absolute_path("facebook", "export")
-      dothis.local_zip_file.unzip_to_absolute_path(newest_fbzip, tmploc)
-      dothis.file.delete_file(newest_fbzip)
-      dothis.facebook_raw_export_dir.process_to_facebook_export_dir(tmploc)
-    end,
-    telegram_backup = function()
-      dothis["nil"].telegram_generate_backup(nil, function()
-        dothis.telegram_raw_export_dir.process_to_telegram_export_dir(
-          transf["nil"].telegram_raw_export_dir_by_current()
-        )
-        dothis.backup_type.log("telegram")
-      end)
-    end,
-    signal_backup = function()
-      dothis["nil"].signal_generate_backup(nil, function()
-        dothis.backup_type.log("signal")
-      end)
-    end,
-    discord_backup = function()
-      dothis["nil"].discord_generate_backup(nil, function()
-        dothis.backup_type.log("discord")
-      end)
-    end,
+  },
 
-  },
-  telegram_raw_export_dir = {
-    process_to_telegram_export_dir = function(dir)
-      for _, chat_dir in transf.arr.pos_int_vt_stateless_iter(transf.dir.absolute_path_arr_by_children(transf.path.path_by_ending_with_slash(dir) .. "chats")) do
-        local media_path = transf.path.path_by_ending_with_slash(dir) .. "media/" 
-        for _, media_type_dir in transf.arr.pos_int_vt_stateless_iter(
-          transf.dir.dir_arr_by_children(chat_dir)
-        ) do
-          dothis.dir.move_children_absolute_path_arr_into_absolute_path(
-            media_type_dir,
-            media_path
-          )
-        end
-      end
-      dothis.extant_path.move_to_absolute_path(
-        dir,
-        transf.str.in_cache_local_absolute_path("telegram", "export")
-      )
-
-    end,
-  },
-  facebook_raw_export_dir = {
-    process_to_facebook_export_dir = function(dir)
-      local actual_dir = transf.path.path_by_ending_with_slash(dir) .. "messages/inbox/"
-      for _, chat_dir in transf.arr.pos_int_vt_stateless_iter(transf.dir.absolute_path_arr_by_children(actual_dir)) do
-        local media_path = chat_dir .. "media/"
-        for _, media_type_dir in transf.arr.pos_int_vt_stateless_iter(
-          transf.dir.dir_arr_by_children(chat_dir)
-        ) do
-          dothis.dir.move_children_absolute_path_arr_into_absolute_path(
-            media_type_dir,
-            media_path
-          )
-        end
-      end
-      dothis.extant_path.move_to_absolute_path(
-        actual_dir,
-        transf.str.in_cache_local_absolute_path("facebook", "export")
-      )
-    end
-  },
-  backuped_thing_identifier = {
-    write_current_timestamp_ms = function(identifier)
-      dothis.local_file.write_file(
-        transf.path.path_by_ending_with_slash(env.MLAST_BACKUP) .. identifier,
-        (os.time() - 30) * 1000
-      )
-    end,
-
-  },
   fn = {
-    reset_by_all = function(fn)
-      dothis.fnid.reset_by_all(
-        transf.fn.fnid(fn)
-      )
-    end,
   },
   fnid = {
     put_memo = function(fnid, opts_as_str, params, result, opts)
@@ -3049,9 +2570,6 @@ dothis = {
       memstore[fnid] = memstore[fnid] or {}
       memstore[fnid][opts_as_str] = {}
     end,
-    reset_by_all = function(fnid)
-      memstore[fnid] = nil
-    end,
   },
   fnname = {
     put_memo = function(fnid, opts_as_str, params, result, opts)
@@ -3062,36 +2580,14 @@ dothis = {
       local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str)
       dothis.absolute_path.delete(cache_path)
     end,
-    reset_by_all = function(fnname)
-      dothis.absolute_path.delete(
-        transf.fnname.local_absolute_path_by_in_cache(fnname)
-      )
-    end,
     set_timestamp_s_created_time = function(fnid, opts_as_str, created_time)
       dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~"), transf.any.str(created_time))
     end
   },
   fn_queue_specifier = {
-    update = function(qspec)
-      hs.alert.closeSpecific(qspec.alert)
-      if #qspec.fn_arr == 0 then 
-        dothis.hotkey_created_item_specifier.pause(qspec.hotkey_created_item_specifier)
-      else
-        qspec.alert = dothis.str.alert(
-          transf.fn_queue_specifier.str_by_waiting_message(qspec),
-          "indefinite"
-        )
-        dothis.hotkey_created_item_specifier.resume(qspec.hotkey_created_item_specifier)
-      end
-    end,
     push = function(qspec, fn)
       dothis.arr.push(qspec.fn_arr, fn)
-      dothis.fn_queue_specifier.update(qspec)
-    end,
-    pop = function(qspec)
-      local fn = act.arr.pop(qspec.fn_arr)
-      fn()
-      dothis.fn_queue_specifier.update(qspec)
+      act.fn_queue_specifier.update(qspec)
     end,
   },
   export_chat_main_object = {
@@ -3111,7 +2607,7 @@ dothis = {
           typ
         )
       )
-      dothis.backuped_thing_identifier.write_current_timestamp_ms(
+      act.backuped_thing_identifier.write_current_timestamp_ms(
         get.export_chat_main_object.backuped_thing_identifier(obj, typ)
       )
       dothis.dir.move_children_absolute_path_arr_into_absolute_path(
@@ -3130,14 +2626,6 @@ dothis = {
       for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
         dothis.export_chat_main_object.log(two_anys__arr[1], typ, two_anys__arr[2])
       end
-    end
-  },
-  backup_type = {
-    log = function(typ)
-      dothis.export_dir.log(
-        transf.str.in_cache_local_absolute_path(typ, "export"),
-        typ
-      )
     end
   },
   search_engine_id = {

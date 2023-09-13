@@ -105,6 +105,12 @@ ls = {
     "sass"
   },
   apis_that_dont_support_authorization_code_fetch = {"google"},
+  backup_type = {
+    "facebook",
+    "telegram",
+    "signal",
+    "discord"
+  },
   csl_type = {
     "article",
     "article-journal",

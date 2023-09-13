@@ -57,14 +57,6 @@ act = {
     end,
   },
   url = {
-    add_event_to_default_calendar = function(url)
-      dothis.url.add_event_from_url(url, "default")
-    end,
-    add_event_to_chosen_calendar = function(url)
-      dothis.arr.choose_item(transf["nil"].writeable_calendar_name_arr(), function(calendar)
-        dothis.url.add_event_from_url(url, calendar)
-      end)
-    end,
     download_into_downloads_async = function(url)
       dothis.url.download_into_async(url, env.DOWNLOADS)
     end,
@@ -147,6 +139,68 @@ act = {
       dothis.plaintext_url_or_local_path_file.open_all(path, "Firefox")
     end,
   },
+  any = {
+    choose_action = function(any)
+      dothis.any.choose_action_specifier(
+        any, 
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.action_specifier.execute, {a_use, any})
+      )
+    end,
+  },
+  mpv_ipc_socket_id = {
+    cycle_loop_playlist = function(id)
+      dothis.mpv_ipc_socket_id.cycle_inf_no(id, "loop-playlist")
+    end,
+    cycle_loop_playback = function(id)
+      dothis.mpv_ipc_socket_id.cycle_inf_no(id, "loop-file")
+    end,
+    cycle_pause = function(id)
+      dothis.mpv_ipc_socket_id.cycle(id, "pause")
+    end,
+    cycle_shuffle = function(id)
+      dothis.mpv_ipc_socket_id.cycle_inf_no(id, "shuffle")
+    end,
+    stop = function(id)
+      dothis.mpv_ipc_socket_id.exec(id, "stop")
+    end,
+    set_playlist_first = function(id)
+      dothis.mpv_ipc_socket_id.set(id, "playlist-pos", 0)
+    end,
+    set_playlist_last = function(id)
+      dothis.mpv_ipc_socket_id.set(id, "playlist-pos", transf.mpv_ipc_socket_id.pos_int_by_playlist_length(id))
+    end,
+    set_playback_first = function(id)
+      dothis.mpv_ipc_socket_id.set_playback_seconds(id, 0)
+    end,
+    chapter_backwards = function(id)
+      dothis.mpv_ipc_socket_id.set_chapter(
+        id,
+        transf.ipc_socket_id.chapter_int(id) - 1
+      )
+    end,
+    chapter_forwards = function(id)
+      dothis.mpv_ipc_socket_id.set_chapter(
+        id,
+        transf.ipc_socket_id.chapter_int(id) + 1
+      )
+    end,
+    playlist_backwards = function(id)
+      dothis.mpv_ipc_socket_id.set_playlist_index(
+        id,
+        transf.ipc_socket_id.playlist_index_int(id) - 1
+      )
+    end,
+    playlist_forwards = function(id)
+      dothis.mpv_ipc_socket_id.set_playlist_index(
+        id,
+        transf.ipc_socket_id.playlist_index_int(id) + 1
+      )
+    end,
+    restart = function(id)
+      act.mpv_ipc_socket_id.set_playlist_first(id)
+      act.mpv_ipc_socket_id.set_playback_first(id)
+    end,
+  },
   stream_created_item_specifier = {
     set_playback_seconds_plus_15 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, 15}),
     set_playback_seconds_minus_15 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, -15}),
@@ -158,46 +212,46 @@ act = {
       spec.inner_item.state = transf.stream_created_item_specifier.stream_state_by_transitioned(spec)
     end,
     cycle_loop_playlist = function(spec)
-      return dothis.mpv_ipc_socket_id.cycle_loop_playlist(spec.inner_item.ipc_socket_id)
+      return act.mpv_ipc_socket_id.cycle_loop_playlist(spec.inner_item.ipc_socket_id)
     end,
     cycle_loop_playback = function(spec)
-      return dothis.mpv_ipc_socket_id.cycle_loop_playback(spec.inner_item.ipc_socket_id)
+      return act.mpv_ipc_socket_id.cycle_loop_playback(spec.inner_item.ipc_socket_id)
     end,
     set_playlist_first = function(spec)
-      return dothis.mpv_ipc_socket_id.set_playlist_first(spec.inner_item.ipc_socket_id)
+      return act.mpv_ipc_socket_id.set_playlist_first(spec.inner_item.ipc_socket_id)
     end,
     set_playlist_last = function(spec)
-      return dothis.mpv_ipc_socket_id.set_playlist_last(spec.inner_item.ipc_socket_id)
+      return act.mpv_ipc_socket_id.set_playlist_last(spec.inner_item.ipc_socket_id)
     end,
     set_playback_first = function(spec)
-      return dothis.mpv_ipc_socket_id.set_playback_first(spec.inner_item.ipc_socket_id)
+      return act.mpv_ipc_socket_id.set_playback_first(spec.inner_item.ipc_socket_id)
     end,
     set_chapter = function(spec, chapter)
       return dothis.mpv_ipc_socket_id.set_chapter(spec.inner_item.ipc_socket_id, chapter)
     end,
     chapter_backwards = function(spec)
-      return dothis.mpv_ipc_socket_id.chapter_backwards(spec.inner_item.ipc_socket_id)
+      return act.mpv_ipc_socket_id.chapter_backwards(spec.inner_item.ipc_socket_id)
     end,
     chapter_forwards = function(spec)
-      return dothis.mpv_ipc_socket_id.chapter_forwards(spec.inner_item.ipc_socket_id)
+      return act.mpv_ipc_socket_id.chapter_forwards(spec.inner_item.ipc_socket_id)
     end,
     restart = function(spec)
-      return dothis.mpv_ipc_socket_id.restart(spec.inner_item.ipc_socket_id)
+      return act.mpv_ipc_socket_id.restart(spec.inner_item.ipc_socket_id)
     end,
     cycle_pause = function(spec)
-      return dothis.mpv_ipc_socket_id.cycle_pause(spec.creation_specifier.ipc_socket_id)
+      return act.mpv_ipc_socket_id.cycle_pause(spec.creation_specifier.ipc_socket_id)
     end,
     stop = function(spec)
-      return dothis.mpv_ipc_socket_id.stop(spec.creation_specifier.ipc_socket_id)
+      return act.mpv_ipc_socket_id.stop(spec.creation_specifier.ipc_socket_id)
     end,
     playlist_backwards = function(spec)
-      return dothis.mpv_ipc_socket_id.playlist_backwards(spec.creation_specifier.ipc_socket_id)
+      return act.mpv_ipc_socket_id.playlist_backwards(spec.creation_specifier.ipc_socket_id)
     end,
     playlist_forwards = function(spec)
-      return dothis.mpv_ipc_socket_id.playlist_forwards(spec.creation_specifier.ipc_socket_id)
+      return act.mpv_ipc_socket_id.playlist_forwards(spec.creation_specifier.ipc_socket_id)
     end,
     cycle_shuffle = function(spec)
-      return dothis.mpv_ipc_socket_id.cycle_shuffle(spec.creation_specifier.ipc_socket_id)
+      return act.mpv_ipc_socket_id.cycle_shuffle(spec.creation_specifier.ipc_socket_id)
     end,
   },
   stream_created_item_specifier_arr = {
@@ -379,6 +433,30 @@ act = {
     alert = function(str)
       dothis.str.alert(str, 10)
     end,
+    paste = function(str)
+      local lines = get.str.str_arr_by_split_w_ascii_char(str, "\n")
+      local is_first_line = true
+      for _, line in transf.arr.pos_int_vt_stateless_iter(lines) do
+        if is_first_line then
+          is_first_line = false
+        else
+          hs.eventtap.keyStroke({}, "return")
+        end
+        hs.eventtap.keyStrokes(line)
+      end
+    end,
+    paste_le = function(str)
+      act.str.paste(get.str.str_by_evaled_as_template(str))
+    end,
+    fill_with_lines = function(str)
+      dothis.str_arr.fill_with(transf.str.line_arr(str))
+    end,
+    fill_with_noempty_line_arr = function(path)
+      dothis.str_arr.fill_with(transf.str.noempty_line_arr(path))
+    end,
+    fill_with_noempty_noindent_nohashcomment_line_arr = function(path)
+      dothis.str_arr.fill_with(transf.str.noempty_noindent_nohashcomment_line_arr(path))
+    end,
     search_wiktionary = function(query) dothis.search_engine_id.search("wiktionary", query) end,
     search_wikipedia = function(query) dothis.search_engine_id.search("wikipedia", query) end,
     search_youtube = function(query) dothis.search_engine_id.search("youtube", query) end,
@@ -446,6 +524,116 @@ act = {
       )
     end,
   },
+  stream_creation_specifier = {
+    create_inner_item = function(spec)
+      local ipc_socket_id = os.time() .. "-" .. math.random(1000000)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("mpv " .. transf.stream_creation_specifier.str_by_flags(spec) .. 
+        " --msg-level=all=warn --input-ipc-server=" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " --start=" .. spec.values.start .. " " .. transf.str_arr.str_by_single_quoted_escaped_joined(spec.urls))
+      return {
+        ipc_socket_id = ipc_socket_id,
+        state = "booting"
+      }
+    end,
+  },
+  hotkey_creation_specifier = {
+    create_inner_item = function(spec)
+      local hotkey = hs.hotkey.new(
+        spec.modifiers or {"cmd", "shift", "alt"},
+        spec.key, 
+        spec.fn
+      )
+      hotkey:enable()
+      return hotkey
+    end,
+  },
+  watcher_creation_specifier = {
+    create_inner_item = function(spec)
+      local watcher = transf.watcher_creation_specifier.watcher_ret_fn(spec)(spec.fn)
+      watcher:start()
+      return watcher
+    end,
+  },
+  task_creation_specifier = {
+    create_inner_item = function(spec)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        spec.opts
+      )
+    end,
+  },
+  creation_specifier = {
+    create = function(spec)
+      return {
+        inner_item = dothis[
+          transf.creation_specifier.creation_specifier_type(spec) .. "_creation_specifier"
+        ].create_inner_item(spec),
+        creation_specifier = spec,
+      }
+    end,
+  },
+  created_item_specifier = {
+    recreate = function(spec)
+      return act.creation_specifier.create(spec.creation_specifier)
+    end,
+  },
+  fireable_created_item_specifier = {
+    fire = function(spec)
+      spec.creation_specifier.fn()
+    end,
+  },
+  task_created_item_specifier = {
+    pause = function(spec)
+      spec.inner_item:pause()
+    end,
+    resume = function(spec)
+      spec.inner_item:resume()
+    end,
+  },
+  hotkey_created_item_specifier = {
+    pause = function(spec)
+      spec.inner_item:disable()
+    end,
+    resume = function(spec)
+      spec.inner_item:enable()
+    end,
+  },
+  watcher_created_item_specifier = {
+    pause = function(spec)
+      spec.inner_item:stop()
+    end,
+    resume = function(spec)
+      spec.inner_item:start()
+    end,
+  },
+  timer_spec = {
+    set_next_timestamp_s = function(spec)
+      spec.next_timestamp_s = transf.cronspec_str.timestamp_s_by_next(spec.cronspec_str)
+    end,
+    fire = function(spec)
+      spec.fn()
+      act.timer_spec.set_next_timestamp_s(spec)
+      spec.largest_interval = transf.two_operational_comparables.bool_by_larger(spec.largest_interval, transf.timer_spec.int_by_interval_left(spec))
+    end,
+  },
+  timer_spec_arr = {
+    fire_all_if_ready_and_space_if_necessary = function(arr)
+      local fired = false
+      for _, v in transf.arr.pos_int_vt_stateless_iter(arr) do
+        if 
+          transf.timer_spec.bool_by_ready(v) 
+        then
+          if 
+            not fired or
+            not transf.timer_spec.bool_by_long_timer(v)
+          then
+            act.timer_spec.fire(v)
+            fired = true
+          else
+            dothis.timer_spec.postpone_next_timestamp_s(v, 1)
+          end
+        end
+      end
+    end,
+  },
   ["nil"] = {
     ensure_sound_played_on_speakers = function()
       local device = hs.audiodevice.findOutputByName("Built-in Output")
@@ -474,7 +662,7 @@ act = {
       act.hs_geometry_size_like.show_grid({w=2, h=4})
     end,
     pop_main_qspec = function()
-      dothis.fn_queue_specifier.pop(
+      act.fn_queue_specifier.pop(
         main_qspec
       )
     end,
@@ -507,7 +695,7 @@ act = {
       dothis.sox.sox_rec_toggle_cache(dothis.any.choose_action)
     end,
     choose_action_on_current_timestamp_s = function()
-      dothis.any.choose_action(transf["nil"].timestamp_s_by_current())
+      act.any.choose_action(transf["nil"].timestamp_s_by_current())
     end,
     choose_login_pass_item_name_and_fill = function()
       dothis.arr.choose_item(
@@ -518,7 +706,7 @@ act = {
     choose_otp_pass_item_name_and_paste = function()
       dothis.arr.choose_item(
         transf["nil"].otp_pass_item_name_arr(),
-        dothis.str.paste
+        act.str.paste
       )
     end,
     activate_next_source_id = function()
@@ -530,16 +718,196 @@ act = {
     choose_action_on_first_running_stream = function()
       local strm = transf.stream_created_item_specifier_arr.stream_created_item_specifier_by_first_running(stream_arr)
       if strm then
-        dothis.any.choose_action(strm)
+        act.any.choose_action(strm)
       else
         act.str.alert("No running streams.")
       end
     end,
     choose_action_on_first_item_in_pasteboard_arr = function()
-      dothis.any.choose_action(
+      act.any.choose_action(
         pasteboard_arr[1]
       )
+    end,
+    vdirsyncer_sync = function()
+      dothis.str.env_bash_eval_async("vdirsyncer sync")
+    end,
+    newsboat_reload = function()
+      dothis.str.env_bash_eval_async("newsboat -x reload")
+    end,
+    mullvad_connect = function()
+      dothis.str.env_bash_eval_async("mullvad connect")
+    end,
+    mullvad_disconnect = function()
+      dothis.str.env_bash_eval_async("mullvad disconnect")
+    end,
+    mullvad_toggle = function()
+      if transf["nil"].bool_by_mullvad_connected() then
+        act["nil"].mullvad_disconnect()
+      else
+        act["nil"].mullvad_connect()
+      end
+    end,
+    mbsync_sync  = function()
+      dothis.str.env_bash_eval('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel')
+    end,
+    purge_memstore_cache = function()
+      memstore = {}
+    end,
+    purge_fsmemoize_cache = function()
+      dothis.absolute_path.delete(
+        dothis.absolute_path.empty_dir(env.XDG_CACHE_HOME .. "/hs/fsmemoize")
+      )
+    end,
+    omegat_create_all_translated_documents = function()
+      dothis.mac_application_name.execute_full_action_path(
+        "OmegaT",
+        {
+          "Project",
+          "Create Translated Documents"
+        }
+      )
+    end,
+    omegat_create_current_translated_document = function()
+      dothis.mac_application_name.execute_full_action_path(
+        "OmegaT",
+        {
+          "Project",
+          "Create Current Translated Document"
+        }
+      )
+    end,
+    -- expects to be called on a watcher for tachiyomi state
+    tachiyomi_backup = function()
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
+        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_fn(env.TMP_TACHIYOMI_JSON))
+        tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
+        dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+          env.MMANGA_LOGS,
+          tmst_assoc
+        )
+        act.backuped_thing_identifier.write_current_timestamp_ms("tachiyomi")
+      end)
+    end,
+    --- do once ff is quit
+    ff_backup = function()
+      local timestamp = transf.backuped_thing_identifier.timestamp_ms("firefox")
+      if transf.mac_application_name.bool_by_running_application("Firefox") then
+        return -- don't try to backup while firefox is running
+      end
+      dothis.sqlite_file.query_w_table_arg_fn(
+        env.MAC_FIREFOX_PLACES_SQULITE,
+        "SELECT json_group_object(visit_date/1000, json_object('title', title, 'url', url))" .. 
+        "FROM moz_places " ..
+        "INNER JOIN moz_historyvisits ON moz_places.id = moz_historyvisits.place_id " ..
+        "WHERE visit_date > " .. timestamp * 1000 .. " " ..
+        "ORDER BY timestamp DESC;",
+        function(tbl)
+          dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+            env.MBROWSER_LOGS,
+            tbl
+          )
+          act.backuped_thing_identifier.write_current_timestamp_ms("firefox")
+        end
+      )
+    end,
+    newpipe_backup = function()
+      dothis["nil"].newpipe_extract_backup(nil, function()
+        local timestamp = transf.backuped_thing_identifier.timestamp_ms("newpipe")
+        dothis.sqlite_file.query_w_table_arg_fn(
+          env.env.NEWPIPE_STATE_DIR .. "/history.db",
+          "SELECT json_group_object(access_date, json_object('title', title, 'url', url, 'timestamp_ms', access_date ))" .. 
+          "FROM stream_history " ..
+          "INNER JOIN streams ON stream_history.stream_id = streams.uid " ..
+          "WHERE access_date > " .. timestamp  .. " " ..
+          "ORDER BY timestamp DESC;",
+          function(tbl)
+            dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+              env.MMEDIA_LOGS,
+              tbl
+            )
+            act.backuped_thing_identifier.write_current_timestamp_ms("newpipe")
+          end
+        )
+      end)
+    end,
+    facebook_preprocess_backup = function()
+      local dlchildren = transf.dir.absolute_path_arr_by_children(env.DOWNLOADS)
+      local fbfiles = get.path_arr.path_arr_by_filter_to_filename_starting(dlchildren, "facebook-samswartzberg")
+      local fbzips = get.path_arr.path_arr_by_filter_to_same_extension(fbfiles, "zip")
+      local newest_fbzip = transf.extant_path_arr.extant_path_by_newest_creation(fbzips)
+      local tmploc = transf.str.in_tmp_local_absolute_path("facebook", "export")
+      dothis.local_zip_file.unzip_to_absolute_path(newest_fbzip, tmploc)
+      dothis.file.delete_file(newest_fbzip)
+      act.facebook_raw_export_dir.process_to_facebook_export_dir(tmploc)
+    end,
+    telegram_backup = function()
+      dothis["nil"].telegram_generate_backup(nil, function()
+        act.telegram_raw_export_dir.process_to_telegram_export_dir(
+          transf["nil"].telegram_raw_export_dir_by_current()
+        )
+        act.backup_type.log("telegram")
+      end)
+    end,
+    signal_backup = function()
+      dothis["nil"].signal_generate_backup(nil, function()
+        act.backup_type.log("signal")
+      end)
+    end,
+    discord_backup = function()
+      dothis["nil"].discord_generate_backup(nil, function()
+        act.backup_type.log("discord")
+      end)
+    end,
+
+  },
+  telegram_raw_export_dir = {
+    process_to_telegram_export_dir = function(dir)
+      for _, chat_dir in transf.arr.pos_int_vt_stateless_iter(transf.dir.absolute_path_arr_by_children(transf.path.path_by_ending_with_slash(dir) .. "chats")) do
+        local media_path = transf.path.path_by_ending_with_slash(dir) .. "media/" 
+        for _, media_type_dir in transf.arr.pos_int_vt_stateless_iter(
+          transf.dir.dir_arr_by_children(chat_dir)
+        ) do
+          dothis.dir.move_children_absolute_path_arr_into_absolute_path(
+            media_type_dir,
+            media_path
+          )
+        end
+      end
+      dothis.extant_path.move_to_absolute_path(
+        dir,
+        transf.str.in_cache_local_absolute_path("telegram", "export")
+      )
+
+    end,
+  },
+  facebook_raw_export_dir = {
+    process_to_facebook_export_dir = function(dir)
+      local actual_dir = transf.path.path_by_ending_with_slash(dir) .. "messages/inbox/"
+      for _, chat_dir in transf.arr.pos_int_vt_stateless_iter(transf.dir.absolute_path_arr_by_children(actual_dir)) do
+        local media_path = chat_dir .. "media/"
+        for _, media_type_dir in transf.arr.pos_int_vt_stateless_iter(
+          transf.dir.dir_arr_by_children(chat_dir)
+        ) do
+          dothis.dir.move_children_absolute_path_arr_into_absolute_path(
+            media_type_dir,
+            media_path
+          )
+        end
+      end
+      dothis.extant_path.move_to_absolute_path(
+        actual_dir,
+        transf.str.in_cache_local_absolute_path("facebook", "export")
+      )
     end
+  },
+  backuped_thing_identifier = {
+    write_current_timestamp_ms = function(identifier)
+      dothis.local_file.write_file(
+        transf.path.path_by_ending_with_slash(env.MLAST_BACKUP) .. identifier,
+        (os.time() - 30) * 1000
+      )
+    end,
+
   },
   mullvad_relay_identifier_arr = {
     choose_item_and_set_active = function(arr)
@@ -554,6 +922,33 @@ act = {
       dothis.arr.choose_item(
         arr,
         dothis.menu_item_table.execute
+      )
+    end,
+  },
+  client_project_dir = {
+    generate_rechnung_de_md = function(dir)
+      dothis.absolute_path.write_file(
+        transf.client_project_dir.local_absolute_path_by_rechnung_md(dir),
+        transf.client_project_dir.multiline_str_by_raw_rechnung_de(dir)
+      )
+    end,
+  },
+  latex_project_dir = {
+    open_pdf = function(latex_project_dir)
+      dothis.local_path.open(
+        transf.latex_project_dir.local_absolute_path_by_main_pdf_file(latex_project_dir)
+      )
+    end,
+    build_and_open_pdf = function(latex_project_dir)
+      act.latex_project_dir.build(
+        latex_project_dir,
+        get.fn.fn_by_1st_n_bound(act.latex_project_dir.open_pdf, latex_project_dir)
+      )
+    end,
+    write_bib = function(latex_project_dir)
+      dothis.citations_file.write_bib(
+        transf.latex_project_dir.citations_file(latex_project_dir),
+        transf.latex_project_dir.local_absolute_path_by_main_bib_file(latex_project_dir)
       )
     end,
   },
@@ -575,11 +970,25 @@ act = {
       end
     end,
     shuffle = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.arr.sort, {a_use, transf["nil"].bool_by_random}),
+    sort = function(arr)
+      dothis.arr.sort(arr)
+    end,
+  },
+  contact_table = {
+    edit_contact = function(table)
+      dothis.contact_table.edit(table)
+    end,
+    add_iban_by_prompted = function(table)
+      dothis.contact_table.add_iban(table, get.str.str_by_prompted_once_from_default("", "Enter an IBAN:"))
+    end,
   },
   contact_uuid = {
     edit_contact = function(uuid)
       dothis.contact_uuid.edit_contact(uuid)
-    end
+    end,
+    add_iban_by_prompted = function(uuid)
+      dothis.contact_uuid.add_iban(uuid, get.str.str_by_prompted_once_from_default("", "Enter an IBAN:"))
+    end,
   },
   youtube_video_url = {
     add_as_m3u = function(url)
@@ -618,4 +1027,105 @@ act = {
     end,
 
   },
+  old_location_logs_proc_dir = {
+    process_to_new_location_logs = function(path)
+      local timestamp_ms_key_location_log_spec_value_assoc = transf.old_location_logs_proc_dir.timestamp_ms_key_location_log_spec_value_assoc_by_path(path)
+      dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+        env.MMOMENTS .. "/location_logs",
+        timestamp_ms_key_location_log_spec_value_assoc
+      )
+    end,
+  },
+  old_media_logs_proc_dir = {
+    process_to_new_media_logs = function(path)
+      local timestamp_ms_key_media_log_spec_value_assoc = transf.old_media_logs_proc_dir.timestamp_ms_key_media_log_spec_value_assoc(path)
+      dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+        env.MMOMENTS .. "/media_logs",
+        timestamp_ms_key_media_log_spec_value_assoc
+      )
+    end,
+  },
+  old_entries_proc_dir = {
+    process_to_new_entries = function(path)
+      local files = transf.dir.absolute_path_arr_by_children(path)
+      local assoc = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
+        files,
+        function(fpath)
+          local rfc3339like_ymd = transf.path.path_leaf_specifier(fpath).rfc3339like_dt_o_interval
+          local ts = transf.rfc3339like_dt.timestamp_s_by_min(rfc3339like_ymd) * 1000
+          return ts , {entry = transf.plaintext_file.str_by_contents(fpath), timestamp_ms = ts }
+        end
+      )
+      dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+        env.MMOMENTS .. "/entries",
+        assoc
+      )
+    end,
+  },
+  git_tmp_log_dir = {
+    process_to_git_logs = function(path)
+      local timestamp_ms_key_git_log_spec_value_assoc = transf.git_tmp_log_dir.timestamp_ms_key_assoc_value_assoc(path)
+      dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+        env.MMOMENTS .. "/git_logs",
+        timestamp_ms_key_git_log_spec_value_assoc
+      )
+      dothis.dir.empty_dir(path)
+    end,
+  },
+  mpv_tmp_log_dir = {
+    process_to_media_logs = function(path)
+      local timestamp_ms_key_media_log_spec_value_assoc = transf.mpv_tmp_log_dir.timestamp_ms_key_media_log_spec_value_assoc(path)
+      dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+        env.MMOMENTS .. "/media_logs",
+        timestamp_ms_key_media_log_spec_value_assoc
+      )
+      dothis.dir.empty_dir(path)
+    end,
+  },
+  backup_type = {
+    log = function(typ)
+      dothis.export_dir.log(
+        transf.str.in_cache_local_absolute_path(typ, "export"),
+        typ
+      )
+    end
+  },
+  fn_queue_specifier = {
+    update = function(qspec)
+      hs.alert.closeSpecific(qspec.alert)
+      if #qspec.fn_arr == 0 then 
+        act.hotkey_created_item_specifier.pause(qspec.hotkey_created_item_specifier)
+      else
+        qspec.alert = dothis.str.alert(
+          transf.fn_queue_specifier.str_by_waiting_message(qspec),
+          "indefinite"
+        )
+        act.hotkey_created_item_specifier.resume(qspec.hotkey_created_item_specifier)
+      end
+    end,
+    pop = function(qspec)
+      local fn = act.arr.pop(qspec.fn_arr)
+      fn()
+      act.fn_queue_specifier.update(qspec)
+    end,
+  },
+  fn = {
+    reset_by_all = function(fn)
+      act.fnid.reset_by_all(
+        transf.fn.fnid(fn)
+      )
+    end,
+  },
+  fnid = {
+    reset_by_all = function(fnid)
+      memstore[fnid] = nil
+    end,
+  },
+  fnname = {
+    reset_by_all = function(fnname)
+      dothis.absolute_path.delete(
+        transf.fnname.local_absolute_path_by_in_cache(fnname)
+      )
+    end,
+  } 
 }

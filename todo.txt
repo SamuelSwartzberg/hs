@@ -28,6 +28,7 @@ post 'lua is working':
     - must run cd '$NEWPIPE_STATE_DIR' && unzip *.zip && rm *.zip *.settings regularly, currently extracted due to refactor
   - process bookmarks to sessions, urls
   - old contact importing
+    - refac contacts to use yaml in notes field for met data
     - contact em 
     - contact freiland aktzeichen host (ask first if still hosting)
   - newsboat formatting, interface

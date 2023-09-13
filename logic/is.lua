@@ -967,7 +967,7 @@ is = {
             "/../",
           }
         ) or 
-        get.str.bool_by_contains_any_w_ascii_str_arr(
+        get.str.bool_by_contains_any_w_str_arr(
           path,
           {
             "/./",
@@ -1051,6 +1051,20 @@ is = {
     in_downloads_local_absolute_path = function(path)
       return get.str.bool_by_startswith(path, env.DOWNLOADS)
     end,
+    in_home_proc_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, env.HOME .. "/proc/")
+    end,
+  },
+  in_tmp_local_absolute_path = {
+    
+  },
+  in_home_proc_local_absolute_path = {
+    old_location_logs_proc_dir = function(path)
+      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/old_location_logs/"
+    end,
+    old_media_logs_proc_dir = function(path)
+      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/old_media_logs/"
+    end,
   },
   in_downloads_local_absolute_path = {
     telegram_raw_export_dir = function(path)
@@ -1079,6 +1093,14 @@ is = {
     end,
   },
   in_cache_export_local_absolute_path = {
+    export_dir = function(path)
+      return transf.path.path_by_ending_with_slash(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path)) == env.XDG_CACHE_HOME .. "/export/"
+    end,
+    discord_export_child_dir = function(path)
+      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME .. "/hs/export/discord/")
+    end,
+  },
+  export_dir = {
     telegram_export_dir = function(path)
       return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/telegram/"
     end,
@@ -1091,10 +1113,8 @@ is = {
     signal_export_dir = function(path)
       return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/signal/"
     end,
-    discord_export_child_dir = function(path)
-      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME .. "/hs/export/discord/")
-    end,
   },
+
   in_volume_local_absolute_path = {
     
   },
@@ -1480,6 +1500,9 @@ is = {
     end,
     markdown_extension_name = function(str)
       return get.arr.bool_by_contains(ls.markdown_extension_name, str)
+    end,
+    backup_type = function(str)
+      return get.arr.bool_by_contains(ls.backup_type, str)
     end,
   },
   mixed_strict_snake_case = {
@@ -2179,9 +2202,9 @@ is = {
     non_empty_table = function(t)
       return not is.table.empty_table(t)
     end,
-    only_int_key_table = function(t)
+    only_pos_int_key_table = function(t)
       for k, v in transf.table.kt_vt_stateless_iter(t) do
-        if is.any.not_int(k) then return false end
+        if not is.any.pos_int(k) then return false end
       end
       return true
     end,
@@ -2190,17 +2213,17 @@ is = {
       return t == thing_name_hierarchy
     end
   },
-  only_int_key_table = {
-    --- an empty only_int_key_table is never a hole_y_arrlike and always an arr
-    hole_y_arrlike = function(only_int_key_table)
-      if #only_int_key_table == 0 then return false end
-      for i = 1, #only_int_key_table do
-        if only_int_key_table[i] == nil then return true end
+  only_pos_int_key_table = {
+    --- an empty only_pos_int_key_table is never a hole_y_arrlike and always an arr
+    hole_y_arrlike = function(only_pos_int_key_table)
+      if #only_pos_int_key_table == 0 then return false end
+      for i = 1, #only_pos_int_key_table do
+        if only_pos_int_key_table[i] == nil then return true end
       end
       return false
     end,
-    arr = function(only_int_key_table)
-      return not is.only_int_key_table.hole_y_arrlike(only_int_key_table)
+    arr = function(only_pos_int_key_table)
+      return not is.only_pos_int_key_table.hole_y_arrlike(only_pos_int_key_table)
     end,
   },
   arr = {
@@ -2284,9 +2307,6 @@ is = {
     end,
     prompt_args_spec = function(t)
       return t.message or t.default
-    end,
-    interval_specifier = function(t)
-      return t.start and t.stop
     end,
     dcmp_spec = function(t)
       return t.year or t.month or t.day or t.hour or t.min or t.sec
@@ -2425,6 +2445,31 @@ is = {
     end,
     path_key_haver = function(t)
       return t.path
+    end,
+    cut_specifier = function(t)
+      return t.start or t.stp
+    end,
+    location_log_spec = function(t)
+      return t.lat and t.long
+    end,
+    timestamp_ms_key_haver = function(t)
+      return t.timestamp_ms
+    end,
+    
+  },
+  timestamp_ms_key_haver = {
+    media_log_spec = function(t)
+      return t.title and t.url
+    end,
+  },
+  location_log_spec = {
+    old_location_log_spec = function(t)
+      return t.dt
+    end,
+  },
+  cut_specifier = {
+    interval_specifier = function(t)
+      return t.start and t.stop
     end,
   },
   jxa_windowlike_specifier = {
@@ -2599,6 +2644,14 @@ is = {
   },
   int_interval_specifier = {
     timestamp_s_interval_specifier = transf["nil"]["true"],
+    pos_int_interval_specifier = function(t)
+      return is.number.pos_int(t.start) and is.number.pos_int(t.stop)
+    end,
+  },
+  pos_int_interval_specifier = {
+    pos_int_sequence_specifier = function(t)
+      return is.interval_specifier.sequence_specifier(t)
+    end
   },
   timestamp_s_interval_specifier = {
     timestamp_s_sequence_specifier = function(t)

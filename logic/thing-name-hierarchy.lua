@@ -220,6 +220,10 @@ thing_name_hierarchy = {
                   root_local_absolute_path = "leaf",
                   in_volume_local_absolute_path = "leaf",
                   in_home_local_absolute_path = {
+                    in_home_proc_local_absolute_path = {
+                      old_location_logs_proc_dir = "leaf",
+                      old_media_logs_proc_dir = "leaf",
+                    },
                     in_me_local_absolute_path = {
                       in_mcitations_local_absolute_path = "leaf",
                       in_mpapers_local_absolute_path = "leaf",
@@ -228,16 +232,21 @@ thing_name_hierarchy = {
                     in_cache_local_absolute_path = {
                       in_hs_cache_local_absolute_path = {
                         in_cache_export_local_absolute_path = {
-                          telegram_export_dir = "leaf",
-                          discord_export_dir = "leaf",
-                          facebook_export_dir = "leaf",
-                          signal_export_dir = "leaf",
+                          export_dir = {
+                            telegram_export_dir = "leaf",
+                            discord_export_dir = "leaf",
+                            facebook_export_dir = "leaf",
+                            signal_export_dir = "leaf",
+                          },
                           discord_export_child_dir = "leaf",
                         }
                       }
                       
                     },
-                    in_tmp_local_absolute_path = "leaf",
+                    in_tmp_local_absolute_path = {
+                      git_tmp_log_dir = "leaf",
+                      mpv_tmp_log_dir = "leaf",
+                    },
                   },
                   in_global_tmp_path = {
                     ipc_socket_path = "leaf"
@@ -538,7 +547,8 @@ thing_name_hierarchy = {
                                     client_id = "leaf",
                                     client_project_kind = "leaf",
                                     billing_unit = "leaf",
-                                    markdown_extension_name = "leaf"
+                                    markdown_extension_name = "leaf",
+                                    backup_type = "leaf"
                                   },
                                   mixed_strict_snake_case = {
                                     camel_strict_snake_case = {
@@ -640,7 +650,7 @@ thing_name_hierarchy = {
       },
     },
     table = {
-      only_int_key_table = {
+      only_pos_int_key_table = {
         arr = { 
           dcmp_name_seq = {
             cont_dcmp_name_seq = {
@@ -708,15 +718,17 @@ thing_name_hierarchy = {
         prompt_args_spec = {
           str_prompt_args_spec = "leaf",
         },
-        interval_specifier = {
-          number_interval_specifier = {
-            int_interval_specifier = {
-              timestamp_s_interval_specifier = {
-                timestamp_s_sequence_specifier = "leaf",
-              },
-            }
+        cut_specifier = {
+          interval_specifier = {
+            number_interval_specifier = {
+              int_interval_specifier = {
+                timestamp_s_interval_specifier = {
+                  timestamp_s_sequence_specifier = "leaf",
+                },
+              }
+            },
+            sequence_specifier = "leaf",
           },
-          sequence_specifier = "leaf",
         },
         gpt_response_table = "leaf",
         iban_data_spec = "leaf", 
@@ -806,7 +818,13 @@ thing_name_hierarchy = {
         total_cost_specifier = "leaf",
         price_specifier = "leaf",
         msg_spec = "leaf",
-        path_key_haver = "leaf"
+        path_key_haver = "leaf",
+        location_log_spec = {
+          old_location_log_spec = "leaf",
+        },
+        timestamp_ms_key_haver = {
+          media_log_spec = "leaf",
+        }
       }
     },
     primitive = {
@@ -888,7 +906,7 @@ thing_name_hierarchy = {
 
 -- add array versions of all other types
 
-thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr =
+thing_name_hierarchy.any.table.only_pos_int_key_table.arr.any_arr =
   transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
     thing_name_hierarchy.any, 
     function (k)
@@ -896,7 +914,7 @@ thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr =
     end
   )
 
-thing_name_hierarchy.any.table.only_int_key_table.arr.mult_anys__arr =
+thing_name_hierarchy.any.table.only_pos_int_key_table.arr.mult_anys__arr =
   transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
     thing_name_hierarchy.any, 
     function (k)
@@ -906,17 +924,17 @@ thing_name_hierarchy.any.table.only_int_key_table.arr.mult_anys__arr =
 
 -- add nested array versions of all other types (for now, this level of nesting is what we'll leave it at)
 
-thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr.any_arr_arr = 
+thing_name_hierarchy.any.table.only_pos_int_key_table.arr.any_arr.table_arr.only_pos_int_key_table_arr.arr_arr.any_arr_arr = 
   transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
-    thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr, 
+    thing_name_hierarchy.any.table.only_pos_int_key_table.arr.any_arr, 
     function (k)
       return k .. "_arr"
     end
   )
 
-thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr.table_arr.only_int_key_table_arr.arr_arr.mult_anys__arr_arr =
+thing_name_hierarchy.any.table.only_pos_int_key_table.arr.any_arr.table_arr.only_pos_int_key_table_arr.arr_arr.mult_anys__arr_arr =
   transf.table.table_by_mapped_nested_w_kt_arg_kt_ret_fn_only_primitive_is_leaf(
-    thing_name_hierarchy.any.table.only_int_key_table.arr.any_arr, 
+    thing_name_hierarchy.any.table.only_pos_int_key_table.arr.any_arr, 
     function (k)
       return k .. "__arr"
     end
