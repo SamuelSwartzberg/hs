@@ -99,7 +99,7 @@ act = {
   },
   sha256_hex_str = {
     add_tags_to_hydrus_item = function(str)
-      dothis.sha256_hex_str_arr.add_tags_to_hydrus_item({str})
+      act.sha256_hex_str_arr.add_tags_to_hydrus_item({str})
     end,
   },
   hs_geometry_size_like = {
@@ -298,6 +298,8 @@ act = {
         transf.local_image_file.multiline_str_by_qr_data(path)
       )
     end,
+  },
+  local_hydrusable_file ={
     add_to_hydrus_by_path = function(path, do_after)
       rest({
         api_name = "hydrus",
@@ -314,27 +316,7 @@ act = {
         end
       end)
     end,
-    --- implements smart adding of image files to hydrus
-    --- caveat: must be images in danbooru or similar enough to images that might be found in danbooru
-    --- - all type of art should work
-    --- - real life photos mostly work
-    --- - screenshots etc. don't work
-    --- - physical documents don't really work
-    add_to_hydrus_by_path_or_url = function(path)
-      local booru_url = transf.local_image_file.booru_post_url(path)
-      if booru_url then
-        --- if there's a booru post url, the only thing we will take from the filename is the date
-        local date = transf.path.path_leaf_specifier_or_nil(path).rfc3339like_dt_o_interval
-        dothis.booru_post_url.add_to_hydrus(
-          booru_url,
-          { "date:" .. date }
-        )
-      else
-        --- else, we have multiple sources of knowledge for tags
-        --- - the filename
-        --- - ai tags
-      end
-    end
+    
   },
 
   otp_url = {

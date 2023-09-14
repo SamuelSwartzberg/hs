@@ -77,7 +77,7 @@ dothis = {
     end,
   },
   sha256_hex_str = {
-    add_tags_to_hydrus_item = function(str, str_arr)
+    add_tags_to_hydrus_item = function(str, str_arr, do_after)
       rest({
         api_name = "hydrus",
         endpoint = "add_tags/add_tags",
@@ -88,7 +88,7 @@ dothis = {
           }
         },
         request_verb = "POST",
-      })
+      }, do_after)
     end,
   },
   booru_post_url = {
@@ -1018,14 +1018,6 @@ dothis = {
         name
       )
     end,
-    add_to_hydrus_by_path = function(path, str_arr)
-      act.local_image_file.add_to_hydrus_by_path(
-        path,
-        function(hash)
-          dothis.sha256_hex_str.add_tags_to_hydrus_item(hash, str_arr)
-        end
-      )
-    end,
     add_to_hydrus_by_url = function(path, str_arr)
       local booru_url = transf.local_image_file.booru_post_url(path)
       if booru_url then
@@ -1035,6 +1027,46 @@ dothis = {
         )
       end
     end,
+  },
+  local_hydrusable_file = {
+    add_to_hydrus_by_path = function(path, str_arr, do_after)
+      act.local_hydrusable_file.add_to_hydrus_by_path(
+        path,
+        function(hash)
+          dothis.sha256_hex_str.add_tags_to_hydrus_item(hash, str_arr, function()
+            do_after(hash)
+          end)
+        end
+      )
+    end,
+    --- implements smart adding of image files to hydrus
+    --- caveat: must be images in danbooru or similar enough to images that might be found in danbooru
+    --- - all type of art should work
+    --- - real life photos mostly work
+    --- - screenshots etc. don't work
+    --- - physical documents don't really work
+    add_to_hydrus_by_path_or_url = function(path, use_ai_tags)
+      local booru_url
+      local is_image = is.local_file.local_image_file(path)
+      if is_image then
+        booru_url = transf.local_image_file.booru_post_url(path)
+      end
+      if booru_url then
+        --- if there's a booru post url, the only thing we will take from the filename is the date
+        local date = transf.path.path_leaf_specifier_or_nil(path).rfc3339like_dt_o_interval
+        dothis.booru_post_url.add_to_hydrus(
+          booru_url,
+          { "date:" .. date }
+        )
+      else
+        dothis.local_hydrusable_file.add_to_hydrus_by_path(
+          path,
+          transf.local_file.line_arr_by_file_tags(path),
+          act.sha256_hex_str.add_tags_to_hydrus_item
+        )
+        --- - ai tags
+      end
+    end
   },
   local_zip_file = {
     unzip_to_absolute_path = function(path, tgt)

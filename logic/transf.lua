@@ -791,8 +791,13 @@ transf = {
       if pspec_tags then
         return pspec_tags
       else -- extract tags from non-standartized filename (uses gpt)
+        local date = transf.str.rfc3339like_dt_by_guess_gpt(
+          transf.path.leaflike_by_filename(path)
+        )
         -- 1. data for series
+        get.n_shot_llm_spec.str_or_nil_by_response({
 
+        })
         -- 2. data for creator etc.
 
         -- 3. data for metadata
@@ -1231,6 +1236,7 @@ transf = {
         notz = get.str.str_by_replaced_w_ascii_str(notz, " ", "T")
         res[1] = {"date", notz}
       end
+      error("todo")
       return res
     end,
     two_lines__arr_arr_by_file_tags = function(path)
@@ -1239,6 +1245,11 @@ transf = {
         transf.path.two_lines__arr_arr_by_filename_tags(path)
       )
     end,
+    line_arr_by_file_tags = function(path)
+      return transf.two_lines_arr__arr.line_arr_by_booru_namespaced_tag_smart(
+        transf.local_file.two_lines__arr_arr_by_file_tags(path)
+      )
+    end
   },
   local_file_arr = {
     single_attachment_str_arr = function(path_arr)
@@ -4091,7 +4102,21 @@ transf = {
       return " <<EOF\n" .. str .. "\nEOF"
     end,
     rfc3339like_dt_by_guess_gpt = function(str)
-      return get.n_shot_llm_spec.str_or_nil_by_response({input = str, query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified."})
+      return get.n_shot_llm_spec.str_or_nil_by_response({
+        input = str, 
+        query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified.", 
+        shots = {
+          {"IMG_20221115_183659759_HDR", "2022-21-15T18:36:59"},
+          {"Screenshot_20081130-230925", "2008-11-30T23:09:25"},
+          {"Screen Recording 2022-01-31 at 13.42.51", "2022-01-31T13:42:51"},
+          {"2019--art_drafts.md", "2019"},
+          {"20020803034034875.jpg", "2002-08-03T03:40:34"},
+          {"2016111518_O7N1BEKrNTWTIgr33xRS5xCT", "2016-11-15T18"},
+          {"com.apple.finder__20150218.324_manifest", "2015-02-18T03:24"},
+          {"Yotsuba&! - 13 - 08 - 10", "IMPOSSIBLE"}
+
+        }
+      })
     end,
     raw_contact_or_nil = function(searchstr)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("khard show --format=yaml " .. searchstr )
@@ -4573,7 +4598,7 @@ transf = {
       end
     end,
   },
-  two_line_arr__arr = {
+  two_lines_arr__arr = {
     line_arr_by_booru_namespaced_tag_smart = function(arr)
       return get.arr.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
         arr,
