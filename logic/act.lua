@@ -84,13 +84,22 @@ act = {
     end,
   },
   booru_post_url = {
-    add_to_local = function(url)
-      rest({
-        api_name = "hydrus",
-        endpoint = "add_urls/add_url",
-        request_table = { url = url },
-        request_verb = "POST",
-      })
+    add_to_hydrus = function(url, do_after)
+      dothis.booru_post_url.add_to_hydrus(url, nil, do_after)
+    end,
+  },
+  sha256_hex_str_arr = {
+    add_tags_to_hydrus_item = function(arr)
+      dothis.str.env_bash_eval_async(
+        "hydrus_add_tags" .. transf.str.here_doc(
+          transf.str_arr.multiline_str(arr)
+        )
+      )
+    end,
+  },
+  sha256_hex_str = {
+    add_tags_to_hydrus_item = function(str)
+      dothis.sha256_hex_str_arr.add_tags_to_hydrus_item({str})
     end,
   },
   hs_geometry_size_like = {
@@ -289,7 +298,45 @@ act = {
         transf.local_image_file.multiline_str_by_qr_data(path)
       )
     end,
+    add_to_hydrus_by_path = function(path, do_after)
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_files/add_file",
+        request_table = { path = path },
+        request_verb = "POST",
+      }, function(res)
+        if res.status ~= 1 then
+          error("Hydrus error, failed to add. Status: " .. res.status, 0)
+        else
+          if do_after then
+            do_after(res.hash)
+          end
+        end
+      end)
+    end,
+    --- implements smart adding of image files to hydrus
+    --- caveat: must be images in danbooru or similar enough to images that might be found in danbooru
+    --- - all type of art should work
+    --- - real life photos mostly work
+    --- - screenshots etc. don't work
+    --- - physical documents don't really work
+    add_to_hydrus_by_path_or_url = function(path)
+      local booru_url = transf.local_image_file.booru_post_url(path)
+      if booru_url then
+        --- if there's a booru post url, the only thing we will take from the filename is the date
+        local date = transf.path.path_leaf_specifier_or_nil(path).rfc3339like_dt_o_interval
+        dothis.booru_post_url.add_to_hydrus(
+          booru_url,
+          { "date:" .. date }
+        )
+      else
+        --- else, we have multiple sources of knowledge for tags
+        --- - the filename
+        --- - ai tags
+      end
+    end
   },
+
   otp_url = {
     add_otp_pass_item_with_prompted_name = function(url)
       local name = get.str.alphanum_minus_underscore_str_by_prompted_once_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
@@ -1051,7 +1098,7 @@ act = {
       local assoc = get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         files,
         function(fpath)
-          local rfc3339like_ymd = transf.path.path_leaf_specifier(fpath).rfc3339like_dt_o_interval
+          local rfc3339like_ymd = transf.path.path_leaf_specifier_or_nil(fpath).rfc3339like_dt_o_interval
           local ts = transf.rfc3339like_dt.timestamp_s_by_min(rfc3339like_ymd) * 1000
           return ts , {entry = transf.plaintext_file.str_by_contents(fpath), timestamp_ms = ts }
         end

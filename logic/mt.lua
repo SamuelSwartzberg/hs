@@ -111,6 +111,50 @@ ls = {
     "signal",
     "discord"
   },
+  booru_rating = {
+    "general",
+    "sensitive",
+    "safe", -- safe ≙ general or sensitive
+    "questionable",
+    "explicit"
+  },
+  danbooru_namespace = {
+    "artist",
+    "character",
+    "copyright",
+    "meta",
+    "general" 
+  },
+  hydrus_namespace = {
+    "character",
+    "creator",
+    "date",
+    "medium",
+    "meta",
+    "person",
+    "series",
+    "studio",
+    "general",
+    "title"
+  },
+  all_namespace = {
+    "artist",
+    "chapter_index",
+    "chapter_name",
+    "page_index",
+    "volume_index",
+    "character",
+    "copyright",
+    "creator",
+    "date",
+    "medium",
+    "meta",
+    "person",
+    "series",
+    "studio",
+    "general",
+    "title"
+  },
   csl_type = {
     "article",
     "article-journal",
@@ -310,7 +354,11 @@ ls = {
       "m4a",
       "wav",
       "webm"
-    }
+    },
+    hydrusable_file = {
+     "jpg",
+     -- todo
+    },
   
   },
   auth_processes = {

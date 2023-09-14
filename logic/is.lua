@@ -641,6 +641,9 @@ is = {
     git_sha1_hex_str = function(str)
       return #str >= 7 and #str <= 40
     end,
+    sha256_hex_str = function(str)
+      return #str == 64
+    end,
   },
   git_sha1_hex_str = {
     full_sha1_hex_str = function(str)
@@ -1156,6 +1159,12 @@ is = {
     maildir_file = function(path)
       return is.local_dir.maildir_dir(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path))
      end,
+    local_image_file = function(path)
+      return is.file.image_file(path)
+    end,
+    local_hydrusable_file = function(path)
+      return is.file.hydrusable_file(path)
+    end,
   },
   local_dir = {
     empty_local_dir = function(path)
@@ -1291,6 +1300,9 @@ is = {
     end,
     image_file = function(path)
       return get.path.bool_by_extension_group(path, "image")
+    end,
+    hydrusable_file = function(path)
+      return get.path.bool_by_extension_group(path, "hydrus")
     end,
     bin_file = function(path)
       return get.arr.bool_by_contains(ls.extension.bin, transf.path.extension_by_normalized(path))
@@ -1504,6 +1516,17 @@ is = {
     backup_type = function(str)
       return get.arr.bool_by_contains(ls.backup_type, str)
     end,
+    all_namespace = function(str)
+      return get.arr.bool_by_contains(ls.all_namespace, str)
+    end,
+  },
+  all_namespace = {
+    hydrus_namespace = function(str)
+      return get.arr.bool_by_contains(ls.hydrus_namespace, str)
+    end,
+    danbooru_namespace = function(str)
+      return get.arr.bool_by_contains(ls.danbooru_namespace, str)
+    end,
   },
   mixed_strict_snake_case = {
     camel_strict_snake_case = function(str)
@@ -1666,6 +1689,9 @@ is = {
     end,
     markdown_extension_set_name = function(str)
       return get.arr.bool_by_contains(ls.markdown_extension_set_name, str)
+    end,
+    booru_rating = function(str)
+      return get.arr.bool_by_contains(ls.booru_rating, str)
     end,
 
   },

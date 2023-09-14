@@ -586,6 +586,43 @@ tblmap = {
       }
     }
   },
+  lower_strict_snake_case = {
+    all_namespace = {
+      tcrea = "creator",
+      series = "series",
+      srs = "series",
+      char = "character",
+      title = "title",
+      date = "date",
+      ch = "chapter_index",
+      chname = "chapter_name",
+      page = "page_index",
+      vol = "volume_index",
+    },
+    lower_strict_snake_case_key_line_value_assoc = {
+      action = {
+        confession = "confession",
+        hairplay = "playing_with_another's_hair",
+        head_rest = "head_on_another's_shoulder",
+        hug = "hug",
+        headpat = "headpat",
+        breast_rub = "grabbing_another's_breast"
+
+      },
+      relationship = {
+        yuri = "yuri",
+      },
+      orig = {
+        orig = "original",
+      },
+      style = {
+        real = "realistic",
+      },
+      layout = {
+        manga_page = "comic"
+      }
+    }
+  },
   flag_profile_name ={
     lower_strict_kebap_case_key_bool_value_assoc = {
       foreground = {

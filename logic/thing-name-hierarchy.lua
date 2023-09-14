@@ -162,6 +162,7 @@ thing_name_hierarchy = {
                     empty_file = "leaf",
                     nonempty_file = "leaf",
                     image_file = "leaf",
+                    hydrusable_file = "leaf",
                     plaintext_file = { 
                       script_file = {
                         shell_script_file = {
@@ -278,6 +279,8 @@ thing_name_hierarchy = {
                       empty_local_file = "leaf",
                       nonempty_local_file = "leaf",
                       maildir_file = "leaf",
+                      local_image_file = "leaf",
+                      local_hydrusable_file = "leaf",
                     }
                   }
                 },
@@ -548,7 +551,11 @@ thing_name_hierarchy = {
                                     client_project_kind = "leaf",
                                     billing_unit = "leaf",
                                     markdown_extension_name = "leaf",
-                                    backup_type = "leaf"
+                                    backup_type = "leaf",
+                                    all_namespace = {
+                                      hydrus_namespace = "leaf",
+                                      danbooru_namespace = "leaf",
+                                    }
                                   },
                                   mixed_strict_snake_case = {
                                     camel_strict_snake_case = {
@@ -580,6 +587,7 @@ thing_name_hierarchy = {
                                   stream_state = "leaf",
                                   flag_profile_name = "leaf",
                                   markdown_extension_set_name = "leaf",
+                                  booru_rating = "leaf",
                                 },
                                 iso_3366_1_alpha_2_country_code = "leaf",
                                 iso_3366_1_alpha_3_country_code = "leaf",

@@ -76,6 +76,37 @@ dothis = {
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("khard edit " .. uuid, do_after or function() end)
     end,
   },
+  sha256_hex_str = {
+    add_tags_to_hydrus_item = function(str, str_arr)
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_tags/add_tags",
+        request_table = { 
+          hash = str,
+          service_keys_to_tags = {
+            ["6c6f63616c2074616773"] = str_arr
+          }
+        },
+        request_verb = "POST",
+      })
+    end,
+  },
+  booru_post_url = {
+    add_to_hydrus = function(url, str_arr, do_after)
+      local request_table = { url = url }
+      if str_arr then
+        request_table.service_keys_to_additional_tags = {
+          ["6c6f63616c2074616773"] = str_arr
+        }
+      end
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_urls/add_url",
+        request_table = request_table,
+        request_verb = "POST",
+      }, do_after)
+    end,
+  },
   pass_item_name = {
     replace = function(name, type, data)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("pass rm " .. type .. "/" .. name, function()
@@ -981,21 +1012,28 @@ dothis = {
     end
   },
   local_image_file = {
-    add_hs_image_to_clipboard = function(path)
-      dothis.hs_image.add_to_clipboard(
-        transf.local_image_file.hs_image(path)
-      )
-    end,
-    paste_hs_image = function(path)
-      dothis.hs_image.paste(
-        transf.local_image_file.hs_image(path)
-      )
-    end,
     add_as_otp = function(path, name)
       dothis.otp_url.add_otp_pass_item(
         transf.local_image_file.multiline_str_by_qr_data(path),
         name
       )
+    end,
+    add_to_hydrus_by_path = function(path, str_arr)
+      act.local_image_file.add_to_hydrus_by_path(
+        path,
+        function(hash)
+          dothis.sha256_hex_str.add_tags_to_hydrus_item(hash, str_arr)
+        end
+      )
+    end,
+    add_to_hydrus_by_url = function(path, str_arr)
+      local booru_url = transf.local_image_file.booru_post_url(path)
+      if booru_url then
+        act.booru_post_url.add_to_hydrus(
+          booru_url,
+          str_arr
+        )
+      end
     end,
   },
   local_zip_file = {

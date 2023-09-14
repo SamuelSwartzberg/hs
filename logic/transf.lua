@@ -647,11 +647,11 @@ transf = {
       return get.str.str_by_formatted_w_n_anys("%%%02X", transf.ascii_char.halfbyte_pos_int(char))
     end,
   },
-  leaf = {
-    rfc3339like_dt_or_interval_general_name_fs_tag_str = function(leaf)
+  leaflike = {
+    rfc3339like_dt_or_interval_general_name_fs_tag_str_or_nil = function(leaf)
       return get.str.n_strs_by_extracted_onig(
         leaf,
-        ("^(%s(?:_to_%s)?--)?([^%%]*)(%%.*)?$"):format(
+        ("^(%s(?:_to_%s)?--)([a-z0-9_]*)(%%[-a-z0-9_%%]+)?$"):format(
           r.g.rfc3339like_dt,
           r.g.rfc3339like_dt
         )
@@ -766,15 +766,48 @@ transf = {
         transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path)
       )
     end,
-    path_leaf_specifier = function(path)
-      local rfc3339like_dt_or_interval, general_name, fs_tag_str = transf.leaf.rfc3339like_dt_or_interval_general_name_fs_tag_str(transf.path.leaflike_by_leaf(path))
-      return {
-        extension = transf.path.extension(path),
-        path = transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path),
-        rfc3339like_dt_o_interval = rfc3339like_dt_or_interval,
-        general_name = general_name,
-        lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = transf.fs_tag_str.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(fs_tag_str),
-      }
+    path_leaf_specifier_or_nil = function(path)
+      local rfc3339like_dt_or_interval, general_name, fs_tag_str = transf.leaflike.rfc3339like_dt_or_interval_general_name_fs_tag_str_or_nil(transf.path.leaflike_by_leaf(path))
+      if rfc3339like_dt_or_interval then
+        return {
+          extension = transf.path.extension(path),
+          path = transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path),
+          rfc3339like_dt_o_interval = rfc3339like_dt_or_interval,
+          general_name = general_name,
+          lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = transf.fs_tag_str.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(fs_tag_str),
+        }
+      end
+    end,
+    two_lines__arr_arr_or_nil_by_path_leaf_specifier_to_tag_pairs = function(path)
+      local pspc = transf.path.path_leaf_specifier_or_nil(path)
+      if pspc then
+        return transf.path_leaf_specifier.two_lines__arr_arr_by_tag_pairs(
+          pspc
+        )
+      end
+    end,
+    two_lines__arr_arr_by_filename_tags = function(path)
+      local pspec_tags = transf.path.two_lines__arr_arr_or_nil_by_path_leaf_specifier_to_tag_pairs(path)
+      if pspec_tags then
+        return pspec_tags
+      else -- extract tags from non-standartized filename (uses gpt)
+        -- 1. data for series
+
+        -- 2. data for creator etc.
+
+        -- 3. data for metadata
+      end
+    end,
+    two_lines__arr_arr_by_ancestor_path_tags = function(path)
+      local res = {}
+      -- todo
+      return res
+    end,
+    two_lines__arr_arr_by_path_tags = function(path)
+      return transf.two_arrs.arr_by_appended(
+        transf.path.two_lines__arr_arr_by_filename_tags(path),
+        transf.path.two_lines__arr_arr_by_ancestor_path_tags(path)
+      )
     end,
     window_by_with_leaf_as_title = function(path)
       return transf.str.window_or_nil_by_title(transf.path.leaflike_by_leaf(path))
@@ -1057,7 +1090,7 @@ transf = {
       return get.arr.arr_by_filtered(path_arr, is.path.not_useless_file_leaf_path)
     end,
     path_leaf_specifier_arr = function(path_arr)
-      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.path_leaf_specifier)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.path_leaf_specifier_or_nil)
     end,
     timestamp_s_interval_specifier_arr = function(path_arr)
       return transf.path_leaf_specifier_arr.timestamp_s_interval_specifier_arr(
@@ -1138,7 +1171,7 @@ transf = {
       return transf.plaintext_file_arr.url_or_local_path_arr_by_m3u_file_content_lines(
         transf.file_arr.plaintext_file_arr_by_filter(path_arr)
       )
-    end
+    end,
   },
   labelled_remote_dir = {
     absolute_path_arr_by_children = function(remote_extant_path)
@@ -1185,6 +1218,27 @@ transf = {
         non_inline_attachment_local_file_arr = {path}
       }
     end,
+    assoc_by_exiftool_info = function(path)
+      return transf.local_image_file_arr.assoc_arr_by_exiftool_info(
+        {path}
+      )[1]
+    end,
+    two_lines__arr_arr_by_exif_metadata = function(path)
+      local exifassoc = transf.local_file.assoc_by_exiftool_info(path)
+      local res = {}
+      if exifassoc.CreationDate then
+        local notz = get.str.n_strs_by_extracted_onig_str(exifassoc.CreationDate, "^(^\\+)+")
+        notz = get.str.str_by_replaced_w_ascii_str(notz, " ", "T")
+        res[1] = {"date", notz}
+      end
+      return res
+    end,
+    two_lines__arr_arr_by_file_tags = function(path)
+      return transf.two_arr_or_nils.arr(
+        transf.local_file.two_lines__arr_arr_by_exif_metadata(path),
+        transf.path.two_lines__arr_arr_by_filename_tags(path)
+      )
+    end,
   },
   local_file_arr = {
     single_attachment_str_arr = function(path_arr)
@@ -1197,6 +1251,11 @@ transf = {
       return {
         non_inline_attachment_local_file_arr = path_arr
       }
+    end,
+    assoc_arr_by_exiftool_info = function(path_arr)
+      transf.str.table_or_err_by_evaled_env_bash_parsed_json(
+        "exiftool -j --all " .. transf.str_arr.str_arr_by_mapped_single_quoted_escaped(path_arr)
+      )
     end,
   },
   labelled_remote_file = {
@@ -1320,7 +1379,7 @@ transf = {
       )
     end,
     path_leaf_specifier_by_using_union_rfc3339like_dt_or_interval = function(path)
-      local path_leaf_specifier = transf.path.path_leaf_specifier(path)
+      local path_leaf_specifier = transf.path.path_leaf_specifier_or_nil(path)
       local union_rfc3339like_dt_or_interval = transf.dir.rfc3339like_dt_o_interval_by_union_of_children(path)
       if union_rfc3339like_dt_or_interval then
         path_leaf_specifier.rfc3339like_dt_o_interval = union_rfc3339like_dt_or_interval
@@ -1555,6 +1614,16 @@ transf = {
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(path_leaf_specifier)
       return path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc
     end,
+    lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc_by_supplemented = function(path_leaf_specifier)
+      local assoc = transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(path_leaf_specifier)
+      assoc.date = transf.path_leaf_specifier.rfc3339like_dt_or_interval
+      assoc.title = assoc.title or path_leaf_specifier.general_name
+    end,
+    two_line__arr_arr_by_fs_tags = function(path_leaf_specifier)
+      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.two_line__arr_arr_by_fs_tags(
+        transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc_by_supplemented(path_leaf_specifier)
+      )
+    end,
     lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = function(path_leaf_specifier)
       return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
     end,
@@ -1635,23 +1704,56 @@ transf = {
     end,
   },
   lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = {
-    lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+    lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc = function(assoc)
       return hs.fnutils.map(
-        lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc,
+        assoc,
         transf.any.join_if_arr
       )
     end,
-    fs_tag_kv_arr = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+    fs_tag_kv_arr = function(assoc)
       return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc.fs_tag_kv_arr(
-        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.lower_alphanum_underscore_key_lower_alphanum_underscore_comma_value_assoc(assoc)
       )
     end,
-    fs_tag_str = function(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+    fs_tag_str = function(assoc)
       return transf.fs_tag_kv_arr.fs_tag_str(
-        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_kv_arr(lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc)
+        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.fs_tag_kv_arr(assoc)
       )
     end,
-  },
+    lower_alphanum_underscore_key_line_or_line_arr_value_assoc_by_rename_filter_namespace = function(assoc)
+      local res = {}
+      for k, v in transf.table.stateless_key_value_iter(assoc) do
+        local namespace = tblmap.lower_strict_snake_case.all_namespace[k]
+        if namespace then
+          res[namespace] = v
+        else
+          local booru_equivalent = tblmap.lower_strict_snake_case.lower_strict_snake_case_key_line_value_assoc[k][v]
+          if booru_equivalent then
+            res.general = res.general or {}
+            dothis.arr.push(res.general, booru_equivalent)
+          end
+        end
+      end
+    end,
+    two_lower_alphanum_underscores__arr_arr = function(assoc)
+      local res = {}
+      for k, v in transf.table.stateless_key_value_iter(assoc) do
+        if is.any.arr(v) then
+          for _, v2 in transf.arr.pos_int_vt_stateless_iter(v) do
+            act.arr.push(res, {k, v2})
+          end
+        else
+          act.arr.push(res, {k, v})
+        end
+      end
+      return res
+    end,
+    two_line__arr_arr_by_rename_filter_namespace = function(assoc)
+      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.two_lower_alphanum_underscores__arr_arr(
+        transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.lower_alphanum_underscore_key_line_or_line_arr_value_assoc_by_rename_filter_namespace(assoc)
+      )
+    end,
+    },
   path_leaf_specifier_arr = {
     path_leaf_specifier_key_timestamp_s_interval_specifier_value_assoc = function(arr)
       return get.table.table_by_mapped_w_kt_arg_kt_vt_ret_fn(
@@ -1726,6 +1828,38 @@ transf = {
       local ext = transf.path.extension(path)
       return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
     end,
+    multiline_str_by_local_ai_tags = function (path)
+      return get.fn.rt_or_nil_by_memoized(
+        transf.str.str_or_nil_by_evaled_env_bash_stripped,
+        nil,
+        "transf.str.str_or_nil_by_evaled_env_bash_stripped"
+    )
+      (
+        "hydrus_get_tags " .. transf.str.str_by_single_quoted_escaped(path)
+      )
+    end,
+    booru_rating_by_local_ai = function(path)
+      return get.str.n_strs_by_extracted_onig(
+        transf.local_image_file.multiline_str_by_local_ai_tags(path),
+        "\nrating: ([^\n]+)\n"
+      )
+    end,
+    line_by_local_ai_tags = function(path)
+      return get.str.n_strs_by_extracted_onig(
+        transf.local_image_file.multiline_str_by_local_ai_tags(path),
+        "tags: ([^\n]+)\n"
+      )
+    end,
+    line_arr_by_local_ai_tags = function(path)
+      return get.str.str_arr_by_split_w_ascii_char(
+        transf.local_image_file.line_by_local_ai_tags(path),
+        ","
+      )
+    end,
+    
+  },
+  local_image_file_arr = {
+
   },
   maildir_file = {
     decoded_email_header_block_by_all = function(path)
@@ -4427,6 +4561,28 @@ transf = {
       return l1 .. " = " .. l2
     end,
   },
+  two_lines = {
+    line_by_booru_namespaced_tag_every = function(s1, s2)
+      return s1 .. ":" .. s2
+    end,
+    line_by_booru_namespaced_tag_smart = function(s1, s2)
+      if s1 == "global" then
+        return s2
+      else
+        return s1 .. ":" .. s2
+      end
+    end,
+  },
+  two_line_arr__arr = {
+    line_arr_by_booru_namespaced_tag_smart = function(arr)
+      return get.arr.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        arr,
+        function(arr)
+          return transf.two_lines.line_by_booru_namespaced_tag_smart(arr[1], arr[2])
+        end
+      )
+    end,
+  },
   str_key_str_value_assoc = {
     ini_kv_line_arr = function(str_key_str_value_assoc)
       return get.table.arr_by_mapped_w_kt_vt_arg_vt_ret_fn(
@@ -4440,6 +4596,7 @@ transf = {
         "\n"
       )
     end,
+
   },
   two_operational_comparables = {
     operational_comparable_by_larger = function(a, b)
