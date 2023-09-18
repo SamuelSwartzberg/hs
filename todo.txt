@@ -53,3 +53,5 @@ post 'stuff is implemented':
     - more memoization
     - more item cache
   - clean up android
+after new computer:
+  - set up windows virtualized env, transfer stuff from my windows laptop over there

@@ -254,6 +254,7 @@ tblmap = {
       hydrus = "127.0.0.1:45869",
       httpbin = "httpbin.org",
       google = "www.googleapis.com",
+      osm = "nominatim.openstreetmap.org",
     },
     scheme = {
       hydrus = "http://",
@@ -595,9 +596,15 @@ tblmap = {
       title = "title",
       date = "date",
       ch = "chapter_index",
-      chname = "chapter_name",
+      chname = "chapter_title",
       page = "page_index",
       vol = "volume_index",
+      purpose = "purpose",
+      general = "general",
+      g = "general",
+      person = "person",
+      medium = "medium",
+      occ = "occassion",
     },
     lower_strict_snake_case_key_line_value_assoc = {
       action = {
@@ -606,8 +613,10 @@ tblmap = {
         head_rest = "head_on_another's_shoulder",
         hug = "hug",
         headpat = "headpat",
-        breast_rub = "grabbing_another's_breast"
-
+        breast_rub = "grabbing_another's_breast",
+        breast_grab = "grabbing_another's_breast",
+        penetration = "sex",
+        masturbation = "masturbation",
       },
       relationship = {
         yuri = "yuri",
@@ -620,7 +629,7 @@ tblmap = {
       },
       layout = {
         manga_page = "comic"
-      }
+      },
     }
   },
   flag_profile_name ={

@@ -118,13 +118,6 @@ ls = {
     "questionable",
     "explicit"
   },
-  danbooru_namespace = {
-    "artist",
-    "character",
-    "copyright",
-    "meta",
-    "general" 
-  },
   hydrus_namespace = {
     "character",
     "creator",
@@ -138,13 +131,11 @@ ls = {
     "title"
   },
   all_namespace = {
-    "artist",
     "chapter_index",
-    "chapter_name",
+    "chapter_title",
     "page_index",
     "volume_index",
     "character",
-    "copyright",
     "creator",
     "date",
     "medium",
@@ -153,6 +144,43 @@ ls = {
     "series",
     "studio",
     "general",
+    "capturing_device",
+    "capturing_device_manufacturer",
+    "title",
+    "subreddit",
+    "uploader",
+    "creation_context",
+    "season",
+    "concept",
+    "lat",
+    "lon",
+    "country",
+    "city",
+    "occasion",
+    "use_as"
+  },
+  edu_type = {
+    "kindergarden",
+    "school",
+    "uni"
+  },
+  my_edu_venue = {
+    "tu",
+    "hu",
+    "fu",
+    "ur"
+
+  },
+  series_namespace = {
+    "chapter_index",
+    "chapter_title",
+    "page_index",
+    "volume_index",
+    "season",
+    "series",
+    "character",
+    "creator",
+    "studio",
     "title"
   },
   csl_type = {

@@ -66,7 +66,10 @@ act = {
     subscribe_to_calendar = function(url)
       local pair_spec = transf.url.vdirsyncer_pair_specifier(url)
       act.vdirsyncer_pair_specifier.write_to_config(pair_spec)
-    end
+    end,
+    add_to_hydrus = function(url, do_after)
+      dothis.url.add_to_hydrus(url, {"date:"..transf["nil"].full_rfc3339like_dt_by_current()}, do_after)
+    end,
   },
   ics_file = {
     add_events_to_default_calendar = function(ics_file)
@@ -83,11 +86,6 @@ act = {
       )
     end,
   },
-  booru_post_url = {
-    add_to_hydrus = function(url, do_after)
-      dothis.booru_post_url.add_to_hydrus(url, nil, do_after)
-    end,
-  },
   sha256_hex_str_arr = {
     add_tags_to_hydrus_item = function(arr)
       dothis.str.env_bash_eval_async(
@@ -98,7 +96,7 @@ act = {
     end,
   },
   sha256_hex_str = {
-    add_tags_to_hydrus_item = function(str)
+    add_tags_to_hydrus_item_by_ai_tags = function(str)
       act.sha256_hex_str_arr.add_tags_to_hydrus_item({str})
     end,
   },
@@ -318,7 +316,26 @@ act = {
     end,
     
   },
-
+  hydrus_noai_proc_dir = {
+    add_all_to_hydrus = function(path)
+      local files = transf.extant_path.file_arr_by_descendants(path)
+      dothis.arr.each(
+        files,
+        dothis.local_hydrusable_file.add_to_hydrus_by_path_or_url
+      )
+    end
+  },
+  hydrus_ai_proc_dir = {
+    add_all_to_hydrus = function(path)
+      local files = transf.extant_path.file_arr_by_descendants(path)
+      dothis.arr.each(
+        files,
+        function(file)
+          dothis.local_hydrusable_file.add_to_hydrus_by_path_or_url(file, true)
+        end
+      )
+    end
+  },
   otp_url = {
     add_otp_pass_item_with_prompted_name = function(url)
       local name = get.str.alphanum_minus_underscore_str_by_prompted_once_from_default("", "Enter a name for the pass OTP item (alphanum minus underscore only):")
@@ -597,6 +614,13 @@ act = {
         ].create_inner_item(spec),
         creation_specifier = spec,
       }
+    end,
+  },
+  local_svg_file = {
+    to_png_in_cache = function(path)
+      dothis.local_svg_file.to_png(
+        path,
+        transf.local_svg_file.local_absolute_path_by_png_in_cache(path)      )
     end,
   },
   created_item_specifier = {

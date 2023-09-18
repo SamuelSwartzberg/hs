@@ -224,6 +224,8 @@ thing_name_hierarchy = {
                     in_home_proc_local_absolute_path = {
                       old_location_logs_proc_dir = "leaf",
                       old_media_logs_proc_dir = "leaf",
+                      hydrus_noai_proc_dir = "leaf",
+                      hydrus_ai_proc_dir = "leaf",
                     },
                     in_me_local_absolute_path = {
                       in_mcitations_local_absolute_path = "leaf",
@@ -279,7 +281,9 @@ thing_name_hierarchy = {
                       empty_local_file = "leaf",
                       nonempty_local_file = "leaf",
                       maildir_file = "leaf",
-                      local_image_file = "leaf",
+                      local_image_file = {
+                        loca_svg_fie = "leaf",
+                      },
                       local_hydrusable_file = "leaf",
                     }
                   }
@@ -554,7 +558,6 @@ thing_name_hierarchy = {
                                     backup_type = "leaf",
                                     all_namespace = {
                                       hydrus_namespace = "leaf",
-                                      danbooru_namespace = "leaf",
                                     }
                                   },
                                   mixed_strict_snake_case = {
@@ -698,6 +701,10 @@ thing_name_hierarchy = {
             hotkey_created_item_specifier = "leaf",
             watcher_created_item_specifier = "leaf",
           }
+        },
+        geojson_obj = {
+          geojson_feature_collection = "leaf",
+          geojson_feature = "leaf",
         },
         creation_specifier = {
           watcher_creation_specifier = "leaf",

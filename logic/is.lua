@@ -1063,10 +1063,16 @@ is = {
   },
   in_home_proc_local_absolute_path = {
     old_location_logs_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/old_location_logs/"
+      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/old/location_logs/"
     end,
     old_media_logs_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/old_media_logs/"
+      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/old/media_logs/"
+    end,
+    hydrus_noai_proc_dir = function(path)
+      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/hydrus/noai/"
+    end,
+    hydrus_ai_proc_dir = function(path)
+      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/hydrus/ai/"
     end,
   },
   in_downloads_local_absolute_path = {
@@ -1164,6 +1170,11 @@ is = {
     end,
     local_hydrusable_file = function(path)
       return is.file.hydrusable_file(path)
+    end,
+  },
+  local_image_file = {
+    local_svg_file = function(path)
+      return get.str.bool_by_endswith(path, ".svg")
     end,
   },
   local_dir = {
@@ -1523,9 +1534,6 @@ is = {
   all_namespace = {
     hydrus_namespace = function(str)
       return get.arr.bool_by_contains(ls.hydrus_namespace, str)
-    end,
-    danbooru_namespace = function(str)
-      return get.arr.bool_by_contains(ls.danbooru_namespace, str)
     end,
   },
   mixed_strict_snake_case = {
@@ -2313,9 +2321,12 @@ is = {
       return
         t.device and t.subtype
     end,
+    geojson_obj = function(t)
+      return
+        t.type
+    end,
     csl_table = function(t)
       return
-       
     end,
     input_spec = function(t)
       return
@@ -2482,6 +2493,14 @@ is = {
       return t.timestamp_ms
     end,
     
+  },
+  geojson_obj = {
+    geojson_feature_collection = function(t)
+      return t.type == "FeatureCollection"
+    end,
+    geojson_feature = function(t)
+      return t.type == "Feature"
+    end,
   },
   timestamp_ms_key_haver = {
     media_log_spec = function(t)

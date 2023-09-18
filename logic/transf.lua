@@ -781,8 +781,18 @@ transf = {
     two_lines__arr_arr_or_nil_by_path_leaf_specifier_to_tag_pairs = function(path)
       local pspc = transf.path.path_leaf_specifier_or_nil(path)
       if pspc then
-        return transf.path_leaf_specifier.two_lines__arr_arr_by_tag_pairs(
+        return transf.path_leaf_specifier.two_lines__arr_arr_by_fs_tags(
           pspc
+        )
+      end
+    end,
+    rfc3339like_dt_or_nil_by_filename = function(path)
+      local pspc = transf.path.path_leaf_specifier_or_nil(path)
+      if pspc then
+        return pspc.rfc3339like_dt_o_interval
+      else
+        return transf.str.rfc3339like_dt_or_nil_by_guess_gpt(
+          transf.path.leaflike_by_filename(path)
         )
       end
     end,
@@ -791,22 +801,88 @@ transf = {
       if pspec_tags then
         return pspec_tags
       else -- extract tags from non-standartized filename (uses gpt)
-        local date = transf.str.rfc3339like_dt_by_guess_gpt(
-          transf.path.leaflike_by_filename(path)
-        )
+        local filename = transf.path.leaflike_by_filename(path)
         -- 1. data for series
-        get.n_shot_llm_spec.str_or_nil_by_response({
-
-        })
-        -- 2. data for creator etc.
+        local series_pairs = get.all_namespace_arr.two_lines__arr_arr(
+          ls.series_namespace,
+          filename,
+          {
+            {"Screenshot 2023-09-15 at 14.55.23", "[]"},
+            {"Adachi to Shimamura - Ch.28 - Shimamura's Sword - 8", '[["series", "Adachi to Shimamura"], ["chapter_index", "28"], ["chapter_title", "Shimamura\'s Sword"], ["page_index", "8"]]'},
+            {"Tatoe Todokanu Ito da to Shite mo - Chapter 01 - 32", '[["series", "Tatoe Todokanu Ito da to Shite mo"], ["chapter_index", "01"], ["page_index", "32"]]'},
+            {"The Real Momoka - by Arai Sumiko - 17", '[["series", "The Real Momoka"], ["creator", "Arai Sumiko"], ["page_index", "17"]]'},
+            {"__warrior_of_light_final_fantasy_and_1_more_drawn_by_d_rex__781a13c9a81ed223c83d9b65f4531b90", 'IMPOSSIBLE: Danbooru-like filename, should not be parsed because better solutions exist.'
+          }
+        )
+        local res = {}
+        if #series_pairs > 0 then
+          dothis.arr.push(res, {"general", "original"})
+        end
 
         -- 3. data for metadata
       end
     end,
     two_lines__arr_arr_by_ancestor_path_tags = function(path)
       local res = {}
-      -- todo
-      return res
+      local path_components =transf.path.path_component_arr_by_parent(path)
+      if get.arr.bool_by_contains(path_components, "android") then
+        dothis.arr.push(res, {"general", "android_(os)"})
+      end
+
+      if get.arr.bool_by_contains(path_components, "screenshots") then
+        dothis.arr.push(res, {"meta", "screenshot"})
+      end
+      if get.arr.bool_by_contains(path_components, "i_made_this") then
+        dothis.arr.push(res, {"creator", "me"})
+      end
+      if get.arr.bool_by_contains(path_components, "photography") or get.arr.bool_by_contains(path_components, "photos") then
+        dothis.arr.push(res, {"medium", "photography"})
+      end
+      if get.arr.bool_by_contains(path_components, "style_inspiration") then
+        dothis.arr.push(res, {"purpose", "inspiration"})
+        dothis.arr.push(res, {"inspiration_for", "style"})
+      end
+      if get.arr.bool_by_contains(path_components, "funny") then
+        dothis.arr.push(res, {"purpose", "funny"})
+      end
+      if get.arr.bool_by_contains(path_components, "receipts") then
+        dothis.arr.push(res, {"purpose", "official"})
+        dothis.arr.push(res, {"purpose", "receipt"})
+      end
+      if get.arr.bool_by_contains(path_components, "mark_of_ownership") then
+        dothis.arr.push(res, {"purpose", "official"})
+        dothis.arr.push(res, {"purpose", "mark_of_ownership"})
+      end
+      if get.arr.bool_by_contains(path_components, "voice") then
+        dothis.arr.push(res, {"medium", "voice_memo"})
+      end
+      if get.arr.bool_by_contains(path_components, "edu") then
+        dothis.arr.push(res, {"creation_context", "edu"})
+        
+        for _, edu_type in transf.arr.pos_int_vt_stateless_iter(ls.edu_type) do
+          if get.arr.bool_by_contains(path_components, edu_type) then
+            dothis.arr.push(res, {"edu_type", edu_type})
+          end
+        end
+        for _, edu_venue in transf.arr.pos_int_vt_stateless_iter(ls.my_edu_venue) do
+          if get.arr.bool_by_contains(path_components, edu_venue) then
+            dothis.arr.push(res, {"edu_venue", edu_venue})
+          end
+        end
+      end
+      if get.arr.bool_by_contains(path_components, "certificate") then
+        dothis.arr.push(res, {"purpose", "certificate"})
+      end
+      if get.arr.bool_by_contains(path_components, "application") then
+        dothis.arr.push(res, {"purpose", "application"})
+      end
+      local semester = get.arr.t_or_nil_by_first_match_w_fn(
+        path_components,
+        function(path_component)
+          return get.str.bool_by_startswith(path_component, "summer"
+        end
+      )
+     return res
     end,
     two_lines__arr_arr_by_path_tags = function(path)
       return transf.two_arrs.arr_by_appended(
@@ -1034,6 +1110,9 @@ transf = {
     timestamp_s_by_creation = function(path)
       return get.local_extant_path.attr(path, "creation")
     end,
+    full_rfc3339like_dt_by_creation = function(path)
+      return transf.timestamp_s.rfc3339like_dt(transf.local_extant_path.timestamp_s_by_creation(path))
+    end,
     timestamp_s_by_change = function(path)
       return get.local_extant_path.attr(path, "change")
     end,
@@ -1203,6 +1282,55 @@ transf = {
       return transf.labelled_remote_dir.absolute_path_stateful_iter_by_children(remote_extant_path)
     end,
   },
+  dms_str = {
+    three_nonindicated_number_strs = function(str)
+      return get.str.n_strs_by_extracted_onig_str(str, "^(\\d+)[^\\d]+(\\d+)'[^\\d]+([\\d.]+)")
+    end,
+    three_numbers = function(str)
+      local deg, min, sec = transf.dms_str.three_nonindicated_number_strs(str)
+      return transf.nonindicated_number_str.number_by_base_10(deg), transf.nonindicated_number_str.number_by_base_10(min), transf.nonindicated_number_str.number_by_base_10(sec)
+    end,
+    number = function(str)
+      local deg, min, sec = transf.dms_str.three_numbers(str)
+      return deg + min/60 + sec/3600
+    end,
+  },
+  location_log_spec = {
+    geojson_feature_collection = function(spec)
+      return rest({
+        api_name = "osm",
+        endpoint = "reverse",
+        params = {
+          lat = spec.lat,
+          lon = spec.long,
+          format = "geojson",
+        }
+      })
+    end,
+    geojson_feature_or_nil = function(spec)
+      return transf.location_log_spec.geojson_feature_collection(spec).features[1]
+    end,
+    two_lines__arr_arr = function(spec)
+      local res = {
+        {"lat", spec.lat},
+        {"long", spec.long},
+      }
+      if spec.ele then
+        dothis.arr.push(res, {"ele", spec.ele})
+      end
+      local geojson_feature = transf.location_log_spec.geojson_feature_or_nil(spec)
+      if geojson_feature then
+        -- populate with value of various osm fields, bearing in mind that they may be nil
+        -- instead of manually checking fields, we will instead just zero-out the fields we don't want
+        geojson_feature["ISO3166-2-lvl4"] = nil
+        geojson_feature.tourism = nil
+        for k, v in transf.table.kt_vt_stateless_iter(geojson_feature.properties.address) do
+          dothis.arr.push(res, {k, v})
+        end
+      end
+      return res
+    end,
+  },
   local_file = {
     str_by_contents = function(path)
       local file = io.open(path, "r")
@@ -1224,26 +1352,66 @@ transf = {
       }
     end,
     assoc_by_exiftool_info = function(path)
-      return transf.local_image_file_arr.assoc_arr_by_exiftool_info(
+      return transf.local_file_arr.assoc_arr_by_exiftool_info(
         {path}
       )[1]
     end,
-    two_lines__arr_arr_by_exif_metadata = function(path)
+    location_log_spec_by_exiftool = function(path)
       local exifassoc = transf.local_file.assoc_by_exiftool_info(path)
       local res = {}
+      if exifassoc.GPSLatitude and exifassoc.GPSLongitude then
+        res.lat = exifassoc.GPSLatitude
+        res.long = exifassoc.GPSLongitude
+        if exifassoc.GPSAltitude then
+          res.ele = exifassoc.GPSAltitude
+        end
+        return res
+      else
+        return nil
+      end
+    end,
+    full_rfc3339like_dt_by_metadata = function(path)
+      local exifassoc = transf.local_file.assoc_by_exiftool_info(path)
       if exifassoc.CreationDate then
         local notz = get.str.n_strs_by_extracted_onig_str(exifassoc.CreationDate, "^(^\\+)+")
         notz = get.str.str_by_replaced_w_ascii_str(notz, " ", "T")
-        res[1] = {"date", notz}
+        return notz 
+      else
+        return transf.local_extant_path.full_rfc3339like_dt_by_creation(path)
       end
-      error("todo")
+    end,
+    rfc3339like_dt_by_any_source = function(path)
+      local dt = transf.path.rfc3339like_dt_or_nil_by_filename(path)
+      if dt then
+        return dt
+      else
+        return transf.local_file.full_rfc3339like_dt_by_metadata(path)
+      end
+    end,
+    two_lines__arr_arr_by_metadata = function(path)
+      local exifassoc = transf.local_file.assoc_by_exiftool_info(path)
+      local res = {}
+      if exifassoc.Make then
+        dothis.arr.push({"capturing_device_manufacturer", exifassoc.Make})
+      end
+      if exifassoc.DeviceManufacturer then
+        dothis.arr.push({"capturing_device_manufacturer", exifassoc.DeviceManufacturer})
+      end
+      if exifassoc.Model then
+        dothis.arr.push({"capturing_device", exifassoc.Model})
+      end
+      if exifassoc.DeviceModel then
+        dothis.arr.push({"capturing_device", exifassoc.DeviceModel})
+      end
       return res
     end,
     two_lines__arr_arr_by_file_tags = function(path)
-      return transf.two_arr_or_nils.arr(
-        transf.local_file.two_lines__arr_arr_by_exif_metadata(path),
-        transf.path.two_lines__arr_arr_by_filename_tags(path)
+      local arr = transf.two_arr_or_nils.arr(
+        transf.local_file.two_lines__arr_arr_by_metadata(path),
+        transf.path.two_lines__arr_arr_by_path_tags(path)
       )
+      dothis.arr.push(arr, {"date", transf.local_file.rfc3339like_dt_by_any_source(path)})
+      return arr
     end,
     line_arr_by_file_tags = function(path)
       return transf.two_lines_arr__arr.line_arr_by_booru_namespaced_tag_smart(
@@ -1265,7 +1433,7 @@ transf = {
     end,
     assoc_arr_by_exiftool_info = function(path_arr)
       transf.str.table_or_err_by_evaled_env_bash_parsed_json(
-        "exiftool -j --all " .. transf.str_arr.str_arr_by_mapped_single_quoted_escaped(path_arr)
+        "exiftool -j -n --all " .. transf.str_arr.str_arr_by_mapped_single_quoted_escaped(path_arr) .. "| jq 'map(. |= with_entries(if .value == \"\" then .value = null else . end))'"
       )
     end,
   },
@@ -1627,10 +1795,9 @@ transf = {
     end,
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc_by_supplemented = function(path_leaf_specifier)
       local assoc = transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(path_leaf_specifier)
-      assoc.date = transf.path_leaf_specifier.rfc3339like_dt_or_interval
       assoc.title = assoc.title or path_leaf_specifier.general_name
     end,
-    two_line__arr_arr_by_fs_tags = function(path_leaf_specifier)
+    two_lines__arr_arr_by_fs_tags = function(path_leaf_specifier)
       return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.two_line__arr_arr_by_fs_tags(
         transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc_by_supplemented(path_leaf_specifier)
       )
@@ -1840,13 +2007,20 @@ transf = {
       return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
     end,
     multiline_str_by_local_ai_tags = function (path)
+      local fetchpath = transf.str.str_by_single_quoted_escaped(path)
+      if is.local_image_file.local_svg_file(path) then
+        fetchpath = transf.local_svg_file.local_absolute_path_by_png_in_cache(path)
+        if not is.local_absolute_path.local_extant_path(fetchpath) then
+          act.local_svg_file.to_png_in_cache(path)
+        end
+      end
       return get.fn.rt_or_nil_by_memoized(
         transf.str.str_or_nil_by_evaled_env_bash_stripped,
         nil,
         "transf.str.str_or_nil_by_evaled_env_bash_stripped"
     )
       (
-        "hydrus_get_tags " .. transf.str.str_by_single_quoted_escaped(path)
+        "hydrus_get_tags " .. fetchpath
       )
     end,
     booru_rating_by_local_ai = function(path)
@@ -2134,7 +2308,14 @@ transf = {
       return get.shell_script_file.str_or_nil_by_lint_gcc(path, "warnings")
     end,
   },
-
+  local_svg_file = {
+    local_absolute_path_by_png_in_cache = function(path)
+      return transf.str.in_cache_local_absolute_path(
+        transf.path.leaflike_by_filename(path) .. ".png",
+        "svgconv"
+      )
+    end,
+  },
   plaintext_file = {
     str_by_contents = function(path)
       return transf.file.str_by_contents(path)
@@ -4101,7 +4282,7 @@ transf = {
     here_doc = function(str)
       return " <<EOF\n" .. str .. "\nEOF"
     end,
-    rfc3339like_dt_by_guess_gpt = function(str)
+    rfc3339like_dt_or_nil_by_guess_gpt = function(str)
       return get.n_shot_llm_spec.str_or_nil_by_response({
         input = str, 
         query = "Please transform the following thing indicating a date(time) into the corresponding RFC3339-like date(time) (UTC). Leave out elements that are not specified.", 
@@ -4110,7 +4291,7 @@ transf = {
           {"Screenshot_20081130-230925", "2008-11-30T23:09:25"},
           {"Screen Recording 2022-01-31 at 13.42.51", "2022-01-31T13:42:51"},
           {"2019--art_drafts.md", "2019"},
-          {"20020803034034875.jpg", "2002-08-03T03:40:34"},
+          {"20020803034034875", "2002-08-03T03:40:34"},
           {"2016111518_O7N1BEKrNTWTIgr33xRS5xCT", "2016-11-15T18"},
           {"com.apple.finder__20150218.324_manifest", "2015-02-18T03:24"},
           {"Yotsuba&! - 13 - 08 - 10", "IMPOSSIBLE"}
@@ -4744,7 +4925,7 @@ transf = {
     
   },
   line_arr = {
-    noindent_str_arr = function(arr)
+    noindent_line_arr = function(arr)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.line.noindent_line_by_extract)
     end,
     nohashcomment_line_arr = function(arr)
@@ -5504,7 +5685,7 @@ transf = {
           url = manga_url,
           title = manga_title,
           chapter_number = chapter.chapterNumber,
-          chapter_name = chapter.name,
+          chapter_title = chapter.name,
           timestamp_ms = hist_item.lastRead
         }
       end
@@ -8566,7 +8747,7 @@ transf = {
               content = "If the input is already valid, echo the input."
             }, {
               role = "user",
-              content = "If you are unable to fulfill the request, return 'IMPOSSIBLE'."
+              content = "If you are unable to fulfill the request, return 'IMPOSSIBLE'. You may additionally return a message explaining why the request is impossible."
             }
           },
           transf.n_shot_llm_spec.role_content_message_spec_arr_or_nil_by_shots(spec) or {},
@@ -8916,7 +9097,11 @@ transf = {
     end
 
   },
-  
+  str_or_number_arr = {
+    str_by_joined_comma = function(arr)
+      return get.str_or_number_arr.str_by_joined(arr, ", ")
+    end,
+  }
   
 }
 

@@ -3429,11 +3429,28 @@ get = {
         temperature,
         max_tokens
       )
-      if res == "IMPOSSIBLE" then
+      if get.str.bool_by_startswith(res,"IMPOSSIBLE") then
         return nil
       else
         return res
       end
+    end,
+  },
+  all_namespace_arr = {
+    n_shot_llm_spec = function(arr, str, shots)
+      return {
+        query = "Extract data for the fields " .. transf.str_or_number_arr.str_by_joined_comma(arr) .. "from the following string, if present. Return the extracted data as a JSON array of json pairs.",
+        input = str,
+        shots = shots
+      }
+    end,
+    two_lines__arr_arr = function(arr, str, shots)
+      return transf.json_str.table_or_nil(
+        get.n_shot_llm_spec.str_or_nil_by_response(
+          get.all_namespace_arr.n_shot_llm_spec(arr, str, shots),
+          0
+        )
+      )
     end,
   },
   not_userdata_or_fn = {

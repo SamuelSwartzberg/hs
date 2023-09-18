@@ -91,22 +91,6 @@ dothis = {
       }, do_after)
     end,
   },
-  booru_post_url = {
-    add_to_hydrus = function(url, str_arr, do_after)
-      local request_table = { url = url }
-      if str_arr then
-        request_table.service_keys_to_additional_tags = {
-          ["6c6f63616c2074616773"] = str_arr
-        }
-      end
-      rest({
-        api_name = "hydrus",
-        endpoint = "add_urls/add_url",
-        request_table = request_table,
-        request_verb = "POST",
-      }, do_after)
-    end,
-  },
   pass_item_name = {
     replace = function(name, type, data)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("pass rm " .. type .. "/" .. name, function()
@@ -173,6 +157,20 @@ dothis = {
     add_event_from_url = function(url, calendar)
       local temp_path_arg = transf.str.str_by_single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
       dothis.str.env_bash_eval('curl' .. transf.str.str_by_single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg)
+    end,
+    add_to_hydrus = function(url, str_arr, do_after)
+      local request_table = { url = url }
+      if str_arr then
+        request_table.service_keys_to_additional_tags = {
+          ["6c6f63616c2074616773"] = str_arr
+        }
+      end
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_urls/add_url",
+        request_table = request_table,
+        request_verb = "POST",
+      }, do_after)
     end,
   },
   otp_url = {
@@ -1021,7 +1019,7 @@ dothis = {
     add_to_hydrus_by_url = function(path, str_arr)
       local booru_url = transf.local_image_file.booru_post_url(path)
       if booru_url then
-        act.booru_post_url.add_to_hydrus(
+        act.url.add_to_hydrus(
           booru_url,
           str_arr
         )
@@ -1052,9 +1050,9 @@ dothis = {
         booru_url = transf.local_image_file.booru_post_url(path)
       end
       if booru_url then
-        --- if there's a booru post url, the only thing we will take from the filename is the date
-        local date = transf.path.path_leaf_specifier_or_nil(path).rfc3339like_dt_o_interval
-        dothis.booru_post_url.add_to_hydrus(
+        --- if there's a booru post url, the only thing we will take from the file is the date
+        local date = transf.local_file.rfc3339like_dt_by_any_source(path)
+        dothis.url.add_to_hydrus(
           booru_url,
           { "date:" .. date }
         )
@@ -1062,9 +1060,8 @@ dothis = {
         dothis.local_hydrusable_file.add_to_hydrus_by_path(
           path,
           transf.local_file.line_arr_by_file_tags(path),
-          act.sha256_hex_str.add_tags_to_hydrus_item
+          use_ai_tags and act.sha256_hex_str.add_tags_to_hydrus_item_by_ai_tags
         )
-        --- - ai tags
       end
     end
   },
@@ -1999,6 +1996,13 @@ dothis = {
       )
       act.latex_project_dir.write_bib(latex_project_dir)
     end,
+  },
+  local_svg_file = {
+    to_png = function(local_svg_file, target)
+      dothis.str.env_bash_eval_sync(
+        "convert -background none" .. transf.str.str_by_single_quoted_escaped(local_svg_file) .. transf.str.str_by_single_quoted_escaped(target),
+      )
+    end
   },
   youtube_playlist_id = {
     --- @param id str
