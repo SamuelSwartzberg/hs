@@ -2486,6 +2486,12 @@ get = {
         function(nested_arr) return fn(transf.arr.n_anys(nested_arr)) end
       )
     end,
+    bool_by_has_first = function(arr, any)
+      return get.arr.bool_by_first_match_w_fn(arr, 
+        function(subarr) 
+          return subarr[1] == any
+        end) 
+    end,
 
   },
   mac_application_name = {

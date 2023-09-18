@@ -596,6 +596,7 @@ tblmap = {
       title = "title",
       date = "date",
       ch = "chapter_index",
+      ep = "episode_index",
       chname = "chapter_title",
       page = "page_index",
       vol = "volume_index",
@@ -604,7 +605,9 @@ tblmap = {
       g = "general",
       person = "person",
       medium = "medium",
-      occ = "occassion",
+      occ = "occasion",
+      epsub = "episode_subindex",
+      prompt = "prompt",
     },
     lower_strict_snake_case_key_line_value_assoc = {
       action = {
@@ -628,7 +631,8 @@ tblmap = {
         real = "realistic",
       },
       layout = {
-        manga_page = "comic"
+        manga_page = "comic",
+        webtoon = "webtoon"
       },
     }
   },

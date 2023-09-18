@@ -157,7 +157,12 @@ ls = {
     "country",
     "city",
     "occasion",
-    "use_as"
+    "use_as",
+    "episode_index",
+    "episode_subindex",
+    "semver",
+    "purpose",
+    "inspiration_for"
   },
   edu_type = {
     "kindergarden",
@@ -176,12 +181,15 @@ ls = {
     "chapter_title",
     "page_index",
     "volume_index",
+    "episode_index",
+    "episode_subindex",
     "season",
     "series",
     "character",
     "creator",
     "studio",
-    "title"
+    "title",
+    "prompt"
   },
   csl_type = {
     "article",

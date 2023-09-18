@@ -41,11 +41,15 @@ post 'lua is working':
   - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them -> Perhaps better\: cache MAUDIOVISUAL urls, allow playing of those local files as dropin (however, we also query a lot from yt, so we need to cache that - ideally permanently). However\: Cache should be conceptualized as temporary, but this cache as permanent. So we need some solution to say 'don't delete this cache', or a different kind of cache. Okay, I have an idea: Fetch url, urlmd5 it, create entry in dir. When playing, check whether we have corresponding file, either use it or download it (only non-playlists).
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
   - danbooru search links need their query to count as 'seen' for other queries
-  - wrapper for hs chords?
   - citations
     - add citations and test citation usage workflow
     - rename, sort books based on what is needed for citation workflow, and what is desirable
     - enable book sync to phone  
+post hydrus import:
+  - set up tag implications
+    - use_as:advertising_poster -> use_as:advertising, use_as:poster
+    - use_as:crest_profile_pic -> use_as:crest, use_as:profile_pic
+    - tcrea:dalle -> tcrea:ai
 post 'stuff is implemented':
   - performance:
     - optimize checks by using new stringy functions & memoization where necessary

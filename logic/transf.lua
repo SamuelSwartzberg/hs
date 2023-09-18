@@ -781,9 +781,14 @@ transf = {
     two_lines__arr_arr_or_nil_by_path_leaf_specifier_to_tag_pairs = function(path)
       local pspc = transf.path.path_leaf_specifier_or_nil(path)
       if pspc then
-        return transf.path_leaf_specifier.two_lines__arr_arr_by_fs_tags(
+        local pspc_tags = transf.path_leaf_specifier.two_lines__arr_arr_by_fs_tags(
           pspc
         )
+        if get.arr_arr.bool_by_has_first(pspc_tags, "episode_index")
+        then
+          dothis.arr.push(pspc_tags, {"meta", "anime_screencap"})
+        end
+        return pspc_tags
       end
     end,
     rfc3339like_dt_or_nil_by_filename = function(path)
@@ -798,6 +803,9 @@ transf = {
     end,
     two_lines__arr_arr_by_filename_tags = function(path)
       local pspec_tags = transf.path.two_lines__arr_arr_or_nil_by_path_leaf_specifier_to_tag_pairs(path)
+      if #pspec_tags == 1 and pspec_tags[1][1] == "title" then
+        pspec_tags = nil -- if we parsed the entire filename as a title, the file didn't have any proper tags. In that case it's a better idea to use AI to extract tags.
+      end
       if pspec_tags then
         return pspec_tags
       else -- extract tags from non-standartized filename (uses gpt)
@@ -811,7 +819,7 @@ transf = {
             {"Adachi to Shimamura - Ch.28 - Shimamura's Sword - 8", '[["series", "Adachi to Shimamura"], ["chapter_index", "28"], ["chapter_title", "Shimamura\'s Sword"], ["page_index", "8"]]'},
             {"Tatoe Todokanu Ito da to Shite mo - Chapter 01 - 32", '[["series", "Tatoe Todokanu Ito da to Shite mo"], ["chapter_index", "01"], ["page_index", "32"]]'},
             {"The Real Momoka - by Arai Sumiko - 17", '[["series", "The Real Momoka"], ["creator", "Arai Sumiko"], ["page_index", "17"]]'},
-            {"__warrior_of_light_final_fantasy_and_1_more_drawn_by_d_rex__781a13c9a81ed223c83d9b65f4531b90", 'IMPOSSIBLE: Danbooru-like filename, should not be parsed because better solutions exist.'
+            {"__warrior_of_light_final_fantasy_and_1_more_drawn_by_d_rex__781a13c9a81ed223c83d9b65f4531b90", 'IMPOSSIBLE: Danbooru-like filename, should not be parsed because better solutions exist.'}
           }
         )
         local res = {}
@@ -839,11 +847,11 @@ transf = {
         dothis.arr.push(res, {"medium", "photography"})
       end
       if get.arr.bool_by_contains(path_components, "style_inspiration") then
-        dothis.arr.push(res, {"purpose", "inspiration"})
+        dothis.arr.push(res, {"use_as", "inspiration"})
         dothis.arr.push(res, {"inspiration_for", "style"})
       end
       if get.arr.bool_by_contains(path_components, "funny") then
-        dothis.arr.push(res, {"purpose", "funny"})
+        dothis.arr.push(res, {"use_as", "funny"})
       end
       if get.arr.bool_by_contains(path_components, "receipts") then
         dothis.arr.push(res, {"purpose", "official"})
