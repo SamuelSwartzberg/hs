@@ -819,7 +819,8 @@ transf = {
             {"Adachi to Shimamura - Ch.28 - Shimamura's Sword - 8", '[["series", "Adachi to Shimamura"], ["chapter_index", "28"], ["chapter_title", "Shimamura\'s Sword"], ["page_index", "8"]]'},
             {"Tatoe Todokanu Ito da to Shite mo - Chapter 01 - 32", '[["series", "Tatoe Todokanu Ito da to Shite mo"], ["chapter_index", "01"], ["page_index", "32"]]'},
             {"The Real Momoka - by Arai Sumiko - 17", '[["series", "The Real Momoka"], ["creator", "Arai Sumiko"], ["page_index", "17"]]'},
-            {"__warrior_of_light_final_fantasy_and_1_more_drawn_by_d_rex__781a13c9a81ed223c83d9b65f4531b90", 'IMPOSSIBLE: Danbooru-like filename, should not be parsed because better solutions exist.'}
+            {"__warrior_of_light_final_fantasy_and_1_more_drawn_by_d_rex__781a13c9a81ed223c83d9b65f4531b90", 'IMPOSSIBLE: Danbooru-like filename, should not be parsed because better solutions exist.'},
+            {"2022-02-16--diary_2", 'IMPOSSIBLE'}
           }
         )
         local res = {}
@@ -839,6 +840,11 @@ transf = {
 
       if get.arr.bool_by_contains(path_components, "screenshots") then
         dothis.arr.push(res, {"meta", "screenshot"})
+        for _, app_serieslike in transf.arr.pos_int_vt_stateless_iter(ls.app_serieslike) do
+          if get.arr.bool_by_contains(path_components, app_serieslike) then
+            dothis.arr.push(res, {"series", app_serieslike})
+          end
+        end
       end
       if get.arr.bool_by_contains(path_components, "i_made_this") then
         dothis.arr.push(res, {"creator", "me"})

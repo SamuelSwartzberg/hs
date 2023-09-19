@@ -162,7 +162,10 @@ ls = {
     "episode_subindex",
     "semver",
     "purpose",
-    "inspiration_for"
+    "inspiration_for",
+    "prompt",
+    "venue",
+    "collection"
   },
   edu_type = {
     "kindergarden",
@@ -173,8 +176,17 @@ ls = {
     "tu",
     "hu",
     "fu",
-    "ur"
+    "ur",
+    "primary"
 
+  },
+  app_serieslike = {
+    "bumble",
+    "facebook",
+    "hinge",
+    "okc",
+    "tinder",
+    "whatsapp",
   },
   series_namespace = {
     "chapter_index",

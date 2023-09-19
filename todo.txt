@@ -50,6 +50,7 @@ post hydrus import:
     - use_as:advertising_poster -> use_as:advertising, use_as:poster
     - use_as:crest_profile_pic -> use_as:crest, use_as:profile_pic
     - tcrea:dalle -> tcrea:ai
+    - foo_(medium) -> medium:foo
 post 'stuff is implemented':
   - performance:
     - optimize checks by using new stringy functions & memoization where necessary
