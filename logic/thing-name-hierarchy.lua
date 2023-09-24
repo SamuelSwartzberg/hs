@@ -366,9 +366,11 @@ thing_name_hierarchy = {
                         },
                         danbooru_stule_post_url = "leaf",
                         yandere_style_post_url = "leaf",
+                        pornpen_style_post_url = "leaf",
                       },
                       authority_url = {
                         host_url = {
+                          pornpen_url = "leaf",
                           booru_url = {
                             danbooru_url = "leaf",
                             yandere_url = "leaf",
@@ -396,6 +398,7 @@ thing_name_hierarchy = {
                       password_url = "leaf",
                       userinfo_url = "leaf",
                       booru_post_url = "leaf",
+                      pornpen_post_url = "leaf",
                       github_url = {
                         github_path_url = {
                           github_user_url = "leaf"

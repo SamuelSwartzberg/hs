@@ -1740,6 +1740,9 @@ is = {
           is.path_url.yandere_style_post_url(url)
         ))
     end,
+    pornpen_post_url = function(url)
+      return is.url.pornpen_style_post_url(url) and is.url.porpen_url(url)
+    end,
     github_url = function(url)
       return get.str.bool_by_startswith(url, "https://github.com/")
     end,
@@ -1819,6 +1822,9 @@ is = {
     yandere_style_post_url = function(url)
       return get.str.bool_by_matches_whole_eutf8(transf.path_url.path(url), "/post/show/%d+/?")
     end,
+    pornpen_style_post_url = function(url)
+      return get.str.bool_by_matches_whole_onig(transf.path_url.path(url), "/view/[a-zA-Z0-9]+/?")
+    end,
     doi_url = function(url)
       return is.str.doi(
         transf.url.local_absolute_path_or_nil_by_path_decoded(url)
@@ -1860,10 +1866,13 @@ is = {
   },
   host_url = {
     booru_url = function(url)
-      return get.arr.bool_by_contains(ls.url.booru, transf.host_url.host(url))
+      return get.arr.booru_hosts(ls.url.booru, transf.host_url.host(url))
     end,
     youtube_url = function(url)
       return transf.host_url.host(url) == "youtube.com"
+    end,
+    pornpen_url = function(url)
+      return transf.host_url.host(url) == "pornpen.ai"
     end,
   },
   booru_url = {

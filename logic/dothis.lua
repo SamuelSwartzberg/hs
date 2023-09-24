@@ -2000,7 +2000,7 @@ dothis = {
   local_svg_file = {
     to_png = function(local_svg_file, target)
       dothis.str.env_bash_eval_sync(
-        "convert -background none" .. transf.str.str_by_single_quoted_escaped(local_svg_file) .. transf.str.str_by_single_quoted_escaped(target),
+        "convert -background none" .. transf.str.str_by_single_quoted_escaped(local_svg_file) .. transf.str.str_by_single_quoted_escaped(target)
       )
     end
   },

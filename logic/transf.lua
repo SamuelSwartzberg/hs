@@ -784,10 +784,6 @@ transf = {
         local pspc_tags = transf.path_leaf_specifier.two_lines__arr_arr_by_fs_tags(
           pspc
         )
-        if get.arr_arr.bool_by_has_first(pspc_tags, "episode_index")
-        then
-          dothis.arr.push(pspc_tags, {"meta", "anime_screencap"})
-        end
         return pspc_tags
       end
     end,
@@ -820,8 +816,7 @@ transf = {
             {"Tatoe Todokanu Ito da to Shite mo - Chapter 01 - 32", '[["series", "Tatoe Todokanu Ito da to Shite mo"], ["chapter_index", "01"], ["page_index", "32"]]'},
             {"The Real Momoka - by Arai Sumiko - 17", '[["series", "The Real Momoka"], ["creator", "Arai Sumiko"], ["page_index", "17"]]'},
             {"__warrior_of_light_final_fantasy_and_1_more_drawn_by_d_rex__781a13c9a81ed223c83d9b65f4531b90", 'IMPOSSIBLE: Danbooru-like filename, should not be parsed because better solutions exist.'},
-            {"2022-02-16--diary_2", 'IMPOSSIBLE'}
-          }
+            {"2022-02-16--diary_2", 'IMPOSSIBLE'},
         )
         local res = {}
         if #series_pairs > 0 then
@@ -834,68 +829,98 @@ transf = {
     two_lines__arr_arr_by_ancestor_path_tags = function(path)
       local res = {}
       local path_components =transf.path.path_component_arr_by_parent(path)
+      -- I don't use spaces in my fs, but my tags do.
+      path_components = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        path_components,
+        function(leaflike)
+          return get.str.str_by_continuous_replaced_onig_w_regex_quantifiable(
+            leaflike,
+            "_",
+            " "
+          )
+        end
+      )
       if get.arr.bool_by_contains(path_components, "android") then
         dothis.arr.push(res, {"general", "android_(os)"})
       end
 
       if get.arr.bool_by_contains(path_components, "screenshots") then
         dothis.arr.push(res, {"meta", "screenshot"})
-        for _, app_serieslike in transf.arr.pos_int_vt_stateless_iter(ls.app_serieslike) do
-          if get.arr.bool_by_contains(path_components, app_serieslike) then
-            dothis.arr.push(res, {"series", app_serieslike})
+        for _, service in transf.arr.pos_int_vt_stateless_iter(ls.services) do
+          if get.arr.bool_by_contains(path_components, service) then
+            dothis.arr.push(res, {"service", service})
           end
         end
       end
+      if get.arr.bool_by_contains(path_components, "chatgpt") or get.arr.bool_by_contains(path_components, "openai_playground") then
+        dothis.arr.push(res, {"tcrea", "gpt"})
+        dothis.arr.push(res, {"tcrea", "me"}) -- both of these are not guaranteed to be true, but they are likely enough to be true that I can just manually remove the tag if it's not true.
+      end
+      for _, series in transf.arr.pos_int_vt_stateless_iter(ls.series) do
+        if get.arr.bool_by_contains(path_components, series) then
+          dothis.arr.push(res, {"series", series})
+        end
+      end
+      if get.arr.bool_by_contains(path_components, "lishogi") then
+        dothis.arr.push(res, {"general", "shogi"}) -- not all lishogi screenshots are shogi, but most are. I can just manually remove the tag if it's not shogi.
+      end
+      if get.arr.bool_by_contains(path_components, "lichess") then
+        dothis.arr.push(res, {"general", "chess"}) -- same as above
+      end
       if get.arr.bool_by_contains(path_components, "i_made_this") then
         dothis.arr.push(res, {"creator", "me"})
+      end
+      if get.arr.bool_by_contains(path_components, "ai_made_this") then
+        dothis.arr.push(res, {"creator", "ai"})
+        for _, ai_creator in transf.arr.pos_int_vt_stateless_iter(ls.ai_creator) do
+          if get.arr.bool_by_contains(path_components, ai_creator) then
+            dothis.arr.push(res, {"creator", ai_creator})
+          end
+        end
+        if get.arr.bool_by_contains(path_components, "pornpen") then
+          dothis.arr.push(res, {"proximate_source", "pornpen"})
+        end
+      end
+      if get.arr.bool_by_contains(path_components, "proximate_source") then
+        for _, proximate_source in transf.arr.pos_int_vt_stateless_iter(ls.proximate_source) do
+          if get.arr.bool_by_contains(path_components, proximate_source) then
+            dothis.arr.push(res, {"proximate_source", proximate_source})
+          end
+        end
       end
       if get.arr.bool_by_contains(path_components, "photography") or get.arr.bool_by_contains(path_components, "photos") then
         dothis.arr.push(res, {"medium", "photography"})
       end
       if get.arr.bool_by_contains(path_components, "style_inspiration") then
-        dothis.arr.push(res, {"use_as", "inspiration"})
-        dothis.arr.push(res, {"inspiration_for", "style"})
+        dothis.arr.push(res, {"use_as", "style_inspiration"})
       end
-      if get.arr.bool_by_contains(path_components, "funny") then
-        dothis.arr.push(res, {"use_as", "funny"})
+      for _, use_as in transf.arr.pos_int_vt_stateless_iter(ls.use_as) do
+        if get.arr.bool_by_contains(path_components, use_as) then
+          dothis.arr.push(res, {"use_as", use_as})
+        end
       end
-      if get.arr.bool_by_contains(path_components, "receipts") then
-        dothis.arr.push(res, {"purpose", "official"})
-        dothis.arr.push(res, {"purpose", "receipt"})
-      end
-      if get.arr.bool_by_contains(path_components, "mark_of_ownership") then
-        dothis.arr.push(res, {"purpose", "official"})
-        dothis.arr.push(res, {"purpose", "mark_of_ownership"})
+      error("the following may be problematic, temporary stop")
+      for _, subject_matter in transf.arr.pos_int_vt_stateless_iter(ls.subject_matter) do
+        if get.arr.bool_by_contains(path_components, subject_matter) then
+          dothis.arr.push(res, {"subject_matter", subject_matter})
+        end
       end
       if get.arr.bool_by_contains(path_components, "voice") then
         dothis.arr.push(res, {"medium", "voice_memo"})
       end
-      if get.arr.bool_by_contains(path_components, "edu") then
-        dothis.arr.push(res, {"creation_context", "edu"})
+      if get.arr.bool_by_contains(path_components, "acquisition_context") then
         
-        for _, edu_type in transf.arr.pos_int_vt_stateless_iter(ls.edu_type) do
-          if get.arr.bool_by_contains(path_components, edu_type) then
-            dothis.arr.push(res, {"edu_type", edu_type})
+        for _, acctx in transf.arr.pos_int_vt_stateless_iter(ls.acquisition_context) do
+          if get.arr.bool_by_contains(path_components, acctx) then
+            dothis.arr.push(res, {"acquisition_context", acctx})
           end
         end
-        for _, edu_venue in transf.arr.pos_int_vt_stateless_iter(ls.my_edu_venue) do
-          if get.arr.bool_by_contains(path_components, edu_venue) then
-            dothis.arr.push(res, {"edu_venue", edu_venue})
+        for _, acins in transf.arr.pos_int_vt_stateless_iter(ls.acquisition_institution) do
+          if get.arr.bool_by_contains(path_components, acins) then
+            dothis.arr.push(res, {"acquisition_institution", acins})
           end
         end
       end
-      if get.arr.bool_by_contains(path_components, "certificate") then
-        dothis.arr.push(res, {"purpose", "certificate"})
-      end
-      if get.arr.bool_by_contains(path_components, "application") then
-        dothis.arr.push(res, {"purpose", "application"})
-      end
-      local semester = get.arr.t_or_nil_by_first_match_w_fn(
-        path_components,
-        function(path_component)
-          return get.str.bool_by_startswith(path_component, "summer"
-        end
-      )
      return res
     end,
     two_lines__arr_arr_by_path_tags = function(path)
@@ -1406,16 +1431,16 @@ transf = {
       local exifassoc = transf.local_file.assoc_by_exiftool_info(path)
       local res = {}
       if exifassoc.Make then
-        dothis.arr.push({"capturing_device_manufacturer", exifassoc.Make})
+        dothis.arr.push({"creation_ware", exifassoc.Make})
       end
       if exifassoc.DeviceManufacturer then
-        dothis.arr.push({"capturing_device_manufacturer", exifassoc.DeviceManufacturer})
+        dothis.arr.push({"creation_ware", exifassoc.DeviceManufacturer})
       end
       if exifassoc.Model then
-        dothis.arr.push({"capturing_device", exifassoc.Model})
+        dothis.arr.push({"creation_ware", exifassoc.Model})
       end
       if exifassoc.DeviceModel then
-        dothis.arr.push({"capturing_device", exifassoc.DeviceModel})
+        dothis.arr.push({"creation_ware", exifassoc.DeviceModel})
       end
       return res
     end,
@@ -1812,7 +1837,7 @@ transf = {
       assoc.title = assoc.title or path_leaf_specifier.general_name
     end,
     two_lines__arr_arr_by_fs_tags = function(path_leaf_specifier)
-      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.two_line__arr_arr_by_fs_tags(
+      return transf.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc.two_line__arr_arr_by_rename_filter_namespace(
         transf.path_leaf_specifier.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc_by_supplemented(path_leaf_specifier)
       )
     end,
@@ -1932,9 +1957,11 @@ transf = {
       for k, v in transf.table.stateless_key_value_iter(assoc) do
         if is.any.arr(v) then
           for _, v2 in transf.arr.pos_int_vt_stateless_iter(v) do
+            v2 = get.str.str_by_replaced_w_ascii_str(v2, "_", " ")
             act.arr.push(res, {k, v2})
           end
         else
+          v = get.str.str_by_replaced_w_ascii_str(v, "_", " ")
           act.arr.push(res, {k, v})
         end
       end
