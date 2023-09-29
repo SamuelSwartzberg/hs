@@ -870,8 +870,7 @@ transf = {
       if get.arr.bool_by_contains(path_components, "i_made_this") then
         dothis.arr.push(res, {"creator", "me"})
       end
-      if get.arr.bool_by_contains(path_components, "ai_made_this") then
-        dothis.arr.push(res, {"creator", "ai"})
+      if get.arr.bool_by_contains(path_components, "what made this") then
         for _, ai_creator in transf.arr.pos_int_vt_stateless_iter(ls.ai_creator) do
           if get.arr.bool_by_contains(path_components, ai_creator) then
             dothis.arr.push(res, {"creator", ai_creator})
