@@ -97,10 +97,26 @@ ls = {
     "yande.re",
   },
   proximate_sources = {
-    "danbooru",
+    "booru",
+      "danbooru",
+      "gelbooru",
+      "xbooru",
+      "aibooru",
+    "pornpendotai", -- canonical name: pornpen.ai
+    "trynectardotai", -- canonical name: trynectar.ai
+    "discord",
     "reddit",
     "aliexpress"
   },
+  proximate_source_page_type = {
+    "post",
+    "thread",
+    "product page",
+  },
+  proximate_source_subdivision = {
+    "midjourney"
+  },
+
   tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"},
   project_type = {
     "latex",
@@ -125,7 +141,6 @@ ls = {
   },
   hydrus_namespace = {
     "character",
-    "creator",
     "date",
     "medium",
     "meta",
@@ -149,16 +164,13 @@ ls = {
     "season_index", -- numerical index of a season, e.g. 3
 
     -- creation tags - who, when, where, and how was this object created?
-
-    "creator", -- name of an original creator of the tagged object. This should not be used for someone who shared the object, but did not create it. However, the contribution doesn't have to be major. If the creator appears in the image, other tags may also apply, such as person:<name> or general:signature, or others.
+    
+    "creation_ware", -- anything that was used to create the object, be that meatspace or cyberspace, tools or people, organizations or brands. E.g. "studio trigger", "kana hanazawa", "makoto shinkai", "adobe illustrator", "mirrorless camera"
     "official_title", -- the official title of a work, if applicable. E.g. "The Lord of the Rings: The Fellowship of the Ring", "One Hundred Years of Solitude", etc. Bear in mind that this isn't the title of the series, but of the specific work. If the work is part of a series, the series tag should be used instead.
-    "studio", -- mostly used by parsers, but can be used to indicate the studio that produced a work. I'll probably alias all of these to creator:<studio name>.
-    "digitization_method", -- by their nature, all objects I'm tagging are digital. How did they get that way? E.g. scan, screenshot, photo
     "semver", -- semantic version of a work, e.g. 1.0.0
     "creation_use", -- what the object was created for. Don't use this when the message tags could apply, and also consider if general tags might not be sufficient. So, if this is a photo of an antique contract, creation_use:contract *could* be used, but why not just use format:contract and maybe general:yellowed paper?
     "creation_stage", -- what stage of the creation process the object is in. E.g. brainstorming, conceptualization, mockup, final_product, etc. Don't forget to add any relevant general tags. So if you have a mockup that which uses a smartphone mockup, add general:smartphone_mockup.
     "completeness", -- how complete the creator considers the object to be. E.g. complete, incomplete, abandoned, creation_stage_of_other_object
-    "creation_ware", -- the thing that was used to create the item. Can be both software and hardware. E.g. photoshop, iphone 11 pro, canon eos 5d mark iv, etc. Through tag parent/child relationships, this will add a fair few tags. e.g. creation_ware:photoshop -> creation_ware:raster graphics editor -> creation_ware:graphics editor -> creation_ware:visual editor -> creation_ware:software.
 
     -- creation tags > creation settings tags - what settings were used to create the object?
 
@@ -328,7 +340,12 @@ ls = {
     "teamfight tactics",
     "slay the spire",
     "sable game", -- canonical name: sable (game)
-    "dungeon massage service"
+    "dungeon massage service",
+    "google",
+      "google pixel",
+      "google nexus",
+      "google chrome",
+      "android google", -- canonical name: android (google)
   },
   use = {
     "hot",
@@ -343,6 +360,7 @@ ls = {
       "medium inspiration",
       "very inspiration",
       "incredibly inspiration",
+      "style inspiration",
     "reflection",
       "medium reflection",
       "very reflection",
@@ -488,6 +506,7 @@ ls = {
       "animallike",
         "real animal",
         "imagined animal",
+          "pokemon", -- aliases general:pokemon (creature)
       "robot", -- aliases general:robot
         "robot animallike", -- also implies things:animallike
         "semihumanoid robot", -- also implies things:semihumanoid, just decided to put it here arbitrarily
@@ -513,19 +532,28 @@ ls = {
               "infrastructure",
 
             "single object",
-              "consumer device",
-              "household object",
-                "furniture",
-                "appliance",
-                  "major appliance",
-                  "small appliance",
-              "piece of clothes",
-              "tool",
-                "sex toy", -- aliases general:sex toy
-                "bodyrelated tool",
-                  "genital tool",
-                    "speculum", -- aliases general:speculum
-                    "dilation tape", -- aliases general:dilation tape
+              "digital object",
+                "operating system",
+                  "mobile operating system",
+                    "android os", -- canonical name: android (os); aliases general:android (os); implies series:android google
+              "real object",
+                "consumer device",
+                  "black mirror",
+                    "smartphone",
+                      "google pixel smartphone", -- implies series:google pixel
+                        "google pixel 4",
+                "household object",
+                  "furniture",
+                  "appliance",
+                    "major appliance",
+                    "small appliance",
+                "piece of clothes",
+                "tool",
+                  "sex toy", -- aliases general:sex toy
+                  "bodyrelated tool",
+                    "genital tool",
+                      "speculum", -- aliases general:speculum
+                      "dilation tape", -- aliases general:dilation tape
           "material",
             "materials by assemblage",
               "strand-assembled materials",
@@ -555,22 +583,40 @@ ls = {
           "location",
         "hyperbody",
           "2d hyperbody",
-            "conics",
+            "conic section",
               "ellipse",
                 "circle",
+              "parabola",
+              "hyperbola",
             "polygon",
               "n-sided polygon",
                 "1-sided polygon",
                 "2-sided polygon",
-                "3-sided polygon",
+                "3-sided polygon", -- aliases general:triangle
                 "4-sided polygon",
                 "5-sided polygon",
                 "6-sided polygon",
                 "7-sided polygon",
                 "8-sided polygon",
-              "regular polygon",
-                "convex polygon",
-                "star polygon",
+                "9-sided polygon",
+                "10-sided polygon",
+                "11-sided polygon",
+                "12-sided polygon",
+              "equilateral polygon",
+              "equiangular polygon",
+              "parallel sides polygon",
+              "equilateral equiangular polygon",
+                "convex regular polygon",
+                  "3-sided convex regular polygon", -- canonical name: regular triangle
+                "star regular polygon",
+              "equilateral parallel sides polygon",
+                "4-sided equilateral parallel sides polygon", -- canonical name: rhombus; aliases general:diamond (shape)
+              "some other polygon",
+                "cross",
+                "x",
+            "other 2d hyperbody",
+              "sparkle",
+              "heart",
           "3d hyperbody",
             "polyhedron",
       "body part",
@@ -593,63 +639,14 @@ ls = {
                   "bear ear headphones", -- aliases general:bear ear headphones
                   "cat ear headphones", -- aliases general:cat ear headphones
                   "rabbit ear headphones", -- aliases general:dog ear headphones
-              "bat ear", -- aliases general:bat ears
-              "bear ear", -- aliases general:bear ears
-              "rabbit ear", -- aliases general:rabbit ears
-              "cat ear", -- aliases general:cat ears
-              "cow ear", -- aliases general:cow ears
-              "deer ear", -- aliases general:deer ears
-              "dog ear", -- aliases general:dog ears
-              "ferret ear", -- aliases general:ferret ears
-              "fox ear", -- aliases general:fox ears
-              "goat ear", -- aliases general:goat ears
-              "horse ear", -- aliases general:horse ears
-              "kemonomimi mode", -- aliases general:kemonomimi mode
-              "lion ear", -- aliases general:lion ears
-              "monkey ear", -- aliases general:monkey ears
-              "mouse ear", -- aliases general:mouse ears
-              "panda ear", -- aliases general:panda ears
-              "pikachu ear", -- aliases general:pikachu ears
-              "pig ear", -- aliases general:pig ears
-              "raccoon ear", -- aliases general:raccoon ears
-              "sheep ear", -- aliases general:sheep ears
-              "squirrel ear", -- aliases general:squirrel ears
-              "tiger ear", -- aliases general:tiger ears
-              "wolf ear", -- aliases general:wolf ears
             "mechanical ear", -- aliases general:mechanical ears
             "pointy ear", -- aliases general:pointy ears
               "long pointy ear", -- aliases general:long pointy ears
+          "iris",
+          "pupil",
           "eye", -- aliases general:eyes
-            "eyes with iris",
-              "multicolored eye", -- aliases general:multicolored eyes
-              "aqua eye", -- aliases general:aqua eyes
-              "black eye", -- aliases general:black eyes
-              "blue eye", -- aliases general:blue eyes
-              "brown eye", -- aliases general:brown eyes
-              "green eye", -- aliases general:green eyes
-              "grey eye", -- aliases general:grey eyes
-              "orange eye", -- aliases general:orange eyes
-              "purple eye", -- aliases general:purple eyes
-              "pink eye", -- aliases general:pink eyes
-              "red eye", -- aliases general:red eyes
-              "white eye", -- aliases general:white eyes
-              "yellow eye", -- aliases general:yellow eyes
-              "amber eye", -- aliases general:amber eyes
             "eyes with no pupils", -- aliases general:no pupils
             "eyes with pupils",
-              "aqua pupil", -- aliases general:aqua pupils
-              "black pupil", -- aliases general:black pupils
-              "blue pupil", -- aliases general:blue pupils
-              "brown pupil", -- aliases general:brown pupils
-              "green pupil", -- aliases general:green pupils
-              "grey pupil", -- aliases general:grey pupils
-              "orange pupil", -- aliases general:orange pupils
-              "purple pupil", -- aliases general:purple pupils
-              "pink pupil", -- aliases general:pink pupils
-              "red pupil", -- aliases general:red pupils
-              "white pupil", -- aliases general:white pupils
-              "yellow pupil", -- aliases general:yellow pupils
-              "amber pupil", -- aliases general:amber pupils
               "modified aperture pupil",
                 "constricted pupil", -- aliases general:constricted pupils
                 "dilated pupil", -- aliases general:dilated pupils
@@ -747,155 +744,7 @@ ls = {
   },
   -- if extant, the first part of the with is the active part, the second is the passive part
   arrangement = {
-    "agentlike with any",
-      "agentlike with agentlike",
-        "agentlike emoting to agentlike",
-          "agentlike affectionating agentlike",
-            "agentlike affectionating agentlike (nonromantic)", -- aliases general:affectionate
-            "agentlike cuddling agentlike", -- aliases general:cuddling
-        "related agentlike with agentlike",
-          "family agentlike with agentlike",
-            "family agentlike with related agentlike",
-              "family agentlike with family agentlike", -- aliases general:family
-
-        "agentlike with two agentlikes",
-          "agentlike lewding two agentlikes", -- aliases general:threesome
-      "gendered agentlike with any",
-        "female agentlike with any",
-          "female agentlike with agentlike",
-            "male agentlike with gendered agentlike",
-              "male agentlike with male agentlike",
-                "male agentlike vibing with male agentlike", -- aliases general:yaoi
-                "one male agentlike with two male agentlikes", 
-                  "one male agentlike lewding two male agentlikes",-- aliases general:MMM threesome
-            "female agentlike with gendered agentlike",
-              "female agentlike with female agentlike",
-                "female agentlike vibing with female agentlike", -- aliases general:yuri
-                "one female agentlike with two female agentlikes", 
-                  "one female agentlike lewding two female agentlikes",-- aliases general:FFF threesome
-              "female agentlike with male agentlike",
-                "one female agentlike with one male agentlike",
-                  "one female agentlike vibing with one male agentlike", -- aliases general:hetero
-                "one female agentlike with two male agentlikes", 
-                  "one female agentlike lewding two male agentlikes",-- aliases general:MMF threesome
-                "two female agentlikes with one male agentlike", 
-                  "two female agentlikes lewding one male agentlike",-- aliases general:FFM threesome
-      "agentlike with body part",
-        "agentlike with anatomical category",
-          "agentlike with muscles",
-            "agentlike emoting about muscles",
-              "agentlike envying muscles", -- aliases general:muscle envy
-        "agentlike with general body part",
-          "agentlike with breasts",
-            "agentlike with breasts",
-              "agentlike envying breasts",
-              "agentlike with large breasts",
-                "agentlike emoting about large breasts",
-                  "agentlike envying large breasts", -- aliases general:breast envy
-              "agentlike with small breasts",
-                "agentlike emoting about small breasts",
-                  "agentlike envying flat breasts", -- aliases general:flat awe
-              "agentlike emoting about breasts",
-                "agentlike awed by breasts", -- aliases general:breast awe
-      "agentlike carrying any", -- aliases general:carrying
-        "agentlike carrying any on body part",
-          "agentlike carrying any on shoulder", -- aliases general:carrying over shoulder
-          "agentlike carrying any under arm", -- aliases general:carrying under arm
-        "agentlike carrying object", 
-        "agentlike carrying agentlike", -- aliases general:carrying person
-          "princess carry", -- aliases general:princes carry
-          "firemans carry", -- aliases general:fireman's carry
-          "agentlike carrying agentlike on shoulder", -- aliases general:shoulder carry
-          "agentlike carrying agentlike on back", -- aliases general:piggyback
-          "agentlike carrying child agentlike", -- aliases general:child carry
-          "agentlike carrying baby agentlike", -- aliases general:baby carry
-    "object with any",
-      "body part with amy",
-        "general body part with any",
-          "limb with any",
-            "hand with any",
-              "hand with object",
-                "hand with body part",
-                  "hand with general body part",
-                    "hand with hip",
-                      "hand on hip", -- aliases general:hand on feet
-                        "hand on hip (own)", 
-                          "one hand on hip (own)", -- aliases general:hand on own hip
-                          "two hands on hip (own)", -- aliases general:hands on own hip
-                        "hand on hip (other)",
-                          "one hand on hip (other)", -- aliases general:hand on another's hip
-                          "two hands on hip (other)", -- aliases general:hands on another's hip
-                      "hand grabbing or pulling hip", -- aliases general:hip grab; general:hip pull; general:grabbing hip; general:pulling hip
-                        "hand grabbing or pulling hip (own)", -- aliases general:grabbing own hip, general:pulling own hip
-                        "hand grabbing or pulling hip (other)", -- aliases genereral:grabbing another's hip, general:pulling another's hip
-                      "hand around hip", -- aliases general:hand around hip
-                      "hand holding hip",
-                        "hand holding one hip", -- aliases general:holding hip
-                        "hand holding two hips", -- aliases general:holding hips
-                    -- todo: mirror the above for horns, hair, forehead, ear, eyes
-                "hand with non body part",
-                  "hand on non body part", 
-                  "hand around non body part", 
-                  "hand holding non body part", 
-              "hand with agentlike", 
-                "hand on agentlike",
-                "hand around agentlike",
-                "hand holding agentlike",
-            "arm with any",
-              "arm with any",
-                "arm with object",
-                  "arm with body part",
-                    "arm with general body part",
-                      "arm with neck", -- aliases general:arms around neck
-                        "arm around neck", -- aliases general:arms around neck
-                          "arm hugging neck",
-                      "arm with waist", -- aliases general:arms around waist
-                        "arm around waist", -- aliases general:arms around waist
-                          "arm hugging waist", -- aliases general:hugging waist
-                      "arm with back", -- aliases general:arms around back
-                        "arm around back", -- aliases general:arms around back
-                      "arm with leg",
-                        "arm around leg",
-                          "arm hugging leg", 
-                            "arm hugging leg (other)", -- aliases general:hugging another's leg
-                            "arm hugging leg (own)", -- aliases general:hugging own leg
-                      "arm with arm",
-                        "arm around arm",
-                          "arm around arm (other)",
-                            "one arm around one arm", -- aliases general:locked arms
-                        "two arms around one arm", -- aliases general:arm hug
-                  "arm with non body part",
-                    "arm around non body part", 
-                      "arm hugging non body part", -- aliases general:hugging object
-                "arm with agentlike", 
-                  "arm around agentlike", 
-                    "arm hugging agentlike", -- aliases general:hug
-      "object with object",
-        "object with body part",
-          "object with genital",
-            "object with penis",
-              "body part with penis",
-            "object with vulva",
-              "spread vulva", -- aliases general:spread pussy
-        "body part with object",
-          "tongue with object", -- aliases general:licking
-            "tongue with body part", -- aliases general:
-              "tongue with general body part", -- aliases general:
-                "tongue with genital", -- aliases general:
-                  "tongue with primary genital", -- aliases general:oral
-                    "tongue with penis", -- aliases general:
-                      "tongue with fake penis", -- aliases general:licking dildo
-                      "tongue with penis (implied)", -- aliases general:implied fellatio
-                      "tongue with penis (after)", -- aliases general:after fellatio
-                      "tongue with penis (own)", -- aliases general:autofellatio
-                      "tongue with penis (deep)", -- aliases general:deepthroat
-                      "two tongues with penis", -- aliases general:cooperative fellatio
-                      "tongue with two penises", -- aliases general:double fellatio
-
-                    "tongue with genital holelike", -- aliases general:
-                      "tongue with vulva", -- aliases general:cunnilingus
-                        "tongue with vulva (own)", -- aliases general:autoconnilingus
-                        "tongue with vulva (implied)", -- aliases general:implied cunnilingus
+    
 
 
 
@@ -1050,34 +899,264 @@ ls = {
           "blur effect", -- aliases general:blur 
   },
   cross_applications = {
-    "x with x",
-      "composition with x",
-        "visual composition with x",
-          "2d composition with x",
-            "subjectivity related composition with x",
-              "subjectivity composition with x",
-                "subject composition with x",
-                  "subject composition with thing",
-                    "subject composition with object",
-                      "subject composition with body part",
-                        "subject composition with general body part",
-                          "subject composition with eye", -- aliases general:eye focus
-                    "subject compositin with agentlike",
-                      "subject compositin with gendered agentlike",
-                        "subject composition with male agentlike", -- aliasess general:male focus
-      "effect with x",
-        "visual effect with x",
-          "2d effect with x",
-            "post effect with x",
-              "blur effect with x",
-                "blur effect with visual composition",
-                  "blur effect with 2d composition",
-                    "blur effect with visual layer related composition",
-                      "blur effect with visual layer composition",
-                        "blur effect with foreground composition", -- aliases general:foreground blur
-                        "blur effect with midground composition", -- aliases general:midground blur
-                        "blur effect with background composition", -- aliases general:background blur
-      "allusion with x",
+      "thing + x",
+        "agentlike + x",
+          "agentlike + thing",
+            "agentlike + agentlike",
+              "agentlike kantokukouing agentlike",
+                "agentlike kawaigaruing agentlike",
+                  "agentlike kawaigaruing agentlike (nonromantic)", -- aliases general:affectionate
+                  "agentlike cuddling agentlike", -- aliases general:cuddling
+              "related agentlike + agentlike",
+                "family agentlike + agentlike",
+                  "family agentlike + related agentlike",
+                    "family agentlike + family agentlike", -- aliases general:family
+              "agentlike + two agentlikes",
+                "agentlike lewding two agentlikes", -- aliases general:threesome
+            "gendered agentlike + thing",
+              "female agentlike + thing",
+                "female agentlike + agentlike",
+                  "male agentlike + gendered agentlike",
+                    "male agentlike + male agentlike",
+                      "male agentlike aijou hyougening male agentlike", -- aliases general:yaoi
+                      "one male agentlike + two male agentlikes", 
+                        "one male agentlike lewding two male agentlikes",-- aliases general:MMM threesome
+                  "female agentlike + gendered agentlike",
+                    "female agentlike + female agentlike",
+                      "female agentlike aijou hyougening female agentlike", -- aliases general:yuri
+                      "one female agentlike + two female agentlikes", 
+                        "one female agentlike lewding two female agentlikes",-- aliases general:FFF threesome
+                    "female agentlike + male agentlike",
+                      "one female agentlike + one male agentlike",
+                        "one female agentlike aijou hyougening one male agentlike", -- aliases general:hetero
+                      "one female agentlike + two male agentlikes", 
+                        "one female agentlike lewding two male agentlikes",-- aliases general:MMF threesome
+                      "two female agentlikes + one male agentlike", 
+                        "two female agentlikes lewding one male agentlike",-- aliases general:FFM threesome
+            "agentlike + body part",
+              "agentlike + anatomical category",
+                "agentlike + muscles",
+                  "agentlike affecting muscles",
+                    "agentlike envying muscles", -- aliases general:muscle envy
+              "agentlike + general body part",
+                "agentlike + breasts",
+                  "agentlike + breasts",
+                    "agentlike envying breasts",
+                    "agentlike + large breasts",
+                      "agentlike affecting large breasts",
+                        "agentlike envier of large breasts", -- aliases general:breast envy
+                    "agentlike + small breasts",
+                      "agentlike affecting small breasts",
+                        "agentlike envier of flat breasts", -- aliases general:flat awe
+                    "agentlike affecting breasts",
+                      "agentlike awed by breasts", -- aliases general:breast awe
+            "agentlike carrying thing", -- aliases general:carrying
+              "agentlike carrying thing on body part",
+                "agentlike carrying thing on shoulder", -- aliases general:carrying over shoulder
+                "agentlike carrying thing under arm", -- aliases general:carrying under arm
+              "agentlike carrying object", 
+              "agentlike carrying agentlike", -- aliases general:carrying person
+                "princess carry", -- aliases general:princes carry
+                "firemans carry", -- aliases general:fireman's carry
+                "agentlike carrying agentlike on shoulder", -- aliases general:shoulder carry
+                "agentlike carrying agentlike on back", -- aliases general:piggyback
+                "agentlike carrying child agentlike", -- aliases general:child carry
+                "agentlike carrying baby agentlike", -- aliases general:baby carry
+        "object + x",
+          "object + x",
+            "body part + x",
+              "general body part + x",
+                "iris + x",
+                  "iris + visual style",
+                    "iris + color style",
+                      "iris + SBCS^2^",
+                        "iris + hue SBCS^2^",
+                          "iris + hue polyadic SBCS^2^", -- aliases general:multicolored eyes
+                          "iris + hue 1-adic SBCS^2^",
+                            "iris + hue 1-adic range SBCS^2^",
+                              "iris + hue 1-adic range SBCS^2^ palette",
+                                "iris + aqua 1-adic range SBCS^2^ palette", -- aliases general:aqua eyes
+                                "iris + black 1-adic range SBCS^2^ palette", -- aliases general:black eyes
+                                "iris + blue 1-adic range SBCS^2^ palette", -- aliases general:blue eyes
+                                "iris + brown 1-adic range SBCS^2^ palette", -- aliases general:brown eyes
+                                "iris + green 1-adic range SBCS^2^ palette", -- aliases general:green eyes
+                                "iris + grey 1-adic range SBCS^2^ palette", -- aliases general:grey eyes
+                                "iris + orange 1-adic range SBCS^2^ palette", -- aliases general:orange eyes
+                                "iris + pink 1-adic range SBCS^2^ palette", -- aliases general:pink eyes
+                                "iris + purple 1-adic range SBCS^2^ palette", -- aliases general:purple eyes
+                                "iris + red 1-adic range SBCS^2^ palette", -- aliases general:red eyes
+                                "iris + white 1-adic range SBCS^2^ palette", -- aliases general:white eyes
+                                "iris + yellow 1-adic range SBCS^2^ palette", -- aliases general:yellow eyes
+                "pupil + x",
+                  "pupil + visual style",
+                    "pupil + color style",
+                      "pupil + SBCS^2^",
+                        "pupil + hue SBCS^2^",
+                          "pupil + hue polyadic SBCS^2^", -- aliases general:multicolored pupils
+                          "pupil + hue 1-adic SBCS^2^",
+                            "pupil + hue 1-adic range SBCS^2^",
+                              "pupil + hue 1-adic range SBCS^2^ palette",
+                                "pupil + aqua 1-adic range SBCS^2^ palette", -- aliases general:aqua pupils
+                                "pupil + black 1-adic range SBCS^2^ palette", -- aliases general:black pupils
+                                "pupil + blue 1-adic range SBCS^2^ palette", -- aliases general:blue pupils
+                                "pupil + brown 1-adic range SBCS^2^ palette", -- aliases general:brown pupils
+                                "pupil + green 1-adic range SBCS^2^ palette", -- aliases general:green pupils
+                                "pupil + grey 1-adic range SBCS^2^ palette", -- aliases general:grey pupils
+                                "pupil + orange 1-adic range SBCS^2^ palette", -- aliases general:orange pupils
+                                "pupil + pink 1-adic range SBCS^2^ palette", -- aliases general:pink pupils
+                                "pupil + purple 1-adic range SBCS^2^ palette", -- aliases general:purple pupils
+                                "pupil + red 1-adic range SBCS^2^ palette", -- aliases general:red pupils
+                                "pupil + white 1-adic range SBCS^2^ palette", -- aliases general:white pupils
+                                "pupil + yellow 1-adic range SBCS^2^ palette", -- aliases general:yellow pupils
+                  "pupil + thing",
+                    "pupil + object",
+                      "pupil + body part",
+                        "pupil + general body part",
+                        
+                "ear + x",
+                  "ear + thing",
+                    "ear + agentlike",
+                      "ear + animallike",
+                        "ear + imagined animal",
+                          "ear + pokemon",
+                        "ear + real animal",
+                          "ear masking bat", -- aliases general:bat ears
+                          "ear masking bear", -- aliases general:bear ears
+                          "ear masking rabbit", -- aliases general:rabbit ears
+                          "ear masking cat", -- aliases general:cat ears
+                          "ear masking cow", -- aliases general:cow ears
+                          "ear masking deer", -- aliases general:deer ears
+                          "ear masking dog", -- aliases general:dog ears
+                          "ear masking ferret", -- aliases general:ferret ears
+                          "ear masking fox", -- aliases general:fox ears
+                          "ear masking goat", -- aliases general:goat ears
+                          "ear masking horse", -- aliases general:horse ears
+                          "ear masking lion", -- aliases general:lion ears
+                          "ear masking monkey", -- aliases general:monkey ears
+                          "ear masking mouse", -- aliases general:mouse ears
+                          "ear masking panda", -- aliases general:panda ears
+                          "ear masking pikachu", -- aliases general:pikachu ears
+                          "ear masking pig", -- aliases general:pig ears
+                          "ear masking raccoon", -- aliases general:raccoon ears
+                          "ear masking sheep", -- aliases general:sheep ears
+                          "ear masking squirrel", -- aliases general:squirrel ears
+                          "ear masking tiger", -- aliases general:tiger ears
+                          "ear masking wolf", -- aliases general:wolf ears
+                "limb + x",
+                  "hand + x",
+                    "hand + thing",
+                      "hand + object",
+                        "hand + body part",
+                          "hand + general body part",
+                            "hand + hip",
+                              "hand tangent hip", -- aliases general:hand on feet
+                                "hand tangent hip (reflexive voice)", 
+                                  "one hand tangent hip (reflexive voice)", -- aliases general:hand on own hip
+                                  "two hands tangent hip (reflexive voice)", -- aliases general:hands on own hip
+                                "hand tangent hip (other)",
+                                  "one hand tangent hip (other)", -- aliases general:hand on another's hip
+                                  "two hands tangent hip (other)", -- aliases general:hands on another's hip
+                              "hand grabbing or pulling hip", -- aliases general:hip grab; general:hip pull; general:grabbing hip; general:pulling hip
+                                "hand grabbing or pulling hip (reflexive voice)", -- aliases general:grabbing own hip, general:pulling own hip
+                                "hand grabbing or pulling hip (other)", -- aliases genereral:grabbing another's hip, general:pulling another's hip
+                              "hand circumtangent hip", -- aliases general:hand around hip
+                              "hand holding hip",
+                                "hand holding one hip", -- aliases general:holding hip
+                                "hand holding two hips", -- aliases general:holding hips
+                            -- todo: mirror the above for horns, hair, forehead, ear, eyes
+                        "hand + non body part",
+                          "hand tangent non body part", 
+                            "hand tangent non body part", 
+                            "hand circumtangent non body part", 
+                            "hand holding non body part", 
+                      "hand + agentlike", 
+                        "hand tangent agentlike",
+                          "hand tangent agentlike",
+                          "hand circumtangent agentlike",
+                          "hand holding agentlike",
+                  "arm + x",
+                    "arm + thing",
+                      "arm + object",
+                        "arm + body part",
+                          "arm + general body part",
+                            "arm + neck", -- aliases general:arms around neck
+                              "arm circumtangent neck", -- aliases general:arms around neck
+                                "arm hugging neck",
+                            "arm + waist", -- aliases general:arms around waist
+                              "arm circumtangent waist", -- aliases general:arms around waist
+                                "arm hugging waist", -- aliases general:hugging waist
+                            "arm + back", -- aliases general:arms around back
+                              "arm circumtangent back", -- aliases general:arms around back
+                            "arm + leg",
+                              "arm circumtangent leg",
+                                "arm hugging leg", 
+                                  "arm hugging leg (other)", -- aliases general:hugging another's leg
+                                  "arm hugging leg (reflexive voice)", -- aliases general:hugging own leg
+                            "arm + arm",
+                              "arm circumtangent arm",
+                                "arm circumtangent arm (other)",
+                                  "one arm circumtangent one arm", -- aliases general:locked arms
+                              "two arms circumtangent one arm", -- aliases general:arm hug
+                        "arm + non body part",
+                          "arm circumtangent non body part", 
+                            "arm hugging non body part", -- aliases general:hugging object
+                      "arm + agentlike", 
+                        "arm circumtangent agentlike", 
+                          "arm hugging agentlike", -- aliases general:hug
+            "object + object",
+              "object + body part",
+                "object + genital",
+                  "object + penis",
+                    "body part + penis",
+                  "object + vulva",
+                    "spread vulva", -- aliases general:spread pussy
+              "body part + object",
+                "tongue + object", -- aliases general:licking
+                  "tongue + body part", -- aliases general:
+                    "tongue + general body part", -- aliases general:
+                      "tongue + genital", -- aliases general:
+                        "tongue + primary genital", -- aliases general:oral
+                          "tongue + penis", -- aliases general:
+                            "tongue + fake penis", -- aliases general:licking dildo
+                            "tongue + penis (inferential evidentiality)", -- aliases general:implied fellatio
+                            "tongue + penis (retrospective aspect)", -- aliases general:after fellatio
+                            "tongue + penis (reflexive voice)", -- aliases general:autofellatio
+                            "tongue + penis (deep)", -- aliases general:deepthroat
+                            "two tongues + penis", -- aliases general:cooperative fellatio
+                            "tongue + two penises", -- aliases general:double fellatio
+
+                          "tongue + genital holelike", -- aliases general:
+                            "tongue + vulva", -- aliases general:cunnilingus
+                              "tongue + vulva (reflexive voice)", -- aliases general:autoconnilingus
+                              "tongue + vulva (inferential evidentiality)", -- aliases general:implied cunnilingus
+             
+      "composition + x",
+        "visual composition + x",
+          "2d composition + x",
+            "subjectivity related composition + x",
+              "subjectivity composition + x",
+                "subject composition + x",
+                  "subject composition + thing",
+                    "subject composition + object",
+                      "subject composition + body part",
+                        "subject composition + general body part",
+                          "subject composition + eye", -- aliases general:eye focus
+                    "subject compositin + agentlike",
+                      "subject compositin + gendered agentlike",
+                        "subject composition + male agentlike", -- aliasess general:male focus
+      "effect + x",
+        "visual effect + x",
+          "2d effect + x",
+            "post effect + x",
+              "blur effect + x",
+                "blur effect + visual composition",
+                  "blur effect + 2d composition",
+                    "blur effect + visual layer related composition",
+                      "blur effect + visual layer composition",
+                        "blur effect + foreground composition", -- aliases general:foreground blur
+                        "blur effect + midground composition", -- aliases general:midground blur
+                        "blur effect + background composition", -- aliases general:background blur
+      "allusion + x",
 
   },
   allusion = {
@@ -1099,19 +1178,94 @@ ls = {
     "purple haired mpdg pornpen", -- canonical name: purple haired mpdg (pornpen)
   },
   creation_ware = {
-    "meatspace tools",
-    "digital tools",
-      "software",
-        "ai",
-          "ai model",
-            "image generation model",
-              "text to image model",
-                "pornpen text to image model",
-                  "pornpen anime text to image model",
-                    "pornpen anime detailed model",
-          "ai interface",
-            "pornpen interface",
-            "midjourney interface",  
+    "creation location",
+      "meatspace",
+      "cyberspace",
+    "creation method",
+      "capturing",
+      "generating",
+      "manual creation",
+    "creation instrument",
+      "creation agent",
+        "individual creator",
+        "group of creators",
+          "creator circle",
+          "creator studio",
+          "creator company",
+      "creation tool",
+        "hardware",
+          "hardware brand",
+            "xiaomi",
+        "software",
+    "creation setting",
+    "creation location + x", -- implies creation_ware:creation location
+      "meatspace + x", -- implies creation_ware:meatspace
+        "meatspace + creation method", -- implies creation_ware:creation method
+          "meatspace + capturing", -- implies creation_ware:capturing
+            "meatspace + capturing + creation instrument", -- implies creation_ware:creation instrument
+              "meatspace + capturing + creation tool", -- implies creation_ware:creation tool
+                "meatspace + capturing + hardware", -- implies creation_ware:hardware
+                  "smartphone",
+                    "xiaomi smartphone",
+                      "xiaomi redmi note 11 pro plus 5g",
+                  "camera",
+                    "integrated camera",
+                      "front camera",
+                      "rear camera",
+                    "dedicated camera",
+                      "dslr",
+                      "mirrorless camera",
+                  "scanner",
+      "cyberspace + x", -- implies creation_ware:cyberspace
+        "cyberspace + creation method", -- implies creation_ware:creation method
+          "cyberspace + capturing", -- implies creation_ware:capturing
+            "screen capture", -- aliases meta:screenshot
+            "cyberspace + capturing + creation instrument", -- implies creation_ware:creation instrument
+              "cyberspace + capturing + creation tool", -- implies creation_ware:creation tool
+          "cyberspace + generating", -- implies creation_ware:generating
+            "cyberspace + generating + creation instrument", -- implies creation_ware:creation instrument
+              "cyberspace + generating + creation tool", -- implies creation_ware:creation tool
+                "cyberspace + generating + software", -- implies creation_ware:software
+                  "generative ai",
+                    "generative ai model",
+                      "image generation model",
+                        "text to image model",
+                          "trynectar text to image model",
+                          "pornpen text to image model",
+                            "pornpen anime text to image model",
+                              "pornpen anime detailed model",
+                              "pornpen anime v1 model",
+                              "pornpen women accurate model",
+                              "pornpen women realistic model",
+                              "pornpen women detiailed model",
+                              "pornpen men v1 model",
+                              "pornpen missionary model",
+                              "pornpen blowjob model",
+                              "pornpen doggystyle model",
+                    "generative ai interface",
+                      "image generation interface",
+                        "pornpen web interface",
+                        "midjourney discord interface",
+                        "trynectar interface",
+          "cyberspace + manual creation", -- implies creation_ware:manual creation
+            "cyberspace + manual creation + creation instrument", -- implies creation_ware:creation instrument
+              "cyberspace + manual creation + creation tool", -- implies creation_ware:creation tool
+                "cyberspace + manual creation + software", -- implies creation_ware:software
+                  "graphics editor",
+                    "still editor",
+                      "2d graphics editor",
+                        "image processing editor",
+                          "adobe lightroom",
+                        "raster graphics editor",
+                          "gimp",
+                          "photoshop",
+                        "vector graphics editor",
+                          "affinity designer",
+                          "inkscape",
+                    "video editor",
+                      "davinci resolve",
+          
+
   },
   style = {
     "visual style",
@@ -1151,6 +1305,18 @@ ls = {
             "hue 1-adic SBCS^2^",
               "hue 1-adic range SBCS^2^",
                   "hue 1-adic range SBCS^2^ palette", -- aliases general:monochrome
+                    "aqua 1-adic range SBCS^2^ palette",
+                    "black 1-adic range SBCS^2^ palette",
+                    "blue 1-adic range SBCS^2^ palette",
+                    "brown 1-adic range SBCS^2^ palette",
+                    "green 1-adic range SBCS^2^ palette",
+                    "grey 1-adic range SBCS^2^ palette",
+                    "orange 1-adic range SBCS^2^ palette",
+                    "pink 1-adic range SBCS^2^ palette",
+                    "purple 1-adic range SBCS^2^ palette",
+                    "red 1-adic range SBCS^2^ palette",
+                    "white 1-adic range SBCS^2^ palette",
+                    "yellow 1-adic range SBCS^2^ palette",
                   "hue 1-adic range SBCS^2^ theme",
                     "aqua 1-adic range SBCS^2^ theme", -- aliases general:aqua theme
                     "black 1-adic range SBCS^2^ theme", -- aliases general:black theme
@@ -1173,6 +1339,7 @@ ls = {
 
   },
   medium = {
+    "audio",
     "visual",
       "still",
         "twodimensional media",
@@ -1208,11 +1375,11 @@ ls = {
             "digital media",
               "2d",
               "3d",
-        "object media",
-        "unconventional media",
+        "nontwodominesional media", -- aliases general:unconventional media
         "mixed media", -- tag this if two or more of photography, object media, traditional media, digital media, and unconventional media apply, but not if two different subtype tags apply. e.g. watercolor and ballpoint pen is not mixed media (with how common it is to use two different implements, that'd be insane)
 
   },
+
   format = {
     "audio",
     "visual",
@@ -1345,7 +1512,6 @@ ls = {
     "season",
     "series",
     "character",
-    "creator",
     "studio",
     "title",
     "prompt"

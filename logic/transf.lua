@@ -840,10 +840,17 @@ transf = {
           )
         end
       )
-      if get.arr.bool_by_contains(path_components, "android") then
-        dothis.arr.push(res, {"general", "android_(os)"})
-      end
 
+      for _, path_component in transf.arr.pos_int_vt_stateless_iter(path_components) do
+        local current_namespace
+        if get.arr.bool_by_contains(ls.all_namespace, path_component) then -- all subdirs until we find the next namespace are assumed to be metadata in that namespace
+          current_namespace = path_component
+        elseif current_namespace then
+          if get.arr.bool_by_contains(ls[current_namespace], path_component) then
+            dothis.arr.push(res, {current_namespace, path_component})
+          end
+        end
+      end
       if get.arr.bool_by_contains(path_components, "screenshots") then
         dothis.arr.push(res, {"meta", "screenshot"})
         for _, service in transf.arr.pos_int_vt_stateless_iter(ls.services) do

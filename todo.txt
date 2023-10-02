@@ -21,6 +21,7 @@ post 'lua is working':
       - need to think on how to handle other file transmission & parsing (e.g. downloads, images from phone)
       - parse manga panels -> add to hydrus
       - needs auto tagging capabilities based on ai
+      - deal with low-tagging boorus and other sources
     - shrinking, moving other documents
     - consider how to integrate email into history
     - is self-renaming of dated dirs implemented?
@@ -41,6 +42,7 @@ post 'lua is working':
   - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them -> Perhaps better\: cache MAUDIOVISUAL urls, allow playing of those local files as dropin (however, we also query a lot from yt, so we need to cache that - ideally permanently). However\: Cache should be conceptualized as temporary, but this cache as permanent. So we need some solution to say 'don't delete this cache', or a different kind of cache. Okay, I have an idea: Fetch url, urlmd5 it, create entry in dir. When playing, check whether we have corresponding file, either use it or download it (only non-playlists).
   - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
   - danbooru search links need their query to count as 'seen' for other queries
+  - convenient way to deal with anonymous but permanent email addresses
   - citations
     - add citations and test citation usage workflow
     - rename, sort books based on what is needed for citation workflow, and what is desirable

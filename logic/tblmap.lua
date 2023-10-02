@@ -589,7 +589,7 @@ tblmap = {
   },
   lower_strict_snake_case = {
     all_namespace = {
-      tcrea = "creator",
+      tcrea = "creation_ware",
       series = "series",
       srs = "series",
       char = "character",
