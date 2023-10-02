@@ -22,6 +22,7 @@ post 'lua is working':
       - parse manga panels -> add to hydrus
       - needs auto tagging capabilities based on ai
       - deal with low-tagging boorus and other sources
+      - way to add url and make ai add tags later
     - shrinking, moving other documents
     - consider how to integrate email into history
     - is self-renaming of dated dirs implemented?

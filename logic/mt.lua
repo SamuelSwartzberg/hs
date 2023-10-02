@@ -504,9 +504,77 @@ ls = {
             "slime girl", -- aliases general:slime girl
 
       "animallike",
+        "animal by taxon (simplified)",
+          "vertebrate",
+            "mammal",
+              "carnivora animal",
+                "bear",
+                  "brown bear",
+                  "black bear",
+                  "polar bear",
+                "felidae animal",
+                  "felinae animal",
+                    "cat",
+                    "lynx",
+                    "puma",
+                  "panthera animal",
+                    "tiger",
+                    "lion",
+                    "leopard",
+                    "jaguar",
+                    "snow leopard",
+                "canidae animal",
+                  "canina animal",
+                    "wolf",
+                    "dog",
+                    "coyote",
+                  "vulpini animal",
+                    "racoon dog",
+                      "tanuki",
+                    "fox",
+                  "other canidae animal",
+                    "jackal",
+                "musteloidae animal",
+                  "weasel",
+                  "otter",
+                  "badger",
+                  "raccoon",
+                  "skunk",
+                  "ferret",
+                "other carnivora taxa animal",
+              "rodentia",
+                "porcupine",
+                "quinea pig",
+                "beaver",
+                "chipmunk",
+                "squirrel",
+                "rat",
+                "mouse",
+                "hamster",
+                "gerbil",
+              "primate",
+                "prosimian",
+                  "lemur",
+                  "loris",
+                "monkey",
+                "ape",
+                  "lesser ape",
+                  "great ape",
+                    "orangutan",
+                    "gorilla",
+                    "chimpanzee",
+                    "bonobo",
+              "lagomorpha animal",
+                "hare",
+                "rabbit",
+            "fish",
+            "amphiban",
+            "reptile",
+            "bird",
         "real animal",
         "imagined animal",
           "pokemon", -- aliases general:pokemon (creature)
+            "pikachu", 
       "robot", -- aliases general:robot
         "robot animallike", -- also implies things:animallike
         "semihumanoid robot", -- also implies things:semihumanoid, just decided to put it here arbitrarily
@@ -532,11 +600,13 @@ ls = {
               "infrastructure",
 
             "single object",
+              "abstract object",
+                "text",
               "digital object",
                 "operating system",
                   "mobile operating system",
                     "android os", -- canonical name: android (os); aliases general:android (os); implies series:android google
-              "real object",
+              "meatspace object",
                 "consumer device",
                   "black mirror",
                     "smartphone",
@@ -549,6 +619,8 @@ ls = {
                     "small appliance",
                 "piece of clothes",
                 "tool",
+                  "medical device",
+                    "medical test",
                   "sex toy", -- aliases general:sex toy
                   "bodyrelated tool",
                     "genital tool",
@@ -581,6 +653,10 @@ ls = {
             "dutch flag",
         "concept",
           "location",
+          "language",
+            "english",
+            "japanese",
+            "german",
         "hyperbody",
           "2d hyperbody",
             "conic section",
@@ -621,6 +697,14 @@ ls = {
             "polyhedron",
       "body part",
         "body part grouping",
+          "body part grouping by function",
+            "sensory organ",
+            "pleasurable organ",
+              "crotch pleasurable organ",
+            "ussy",
+          "body part grouping by similarity",
+            "digit",
+            "teashi",
           "axis body part grouping",
             "y axis body part grouping",
               "bi-ly body part grouping",
@@ -704,18 +788,15 @@ ls = {
           "tail",
           "ass",
           "crotch",
-          "genital",
-            "chest",
-              "breasts",
-            "primary genital",
-              "penis",
-                "real penis", --
-                "fake penis", -- aliases general:dildo; implies thing:sex toy
-                  "fake vibrating penis",
-                  "fake penis with suction cup", -- aliases general:suction cup dildo
-              "genital holelike",
-                "vulva",
-                "anus",
+          "chest",
+          "breasts",
+          "penis",
+            "real penis", --
+            "fake penis", -- aliases general:dildo; implies thing:sex toy
+              "fake vibrating penis",
+              "fake penis with suction cup", -- aliases general:suction cup dildo
+          "vulva",
+          "anus",
           "hip",
           "thigh",
           "knee",
@@ -1103,32 +1184,26 @@ ls = {
                       "arm + agentlike", 
                         "arm circumtangent agentlike", 
                           "arm hugging agentlike", -- aliases general:hug
-            "object + object",
-              "object + body part",
-                "object + genital",
-                  "object + penis",
-                    "body part + penis",
-                  "object + vulva",
-                    "spread vulva", -- aliases general:spread pussy
-              "body part + object",
-                "tongue + object", -- aliases general:licking
-                  "tongue + body part", -- aliases general:
-                    "tongue + general body part", -- aliases general:
-                      "tongue + genital", -- aliases general:
-                        "tongue + primary genital", -- aliases general:oral
-                          "tongue + penis", -- aliases general:
-                            "tongue + fake penis", -- aliases general:licking dildo
-                            "tongue + penis (inferential evidentiality)", -- aliases general:implied fellatio
-                            "tongue + penis (retrospective aspect)", -- aliases general:after fellatio
-                            "tongue + penis (reflexive voice)", -- aliases general:autofellatio
-                            "tongue + penis (deep)", -- aliases general:deepthroat
-                            "two tongues + penis", -- aliases general:cooperative fellatio
-                            "tongue + two penises", -- aliases general:double fellatio
+                "tongue + x",
+                  "tongue + thing",
+                    "tongue + object", -- aliases general:licking
+                      "tongue + body part", -- aliases general:
+                        "tongue + general body part", -- aliases general:
+                          "tongue + genital", -- aliases general:
+                            "tongue + primary genital", -- aliases general:oral
+                              "tongue + penis", -- aliases general:
+                                "tongue + fake penis", -- aliases general:licking dildo
+                                "tongue + penis (inferential evidentiality)", -- aliases general:implied fellatio
+                                "tongue + penis (retrospective aspect)", -- aliases general:after fellatio
+                                "tongue + penis (reflexive voice)", -- aliases general:autofellatio
+                                "tongue + penis (deep)", -- aliases general:deepthroat
+                                "two tongues + penis", -- aliases general:cooperative fellatio
+                                "tongue + two penises", -- aliases general:double fellatio
 
-                          "tongue + genital holelike", -- aliases general:
-                            "tongue + vulva", -- aliases general:cunnilingus
-                              "tongue + vulva (reflexive voice)", -- aliases general:autoconnilingus
-                              "tongue + vulva (inferential evidentiality)", -- aliases general:implied cunnilingus
+                              "tongue + genital holelike", -- aliases general:
+                                "tongue + vulva", -- aliases general:cunnilingus
+                                  "tongue + vulva (reflexive voice)", -- aliases general:autoconnilingus
+                                  "tongue + vulva (inferential evidentiality)", -- aliases general:implied cunnilingus
              
       "composition + x",
         "visual composition + x",
