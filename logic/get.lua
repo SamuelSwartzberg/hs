@@ -897,6 +897,12 @@ get = {
     pos_int_by_amount_contained_overlap = function(str, substr)
       return plstringx.count(str, substr, true)
     end,
+    pos_int_by_indent = function(line, indent_size)
+      return 
+        transf.number.int_by_floor(
+          transf.str.pos_int_by_initial_space_indent_len(line) / indent_size
+        )
+    end,
     str_by_sub_lua = string.sub,
     str_by_sub_eutf8 = eutf8.sub,
     str_by_formatted_w_n_anys = string.format,
@@ -935,6 +941,11 @@ get = {
         act.arr.pop(res)
       end
       return res
+    end,
+    not_starting_o_ending_with_whitespace_str_by_split_noedge_w_str = function(str, sep)
+      return transf.str_arr.not_starting_o_ending_with_whitespace_str_arr(
+        get.str.str_arr_by_split_noedge_w_str(str, sep)
+      )
     end,
     n_strs_by_split_w_str = function(str, sep, n)
       return transf.arr.n_anys(get.str.str_arr_by_split_w_str(str, sep, n))

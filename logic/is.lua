@@ -84,6 +84,7 @@ is = {
       return get.str.bool_by_startswith(str, "#!")
     end,
     raw_contact = transf["nil"]["true"],
+    hydrus_relationship_block = transf["nil"]["true"],
     ini_section_contents_str = function(str)
       return get.arr.bool_by_all_pass_w_fn(
         transf.str.noempty_line_arr(str),
@@ -2500,6 +2501,9 @@ is = {
     end,
     timestamp_ms_key_haver = function(t)
       return t.timestamp_ms
+    end,
+    hydrus_rel_spec = function(t)
+      return t.implies and t.aliases
     end,
     
   },

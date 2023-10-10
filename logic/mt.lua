@@ -102,8 +102,8 @@ ls = {
       "gelbooru",
       "xbooru",
       "aibooru",
-    "pornpendotai", -- canonical name: pornpen.ai
-    "trynectardotai", -- canonical name: trynectar.ai
+    "pornpendotai", -- canonical_name pornpen.ai
+    "trynectardotai", -- canonical_name trynectar.ai
     "discord",
     "reddit",
     "aliexpress"
@@ -253,7 +253,7 @@ ls = {
     "barmer health insurance",
     "housing",
     "rental housing",
-    "2023 stw berlin housing", -- canonical name: 2023- stw berlin housing
+    "2023 stw berlin housing", -- canonical_name 2023- stw berlin housing
     "leisure",
     "sports",
     "surfing",
@@ -267,14 +267,14 @@ ls = {
     "freelance",
     "freelance translation",
     "permanent employment",
-    "2022 mycontrol", -- canonical name: 2022- mycontrol
+    "2022 mycontrol", -- canonical_name 2022- mycontrol
     "ownership",
     "interests",
     "dev",
     "language",
     "japanese",
     "systems",
-    "2022 hammerspoon" -- canonical name: 2022- hammerspoon
+    "2022 hammerspoon" -- canonical_name 2022- hammerspoon
   },
   acquisition_institution = {
     "tu",
@@ -328,7 +328,7 @@ ls = {
     "hermes"
   },
   series = {
-    "mass effect series", -- canonical name: mass effect (series)
+    "mass effect series", -- canonical_name mass effect (series)
       "mass effect 3",
       "mass effect 2",
       "mass effect 1",
@@ -339,13 +339,13 @@ ls = {
     "dragon age inquisition",
     "teamfight tactics",
     "slay the spire",
-    "sable game", -- canonical name: sable (game)
+    "sable game", -- canonical_name sable (game)
     "dungeon massage service",
     "google",
       "google pixel",
       "google nexus",
       "google chrome",
-      "android google", -- canonical name: android (google)
+      "android google", -- canonical_name android (google)
   },
   use = {
     "hot",
@@ -567,6 +567,45 @@ ls = {
               "lagomorpha animal",
                 "hare",
                 "rabbit",
+              "ungulate",
+                "perisodactyl",
+                  "equid",
+                    "horse",
+                    "ass (animal)",
+                      "donkey",
+                    "zebra",
+                  "rhinoceros",
+                  "tapir",
+                "artiodactyl",
+                  "camelid",
+                    "llama",
+                    "alpaca",
+                    "camel",
+                      "dromedary camel",
+                  "suinan",
+                    "domestic pig",
+                    "wild boar",
+                  "ruminant",
+                    "giraffidae animal",
+                      "giraffe",
+                      "okapi",
+                    "bovid",
+                      "cattle",
+                      "yak",
+                      "bison",
+                      "buffalo",
+                      "antilope",
+                      "sheep",
+                      "goat",
+                    "deer",
+                      "elk",
+                      "reindeer",
+                      "moose",
+                  "hippopotamid",
+                    "hippopotamus",
+                  "whale",
+
+
             "fish",
             "amphiban",
             "reptile",
@@ -605,7 +644,7 @@ ls = {
               "digital object",
                 "operating system",
                   "mobile operating system",
-                    "android os", -- canonical name: android (os); aliases general:android (os); implies series:android google
+                    "android os", -- canonical_name android (os); aliases general:android (os); implies series:android google
               "meatspace object",
                 "consumer device",
                   "black mirror",
@@ -683,10 +722,10 @@ ls = {
               "parallel sides polygon",
               "equilateral equiangular polygon",
                 "convex regular polygon",
-                  "3-sided convex regular polygon", -- canonical name: regular triangle
+                  "3-sided convex regular polygon", -- canonical_name regular triangle
                 "star regular polygon",
               "equilateral parallel sides polygon",
-                "4-sided equilateral parallel sides polygon", -- canonical name: rhombus; aliases general:diamond (shape)
+                "4-sided equilateral parallel sides polygon", -- canonical_name rhombus; aliases general:diamond (shape)
               "some other polygon",
                 "cross",
                 "x",
@@ -696,6 +735,9 @@ ls = {
           "3d hyperbody",
             "polyhedron",
       "body part",
+        "body data",
+          "body measurement",
+          "body ratio",
         "body part grouping",
           "body part grouping by function",
             "sensory organ",
@@ -944,12 +986,12 @@ ls = {
           "subject setup genre",
             "still life", -- aliases general:still life
         "subject camera distance combination",
-          "portrait shot", -- aliases general:portrait, implies compostion:closeup shot
-          "upper body shot", -- aliases general:upper body, implies composition:medium shot
-          "lower body shot", -- aliases general:lower body, implies composition:medium shot
-          "cowboy shot", -- aliases general:cowboy shot, implies composition:cowboylike shot, composition:humanoid focus
-          "feet out of frame shot", -- aliases general:feet out of frame, implies composition:medium full shot, composition:humanoid focus
-          "full body shot", -- aliases general:full body, implies composition:full shot, composition:humanoid focus
+          "portrait shot", -- aliases general:portrait; implies compostion:closeup shot
+          "upper body shot", -- aliases general:upper body; implies composition:medium shot
+          "lower body shot", -- aliases general:lower body; implies composition:medium shot
+          "cowboy shot", -- aliases general:cowboy shot; implies composition:cowboylike shot, composition:humanoid focus
+          "feet out of frame shot", -- aliases general:feet out of frame; implies composition:medium full shot, composition:humanoid focus
+          "full body shot", -- aliases general:full body; implies composition:full shot, composition:humanoid focus
           
 
 
@@ -984,6 +1026,15 @@ ls = {
         "agentlike + x",
           "agentlike + thing",
             "agentlike + agentlike",
+              "agentlike + gendered agentlike",
+                "agentlike + male agentlike",
+                  "agentlike + 2 male agentlikes",
+                    "agentlike interessive 2 male agentlikes", -- aliases general:boy sandwich
+                "agentlike + female agentlike",
+                  "agentlike + 2 female agentlikes",
+                    "agentlike interessive 2 female agentlikes", -- aliases general:girl sandwich
+                "agentlike + male agentlike and female agentlike",
+                  "agentlike interessive male agentlike and female agentlike", -- aliases general:boy and girl sandwich
               "agentlike kantokukouing agentlike",
                 "agentlike kawaigaruing agentlike",
                   "agentlike kawaigaruing agentlike (nonromantic)", -- aliases general:affectionate
@@ -992,28 +1043,33 @@ ls = {
                 "family agentlike + agentlike",
                   "family agentlike + related agentlike",
                     "family agentlike + family agentlike", -- aliases general:family
-              "agentlike + two agentlikes",
-                "agentlike lewding two agentlikes", -- aliases general:threesome
-            "gendered agentlike + thing",
-              "female agentlike + thing",
-                "female agentlike + agentlike",
+              "agentlike + 2 agentlikes",
+                "agentlike interessive 2 agentlikes", -- aliases general:sandwich
+                "agentlike lewding 2 agentlikes", -- aliases general:threesome
+          "gendered agentlike + x",
+            "male agentlike + x",
+              "male agentlike + thing",
+                "male agentlike + agentlike",
                   "male agentlike + gendered agentlike",
                     "male agentlike + male agentlike",
                       "male agentlike aijou hyougening male agentlike", -- aliases general:yaoi
-                      "one male agentlike + two male agentlikes", 
-                        "one male agentlike lewding two male agentlikes",-- aliases general:MMM threesome
+                      "1 male agentlike + 2 male agentlikes", 
+                        "1 male agentlike lewding 2 male agentlikes",-- aliases general:MMM threesome
+            "female agentlike + x",
+              "female agentlike + thing",
+                "female agentlike + agentlike",
                   "female agentlike + gendered agentlike",
                     "female agentlike + female agentlike",
                       "female agentlike aijou hyougening female agentlike", -- aliases general:yuri
-                      "one female agentlike + two female agentlikes", 
-                        "one female agentlike lewding two female agentlikes",-- aliases general:FFF threesome
+                      "1 female agentlike + 2 female agentlikes", 
+                        "1 female agentlike lewding 2 female agentlikes",-- aliases general:FFF threesome
                     "female agentlike + male agentlike",
-                      "one female agentlike + one male agentlike",
-                        "one female agentlike aijou hyougening one male agentlike", -- aliases general:hetero
-                      "one female agentlike + two male agentlikes", 
-                        "one female agentlike lewding two male agentlikes",-- aliases general:MMF threesome
-                      "two female agentlikes + one male agentlike", 
-                        "two female agentlikes lewding one male agentlike",-- aliases general:FFM threesome
+                      "1 female agentlike + 1 male agentlike",
+                        "1 female agentlike aijou hyougening 1 male agentlike", -- aliases general:hetero
+                      "1 female agentlike + 2 male agentlikes", 
+                        "1 female agentlike lewding 2 male agentlikes",-- aliases general:MMF threesome
+                      "2 female agentlikes + 1 male agentlike", 
+                        "2 female agentlikes lewding 1 male agentlike",-- aliases general:FFM threesome
             "agentlike + body part",
               "agentlike + anatomical category",
                 "agentlike + muscles",
@@ -1132,18 +1188,18 @@ ls = {
                             "hand + hip",
                               "hand tangent hip", -- aliases general:hand on feet
                                 "hand tangent hip (reflexive voice)", 
-                                  "one hand tangent hip (reflexive voice)", -- aliases general:hand on own hip
-                                  "two hands tangent hip (reflexive voice)", -- aliases general:hands on own hip
+                                  "1 hand tangent hip (reflexive voice)", -- aliases general:hand on own hip
+                                  "2 hands tangent hip (reflexive voice)", -- aliases general:hands on own hip
                                 "hand tangent hip (other)",
-                                  "one hand tangent hip (other)", -- aliases general:hand on another's hip
-                                  "two hands tangent hip (other)", -- aliases general:hands on another's hip
+                                  "1 hand tangent hip (other)", -- aliases general:hand on another's hip
+                                  "2 hands tangent hip (other)", -- aliases general:hands on another's hip
                               "hand grabbing or pulling hip", -- aliases general:hip grab; general:hip pull; general:grabbing hip; general:pulling hip
                                 "hand grabbing or pulling hip (reflexive voice)", -- aliases general:grabbing own hip, general:pulling own hip
                                 "hand grabbing or pulling hip (other)", -- aliases genereral:grabbing another's hip, general:pulling another's hip
                               "hand circumtangent hip", -- aliases general:hand around hip
                               "hand holding hip",
-                                "hand holding one hip", -- aliases general:holding hip
-                                "hand holding two hips", -- aliases general:holding hips
+                                "hand holding 1 hip", -- aliases general:holding hip
+                                "hand holding 2 hips", -- aliases general:holding hips
                             -- todo: mirror the above for horns, hair, forehead, ear, eyes
                         "hand + non body part",
                           "hand tangent non body part", 
@@ -1176,8 +1232,8 @@ ls = {
                             "arm + arm",
                               "arm circumtangent arm",
                                 "arm circumtangent arm (other)",
-                                  "one arm circumtangent one arm", -- aliases general:locked arms
-                              "two arms circumtangent one arm", -- aliases general:arm hug
+                                  "1 arm circumtangent 1 arm", -- aliases general:locked arms
+                              "2 arms circumtangent 1 arm", -- aliases general:arm hug
                         "arm + non body part",
                           "arm circumtangent non body part", 
                             "arm hugging non body part", -- aliases general:hugging object
@@ -1197,8 +1253,8 @@ ls = {
                                 "tongue + penis (retrospective aspect)", -- aliases general:after fellatio
                                 "tongue + penis (reflexive voice)", -- aliases general:autofellatio
                                 "tongue + penis (deep)", -- aliases general:deepthroat
-                                "two tongues + penis", -- aliases general:cooperative fellatio
-                                "tongue + two penises", -- aliases general:double fellatio
+                                "2 tongues + penis", -- aliases general:cooperative fellatio
+                                "tongue + 2 penises", -- aliases general:double fellatio
 
                               "tongue + genital holelike", -- aliases general:
                                 "tongue + vulva", -- aliases general:cunnilingus
@@ -1250,7 +1306,7 @@ ls = {
     
   },
   character = {
-    "purple haired mpdg pornpen", -- canonical name: purple haired mpdg (pornpen)
+    "purple haired mpdg pornpen", -- canonical_name purple haired mpdg (pornpen)
   },
   creation_ware = {
     "creation location",

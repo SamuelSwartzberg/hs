@@ -4454,7 +4454,19 @@ transf = {
       res = get.str.str_and_int_by_replaced_eutf8_w_regex_str(res, ",", ".")
       res = get.str.str_and_int_by_replaced_eutf8_w_regex_str(str, "^[0-9a-zA-Z]+", "")
       return res
-    end
+    end,
+    line_by_initial_space_indent = function(str)
+      return get.str.n_strs_by_extracted_onig(str, "^ *")
+    end,
+    pos_int_by_initial_space_indent_len = function(str)
+      return #transf.str.line_by_initial_space_indent(str)
+    end,
+    pos_int_by_initial_indent_2 = function(str)
+      return get.str.pos_int_by_indent(str, 2)
+    end,
+    pos_int_by_initial_indent_4 = function(str)
+      return get.str.pos_int_by_indent(str, 4)
+    end,
   },
   line = {
     noindent_line_by_extract = function(str)
@@ -4702,6 +4714,111 @@ transf = {
       return countries
     end,
     
+  },
+  hydrus_relationship_block = {
+    hydrus_rel_spec = function(block)
+      local lines = transf.str.noempty_line_arr(block)
+      local hydrus_rel_spec = {
+        implies = {},
+        aliases = {},
+      }
+      local namespace
+      local parent_chain = {}
+      local indent_level = 1
+      for _, line in transf.arr.pos_int_vt_stateless_iter(lines) do
+        local new_indent_level = transf.str.pos_int_by_initial_indent_2(line)
+        if new_indent_level == 1 then -- new block mode
+          namespace = get.str.n_strs_by_extracted_onig(line, "^ +([^ ]+) *=")
+          parent_chain = {}
+        elseif new_indent_level > 1 then
+          -- extract item name, aliases, canonical name, and implies
+          local item, data_section  = get.str.n_strs_by_extracted_onig(line, "^ +\"([^\"]+)\",? *(?:-- *(.+))? *$")
+          if data_section and #data_section > 8 then -- 8 for sanity check
+            local parts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(data_section, ";" )
+            for _, part in transf.arr.pos_int_vt_stateless_iter(parts) do
+              local key, value = get.str.n_strs_by_split_w_str(part, " ", 2)
+              local values = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(value, ",")
+              for _, val in transf.arr.pos_int_vt_stateless_iter(values) do
+                if key == "canonical_name" then -- a canonical name is the same thing as an alias, but with source and target swapped. Also, the source must be in the same namespace as the item and thus has it prepended automatically
+                  dothis.arr.push(hydrus_rel_spec.aliases, {
+                    namespace .. ":" .. val,
+                    namespace .. ":" .. item
+                  })
+                else
+                  dothis.arr.push(hydrus_rel_spec[key], {
+                    namespace .. ":" .. item,
+                    val
+                  })
+                end
+              end
+            end
+            if transf.arr.pos_int_by_length(parent_chain) > 0 then
+              dothis.arr.push(hydrus_rel_spec.implies, {
+                namespace .. ":" .. item,
+                namespace .. ":" .. transf.arr.t_by_last(parent_chain)
+              })
+            end
+            if new_indent_level > indent_level then -- we're going deeper
+              dothis.arr.push(parent_chain, item)
+            elseif new_indent_level < indent_level then -- we're going shallower
+              for i = 1, indent_level - new_indent_level do
+                dothis.arr.pop(parent_chain)
+              end
+            end
+          end
+        else
+          error("invalid indent level, must be 1 or greater, was " .. new_indent_level)
+        end
+        new_indent_level = indent_level
+      end
+          
+    end,
+  },
+  hydrus_rel_spec = {
+    input_spec_arr = function(hydrus_rel_spec)
+      local arr = {}
+      for _, alias in transf.arr.pos_int_vt_stateless_iter(hydrus_rel_spec.aliases) do
+        -- to add an alias, we need to focus the source text field, type the source, focus the target text field, type the target, and press enter to stage, and then click the add button to add it
+        arr = transf.two_arrs.arr_by_appended(arr, {
+          {
+            x = 150,
+            y = -670,
+            relative_to = "tl",
+            mode = "move",
+          }, {
+            mode = "click",
+            mouse_button_str =  "l"
+          }, {
+            mode = "key",
+            key = alias[1]
+          }, {
+            x = 450,
+            y = -670,
+            relative_to = "tl",
+            mode = "move",
+          }, {
+            mode = "click",
+            mouse_button_str =  "l"
+          }, {
+            mode = "key",
+            key = alias[2]
+          }, {
+            mode = "key",
+            key = "enter"
+          }, {
+            x = 410,
+            y = -425,
+            relative_to = "tl",
+            mode = "move",
+          }, {
+            mode = "click",
+            mouse_button_str =  "l"
+          }
+        })
+
+      end
+      return res
+    end,
   },
   multirecord_str = {
     record_str_arr = function(str)

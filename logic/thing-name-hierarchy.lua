@@ -62,6 +62,7 @@ thing_name_hierarchy = {
         multiline_str = {
           here_doc = "leaf",
           raw_contact = "leaf",
+          hydrus_relationship_block = "leaf",
           ini_section_contents_str = "leaf",
           decoded_email_header_block = "leaf",
           decoded_email = "leaf",
