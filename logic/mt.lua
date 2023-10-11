@@ -102,8 +102,8 @@ ls = {
       "gelbooru",
       "xbooru",
       "aibooru",
-    "pornpendotai", -- canonical_name pornpen.ai
-    "trynectardotai", -- canonical_name trynectar.ai
+    "pornpendotai", -- cnm pornpen.ai
+    "trynectardotai", -- cnm trynectar.ai
     "discord",
     "reddit",
     "aliexpress"
@@ -152,7 +152,7 @@ ls = {
   },
   all_namespace = {
 
-    -- series tags - where within some general series does this object fit?
+    -- series tag namespaces - where within some general series does this object fit?
 
     "chapter_index", -- numerical index of a chapter, e.g. 25
     "chapter_title", -- title of a chapter, e.g. "Can't stop won't stop can't stop"
@@ -163,7 +163,7 @@ ls = {
     "episode_timestamp", -- timestamp of an object within an episode, e.g. 00:03:12.
     "season_index", -- numerical index of a season, e.g. 3
 
-    -- creation tags - who, when, where, and how was this object created?
+    -- creation tag namespaces - who, when, where, and how was this object created?
     
     "creation_ware", -- anything that was used to create the object, be that meatspace or cyberspace, tools or people, organizations or brands. E.g. "studio trigger", "kana hanazawa", "makoto shinkai", "adobe illustrator", "mirrorless camera"
     "official_title", -- the official title of a work, if applicable. E.g. "The Lord of the Rings: The Fellowship of the Ring", "One Hundred Years of Solitude", etc. Bear in mind that this isn't the title of the series, but of the specific work. If the work is part of a series, the series tag should be used instead.
@@ -172,12 +172,12 @@ ls = {
     "creation_stage", -- what stage of the creation process the object is in. E.g. brainstorming, conceptualization, mockup, final_product, etc. Don't forget to add any relevant general tags. So if you have a mockup that which uses a smartphone mockup, add general:smartphone_mockup.
     "completeness", -- how complete the creator considers the object to be. E.g. complete, incomplete, abandoned, creation_stage_of_other_object
 
-    -- creation tags > creation settings tags - what settings were used to create the object?
+    -- creation tags > creation settings tag namespaces - what settings were used to create the object?
 
     "prompt", -- if creator:ai or a child tag of creator:ai, what the prompt was. e.g. "a picture of a cat"
     -- in the future, I may add more tags for specific settings, e.g. "brush size", "f-stop", etc.
 
-    -- creation tags > location tags - where was the object created?
+    -- creation tags > location tag namespaces - where was the object created?
     -- if the location is also visually identifiable in the object, don't forget to add the corresponding general:<location name> (<location type>) tag, e.g. general:berlin (city)
     "lat", -- latitude of the object as a decimal number, if applicable. E.g. 48.137154.
     "lon", -- longitude of the object as a decimal number, if applicable. E.g. 11.576124
@@ -186,18 +186,18 @@ ls = {
     "venue", -- a specific name of a location, e.g. My mom's house, 2016 italy rental, etc.
     "tourism", -- works like the OSM tourism field
 
-    -- percievable tags - what can be percieved in the object, or inferred from it and a reasonable knowledge of the world? (however, not from me & my context)
+    -- thing tag namespaces - what can be percieved in the fobjectlike, or inferred only from the fobjectlike and a reasonable knowledge of the world? What importance does it have to the fobjectlike?
     
-    "character", -- name of a character that appears in the tagged object in some way, for example their face, their name as text, or some other unambiguous reference
-    "person", -- like character, but for real people.
-    "series", -- The title of series or copyrights involved. really should be called 'copyright'. Works like danbooru, however danbooru also has some things that I think should really be series/copyright under general (e.g. some brands), which I alias to a series: tag.
-    "service", -- the main service that the object features. If something about the object or why I kept it only makes sense in the context of a specific service, this tag should be used, else prefer proximate_source. Any service will automatically also apply the corresponding series tag, e.g. service:reddit -> series:reddit.
-    "format", -- the format of the thing or the thing mainly featured (in the case of digitalizations, etc.). E.g. single page, triptych, 4koma. Answers: What is the fundamental structure of the object? Some danbooru unnamespaced tags are aliased to this.
-    "medium", -- the medium or media of the thing, such as voice, watercolor, mixed media, etc. Answers: What techniques/styles were fundamental to creating this object. Danbooru tags such as watercolor (medium) are aliased to subtags of this, however there are also (medium) tags that are not aliased to this, such as photoshop (medium). For that, see creation_ware.
+    "thing", -- Anything that appears in the fobjectlike, or is referenced. This describes the thing namespace set, which is also used below.
+    "substance", -- A thing namespace item which describes the fobjectlike itself, rather than one of its parts or something contained within. thing:apple means it contains an apple, substance:apple means it is an apple. thing:aqua 1-adic range SBCS^2^ means there is something aqua, substance:aqua 1-adic range SBCS^2^ means the object is a color sample of aqua.
+    "substance_part", -- A thing namespace item which describes something that contributes to the substance of the fobjectlike. E.g. substance_part:apple means that a recognizable part of the fobjectlike itself is an apple. substance_part:photo means that a recognizable part of the fobjectlike itself is a photo.
+    "focus", -- A thing namespace item which describes the main focus of the fobjectlike. E.g. focus:apple means the apple is the main focus of the object.
+    "theme", -- A thing namespace item which describes something that is important throughout the fobjectlike, but not necessarily the main focus. E.g. theme:apple might mean that apples are strategically placed around the object to symbolize temptation, or just because it's a food picture with a fall-apple theme.
+    "accent", -- A thing namespace item which describes something that has some amount of focus within the fobjectlike, but not as much as the focus or theme. E.g. thing:dagger means it contains a dagger, accent:dagger might mean that there is a dagger in the background as an easter egg or foreshadowing.
+    "framing", -- A thing namespace item which describes something that gives major context to the fobjectlike. E.g. framing:dagger might mean that the fobjectlike is a dagger with some intericate metalwork, where the metalwork is the focus, but the dagger is the framing. framing:web browser might mean that the focus is some content on the web, but the web browser what gives it context and meaning. This does not mean that anything e.g. in a web browser must be tagged with framing:web browser, if that fact is unimportant to the fobjectilke.
+    "incidental", -- A thing namespace item which describes something that is present in the fobjectlike, but is not important to it at all.
 
-    "general", -- this is my namespace for what would be unnamespaced tags on most boorus. Anything that is percievable or reasonably inferrable, but not covered by the other percievable tags, should go here. Tag names here follow danbooru's guidelines to a large extent.
-
-    -- important illocutionary message tags - what is the object trying to tell me? 
+    -- important illocutionary message tag namespaces - what is the object trying to tell me? 
 
     "message_force", -- what illocutionary force does the message have
     "message_direction", -- what direction does the message have? e.g. inbound, outbound
@@ -205,7 +205,7 @@ ls = {
     "message_subject", -- i.e. the general locutionary content. What is the force about? e.g. money, employment, housing, etc.
     -- there'd be some reason to add a "message_audience" tag, but for now I think I'm well enough served by tagging that with person:<name>, given the audience's name is likely to be mentioned or implied in the object, which forces me to tag it with person:<name> anyway. Thus there'd be a lot of redundancy.
 
-    -- sharing tags - many objects I encounter were shared in some way, such that I was able to encounter them. These tags are for that.
+    -- sharing tag namespaces - many objects I encounter were shared in some way, such that I was able to encounter them. These tags are for that.
 
     "proximate_source", -- the location where I encountered an object, or where it was shared. E.g. reddit, danbooru, etc. Many downloaders automatically populate this tag, but setting it manually is not strictly necessary.
     "proximate_source_page_type", -- the type of the page where I encountered the object. E.g. post, thread, product page, etc.
@@ -214,7 +214,7 @@ ls = {
     "proximate_source_use", -- what was the object used for on the proximate_source? For many proximate sources there isn't an interesting one, but for example for amazon, this could be product_picture
     "uploader", -- the uploader/sharer of the object on the proximate_source. E.g. the reddit username, or the twitter handle.
 
-    -- acquisition tags - how did I acquire the object? This is not the same as sharing, as I may have acquired the object in a way that doesn't involve sharing, e.g. by creating it myself.
+    -- acquisition tag namespaces - how did I acquire the object? This is not the same as sharing, as I may have acquired the object in a way that doesn't involve sharing, e.g. by creating it myself.
 
     "date", -- date of acquisition in (partial) RFC3339 format
     "occasion", -- the occasion the object was acquired in/for. This may be specific e.g. 2025 trip to canada, or more general, e.g. christmas. 
@@ -222,17 +222,11 @@ ls = {
     "acquisition_institution", -- the institution that I created the object at/for or encountered it in.. E.g. university of melbourne, etc. 
     "period", -- Some processes or organizations categorize things into periods, even where the `date` field may lie outside of those periods. Financial years & quarters, academic years, semesters, trimesters, etc. This tag is for those. If it's not a recognized period, consider using `occasion` or another tag instead. Specific examples: "winter semester 2020", "2018 school year". Inheritance is set up thus that e.g. winter semester 2020 -> winter semester & 2020 semester -> semester, 2018 school year -> school year
 
-
-    -- metatexual tags - what larger ideas are reflected or involved in the object?
-
-    "topic", -- the main topic the content is about. The possible values are the same as "concept", the difference is that "topic" is used for the main topic, while "concept" is used for all concepts that are involved in the object. 
-    "concept", -- concepts at issue in the object. e.g. "existentialism", "kuhnian scientific theory", "ru-verbs"
-
-    -- use tags - why did I keep the object? What do I use it for?
+    -- use tag namespaces - why did I keep the object? What do I use it for?
 
     "use", -- Without complex semantics, what might I want to use the iamge for? e.g. reaction_face, inspiration, etc. 
 
-    -- general meta tags - tags with a more general purpose, that don't fit into any of the above categories.
+    -- general meta tag namespaces - tags with a more general purpose, that don't fit into any of the above categories.
 
     "collection", -- a wide field that allows grouping objects in a way where I don't want to create a specific tag namespace, potentially only temporarily. Prefer more specific namespaces where possible.
     "meta", -- things that you know about the object, but aren't directly visible, and aren't included in other fields. I rarely use this, but parsers I use sometimes do.
@@ -253,7 +247,7 @@ ls = {
     "barmer health insurance",
     "housing",
     "rental housing",
-    "2023 stw berlin housing", -- canonical_name 2023- stw berlin housing
+    "2023 stw berlin housing", -- cnm 2023- stw berlin housing
     "leisure",
     "sports",
     "surfing",
@@ -267,14 +261,14 @@ ls = {
     "freelance",
     "freelance translation",
     "permanent employment",
-    "2022 mycontrol", -- canonical_name 2022- mycontrol
+    "2022 mycontrol", -- cnm 2022- mycontrol
     "ownership",
     "interests",
     "dev",
     "language",
     "japanese",
     "systems",
-    "2022 hammerspoon" -- canonical_name 2022- hammerspoon
+    "2022 hammerspoon" -- cnm 2022- hammerspoon
   },
   acquisition_institution = {
     "tu",
@@ -283,69 +277,6 @@ ls = {
     "ur",
     "primary"
 
-  },
-  services = {
-    "bumble",
-    "facebook",
-    "hinge",
-    "okc",
-    "tinder",
-    "whatsapp",
-    "reddit",
-    "bumble",
-    "vscode",
-    "discord",
-    "fb messenger",
-    "flightradar",
-    "google",
-    "hinge",
-    "jisho",
-    "mvg",
-    "newpipe",
-    "outlook",
-    "reddit",
-    "sms",
-    "telegram",
-    "the guardian",
-    "wikipedia",
-    "youtube",
-    "her",
-    "strava",
-    "lishogi",
-    "lichess",
-    "ikea",
-    "landefeld",
-    "aws",
-    "amazon",
-    "anki",
-    "github",
-    "gitlab",
-    "bitbucket",
-    "chatgpt",
-    "openai playground",
-    "dbeaver",
-    "google chrome",
-    "hermes"
-  },
-  series = {
-    "mass effect series", -- canonical_name mass effect (series)
-      "mass effect 3",
-      "mass effect 2",
-      "mass effect 1",
-    "unholy arts",
-    "growing up",
-    "girl crush",
-    "genshin impact",
-    "dragon age inquisition",
-    "teamfight tactics",
-    "slay the spire",
-    "sable game", -- canonical_name sable (game)
-    "dungeon massage service",
-    "google",
-      "google pixel",
-      "google nexus",
-      "google chrome",
-      "android google", -- canonical_name android (google)
   },
   use = {
     "hot",
@@ -448,431 +379,606 @@ ls = {
     "inbound",
     "outbound",
   },
-  digitization_method = {
-    "natively digital",
-      "generation",
-      "export",
-      "screen capture",
-    "natively physical",
-      "camera",
-      "scan",
-  },
   things = {
-    "grouping",
-      "too many",
-    "agentlikes", -- anything that is an agent, or is shaped like one, or otherwise similar
-      "gendered agentlikes",
-        "male agentlike",
-        "female agentlike",
-        "nonbinary agentlike",
-        "agender agentlike",
-        "genderfluid agentlike",
-      "related agentlike",
-        "family agentlike",
-          "parent",
-            "male parent",
-            "female parent",
-            "nonbinary parent",
-            "agender parent",
-            "genderfluid parent",
-      "aged agentlike",
-        "old agentlike", -- aliases general:old
-        "young agentlike",
-          "child agentlike", -- aliases general:child
-          "baby agentlike", -- aliases general:baby
-        "modified age agentlike",
-          "aged up agentlike", -- aliases general:aged up
-          "aged down agentlike", -- aliases general:aged down
-      "agentlike state",
-        "amputee", -- aliases general:amputee
-      "semihumanoid", -- a semihumanoid has at least some of the features of a humanoid.
-        "dullahan", -- aliases general:dullahan
-        "hemihumanoid",
-          "leg hemihumanoid", -- look mom, no arms!
-          "arm hemihumanoid", -- look mom, no legs!
-        "humanoid hybrid", -- humanoid plus something extra
-          "monster humanoid",
-            "taur", -- aliases general:taur
-              "centauroid", -- aliases general:centauroid
-                "centaur", -- aliases general:centaur
-              "arachne", -- aliases general:arachne
-            "female monster humanoid", -- aliases general:monster girl
-              
-        "humanoid", -- two arms, two legs, a head, and a torso, plus extras. Minor deviations allowed.
-          "basically humans", -- almost human, don't sweat the details
-          "clearly nonhuman humanoid",
-            "slime girl", -- aliases general:slime girl
-
-      "animallike",
-        "animal by taxon (simplified)",
-          "vertebrate",
-            "mammal",
-              "carnivora animal",
-                "bear",
-                  "brown bear",
-                  "black bear",
-                  "polar bear",
-                "felidae animal",
-                  "felinae animal",
-                    "cat",
-                    "lynx",
-                    "puma",
-                  "panthera animal",
-                    "tiger",
-                    "lion",
-                    "leopard",
-                    "jaguar",
-                    "snow leopard",
-                "canidae animal",
-                  "canina animal",
-                    "wolf",
-                    "dog",
-                    "coyote",
-                  "vulpini animal",
-                    "racoon dog",
-                      "tanuki",
-                    "fox",
-                  "other canidae animal",
-                    "jackal",
-                "musteloidae animal",
-                  "weasel",
-                  "otter",
-                  "badger",
-                  "raccoon",
-                  "skunk",
-                  "ferret",
-                "other carnivora taxa animal",
-              "rodentia",
-                "porcupine",
-                "quinea pig",
-                "beaver",
-                "chipmunk",
-                "squirrel",
-                "rat",
-                "mouse",
-                "hamster",
-                "gerbil",
-              "primate",
-                "prosimian",
-                  "lemur",
-                  "loris",
-                "monkey",
-                "ape",
-                  "lesser ape",
-                  "great ape",
-                    "orangutan",
-                    "gorilla",
-                    "chimpanzee",
-                    "bonobo",
-              "lagomorpha animal",
-                "hare",
-                "rabbit",
-              "ungulate",
-                "perisodactyl",
-                  "equid",
-                    "horse",
-                    "ass (animal)",
-                      "donkey",
-                    "zebra",
-                  "rhinoceros",
-                  "tapir",
-                "artiodactyl",
-                  "camelid",
-                    "llama",
-                    "alpaca",
-                    "camel",
-                      "dromedary camel",
-                  "suinan",
-                    "domestic pig",
-                    "wild boar",
-                  "ruminant",
-                    "giraffidae animal",
-                      "giraffe",
-                      "okapi",
-                    "bovid",
-                      "cattle",
-                      "yak",
-                      "bison",
-                      "buffalo",
-                      "antilope",
-                      "sheep",
-                      "goat",
-                    "deer",
-                      "elk",
-                      "reindeer",
-                      "moose",
-                  "hippopotamid",
-                    "hippopotamus",
-                  "whale",
-
-
-            "fish",
-            "amphiban",
-            "reptile",
-            "bird",
-        "real animal",
-        "imagined animal",
-          "pokemon", -- aliases general:pokemon (creature)
-            "pikachu", 
-      "robot", -- aliases general:robot
-        "robot animallike", -- also implies things:animallike
-        "semihumanoid robot", -- also implies things:semihumanoid, just decided to put it here arbitrarily
-          "humanoid robot", -- also implies things:humanoid, just decided to put it here arbitrarily
-            "human-passing humanoid robot", -- aliases general:android
-            "non human-passing humanoid robot", -- aliases general:humanoid robot
-          "mecha", -- aliases general:mecha; giant andor piloted robot
-            "walker mecha", -- aliases general:walker; implies things:leg hemihumanoid
-
-        
-    "object",
-      "non body part",
-        "real object",
-          "specific object",
-            "general assemblage",
-              "assemblage of structures",
+    "single",
+      "agentlike", -- anything that is an agent, or is shaped like one, or otherwise similar
+        "unique agentlike",
+          "real agentlike",
+          "fictional agentlike",
+        "gendered agentlikes",
+          "male agentlike",
+          "female agentlike",
+          "nonbinary agentlike",
+          "agender agentlike",
+          "genderfluid agentlike",
+        "related agentlike",
+          "family agentlike",
+            "parent",
+              "male parent",
+              "female parent",
+              "nonbinary parent",
+              "agender parent",
+              "genderfluid parent",
+        "aged agentlike",
+          "old agentlike", -- aliases general:old
+          "young agentlike",
+            "child agentlike", -- aliases general:child
+            "baby agentlike", -- aliases general:baby
+          "modified age agentlike",
+            "aged up agentlike", -- aliases general:aged up
+            "aged down agentlike", -- aliases general:aged down
+        "agentlike state",
+          "amputee", -- aliases general:amputee
+        "semihumanoid", -- a semihumanoid has at least some of the features of a humanoid.
+          "dullahan", -- aliases general:dullahan
+          "hemihumanoid",
+            "leg hemihumanoid", -- look mom, no arms!
+            "arm hemihumanoid", -- look mom, no legs!
+          "humanoid hybrid", -- humanoid plus something extra
+            "monster humanoid",
+              "taur", -- aliases general:taur
+                "centauroid", -- aliases general:centauroid
+                  "centaur", -- aliases general:centaur
+                "arachne", -- aliases general:arachne
+              "female monster humanoid", -- aliases general:monster girl
                 
-            "spatial features",
-              "natural features",
-                "earthen features",
-                  "firmamental features",
-                  "grounded features",
-              "infrastructure",
+          "humanoid", -- two arms, two legs, a head, and a torso, plus extras. Minor deviations allowed.
+            "basically humans", -- almost human, don't sweat the details
+            "clearly nonhuman humanoid",
+              "slime girl", -- aliases general:slime girl
 
-            "single object",
-              "abstract object",
-                "text",
-              "digital object",
-                "operating system",
-                  "mobile operating system",
-                    "android os", -- canonical_name android (os); aliases general:android (os); implies series:android google
-              "meatspace object",
-                "consumer device",
-                  "black mirror",
-                    "smartphone",
-                      "google pixel smartphone", -- implies series:google pixel
-                        "google pixel 4",
-                "household object",
-                  "furniture",
-                  "appliance",
-                    "major appliance",
-                    "small appliance",
-                "piece of clothes",
-                "tool",
-                  "medical device",
-                    "medical test",
-                  "sex toy", -- aliases general:sex toy
-                  "bodyrelated tool",
-                    "genital tool",
-                      "speculum", -- aliases general:speculum
-                      "dilation tape", -- aliases general:dilation tape
-          "material",
-            "materials by assemblage",
-              "strand-assembled materials",
-                "bunched-strand materials",
-                "interleaved-strand materials",
-              "bonded materials",
-              "one-piece materials",
-                "hewn materials",
-                "molded materials",
-            "materials by underlying form",
-              "material from aggregate",
-              "material from fibers",
-            "materials by underlying substance",
-              "natural-seeming materials",
-                "plant-based materials",
-                  "cellulose-based materials",
-                    "wood cellulose-based materials",
-                "animal-based materials",
-              "permanent-seeming materials",
-                "petroleoum-based materials",
-                "mineral-based materials",
-                "metal-based materials",
-        "symbolic object",
-          "flag",
-            "dutch flag",
+        "animallike",
+          "animal by taxon (simplified)",
+            "vertebrate",
+              "mammal",
+                "carnivora animal",
+                  "bear",
+                    "brown bear",
+                    "black bear",
+                    "polar bear",
+                  "felidae animal",
+                    "felinae animal",
+                      "cat",
+                      "lynx",
+                      "puma",
+                    "panthera animal",
+                      "tiger",
+                      "lion",
+                      "leopard",
+                      "jaguar",
+                      "snow leopard",
+                  "canidae animal",
+                    "canina animal",
+                      "wolf",
+                      "dog",
+                      "coyote",
+                    "vulpini animal",
+                      "racoon dog",
+                        "tanuki",
+                      "fox",
+                    "other canidae animal",
+                      "jackal",
+                  "musteloidae animal",
+                    "weasel",
+                    "otter",
+                    "badger",
+                    "raccoon",
+                    "skunk",
+                    "ferret",
+                  "other carnivora taxa animal",
+                "rodentia",
+                  "porcupine",
+                  "quinea pig",
+                  "beaver",
+                  "chipmunk",
+                  "squirrel",
+                  "rat",
+                  "mouse",
+                  "hamster",
+                  "gerbil",
+                "primate",
+                  "prosimian",
+                    "lemur",
+                    "loris",
+                  "monkey",
+                  "ape",
+                    "lesser ape",
+                    "great ape",
+                      "orangutan",
+                      "gorilla",
+                      "chimpanzee",
+                      "bonobo",
+                "lagomorpha animal",
+                  "hare",
+                  "rabbit",
+                "ungulate",
+                  "perisodactyl",
+                    "equid",
+                      "horse",
+                      "ass (animal)",
+                        "donkey",
+                      "zebra",
+                    "rhinoceros",
+                    "tapir",
+                  "artiodactyl",
+                    "camelid",
+                      "llama",
+                      "alpaca",
+                      "camel",
+                        "dromedary camel",
+                    "suinan",
+                      "domestic pig",
+                      "wild boar",
+                    "ruminant",
+                      "giraffidae animal",
+                        "giraffe",
+                        "okapi",
+                      "bovid",
+                        "cattle",
+                        "yak",
+                        "bison",
+                        "buffalo",
+                        "antilope",
+                        "sheep",
+                        "goat",
+                      "deer",
+                        "elk",
+                        "reindeer",
+                        "moose",
+                    "hippopotamid",
+                      "hippopotamus",
+                    "whale",
+
+
+              "fish",
+              "amphiban",
+              "reptile",
+              "bird",
+          "real animal",
+          "imagined animal",
+            "pokemon", -- aliases general:pokemon (creature)
+              "pikachu", 
+        "robot", -- aliases general:robot
+          "robot animallike", -- implies things:animallike
+          "semihumanoid robot", -- implies things:semihumanoid -- just decided to put it here arbitrarily
+            "humanoid robot", -- implies things:humanoid -- just decided to put it here arbitrarily
+              "human-passing humanoid robot", -- aliases general:android
+              "non human-passing humanoid robot", -- aliases general:humanoid robot
+            "mecha", -- aliases general:mecha; giant andor piloted robot
+              "walker mecha", -- aliases general:walker; implies things:leg hemihumanoid
+
+          
+      "object",
+        "non body part",
+          "style", 
+            
+          "effect",
+            "visual effect",
+              "2d effect",
+                "cameralike effect",
+                  "lens effect", -- -- an effect due to the fact that cameras use lenses
+                    "lens artifact",
+                      "lens flare", -- aliases general:lens flare
+                      "bokeh", -- aliases general:bokeh
+                      "chromatic aberration", -- aliases general:chromatic aberration
+                      "diffraction spikes", -- aliases general:diffraction spikes
+                    "expousre triangle effect",
+                      "exposure effect",
+                        "motion blur", -- aliases general:motion blur
+                  "signal processing effect",
+                    "film effect", 
+                      "film grain", -- aliases general:film grain
+                "perceptual effect",
+                  "afterimage", -- aliases general:afterimage
+                "post effect",
+                  "symbolic effects",
+        
+                  "insert",
+                    "cut-in",
+                  "blur effect", -- aliases general:blur 
+          "real object",
+            "specific object",
+              "general assemblage",
+                "assemblage of structures",
+                  
+              "spatial features",
+                "natural features",
+                  "earthen features",
+                    "firmamental features",
+                    "grounded features",
+                "infrastructure",
+
+              "single object",
+                "abstract object",
+                  "text",
+                "digital object",
+                  "digital mockup",
+                    "smartphone mockup",
+                  "user interface object",
+                    "user interface component",
+                      "icon",
+                    "user interface",
+                      "os user interface",
+                        "smartphone user interface", -- aliases general:fake phone screenshot
+                        "desktop user interface",
+                      "app user interface", -- -- the user interface of an app or program covering the entire screen. Protyptically in the kind of screenshots cmd+shift+5 can take
+                  "software application",
+
+                  "operating system",
+                    "mobile operating system",
+                      "android os", -- cnm android (os); aliases general:android (os); implies android google
+                "prototypically 2d object",
+                  "document",
+                    "slide",
+                      "latex slide", -- -- you know the one
+                    "cv",
+                  "photograph",
+                    "polaroid", -- aliases general:polaroid
+                  "2d functional art",
+                    "large format functional",
+                      "poster",
+                        "movie poster",
+                    "medium format functional",
+                      "calendar page", -- [substance] aliases general:calendar (medium)
+                      "cover", -- [substance] aliases general:cover
+                        "standalone print media cover", -- [substance] aliases general:cover page
+                          "novel cover", -- [substance] aliases general:novel cover
+                          "doujin cover", -- [substance] aliases general:doujin cover
+                          "manga cover", -- [substance] aliases general:manga cover
+                        "album cover", -- [substance] aliases general:album cover
+                        "magazine cover", -- [substance] aliases general:magazine cover
+                        "video game cover", -- [substance] aliases general:video game cover
+                        "dvd cover", -- [substance] aliases general:dvd cover
+                        "bluray cover", -- [substance] aliases general:bluray cover
+                        "small format functional",
+                          "postcard",
+                          "flyer",
+                            "tear off flyer",
+                        "irregular format functional",
+                          "crest",
+                "prototypically 3d object",
+                  "consumer device",
+                    "black mirror",
+                      "smartphone",
+                        "google pixel smartphone", -- implies google pixel
+                          "google pixel 4",
+                  "household object",
+                    "furniture",
+                    "appliance",
+                      "major appliance",
+                      "small appliance",
+                  "piece of clothes",
+                  "tool",
+                    "medical device",
+                      "medical test",
+                    "sex toy", -- aliases general:sex toy
+                    "bodyrelated tool",
+                      "genital tool",
+                        "speculum", -- aliases general:speculum
+                        "dilation tape", -- aliases general:dilation tape
+            "material",
+              "material by assemblage",
+                "strand-assembled material",
+                  "bunched-strand material",
+                  "interleaved-strand material",
+                    "woven material",
+                    "knitted material",
+                "bonded material",
+                "one-piece material",
+                  "hewn material",
+                  "molded material",
+              "material by underlying form",
+                "material from aggregate",
+                "material from fibers",
+              "material by underlying substance",
+                "natural-seeming material",
+                  "plant-based material",
+                    "mainly cellulose-based material",
+                      "wood cellulose-based material",
+                      "flax cellulose-based material",
+                      "cotton cellulose-based material",
+                      "hemp cellulose-based material",
+                    "mainly lignin-based material",
+                  "animal-based material",
+                "permanent-seeming material",
+                  "petroleoum-based material",
+                  "mineral-based material",
+                  "metal-based material",
+              "material by common name",
+                "paper", -- aliases general:paper; implies ???
+                "canvas", -- [substance_part] aliases general:canvas (medium)
+            "surface covering",
+              "3d-ish surface covering", -- aliases general:unconventional media
+              "2d-ish surface covering",
+                "graphic art surface covering",
+                  "digital graphic art surface covering",
+                  "digital-seeming graphic art surface covering",
+                  "traditional graphic art surface covering",
+                  "traditional-seeming graphic art surface covering", -- [substance_part] aliases general:traditional media
+                    "penlike seeming surface covering",
+                      "ballpoint pen seeming surface covering", -- [substance_part] aliases general:ballpoint pen (medium)
+                    "crayonlike seeming surface covering", 
+                      "crayon seeming surface covering", -- [substance_part] aliases general:crayon (medium)
+                      "coupy pencil seeming surface covering", -- [substance_part] aliases general:coupy pencil (medium)
+                    "inklike seeming surface covering",
+                      "ink seeming surface covering", -- [substance_part] aliases general:ink (medium)
+                      "nib pen seeming surface covering", -- [substance_part] aliases general:nib pen (medium)
+                      "calligraphy brush seeming surface covering", -- [substance_part] aliases general:calligraphy brush (medium),
+                      "color ink seeming surface covering", -- [substance_part] aliases general:color ink (medium)
+                    "graphitelike seeming surface covering",
+                      "graphite seeming surface covering", -- [substance_part] aliases general:graphite (medium)
+                      "charcoal seeming surface covering", -- [substance_part] aliases general:charcoal (medium)
+                      "colored pencil seeming surface covering", -- [substance_part] aliases general:colored pencil (medium)
+                    "painting seeming surface covering",
+                      "acrylic paint seeming surface covering", -- [substance_part] aliases general:acrylic paint (medium)
+                      "gouache seeming surface covering", -- [substance_part] aliases general:gouache (medium)
+                      "oil paint seeming surface covering", -- [substance_part] aliases general:oil painting (medium)
+                      "watercolor seeming surface covering", -- [substance_part] aliases general:watercolor (medium)
+                    "watercolor pencil seeming surface covering", -- [substance_part] aliases general:watercolor pencil (medium)
+                    "pastel seeming surface covering", -- [substance_part] aliases general:pastel (medium)
+                  "real digital graphic art surface covering", -- implies digital graphic art surface covering, digital-seeming graphic art surface covering
+                  "real traditional graphic art surface covering", -- implies traditional graphic art surface covering, traditional-seeming graphic art surface covering
+                  "faux digital graphic art surface covering", -- implies traditional graphic art surface covering, digital-seeming graphic art surface covering
+                  "faux traditional graphic art surface covering", -- implies digital graphic art surface covering, traditional-seeming graphic art surface covering; aliases general:faux traditional media
+          "symbolic object",
+            "flag",
+          "hyperbody",
+            "2d hyperbody",
+              "conic section",
+                "ellipse",
+                  "circle",
+                "parabola",
+                "hyperbola",
+              "polygon",
+                "n-sided polygon",
+                  "1-sided polygon",
+                  "2-sided polygon",
+                  "3-sided polygon", -- aliases general:triangle
+                  "4-sided polygon",
+                  "5-sided polygon",
+                  "6-sided polygon",
+                  "7-sided polygon",
+                  "8-sided polygon",
+                  "9-sided polygon",
+                  "10-sided polygon",
+                  "11-sided polygon",
+                  "12-sided polygon",
+                "equilateral polygon",
+                "equiangular polygon",
+                "parallel sides polygon",
+                "equilateral equiangular polygon",
+                  "convex regular polygon",
+                    "3-sided convex regular polygon", -- cnm regular triangle
+                  "star regular polygon",
+                "equilateral parallel sides polygon",
+                  "4-sided equilateral parallel sides polygon", -- cnm rhombus; aliases general:diamond (shape)
+                "some other polygon",
+                  "cross",
+                  "x",
+              "other 2d hyperbody",
+                "sparkle",
+                "heart",
+            "3d hyperbody",
+              "polyhedron",
+        "body part",
+          "body data",
+            "body measurement",
+            "body ratio",
+          "body part grouping",
+            "body part grouping by function",
+              "sensory organ",
+              "pleasurable organ",
+                "crotch pleasurable organ",
+              "ussy",
+            "body part grouping by similarity",
+              "digit",
+              "teashi",
+            "axis body part grouping",
+              "y axis body part grouping",
+                "bi-ly body part grouping",
+                  "upper body",
+                  "lower body",
+          "general body part",
+            "horn",
+            "hair",
+              "hair ear", -- aliases general:hair ears
+            "forehead",
+            "ear",
+              "human ear",
+              "animal ear", -- aliases general:animal ears
+                "fake animal ear", -- aliases general:fake animal ears, can coexist with all other animal ears tags
+                  "animal ear headphones", -- aliases general:animal ear headphones
+                    "bear ear headphones", -- aliases general:bear ear headphones
+                    "cat ear headphones", -- aliases general:cat ear headphones
+                    "rabbit ear headphones", -- aliases general:dog ear headphones
+              "mechanical ear", -- aliases general:mechanical ears
+              "pointy ear", -- aliases general:pointy ears
+                "long pointy ear", -- aliases general:long pointy ears
+            "iris",
+            "pupil",
+            "eye", -- aliases general:eyes
+              "eyes with no pupils", -- aliases general:no pupils
+              "eyes with pupils",
+                "modified aperture pupil",
+                  "constricted pupil", -- aliases general:constricted pupils
+                  "dilated pupil", -- aliases general:dilated pupils
+                "extra pupil", -- aliases general:extra pupils
+                "unusual shaped pupil",
+                  "mismatched pupils", -- aliases general:mismatched pupils
+                  "rectangular pupil", -- aliases general:horizontal pupils
+                  "slit pupil", -- aliases general:slit pupils
+                  "symbol shaped pupil", -- aliases general:symbol-shaped pupils
+                    "sparkle shaped pupil", -- aliases general:+ +
+                    "heart shaped pupil", -- aliases general:heart-shaped pupils
+                    "star shaped pupil", -- aliases general:star-shaped pupils
+                    "cross shaped pupil", -- aliases general:cross-shaped pupils
+                    "x shaped pupil", -- aliases general:x-shaped pupils
+                    "flower shaped pupil", -- aliases general:flower-shaped pupils
+                    "diamond shaped pupil", -- aliases general:diamond-shaped pupils
+                    "rabbit shaped pupil", -- aliases general:rabbit-shaped pupils
+                    "butterfly shaped pupil", -- aliases general:butterfly-shaped pupils
+                    "triangle shaped pupil", -- aliases general:triangle-shaped pupils
+                    "power symbol shaped pupil", -- aliases general:power symbol-shaped pupils
+                    "drop shaped pupil", -- aliases general:drop-shaped pupils
+                    "clover shaped pupil", -- aliases general:clover-shaped pupils
+                    "money shaped pupil", -- aliases general:money-shaped pupils
+                    "crescent shaped pupil", -- aliases general:crescent-shaped pupils
+                    "skill shaped pupil", -- aliases general:skull-shaped pupils
+                    "musical note shaped pupil", -- aliases general:musical note-shaped pupils
+                    "lightning bolt shaped pupil", -- aliases general:lightning bolt-shaped pupils
+                    "bone shaped pupil", -- aliases general:bone-shaped pupils
+                    "paw shaped pupil", -- aliases general:paw-shaped pupils
+                    "sprout shaped pupil", -- aliases general:sprout-shaped pupils
+                    "cat shaped pupil", -- aliases general:cat-shaped pupils
+                    "spade shaped pupil", -- aliases general:spade-shaped pupils
+                    "crescent shaped pupil", -- aliases general:crescent-shaped pupils
+
+
+            "nose",
+            "cheek",
+            "mouth",
+            "tongue",
+            "chin",
+            "head",
+            "face",
+            "neck",
+            "throat",
+            "shoulder",
+            "back",
+            "wings",
+            "limb",
+              "arm",
+              "leg",
+            "elbow",
+            "wrist",
+            "stomach",
+            "waist",
+            "tail",
+            "ass",
+            "crotch",
+            "chest",
+            "breasts",
+            "penis",
+              "real penis", --
+              "fake penis", -- aliases general:dildo; implies thing:sex toy
+                "fake vibrating penis",
+                "fake penis with suction cup", -- aliases general:suction cup dildo
+            "vulva",
+            "anus",
+            "hip",
+            "thigh",
+            "knee",
+            "calf",
+            "ankle",
+            "foot",
+            "tentacle",
+
+          "anatomical feature",
+            "shoulder blades", -- aliases general:shoulder blades
+          "anatomical category",
+            "muscle",
+      "abstract thing",
+        "intellectual property",
+          "corporate ip",
+            "google",
+              "google pixel",
+              "google nexus",
+              "google chrome",
+              "android google", -- cnm android (google)
+          "game ip",
+            "mass effect series", -- cnm mass effect (series)
+              "mass effect 3",
+              "mass effect 2",
+              "mass effect 1",
+            "unholy arts",
+            "growing up",
+            "girl crush",
+            "genshin impact",
+            "dragon age inquisition",
+            "teamfight tactics",
+            "slay the spire",
+            "sable game", -- cnm sable (game)
+            "dungeon massage service",
+            "bumble",
+            "facebook",
+            "hinge",
+            "okc",
+            "tinder",
+            "whatsapp",
+            "reddit",
+            "bumble",
+            "vscode",
+            "discord",
+            "fb messenger",
+            "flightradar",
+            "google",
+            "hinge",
+            "jisho",
+            "mvg",
+            "newpipe",
+            "outlook",
+            "reddit",
+            "sms",
+            "telegram",
+            "the guardian",
+            "wikipedia",
+            "youtube",
+            "her",
+            "strava",
+            "lishogi",
+            "lichess",
+            "ikea",
+            "landefeld",
+            "aws",
+            "amazon",
+            "anki",
+            "github",
+            "gitlab",
+            "bitbucket",
+            "chatgpt",
+            "openai playground",
+            "dbeaver",
+            "hermes",
+          "multimedia ip",
         "concept",
+          "disciplinary concept",
+            "philosophy concept",
+          "nation",
+            "the netherlands",
           "location",
           "language",
             "english",
             "japanese",
             "german",
-        "hyperbody",
-          "2d hyperbody",
-            "conic section",
-              "ellipse",
-                "circle",
-              "parabola",
-              "hyperbola",
-            "polygon",
-              "n-sided polygon",
-                "1-sided polygon",
-                "2-sided polygon",
-                "3-sided polygon", -- aliases general:triangle
-                "4-sided polygon",
-                "5-sided polygon",
-                "6-sided polygon",
-                "7-sided polygon",
-                "8-sided polygon",
-                "9-sided polygon",
-                "10-sided polygon",
-                "11-sided polygon",
-                "12-sided polygon",
-              "equilateral polygon",
-              "equiangular polygon",
-              "parallel sides polygon",
-              "equilateral equiangular polygon",
-                "convex regular polygon",
-                  "3-sided convex regular polygon", -- canonical_name regular triangle
-                "star regular polygon",
-              "equilateral parallel sides polygon",
-                "4-sided equilateral parallel sides polygon", -- canonical_name rhombus; aliases general:diamond (shape)
-              "some other polygon",
-                "cross",
-                "x",
-            "other 2d hyperbody",
-              "sparkle",
-              "heart",
-          "3d hyperbody",
-            "polyhedron",
-      "body part",
-        "body data",
-          "body measurement",
-          "body ratio",
-        "body part grouping",
-          "body part grouping by function",
-            "sensory organ",
-            "pleasurable organ",
-              "crotch pleasurable organ",
-            "ussy",
-          "body part grouping by similarity",
-            "digit",
-            "teashi",
-          "axis body part grouping",
-            "y axis body part grouping",
-              "bi-ly body part grouping",
-                "upper body",
-                "lower body",
-        "general body part",
-          "horn",
-          "hair",
-            "hair ear", -- aliases general:hair ears
-          "forehead",
-          "ear",
-            "human ear",
-            "animal ear", -- aliases general:animal ears
-              "fake animal ear", -- aliases general:fake animal ears, can coexist with all other animal ears tags
-                "animal ear headphones", -- aliases general:animal ear headphones
-                  "bear ear headphones", -- aliases general:bear ear headphones
-                  "cat ear headphones", -- aliases general:cat ear headphones
-                  "rabbit ear headphones", -- aliases general:dog ear headphones
-            "mechanical ear", -- aliases general:mechanical ears
-            "pointy ear", -- aliases general:pointy ears
-              "long pointy ear", -- aliases general:long pointy ears
-          "iris",
-          "pupil",
-          "eye", -- aliases general:eyes
-            "eyes with no pupils", -- aliases general:no pupils
-            "eyes with pupils",
-              "modified aperture pupil",
-                "constricted pupil", -- aliases general:constricted pupils
-                "dilated pupil", -- aliases general:dilated pupils
-              "extra pupil", -- aliases general:extra pupils
-              "unusual shaped pupil",
-                "mismatched pupils", -- aliases general:mismatched pupils
-                "rectangular pupil", -- aliases general:horizontal pupils
-                "slit pupil", -- aliases general:slit pupils
-                "symbol shaped pupil", -- aliases general:symbol-shaped pupils
-                  "sparkle shaped pupil", -- aliases general:+ +
-                  "heart shaped pupil", -- aliases general:heart-shaped pupils
-                  "star shaped pupil", -- aliases general:star-shaped pupils
-                  "cross shaped pupil", -- aliases general:cross-shaped pupils
-                  "x shaped pupil", -- aliases general:x-shaped pupils
-                  "flower shaped pupil", -- aliases general:flower-shaped pupils
-                  "diamond shaped pupil", -- aliases general:diamond-shaped pupils
-                  "rabbit shaped pupil", -- aliases general:rabbit-shaped pupils
-                  "butterfly shaped pupil", -- aliases general:butterfly-shaped pupils
-                  "triangle shaped pupil", -- aliases general:triangle-shaped pupils
-                  "power symbol shaped pupil", -- aliases general:power symbol-shaped pupils
-                  "drop shaped pupil", -- aliases general:drop-shaped pupils
-                  "clover shaped pupil", -- aliases general:clover-shaped pupils
-                  "money shaped pupil", -- aliases general:money-shaped pupils
-                  "crescent shaped pupil", -- aliases general:crescent-shaped pupils
-                  "skill shaped pupil", -- aliases general:skull-shaped pupils
-                  "musical note shaped pupil", -- aliases general:musical note-shaped pupils
-                  "lightning bolt shaped pupil", -- aliases general:lightning bolt-shaped pupils
-                  "bone shaped pupil", -- aliases general:bone-shaped pupils
-                  "paw shaped pupil", -- aliases general:paw-shaped pupils
-                  "sprout shaped pupil", -- aliases general:sprout-shaped pupils
-                  "cat shaped pupil", -- aliases general:cat-shaped pupils
-                  "spade shaped pupil", -- aliases general:spade-shaped pupils
-                  "crescent shaped pupil", -- aliases general:crescent-shaped pupils
-
-
-          "nose",
-          "cheek",
-          "mouth",
-          "tongue",
-          "chin",
-          "head",
-          "face",
-          "neck",
-          "throat",
-          "shoulder",
-          "back",
-          "wings",
-          "limb",
-            "arm",
-            "leg",
-          "elbow",
-          "wrist",
-          "stomach",
-          "waist",
-          "tail",
-          "ass",
-          "crotch",
-          "chest",
-          "breasts",
-          "penis",
-            "real penis", --
-            "fake penis", -- aliases general:dildo; implies thing:sex toy
-              "fake vibrating penis",
-              "fake penis with suction cup", -- aliases general:suction cup dildo
-          "vulva",
-          "anus",
-          "hip",
-          "thigh",
-          "knee",
-          "calf",
-          "ankle",
-          "foot",
-          "tentacle",
-
-        "anatomical feature",
-          "shoulder blades", -- aliases general:shoulder blades
-        "anatomical category",
-          "muscle",
-      
-          
+    "combination", -- | if extant, the first part of the with is the active part, the second is the passive part
   },
+  -- interaction = {
+  --   "repetition",
+  --     "patterning",
+  --       "referential patterning",
+  --         "self-referential patterning",
+  --         "axis-referential patterning",
+  --           "1-axis referential patterning",
+  --           "2-axis referential patterning",
+  --           "many-axis referential patterning"
+
+  -- },
+
   interaction = {
-    "repetition",
-      "patterning",
-        "referential patterning",
-          "self-referential patterning",
-          "axis-referential patterning",
-            "1-axis referential patterning",
-            "2-axis referential patterning",
-            "many-axis referential patterning"
-
+    "grammatical case",
+      "thematic case",
+        "nuclear case",
+          "agentive",
+          "patientive",
+          "themetive",
+        "non-nuclear case",
+          
+      "spatial",
+        "essive",
+          "interessive",
+    "visual",
   },
-  -- if extant, the first part of the with is the active part, the second is the passive part
-  arrangement = {
-    
-
-
-
-    
-  },
+  
   composition = {
     "visual composition",
       "2d composition",
@@ -882,11 +988,6 @@ ls = {
             "midground composition",
             "background composition",
           "visual layering composition",
-        "subjectivity related composition",
-          "subjectivity composition",
-            "subject composition",
-            "nonsubject composition",
-          "subjectivizing composition",
         "perspective composition",
           "camera subject distance composition",
             "extreme closeup shot",
@@ -995,31 +1096,6 @@ ls = {
           
 
 
-  },
-  effects = {
-    "visual effect",
-      "2d effect",
-        "cameralike effect",
-          "lens effect", -- an effect due to the fact that cameras use lenses
-            "lens artifact",
-              "lens flare", -- aliases general:lens flare
-              "bokeh", -- aliases general:bokeh
-              "chromatic aberration", -- aliases general:chromatic aberration
-              "diffraction spikes", -- aliases general:diffraction spikes
-            "expousre triangle effect",
-              "exposure effect",
-                "motion blur", -- aliases general:motion blur
-          "signal processing effect",
-            "film effect", 
-              "film grain", -- aliases general:film grain
-        "perceptual effect",
-          "afterimage", -- aliases general:afterimage
-        "post effect",
-          "symbolic effects",
-
-          "insert",
-            "cut-in",
-          "blur effect", -- aliases general:blur 
   },
   cross_applications = {
       "thing + x",
@@ -1306,7 +1382,7 @@ ls = {
     
   },
   character = {
-    "purple haired mpdg pornpen", -- canonical_name purple haired mpdg (pornpen)
+    "purple haired mpdg pornpen", -- cnm purple haired mpdg (pornpen)
   },
   creation_ware = {
     "creation location",
@@ -1404,23 +1480,18 @@ ls = {
         "SBCS^2^",
           "lightness SBCS^2",
             "lightness 1-adic SBCS^2",
-              "lightness 1-adic range SBCS^2",
-                "4th 4tile lightness 1-adic range SBCS^2",
-                  "4th 4tile lightness 1-adic range SBCS^2 theme", -- aliases general:pale color
+              "lightness 1-adic range SBCS^2", -- [theme] aliases general:pale color
           "saturation SBCS^2",
             "saturation 1-adic SBCS^2",
-              "0 saturation 1-adic SBCS^2",
-                "0 saturation 1-adic SBCS^2 palette", -- aliases general:greyscale
+              "0 saturation 1-adic SBCS^2", -- [substance] aliases general:greyscale
           "hsv saturation SBCS^2",
             "hsv saturation 1-adic SBCS^2",
               "hsv saturation 1-adic range SBCS^2", 
-                "1st 2tile hsv saturation 1-adic range SBCS^2",
-                  "1st 2tile hsv saturation 1-adic range SBCS^2 theme", -- aliases general:muted color
+                "1st 2tile hsv saturation 1-adic range SBCS^2", -- [theme] aliases general:muted color
           "hsv saturation value SBCS^2",
             "hsv saturation value 1-adic SBCS^2",
               "hsv saturation value 1-adic range SBCS^2",
-                "1st 4tile hsv saturation 4th 4tile value 1-adic range SBCS^2",
-                  "1st 4tile hsv saturation 4th 4tile value 1-adic range SBCS^2 theme", -- aliases general:pastel colors
+                "1st 4tile hsv saturation 4th 4tile value 1-adic range SBCS^2", -- [theme] aliases general:pastel colors
           "hue SBCS^2^",
             "temperature SBCS^2^",
               "red-based temperature SBCS^2^",
@@ -1434,83 +1505,29 @@ ls = {
                 "yellow-based warm SBCS^2^",
                   "yellow-based warm range SBCS^2^",
             "hue 1-adic SBCS^2^",
-              "hue 1-adic range SBCS^2^",
-                  "hue 1-adic range SBCS^2^ palette", -- aliases general:monochrome
-                    "aqua 1-adic range SBCS^2^ palette",
-                    "black 1-adic range SBCS^2^ palette",
-                    "blue 1-adic range SBCS^2^ palette",
-                    "brown 1-adic range SBCS^2^ palette",
-                    "green 1-adic range SBCS^2^ palette",
-                    "grey 1-adic range SBCS^2^ palette",
-                    "orange 1-adic range SBCS^2^ palette",
-                    "pink 1-adic range SBCS^2^ palette",
-                    "purple 1-adic range SBCS^2^ palette",
-                    "red 1-adic range SBCS^2^ palette",
-                    "white 1-adic range SBCS^2^ palette",
-                    "yellow 1-adic range SBCS^2^ palette",
-                  "hue 1-adic range SBCS^2^ theme",
-                    "aqua 1-adic range SBCS^2^ theme", -- aliases general:aqua theme
-                    "black 1-adic range SBCS^2^ theme", -- aliases general:black theme
-                    "blue 1-adic range SBCS^2^ theme", -- aliases general:blue theme
-                    "brown 1-adic range SBCS^2^ theme", -- aliases general:brown theme
-                    "green 1-adic range SBCS^2^ theme", -- aliases general:green theme
-                    "grey 1-adic range SBCS^2^ theme", -- aliases general:grey theme
-                    "orange 1-adic range SBCS^2^ theme", -- aliases general:orange theme
-                    "pink 1-adic range SBCS^2^ theme", -- aliases general:pink theme
-                    "purple 1-adic range SBCS^2^ theme", -- aliases general:purple theme
-                    "red 1-adic range SBCS^2^ theme", -- aliases general:red theme
-                    "white 1-adic range SBCS^2^ theme", -- aliases general:white theme
-                    "yellow 1-adic range SBCS^2^ theme", -- aliases general:yellow theme
+              "hue 1-adic range SBCS^2^", -- [substance] aliases general:monochrome
+                "aqua 1-adic range SBCS^2^", -- [theme] aliases general:aqua theme
+                "black 1-adic range SBCS^2^", -- [theme] aliases general:black theme
+                "blue 1-adic range SBCS^2^", -- [theme] aliases general:blue theme
+                "brown 1-adic range SBCS^2^", -- [theme] aliases general:brown theme
+                "green 1-adic range SBCS^2^", -- [theme] aliases general:green theme
+                "grey 1-adic range SBCS^2^", -- [theme] aliases general:grey theme
+                "orange 1-adic range SBCS^2^", -- [theme] aliases general:orange theme
+                "pink 1-adic range SBCS^2^", -- [theme] aliases general:pink theme
+                "purple 1-adic range SBCS^2^", -- [theme] aliases general:purple theme
+                "red 1-adic range SBCS^2^", -- [theme] aliases general:red theme
+                "white 1-adic range SBCS^2^", -- [theme] aliases general:white theme
+                "yellow 1-adic range SBCS^2^", -- [theme] aliases general:yellow theme
       "hyperbody style",
         "line style",
           "line thickness style",
           "line roughness style",
-
         "surface style",
 
+  }, 
+  general = {
+    "mixed media", -- [substance] cnm traditional-seeming graphic art surface covering ++ digital-seeming graphic art surface covering
   },
-  medium = {
-    "audio",
-    "visual",
-      "still",
-        "twodimensional media",
-          "photography",
-          "artificial visual media", -- not created by capturing reality
-            "traditionallike media",
-              "recognizable surface",
-                "canvas", -- aliases general:canvas (medium)
-                "paper", -- DO NOT alias general:paper to this
-              "penlike",
-                "ballpoint pen", -- aliases general:ballpoint pen (medium)
-              "crayonlike", 
-                "crayon", -- aliases general:crayon (medium)
-                "coupy pencil", -- aliases general:coupy pencil (medium)
-              "inklike",
-                "ink", -- aliases general:ink (medium)
-                "nib pen", -- aliases general:nib pen (medium)
-                "calligraphy brush", -- aliases general:calligraphy brush (medium),
-                "color ink", -- aliases general:color ink (medium)
-              "graphitelike",
-                "graphite", -- aliases general:graphite (medium)
-                "charcoal", -- aliases general:charcoal (medium)
-                "colored pencil", -- aliases general:colored pencil (medium)
-              "painting",
-                "acrylic paint", -- aliases general:acrylic paint (medium)
-                "gouache", -- aliases general:gouache (medium)
-                "oil paint", -- aliases general:oil painting (medium)
-                "watercolor", -- aliases general:watercolor (medium)
-              "watercolor pencil", -- aliases general:watercolor pencil (medium)
-              "pastel", -- aliases general:pastel (medium)
-              "traditional media",
-              "faux traditional media",
-            "digital media",
-              "2d",
-              "3d",
-        "nontwodominesional media", -- aliases general:unconventional media
-        "mixed media", -- tag this if two or more of photography, object media, traditional media, digital media, and unconventional media apply, but not if two different subtype tags apply. e.g. watercolor and ballpoint pen is not mixed media (with how common it is to use two different implements, that'd be insane)
-
-  },
-
   format = {
     "audio",
     "visual",
@@ -1591,47 +1608,23 @@ ls = {
           "rolled paged media",
             "scroll",
           "digitally paginated paged media",
-        "standalone whole", -- this can coexist with multipart image or with paged media, as long as the whole makes sense on its own
-          "pure art", 
-          "functional art",
-            "large format functional",
-              "poster",
-                "movie poster",
-            "medium format functional",
-              "cover", -- aliases general:cover
-                "standalone print media cover", -- aliases general:cover page
-                  "novel cover", -- aliases general:novel cover
-                  "doujin cover", -- aliases general:doujin cover
-                  "manga cover", -- aliases general:manga cover
-                "album cover", -- aliases general:album cover
-                "magazine cover", -- aliases general:magazine cover
-                "video game cover", -- aliases general:video game cover
-                "dvd cover", -- aliases general:dvd cover
-                "bluray cover", -- aliases general:bluray cover
-            "small format functional",
-              "postcard",
-              "flyer",
-                "tear off flyer",
-            "irregular format functional",
-              "crest",
-            "styled object",
-              "calendar", -- aliases general:calendar (medium)
-          "pure functionality",
-            "user interface", -- implies general:user interface, but is not aliased
-              "os user interface", -- the typical user interface of an operating system, covering the entire screen. On android, this means an app or the home screen plus notification bar and potentially software buttons.
-                "smartphone user interface", -- aliases general:fake phone screenshot
-                "desktop user interface",
-              "app user interface", -- the user interface of an app or program covering the entire screen. Protyptically in the kind of screenshots cmd+shift+5 can take
-            "document",
-              "slide",
-                "latex slide", -- you know the one
-              "cv",
-            "thingy",
-              "icon",
   },
-  general_tags = {
-    "smartphone mockup",
-    "google pixel 4"
+  thing_namespace = {
+    "thing",
+    "substance",
+    "focus",
+    "theme",
+    "accent",
+    "framing",
+    "incidental"
+  },
+  thing_other_namespace = {
+    "substance",
+    "focus",
+    "theme",
+    "accent",
+    "framing",
+    "incidental"
   },
   series_namespace = {
     "chapter index",

@@ -817,6 +817,7 @@ transf = {
             {"The Real Momoka - by Arai Sumiko - 17", '[["series", "The Real Momoka"], ["creator", "Arai Sumiko"], ["page_index", "17"]]'},
             {"__warrior_of_light_final_fantasy_and_1_more_drawn_by_d_rex__781a13c9a81ed223c83d9b65f4531b90", 'IMPOSSIBLE: Danbooru-like filename, should not be parsed because better solutions exist.'},
             {"2022-02-16--diary_2", 'IMPOSSIBLE'},
+          }
         )
         local res = {}
         if #series_pairs > 0 then
@@ -4731,39 +4732,88 @@ transf = {
           namespace = get.str.n_strs_by_extracted_onig(line, "^ +([^ ]+) *=")
           parent_chain = {}
         elseif new_indent_level > 1 then
-          -- extract item name, aliases, canonical name, and implies
-          local item, data_section  = get.str.n_strs_by_extracted_onig(line, "^ +\"([^\"]+)\",? *(?:-- *(.+))? *$")
+          -- extract item, data section
+          local item, data_section  = get.str.n_strs_by_extracted_onig(line, "^ +\"([^\"]+)\",? *(?:-- *([^|]+))? *$")
           if data_section and #data_section > 8 then -- 8 for sanity check
-            local parts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(data_section, ";" )
-            for _, part in transf.arr.pos_int_vt_stateless_iter(parts) do
-              local key, value = get.str.n_strs_by_split_w_str(part, " ", 2)
-              local values = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(value, ",")
-              for _, val in transf.arr.pos_int_vt_stateless_iter(values) do
-                if key == "canonical_name" then -- a canonical name is the same thing as an alias, but with source and target swapped. Also, the source must be in the same namespace as the item and thus has it prepended automatically
-                  dothis.arr.push(hydrus_rel_spec.aliases, {
-                    namespace .. ":" .. val,
-                    namespace .. ":" .. item
-                  })
-                else
-                  dothis.arr.push(hydrus_rel_spec[key], {
-                    namespace .. ":" .. item,
-                    val
-                  })
+            local data_subsections = get.str.not_empty_str_arr_by_split_w_str(data_section, "[") -- subsections are [namespace] content, except the first one, which is just content
+            for _, data_subsection in transf.arr.pos_int_vt_stateless_iter(data_subsections) do
+              local data_namespace, data_content = get.str.n_strs_by_split_w_str(data_subsection, "]")
+              if not data_content then
+                data_content = data_namespace
+                data_namespace = namespace
+              end
+              -- subsection content consists of key-value pairs separated by semicolons, with the key and value separated by a space. Values can be comma-separated lists. 
+              local parts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(data_section, ";" )
+              for _, part in transf.arr.pos_int_vt_stateless_iter(parts) do
+                local key, value = get.str.n_strs_by_split_w_str(part, " ", 2)
+                local values = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(value, ",")
+                for _, val in transf.arr.pos_int_vt_stateless_iter(values) do
+                  local val_namespace, actual_val = get.str.n_strs_by_split_w_str(val, ":", 2)
+                  if not actual_val then
+                    actual_val = val_namespace
+                    val_namespace = data_namespace
+                  end
+                  local namespaced_val = val_namespace .. ":" .. actual_val
+                  if key == "cnm" then -- a canonical name is the same thing as an alias, but with source and target swapped. Also, the source must be in the same namespace as the item and thus has it prepended automatically
+                    dothis.arr.push(hydrus_rel_spec.aliases, {
+                      namespaced_val,
+                      data_namespace .. ":" .. item
+                    })
+                  else
+                    dothis.arr.push(hydrus_rel_spec[key], {
+                      data_namespace .. ":" .. item,
+                      namespaced_val
+                    })
+                  end
+
+                  -- handle the case where the value is composed and thus we need to set up further implications
+
+                  local valparts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(actual_val, "+")
+                  if #valparts > 1 and val_namespace ~= "thing" then -- composed values first need to be implied to thing:
+                    dothis.arr.push(hydrus_rel_spec.implies, {
+                      val_namespace .. ":" .. actual_val,
+                      "thing:" .. actual_val
+                    })
+                  end
+                  for i = 1, #valparts, 1 do
+                    local valpart = transf.str.str_by_percent_decoded_no_plus(valparts[i]) -- we're percent encoding to allow for plus signs in the value, which in turn allows for nested composed values. e.g. danbooru's 'girl sandwich tag', which we render as "agentlike+interessive+female agentlike%2Bfemale agentlike"
+                    if i % 2 then -- valpart is a relationship
+                      if  #valpart > 0 then
+                        dothis.arr.push(hydrus_rel_spec.implies, {
+                          namespaced_val,
+                          "relationship:" .. valpart
+                        })
+                      end
+                    else 
+                      dothis.arr.push(hydrus_rel_spec.implies, {
+                        "thing:" .. val,
+                        "thing:" .. valpart
+                      })
+                    end
+                  end
                 end
               end
             end
-            if transf.arr.pos_int_by_length(parent_chain) > 0 then
+          end
+          if transf.arr.pos_int_by_length(parent_chain) > 0 then
+            dothis.arr.push(hydrus_rel_spec.implies, {
+              namespace .. ":" .. item,
+              namespace .. ":" .. transf.arr.t_by_last(parent_chain)
+            }) -- establish the implication e.g. whatever:child -> whatever:parent
+          end
+          if namespace == "thing" then -- establish the implication e.g. focus:foo -> thing:foo
+            for _, ns in transf.arr.pos_int_vt_stateless_iter(ls.thing_other_namespace) do
               dothis.arr.push(hydrus_rel_spec.implies, {
-                namespace .. ":" .. item,
-                namespace .. ":" .. transf.arr.t_by_last(parent_chain)
+                ns .. ":" .. item,
+                "thing:" .. item
               })
             end
-            if new_indent_level > indent_level then -- we're going deeper
-              dothis.arr.push(parent_chain, item)
-            elseif new_indent_level < indent_level then -- we're going shallower
-              for i = 1, indent_level - new_indent_level do
-                dothis.arr.pop(parent_chain)
-              end
+          end
+          if new_indent_level > indent_level then -- we're going deeper
+            dothis.arr.push(parent_chain, item)
+          elseif new_indent_level < indent_level then -- we're going shallower
+            for i = 1, indent_level - new_indent_level do
+              dothis.arr.pop(parent_chain)
             end
           end
         else
@@ -5085,6 +5135,9 @@ transf = {
         }, "..."),
         ", "
       )
+    end,
+    str_arr_by_percent_decoded_no_plus = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.str_by_percent_decoded_no_plus)
     end,
     
   },
