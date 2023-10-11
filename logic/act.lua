@@ -10,13 +10,13 @@ act = {
   },
   package_manager_name = {
     install_self = function(mgr)
-      dothis.str.env_bash_eval_async("upkg " .. mgr .. " install-self")
+      act.str.env_bash_eval_async("upkg " .. mgr .. " install-self")
     end,
     install_missing = function(mgr)
-      dothis.str.env_bash_eval_async("upkg " .. mgr .. " install-missing")
+      act.str.env_bash_eval_async("upkg " .. mgr .. " install-missing")
     end,
     upgrade_all = function(mgr)
-      dothis.str.env_bash_eval_async("upkg " .. mgr .. " upgrade-all")
+      act.str.env_bash_eval_async("upkg " .. mgr .. " upgrade-all")
     end,
     backup = function(mgr)
       dothis.package_manager_name.do_backup_and_commit(mgr, "backup", "backup packages")
@@ -46,7 +46,7 @@ act = {
         "vdirsyncer discover" ..
         transf.str.str_by_single_quoted_escaped(name),
         get.fn.fn_by_1st_n_bound(
-          dothis.str.env_bash_eval_async,
+          act.str.env_bash_eval_async,
           "vdirsyncer sync" .. transf.str.str_by_single_quoted_escaped(name)
         )
       )
@@ -81,14 +81,14 @@ act = {
       end)
     end,
     generate_json_file = function(path)
-      return dothis.str.env_bash_eval_async(
+      return act.str.env_bash_eval_async(
         "ical2json" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
   },
   sha256_hex_str_arr = {
     add_tags_to_hydrus_item = function(arr)
-      dothis.str.env_bash_eval_async(
+      act.str.env_bash_eval_async(
         "hydrus_add_tags" .. transf.str.here_doc(
           transf.str_arr.multiline_str(arr)
         )
@@ -276,20 +276,20 @@ act = {
   },
   local_image_file = {
     add_hs_image_to_clipboard = function(path)
-      dothis.hs_image.add_to_clipboard(
+      act.hs_image.add_to_clipboard(
         transf.local_image_file.hs_image(path)
       )
     end,
     paste_hs_image = function(path)
-      dothis.hs_image.paste(
+      act.hs_image.paste(
         transf.local_image_file.hs_image(path)
       )
     end,
     paste_hs_image_and_delete = function(path)
-      dothis.hs_image.paste(
+      act.hs_image.paste(
         transf.local_image_file.hs_image(path)
       )
-      dothis.absolute_path.delete(path)
+      act.absolute_path.delete(path)
     end,
     add_as_otp_with_prompted_name = function(path)
       act.otp_url.add_otp_pass_item_with_prompted_name(
@@ -347,14 +347,87 @@ act = {
       dothis.local_path.open_app(path, "LibreOffice", true)
     end,
   },
+  local_extant_path = {
+    pull_all_descendants = function(path)
+      act.in_git_dir_arr.pull_all(
+        transf.extant_path.git_root_dir_arr_by_descendants(path)
+      )
+    end,
+  },
   local_dir = {
     git_init = function(path)
-      dothis.local_extant_path.do_in_path(path, "git init")
+      dothis.local_extant_path.do_in_path(
+        path,
+        "git init",
+        function()
+          dothis.absolute_path.write_file_if_nonextant_path(
+            transf.path.path_by_ending_with_slash(path) .. ".gitignore",
+            ""
+          )
+          dothis.in_git_dir.commit_all_root(path, "Initial commit")
+        end
+      )
+    end,
+  },
+  in_git_dir = {
+    pull = function(path)
+      dothis.local_extant_path.do_in_path(path, "git pull")
+    end,
+    push = function(path)
+      dothis.local_extant_path.do_in_path(path, "git push")
+    end,
+    fetch = function(path)
+      dothis.local_extant_path.do_in_path(path, "git fetch")
+    end,
+    add_self = function(path, do_after)
+      dothis.local_extant_path.do_in_path(path, "git add" .. transf.str.str_by_single_quoted_escaped(path), do_after)
+    end,
+    -- will also add untracked files
+    add_all = function(path, do_after)
+      dothis.local_extant_path.do_in_path(path, "git add -A", do_after)
+    end,
+    add_all_root = function(path, do_after)
+      act.in_git_dir.add_all(transf.in_git_dir.git_root_dir(path), do_after)
+    end,
+  },
+  email_specifier = {
+    send = function(specifier, do_after)
+      dothis.maildir_file.send(transf.email_specifier.raw_email(specifier), do_after)
+    end,
+    edit_then_send = function(specifier, do_after)
+      dothis.maildir_file.edit_then_send(transf.email_specifier.raw_email(specifier), do_after)
+    end,
+  },
+  email = {
+    edit_then_send = function(address, do_after)
+      act.email_specifier.edit_then_send({to = address}, do_after)
+    end,
+  },
+  audiodevice = {
+    ensure_sound_will_be_played = function(device)
+      device:setOutputMuted(false)
+      device:setOutputVolume(100)
+    end,
+  },
+  audiodevice_specifier = {
+    set_default = function(specifier)
+      dothis.audiodevice.set_default(
+        transf.audiodevice_specifier.audiodevice(specifier),
+        transf.audiodevice_specifier.audiodevice_subtype(specifier)
+      )
+    end,
+  },
+  audiodevice_specifier_arr = {
+    choose_item_and_set_default = function(arr)
+      dothis.arr.choose_item(
+        arr,
+        act.audiodevice_specifier.set_default
+      )
     end,
   },
   in_menv_absolute_path = {
     write_env_and_check = function(in_menv_absolute_path)
-      dothis.envlike_str.write_env_and_check(
+      act.envlike_str.write_env_and_check(
         transf.in_menv_absolute_path.envlike_str(in_menv_absolute_path)
       )
     end,
@@ -375,14 +448,204 @@ act = {
   },
   login_pass_item_name = {
     fill = function(name)
-      dothis.str_arr.fill_with({
+      act.str_arr.fill_with({
         transf.auth_pass_item_name.line_by_username_or_default(name),
         transf.passw_pass_item_name.line_by_password(name),
       })
     end,
   },
+  str_arr = {
+    fill_with = function(arr)
+      dothis.str_arr.join_and_paste(arr, "\t")
+    end
+  },
   assoc = {
     
+  },
+  window = {
+    focus = function(window)
+      window:focus()
+    end,
+    close = function(window)
+      window:close()
+    end,
+    make_main = function(window)
+      window:becomeMain()
+    end,
+  },
+  jxa_tab_specifier = {
+    make_main = function(jxa_tab_specifier)
+      get.str.any_by_evaled_js_osa( ("Application('%s').windows()[%d].activeTabIndex = %d"):format(
+        jxa_tab_specifier.application_name,
+        jxa_tab_specifier.window_index,
+        jxa_tab_specifier.tab_index
+      ))
+    end,
+    close = function(jxa_tab_specifier)
+      get.str.any_by_evaled_js_osa( ("Application('%s').windows()[%d].tabs()[%d].close()"):format(
+        jxa_tab_specifier.application_name,
+        jxa_tab_specifier.window_index,
+        jxa_tab_specifier.tab_index
+      ))
+    end,
+  },
+  intra_file_location_spec = {
+    go_to = function(specifier)
+      dothis.input_spec_arr.exec(
+        transf.intra_file_location_spec.input_spec_arr(specifier)
+      )
+    end,
+    open_go_to = function(specifier)
+      dothis.local_path.open_app(
+        transf.intra_file_location_spec.path(specifier),
+        env.GUI_EDITOR,
+        get.fn.fn_by_1st_n_bound(act.intra_file_location_spec.go_to, specifier)
+      )
+    end
+  },
+  path_with_twod_locator = {
+    open_go_to = function(path_with_twod_locator)
+      act.intra_file_location_spec.open_go_to(
+        transf.path_with_twod_locator.intra_file_location_spec(path_with_twod_locator)
+      )
+    end
+  },
+  absolute_path_key_str_or_str_arr_assoc = {
+    write = function(dynamic_absolute_path_key_assoc)
+      for absolute_path, contents in transf.table.kt_vt_stateless_iter(dynamic_absolute_path_key_assoc) do
+        if is.any.arr(contents) then
+          dothis.absolute_path[act.arr.shift(contents)](absolute_path, transf.arr.n_anys(contents))
+        else
+          act.absolute_path[contents](absolute_path)
+        end
+      end
+    end,
+  },
+  absolute_path = {
+    write_template = function(path, template_path)
+      dothis.absolute_path.write_file(
+        path,
+        get.str.str_by_evaled_as_template(
+          get.str.any_by_evaled_as_lua(template_path),
+          path
+        )
+      )
+    end,
+    create_dir = function(path)
+      if is.absolute_path.nonextant_path(path) then
+        dothis.nonextant_path.create_dir(path)
+      end
+    end,
+    create_parent_dir = function(path)
+      act.absolute_path.create_parent_dir(path)
+    end,
+    delete = function(path)
+      if is.absolute_path.extant_path(path) then
+        act.extant_path.delete(path)
+      end
+    end,
+    empty = function(path)
+      if is.absolute_path.extant_path(path) then
+        act.extant_path.empty(path)
+      end
+    end,
+    delete_dir = function(path)
+      if is.path.extant_path(path) then
+        act.extant_path.delete_dir(path)
+      end
+    end,
+    empty_dir = function(path)
+      if is.path.extant_path(path) then
+        act.extant_path.empty_dir(path)
+      end
+    end,
+    delete_file = function(path)
+      if is.path.extant_path(path) then
+        act.extant_path.delete_file(path)
+      end
+    end,
+    empty_file = function(path)
+      if is.path.extant_path(path) then
+        act.extant_path.empty_file(path)
+      end
+    end,
+    delete_if_empty_path = function(path)
+      if is.path.extant_path(path) then
+        act.extant_path.delete_if_empty_path(path)
+      end
+    end,
+    delete_file_if_empty_file = function(path)
+      if is.path.extant_path(path) then
+        act.extant_path.delete_file_if_empty_file(path)
+      end
+    end,
+    delete_dir_if_empty_dir = function(path)
+      if is.path.extant_path(path) then
+        act.extant_path.delete_dir_if_empty_dir(path)
+      end
+    end,
+    initialize_omegat_project = function (path)
+      dothis.local_path.write_dynamic_structure(path, "omegat")
+      dothis.omegat_project_dir.pull_project_materials(path)
+    end,
+    empty_write_file = function(path)
+      act.absolute_path.create_parent_dir(path)
+      dothis.file.empty_write_file(path)
+    end,
+  },
+  absolute_path_str_value_assoc = {
+    write = function(absolute_path_str_value_assoc)
+      for absolute_path, contents in transf.table.kt_vt_stateless_iter(absolute_path_str_value_assoc) do
+        dothis.absolute_path.write_file(absolute_path, contents)
+      end
+    end,
+  },
+  running_application = {
+    focus_main_window = function(running_application)
+      transf.running_application.main_window(running_application):focus()
+    end,
+    activate = function(running_application)
+      running_application:activate()
+    end,
+  },
+  mac_application_name = {
+    reload = function(application_name)
+      dothis.mac_application_name.execute_full_action_path(
+        application_name,
+        tblmap.mac_application_name.reload_full_action_path[application_name]
+      )
+    end,
+    focus_main_window = function(application_name)
+      dothis.running_application.focus_main_window(
+        transf.mac_application_name.running_application_or_nil(application_name)
+      )
+    end,
+    activate = function(application_name)
+      dothis.running_application.activate(
+        transf.mac_application_name.running_application_or_nil(application_name)
+      )
+    end,
+  },
+  iban = {
+    fill_bank_form = function(iban)
+      act.str_arr.fill_with(transf.iban.three_str__arr_by_iban_bic_bank_name(iban))
+    end
+  },
+  menu_item_table = {
+    execute = function(menu_item_table)
+      dothis.running_application.execute_full_action_path(
+        transf.menu_item_table.running_application(menu_item_table),
+        transf.menu_item_table.str_arr_by_action_path(menu_item_table)
+      )
+    end,
+  },
+  envlike_str = {
+    write_env_and_check = function(str)
+      dothis.envlike_str.write_and_check(
+        str,
+        env.ENVFILE
+      )
+    end,
   },
   volume_local_extant_path = {
     eject_or_err = function(path)
@@ -440,6 +703,7 @@ act = {
       )
     end,
   },
+  
   str = {
     say_ja = function(str)
       dothis.str.say(str, "ja")
@@ -476,6 +740,49 @@ act = {
         str
       )
     end,
+    write_to_temp_file = function(str)
+      local path = transf.str.in_tmp_local_absolute_path(os.time(), "temp_file")
+      dothis.absolute_path.write_file(path, str)
+      return path
+    end,
+    open_temp_file = function(str, do_after)
+      dothis.local_path.open_app(
+        act.str.write_to_temp_file(str),
+        env.GUI_EDITOR,
+        do_after
+      )
+    end,
+    edit_temp_file_in_vscode_act_on_path = function(str, do_after)
+      local path = act.str.write_to_temp_file(str)
+      dothis.local_file.edit_file_in_vscode_act_on_path(path, do_after)
+    end,
+    edit_temp_file_in_vscode_act_on_contents = function(str, do_after)
+      local path = act.str.write_to_temp_file(str)
+      dothis.local_file.edit_file_in_vscode_act_on_contents(path, do_after)
+    end,
+    create_url_arr_as_session_in_msessions = function(str)
+      dothis.url_arr.create_as_session_in_msessions(
+        transf.str.url_arr_by_one_per_line(str)
+      )
+    end,
+    env_bash_eval_async = function(str)
+      local task = hs.task.new(
+        "/opt/homebrew/bin/bash",
+        transf["nil"]["nil"],
+        { "-c", transf.str.str_by_env_getter_comamnds_prepended(
+          str
+        )}
+      )
+      task:start()
+      return task
+    end,
+    env_bash_eval_sync = function(str)
+      hs.execute(
+        transf.str.str_by_env_getter_comamnds_prepended(
+          str
+        )
+      )
+    end,
     alert = function(str)
       dothis.str.alert(str, 10)
     end,
@@ -495,13 +802,13 @@ act = {
       act.str.paste(get.str.str_by_evaled_as_template(str))
     end,
     fill_with_lines = function(str)
-      dothis.str_arr.fill_with(transf.str.line_arr(str))
+      act.str_arr.fill_with(transf.str.line_arr(str))
     end,
     fill_with_noempty_line_arr = function(path)
-      dothis.str_arr.fill_with(transf.str.noempty_line_arr(path))
+      act.str_arr.fill_with(transf.str.noempty_line_arr(path))
     end,
     fill_with_noempty_noindent_nohashcomment_line_arr = function(path)
-      dothis.str_arr.fill_with(transf.str.noempty_noindent_nohashcomment_line_arr(path))
+      act.str_arr.fill_with(transf.str.noempty_noindent_nohashcomment_line_arr(path))
     end,
     search_wiktionary = function(query) dothis.search_engine_id.search("wiktionary", query) end,
     search_wikipedia = function(query) dothis.search_engine_id.search("wikipedia", query) end,
@@ -525,6 +832,64 @@ act = {
     search_gelbooru = function(query) dothis.search_engine_id.search("gelbooru", query) end,
   },
   extant_path = {
+    empty = function(path)
+      if is.extant_path.dir(path) then
+        act.dir.empty_dir(path)
+      elseif is.extant_path.file(path) then
+        dothis.file.empty_write_file(path)
+      end
+    end,
+    delete = function(path)
+      if is.extant_path.dir(path) then
+        act.dir.delete_dir(path)
+      elseif is.extant_path.file(path) then
+        dothis.file.delete_file(path)
+      end
+    end,
+    delete_if_empty_path = function(path)
+      if is.extant_path.empty_path(path) then
+        act.extant_path.delete(path)
+      end
+    end,
+    empty_file = function(path)
+      if is.extant_path.file(path) then
+        dothis.file.empty_write_file(path)
+      end
+    end,
+    delete_file = function(path)
+      if is.extant_path.file(path) then
+        dothis.file.delete_file(path)
+      end
+    end,
+    delete_file_if_empty_file = function(path)
+      if is.extant_path.file(path) then
+        dothis.file.delete_file_if_empty_file(path)
+      end
+    end,
+    delete_dir = function(path)
+      if is.extant_path.dir(path) then
+        act.dir.delete_dir(path)
+      end
+    end,
+    delete_dir_if_empty_dir = function(path)
+      if is.extant_path.dir(path) then
+        act.dir.delete_dir_if_empty_dir(path)
+      end
+    end,
+    empty_dir = function(path)
+      if is.extant_path.dir(path) then
+        act.dir.empty_dir(path)
+      end
+    end,
+    move_to_parent_path = function(path)
+      dothis.extant_path.move_to_absolute_path(path, transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path))
+    end,
+    move_to_downloads = function(path)
+      dothis.extant_path.move_to_absolute_path(path, env.DOWNLOADS)
+    end,
+    move_to_parent_path_with_extension_if_any = function(path)
+      dothis.extant_path.move_to_absolute_path(path, transf.path.path_by_parent_path_with_extension_if_any(path))
+    end,
     create_stream_foreground = function(path)
       dothis.created_item_specifier_arr.create(
         stream_arr,
@@ -548,6 +913,20 @@ act = {
       )
     end,
   },
+  audio_file = {
+    play = function(path, do_after)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("play " .. transf.str.str_by_single_quoted_escaped(path), do_after)
+    end
+  },
+  hs_image = {
+    add_to_clipboard = function(hsimage)
+      hs.pasteboard.writeObjects(hsimage)
+    end,
+    paste = function(hsimage)
+      hs.pasteboard.writeObjects(hsimage)
+      hs.eventtap.keyStroke({"cmd"}, "v")
+    end,
+  },
   dir = {
     choose_item_and_action_by_children = function(path)
       act.arr.choose_item_and_action(
@@ -559,6 +938,16 @@ act = {
         path,
         dothis.any.choose_action
       )
+    end,
+    empty_dir = function(path)
+      dothis[
+        transf.path.local_o_remote_str(path) .. "_extant_path"
+      ].empty_dir(path)
+    end,
+    delete_dir = function(path)
+      dothis[
+        transf.path.local_o_remote_str(path) .. "_extant_path"
+      ].delete_dir(path)
     end,
     
   },
@@ -590,6 +979,14 @@ act = {
       )
       hotkey:enable()
       return hotkey
+    end,
+  },
+  plist_single_dkv_spec = {
+    write_default = function(spec, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped_noempty(
+        transf.plist_single_dkv_spec.line_by_write_default_command(spec),
+        do_after
+      )
     end,
   },
   watcher_creation_specifier = {
@@ -690,7 +1087,7 @@ act = {
   ["nil"] = {
     ensure_sound_played_on_speakers = function()
       local device = hs.audiodevice.findOutputByName("Built-in Output")
-      dothis.audiodevice.ensure_sound_will_be_played(device)
+      act.audiodevice.ensure_sound_will_be_played(device)
       dothis.audiodevice.set_default(device, "output")
     end,
     choose_menu_item_table_and_execute_by_frontmost_application = function()
@@ -730,12 +1127,12 @@ act = {
       )
     end,
     choose_input_audiodevice_specifier_and_set_default = function()
-      dothis.audiodevice_specifier_arr.choose_item_and_set_default(
+      act.audiodevice_specifier_arr.choose_item_and_set_default(
         transf.audiodevice_type.audiodevice_specifier_arr("input")
       )
     end,
     choose_output_audiodevice_specifier_and_set_default = function()
-      dothis.audiodevice_specifier_arr.choose_item_and_set_default(
+      act.audiodevice_specifier_arr.choose_item_and_set_default(
         transf.audiodevice_type.audiodevice_specifier_arr("output")
       )
     end,
@@ -782,16 +1179,16 @@ act = {
       )
     end,
     vdirsyncer_sync = function()
-      dothis.str.env_bash_eval_async("vdirsyncer sync")
+      act.str.env_bash_eval_async("vdirsyncer sync")
     end,
     newsboat_reload = function()
-      dothis.str.env_bash_eval_async("newsboat -x reload")
+      act.str.env_bash_eval_async("newsboat -x reload")
     end,
     mullvad_connect = function()
-      dothis.str.env_bash_eval_async("mullvad connect")
+      act.str.env_bash_eval_async("mullvad connect")
     end,
     mullvad_disconnect = function()
-      dothis.str.env_bash_eval_async("mullvad disconnect")
+      act.str.env_bash_eval_async("mullvad disconnect")
     end,
     mullvad_toggle = function()
       if transf["nil"].bool_by_mullvad_connected() then
@@ -864,7 +1261,7 @@ act = {
       )
     end,
     newpipe_backup = function()
-      dothis["nil"].newpipe_extract_backup(nil, function()
+      act["nil"].newpipe_extract_backup(nil, function()
         local timestamp = transf.backuped_thing_identifier.timestamp_ms("newpipe")
         dothis.sqlite_file.query_w_table_arg_fn(
           env.env.NEWPIPE_STATE_DIR .. "/history.db",
@@ -894,7 +1291,7 @@ act = {
       act.facebook_raw_export_dir.process_to_facebook_export_dir(tmploc)
     end,
     telegram_backup = function()
-      dothis["nil"].telegram_generate_backup(nil, function()
+      act["nil"].telegram_generate_backup(nil, function()
         act.telegram_raw_export_dir.process_to_telegram_export_dir(
           transf["nil"].telegram_raw_export_dir_by_current()
         )
@@ -902,14 +1299,118 @@ act = {
       end)
     end,
     signal_backup = function()
-      dothis["nil"].signal_generate_backup(nil, function()
+      act["nil"].signal_generate_backup(nil, function()
         act.backup_type.log("signal")
       end)
     end,
     discord_backup = function()
-      dothis["nil"].discord_generate_backup(nil, function()
+      act["nil"].discord_generate_backup(nil, function()
         act.backup_type.log("discord")
       end)
+    end,
+    sox_rec_start_cache = function(_, do_after)
+      act.local_absolute_path.start_recording_to(transf.str.in_cache_local_absolute_path(os.time(), "recording"), do_after)
+    end,
+    sox_rec_stop = function(_, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("killall rec", do_after)
+    end,
+    sox_rec_toggle_cache = function(_, do_after)
+      if transf["nil"].bool_by_sox_is_recording() then
+        act["nil"].sox_rec_stop()
+      else
+        act["nil"].sox_rec_start_cache(_, do_after)
+      end
+    end,
+    firefox_dump_state = function(_, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
+    end,
+    newpipe_extract_backup = function(_, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
+    end,
+   
+    telegram_generate_backup = function(_, do_after)
+      dothis.fn_queue_specifier.push(main_qspec,
+        function()
+          local window = transf.running_application.main_window(
+            transf.mac_application_name.running_application_or_nil("Telegram")
+          )
+          act.window.focus(window)
+          dothis.window.set_hs_geometry_rect_like(window, {x = 0, y = 0, w = 800, h = 1500})
+          dothis.input_spec_arr.exec({
+            "m30 65 %tl", ".",
+            "m40 395 %tl", ".",
+            "m0 -300 %c", ".",
+            "m0 295 %c", ".",
+            "m-150 -155 %c", ".",
+            "m-150 -65 %c", ".",
+            "s0 -200",
+            "m0 0 %c", ".",
+            "s0 -200",
+            "s0 -200",
+            "s0 -70",
+            "m0 0 %c", ".",
+            "m0 -100 %c",
+            "s0 -300",
+            "s0 -300",
+            "m0 170 %c", ".",
+            "m130 215 %c", ".",
+          })
+          hs.timer.doAfter(300, do_after)
+        end
+      )
+    end,
+    signal_generate_backup = function(_, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "sigtop export-messages -f json" ..
+        transf.str.str_by_single_quoted_escaped(
+          transf.str.in_cache_local_absolute_path("signal", "export") .. "/chats"
+        ) .. "&& sigtop export-attachments" ..
+        transf.str.str_by_single_quoted_escaped(
+          transf.str.in_cache_local_absolute_path("signal", "export") .. "/media"
+        ),
+        do_after
+      )
+    end,
+    facebook_generate_backup = function(_, do_after)
+      dothis.fn_queue_specifier.push(main_qspec,
+      function()
+        dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open -a Firefox" .. 
+          transf.str.str_by_single_quoted_escaped("https://www.facebook.com/dyi/?referrer=yfi_settings") " && sleep 1", function()
+            hs.eventtap.keyStroke({"cmd"}, "0") -- reset zoom
+            local ff_window = transf.running_application.main_window(
+              transf.mac_application_name.running_application_or_nil("Firefox")
+            )
+            act.window.focus(ff_window)
+            dothis.window.set_hs_geometry_rect_like(ff_window, {x = 0, y = 0, w = 1280, h = 1600})
+            dothis.input_spec_arr.exec({ 
+              "m-100x-410 %c", -- format open
+              ".",
+              "m-100x-310 %c", -- format select
+              ".",
+              "m-100x-270 %c", -- date open
+              ".",
+              "m-100x-200 %c", -- date select
+              ".",
+              "m-80x690 %tr", -- deselect all
+              ".",
+              "m-63x945 %tr", -- select messages
+              ".",
+              "s0x-4000", -- scroll to end of page
+              "m530x1548 %l", -- export button
+              ".",
+            })
+            do_after()
+          end)
+        end
+      )
+    end,
+    discord_generate_backup = function(_, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "dscexport exportdm --media --reuse-media -f json --dateformat unix -o" .. transf.str.str_by_single_quoted_escaped(
+          transf.str.in_cache_local_absolute_path("discord", "export")
+        ),
+        do_after
+      )
     end,
 
   },
@@ -974,7 +1475,7 @@ act = {
     choose_item_and_execute = function(arr)
       dothis.arr.choose_item(
         arr,
-        dothis.menu_item_table.execute
+        act.menu_item_table.execute
       )
     end,
   },
@@ -1028,8 +1529,8 @@ act = {
     end,
   },
   contact_table = {
-    edit_contact = function(table)
-      dothis.contact_table.edit(table)
+    edit_contact = function(table, do_after)
+      dothis.contact_uuid.edit_contact(transf.contact_table.contact_uuid(table), do_after)
     end,
     add_iban_by_prompted = function(table)
       dothis.contact_table.add_iban(table, get.str.str_by_prompted_once_from_default("", "Enter an IBAN:"))
@@ -1070,13 +1571,13 @@ act = {
   },
   in_git_dir_arr = {
     pull_all = function(paths)
-      dothis.arr.each(paths, dothis.in_git_dir.pull)
+      dothis.arr.each(paths, act.in_git_dir.pull)
     end,
     push_all = function(paths)
-      dothis.arr.each(paths, dothis.in_git_dir.push)
+      dothis.arr.each(paths, act.in_git_dir.push)
     end,
     fetch_all = function(paths)
-      dothis.arr.each(paths, dothis.in_git_dir.fetch)
+      dothis.arr.each(paths, act.in_git_dir.fetch)
     end,
 
   },
@@ -1122,7 +1623,7 @@ act = {
         env.MMOMENTS .. "/git_logs",
         timestamp_ms_key_git_log_spec_value_assoc
       )
-      dothis.dir.empty_dir(path)
+      act.dir.empty_dir(path)
     end,
   },
   mpv_tmp_log_dir = {
@@ -1132,7 +1633,7 @@ act = {
         env.MMOMENTS .. "/media_logs",
         timestamp_ms_key_media_log_spec_value_assoc
       )
-      dothis.dir.empty_dir(path)
+      act.dir.empty_dir(path)
     end,
   },
   backup_type = {

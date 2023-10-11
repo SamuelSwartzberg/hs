@@ -445,7 +445,7 @@ tblmap = {
     }
   },
   dynamic_structure_name = {
-    dynamic_structure = {
+    leaflike_key_str_or_str_arr_value_assoc = {
       latex = {
         citations = "write_file",
         ["main.tex"] = {"write_template","comp.templates.latex_main"},

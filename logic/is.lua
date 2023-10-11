@@ -1531,6 +1531,9 @@ is = {
     all_namespace = function(str)
       return get.arr.bool_by_contains(ls.all_namespace, str)
     end,
+    dynamic_structure_name = function(str)
+      return get.arr.bool_by_contains(ls.dynamic_structure_name, str)
+    end,
   },
   all_namespace = {
     hydrus_namespace = function(str)
@@ -1701,6 +1704,12 @@ is = {
     end,
     booru_rating = function(str)
       return get.arr.bool_by_contains(ls.booru_rating, str)
+    end,
+    type_name = function(str)
+      return get.arr.bool_by_contains(ls.type_name, str)
+    end,
+    mac_plist_type_name = function(str)
+      return get.arr.bool_by_contains(ls.mac_plist_type_name, str)
     end,
 
   },
@@ -2505,7 +2514,15 @@ is = {
     hydrus_rel_spec = function(t)
       return t.implies and t.aliases
     end,
+    plist_single_dk_spec = function(t)
+      return t.domain and t.key
+    end,
     
+  },
+  plist_single_dk_spec = {
+    plist_single_dkv_spec = function(t)
+      return t.value ~= nil
+    end,
   },
   geojson_obj = {
     geojson_feature_collection = function(t)

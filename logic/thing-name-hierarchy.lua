@@ -562,7 +562,8 @@ thing_name_hierarchy = {
                                     backup_type = "leaf",
                                     all_namespace = {
                                       hydrus_namespace = "leaf",
-                                    }
+                                    },
+                                    dynamic_structure_name = "leaf"
                                   },
                                   mixed_strict_snake_case = {
                                     camel_strict_snake_case = {
@@ -595,6 +596,7 @@ thing_name_hierarchy = {
                                   flag_profile_name = "leaf",
                                   markdown_extension_set_name = "leaf",
                                   booru_rating = "leaf",
+                                  type_name = "leaf",
                                 },
                                 iso_3366_1_alpha_2_country_code = "leaf",
                                 iso_3366_1_alpha_3_country_code = "leaf",
@@ -843,6 +845,9 @@ thing_name_hierarchy = {
         },
         timestamp_ms_key_haver = {
           media_log_spec = "leaf",
+        },
+        plist_single_dk_spec = {
+          plist_single_dkv_spec = "leaf",
         }
       }
     },

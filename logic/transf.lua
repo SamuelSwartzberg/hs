@@ -556,6 +556,11 @@ transf = {
         transf.any.str_by_replicable
       )
     end,
+    str_arr_by_mapped_single_quoted_escaped = function(arr)
+      return get.str_arr.str_arr_by_mapped_single_quoted_escaped(
+        transf.arr.str_arr(arr)
+      )
+    end,
     str_by_contents_summary = function(arr)
       return transf.str_arr.str_by_summary(
         transf.arr.str_arr(arr)
@@ -2228,8 +2233,8 @@ transf = {
       act.ics_file.generate_json_file(temppath)
       local jsonpath = transf.file.str_by_contents(get.path.path_by_with_different_extension(temppath, "json"))
       local res = json.decode(transf.file.str_by_contents(jsonpath))
-      dothis.absolute_path.delete(temppath)
-      dothis.absolute_path.delete(jsonpath)
+      act.absolute_path.delete(temppath)
+      act.absolute_path.delete(jsonpath)
       return res
     end,
   },
@@ -4768,7 +4773,9 @@ transf = {
 
                   -- handle the case where the value is composed and thus we need to set up further implications
 
-                  local valparts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(actual_val, "+")
+                  local noinference  = get.str.n_strs_by_split_w_str(actual_val, "/") -- get everything before '/' - after is a potential modifier
+                  local valparts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(noinference, "+")
+                  
                   if #valparts > 1 and val_namespace ~= "thing" then -- composed values first need to be implied to thing:
                     dothis.arr.push(hydrus_rel_spec.implies, {
                       val_namespace .. ":" .. actual_val,
@@ -4825,8 +4832,26 @@ transf = {
     end,
   },
   hydrus_rel_spec = {
+    hydrus_rel_spec_by_process_modifiers = function(hydrus_rel_spec)
+      local res = hydrus_rel_spec
+      res = transf.two_arrs.arr_by_appended(
+        res.implies,
+        transf.two_strs__arr_arr.two_strs__arr_arr_by_get_hydrus_modifier_implies(
+          res.implies
+        )
+      )
+      res = transf.two_arrs.arr_by_appended(
+        res.implies,
+        transf.two_strs__arr_arr.two_strs__arr_arr_by_get_hydrus_modifier_implies(
+          res.aliases
+        )
+      )
+      return res
+    end,
     input_spec_arr = function(hydrus_rel_spec)
+      hydrus_rel_spec = transf.hydrus_rel_spec.hydrus_rel_spec_by_process_modifiers(hydrus_rel_spec)
       local arr = {}
+      error("todo implies")
       for _, alias in transf.arr.pos_int_vt_stateless_iter(hydrus_rel_spec.aliases) do
         -- to add an alias, we need to focus the source text field, type the source, focus the target text field, type the target, and press enter to stage, and then click the add button to add it
         arr = transf.two_arrs.arr_by_appended(arr, {
@@ -5467,6 +5492,14 @@ transf = {
       end
       return res
     end,
+    kt_or_vt_arr = function(t)
+      local res = {}
+      for k, v in transf.table.kt_vt_stateless_iter(t) do
+        res[#res + 1] = k
+        res[#res + 1] = v
+      end
+      return res
+    end,
     kt_arr_by_sorted_smaller_first = function(t)
       return get.table.kt_arr_by_sorted(t, transf.two_operational_comparables.bool_by_smaller)
     end,
@@ -5503,7 +5536,7 @@ transf = {
       local tmpdir_ics_path = transf.not_userdata_or_fn.in_tmp_local_absolute_path(t) .. ".ics"
       dothis.table.write_ics_file(t, tmpdir_ics_path)
       local contents = transf.file.str_by_contents(tmpdir_ics_path)
-      dothis.absolute_path.delete(tmpdir_ics_path)
+      act.absolute_path.delete(tmpdir_ics_path)
       return contents
     end,
     vt_set = function(t)
@@ -5796,18 +5829,30 @@ transf = {
     
     role_content_message_spec_arr_by_alternating_user_assistant = function(arr)
       local res = {}
-      for _, two_anys__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
+      for _, two_strs__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
         dothis.arr.push(res, {
           role = "user",
-          content = two_anys__arr[1],
+          content = two_strs__arr[1],
         })
         dothis.arr.push(res, {
           role = "assistant",
-          content = two_anys__arr[2],
+          content = two_strs__arr[2],
         })
       end
       return res
-    end
+    end,
+    two_strs__arr_arr_by_get_hydrus_modifier_implies = function(arr)
+      local res = {}
+      for _, two_strs__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
+        for _, str in transf.arr.pos_int_vt_stateless_iter(two_strs__arr) do
+          local main, modifier = get.str.n_not_starting_o_ending_with_whitespace_strs_by_split_w_str(str, "/")
+          if modifier then
+            dothis.arr.push(res, {str, main}) -- so that e.g. "lover /inferred" auto adds "lover"
+          end
+        end
+      end
+      return res
+    end,
   },
   noempty_line_and_assoc = {
     ini_section_str = function(l,assoc)
@@ -7529,6 +7574,35 @@ transf = {
         else
           return transf.any.str_by_inspect(strable)
         end
+      end
+    end,
+    type_name = type,
+    mac_plist_type_name = function(any)
+      local lua_type_name = transf.any.type_name(any)
+      if lua_type_name == "string" then
+        if is.str.rfc3339like_dt(any) then
+          return "date"
+        elseif is.str.hex_str(any) then
+          return "data"
+        else
+          return "string"
+        end
+      elseif lua_type_name == "number" then
+        if is.number.int(any) then
+          return "integer"
+        else
+          return "float"
+        end
+      elseif lua_type_name == "table" then
+        if is.table.array(any) then
+          return "array"
+        else
+          return "dict"
+        end
+      elseif lua_type_name == "boolean" then
+        return "boolean"
+      else
+        return "string"
       end
     end,
     self_and_empty_str = function(any)
@@ -9317,6 +9391,61 @@ transf = {
   str_or_number_arr = {
     str_by_joined_comma = function(arr)
       return get.str_or_number_arr.str_by_joined(arr, ", ")
+    end,
+  },
+  plist_single_dk_spec = {
+    plist_type_name_or_nil_by_read = function(spec)
+      return transf.str.str_or_err_by_evaled_env_bash_stripped_noempty(
+        "defaults read-type " .. transf.str.str_by_single_quoted_escaped(spec.domain) .. " " .. transf.str.str_by_single_quoted_escaped(spec.key)
+      )
+    end,
+    str_or_nil_by_read_value = function(spec)
+      return transf.str.str_or_err_by_evaled_env_bash_stripped_noempty(
+        "defaults read " .. transf.str.str_by_single_quoted_escaped(spec.domain) .. " " .. transf.str.str_by_single_quoted_escaped(spec.key)
+      )
+    end,
+  },
+  plist_single_dkv_spec = {
+    mac_plist_type_name = function(spec)
+      if spec.type then -- manual
+        return spec.type
+      else -- inferred
+        return transf.any.mac_plist_type_name(spec.value)
+      end
+    end,
+    str_by_value_mac_plist_encoded = function(spec)
+      local mac_plist_type_name = transf.any.mac_plist_type_name(spec)
+      if is.any.table(spec.value) then
+        if get.str.bool_by_startswith(mac_plist_type_name, "array") then
+          if is.table.array(spec.value) then
+            return transf.arr.str_arr_by_mapped_single_quoted_escaped(
+              spec.value
+            )
+          else
+            error("Please don't try to add an assoc as an array to a plist. It doesn't have any inherent order, so adding it would impose an arbitrary order.")
+          end
+        elseif get.str.bool_by_startswith(mac_plist_type_name, "dict") then
+          return transf.arr.str_arr_by_mapped_single_quoted_escaped(
+              transf.table.kt_or_vt_arr(spec.value)
+            )
+        else
+          return transf.any.str(spec.value)
+        end
+      else 
+        return transf.any.str(spec.value)
+      end
+    end,
+    line_by_write_default_command = function(spec)
+      return 
+        "defaults write" ..
+        transf.str.str_by_single_quoted_escaped(spec.domain) ..
+        transf.str.str_by_single_quoted_escaped(spec.key) ..
+        transf.str.str_by_single_quoted_escaped(
+          transf.plist_single_dkv_spec.mac_plist_type_name(spec)
+        ) ..
+        transf.str.str_by_single_quoted_escaped(
+          transf.plist_single_dkv_spec.str_by_value_mac_plist_encoded(spec)
+        )
     end,
   }
   

@@ -82,6 +82,15 @@ get = {
   },
   ["nil"] = {
   },
+  plist_single_dk_spec = {
+    plist_single_dkv_spec = function(spec, value)
+      return {
+        domain = spec.domain,
+        key = spec.key,
+        value = value,
+      }
+    end,
+  },
   audiodevice = {
     audiodevice_specifier = function (device, type)
       return {
@@ -920,9 +929,9 @@ get = {
         get.str.str_arr_by_split_w_str(str, sep)
       )
     end,
-    not_starting_o_ending_with_whitespace_str_arr_by_split_w_str = function(str, sep)
+    not_starting_o_ending_with_whitespace_str_arr_by_split_w_str = function(str, sep, n)
       return transf.str_arr.not_starting_o_ending_with_whitespace_str_arr(
-        get.str.str_arr_by_split_w_str(str, sep)
+        get.str.str_arr_by_split_w_str(str, sep, n)
       )
     end,
     str_arr_by_split_w_str = plstringx.split,
@@ -949,6 +958,11 @@ get = {
     end,
     n_strs_by_split_w_str = function(str, sep, n)
       return transf.arr.n_anys(get.str.str_arr_by_split_w_str(str, sep, n))
+    end,
+    n_not_starting_o_ending_with_whitespace_strs_by_split_w_str = function(str, sep, n)
+      return transf.arr.n_anys(
+        get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(str, sep, n)
+      )
     end,
     two_strs__arr_or_nil_by_split_w_str = function(str, sep)
       local arr = get.str.str_arr_by_split_w_str(str, sep, 2)

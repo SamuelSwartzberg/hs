@@ -18,7 +18,7 @@ fstblmap = transf.dir.plaintext_dictonary_read_assoc(env.MDICTIONARIES .. "/mapp
 timer_arr = {}
 timer_arr_refresher = hs.timer.doEvery(1, get.fn.fn_by_1st_n_bound(act.timer_spec_array.fire_all_if_ready_and_space_if_necessary, timer_arr))
 
-env = transf.string.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
+env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
 
 watcher_arr = {}
 hotkey_arr = {}
@@ -42,7 +42,7 @@ dothis.created_item_specifier_array.create_all(
       watcher_type = hs.application.watcher,
       fn = function(mac_application_name, hs_applicaton_event_type, running_application)
         if mac_application_name == "Firefox" and hs_applicaton_event_type == hs.application.watcher.terminated then
-          hs.timer.doAfter(3, dothis["nil"].ff_backup)
+          hs.timer.doAfter(3, act["nil"].ff_backup)
         end
       end
     },{ 
@@ -57,7 +57,7 @@ dothis.created_item_specifier_array.create_all(
         if event == hs.fs.volume.didMount then
           if is.volume_local_extant_path.static_time_machine_volume_local_extant_path(information.path) then
             hs.alert.show("Starting backup...")
-            dothis.string.env_bash_eval_async("tmutil startbackup")
+            act.str.env_bash_eval_async("tmutil startbackup")
           end
         elseif event == hs.fs.volume.didUnmount then
           if is.volume_local_extant_path.dynamic_time_machine_volume_local_extant_path(information.path) then
@@ -349,7 +349,7 @@ System:get("manager", "timer"):doThis("create-all", {
   {
     fn = function()
       act.env_yaml_file_container.write_env_and_check(env.ENVFILE)
-      env = transf.string.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
+      env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
     end,
     interval = "*/5 * * * *",
   },
