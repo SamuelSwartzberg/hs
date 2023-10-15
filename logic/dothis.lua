@@ -76,7 +76,7 @@ dothis = {
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("khard edit " .. uuid, do_after or function() end)
     end,
   },
-  sha256_hex_str = {
+  hydrus_file_hash = {
     add_tags_to_hydrus_item = function(str, str_arr, do_after)
       rest({
         api_name = "hydrus",
@@ -90,6 +90,21 @@ dothis = {
         request_verb = "POST",
       }, do_after)
     end,
+    save_into_async_by_hydrus_item = function(str, path)
+      dothis.url.download_into_async(
+        get.sha256_hex_str.url_by_hydrus_item(str),
+        path
+      )
+    end,
+    save_into_sync_by_hydrus_item = function(str, path)
+      dothis.url.download_into_sync(
+        get.sha256_hex_str.url_by_hydrus_item(str),
+        path
+      )
+    end,
+  },
+  hydrus_file_hash_arr = {
+    wri
   },
   pass_item_name = {
     replace = function(name, type, data)
@@ -426,17 +441,8 @@ dothis = {
     end,
   },
   local_path = {
-    open_default = function(path, do_after)
-      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open " .. transf.str.str_by_single_quoted_escaped(path), do_after)
-    end,
     open_app = function(path, app, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open -a " .. transf.str.str_by_single_quoted_escaped(app) .. " " .. transf.str.str_by_single_quoted_escaped(path), do_after)
-    end,
-    open_gui_editor = function(path, do_after)
-      dothis.local_path.open_app(path, env.GUI_EDITOR, do_after)
-    end,
-    open_and_reveal = function(path)
-      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open -R " .. transf.str.str_by_single_quoted_escaped(path))
     end,
     write_nonabsolute_path_key_str_or_str_arr_value_assoc = function(path, nonabsolute_path_key_assoc, extension)
       act.absolute_path_key_str_or_str_arr_assoc.write(
@@ -484,10 +490,6 @@ dothis = {
       act.absolute_path.create_parent_dir(path)
       dothis.file.write_file(path, contents)
     end,
-    empty_write_file = function(path)
-      act.absolute_path.create_parent_dir(path)
-      dothis.file.empty_write_file(path)
-    end,
     append_or_write_file = function(path, contents)
       act.absolute_path.create_parent_dir(path)
       dothis.file.append_or_write_file(path, contents)
@@ -511,44 +513,12 @@ dothis = {
       end
     end,
   },
-  local_absolute_path = {
-    start_recording_to = function(path, do_after)
-      act.absolute_path.create_parent_dir(path)
-      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("rec " .. transf.str.str_by_single_quoted_escaped(path), function()
-        if do_after then
-          do_after(path)
-        end
-      end)
-    end,
-  },
-  local_nonextant_path = {
-    create_dir = function(path)
-      act.str.env_bash_eval_sync("mkdir -p " .. transf.str.str_by_single_quoted_escaped(path))
-    end,
-  },
-  local_nonabsolute_path_relative_to_home = {
-    copy_local_to_labelled_remote = function(path)
-      dothis.absolute_path.copy_to_absolute_path(
-        transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path),
-        transf.labelled_remote_path.labelled_remote_absolute_path(path)
-      )
-    end,
-    copy_labelled_remote_to_local = function(path)
-      dothis.absolute_path.copy_to_absolute_path(
-        transf.labelled_remote_path.labelled_remote_absolute_path(path),
-        transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path)
-      )
-    end,
 
-  },
+
   labelled_remote_absolute_path = {
     
   },
-  labelled_remote_nonextant_path = {
-    create_dir = function(path)
-      act.str.env_bash_eval_sync("rclone mkdir " .. transf.str.str_by_single_quoted_escaped(path))
-    end,
-  },
+
   remote_absolute_path = {
     
   },
@@ -572,24 +542,7 @@ dothis = {
       dothis.extant_path.zip_to_absolute_path_and_delete(tmppath, tgt)
     end,
   },
-  remote_nonextant_path = {
-    create_dir = function(path)
-      dothis.labelled_remote_absolute_path.create_dir(path)
-    end,
-  },
-  nonextant_path = {
-    create_dir = function(path)
-      if is.path.remote_path(path) then
-        dothis.remote_absolute_path.create_dir(path)
-      else
-        dothis.local_extant_path.create_dir(path)
-      end
-    end,
-  },
   local_extant_path = {
-    make_executable = function(path)
-      transf.str.str_or_nil_by_evaled_env_bash_stripped("chmod +x " .. transf.str.str_by_single_quoted_escaped(path))
-    end,
     do_in_path = function(path, cmd, do_after)
       if is.path.dir(path) then
         dothis.dir.do_in_path(path, cmd, do_after)
@@ -597,7 +550,6 @@ dothis = {
         dothis.dir.do_in_path(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path), cmd, do_after)
       end
     end,
-    delete = os.remove,
     move_to_local_absolute_path = function(path, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
       os.rename(path, tgt)
@@ -613,7 +565,7 @@ dothis = {
     end,
     zip_to_absolute_path_and_delete = function(path, tgt)
       dothis.local_extant_path.zip_to_absolute_path(path, tgt)
-      dothis.local_extant_path.delete(path)
+      act.local_extant_path.delete(path)
     end,
     link_to_nosudo_nonextant_path = function(path, tgt)
       act.absolute_path.create_parent_dir(tgt)
@@ -679,15 +631,7 @@ dothis = {
       dothis.labelled_remote_file.write_file(path, transf.local_file.str_by_contents(temp_file))
     end,
   },
-  labelled_remote_dir = {
-    empty_dir = function(path)
-      dothis.labelled_remote_dir.delete_dir(path)
-      dothis.labelled_remote_nonextant_path.create_dir(path)
-    end,
-    delete_dir = function(path)
-      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone purge " .. transf.str.str_by_single_quoted_escaped(path))
-    end,
-  },
+
   remote_file = {
     write_file = function(path, contents)
       dothis.labelled_remote_file.write_file(path, contents)
@@ -696,22 +640,16 @@ dothis = {
       dothis.labelled_remote_file.append_or_write_file(path, contents)
     end,
   },
-  remote_dir =  {
-    empty_dir = function(path)
-      dothis.labelled_remote_dir.empty_dir(path)
-    end,
-    delete_dir = function(path)
-      dothis.labelled_remote_dir.delete_dir(path)
-    end,
-  },
   local_file = {
     write_file = function(path, contents)
       local file = io.open(path, "w")
+      if not file then error("Couldn't open file in mode 'w': " .. path) end
       file:write(contents)
       file:close()
     end,
     append_or_write_file = function(path, contents)
       local file = io.open(path, "a")
+      if not file then error("Couldn't open file in mode 'a': " .. path) end
       file:write(contents)
       file:close()
     end,
@@ -719,28 +657,9 @@ dothis = {
       dothis.local_extant_path.create_parent_dir(tgt)
       plfile.copy(path, tgt)
     end,
-    edit_file_in_vscode_act_on_path = function(path, do_after)
-      dothis.str.env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn("codium --wait --disable-extensions " .. transf.str.str_by_single_quoted_escaped(path), function()
-        if do_after then
-          do_after(path)
-        end
-        act.absolute_path.delete(path)
-      end)
-    end,
-    edit_file_in_vscode_act_on_contents = function(path, do_after)
-      dothis.str.env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn("codium --wait --disable-extensions " .. transf.str.str_by_single_quoted_escaped(path), function()
-        local contents = transf.file.str_by_contents(path)
-        act.absolute_path.delete(path)
-        do_after(contents)
-      end)
-    end
   },
   local_dir = {
-    empty_dir = function(path)
-      transf.str.str_or_nil_by_evaled_env_bash_stripped("rm -rf " .. transf.str.str_by_single_quoted_escaped(
-        transf.path.path_by_ending_with_slash(path) .. "*"
-      ) .. "/*")
-    end,
+
     copy_to_local_absolute_path = function(path, tgt)
       dothis.local_extant_path.create_parent_dir(tgt)
       pldir.clonetree(path, tgt)
@@ -847,20 +766,6 @@ dothis = {
     write_file_if_file = function(path, contents)
       dothis.file.write_file(path, contents) -- if the file already exists, replacing is the same as writing
     end,
-    empty_write_file = function(path)
-      dothis.file.write_file(path, "")
-    end,
-    delete_file = function(path)
-      dothis[
-        transf.path.local_o_remote_str(path) .. "_extant_path"
-      ].delete_file(path)
-    end,
-    delete_file_if_empty_file = function(path)
-      if is.file.empty_file(path) then
-        dothis.file.delete_file(path)
-      end
-    end,
-
   },
   local_image_file = {
     add_as_otp = function(path, name)
@@ -884,7 +789,7 @@ dothis = {
       act.local_hydrusable_file.add_to_hydrus_by_path(
         path,
         function(hash)
-          dothis.sha256_hex_str.add_tags_to_hydrus_item(hash, str_arr, function()
+          dothis.hydrus_file_hash.add_tags_to_hydrus_item(hash, str_arr, function()
             do_after(hash)
           end)
         end
@@ -892,11 +797,12 @@ dothis = {
     end,
     --- implements smart adding of image files to hydrus
     --- caveat: must be images in danbooru or similar enough to images that might be found in danbooru
+    --- for ai tags to work
     --- - all type of art should work
     --- - real life photos mostly work
     --- - screenshots etc. don't work
     --- - physical documents don't really work
-    add_to_hydrus_by_path_or_url = function(path, use_ai_tags)
+    add_to_hydrus_by_path_or_url = function(path, use_ai_tags, do_after)
       local booru_url
       local is_image = is.local_file.local_image_file(path)
       if is_image then
@@ -907,13 +813,25 @@ dothis = {
         local date = transf.local_file.rfc3339like_dt_by_any_source(path)
         dothis.url.add_to_hydrus(
           booru_url,
-          { "date:" .. date }
+          { "date:" .. date },
+          do_after
         )
       else
         dothis.local_hydrusable_file.add_to_hydrus_by_path(
           path,
           transf.local_file.line_arr_by_file_tags(path),
-          use_ai_tags and act.sha256_hex_str.add_tags_to_hydrus_item_by_ai_tags
+          function(sha)
+            if use_ai_tags then
+              act.sha256_hex_str.add_tags_to_hydrus_item_by_ai_tags(
+                sha,
+                function()
+                  if do_after then do_after(sha) end
+                end
+              )
+            else
+              if do_after then do_after(sha) end
+            end
+          end
         )
       end
     end
@@ -941,15 +859,6 @@ dothis = {
       dothis.plaintext_file.append_line(path, line)
       dothis.in_git_dir.commit_self(path, "Added line " .. line .. " to " .. get.local_absolute_path.local_nonabsolute_path_by_from(path, transf.in_git_dir.git_root_dir(path)))
     end,
-    append_line_and_commit_by_prompted = function(path)
-      dothis.plaintext_file.append_line_and_commit(
-        path,
-        get.str.str_by_prompted_once_from_default(
-          "",
-          "Enter line to add to " .. path
-        )
-      )
-    end,
     write_lines = function(path, lines)
       dothis.absolute_path.write_file_if_file(path, get.str_or_number_arr.str_by_joined(lines, "\n"))
     end,
@@ -957,12 +866,6 @@ dothis = {
       local lines = transf.plaintext_file.line_arr(path)
       lines[line_number] = line
       dothis.plaintext_file.write_lines(path, lines)
-    end,
-    pop_line = function(path)
-      local lines = transf.plaintext_file.line_arr(path)
-      local line = dothis.arr.remove_by_index(lines, #lines)
-      dothis.plaintext_file.write_lines(path, lines)
-      return line
     end,
     remove_line_w_pos_int = function(path, line_number)
       local lines = transf.plaintext_file.line_arr(path)
@@ -1007,7 +910,7 @@ dothis = {
     end,
   },
   maildir_file ={
-    download_attachment = function(path, name, do_after)
+    download_attachment_to_cache = function(path, name, do_after)
       local cache_path = env.XDG_CACHE_HOME .. '/hs/email_attachments'
       local att_path = cache_path .. '/' .. name
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
@@ -1018,67 +921,7 @@ dothis = {
         end
       )
     end,
-    choose_attachment_and_download = function(path, fn)
-      dothis.arr.choose_item(
-        transf.maildir_file.leaflike_arr_by_attachments(path),
-        function(att)
-          dothis.maildir_file.download_attachment(path, att, fn)
-        end
-      )
-    end,
-    send = function(path, do_after)
-      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
-        "msmtp -t <" .. transf.str.str_by_single_quoted_escaped(path),
-        function(res)
-          if not res then
-            dothis.absolute_path.write_file(
-              env.FAILED_EMAILS .. "/" .. transf["nil"].full_rfc3339like_dt_by_current(), 
-              transf.file.str_by_contents(path)
-            )
-            act.absolute_path.delete(path)
-          else
-            dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
-              "cat" ..
-              transf.str.str_by_single_quoted_escaped(path) .. "| msed" ..
-              transf.str.str_by_single_quoted_escaped(
-                "/Date/a/"..
-                transf.timestamp_s.urlcharset_str_by_email_dt(
-                  transf["nil"].timestamp_s_by_current()
-                )
-              ) ..
-              "| msed".. transf.str.str_by_single_quoted_escaped("/Status/a/S/") ..
-              "| mdeliver -c" .. transf.str.str_by_single_quoted_escaped(env.MBSYNC_ARCHIVE),
-              function()
-                act.absolute_path.delete(path)
-                if do_after then
-                  do_after()
-                end
-              end
-            )
-          end
-        end
-      )
-    end,
-    edit_then_send = function(path, do_after)
-      dothis.local_file.edit_file_in_vscode_act_on_contents(path, function(str)
-        dothis.absolute_path.write_file(path, get.str.str_by_evaled_as_template(str)) -- re-eval
-        dothis.maildir_file.send(path, do_after)
-      end)
-    end,
-    reply = function(path, specifier, do_after)
-      specifier = transf.two_tables.table_by_take_new(transf.maildir_file.email_specifier_by_reply(path), specifier)
-      act.email_specifier.send(specifier, do_after)
-    end,
-    edit_then_reply = function(path, do_after)
-      act.email_specifier.edit_then_send(transf.maildir_file.email_specifier_by_reply(path), do_after)
-    end,
-    forward = function(path, specifier, do_after)
-      specifier = transf.two_tables.table_by_take_new(transf.maildir_file.email_specifier_by_forward(path), specifier)
-      act.email_specifier.send(specifier, do_after)
-    end,
-    edit_then_forward = function(path, do_after)
-      act.email_specifier.edit_then_send(transf.maildir_file.email_specifier_by_forward(path), do_after)
-    end,
+    
     move = function(source, target)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "mdeliver" .. transf.str.str_by_single_quoted_escaped(target) ..
@@ -1107,11 +950,6 @@ dothis = {
       dothis.absolute_path.delete(
         get.dir.extant_path_by_child_having_leaf_ending(path, ending)
       )
-    end,
-    delete_dir_if_empty_dir = function(path)
-      if is.dir.empty_dir(path) then
-        act.dir.delete_dir(path)
-      end
     end,
     copy_children_absolute_path_arr_into_absolute_path = function(path, tgt)
       dothis.extant_path_arr.copy_into_absolute_path(
@@ -1218,10 +1056,6 @@ dothis = {
     set_default = function(device, type)
       device["setDefault" .. transf.str.str_by_first_eutf8_upper(type) .. "Device"](device)
     end,
-    ensure_sound_will_be_played = function(device)
-      device:setOutputMuted(false)
-      device:setOutputVolume(100)
-    end,
   },
 
   ics_file = {
@@ -1237,18 +1071,18 @@ dothis = {
     add_hook = function(path, hook_path, name)
       name = name or transf.path.leaflike_by_filename(hook_path)
       dothis.extant_path.copy_to_absolute_path(hook_path, get.git_root_dir.in_git_dir_by_hook_path(path, name))
-      dothis.local_extant_path.make_executable(get.git_root_dir.in_git_dir_by_hook_path(path, name))
+      act.local_extant_path.make_executable(get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     copy_hook = function(path, type, name)
       type = type or "default"
       local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
-      dothis.local_extant_path.make_executable(source_hook)
+      act.local_extant_path.make_executable(source_hook)
       dothis.extant_path.copy_to_absolute_path(source_hook, get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     link_hook = function(path, type, name)
       type = type or "default"
       local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
-      dothis.local_extant_path.make_executable(source_hook)
+      act.local_extant_path.make_executable(source_hook)
       dothis.local_extant_path.link_to_nosudo_nonextant_path(source_hook, get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     link_all_hooks = function(path, type)
@@ -1462,6 +1296,44 @@ dothis = {
       act.window.make_main(main_window)
     end,
   },
+  api_name = {
+    write_api_key = function(api_name, value)
+      dothis.absolute_path.write_file(
+        transf.api_name.local_absolute_path_by_api_key_file(api_name),
+        value
+      )
+    end,
+    write_access_token = function(api_name, value)
+      dothis.absolute_path.write_file(
+        transf.api_name.local_absolute_path_by_access_token_file(api_name),
+        value
+      )
+    end,
+    write_refresh_token = function(api_name, value)
+      dothis.absolute_path.write_file(
+        transf.api_name.local_absolute_path_by_refresh_token_file(api_name),
+        value
+      )
+    end,
+    write_client_id = function(api_name, value)
+      dothis.absolute_path.write_file(
+        transf.api_name.local_absolute_path_by_client_id_file(api_name),
+        value
+      )
+    end,
+    write_client_secret = function(api_name, value)
+      dothis.absolute_path.write_file(
+        transf.api_name.local_absolute_path_by_client_secret_file(api_name),
+        value
+      )
+    end,
+    write_authorization_code = function(api_name, value)
+      dothis.absolute_path.write_file(
+        transf.api_name.local_absolute_path_by_authorization_code_file(api_name),
+        value
+      )
+    end,
+  },
   url_components = {
     open_browser = function(url_components, browser, do_after)
       dothis.url_or_local_path.open_browser(
@@ -1557,79 +1429,15 @@ dothis = {
     end,
   },
   omegat_project_dir = {
-    pull_project_materials = function(omegat_project_dir)
-      for _, type in transf.arr.pos_int_vt_stateless_iter(tblmap.project_type.project_materials_list["omegat"]) do
-        dothis.project_dir.pull_project_materials(
-          omegat_project_dir,
-          type,
-          transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
-        )
-      end
-    end,
-    push_project_materials = function(omegat_project_dir)
-      dothis.project_dir.push_project_materials(
-        omegat_project_dir,
-        "glossary",
-        transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
-      )
-      dothis.extant_path.copy_into_absolute_path(
-        transf.omegat_project_dir.local_absolute_path_by_resultant_tm(omegat_project_dir),
-        get.project_dir.local_absolute_path_by_global_subtype_project_material(
-          omegat_project_dir,
-          "tm",
-          transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
-        )
-      )
-    end,
     create_and_open_new_source_odt = function(omegat_project_dir, name) -- while we support any source file, if we manually create a file, it should be an odt
       dothis.absolute_path.write_file_if_nonextant_path(
         transf.omegat_project_dir.local_extant_path_by_source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
       )
-      dothis.local_path.open(
+      act.local_path.open_default(
         transf.omegat_project_dir.local_extant_path_by_source_dir(omegat_project_dir) .. "/" .. name .. ".odt"
       )
     end,
-    open_project = function(omegat_project_dir)
-      local running_application = transf.mac_application_name.running_application_by_ensure("OmegaT")
-      dothis.mac_application_name.open_recent("OmegaT", omegat_project_dir)
-      dothis.running_application.focus_main_window(running_application)
-    end,
-    generate_target_txts = function(dir, do_after)
-      dothis.arr.each(
-        transf.omegat_project_dir.file_arr_by_target(dir),
-        function(file)
-          transf.str.str_or_nil_by_evaled_env_bash_stripped("soffice --headless --convert-to txt:Text --outdir"..
-          transf.str.str_by_single_quoted_escaped(
-            transf.omegat_project_dir.local_extant_path_by_target_txt_dir(dir)
-          ) ..
-          transf.str.str_by_single_quoted_escaped(file))
-        end
-      )
-      error("TODO: Watch dir, count files every second or so until they are all there, then do_after. Perhaps refactor this into a general function")
-    end,
-    generate_rechnung_pdf = function(dir, do_after)
-      dothis.md_file.to_file_in_same_dir(
-        transf.client_project_dir.local_absolute_path_by_rechnung_md(dir),
-        "pdf",
-        transf.client_project_dir.local_absolute_path_by_rechnung_pdf(dir),
-        do_after
-      )
-    end,
-    generate_rechnung = function(path, do_after)
-      dothis.omegat_project_dir.generate_target_txts(path, function()
-        act.client_project_dir.generate_rechnung_de_md(path)
-        dothis.omegat_project_dir.generate_rechnung_pdf(path, do_after)
-      end)
-    end,
-    finalize_rechnung = function(path)
-
-    end,
-    finalize_project = function(path)
-      dothis.omegat_project_dir.push_project_materials(path)
-      dothis.omegat_project_dir.file_rechnung(path)
-      dothis.omegat_project_dir.file_source_target(path)
-    end,
-
+   
       
   },
   latex_project_dir = {      
@@ -2047,83 +1855,13 @@ dothis = {
     end
   },
   move_input_spec = {
-    final_exec = function(spec)
-      hs.mouse.absolutePosition(
-        transf.declared_position_change_input_spec.hs_geometry_point_by_start(spec)
-      )
-    end,
     exec_position_change_state_spec = function(spec, position_change_state_spec)
       hs.mouse.absolutePosition(position_change_state_spec.current_hs_geometry_point)
     end,
-    exec = function(spec, do_after)
-      dothis.declared_position_change_input_spec.exec(
-        get.input_spec.declared_input_spec(spec, "move"),
-        do_after
-      )
-    end,
   },
   scroll_input_spec = {
-    final_exec = function() end,
     exec_position_change_state_spec = function(spec, position_change_state_spec)
       hs.eventtap.scrollWheel({position_change_state_spec.delta_hs_geometry_point.x, position_change_state_spec.delta_hs_geometry_point.y}, {}, "pixel")
-    end,
-    exec = function(spec, do_after)
-      dothis.declared_position_change_input_spec.exec(
-        get.input_spec.declared_input_spec(spec, "scroll"),
-        do_after
-      )
-    end,
-  },
-  declared_position_change_input_spec = {
-    exec = function(spec, do_after)
-      local position_change_state_spec = transf.declared_position_change_input_spec.position_change_state_spec_by_start(spec)
-      local timer = hs.timer.doWhile(function() 
-        if 
-          not transf.position_change_state_spec.should_continue(position_change_state_spec)
-        then
-          dothis[
-            spec.mode .. "_input_spec"
-          ].final_exec(spec, do_after)
-          if do_after then
-            hs.timer.doAfter(0.2, do_after)
-          end
-          return false
-        else
-          position_change_state_spec = transf.position_change_state_spec.position_change_state_spec_by_next(position_change_state_spec)
-          return true
-        end
-      end, function()
-        dothis[
-          spec.mode .. "_input_spec"
-        ].exec_position_change_state_spec(spec, position_change_state_spec)
-      end, POLLING_INTERVAL)
-      timer:start()
-    end,
-  },
-  key_input_spec = {
-    exec = function(spec, do_after)
-      if spec.mods then
-        local mods = get.arr.arr_by_mapped_w_t_key_assoc(spec.mods, normalize.mod)
-        hs.eventtap.keyStroke(mods, spec.key)
-      elseif #spec.key == 1 then
-        hs.eventtap.keyStroke({}, spec.key)
-      else
-        hs.eventtap.keyStrokes(spec.key)
-      end
-      hs.timer.doAfter(0.2, do_after)
-    end,
-  },
-  click_input_spec = {
-    exec = function(spec, do_after)
-      transf.click_input_spec.click_fn(spec)(hs.mouse.absolutePosition())
-      hs.timer.doAfter(0.2, do_after)
-    end,
-  },
-  input_spec = {
-    exec = function(spec, do_after)
-      dothis[
-        spec.mode .. "_input_spec"
-      ].exec(spec, do_after)
     end,
   },
   input_spec_arr = {
@@ -2139,8 +1877,8 @@ dothis = {
         wait_time, 
         function()
           local subspecifier = act.arr.shift(specarr)
-          dothis.input_spec.exec(subspecifier, function()
-            dothis.input_spec_arr.exec(subspecifier, do_after)
+          act.input_spec.exec(subspecifier, function()
+            dothis.input_spec_arr.exec(subspecifier, wait_time, do_after)
           end)
         end
       )

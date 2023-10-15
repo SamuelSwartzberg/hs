@@ -87,17 +87,18 @@ act = {
     end,
   },
   sha256_hex_str_arr = {
-    add_tags_to_hydrus_item = function(arr)
-      act.str.env_bash_eval_async(
+    add_tags_to_hydrus_item = function(arr, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "hydrus_add_tags" .. transf.str.here_doc(
           transf.str_arr.multiline_str(arr)
-        )
+        ),
+        do_after
       )
     end,
   },
   sha256_hex_str = {
-    add_tags_to_hydrus_item_by_ai_tags = function(str)
-      act.sha256_hex_str_arr.add_tags_to_hydrus_item({str})
+    add_tags_to_hydrus_item_by_ai_tags = function(str, do_after)
+      act.sha256_hex_str_arr.add_tags_to_hydrus_item({str}, do_after)
     end,
   },
   hs_geometry_size_like = {
@@ -314,6 +315,12 @@ act = {
         end
       end)
     end,
+    add_to_hydrus_by_path_or_url_ai = function(path_or_url, do_after)
+      dothis.local_hydrusable_file.add_to_hydrus_by_path_or_url(path_or_url, true, do_after)
+    end,
+    add_to_hydrus_by_path_or_url_noai = function(path_or_url, do_after)
+      dothis.local_hydrusable_file.add_to_hydrus_by_path_or_url(path_or_url, false, do_after)
+    end,
     
   },
   hydrus_noai_proc_dir = {
@@ -343,8 +350,31 @@ act = {
     end,
   },
   local_path = {
+    open_default = function(path, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open " .. transf.str.str_by_single_quoted_escaped(path), do_after)
+    end,
+    open_gui_editor = function(path, do_after)
+      dothis.local_path.open_app(path, env.GUI_EDITOR, do_after)
+    end,
+    open_and_reveal = function(path)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open -R " .. transf.str.str_by_single_quoted_escaped(path))
+    end,
     open_libreoffice_async = function(path)
       dothis.local_path.open_app(path, "LibreOffice", true)
+    end,
+  },
+  remote_nonextant_path = {
+    create_dir = function(path)
+      dothis.labelled_remote_absolute_path.create_dir(path)
+    end,
+  },
+  nonextant_path = {
+    create_dir = function(path)
+      if is.path.remote_path(path) then
+        dothis.remote_absolute_path.create_dir(path)
+      else
+        dothis.local_extant_path.create_dir(path)
+      end
     end,
   },
   local_extant_path = {
@@ -352,6 +382,81 @@ act = {
       act.in_git_dir_arr.pull_all(
         transf.extant_path.git_root_dir_arr_by_descendants(path)
       )
+    end,
+    make_executable = function(path)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("chmod +x " .. transf.str.str_by_single_quoted_escaped(path))
+    end,
+    delete = os.remove,
+
+  },
+  local_nonextant_path = {
+    create_dir = function(path)
+      act.str.env_bash_eval_sync("mkdir -p " .. transf.str.str_by_single_quoted_escaped(path))
+    end,
+  },
+  local_file = {
+    edit_file_in_vscode_act_on_path = function(path, do_after)
+      dothis.str.env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn("codium --wait --disable-extensions " .. transf.str.str_by_single_quoted_escaped(path), function()
+        if do_after then
+          do_after(path)
+        end
+        act.absolute_path.delete(path)
+      end)
+    end,
+    edit_file_in_vscode_act_on_contents = function(path, do_after)
+      dothis.str.env_bash_eval_w_str_or_str_and_8_bit_pos_int_arg_fn("codium --wait --disable-extensions " .. transf.str.str_by_single_quoted_escaped(path), function()
+        local contents = transf.file.str_by_contents(path)
+        act.absolute_path.delete(path)
+        do_after(contents)
+      end)
+    end,
+  },
+  labelled_remote_dir = {
+    empty_dir = function(path)
+      act.labelled_remote_dir.delete_dir(path)
+      act.labelled_remote_nonextant_path.create_dir(path)
+    end,
+    delete_dir = function(path)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone purge " .. transf.str.str_by_single_quoted_escaped(path))
+    end,
+  },
+  labelled_remote_nonextant_path = {
+    create_dir = function(path)
+      act.str.env_bash_eval_sync("rclone mkdir " .. transf.str.str_by_single_quoted_escaped(path))
+    end,
+  },
+  local_nonabsolute_path_relative_to_home = {
+    copy_local_to_labelled_remote = function(path)
+      dothis.absolute_path.copy_to_absolute_path(
+        transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path),
+        transf.labelled_remote_path.labelled_remote_absolute_path(path)
+      )
+    end,
+    copy_labelled_remote_to_local = function(path)
+      dothis.absolute_path.copy_to_absolute_path(
+        transf.labelled_remote_path.labelled_remote_absolute_path(path),
+        transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path)
+      )
+    end,
+
+  },
+  local_absolute_path = {
+    start_recording_to = function(path, do_after)
+      act.absolute_path.create_parent_dir(path)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("rec " .. transf.str.str_by_single_quoted_escaped(path), function()
+        if do_after then
+          do_after(path)
+        end
+      end)
+    end,
+  },
+
+  remote_dir =  {
+    empty_dir = function(path)
+      act.labelled_remote_dir.empty_dir(path)
+    end,
+    delete_dir = function(path)
+      act.labelled_remote_dir.delete_dir(path)
     end,
   },
   local_dir = {
@@ -367,6 +472,11 @@ act = {
           dothis.in_git_dir.commit_all_root(path, "Initial commit")
         end
       )
+    end,
+    empty_dir = function(path)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rm -rf " .. transf.str.str_by_single_quoted_escaped(
+        transf.path.path_by_ending_with_slash(path) .. "*"
+      ) .. "/*")
     end,
   },
   in_git_dir = {
@@ -392,10 +502,10 @@ act = {
   },
   email_specifier = {
     send = function(specifier, do_after)
-      dothis.maildir_file.send(transf.email_specifier.raw_email(specifier), do_after)
+      act.maildir_file.send(transf.email_specifier.raw_email(specifier), do_after)
     end,
     edit_then_send = function(specifier, do_after)
-      dothis.maildir_file.edit_then_send(transf.email_specifier.raw_email(specifier), do_after)
+      act.maildir_file.edit_then_send(transf.email_specifier.raw_email(specifier), do_after)
     end,
   },
   email = {
@@ -440,7 +550,7 @@ act = {
       )
     end,
     open_mpapers_citable_object_file = function(indicated_citable_object_id)
-      dothis.local_path.open(
+      act.local_path.open_default(
         transf.indicated_citable_object_id.mpapers_citable_object_file(indicated_citable_object_id)
       )
     end,
@@ -473,6 +583,82 @@ act = {
       window:becomeMain()
     end,
   },
+  omegat_project_dir = {
+    create_and_open_new_source_odt = function(omegat_project_dir)
+      dothis.omegat_project_dir.create_and_open_new_source_odt(
+        omegat_project_dir,
+        get.str.str_by_prompted_once_from_default(
+          "",
+          "Enter the name of the new source file (without extension):"
+        )
+      )
+    end,
+    pull_project_materials = function(omegat_project_dir)
+      for _, type in transf.arr.pos_int_vt_stateless_iter(tblmap.project_type.project_materials_list["omegat"]) do
+        dothis.project_dir.pull_project_materials(
+          omegat_project_dir,
+          type,
+          transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
+        )
+      end
+    end,
+    push_project_materials = function(omegat_project_dir)
+      dothis.project_dir.push_project_materials(
+        omegat_project_dir,
+        "glossary",
+        transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
+      )
+      dothis.extant_path.copy_into_absolute_path(
+        transf.omegat_project_dir.local_absolute_path_by_resultant_tm(omegat_project_dir),
+        get.project_dir.local_absolute_path_by_global_subtype_project_material(
+          omegat_project_dir,
+          "tm",
+          transf.omegat_project_dir.client_id_by_client(omegat_project_dir)
+        )
+      )
+    end,
+    open_project = function(omegat_project_dir)
+      local running_application = transf.mac_application_name.running_application_by_ensure("OmegaT")
+      dothis.mac_application_name.open_recent("OmegaT", omegat_project_dir)
+      dothis.running_application.focus_main_window(running_application)
+    end,
+    generate_target_txts = function(dir, do_after)
+      dothis.arr.each(
+        transf.omegat_project_dir.file_arr_by_target(dir),
+        function(file)
+          transf.str.str_or_nil_by_evaled_env_bash_stripped("soffice --headless --convert-to txt:Text --outdir"..
+          transf.str.str_by_single_quoted_escaped(
+            transf.omegat_project_dir.local_extant_path_by_target_txt_dir(dir)
+          ) ..
+          transf.str.str_by_single_quoted_escaped(file))
+        end
+      )
+      error("TODO: Watch dir, count files every second or so until they are all there, then do_after. Perhaps refactor this into a general function")
+    end,
+    generate_rechnung_pdf = function(dir, do_after)
+      dothis.md_file.to_file_in_same_dir(
+        transf.client_project_dir.local_absolute_path_by_rechnung_md(dir),
+        "pdf",
+        transf.client_project_dir.local_absolute_path_by_rechnung_pdf(dir),
+        do_after
+      )
+    end,
+    generate_rechnung = function(path, do_after)
+      act.omegat_project_dir.generate_target_txts(path, function()
+        act.client_project_dir.generate_rechnung_de_md(path)
+        act.omegat_project_dir.generate_rechnung_pdf(path, do_after)
+      end)
+    end,
+    finalize_rechnung = function(path)
+
+    end,
+    finalize_project = function(path)
+      act.omegat_project_dir.push_project_materials(path)
+      act.omegat_project_dir.file_rechnung(path)
+      act.omegat_project_dir.file_source_target(path)
+    end,
+
+  },
   jxa_tab_specifier = {
     make_main = function(jxa_tab_specifier)
       get.str.any_by_evaled_js_osa( ("Application('%s').windows()[%d].activeTabIndex = %d"):format(
@@ -488,6 +674,103 @@ act = {
         jxa_tab_specifier.tab_index
       ))
     end,
+  },
+  move_input_spec = {
+    final_exec = function(spec)
+      hs.mouse.absolutePosition(
+        transf.declared_position_change_input_spec.hs_geometry_point_by_start(spec)
+      )
+    end,
+    exec = function(spec, do_after)
+      act.declared_position_change_input_spec.exec(
+        get.input_spec.declared_input_spec(spec, "move"),
+        do_after
+      )
+    end,
+  },
+  scroll_input_spec = {
+    final_exec = function() end,
+    exec = function(spec, do_after)
+      act.declared_position_change_input_spec.exec(
+        get.input_spec.declared_input_spec(spec, "scroll"),
+        do_after
+      )
+    end,
+  },
+  declared_position_change_input_spec = {
+    exec = function(spec, do_after)
+      local position_change_state_spec = transf.declared_position_change_input_spec.position_change_state_spec_by_start(spec)
+      local timer = hs.timer.doWhile(function() 
+        if 
+          not transf.position_change_state_spec.should_continue(position_change_state_spec)
+        then
+          act[
+            spec.mode .. "_input_spec"
+          ].final_exec(spec, do_after)
+          if do_after then
+            hs.timer.doAfter(0.2, do_after)
+          end
+          return false
+        else
+          position_change_state_spec = transf.position_change_state_spec.position_change_state_spec_by_next(position_change_state_spec)
+          return true
+        end
+      end, function()
+        dothis[
+          spec.mode .. "_input_spec"
+        ].exec_position_change_state_spec(spec, position_change_state_spec)
+      end, POLLING_INTERVAL)
+      timer:start()
+    end,
+  },
+  key_input_spec = {
+    exec = function(spec, do_after)
+      if spec.mods then
+        local mods = get.arr.arr_by_mapped_w_t_key_assoc(spec.mods, normalize.mod)
+        hs.eventtap.keyStroke(mods, spec.key)
+      elseif #spec.key == 1 then
+        hs.eventtap.keyStroke({}, spec.key)
+      else
+        hs.eventtap.keyStrokes(spec.key)
+      end
+      hs.timer.doAfter(0.2, do_after)
+    end,
+  },
+  click_input_spec = {
+    exec = function(spec, do_after)
+      transf.click_input_spec.click_fn(spec)(hs.mouse.absolutePosition())
+      hs.timer.doAfter(0.2, do_after)
+    end,
+  },
+  input_spec = {
+    exec = function(spec, do_after)
+      act[
+        spec.mode .. "_input_spec"
+      ].exec(spec, do_after)
+    end,
+  },
+  input_spec_arr = {
+    exec = function(specarr, do_after)
+      wait_time = transf.number_interval_specifier.number_by_random({start=0.10, stop=0.12})
+      dothis.input_spec_arr.exec(specarr, wait_time, do_after)
+    end
+  },
+  input_spec_str_arr = {
+    exec = function(strarr, do_after)
+      act.input_spec_arr.exec(
+        transf.input_spec_str_arr.input_spec_arr(strarr),
+        do_after
+      )
+    end
+  },
+  input_spec_series_str = {
+    exec = function(str, do_after)
+      act.input_spec_arr.exec(
+        transf.input_spec_series_str.input_spec_arr(str),
+        do_after 
+      )
+    end
+
   },
   intra_file_location_spec = {
     go_to = function(specifier)
@@ -521,6 +804,23 @@ act = {
       end
     end,
   },
+  plaintext_file = {
+    append_line_and_commit_by_prompted = function(path)
+      dothis.plaintext_file.append_line_and_commit(
+        path,
+        get.str.str_by_prompted_once_from_default(
+          "",
+          "Enter line to add to " .. path
+        )
+      )
+    end,
+    pop_line = function(path)
+      local lines = transf.plaintext_file.line_arr(path)
+      local line = dothis.arr.remove_by_index(lines, #lines)
+      dothis.plaintext_file.write_lines(path, lines)
+      return line
+    end,
+  },
   absolute_path = {
     write_template = function(path, template_path)
       dothis.absolute_path.write_file(
@@ -533,7 +833,7 @@ act = {
     end,
     create_dir = function(path)
       if is.absolute_path.nonextant_path(path) then
-        dothis.nonextant_path.create_dir(path)
+        act.nonextant_path.create_dir(path)
       end
     end,
     create_parent_dir = function(path)
@@ -586,11 +886,11 @@ act = {
     end,
     initialize_omegat_project = function (path)
       dothis.local_path.write_dynamic_structure(path, "omegat")
-      dothis.omegat_project_dir.pull_project_materials(path)
+      act.omegat_project_dir.pull_project_materials(path)
     end,
     empty_write_file = function(path)
       act.absolute_path.create_parent_dir(path)
-      dothis.file.empty_write_file(path)
+      act.file.empty_write_file(path)
     end,
   },
   absolute_path_str_value_assoc = {
@@ -680,7 +980,68 @@ act = {
   },
   maildir_file = {
     choose_attachment_and_choose_action = function(path)
-      dothis.maildir_file.choose_attachment_and_download(path, dothis.any.choose_action)
+      act.maildir_file.choose_attachment_and_download(path, dothis.any.choose_action)
+    end,
+    choose_attachment_and_download = function(path, do_after)
+      dothis.arr.choose_item(
+        transf.maildir_file.leaflike_arr_by_attachments(path),
+        function(att)
+          dothis.maildir_file.download_attachment_to_cache(path, att, do_after)
+        end
+      )
+    end,
+    send = function(path, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "msmtp -t <" .. transf.str.str_by_single_quoted_escaped(path),
+        function(res)
+          if not res then
+            dothis.absolute_path.write_file(
+              env.FAILED_EMAILS .. "/" .. transf["nil"].full_rfc3339like_dt_by_current(), 
+              transf.file.str_by_contents(path)
+            )
+            act.absolute_path.delete(path)
+          else
+            dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+              "cat" ..
+              transf.str.str_by_single_quoted_escaped(path) .. "| msed" ..
+              transf.str.str_by_single_quoted_escaped(
+                "/Date/a/"..
+                transf.timestamp_s.urlcharset_str_by_email_dt(
+                  transf["nil"].timestamp_s_by_current()
+                )
+              ) ..
+              "| msed".. transf.str.str_by_single_quoted_escaped("/Status/a/S/") ..
+              "| mdeliver -c" .. transf.str.str_by_single_quoted_escaped(env.MBSYNC_ARCHIVE),
+              function()
+                act.absolute_path.delete(path)
+                if do_after then
+                  do_after()
+                end
+              end
+            )
+          end
+        end
+      )
+    end,
+    edit_then_send = function(path, do_after)
+      dothis.local_file.edit_file_in_vscode_act_on_contents(path, function(str)
+        dothis.absolute_path.write_file(path, get.str.str_by_evaled_as_template(str)) -- re-eval
+        act.maildir_file.send(path, do_after)
+      end)
+    end,
+    reply = function(path, specifier, do_after)
+      specifier = transf.two_tables.table_by_take_new(transf.maildir_file.email_specifier_by_reply(path), specifier)
+      act.email_specifier.send(specifier, do_after)
+    end,
+    edit_then_reply = function(path, do_after)
+      act.email_specifier.edit_then_send(transf.maildir_file.email_specifier_by_reply(path), do_after)
+    end,
+    forward = function(path, specifier, do_after)
+      specifier = transf.two_tables.table_by_take_new(transf.maildir_file.email_specifier_by_forward(path), specifier)
+      act.email_specifier.send(specifier, do_after)
+    end,
+    edit_then_forward = function(path, do_after)
+      act.email_specifier.edit_then_send(transf.maildir_file.email_specifier_by_forward(path), do_after)
     end,
   },
   alphanum_minus_underscore = {
@@ -754,14 +1115,14 @@ act = {
     end,
     edit_temp_file_in_vscode_act_on_path = function(str, do_after)
       local path = act.str.write_to_temp_file(str)
-      dothis.local_file.edit_file_in_vscode_act_on_path(path, do_after)
+      act.local_file.edit_file_in_vscode_act_on_path(path, do_after)
     end,
     edit_temp_file_in_vscode_act_on_contents = function(str, do_after)
       local path = act.str.write_to_temp_file(str)
-      dothis.local_file.edit_file_in_vscode_act_on_contents(path, do_after)
+      act.local_file.edit_file_in_vscode_act_on_contents(path, do_after)
     end,
     create_url_arr_as_session_in_msessions = function(str)
-      dothis.url_arr.create_as_session_in_msessions(
+      act.url_arr.create_as_session_in_msessions(
         transf.str.url_arr_by_one_per_line(str)
       )
     end,
@@ -843,7 +1204,7 @@ act = {
       if is.extant_path.dir(path) then
         act.dir.delete_dir(path)
       elseif is.extant_path.file(path) then
-        dothis.file.delete_file(path)
+        act.file.delete_file(path)
       end
     end,
     delete_if_empty_path = function(path)
@@ -853,17 +1214,17 @@ act = {
     end,
     empty_file = function(path)
       if is.extant_path.file(path) then
-        dothis.file.empty_write_file(path)
+        act.file.empty_write_file(path)
       end
     end,
     delete_file = function(path)
       if is.extant_path.file(path) then
-        dothis.file.delete_file(path)
+        act.file.delete_file(path)
       end
     end,
     delete_file_if_empty_file = function(path)
       if is.extant_path.file(path) then
-        dothis.file.delete_file_if_empty_file(path)
+        act.file.delete_file_if_empty_file(path)
       end
     end,
     delete_dir = function(path)
@@ -915,7 +1276,7 @@ act = {
   },
   audio_file = {
     play = function(path, do_after)
-      transf.str.str_or_nil_by_evaled_env_bash_stripped("play " .. transf.str.str_by_single_quoted_escaped(path), do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("play " .. transf.str.str_by_single_quoted_escaped(path), do_after)
     end
   },
   hs_image = {
@@ -925,6 +1286,38 @@ act = {
     paste = function(hsimage)
       hs.pasteboard.writeObjects(hsimage)
       hs.eventtap.keyStroke({"cmd"}, "v")
+    end,
+  },
+  api_name = {
+    delete_api_key = function(api_name)
+      act.absolute_path.delete(
+        transf.api_name.local_absolute_path_by_api_key_file(api_name)
+      )
+    end,
+    delete_access_token = function(api_name)
+      act.absolute_path.delete(
+        transf.api_name.local_absolute_path_by_access_token_file(api_name)
+      )
+    end,
+    delete_refresh_token = function(api_name)
+      act.absolute_path.delete(
+        transf.api_name.local_absolute_path_by_refresh_token_file(api_name)
+      )
+    end,
+    delete_client_id = function(api_name)
+      act.absolute_path.delete(
+        transf.api_name.local_absolute_path_by_client_id_file(api_name)
+      )
+    end,
+    delete_client_secret = function(api_name)
+      act.absolute_path.delete(
+        transf.api_name.local_absolute_path_by_client_secret_file(api_name)
+      )
+    end,
+    delete_authorization_code = function(api_name)
+      act.absolute_path.delete(
+        transf.api_name.local_absolute_path_by_authorization_code_file(api_name)
+      )
     end,
   },
   dir = {
@@ -940,16 +1333,35 @@ act = {
       )
     end,
     empty_dir = function(path)
-      dothis[
+      act[
         transf.path.local_o_remote_str(path) .. "_extant_path"
       ].empty_dir(path)
     end,
     delete_dir = function(path)
-      dothis[
+      act[
         transf.path.local_o_remote_str(path) .. "_extant_path"
       ].delete_dir(path)
     end,
-    
+    delete_dir_if_empty_dir = function(path)
+      if is.dir.empty_dir(path) then
+        act.dir.delete_dir(path)
+      end
+    end,
+  },
+  file = {
+    empty_write_file = function(path)
+      dothis.file.write_file(path, "")
+    end,
+    delete_file = function(path)
+      act[
+        transf.path.local_o_remote_str(path) .. "_extant_path"
+      ].delete_file(path)
+    end,
+    delete_file_if_empty_file = function(path)
+      if is.file.empty_file(path) then
+        act.file.delete_file(path)
+      end
+    end,
   },
   volume_local_extant_path_arr = {
     choose_item_and_eject_or_msg = function(arr)
@@ -1200,6 +1612,20 @@ act = {
     mbsync_sync  = function()
       dothis.str.env_bash_eval('mbsync -c "$XDG_CONFIG_HOME/isync/mbsyncrc" mb-channel')
     end,
+    choose_action_on_user_entered_str = function()
+      local res = get.str.str_by_prompted_once_from_default("", "str to act on")
+      if res then 
+        act.any.choose_action(res)
+      end
+    end,
+    choose_item_and_action_on_local_extant_path_in_downloads = function()
+      act.extant_path.choose_item_and_action_by_children(env.DOWNLOADS)
+    end,
+    choose_action_on_running_application_by_frontmost = function()
+      act.any.choose_action(
+        transf["nil"].running_application_by_frontmost()
+      )
+    end,
     purge_memstore_cache = function()
       memstore = {}
     end,
@@ -1287,7 +1713,7 @@ act = {
       local newest_fbzip = transf.extant_path_arr.extant_path_by_newest_creation(fbzips)
       local tmploc = transf.str.in_tmp_local_absolute_path("facebook", "export")
       dothis.local_zip_file.unzip_to_absolute_path(newest_fbzip, tmploc)
-      dothis.file.delete_file(newest_fbzip)
+      act.file.delete_file(newest_fbzip)
       act.facebook_raw_export_dir.process_to_facebook_export_dir(tmploc)
     end,
     telegram_backup = function()
@@ -1489,7 +1915,7 @@ act = {
   },
   latex_project_dir = {
     open_pdf = function(latex_project_dir)
-      dothis.local_path.open(
+      act.local_path.open_default(
         transf.latex_project_dir.local_absolute_path_by_main_pdf_file(latex_project_dir)
       )
     end,

@@ -563,7 +563,8 @@ thing_name_hierarchy = {
                                     all_namespace = {
                                       hydrus_namespace = "leaf",
                                     },
-                                    dynamic_structure_name = "leaf"
+                                    dynamic_structure_name = "leaf",
+                                    api_name = "leaf",
                                   },
                                   mixed_strict_snake_case = {
                                     camel_strict_snake_case = {
@@ -606,6 +607,10 @@ thing_name_hierarchy = {
                                 byte_hex_str = "leaf",
                                 two_byte_hex_str = "leaf",
                                 sha1_hex_str = "leaf",
+                                sha256_hex_str = {
+                                  hydrus_file_hash = "leaf",
+                                },
+                                hydrus_service_key = "leaf",
                                 git_sha1_hex_str = {
                                   full_sha1_hex_str = "leaf",
                                   short_sha1_hex_str = "leaf",
@@ -848,7 +853,10 @@ thing_name_hierarchy = {
         },
         plist_single_dk_spec = {
           plist_single_dkv_spec = "leaf",
-        }
+        },
+        hydrus_rel_spec = "leaf",
+        hydrus_metadata_spec = "leaf",
+        hydrus_internal_tag_spec = "leaf",
       }
     },
     primitive = {

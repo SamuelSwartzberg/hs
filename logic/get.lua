@@ -80,6 +80,26 @@ get = {
       return get.pass_item_name.bool_by_exists_as(item, "p/" .. type, ext)
     end,
   },
+  hydrus_file_hash = {
+
+  },
+  hydrus_metadata_spec = {
+    two_strs_arr__arr_by_tag_namespace = function(spec, namespace)
+      local alltags = transf.hydrus_metadata_spec.two_strs_arr__arr_by_all_current_display_tags(spec)
+      return get.arr_arr.arr_arr_by_filtered_first_element_equals(
+        alltags,
+        namespace
+      )
+    end,
+    str_arr_by_tag_namespace = function(spec, namespace)
+      return get.arr.arr_by_mapped_w_vt_arg_vt_ret_fn(
+        get.hydrus_metadata_spec.two_strs_arr__arr_by_tag_namespace(spec, namespace),
+        function(two_strs_arr)
+          return two_strs_arr[2]
+        end
+      )
+    end,
+  },
   ["nil"] = {
   },
   plist_single_dk_spec = {
@@ -1690,7 +1710,6 @@ get = {
         get.arr.pos_int_or_nil_by_first_match_starting_w_str(arr, str)
       ]
     end,
-
   },
   str_arr_arr = {
   },
@@ -1948,7 +1967,7 @@ get = {
     bool_by_some_descendants_pass_w_fn = function(path, fn)
       return get.arr.bool_by_some_pass_w_fn(transf.extant_path.absolute_path_arr_by_descendants(path), fn)
     end,
-    stream_creation_specifier = function(path, flag_profile_name)
+    stream_creation_specifier_by_descendant_m3u_file_content_lines = function(path, flag_profile_name)
       return {
         source_path = path,
         urls = transf.extant_path.url_or_local_path_arr_by_descendant_m3u_file_content_lines(path),
@@ -1956,7 +1975,7 @@ get = {
         flag_profile_name = flag_profile_name,
       }
     end,
-    stream_creation_specifier_arr = function(path, flag_profile_name)
+    stream_creation_specifier_arr_by_descendant_m3u_file_content_lines = function(path, flag_profile_name)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         transf.extant_path.m3u_file_arr_by_descendants(path),
         get.fn.fn_by_arbitrary_args_bound_or_ignored(
@@ -2016,6 +2035,14 @@ get = {
         prompter = transf.path_prompt_args_spec.local_absolute_path_arr_and_bool,
         prompt_args = {default = path, message = message or "Choose absolute paths..."}
       })
+    end,
+    stream_creation_specifier_by_descendant_files = function(path, flag_profile_name)
+      return {
+        source_path = path,
+        urls = transf.extant_path.absolute_path_arr_by_descendants(path),
+        type = "stream",
+        flag_profile_name = flag_profile_name,
+      }
     end,
   },
   dir = {
@@ -2467,6 +2494,14 @@ get = {
           else
             return fn(arr)
           end
+        end
+      )
+    end,
+    arr_arr_by_filtered_first_element_equals = function(arr_arr, any)
+      return get.arr.arr_by_filtered(
+        arr_arr,
+        function(arr)
+          return arr[1] == any
         end
       )
     end,

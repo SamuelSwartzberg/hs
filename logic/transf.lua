@@ -5164,6 +5164,17 @@ transf = {
     str_arr_by_percent_decoded_no_plus = function(arr)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.str_by_percent_decoded_no_plus)
     end,
+    two_strs__arr_arr_by_split_colon = function(arr)
+      local res = {}
+      for _, v in transf.arr.pos_int_vt_stateless_iter(arr) do
+        local k, v = get.str.n_strs_by_split_w_str(v, ":")
+        if not v then
+          v = k
+          k = ""
+        end
+        dothis.arr.push(res, {k, v})
+      end
+    end
     
   },
   line_arr = {
@@ -5524,7 +5535,7 @@ transf = {
       )
       transf.str.str_or_nil_by_evaled_env_bash_stripped("align " .. transf.str.str_by_single_quoted_escaped(tmp))
       local res = transf.yaml_file.not_userdata_or_fn(tmp)
-      dothis.local_extant_path.delete(tmp)
+      act.local_extant_path.delete(tmp)
       return res
     end,
     multiline_str_by_yaml_metadata = function(t)
@@ -7800,6 +7811,89 @@ transf = {
       return get.arr.arr_by_slice_w_3_int_any_or_nils(get.str.str_arr_by_split_w_ascii_char(source_id, "."), -1, -1)[1]
     end,
   },
+  hydrus_metadata_spec = {
+    hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc = function(spec)
+      return spec.tags
+    end,
+    hydrus_file_hash = function(spec)
+      return spec.hash
+    end,
+    two_strs_arr__arr_by_all_current_display_tags = function(spec)
+      return transf.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc.two_strs_arr__arr_by_all_current_display_tags(transf.hydrus_metadata_spec.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc(spec))
+    end,
+  },
+  hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc = {
+    hydrus_internal_tag_spec_arr = function(assoc)
+      return transf.table.vt_arr(assoc)
+    end,
+    two_strs_arr__arr_by_all_current_display_tags = function(assoc)
+      return transf.hydrus_internal_tag_spec_arr.two_strs_arr__arr_by_all_current_display_tags(transf.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc.hydrus_internal_tag_spec_arr(assoc))
+    end
+  },
+  hydrus_internal_tag_spec_arr = {
+    two_strs_arr__arr_by_all_current_display_tags = function(spec_arr)
+      return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(
+        spec_arr,
+        transf.hydrus_internal_tag_spec.two_strs_arr__arr_by_current_display_tags
+      )
+    end,
+  },
+  hydrus_internal_tag_spec = {
+    digit_str_key_str_arr_value_assoc_by_storage_tags = function(spec)
+      return spec.storage_tags
+    end,
+    digit_str_key_str_arr_value_assoc_by_display_tags = function(spec)
+      return spec.display_tags
+    end,
+    str_arr_by_current_display_tags = function(spec)
+      return spec.display_tags["0"]
+    end,
+    two_strs_arr__arr_by_current_display_tags = function(spec)
+      return transf.str_arr.two_strs__arr_arr_by_split_colon(spec.display_tags["0"])
+    end,
+  },
+  digit_str_key_str_arr_value_assoc = {
+    str_arr_by_current = function(assoc)
+      return assoc["0"]
+    end,
+    two_strs_arr__arr_by_current = function(assoc)
+      return transf.str_arr.two_strs__arr_arr_by_split_colon(assoc["0"])
+    end,
+
+  },
+  hydrus_file_hash = {
+    http_url_by_hydrus_file_url = function(sha256_hex_str)
+      return "http://" .. tblmap.api_name.host.hydrus .. "/get_files/file?hash=" .. sha256_hex_str "&Hydrus-Client-API-Access-Key=" .. transf.api_name.str_or_nil_by_api_key("hydrus")
+    end,
+    hydrus_metadata_spec = function(sha256_hex_str)
+      return transf.hydrus_file_hash_arr.hydrus_metadata_spec_arr({sha256_hex_str})[1]
+    end,
+    hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc = function(sha256_hex_str)
+      return transf.hydrus_metadata_spec.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc(transf.hydrus_file_hash.hydrus_metadata_spec(sha256_hex_str))
+    end,
+  },
+  hydrus_file_hash_arr = {
+    assoc_by_hydrus_metadata_response = function(sha256_hex_str_arr)
+      return rest({
+        api_name = "hydrus",
+        endpoint = "get_files/file_metadata",
+        params = { 
+          hashes = get.str_or_number_arr.str_by_joined(sha256_hex_str_arr, ",")
+        },
+        request_verb = "GET",
+      })
+    end,
+    hydrus_metadata_spec_arr = function(sha256_hex_str_arr)
+      return transf.hydrus_file_hash_arr.assoc_by_hydrus_metadata_response(sha256_hex_str_arr).metadata
+    end,
+    hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc_arr = function(sha256_hex_str_arr)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+        transf.hydrus_file_hash_arr.hydrus_metadata_spec_arr(sha256_hex_str_arr),
+        transf.hydrus_metadata_spec.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc
+      )
+    end,
+
+  },
   source_id_arr = {
     source_id_by_next_to_be_activated = function(source_id_arr)
       return get.arr.t_by_next_wrapping_w_fn(source_id_arr, is.source_id.active_source_id)
@@ -9446,6 +9540,53 @@ transf = {
         transf.str.str_by_single_quoted_escaped(
           transf.plist_single_dkv_spec.str_by_value_mac_plist_encoded(spec)
         )
+    end,
+  },
+  api_name = {
+    local_absolute_path_by_api_details_location_dir = function(api_name)
+      return env.MAPI .. "/" .. api_name .. "/"
+    end,
+    local_absolute_path_by_api_key_file = function(api_name)
+      return transf.api_name.local_absolute_path_by_api_details_location_dir(api_name) .. "key"
+    end,
+    str_or_nil_by_api_key = function(api_name)
+      local key_file = transf.api_name.local_absolute_path_by_api_key_file(api_name)
+      return transf.absolute_path.str_or_nil_by_file_contents(key_file)
+    end,
+    local_absolute_path_by_access_token_file = function(api_name)
+      return transf.api_name.local_absolute_path_by_api_details_location_dir(api_name) .. "access_token"
+    end,
+    str_or_nil_by_access_token = function(api_name)
+      local access_token_file = transf.api_name.local_absolute_path_by_access_token_file(api_name)
+      return transf.absolute_path.str_or_nil_by_file_contents(access_token_file)
+    end,
+    local_absolute_path_by_refresh_token_file = function(api_name)
+      return transf.api_name.local_absolute_path_by_api_details_location_dir(api_name) .. "refresh_token"
+    end,
+    str_or_nil_by_refresh_token = function(api_name)
+      local refresh_token_file = transf.api_name.local_absolute_path_by_refresh_token_file(api_name)
+      return transf.absolute_path.str_or_nil_by_file_contents(refresh_token_file)
+    end,
+    local_absolute_path_by_client_id_file = function(api_name)
+      return transf.api_name.local_absolute_path_by_api_details_location_dir(api_name) .. "client_id"
+    end,
+    str_or_nil_by_client_id = function(api_name)
+      local client_id_file = transf.api_name.local_absolute_path_by_client_id_file(api_name)
+      return transf.absolute_path.str_or_nil_by_file_contents(client_id_file)
+    end,
+    local_absolute_path_by_client_secret_file = function(api_name)
+      return transf.api_name.local_absolute_path_by_api_details_location_dir(api_name) .. "client_secret"
+    end,
+    str_or_nil_by_client_secret = function(api_name)
+      local client_secret_file = transf.api_name.local_absolute_path_by_client_secret_file(api_name)
+      return transf.absolute_path.str_or_nil_by_file_contents(client_secret_file)
+    end,
+    local_absolute_path_by_authorization_code_file = function(api_name)
+      return transf.api_name.local_absolute_path_by_api_details_location_dir(api_name) .. "authorization_code"
+    end,
+    str_or_nil_by_authorization_code = function(api_name)
+      local authorization_code_file = transf.api_name.local_absolute_path_by_authorization_code_file(api_name)
+      return transf.absolute_path.str_or_nil_by_file_contents(authorization_code_file)
     end,
   }
   

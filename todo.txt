@@ -1,9 +1,7 @@
 refac:
   - dissolve remaining 'items' stuff
   - dissolve actable_paths
-  - move/add things from dothis to act
   - add implementations of various 'get' things to 'transf'
-  - clean up is & hierarchy
   - fix static type errors in remaining files
   - write tests with busted
   - many names don't yet corrrespond to the new schema

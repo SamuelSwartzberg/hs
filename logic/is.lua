@@ -642,8 +642,19 @@ is = {
     git_sha1_hex_str = function(str)
       return #str >= 7 and #str <= 40
     end,
+    sha1_hex_str = function(str)
+      return #str == 40
+    end,
     sha256_hex_str = function(str)
       return #str == 64
+    end,
+    hydrus_service_key = function(str)
+      return true
+    end,
+  },
+  sha256_hex_str = {
+    hydrus_file_hash = function(str)
+      return true
     end,
   },
   git_sha1_hex_str = {
@@ -1533,6 +1544,9 @@ is = {
     end,
     dynamic_structure_name = function(str)
       return get.arr.bool_by_contains(ls.dynamic_structure_name, str)
+    end,
+    api_name = function(str)
+      return true
     end,
   },
   all_namespace = {
@@ -2516,6 +2530,12 @@ is = {
     end,
     plist_single_dk_spec = function(t)
       return t.domain and t.key
+    end,
+    hydrus_metadata_spec = function(t)
+      return t.hash
+    end,
+    hydrus_internal_tag_spec = function(t)
+      return t.storage_tags and t.display_tags
     end,
     
   },

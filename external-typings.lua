@@ -709,9 +709,18 @@ speak = hs.speech.new()
 --- @field mkdir fun(dirname: string): boolean
 --- @field rmdir fun(dirname: string): true | nil, err: string | nil
 --- @field chdir fun(path: string): true | nil, err: string | nil
---- @field dir fun(path): function, table, nil, table
+--- @field currentDir fun(): string | nil, err: string | nil
+--- @field dir fun(path: string): function, table, nil, table
+--- @field displayName fun(filepath: string): string | nil
+--- @field fileUTI fun(path: string): string | nil
+--- @field fileUTIalternate fun(fileUTI: string, type: string): string | nil
+--- @field getFinderComments fun(path: string): string | nil
+--- @field link fun(old: string, new: string, symlink?: boolean): boolean | nil, err: string | nil
+--- @field lock fun(filehandle, mode: string, start: integer, length: integer): true | nil, err: string | nil
 --- @field touch fun(filepath: string, atime?: number, mtime?: number): boolean | nil, err: string | nil
 --- @field pathToAbsolute fun(path: string): string
+
+
 
 --- @class hs.fs.volume
 --- @field didMount 0

@@ -34,7 +34,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
   local original_specifier = specifier
   specifier = get.table.table_by_copy(specifier) or {}
 
-  local api_keys_location, catch_auth_error, secondary_api_name
+  local catch_auth_error, secondary_api_name
 
   if specifier.api_name then
     if tblmap.secondary_api_name.api_name[specifier.api_name] then
@@ -50,10 +50,6 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   if specifier.token_where then
 
-    if specifier.api_name then
-      api_keys_location = env.MAPI .. "/" .. specifier.api_name .. "/" 
-    end
-
     specifier.token_type = specifier.token_type or tblmap.api_name.token_type[specifier.api_name] or "simple"
 
     if not specifier.token then
@@ -62,9 +58,9 @@ function rest(specifier, do_after, have_tried_access_refresh)
       end
       local keyloc
       if specifier.token_type == "simple" then
-        keyloc = api_keys_location .. "key"
+        keyloc = transf.api_name.local_absolute_path_by_api_key_file(specifier.api_name)
       elseif specifier.token_type == "oauth2" then
-        keyloc = api_keys_location .. "access_token"
+        keyloc = transf.api_name.local_absolute_path_by_access_token_file(specifier.api_name)
       elseif specifier.token_type == "telegram" then
         -- todo
       end
@@ -75,22 +71,22 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
       local function process_tokenres(tokenres)
         if tokenres.refresh_token then
-          dothis.absolute_path.write_file(api_keys_location .. "refresh_token", tokenres.refresh_token)
+          dothis.api_name.write_refresh_token(specifier.api_name, tokenres.refresh_token)
         end
         if tokenres.access_token then
-          dothis.absolute_path.write_file(api_keys_location .. "access_token", tokenres.access_token)
+          dothis.api_name.write_access_token(specifier.api_name, tokenres.access_token)
           return rest(original_specifier, do_after) -- try again
         else
           error("Failed to refresh access token. Result was:\n" .. json.encode(tokenres))
         end
       end
 
-      local clientid = transf.file.str_by_contents(api_keys_location .. "clientid")
-      local clientsecret = transf.file.str_by_contents(api_keys_location .. "clientsecret")
+      local clientid = transf.api_name.str_or_nil_by_client_id(specifier.api_name)
+      local clientsecret = transf.api_name.str_or_nil_by_client_secret(specifier.api_name)
       if not clientid or not clientsecret then
-        error("Failed to get clientid or clientsecret from " .. api_keys_location ". Oauth2 apis must have these. Are you sure you've already set up the api?")
+        error("Failed to get clientid or clientsecret for " .. specifier.api_name ". Oauth2 apis must have these. Are you sure you've already set up the api?")
       end
-      local refresh_token = transf.file.str_by_contents(api_keys_location .. "refresh_token")
+      local refresh_token = transf.api_name.str_or_nil_by_refresh_token(specifier.api_name)
 
       specifier.oauth2_url = specifier.oauth2_url or tblmap.api_name.oauth2_url[specifier.api_name]
       specifier.oauth2_authorization_url = specifier.oauth2_authorization_url or tblmap.api_name.oauth2_authorization_url[specifier.api_name] or specifier.oauth2_url
@@ -115,8 +111,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
         end
         
         dothis.url_components.open_browser(open_spec, nil, function() -- our server listening on the above port will save the authorization code to the proper location
-          local authorization_code = transf.file.str_by_contents(api_keys_location .. "authorization_code")
-          dothis.absolute_path.delete(api_keys_location .. "authorization_code") -- this lost it's argument during refactor, i've added it back in, but I'm not sure if it's correct
+          local authorization_code = transf.api_name.str_or_nil_by_authorization_code(specifier.api_name)
+          act.api_name.delete_authorization_code(specifier.api_name)
           if not authorization_code then
             error("Failed to get authorization code from server")
           end

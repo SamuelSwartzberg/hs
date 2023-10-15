@@ -16,7 +16,7 @@ comp = transf.dir.plaintext_dictonary_read_assoc(env.MCOMPOSITE)
 fstblmap = transf.dir.plaintext_dictonary_read_assoc(env.MDICTIONARIES .. "/mappings")
 
 timer_arr = {}
-timer_arr_refresher = hs.timer.doEvery(1, get.fn.fn_by_1st_n_bound(act.timer_spec_array.fire_all_if_ready_and_space_if_necessary, timer_arr))
+timer_arr_refresher = hs.timer.doEvery(1, get.fn.fn_by_1st_n_bound(act.timer_spec_arr.fire_all_if_ready_and_space_if_necessary, timer_arr))
 
 env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
 
@@ -26,7 +26,7 @@ pasteboard_arr = {}
 stream_arr = {}
 source_id_arr = {}
 
-dothis.created_item_specifier_array.create(
+dothis.created_item_specifier_arr.create(
   hotkey_arr,
   {
     key = "r",
@@ -34,7 +34,7 @@ dothis.created_item_specifier_array.create(
   }
 )
 
-dothis.created_item_specifier_array.create_all(
+dothis.created_item_specifier_arr.create_all(
   watcher_arr,
   {
     {
@@ -48,7 +48,7 @@ dothis.created_item_specifier_array.create_all(
     },{ 
       type = "watcher",
       watcher_type = hs.pasteboard.watcher, 
-      fn = act.string.add_to_pasteboard_arr
+      fn = act.str.add_to_pasteboard_arr
     },
     {
       type = "watcher",
@@ -74,7 +74,7 @@ dothis.created_item_specifier_array.create_all(
 
 main_qspec = {}
 main_qspec = {
-  fn_array = {},
+  fn_arr = {},
   hotkey_created_item_specifier = act.creation_specifier.create({
     type = "hotkey",
     key = "/",
@@ -96,7 +96,7 @@ local keymap = {
   },
   ["2"] = {
     explanation = "Choose contact and action on that contact (from local vcf files)",
-    fn = act["nil"].choose_item_and_action_on_contact_table_array,
+    fn = act["nil"].choose_item_and_action_on_contact_table_arr,
     mnemonic = "2 by association with @"
   },
   ["3"] = {
@@ -132,35 +132,11 @@ local keymap = {
     fn = function() 
       System
         :get("manager", "hotkey")
-        :get("sorted-to-string-to-new-array")
+        :get("sorted-to-str-to-new-arr")
         :doThis("choose-item")
     end,
   },
-  ["="] = {
-    explanation = "Various searches on mail",
-    fn = function()
-      local searches = ovtable.new()
-      searches["from_cont"] = "magrep -i from:%s"
-      searches["to_cont"] = "magrep -i to:%s"
-      searches["subj_cont"] = "magrep -i subject:%s"
-      searches["body_cont"] = "magrep -i /:%s"
-      searches["adv"] = "mpick -t %s"
-      dc(searches)
-        :doThis("choose-item", function(val)
-          local true_val = transf.array.t_by_last(stringy.split(val, " ")) -- ignore all the `magrep -i` or `mpick -t` stuff, that's just for user comprehension
-          true_val = string.format(true_val, get.string.string_by_prompted_once_from_default("", "Search for: "))
-          local results
-          if get.string.bool_by_startswith(val, "magrep") then
-            results = get.maildir_dir.email_file_arr_by_sorted_filtered(env.MBSYNC_ARCHIVE, true, true_val)
-          elseif get.string.bool_by_startswith(val, "mpick") then
-            results = get.maildir_dir.email_file_arr_by_sorted_filtered(env.MBSYNC_ARCHIVE, true, nil, true_val)
-          end
-          ar(results)
-            :get("to-string-item-array")
-            :doThis("choose-email-and-then-action-parallel")
-        end)
-    end,
-  },
+  ["="] = nil, -- unassigned
   q = nil, -- never assign anything to q, since it's too risky to accidentally miss a modifier key and log out (cmd shift q)
   w = nil, -- never assign anything to w, since too many 'close window' hotkeys use it
   e = {
@@ -172,14 +148,14 @@ local keymap = {
     fn = act["nil"].sox_rec_toggle_and_act
   },
   t = {
-    explanation = "Choose an action on the current date.",
+    explanation = "Choose an action on the current timestamp.",
     fn = act["nil"].choose_action_on_current_timestamp_s
   },
   y = {
     explanation = "Choose action on tag name and value in MAUDIOVISUAL (mostly for interacting with streams)",
     fn = function() 
       st(env.MAUDIOVISUAL)
-        :get("descendant-string-item-array")
+        :get("descendant-str-item-arr")
         :doThis("choose-tag-name-value-and-thenx-action")
     end,
   },
@@ -188,7 +164,7 @@ local keymap = {
     fn = function() 
       get.fn.rt_or_nil_by_memoized(function()
         return st()
-          :get("descendant-string-item-array")
+          :get("descendant-str-item-arr")
           :get("map-to-table-of-path-and-path-content-items")
       end)():doThis("choose-item-and-then-action")
     end,
@@ -196,7 +172,7 @@ local keymap = {
   i = {
     explanation = "Choose a favorite stream",
     fn = function() 
-      ar(transf.plaintext_file.string_array_by_lines("/Users/sam/me/state/init_playlists"))
+      ar(transf.plaintext_file.str_arr_by_lines("/Users/sam/me/state/init_playlists"))
         :doThis("choose-item", function(item)
           System:get("manager", "stream"):doThis("create-background-stream", item)
         end)
@@ -218,34 +194,23 @@ local keymap = {
     explanation = "Choose a file in MAUDIOVISUAL and an action on it.",
     fn = function()
       st(env.MAUDIOVISUAL)
-        :get("child-string-item-array")
+        :get("child-str-item-arr")
         :doThis("choose-dir-until-file-then-choose-action")
     end,
   },
   s = {
     explanation = "Choose a project and choose an action on it.",
     fn = function()
-      act.array.choose_item_and_action(
-        transf.local_extant_path.project_dir_array_by_descendants_depth_3(env.ME)
+      act.arr.choose_item_and_action(
+        transf.local_extant_path.project_dir_arr_by_descendants_depth_3(env.ME)
       )
     end,
   },
   d = {
     explanation = "Choose an file in DOWNLOADS and an action on it.",
-    fn = function()
-      st(env.MAC_DOWNLOADS)
-        :get("child-string-item-array")
-        :doThis("choose-item-and-then-action") 
-    end,
+    fn = act["nil"].choose_item_and_action_on_local_extant_path_in_downloads,
   },
-  f = {
-    explanation = "Choose a composite item, eval and choose an action on it.",
-    fn = function()
-      compTable:doThis("choose-item", function (item)
-        st(get.string.string_by_evaled_as_template(item)):doThis("choose-action")
-      end)
-    end,
-  },
+  f = nil, -- unassigned
   g = {
     explanation = "Choose an item from the clipboard and then an action on it.",
     fn = act["nil"].choose_action_on_first_item_in_pasteboard_arr,
@@ -258,9 +223,9 @@ local keymap = {
   ["'"] = {
     explanation = "Choose a citation item, and then choose an action on it.",
     fn = function()
-      act.array.choose_item_and_action(
-        transf.path_array.csl_table_array_by_filtered_mapped(
-          transf.extant_path.file_array_by_descendants(
+      act.arr.choose_item_and_action(
+        transf.path_arr.csl_table_arr_by_filtered_mapped(
+          transf.extant_path.file_arr_by_descendants(
             env.MCITATIONS
           )
         )
@@ -269,20 +234,11 @@ local keymap = {
   },
   ["\\"] = {
     explanation = "Choose an action on the current application",
-    fn = function()
-      CreateRunningApplicationItem(
-        hs.application.frontmostApplication()
-      ):doThis("choose-action")
-    end,
+    fn = act["nil"].choose_action_on_running_application_by_frontmost
   },
   ["`"] = {
-    explanation = "Choose an action on a user-entered string",
-    fn = function()
-      local res = get.string.string_by_prompted_once_from_default("", "String to act on")
-      if res then 
-        st(res):doThis("choose-action")
-      end
-    end,
+    explanation = "Choose an action on a user-entered str",
+    fn = act["nil"].choose_action_on_user_entered_str,
   },
   z = nil, -- unassigned
   x = nil,
@@ -338,7 +294,7 @@ System:get("manager", "creatable"):doThis("create-all", {
 System:get("manager", "timer"):doThis("create-all", {
   act["nil"].newsboat_reload,
   dothis.vdirsyncer.sync,
-  hs.fnutils.partial(dothis.local_nonabsolute_path_relative_to_home.copy_local_to_labelled_remote, "me/state/todo"),
+  hs.fnutils.partial(act.local_nonabsolute_path_relative_to_home.copy_local_to_labelled_remote, "me/state/todo"),
   st(env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
