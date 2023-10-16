@@ -210,6 +210,28 @@ dothis = {
         do_after
       )
     end,
+    add_to_hydrus = function(url, str_arr, do_after)
+      local video_id = transf.youtube_video_url.youtube_video_id(url)
+      local cache_path = transf.str.in_cache_local_absolute_path(video_id, "ytdl")
+      dothis.youtube_video_url.download_to_max_info(
+        url,
+        cache_path,
+        function()
+          dothis.local_hydrusable_file.add_to_hydrus_by_path(
+            cache_path,
+            transf.arr_or_nil_and_any.arr(str_arr, {"proximate_source_description", transf.youtube_video_id.str_by_description(url)}),
+            function(hash)
+              act.file.delete_file(cache_path)
+              dothis.hydrus_file_hash.add_url(
+                hash,
+                url
+              )
+              do_after(hash)
+            end
+          )
+        end
+      )
+    end,
   },
   url = {
     download_to_async = function(url, target)

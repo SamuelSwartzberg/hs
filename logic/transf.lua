@@ -1983,7 +1983,7 @@ transf = {
     lower_alphanum_underscore_key_line_or_line_arr_value_assoc_by_rename_filter_namespace = function(assoc)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc) do
-        local namespace = tblmap.lower_strict_snake_case.all_namespace[k]
+        local namespace = tblmap.lower_strict_snake_case.line_by_namespace_and_potentially_subnamespace[k]
         if namespace then
           res[namespace] = v
         else
@@ -3224,25 +3224,25 @@ transf = {
       end
     end,
     dcmp_spec_by_filtered_max = function(dcmp_spec)
-      return get.assoc.assoc_by_filtered_w_kt_vt_fn(
+      return get.table.table_by_filtered_w_kt_vt_fn(
         dcmp_spec,
         function(k, v) return v == tblmap.dcmp_name.pos_int_by_max_dcmp_val[k] end
       )
     end,
     dcmp_spec_by_filtered_min = function(dcmp_spec)
-      return get.assoc.assoc_by_filtered_w_kt_vt_fn(
+      return get.table.table_by_filtered_w_kt_vt_fn(
         dcmp_spec,
         function(k, v) return v == tblmap.dcmp_name.int_by_min_dcmp_val[k] end
       )
     end,
     dcmp_spec_by_filtered_not_max = function(dcmp_spec)
-      return get.assoc.assoc_by_filtered_w_kt_vt_fn(
+      return get.table.table_by_filtered_w_kt_vt_fn(
         dcmp_spec,
         function(k, v) return v ~= tblmap.dcmp_name.pos_int_by_max_dcmp_val[k] end
       )
     end,
     dcmp_spec_by_filtered_not_min = function(dcmp_spec)
-      return get.assoc.assoc_by_filtered_w_kt_vt_fn(
+      return get.table.table_by_filtered_w_kt_vt_fn(
         dcmp_spec,
         function(k, v) return v ~= tblmap.dcmp_name.int_by_min_dcmp_val[k] end
       )
@@ -3962,6 +3962,12 @@ transf = {
     str_by_long_flag = function(word)
       return "--" .. word
     end,
+    bool_by_starts_2underscore = function(word)
+      return get.str.bool_by_startswith(word, "__") and not get.str.bool_by_startswith(word, "___")
+    end,
+    bool_by_starts_underscore = function(word)
+      return get.str.bool_by_startswith(word, "_") and not get.str.bool_by_startswith(word, "__")
+    end,
     noempty_trimmed_line_arr_by_synonyms = function(str)
       local items = get.str.str_arr_by_split_w_ascii_char_arr(transf.str.str_or_nil_by_raw_av_output(str), {"\t", "\n"})
       items = transf.str_arr.not_starting_o_ending_with_whitespace_str_arr(items)
@@ -4508,7 +4514,61 @@ transf = {
       local parts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(str, "&&")
       return transf.arr.hydrus_file_hash_arr_by_search(parts)
     end,
+    str_or_nil_and_str_or_nil_and_str_arr_by_namespace_inference_valparts = function(str)
+      local noinference, inference  = get.str.n_strs_by_split_w_str(str, "/") -- get everything before '/' - after is a potential modifier
+      local namespace, val = get.str.two_strs_or_nil_by_split_w_str(noinference, ":")
+      local valparts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(val, "+")
+      return namespace, inference, valparts
+    end,
+    two_strs__arr_arr_by_deduce_from_parts = function(str)
+      local res = {}
+      
+      local namespace, inference, valparts = transf.str.str_or_nil_and_str_or_nil_and_str_arr_by_namespace_inference_valparts(str)
+      if inference then
+        dothis.arr.push(
+          res,
+          {
+            str,
+            "complete_modification:" .. inference
+          }
+        )
+      end
+      for i = 1, #valparts, 1 do
+        local valpart = valparts[i]
+        if i % 2 then -- valpart is a relationship
+          dothis.arr.push(
+            res,
+            {
+               str,
+              "interaction:" .. valpart
+            }
+          )
+        else
+          dothis.arr.push(
+            res,
+            {
+              str,
+              valpart
+            }
+          )
+        end
+      end
+      return res
+    end,
 
+  },
+  str_or_nil_and_str_or_nil_and_str_arr = {
+    str_by_namespace_inference_valparts = function(str1, str2, str_arr)
+      local res = ""
+      if str1 and #str1 > 0 then
+        res = res .. str1 .. ":"
+      end
+      res = res .. get.str_or_number_arr.str_by_joined(str_arr, "+")
+      if str2 and #str2 > 0 then
+        res = res .. "/" .. str2
+      end
+      return res
+    end,
   },
   line = {
     noindent_line_by_extract = function(str)
@@ -4809,8 +4869,8 @@ transf = {
 
                   -- handle the case where the value is composed and thus we need to set up further implications
 
-                  local noinference  = get.str.n_strs_by_split_w_str(actual_val, "/") -- get everything before '/' - after is a potential modifier
-                  local valparts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(noinference, "+")
+                  
+                  
                   
                   if #valparts > 1 and val_namespace ~= "thing" then -- composed values first need to be implied to thing:
                     dothis.arr.push(hydrus_rel_spec.implies, {
@@ -4818,9 +4878,7 @@ transf = {
                       "thing:" .. actual_val
                     })
                   end
-                  for i = 1, #valparts, 1 do
-                    local valpart = transf.str.str_by_percent_decoded_no_plus(valparts[i]) -- we're percent encoding to allow for plus signs in the value, which in turn allows for nested composed values. e.g. danbooru's 'girl sandwich tag', which we render as "agentlike+interessive+female agentlike%2Bfemale agentlike"
-                    if i % 2 then -- valpart is a relationship
+                 
                       if  #valpart > 0 then
                         dothis.arr.push(hydrus_rel_spec.implies, {
                           namespaced_val,
@@ -5560,6 +5618,67 @@ transf = {
       return get.table.vt_arr_by_sorted(t, transf.two_operational_comparables.bool_by_larger)
     end,
     kt_vt_stateless_iter = pairs,
+    table_by_2underscore_private = function(t)
+      return get.table.table_by_filtered_w_kt_fn(
+        t,
+        transf.any.bool_by_starts_2underscore
+      )
+    end,
+    table_by_underscore_private = function(t)
+      return get.table.table_by_filtered_w_kt_fn(
+        t,
+        transf.any.bool_by_starts_underscore
+      )
+    end,
+    table_by_no_2underscore_private = function(t)
+      return get.table.table_by_filtered_w_kt_fn(
+        t,
+        transf.bool_ret_fn.bool_ret_fn_by_invert(
+          transf.any.bool_by_starts_2underscore
+        )
+      )
+    end,
+    table_by_no_underscore_private = function(t)
+      return get.table.table_by_filtered_w_kt_fn(
+        t,
+        transf.bool_ret_fn.bool_ret_fn_by_invert(
+          transf.any.bool_by_starts_underscore
+        )
+      )
+    end,
+    table_by_no_any_underscore_private = function(t)
+      return get.table.table_by_filtered_w_kt_fn(
+        t,
+        function (k)
+          return not get.str.bool_by_startswith(k, "_")
+        end
+      )
+    end,
+    kt_vt_stateless_iter_by_no_2underscore_private = function(t)
+      return transf.table.kt_vt_stateless_iter(
+        transf.table.table_by_no_2underscore_private(t)
+      )
+    end,
+    kt_vt_stateless_iter_by_2underscore_private = function(t)
+      return transf.table.kt_vt_stateless_iter(
+        transf.table.table_by_2underscore_private(t)
+      )
+    end,
+    kt_vt_stateless_iter_by_no_underscore_private = function(t)
+      return transf.table.kt_vt_stateless_iter(
+        transf.table.table_by_no_underscore_private(t)
+      )
+    end,
+    kt_vt_stateless_iter_by_underscore_private = function(t)
+      return transf.table.kt_vt_stateless_iter(
+        transf.table.table_by_underscore_private(t)
+      )
+    end,
+    kt_vt_stateless_iter_by_no_any_underscore_private = function(t)
+      return transf.table.kt_vt_stateless_iter(
+        transf.table.table_by_no_any_underscore_private(t)
+      )
+    end,
     kt_vt_stateful_iter = get.stateless_generator.stateful_generator(transf.table.kt_vt_stateless_iter),
     kt_stateful_iter = get.stateless_generator.stateful_generator(transf.table.kt_vt_stateful_iter, 1, 1),
     vt_stateful_iter = get.stateless_generator.stateful_generator(transf.table.kt_vt_stateful_iter, 2, 2),
@@ -5716,7 +5835,7 @@ transf = {
       return get.str_or_number_arr.str_by_joined(transf.assoc.assoc_entry_str_arr(t), "\n")
     end,
     kt_key_vt_value_assoc_by_truthy_values = function(t)
-      return get.assoc.assoc_by_filtered_w_vt_fn(
+      return get.table.table_by_filtered_w_kt_vt_fn(
         t,
         transf.any.bool
       )
@@ -5951,6 +6070,20 @@ transf = {
       return transf.arr_arr.arr_by_flatten(transf.table.vt_arr(arr))
     end,
         
+  },
+  arr_value_assoc_arr = {
+    arr_value_assoc_by_merge = function(arr)
+      local res = {}
+      for _, assoc in transf.arr.pos_int_vt_stateless_iter(arr) do
+        for k, v in transf.table.stateless_key_value_iter(assoc) do
+          res[k] = transf.two_arr_or_nils.arr(
+            res[k],
+            v
+          )
+        end
+      end
+      return res
+    end,
   },
   timestamp_ms_key_assoc_value_assoc = {
     local_nonabsolute_path_key_timestamp_ms_key_assoc_value_assoc_by_ymd = function(timestamp_key_table)
@@ -7485,6 +7618,27 @@ transf = {
         return transf.str.leaflike_by_safe_filename(url) .. ".url2"
       end
     end,
+    assoc_by_hydrus_api_response_matching_files = function (url)
+      return rest({
+        api_name = "hydrus",
+        endpoint = "/add_urls/get_url_files",
+        method = "GET",
+        params = {
+          url = url,
+        }
+      })
+    end,
+    url_by_hydrus_normalized_url = function(url)
+      return transf.url.assoc_by_hydrus_api_response_matching_files(url).normalized_url
+    end,
+    assoc_arr_by_hydrus_matching_files = function(url)
+      return transf.url.assoc_by_hydrus_api_response_matching_files(url).url_file_statuses
+    end,
+    hydrus_file_hash_arr_by_hydrus_matching_files = function(url)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf.url.assoc_arr_by_hydrus_matching_files(url), function(url_file_status)
+        return url_file_status.hash
+      end)
+    end,
 
   },
   path_url = {
@@ -7674,6 +7828,12 @@ transf = {
     bool = function(any)
       return not not any
     end,
+    bool_by_starts_underscore = function(any)
+      return is.any.str(any) and transf.str.bool_by_starts_underscore(any)
+    end,
+    bool_by_starts_2underscore = function(any)
+      return is.any.str(any) and transf.str.bool_by_starts_2underscore(any)
+    end,
     n_anys_by_unpack_if_arr = function(any)
       if is.any.table(any) then
         return transf.arr.n_anys(any)
@@ -7741,7 +7901,14 @@ transf = {
     end,
     t_arr = function(any)
       return {any}
-    end
+    end,
+    arr_by_ensure = function(any)
+      if is.any.arr(any) then
+        return any
+      else
+        return {any}
+      end
+    end,
   },
   chooser_item_specifier = {
     chooser_item_specifier_by_truncated_text = function(item_chooser_item_specifier)
@@ -7860,6 +8027,9 @@ transf = {
     hydrus_file_hash = function(spec)
       return spec.hash
     end,
+    url_arr_by_associated_urls = function(spec)
+      return spec.known_urls
+    end,
     two_strs_arr__arr_by_all_current_display_tags = function(spec)
       return transf.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc.two_strs_arr__arr_by_all_current_display_tags(transf.hydrus_metadata_spec.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc(spec))
     end,
@@ -7932,6 +8102,9 @@ transf = {
   hydrus_file_hash = {
     local_hydrus_file_url = function(sha256_hex_str)
       return "http://" .. tblmap.api_name.host.hydrus .. "/get_files/file?hash=" .. sha256_hex_str "&Hydrus-Client-API-Access-Key=" .. transf.api_name.str_or_nil_by_api_key("hydrus")
+    end,
+    url_arr_by_associated_urls = function(sha256_hex_str)
+      return transf.hydrus_metadata_spec.url_arr_by_associated_urls(transf.hydrus_file_hash.hydrus_metadata_spec(sha256_hex_str))
     end,
     hydrus_metadata_spec = function(sha256_hex_str)
       return transf.hydrus_file_hash_arr.hydrus_metadata_spec_arr({sha256_hex_str})[1]
@@ -9245,6 +9418,13 @@ transf = {
       return "Waiting to proceed (" .. #qspec.fn_arr .. " waiting in queue) ... (Press " .. transf.hotkey_created_item_specifier.str_by_shortcut(qspec.hotkey_created_item_specifier) .. " to continue.)"
     end,
       
+  },
+  bool_ret_fn = {
+    bool_ret_fn_by_invert = function(fn)
+      return function(...)
+        return not fn(...)
+      end
+    end,
   },
   n_anys_or_err_ret_fn = {
     n_anys_or_nil_ret_fn_by_pcall = function(fn)

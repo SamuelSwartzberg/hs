@@ -2552,7 +2552,7 @@ is = {
       return t.timestamp_ms
     end,
     hydrus_rel_spec = function(t)
-      return t.implies and t.aliases
+      return t.sib and t.parent
     end,
     plist_single_dk_spec = function(t)
       return t.domain and t.key

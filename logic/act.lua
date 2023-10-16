@@ -2018,6 +2018,25 @@ act = {
       dothis.contact_uuid.add_iban(uuid, get.str.str_by_prompted_once_from_default("", "Enter an IBAN:"))
     end,
   },
+  m3u_file = {
+    add_to_hydrus = function(path)
+      local urls = transf.plaintext_file.noempty_noindent_nohashcomment_line_arr(path)
+      dothis.arr.each(
+        urls,
+        function(url)
+          if is.url.youtube_video_url(url) then
+            dothis.youtube_video_url.add_to_hydrus(
+              url,
+              transf.local_file.line_arr_by_file_tags(path),
+              function()
+                act.file.delete_file(path)
+              end
+            )
+          end
+        end
+      )
+    end,
+  },
   youtube_video_url = {
     add_as_m3u = function(url)
       local deduced_tags = transf.youtube_video_url.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(url)
@@ -2029,30 +2048,8 @@ act = {
       plspec.extension = "m3u"
       dothis.absolute_path.write_file(transf.path_leaf_specifier.absolute_path(plspec), url)
     end,
-    add_to_hydrus = function(url)
-      local video_id = transf.youtube_video_url.youtube_video_id(url)
-      local cache_path = transf.str.in_cache_local_absolute_path(video_id, "ytdl")
-      dothis.youtube_video_url.download_to_max_info(
-        url,
-        cache_path,
-        function()
-          dothis.local_hydrusable_file.add_to_hydrus_by_path(
-            cache_path,
-            {},
-            function(hash)
-              act.file.delete_file(cache_path)
-              dothis.hydrus_file_hash.add_url(
-                hash,
-                url
-              )
-              dothis.hydrus_file_hash.add_notes(
-                hash,
-                {{"proximate_source_description", transf.youtube_video_id.str_by_description(url)}}
-              )
-            end
-          )
-        end
-      )
+    add_to_hydrus = function(url, do_after)
+      dothis.youtube_video_url.add_to_hydrus(url, {}, do_after)
     end,
   },
   source_id = {

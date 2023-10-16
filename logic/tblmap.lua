@@ -246,6 +246,14 @@ tblmap = {
       }
     }
   },
+  rel_pkey = {
+    hydrus_rel = {
+      _p = "parent",
+      _rp = "parent",
+      _s = "sib",
+      _rs = "sib",
+    }
+  },
   api_name = {
     host = {
       dropbox = "api.dropboxapi.com/2",
@@ -588,13 +596,15 @@ tblmap = {
     }
   },
   lower_strict_snake_case = {
-    all_namespace = {
-      tcrea = "creation_ware",
-      series = "series",
-      srs = "series",
-      char = "character",
-      character = "character",
-      title = "title",
+    line_by_namespace_and_potentially_subnamespace = {
+      srsrelindex = "season_subindex",
+      srsrel = "episode_role",
+      tcrea = "creation_ware:creation_agent",
+      series = "thing:ip",
+      srs = "thing:ip",
+      char = "agentlike:char",
+      character = "agentlike:char",
+      title = "official_title",
       date = "date",
       ch = "chapter_index",
       chapter_index = "chapter_index",
@@ -688,6 +698,45 @@ tblmap = {
       }
     }
   },
+    
+  keychange_fstring = {
+    two_strs__arr_by_insertion =  {
+      ["implied %s"] = {"end", "/inferential evidentiality"},
+      ["auto%s"] = {"end", "/reflexive voice"},
+      ["self%s"] = {"end", "/reflexive voice"},
+      ["after %s"] = {"end", "/retrospective aspect"},
+      ["stealth %s"] = {"end", "/hidden"},
+      ["mutual %s"] = {"end", "/reciprocal voice"},
+      ["public %s"] = {"end", "/public"},
+      ["clothed %s"] = {"end", "/clothed"},
+      ["%s through clothes"] = {"end", "/through clothes"},
+      ["cooperative %s"] = {"i1p", "[dual]"},
+      ["double %s"] = {"i2p", "[dual]"},
+      ["%s hip"] = {"i2i", "thing:bodypartlike:hip"},
+      ["%s hips"] = {"i2i", "[dual] thing:bodypartlike:hip"},
+    },
+  },
+  keychange_fstring_name = {
+    keychange_fstring_arr = {
+      handable = {
+        "%s hip",
+        "%s hips"
+      },
+      sex_act = {
+        "implied %s",
+        "auto%s",
+        "self%s",
+        "after %s",
+        "stealth %s",
+        "mutual %s",
+        "public %s",
+        "clothed %s",
+        "%s through clothes",
+        "cooperative %s",
+        "double %s"
+      }
+    }
+},
   markdown_extension_set_name = {
     markdown_extension_name_arr = {
       basic = {

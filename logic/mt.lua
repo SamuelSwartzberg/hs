@@ -82,7 +82,8 @@ r = {
 
 consts = {
   unique_record_separator  = "__ENDOFRECORD5579__",
-  unique_field_separator = "Y:z:Y"
+  unique_field_separator = "Y:z:Y",
+  int_by_large = 2^51, -- a bit smaller than the maximum 2^53 to allow for some wiggle room
 }
 
 ls = {
@@ -167,6 +168,8 @@ ls = {
     "episode_subindex", -- numerical index of an object within an episode, e.g. 5. In principle, episode_timestamp would be better, but this is exists where that information isn't easily available or has been lost.
     "episode_timestamp", -- timestamp of an object within an episode, e.g. 00:03:12.
     "season_index", -- numerical index of a season, e.g. 3
+    "season_subindex", -- numerical index of an object within a season, especially for openings and endings
+    "episode_role", -- role of an object within an episode, e.g. opening, ending, insert song, etc.
 
     -- creation tag namespaces - who, when, where, and how was this object created?
     
@@ -297,46 +300,9 @@ ls = {
       "very reflection",
       "incredibly reflection",
   },
-
-  things = {
-   
-  },
-  -- interaction = {
-  --   "repetition",
-  --     "patterning",
-  --       "referential patterning",
-  --         "self-referential patterning",
-  --         "axis-referential patterning",
-  --           "1-axis referential patterning",
-  --           "2-axis referential patterning",
-  --           "many-axis referential patterning"
-
-  -- },
-
-  interaction = {
-    "grammatical case",
-      "thematic case",
-        "nuclear case",
-          "agentive",
-          "patientive",
-          "themetive",
-        "non-nuclear case",
-          
-      "spatial",
-        "essive",
-          "interessive",
-    "visual",
-  },
-  
   composition = {
     "visual composition",
       "2d composition",
-        "visual layer related composition",
-          "visual layer composition",
-            "foreground composition",
-            "midground composition",
-            "background composition",
-          "visual layering composition",
         "perspective composition",
           "camera subject distance composition",
             "extreme closeup shot",
@@ -590,15 +556,7 @@ ls = {
                         "hand + body part",
                           "hand + general body part",
                             "hand + hip",
-                              "hand tangent hip", -- aliases general:hand on feet
-                                "hand tangent hip (reflexive voice)", 
-                                  "1 hand tangent hip (reflexive voice)", -- aliases general:hand on own hip
-                                  "2 hands tangent hip (reflexive voice)", -- aliases general:hands on own hip
-                                "hand tangent hip (other)",
-                                  "1 hand tangent hip (other)", -- aliases general:hand on another's hip
-                                  "2 hands tangent hip (other)", -- aliases general:hands on another's hip
                               "hand grabbing or pulling hip", -- aliases general:hip grab; general:hip pull; general:grabbing hip; general:pulling hip
-                                "hand grabbing or pulling hip (reflexive voice)", -- aliases general:grabbing own hip, general:pulling own hip
                                 "hand grabbing or pulling hip (other)", -- aliases genereral:grabbing another's hip, general:pulling another's hip
                               "hand circumtangent hip", -- aliases general:hand around hip
                               "hand holding hip",
@@ -644,44 +602,9 @@ ls = {
                       "arm + agentlike", 
                         "arm circumtangent agentlike", 
                           "arm hugging agentlike", -- aliases general:hug
-                "tongue + x",
-                  "tongue + thing",
-                    "tongue + object", -- aliases general:licking
-                      "tongue + body part", -- aliases general:
-                        "tongue + general body part", -- aliases general:
-                          "tongue + genital", -- aliases general:
-                            "tongue + primary genital", -- aliases general:oral
-                              "tongue + penis", -- aliases general:
-                                "tongue + fake penis", -- aliases general:licking dildo
-                                "tongue + penis (inferential evidentiality)", -- aliases general:implied fellatio
-                                "tongue + penis (retrospective aspect)", -- aliases general:after fellatio
-                                "tongue + penis (reflexive voice)", -- aliases general:autofellatio
-                                "tongue + penis (deep)", -- aliases general:deepthroat
-                                "2 tongues + penis", -- aliases general:cooperative fellatio
-                                "tongue + 2 penises", -- aliases general:double fellatio
-
-                              "tongue + genital holelike", -- aliases general:
-                                "tongue + vulva", -- aliases general:cunnilingus
-                                  "tongue + vulva (reflexive voice)", -- aliases general:autoconnilingus
-                                  "tongue + vulva (inferential evidentiality)", -- aliases general:implied cunnilingus
-  },
-  allusion = {
-    "certain allusion repetitiveness",
-      "cliched allusion", -- aliases general:meme
-      "certain allusion", -- aliases general:reference
-    "certain allusion distance",
-      "direct allusion", -- aliases general:source quote
-      "direct allusion variation",
-      "indirect allusion",
-    "certain allusion stance",
-      "humorous allusion", -- aliases general:parody
-      "critical allusion",
   },
   creator = {
     
-  },
-  character = {
-    "purple haired mpdg pornpen", -- cnm purple haired mpdg (pornpen)
   },
   general = {
     "mixed media", -- [substance] cnm traditional-seeming graphic art surface covering ++ digital-seeming graphic art surface covering
