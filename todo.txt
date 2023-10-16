@@ -8,6 +8,11 @@ refac:
   - replace package methods with my own
   - fix logging dirs, etc, to now use json
   - update tblmap with a few changes from other files
+  - hydrus
+    - now that some namespaces don't exist, we need a cleverer way to tell gpt4 what to extract from the filename in case of existing files, and also apply this to youtube import
+    - split notes from others
+    - m3u files need to keep their date
+    - get url from hash
   - memoization: instead of reading the things in fscache from disk every time, why don't we write it to disk once while memoizing and then read the entire cache from disk on startup?
 post 'lua is working':  
   - add/rename missing m3us

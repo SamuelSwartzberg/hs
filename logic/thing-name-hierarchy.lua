@@ -368,10 +368,12 @@ thing_name_hierarchy = {
                         danbooru_stule_post_url = "leaf",
                         yandere_style_post_url = "leaf",
                         pornpen_style_post_url = "leaf",
+                        hydrus_style_file_endpoint_url = "leaf",
                       },
                       authority_url = {
                         host_url = {
                           pornpen_url = "leaf",
+                          hydrus_url = "leaf",
                           booru_url = {
                             danbooru_url = "leaf",
                             yandere_url = "leaf",
@@ -393,6 +395,8 @@ thing_name_hierarchy = {
                       },
                       query_url = {
                         gelbooru_style_post_url = "leaf",
+                        hydrus_style_single_hash_url = "leaf",
+                        hydrus_style_multi_hash_url = "leaf",
                       },
                       fragment_url = "leaf",
                       username_url = "leaf",
@@ -404,7 +408,10 @@ thing_name_hierarchy = {
                         github_path_url = {
                           github_user_url = "leaf"
                         }
-                      }
+                      },
+                      hydrus_style_file_url = {
+                        local_hydrus_file_url = "leaf",
+                      },
                     },
                     urllike_with_no_scheme = "leaf",
                     query_k_o_v = "leaf",
@@ -875,6 +882,7 @@ thing_name_hierarchy = {
         },
         even_int = "leaf",
         pos_int = {
+          hydrus_file_id = "leaf",
           eightbyte_pos_int = {
             fourbyte_pos_int = {
               twobyte_pos_int = {

@@ -1773,7 +1773,15 @@ is = {
     wayback_machine_url = function(url)
       return get.str.bool_by_startswith(url, "https://web.archive.org/web/")
     end,
+    hydrus_style_file_url = function(url)
+      return is.url.hydrus_style_file_endpoint_url(url) and is.url.hydrus_style_single_hash_url(url)
+    end,
 
+  },
+  hydrus_style_file_url = {
+    local_hydrus_file_url = function(url)
+      return is.url.hydrus_url(url)
+    end,
   },
   github_url = {
     github_path_url = function(url)
@@ -1853,13 +1861,25 @@ is = {
       return is.str.doi(
         transf.url.local_absolute_path_or_nil_by_path_decoded(url)
       )
-    end
+    end,
+    hydrus_style_file_endpoint_url = function(url)
+      return 
+        transf.path.path_by_ending_with_slash(transf.path_url.path(url)) == "/get_files/file/"
+    end,
   },
   query_url = {
     gelbooru_style_post_url = function(url)
       local paramtbl = transf.url.str_key_str_value_assoc_by_decoded_param_table(url)
       return is.any.int_str(paramtbl["id"]) and paramtbl["page"] == "post"
-    end
+    end,
+    hydrus_style_single_hash_url = function(url)
+      local paramtbl = transf.url.str_key_str_value_assoc_by_decoded_param_table(url)
+      return paramtbl.hash
+    end,
+    hydrus_style_multiple_hash_url = function(url)
+      local paramtbl = transf.url.str_key_str_value_assoc_by_decoded_param_table(url)
+      return paramtbl.hashes
+    end,
   },
   extension_url = {
     image_url = function(url)
@@ -1897,6 +1917,9 @@ is = {
     end,
     pornpen_url = function(url)
       return transf.host_url.host(url) == "pornpen.ai"
+    end,
+    hydrus_url = function(url)
+      return transf.host_url.host(url) == "127.0.0.1:45869"
     end,
   },
   booru_url = {
@@ -2017,6 +2040,9 @@ is = {
     end,
   },
   pos_int = {
+    hydrus_file_id = function(num)
+      return true
+    end,
     eightbyte_pos_int = function(num)
       return num < 2^64
     end,

@@ -77,7 +77,7 @@ dothis = {
     end,
   },
   hydrus_file_hash = {
-    add_tags_to_hydrus_item = function(str, str_arr, do_after)
+    add_tags = function(str, str_arr, do_after)
       rest({
         api_name = "hydrus",
         endpoint = "add_tags/add_tags",
@@ -89,6 +89,46 @@ dothis = {
         },
         request_verb = "POST",
       }, do_after)
+    end,
+    add_url = function(str, url, do_after)
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_urls/associate_url",
+        request_table = { 
+          hash = str,
+          url_to_add = url
+        },
+        request_verb = "POST",
+      }, do_after)
+    end,
+    add_urls = function(str, url_arr, do_after)
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_urls/associate_urls",
+        request_table = { 
+          hash = str,
+          urls_to_add = url_arr
+        },
+        request_verb = "POST",
+      }, do_after)
+    end,
+    add_notes = function(str, str_arr, do_after)
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_notes/set_notes",
+        request_table = { 
+          hash = str,
+          notes = transf.two_anys__arr_arr.assoc(str_arr)
+        },
+        request_verb = "POST",
+      }, do_after)
+    end,
+    add_tags_and_notes = function(str, str_arr, do_after)
+      local notes, tags = transf.two_strs__arr_arr.two_two_strs__arr_arrs_by_sep_note_and_tag(str_arr)
+      dothis.hydrus_file_hash.add_notes(str, notes, function()
+        dothis.hydrus_file_hash.add_tags(str, tags, do_after)
+      end)
+
     end,
     save_into_async_by_hydrus_item = function(str, path)
       dothis.url.download_into_async(
@@ -104,7 +144,17 @@ dothis = {
     end,
   },
   hydrus_file_hash_arr = {
-    wri
+    create_stream = function(arr, flag_profile_name)
+      dothis.created_item_specifier_arr.create(
+        stream_arr,
+        get.hydrus_file_hash_arr.stream_creation_specifier(arr, flag_profile_name)
+      )
+    end,
+    write_stream_metadata_to_cache_and_create_stream = function(arr, flag_profile_name)
+      act.hydrus_file_hash_arr.write_stream_metadata_to_cache(arr)
+      dothis.hydrus_file_hash_arr.create_stream(arr, flag_profile_name)
+    end,
+
   },
   pass_item_name = {
     replace = function(name, type, data)
@@ -151,6 +201,15 @@ dothis = {
   },
   youtube_video_id = {
     
+  },
+  youtube_video_url = {
+    --- max info ≙ try to get the best quality of everything, and try to embed as much metadata as possible.
+    download_to_max_info = function(url, target, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "yt-dlp --embed-subs --embed-thumbnail --embed-chapters --embed-metadata --embed-info-json --format bestvideo+bestaudio/best" .. transf.str.str_by_single_quoted_escaped(url) .. " -o" .. transf.str.str_by_single_quoted_escaped(target),
+        do_after
+      )
+    end,
   },
   url = {
     download_to_async = function(url, target)
@@ -723,7 +782,10 @@ dothis = {
       )
     end,
     create_stream = function(path, flag_profile_name)
-
+      dothis.created_item_specifier_arr.create(
+        stream_arr,
+        get.extant_path.stream_creation_specifier_by_descendant_m3u_file_content_lines(path, flag_profile_name)
+      )
     end,
   },
   extant_path_arr = {
@@ -789,7 +851,7 @@ dothis = {
       act.local_hydrusable_file.add_to_hydrus_by_path(
         path,
         function(hash)
-          dothis.hydrus_file_hash.add_tags_to_hydrus_item(hash, str_arr, function()
+          dothis.hydrus_file_hash.add_tags_and_notes(hash, str_arr, function()
             do_after(hash)
           end)
         end
@@ -822,7 +884,7 @@ dothis = {
           transf.local_file.line_arr_by_file_tags(path),
           function(sha)
             if use_ai_tags then
-              act.sha256_hex_str.add_tags_to_hydrus_item_by_ai_tags(
+              act.hydrus_file_hash.add_tags_to_hydrus_item_by_ai_tags(
                 sha,
                 function()
                   if do_after then do_after(sha) end

@@ -151,35 +151,9 @@ local keymap = {
     explanation = "Choose an action on the current timestamp.",
     fn = act["nil"].choose_action_on_current_timestamp_s
   },
-  y = {
-    explanation = "Choose action on tag name and value in MAUDIOVISUAL (mostly for interacting with streams)",
-    fn = function() 
-      st(env.MAUDIOVISUAL)
-        :get("descendant-str-item-arr")
-        :doThis("choose-tag-name-value-and-thenx-action")
-    end,
-  },
-  u = {
-    explanation = "Choose item and action on it in MAUDIOVISUAL (mostly for interacting with streams)",
-    fn = function() 
-      get.fn.rt_or_nil_by_memoized(function()
-        return st()
-          :get("descendant-str-item-arr")
-          :get("map-to-table-of-path-and-path-content-items")
-      end)():doThis("choose-item-and-then-action")
-    end,
-  },
-  i = {
-    explanation = "Choose a favorite stream",
-    fn = function() 
-      ar(transf.plaintext_file.str_arr_by_lines("/Users/sam/me/state/init_playlists"))
-        :doThis("choose-item", function(item)
-          System:get("manager", "stream"):doThis("create-background-stream", item)
-        end)
-
-          
-    end,
-  },
+  y = nil, -- unassigned
+  u = nil, -- unassigned
+  i = nil, -- unassigned
   o = {
     explanation = "Choose a otp and paste it",
     fn = act["nil"].choose_otp_pass_item_name_and_paste
@@ -191,12 +165,8 @@ local keymap = {
   ["["] = nil, -- unassigned
   ["]"] = nil, -- unassigned
   a = {
-    explanation = "Choose a file in MAUDIOVISUAL and an action on it.",
-    fn = function()
-      st(env.MAUDIOVISUAL)
-        :get("child-str-item-arr")
-        :doThis("choose-dir-until-file-then-choose-action")
-    end,
+    explanation = "Choose a default search, and create a stream based on it.",
+    fn = act["nil"].choose_default_search_and_create_stream
   },
   s = {
     explanation = "Choose a project and choose an action on it.",
@@ -262,10 +232,7 @@ local keymap = {
   },
   m = {
     explanation = "Choose a stream and then an action on it. (Stream management)",
-    fn = function()
-      System:get("manager", "stream")
-        :doThis("choose-item-and-then-action")
-    end,
+    fn = act["nil"].choose_stream_and_then_action
   },
   [","] = nil, -- unassigned
   ["."] = nil, -- unassigned

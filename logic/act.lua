@@ -86,7 +86,7 @@ act = {
       )
     end,
   },
-  sha256_hex_str_arr = {
+  hydrus_file_hash_arr = {
     add_tags_to_hydrus_item = function(arr, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "hydrus_add_tags" .. transf.str.here_doc(
@@ -95,10 +95,44 @@ act = {
         do_after
       )
     end,
+    write_stream_metadata_to_cache = function(arr)
+      dothis.arr.each(
+        arr,
+        act.hydrus_file_hash.write_stream_metadata_to_cache
+      )
+    end,
+    create_stream_foreground = function(arr)
+      dothis.hydrus_file_hash_arr.create_stream(arr, "foreground")
+    end,
+    create_stream_background = function(arr)
+      dothis.hydrus_file_hash_arr.create_stream(arr, "background")
+    end,
   },
-  sha256_hex_str = {
+  hydrus_file_hash = {
     add_tags_to_hydrus_item_by_ai_tags = function(str, do_after)
-      act.sha256_hex_str_arr.add_tags_to_hydrus_item({str}, do_after)
+      act.hydrus_file_hash_arr.add_tags_to_hydrus_item({str}, do_after)
+    end,
+    write_stream_metadata_to_cache = function(hash)
+      local path = transf.str.in_cache_local_absolute_path(
+        transf.str.base64_url_str_by_utf8(
+          transf.hydrus_file_hash.local_hydrus_file_url(
+            hash
+          )
+        ),
+        "hydrus_metadata"
+      ) .. ".json"
+      if is.absolute_path.extant_path(path) then
+        return
+      end
+      dothis.absolute_path.write_file(
+        path,
+        transf.not_userdata_or_fn.json_str_by_pretty(
+          transf.hydrus_file_hash.assoc_by_stream_metadata(
+            hash
+          )
+        )
+      )
+
     end,
   },
   hs_geometry_size_like = {
@@ -1254,13 +1288,13 @@ act = {
     create_stream_foreground = function(path)
       dothis.created_item_specifier_arr.create(
         stream_arr,
-        get.local_extant_path.stream_creation_specifier(path, "foreground")
+        get.extant_path.stream_creation_specifier_by_descendant_m3u_file_content_lines(path, "foreground")
       )
     end,
     create_stream_background = function(path)
       dothis.created_item_specifier_arr.create(
         stream_arr,
-        get.local_extant_path.stream_creation_specifier(path, "background")
+        get.extant_path.stream_creation_specifier_by_descendant_m3u_file_content_lines(path, "background")
       )
     end,
     choose_item_and_action_by_descendants = function(path)
@@ -1523,6 +1557,15 @@ act = {
     show_2_by_4_grid = function()
       act.hs_geometry_size_like.show_grid({w=2, h=4})
     end,
+    choose_default_search_and_create_background_stream = function()
+      dothis.arr.choose_item(
+        transf.json_file.not_userdata_or_fn(env.MSPEC .. "/lists/video_searches.json"),
+        function(arr)
+          local hashes = transf.arr.hydrus_file_hash_arr_by_search_motion_only(arr)
+          act.hydrus_file_hash_arr.create_stream_background(hashes)
+        end
+      )
+    end,
     pop_main_qspec = function()
       act.fn_queue_specifier.pop(
         main_qspec
@@ -1584,6 +1627,11 @@ act = {
       else
         act.str.alert("No running streams.")
       end
+    end,
+    choose_stream_and_then_action = function()
+      act.arr.choose_item_and_action(
+        stream_arr
+      )
     end,
     choose_action_on_first_item_in_pasteboard_arr = function()
       act.any.choose_action(
@@ -1980,6 +2028,31 @@ act = {
       plspec.path = transf.str.str_by_prompted_once_from_default(plspec.path)
       plspec.extension = "m3u"
       dothis.absolute_path.write_file(transf.path_leaf_specifier.absolute_path(plspec), url)
+    end,
+    add_to_hydrus = function(url)
+      local video_id = transf.youtube_video_url.youtube_video_id(url)
+      local cache_path = transf.str.in_cache_local_absolute_path(video_id, "ytdl")
+      dothis.youtube_video_url.download_to_max_info(
+        url,
+        cache_path,
+        function()
+          dothis.local_hydrusable_file.add_to_hydrus_by_path(
+            cache_path,
+            {},
+            function(hash)
+              act.file.delete_file(cache_path)
+              dothis.hydrus_file_hash.add_url(
+                hash,
+                url
+              )
+              dothis.hydrus_file_hash.add_notes(
+                hash,
+                {{"proximate_source_description", transf.youtube_video_id.str_by_description(url)}}
+              )
+            end
+          )
+        end
+      )
     end,
   },
   source_id = {

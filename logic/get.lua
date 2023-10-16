@@ -81,7 +81,22 @@ get = {
     end,
   },
   hydrus_file_hash = {
+    str_arr_by_tag_namespace = function(hash, namespace)
+      return get.hydrus_metadata_spec.str_arr_by_tag_namespace(
+        transf.hydrus_file_hash.hydrus_metadata_spec(hash),
+        namespace
+      )
+    end,
+    
 
+  },
+  hydrus_file_hash_arr = {
+    stream_creation_specifier = function(arr, flag_profile_name)
+      return get.url_arr.stream_creation_specifier(
+        transf.hydrus_file_hash_arr.local_hydrus_file_url_arr(arr),
+        flag_profile_name
+      )
+    end
   },
   hydrus_metadata_spec = {
     two_strs_arr__arr_by_tag_namespace = function(spec, namespace)
@@ -98,6 +113,14 @@ get = {
           return two_strs_arr[2]
         end
       )
+    end,
+    str_or_nil_by_tag_namespace = function(spec, namespace)
+      local arr = get.hydrus_metadata_spec.str_arr_by_tag_namespace(spec, namespace)
+      if #arr > 0 then
+        return transf.str_or_number_arr.str_by_joined_comma(arr)
+      else
+        return nil
+      end
     end,
   },
   ["nil"] = {
@@ -2502,6 +2525,22 @@ get = {
         arr_arr,
         function(arr)
           return arr[1] == any
+        end
+      )
+    end,
+    two_arr_arrs_by_filtered_nonfiltered_first_element = function(arr_arr, fn)
+      return get.arr.two_arrs_by_filtered_nonfiltered(
+        arr_arr,
+        function(arr)
+          return fn(arr[1])
+        end
+      )
+    end,
+    two_arr_arrs_by_filtered_nonfiltered_first_element_w_arr = function(arr_arr, testarr)
+      return get.arr.two_arrs_by_filtered_nonfiltered(
+        arr_arr,
+        function(arr)
+          return get.arr.bool_by_contains(testarr, arr[1])
         end
       )
     end,

@@ -612,6 +612,37 @@ transf = {
         transf.any.thing_name_arr_by_applicable(arr)
       ) or 1 
     end,
+    hydrus_file_hash_arr_by_search = function(arr)
+      return rest({
+        api_name = "hydrus",
+        endpoint = "get_files/search_files",
+        params = {
+          tags = transf.not_userdata_or_fn.json_str(
+            arr
+          ),
+          return_hashes = true,
+        }
+      }).hashes
+    end,
+    hydrus_file_hash_arr_by_search_motion_only = function(arr)
+      return transf.arr.hydrus_file_hash_arr_by_search(
+        transf.any_and_arr.arr(
+          "system:filetype is animation, video",
+          arr
+        )
+      )
+    end,
+    hydrus_file_id_arr_by_search = function(arr)
+      return rest({
+        api_name = "hydrus",
+        endpoint = "get_files/search_files",
+        params = {
+          tags = transf.not_userdata_or_fn.json_str(
+            arr
+          ),
+        }
+      }).file_ids
+    end,
   },
   hole_y_arrlike = {
     arr = function(tbl)
@@ -4473,6 +4504,11 @@ transf = {
     pos_int_by_initial_indent_4 = function(str)
       return get.str.pos_int_by_indent(str, 4)
     end,
+    hydrus_file_hash_arr_by_search = function(str)
+      local parts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(str, "&&")
+      return transf.arr.hydrus_file_hash_arr_by_search(parts)
+    end,
+
   },
   line = {
     noindent_line_by_extract = function(str)
@@ -5851,6 +5887,12 @@ transf = {
         })
       end
       return res
+    end,
+    two_two_strs__arr_arrs_by_sep_note_and_tag = function(arr)
+      return get.arr_arr.two_arr_arrs_by_filtered_nonfiltered_first_element_w_arr(
+        arr,
+        ls.note_key
+      )
     end,
     two_strs__arr_arr_by_get_hydrus_modifier_implies = function(arr)
       local res = {}
@@ -7821,6 +7863,17 @@ transf = {
     two_strs_arr__arr_by_all_current_display_tags = function(spec)
       return transf.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc.two_strs_arr__arr_by_all_current_display_tags(transf.hydrus_metadata_spec.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc(spec))
     end,
+    str_arr_by_all_current_display_tags = function(spec)
+      return transf.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc.str_arr_by_all_current_display_tags(transf.hydrus_metadata_spec.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc(spec))
+    end,
+    assoc_by_stream_metadata = function(spec)
+      return {
+        official_title = get.hydrus_metadata_spec.str_or_nil_by_tag_namespace(spec, "official_title"),
+        proximate_source_title = get.hydrus_metadata_spec.str_or_nil_by_tag_namespace(spec, "proximate_source_title"),
+        tags = get.hydrus_metadata_spec.str_arr_by_all_current_display_tags(spec),
+        hash = get.hydrus_metadata_spec.hydrus_file_hash(spec),
+      }
+    end,
   },
   hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc = {
     hydrus_internal_tag_spec_arr = function(assoc)
@@ -7828,13 +7881,22 @@ transf = {
     end,
     two_strs_arr__arr_by_all_current_display_tags = function(assoc)
       return transf.hydrus_internal_tag_spec_arr.two_strs_arr__arr_by_all_current_display_tags(transf.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc.hydrus_internal_tag_spec_arr(assoc))
-    end
+    end,
+    str_arr_by_all_current_display_tags = function(assoc)
+      return transf.hydrus_internal_tag_spec_arr.str_arr_by_all_current_display_tags(transf.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc.hydrus_internal_tag_spec_arr(assoc))
+    end,
   },
   hydrus_internal_tag_spec_arr = {
     two_strs_arr__arr_by_all_current_display_tags = function(spec_arr)
       return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(
         spec_arr,
         transf.hydrus_internal_tag_spec.two_strs_arr__arr_by_current_display_tags
+      )
+    end,
+    str_arr_by_all_current_display_tags = function(spec_arr)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(
+        spec_arr,
+        transf.hydrus_internal_tag_spec.str_arr_by_current_display_tags
       )
     end,
   },
@@ -7861,8 +7923,14 @@ transf = {
     end,
 
   },
+  hydrus_style_file_url = {
+    hydrus_file_hash = function(url)
+      local params = transf.url.str_key_str_value_assoc_by_decoded_param_table(url)
+      return params.hash
+    end,
+  },
   hydrus_file_hash = {
-    http_url_by_hydrus_file_url = function(sha256_hex_str)
+    local_hydrus_file_url = function(sha256_hex_str)
       return "http://" .. tblmap.api_name.host.hydrus .. "/get_files/file?hash=" .. sha256_hex_str "&Hydrus-Client-API-Access-Key=" .. transf.api_name.str_or_nil_by_api_key("hydrus")
     end,
     hydrus_metadata_spec = function(sha256_hex_str)
@@ -7871,8 +7939,14 @@ transf = {
     hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc = function(sha256_hex_str)
       return transf.hydrus_metadata_spec.hydrus_service_key_key_hydrus_internal_tag_spec_value_assoc(transf.hydrus_file_hash.hydrus_metadata_spec(sha256_hex_str))
     end,
+    assoc_by_stream_metadata = function(sha256_hex_str)
+      return transf.hydrus_metadata_spec.assoc_by_stream_metadata(transf.hydrus_file_hash.hydrus_metadata_spec(sha256_hex_str))
+    end,
   },
   hydrus_file_hash_arr = {
+    local_hydrus_file_url_arr = function(sha256_hex_str_arr)
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(sha256_hex_str_arr, transf.hydrus_file_hash.local_hydrus_file_url)
+    end,
     assoc_by_hydrus_metadata_response = function(sha256_hex_str_arr)
       return rest({
         api_name = "hydrus",
@@ -8505,7 +8579,7 @@ transf = {
     url_or_local_path_by_current = function(stream_created_item_specifier)
       return transf.mpv_ipc_socket_id.url_or_local_path_by_current(stream_created_item_specifier.mpv_ipc_socket_id)
     end,
-    url_or_local_paths_by_creation = function(stream_created_item_specifier)
+    url_or_local_path_arr_by_creation = function(stream_created_item_specifier)
       return stream_created_item_specifier.creation_specifier.urls
     end,
     bool_by_is_running = function(stream_created_item_specifier)
