@@ -97,27 +97,6 @@ ls = {
     "danbooru.donmai.us",
     "yande.re",
   },
-  proximate_sources = {
-    "booru",
-      "danbooru",
-      "gelbooru",
-      "xbooru",
-      "aibooru",
-    "pornpendotai", -- cnm pornpen.ai
-    "trynectardotai", -- cnm trynectar.ai
-    "discord",
-    "reddit",
-    "aliexpress"
-  },
-  proximate_source_page_type = {
-    "post",
-    "thread",
-    "product page",
-  },
-  proximate_source_subdivision = {
-    "midjourney"
-  },
-
   tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"},
   project_type = {
     "latex",
@@ -173,25 +152,12 @@ ls = {
 
     -- creation tag namespaces - who, when, where, and how was this object created?
     
-    "creation_ware", -- anything that was used to create the object, be that meatspace or cyberspace, tools or people, organizations or brands. E.g. "studio trigger", "kana hanazawa", "makoto shinkai", "adobe illustrator", "mirrorless camera"
+    "creation_ware", -- A thing namespace item that was used to create the object. This could be a creator, an object used in its creation, a location, or the like.
     "official_title", -- the official title of a work, if applicable. E.g. "The Lord of the Rings: The Fellowship of the Ring", "One Hundred Years of Solitude", etc. Bear in mind that this isn't the title of the series, but of the specific work. 
     "semver", -- semantic version of a work, e.g. 1.0.0
-    "creation_use", -- what the object was created for. Don't use this when the message tags could apply, and also consider if general tags might not be sufficient. So, if this is a photo of an antique contract, creation_use:contract *could* be used, but why not just use format:contract and maybe general:yellowed paper?
-    "creation_stage", -- what stage of the creation process the object is in. E.g. brainstorming, conceptualization, mockup, final_product, etc. Don't forget to add any relevant general tags. So if you have a mockup that which uses a smartphone mockup, add general:smartphone_mockup.
-    "completeness", -- how complete the creator considers the object to be. E.g. complete, incomplete, abandoned, creation_stage_of_other_object
-
-    -- creation tags > creation settings tag namespaces - what settings were used to create the object?
-
-    -- in the future, I may add more tags for specific settings, e.g. "brush size", "f-stop", etc.
-
-    -- creation tags > location tag namespaces - where was the object created?
-    -- if the location is also visually identifiable in the object, don't forget to add the corresponding general:<location name> (<location type>) tag, e.g. general:berlin (city)
     "lat", -- latitude of the object as a decimal number, if applicable. E.g. 48.137154.
     "lon", -- longitude of the object as a decimal number, if applicable. E.g. 11.576124
-    "country",
-    "city",
-    "venue", -- a specific name of a location, e.g. My mom's house, 2016 italy rental, etc.
-    "tourism", -- works like the OSM tourism field
+    
 
     -- thing tag namespaces - what can be percieved in the fobjectlike, or inferred only from the fobjectlike and a reasonable knowledge of the world? What importance does it have to the fobjectlike?
     
@@ -210,8 +176,7 @@ ls = {
 
     -- sharing tag namespaces - many objects I encounter were shared in some way, such that I was able to encounter them. These tags are for that.
 
-    "proximate_source", -- the location where I encountered an object, or where it was shared. E.g. reddit, danbooru, etc. Many downloaders automatically populate this tag, but setting it manually is not strictly necessary.
-    "proximate_source_page_type", -- the type of the page where I encountered the object. E.g. post, thread, product page, etc.
+    "proximate_source", -- A thing namespace item which describes something about how I encountered the object, where this
     "proximate_source_subdivision", -- the subdivision of the proximate_source where I encountered the object. E.g. the subreddit, the board, etc.
     "proximate_source_title", -- the title of the proximate_source. E.g. the reddit post title
     "proximate_source_use", -- what was the object used for on the proximate_source? For many proximate sources there isn't an interesting one, but for example for amazon, this could be product_picture
@@ -220,66 +185,17 @@ ls = {
     -- acquisition tag namespaces - how did I acquire the object? This is not the same as sharing, as I may have acquired the object in a way that doesn't involve sharing, e.g. by creating it myself.
 
     "date", -- date of acquisition in (partial) RFC3339 format
-    "occasion", -- the occasion the object was acquired in/for. This may be specific e.g. 2025 trip to canada, or more general, e.g. christmas. 
     "acquisition_context", -- the context of my life this object was created or encountered in. Can be general, e.g. edu, work, leisure, etc., or more specific, e.g. freelance translation. The more specific ones should be tag children of the more general ones. The difference between this and occasion is that an occasion is a temporally bounded event, while an acquisition_context is an area of my life that may or may not be temporally bounded. In a sense, these are orthogonal to each other. If I have a christmas party at my workplace, I would tag the occasion as christmas (or perhaps 2015 christmas party, with corresponding parents), and the acquisition_context as work (or perhaps 2012-2017 graphic design job). So if I was wondering what I did at christmas, I could just search occasion:christmas, even though I spent the 2015 christmas at work, and perhaps another at home.
-    "acquisition_institution", -- the institution that I created the object at/for or encountered it in.. E.g. university of melbourne, etc. 
-    "period", -- Some processes or organizations categorize things into periods, even where the `date` field may lie outside of those periods. Financial years & quarters, academic years, semesters, trimesters, etc. This tag is for those. If it's not a recognized period, consider using `occasion` or another tag instead. Specific examples: "winter semester 2020", "2018 school year". Inheritance is set up thus that e.g. winter semester 2020 -> winter semester & 2020 semester -> semester, 2018 school year -> school year
+    "acquisition", -- A thing namespace item which describes something about how, when, where, in what context etc. I acquired the object.
 
     -- use tag namespaces - why did I keep the object? What do I use it for?
 
-    "use", -- Without complex semantics, what might I want to use the iamge for? e.g. reaction_face, inspiration, etc. 
+    "use", -- Without complex semantics, what might I want to use the object for? e.g. reaction_face, inspiration, etc. 
+    "under_management", -- If this namespace contains a value, this means that we're managing the object for another person or organization, which is what this namespace will contain.
 
     -- general meta tag namespaces - tags with a more general purpose, that don't fit into any of the above categories.
 
     "collection", -- a wide field that allows grouping objects in a way where I don't want to create a specific tag namespace, potentially only temporarily. Prefer more specific namespaces where possible.
-    "meta", -- things that you know about the object, but aren't directly visible, and aren't included in other fields. I rarely use this, but parsers I use sometimes do.
-    "title", -- the title of a work. This is fed from various sources and may be quite polluted. I don't use this much, but it's there.
-  },
-  acquisition_context = {
-    "edu",
-    "kindergarden",
-    "school",
-    "primary",
-    "secondary",
-    "uni",
-    "philosophy bachelors",
-    "official",
-    "contract",
-    "insurance",
-    "health insurance",
-    "barmer health insurance",
-    "housing",
-    "rental housing",
-    "2023 stw berlin housing", -- cnm 2023- stw berlin housing
-    "leisure",
-    "sports",
-    "surfing",
-    "hornysurfing",
-    "gaming",
-    "animanga",
-    "reading manga",
-    "watching anime",
-    "dating",
-    "work",
-    "freelance",
-    "freelance translation",
-    "permanent employment",
-    "2022 mycontrol", -- cnm 2022- mycontrol
-    "ownership",
-    "interests",
-    "dev",
-    "language",
-    "japanese",
-    "systems",
-    "2022 hammerspoon" -- cnm 2022- hammerspoon
-  },
-  acquisition_institution = {
-    "tu",
-    "hu",
-    "fu",
-    "ur",
-    "primary"
-
   },
   use = {
     "hot",
@@ -440,23 +356,6 @@ ls = {
                         "1 female agentlike lewding 2 male agentlikes",-- aliases general:MMF threesome
                       "2 female agentlikes + 1 male agentlike", 
                         "2 female agentlikes lewding 1 male agentlike",-- aliases general:FFM threesome
-            "agentlike + body part",
-              "agentlike + anatomical category",
-                "agentlike + muscles",
-                  "agentlike affecting muscles",
-                    "agentlike envying muscles", -- aliases general:muscle envy
-              "agentlike + general body part",
-                "agentlike + breasts",
-                  "agentlike + breasts",
-                    "agentlike envying breasts",
-                    "agentlike + large breasts",
-                      "agentlike affecting large breasts",
-                        "agentlike envier of large breasts", -- aliases general:breast envy
-                    "agentlike + small breasts",
-                      "agentlike affecting small breasts",
-                        "agentlike envier of flat breasts", -- aliases general:flat awe
-                    "agentlike affecting breasts",
-                      "agentlike awed by breasts", -- aliases general:breast awe
             "agentlike carrying thing", -- aliases general:carrying
               "agentlike carrying thing on body part",
                 "agentlike carrying thing on shoulder", -- aliases general:carrying over shoulder
@@ -549,60 +448,7 @@ ls = {
                           "ear masking squirrel", -- aliases general:squirrel ears
                           "ear masking tiger", -- aliases general:tiger ears
                           "ear masking wolf", -- aliases general:wolf ears
-                "limb + x",
-                  "hand + x",
-                    "hand + thing",
-                      "hand + object",
-                        "hand + body part",
-                          "hand + general body part",
-                            "hand + hip",
-                              "hand grabbing or pulling hip", -- aliases general:hip grab; general:hip pull; general:grabbing hip; general:pulling hip
-                                "hand grabbing or pulling hip (other)", -- aliases genereral:grabbing another's hip, general:pulling another's hip
-                              "hand circumtangent hip", -- aliases general:hand around hip
-                              "hand holding hip",
-                                "hand holding 1 hip", -- aliases general:holding hip
-                                "hand holding 2 hips", -- aliases general:holding hips
-                            -- todo: mirror the above for horns, hair, forehead, ear, eyes
-                        "hand + non body part",
-                          "hand tangent non body part", 
-                            "hand tangent non body part", 
-                            "hand circumtangent non body part", 
-                            "hand holding non body part", 
-                      "hand + agentlike", 
-                        "hand tangent agentlike",
-                          "hand tangent agentlike",
-                          "hand circumtangent agentlike",
-                          "hand holding agentlike",
-                  "arm + x",
-                    "arm + thing",
-                      "arm + object",
-                        "arm + body part",
-                          "arm + general body part",
-                            "arm + neck", -- aliases general:arms around neck
-                              "arm circumtangent neck", -- aliases general:arms around neck
-                                "arm hugging neck",
-                            "arm + waist", -- aliases general:arms around waist
-                              "arm circumtangent waist", -- aliases general:arms around waist
-                                "arm hugging waist", -- aliases general:hugging waist
-                            "arm + back", -- aliases general:arms around back
-                              "arm circumtangent back", -- aliases general:arms around back
-                            "arm + leg",
-                              "arm circumtangent leg",
-                                "arm hugging leg", 
-                                  "arm hugging leg (other)", -- aliases general:hugging another's leg
-                                  "arm hugging leg (reflexive voice)", -- aliases general:hugging own leg
-                            "arm + arm",
-                              "arm circumtangent arm",
-                                "arm circumtangent arm (other)",
-                                  "1 arm circumtangent 1 arm", -- aliases general:locked arms
-                              "2 arms circumtangent 1 arm", -- aliases general:arm hug
-                        "arm + non body part",
-                          "arm circumtangent non body part", 
-                            "arm hugging non body part", -- aliases general:hugging object
-                      "arm + agentlike", 
-                        "arm circumtangent agentlike", 
-                          "arm hugging agentlike", -- aliases general:hug
-  },
+
   creator = {
     
   },

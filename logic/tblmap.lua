@@ -714,13 +714,23 @@ tblmap = {
       ["double %s"] = {"i2p", "[dual]"},
       ["%s hip"] = {"i2i", "thing:bodypartlike:hip"},
       ["%s hips"] = {"i2i", "[dual] thing:bodypartlike:hip"},
+      ["breast %s"] = {"i1i", 'thing:bodypartlike:breast'},
+      ["flat %s"] = {"i1i", 'thing:bodypartlike:flat breast'},
+      ["muscle %s"] = {"i1i", "thing:bodypartlike:muscled body"},
     },
   },
   keychange_fstring_name = {
     keychange_fstring_arr = {
       handable = {
         "%s hip",
-        "%s hips"
+        "%s hips",
+        "%s neck",
+        "%s waist",
+        "%s back",
+        "%s leg",
+        "%s arm",
+        "%s object",
+        "%s thigh",
       },
       sex_act = {
         "implied %s",
@@ -734,6 +744,10 @@ tblmap = {
         "%s through clothes",
         "cooperative %s",
         "double %s"
+      },
+      affectable = {
+        "breast %s",
+        "flat %s",
       }
     }
 },

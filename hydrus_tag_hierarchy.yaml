@@ -17,100 +17,6 @@
 #   _rp: reverse parent (child)
 #   _s: canonical sibling
 #   _rs: reverse sibling (non-canonical sibling)
-creation_ware:
-  creation location:
-    __is_subnamespace: true
-    meatspace:
-    cyberspace:
-  creation method:
-    __is_subnamespace: true
-    capturing:
-    generating:
-    manual creation:
-  creation instrument:
-    creation agent:
-      __is_subnamespace: true
-      individual creator:
-      group of creators:
-        creator circle:
-        creator studio:
-        creator company:
-    creation tool:
-      hardware:
-        __is_subnamespace: true
-        hardware brand:
-          xiaomi:
-      software:
-        __is_subnamespace: true
-  creation setting:
-  creation combination:
-    creation location ++:
-      meatspace ++:
-        meatspace ++ creation method:
-          meatspace ++ creation method:capturing:
-            meatspace ++ creation method:capturing ++ creation instrument:
-              meatspace ++ creation method:capturing ++ creation tool:
-                meatspace ++ creation method:capturing ++ hardware:
-                  smartphone:
-                    xiaomi smartphone:
-                      xiaomi redmi note 11 pro plus 5g:
-                  camera:
-                    integrated camera:
-                      front camera:
-                      rear camera:
-                    dedicated camera:
-                      dslr:
-                      mirrorless camera:
-                  scanner:
-      cyberspace ++:
-        cyberspace ++ creation method:
-          cyberspace ++ creation method:capturing:
-            screen capture:
-              _s: meta:screenshot
-            cyberspace ++ creation method:capturing ++ creation instrument:
-              cyberspace ++ creation method:capturing ++ creation tool:
-          cyberspace ++ creation method:generating:
-            cyberspace ++ creation method:generating ++ creation instrument:
-              cyberspace ++ creation method:generating ++ creation tool:
-                cyberspace ++ creation method:generating ++ software:
-                  generative ai:
-                    generative ai model:
-                      image generation model:
-                        text to image model:
-                          trynectar text to image model:
-                          pornpen text to image model:
-                            pornpen anime text to image model:
-                              pornpen anime detailed model:
-                              pornpen anime v1 model:
-                              pornpen women accurate model:
-                              pornpen women realistic model:
-                              pornpen women detiailed model:
-                              pornpen men v1 model:
-                              pornpen missionary model:
-                              pornpen blowjob model:
-                              pornpen doggystyle model:
-                    generative ai interface:
-                      image generation interface:
-                        pornpen web interface:
-                        midjourney discord interface:
-                        trynectar interface:
-          cyberspace ++ manual creation:
-            cyberspace ++ manual creation ++ creation instrument:
-              cyberspace ++ manual creation ++ creation tool:
-                cyberspace ++ manual creation ++ software:
-                  graphics editor:
-                    still editor:
-                      2d graphics editor:
-                        image processing editor:
-                          adobe lightroom:
-                        raster graphics editor:
-                          gimp:
-                          photoshop:
-                        vector graphics editor:
-                          affinity designer:
-                          inkscape:
-                    video editor:
-                      davinci resolve:
 things:
   agentlike: 
     __ex: anything that is an agent, or is shaped like one, or otherwise similar
@@ -118,9 +24,27 @@ things:
     char:
       __is_subnamespace: true
       real:
+        renate maria trujillo:
       fictional:
         purple haired mpdg pornpen:
           _rs: purple haired mpdg (pornpen)
+    character archetype:
+      maid:
+        wa maid:
+          _s: general:wa maid
+        qi maid:
+          _s: general:qi maid
+        victorian maid:
+          _s: general:victorian maid
+        western maid:
+          _s: general:western maid
+        mixed maids:
+          _s: general:mixed maids
+        male maid:
+          _s: general:male maid
+          _p: thing:agentlike:male
+        enmaided:
+          _s: general:enmaided
     gendered:
       male:
       female:
@@ -180,6 +104,18 @@ things:
         clearly nonhuman humanoid:
           slime girl:
             _s: general:slime girl
+    gesture:
+      __is_subnamespace: true
+      hand gesture:
+        collaborative hand gesture:
+        two hand gesture:
+          finger frame:
+            _s: general:finger frame
+            finger frame duo:
+              _s: general:finger frame duo
+              _p: thing:gesture:collaborative hand gesture
+
+
     animallike:
       animallike by taxon (simplified):
         vertebrate:
@@ -498,452 +434,826 @@ things:
           blur:
             _s: general:blur
   phallic object:
-  object:
-    real object:
-      specific object:
-        general assemblage:
-          assemblage of structures:
-            
-        spatial features:
-          natural features:
-            firmamental features:
-              moon:
-            earthen features:
-          infrastructure:
-
-        single object:
-          abstract object:
-            language:
-              text:
-            language genre:
-              poetry:
-                found poetry:
-              prose:
-            mathematical information:
-            data:
-              graph:
-            
-
-          digital object:
-            digital mockup:
-              smartphone mockup:
-            user interface object:
-              user interface component:
-                icon:
-              user interface:
-                os user interface:
-                  smartphone user interface:
-                    _s: general:fake phone screenshot
-                  desktop user interface:
-                app user interface: 
-                  __ex: the user interface of an app or program covering the entire screen. Protyptically in the kind of screenshots cmd+shift+5 can take
-            software application:
-
-            operating system:
-              mobile operating system:
-                android os:
-                  _rs: android (os)
-                  _s: general:android (os)
-                  _p: android google
-          prototypically 2d object:
-            document:
-              documentation:
-              manual:
-              schematic:
-              slide:
-                latex slide: 
-              cv:
-            photograph:
-              polaroid:
-                _s: general:polaroid
-            2d functional art:
-              large format functional:
-                poster:
-                  movie poster:
-              medium format functional:
-                calendar page:
-                  _s:
-                    substance: general:calendar (medium)
-                cover:
-                  _s:
-                    substance: general:cover
-                  standalone print media cover:
-                    _s:
-                      substance: general:cover page
-                    novel cover:
-                      _s:
-                        substance: general:novel cover
-                    doujin cover:
-                      _s:
-                        substance: general:doujin cover
-                    manga cover:
-                      _s:
-                        substance: general:manga cover
-                  album cover:
-                    _s:
-                      substance: general:album cover
-                  magazine cover:
-                    _s:
-                      substance: general:magazine cover
-                  video game cover:
-                    _s:
-                      substance: general:video game cover
-                  dvd cover:
-                    _s:
-                      substance: general:dvd cover
-                  bluray cover:
-                    _s:
-                      substance: general:bluray cover
-                  small format functional:
-                    postcard:
-                    flyer:
-                      tear off flyer:
-                  irregular format functional:
-                    crest:
-          prototypically 3d object:
-            consumer device:
-              black mirror:
-                smartphone:
-                  google pixel smartphone:
-                    _p: google pixel
-                    google pixel 4:
-            household object:
-              furniture:
-              appliance:
-                major appliance:
-                small appliance:
-            piece of clothes:
-            incidentally phallic object:
-              _p: phallic object
-            tool:
-              medical device:
-                medical test:
-              sex toy:
-                _s: general:sex toy
-                phallic sex toy:
-                  _p: phallic object
-              bodyrelated tool:
-                genital tool:
-                  speculum:
-                    _s: general:speculum
-                  dilation tape:
-                    _s: general:dilation tape
-      material:
-        material by assemblage:
-          strand-assembled material:
-            bunched-strand material:
-            interleaved-strand material:
-              woven material:
-              knitted material:
-          bonded material:
-          one-piece material:
-            hewn material:
-            molded material:
-        material by underlying form:
-          material from aggregate:
-          material from fibers:
-        material by underlying substance:
-          natural-seeming material:
-            plant-based material:
-              mainly cellulose-based material:
-                wood cellulose-based material:
-                flax cellulose-based material:
-                cotton cellulose-based material:
-                hemp cellulose-based material:
-              mainly lignin-based material:
-            animal-based material:
-          permanent-seeming material:
-            petroleoum-based material:
-            mineral-based material:
-            metal-based material:
-        material by common name:
-          paper:
-            _s: general:paper; implies ???
-          canvas:
-            _s:
-              substance_part: general:canvas (medium)
-      surface covering:
-        3d-ish surface covering:
-          _s: general:unconventional media
-        2d-ish surface covering:
-          graphic art surface covering:
-            digital graphic art surface covering:
-            digital-seeming graphic art surface covering:
-            traditional graphic art surface covering:
-            traditional-seeming graphic art surface covering:
-              _s:
-                substance_part: general:traditional media
-              penlike seeming surface covering:
-                ballpoint pen seeming surface covering:
-                  _s:
-                    substance_part: general:ballpoint pen (medium)
-              crayonlike seeming surface covering: 
-                crayon seeming surface covering:
-                  _s:
-                    substance_part: general:crayon (medium)
-                coupy pencil seeming surface covering:
-                  _s:
-                    substance_part: general:coupy pencil (medium)
-              inklike seeming surface covering:
-                ink seeming surface covering:
-                  _s:
-                    substance_part: general:ink (medium)
-                nib pen seeming surface covering:
-                  _s:
-                    substance_part: general:nib pen (medium)
-                calligraphy brush seeming surface covering:
-                  _s:
-                    substance_part: general:calligraphy brush (medium),
-                color ink seeming surface covering:
-                  _s:
-                    substance_part: general:color ink (medium)
-              graphitelike seeming surface covering:
-                graphite seeming surface covering:
-                  _s:
-                    substance_part: general:graphite (medium)
-                charcoal seeming surface covering:
-                  _s:
-                    substance_part: general:charcoal (medium)
-                colored pencil seeming surface covering:
-                  _s:
-                    substance_part: general:colored pencil (medium)
-              painting seeming surface covering:
-                acrylic paint seeming surface covering:
-                  _s:
-                    substance_part: general:acrylic paint (medium)
-                gouache seeming surface covering:
-                  _s:
-                    substance_part: general:gouache (medium)
-                oil paint seeming surface covering:
-                  _s:
-                    substance_part: general:oil painting (medium)
-                watercolor seeming surface covering:
-                  _s:
-                    substance_part: general:watercolor (medium)
-              watercolor pencil seeming surface covering:
-                _s:
-                  substance_part: general:watercolor pencil (medium)
-              pastel seeming surface covering:
-                _s:
-                  substance_part: general:pastel (medium)
-            real digital graphic art surface covering:
-              _p: digital graphic art surface covering, digital-seeming graphic art surface covering
-            real traditional graphic art surface covering:
-              _p: traditional graphic art surface covering, traditional-seeming graphic art surface covering
-            faux digital graphic art surface covering:
-              _p: traditional graphic art surface covering, digital-seeming graphic art surface covering
-            faux traditional graphic art surface covering:
-              _p: digital graphic art surface covering, traditional-seeming graphic art surface covering; aliases general:faux traditional media
+  abstract object:
+    musical content:
+    language (abstract):
+      __is_subnamespace: true
+      production:
+        spoken:
+        written:
+        sign:
+      genre:
+        poetry:
+          found poetry:
+        prose:
+        functional:
+      lect:
+      language proper:
+        english:
+        japanese:
+        german:
+    mathematical information:
+    data:
+      graph:
     symbolic object:
       flag:
-    hyperbody:
-        2d hyperbody:
-          conic section:
-            ellipse:
-              circle:
-            parabola:
-            hyperbola:
-          polygon:
-            n-sided polygon:
-              1-sided polygon:
-              2-sided polygon:
-              3-sided polygon:
-                _s: general:triangle
-              4-sided polygon:
-              5-sided polygon:
-              6-sided polygon:
-              7-sided polygon:
-              8-sided polygon:
-              9-sided polygon:
-              10-sided polygon:
-              11-sided polygon:
-              12-sided polygon:
-            equilateral polygon:
-            equiangular polygon:
-            parallel sides polygon:
-            equilateral equiangular polygon:
-              convex regular polygon:
-                3-sided convex regular polygon: 
-                  _rs: regular triangle
-              star regular polygon:
-            equilateral parallel sides polygon:
-              4-sided equilateral parallel sides polygon: 
-                _rs: cnm rhombus; aliases general:diamond (shape)
-            some other polygon:
-              cross:
-              x:
-          other 2d hyperbody:
-            sparkle:
-            heart:
-        3d hyperbody:
-          polyhedron:
-    bodypartlike:
-      __is_subnamespace: true
-      body data:
-      body part grouping:
-        body part grouping by function:
-          sensory organ:
-          pleasurable organ:
-            crotch pleasurable organ:
-              primary genital:
-          ussy:
-        body part grouping by similarity:
-          digit:
-          teashi:
-        body part grouping by closeness:
-          oral parts:
-      general body part:
-        
-        horn:
-        hair:
-          hair ear:
-            _s: general:hair ears
-        forehead:
-        ear:
-          human ear:
-          animal ear:
-            _s: general:animal ears
-            fake animal ear:
-              _s: general:fake animal ears, can coexist with all other animal ears tags
-              animal ear headphones:
-                _s: general:animal ear headphones
-                bear ear headphones:
-                  _s: general:bear ear headphones
-                cat ear headphones:
-                  _s: general:cat ear headphones
-                rabbit ear headphones:
-                  _s: general:dog ear headphones
-          mechanical ear:
-            _s: general:mechanical ears
-          pointy ear:
-            _s: general:pointy ears
-            long pointy ear:
-              _s: general:long pointy ears
-        iris:
-        pupil:
-        eye:
-          _s: general:eyes
-          eyes with no pupils:
-            _s: general:no pupils
-          eyes with pupils:
-            modified aperture pupil:
-              constricted pupil:
-                _s: general:constricted pupils
-              dilated pupil:
-                _s: general:dilated pupils
-            extra pupil:
-              _s: general:extra pupils
-            unusual shaped pupil:
-              mismatched pupils:
-                _s: general:mismatched pupils
-              rectangular pupil:
-                _s: general:horizontal pupils
-              slit pupil:
-                _s: general:slit pupils
-              symbol shaped pupil:
-                _s: general:symbol-shaped pupils
-                sparkle shaped pupil:
-                  _s: general:+ +
-                heart shaped pupil:
-                  _s: general:heart-shaped pupils
-                star shaped pupil:
-                  _s: general:star-shaped pupils
-                cross shaped pupil:
-                  _s: general:cross-shaped pupils
-                x shaped pupil:
-                  _s: general:x-shaped pupils
-                flower shaped pupil:
-                  _s: general:flower-shaped pupils
-                diamond shaped pupil:
-                  _s: general:diamond-shaped pupils
-                rabbit shaped pupil:
-                  _s: general:rabbit-shaped pupils
-                butterfly shaped pupil:
-                  _s: general:butterfly-shaped pupils
-                triangle shaped pupil:
-                  _s: general:triangle-shaped pupils
-                power symbol shaped pupil:
-                  _s: general:power symbol-shaped pupils
-                drop shaped pupil:
-                  _s: general:drop-shaped pupils
-                clover shaped pupil:
-                  _s: general:clover-shaped pupils
-                money shaped pupil:
-                  _s: general:money-shaped pupils
-                crescent shaped pupil:
-                  _s: general:crescent-shaped pupils
-                skill shaped pupil:
-                  _s: general:skull-shaped pupils
-                musical note shaped pupil:
-                  _s: general:musical note-shaped pupils
-                lightning bolt shaped pupil:
-                  _s: general:lightning bolt-shaped pupils
-                bone shaped pupil:
-                  _s: general:bone-shaped pupils
-                paw shaped pupil:
-                  _s: general:paw-shaped pupils
-                sprout shaped pupil:
-                  _s: general:sprout-shaped pupils
-                cat shaped pupil:
-                  _s: general:cat-shaped pupils
-                spade shaped pupil:
-                  _s: general:spade-shaped pupils
-        nose:
-        cheek:
-        mouth:
-          _p: bodypartlike:oral parts
-        lips:
-          _p: bodypartlike:oral parts
-        teeth:
-          _p: bodypartlike:oral parts
-        tongue:
-          _p: bodypartlike:oral parts
-        chin:
-        head:
-        face:
-        neck:
-        throat:
-          _p: bodypartlike:oral parts
-        shoulder:
-        back:
-        wings:
-        limb:
-          arm:
-          leg:
-        elbow:
-        wrist:
-        stomach:
-        waist:
-        tail:
-        ass:
-        crotch:
-        chest:
-        breasts:
-        penis:
-          _p: 
-            - bodypartlike:primary genital
-            - phallic object
-        vulva:
-          _p: 
-            - bodypartlike:primary genital
-            - bodypartlike:ussy
-        anus:
-          _p:
-            - bodypartlike:crotch pleasurable organ
-            - bodypartlike:ussy
-        hip:
-        thigh:
-        knee:
-        calf:
-        ankle:
-        foot:
-        tentacle:
+  virtual object:
+    concrete virtual object:
+      screen contents:
+        _s:
+          creation_ware: meta:screenshot
+      digital mockup:
+        smartphone mockup:
+      user interface object:
+        user interface component:
+          icon:
+          camera user interface component:
+            viewfinder:
+              _s: general:viewfinder
+            recording indicator:
+              _s: general:recording
+        user interface:
+          os user interface:
+            smartphone user interface:
+              _s: general:fake phone screenshot
+            desktop user interface:
+          app user interface: 
+            __ex: the user interface of an app or program covering the entire screen. Protyptically in the kind of screenshots cmd+shift+5 can take
+    abstract virtual object:
+      thing on the web:
+        page type:
+          social page:
+            post:
+            thread:
+          shopping page:
+            product page:
+        web service:
+          booru:
+            danbooru:
+            gelbooru:
+            realbooru:
+            xbooru:
+            aibooru:
+          social media:
+            discord:
+            reddit:
+          ai sharing site:
+            pornpendotai: 
+              _rs: pornpen.ai
+            trynectardotai: 
+              _rs: trynectar.ai
+          web store:
+            aliexpress:
+      ai model:
+        generative ai model:
+          image generation model:
+            text to image model:
+              trynectar text to image model:
+              pornpen text to image model:
+                pornpen anime text to image model:
+                  pornpen anime detailed model:
+                  pornpen anime v1 model:
+                  pornpen women accurate model:
+                  pornpen women realistic model:
+                  pornpen women detiailed model:
+                  pornpen men v1 model:
+                  pornpen missionary model:
+                  pornpen blowjob model:
+                  pornpen doggystyle model:
+      software:
+        generative ai interface:
+          image generation interface:
+            pornpen web interface:
+            midjourney discord interface:
+            trynectar interface:
+        graphics editor:
+          still editor:
+            2d graphics editor:
+              image processing editor:
+                adobe lightroom:
+              raster graphics editor:
+                gimp:
+                photoshop:
+              vector graphics editor:
+                affinity designer:
+                inkscape:
+          video editor:
+            davinci resolve:
 
-      anatomical feature:
-        shoulder blades:
-          _s: general:shoulder blades
-      anatomical category:
-        muscle:
+      operating system:
+        mobile operating system:
+          android os:
+            _rs: android (os)
+            _s: general:android (os)
+            _p: android google
+
+
+          
+  general assemblage:
+    assemblage of structures:
+            
+  landscape feature:
+    natural feature:
+      firmamental feature:
+        moon:
+      earthen feature:
+    infrastructure:
+
+  spatial object:
+    prototypically 2d object:
+      document:
+        documentation:
+        manual:
+        schematic:
+        slide:
+          latex slide: 
+        cv:
+      photograph:
+        polaroid:
+          _s: general:polaroid
+      2d functional art:
+        large format functional:
+          poster:
+            movie poster:
+        medium format functional:
+          calendar page:
+            _s:
+              substance: general:calendar (medium)
+          cover:
+            _s:
+              substance: general:cover
+            standalone print media cover:
+              _s:
+                substance: general:cover page
+              novel cover:
+                _s:
+                  substance: general:novel cover
+              doujin cover:
+                _s:
+                  substance: general:doujin cover
+              manga cover:
+                _s:
+                  substance: general:manga cover
+            album cover:
+              _s:
+                substance: general:album cover
+            magazine cover:
+              _s:
+                substance: general:magazine cover
+            video game cover:
+              _s:
+                substance: general:video game cover
+            dvd cover:
+              _s:
+                substance: general:dvd cover
+            bluray cover:
+              _s:
+                substance: general:bluray cover
+            small format functional:
+              postcard:
+              flyer:
+                tear off flyer:
+            irregular format functional:
+              crest:
+    prototypically 3d object:
+      vehicle:
+        spacecraft:
+          _s: general:spacecraft
+          space shuttle:
+            _s: general:space shuttle
+          space station:
+            _s: general:space station
+          starfighter:
+            _s: general:starfighter
+          rocketship:
+            _s: general:rocket ship
+          flying saucer:
+            _s: general:flying saucer
+          star wars spacecraft:
+            _s: general:star wars spacecraft
+            _p: thing:ip:entertainment:star wars
+            galactic empire (star wars) spacecraft:
+              _p: things:galactic empire (star wars)
+              tie spacecraft:
+                tie fighter:
+                  _s: general:tie fighter
+                tie interceptor:
+                  _s: general:tie interceptor
+                tie bomber:
+                  _s: general:tie bomber
+              imperial star destroyer:
+                _s: general:star destroyer
+        aircraft:
+          _s: general:aircraft
+          airplane:
+            _s: general:airplane
+            n wing airplane:
+              biplane:
+                _s: general:biplane
+              monoplane:
+                _s: general:monoplane
+            engine airplane:
+              jet plane:
+                _s: general:jet plane
+        military vehicle:
+          fighter jet:
+            _s: general:fighter jet
+            _p: general:jet plane
+
+      consumer device:
+        peripherals:
+          image scanner:
+            _s: general:image scanner
+        camera related:
+          camera paraphernalia:
+            camera lens:
+              detached camera lens:
+                _s: general:detached lens
+              zoom lens:
+                _s: general:zoom lens
+          camera:
+            __is_subnamespace: true
+            integrated:
+              __is_subnamespace: true
+              front:
+              rear:            
+            dedicated:
+              __is_subnamespace: true
+              photo:
+                _s: general:camera
+                exchangable lens photo:
+                  slr:
+                    _s: general:single-lens reflex camera
+                    dslr:
+                      _s: general:dslr
+                      _p: thing:camera:dedicated:digital
+                  twin lens reflex:
+                    _s: general:twin-lens reflex camera
+                  mirrorless:
+                    _s: general:mirrorless
+                    _p: thing:camera:dedicated:digital
+                point and shoot:
+                  _s: general:point and shoot
+                  _p: thing:camera:dedicated:digital
+              video:
+                _s: general:video camera
+                action:
+                  _s: general:action camera
+                camcorder:
+                  _s: general:camcorder
+                tv camera:
+                  _s: general:tv camera
+                traditional movie camera:
+                  _s: general:movie camera
+              medium:
+                film:
+                digital:
+              exchangable lens:
+              fixed lens:
+              bellows camera:
+                _s: general:bellows camera
+              disposable camera:
+                _s: general:disposable camera
+        computer:
+        phone:
+          _s: general:phone
+          cellphone:
+            _s: general:cellphone
+            smartphone:
+              xiaomi smartphone:
+                xiaomi redmi note 11 pro plus 5g:
+              google pixel smartphone:
+                _p: google pixel
+                google pixel 4:
+      household object:
+        furniture:
+        appliance:
+          major appliance:
+          small appliance:
+      clothing:
+        uniform:
+        functional clothing:
+      incidentally phallic object:
+        _p: phallic object
+      tool:
+        personal combat tool:
+          firearm-related tool:
+            firearm paraphernalia:
+              holster:
+                _s: general:holster
+            firearm components:
+              firearm sight:
+                optical sight:
+                  _s: general:optical sight
+                  reflex sight:
+                    _s: general:reflex sight
+                  scope:
+                    _s: general:scope
+                laser sight:
+                  _s: general:laser sight
+                eotech:
+                  _s: general:eotech
+            firearm:
+              firearm by general type:
+                handgun:
+                rifle:
+                  _s: general:rifle
+                  assault rifle:
+                    _s: general:assault rifle
+
+                machine gun:
+              firearm by mechanism:
+                bullpup:
+                  _s: general:bullpup
+                bolt action:
+                  _s: general:bolt action
+                lever action:
+                  _s: general:lever action
+                revolver:
+                  _s: general:revolver
+                flintlock:
+                  _s: general:flintlock
+
+
+        medical device:
+          medical test:
+        sex toy:
+          _s: general:sex toy
+          phallic sex toy:
+            _p: phallic object
+        bodyrelated tool:
+          genital tool:
+            speculum:
+              _s: general:speculum
+            dilation tape:
+              _s: general:dilation tape  
+  time:
+    __is_subnamespace: true
+    time bounded activity:
+      vacation:
+    date:
+      __ex: must be relevant to the content, and not just incidental
+      gregorian date:
+        gregorian month:
+        gregorian year:
+    celebration:
+      general holiday:
+      personal holiday:
+    season:
+      four seasons:
+        _s: general:seasons
+      autumn:
+        _s: general:autumn
+    formal period:
+      semester:
+        __is_subnamespace: true
+        by year:
+          "2024":
+            2024 summer:
+              _p: thing:time:semester:summer
+            2024 winter:
+              _p: thing:time:semester:winter
+          "2023":
+            2023 summer:
+              _p: thing:time:semester:summer
+            2023 winter:
+              _p: thing:time:semester:winter
+          "2022":
+            2022 summer:
+              _p: thing:time:semester:summer
+            2022 winter:
+              _p: thing:time:semester:winter
+          "2021":
+            2021 summer:
+              _p: thing:time:semester:summer
+            2021 winter:
+              _p: thing:time:semester:winter
+          "2020":
+            2020 summer:
+              _p: thing:time:semester:summer
+            2020 winter:
+              _p: thing:time:semester:winter
+          "2019":
+            2019 summer:
+              _p: thing:time:semester:summer
+            2019 winter:
+              _p: thing:time:semester:winter
+          "2018":
+            2018 summer:
+              _p: thing:time:semester:summer
+            2018 winter:
+              _p: thing:time:semester:winter
+          "2017":
+            2017 summer:
+              _p: thing:time:semester:summer
+            2017 winter:
+              _p: thing:time:semester:winter
+          "2016":
+            2016 summer:
+              _p: thing:time:semester:summer
+            2016 winter:
+              _p: thing:time:semester:winter
+          "2015":
+            2015 summer:
+              _p: thing:time:semester:summer
+            2015 winter:
+              _p: thing:time:semester:winter
+        by season:
+          summer:
+          winter:
+  social group:
+    primary group:
+      kin:
+      friends:
+      local community:
+    collective:
+    category:
+    organization:
+      association:
+        circle:
+        team:
+        league:
+          soccer league:
+        union:
+      corporation:
+        animation studio:
+        xiaomi:
+      institution:
+        educational institution:
+          university:
+            german university:
+              tu:
+                _rs: technische universität berlin
+              hu:
+                _rs: humboldt universität zu berlin
+              fu:
+                _rs: freie universität berlin
+              ur:
+                _rs: universität regensburg
+
+          school:
+            _s: general:school
+            primary school:
+            secondary school:
+              middle school:
+              high school:
+        military organization:
+          _s: general:military
+          military:
+            japan self-defense force:
+              _s: general:japan self-defense force
+            us armed forces:
+          branch of service:
+            navy:
+              _s: general:navy
+            army:
+              _s: general:army
+              us army:
+                _s: general:united states army
+
+          military unit:
+            us military unit:
+              _s: 
+    political subdivisions:
+      national subdivision:
+        real national subdivision:
+          the netherlands:
+      supranational subdivision:
+        real supranational subdivision:
+        fake supranational subdivision:
+          star wars supranational subdivision:
+            _p: thing:ip:multimedia:star wars
+            galactic republic (star wars):
+              _s: general:galactic republic
+            galactic empire (star wars):
+              _s: general:galactic empire
+  human condition:
+    general activity:
+      waiting:
+        _s: general:waiting
+      cleaning:
+        _s: generalcleaning
+    bureaucracy:
+      state bureaucracy:
+    education:
+      enrollment:
+    capitalist condition:
+      employment:
+      business activity:
+        advertising:
+          _s: general:ad
+      money:
+        _s: general:money
+        currency:
+          real currency:
+          fictional currency:
+        money medium:
+          physical money:
+            coin:
+      exchange:
+        exchange reason:
+          payment:
+          gift:
+          loan:
+          taxes:
+            payroll taxes:
+        exchange medium:
+          digital exchange:
+            direct debit:
+          physical exhange:
+      ownership:
+      economic state:
+        poverty:
+          _s: poverty
+    housing:
+      rental housing:
+    danger:
+      danger prevention:
+    cultural activity:
+    conflict:
+      war:
+        _s: war
+  natural phenomena:
+  location:
+    __is_subnamespace: true
+    specific location:
+      byname:
+        __is_subnamespace: true
+        __ex: categorizes location by name type and name without inheritance
+        continent:
+          __is_subnamespace: true
+          europe:
+        country:
+          __is_subnamespace: true
+          germany:
+        city: 
+          __is_subnamespace: true
+          berlin:
+      byprecise:
+        __is_subnamespace: true
+        __ex: categorizes locations by inheritance
+        europe:
+          europe itself:
+          germany:
+            germany itself:
+            munich:
+              munich itself:
+            kinding:
+              renates house kinding:
+            berlin:
+              berlin itself:
+                _s: general:berlin
+              brandenburg gate:
+                _s: general:brandenburg gate
+              
+
+    general location:
+  construction:
+    material:
+      paper:
+        _s: general:paper; implies ???
+      canvas:
+        _s:
+          substance_part: general:canvas (medium)
+    surface covering:
+      3d-ish surface covering:
+        _s: general:unconventional media
+      2d-ish surface covering:
+        graphic art surface covering:
+          digital graphic art surface covering:
+          digital-seeming graphic art surface covering:
+          traditional graphic art surface covering:
+          traditional-seeming graphic art surface covering:
+            _s:
+              substance_part: general:traditional media
+            penlike seeming surface covering:
+              ballpoint pen seeming surface covering:
+                _s:
+                  substance_part: general:ballpoint pen (medium)
+            crayonlike seeming surface covering: 
+              crayon seeming surface covering:
+                _s:
+                  substance_part: general:crayon (medium)
+              coupy pencil seeming surface covering:
+                _s:
+                  substance_part: general:coupy pencil (medium)
+            inklike seeming surface covering:
+              ink seeming surface covering:
+                _s:
+                  substance_part: general:ink (medium)
+              nib pen seeming surface covering:
+                _s:
+                  substance_part: general:nib pen (medium)
+              calligraphy brush seeming surface covering:
+                _s:
+                  substance_part: general:calligraphy brush (medium),
+              color ink seeming surface covering:
+                _s:
+                  substance_part: general:color ink (medium)
+            graphitelike seeming surface covering:
+              graphite seeming surface covering:
+                _s:
+                  substance_part: general:graphite (medium)
+              charcoal seeming surface covering:
+                _s:
+                  substance_part: general:charcoal (medium)
+              colored pencil seeming surface covering:
+                _s:
+                  substance_part: general:colored pencil (medium)
+            painting seeming surface covering:
+              acrylic paint seeming surface covering:
+                _s:
+                  substance_part: general:acrylic paint (medium)
+              gouache seeming surface covering:
+                _s:
+                  substance_part: general:gouache (medium)
+              oil paint seeming surface covering:
+                _s:
+                  substance_part: general:oil painting (medium)
+              watercolor seeming surface covering:
+                _s:
+                  substance_part: general:watercolor (medium)
+            watercolor pencil seeming surface covering:
+              _s:
+                substance_part: general:watercolor pencil (medium)
+            pastel seeming surface covering:
+              _s:
+                substance_part: general:pastel (medium)
+          real digital graphic art surface covering:
+            _p: digital graphic art surface covering, digital-seeming graphic art surface covering
+          real traditional graphic art surface covering:
+            _p: traditional graphic art surface covering, traditional-seeming graphic art surface covering
+          faux digital graphic art surface covering:
+            _p: traditional graphic art surface covering, digital-seeming graphic art surface covering
+          faux traditional graphic art surface covering:
+            _p: digital graphic art surface covering, traditional-seeming graphic art surface covering; aliases general:faux traditional media
+  bodypartlike:
+    __is_subnamespace: true
+    body data:
+    body part grouping:
+      body part grouping by function:
+        sensory organ:
+        pleasurable organ:
+          crotch pleasurable organ:
+            primary genital:
+        ussy:
+      body part grouping by similarity:
+        digit:
+        teashi:
+      body part grouping by closeness:
+        oral parts:
+    general body part:
+      
+      horn:
+      hair:
+        hair ear:
+          _s: general:hair ears
+      forehead:
+      ear:
+        human ear:
+        animal ear:
+          _s: general:animal ears
+          fake animal ear:
+            _s: general:fake animal ears, can coexist with all other animal ears tags
+            animal ear headphones:
+              _s: general:animal ear headphones
+              bear ear headphones:
+                _s: general:bear ear headphones
+              cat ear headphones:
+                _s: general:cat ear headphones
+              rabbit ear headphones:
+                _s: general:dog ear headphones
+        mechanical ear:
+          _s: general:mechanical ears
+        pointy ear:
+          _s: general:pointy ears
+          long pointy ear:
+            _s: general:long pointy ears
+      iris:
+      pupil:
+      eye:
+        _s: general:eyes
+        eyes with no pupils:
+          _s: general:no pupils
+        eyes with pupils:
+          modified aperture pupil:
+            constricted pupil:
+              _s: general:constricted pupils
+            dilated pupil:
+              _s: general:dilated pupils
+          extra pupil:
+            _s: general:extra pupils
+          unusual shaped pupil:
+            mismatched pupils:
+              _s: general:mismatched pupils
+            rectangular pupil:
+              _s: general:horizontal pupils
+            slit pupil:
+              _s: general:slit pupils
+            symbol shaped pupil:
+              _s: general:symbol-shaped pupils
+              sparkle shaped pupil:
+                _s: general:+ +
+              heart shaped pupil:
+                _s: general:heart-shaped pupils
+              star shaped pupil:
+                _s: general:star-shaped pupils
+              cross shaped pupil:
+                _s: general:cross-shaped pupils
+              x shaped pupil:
+                _s: general:x-shaped pupils
+              flower shaped pupil:
+                _s: general:flower-shaped pupils
+              diamond shaped pupil:
+                _s: general:diamond-shaped pupils
+              rabbit shaped pupil:
+                _s: general:rabbit-shaped pupils
+              butterfly shaped pupil:
+                _s: general:butterfly-shaped pupils
+              triangle shaped pupil:
+                _s: general:triangle-shaped pupils
+              power symbol shaped pupil:
+                _s: general:power symbol-shaped pupils
+              drop shaped pupil:
+                _s: general:drop-shaped pupils
+              clover shaped pupil:
+                _s: general:clover-shaped pupils
+              money shaped pupil:
+                _s: general:money-shaped pupils
+              crescent shaped pupil:
+                _s: general:crescent-shaped pupils
+              skill shaped pupil:
+                _s: general:skull-shaped pupils
+              musical note shaped pupil:
+                _s: general:musical note-shaped pupils
+              lightning bolt shaped pupil:
+                _s: general:lightning bolt-shaped pupils
+              bone shaped pupil:
+                _s: general:bone-shaped pupils
+              paw shaped pupil:
+                _s: general:paw-shaped pupils
+              sprout shaped pupil:
+                _s: general:sprout-shaped pupils
+              cat shaped pupil:
+                _s: general:cat-shaped pupils
+              spade shaped pupil:
+                _s: general:spade-shaped pupils
+      nose:
+      cheek:
+      mouth:
+        _p: bodypartlike:oral parts
+      lips:
+        _p: bodypartlike:oral parts
+      teeth:
+        _p: bodypartlike:oral parts
+      tongue:
+        _p: bodypartlike:oral parts
+      chin:
+      head:
+      face:
+      neck:
+      throat:
+        _p: bodypartlike:oral parts
+      shoulder:
+      back:
+      wings:
+      limb:
+        arm:
+        leg:
+      elbow:
+      wrist:
+      stomach:
+      waist:
+      tail:
+      ass:
+      crotch:
+      chest:
+      breasts:
+      penis:
+        _p: 
+          - bodypartlike:primary genital
+          - phallic object
+      vulva:
+        _p: 
+          - bodypartlike:primary genital
+          - bodypartlike:ussy
+      anus:
+        _p:
+          - bodypartlike:crotch pleasurable organ
+          - bodypartlike:ussy
+      hip:
+      thigh:
+      knee:
+      calf:
+      ankle:
+      foot:
+      tentacle:
+
+    anatomical feature:
+      shoulder blades:
+        _s: general:shoulder blades
+    anatomical category:
+      muscle:
   ip:
     __is_subnamespace: true
     corporate:
@@ -1008,54 +1318,34 @@ things:
           _rs: sable (game)
         dungeon massage service:
       multimedia:
-  abstract thing:
-    
+        star wars:
+  unfinished:
+    _s: meta:unfinished
     concept:
-      disciplinary concept:
-        philosophy concept:
+    mockup:
+      _s: general:mockup
+    concept art:
+      _s: meta:concept art
+  concept:
+    disciplinary concept:
+      philosophy concept:
+  abstract thing:
       day-to-day concept:
         self:
           employable characteristics:
         style:
           my look:
-        employment:
-        ownership:
-        culture:
-        presence:
-          participation:
-            enrollment:
-        money:
-          money compensation:
-            pay:
-            money gift:
-            money loan:
-            taxes:
-              payroll taxes:
-          money transfer:
-            direct debit:
         internet:
         location of residence:
         housing:
           room layout:
-          rental:
         object:
           object use:
-        danger:
-          fire danger:
-            fire prevention:
-      culture and geography:
-        nation:
-          the netherlands:
-        location:
-        language:
-          english:
-          japanese:
-          german:
 general:
-  male focus:
-    _rs: "focus:agentlike:male"
-  eye focus:
-    _rs: "focus:body part:eye"
+  focus:
+    _rs: "focus:"
+    __infer:
+      _rs: universalpredicatable
   blurry foreground:
     _rs: "foreground:blur"
   blurry background:
@@ -1075,41 +1365,96 @@ general:
     __infer:
       _rs: sex_act
   holding:
-    _rs: "thing:thing:bodypartlike:hand +holding+ %s"
+    _rs: "thing:thing:bodypartlike:hand +holding+"
     __infer:
-      _rs: handable
+      _rs: limbable
   hand around:
-    _rs: "thing:thing:bodypartlike:hand +circumtangent+ %s"
+    _rs: "thing:thing:bodypartlike:hand +circumtangent+"
     __infer:
-      _rs: handable
+      _rs: limbable
   hand on:
-    _rs: "thing:thing:bodypartlike:hand +tangent+ %s"
+    _rs: "thing:thing:bodypartlike:hand +tangent+"
     __infer:
-      _rs: handable
+      _rs: limbable
   touching: 
     _rs: 
       - "%s +tangent+ /reflexive"
-      - "thing:thing:bodypartlike:hand +tangent+ %s"
+      - "thing:thing:bodypartlike:hand +tangent+"
     __infer:
       _rs: 
         - reflexive_touchable
-        - handable
+        - limbable
   hand on own:
-    _rs: "thing:thing:bodypartlike:hand +tangent+ %s /reflexive voice"
+    _rs: "thing:thing:bodypartlike:hand +tangent+ /reflexive voice"
     __infer:
-      _rs: handable
+      _rs: limbable
   hand on another's:
-    _rs: "thing:thing:bodypartlike:hand +tangent+ %s /targeting another"
+    _rs: "thing:thing:bodypartlike:hand +tangent+ /targeting another"
     __infer:
-      _rs: handable
+      _rs: limbable
   hands on own:
-    _rs: "thing:[plural] thing:bodypartlike:hand +tangent+ %s /reflexive voice"
+    _rs: "thing:[plural] thing:bodypartlike:hand +tangent+ /reflexive voice"
     __infer:
-      _rs: handable
+      _rs: limbable
   hands on another's:
-    _rs: "thing:[plural] thing:bodypartlike:hand +tangent+ %s /targeting another"
+    _rs: "thing:[plural] thing:bodypartlike:hand +tangent+ /targeting another"
     __infer:
-      _rs: handable
+      _rs: limbable
+  arm around:
+    _rs: "thing:thing:bodypartlike:arm +circumtangent+"
+    __infer:
+      _rs: limbable
+  arms around:
+    _rs: "thing:[plural] thing:bodypartlike:arm +circumtangent+"
+    __infer:
+      _rs: limbable
+  hugging:
+    _rs: "thing:thing:bodypartlike:arm +hugging+"
+    __infer:
+      _rs: limbable
+  hugging own:
+    _rs: "thing:thing:bodypartlike:arm +hugging+ /reflexive voice"
+    __infer:
+      _rs: limbable
+  hugging another's:
+    _rs: "thing:thing:bodypartlike:arm +hugging+ /targeting another"
+    __infer:
+      _rs: limbable
+  arm hug:
+    _rs: general:hugging arm
+  locked_arms:
+    _rs: general:interlocked arms
+  hug:
+    _rs: general:hugging
+  interlocked:
+    _rs: "thing: +circumtangent+ /reciprocal voice"
+    __infer:
+      _rs: limbable
+  grabbing:
+    _rs: "thing:thing:bodypartlike:hand +forcefully circumtangent+"
+    __infer:
+      _rs: limbable
+  pulling:
+    _rs: "thing:thing:bodypartlike:hand +forcefully circumtangent+"
+    __infer:
+      _rs: limbable
+  pulling own:
+    _rs: "thing:thing:bodypartlike:hand +forcefully circumtangent+ /reflexive voice"
+    __infer:
+      _rs: limbable
+  pulling another's:
+    _rs: "thing:thing:bodypartlike:hand +forcefully circumtangent+ /targeting another"
+    __infer:
+      _rs: limbable
+  envy:
+    _rs: "thing: +envied+"
+    __infer:
+      _rs: affectable
+  awe:
+    _rs: "thing: +awed+"
+    __infer:
+      _rs: affectable
+  
 
   
   
@@ -1127,12 +1472,24 @@ interaction:
           patientive:
           themetive:
         non-nuclear case:
+          affective:
+            affecter:
+            affected:
+            envy:
+              envier:
+              envied:
+            awe:
+              awer:
+              awed:
+            
     spatial:
       essive:
         interessive:
       tangent:
         circumtangent:
+          hugging:
           holding:
+          forcefully circumtangent:
       vicinitive:
       tective:
       hesive:
@@ -1182,3 +1539,54 @@ complete_modification:
       middlelike voice:
         middle voice:
         reflexive voice:
+proximate_source_page_type:
+  post:
+  thread:
+  product page:
+proximate_source_subdivision:
+  midjourney:
+acquisition_context:
+  edu:
+    kindergarden:
+    school:
+      primary:
+      secondary:
+    uni:
+      philosophy bachelors:
+  official:
+    contract:
+      insurance:
+        health insurance:
+          barmer health insurance:
+  housing:
+    rental housing:
+      2023 stw berlin housing: 
+        _rs: 2023- stw berlin housing
+  leisure:
+    sports:
+    surfing:
+    hornysurfing:
+    gaming:
+    animanga:
+      reading manga:
+      watching anime:
+  social:
+    dating:
+    family:
+      parents:
+        renate:
+      siblings:
+  work:
+    freelance:
+      freelance translation:
+      permanent employment:
+        2022 mycontrol: 
+        _rs: 2022- mycontrol
+  ownership:
+  interests:
+    dev:
+    language:
+    japanese:
+    systems:
+      2022 hammerspoon: 
+        _rs: 2022- hammerspoon
