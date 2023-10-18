@@ -113,11 +113,23 @@ get = {
     end,
     two_strs__arr_arr_by_danbooru_tag_my_tag_implications = function(spec, danbooru_hydrus_map)
       return transf.two_arrs.two_ts__arr_arr_by_zip_error_not_same_length(
-        transf.danbooru_hydrus_inference_specifier.str_arr_by_danbooru_tag(spec),
-        get.danbooru_hydrus_inference_specifier.str_arr_by_my_tag(spec, danbooru_hydrus_map)
+        get.danbooru_hydrus_inference_specifier.str_arr_by_my_tag(spec, danbooru_hydrus_map),
+        transf.danbooru_hydrus_inference_specifier.str_arr_by_danbooru_tag(spec)
       )
     end,
 
+  },
+  danbooru_hydrus_inference_specifier_arr = {
+    two_strs__arr_arr_by_danbooru_tag_my_tag_implications = function(spec_arr, danbooru_hydrus_map)
+      return transf.arr_arr.arr_by_flatten(
+        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+          spec_arr,
+          function(spec)
+            return get.danbooru_hydrus_inference_specifier.two_strs__arr_arr_by_danbooru_tag_my_tag_implications(spec, danbooru_hydrus_map)
+          end
+        )
+      )
+    end,
   },
   hydrus_file_hash = {
     str_arr_by_tag_namespace = function(hash, namespace)
@@ -165,6 +177,7 @@ get = {
   hydrus_tag_hierarchy_node = {
     str_key_str_value_assoc_by_danbooru_to_my_tag_map = function(node_key, node_assoc, namespace_chain)
       local res = {}
+      namespace_chain = get.table.table_by_copy(namespace_chain) or {}
       local current_value = get.str_or_number_arr.str_by_joined(namespace_chain, ":") .. ":" .. node_key
       if node_assoc then
         if node_assoc.__is_subnamespace then
@@ -220,28 +233,29 @@ get = {
       }
       namespace_chain = get.table.table_by_copy(namespace_chain) or {}
       local current_value = get.str_or_number_arr.str_by_joined(namespace_chain, ":") .. ":" .. node_key
-      dothis.arr.push(
-        res.parent,
-        {
-          nodeparent,
-          current_value
-        }
-      )
-      local to_deduce = {}
-      dothis.arr.push(to_deduce, current_value)
-      virtuals = virtuals or (node_assoc and node_assoc.__virtuals) or {}
-      local virtual_map = {}
-      for _, virtual in transf.arr.pos_int_vt_stateless_iter(virtuals) do
-        local namespace_chain_subbed = get.arr.arr_by_nth_element_subbed(namespace_chain, 1, virtual)
-        local virtual_value = get.str_or_number_arr.str_by_joined(namespace_chain_subbed, ":") .. ":" .. node_key
-        virtual_map[virtual] = virtual_value
+      if nodeparent then
         dothis.arr.push(
           res.parent,
           {
-            current_value,
-            virtual_value
+            nodeparent,
+            current_value
           }
         )
+      end
+      local virtual_map = {}
+      if virtuals then
+        for _, virtual in transf.arr.pos_int_vt_stateless_iter(virtuals) do
+          local namespace_chain_subbed = get.arr.arr_by_nth_element_subbed(namespace_chain, 1, virtual)
+          local virtual_value = get.str_or_number_arr.str_by_joined(namespace_chain_subbed, ":") .. ":" .. node_key
+          virtual_map[virtual] = virtual_value
+          dothis.arr.push(
+            res.parent,
+            {
+              current_value,
+              virtual_value
+            }
+          )
+        end
       end
       if node_assoc then
         if node_assoc.__is_subnamespace then
@@ -261,10 +275,6 @@ get = {
             end
             dothis.arr.push(
               res[reskey],
-              toadd
-            )
-            dothis.arr.push(
-              to_deduce,
               toadd
             )
           end
@@ -289,16 +299,6 @@ get = {
           end
   
         end
-      end
-     
-      for _,v in transf.arr.pos_int_vt_stateless_iter(to_deduce) do
-        local deduced = transf.str.two_strs__arr_arr_by_deduce_from_parts(
-          v
-        )
-        parent = transf.two_arrs.arr_by_appended(
-          res.parent,
-          deduced
-        )
       end
       if node_assoc then
         local totalres = {res}
@@ -1770,29 +1770,6 @@ get = {
     str_by_percent_encoded = function(str, as_path)
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
       else return transf.str.urlcharset_str_by_encoded_query_param_value_folded(str) end
-    end,
-    str_by_insert_at_insertion_point = function(str, insertion_point, insertion)
-      if insertion_point == "end" then
-        return str .. insertion
-      elseif insertion_point == "start" then
-        return insertion .. str
-      elseif get.str.bool_by_startswith_any_w_str_arr(insertion, {"r", "i"}) then
-        local namespace, inference, valparts = transf.str.str_or_nil_and_str_or_nil_and_str_arr_by_namespace_inference_valparts(str)
-        local index = transf.nonindicated_number_str.number_by_base_10(insertion:sub(2))
-        local type = insertion:sub(1,1)
-        local trueindex 
-        if type == "r" then trueindex = index * 2
-        elseif type == "i" then trueindex = index * 2 - 1 end
-        local action = insertion:sub(3,3)
-        if action == "i" then
-          valparts[trueindex] = insertion
-        elseif action == "p" then
-          valparts[trueindex] = insertion .. valparts[trueindex]
-        elseif action == "s" then
-          valparts[trueindex] = valparts[trueindex] .. insertion
-        end
-        return transf.str_or_nil_and_str_or_nil_and_str_arr.str_by_namespace_inference_valparts(namespace, inference, valparts)
-      end
     end,
   },
   nonindicated_number_str_arr = {

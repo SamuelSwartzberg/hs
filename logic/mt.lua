@@ -197,6 +197,10 @@ ls = {
       result = "{{[d.prts[1]]}}:{{[d.prts[2]]}}"
     }
   },
+  two_strs__arr_arr_by_additional_siblings = {
+    {"foreground:blur", "general:blurry foreground"},
+    {"background:blur", "general:blurry foreground"}
+  },
   note_key = {
     "positive_prompt", -- what the creator was told to create
     "negative_prompt", -- what the creator was told not to create
@@ -264,6 +268,23 @@ ls = {
     "creation_lon", -- longitude of the object as a decimal number, if applicable. E.g. 11.576124
     "under_management", -- If this namespace contains a value, this means that we're managing the object for another person or organization, which is what this namespace will contain.
 
+  },
+  global_namespace_taking_key_name_arr = {
+    "thing",
+    "substance",
+    "substance_part",
+    "focus",
+    "theme",
+    "accent",
+    "framing",
+    "incidental",
+    "foreground",
+    "midground",
+    "background",
+    "creation",
+    "proximate_source",
+    "acquisition",
+    "use",
   },
   composition = {
     "visual composition",

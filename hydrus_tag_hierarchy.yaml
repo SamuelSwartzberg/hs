@@ -1,10 +1,6 @@
 # schema outline
-# toplevel key - main tag namespace
-# virtual main tag namespace: For some main tag namespaces, in constructing the output, we will reuse a toplevel key but substitute a different main tag namespace. This is a virtual main tag namespace.
-# special children of the toplevel key:
-#   __virtuals: list of virtual main tag namespaces
-# non-toplevel key - tag value (most of the time)
-# non-toplevel key starting with __ - information about the tag value
+# key - tag value (most of the time)
+# key starting with __ - information about the tag value
 #   __ex: explanation of the tag value
 #   __is_subnamespace: Boolean indicating whether the tag value is a subnamespace. If true, all lower-level keys are tag values in the subnamespace. Subnamespaces may be nested. References to subnamespaced tags must include the subnamespace.
 #   __infer: Use inferral logic using the specified group
@@ -1090,6 +1086,7 @@ things:
         inspiration:
   natural phenomena:
   relation:
+    __is_subnamespace: true
     source:
     target:
     spatial relation:
@@ -1523,10 +1520,6 @@ general:
     _rs: "focus:"
     __infer:
       _rs: universalpredicatable
-  blurry foreground:
-    _rs: "foreground:blur"
-  blurry background:
-    _rs: "background:blur"
   licking:
     _rs: "thing:thing:bodypartlike:tongue +essive+"
   licking dildo:

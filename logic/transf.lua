@@ -4514,44 +4514,38 @@ transf = {
       local parts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(str, "&&")
       return transf.arr.hydrus_file_hash_arr_by_search(parts)
     end,
-    str_or_nil_and_str_or_nil_and_str_arr_by_namespace_inference_valparts = function(str)
+    three_str_or_nils_by_namespace_inference_val = function(str)
       local noinference, inference  = get.str.n_strs_by_split_w_str(str, "/") -- get everything before '/' - after is a potential modifier
       local namespace, val = get.str.two_strs_or_nil_by_split_w_str(noinference, ":")
-      local valparts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(val, "+")
-      return namespace, inference, valparts
+      return namespace, inference, val
     end,
     two_strs__arr_arr_by_deduce_from_parts = function(str)
       local res = {}
-      
-      local namespace, inference, valparts = transf.str.str_or_nil_and_str_or_nil_and_str_arr_by_namespace_inference_valparts(str)
+      -- example: str = thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
+      local namespace, inference, val = transf.str.three_str_or_nils_by_namespace_inference_val(str)
       if inference then
         dothis.arr.push(
           res,
-          {
-            str,
-            "complete_modification:" .. inference
-          }
-        )
+          { inference, str }
+        ) -- e.g. thing:targeting another is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
+        dothis.arr.push(
+          res,
+          { namespace .. ":" .. val, str}
+        ) -- e.g. thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
       end
+      local valparts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(val, "+")
+
       for i = 1, #valparts, 1 do
         local valpart = valparts[i]
-        if i % 2 then -- valpart is a relationship
-          dothis.arr.push(
-            res,
-            {
-               str,
-              "interaction:" .. valpart
-            }
-          )
-        else
-          dothis.arr.push(
-            res,
-            {
-              str,
-              valpart
-            }
-          )
+        local unmodified, modifier = get.str.n_strs_by_extracted_onig(valpart, "^([^\\[]+)\\[([^\\]])\\] *" ) -- e.g. thing:bodypartlike:hand[thing:quantification:plural]
+        if unmodified and modifier then
+          dothis.arr.push(res, {modifier, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:quantification:plural (or more precisely, thing:quantification:plural is a parent to thing:bodypartlike:hand[plural])
+          dothis.arr.push(res, {unmodified, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:bodypartlike:hand (or more precisely, thing:bodypartlike:hand is a parent to thing:bodypartlike:hand[plural])
         end
+        dothis.arr.push(
+          res,
+          { valpart, namespace .. ":" .. val }
+        ) -- e.g. thing:bodypartlike:hand[plural]  is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist
       end
       return res
     end,
@@ -4910,28 +4904,38 @@ transf = {
       )
     end,
   },
+  hydrus_tag_hierarchy = {
+    hydrus_rel_spec = function(hierarchy)
+      local basic_rel_spec = get.hydrus_tag_hierarchy_node.hydrus_rel_spec("global", hierarchy, nil, nil, ls.global_namespace_taking_key_name_arr)
+      local tag_map = get.hydrus_tag_hierarchy_node.str_key_str_value_assoc_by_danbooru_to_my_tag_map("global", hierarchy)
+      local further_siblings = get.danbooru_hydrus_inference_specifier_arr.two_strs__arr_arr_by_danbooru_tag_my_tag_implications(
+        ls.danbooru_hydrus_inference_specifier_arr,
+        tag_map
+      )
+      basic_rel_spec.sib = transf.two_arrs.arr_by_appended(basic_rel_spec.sib, further_siblings)
+      local simple_siblings = ls.two_strs__arr_arr_by_additional_siblings
+      basic_rel_spec.sib = transf.two_arrs.arr_by_appended(basic_rel_spec.sib, simple_siblings)
+      local all_current_tags = transf.hydrus_rel_spec.str_arr_by_to_be_derived(basic_rel_spec)
+      local further_parents = transf.str_arr.two_strs__arr_arr_by_deduce_from_parts(
+        all_current_tags
+      )
+      basic_rel_spec.parent = transf.two_arrs.arr_by_appended(basic_rel_spec.parent, further_parents)
+      return basic_rel_spec
+    end,
+  },
   hydrus_rel_spec = {
-    hydrus_rel_spec_by_process_modifiers = function(hydrus_rel_spec)
-      local res = hydrus_rel_spec
-      res = transf.two_arrs.arr_by_appended(
-        res.implies,
-        transf.two_strs__arr_arr.two_strs__arr_arr_by_get_hydrus_modifier_implies(
-          res.implies
+    str_arr_by_to_be_derived = function(hydrus_rel_spec)
+      return transf.arr.set(
+        transf.two_arrs.arr_by_appended(
+          transf.arr_arr.arr_by_flatten(hydrus_rel_spec.sib),
+          transf.arr_arr.arr_by_flatten(hydrus_rel_spec.parent)  
         )
       )
-      res = transf.two_arrs.arr_by_appended(
-        res.implies,
-        transf.two_strs__arr_arr.two_strs__arr_arr_by_get_hydrus_modifier_implies(
-          res.aliases
-        )
-      )
-      return res
     end,
     input_spec_arr = function(hydrus_rel_spec)
-      hydrus_rel_spec = transf.hydrus_rel_spec.hydrus_rel_spec_by_process_modifiers(hydrus_rel_spec)
       local arr = {}
       error("todo implies")
-      for _, alias in transf.arr.pos_int_vt_stateless_iter(hydrus_rel_spec.aliases) do
+      for _, sib in transf.arr.pos_int_vt_stateless_iter(hydrus_rel_spec.sib) do
         -- to add an alias, we need to focus the source text field, type the source, focus the target text field, type the target, and press enter to stage, and then click the add button to add it
         arr = transf.two_arrs.arr_by_appended(arr, {
           {
@@ -4944,7 +4948,7 @@ transf = {
             mouse_button_str =  "l"
           }, {
             mode = "key",
-            key = alias[1]
+            key = sib[2]
           }, {
             x = 450,
             y = -670,
@@ -4955,7 +4959,7 @@ transf = {
             mouse_button_str =  "l"
           }, {
             mode = "key",
-            key = alias[2]
+            key = sib[1]
           }, {
             mode = "key",
             key = "enter"
@@ -5253,6 +5257,14 @@ transf = {
         end
         dothis.arr.push(res, {k, v})
       end
+    end,
+    two_strs__arr_arr_by_deduce_from_parts = function(arr)
+      return transf.arr_arr.arr_by_flatten(
+        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+          arr,
+          transf.str.two_strs__arr_arr_by_deduce_from_parts
+        )
+      )
     end
     
   },
@@ -5986,6 +5998,9 @@ transf = {
       )
     end,
     arr_by_flatten = plarray2d.flatten,
+    set_by_flatten = function(arr)
+      return transf.arr.set(transf.arr_arr.arr_by_flatten(arr))
+    end,
     arr_pos_int_stateful_iter_by_columns = plarray2d.columns,
     set_arr = function(arr)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
@@ -6057,18 +6072,6 @@ transf = {
         arr,
         ls.note_key
       )
-    end,
-    two_strs__arr_arr_by_get_hydrus_modifier_implies = function(arr)
-      local res = {}
-      for _, two_strs__arr in transf.arr.pos_int_vt_stateless_iter(arr) do
-        for _, str in transf.arr.pos_int_vt_stateless_iter(two_strs__arr) do
-          local main, modifier = get.str.n_not_starting_o_ending_with_whitespace_strs_by_split_w_str(str, "/")
-          if modifier then
-            dothis.arr.push(res, {str, main}) -- so that e.g. "lover /inferred" auto adds "lover"
-          end
-        end
-      end
-      return res
     end,
   },
   noempty_line_and_assoc = {
