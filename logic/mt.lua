@@ -119,16 +119,83 @@ ls = {
     "questionable",
     "explicit"
   },
-  hydrus_namespace = {
-    "character",
-    "date",
-    "medium",
-    "meta",
-    "person",
-    "series",
-    "studio",
+  danbooru_category_name_arr = {
     "general",
-    "title"
+    "artist",
+    "copyright",
+    "character",
+    "meta",
+  },
+  danbooru_hydrus_inference_specifier_arr = {
+    
+    {
+      danbooru_tags = {
+        prts = {
+          {
+            "suit",
+            "headwear",
+            -- more later, currently just proof of concept
+          }, {
+            "red",
+            "blue",
+            "green",
+            "yellow",
+            "purple",
+            "orange",
+            "pink",
+            "brown",
+            "black",
+            "white",
+            "grey",
+            "aqua",
+            "beige",
+          }
+        },
+        
+        combine = "general:{{[d.prts[2]]}} {{[d.prts[1]]}}",
+      },
+      result =  "thing:thing:{{[d.my(d.prts[1])]}} ++ thing:{{[d.my(d.prts[2])]}}",
+    },
+    {
+      danbooru_tags = {
+        prts = {
+          {
+            "hand",
+            "arm"
+          }, {
+            "s",
+            "",
+          }, {
+            "on",
+            "around"
+          }, {
+            "",
+            "own",
+            "another's"
+          }, {
+            "face",
+            "waist",
+            "cheek",
+            -- more later, currently just proof of concept
+          }
+        },
+        combine = "general:{{[d.prts[1]]}} {{[d.prts[2]]}} {{[d.prts[3]]}} {{[d.prts[4]]}}",
+      },
+      action = "thing:"
+        .. "thing:{{[ d.my(d.prts[1]) .. d.decorate_if_ext(d.my(d.prts[2]), \"[%s]\") ]}}" 
+        .. " +{{[ d.my(d.prts[3]) ]}}"
+        .. " thing:{{[ d.my(d.prts[5]) ]}}"
+        .. " {{[ d.decorate_if_ext(d.my(d.prts[4]), \"/%s\") ]}}"
+    }, {
+      danbooru_tags = {
+        fetch = "* focus",
+        prts_extractor = function(name)
+          return get.str.str_arr_by_onig_regex_match(name, "^general:(.*)([^ ]+)$")
+        end,
+        combine = "general:{{[d.prts[2]]}} {{[d.prts[1]]}}",
+      },
+      result = "{{[d.prts[1]]}}:{{[d.prts[2]]}}"
+    }
   },
   note_key = {
     "positive_prompt", -- what the creator was told to create
@@ -155,32 +222,27 @@ ls = {
     "midground", -- A global namespace item which describes something that is in the midground of the fobjectlike.
     "background", -- A global namespace item which describes something that is in the background of the fobjectlike.
 
-    -- creation tag namespaces - who, when, where, and how was this object created?
+    -- creation tag namespaces
     
-    "creation_ware", -- A global namespace item that was used to create the object. This could be a creator, an object used in its creation, a location, or the like.
-    "creation_title", -- the official title of a work, if applicable. E.g. "The Lord of the Rings: The Fellowship of the Ring", "One Hundred Years of Solitude", etc. Bear in mind that this isn't the title of the series, but of the specific work. 
-    "semver", -- semantic version of a work, e.g. 1.0.0
-    "lat", -- latitude of the object as a decimal number, if applicable. E.g. 48.137154.
-    "lon", -- longitude of the object as a decimal number, if applicable. E.g. 11.576124
+    "creation", -- A global namespace item that describes something about the creation of the object. This could be a creator, an object used in its creation, a location, or the like.
+    "creation_title", -- the title as chosen by the creator
 
-    -- sharing tag namespaces - many objects I encounter were shared in some way, such that I was able to encounter them. These tags are for that.
+    -- proximate source tag namespaces
 
-    "proximate_source", -- A global namespace item which describes something about how I encountered the object, where this
-    "proximate_source_subdivision", -- the subdivision of the proximate_source where I encountered the object. E.g. the subreddit, the board, etc.
-    "proximate_source_title", -- the title of the proximate_source. E.g. the reddit post title
-    "uploader", -- the uploader/sharer of the object on the proximate_source. E.g. the reddit username, or the twitter handle.
+    "proximate_source", -- A global namespace item which describes something about how I encountered the object. This could be the uploader, the website, the subreddit, etc.
+    "proximate_source_title", -- the title as chosen by the proximate source, most often the uploader
 
     -- acquisition tag namespaces - how did I acquire the object? This is not the same as sharing, as I may have acquired the object in a way that doesn't involve sharing, e.g. by creating it myself.
 
-    "date", -- date of acquisition in (partial) RFC3339 format
-    "acquisition_context", -- the context of my life this object was created or encountered in. Can be general, e.g. edu, work, leisure, etc., or more specific, e.g. freelance translation. The more specific ones should be tag children of the more general ones. The difference between this and occasion is that an occasion is a temporally bounded event, while an acquisition_context is an area of my life that may or may not be temporally bounded. In a sense, these are orthogonal to each other. If I have a christmas party at my workplace, I would tag the occasion as christmas (or perhaps 2015 christmas party, with corresponding parents), and the acquisition_context as work (or perhaps 2012-2017 graphic design job). So if I was wondering what I did at christmas, I could just search occasion:christmas, even though I spent the 2015 christmas at work, and perhaps another at home.
     "acquisition", -- A global namespace item which describes something about how, when, where, in what context etc. I acquired the object.
+    "acquisition_title", -- the title during acqusition. I'm not sure if this is ever different from creation_title or proximate_source_title.
+    "acquisition_context", -- the context of my life this object was created or encountered in. Can be general, e.g. edu, work, leisure, etc., or more specific, e.g. freelance translation. The more specific ones should be tag children of the more general ones. 
 
     -- use tag namespaces - why did I keep the object? What do I use it for?
 
-    "use", -- Without complex semantics, what might I want to use the object for? e.g. reaction_face, inspiration, etc. 
-    "under_management", -- If this namespace contains a value, this means that we're managing the object for another person or organization, which is what this namespace will contain.
-
+    "use", -- A global namespace item which describes something about why I kept the object, or how I'd like to use it in the future.
+    "use_title", -- the title during use. For example, a funny name I give the object.
+    
     -- series tag namespaces - where within some general series does this object fit?
 
     "chapter_index", -- numerical index of a chapter, e.g. 25
@@ -196,26 +258,12 @@ ls = {
 
     -- general meta tag namespaces - tags with a more general purpose, that don't fit into any of the above categories.
 
+    "date", -- date of acquisition in (partial) RFC3339 format
     "collection", -- a wide field that allows grouping objects in a way where I don't want to create a specific tag namespace, potentially only temporarily. Prefer more specific namespaces where possible.
-  },
-  use = {
-    "hot",
-      "medium hot",
-      "very hot",
-      "incredibly hot",
-    "funny",
-      "medium funny",
-      "very funny",
-      "incredibly funny",
-    "inspiration",
-      "medium inspiration",
-      "very inspiration",
-      "incredibly inspiration",
-      "style inspiration",
-    "reflection",
-      "medium reflection",
-      "very reflection",
-      "incredibly reflection",
+    "creation_lat", -- latitude of the object as a decimal number, if applicable. E.g. 48.137154.
+    "creation_lon", -- longitude of the object as a decimal number, if applicable. E.g. 11.576124
+    "under_management", -- If this namespace contains a value, this means that we're managing the object for another person or organization, which is what this namespace will contain.
+
   },
   composition = {
     "visual composition",
@@ -415,47 +463,6 @@ ls = {
                                 "pupil + red 1-adic range SBCS^2^ palette", -- aliases general:red pupils
                                 "pupil + white 1-adic range SBCS^2^ palette", -- aliases general:white pupils
                                 "pupil + yellow 1-adic range SBCS^2^ palette", -- aliases general:yellow pupils
-                  "pupil + thing",
-                    "pupil + object",
-                      "pupil + body part",
-                        "pupil + general body part",
-                        
-                "ear + x",
-                  "ear + thing",
-                    "ear + agentlike",
-                      "ear + animallike",
-                        "ear + imagined animal",
-                          "ear + pokemon",
-                        "ear + real animal",
-                          "ear masking bat", -- aliases general:bat ears
-                          "ear masking bear", -- aliases general:bear ears
-                          "ear masking rabbit", -- aliases general:rabbit ears
-                          "ear masking cat", -- aliases general:cat ears
-                          "ear masking cow", -- aliases general:cow ears
-                          "ear masking deer", -- aliases general:deer ears
-                          "ear masking dog", -- aliases general:dog ears
-                          "ear masking ferret", -- aliases general:ferret ears
-                          "ear masking fox", -- aliases general:fox ears
-                          "ear masking goat", -- aliases general:goat ears
-                          "ear masking horse", -- aliases general:horse ears
-                          "ear masking lion", -- aliases general:lion ears
-                          "ear masking monkey", -- aliases general:monkey ears
-                          "ear masking mouse", -- aliases general:mouse ears
-                          "ear masking panda", -- aliases general:panda ears
-                          "ear masking pikachu", -- aliases general:pikachu ears
-                          "ear masking pig", -- aliases general:pig ears
-                          "ear masking raccoon", -- aliases general:raccoon ears
-                          "ear masking sheep", -- aliases general:sheep ears
-                          "ear masking squirrel", -- aliases general:squirrel ears
-                          "ear masking tiger", -- aliases general:tiger ears
-                          "ear masking wolf", -- aliases general:wolf ears
-
-  creator = {
-    
-  },
-  general = {
-    "mixed media", -- [substance] cnm traditional-seeming graphic art surface covering ++ digital-seeming graphic art surface covering
-  },
   format = {
     "audio",
     "visual",
@@ -536,37 +543,6 @@ ls = {
           "rolled paged media",
             "scroll",
           "digitally paginated paged media",
-  },
-  thing_namespace = {
-    "thing",
-    "substance",
-    "focus",
-    "theme",
-    "accent",
-    "framing",
-    "incidental"
-  },
-  thing_other_namespace = {
-    "substance",
-    "focus",
-    "theme",
-    "accent",
-    "framing",
-    "incidental"
-  },
-  series_namespace = {
-    "chapter index",
-    "chapter title",
-    "page index",
-    "volume index",
-    "episode index",
-    "episode subindex",
-    "season",
-    "series",
-    "character",
-    "studio",
-    "title",
-    "prompt"
   },
   csl_type = {
     "article",

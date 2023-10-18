@@ -4569,12 +4569,21 @@ transf = {
     end,
 
   },
-  danbooru_tag_record_arr = {
+  danbooru_tag_record = {
     pos_int_by_id = function(tag_record)
       return tag_record.id
     end,
     printable_ascii_by_name = function(tag_record)
       return tag_record.name
+    end,
+    sme_5_pos_int_by_category = function(tag_record)
+      return tag_record.category
+    end,
+    danbooru_category_name = function(tag_record)
+      return tblmap.sme_5_pos_int.danbooru_category_name[tag_record.category]
+    end,
+    printable_ascii_by_name_prefixed_namespace = function(tag_record)
+      return  transf.danbooru_tag_record.danbooru_category_name(tag_record) .. ":" .. transf.danbooru_tag_record.printable_ascii_by_name(tag_record)
     end,
     danbooru_tag_implication_record_arr_by_name_as_antecedent = function(tag_record)
       return rest({
@@ -4597,6 +4606,14 @@ transf = {
       })
     end,
 
+  },
+  danbooru_tag_record_arr = {
+    printable_ascii_arr_by_name = function(tag_record_arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(tag_record_arr, transf.danbooru_tag_record.printable_ascii_by_name)
+    end,
+    printable_ascii_arr_by_name_prefixed_namespace = function(tag_record_arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(tag_record_arr, transf.danbooru_tag_record.printable_ascii_by_name_prefixed_namespace)
+    end,
   },
   str_or_nil_and_str_or_nil_and_str_arr = {
     str_by_namespace_inference_valparts = function(str1, str2, str_arr)
@@ -4858,112 +4875,39 @@ transf = {
     end,
     
   },
-  hydrus_relationship_block = {
-    hydrus_rel_spec = function(block)
-      local lines = transf.str.noempty_line_arr(block)
-      local hydrus_rel_spec = {
-        implies = {},
-        aliases = {},
-      }
-      local namespace
-      local parent_chain = {}
-      local indent_level = 1
-      for _, line in transf.arr.pos_int_vt_stateless_iter(lines) do
-        local new_indent_level = transf.str.pos_int_by_initial_indent_2(line)
-        if new_indent_level == 1 then -- new block mode
-          namespace = get.str.n_strs_by_extracted_onig(line, "^ +([^ ]+) *=")
-          parent_chain = {}
-        elseif new_indent_level > 1 then
-          -- extract item, data section
-          local item, data_section  = get.str.n_strs_by_extracted_onig(line, "^ +\"([^\"]+)\",? *(?:-- *([^|]+))? *$")
-          if data_section and #data_section > 8 then -- 8 for sanity check
-            local data_subsections = get.str.not_empty_str_arr_by_split_w_str(data_section, "[") -- subsections are [namespace] content, except the first one, which is just content
-            for _, data_subsection in transf.arr.pos_int_vt_stateless_iter(data_subsections) do
-              local data_namespace, data_content = get.str.n_strs_by_split_w_str(data_subsection, "]")
-              if not data_content then
-                data_content = data_namespace
-                data_namespace = namespace
-              end
-              -- subsection content consists of key-value pairs separated by semicolons, with the key and value separated by a space. Values can be comma-separated lists. 
-              local parts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(data_section, ";" )
-              for _, part in transf.arr.pos_int_vt_stateless_iter(parts) do
-                local key, value = get.str.n_strs_by_split_w_str(part, " ", 2)
-                local values = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(value, ",")
-                for _, val in transf.arr.pos_int_vt_stateless_iter(values) do
-                  local val_namespace, actual_val = get.str.n_strs_by_split_w_str(val, ":", 2)
-                  if not actual_val then
-                    actual_val = val_namespace
-                    val_namespace = data_namespace
-                  end
-                  local namespaced_val = val_namespace .. ":" .. actual_val
-                  if key == "cnm" then -- a canonical name is the same thing as an alias, but with source and target swapped. Also, the source must be in the same namespace as the item and thus has it prepended automatically
-                    dothis.arr.push(hydrus_rel_spec.aliases, {
-                      namespaced_val,
-                      data_namespace .. ":" .. item
-                    })
-                  else
-                    dothis.arr.push(hydrus_rel_spec[key], {
-                      data_namespace .. ":" .. item,
-                      namespaced_val
-                    })
-                  end
-
-                  -- handle the case where the value is composed and thus we need to set up further implications
-
-                  
-                  
-                  
-                  if #valparts > 1 and val_namespace ~= "thing" then -- composed values first need to be implied to thing:
-                    dothis.arr.push(hydrus_rel_spec.implies, {
-                      val_namespace .. ":" .. actual_val,
-                      "thing:" .. actual_val
-                    })
-                  end
-                 
-                      if  #valpart > 0 then
-                        dothis.arr.push(hydrus_rel_spec.implies, {
-                          namespaced_val,
-                          "relationship:" .. valpart
-                        })
-                      end
-                    else 
-                      dothis.arr.push(hydrus_rel_spec.implies, {
-                        "thing:" .. val,
-                        "thing:" .. valpart
-                      })
-                    end
-                  end
-                end
-              end
-            end
-          end
-          if transf.arr.pos_int_by_length(parent_chain) > 0 then
-            dothis.arr.push(hydrus_rel_spec.implies, {
-              namespace .. ":" .. item,
-              namespace .. ":" .. transf.arr.t_by_last(parent_chain)
-            }) -- establish the implication e.g. whatever:child -> whatever:parent
-          end
-          if namespace == "thing" then -- establish the implication e.g. focus:foo -> thing:foo
-            for _, ns in transf.arr.pos_int_vt_stateless_iter(ls.thing_other_namespace) do
-              dothis.arr.push(hydrus_rel_spec.implies, {
-                ns .. ":" .. item,
-                "thing:" .. item
-              })
-            end
-          end
-          if new_indent_level > indent_level then -- we're going deeper
-            dothis.arr.push(parent_chain, item)
-          elseif new_indent_level < indent_level then -- we're going shallower
-            for i = 1, indent_level - new_indent_level do
-              dothis.arr.pop(parent_chain)
-            end
-          end
-        else
-          error("invalid indent level, must be 1 or greater, was " .. new_indent_level)
-        end
-        new_indent_level = indent_level
+  danbooru_hydrus_inference_specifier = {
+    str_arr_arr_by_danbooru_prts = function(spec)
+      if spec.danbooru_tags.prts then
+        return spec.danbooru_tags.prts
+      else
+        local tag_records = transf.str.danbooru_tag_record_arr(
+          spec.danbooru_tags.fetch
+        )
+        local namespaced_tags = transf.danbooru_tag_record_arr.printable_ascii_arr_by_name_prefixed_namespace(tag_records)
+        local arr_arr_by_extraction = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+          namespaced_tags,
+          spec.danbooru_tags.prts_extractor
+        )
+        local unproc_prts = transf.arr_arr.arr_arr_by_swap_row_column(arr_arr_by_extraction)
+        local prts = transf.arr_arr.set_arr(unproc_prts)
+        return prts
       end
-          
+    end,
+    str_arr_arr_by_danbooru_cartesian_product = function(spec)
+      return transf.arr_arr.arr_arr_by_cartesian_product(
+        transf.danbooru_hydrus_inference_specifier.str_arr_arr_by_danbooru_prts(spec)
+      )
+    end,
+    str_arr_by_danbooru_tag = function(spec)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        transf.danbooru_hydrus_inference_specifier.str_arr_arr_by_danbooru_cartesian_product(spec),
+        function(arr)
+          return get.str.str_by_evaled_as_template(
+            spec.danbooru_tags.combine,
+            {prts=arr}
+          )
+        end
+      )
     end,
   },
   hydrus_rel_spec = {
@@ -5400,6 +5344,12 @@ transf = {
       end
       return res
     end,
+    two_ts__arr_arr_by_zip_error_not_same_length = function(arr1, arr2)
+      if #arr1 ~= #arr2 then
+        error("arrays not same length")
+      end
+      return transf.two_ts__arr_arr.two_ts__arr_arr_by_zip_stop_shortest(arr1, arr2)
+    end,
     assoc_by_zip_stop_shortest = function(arr1, arr2)
       return transf.two_anys__arr_arr.assoc(
         transf.two_arrs.two_ts__arr_arr_by_zip_stop_shortest(arr1, arr2)
@@ -5579,12 +5529,52 @@ transf = {
     end,
   },
   stateless_iter = {
-    arr = function(...)
+    arr_by_pack_individual = function(...)
       local res = {}
       for a1, a2, a3, a4, a5, a6, a7, a8, a9 in ... do
         dothis.arr.push(
           res,
           {a1, a2, a3, a4, a5, a6, a7, a8, a9}
+        )
+      end
+      return res
+    end,
+    arr_by_take_first = function(...)
+      local res = {}
+      for a in ... do
+        dothis.arr.push(
+          res,
+          a
+        )
+      end
+      return res
+    end,
+  },
+  stateful_iter = {
+    arr_by_pack_individual = function(iter)
+      local res = {}
+      while true do
+        local singleres = {iter()}
+        if #singleres == 0 then
+          break
+        end
+        dothis.arr.push(
+          res,
+          singleres
+        )
+      end
+      return res
+    end,
+    arr_by_take_first = function(iter)
+      local res = {}
+      while true do
+        local singleres = {iter()}
+        if #singleres == 0 then
+          break
+        end
+        dothis.arr.push(
+          res,
+          singleres[1]
         )
       end
       return res
@@ -5990,8 +5980,19 @@ transf = {
         transf.two_arrs.bool_by_smaller_first_item
       )
     end,
-
+    arr_arr_by_swap_row_column = function(arr)
+      return transf.stateful_iter.arr_by_take_first(
+        transf.arr_arr.arr_pos_int_stateful_iter_by_columns(arr)
+      )
+    end,
     arr_by_flatten = plarray2d.flatten,
+    arr_pos_int_stateful_iter_by_columns = plarray2d.columns,
+    set_arr = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        transf.arr.set
+      )
+    end,
     arr_by_map_to_last = function(arr)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.arr.t_by_last)
     end,
@@ -6021,6 +6022,9 @@ transf = {
         transf.arr.reverse_mapped(arr)
       )
       return transf.arr_by_reversed.arr(reversed_res)
+    end,
+    arr_arr_by_cartesian_product = function(arr)
+      return get.arr_arr.arr_arr_by_cartesian_product(arr, 1)
     end,
   },
   two_anys__arr_arr = {

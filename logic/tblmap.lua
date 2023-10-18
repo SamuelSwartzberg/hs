@@ -719,6 +719,15 @@ tblmap = {
       ["muscle %s"] = {"i1i", "thing:bodypartlike:muscled body"},
     },
   },
+  sme_5_pos_int = {
+    danbooru_category_name = {
+      [0] = "general",
+      [1] = "artist",
+      [3] = "copyright",
+      [4] = "character",
+      [5] = "meta",
+    }
+  },
   keychange_fstring_name = {
     keychange_fstring_arr = {
       handable = {

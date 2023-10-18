@@ -1550,9 +1550,7 @@ is = {
     end,
   },
   all_namespace = {
-    hydrus_namespace = function(str)
-      return get.arr.bool_by_contains(ls.hydrus_namespace, str)
-    end,
+
   },
   mixed_strict_snake_case = {
     camel_strict_snake_case = function(str)
@@ -1718,6 +1716,9 @@ is = {
     end,
     booru_rating = function(str)
       return get.arr.bool_by_contains(ls.booru_rating, str)
+    end,
+    danbooru_category_name = function(str)
+      return get.arr.bool_by_contains(ls.danbooru_category_name_arr, str)
     end,
     type_name = function(str)
       return get.arr.bool_by_contains(ls.type_name, str)
@@ -2106,6 +2107,9 @@ is = {
   sme_6_pos_int = {
     weekday_int_start_0 = transf["nil"]["true"],
     date_component_index = transf["nil"]["true"],
+    sme_5_pos_int = function(num)
+      return num <= 5
+    end,
     zero = function(num)
       return num == 0
     end,
@@ -2568,6 +2572,9 @@ is = {
     end,
     danbooru_tag_implication_record = function(t)
       return t.id and t.antecedent_name and t.consequent_name
+    end,
+    danbooru_hydrus_inference_specifier = function(t)
+      return t.danbooru_tags and t.result
     end,
     
   },

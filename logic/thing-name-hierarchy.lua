@@ -567,9 +567,7 @@ thing_name_hierarchy = {
                                     billing_unit = "leaf",
                                     markdown_extension_name = "leaf",
                                     backup_type = "leaf",
-                                    all_namespace = {
-                                      hydrus_namespace = "leaf",
-                                    },
+                                    all_namespace = "leaf",
                                     dynamic_structure_name = "leaf",
                                     api_name = "leaf",
                                   },
@@ -604,6 +602,7 @@ thing_name_hierarchy = {
                                   flag_profile_name = "leaf",
                                   markdown_extension_set_name = "leaf",
                                   booru_rating = "leaf",
+                                  danbooru_category_name = "leaf",
                                   type_name = "leaf",
                                 },
                                 iso_3366_1_alpha_2_country_code = "leaf",
@@ -866,6 +865,7 @@ thing_name_hierarchy = {
         hydrus_internal_tag_spec = "leaf",
         danbooru_tag_record = "leaf",
         danbooru_tag_implication_record = "leaf",
+        danbooru_hydrus_inference_specifier = "leaf",
       }
     },
     primitive = {
@@ -897,6 +897,7 @@ thing_name_hierarchy = {
                           sme_8_pos_int = {
                             sme_7_pos_int = {
                               sme_6_pos_int = {
+                                sme_5_pos_int = "leaf",
                                 weekday_int_start_0 = "leaf",
                                 date_component_index = "leaf",
                                 zero = "leaf",

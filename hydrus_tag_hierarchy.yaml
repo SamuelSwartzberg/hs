@@ -24,7 +24,10 @@ things:
     char:
       __is_subnamespace: true
       real:
-        renate maria trujillo:
+        my family:
+          my parents:
+            renate maria trujillo:
+          my siblings:
       fictional:
         purple haired mpdg pornpen:
           _rs: purple haired mpdg (pornpen)
@@ -301,89 +304,89 @@ things:
           schematic:
           overview:
           miscellaneous information:
-  style: 
-    visual style:
-      color style:
-        SBCS^2^:
-          lightness SBCS^2:
-            lightness 1-adic SBCS^2:
-              lightness 1-adic range SBCS^2:
-                _s:
-                  theme: general:pale color
-          saturation SBCS^2:
-            saturation 1-adic SBCS^2:
-              0 saturation 1-adic SBCS^2:
-                _s:
-                  substance: general:greyscale
-          hsv saturation SBCS^2:
-            hsv saturation 1-adic SBCS^2:
-              hsv saturation 1-adic range SBCS^2: 
-                1st 2tile hsv saturation 1-adic range SBCS^2:
-                  _s:
-                    theme: general:muted color
-          hsv saturation value SBCS^2:
-            hsv saturation value 1-adic SBCS^2:
-              hsv saturation value 1-adic range SBCS^2:
-                1st 4tile hsv saturation 4th 4tile value 1-adic range SBCS^2:
-                  _s:
-                    theme: general:pastel colors
-          hue SBCS^2^:
-            temperature SBCS^2^:
-              red-based temperature SBCS^2^:
-                red-based cool SBCS^2^:
-                  red-based cool range SBCS^2^:
-                red-based warm SBCS^2^:
-                  red-based warm range SBCS^2^:
-              yellow-based temperature SBCS^2^:
-                yellow-based cool SBCS^2^:
-                  yellow-based cool range SBCS^2^:
-                yellow-based warm SBCS^2^:
-                  yellow-based warm range SBCS^2^:
-            hue 1-adic SBCS^2^:
-              hue 1-adic range SBCS^2^:
-                _s:
-                  substance: general:monochrome
-                aqua 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:aqua theme
-                black 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:black theme
-                blue 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:blue theme
-                brown 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:brown theme
-                green 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:green theme
-                grey 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:grey theme
-                orange 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:orange theme
-                pink 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:pink theme
-                purple 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:purple theme
-                red 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:red theme
-                white 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:white theme
-                yellow 1-adic range SBCS^2^:
-                  _s:
-                    theme: general:yellow theme
-      hyperbody style:
-        line style:
-          line thickness style:
-          line roughness style:
-        surface style:
+  color:
+    SBCS^2^:
+      lightness SBCS^2:
+        lightness 1-adic SBCS^2:
+          lightness 1-adic range SBCS^2:
+            _s:
+              theme: general:pale color
+      saturation SBCS^2:
+        saturation 1-adic SBCS^2:
+          0 saturation 1-adic SBCS^2:
+            _s:
+              substance: general:greyscale
+      hsv saturation SBCS^2:
+        hsv saturation 1-adic SBCS^2:
+          hsv saturation 1-adic range SBCS^2: 
+            1st 2tile hsv saturation 1-adic range SBCS^2:
+              _s:
+                theme: general:muted color
+      hsv saturation value SBCS^2:
+        hsv saturation value 1-adic SBCS^2:
+          hsv saturation value 1-adic range SBCS^2:
+            1st 4tile hsv saturation 4th 4tile value 1-adic range SBCS^2:
+              _s:
+                theme: general:pastel colors
+      hue SBCS^2^:
+        temperature SBCS^2^:
+          red-based temperature SBCS^2^:
+            red-based cool SBCS^2^:
+              red-based cool range SBCS^2^:
+            red-based warm SBCS^2^:
+              red-based warm range SBCS^2^:
+          yellow-based temperature SBCS^2^:
+            yellow-based cool SBCS^2^:
+              yellow-based cool range SBCS^2^:
+            yellow-based warm SBCS^2^:
+              yellow-based warm range SBCS^2^:
+        hue 1-adic SBCS^2^:
+          hue 1-adic range SBCS^2^:
+            _s:
+              substance: general:monochrome
+            aqua 1-adic range SBCS^2^:
+              _s:
+                theme: general:aqua theme
+                thing: general:aqua
+            black 1-adic range SBCS^2^:
+              _s:
+                theme: general:black theme
+                thing: general:black
+            blue 1-adic range SBCS^2^:
+              _s:
+                theme: general:blue theme
+            brown 1-adic range SBCS^2^:
+              _s:
+                theme: general:brown theme
+            green 1-adic range SBCS^2^:
+              _s:
+                theme: general:green theme
+            grey 1-adic range SBCS^2^:
+              _s:
+                theme: general:grey theme
+            orange 1-adic range SBCS^2^:
+              _s:
+                theme: general:orange theme
+            pink 1-adic range SBCS^2^:
+              _s:
+                theme: general:pink theme
+            purple 1-adic range SBCS^2^:
+              _s:
+                theme: general:purple theme
+            red 1-adic range SBCS^2^:
+              _s:
+                theme: general:red theme
+            white 1-adic range SBCS^2^:
+              _s:
+                theme: general:white theme
+            yellow 1-adic range SBCS^2^:
+              _s:
+                theme: general:yellow theme
+  hyperbody style:
+    line style:
+      line thickness style:
+      line roughness style:
+    surface style:
   allusion:
     __is_subnamespace: true
     meme:
@@ -435,6 +438,13 @@ things:
             _s: general:blur
   phallic object:
   abstract object:
+    identificiaton:
+      name:
+        artist name:
+          _s: general:artist name
+      version:
+        semver:
+          __is_subnamespace: true
     musical content:
     language (abstract):
       __is_subnamespace: true
@@ -447,6 +457,8 @@ things:
           found poetry:
         prose:
         functional:
+          code:
+            _s: general:code
       lect:
       language proper:
         english:
@@ -467,6 +479,7 @@ things:
       user interface object:
         user interface component:
           icon:
+            _s: general:icon (computing)
           camera user interface component:
             viewfinder:
               _s: general:viewfinder
@@ -496,7 +509,11 @@ things:
             aibooru:
           social media:
             discord:
+              discord channel:
+                midjourney discord channel:
             reddit:
+              subreddit:
+            twitter:
           ai sharing site:
             pornpendotai: 
               _rs: pornpen.ai
@@ -521,6 +538,11 @@ things:
                   pornpen blowjob model:
                   pornpen doggystyle model:
       software:
+        programming tool:
+          programming language:
+            _s: general:programming (topic)
+          programming framework:
+            hammerspoon:
         generative ai interface:
           image generation interface:
             pornpen web interface:
@@ -878,25 +900,31 @@ things:
       corporation:
         animation studio:
         xiaomi:
+        barmer:
+        mycontrol:
       institution:
         educational institution:
-          university:
-            german university:
-              tu:
-                _rs: technische universität berlin
-              hu:
-                _rs: humboldt universität zu berlin
-              fu:
-                _rs: freie universität berlin
-              ur:
-                _rs: universität regensburg
-
-          school:
-            _s: general:school
-            primary school:
-            secondary school:
-              middle school:
-              high school:
+          university constituent:
+            university:
+              german university:
+                tu:
+                  _rs: technische universität berlin
+                hu:
+                  _rs: humboldt universität zu berlin
+                fu:
+                  _rs: freie universität berlin
+                ur:
+                  _rs: universität regensburg
+            university course:
+          school constituent:
+            school:
+              primary school:
+              secondary school:
+                middle school:
+                high school:
+            school class:
+          kindergarden:
+            _s: general:kindergarten
         military organization:
           _s: general:military
           military:
@@ -937,8 +965,14 @@ things:
       state bureaucracy:
     education:
       enrollment:
+    insurance:
+      health insurance:
+        barmer health insurance:
+          _p: thing:barmer
     capitalist condition:
       employment:
+        freelance:
+        permanent employment:
       business activity:
         advertising:
           _s: general:ad
@@ -969,11 +1003,107 @@ things:
       rental housing:
     danger:
       danger prevention:
-    cultural activity:
     conflict:
       war:
         _s: war
+  knowledge:
+    academic discipline related:
+      linguistics:
+  quantification:
+    amount:
+      numerical:
+        dual:
+        trial:
+        quadral:
+        plural:
+      non-numerical:
+        single:
+    grouping:
+    viewpoint:
+  modification:
+    other:
+      hidden:
+      public:
+      clothed:
+      through clothes:
+      targeting another:
+    gradation:
+      gradation relation:
+        greater gradataion:
+        lesser gradation:
+        equal gradation:
+    aspect:
+      spective aspect:
+        retrospective aspect:
+        prospective aspect:
+    modality:
+      epistemic modality:
+        evidentiality:
+          indirectivity:
+          evidentiality proper:
+            inferential evidentiality:
+    voice:
+      activelike voice:
+        active voice:
+        reciprocal voice:
+      passivelike voice:
+        passive voice:
+        antipassive voice:
+        middlelike voice:
+          middle voice:
+          reflexive voice:
+  activity:
+    __is_subnamespace: true
+    sports:
+    social:
+      socializing:
+        dating:
+          _s: dating
+        talking:
+          _s: talking
+    media consumption:
+      gaming:
+      reading:
+        reading manga:
+      watching media:
+        watching anime:
+    language:
+      translation:
+    digital:
+      programming:
+        
+      web surfing:
+        hornysurfing:
+    cultural:
+    cognitive:
+      emotional:
+        positive emotional:
+          joy:
+          enjoyment:
+          amusement:
+          arousal:
+          awe:
+        negative emotional:
+          envy:
+      mental:
+        reflecting:
+        inspiration:
   natural phenomena:
+  relation:
+    source:
+    target:
+    spatial relation:
+      essive:
+        interessive:
+      tangent:
+        circumtangent:
+          hugging:
+          holding:
+          forcefully circumtangent:
+      vicinitive:
+      tective:
+      hesive:
+      lative:
   location:
     __is_subnamespace: true
     specific location:
@@ -1113,8 +1243,56 @@ things:
         human ear:
         animal ear:
           _s: general:animal ears
+          real-animal ear:
+            bat ear:
+              _s: general:bat ears
+            bear ear:
+              _s: general:bear ears
+            rabbit ear:
+              _s: general:rabbit ears
+            cat ear:
+              _s: general:cat ears
+            cow ear:
+              _s: general:cow ears
+            deer ear:
+              _s: general:deer ears
+            dog ear:
+              _s: general:dog ears
+            ferret ear:
+              _s: general:ferret ears
+            fox ear:
+              _s: general:fox ears
+            goat ear:
+              _s: general:goat ears
+            horse ear:
+              _s: general:horse ears
+            lion ear:
+              _s: general:lion ears
+            monkey ear:
+              _s: general:monkey ears
+            mouse ear:
+              _s: general:mouse ears
+            panda ear:
+              _s: general:panda ears
+            pig ear:
+              _s: general:pig ears
+            raccoon ear:
+              _s: general:raccoon ears
+            sheep ear:
+              _s: general:sheep ears
+            squirrel ear:
+              _s: general:squirrel ears
+            tiger ear:
+              _s: general:tiger ears
+            wolf ear:
+              _s: general:wolf ears
+          imagined-animal ear:
+            pokemon ear:
+              _s: general:pokemon ears
+              pikachu ear:
+                _s: general:pikachu ears
           fake animal ear:
-            _s: general:fake animal ears, can coexist with all other animal ears tags
+            _s: general:fake animal ears
             animal ear headphones:
               _s: general:animal ear headphones
               bear ear headphones:
@@ -1271,7 +1449,6 @@ things:
       mvg:
       newpipe:
       outlook:
-      reddit:
       sms:
       telegram:
       the guardian:
@@ -1454,139 +1631,20 @@ general:
     _rs: "thing: +awed+"
     __infer:
       _rs: affectable
-  
-
-  
-  
-  
-  
-
-
-
-interaction:
-  grammatical case:
-    semantic grammatical case:
-      thematic case:
-        nuclear case:
-          agentive:
-          patientive:
-          themetive:
-        non-nuclear case:
-          affective:
-            affecter:
-            affected:
-            envy:
-              envier:
-              envied:
-            awe:
-              awer:
-              awed:
-            
-    spatial:
-      essive:
-        interessive:
-      tangent:
-        circumtangent:
-          hugging:
-          holding:
-          forcefully circumtangent:
-      vicinitive:
-      tective:
-      hesive:
-      lative:
-single_modification:
-  number:
-    amount number:
-      amount:
-        numerical:
-          dual:
-          trial:
-          quadral:
-          plural:
-        non-numerical:
-          single:
-      grouping:
-      viewpoint:
-complete_modification:
-  other:
-    hidden:
-    public:
-    clothed:
-    through clothes:
-    targeting another:
-  gradation:
-    gradation relation:
-      greater gradataion:
-      lesser gradation:
-      equal gradation:
-  aspect:
-    spective aspect:
-      retrospective aspect:
-      prospective aspect:
-  modality:
-    epistemic modality:
-      evidentiality:
-        indirectivity:
-        evidentiality proper:
-          inferential evidentiality:
-  voice:
-    activelike voice:
-      active voice:
-      reciprocal voice:
-    passivelike voice:
-      passive voice:
-      antipassive voice:
-      middlelike voice:
-        middle voice:
-        reflexive voice:
-proximate_source_page_type:
-  post:
-  thread:
-  product page:
-proximate_source_subdivision:
-  midjourney:
 acquisition_context:
-  edu:
-    kindergarden:
-    school:
-      primary:
-      secondary:
-    uni:
-      philosophy bachelors:
-  official:
-    contract:
-      insurance:
-        health insurance:
-          barmer health insurance:
+  uni:
+    philosophy bachelors:
   housing:
     rental housing:
       2023 stw berlin housing: 
         _rs: 2023- stw berlin housing
-  leisure:
-    sports:
-    surfing:
-    hornysurfing:
-    gaming:
-    animanga:
-      reading manga:
-      watching anime:
-  social:
-    dating:
-    family:
-      parents:
-        renate:
-      siblings:
   work:
     freelance:
       freelance translation:
       permanent employment:
         2022 mycontrol: 
         _rs: 2022- mycontrol
-  ownership:
   interests:
-    dev:
-    language:
-    japanese:
     systems:
       2022 hammerspoon: 
         _rs: 2022- hammerspoon

@@ -44,7 +44,18 @@ get = {
       })
     end,
   },
-
+  str_or_nil = {
+    str_or_nil_by_apply_format_str = function(str, format_str)
+      if str ~= nil then
+        return get.str.str_by_formatted_w_n_anys(format_str, str)
+      else
+        return nil
+      end
+    end,
+    str_by_apply_format_str_or_empty_str = function(str, format_str)
+      return get.str.str_or_nil_by_apply_format_str(str, format_str) or ""
+    end,
+  },
   package_manager_name_or_nil = {
     package_name_semver_compound_str_arr = function(mgr, arg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version " .. (arg or ""))) end,
     package_name_semver_package_manager_name_compound_str_arr = function(mgr, arg) return transf.str.line_arr(transf.str.str_or_nil_by_evaled_env_bash_stripped("upkg " .. (mgr or "") .. " with-version-package-manager " .. (arg or ""))) end,
@@ -79,6 +90,34 @@ get = {
     bool_by_exists_as = function(item, type, ext)
       return get.pass_item_name.bool_by_exists_as(item, "p/" .. type, ext)
     end,
+  },
+  danbooru_hydrus_inference_specifier = {
+    str_arr_by_my_tag = function(spec, danbooru_hydrus_map)
+      local d_proto = {
+        decorate_if_ext = get.str_or_nil.str_by_apply_format_str_or_empty_str,
+        my = function(danbooru_tag)
+          return danbooru_hydrus_map[danbooru_tag]
+        end,
+      }
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        transf.danbooru_hydrus_inference_specifier.str_arr_arr_by_danbooru_cartesian_product(spec),
+        function(arr)
+          local d = get.table.table_by_copy(d_proto, false)
+          d.prts = arr
+          return get.str.str_by_evaled_as_template(
+            spec.result,
+            d
+          )
+        end
+      )
+    end,
+    two_strs__arr_arr_by_danbooru_tag_my_tag_implications = function(spec, danbooru_hydrus_map)
+      return transf.two_arrs.two_ts__arr_arr_by_zip_error_not_same_length(
+        transf.danbooru_hydrus_inference_specifier.str_arr_by_danbooru_tag(spec),
+        get.danbooru_hydrus_inference_specifier.str_arr_by_my_tag(spec, danbooru_hydrus_map)
+      )
+    end,
+
   },
   hydrus_file_hash = {
     str_arr_by_tag_namespace = function(hash, namespace)
@@ -124,6 +163,56 @@ get = {
     end,
   },
   hydrus_tag_hierarchy_node = {
+    str_key_str_value_assoc_by_danbooru_to_my_tag_map = function(node_key, node_assoc, namespace_chain)
+      local res = {}
+      local current_value = get.str_or_number_arr.str_by_joined(namespace_chain, ":") .. ":" .. node_key
+      if node_assoc then
+        if node_assoc.__is_subnamespace then
+          dothis.arr.push(namespace_chain, node_key)
+        end
+        if node_assoc._s then
+          if is.any.table(node_assoc._s) then
+            if is.table.array(node_assoc._s) then
+              dothis.arr.each(
+                node_assoc._s,
+                function(v)
+                  res[v] = current_value
+                end
+              )
+            else
+              for k, v in transf.table.kt_vt_stateless_iter(node_assoc._s) do
+                current_value = get.str_or_number_arr.str_by_joined(
+                  get.arr.arr_by_nth_element_subbed(namespace_chain, 1, k),
+                  ":"
+                ) .. ":" .. node_key
+                if is.any.str(v) then
+                  res[v] = current_value
+                elseif is.any.arr(v) then
+                  dothis.arr.each(
+                    v,
+                    function(v2)
+                      res[v2] = current_value
+                    end
+                  )
+                end
+              end
+            end
+          else
+            res[node_assoc._s] = current_value
+          end
+        end
+        for k, v in transf.table.table_by_no_any_underscore_private(node_assoc) do
+          res = transf.two_tables.table_by_take_new(
+            res,
+            get.hydrus_tag_hierarchy_node.str_key_str_value_assoc_by_danbooru_to_my_tag_map(
+              k,
+              v,
+              namespace_chain
+            )
+          )
+        end
+      end
+    end,
     hydrus_rel_spec = function(node_key, node_assoc, nodeparent, namespace_chain, virtuals)
       local res = {
         parent = {},
@@ -224,44 +313,6 @@ get = {
               virtuals
             )
           )
-        end
-        if node_assoc.__infer then -- __infer tells us to make copies with certain modifications
-          for infer_relkey, infer_value in transf.table.kt_vt_stateless_iter(node_assoc.__infer) do
-            if is.any.str(infer_value) then
-              infer_value = {infer_value}
-            end
-            local main_relval = node_assoc[infer_relkey]
-            if is.any.str(node_assoc[infer_relkey]) then
-              main_relval = {node_assoc[infer_relkey]}
-            end
-            for i, infer_group_name in transf.arr.pos_int_vt_stateless_iter(infer_value) do
-              local fstrings = tblmap.keychange_fstring_name.keychange_fstring_arr[infer_group_name]
-              for _, fstring in transf.arr.pos_int_vt_stateless_iter(fstrings) do
-                local insertion_arr = tblmap.keychange_fstring.two_strs__arr_by_insertion[fstring]
-                local newnodekey = get.str.str_by_formatted_w_n_anys(
-                  fstring,
-                  node_key
-                )
-                local new = get.str.str_by_insert_at_insertion_point(
-                  main_relval[i],
-                  transf.arr.n_anys(insertion_arr)
-                )
-                dothis.arr.push(
-                  totalres,
-                  get.hydrus_tag_hierarchy_node.hydrus_rel_spec(
-                    newnodekey,
-                    {
-                      [infer_relkey] = new,
-                    },
-                    nodeparent,
-                    namespace_chain,
-                    virtuals
-                  )
-                )
-
-              end
-            end
-          end
         end
         return transf.arr_value_assoc_arr.arr_value_assoc_by_merge(totalres)
       else
@@ -2685,6 +2736,22 @@ get = {
   arr_arr = {
     arr_by_column = plarray2d.column,
     arr_by_row = plarray2d.row,
+    arr_arr_by_cartesian_product = function(arr_arr, level)
+      level = level or 1
+      local res = {}
+      for _, v in transf.arr.pos_int_vt_stateless_iter(arr_arr[level]) do
+        if arr_arr[level + 1] == nil then
+          dothis.arr.push(res, {v})
+        else
+          local res_for_v = get.arr_arr.arr_arr_by_cartesian_product(arr_arr, level + 1)
+          for _, subres in transf.arr.pos_int_vt_stateless_iter(res_for_v) do
+            dothis.arr.unshift(subres, v)
+            dothis.arr.push(res, subres)
+          end
+        end
+      end
+
+    end,
     arr_arr_by_mapped_if_not_length_0 = function(arr_arr, fn)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
