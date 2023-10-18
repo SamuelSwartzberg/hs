@@ -4555,6 +4555,47 @@ transf = {
       end
       return res
     end,
+    danbooru_tag_record_arr = function(str)
+      return rest({
+        api_name = "danbooru",
+        endpoint = "tags.json",
+        params = {
+          ["search[name_matches]"] = str,
+          ["search[order]"] = "count",
+          ["search[hide_empty]"] = "true",
+          limit = 999
+        },
+      })
+    end,
+
+  },
+  danbooru_tag_record_arr = {
+    pos_int_by_id = function(tag_record)
+      return tag_record.id
+    end,
+    printable_ascii_by_name = function(tag_record)
+      return tag_record.name
+    end,
+    danbooru_tag_implication_record_arr_by_name_as_antecedent = function(tag_record)
+      return rest({
+        api_name = "danbooru",
+        endpoint = "tag_implications.json",
+        params = {
+          ["search[antecedent_name]"] = tag_record.name,
+          limit = 999
+        },
+      })
+    end,
+    danbooru_tag_implication_record_arr_by_name_as_consequent = function(tag_record)
+      return rest({
+        api_name = "danbooru",
+        endpoint = "tag_implications.json",
+        params = {
+          ["search[consequent_name]"] = tag_record.name,
+          limit = 999
+        },
+      })
+    end,
 
   },
   str_or_nil_and_str_or_nil_and_str_arr = {
@@ -8038,7 +8079,7 @@ transf = {
     end,
     assoc_by_stream_metadata = function(spec)
       return {
-        official_title = get.hydrus_metadata_spec.str_or_nil_by_tag_namespace(spec, "official_title"),
+        creation_title = get.hydrus_metadata_spec.str_or_nil_by_tag_namespace(spec, "creation_title"),
         proximate_source_title = get.hydrus_metadata_spec.str_or_nil_by_tag_namespace(spec, "proximate_source_title"),
         tags = get.hydrus_metadata_spec.str_arr_by_all_current_display_tags(spec),
         hash = get.hydrus_metadata_spec.hydrus_file_hash(spec),

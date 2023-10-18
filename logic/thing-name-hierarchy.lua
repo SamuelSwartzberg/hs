@@ -864,6 +864,8 @@ thing_name_hierarchy = {
         hydrus_rel_spec = "leaf",
         hydrus_metadata_spec = "leaf",
         hydrus_internal_tag_spec = "leaf",
+        danbooru_tag_record = "leaf",
+        danbooru_tag_implication_record = "leaf",
       }
     },
     primitive = {

@@ -2563,6 +2563,12 @@ is = {
     hydrus_internal_tag_spec = function(t)
       return t.storage_tags and t.display_tags
     end,
+    danbooru_tag_record = function(t)
+      return t.id and t.name and t.category and t.post_count -- there are more, but this should be enough
+    end,
+    danbooru_tag_implication_record = function(t)
+      return t.id and t.antecedent_name and t.consequent_name
+    end,
     
   },
   plist_single_dk_spec = {

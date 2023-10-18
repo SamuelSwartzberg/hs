@@ -137,6 +137,50 @@ ls = {
   },
   all_namespace = {
 
+    -- global tag namespace
+
+    "global", -- This describes the global namespace set, which is also used below.
+
+    -- thing tag namespaces - what can be percieved in the fobjectlike, or inferred only from the fobjectlike and a reasonable knowledge of the world? What importance does it have to the fobjectlike?
+    
+    "thing", -- A global namespace item which describes something that can be percieved in the fobjectlike, or inferred only from the fobjectlike and a reasonable knowledge of the world.
+    "substance", -- A global namespace item which describes the fobjectlike itself, rather than one of its parts or something contained within. thing:apple means it contains an apple, substance:apple means it is an apple. thing:aqua 1-adic range SBCS^2^ means there is something aqua, substance:aqua 1-adic range SBCS^2^ means the object is a color sample of aqua.
+    "substance_part", -- A global namespace item which describes something that contributes to the substance of the fobjectlike. E.g. substance_part:apple means that a recognizable part of the fobjectlike itself is an apple. substance_part:photo means that a recognizable part of the fobjectlike itself is a photo.
+    "focus", -- A global namespace item which describes the main focus of the fobjectlike. E.g. focus:apple means the apple is the main focus of the object.
+    "theme", -- A global namespace item which describes something that is important throughout the fobjectlike, but not necessarily the main focus. E.g. theme:apple might mean that apples are strategically placed around the object to symbolize temptation, or just because it's a food picture with a fall-apple theme.
+    "accent", -- A global namespace item which describes something that has some amount of focus within the fobjectlike, but not as much as the focus or theme. E.g. thing:dagger means it contains a dagger, accent:dagger might mean that there is a dagger in the background as an easter egg or foreshadowing.
+    "framing", -- A global namespace item which describes something that gives major context to the fobjectlike. E.g. framing:dagger might mean that the fobjectlike is a dagger with some intericate metalwork, where the metalwork is the focus, but the dagger is the framing. framing:web browser might mean that the focus is some content on the web, but the web browser what gives it context and meaning. This does not mean that anything e.g. in a web browser must be tagged with framing:web browser, if that fact is unimportant to the fobjectilke.
+    "incidental", -- A global namespace item which describes something that is present in the fobjectlike, but is not important to it at all.
+    "foreground", -- A global namespace item which describes something that is in the foreground of the fobjectlike.
+    "midground", -- A global namespace item which describes something that is in the midground of the fobjectlike.
+    "background", -- A global namespace item which describes something that is in the background of the fobjectlike.
+
+    -- creation tag namespaces - who, when, where, and how was this object created?
+    
+    "creation_ware", -- A global namespace item that was used to create the object. This could be a creator, an object used in its creation, a location, or the like.
+    "creation_title", -- the official title of a work, if applicable. E.g. "The Lord of the Rings: The Fellowship of the Ring", "One Hundred Years of Solitude", etc. Bear in mind that this isn't the title of the series, but of the specific work. 
+    "semver", -- semantic version of a work, e.g. 1.0.0
+    "lat", -- latitude of the object as a decimal number, if applicable. E.g. 48.137154.
+    "lon", -- longitude of the object as a decimal number, if applicable. E.g. 11.576124
+
+    -- sharing tag namespaces - many objects I encounter were shared in some way, such that I was able to encounter them. These tags are for that.
+
+    "proximate_source", -- A global namespace item which describes something about how I encountered the object, where this
+    "proximate_source_subdivision", -- the subdivision of the proximate_source where I encountered the object. E.g. the subreddit, the board, etc.
+    "proximate_source_title", -- the title of the proximate_source. E.g. the reddit post title
+    "uploader", -- the uploader/sharer of the object on the proximate_source. E.g. the reddit username, or the twitter handle.
+
+    -- acquisition tag namespaces - how did I acquire the object? This is not the same as sharing, as I may have acquired the object in a way that doesn't involve sharing, e.g. by creating it myself.
+
+    "date", -- date of acquisition in (partial) RFC3339 format
+    "acquisition_context", -- the context of my life this object was created or encountered in. Can be general, e.g. edu, work, leisure, etc., or more specific, e.g. freelance translation. The more specific ones should be tag children of the more general ones. The difference between this and occasion is that an occasion is a temporally bounded event, while an acquisition_context is an area of my life that may or may not be temporally bounded. In a sense, these are orthogonal to each other. If I have a christmas party at my workplace, I would tag the occasion as christmas (or perhaps 2015 christmas party, with corresponding parents), and the acquisition_context as work (or perhaps 2012-2017 graphic design job). So if I was wondering what I did at christmas, I could just search occasion:christmas, even though I spent the 2015 christmas at work, and perhaps another at home.
+    "acquisition", -- A global namespace item which describes something about how, when, where, in what context etc. I acquired the object.
+
+    -- use tag namespaces - why did I keep the object? What do I use it for?
+
+    "use", -- Without complex semantics, what might I want to use the object for? e.g. reaction_face, inspiration, etc. 
+    "under_management", -- If this namespace contains a value, this means that we're managing the object for another person or organization, which is what this namespace will contain.
+
     -- series tag namespaces - where within some general series does this object fit?
 
     "chapter_index", -- numerical index of a chapter, e.g. 25
@@ -149,49 +193,6 @@ ls = {
     "season_index", -- numerical index of a season, e.g. 3
     "season_subindex", -- numerical index of an object within a season, especially for openings and endings
     "episode_role", -- role of an object within an episode, e.g. opening, ending, insert song, etc.
-
-    -- creation tag namespaces - who, when, where, and how was this object created?
-    
-    "creation_ware", -- A thing namespace item that was used to create the object. This could be a creator, an object used in its creation, a location, or the like.
-    "official_title", -- the official title of a work, if applicable. E.g. "The Lord of the Rings: The Fellowship of the Ring", "One Hundred Years of Solitude", etc. Bear in mind that this isn't the title of the series, but of the specific work. 
-    "semver", -- semantic version of a work, e.g. 1.0.0
-    "lat", -- latitude of the object as a decimal number, if applicable. E.g. 48.137154.
-    "lon", -- longitude of the object as a decimal number, if applicable. E.g. 11.576124
-    
-
-    -- thing tag namespaces - what can be percieved in the fobjectlike, or inferred only from the fobjectlike and a reasonable knowledge of the world? What importance does it have to the fobjectlike?
-    
-    "thing", -- Anything that appears in the fobjectlike, or is referenced. This describes the thing namespace set, which is also used below.
-    "substance", -- A thing namespace item which describes the fobjectlike itself, rather than one of its parts or something contained within. thing:apple means it contains an apple, substance:apple means it is an apple. thing:aqua 1-adic range SBCS^2^ means there is something aqua, substance:aqua 1-adic range SBCS^2^ means the object is a color sample of aqua.
-    "substance_part", -- A thing namespace item which describes something that contributes to the substance of the fobjectlike. E.g. substance_part:apple means that a recognizable part of the fobjectlike itself is an apple. substance_part:photo means that a recognizable part of the fobjectlike itself is a photo.
-    "focus", -- A thing namespace item which describes the main focus of the fobjectlike. E.g. focus:apple means the apple is the main focus of the object.
-    "theme", -- A thing namespace item which describes something that is important throughout the fobjectlike, but not necessarily the main focus. E.g. theme:apple might mean that apples are strategically placed around the object to symbolize temptation, or just because it's a food picture with a fall-apple theme.
-    "accent", -- A thing namespace item which describes something that has some amount of focus within the fobjectlike, but not as much as the focus or theme. E.g. thing:dagger means it contains a dagger, accent:dagger might mean that there is a dagger in the background as an easter egg or foreshadowing.
-    "framing", -- A thing namespace item which describes something that gives major context to the fobjectlike. E.g. framing:dagger might mean that the fobjectlike is a dagger with some intericate metalwork, where the metalwork is the focus, but the dagger is the framing. framing:web browser might mean that the focus is some content on the web, but the web browser what gives it context and meaning. This does not mean that anything e.g. in a web browser must be tagged with framing:web browser, if that fact is unimportant to the fobjectilke.
-    "incidental", -- A thing namespace item which describes something that is present in the fobjectlike, but is not important to it at all.
-    "foreground", -- A thing namespace item which describes something that is in the foreground of the fobjectlike.
-    "midground", -- A thing namespace item which describes something that is in the midground of the fobjectlike.
-    "background", -- A thing namespace item which describes something that is in the background of the fobjectlike.
-
-
-    -- sharing tag namespaces - many objects I encounter were shared in some way, such that I was able to encounter them. These tags are for that.
-
-    "proximate_source", -- A thing namespace item which describes something about how I encountered the object, where this
-    "proximate_source_subdivision", -- the subdivision of the proximate_source where I encountered the object. E.g. the subreddit, the board, etc.
-    "proximate_source_title", -- the title of the proximate_source. E.g. the reddit post title
-    "proximate_source_use", -- what was the object used for on the proximate_source? For many proximate sources there isn't an interesting one, but for example for amazon, this could be product_picture
-    "uploader", -- the uploader/sharer of the object on the proximate_source. E.g. the reddit username, or the twitter handle.
-
-    -- acquisition tag namespaces - how did I acquire the object? This is not the same as sharing, as I may have acquired the object in a way that doesn't involve sharing, e.g. by creating it myself.
-
-    "date", -- date of acquisition in (partial) RFC3339 format
-    "acquisition_context", -- the context of my life this object was created or encountered in. Can be general, e.g. edu, work, leisure, etc., or more specific, e.g. freelance translation. The more specific ones should be tag children of the more general ones. The difference between this and occasion is that an occasion is a temporally bounded event, while an acquisition_context is an area of my life that may or may not be temporally bounded. In a sense, these are orthogonal to each other. If I have a christmas party at my workplace, I would tag the occasion as christmas (or perhaps 2015 christmas party, with corresponding parents), and the acquisition_context as work (or perhaps 2012-2017 graphic design job). So if I was wondering what I did at christmas, I could just search occasion:christmas, even though I spent the 2015 christmas at work, and perhaps another at home.
-    "acquisition", -- A thing namespace item which describes something about how, when, where, in what context etc. I acquired the object.
-
-    -- use tag namespaces - why did I keep the object? What do I use it for?
-
-    "use", -- Without complex semantics, what might I want to use the object for? e.g. reaction_face, inspiration, etc. 
-    "under_management", -- If this namespace contains a value, this means that we're managing the object for another person or organization, which is what this namespace will contain.
 
     -- general meta tag namespaces - tags with a more general purpose, that don't fit into any of the above categories.
 
