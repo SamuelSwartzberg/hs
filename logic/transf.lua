@@ -1065,6 +1065,20 @@ transf = {
         return transf.str.line_by_folded(str)
       end
     end,
+    str_by_surrounded_with_brackets_if_str = function(str)
+      if str then
+        return transf.str.str_by_surrounded_with_brackets(str)
+      else
+        return ""
+      end
+    end,
+    str_by_start_with_slash_if_str = function(str)
+      if str then
+        return transf.str.str_by_start_with_slash(str)
+      else
+        return ""
+      end
+    end,
   },
   absolute_path = {
     file_url = function(path)
@@ -4302,6 +4316,20 @@ transf = {
     not_whitespace_str = function(str)
       return get.str.str_by_continuous_replaced_eutf8_w_regex_quantifiable(str, "%s", "")
     end,
+    line_by_all_whitespace_single_underscore = function(str)
+      return get.str.str_by_replaced_w_ascii_str(
+        transf.str.line_by_all_whitespace_collapsed(str),
+        " ",
+        "_"
+      )
+    end,
+    str_by_underscore_to_space = function(str)
+      return get.str.str_by_replaced_w_ascii_str(
+        str,
+        "_",
+        " "
+      )
+    end,
     pos_int_by_len_ascii_chars = string.len,
 
 
@@ -4492,6 +4520,12 @@ transf = {
         " "
       )
     end,
+    str_by_surrounded_with_brackets = function(str)
+      return "[" .. str .. "]"
+    end,
+    str_by_start_with_slash = function(str)
+      return "/" .. str
+    end,
     nonindicated_number_str_by_clean = function(str)
       local res = str
       res = get.str.str_and_int_by_replaced_eutf8_w_regex_str(res, ",", ".")
@@ -4554,7 +4588,7 @@ transf = {
         api_name = "danbooru",
         endpoint = "tags.json",
         params = {
-          ["search[name_matches]"] = str,
+          ["search[name_matches]"] = transf.str.line_by_all_whitespace_single_underscore(str),
           ["search[order]"] = "count",
           ["search[hide_empty]"] = "true",
           limit = 999
@@ -4569,6 +4603,9 @@ transf = {
     end,
     printable_ascii_by_name = function(tag_record)
       return tag_record.name
+    end,
+    printable_ascii_by_name_with_spaces = function(tag_record)
+      return transf.str.str_by_underscore_to_space(transf.str.danbooru_tag_record.printable_ascii_by_name(tag_record))
     end,
     sme_5_pos_int_by_category = function(tag_record)
       return tag_record.category
@@ -4904,17 +4941,26 @@ transf = {
       )
     end,
   },
+  two_hydrus_rel_specs = {
+    hydrus_rel_spec = function(spec1, spec2)
+      return {
+        sib = transf.two_arrs.arr_by_appended(spec1.sib, spec2.sib),
+        parent = transf.two_arrs.arr_by_appended(spec1.parent, spec2.parent),
+      }
+    end,
+  },
   hydrus_tag_hierarchy = {
     hydrus_rel_spec = function(hierarchy)
       local basic_rel_spec = get.hydrus_tag_hierarchy_node.hydrus_rel_spec("global", hierarchy, nil, nil, ls.global_namespace_taking_key_name_arr)
-      local tag_map = get.hydrus_tag_hierarchy_node.str_key_str_value_assoc_by_danbooru_to_my_tag_map("global", hierarchy)
-      local further_siblings = get.danbooru_hydrus_inference_specifier_arr.two_strs__arr_arr_by_danbooru_tag_my_tag_implications(
+      local tag_map = transf.two_tables.table_by_take_new(
+        transf.two_anys__arr_arr.assoc_by_reverse_nested(basic_rel_spec.sib),
+        transf.two_anys__arr_arr.assoc_by_reverse_nested(ls.two_strs__arr_arr_by_siblings)
+      ) -- add the reverse of the simple siblings to the tag map
+      local generated_hydrus_rel_spec = get.danbooru_hydrus_inference_specifier_arr.hydrus_rel_spec_by_danbooru_tag_my_tag_implications(
         ls.danbooru_hydrus_inference_specifier_arr,
         tag_map
       )
-      basic_rel_spec.sib = transf.two_arrs.arr_by_appended(basic_rel_spec.sib, further_siblings)
-      local simple_siblings = ls.two_strs__arr_arr_by_additional_siblings
-      basic_rel_spec.sib = transf.two_arrs.arr_by_appended(basic_rel_spec.sib, simple_siblings)
+      basic_rel_spec = transf.two_hydrus_rel_specs.hydrus_rel_spec(basic_rel_spec, generated_hydrus_rel_spec)
       local all_current_tags = transf.hydrus_rel_spec.str_arr_by_to_be_derived(basic_rel_spec)
       local further_parents = transf.str_arr.two_strs__arr_arr_by_deduce_from_parts(
         all_current_tags
@@ -5123,6 +5169,20 @@ transf = {
         transf.str_key_str_value_assoc.ini_kv_line_arr(str_key_str_value_assoc),
         "\n"
       )
+    end,
+    tag_d_spec =  function(assoc)
+      return  {
+        decorate_if_ext = get.str_or_nil.str_by_apply_format_str_or_empty_str,
+        bracket = transf.str_or_nil.str_by_surrounded_with_brackets_if_str,
+        slash = transf.str_or_nil.str_by_start_with_slash_if_str,
+        my = function(danbooru_tag)
+          local res = assoc["general:" .. danbooru_tag]
+          if res == nil then 
+            print("WARN: No hydrus tag for danbooru tag " .. danbooru_tag)
+          end
+          return res
+        end,
+      }
     end,
 
   },
@@ -6029,7 +6089,7 @@ transf = {
       end)
       return get.arr.arr_by_slice_w_3_int_any_or_nils(a_o_a[1], 1, last_matching_index)
     end,
-    arr_arr_by_reverse = function(arr)
+    arr_arr_by_reverse_nested = function(arr)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.arr.arr_by_reverse)
     end,
     arr_by_longest_common_suffix = function(arr)
@@ -6049,6 +6109,11 @@ transf = {
         res[two_anys__arr[1]] = two_anys__arr[2]
       end
       return res
+    end,
+    assoc_by_reverse_nested = function(arr)
+      return transf.two_anys__arr_arr.assoc(
+        transf.arr_arr.arr_arr_by_reverse_nested(arr)
+      )
     end,
   },
   two_strs__arr_arr = {

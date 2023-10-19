@@ -72,6 +72,21 @@ things:
         aged down:
           _s: general:aged down
     modified body:
+      noticably different agentlike anatomy:
+        _s: general:agentlike anatomy
+      noticably different agentlike proportions:
+        _s: general:agentlike proportions
+      limb with noncorresponding teashi:
+        leg with noncorresponding foot:
+          _s: general:wrong feet
+          _p:
+            - thing:bodypartlike:leg
+            - thing:bodypartlike:foot
+        arm with noncorresponding hand:
+          _s: general:wrong hands
+          _p:
+            - thing:bodypartlike:arm
+            - thing:bodypartlike:hand
       amputee:
         _s: general:amputee
     semihumanoid: 
@@ -442,29 +457,61 @@ things:
         semver:
           __is_subnamespace: true
     musical content:
-    language (abstract):
-      __is_subnamespace: true
-      production:
-        spoken:
-        written:
-        sign:
-      genre:
-        poetry:
-          found poetry:
-        prose:
-        functional:
-          code:
-            _s: general:code
-      lect:
-      language proper:
-        english:
-        japanese:
-        german:
     mathematical information:
     data:
       graph:
     symbolic object:
       flag:
+        _s: general:flag
+  language:
+    __is_subnamespace: true
+    deviation:
+      _p: thing:deviation
+      unintentional deviation:
+        _p: thing:deviation:unintentional
+        unintentional deviation from ideal:
+          _p: thing:deviation:unintentional from ideal
+          error:
+            _p: thing:deviation:error
+            _s: general:ranguage
+          mistake:
+            _p: thing:deviation:mistake
+    medium:
+      speech:
+      writing:
+        __is_subnamespace: true
+        _s: general:text
+        deviation:
+          _p: thing:language:deviation
+          unintentional deviation:
+            _p: thing:language:unintentional deviation
+            unintentional deviation from ideal:
+              _p: thing:language:unintentional deviation from ideal
+              mistake:
+                _p: thing:language:mistake
+                typo:
+                  _s: general:typo
+        writing system:
+          hiragana:
+          katakana:
+          cjk ideograph:
+            kanji:
+      sign:
+    genre:
+      poetry:
+        found poetry:
+      prose:
+      functional:
+        code:
+          _s: general:code
+    lect:
+    language proper:
+      english:
+        _s: general:english
+      japanese:
+        _s: general:japanese
+      german:
+        _s: general:german
   virtual object:
     concrete virtual object:
       screen contents:
@@ -635,6 +682,8 @@ things:
               crest:
     prototypically 3d object:
       vehicle:
+        noticable different vehicle anatomy:
+          _s: general:vehicle anatomy
         spacecraft:
           _s: general:spacecraft
           space shuttle:
@@ -772,6 +821,8 @@ things:
                 eotech:
                   _s: general:eotech
             firearm:
+              noticable different firearm anatomy:
+                _s: general:gun anatomy
               firearm by general type:
                 handgun:
                 rifle:
@@ -926,22 +977,19 @@ things:
           military:
             japan self-defense force:
               _s: general:japan self-defense force
-            us armed forces:
           branch of service:
+            air force:
+              _s: general:air force
             navy:
               _s: general:navy
             army:
               _s: general:army
-              us army:
-                _s: general:united states army
-
           military unit:
             us military unit:
               _s: 
     political subdivisions:
       national subdivision:
         real national subdivision:
-          the netherlands:
       supranational subdivision:
         real supranational subdivision:
         fake supranational subdivision:
@@ -951,6 +999,10 @@ things:
               _s: general:galactic republic
             galactic empire (star wars):
               _s: general:galactic empire
+  culture:
+    __is_subnamespace: true
+    national culture:
+      real national culture:
   human condition:
     general activity:
       waiting:
@@ -1012,8 +1064,12 @@ things:
         trial:
         quadral:
         plural:
+          _s: general:s
       non-numerical:
         single:
+        excessive:
+        plusexcessive:
+          _s: general:too many
     grouping:
     viewpoint:
   modification:
@@ -1023,6 +1079,7 @@ things:
       clothed:
       through clothes:
       targeting another:
+        _s: general:another's
     gradation:
       gradation relation:
         greater gradataion:
@@ -1048,6 +1105,7 @@ things:
         middlelike voice:
           middle voice:
           reflexive voice:
+            _s: general:own
   activity:
     __is_subnamespace: true
     sports:
@@ -1070,7 +1128,6 @@ things:
         
       web surfing:
         hornysurfing:
-    cultural:
     cognitive:
       emotional:
         positive emotional:
@@ -1085,6 +1142,9 @@ things:
         reflecting:
         inspiration:
   natural phenomena:
+  identity:
+    __is_subnamespace: true
+    natiocultural:
   relation:
     __is_subnamespace: true
     source:
@@ -1093,10 +1153,19 @@ things:
       essive:
         interessive:
       tangent:
+        _s: 
+          - general:on
+          - general:touching
         circumtangent:
+          _s: general:around
           hugging:
+            _s: general:hugging
           holding:
-          forcefully circumtangent:
+            _s: general:holding
+          grabbing:
+            _s: general:grabbing
+          pulling:
+            _s: general:pulling
       vicinitive:
       tective:
       hesive:
@@ -1135,10 +1204,21 @@ things:
               
 
     general location:
+  deviaton:
+    __is_subnamespace: true
+    from ideal:
+    unintentional:
+      unintentional from ideal:
+        error:
+          _ex: due to fundamental misunderstanding
+        mistake:
+          _ex: momentary slip or confustion
+        _p: thing:deviation:from ideal
+        _s: general:artistic error
   construction:
     material:
       paper:
-        _s: general:paper; implies ???
+        _s: general:paper
       canvas:
         _s:
           substance_part: general:canvas (medium)
@@ -1224,9 +1304,6 @@ things:
           crotch pleasurable organ:
             primary genital:
         ussy:
-      body part grouping by similarity:
-        digit:
-        teashi:
       body part grouping by closeness:
         oral parts:
     general body part:
@@ -1394,13 +1471,31 @@ things:
       wings:
       limb:
         arm:
+          _s: 
+            - general:arm
+            - general:arms
         leg:
+          _s:
+            - general:leg
+            - general:legs
+      teashi:
+        foot:
+          _s:
+            - general:foot
+            - general:feet
+        hand:
+          _s: 
+            - general:hand
+            - general:hands
       elbow:
       wrist:
       stomach:
       waist:
       tail:
       ass:
+        _s:
+          - general:butt
+          - general:ass
       crotch:
       chest:
       breasts:
@@ -1409,6 +1504,10 @@ things:
           - bodypartlike:primary genital
           - phallic object
       vulva:
+        _s:
+          - general:vulva
+          - general:pussy
+          - general:vagina
         _p: 
           - bodypartlike:primary genital
           - bodypartlike:ussy
@@ -1421,7 +1520,6 @@ things:
       knee:
       calf:
       ankle:
-      foot:
       tentacle:
 
     anatomical feature:
@@ -1516,14 +1614,6 @@ things:
         object:
           object use:
 general:
-  focus:
-    _rs: "focus:"
-    __infer:
-      _rs: universalpredicatable
-  licking:
-    _rs: "thing:thing:bodypartlike:tongue +essive+"
-  licking dildo:
-    _rs: "thing:thing:bodypartlike:tongue +essive+ thing:bodypartlike:phallic sex toy"
   oral:
     _rs: "thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:crotch pleasurable organ"
   fellatio:
@@ -1534,86 +1624,11 @@ general:
     _rs: "thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:vulva"
     __infer:
       _rs: sex_act
-  holding:
-    _rs: "thing:thing:bodypartlike:hand +holding+"
-    __infer:
-      _rs: limbable
-  hand around:
-    _rs: "thing:thing:bodypartlike:hand +circumtangent+"
-    __infer:
-      _rs: limbable
-  hand on:
-    _rs: "thing:thing:bodypartlike:hand +tangent+"
-    __infer:
-      _rs: limbable
   touching: 
     _rs: 
       - "%s +tangent+ /reflexive"
-      - "thing:thing:bodypartlike:hand +tangent+"
-    __infer:
-      _rs: 
-        - reflexive_touchable
-        - limbable
-  hand on own:
-    _rs: "thing:thing:bodypartlike:hand +tangent+ /reflexive voice"
-    __infer:
-      _rs: limbable
-  hand on another's:
-    _rs: "thing:thing:bodypartlike:hand +tangent+ /targeting another"
-    __infer:
-      _rs: limbable
-  hands on own:
-    _rs: "thing:[plural] thing:bodypartlike:hand +tangent+ /reflexive voice"
-    __infer:
-      _rs: limbable
-  hands on another's:
-    _rs: "thing:[plural] thing:bodypartlike:hand +tangent+ /targeting another"
-    __infer:
-      _rs: limbable
-  arm around:
-    _rs: "thing:thing:bodypartlike:arm +circumtangent+"
-    __infer:
-      _rs: limbable
-  arms around:
-    _rs: "thing:[plural] thing:bodypartlike:arm +circumtangent+"
-    __infer:
-      _rs: limbable
-  hugging:
-    _rs: "thing:thing:bodypartlike:arm +hugging+"
-    __infer:
-      _rs: limbable
-  hugging own:
-    _rs: "thing:thing:bodypartlike:arm +hugging+ /reflexive voice"
-    __infer:
-      _rs: limbable
-  hugging another's:
-    _rs: "thing:thing:bodypartlike:arm +hugging+ /targeting another"
-    __infer:
-      _rs: limbable
-  arm hug:
-    _rs: general:hugging arm
-  locked_arms:
-    _rs: general:interlocked arms
-  hug:
-    _rs: general:hugging
   interlocked:
     _rs: "thing: +circumtangent+ /reciprocal voice"
-    __infer:
-      _rs: limbable
-  grabbing:
-    _rs: "thing:thing:bodypartlike:hand +forcefully circumtangent+"
-    __infer:
-      _rs: limbable
-  pulling:
-    _rs: "thing:thing:bodypartlike:hand +forcefully circumtangent+"
-    __infer:
-      _rs: limbable
-  pulling own:
-    _rs: "thing:thing:bodypartlike:hand +forcefully circumtangent+ /reflexive voice"
-    __infer:
-      _rs: limbable
-  pulling another's:
-    _rs: "thing:thing:bodypartlike:hand +forcefully circumtangent+ /targeting another"
     __infer:
       _rs: limbable
   envy:

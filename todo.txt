@@ -12,9 +12,12 @@ refac:
     - now that some namespaces don't exist, we need a cleverer way to tell gpt4 what to extract from the filename in case of existing files, and also apply this to youtube import
     - split notes from others
     - also, existing files do have metadata in filename
+    - is there a nice, current way to fetch artist and copyright and autoincorporate them in the structure?
+    - children via structure
   - memoization: instead of reading the things in fscache from disk every time, why don't we write it to disk once while memoizing and then read the entire cache from disk on startup?
 post 'lua is working':  
   - add/rename missing m3us
+  - restructure external server: /io/[push|pull]/[pmac|pandroid], /mirror/[pmac|pandroid], /share/*
   - history
     - move images to hydrus
       - date string parsing

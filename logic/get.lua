@@ -92,43 +92,90 @@ get = {
     end,
   },
   danbooru_hydrus_inference_specifier = {
-    str_arr_by_my_tag = function(spec, danbooru_hydrus_map)
-      local d_proto = {
-        decorate_if_ext = get.str_or_nil.str_by_apply_format_str_or_empty_str,
-        my = function(danbooru_tag)
-          return danbooru_hydrus_map[danbooru_tag]
-        end,
+    hydrus_rel_spec_by_resolve = function(spec, danbooru_hydrus_map)
+      local res = {
+        parent = {},
+        sib = {}
       }
-      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
-        transf.danbooru_hydrus_inference_specifier.str_arr_arr_by_danbooru_cartesian_product(spec),
-        function(arr)
-          local d = get.table.table_by_copy(d_proto, false)
-          d.prts = arr
-          return get.str.str_by_evaled_as_template(
-            spec.result,
-            d
-          )
+      local input_cartesian_prod = transf.danbooru_hydrus_inference_specifier.str_arr_arr_by_danbooru_cartesian_product(spec)
+      for _, prodelem in transf.arr.pos_int_vt_stateless_iter(input_cartesian_prod) do
+        local d = transf.str_key_str_value_assoc.tag_d_spec(danbooru_hydrus_map)
+        d.parts = prodelem
+
+        if spec.other then
+          for _, siborparent in transf.arr.pos_int_vt_stateless_iter({"sib", "parent"}) do
+            if spec.other[siborparent] then
+              local newpairs = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+                spec.other[siborparent],
+                function(pair)
+                  return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+                    pair,
+                    function(elem)
+                      return get.str.str_by_evaled_as_template(
+                        elem,
+                        d
+                      )
+                    end
+                  )
+                end
+              )
+              res[siborparent] = transf.two_arr_or_nils.arr(
+                res[siborparent],
+                newpairs
+              )
+              if siborparent == "sib" then -- sibs need to immediately be merged into the danbooru_hydrus_map
+                danbooru_hydrus_map = transf.two_tables.table_by_take_new(
+                  danbooru_hydrus_map,
+                  transf.two_anys__arr_arr.assoc_by_reverse_nested(
+                    newpairs
+                  )
+                )
+              end
+            end
+          end
         end
-      )
-    end,
-    two_strs__arr_arr_by_danbooru_tag_my_tag_implications = function(spec, danbooru_hydrus_map)
-      return transf.two_arrs.two_ts__arr_arr_by_zip_error_not_same_length(
-        get.danbooru_hydrus_inference_specifier.str_arr_by_my_tag(spec, danbooru_hydrus_map),
-        transf.danbooru_hydrus_inference_specifier.str_arr_by_danbooru_tag(spec)
-      )
-    end,
+
+        local canon_sib_str = get.str.str_by_evaled_as_template(
+          spec.result,
+          d
+        )
+        local noncanon_sib_str = get.str.str_by_evaled_as_template(
+          spec.danbooru_tags.combine,
+          d
+        )
+        local sib = {canon_sib_str, noncanon_sib_str}
+        dothis.arr.push(
+          res.sib,
+          sib
+        )
+
+      end
+      return res
+    end
 
   },
   danbooru_hydrus_inference_specifier_arr = {
-    two_strs__arr_arr_by_danbooru_tag_my_tag_implications = function(spec_arr, danbooru_hydrus_map)
-      return transf.arr_arr.arr_by_flatten(
-        get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-          spec_arr,
-          function(spec)
-            return get.danbooru_hydrus_inference_specifier.two_strs__arr_arr_by_danbooru_tag_my_tag_implications(spec, danbooru_hydrus_map)
-          end
+    hydrus_rel_spec_by_danbooru_tag_my_tag_implications = function(spec_arr, danbooru_hydrus_map)
+      local res = {
+        parent = {},
+        sib = {},
+      }
+      for _, spec in transf.arr.pos_int_vt_stateless_iter(spec_arr) do
+        local newspec = get.danbooru_hydrus_inference_specifier.hydrus_rel_spec_by_resolve(
+          spec,
+          danbooru_hydrus_map
         )
-      )
+        res = transf.two_hydrus_rel_specs.hydrus_rel_spec(
+          res,
+          newspec
+        )
+        danbooru_hydrus_map = transf.two_tables.table_by_take_new(
+          danbooru_hydrus_map,
+          transf.two_anys__arr_arr.assoc_by_reverse_nested(
+            newspec.sib
+          )
+        )
+      end
     end,
   },
   hydrus_file_hash = {
@@ -175,57 +222,57 @@ get = {
     end,
   },
   hydrus_tag_hierarchy_node = {
-    str_key_str_value_assoc_by_danbooru_to_my_tag_map = function(node_key, node_assoc, namespace_chain)
-      local res = {}
-      namespace_chain = get.table.table_by_copy(namespace_chain) or {}
-      local current_value = get.str_or_number_arr.str_by_joined(namespace_chain, ":") .. ":" .. node_key
-      if node_assoc then
-        if node_assoc.__is_subnamespace then
-          dothis.arr.push(namespace_chain, node_key)
-        end
-        if node_assoc._s then
-          if is.any.table(node_assoc._s) then
-            if is.table.array(node_assoc._s) then
-              dothis.arr.each(
-                node_assoc._s,
-                function(v)
-                  res[v] = current_value
-                end
-              )
-            else
-              for k, v in transf.table.kt_vt_stateless_iter(node_assoc._s) do
-                current_value = get.str_or_number_arr.str_by_joined(
-                  get.arr.arr_by_nth_element_subbed(namespace_chain, 1, k),
-                  ":"
-                ) .. ":" .. node_key
-                if is.any.str(v) then
-                  res[v] = current_value
-                elseif is.any.arr(v) then
-                  dothis.arr.each(
-                    v,
-                    function(v2)
-                      res[v2] = current_value
-                    end
-                  )
-                end
-              end
-            end
-          else
-            res[node_assoc._s] = current_value
-          end
-        end
-        for k, v in transf.table.table_by_no_any_underscore_private(node_assoc) do
-          res = transf.two_tables.table_by_take_new(
-            res,
-            get.hydrus_tag_hierarchy_node.str_key_str_value_assoc_by_danbooru_to_my_tag_map(
-              k,
-              v,
-              namespace_chain
-            )
-          )
-        end
-      end
-    end,
+    -- str_key_str_value_assoc_by_danbooru_to_my_tag_map = function(node_key, node_assoc, namespace_chain)
+    --   local res = {}
+    --   namespace_chain = get.table.table_by_copy(namespace_chain) or {}
+    --   local current_value = get.str_or_number_arr.str_by_joined(namespace_chain, ":") .. ":" .. node_key
+    --   if node_assoc then
+    --     if node_assoc.__is_subnamespace then
+    --       dothis.arr.push(namespace_chain, node_key)
+    --     end
+    --     if node_assoc._s then
+    --       if is.any.table(node_assoc._s) then
+    --         if is.table.array(node_assoc._s) then
+    --           dothis.arr.each(
+    --             node_assoc._s,
+    --             function(v)
+    --               res[v] = current_value
+    --             end
+    --           )
+    --         else
+    --           for k, v in transf.table.kt_vt_stateless_iter(node_assoc._s) do
+    --             current_value = get.str_or_number_arr.str_by_joined(
+    --               get.arr.arr_by_nth_element_subbed(namespace_chain, 1, k),
+    --               ":"
+    --             ) .. ":" .. node_key
+    --             if is.any.str(v) then
+    --               res[v] = current_value
+    --             elseif is.any.arr(v) then
+    --               dothis.arr.each(
+    --                 v,
+    --                 function(v2)
+    --                   res[v2] = current_value
+    --                 end
+    --               )
+    --             end
+    --           end
+    --         end
+    --       else
+    --         res[node_assoc._s] = current_value
+    --       end
+    --     end
+    --     for k, v in transf.table.table_by_no_any_underscore_private(node_assoc) do
+    --       res = transf.two_tables.table_by_take_new(
+    --         res,
+    --         get.hydrus_tag_hierarchy_node.str_key_str_value_assoc_by_danbooru_to_my_tag_map(
+    --           k,
+    --           v,
+    --           namespace_chain
+    --         )
+    --       )
+    --     end
+    --   end
+    -- end, -- I think this code is superfluous, but I'm not yet entirely sure.
     hydrus_rel_spec = function(node_key, node_assoc, nodeparent, namespace_chain, virtuals)
       local res = {
         parent = {},

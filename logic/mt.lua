@@ -152,9 +152,9 @@ ls = {
           }
         },
         
-        combine = "general:{{[d.prts[2]]}} {{[d.prts[1]]}}",
+        combine = "general:{{[ d.prts[2] ]}} {{[ d.prts[1] ]}}",
       },
-      result =  "thing:thing:{{[d.my(d.prts[1])]}} ++ thing:{{[d.my(d.prts[2])]}}",
+      result =  "thing:thing:{{[ d.my(d.prts[1]) ]}} ++ thing:{{[ d.my(d.prts[2]) ]}}",
     },
     {
       danbooru_tags = {
@@ -179,27 +179,176 @@ ls = {
             -- more later, currently just proof of concept
           }
         },
-        combine = "general:{{[d.prts[1]]}} {{[d.prts[2]]}} {{[d.prts[3]]}} {{[d.prts[4]]}}",
+        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}} {{[ d.prts[3] ]}} {{[ d.prts[4] ]}}",
       },
       action = "thing:"
-        .. "thing:{{[ d.my(d.prts[1]) .. d.decorate_if_ext(d.my(d.prts[2]), \"[%s]\") ]}}" 
+        .. "thing:{{[ d.my(d.prts[1]) .. d.bracket(d.my(d.prts[2])) ]}}" 
         .. " +{{[ d.my(d.prts[3]) ]}}"
         .. " thing:{{[ d.my(d.prts[5]) ]}}"
-        .. " {{[ d.decorate_if_ext(d.my(d.prts[4]), \"/%s\") ]}}"
+        .. " {{[ d.slash(d.my(d.prts[4])) ]}}"
+    },  {
+      danbooru_tags = {
+        prts = {
+          {
+            "hugging",
+            "grabbing",
+            "pulling",
+            "touching",
+            "holding",
+          }, {
+            "",
+            "own",
+            "another's"
+          }, {
+            "face",
+            "waist",
+            "cheek",
+            -- more later, currently just proof of concept
+          }
+        },
+        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}} {{[ d.prts[3] ]}}",
+      },
+      action = "thing:"
+        .. " +{{[ d.my(d.prts[1]) ]}}"
+        .. " thing:{{[ d.my(d.prts[3]) ]}}"
+        .. " {{[ d.slash(d.my(d.prts[2])) ]}}"
     }, {
       danbooru_tags = {
         fetch = "* focus",
         prts_extractor = function(name)
-          return get.str.str_arr_by_onig_regex_match(name, "^general:(.*)([^ ]+)$")
+          return get.str.str_arr_by_onig_regex_match(name, "^general:(.*) (focus)$")
         end,
-        combine = "general:{{[d.prts[2]]}} {{[d.prts[1]]}}",
+        combine = "general:{{[ d.prts[2] ]}} {{[ d.prts[1] ]}}",
       },
-      result = "{{[d.prts[1]]}}:{{[d.prts[2]]}}"
-    }
+      result = "{{[ d.prts[1] ]}}:{{[ d.my(d.prts[2]) ]}}"
+    }, {
+      danbooru_tags = {
+        fetch = "licking *",
+        prts_extractor = function(name)
+          return get.str.str_arr_by_onig_regex_match(name, "^general:(licking) (.*)$")
+        end,
+        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}}",
+      },
+      result = "thing:thing:bodypartlike:tongue +essive+ {{[ d.my(d.prts[2]) ]}}"
+    }, {
+      danbooru_tags = {
+        fetch = "too many *",
+        prts_extractor = function(name)
+          return get.str.str_arr_by_onig_regex_match(name, "^general:(too many) (.*)$")
+        end,
+        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}}",
+      },
+      result = "thing:{{[ d.my(d.prts[2]) ]}}{{[ d.bracket(d.my(d.prts[1])) ]}}"
+    }, {
+      danbooru_tags = {
+        prts = {
+          {
+            "ranguage",
+            "text",
+          }, {
+            "german",
+            "english",
+            "latin",
+            -- TODO
+          }
+        },
+        combine = "general:{{[ d.prts[2] ]}} {{[ d.prts[1] ]}}",
+      },
+      result = "thing:{{[ d.my(d.prts[1]) ]}} ++ {{[ d.my(d.prts[2)) ]}}"
+    }, {
+      danbooru_tags = {
+        prts = {
+          {
+            "german",
+            "british",
+            "russian",
+            "united states"
+            -- TODO
+          },
+          {
+            "flag",
+            "army",
+            "air force",
+            "navy",
+          }
+        },
+        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}}",
+      },
+      other = {
+        sib = {
+          { "thing:identity:{{[ d.prts[1] ]}}", "general:{{[ d.prts[1] ]}} nation" }
+        },
+        parent = {
+          { "thing:real national subdivision", "{{[ d.my(d.prts[1] .. ' nation') ]}}" },
+          { "thing:identity:{{[ d.prts[1] ]}}", "{{[ d.my(d.prts[1] .. ' nation') ]}}" },
+        },
+      },
+      
+      result = "thing:{{[ d.my(d.prts[1] .. ' nation') ]}} ++ {{[ d.my(d.prts[2)) ]}}", -- TODO: This requires that something mapping to e.g. general:german nation exists. The item below requires the same form e.g. general:german culture. I could create those manually, but it seems like a lot of duplicate work. I'm still considering if there's some way to derive these programmatically without messing other things up.
+    }, {
+      danbooru_tags = {
+        prts = {
+          {
+            "german",
+            "russian",
+            -- TODO
+          },
+          {
+            "clothes",
+          }
+        },
+        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}}",
+      },
+      other = {
+        sib = {
+          { "thing:identity:{{[ d.prts[1] ]}}", "general:{{[ d.prts[1] ]}} culture" }
+        },
+        parent = {
+          { "thing:real national culture", "{{[ d.my(d.prts[1] .. ' culture') ]}}" },
+          { "thing:culture:{{[ d.prts[1] ]}}", "{{[ d.my(d.prts[1] .. ' culture') ]}}" },
+        },
+      },
+      result = "thing:{{[ d.my(d.prts[1] .. ' culture') ]}} ++ {{[ d.my(d.prts[2)) ]}}"
+    },{
+      danbooru_tags = {
+        prts = {
+          {
+            "bad",
+          }, {
+            "anatomy",
+            "feet",
+            "foot",
+            "hand",
+            "hands",
+            "proportions",
+            "perspective",
+            "leg",
+            "arm",
+            "neck",
+            "reflection",
+            "gun anatomy",
+            "vulva",
+            "face",
+            "ass",
+            "singing",
+            "multiple views",
+            "vehicle anatomy"
+          }
+        },
+        
+        combine = "general:{{[ d.prts[2] ]}} {{[ d.prts[1] ]}}",
+      },
+      result =  "thing:thing:deviation:unintentional ++ thing:deviation:from ideal ++ thing:{{[ d.my(d.prts[2]) ]}}", -- TODO: not sure if this is really how I want to deal with this. 
+    },
   },
-  two_strs__arr_arr_by_additional_siblings = {
+  two_strs__arr_arr_by_siblings = {
     {"foreground:blur", "general:blurry foreground"},
-    {"background:blur", "general:blurry foreground"}
+    {"background:blur", "general:blurry foreground"},
+    {"general:british navy", "general:royal navy"},
+    {"general:hugging arm", "general:arm hug"},
+    {"general:interlocked arms", "general:locked arms"},
+    {"general:hugging", "general:hug"},
+    {"general:german nation", "general:germany"}
   },
   note_key = {
     "positive_prompt", -- what the creator was told to create
