@@ -8476,7 +8476,9 @@ transf = {
     otp_pass_item_name_arr = function()
       return transf.dir.leaflike_arr_by_children_filenames(env.MPASSOTP)
     end,
-
+    digit_str_by_next_free_port = function()
+      return transf.str.str_or_err_by_evaled_env_bash_stripped_noempty("nextport")
+    end,
     full_dcmp_spec_by_current = function()
       return os.date("*t")
     end,

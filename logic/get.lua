@@ -3629,6 +3629,16 @@ get = {
     end,
   },
   fnname = {
+    json_string_by_response = function (fnname, argsb64, bodyb64, method)
+      local args = transf.base64_url_str.str_by_decode_to_utf8(argsb64)
+      local body = transf.base64_url_str.str_by_decode_to_utf8(bodyb64)
+      local mainargs = args or body
+      local parsedargs = transf.json_str.not_userdata_or_fn(mainargs)
+      local ns, typ, unnamespaced_fnname = get.str.n_strs_by_split_w_str(fnname, ".", 3)
+      local fn = ns[typ][unnamespaced_fnname]
+      local res = fn(transf.arr.n_anys(parsedargs))
+      return transf.not_userdata_or_fn.json_str(res)
+    end,
     local_absolute_path_by_in_cache_w_str_and_arr_or_nil = function(fnname, optsstr, args)
       local path = transf.fnname.local_absolute_path_by_in_cache(fnname)
 

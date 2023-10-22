@@ -855,6 +855,18 @@ act = {
       return line
     end,
   },
+  absolute_path_and_fnname = {
+    url_by_serve = function(path, fnname)
+      act.str.env_bash_eval_async(
+        "luaserve-server" ..
+        transf.str.str_by_single_quoted_escaped(path) ..
+        transf.str.str_by_single_quoted_escaped(fnname) ..
+        transf.str.str_by_single_quoted_escaped(
+          transf["nil"].digit_str_by_next_free_port()
+        )
+      )
+    end,
+  },
   absolute_path = {
     write_template = function(path, template_path)
       dothis.absolute_path.write_file(
