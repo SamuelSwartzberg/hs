@@ -84,6 +84,7 @@ consts = {
   unique_record_separator  = "__ENDOFRECORD5579__",
   unique_field_separator = "Y:z:Y",
   int_by_large = 2^51, -- a bit smaller than the maximum 2^53 to allow for some wiggle room
+  global_namespace_taking_key_name_by_default = "global",
 }
 
 ls = {
@@ -154,7 +155,6 @@ ls = {
         
         combine = "general:{{[ d.prts[2] ]}} {{[ d.prts[1] ]}}",
       },
-      result =  "thing:thing:{{[ d.my(d.prts[1]) ]}} ++ thing:{{[ d.my(d.prts[2]) ]}}",
     },
     {
       danbooru_tags = {
@@ -180,10 +180,13 @@ ls = {
           }
         },
       },
-      action = "thing:"
-        .. "thing:{{[ d.my(d.prts[1]) .. d.bracket(d.my(d.prts[2])) ]}}" 
+      action = [[{{[
+        d.modif
+      ]}}]]
+      "thing:"
+        .. "{{[ d.my(d.prts[1]) .. d.bracket(d.my(d.prts[2])) ]}}" 
         .. " +{{[ d.my(d.prts[3]) ]}}"
-        .. " thing:{{[ d.my(d.prts[5]) ]}}"
+        .. " {{[ d.my(d.prts[5]) ]}}"
         .. " {{[ d.slash(d.my(d.prts[4])) ]}}"
     },  {
       danbooru_tags = {
@@ -208,7 +211,7 @@ ls = {
       },
       action = "thing:"
         .. " +{{[ d.my(d.prts[1]) ]}}"
-        .. " thing:{{[ d.my(d.prts[3]) ]}}"
+        .. " {{[ d.my(d.prts[3]) ]}}"
         .. " {{[ d.slash(d.my(d.prts[2])) ]}}"
     }, {
       danbooru_tags = {
@@ -226,7 +229,7 @@ ls = {
           return get.str.str_arr_by_onig_regex_match(name, "^general:(licking) (.*)$")
         end,
       },
-      result = "thing:thing:bodypartlike:tongue +essive+ {{[ d.my(d.prts[2]) ]}}"
+      result = "{thing:bodypartlike:tongue +essive+ {{[ d.my(d.prts[2]) ]}}}"
     }, {
       danbooru_tags = {
         fetch = "too many *",
@@ -234,7 +237,7 @@ ls = {
           return get.str.str_arr_by_onig_regex_match(name, "^general:(too many) (.*)$")
         end,
       },
-      result = "thing:{{[ d.my(d.prts[2]) ]}}{{[ d.bracket(d.my(d.prts[1])) ]}}"
+      result = "{{{[ d.my(d.prts[2]) ]}}{{[ d.bracket(d.my(d.prts[1])) ]}}}"
     }, {
       danbooru_tags = {
         prts = {
@@ -250,7 +253,7 @@ ls = {
           }, 
         },
       },
-      result = "thing:{{[ d.my(d.prts[2]) ]}} ++ {{[ d.my(d.prts[1)) ]}}"
+      result = "{{{[ d.my(d.prts[2]) ]}} ++ {{[ d.my(d.prts[1)) ]}}}"
     }, {
       danbooru_tags = {
         prts = {
@@ -355,7 +358,7 @@ ls = {
           return get.str.str_arr_by_onig_regex_match(name, "^general:(self)(.*)$")
         end,
       },
-      result = "" -- TODO. We have a problem here: the combined things are namespace:val /modification, but the uncombined things are not. So we would need to add a thing: to the beginning for some, but not for others. Obviously, that can't work. Solutions: Find a way to not prefix the combined things with a namespace (problematic), or find a way to auto add a namespace to unnamespaced things. The latter could work (have a list of valid namespaces, check each item -> does it start with a valid namespace? If not, add a default namespace.), the main problem is, when do we apply it? We need to make sure that it's applied before we add parents or siblings based on it, otherwise these will target the wrong thing.
+      result = ""
     },{
       danbooru_tags = {
         prts = {
@@ -383,7 +386,6 @@ ls = {
           }
         },
         
-        combine = "general:{{[ d.prts[2] ]}} {{[ d.prts[1] ]}}",
       },
       result =  "thing:thing:deviation:unintentional ++ thing:deviation:from ideal ++ thing:{{[ d.my(d.prts[2]) ]}}", -- TODO: not sure if this is really how I want to deal with this. 
     },{
@@ -505,6 +507,13 @@ ls = {
     "proximate_source",
     "acquisition",
     "use",
+  },
+  external_namespace_arr = {
+    "general",
+    "series",
+    "copyright",
+    "character",
+    "meta"
   },
   composition = {
     "visual composition",
@@ -704,6 +713,7 @@ ls = {
                                 "pupil + red 1-adic range SBCS^2^ palette", -- aliases general:red pupils
                                 "pupil + white 1-adic range SBCS^2^ palette", -- aliases general:white pupils
                                 "pupil + yellow 1-adic range SBCS^2^ palette", -- aliases general:yellow pupils
+  },
   format = {
     "audio",
     "visual",
@@ -1340,4 +1350,11 @@ ls = {
     "latex",
     "omegat"
   }
+}
+
+ls_by_union = {
+  global_or_external_namespace_arr = transf.two_arrs.arr_by_appended(
+    ls.global_namespace_taking_key_name_arr,
+    ls.external_namespace_arr
+  )
 }

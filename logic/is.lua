@@ -67,7 +67,7 @@ is = {
     starting_with_dot_str = function(str)
       return get.str.bool_by_startswith(str, ".")
     end,
-    input_spec_str = function(str)
+     input_spec_str = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.rough_input_spec_str) -- we're calling onig on a str which we are not sure is ascii. I'm not sure how problematic this is, since I've forgotten whether onig just doesn't implement any specific behavior for non-ascii chars, or if actually sees them as the ascii chars the utf8 corresponds to. Either way, worst comes the worst it'd result in a few false positives, which is fine.
     end,
     input_spec_series_str = function(str)
@@ -2575,6 +2575,9 @@ is = {
     end,
     danbooru_hydrus_inference_specifier = function(t)
       return t.danbooru_tags and t.result
+    end,
+    composite_tag_specifier = function(t)
+      return t.parts
     end,
     
   },

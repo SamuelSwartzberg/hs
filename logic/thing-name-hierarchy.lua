@@ -866,6 +866,7 @@ thing_name_hierarchy = {
         danbooru_tag_record = "leaf",
         danbooru_tag_implication_record = "leaf",
         danbooru_hydrus_inference_specifier = "leaf",
+        composite_tag_specifier = "leaf",
       }
     },
     primitive = {

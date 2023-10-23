@@ -1739,6 +1739,12 @@ dothis = {
       do_next_item()
     end,
   },
+  two_strs__arr_arr = {
+    push_ensure_global_namespace = function(two_strs__arr_arr, item)
+      item = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(item, transf.str.str_by_ensure_global_namespace_start)
+      dothis.arr.push(two_strs__arr_arr, item)
+    end,
+  },
   action_specifier = {
     execute = function(spec, target)
       

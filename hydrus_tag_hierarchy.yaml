@@ -1680,8 +1680,6 @@ things:
         location of residence:
         housing:
           room layout:
-        object:
-          object use:
 general:
   touching: 
     _rs: 

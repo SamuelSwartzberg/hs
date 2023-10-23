@@ -644,7 +644,7 @@ transf = {
       }).file_ids
     end,
   },
-  hole_y_arrlike = {
+  only_pos_int_key_table = {
     arr = function(tbl)
       local new_tbl = {}
       for i = 1, #tbl do
@@ -3494,7 +3494,7 @@ transf = {
       return get.contact_table.line_or_nil_by_tax_number(contact_table, "personal")
     end,
     line_arr_by_full_name_western = function(contact_table)
-      return transf.hole_y_arrlike.arr({ 
+      return transf.only_pos_int_key_table.arr({ 
         transf.contact_table.line_or_nil_by_name_pre(contact_table),
         transf.contact_table.line_or_nil_by_first_name(contact_table),
         transf.contact_table.line_or_nil_by_middle_name(contact_table),
@@ -3509,7 +3509,7 @@ transf = {
       )
     end,
     line_arr_by_normal_name_western = function(contact_table)
-      return transf.hole_y_arrlike.arr({ 
+      return transf.only_pos_int_key_table.arr({ 
         transf.contact_table.line_or_nil_by_first_name(contact_table),
         transf.contact_table.line_or_nil_by_last_name(contact_table),
       })
@@ -3524,7 +3524,7 @@ transf = {
       return transf.contact_table.line_or_nil_by_pref_name(contact_table) or transf.contact_table.line_by_normal_name_western(contact_table)
     end,
     line_arr_by_full_name_eastern = function(contact_table)
-      return transf.hole_y_arrlike.arr({ 
+      return transf.only_pos_int_key_table.arr({ 
         transf.contact_table.line_or_nil_by_name_pre(contact_table),
         transf.contact_table.line_or_nil_by_last_name(contact_table),
         transf.contact_table.line_or_nil_by_first_name(contact_table),
@@ -3538,7 +3538,7 @@ transf = {
       )
     end,
     line_arr_by_normal_name_eastern = function(contact_table)
-      return transf.hole_y_arrlike.arr({ 
+      return transf.only_pos_int_key_table.arr({ 
         transf.contact_table.line_or_nil_by_last_name(contact_table),
         transf.contact_table.line_or_nil_by_first_name(contact_table),
       })
@@ -3550,7 +3550,7 @@ transf = {
       )
     end,
     line_arr_by_name_additions = function(contact_table)
-      return transf.hole_y_arrlike.arr({ 
+      return transf.only_pos_int_key_table.arr({ 
         transf.contact_table.line_or_nil_by_title(contact_table),
         transf.contact_table.line_or_nil_by_role(contact_table),
         transf.contact_table.line_or_nil_by_organization(contact_table),
@@ -3686,7 +3686,7 @@ transf = {
     end,
     line_by_postal_code_city = function(single_address_table)
       return get.str_or_number_arr.str_by_joined(
-        transf.hole_y_arrlike.arr({
+        transf.only_pos_int_key_table.arr({
           transf.address_table.line_by_postal_code(single_address_table),
           transf.address_table.line_by_city(single_address_table)
         }),
@@ -3696,7 +3696,7 @@ transf = {
     line_by_region_country = function(single_address_table)
       return 
         get.str_or_number_arr.str_by_joined(
-          transf.hole_y_arrlike.arr({
+          transf.only_pos_int_key_table.arr({
             transf.address_table.line_by_region(single_address_table),
             transf.address_table.country_identifier_str(single_address_table)
           }),
@@ -3704,20 +3704,20 @@ transf = {
         )
     end,
     line_arr_by_addressee = function(single_address_table)
-      return transf.hole_y_arrlike.arr({
+      return transf.only_pos_int_key_table.arr({
         transf.contact_table.line_by_main_name(single_address_table.contact),
         transf.address_table.line_by_extended(single_address_table)
       })
     end,
     line_arr_by_in_country_location = function(single_address_table)
-      return transf.hole_y_arrlike.arr({
+      return transf.only_pos_int_key_table.arr({
         transf.address_table.line_by_street(single_address_table),
         transf.address_table.line_by_postal_code(single_address_table),
         transf.address_table.line_by_city(single_address_table),
       })
     end,
     line_arr_by_international_location = function(single_address_table)
-      return transf.hole_y_arrlike.arr({
+      return transf.only_pos_int_key_table.arr({
         transf.address_table.line_by_street(single_address_table),
         transf.address_table.line_by_postal_code(single_address_table),
         transf.address_table.line_by_city(single_address_table),
@@ -4523,6 +4523,12 @@ transf = {
     str_by_surrounded_with_brackets = function(str)
       return "[" .. str .. "]"
     end,
+    str_by_extract_bracket_contents = function(str)
+      return get.str.str_by_extracted_eutf8_w_regex(str, "%[([^%]]-)%]")
+    end,
+    str_by_extract_prebracket_contents = function(str)
+      return get.str.str_by_extracted_eutf8_w_regex(str, "([^%[]-)%[")
+    end,
     str_by_start_with_slash = function(str)
       return "/" .. str
     end,
@@ -4548,57 +4554,78 @@ transf = {
       local parts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(str, "&&")
       return transf.arr.hydrus_file_hash_arr_by_search(parts)
     end,
-    three_str_or_nils_by_namespace_inference_val = function(str)
-      local noinference, inference  = get.str.n_strs_by_split_w_str(str, "/") -- get everything before '/' - after is a potential modifier
-      local namespace, val = get.str.two_strs_or_nil_by_split_w_str(noinference, ":")
-      return namespace, inference, val
+    str_by_ensure_global_namespace_start = function(str)
+      if get.str.bool_by_startswith_any_w_str_arr(
+        str,
+        ls.global_or_external_namespace_arr
+      ) then
+        return str
+      else
+        return consts.global_namespace_taking_key_name_by_default .. ":" .. str
+      end
     end,
-    two_str_or_nils_and_str_arr_by_namespace_inference_val = function(str)
-      local namespace, inference, val = transf.str.three_str_or_nils_by_namespace_inference_val(str)
+    composite_tag_specifier_or_nil = function(str)
+      local namespace, val = get.str.two_strs_or_nil_by_split_w_str(str, ":")
+      if not get.str.bool_by_startswith(val, "{") then
+        return nil
+      end
+      val = get.str.str_by_no_prefix(val, "{")
+      val = get.str.str_by_no_suffix(val, "}")
+      local noinference, inference  = get.str.n_strs_by_split_w_str(val, "/") -- get everything before '/' - after is a potential modifier
       local valparts = get.str.str_arr_by_split_noedge_w_str(val, "+")
-      return namespace, inference, valparts
+      local modifiers = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(valparts, transf.str.str_by_extract_bracket_contents)
+      local nonmodifier_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(valparts, transf.str.str_by_extract_prebracket_contents)
+      return {
+        namespace = namespace,
+        val = val,
+        noinference = noinference,
+        inference = inference,
+        parts = valparts,
+        modifiers = modifiers,
+        nonmodifier_parts = nonmodifier_parts
+      }
     end,
     two_strs__arr_arr_by_deduce_from_parts = function(str)
       local res = {}
       -- example: str = thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
-      local namespace, inference, valparts = transf.str.three_str_or_nils_by_namespace_inference_val(str)
-      local val = get.str_or_number_arr.str_by_joined_w_after_ticktock(valparts, "+")
-      local noinference = namespace .. ":" .. val
-      if inference then
-        dothis.arr.push(
+      local composite_tag_specifier = transf.str.composite_tag_specifier_or_nil(str)
+      if composite_tag_specifier == nil then
+        return res
+      end
+      if composite_tag_specifier.inference then
+        dothis.two_strs__arr_arr.push_ensure_global_namespace(
           res,
-          { inference, str }
+          { composite_tag_specifier.inference, str }
         ) -- e.g. thing:targeting another is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
-        dothis.arr.push(
+        dothis.two_strs__arr_arr.push_ensure_global_namespace(
           res,
-          { noinference, str}
+          { composite_tag_specifier.noinference, str}
         ) -- e.g. thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
       end
-      local valparts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(val, "+")
-      local consumable_valparts = get.table.table_by_copy(valparts)
+      local consumable_valparts = get.table.table_by_copy(composite_tag_specifier.parts)
 
       while #consumable_valparts > 0 do
         local valpart = act.arr.pop(consumable_valparts)
         if #valpart > 0 then
           local unmodified, modifier = get.str.n_strs_by_extracted_onig(valpart, "^([^\\[]+)\\[([^\\]])\\] *" ) -- e.g. thing:bodypartlike:hand[thing:quantification:plural]
           if unmodified and modifier then
-            dothis.arr.push(res, {modifier, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:quantification:plural (or more precisely, thing:quantification:plural is a parent to thing:bodypartlike:hand[plural])
-            dothis.arr.push(res, {unmodified, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:bodypartlike:hand (or more precisely, thing:bodypartlike:hand is a parent to thing:bodypartlike:hand[plural])
+            dothis.two_strs__arr_arr.push_ensure_global_namespace(res, {modifier, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:quantification:plural (or more precisely, thing:quantification:plural is a parent to thing:bodypartlike:hand[plural])
+            dothis.two_strs__arr_arr.push_ensure_global_namespace(res, {unmodified, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:bodypartlike:hand (or more precisely, thing:bodypartlike:hand is a parent to thing:bodypartlike:hand[plural])
           end
 
           if #consumable_valparts > 1 then -- in the #valparts == 1 case, the later code results in the same thing as this, so we can skip it
-            dothis.arr.push(
+            dothis.two_strs__arr_arr.push_ensure_global_namespace(
               res,
-              { valpart, noinference }
+              { valpart, composite_tag_specifier.noinference }
             ) -- e.g. thing:bodypartlike:hand[plural]  is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist
           end
 
-          if #consumable_valparts ~= #valparts then
-            local remaining_val = get.str_or_number_arr.str_by_joined_w_after_ticktock(valparts, "+")
-          dothis.arr.push(
-              res,
-              { remaining_val, noinference }
-            ) 
+          if #consumable_valparts ~= #composite_tag_specifier.parts then
+            local remaining_val = get.str_or_number_arr.str_by_joined_w_after_ticktock(composite_tag_specifier.parts, "+")
+            dothis.two_strs__arr_arr.push_ensure_global_namespace(
+                res,
+                { remaining_val, composite_tag_specifier.noinference }
+              ) 
           end
           -- for our example:
           -- - #valparts = 3: do nothing
@@ -4672,16 +4699,20 @@ transf = {
     end,
   },
   str_or_nil_and_str_or_nil_and_str_arr = {
-    str_by_namespace_inference_valparts = function(str1, str2, str_arr)
+    str_by_namespace_inference_valparts = function(ns, mod, str_arr)
       local res = ""
-      if str1 and #str1 > 0 then
-        res = res .. str1 .. ":"
-      end
       res = res .. get.str_or_number_arr.str_by_joined(str_arr, "+")
-      if str2 and #str2 > 0 then
-        res = res .. "/" .. str2
+      if mod and #mod > 0 then
+        res = res .. "/" .. mod
       end
-      return res
+      if #str_arr == 1 and (not mod or #mod == 0) then
+        -- noop, still single tag, no need to {}
+      else
+        res = "{" .. res .. "}"
+      end
+      if ns and #ns > 0 then
+        res = ns .. ":" .. res
+      end
     end,
   },
   line = {
@@ -4979,6 +5010,43 @@ transf = {
       )
     end,
   },
+  composite_tag_specifier = {
+    str = function(spec)
+      local noinference = spec.noinference
+      if not noinference then
+        local parts = {}
+        local maxlength = transf.operational_comparable_arr.operational_comparable_by_largest(
+          get.arr.arr_by_mapped_w_pos_int_t_arg_t_ret_fn(
+            transf.only_pos_int_key_table.arr(
+              {
+                spec.parts,
+                spec.modifiers,
+                spec.nonmodifier_parts
+              }
+            )
+          )
+        )
+        for i = 1, #maxlength, 1 do
+          if spec.parts and spec.parts[io] then
+            parts[i] = spec.parts[i]
+          elseif spec.nonmodifier_parts and spec.nonmodifier_parts[i] then
+            parts[i] = spec.nonmodifier_parts[i]
+            if spec.modifiers and spec.modifiers[i] then
+              parts[i] = parts[i] .. "[" .. spec.modifiers[i] .. "]"
+            end
+          else
+            parts[i] = ""
+          end
+        end
+        noinference = get.str_or_number_arr.str_by_joined_w_after_ticktock(parts, "+")
+      end
+      local val = "{" .. noinference .. transf.str_or_nil.str_by_start_with_slash_if_str(spec.inference) .. "}"
+      if spec.namespace and #spec.namespace > 0 then
+        val = spec.namespace .. ":" .. val
+      end
+      return val
+    end,
+  },
   two_hydrus_rel_specs = {
     hydrus_rel_spec = function(spec1, spec2)
       return {
@@ -4990,10 +5058,8 @@ transf = {
   hydrus_tag_hierarchy = {
     hydrus_rel_spec = function(hierarchy)
       local basic_rel_spec = get.hydrus_tag_hierarchy_node.hydrus_rel_spec("global", hierarchy, nil, nil, ls.global_namespace_taking_key_name_arr)
-      local tag_map = transf.two_tables.table_by_take_new(
-        transf.two_anys__arr_arr.assoc_by_reverse_nested(basic_rel_spec.sib),
-        transf.two_anys__arr_arr.assoc_by_reverse_nested(ls.two_strs__arr_arr_by_siblings)
-      ) -- add the reverse of the simple siblings to the tag map
+      basic_rel_spec.sib = transf.two_arrs.arr_by_appended(basic_rel_spec.sib, ls.two_strs__arr_arr_by_siblings)
+      local tag_map = transf.two_anys__arr_arr.assoc_by_reverse_nested(basic_rel_spec.sib)
       local generated_hydrus_rel_spec = get.danbooru_hydrus_inference_specifier_arr.hydrus_rel_spec_by_danbooru_tag_my_tag_implications(
         ls.danbooru_hydrus_inference_specifier_arr,
         tag_map
@@ -5210,10 +5276,7 @@ transf = {
     end,
     tag_d_spec =  function(assoc)
       return  {
-        decorate_if_ext = get.str_or_nil.str_by_apply_format_str_or_empty_str,
-        bracket = transf.str_or_nil.str_by_surrounded_with_brackets_if_str,
-        slash = transf.str_or_nil.str_by_start_with_slash_if_str,
-        modify = get.two_strs.str_by_modified_at_position,
+        modify = get.str.str_by_modified_at_position,
         my = function(danbooru_tag)
           local res = assoc["general:" .. danbooru_tag]
           if res == nil then 
@@ -5248,6 +5311,34 @@ transf = {
     end,
     bool_by_smaller = function(a, b)
       return a < b
+    end,
+  },
+  operational_comparable_arr = {
+    operational_comparable_by_largest = function(arr)
+      return get.arr.t_by_max(
+        arr,
+        transf.two_operational_comparables.bool_by_larger
+      )
+    end,
+    operational_comparable_by_smallest = function(arr)
+      return get.arr.t_by_min(
+        arr,
+        transf.two_operational_comparables.bool_by_smaller
+      )
+    end,
+  },
+  operational_comparable_key_assoc = {
+    operational_comparable_by_largest_key = function(assoc)
+      return get.table.kt_by_max_key(
+        assoc,
+        transf.two_operational_comparables.bool_by_larger
+      )
+    end,
+    operational_comparable_by_smallest_key = function(assoc)
+      return get.table.kt_by_min_key(
+        assoc,
+        transf.two_operational_comparables.bool_by_smaller
+      )
     end,
   },
   two_numbers ={
@@ -7527,7 +7618,7 @@ transf = {
     end,
     line_by_name_naive = function(csl_person)
       return get.str_or_number_arr.str_by_joined(
-        transf.hole_y_arrlike.arr({
+        transf.only_pos_int_key_table.arr({
           transf.csl_person.given(csl_person),
           transf.csl_person.line_or_nil_by_dropping_particle(csl_person),
           transf.csl_person.line_or_nil_by_non_dropping_particle(csl_person),
@@ -9236,7 +9327,7 @@ transf = {
         end
       elseif get.str.bool_by_startswith(str, ":") then
         input_spec.mode = "key"
-        local parts = transf.hole_y_arrlike.arr(get.str.str_arr_by_split_w_ascii_char(get.str.str_by_sub_lua(str, 2), "+")) -- separating modifier keys with `+`
+        local parts = transf.only_pos_int_key_table.arr(get.str.str_arr_by_split_w_ascii_char(get.str.str_by_sub_lua(str, 2), "+")) -- separating modifier keys with `+`
         if #parts > 1 then
           input_spec.key = act.arr.pop(parts)
           input_spec.mods = parts
@@ -9276,7 +9367,7 @@ transf = {
   },
   input_spec_series_str = {
     input_spec_str_arr = function(str)
-      return transf.hole_y_arrlike.arr(get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(str, "\n"))
+      return transf.only_pos_int_key_table.arr(get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(str, "\n"))
     end,
     input_spec_arr = function(str)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(

@@ -44,15 +44,6 @@ get = {
       })
     end,
   },
-  two_strs = {
-    str_by_modified_at_position = function(str1, str2, i)
-      local ns, mod, parts = transf.str.three_str_or_nils_by_namespace_inference_val(str1)
-      if parts and parts[i] then
-        parts[i] = parts[i] .. str2
-      end
-      return transf.two_str_or_nils_and_str_arr.str_by_namespace_inference_valparts(ns, mod, parts)
-    end
-  },
   str_or_nil = {
     str_or_nil_by_apply_format_str = function(str, format_str)
       if str ~= nil then
@@ -114,24 +105,26 @@ get = {
         if spec.other then
           for _, siborparent in transf.arr.pos_int_vt_stateless_iter({"sib", "parent"}) do
             if spec.other[siborparent] then
-              local newpairs = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
-                spec.other[siborparent],
-                function(pair)
-                  return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
-                    pair,
-                    function(elem)
-                      return get.str.str_by_evaled_as_template(
-                        elem,
-                        d
-                      )
-                    end
-                  )
-                end
-              )
-              res[siborparent] = transf.two_arr_or_nils.arr(
-                res[siborparent],
-                newpairs
-              )
+              local newpairs = {}
+              for _, pair in transf.arr.pos_int_vt_stateless_iter(spec.other[siborparent]) do
+                local newpair = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+                  pair,
+                  function(elem)
+                    return get.str.str_by_evaled_as_template(
+                      elem,
+                      d
+                    )
+                  end
+                )
+                dothis.two_strs__arr_arr.push_ensure_global_namespace(
+                  res[siborparent],
+                  newpair
+                )
+                dothis.arr.push(
+                  newpairs,
+                  transf.arr.t_by_last(res[siborparent]) -- not using newpair itself since we've transformed in pushing
+                )
+              end
               if siborparent == "sib" then -- sibs need to immediately be merged into the danbooru_hydrus_map
                 danbooru_hydrus_map = transf.two_tables.table_by_take_new(
                   danbooru_hydrus_map,
@@ -145,7 +138,18 @@ get = {
         end
 
         local canon_sib_str = get.str.str_by_evaled_as_template(
-          spec.result,
+          spec.result or [[{{[ 
+            "{" ..
+            get.str_or_number_arr.str_by_joined_w_after_ticktock(
+              get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+                d.prts,
+                d.my
+              ), 
+              '+'
+            ) 
+            .. "}"
+            
+          ]}}]],
           d
         )
         local noncanon_sib_str = get.str.str_by_evaled_as_template(
@@ -153,7 +157,7 @@ get = {
           d
         )
         local sib = {canon_sib_str, noncanon_sib_str}
-        dothis.arr.push(
+        dothis.two_strs__arr_arr.push_ensure_global_namespace(
           res.sib,
           sib
         )
@@ -290,7 +294,7 @@ get = {
       namespace_chain = get.table.table_by_copy(namespace_chain) or {}
       local current_value = get.str_or_number_arr.str_by_joined(namespace_chain, ":") .. ":" .. node_key
       if nodeparent then
-        dothis.arr.push(
+        dothis.two_strs__arr_arr.push_ensure_global_namespace(
           res.parent,
           {
             nodeparent,
@@ -304,7 +308,7 @@ get = {
           local namespace_chain_subbed = get.arr.arr_by_nth_element_subbed(namespace_chain, 1, virtual)
           local virtual_value = get.str_or_number_arr.str_by_joined(namespace_chain_subbed, ":") .. ":" .. node_key
           virtual_map[virtual] = virtual_value
-          dothis.arr.push(
+          dothis.two_strs__arr_arr.push_ensure_global_namespace(
             res.parent,
             {
               current_value,
@@ -329,7 +333,7 @@ get = {
             if reverse then
               toadd = transf.arr.arr_by_reversed(toadd)
             end
-            dothis.arr.push(
+            dothis.two_strs__arr_arr.push_ensure_global_namespace(
               res[reskey],
               toadd
             )
@@ -416,6 +420,30 @@ get = {
     end,
   },
   table = {
+    kt_by_max_key = function(t, comp)
+      return get.arr.t_by_max(
+        transf.table.kt_arr(t),
+        comp
+      )
+    end,
+    kt_by_min_key = function(t, comp)
+      return get.arr.t_by_min(
+        transf.table.kt_arr(t),
+        comp
+      )
+    end,
+    vt_by_max_value = function(t, comp)
+      return get.arr.t_by_max(
+        transf.table.vt_arr(t),
+        comp
+      )
+    end,
+    vt_by_min_value = function(t, comp)
+      return get.arr.t_by_min(
+        transf.table.vt_arr(t),
+        comp
+      )
+    end,
     table_by_filtered_w_kt_vt_fn = function(t, fn)
       return transf.two_anys__arr_arr.assoc(
         get.arr.arr_by_filtered(
@@ -1159,7 +1187,7 @@ get = {
     end,
     only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn = hs.fnutils.imap,
     arr_by_mapped_w_t_arg_t_ret_fn = function(arr, fn)
-      return transf.hole_y_arrlike.arr(
+      return transf.only_pos_int_key_table.arr(
         get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, fn)
       )
     end,
@@ -1827,6 +1855,19 @@ get = {
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
       else return transf.str.urlcharset_str_by_encoded_query_param_value_folded(str) end
     end,
+    str_by_modified_at_position = function(str, modspec)
+      local ns, mod, parts = transf.str.two_str_or_nils_and_str_arr_by_namespace_inference_val(str)
+      ns = modspec.namespace or ns
+      mod = modspec.mod or mod
+      parts = transf.two_table_or_nils.table_by_take_new(parts, modspec.set)
+      parts = get.table.table_by_mapped_w_kt_vt_arg_vt_ret_fn(
+        parts,
+        function(i, part)
+          return part .. transf.str_or_nil.str_by_surrounded_with_brackets_if_str(modspec.modsingle[i])
+        end
+      )
+      return transf.two_str_or_nils_and_str_arr.str_by_namespace_inference_valparts(ns, mod, parts)
+    end
   },
   nonindicated_number_str_arr = {
     number_arr = function(arr, base)
