@@ -44,6 +44,15 @@ get = {
       })
     end,
   },
+  two_strs = {
+    str_by_modified_at_position = function(str1, str2, i)
+      local ns, mod, parts = transf.str.three_str_or_nils_by_namespace_inference_val(str1)
+      if parts and parts[i] then
+        parts[i] = parts[i] .. str2
+      end
+      return transf.two_str_or_nils_and_str_arr.str_by_namespace_inference_valparts(ns, mod, parts)
+    end
+  },
   str_or_nil = {
     str_or_nil_by_apply_format_str = function(str, format_str)
       if str ~= nil then
@@ -140,7 +149,7 @@ get = {
           d
         )
         local noncanon_sib_str = get.str.str_by_evaled_as_template(
-          spec.danbooru_tags.combine,
+          spec.danbooru_tags.combine or "general:{{[ get.str_or_number_arr.str_by_joined(d.prts, ' ') ]}}",
           d
         )
         local sib = {canon_sib_str, noncanon_sib_str}
@@ -1883,6 +1892,16 @@ get = {
   },
   str_or_number_arr = {
     str_by_joined = table.concat,
+    str_by_joined_w_after = function(arr, joiner, i, j)
+      return get.str_or_number_arr.str_by_joined(arr, joiner, i, j) .. joiner
+    end,
+    str_by_joined_w_after_ticktock = function(arr, joiner)
+      if is.int.even_int(transf.arr.pos_int_by_length(arr)) then
+        return get.str_or_number_arr.str_by_joined_w_after(arr, joiner)
+      else
+        return get.str_or_number_arr.str_by_joined(arr, joiner)
+      end
+    end,
   },
   str_arr = {
     str_by_repeatedly_same_space_sep_prefix = function(arr, opt)

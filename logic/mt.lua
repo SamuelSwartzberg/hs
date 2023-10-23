@@ -179,7 +179,6 @@ ls = {
             -- more later, currently just proof of concept
           }
         },
-        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}} {{[ d.prts[3] ]}} {{[ d.prts[4] ]}}",
       },
       action = "thing:"
         .. "thing:{{[ d.my(d.prts[1]) .. d.bracket(d.my(d.prts[2])) ]}}" 
@@ -206,7 +205,6 @@ ls = {
             -- more later, currently just proof of concept
           }
         },
-        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}} {{[ d.prts[3] ]}}",
       },
       action = "thing:"
         .. " +{{[ d.my(d.prts[1]) ]}}"
@@ -227,7 +225,6 @@ ls = {
         prts_extractor = function(name)
           return get.str.str_arr_by_onig_regex_match(name, "^general:(licking) (.*)$")
         end,
-        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}}",
       },
       result = "thing:thing:bodypartlike:tongue +essive+ {{[ d.my(d.prts[2]) ]}}"
     }, {
@@ -236,25 +233,24 @@ ls = {
         prts_extractor = function(name)
           return get.str.str_arr_by_onig_regex_match(name, "^general:(too many) (.*)$")
         end,
-        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}}",
       },
       result = "thing:{{[ d.my(d.prts[2]) ]}}{{[ d.bracket(d.my(d.prts[1])) ]}}"
     }, {
       danbooru_tags = {
         prts = {
           {
-            "ranguage",
-            "text",
-          }, {
             "german",
             "english",
             "latin",
             -- TODO
-          }
+          },
+          {
+            "ranguage",
+            "text",
+          }, 
         },
-        combine = "general:{{[ d.prts[2] ]}} {{[ d.prts[1] ]}}",
       },
-      result = "thing:{{[ d.my(d.prts[1]) ]}} ++ {{[ d.my(d.prts[2)) ]}}"
+      result = "thing:{{[ d.my(d.prts[2]) ]}} ++ {{[ d.my(d.prts[1)) ]}}"
     }, {
       danbooru_tags = {
         prts = {
@@ -272,7 +268,6 @@ ls = {
             "navy",
           }
         },
-        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}}",
       },
       other = {
         sib = {
@@ -284,7 +279,7 @@ ls = {
         },
       },
       
-      result = "thing:{{[ d.my(d.prts[1] .. ' nation') ]}} ++ {{[ d.my(d.prts[2)) ]}}", -- TODO: This requires that something mapping to e.g. general:german nation exists. The item below requires the same form e.g. general:german culture. I could create those manually, but it seems like a lot of duplicate work. I'm still considering if there's some way to derive these programmatically without messing other things up.
+      result = "thing:{{[ d.my(d.prts[1] .. ' nation') ]}} ++ {{[ d.my(d.prts[2)) ]}}",
     }, {
       danbooru_tags = {
         prts = {
@@ -297,7 +292,6 @@ ls = {
             "clothes",
           }
         },
-        combine = "general:{{[ d.prts[1] ]}} {{[ d.prts[2] ]}}",
       },
       other = {
         sib = {
@@ -309,6 +303,59 @@ ls = {
         },
       },
       result = "thing:{{[ d.my(d.prts[1] .. ' culture') ]}} ++ {{[ d.my(d.prts[2)) ]}}"
+    },{
+      danbooru_tags = {
+        prts = {
+          {
+            "implied",
+            "after",
+            "stealth",
+            "mutual",
+            "public",
+            "clothed",
+          },
+          {
+            "oral",
+            "blowjob",
+            "cunnilingus",
+          }
+        },
+      },
+      result = "{{[ d.my(d.prts[2]) ]}}/{{[ d.my(d.prts[1)) ]}}"
+    },{
+      danbooru_tags = {
+        prts = {
+          {
+            "double",
+            "triple",
+            "quadruple",
+            "multiple",
+          },
+          {
+            "oral",
+            "blowjob",
+            "cunnilingus",
+            "penetration"
+          }
+        },
+      },
+      result = "{{[ d.modify(d.my(d.prts[2]), d.my(d.prts[1)), 2) ]}}"
+    }, {
+      danbooru_tags = {
+        fetch = "cooperative *",
+        prts_extractor = function(name)
+          return get.str.str_arr_by_onig_regex_match(name, "^general:(cooperative) (.*)$")
+        end,
+      },
+      result = "{{[ d.modify(d.my(d.prts[2]), d.my(d.prts[1)), 1) ]}}"
+    },{
+      danbooru_tags = {
+        fetch = "self*",
+        prts_extractor = function(name)
+          return get.str.str_arr_by_onig_regex_match(name, "^general:(self)(.*)$")
+        end,
+      },
+      result = "" -- TODO. We have a problem here: the combined things are namespace:val /modification, but the uncombined things are not. So we would need to add a thing: to the beginning for some, but not for others. Obviously, that can't work. Solutions: Find a way to not prefix the combined things with a namespace (problematic), or find a way to auto add a namespace to unnamespaced things. The latter could work (have a list of valid namespaces, check each item -> does it start with a valid namespace? If not, add a default namespace.), the main problem is, when do we apply it? We need to make sure that it's applied before we add parents or siblings based on it, otherwise these will target the wrong thing.
     },{
       danbooru_tags = {
         prts = {
@@ -339,7 +386,26 @@ ls = {
         combine = "general:{{[ d.prts[2] ]}} {{[ d.prts[1] ]}}",
       },
       result =  "thing:thing:deviation:unintentional ++ thing:deviation:from ideal ++ thing:{{[ d.my(d.prts[2]) ]}}", -- TODO: not sure if this is really how I want to deal with this. 
-    },
+    },{
+      danbooru_tags = {
+        prts = {
+          {
+            "breast",
+            "muscle",
+            "penis",
+            "height",
+            "ass",
+            "hair",
+            "food"
+          },
+          {
+            "envy",
+            "awe",
+          }
+        },
+      },
+      result = "thing:thing:agentlike +{{[d.my(d.prts[2])]}}+ {{[ d.my(d.prts[1]) ]}}"
+    }, 
   },
   two_strs__arr_arr_by_siblings = {
     {"foreground:blur", "general:blurry foreground"},
@@ -348,7 +414,12 @@ ls = {
     {"general:hugging arm", "general:arm hug"},
     {"general:interlocked arms", "general:locked arms"},
     {"general:hugging", "general:hug"},
-    {"general:german nation", "general:germany"}
+    {"general:german nation", "general:germany"},
+    {"thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:crotch pleasurable organ", "general:oral"},
+    {"thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:phallic object", "general:fellatio"},
+    {"thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:vulva", "general:cunnilingus"},
+    {"thing:thing:agentlike +thing:activity:awe+ bodypartlike:flat breasts", "flat awe"},
+    {"thing:thing:agentlike +thing:activity:envy+ bodypartlike:flat breasts", "flat envy"},
   },
   note_key = {
     "positive_prompt", -- what the creator was told to create

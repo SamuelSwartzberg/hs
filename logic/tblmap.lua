@@ -699,26 +699,7 @@ tblmap = {
     }
   },
     
-  keychange_fstring = {
-    two_strs__arr_by_insertion =  {
-      ["implied %s"] = {"end", "/inferential evidentiality"},
-      ["auto%s"] = {"end", "/reflexive voice"},
-      ["self%s"] = {"end", "/reflexive voice"},
-      ["after %s"] = {"end", "/retrospective aspect"},
-      ["stealth %s"] = {"end", "/hidden"},
-      ["mutual %s"] = {"end", "/reciprocal voice"},
-      ["public %s"] = {"end", "/public"},
-      ["clothed %s"] = {"end", "/clothed"},
-      ["%s through clothes"] = {"end", "/through clothes"},
-      ["cooperative %s"] = {"i1p", "[dual]"},
-      ["double %s"] = {"i2p", "[dual]"},
-      ["%s hip"] = {"i2i", "thing:bodypartlike:hip"},
-      ["%s hips"] = {"i2i", "[dual] thing:bodypartlike:hip"},
-      ["breast %s"] = {"i1i", 'thing:bodypartlike:breast'},
-      ["flat %s"] = {"i1i", 'thing:bodypartlike:flat breast'},
-      ["muscle %s"] = {"i1i", "thing:bodypartlike:muscled body"},
-    },
-  },
+ 
   sme_5_pos_int = {
     danbooru_category_name = {
       [0] = "general",
@@ -754,10 +735,6 @@ tblmap = {
         "cooperative %s",
         "double %s"
       },
-      affectable = {
-        "breast %s",
-        "flat %s",
-      }
     }
 },
   markdown_extension_set_name = {

@@ -17,6 +17,9 @@ things:
   agentlike: 
     __ex: anything that is an agent, or is shaped like one, or otherwise similar
     __is_subnamespace: true
+    decorated:
+      wearing clothing:
+        _s: general:clothed
     char:
       __is_subnamespace: true
       real:
@@ -71,6 +74,11 @@ things:
           _s: general:aged up
         aged down:
           _s: general:aged down
+    featured:
+      muscular:
+        _s: 
+          - general:muscular
+          - general:muscle
     modified body:
       noticably different agentlike anatomy:
         _s: general:agentlike anatomy
@@ -458,11 +466,12 @@ things:
           __is_subnamespace: true
     musical content:
     mathematical information:
-    data:
-      graph:
+    
     symbolic object:
       flag:
         _s: general:flag
+  data:
+    graph:
   language:
     __is_subnamespace: true
     deviation:
@@ -797,6 +806,9 @@ things:
         appliance:
           major appliance:
           small appliance:
+      biological matter:
+        food:
+          _s: general:food
       clothing:
         uniform:
         functional clothing:
@@ -1061,10 +1073,20 @@ things:
     amount:
       numerical:
         dual:
+          _s:
+            - general:double
         trial:
+          _s:
+            - general:triple
         quadral:
+          _s:
+            - general:quadruple
+        paucal:
         plural:
-          _s: general:s
+          _s: 
+            - general:s # plural s
+            - general:cooperative
+            - general:multiple
       non-numerical:
         single:
         excessive:
@@ -1072,14 +1094,7 @@ things:
           _s: general:too many
     grouping:
     viewpoint:
-  modification:
-    other:
-      hidden:
-      public:
-      clothed:
-      through clothes:
-      targeting another:
-        _s: general:another's
+  action modification:
     gradation:
       gradation relation:
         greater gradataion:
@@ -1088,6 +1103,7 @@ things:
     aspect:
       spective aspect:
         retrospective aspect:
+          _s: general:after
         prospective aspect:
     modality:
       epistemic modality:
@@ -1095,17 +1111,24 @@ things:
           indirectivity:
           evidentiality proper:
             inferential evidentiality:
-    voice:
+              _s: general:implied
+    voicelike modification:
+      targeting another:
+        _s: general:another's
       activelike voice:
         active voice:
         reciprocal voice:
+          _s: general:mutual
       passivelike voice:
         passive voice:
         antipassive voice:
         middlelike voice:
           middle voice:
           reflexive voice:
-            _s: general:own
+            _s: 
+              - general:own
+              - general:auto
+              - general:self
   activity:
     __is_subnamespace: true
     sports:
@@ -1146,16 +1169,27 @@ things:
     __is_subnamespace: true
     natiocultural:
   relation:
-    __is_subnamespace: true
+    
     source:
     target:
-    spatial relation:
-      essive:
-        interessive:
-      tangent:
-        _s: 
-          - general:on
-          - general:touching
+  spatial relation:
+    __is_subnamespace: true
+    through clothes:
+      _s: general:through clothes
+    obscured:
+      _s: general:obscured
+      hidden:
+        _s: general:stealth
+        _p: thing:location:non-private
+    nonobsured:
+      _s: general:nonobscured
+    essive:
+      interessive:
+    tangent:
+      _s: 
+        - general:on
+        - general:touching
+      tangent by location:
         circumtangent:
           _s: general:around
           hugging:
@@ -1166,10 +1200,15 @@ things:
             _s: general:grabbing
           pulling:
             _s: general:pulling
-      vicinitive:
-      tective:
-      hesive:
-      lative:
+    vicinitive:
+    tective:
+    hesive:
+    lative:
+      lative by location:
+        inlative:
+      lative by direction:
+        ablative:
+        prolative:
   location:
     __is_subnamespace: true
     specific location:
@@ -1204,6 +1243,16 @@ things:
               
 
     general location:
+      indoor location:
+    
+    publicity:
+      _ex: for our purposes, a location is public if it is accessible to most people, semi-public if it is accessible to a limited group of people, but not just the subjects, and private if it is only accessible to the subjects. That also means that e.g. a living room is semi-public if the subject is one of the members of the family, but private if the subject is the entire family.
+      non-private:
+        public:
+          _s: general:public
+        semi-public:
+      private:
+        _s: general:private
   deviaton:
     __is_subnamespace: true
     from ideal:
@@ -1297,6 +1346,12 @@ things:
   bodypartlike:
     __is_subnamespace: true
     body data:
+      indicated body datum:
+        _p: things:data
+      height:
+        _s: general:height
+      weight:
+        _s: general:weight
     body part grouping:
       body part grouping by function:
         sensory organ:
@@ -1310,8 +1365,14 @@ things:
       
       horn:
       hair:
-        hair ear:
-          _s: general:hair ears
+        head hair:
+          _s: general:hair
+          severed hair:
+            _s: general:severed hair
+          detached hair:
+            _s: general:detached hair
+          hair ear:
+            _s: general:hair ears
       forehead:
       ear:
         human ear:
@@ -1498,8 +1559,13 @@ things:
           - general:ass
       crotch:
       chest:
-      breasts:
+      breast:
+        _s:
+          - general:breast
+          - general:breasts
       penis:
+        _s:
+          - general:penis
         _p: 
           - bodypartlike:primary genital
           - phallic object
@@ -1516,6 +1582,9 @@ things:
           - bodypartlike:crotch pleasurable organ
           - bodypartlike:ussy
       hip:
+        _s: 
+          - general:hip
+          - general:hips
       thigh:
       knee:
       calf:
@@ -1614,16 +1683,6 @@ things:
         object:
           object use:
 general:
-  oral:
-    _rs: "thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:crotch pleasurable organ"
-  fellatio:
-    _rs: "thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:phallic object"
-    __infer:
-      _rs: sex_act
-  cunnilingus: 
-    _rs: "thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:vulva"
-    __infer:
-      _rs: sex_act
   touching: 
     _rs: 
       - "%s +tangent+ /reflexive"

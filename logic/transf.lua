@@ -4553,33 +4553,58 @@ transf = {
       local namespace, val = get.str.two_strs_or_nil_by_split_w_str(noinference, ":")
       return namespace, inference, val
     end,
+    two_str_or_nils_and_str_arr_by_namespace_inference_val = function(str)
+      local namespace, inference, val = transf.str.three_str_or_nils_by_namespace_inference_val(str)
+      local valparts = get.str.str_arr_by_split_noedge_w_str(val, "+")
+      return namespace, inference, valparts
+    end,
     two_strs__arr_arr_by_deduce_from_parts = function(str)
       local res = {}
-      -- example: str = thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
-      local namespace, inference, val = transf.str.three_str_or_nils_by_namespace_inference_val(str)
+      -- example: str = thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
+      local namespace, inference, valparts = transf.str.three_str_or_nils_by_namespace_inference_val(str)
+      local val = get.str_or_number_arr.str_by_joined_w_after_ticktock(valparts, "+")
+      local noinference = namespace .. ":" .. val
       if inference then
         dothis.arr.push(
           res,
           { inference, str }
-        ) -- e.g. thing:targeting another is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
+        ) -- e.g. thing:targeting another is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
         dothis.arr.push(
           res,
-          { namespace .. ":" .. val, str}
-        ) -- e.g. thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
+          { noinference, str}
+        ) -- e.g. thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist /thing:targeting another
       end
       local valparts = get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str(val, "+")
+      local consumable_valparts = get.table.table_by_copy(valparts)
 
-      for i = 1, #valparts, 1 do
-        local valpart = valparts[i]
-        local unmodified, modifier = get.str.n_strs_by_extracted_onig(valpart, "^([^\\[]+)\\[([^\\]])\\] *" ) -- e.g. thing:bodypartlike:hand[thing:quantification:plural]
-        if unmodified and modifier then
-          dothis.arr.push(res, {modifier, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:quantification:plural (or more precisely, thing:quantification:plural is a parent to thing:bodypartlike:hand[plural])
-          dothis.arr.push(res, {unmodified, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:bodypartlike:hand (or more precisely, thing:bodypartlike:hand is a parent to thing:bodypartlike:hand[plural])
+      while #consumable_valparts > 0 do
+        local valpart = act.arr.pop(consumable_valparts)
+        if #valpart > 0 then
+          local unmodified, modifier = get.str.n_strs_by_extracted_onig(valpart, "^([^\\[]+)\\[([^\\]])\\] *" ) -- e.g. thing:bodypartlike:hand[thing:quantification:plural]
+          if unmodified and modifier then
+            dothis.arr.push(res, {modifier, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:quantification:plural (or more precisely, thing:quantification:plural is a parent to thing:bodypartlike:hand[plural])
+            dothis.arr.push(res, {unmodified, valpart}) -- e.g. thing:bodypartlike:hand[plural] implies thing:bodypartlike:hand (or more precisely, thing:bodypartlike:hand is a parent to thing:bodypartlike:hand[plural])
+          end
+
+          if #consumable_valparts > 1 then -- in the #valparts == 1 case, the later code results in the same thing as this, so we can skip it
+            dothis.arr.push(
+              res,
+              { valpart, noinference }
+            ) -- e.g. thing:bodypartlike:hand[plural]  is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist
+          end
+
+          if #consumable_valparts ~= #valparts then
+            local remaining_val = get.str_or_number_arr.str_by_joined_w_after_ticktock(valparts, "+")
+          dothis.arr.push(
+              res,
+              { remaining_val, noinference }
+            ) 
+          end
+          -- for our example:
+          -- - #valparts = 3: do nothing
+          -- - #valparts = 2: thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ is a parent to thing:bodypartlike:hand[thing:quantification:plural] +thing:spatial relation:circumtangent+ thing:bodypartlike:waist
+          -- - #valparts = 1: see above
         end
-        dothis.arr.push(
-          res,
-          { valpart, namespace .. ":" .. val }
-        ) -- e.g. thing:bodypartlike:hand[plural]  is a parent to thing:thing:bodypartlike:hand[thing:quantification:plural] +thing:relation:circumtangent+ thing:bodypartlike:waist
       end
       return res
     end,
@@ -4743,6 +4768,19 @@ transf = {
     end,
     my_slash_date_by_expiry = function(cc_pass_item_name)
       return get.pass_item_name.str_or_nil_by_fetch_value(cc_pass_item_name, "cc/exp")
+    end,
+  },
+  three_str_or_nils = {
+    str_by_namespace_inference_val = function(ns, inference, val)
+      return 
+        get.str_or_nil.str_by_apply_format_str_or_empty_str(ns, "%s:") ..
+        val ..
+        get.str_or_nil.str_by_apply_format_str_or_empty_str(inference, "/%s")
+    end,
+  },
+  two_str_or_nils_and_str_arr = {
+    str_by_namespace_inference_valparts = function(ns, inference, valparts)
+      return transf.three_str_or_nils.str_by_namespace_inference_valparts(ns, inference, get.str_or_number_arr.str_by_joined_w_after_ticktock(valparts, "+"))
     end,
   },
   styledtext = {
@@ -5175,6 +5213,7 @@ transf = {
         decorate_if_ext = get.str_or_nil.str_by_apply_format_str_or_empty_str,
         bracket = transf.str_or_nil.str_by_surrounded_with_brackets_if_str,
         slash = transf.str_or_nil.str_by_start_with_slash_if_str,
+        modify = get.two_strs.str_by_modified_at_position,
         my = function(danbooru_tag)
           local res = assoc["general:" .. danbooru_tag]
           if res == nil then 
