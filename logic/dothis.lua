@@ -246,6 +246,9 @@ dothis = {
     download_into_sync = function(url, target_dir)
       act.str.env_bash_eval_sync("cd " .. transf.str.str_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -O")
     end,
+    download_pdf_to_sync = function(url, target)
+      act.str.env_bash_eval_sync("pdfgen" .. transf.str.str_by_single_quoted_escaped(url) .. transf.str.str_by_single_quoted_escaped(target))
+    end,
       
     add_event_from_url = function(url, calendar)
       local temp_path_arg = transf.str.str_by_single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")

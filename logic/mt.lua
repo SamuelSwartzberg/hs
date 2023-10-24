@@ -180,14 +180,19 @@ ls = {
           }
         },
       },
-      action = [[{{[
-        d.modif
-      ]}}]]
-      "thing:"
-        .. "{{[ d.my(d.prts[1]) .. d.bracket(d.my(d.prts[2])) ]}}" 
-        .. " +{{[ d.my(d.prts[3]) ]}}"
-        .. " {{[ d.my(d.prts[5]) ]}}"
-        .. " {{[ d.slash(d.my(d.prts[4])) ]}}"
+      result = function(d)
+        return d.create({
+          nonmodifier_parts = {
+            d.my(d.prts[1]),
+            d.my(d.prts[3]),
+            d.my(d.prts[5]),
+          },
+          modifiers = {
+            d.my(d.prts[2]),
+          },
+          inference = d.my(d.prts[4])
+        })
+      end,
     },  {
       danbooru_tags = {
         prts = {
@@ -209,10 +214,16 @@ ls = {
           }
         },
       },
-      action = "thing:"
-        .. " +{{[ d.my(d.prts[1]) ]}}"
-        .. " {{[ d.my(d.prts[3]) ]}}"
-        .. " {{[ d.slash(d.my(d.prts[2])) ]}}"
+      result = function (d)
+        return  d.create({
+          nonmodifier_parts = {
+            "thing:agentlike",
+            d.my(d.prts[1]),
+            d.my(d.prts[3]),
+          },
+          inference = d.my(d.prts[2])
+        })
+      end
     }, {
       danbooru_tags = {
         fetch = "* focus",
@@ -229,7 +240,7 @@ ls = {
           return get.str.str_arr_by_onig_regex_match(name, "^general:(licking) (.*)$")
         end,
       },
-      result = "{thing:bodypartlike:tongue +essive+ {{[ d.my(d.prts[2]) ]}}}"
+      result = "{thing:bodypartlike:tongue + essive + {{[ d.my(d.prts[2]) ]}}}"
     }, {
       danbooru_tags = {
         fetch = "too many *",
@@ -237,7 +248,16 @@ ls = {
           return get.str.str_arr_by_onig_regex_match(name, "^general:(too many) (.*)$")
         end,
       },
-      result = "{{{[ d.my(d.prts[2]) ]}}{{[ d.bracket(d.my(d.prts[1])) ]}}}"
+      result = function (d)
+        return d.create({
+          parts = {
+            d.my(d.prts[2]),
+          },
+          modifiers = {
+            d.my(d.prts[1]),
+          },
+        })
+      end
     }, {
       danbooru_tags = {
         prts = {
@@ -253,7 +273,7 @@ ls = {
           }, 
         },
       },
-      result = "{{{[ d.my(d.prts[2]) ]}} ++ {{[ d.my(d.prts[1)) ]}}}"
+      result = "{{{[ d.my(d.prts[2]) ]}} + {{[ d.my(d.prts[1)) ]}}}"
     }, {
       danbooru_tags = {
         prts = {
@@ -282,7 +302,14 @@ ls = {
         },
       },
       
-      result = "thing:{{[ d.my(d.prts[1] .. ' nation') ]}} ++ {{[ d.my(d.prts[2)) ]}}",
+      result = function (d)
+        return d.create({
+          parts = {
+            d.my(d.prts[1] .. ' nation'),
+            d.my(d.prts[2]),
+          },
+        })
+      end
     }, {
       danbooru_tags = {
         prts = {
@@ -305,7 +332,14 @@ ls = {
           { "thing:culture:{{[ d.prts[1] ]}}", "{{[ d.my(d.prts[1] .. ' culture') ]}}" },
         },
       },
-      result = "thing:{{[ d.my(d.prts[1] .. ' culture') ]}} ++ {{[ d.my(d.prts[2)) ]}}"
+      result = function (d)
+        return d.create({
+          parts = {
+            d.my(d.prts[1] .. ' culture'),
+            d.my(d.prts[2]),
+          },
+        })
+      end
     },{
       danbooru_tags = {
         prts = {
@@ -319,12 +353,16 @@ ls = {
           },
           {
             "oral",
-            "blowjob",
+            "fellatio",
             "cunnilingus",
           }
         },
       },
-      result = "{{[ d.my(d.prts[2]) ]}}/{{[ d.my(d.prts[1)) ]}}"
+      result = function (d)
+        return d.modify(d.my(d.prts[2]), {
+          inference = d.my(d.prts[1])
+        })
+      end
     },{
       danbooru_tags = {
         prts = {
@@ -336,13 +374,17 @@ ls = {
           },
           {
             "oral",
-            "blowjob",
+            "fellatio",
             "cunnilingus",
             "penetration"
           }
         },
       },
-      result = "{{[ d.modify(d.my(d.prts[2]), d.my(d.prts[1)), 2) ]}}"
+      result = function (d)
+        return d.modify(d.my(d.prts[2]), {
+          modifiers = {[2] = d.my(d.prts[1])}
+        })
+      end
     }, {
       danbooru_tags = {
         fetch = "cooperative *",
@@ -350,7 +392,11 @@ ls = {
           return get.str.str_arr_by_onig_regex_match(name, "^general:(cooperative) (.*)$")
         end,
       },
-      result = "{{[ d.modify(d.my(d.prts[2]), d.my(d.prts[1)), 1) ]}}"
+      result = function (d)
+        return d.modify(d.my(d.prts[2]), {
+          modifiers = {d.my(d.prts[1])}
+        })
+      end
     },{
       danbooru_tags = {
         fetch = "self*",
@@ -387,7 +433,7 @@ ls = {
         },
         
       },
-      result =  "thing:thing:deviation:unintentional ++ thing:deviation:from ideal ++ thing:{{[ d.my(d.prts[2]) ]}}", -- TODO: not sure if this is really how I want to deal with this. 
+      result =  "thing:thing:deviation:unintentional + thing:deviation:from ideal + thing:{{[ d.my(d.prts[2]) ]}}", -- TODO: not sure if this is really how I want to deal with this. 
     },{
       danbooru_tags = {
         prts = {
@@ -406,7 +452,9 @@ ls = {
           }
         },
       },
-      result = "thing:thing:agentlike +{{[d.my(d.prts[2])]}}+ {{[ d.my(d.prts[1]) ]}}"
+      result = function (d)
+        return d.create({ parts = { 'thing:thing:agentlike', d.my(d.prts[2]), d.my(d.prts[1])}})
+      end
     }, 
   },
   two_strs__arr_arr_by_siblings = {
@@ -417,11 +465,11 @@ ls = {
     {"general:interlocked arms", "general:locked arms"},
     {"general:hugging", "general:hug"},
     {"general:german nation", "general:germany"},
-    {"thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:crotch pleasurable organ", "general:oral"},
-    {"thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:phallic object", "general:fellatio"},
-    {"thing:thing:bodypartlike:oral parts +essive+ thing:bodypartlike:vulva", "general:cunnilingus"},
-    {"thing:thing:agentlike +thing:activity:awe+ bodypartlike:flat breasts", "flat awe"},
-    {"thing:thing:agentlike +thing:activity:envy+ bodypartlike:flat breasts", "flat envy"},
+    {"thing:thing:bodypartlike:oral parts + essive + thing:bodypartlike:crotch pleasurable organ", "general:oral"},
+    {"thing:thing:bodypartlike:oral parts + essive + thing:bodypartlike:phallic object", "general:fellatio"},
+    {"thing:thing:bodypartlike:oral parts + essive + thing:bodypartlike:vulva", "general:cunnilingus"},
+    {"thing:thing:agentlike + thing:activity:awe + bodypartlike:flat breasts", "flat awe"},
+    {"thing:thing:agentlike + thing:activity:envy + bodypartlike:flat breasts", "flat envy"},
   },
   note_key = {
     "positive_prompt", -- what the creator was told to create

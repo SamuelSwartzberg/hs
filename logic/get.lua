@@ -136,22 +136,23 @@ get = {
             end
           end
         end
-
-        local canon_sib_str = get.str.str_by_evaled_as_template(
-          spec.result or [[{{[ 
-            "{" ..
-            get.str_or_number_arr.str_by_joined_w_after_ticktock(
-              get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
-                d.prts,
-                d.my
-              ), 
-              '+'
-            ) 
-            .. "}"
-            
-          ]}}]],
-          d
-        )
+        spec.result = spec.result or [[{{[ 
+          d.create({
+            parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(
+              d.prts,
+              d.my
+            )
+          })
+        ]}}]]
+        local canon_sib_str
+        if type(spec.result) == "string" then
+          canon_sib_str = get.str.str_by_evaled_as_template(
+            spec.result,
+            d
+          )
+        else
+          canon_sib_str = spec.result(d)
+        end
         local noncanon_sib_str = get.str.str_by_evaled_as_template(
           spec.danbooru_tags.combine or "general:{{[ get.str_or_number_arr.str_by_joined(d.prts, ' ') ]}}",
           d
@@ -1855,18 +1856,11 @@ get = {
       if as_path then return transf.local_path.local_path_by_percent_encoded(str) 
       else return transf.str.urlcharset_str_by_encoded_query_param_value_folded(str) end
     end,
-    str_by_modified_at_position = function(str, modspec)
-      local ns, mod, parts = transf.str.two_str_or_nils_and_str_arr_by_namespace_inference_val(str)
-      ns = modspec.namespace or ns
-      mod = modspec.mod or mod
-      parts = transf.two_table_or_nils.table_by_take_new(parts, modspec.set)
-      parts = get.table.table_by_mapped_w_kt_vt_arg_vt_ret_fn(
-        parts,
-        function(i, part)
-          return part .. transf.str_or_nil.str_by_surrounded_with_brackets_if_str(modspec.modsingle[i])
-        end
-      )
-      return transf.two_str_or_nils_and_str_arr.str_by_namespace_inference_valparts(ns, mod, parts)
+    str_by_modified_w_composite_tag_specifier = function(str, composite_tag_specifier)
+      local original_composite_tag_specifier = transf.str.composite_tag_specifier_or_nil_by_str(str)
+      if not original_composite_tag_specifier then original_composite_tag_specifier = { parts = { str } } end
+      local merged_composite_tag_specifier = transf.two_tables.table_by_recursive_merge_take_new(original_composite_tag_specifier, composite_tag_specifier)
+      return transf.composite_tag_specifier.str(merged_composite_tag_specifier)
     end
   },
   nonindicated_number_str_arr = {

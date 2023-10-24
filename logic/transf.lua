@@ -4527,7 +4527,7 @@ transf = {
       return get.str.str_by_extracted_eutf8_w_regex(str, "%[([^%]]-)%]")
     end,
     str_by_extract_prebracket_contents = function(str)
-      return get.str.str_by_extracted_eutf8_w_regex(str, "([^%[]-)%[")
+      return get.str.str_by_extracted_eutf8_w_regex(str, "^([^%[]-)")
     end,
     str_by_start_with_slash = function(str)
       return "/" .. str
@@ -4572,7 +4572,7 @@ transf = {
       val = get.str.str_by_no_prefix(val, "{")
       val = get.str.str_by_no_suffix(val, "}")
       local noinference, inference  = get.str.n_strs_by_split_w_str(val, "/") -- get everything before '/' - after is a potential modifier
-      local valparts = get.str.str_arr_by_split_noedge_w_str(val, "+")
+      local valparts = get.str.str_arr_by_split_w_str(val, " + ")
       local modifiers = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(valparts, transf.str.str_by_extract_bracket_contents)
       local nonmodifier_parts = get.arr.arr_by_mapped_w_t_arg_t_ret_fn(valparts, transf.str.str_by_extract_prebracket_contents)
       return {
@@ -4584,6 +4584,9 @@ transf = {
         modifiers = modifiers,
         nonmodifier_parts = nonmodifier_parts
       }
+    end,
+    composite_tag_specifier_or_str = function(str)
+      return transf.str.composite_tag_specifier_or_nil(str) or str
     end,
     two_strs__arr_arr_by_deduce_from_parts = function(str)
       local res = {}
@@ -4621,7 +4624,7 @@ transf = {
           end
 
           if #consumable_valparts ~= #composite_tag_specifier.parts then
-            local remaining_val = get.str_or_number_arr.str_by_joined_w_after_ticktock(composite_tag_specifier.parts, "+")
+            local remaining_val = get.str_or_number_arr.str_by_joined(composite_tag_specifier.parts, " + ")
             dothis.two_strs__arr_arr.push_ensure_global_namespace(
                 res,
                 { remaining_val, composite_tag_specifier.noinference }
@@ -4811,7 +4814,7 @@ transf = {
   },
   two_str_or_nils_and_str_arr = {
     str_by_namespace_inference_valparts = function(ns, inference, valparts)
-      return transf.three_str_or_nils.str_by_namespace_inference_valparts(ns, inference, get.str_or_number_arr.str_by_joined_w_after_ticktock(valparts, "+"))
+      return transf.three_str_or_nils.str_by_namespace_inference_valparts(ns, inference, get.str_or_number_arr.str_by_joined(valparts, " + "))
     end,
   },
   styledtext = {
@@ -5026,19 +5029,22 @@ transf = {
             )
           )
         )
+        spec.parts = spec.parts or {}
+        spec.modifiers = spec.modifiers or {}
+        spec.nonmodifier_parts = spec.nonmodifier_parts or {}
         for i = 1, #maxlength, 1 do
-          if spec.parts and spec.parts[io] then
-            parts[i] = spec.parts[i]
-          elseif spec.nonmodifier_parts and spec.nonmodifier_parts[i] then
+          spec.nonmodifier_parts[i] = spec.nonmodifier_parts[i] or  transf.str.str_by_extract_prebracket_contents(spec.parts[i])
+          spec.modifiers[i] = spec.modifiers[i] or transf.str.str_by_extract_bracket_contents(spec.parts[i])
+          if spec.nonmodifier_parts[i] then
             parts[i] = spec.nonmodifier_parts[i]
-            if spec.modifiers and spec.modifiers[i] then
+            if spec.modifiers[i] then
               parts[i] = parts[i] .. "[" .. spec.modifiers[i] .. "]"
             end
           else
             parts[i] = ""
           end
         end
-        noinference = get.str_or_number_arr.str_by_joined_w_after_ticktock(parts, "+")
+        noinference = get.str_or_number_arr.str_by_joined(parts, " + ")
       end
       local val = "{" .. noinference .. transf.str_or_nil.str_by_start_with_slash_if_str(spec.inference) .. "}"
       if spec.namespace and #spec.namespace > 0 then
@@ -5276,7 +5282,8 @@ transf = {
     end,
     tag_d_spec =  function(assoc)
       return  {
-        modify = get.str.str_by_modified_at_position,
+        modify = get.str.str_by_modified_w_composite_tag_specifier,
+        create = transf.composite_tag_specifier.str,
         my = function(danbooru_tag)
           local res = assoc["general:" .. danbooru_tag]
           if res == nil then 
@@ -6110,6 +6117,32 @@ transf = {
       end
       return res
     end,
+    table_by_recursive_merge_take_new = function(t)
+      local res = {}
+      for _, tbl in transf.arr.pos_int_vt_stateless_iter(t) do
+        for k, v in transf.table.stateless_key_value_iter(tbl) do
+          if type(v) == "table" then
+            res[k] = transf.table.table_by_recursive_merge_take_new({res[k], v})
+          else
+            res[k] = v
+          end
+        end
+      end
+      return res
+    end,
+    table_by_recursive_merge_take_old = function(t)
+      local res = {}
+      for _, tbl in transf.arr.pos_int_vt_stateless_iter(t) do
+        for k, v in transf.table.stateless_key_value_iter(tbl) do
+          if type(v) == "table" then
+            res[k] = transf.table.table_by_recursive_merge_take_old({res[k], v})
+          elseif not res[k] then
+            res[k] = v
+          end
+        end
+      end
+      return res
+    end,
   },
   two_tables = {
     table_by_take_new = function(t1, t2)
@@ -6117,6 +6150,12 @@ transf = {
     end,
     table_by_take_old = function(t1, t2)
       return transf.table_arr.table_by_take_old({t1, t2})
+    end,
+    table_by_recursive_merge_take_new = function(t1, t2)
+      return transf.table_arr.table_by_recursive_merge_take_new({t1, t2})
+    end,
+    table_by_recursive_merge_take_old = function(t1, t2)
+      return transf.table_arr.table_by_recursive_merge_take_old({t1, t2})
     end,
   },
   two_table_or_nils = {
