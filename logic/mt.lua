@@ -431,12 +431,152 @@ ls = {
       end
     },{
       danbooru_tags = {
-        fetch = "self*",
-        prts_extractor = function(name)
-          return get.str.str_arr_by_onig_regex_match(name, "^general:(self)(.*)$")
-        end,
+        prts = {
+          {
+            "masturbation",
+            "fingering",
+            "lactation",
+            "pussy juice drip",
+            "female ejaculation",
+            "cunnilingus",
+            "penetration",
+            "tribadism",
+            "nipple tweak",
+            "breast sucking",
+            "anilingus",
+            "fellatio",
+            "breastfeeding"
+          }, {
+            "through clothes"
+          }
+        }
       },
-      result = ""
+      result = function (d)
+        return d.modify(
+          d.my(d.prts[1]),
+          {
+          inference = "thing:spatial relation:through clothes"
+        })
+      end
+    },{
+      danbooru_tags = {
+        prts = {
+          {
+            "cum",
+          }, {
+            "in",
+            "on"
+          }, {
+            "body",
+            "breasts",
+            "hair",
+            "tongue",
+            "stomach",
+            "male",
+            "penis",
+            "legs",
+            "hands",
+            "feet",
+            "self",
+            "pectorals",
+            "eyewear",
+            "floor",
+            "fingers",
+            "back",
+            "armpits",
+            "figure",
+            "food",
+            "chest",
+            "gloves",
+            "object",
+            "skirt",
+            "tail",
+            "lips",
+            "sheets",
+            "crotch",
+            "bed",
+            "mask",
+            "testicles",
+            "goggles",
+            "neck",
+            "horns",
+            "underside",
+            "wall",
+            "desk",
+            "picture",
+            "wings",
+            "portrait",
+            "pubic hair",
+            "ears",
+            "halo",
+            "camera",
+            "window",
+            "pussy",
+            "mouth",
+            "hair",
+            "ass",
+            "clothes",
+            "uterus",
+            "nose",
+            "container",
+            "cup",
+            "panties",
+            "navel",
+            "throat",
+            "bowl",
+            "eye",
+            "footwear",
+            "headwear",
+            "cloaca",
+            "nipple",
+            "ear",
+            "mouth"
+          }
+        }
+      },
+      result = function (d)
+        return d.modify(
+          d.my(d.prts[1]),
+          {
+            inference = "thing:spatial relation:through clothes"
+          }
+        )
+      end
+    },{
+      danbooru_tags = {
+        prts = {
+          {
+            "self ",
+            "auto"
+          },{
+            "hug",
+            "exposure",
+            "breast sucking",
+            "wedgie",
+            "bondage",
+            "milking",
+            "fisting",
+            "facial",
+            "arousal",
+            "fellatio",
+            "paizuri",
+            "cunnilingus",
+            "defenestration",
+            "penetration",
+            "tentacle sex",
+            "footjob",
+            "insemination",
+            "anilingus"
+          }
+        },
+        combine = "general:{{[ d.prts[1] ]}}{{[ d.prts[2] ]}}",
+        
+      },
+      result = function (d)
+        return d.modify(d.my(d.prts[2]), {
+          inference = "thing:reflexive voice"
+        })
+      end,
     },{
       danbooru_tags = {
         prts = {
@@ -502,6 +642,7 @@ ls = {
     {"{thing:bodypartlike:oral parts + essive + thing:bodypartlike:vulva}", "general:cunnilingus"},
     {"{thing:agentlike + thing:activity:awe + bodypartlike:flat breasts}", "flat awe"},
     {"{thing:agentlike + thing:activity:envy + bodypartlike:flat breasts}", "flat envy"},
+    {"general:cum in uterus", "general:internal cumshot"}
   },
   note_key = {
     "positive_prompt", -- what the creator was told to create

@@ -709,34 +709,6 @@ tblmap = {
       [5] = "meta",
     }
   },
-  keychange_fstring_name = {
-    keychange_fstring_arr = {
-      handable = {
-        "%s hip",
-        "%s hips",
-        "%s neck",
-        "%s waist",
-        "%s back",
-        "%s leg",
-        "%s arm",
-        "%s object",
-        "%s thigh",
-      },
-      sex_act = {
-        "implied %s",
-        "auto%s",
-        "self%s",
-        "after %s",
-        "stealth %s",
-        "mutual %s",
-        "public %s",
-        "clothed %s",
-        "%s through clothes",
-        "cooperative %s",
-        "double %s"
-      },
-    }
-},
   markdown_extension_set_name = {
     markdown_extension_name_arr = {
       basic = {

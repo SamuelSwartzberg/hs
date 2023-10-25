@@ -634,6 +634,7 @@ things:
     infrastructure:
 
   spatial object:
+    _s: general:object
     prototypically 2d object:
       document:
         documentation:
@@ -1185,24 +1186,25 @@ things:
       _s: general:nonobscured
     essive:
       interessive:
-    tangent:
-      _s: 
-        - general:on
-        - general:touching
-      tangent by location:
-        circumtangent:
-          _s: general:around
-          hugging:
-            _s: general:hugging
-          holding:
-            _s: general:holding
-          grabbing:
-            _s: general:grabbing
-          pulling:
-            _s: general:pulling
+        _s: general:in
+      tangent:
+        _s: 
+          - general:on
+          - general:touching
+        tangent by location:
+          circumtangent:
+            _s: general:around
+            hugging:
+              _s: general:hugging
+            holding:
+              _s: general:holding
+            grabbing:
+              _s: general:grabbing
+            pulling:
+              _s: general:pulling
+      tective:
+      hesive:
     vicinitive:
-    tective:
-    hesive:
     lative:
       lative by location:
         inlative:
@@ -1525,10 +1527,13 @@ things:
       head:
       face:
       neck:
+        _s: general:neck
       throat:
         _p: bodypartlike:oral parts
       shoulder:
       back:
+        _s:
+          - general:back
       wings:
       limb:
         arm:
@@ -1552,6 +1557,7 @@ things:
       wrist:
       stomach:
       waist:
+        _s: general:waist
       tail:
       ass:
         _s:
@@ -1586,6 +1592,9 @@ things:
           - general:hip
           - general:hips
       thigh:
+        _s:
+          - general:thigh
+          - general:thighs
       knee:
       calf:
       ankle:
