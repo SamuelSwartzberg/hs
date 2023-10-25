@@ -34,7 +34,7 @@ dothis = {
   },
   md_file = {
     to_file_in_same_dir = function(source, format, metadata, do_after)
-      local target = transf.path.path_by_without_extension(source) .. "." .. tblmap.pandoc_format.extension[format]
+      local target = transf.path.path_by_without_extension(source) .. "." .. tblmap.pandoc_basic_format.extension[format]
       local rawsource = transf.file.str_by_contents(source)
       local processedsource = get.str.str_by_with_yaml_metadata(rawsource, metadata)
       rawsource = get.str.str_and_int_by_replaced_eutf8_w_regex_str(rawsource, "\n +\n", "\n&nbsp;\n")
@@ -353,7 +353,7 @@ dothis = {
       return hs.alert.show(str, {textSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3} --[[ @as table ]], duration)
     end,
     say = function(str, lang)
-      speak:voice(tblmap.lang.voice[lang]):speak(transf.str.line_by_folded(str))
+      speak:voice(tblmap.iso_639_1_language_code.mac_voice_name_by_default[lang]):speak(transf.str.line_by_folded(str))
     end,
     search = function(str, search_engine_id)
       dothis.url_or_local_path.open_browser(
@@ -1343,7 +1343,7 @@ dothis = {
       dothis.mac_application_name.execute_full_action_path(
         application_name,
         transf.arr_and_any.arr(
-          tblmap.mac_application_name.recent_full_action_path[application_name],
+          tblmap.mac_application_name.str_arr_by_recent_full_action_path[application_name],
           item
         )
       )

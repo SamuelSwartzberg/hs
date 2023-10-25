@@ -628,7 +628,7 @@ act = {
       )
     end,
     pull_project_materials = function(omegat_project_dir)
-      for _, type in transf.arr.pos_int_vt_stateless_iter(tblmap.project_type.project_materials_list["omegat"]) do
+      for _, type in transf.arr.pos_int_vt_stateless_iter(tblmap.project_type.str_arr_by_project_materials_list["omegat"]) do
         dothis.project_dir.pull_project_materials(
           omegat_project_dir,
           type,
@@ -958,7 +958,7 @@ act = {
     reload = function(application_name)
       dothis.mac_application_name.execute_full_action_path(
         application_name,
-        tblmap.mac_application_name.reload_full_action_path[application_name]
+        tblmap.mac_application_name.str_arr_reload_full_action_path[application_name]
       )
     end,
     focus_main_window = function(application_name)

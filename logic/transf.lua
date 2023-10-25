@@ -802,7 +802,7 @@ transf = {
     end,
     extension_by_normalized = function(path)
       local ext = transf.path.extension(path)
-      return tblmap.extension.normalized_extension[
+      return tblmap.extension.extension_by_normalized[
         ext
       ] or ext
     end,
@@ -2804,7 +2804,7 @@ transf = {
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
         arr,
         function(component)
-          return component, tblmap.dcmp_name.int_by_min_dcmp_val[component]
+          return component, tblmap.dcmp_name.pos_int_by_min_dcmp_val[component]
         end
       )
     end,
@@ -3299,7 +3299,7 @@ transf = {
     dcmp_spec_by_filtered_min = function(dcmp_spec)
       return get.table.table_by_filtered_w_kt_vt_fn(
         dcmp_spec,
-        function(k, v) return v == tblmap.dcmp_name.int_by_min_dcmp_val[k] end
+        function(k, v) return v == tblmap.dcmp_name.pos_int_by_min_dcmp_val[k] end
       )
     end,
     dcmp_spec_by_filtered_not_max = function(dcmp_spec)
@@ -3311,7 +3311,7 @@ transf = {
     dcmp_spec_by_filtered_not_min = function(dcmp_spec)
       return get.table.table_by_filtered_w_kt_vt_fn(
         dcmp_spec,
-        function(k, v) return v ~= tblmap.dcmp_name.int_by_min_dcmp_val[k] end
+        function(k, v) return v ~= tblmap.dcmp_name.pos_int_by_min_dcmp_val[k] end
       )
     end,
     prefix_dcmp_spec_by_filtered_not_max_or_not_prefix = function(dcmp_spec)
@@ -5158,7 +5158,7 @@ transf = {
             mode = "move",
           }, {
             mode = "click",
-            mouse_button_str =  "l"
+            mouse_button_char =  "l"
           }, {
             mode = "key",
             key = sib[2]
@@ -5169,7 +5169,7 @@ transf = {
             mode = "move",
           }, {
             mode = "click",
-            mouse_button_str =  "l"
+            mouse_button_char =  "l"
           }, {
             mode = "key",
             key = sib[1]
@@ -5183,7 +5183,7 @@ transf = {
             mode = "move",
           }, {
             mode = "click",
-            mouse_button_str =  "l"
+            mouse_button_char =  "l"
           }
         })
 
@@ -9433,7 +9433,7 @@ transf = {
   click_input_spec = {
     click_fn = function(spec)
       return hs.eventtap[
-        tblmap.mouse_button_str.mouse_button_function_name[spec.mouse_button_str]
+        tblmap.mouse_button_char.alpha_str_by_mouse_button_function_name[spec.mouse_button_char]
       ]
     end,
   },
@@ -9456,9 +9456,9 @@ transf = {
       if get.str.bool_by_startswith(str, ".") then
         input_spec.mode = "click"
         if #str == 1 then
-          input_spec.mouse_button_str = "l"
+          input_spec.mouse_button_char = "l"
         else
-          input_spec.mouse_button_str = get.str.str_by_sub_lua(str, 2, 2)
+          input_spec.mouse_button_char = get.str.str_by_sub_lua(str, 2, 2)
         end
       elseif get.str.bool_by_startswith(str, ":") then
         input_spec.mode = "key"

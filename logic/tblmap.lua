@@ -1,8 +1,8 @@
 
 
 tblmap = {
-  whitespace = {
-    escaped = {
+  lua_escapable_ascii_str = {
+    printable_ascii_not_whitespace_str_by_escaped = {
       ["\n"] = "\\n",
       ["\t"] = "\\t",
       ["\f"] = "\\f",
@@ -10,50 +10,11 @@ tblmap = {
       ["\0"] = "\\0"
     },
   },
-  mouse_button_str = {
-    mouse_button_function_name = {
+  mouse_button_char = {
+    alpha_str_by_mouse_button_function_name = {
       l = "leftClick",
       r = "rightClick",
       m = "middleClick"
-    }
-  },
-  ascii_char = {
-    name = {
-      ["\t"] = "tab",
-      ["\n"] = "newline",
-      [","] = "comma",
-      [";"] = "semicolon",
-      ["."] = "period",
-      [":"] = "colon",
-      ["!"] = "exclamation mark",
-      ["?"] = "question mark",
-      ["("] = "left parenthesis",
-      [")"] = "right parenthesis",
-      ["["] = "left bracket",
-      ["]"] = "right bracket",
-      ["{"] = "left brace",
-      ["}"] = "right brace",
-      ["'"] = "single quote",
-      ['"'] = "double quote",
-      ["*"] = "asterisk",
-      ["-"] = "minus",
-      ["_"] = "underscore",
-      ["="] = "equals",
-      ["+"] = "plus",
-      ["<"] = "less than",
-      [">"] = "greater than",
-      ["/"] = "slash",
-      ["\\"] = "backslash",
-      ["|"] = "vertical bar",
-      ["~"] = "tilde",
-      ["`"] = "backtick",
-      ["@"] = "at sign",
-      ["#"] = "pound sign",
-      ["$"] = "dollar sign",
-      ["%"] = "percent sign",
-      ["^"] = "caret",
-      ["&"] = "ampersand",
-      [" "] = "space",
     }
   },
   mod_name = {
@@ -97,7 +58,6 @@ tblmap = {
       min = "%M",
       hour = "%H",
       day = "%d",
-      week = "%W",
       month = "%m",
       year = "%Y",
     },
@@ -106,7 +66,6 @@ tblmap = {
       min = "%02d",
       hour = "%02d",
       day = "%02d",
-      week = "%02d",
       month = "%02d",
       year = "%04d",
     },
@@ -115,7 +74,6 @@ tblmap = {
       min = "??",
       hour = "??",
       day = "??",
-      week = "??",
       month = "??",
       year = "????",
     },
@@ -150,7 +108,7 @@ tblmap = {
       day = 30,
       month = 12,
     },
-    int_by_min_dcmp_val = {
+    pos_int_by_min_dcmp_val = {
       sec = 0,
       min = 0,
       hour = 0,
@@ -205,8 +163,8 @@ tblmap = {
       second = "sec",
     },
   },
-  int = {
-    weekday_mon1_en = {
+  sme_7_pos_int = {
+    alpha_str_by_weekday_en_mon1 = {
       [1] = "Monday",
       [2] = "Tuesday",
       [3] = "Wednesday",
@@ -216,8 +174,8 @@ tblmap = {
       [7] = "Sunday"
     },
   },
-  weekday_mon1_en = {
-    int = {
+  alpha_str_by_weekday_en_mon1 = {
+    sme_7_pos_int = {
       ["Monday"] = 1,
       ["Tuesday"] = 2,
       ["Wednesday"] = 3,
@@ -227,20 +185,24 @@ tblmap = {
       ["Sunday"] = 7
     }
   },
-  lang = {
-    voice = {
+  iso_639_1_language_code = {
+    basic_locale_by_default = {
+      en = "en-US",
+      de = "de-DE",
+    },
+    mac_voice_name_by_default = {
       en = "Alex",
-      ja = "Kyoko.premium"
+      ja = "Kyoko"
     }
   },
   secondary_api_name = {
     api_name = {
       youtube = "google"
     },
-    endpoint_prefix = {
+    noweirdwhitespace_line_by_endpoint_prefix = {
       youtube = "youtube/v3"
     },
-    default_params = {
+    str_key_str_value_assoc_by_default_params = {
       youtube = {
         part = "snippet",
       }
@@ -264,13 +226,13 @@ tblmap = {
       google = "www.googleapis.com",
       osm = "nominatim.openstreetmap.org",
     },
-    scheme = {
+    url_scheme = {
       hydrus = "http://",
     },
-    auth_header = {
+    alphanum_minus_underscore_by_auth_header = {
       hydrus = "Hydrus-Client-API-Access-Key"
     },
-    token_where = {
+    api_request_kv_location_by_token_where = {
       hydrus = "header",
       danbooru = "param",
       dropbox = "header",
@@ -281,33 +243,33 @@ tblmap = {
       google = "oauth2",
       dropbox = "oauth2",
     },
-    username_pw_where = {
+    api_request_kv_location_by_username_pw_where = {
 
     },
-    auth_process = {
+    http_authentication_scheme = {
       hydrus = "" -- "" means no auth process. Even though it's using keys for auth, it doesn't use the Bearer indicator
     },
-    oauth2_url = {
+    http_protocol_url_by_oauth2_url = {
       dropbox = "api.dropboxapi.com/oauth2/token",
       google = "https://accounts.google.com/o/oauth2/token"
     },
-    oauth2_authorization_url = {
+    http_protocol_url_by_oauth2_authorization_url = {
       dropbox = "https://www.dropbox.com/oauth2/authorize",
       google = "https://accounts.google.com/o/oauth2/auth"
     },
-    needs_scopes = {
+    bool_by_needs_scopes = {
       google = true
     },
-    scopes = {
+    str_by_scopes = {
       google = "https://www.googleapis.com/auth/youtube"
     },
-    empty_post_body = {
+    str_by_empty_post_body = {
       dropbox = "null"
     },
-    empty_post_body_raw_type = {
+    media_type_by_empty_post_body_raw_type = {
       dropbox = "application/json"
     },
-    additional_auth_params = {
+    str_key_str_value_assoc_by_additional_auth_params = {
       google = {
         access_type = "offline", 
         prompt = "consent"
@@ -323,7 +285,7 @@ tblmap = {
       csv = "\n",
       tsv = "\n",
     },
-    normalized_extension =  {
+    extension_by_normalized =  {
       jpeg = "jpg",
       jpg = "jpg",
       htm = "html",
@@ -334,33 +296,23 @@ tblmap = {
       md = "md",
     },
   },
-  pandoc_format = {
+  pandoc_basic_format = {
     extension = {
       pdf = "pdf",
       beamer = "pdf",
       revealjs = "html",
     }
   },
-  sql_history_using_application_name = {
-    backup_condition = {
-      Firefox = function()
-        return not is.mac_application_name.running_mac_application_name("Firefox")
-      end,
-      Newpipe = function()
-        return is.path.extant_path(tblmap.sql_history_using_application_name.history_file_path.Newpipe)
-      end
-    },
-  },
   mac_application_name = {
-    recent_full_action_path = {
+    str_arr_by_recent_full_action_path = {
       OmegaT = {"Project", "Open Recent Project"}
     },
-    reload_full_action_path = {
+    str_arr_reload_full_action_path = {
       LibreOffice = {"File", "Reload"}
     },
   },
   search_engine_id = {
-    url = {
+    http_protocol_url = {
       wiktionary = "https://en.wiktionary.org/wiki/%s",
       wikipedia = "https://en.wikipedia.org/wiki/%s",
       youtube = "https://www.youtube.com/results?search_query=%s",
@@ -422,7 +374,7 @@ tblmap = {
     }
   },
   git_remote_type = {
-    printable_ascii_by_blob_indicator_path = {
+    noweirdwhitespace_line_by_blob_indicator_path = {
       github = "blob/",
       gitlab = "blob/",
       bitbucket = "src/",
@@ -432,7 +384,7 @@ tblmap = {
       gitlab = "gitlab.com",
       bitbucket = "bitbucket.org",
     },
-    printable_ascii_by_raw_indicator_path = {
+    noweirdwhitespace_line_by_raw_indicator_path = {
       
       github = "",
       gitlab = "raw/",
@@ -481,21 +433,19 @@ tblmap = {
     str_by_install_command = {
       npm = "npm run install",
     },
-    project_materials_list = {
+    str_arr_by_project_materials_list = {
       omegat = {
         "tm",
         "glossary"
       }
     }
   },
-  action_specifier_word = {
-  },
   stream_attribute = {
-    true_emoji = {
+    str_by_true_emoji = {
       loop = "🔂",
       shuffle = "🔀",
     },
-    false_emoji =  {
+    str_by_false_emoji =  {
       video = "🙈",
       pause = "▶️",
     }

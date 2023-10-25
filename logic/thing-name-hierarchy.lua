@@ -97,6 +97,7 @@ thing_name_hierarchy = {
           displayname_email = "leaf",
         },
         noweirdwhitespace_line = {
+          mod_symbol = "leaf",
           path_component = {
             leaflike = {
               extension = "leaf",
@@ -297,7 +298,10 @@ thing_name_hierarchy = {
       },
       ascii_str = {
         ascii_char = {
+          base_letter = "leaf",
           rfc3339like_dt_separator = "leaf",
+          lua_escapable_ascii_char = "leaf",
+          mouse_button_char = "leaf",
         },
         printable_ascii_str = {
           printable_ascii_multiline_str = {
@@ -327,7 +331,16 @@ thing_name_hierarchy = {
                   separated_nonindicated_dec_number_str = "leaf",
                 },
                 printable_ascii_not_whitespace_str = {
-                  handle = "leaf",
+                  startswith_percent_printable_ascii_not_whitespace = {
+                    rfc3339like_dt_format_str = "leaf",
+                    dt_format_part = {
+                      rfc3339like_dt_format_part = "leaf",
+                    },
+                    rfc3339like_dt_str_format_part = "leaf"
+                  },
+                  startswith_at_printable_ascii_not_whitespace = {
+                    handle = "leaf",
+                  },
                   package_name = {
                     installed_package_name = "leaf",
                   },
@@ -462,6 +475,7 @@ thing_name_hierarchy = {
                     
                     pcp_alphanum_minus_underscore = {
                       url_scheme = "leaf",
+                      api_request_kv_location = "leaf",
                       colon_period_alphanum_minus_underscore = {
                         indicated_utf8_hex_str = "leaf",
                         rfc3339like_dt_o_interval = {
@@ -536,6 +550,9 @@ thing_name_hierarchy = {
                               upper_alphanum_minus ="leaf",
                               kebap_case = {
                                 strict_kebap_case = {
+                                  bcp_47_language_tag = {
+                                    basic_locale = "leaf",
+                                  },
                                   upper_strict_kebap_case = "leaf",
                                   lower_strict_kebap_case = {
                                     csl_style = "leaf",
@@ -554,7 +571,6 @@ thing_name_hierarchy = {
                                 general_name = {
                                   thing_name = "leaf"
                                 },
-                                search_engine_id = "leaf"
                               },
                               upper_alphanum_underscore = "leaf",
                               snake_case = {
@@ -570,6 +586,9 @@ thing_name_hierarchy = {
                                     all_namespace = "leaf",
                                     dynamic_structure_name = "leaf",
                                     api_name = "leaf",
+                                    secondary_api_name = "leaf",
+                                    pandoc_basic_format = "leaf",
+                                    search_engine_id = "leaf"
                                   },
                                   mixed_strict_snake_case = {
                                     camel_strict_snake_case = {
@@ -607,7 +626,11 @@ thing_name_hierarchy = {
                                 },
                                 iso_3366_1_alpha_2_country_code = "leaf",
                                 iso_3366_1_alpha_3_country_code = "leaf",
+                                iso_639_1_language_code = "leaf",
+                                iso_639_3_language_code = "leaf",
                                 mullvad_city_code = "leaf",
+                                youtube_upload_status = "leaf",
+                                youtube_privacy_status = "leaf",
                               },
                               hex_str = {
                                 byte_hex_str = "leaf",
@@ -638,6 +661,7 @@ thing_name_hierarchy = {
                               indicated_bin_str = "leaf",
                               indicated_oct_str = "leaf",
                               indicated_dec_str = "leaf",
+                              token_type = "leaf",
                             },
                           }
                         },

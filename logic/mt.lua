@@ -48,6 +48,7 @@ r = {
       media_type = "[-\\w.]+/[-\\w.\\+]+",
       domain_name = "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]",
       ipc_socket_id = "\\d+-\\d+",
+      basic_locale = "[a-z]{2,3}-[A-Z]{2,3}",
     },
     html_entity = "&(?:[a-zA-Z\\d]+|#\\d+|#x[a-fA-F\\d]+);",
     input_spec_str = "(?:\\.[lrm])|(?::.*)|(?:[ms]-?\\d+..*?-?\\d+ %[a-zA-Z]+)",
@@ -88,6 +89,10 @@ consts = {
 }
 
 ls = {
+  lua_escapable_ascii_char_arr = {
+    "\a", "\b", "\f", "\n", "\r", "\t", "\v", "\\", "\"", "\'",
+  },
+  mouse_button_char_arr = {"l", "m", "r"},
   lua_regex_metacharacters = {"%", "^", "$", "(", ")", ".", "[", "]", "*", "+", "-", "?"},
   general_regex_metacharacters =  {"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"},
   small_words = {
@@ -107,13 +112,88 @@ ls = {
     "sass"
   },
   apis_that_dont_support_authorization_code_fetch = {"google"},
-  backup_type = {
+  backup_type_arr = {
     "facebook",
     "telegram",
     "signal",
     "discord"
   },
-  booru_rating = {
+  pandoc_basic_format_arr = {
+    "asciidoc",
+    "asciidoc_legacy",
+    "asciidoctor",
+    "beamer",
+    "biblatex",
+    "bibtex",
+    "chunkedhtml",
+    "commonmark",
+    "commonmark_x",
+    "context",
+    "creole",
+    "csljson",
+    "csv",
+    "docbook",
+    "docbook4",
+    "docbook5",
+    "docx",
+    "dokuwiki",
+    "dzslides",
+    "endnotexml",
+    "epub",
+    "epub2",
+    "epub3",
+    "fb2",
+    "gfm",
+    "haddock",
+    "html",
+    "html4",
+    "html5",
+    "icml",
+    "ipynb",
+    "jats",
+    "jats_archiving",
+    "jats_articleauthoring",
+    "jats_publishing",
+    "jira",
+    "json",
+    "latex",
+    "man",
+    "markdown",
+    "markdown_mmd",
+    "markdown_phpextra",
+    "markdown_strict",
+    "markua",
+    "mediawiki",
+    "ms",
+    "muse",
+    "native",
+    "odt",
+    "opendocument",
+    "opml",
+    "org",
+    "pdf",
+    "plain",
+    "pptx",
+    "revealjs",
+    "ris",
+    "rst",
+    "rtf",
+    "s5",
+    "slideous",
+    "slidy",
+    "t2t",
+    "tei",
+    "texinfo",
+    "textile",
+    "tikiwiki",
+    "tsv",
+    "twiki",
+    "typst",
+    "vimwiki",
+    "xwiki",
+    "zimwiki"
+  },
+  booru_rating_arr = {
     "general",
     "sensitive",
     "safe", -- safe ≙ general or sensitive
@@ -1066,14 +1146,14 @@ ls = {
   csl_title_keys = { "title", "title-short" },
   git_remote_types = {"github", "gitlab", "bitbucket"},
   useless_files = {".git", "node_modules", ".vscode"},
-  youtube_upload_status = {
+  youtube_upload_status_arr = {
     "deleted",
     "failed",
     "processed",
     "rejected",
     "uploaded"
   },
-  youtube_privacy_status = {
+  youtube_privacy_status_arr = {
     "private",
     "public",
     "unlisted"
@@ -1269,8 +1349,16 @@ ls = {
   mullvad_states ={
     "Connected", "Disconnected"
   },
-  rfc3339like_dt_separators = {
+  rfc3339like_dt_separator_arr = {
     "-", "T", ":", "Z"
+  },
+  rfc3339like_dt_format_str_arr = {
+    "%Y",
+    "%Y-%m",
+    "%Y-%m-%d",
+    "%Y-%m-%dT%H",
+    "%Y-%m-%dT%H:%M",
+     "%Y-%m-%dT%H:%M:%SZ",
   },
   initial_headers = {"from", "to", "cc", "bcc", "subject"},
   youtube = {
@@ -1301,8 +1389,84 @@ ls = {
   dcmp_names_long = {"year", "month", "day", "hour", "minute", "second"},
   long_dt_seps = {" at "},
   addr_key = {"Formatted name", "First name", "Last name", "Street", "Code", "City", "Region", "Country", "Box", "Extended"},
-  mod_char = {"c", "a", "s", "ct", "f"},
-  mod_name = {"cmd", "alt", "shift", "ctrl", "fn"},
+  mod_char_arr = {"c", "a", "s", "ct", "f"},
+  mod_symbol_arr = {"⌘", "⌥", "⇧", "⌃", "fn"},
+  mod_name_arr = {"cmd", "alt", "shift", "ctrl", "fn"},
+  rfc3339like_dt_str_format_part_arr = {"%02d", "%04d"},
+  api_name_arr = {"dropbox", "danbooru", "openai", "hydrus", "httpbin", "google", "osm"},
+  secondary_api_name_arr = {"youtube"},
+  api_request_kv_location_arr = {"header", "param", "header+param", "payload"},
+  http_authentication_scheme_arr = {"Basic", "Digest", "Bearer"},
+  token_type_arr = {"simple", "oauth2"},
+  rfc3339like_dt_format_part_arr = {
+    "%Y", "%m", "%d", "%H", "%M", "%S"
+  },
+  mac_voice_name_arr = {
+    "Agnes",
+    "Albert",
+    "Alex",
+    "Alice",
+    "Alva",
+    "Amelie",
+    "Anna",
+    "Bad",
+    "Bahh",
+    "Bells",
+    "Boing",
+    "Bruce",
+    "Bubbles",
+    "Carmit",
+    "Cellos",
+    "Damayanti",
+    "Daniel",
+    "Deranged",
+    "Diego",
+    "Ellen",
+    "Fiona",
+    "Fred",
+    "Good",
+    "Hysterical",
+    "Ioana",
+    "Joana",
+    "Junior",
+    "Kanya",
+    "Karen",
+    "Kathy",
+    "Kyoko",
+    "Laura",
+    "Lekha",
+    "Luciana",
+    "Mariska",
+    "Mei-Jia",
+    "Melina",
+    "Milena",
+    "Moira",
+    "Monica",
+    "Nora",
+    "Paulina",
+    "Pipe",
+    "Princess",
+    "Ralph",
+    "Samantha",
+    "Sara",
+    "Satu",
+    "Sin-ji",
+    "Tarik",
+    "Tessa",
+    "Thomas",
+    "Ting-Ting",
+    "Trinoids",
+    "Veena",
+    "Vicki",
+    "Victoria",
+    "Whisper",
+    "Xander",
+    "Yelda",
+    "Yuna",
+    "Zarvox",
+    "Zosia",
+    "Zuzana",
+  },
   email_headers_containin_emails = {"to", "cc", "bcc", "from", "reply-to"},
   vcard = {
     vcard_phone_type = {"home", "cell", "work", "pref", "pager", "voice", "fax", "voice"}, -- only those in both vcard 3.0 and 4.0
@@ -1469,7 +1633,7 @@ ls = {
       "subtype"
     }
   },
-  base_letters = {
+  base_letter_arr = {
     "b",
     "o",
     "d",
@@ -1488,7 +1652,7 @@ ls = {
   client_project_kind = {
     "translation"
   },
-  billing_unit = {
+  billing_unit_arr = {
     "line"
   },
   llm_chat_role = {
@@ -1510,7 +1674,7 @@ ls = {
     "citing",
     "styleable"
   },
-  markdown_extension_name = {
+  markdown_extension_name_arr = {
     "yaml_metadata_block",
     "fenced_code_blocks",
     "backtick_code_blocks",
@@ -1545,7 +1709,7 @@ ls = {
     "link_attributes",
     "fenced_divs"
   },
-  type_name = {
+  type_name_arr = {
     "string",
     "number",
     "boolean",
@@ -1555,7 +1719,7 @@ ls = {
     "userdata",
     "nil"
   },
-  mac_plist_type_name = {
+  mac_plist_type_name_arr = {
     "string",
     "int",
     "integer",
@@ -1567,7 +1731,7 @@ ls = {
     "dict",
     "array"
   },
-  dynamic_structure_name = {
+  dynamic_structure_name_arr = {
     "latex",
     "omegat"
   }

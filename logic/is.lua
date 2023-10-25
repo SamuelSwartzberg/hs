@@ -213,6 +213,9 @@ is = {
     end,
   },
   noweirdwhitespace_line = {
+    mod_symbol = function(str)
+      return get.arr.bool_by_contains(ls.mod_symbol_arr, str)
+    end,
     path_component = function(str)
       return str == "/" or get.str.bool_by_not_contains_w_ascii_str(str, "/") 
     end,
@@ -256,10 +259,16 @@ is = {
   },
   ascii_char = {
     base_letter = function(str)
-      return get.arr.bool_by_contains(ls.base_letters, str)
+      return get.arr.bool_by_contains(ls.base_letter_arr, str)
     end,
     rfc3339like_dt_separator = function(str)
-      return get.arr.bool_by_contains(ls.rfc3339like_dt_separators, str)
+      return get.arr.bool_by_contains(ls.rfc3339like_dt_separator_arr, str)
+    end,
+    lua_escapable_ascii_char = function(str)
+      return get.arr.bool_by_contains(ls.lua_escapable_ascii_char_arr, str)
+    end,
+    mouse_button_char = function(str)
+      return get.arr.bool_by_contains(ls.mouse_button_char_arr, str)
     end,
   },
   printable_ascii_str = {
@@ -369,8 +378,11 @@ is = {
     html_entity = function(str)
       return #str > 20 and get.str.bool_by_startswith(str, "&") and get.str.bool_by_endswith(str, ";") and get.str.bool_by_matches_whole_onig(str, r.g.html_entity) -- the earlier checks are technically unncessary but improve performance
     end,
-    handle = function(str)
-      return get.str.bool_by_startswith(str, "@")
+    startswith_percent_printable_ascii_not_whitespace = function(str)
+      return get.str.bool_by_startswith(str, "%")
+    end,
+    startswith_at_printable_ascii_not_whitespace = function(str)
+      return get.str.bool_by_startswith(str, "%")
     end,
     package_name = transf["nil"]["true"], -- no way to tell if a str is a package name of some package
     package_name_package_manager_name_compound_str = function(str)
@@ -386,6 +398,26 @@ is = {
       return get.str.bool_by_matches_whole_onig_inverted_w_regex_character_class_innards(str, "\"<>`\\|\\\\^{}")
     end,
     
+  },
+  startswith_percent_printable_ascii_not_whitespace = {
+    dt_format_part = function(str)
+      return #str == 2 
+    end,
+    rfc3339like_dt_str_format_part = function(str)
+      return get.arr.bool_by_contains(ls.rfc3339like_dt_str_format_part_arr, str)
+    end,
+    rfc3339like_dt_format_str = function(str)
+      return get.str.bool_by_contains(ls.rfclike_dt_format_str_arr, str)
+    end,
+  },
+  dt_format_part = {
+    rfc3339like_dt_format_part = function(str)
+      return get.arr.bool_by_contains(ls.rfc3339like_dt_format_part_arr, str)
+    end,
+  },
+  startswith_at_printable_ascii_not_whitespace = {
+    handle = transf["nil"]["true"],
+
   },
   urlcharset_str = {
     cronspec_str = function(str)
@@ -528,6 +560,9 @@ is = {
     end,
   },
   pcp_alphanum_minus_underscore = {
+    api_request_kv_location = function(str)
+      return get.arr.bool_by_contains(ls.api_request_kv_location_arr, str)
+    end,
     url_scheme = function(str)
       return get.str.bool_by_matches_whole_onig(str, r.g.url_scheme)
     end,
@@ -770,6 +805,11 @@ is = {
       return not is.strict_kebap_case.upper_strict_kebap_case(str) and not is.strict_kebap_case.lower_strict_kebap_case(str)
     end,
     bcp_47_language_tag = transf["nil"]["true"] -- too lazy for now
+  },
+  bcp_47_language_tag = {
+    basic_locale = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.id.basic_locale)
+    end,
   },
   lower_strict_kebap_case = {
     csl_style = function(str)
@@ -1447,6 +1487,7 @@ is = {
     snakekebap_case = function(str)
       return get.str.bool_by_not_matches_part_onig(str, "^\\d")
     end,
+    locale_str
     
   },
   lower_alphanum_minus_underscore = {
@@ -1531,23 +1572,32 @@ is = {
       return get.arr.bool_by_contains(ls.client_project_kind, str)
     end,
     billing_unit = function(str)
-      return get.arr.bool_by_contains(ls.billing_unit, str)
+      return get.arr.bool_by_contains(ls.billing_unit_arr, str)
     end,
     markdown_extension_name = function(str)
-      return get.arr.bool_by_contains(ls.markdown_extension_name, str)
+      return get.arr.bool_by_contains(ls.markdown_extension_name_arr, str)
     end,
     backup_type = function(str)
-      return get.arr.bool_by_contains(ls.backup_type, str)
+      return get.arr.bool_by_contains(ls.backup_type_arr, str)
     end,
     all_namespace = function(str)
       return get.arr.bool_by_contains(ls.all_namespace, str)
     end,
     dynamic_structure_name = function(str)
-      return get.arr.bool_by_contains(ls.dynamic_structure_name, str)
+      return get.arr.bool_by_contains(ls.dynamic_structure_name_arr, str)
     end,
     api_name = function(str)
-      return true
+      return get.arr.bool_by_contains(ls.api_name_arr, str)
     end,
+    secondary_api_name = function(str)
+      return get.arr.bool_by_contains(ls.secondary_api_name_arr, str)
+    end,
+    pandoc_basic_format = function(str)
+      return get.arr.bool_by_contains(ls.pandoc_basic_format_arr, str)
+    end,
+    search_engine_id = function(str)
+      return get.arr.bool_by_contains(ls.search_engine_id, str)
+    end
   },
   all_namespace = {
 
@@ -1569,9 +1619,7 @@ is = {
     general_name = function(str)
       return get.str.bool_by_not_startswith(str, "_") and get.str.bool_by_not_endswith(str, "_")
     end,
-    search_engine_id = function(str)
-      return get.arr.bool_by_contains(ls.search_engine_id, str)
-    end
+    
   },
   general_name = {
     thing_name = transf["nil"]["true"]
@@ -1616,6 +1664,9 @@ is = {
     upper_camel_case = function(str)
       return get.str.bool_by_matches_part_onig(str, "^[A-Z]")
     end,
+    token_type = function(str)
+      return get.arr.bool_by_contains(ls.token_type_arr, str)
+    end,
   },
   indicated_hex_str = {
     fnid = function(str)
@@ -1656,10 +1707,13 @@ is = {
       return #str == 3
     end,
     youtube_upload_status = function(str)
-      return get.arr.bool_by_contains(ls.youtube_upload_status, str)
+      return get.arr.bool_by_contains(ls.youtube_upload_status_arr, str)
     end,
     youtube_privacy_status = function(str)
-      return get.arr.bool_by_contains(ls.youtube_privacy_status, str)
+      return get.arr.bool_by_contains(ls.youtube_privacy_status_arr, str)
+    end,
+    http_authentication_scheme = function(str)
+      return get.arr.bool_by_contains(ls.http_authentication_scheme_arr, str)
     end,
   },
   lower_alpha_str = {
@@ -1676,10 +1730,10 @@ is = {
       return get.arr.bool_by_contains(ls.dcmp_names_long, str)
     end,
     mod_char = function(str)
-      return get.arr.bool_by_contains(ls.mod_char, str)
+      return get.arr.bool_by_contains(ls.mod_char_arr, str)
     end,
     mod_name = function(str)
-      return get.arr.bool_by_contains(ls.mod_name, str)
+      return get.arr.bool_by_contains(ls.mod_name_arr, str)
     end,
     leaf_str = function(str)
       return str == "leaf"
@@ -1715,17 +1769,18 @@ is = {
       return get.arr.bool_by_contains(ls.markdown_extension_set_name, str)
     end,
     booru_rating = function(str)
-      return get.arr.bool_by_contains(ls.booru_rating, str)
+      return get.arr.bool_by_contains(ls.booru_rating_arr, str)
     end,
     danbooru_category_name = function(str)
       return get.arr.bool_by_contains(ls.danbooru_category_name_arr, str)
     end,
     type_name = function(str)
-      return get.arr.bool_by_contains(ls.type_name, str)
+      return get.arr.bool_by_contains(ls.type_name_arr, str)
     end,
     mac_plist_type_name = function(str)
-      return get.arr.bool_by_contains(ls.mac_plist_type_name, str)
+      return get.arr.bool_by_contains(ls.mac_plist_type_name_arr, str)
     end,
+    
 
   },
   url = {
@@ -2393,7 +2448,7 @@ is = {
     end,
     input_spec = function(t)
       return
-        t.mouse_button_str or t.key or t.target_point
+        t.mouse_button_char or t.key or t.target_point
     end,
     unicode_prop_table = function(t)
       return
@@ -2853,7 +2908,7 @@ is = {
       return t.mode
     end,
     click_input_spec = function(t)
-      return t.mouse_button_str
+      return t.mouse_button_char
     end,
     key_input_spec = function(t)
       return t.key

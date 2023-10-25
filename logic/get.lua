@@ -2437,7 +2437,7 @@ get = {
       local local_nonabsolute_path = transf.in_git_dir.local_nonabsolute_path_by_from_git_root_dir(path)
       return get.host.url_by_git_item_url(
         transf.in_git_dir.host_by_remote_blob_host(path),
-        tblmap.git_remote_type.printable_ascii_by_blob_indicator_path[git_remote_type],
+        tblmap.git_remote_type.noweirdwhitespace_line_by_blob_indicator_path[git_remote_type],
         remote_owner_item,
         branch,
         local_nonabsolute_path
@@ -2449,7 +2449,7 @@ get = {
       local local_nonabsolute_path = transf.in_git_dir.local_nonabsolute_path_by_from_git_root_dir(path)
       return get.host.url_by_git_item_url(
         transf.in_git_dir.host_by_remote_raw_host(path),
-        tblmap.git_remote_type.printable_ascii_by_raw_indicator_path[git_remote_type],
+        tblmap.git_remote_type.noweirdwhitespace_line_by_raw_indicator_path[git_remote_type],
         remote_owner_item,
         branch,
         local_nonabsolute_path
@@ -3343,8 +3343,8 @@ get = {
     end,
     line_by_emoji_for_key = function(id, key)
       local res = get.mpv_ipc_socket_id.str(id, key)
-      if res then return tblmap.stream_attribute.true_emoji[key]
-      else return tblmap.stream_attribute.false_emoji[key] end
+      if res then return tblmap.stream_attribute.str_by_true_emoji[key]
+      else return tblmap.stream_attribute.str_by_false_emoji[key] end
     end,
   },
   created_item_specifier_arr = {
@@ -4052,7 +4052,7 @@ get = {
   },
   search_engine_id = {
     url_by_search = function(search_engine_id, str)
-      return tblmap.search_engine_id.url[search_engine_id]:format(
+      return tblmap.search_engine_id.http_protocol_url[search_engine_id]:format(
         get.str.str_by_percent_encoded(str, tblmap.search_engine_id.bool_by_param_is_path[search_engine_id])
       )
     end,

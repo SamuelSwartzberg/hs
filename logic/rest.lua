@@ -1,4 +1,4 @@
---- @alias header_or_param "header" | "param" | "both"
+--- @alias header_or_param "header" | "param" | "header+param"
 
 --- @class RESTApiSpecifier
 --- @field url? str The URL to send the request to. This is used if not making use of the scheme, host and endpoint params fields.
@@ -42,8 +42,8 @@ function rest(specifier, do_after, have_tried_access_refresh)
       specifier.api_name = tblmap.secondary_api_name.api_name[specifier.api_name]
     end
 
-    specifier.token_where = specifier.token_where or tblmap.api_name.token_where[specifier.api_name]
-    specifier.username_pw_where = specifier.username_pw_where or tblmap.api_name.username_pw_where[specifier.api_name]
+    specifier.token_where = specifier.token_where or tblmap.api_name.api_request_kv_location_by_token_where[specifier.api_name]
+    specifier.username_pw_where = specifier.username_pw_where or tblmap.api_name.api_request_kv_location_by_username_pw_where[specifier.api_name]
   end
 
   -- fetch tokens
@@ -61,8 +61,6 @@ function rest(specifier, do_after, have_tried_access_refresh)
         keyloc = transf.api_name.local_absolute_path_by_api_key_file(specifier.api_name)
       elseif specifier.token_type == "oauth2" then
         keyloc = transf.api_name.local_absolute_path_by_access_token_file(specifier.api_name)
-      elseif specifier.token_type == "telegram" then
-        -- todo
       end
       specifier.token = transf.file.str_by_contents(keyloc)
     end
@@ -88,7 +86,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
       end
       local refresh_token = transf.api_name.str_or_nil_by_refresh_token(specifier.api_name)
 
-      specifier.oauth2_url = specifier.oauth2_url or tblmap.api_name.oauth2_url[specifier.api_name]
+      specifier.oauth2_url = specifier.oauth2_url or tblmap.api_name.http_protocol_url_by_oauth2_url[specifier.api_name]
       specifier.oauth2_authorization_url = specifier.oauth2_authorization_url or tblmap.api_name.oauth2_authorization_url[specifier.api_name] or specifier.oauth2_url
 
       local function authorize_app()
@@ -103,11 +101,11 @@ function rest(specifier, do_after, have_tried_access_refresh)
             reblob_uri = "http://127.0.0.1:8412/?api_name=" .. specifier.api_name
           }
         }
-        if tblmap.api_name.needs_scopes[specifier.api_name] then
-          open_spec.params.scope = tblmap.api_name.scopes[specifier.api_name]
+        if tblmap.api_name.bool_by_needs_scopes[specifier.api_name] then
+          open_spec.params.scope = tblmap.api_name.str_by_scopes[specifier.api_name]
         end
-        if tblmap.api_name.additional_auth_params[specifier.api_name] then
-          open_spec.params = transf.two_table_or_nils.table_by_take_new(open_spec.params, tblmap.api_name.additional_auth_params[specifier.api_name])
+        if tblmap.api_name.str_key_str_value_assoc_by_additional_auth_params[specifier.api_name] then
+          open_spec.params = transf.two_table_or_nils.table_by_take_new(open_spec.params, tblmap.api_name.str_key_str_value_assoc_by_additional_auth_params[specifier.api_name])
         end
         
         dothis.url_components.open_browser(open_spec, nil, function() -- our server listening on the above port will save the authorization code to the proper location
@@ -192,7 +190,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
 
   -- add authentication deets to params
 
-  if specifier.token_where == "param" or specifier.token_where == "both" then
+  if specifier.token_where == "param" or specifier.token_where == "header+param" then
     if specifier.token_type == "oauth2" then
       specifier.token_param = specifier.token_param or "access_token"
     elseif specifier.token_type == "simple" then
@@ -203,7 +201,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     specifier.params[specifier.token_param] = specifier.token
   end
 
-  if specifier.username_pw_where == "param" or specifier.username_pw_where == "both" then
+  if specifier.username_pw_where == "param" or specifier.username_pw_where == "header+param" then
     specifier.params = specifier.params or {}
     specifier.username_param = specifier.username_param or "username"
     specifier.password_param = specifier.password_param or "password"
@@ -217,16 +215,16 @@ function rest(specifier, do_after, have_tried_access_refresh)
     specifier.host = tblmap.api_name.host[specifier.api_name]
   end
 
-  if secondary_api_name and tblmap.secondary_api_name.endpoint_prefix[secondary_api_name] and specifier.endpoint then
-    specifier.endpoint = get.str.str_by_with_suffix(tblmap.secondary_api_name.endpoint_prefix[secondary_api_name], "/") .. get.str.str_by_no_prefix(specifier.endpoint, "/")
+  if secondary_api_name and tblmap.secondary_api_name.noweirdwhitespace_line_by_endpoint_prefix[secondary_api_name] and specifier.endpoint then
+    specifier.endpoint = get.str.str_by_with_suffix(tblmap.secondary_api_name.noweirdwhitespace_line_by_endpoint_prefix[secondary_api_name], "/") .. get.str.str_by_no_prefix(specifier.endpoint, "/")
   end
 
-  if secondary_api_name and tblmap.secondary_api_name.default_params[secondary_api_name] then
+  if secondary_api_name and tblmap.secondary_api_name.str_key_str_value_assoc_by_default_params[secondary_api_name] then
     specifier.params = specifier.params or {}
-    specifier.params = transf.two_table_or_nils.table_by_take_new(get.table.table_by_copy(tblmap.secondary_api_name.default_params[secondary_api_name], true), specifier.params)
+    specifier.params = transf.two_table_or_nils.table_by_take_new(get.table.table_by_copy(tblmap.secondary_api_name.str_key_str_value_assoc_by_default_params[secondary_api_name], true), specifier.params)
   end
 
-  specifier.scheme = specifier.scheme or tblmap.api_name.scheme[specifier.api_name]
+  specifier.scheme = specifier.scheme or tblmap.api_name.url_scheme[specifier.api_name]
 
   local url = transf.url_components.url(specifier)
 
@@ -252,7 +250,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
   end
 
   if specifier.api_name then
-    specifier.auth_header = specifier.auth_header or tblmap.api_name.auth_header[specifier.api_name]
+    specifier.auth_header = specifier.auth_header or tblmap.api_name.alphanum_minus_underscore_by_auth_header[specifier.api_name]
   end
 
   specifier.auth_header = specifier.auth_header or "Authorization"
@@ -261,17 +259,17 @@ function rest(specifier, do_after, have_tried_access_refresh)
   -- add auth to curl command
 
   if specifier.api_name then
-    specifier.auth_process = specifier.auth_process or tblmap.api_name.auth_process[specifier.api_name]
+    specifier.auth_process = specifier.auth_process or tblmap.api_name.http_authentication_scheme[specifier.api_name]
   end
 
-  if specifier.token_where == "header" or specifier.token_where == "both" then
+  if specifier.token_where == "header" or specifier.token_where == "header+param" then
     local auth_header = specifier.auth_header .. get.str.str_by_with_suffix(specifier.auth_process or "Bearer", " ")
     dothis.arr.push(curl_command, "-H")
     dothis.arr.push(curl_command, 
       transf.str.str_by_single_quoted_escaped(auth_header .. specifier.token))
   end
 
-  if specifier.username_pw_where == "header" or specifier.username_pw_where == "both" then
+  if specifier.username_pw_where == "header" or specifier.username_pw_where == "header+param" then
     local auth_header = specifier.auth_header .. get.str.str_by_with_suffix(specifier.auth_process or "Basic", " ")
     dothis.arr.push(curl_command, "-H")
     dothis.arr.push(curl_command, 
@@ -294,11 +292,11 @@ function rest(specifier, do_after, have_tried_access_refresh)
   if 
     specifier.request_verb == "POST"
     and not specifier.request_table
-    and tblmap.api_name.empty_post_body[specifier.api_name]
+    and tblmap.api_name.str_by_empty_post_body[specifier.api_name]
   then
     dothis.arr.push(curl_command, "-d")
     dothis.arr.push(curl_command, 
-      transf.str.str_by_single_quoted_escaped(tblmap.api_name.empty_post_body[specifier.api_name])
+      transf.str.str_by_single_quoted_escaped(tblmap.api_name.str_by_empty_post_body[specifier.api_name])
     )
     dothis.arr.push(curl_command, "-H")
     dothis.arr.push(curl_command, 
