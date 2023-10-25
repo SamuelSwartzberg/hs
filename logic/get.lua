@@ -1049,10 +1049,13 @@ get = {
       return get.arr.all_pass_w_fn(arr, function(x) return get.arr.bool_by_contains(arr2, x) end)
     end,
     arr_by_head = function(arr, n)
-      return get.arr.arr_by_slice_w_3_int_any_or_nils(arr, 1, n or 10)
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(arr, 1, n )
     end,
     arr_by_tail = function(arr, n)
-      return get.arr.arr_by_slice_w_3_int_any_or_nils(arr, -(n or 10))
+      return get.arr.arr_by_slice_w_3_int_any_or_nils(arr, -n)
+    end,
+    arr_by_shuffled_head = function(arr, n)
+      return get.arr.arr_by_head(transf.arr.arr_by_shuffled(arr), n)
     end,
     arr_by_nth_element_subbed = function(arr, n, sub)
       local res = get.table.table_by_copy(arr, false)
@@ -1220,6 +1223,20 @@ get = {
             return v
           end
         end)
+    end,
+    
+  },
+  leaflike = {
+    noempty_noindent_nohashcomment_line_arr_by_wordlist_shuffled_head = function(leaflike, n)
+      return get.arr.arr_by_head(
+        get.leaflike.noempty_noindent_nohashcomment_line_arr_by_wordlist_shuffled(leaflike),
+        n
+      )
+    end,
+    noempty_noindent_nohashcomment_line_by_wordlist_rand_identifier = function(leaflike, n)
+      return transf.str_arr.str_by_all_but_initial_first_eutf8_upper_joined_empty(
+        get.leaflike.noempty_noindent_nohashcomment_line_arr_by_wordlist_shuffled_head(leaflike, n)
+      )
     end,
     
   },

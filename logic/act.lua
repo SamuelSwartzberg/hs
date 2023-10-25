@@ -2009,7 +2009,6 @@ act = {
         arr[i] = nil
       end
     end,
-    shuffle = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.arr.sort, {a_use, transf["nil"].bool_by_random}),
     sort = function(arr)
       dothis.arr.sort(arr)
     end,

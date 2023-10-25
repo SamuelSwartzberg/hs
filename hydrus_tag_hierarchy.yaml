@@ -1680,22 +1680,6 @@ things:
         location of residence:
         housing:
           room layout:
-general:
-  touching: 
-    _rs: 
-      - "%s + tangent + /reflexive"
-  interlocked:
-    _rs: "thing: + circumtangent + /reciprocal voice"
-    __infer:
-      _rs: limbable
-  envy:
-    _rs: "thing: + envied"
-    __infer:
-      _rs: affectable
-  awe:
-    _rs: "thing: + awed"
-    __infer:
-      _rs: affectable
 acquisition_context:
   uni:
     philosophy bachelors:

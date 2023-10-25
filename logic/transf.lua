@@ -400,6 +400,26 @@ transf = {
     base64_gen_str_by_random_of_length = function(int)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("openssl rand -base64 " .. transf.any.str(transf.number.int_by_rounded(int * 3/4))) -- 3/4 because base64 takes the int to be the input length, but we want to specify the output length (which is 4/3 the input length in case of base64)
     end,
+    lower_alpha_str_by_random_of_length = function(int)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "cat /dev/urandom | tr -dc 'a-z' | fold -w " .. int .. " | head -n 1"
+      )
+    end,
+    upper_alpha_str_by_random_of_length = function(int)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "cat /dev/urandom | tr -dc 'A-Z' | fold -w " .. int .. " | head -n 1"
+      )
+    end,
+    alpha_str_by_random_of_length = function(int)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w " .. int .. " | head -n 1"
+      )
+    end,
+    alphanum_by_random_of_length = function(int)
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped(
+        "cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w " .. int .. " | head -n 1"
+      )
+    end,
     digit_str = function(num)
       return transf.any.str(num)
     end,
@@ -526,6 +546,16 @@ transf = {
       end
       return res
     end,
+    arr_by_shuffled = function(arr)
+      local copy = get.table.table_by_copy(arr)
+      local n = #copy
+      while n > 2 do
+        local k = transf.int.int_by_random_of_length(n)
+        copy[n], copy[k] = copy[k], copy[n]
+        n = n - 1
+      end
+      return copy
+    end,
     t_by_first = function(arr)
       return arr[1]
     end,
@@ -543,6 +573,12 @@ transf = {
     end,
     arr_by_nolast = function(arr)
       return get.arr.arr_by_slice_w_3_int_any_or_nils(arr, 1, -2)
+    end,
+    arr_by_10_head = function(arr)
+      return get.arr.arr_by_head(arr, 10)
+    end,
+    arr_by_10_tail = function(arr)
+      return get.arr.arr_by_tail(arr, 10)
     end,
     empty_str_value_assoc = function(arr)
       return get.table.table_by_mapped_w_vt_arg_kt_vt_ret_fn(
@@ -693,6 +729,18 @@ transf = {
         )
       )
     end,
+    local_plaintext_file_or_nil_by_wordlist = function(leaf)
+      return get.extant_path.absolute_path_by_descendant_with_filename(
+        env.HOME .. "/.local/git_packages/github.com/kkrypt0nn/wordlists",
+        leaf
+      )
+    end,
+    noempty_noindent_nohashcomment_line_arr_by_wordlist_shuffled = function(leaf)
+      return transf.plaintext_file.noempty_noindent_nohashcomment_line_arr_by_shuffle(
+        transf.leaflike.local_plaintext_file_or_nil_by_wordlist(leaf)
+      )
+    end,
+    
   },
   ascii_str = {
     printable_ascii_by_remove = function(str)
@@ -2420,6 +2468,11 @@ transf = {
     end,
     line_arr = function(path)
       return transf.str.line_arr(transf.plaintext_file.str_by_contents(path))
+    end,
+    noempty_noindent_nohashcomment_line_arr_by_shuffle = function(path)
+      return transf.arr.arr_by_shuffled(
+        transf.plaintext_file.noempty_noindent_nohashcomment_line_arr(path)
+      )
     end,
     noempty_line_arr = function(path)
       return transf.str.noempty_line_arr(transf.plaintext_file.str_by_contents(path))
@@ -4197,16 +4250,14 @@ transf = {
     end,
     upper_camel_strict_snake_case = function(str)
       local parts = transf.str.alphanum_arr_by_split_on_others(str)
-      local upper_parts = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
-      return get.str_or_number_arr.str_by_joined(upper_parts, "_")
+      return transf.str_arr.str_by_all_first_eutf8_upper_joined_minus(parts)
     end,
     lower_camel_strict_snake_case = function(str)
       return transf.str.str_by_all_eutf8_lower(transf.str.upper_camel_strict_snake_case(str))
     end,
     upper_camel_case = function(str)
       local parts = transf.str.alphanum_arr_by_split_on_others(str)
-      local upper_parts = get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(parts, transf.str.str_by_first_eutf8_upper)
-      return get.str_or_number_arr.str_by_joined(upper_parts, "")
+      return transf.str_arr.str_by_all_first_eutf8_upper_joined_empty(parts)
     end,
     lower_camel_case = function(str)
       return transf.str.str_by_all_eutf8_lower(transf.str.upper_camel_case(str))
@@ -4650,6 +4701,10 @@ transf = {
         },
       })
     end,
+    str_by_nonplural = function(str)
+      error("todo")
+      return
+    end,
 
   },
   danbooru_tag_record = {
@@ -5064,7 +5119,9 @@ transf = {
   hydrus_tag_hierarchy = {
     hydrus_rel_spec = function(hierarchy)
       local basic_rel_spec = get.hydrus_tag_hierarchy_node.hydrus_rel_spec("global", hierarchy, nil, nil, ls.global_namespace_taking_key_name_arr)
-      basic_rel_spec.sib = transf.two_arrs.arr_by_appended(basic_rel_spec.sib, ls.two_strs__arr_arr_by_siblings)
+      dothis.arr.each(ls.two_strs__arr_arr_by_siblings, function(sib)
+        dothis.two_strs__arr_arr.push_ensure_global_namespace(basic_rel_spec.sib, sib)
+      end)
       local tag_map = transf.two_anys__arr_arr.assoc_by_reverse_nested(basic_rel_spec.sib)
       local generated_hydrus_rel_spec = get.danbooru_hydrus_inference_specifier_arr.hydrus_rel_spec_by_danbooru_tag_my_tag_implications(
         ls.danbooru_hydrus_inference_specifier_arr,
@@ -5462,8 +5519,47 @@ transf = {
           transf.str.two_strs__arr_arr_by_deduce_from_parts
         )
       )
-    end
-    
+    end,
+    str_arr_by_all_first_eutf8_upper = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(arr, transf.str.str_by_first_eutf8_upper)
+    end,
+    str_arr_by_all_but_initial_first_eutf8_upper = function(arr)
+      local copy = get.table.table_by_copy(arr)
+      local first = act.arr.shift(copy)
+      local rest_upper = transf.str_arr.str_arr_by_all_first_eutf8_upper(copy)
+      dothis.arr.unshift(rest_upper, first)
+      return rest_upper
+    end,
+    str_by_all_first_eutf8_upper_joined_underscore = function(arr)
+      return transf.str_or_number_arr.str_by_joined_underscore(
+        transf.str_arr.str_arr_by_all_first_eutf8_upper(arr)
+      )
+    end,
+    str_by_all_but_initial_first_eutf8_upper_joined_underscore = function(arr)
+      return transf.str_or_number_arr.str_by_joined_underscore(
+        transf.str_arr.str_arr_by_all_but_initial_first_eutf8_upper(arr)
+      )
+    end,
+    str_by_all_first_eutf8_upper_joined_minus = function(arr)
+      return transf.str_or_number_arr.str_by_joined_minus(
+        transf.str_arr.str_arr_by_all_first_eutf8_upper(arr)
+      )
+    end,
+    str_by_all_but_initial_first_eutf8_upper_joined_minus = function(arr)
+      return transf.str_or_number_arr.str_by_joined_minus(
+        transf.str_arr.str_arr_by_all_but_initial_first_eutf8_upper(arr)
+      )
+    end,
+    str_by_all_first_eutf8_upper_joined_empty = function(arr)
+      return transf.str_or_number_arr.str_by_joined_empty(
+        transf.str_arr.str_arr_by_all_first_eutf8_upper(arr)
+      )
+    end,
+    str_by_all_but_initial_first_eutf8_upper_joined_empty = function(arr)
+      return transf.str_or_number_arr.str_by_joined_empty(
+        transf.str_arr.str_arr_by_all_but_initial_first_eutf8_upper(arr)
+      )
+    end,
   },
   line_arr = {
     noindent_line_arr = function(arr)
@@ -10023,6 +10119,15 @@ transf = {
   str_or_number_arr = {
     str_by_joined_comma = function(arr)
       return get.str_or_number_arr.str_by_joined(arr, ", ")
+    end,
+    str_by_joined_empty = function(arr)
+      return get.str_or_number_arr.str_by_joined(arr, "")
+    end,
+    str_by_joined_underscore = function(arr)
+      return get.str_or_number_arr.str_by_joined(arr, "_")
+    end,
+    str_by_joined_minus = function(arr)
+      return get.str_or_number_arr.str_by_joined(arr, "-")
     end,
   },
   plist_single_dk_spec = {

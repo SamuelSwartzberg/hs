@@ -397,6 +397,38 @@ ls = {
           modifiers = {d.my(d.prts[1])}
         })
       end
+    }, {
+      danbooru_tags = {
+        fetch = "interlocked *",
+        prts_extractor = function(name)
+          return get.str.str_arr_by_onig_regex_match(name, "^general:(interlocked) (.*)$")
+        end,
+      },
+      result = function (d)
+        return d.create({
+          parts = {
+            d.my(transf.str.str_by_nonplural(d.prts[2])),
+            "thing:spatial relation:circumtangent"
+          },
+          inference = "thing:reciprocal voice"
+        })
+      end
+    },{
+      danbooru_tags = {
+        fetch = "* touching",
+        prts_extractor = function(name)
+          return get.str.str_arr_by_onig_regex_match(name, "^general:(.*) touching$")
+        end,
+      },
+      result = function (d)
+        return d.create({
+          parts = {
+            d.my(transf.str.str_by_nonplural(d.prts[2])),
+            "thing:spatial relation:tangent"
+          },
+          inference = "thing:reflexive voice"
+        })
+      end
     },{
       danbooru_tags = {
         fetch = "self*",
@@ -465,11 +497,11 @@ ls = {
     {"general:interlocked arms", "general:locked arms"},
     {"general:hugging", "general:hug"},
     {"general:german nation", "general:germany"},
-    {"thing:thing:bodypartlike:oral parts + essive + thing:bodypartlike:crotch pleasurable organ", "general:oral"},
-    {"thing:thing:bodypartlike:oral parts + essive + thing:bodypartlike:phallic object", "general:fellatio"},
-    {"thing:thing:bodypartlike:oral parts + essive + thing:bodypartlike:vulva", "general:cunnilingus"},
-    {"thing:thing:agentlike + thing:activity:awe + bodypartlike:flat breasts", "flat awe"},
-    {"thing:thing:agentlike + thing:activity:envy + bodypartlike:flat breasts", "flat envy"},
+    {"{thing:bodypartlike:oral parts + essive + thing:bodypartlike:crotch pleasurable organ}", "general:oral"},
+    {"{thing:bodypartlike:oral parts + essive + thing:bodypartlike:phallic object}", "general:fellatio"},
+    {"{thing:bodypartlike:oral parts + essive + thing:bodypartlike:vulva}", "general:cunnilingus"},
+    {"{thing:agentlike + thing:activity:awe + bodypartlike:flat breasts}", "flat awe"},
+    {"{thing:agentlike + thing:activity:envy + bodypartlike:flat breasts}", "flat envy"},
   },
   note_key = {
     "positive_prompt", -- what the creator was told to create
