@@ -1429,11 +1429,17 @@ get = {
     bool_by_matches_whole_onig = function(str, regex_str)
       return get.str.bool_by_matches_part_onig(str, transf.str.str_by_whole_regex(regex_str))
     end,
+    bool_by_matches_whole_insensitive_onig = function (str, regex_str)
+      return get.str.bool_by_matches_part_insenstive_onig(str, transf.str.str_by_whole_regex(regex_str))
+    end,
     bool_by_matches_part_eutf8 = function(str, regex_str)
       return get.str.two_integer_or_nils_by_eutf8_regex_match(str, regex_str) ~= nil
     end,
     bool_by_matches_part_onig = function(str, regex_str)
       return get.str.two_integer_or_nils_by_onig_regex_match(str, regex_str) ~= nil
+    end,
+    bool_by_matches_part_insenstive_onig = function(str, regex_str)
+      return get.str.two_integer_or_nils_by_onig_regex_match(str, regex_str,  nil,  "i") ~= nil
     end,
     bool_by_not_matches_whole_eutf8 = function(str, regex_str)
       return not transf.str.bool_by_matches_whole_eutf8(str, regex_str)

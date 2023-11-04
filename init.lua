@@ -113,7 +113,7 @@ local keymap = {
   },
   ["7"] = {
     explanation = "Switch ·to a different mullvad server",
-    fn = act["nil"].choose_item_and_set_active_mullvad_relay_identifier
+    fn = act["nil"].choose_item_and_set_active_relay_identifier
   },
   ["8"] = {
     explanation = "Choose a email in your inbox and action on it",

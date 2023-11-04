@@ -431,6 +431,7 @@ thing_name_hierarchy = {
                     query_mapping = "leaf",
                     query_str = "leaf",
                     fs_tag_kv = "leaf",
+                    cronspec_str = "leaf",
                     bracketed_ipv6 = "leaf",
                     ip_host = "leaf",
                     host = "leaf",
@@ -698,7 +699,8 @@ thing_name_hierarchy = {
                 },
                 url_or_local_path = "leaf"
               },
-              iban = {},
+              iban = "leaf",
+              shell_shebang = "leaf",
             },
           }
         }

@@ -19,7 +19,7 @@ is = {
       return is.str.not_starting_with_whitespace_str(str) and is.str.not_ending_with_whitespace_str(str)
     end,
     ascii_str = function(str)
-      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.ascii)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.ascii_char)
     end,
     line = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "[\n\r]")
@@ -68,10 +68,10 @@ is = {
       return get.str.bool_by_startswith(str, ".")
     end,
      input_spec_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.rough_input_spec_str) -- we're calling onig on a str which we are not sure is ascii. I'm not sure how problematic this is, since I've forgotten whether onig just doesn't implement any specific behavior for non-ascii chars, or if actually sees them as the ascii chars the utf8 corresponds to. Either way, worst comes the worst it'd result in a few false positives, which is fine.
+      return get.str.bool_by_matches_whole_onig(str, r.g.input_spec_str) -- we're calling onig on a str which we are not sure is ascii. I'm not sure how problematic this is, since I've forgotten whether onig just doesn't implement any specific behavior for non-ascii chars, or if actually sees them as the ascii chars the utf8 corresponds to. Either way, worst comes the worst it'd result in a few false positives, which is fine.
     end,
     input_spec_series_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, " *(?:" .. r.g.rough_input_spec_str .. ")(?: *\\n *(?:" .. r.g.rough_input_spec_str .. "))* *")
+      return get.str.bool_by_matches_whole_onig(str, " *(?:" .. r.g.input_spec_str .. ")(?: *\\n *(?:" .. r.g.input_spec_str .. "))* *")
     end
     
     
@@ -251,7 +251,7 @@ is = {
 
   ascii_str = {
     printable_ascii_str = function(str)
-      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
+      return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, r.g.printable_ascii_char)
     end,
     ascii_char = function(str)
       return #str == 1
@@ -274,6 +274,9 @@ is = {
   printable_ascii_str = {
     printable_ascii_line = function(str)
       return get.str.bool_by_not_matches_part_onig_w_regex_character_class_innards(str, "\r\n")
+    end,
+    printable_ascii_char = function(str)
+      return #str == 1
     end,
     printable_ascii_multiline_str = function(str)
       return not is.printable_ascii_str.printable_ascii_line(str)
@@ -316,13 +319,16 @@ is = {
       local cleaned_iban = transf.iban.cleaned_iban(str)
       return #cleaned_iban <= 34 and is.printable_ascii_str.alphanum(cleaned_iban)
     end,
+    shell_shebang = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.shell_shebang)
+    end,
   },
   printable_ascii_no_nonspace_whitespace_str = {
     fnname = transf["nil"]["true"],
     single_attachment_str = function(str)
       return 
         get.str.bool_by_startswith(str, "#") 
-        and get.str.bool_by_matches_part_onig(str, "^#" .. r.g.id.media_type .. " ")
+        and get.str.bool_by_matches_part_onig(str, "^#" .. r.g.media_type .. " ")
     end,
     printable_ascii_not_whitespace_str = function(str)
       return get.str.bool_by_not_matches_part_eutf8(str, "%s")
@@ -421,7 +427,7 @@ is = {
   },
   urlcharset_str = {
     cronspec_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.cronspec)
+      return get.str.bool_by_matches_whole_onig(str, r.g.cronspec_str)
     end,
     fs_tag_kv = function(str)
       return get.str.bool_by_matches_whole_onig(str, "[a-z0-9]+-[a-z0-9,]+")
@@ -462,13 +468,13 @@ is = {
       return get.str.bool_by_matches_whole_onig(str, r.g.fs_tag_str)
     end,
     media_type = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.media_type)
+      return get.str.bool_by_matches_whole_onig(str, r.g.media_type)
     end,
     base64_gen_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.b.b64.gen)
+      return get.str.bool_by_matches_whole_onig(str, r.g.base64_gen_str)
     end,
     base64_url_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.b.b64.url)
+      return get.str.bool_by_matches_whole_onig(str, r.g.base64_url_str)
     end,
     base64_str = function(str)
       return is.printable_ascii_not_whitespace_str.base64_gen_str(str) or is.printable_ascii_not_whitespace_str.base64_url_str(str)
@@ -480,10 +486,10 @@ is = {
         get.str.bool_by_contains_w_str(str, ".")
     end,
     dice_notation = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.syntax.dice)
+      return get.str.bool_by_matches_whole_onig(str, r.g.dice_notation)
     end,
     doi = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.doi)
+      return get.str.bool_by_matches_whole_onig(str, r.g.doi)
     end,
     lower_alphanum_underscore_comma = function(str)
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "a-z0-9_,")
@@ -492,7 +498,7 @@ is = {
       return get.str.bool_by_not_matches_part_eutf8(str, "[^%w%-_:\\+.]")
     end,
     semver_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.version.semver)
+      return get.str.bool_by_matches_whole_onig(str, r.g.semver_str)
     end,
     indicated_isbn = function(str)
       return get.str.bool_by_startswith(str, "isbn:") -- gonna trust that if it's printable_ascii_not_whitespace_str and starts with isbn: it's an isbn, similarly for the following
@@ -622,10 +628,10 @@ is = {
       )
     end,
     domain_name = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.domain_name)
+      return get.str.bool_by_matches_whole_onig(str, r.g.domain_name)
     end,
     ipv4_address = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.ipv4)
+      return get.str.bool_by_matches_whole_onig(str, r.g.ipv4_address)
     end,
   },
   domain_name = {
@@ -722,7 +728,7 @@ is = {
       return get.str.bool_by_matches_whole_onig_w_regex_character_class_innards(str, "-0-9:")
     end,
     issn_full = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.issn .. "::\\d+::\\d+")
+      return get.str.bool_by_matches_whole_onig(str, r.g.issn .. "::\\d+::\\d+")
     end,
   },
   colon_minus_num = {
@@ -752,22 +758,22 @@ is = {
   },
   alphanum_minus = {
     isbn10 = function(str)
-      return get.str.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.id.isbn10)
+      return get.str.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.isbn10)
     end,
     isbn13 = function(str)
-      return get.str.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.id.isbn13)
+      return get.str.bool_by_matches_whole_onig(transf.alphanum_minus.alphanum_by_remove(str), r.g.isbn13)
     end,
     isbn = function(str)
       return is.alphanum_minus.isbn10(str) or is.alphanum_minus.isbn13(str)
     end,
     issn = function(str) 
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.issn)
+      return get.str.bool_by_matches_whole_onig(str, r.g.issn)
     end,
     uuid = function(str)
-      return get.str.bool_by_matches_whole_onig(transf.str.str_by_all_eutf8_lower(str), r.g.id.uuid)
+      return get.str.bool_by_matches_whole_insensitive_onig(transf.str.str_by_all_eutf8_lower(str), r.g_i.uuid)
     end,
     ipc_socket_id = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.ipc_socket_id)
+      return get.str.bool_by_matches_whole_onig(str, r.g.ipc_socket_id)
     end,
     github_username = function(str)
       return get.str.bool_by_not_startswith(str, "-") and get.str.bool_by_not_endswith(str, "-") and #str <= 39
@@ -808,7 +814,7 @@ is = {
   },
   bcp_47_language_tag = {
     basic_locale = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.basic_locale)
+      return get.str.bool_by_matches_whole_onig(str, r.g.basic_locale)
     end,
   },
   lower_strict_kebap_case = {
@@ -823,7 +829,7 @@ is = {
   },
   mixed_strict_kebap_case = {
     camel_strict_kebap_case = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.case.camel_kebap)
+      return get.str.bool_by_matches_whole_onig(str, r.g.camel_strict_kebap_case)
     end,
   },
   camel_strict_kebap_case = {
@@ -842,7 +848,7 @@ is = {
   },
   lower_alphanum_minus = {
     relay_identifier = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.relay_identifier)
+      return get.str.bool_by_matches_whole_onig(str, r.g.relay_identifier)
     end,
     git_remote_type = function(str)
       return get.arr.bool_by_contains(
@@ -1613,7 +1619,7 @@ is = {
   },
   mixed_strict_snake_case = {
     camel_strict_snake_case = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.case.camel_snake)
+      return get.str.bool_by_matches_whole_onig(str, r.g.camel_strict_snake_case)
     end,
   },
   camel_strict_snake_case = {
@@ -1632,6 +1638,11 @@ is = {
   },
   general_name = {
     thing_name = transf["nil"]["true"]
+  },
+  thing_name = {
+    assc_thing_name = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.assc_thing_name_by_extract_key_value)
+    end,
   },
   alphanum = {
     alpha_str = function(str)
@@ -1656,10 +1667,10 @@ is = {
       return get.str.bool_by_startswith(str, "0d") and is.alphanum.digit_str(str:sub(3))
     end,
     base32_gen_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.gen)
+      return get.str.bool_by_matches_whole_onig(str, r.g.base32_gen_str)
     end,
     base32_crock_str = function(str)
-      return get.str.bool_by_matches_whole_onig(str, r.g.id.b32.crockford)
+      return get.str.bool_by_matches_whole_onig(str, r.g.base32_crock_str)
     end,
     base32_str = function(str)
       return is.printable_ascii_not_whitespace_str.base32_gen_str(str) or is.printable_ascii_not_whitespace_str.base32_crock_str(str)
@@ -1794,7 +1805,7 @@ is = {
   },
   url = {
     scheme_url = function(url)
-      return get.str.bool_by_matches_part_onig(url, r.g.url.scheme)
+      return get.str.bool_by_matches_part_onig(url, "^" .. r.g.url_scheme)
     end,
     path_url = function(url)
       return transf.url.local_absolute_path_or_nil_by_path(url) ~= nil
@@ -3018,7 +3029,7 @@ function get_nested_mt(type1)
     assoc_keytype = "any"
     assoc_valuetype = "any"
   elseif type1_ends_assoc then
-    assoc_keytype, assoc_valuetype = get.string.n_strs_by_extracted_onig(type1, r.g.extract_key_value_assoc)
+    assoc_keytype, assoc_valuetype = get.string.n_strs_by_extracted_onig(type1, r.g.assc_thing_name_by_extract_key_value)
     assoc_valuetype = assoc_valuetype or "any"
   end
 
@@ -3042,7 +3053,7 @@ function get_nested_mt(type1)
           return get.arr.bool_by_all_pass_w_fn(arr, is[type1_noarr][type_b])
         end
       elseif type1_ends_assoc and get.str.bool_by_endswith(type2, "_assoc") then
-        local assoc_keytype_b, assoc_valuetype_b = get.string.n_strs_by_extracted_onig(type2, r.g.extract_key_value_assoc)
+        local assoc_keytype_b, assoc_valuetype_b = get.string.n_strs_by_extracted_onig(type2, r.g.assc_thing_name_by_extract_key_value)
         return function(assoc)
           local retval = get.table.bool_by_all_keys_pass_w_fn(
             assoc,

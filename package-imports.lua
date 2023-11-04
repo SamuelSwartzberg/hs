@@ -25,6 +25,7 @@ toml = require("toml")
 oldutf8 = utf8
 --- @type eutf8
 eutf8 = require 'lua-utf8'
+--- @type onig
 onig = require("rex_onig") -- oniguruma regex engine. Not faster than lua's built in regex engine, but has more features, and can deal with unicode.
 --- @type stringy
 stringy = require("stringy")

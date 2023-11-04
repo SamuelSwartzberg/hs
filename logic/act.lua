@@ -3,7 +3,7 @@
 --- Only take one argument, which is the source.
 --- For actions that take more than one argument, see op.lua, and `op.\<source>.\<action>`.
 act = {
-  mullvad_relay_identifier = {
+  relay_identifier = {
     set_active_mullvad_relay_dentifier = function(id)
       dothis.str.env_bash_eval("mullvad relay set hostname " .. id)
     end,
@@ -1583,8 +1583,8 @@ act = {
         main_qspec
       )
     end,
-    choose_item_and_set_active_mullvad_relay_identifier = function()
-      act.mullvad_relay_identifier_arr.choose_item_and_set_active(
+    choose_item_and_set_active_relay_identifier = function()
+      act.relay_identifier_arr.choose_item_and_set_active(
         transf["nil"].relay_identifier_arr()
       )
     end,
@@ -1949,11 +1949,11 @@ act = {
     end,
 
   },
-  mullvad_relay_identifier_arr = {
+  relay_identifier_arr = {
     choose_item_and_set_active = function(arr)
       dothis.arr.choose_item(
         arr,
-        act.mullvad_relay_identifier.set_active_mullvad_relay_dentifier
+        act.relay_identifier.set_active_mullvad_relay_dentifier
       )
     end,
   },

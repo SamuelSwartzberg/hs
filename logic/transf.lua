@@ -744,7 +744,7 @@ transf = {
   },
   ascii_str = {
     printable_ascii_by_remove = function(str)
-      return get.str.str_by_removed_onig_inverted_w_regex_character_class_innards(str, r.g.char_range.printable_ascii)
+      return get.str.str_by_removed_onig_inverted_w_regex_character_class_innards(str, r.g.printable_ascii_char)
     end,
   },
   path = {
@@ -790,7 +790,7 @@ transf = {
       elseif get.str.bool_by_not_contains_w_ascii_str(leaf, ".") then
         without_extension = leaf
       else -- in case of multiple dots, everything after the last dot is considered the extension
-        without_extension, extension = get.str.n_strs_by_extracted_eutf8(leaf, transf.str.str_by_whole_regex(r.lua.without_extension_and_extension))
+        without_extension, extension = get.str.n_strs_by_extracted_eutf8(leaf, transf.str.str_by_whole_regex("(.+)%.([^%.]+)"))
       end
       dothis.arr.push(path_components, without_extension)
       dothis.arr.push(path_components, extension)
@@ -2646,7 +2646,7 @@ transf = {
   },
   semver_str = {
     semver_component_specifier = function(str)
-      local major, minor, patch, prerelease, build = get.str.n_strs_by_extracted_onig(str, r.g.version.semver)
+      local major, minor, patch, prerelease, build = get.str.n_strs_by_extracted_onig(str, r.g.semver_str)
       return {
         major = transf.nonindicated_number_str.number_by_base_10(major),
         minor = transf.nonindicated_number_str.number_by_base_10(minor),
@@ -8792,7 +8792,7 @@ transf = {
     relay_identifier_arr = function()
       return 
         transf.table.arr_by_nested_value_primitive_and_arrlike_is_leaf(
-          transf.multiline_str.iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_mullvad_relay_identifier_str_arr_value_assoc_value_assoc(
+          transf.multiline_str.iso_3366_1_alpha_2_country_code_key_mullvad_city_code_key_relay_identifier_str_arr_value_assoc_value_assoc(
             transf["nil"].multiline_str_by_mullvad_relay_list()
           )
       )
@@ -9475,7 +9475,7 @@ transf = {
           input_spec.key = parts[1]
         end
       else
-        local mode_char, x, y, optional_relative_specifier = get.str.n_strs_by_extracted_onig(str, "^(.)"..r.g.syntax.point.."( %[a-zA-Z]+)?$")
+        local mode_char, x, y, optional_relative_specifier = get.str.n_strs_by_extracted_onig(str, "^(.)(-?\\d+)..*?(-?\\d+)( %[a-zA-Z]+)?$")
         if not mode_char or not x or not y then
           error("Tried to parse str series_specifier, but it didn't match any known format:\n\n" .. str)
         end

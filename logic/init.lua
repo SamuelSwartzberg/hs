@@ -2,6 +2,7 @@ function rrq(mod)
   require("logic." .. mod)
 end
 
+rrq("r")
 rrq("act")
 rrq("dothis")
 rrq("get")
