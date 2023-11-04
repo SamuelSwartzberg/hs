@@ -817,6 +817,9 @@ is = {
         transf.lower_strict_snake_case.local_absolute_path_by_csl_file(str)
       )
     end,
+    stream_boolean_attribute = function(str)
+      return get.arr.bool_by_contains(ls.stream_boolean_attribute_arr, str)
+    end,
   },
   mixed_strict_kebap_case = {
     camel_strict_kebap_case = function(str)
@@ -1581,7 +1584,7 @@ is = {
       return get.arr.bool_by_contains(ls.backup_type_arr, str)
     end,
     all_namespace = function(str)
-      return get.arr.bool_by_contains(ls.all_namespace, str)
+      return get.arr.bool_by_contains(ls.all_namespace_arr, str)
     end,
     dynamic_structure_name = function(str)
       return get.arr.bool_by_contains(ls.dynamic_structure_name_arr, str)
@@ -1596,8 +1599,14 @@ is = {
       return get.arr.bool_by_contains(ls.pandoc_basic_format_arr, str)
     end,
     search_engine_id = function(str)
-      return get.arr.bool_by_contains(ls.search_engine_id, str)
-    end
+      return get.arr.bool_by_contains(ls.search_engine_id_arr, str)
+    end,
+    creation_specifier_type = function(str)
+      return get.arr.bool_by_contains(ls.creation_specifier_type_arr, str)
+    end,
+    bin_specifier_name = function(str)
+      return get.arr.bool_by_contains(ls.bin_specifier_name_arr, str)
+    end,
   },
   all_namespace = {
 
@@ -1760,13 +1769,13 @@ is = {
       return get.arr.bool_by_contains(ls.llm_chat_role, str)
     end,
     stream_state = function(str)
-      return get.arr.bool_by_contains(ls.stream_state, str)
+      return get.arr.bool_by_contains(ls.stream_state_arr, str)
     end,
     flag_profile_name = function(str)
-      return get.arr.bool_by_contains(ls.flag_profile_name, str)
+      return get.arr.bool_by_contains(ls.flag_profile_name_arr, str)
     end,
     markdown_extension_set_name = function(str)
-      return get.arr.bool_by_contains(ls.markdown_extension_set_name, str)
+      return get.arr.bool_by_contains(ls.markdown_extension_set_name_arr, str)
     end,
     booru_rating = function(str)
       return get.arr.bool_by_contains(ls.booru_rating_arr, str)
@@ -2634,6 +2643,9 @@ is = {
     composite_tag_specifier = function(t)
       return t.parts
     end,
+    bin_specifier = function(t)
+      return t.vt ~= nil and t.vf ~= nil
+    end,
     
   },
   plist_single_dk_spec = {
@@ -2700,7 +2712,7 @@ is = {
     end,
   },
   retriever_specifier = {
-    partial_retriever_specifer = function(t)
+    partial_retriever_specifier = function(t)
       return t.target == nil
     end,
   },

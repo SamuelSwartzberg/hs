@@ -3341,10 +3341,10 @@ get = {
         get.mpv_ipc_socket_id.str(id, key)
       )
     end,
-    line_by_emoji_for_key = function(id, key)
+    line_by_emoji_for_stream_boolean_attribute = function(id, key)
       local res = get.mpv_ipc_socket_id.str(id, key)
-      if res then return tblmap.stream_attribute.str_by_true_emoji[key]
-      else return tblmap.stream_attribute.str_by_false_emoji[key] end
+      if res then return tblmap.stream_boolean_attribute.line_by_true_emoji[key]
+      else return tblmap.stream_boolean_attribute.line_by_false_emoji[key] end
     end,
   },
   created_item_specifier_arr = {

@@ -556,6 +556,7 @@ thing_name_hierarchy = {
                                   upper_strict_kebap_case = "leaf",
                                   lower_strict_kebap_case = {
                                     csl_style = "leaf",
+                                    stream_boolean_attribute = "leaf",
                                   },
                                   mixed_strict_kebap_case = {
                                     camel_strict_kebap_case = {
@@ -588,7 +589,9 @@ thing_name_hierarchy = {
                                     api_name = "leaf",
                                     secondary_api_name = "leaf",
                                     pandoc_basic_format = "leaf",
-                                    search_engine_id = "leaf"
+                                    search_engine_id = "leaf",
+                                    creation_specifier_type = "leaf",
+                                    bin_specifier_name = "leaf",
                                   },
                                   mixed_strict_snake_case = {
                                     camel_strict_snake_case = {
@@ -891,6 +894,7 @@ thing_name_hierarchy = {
         danbooru_tag_implication_record = "leaf",
         danbooru_hydrus_inference_specifier = "leaf",
         composite_tag_specifier = "leaf",
+        bin_specifier = "leaf",
       }
     },
     primitive = {

@@ -92,6 +92,14 @@ ls = {
   lua_escapable_ascii_char_arr = {
     "\a", "\b", "\f", "\n", "\r", "\t", "\v", "\\", "\"", "\'",
   },
+  stream_boolean_attribute_arr = {
+    "loop",
+    "shuffle",
+    "video",
+    "pause",
+    "loop-playlist",
+    "no-video",
+  },
   mouse_button_char_arr = {"l", "m", "r"},
   lua_regex_metacharacters = {"%", "^", "$", "(", ")", ".", "[", "]", "*", "+", "-", "?"},
   general_regex_metacharacters =  {"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"},
@@ -729,7 +737,7 @@ ls = {
     "negative_prompt", -- what the creator was told not to create
     "proximate_source_description", -- description of the fobject on the proximate source
   },
-  all_namespace = {
+  all_namespace_arr = {
 
     -- global tag namespace
 
@@ -1158,7 +1166,7 @@ ls = {
     "public",
     "unlisted"
   },
-  search_engine_id = {
+  search_engine_id_arr = {
     "wiktionary",
     "wikipedia",
     "jisho",
@@ -1371,19 +1379,22 @@ ls = {
     encoded = {"&", ";"},
     decoded = {"\"", "'", "<", ">", "&"}
   },
-  creation_specifier_type = {
+  creation_specifier_type_arr = {
     "watcher",
     "hotkey",
     "stream"
   },
-  stream_state = {
+  stream_state_arr = {
     "booting",
     "active",
     "ended"
   },
-  flag_profile_name = {
+  flag_profile_name_arr = {
     "foreground",
     "background"
+  },
+  bin_specifier_name_arr = {
+    "inf_no"
   },
   dcmp_names = {"year", "month", "day", "hour", "min", "sec"},
   dcmp_names_long = {"year", "month", "day", "hour", "minute", "second"},
@@ -1667,7 +1678,7 @@ ls = {
   jxa_tabbable_name = {
     "Google Chrome",
   },
-  markdown_extension_set_name = {
+  markdown_extension_set_name_arr = {
     "basic",
     "featureful",
     "navigable",

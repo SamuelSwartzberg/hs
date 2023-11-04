@@ -440,12 +440,12 @@ tblmap = {
       }
     }
   },
-  stream_attribute = {
-    str_by_true_emoji = {
+  stream_boolean_attribute = {
+    line_by_true_emoji = {
       loop = "🔂",
       shuffle = "🔀",
     },
-    str_by_false_emoji =  {
+    line_by_false_emoji =  {
       video = "🙈",
       pause = "▶️",
     }
@@ -497,8 +497,8 @@ tblmap = {
         thing_name = "assoc_entry_str",
         precedence = 999
       },
-      date = {
-        thing_name = "summary",
+      full_dcmp_spec = {
+        thing_name = "urlcharset_str_by_detailed_summary",
         precedence = 999
       },
       contact_table = {
@@ -633,7 +633,7 @@ tblmap = {
     }
   },
   flag_profile_name ={
-    lower_strict_kebap_case_key_bool_value_assoc = {
+    stream_boolean_attribute_key_bool_value_assoc = {
       foreground = {
         ["loop-playlist"] = false,
         shuffle = false,

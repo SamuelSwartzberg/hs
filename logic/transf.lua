@@ -928,7 +928,7 @@ transf = {
 
       for _, path_component in transf.arr.pos_int_vt_stateless_iter(path_components) do
         local current_namespace
-        if get.arr.bool_by_contains(ls.all_namespace, path_component) then -- all subdirs until we find the next namespace are assumed to be metadata in that namespace
+        if get.arr.bool_by_contains(ls.all_namespace_arr, path_component) then -- all subdirs until we find the next namespace are assumed to be metadata in that namespace
           current_namespace = path_component
         elseif current_namespace then
           if get.arr.bool_by_contains(ls[current_namespace], path_component) then
@@ -3371,6 +3371,11 @@ transf = {
     end,
     timestamp_ms = function(full_dcmp_spec)
       return transf.full_dcmp_spec.timestamp_s(full_dcmp_spec) * 1000
+    end,
+    urlcharset_str_by_detailed_summary = function(full_dcmp_spec)
+      return transf.timestamp_s.urlcharset_str_by_detailed_summary(
+        transf.full_dcmp_spec.timestamp_s(full_dcmp_spec)
+      )
     end,
     full_rfc3339like_dt = function(full_dcmp_spec)
       return transf.timestamp_s.full_rfc3339like_dt(
@@ -9073,7 +9078,7 @@ transf = {
       return get.str_or_number_arr.str_by_joined(
         get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
           {"pause", "loop", "shuffle", "video"},
-          get.fn.fn_by_1st_n_bound(get.mpv_ipc_socket_id.line_by_emoji_for_key, mpv_ipc_socket_id)
+          get.fn.fn_by_1st_n_bound(get.mpv_ipc_socket_id.line_by_emoji_for_stream_boolean_attribute, mpv_ipc_socket_id)
         ),
         ""
       )
@@ -9095,7 +9100,7 @@ transf = {
   stream_creation_specifier = {
     lower_strict_kebap_case_key_bool_value_assoc_by_flags_with_default = function(stream_creation_specifier)
       return transf.two_tables.table_by_take_new(
-        tblmap.flag_profile_name.lower_strict_kebap_case_key_bool_value_assoc[stream_creation_specifier.flag_profile_name or "foreground"],
+        tblmap.flag_profile_name.stream_boolean_attribute_key_bool_value_assoc[stream_creation_specifier.flag_profile_name or "foreground"],
         stream_creation_specifier.flags 
       )
     end,

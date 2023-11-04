@@ -7,7 +7,6 @@ refac:
   - many names don't yet corrrespond to the new schema
   - replace package methods with my own
   - fix logging dirs, etc, to now use json
-  - update tblmap with a few changes from other files
   - hydrus
     - now that some namespaces don't exist, we need a cleverer way to tell gpt4 what to extract from the filename in case of existing files, and also apply this to youtube import
     - split notes from others
