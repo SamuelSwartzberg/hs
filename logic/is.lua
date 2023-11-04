@@ -198,10 +198,10 @@ is = {
     country_identifier_str = transf["nil"]["true"],
     language_identifier_str = transf["nil"]["true"],
     multirecord_str = function(str)
-      return get.str.bool_by_contains_w_str(str, consts.unique_record_separator)
+      return get.str.bool_by_contains_w_str(str, consts.printable_ascii_not_whitespace_str_by_unique_record_separator)
     end,
     record_str = function(str)
-      return get.str.bool_by_contains_w_str(str, consts.unique_field_separator)
+      return get.str.bool_by_contains_w_str(str, consts.printable_ascii_not_whitespace_str_by_unique_field_separator)
     end,
   },
   noempty_noindent_line = {

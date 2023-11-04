@@ -1,11 +1,6 @@
 
 
-consts = {
-  unique_record_separator  = "__ENDOFRECORD5579__",
-  unique_field_separator = "Y:z:Y",
-  int_by_large = 2^51, -- a bit smaller than the maximum 2^53 to allow for some wiggle room
-  global_namespace_taking_key_name_by_default = "global",
-}
+
 
 ls = {
   lua_escapable_ascii_char_arr = {

@@ -5200,7 +5200,7 @@ transf = {
     record_str_arr = function(str)
       return get.str.not_empty_str_arr_by_split_w_str(
         str,
-        consts.unique_record_separator
+        consts.printable_ascii_not_whitespace_str_by_unique_record_separator
       )
     end,
   },
