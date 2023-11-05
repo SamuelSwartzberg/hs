@@ -298,14 +298,18 @@ thing_name_hierarchy = {
       },
       ascii_str = {
         ascii_char = {
-          base_letter = "leaf",
-          rfc3339like_dt_separator = "leaf",
           lua_escapable_ascii_char = "leaf",
-          mouse_button_char = "leaf",
         },
         printable_ascii_str = {
           printable_ascii_multiline_str = {
             email_header_block = "leaf",
+          },
+          printable_ascii_char = {
+            base_letter = "leaf",
+            rfc3339like_dt_separator = "leaf",
+            mouse_button_char = "leaf",
+            lua_regex_metacharacter = "leaf",
+            general_regex_metacharacter = "leaf",
           },
           printable_ascii_line = {
             printable_ascii_no_vertical_space_str = {
@@ -585,7 +589,10 @@ thing_name_hierarchy = {
                                     billing_unit = "leaf",
                                     markdown_extension_name = "leaf",
                                     backup_type = "leaf",
-                                    all_namespace = "leaf",
+                                    root_hydrus_tag_namespace = {
+                                      global_value_taking_root_hydrus_tag_namespace = "leaf",
+                                    },
+                                    root_hydrus_note_namespace = "leaf",
                                     dynamic_structure_name = "leaf",
                                     api_name = "leaf",
                                     secondary_api_name = "leaf",
@@ -625,7 +632,9 @@ thing_name_hierarchy = {
                                   flag_profile_name = "leaf",
                                   markdown_extension_set_name = "leaf",
                                   booru_rating = "leaf",
-                                  danbooru_category_name = "leaf",
+                                  external_tag_namespace = {
+                                    danbooru_category_name = "leaf",
+                                  },
                                   type_name = "leaf",
                                 },
                                 iso_3366_1_alpha_2_country_code = "leaf",

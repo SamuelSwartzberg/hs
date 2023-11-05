@@ -102,7 +102,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
           }
         }
         if tblmap.api_name.bool_by_needs_scopes[specifier.api_name] then
-          open_spec.params.scope = tblmap.api_name.str_by_scopes[specifier.api_name]
+          open_spec.params.scope = tblmap.api_name.str_by_scopes[specifiper.api_name]
         end
         if tblmap.api_name.str_key_str_value_assoc_by_additional_auth_params[specifier.api_name] then
           open_spec.params = transf.two_table_or_nils.table_by_take_new(open_spec.params, tblmap.api_name.str_key_str_value_assoc_by_additional_auth_params[specifier.api_name])

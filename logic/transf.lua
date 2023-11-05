@@ -891,7 +891,7 @@ transf = {
       else -- extract tags from non-standartized filename (uses gpt)
         local filename = transf.path.leaflike_by_filename(path)
         -- 1. data for series
-        local series_pairs = get.all_namespace_arr.two_lines__arr_arr(
+        local series_pairs = get.root_hydrus_tag_namespace_arr.two_lines__arr_arr(
           ls.series_namespace,
           filename,
           {
@@ -928,7 +928,7 @@ transf = {
 
       for _, path_component in transf.arr.pos_int_vt_stateless_iter(path_components) do
         local current_namespace
-        if get.arr.bool_by_contains(ls.all_namespace_arr, path_component) then -- all subdirs until we find the next namespace are assumed to be metadata in that namespace
+        if get.arr.bool_by_contains(ls.root_hydrus_tag_namespace_arr, path_component) then -- all subdirs until we find the next namespace are assumed to be metadata in that namespace
           current_namespace = path_component
         elseif current_namespace then
           if get.arr.bool_by_contains(ls[current_namespace], path_component) then
@@ -3479,6 +3479,7 @@ transf = {
     end
 
   },
+
   uuid = {
     raw_contact_or_nil = function(uuid)
       return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "khard show --format=yaml uid:" .. uuid)
@@ -4023,7 +4024,7 @@ transf = {
       )
     end,
     str_by_title_case_policy = function(word)
-      if get.arr.bool_by_contains(ls.small_words, word) then
+      if get.arr.bool_by_contains(ls.str_arr_by_small_words, word) then
         return word
       elseif eutf8.find(word, "%u") then -- words with uppercase letters are presumed to already be correctly title cased (acronyms, brands, the like)
         return word
@@ -4174,14 +4175,14 @@ transf = {
     str_by_escaped_lua_regex = function(str)
       return get.str.str_by_prepended_all_w_ascii_str_arr(
         str,
-        ls.lua_regex_metacharacters,
+        ls.lua_regex_metacharacter_arr,
         "%"
       )
     end,
     str_by_escaped_general_regex = function(str)
       return get.str.str_by_prepended_all_w_ascii_str_arr(
         str,
-        ls.general_regex_metacharacters,
+        ls.general_regex_metacharacter_arr,
         "%"
       )
     end,
@@ -4301,6 +4302,14 @@ transf = {
       return transf.str.str_by_percent_decoded_also_plus(
         get.str.str_and_int_by_replaced_eutf8_w_regex_str(str, "%+", "%%2B") -- encode plus sign as %2B, so that it then gets decoded as a plus sign
       )
+    end,
+    str_or_nil_by_percent_decoded_as_url_response = function(str)
+      local decoded = transf.str.str_by_percent_decoded_no_plus(str)
+      if is.str.url(decoded) then
+        return transf.url.str_or_nil_by_default_negotiation_contents_safer(decoded)
+      else
+        return nil
+      end
     end,
     unicode_prop_table_arr = function(str)
       return get.fn.rt_or_nil_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.str.str_by_single_quoted_escaped(str))
@@ -4613,11 +4622,11 @@ transf = {
     str_by_ensure_global_namespace_start = function(str)
       if get.str.bool_by_startswith_any_w_str_arr(
         str,
-        ls.global_or_external_namespace_arr
+        ls_by_union.global_or_external_tag_namespace_arr
       ) then
         return str
       else
-        return consts.global_namespace_taking_key_name_by_default .. ":" .. str
+        return consts.global_value_taking_root_hydrus_tag_namespace_by_default .. ":" .. str
       end
     end,
     composite_tag_specifier_or_nil = function(str)
@@ -5123,7 +5132,7 @@ transf = {
   },
   hydrus_tag_hierarchy = {
     hydrus_rel_spec = function(hierarchy)
-      local basic_rel_spec = get.hydrus_tag_hierarchy_node.hydrus_rel_spec("global", hierarchy, nil, nil, ls.global_namespace_taking_key_name_arr)
+      local basic_rel_spec = get.hydrus_tag_hierarchy_node.hydrus_rel_spec("global", hierarchy, nil, nil, ls.global_value_taking_root_hydrus_tag_namespace_arr)
       dothis.arr.each(ls.two_strs__arr_arr_by_siblings, function(sib)
         dothis.two_strs__arr_arr.push_ensure_global_namespace(basic_rel_spec.sib, sib)
       end)
@@ -6405,7 +6414,7 @@ transf = {
     two_two_strs__arr_arrs_by_sep_note_and_tag = function(arr)
       return get.arr_arr.two_arr_arrs_by_filtered_nonfiltered_first_element_w_arr(
         arr,
-        ls.note_key
+        ls.root_hydrus_note_namespace_arr
       )
     end,
   },

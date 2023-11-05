@@ -857,14 +857,19 @@ act = {
   },
   absolute_path_and_fnname = {
     url_by_serve = function(path, fnname)
-      act.str.env_bash_eval_async(
-        "luaserve-server" ..
-        transf.str.str_by_single_quoted_escaped(path) ..
-        transf.str.str_by_single_quoted_escaped(fnname) ..
-        transf.str.str_by_single_quoted_escaped(
-          transf["nil"].digit_str_by_next_free_port()
+      local cache = {}
+      if not cache[path] then
+        act.str.env_bash_eval_async(
+          "luaserve-server" ..
+          transf.str.str_by_single_quoted_escaped(path) ..
+          transf.str.str_by_single_quoted_escaped(fnname) ..
+          transf.str.str_by_single_quoted_escaped(
+            consts.digit_str_by_lua_server_port
+          )
         )
-      )
+        cache[path] = true
+      end
+      return "https://127.0.0.1:" .. consts.digit_str_by_lua_server_port .. path
     end,
   },
   absolute_path = {
@@ -1543,6 +1548,12 @@ act = {
     end,
   },
   ["nil"] = {
+    url_by_launch_decoding_fetching_server = function()
+      return act.absolute_path_and_fnname.url_by_serve(
+        "/decode_and_fetch",
+        "transf.str.str_or_nil_by_percent_decoded_as_url_response"
+      )
+    end,
     ensure_sound_played_on_speakers = function()
       local device = hs.audiodevice.findOutputByName("Built-in Output")
       act.audiodevice.ensure_sound_will_be_played(device)

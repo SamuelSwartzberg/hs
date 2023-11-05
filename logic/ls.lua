@@ -1,7 +1,4 @@
 
-
-
-
 ls = {
   lua_escapable_ascii_char_arr = {
     "\a", "\b", "\f", "\n", "\r", "\t", "\v", "\\", "\"", "\'",
@@ -15,25 +12,23 @@ ls = {
     "no-video",
   },
   mouse_button_char_arr = {"l", "m", "r"},
-  lua_regex_metacharacters = {"%", "^", "$", "(", ")", ".", "[", "]", "*", "+", "-", "?"},
-  general_regex_metacharacters =  {"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"},
-  small_words = {
+  lua_regex_metacharacter_arr = {"%", "^", "$", "(", ")", ".", "[", "]", "*", "+", "-", "?"},
+  general_regex_metacharacter_arr =  {"\\", "^", "$", ".", "[", "]", "*", "+", "?", "(", ")", "{", "}", "|", "-"},
+  str_arr_by_small_words = {
     "a", "an", "and", "as", "at", "but", "by", "en", "for", "if", "in", "of", "on", "or", "the", "to", "v", "v.", "via", "vs", "vs."
   },
-  booru_hosts = {
+  host_arr_by_booru_hosts = {
     "gelbooru.com",
     "danbooru.donmai.us",
     "yande.re",
   },
-  tree_node_keys = {"pos", "children", "parent", "text", "tag", "attrs", "cdata"},
-  project_type = {
+  project_type_arr = {
     "latex",
     "omegat",
     "npm",
     "cargo",
     "sass"
   },
-  apis_that_dont_support_authorization_code_fetch = {"google"},
   backup_type_arr = {
     "facebook",
     "telegram",
@@ -128,6 +123,18 @@ ls = {
     "copyright",
     "character",
     "meta",
+  },
+  external_tag_namespace_arr = {
+    "general",
+    "artist",
+    "copyright",
+    "character",
+    "meta",
+    "rating", -- rating is considered a distinct type of thing by danbooru, but not after being parsed by hydrus
+    "crgroup",
+    "ehtextlanguage",
+    "proxusr",
+    "proxsrc",
   },
   danbooru_hydrus_inference_specifier_arr = {
     
@@ -629,7 +636,24 @@ ls = {
       result = function (d)
         return d.create({ parts = { 'thing:thing:agentlike', d.my(d.prts[2]), d.my(d.prts[1])}})
       end
-    }, 
+    }, {
+      danbooru_tags = {
+        prts = {
+          {
+            "english",
+          },
+        },
+        combine = "ehtextlanguage:{{[ d.prts[1] ]}}"
+      },
+      result = function (d)
+        return d.create({
+          parts = {
+            d.my(d.prts[1]),
+            "text"
+          }
+        })
+      end
+    },
   },
   two_strs__arr_arr_by_siblings = {
     {"foreground:blur", "general:blurry foreground"},
@@ -644,14 +668,17 @@ ls = {
     {"{thing:bodypartlike:oral parts + essive + thing:bodypartlike:vulva}", "general:cunnilingus"},
     {"{thing:agentlike + thing:activity:awe + bodypartlike:flat breasts}", "flat awe"},
     {"{thing:agentlike + thing:activity:envy + bodypartlike:flat breasts}", "flat envy"},
-    {"general:cum in uterus", "general:internal cumshot"}
+    {"general:cum in uterus", "general:internal cumshot"},
+    {"thing:language:translation", "ehtextlanguage:translated"}
   },
-  note_key = {
-    "positive_prompt", -- what the creator was told to create
-    "negative_prompt", -- what the creator was told not to create
-    "proximate_source_description", -- description of the fobject on the proximate source
+  root_hydrus_note_namespace_arr = {
+    "prompt:positive", -- what the creator was told to create
+    "prompt:negative", -- what the creator was told not to create
+    "proximate_source_description:any", -- description of the fobject on the proximate source
+    "proximate_source_description:original",
+    "proximate_source_description:tl:en"
   },
-  all_namespace_arr = {
+  root_hydrus_tag_namespace_arr = {
 
     -- global tag namespace
 
@@ -674,23 +701,22 @@ ls = {
     -- creation tag namespaces
     
     "creation", -- A global namespace item that describes something about the creation of the object. This could be a creator, an object used in its creation, a location, or the like.
-    "creation_title", -- the title as chosen by the creator
+    "creation_title", -- title item as chosen by the creator. A title item starts with original:,  tl:<language>, or any:, to indicate language and origin.
 
     -- proximate source tag namespaces
 
     "proximate_source", -- A global namespace item which describes something about how I encountered the object. This could be the uploader, the website, the subreddit, etc.
-    "proximate_source_title", -- the title as chosen by the proximate source, most often the uploader
+    "proximate_source_title", -- title item as chosen by the proximate source.
 
     -- acquisition tag namespaces - how did I acquire the object? This is not the same as sharing, as I may have acquired the object in a way that doesn't involve sharing, e.g. by creating it myself.
 
     "acquisition", -- A global namespace item which describes something about how, when, where, in what context etc. I acquired the object.
-    "acquisition_title", -- the title during acqusition. I'm not sure if this is ever different from creation_title or proximate_source_title.
-    "acquisition_context", -- the context of my life this object was created or encountered in. Can be general, e.g. edu, work, leisure, etc., or more specific, e.g. freelance translation. The more specific ones should be tag children of the more general ones. 
+    "acquisition_title", -- title item as chosen by the acquisition source.
 
     -- use tag namespaces - why did I keep the object? What do I use it for?
 
     "use", -- A global namespace item which describes something about why I kept the object, or how I'd like to use it in the future.
-    "use_title", -- the title during use. For example, a funny name I give the object.
+    "use_title", -- the title item during use. For example, a funny name I give the object.
     
     -- series tag namespaces - where within some general series does this object fit?
 
@@ -714,7 +740,7 @@ ls = {
     "under_management", -- If this namespace contains a value, this means that we're managing the object for another person or organization, which is what this namespace will contain.
 
   },
-  global_namespace_taking_key_name_arr = {
+  global_value_taking_root_hydrus_tag_namespace_arr = {
     "thing",
     "substance",
     "substance_part",
@@ -730,13 +756,6 @@ ls = {
     "proximate_source",
     "acquisition",
     "use",
-  },
-  external_namespace_arr = {
-    "general",
-    "series",
-    "copyright",
-    "character",
-    "meta"
   },
   composition = {
     "visual composition",
@@ -1663,8 +1682,8 @@ ls = {
 }
 
 ls_by_union = {
-  global_or_external_namespace_arr = transf.two_arrs.arr_by_appended(
-    ls.global_namespace_taking_key_name_arr,
-    ls.external_namespace_arr
+  global_or_external_tag_namespace_arr = transf.two_arrs.arr_by_appended(
+    ls.global_value_taking_root_hydrus_tag_namespace_arr,
+    ls.external_tag_namespace_arr
   )
 }

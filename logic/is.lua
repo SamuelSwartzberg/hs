@@ -258,18 +258,11 @@ is = {
     end,
   },
   ascii_char = {
-    base_letter = function(str)
-      return get.arr.bool_by_contains(ls.base_letter_arr, str)
-    end,
-    rfc3339like_dt_separator = function(str)
-      return get.arr.bool_by_contains(ls.rfc3339like_dt_separator_arr, str)
-    end,
+    
     lua_escapable_ascii_char = function(str)
       return get.arr.bool_by_contains(ls.lua_escapable_ascii_char_arr, str)
     end,
-    mouse_button_char = function(str)
-      return get.arr.bool_by_contains(ls.mouse_button_char_arr, str)
-    end,
+
   },
   printable_ascii_str = {
     printable_ascii_line = function(str)
@@ -280,6 +273,23 @@ is = {
     end,
     printable_ascii_multiline_str = function(str)
       return not is.printable_ascii_str.printable_ascii_line(str)
+    end,
+  },
+  printable_ascii_char = {
+    base_letter = function(str)
+      return get.arr.bool_by_contains(ls.base_letter_arr, str)
+    end,
+    rfc3339like_dt_separator = function(str)
+      return get.arr.bool_by_contains(ls.rfc3339like_dt_separator_arr, str)
+    end,
+    mouse_button_char = function(str)
+      return get.arr.bool_by_contains(ls.mouse_button_char_arr, str)
+    end,
+    lua_regex_metacharacter = function(str)
+      return get.arr.bool_by_contains(ls.lua_regex_metacharacter_arr, str)
+    end,
+    general_regex_metacharacter = function(str)
+      return get.arr.bool_by_contains(ls.general_regex_metacharacter_arr, str)
     end,
   },
   printable_ascii_multiline_str = {
@@ -1589,8 +1599,11 @@ is = {
     backup_type = function(str)
       return get.arr.bool_by_contains(ls.backup_type_arr, str)
     end,
-    all_namespace = function(str)
-      return get.arr.bool_by_contains(ls.all_namespace_arr, str)
+    root_hydrus_tag_namespace = function(str)
+      return get.arr.bool_by_contains(ls.root_hydrus_tag_namespace_arr, str)
+    end,
+    root_hydrus_note_namespace = function(str)
+      return get.arr.bool_by_contains(ls.root_hydrus_note_namespace_arr, str)
     end,
     dynamic_structure_name = function(str)
       return get.arr.bool_by_contains(ls.dynamic_structure_name_arr, str)
@@ -1614,8 +1627,10 @@ is = {
       return get.arr.bool_by_contains(ls.bin_specifier_name_arr, str)
     end,
   },
-  all_namespace = {
-
+  root_hydrus_tag_namespace = {
+    global_value_taking_root_hydrus_tag_namespace = function(str)
+      return get.arr.bool_by_contains(ls.global_value_taking_root_hydrus_tag_namespace_arr, str)
+    end,
   },
   mixed_strict_snake_case = {
     camel_strict_snake_case = function(str)
@@ -1759,7 +1774,7 @@ is = {
       return str == "leaf"
     end,
     project_type = function(str)
-      return get.arr.bool_by_contains(ls.project_type, str)
+      return get.arr.bool_by_contains(ls.project_type_arr, str)
     end,
     vcard_phone_type = function(str)
       return get.arr.bool_by_contains(ls.vcard.vcard_phone_type, str)
@@ -1791,8 +1806,8 @@ is = {
     booru_rating = function(str)
       return get.arr.bool_by_contains(ls.booru_rating_arr, str)
     end,
-    danbooru_category_name = function(str)
-      return get.arr.bool_by_contains(ls.danbooru_category_name_arr, str)
+    external_tag_namespace = function(str)
+      return get.arr.bool_by_contains(ls.external_tag_namespace_arr, str)
     end,
     type_name = function(str)
       return get.arr.bool_by_contains(ls.type_name_arr, str)
@@ -1802,6 +1817,11 @@ is = {
     end,
     
 
+  },
+  external_tag_namespace = {
+    danbooru_category_name = function(str)
+      return get.arr.bool_by_contains(ls.danbooru_category_name_arr, str)
+    end,
   },
   url = {
     scheme_url = function(url)

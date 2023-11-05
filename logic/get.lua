@@ -3896,7 +3896,7 @@ get = {
       end
     end,
   },
-  all_namespace_arr = {
+  root_hydrus_tag_namespace_arr = {
     n_shot_llm_spec = function(arr, str, shots)
       return {
         query = "Extract data for the fields " .. transf.str_or_number_arr.str_by_joined_comma(arr) .. "from the following string, if present. Return the extracted data as a JSON array of json pairs.",
@@ -3907,7 +3907,7 @@ get = {
     two_lines__arr_arr = function(arr, str, shots)
       return transf.json_str.table_or_nil(
         get.n_shot_llm_spec.str_or_nil_by_response(
-          get.all_namespace_arr.n_shot_llm_spec(arr, str, shots),
+          get.root_hydrus_tag_namespace_arr.n_shot_llm_spec(arr, str, shots),
           0
         )
       )

@@ -22,6 +22,8 @@ things:
         _s: general:clothed
     char:
       __is_subnamespace: true
+      virtual identity:
+        user:
       real:
         my family:
           my parents:
@@ -487,6 +489,11 @@ things:
             _p: thing:deviation:mistake
     medium:
       speech:
+      transmedial:
+        __is_subnamespace: true
+        transcription:
+          speech-writing transcription:
+          sign-writing transcription:
       writing:
         __is_subnamespace: true
         _s: general:text
@@ -501,11 +508,15 @@ things:
                 typo:
                   _s: general:typo
         writing system:
-          hiragana:
-          katakana:
-          cjk ideograph:
-            kanji:
+          specific writing system:
+            hiragana:
+            katakana:
+            cjk ideograph:
+              kanji:
       sign:
+    translation:
+      translanguage translation:
+      cislanguage translation:
     genre:
       poetry:
         found poetry:
@@ -527,7 +538,8 @@ things:
         _s:
           creation_ware: meta:screenshot
       digital mockup:
-        smartphone mockup:
+        device mockup:
+          smartphone mockup:
       user interface object:
         user interface component:
           icon:
@@ -538,6 +550,7 @@ things:
             recording indicator:
               _s: general:recording
         user interface:
+          game interface:
           os user interface:
             smartphone user interface:
               _s: general:fake phone screenshot
@@ -552,7 +565,16 @@ things:
             thread:
           shopping page:
             product page:
+        web host:
+          aws:
         web service:
+          ai interface site:
+            chatgpt:
+             openai playground:
+          git remote:
+            github:
+            gitlab:
+            bitbucket:
           booru:
             danbooru:
             gelbooru:
@@ -575,6 +597,13 @@ things:
             aliexpress:
       ai model:
         generative ai model:
+          text generation model:
+            gpt text generation model:
+              openai gpt text generation model:
+                gpt2:
+                gpt3:
+                gpt3.5:
+                gpt4:
           image generation model:
             text to image model:
               trynectar text to image model:
@@ -736,7 +765,9 @@ things:
           fighter jet:
             _s: general:fighter jet
             _p: general:jet plane
-
+      physical game:
+        card game:
+        board game:
       consumer device:
         peripherals:
           image scanner:
@@ -792,6 +823,32 @@ things:
               disposable camera:
                 _s: general:disposable camera
         computer:
+        game console:
+          microsoft console:
+            xbox console:
+              xbox one:
+              xbox series x:
+              xbox series s:
+              xbox 360:
+          sony console:
+            playstation console:
+              playstation 5:
+              playstation 4:
+              playstation 3:
+              playstation 2:
+              playstation 1:
+          nintendo console:
+            gameboy console:
+            nintendo ds console:
+              nintendo ds lite:
+              nintendo ds:
+              nintendo 3ds:
+              nintendo 2ds:
+            nintendo switch console:
+            ninetendo wii console:
+              nintendo wii:
+              nintendo wii u:
+          sega console:
         phone:
           _s: general:phone
           cellphone:
@@ -802,11 +859,21 @@ things:
               google pixel smartphone:
                 _p: google pixel
                 google pixel 4:
+                google pixel 5:
+                google pixel 6:
+                google pixel 6a:
+                google pixel 7:
       household object:
         furniture:
         appliance:
           major appliance:
+            major bathroom appliance:
+              washing machine:
+            major kitchen appliance:
+              dish washer:
           small appliance:
+            dehumidifier:
+              shinco sdl5-1d:
       biological matter:
         food:
           _s: general:food
@@ -859,6 +926,7 @@ things:
 
         medical device:
           medical test:
+            covid-19 test:
         sex toy:
           _s: general:sex toy
           phallic sex toy:
@@ -871,16 +939,11 @@ things:
               _s: general:dilation tape  
   time:
     __is_subnamespace: true
-    time bounded activity:
-      vacation:
     date:
       __ex: must be relevant to the content, and not just incidental
       gregorian date:
         gregorian month:
         gregorian year:
-    celebration:
-      general holiday:
-      personal holiday:
     season:
       four seasons:
         _s: general:seasons
@@ -962,6 +1025,7 @@ things:
         xiaomi:
         barmer:
         mycontrol:
+        openai:
       institution:
         educational institution:
           university constituent:
@@ -1133,6 +1197,35 @@ things:
   activity:
     __is_subnamespace: true
     sports:
+      running:
+        running by exertion:
+          aerobic running:
+            zone 1 running:
+            zone 2 running:
+          anaerobic running:
+            zone 3 running:
+            zone 4 running:
+          atp/cp running:
+            zone 5 running:
+        running by distance:
+          sprinting distance running:
+            100m running:
+            200m running:
+            400m running:
+            800m running:
+          short distance running:
+            1k running:
+            1 mile running:
+            2k running:
+            5k running:
+          middle distance running:
+            10k running:
+            15k running:
+            half marathon running:
+          long distance running:
+            marathon running:
+            ultramarathon running:
+          
     social:
       socializing:
         dating:
@@ -1165,6 +1258,26 @@ things:
       mental:
         reflecting:
         inspiration:
+  event:
+    __ex: event must be a discrete period of time, not arbitrarily repeatable (that would be an activity)
+    celebration:
+      occasioned celebration:
+        general holiday:
+        personal holiday:
+    travel:
+      solo travel:
+        2017 vsoke tatry trip:
+    convention:
+      book convention:
+        leipziger buchmesse:
+          2017 lbm:
+      anime convention:
+    sports competition:
+      race:
+        footrace:
+          _p: activity:running
+          2018 half marathon:
+            _p: activity:half marathon running
   natural phenomena:
   identity:
     __is_subnamespace: true
@@ -1226,11 +1339,16 @@ things:
         city: 
           __is_subnamespace: true
           berlin:
+          brussels:
       byprecise:
         __is_subnamespace: true
         __ex: categorizes locations by inheritance
         europe:
           europe itself:
+          belgium:
+            belgium itself:
+            brussels:
+              brussels itself:
           germany:
             germany itself:
             munich:
@@ -1246,6 +1364,12 @@ things:
 
     general location:
       indoor location:
+      outdoor location:
+        human-made location:
+          amusement park:
+            toy-branded amusement park:
+              legoland:
+              playmobil funpark:
     
     publicity:
       _ex: for our purposes, a location is public if it is accessible to most people, semi-public if it is accessible to a limited group of people, but not just the subjects, and private if it is only accessible to the subjects. That also means that e.g. a living room is semi-public if the subject is one of the members of the family, but private if the subject is the entire family.
@@ -1639,8 +1763,6 @@ things:
       github:
       gitlab:
       bitbucket:
-      chatgpt:
-      openai playground:
       dbeaver:
       hermes:
       google:
@@ -1669,6 +1791,7 @@ things:
         dungeon massage service:
       multimedia:
         star wars:
+          star wars - edge of the empire:
   unfinished:
     _s: meta:unfinished
     concept:
