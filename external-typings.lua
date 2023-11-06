@@ -489,7 +489,7 @@ speak = hs.speech.new()
 --- @field new fun(interval: integer, fn: fun(): (nil), continueOnError?: boolean): hs.timer
 --- @field doAfter fun(interval: integer, fn: fun(): nil): hs.timer
 --- @field doEvery fun(interval: integer, fn: fun(): nil): hs.timer
---- @field doWhile fun(predicateFn: fun(): (boolean), actionFn: fun(timer: hs.timer): (nil), interval: integer): hs.timer
+--- @field doWhile fun(predicateFn: fun(): (boolean), actionFn: fun(timer: hs.timer): (nil), interval?: integer): hs.timer
 --- @field start fun(self: hs.timer): hs.timer
 --- @field stop fun(self: hs.timer): hs.timer
 

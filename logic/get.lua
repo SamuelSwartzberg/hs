@@ -67,7 +67,7 @@ get = {
   },
   pass_item_name = {
     str_or_nil_by_fetch_value = function(item, typepath)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped)("pass show " .. typepath .. "/" .. item)
+      return transf.fn.rt_by_memoized_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped)("pass show " .. typepath .. "/" .. item)
     end,
     local_absolute_path = function(item, typepath, ext)
       return env.PASSWORD_STORE_DIR .. "/" .. typepath .. "/" .. item .. "." .. (ext or "gpg")
@@ -1892,7 +1892,7 @@ get = {
         arr,
         get.fn.fn_by_arbitrary_args_bound_or_ignored(
           get.nonindicated_number_str.number,
-          {a_use, base}
+          {consts.use_singleton, base}
         )
       )
     end,
@@ -1944,7 +1944,7 @@ get = {
     styledtext_arr_by_merge = function(arr, styledtext_attributes_specifier)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.str_or_styledtext.styledtext_by_merge, {a_use, styledtext_attributes_specifier})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.str_or_styledtext.styledtext_by_merge, {consts.use_singleton, styledtext_attributes_specifier})
       )
     end,
   },
@@ -2324,7 +2324,7 @@ get = {
         transf.extant_path.m3u_file_arr_by_descendants(path),
         get.fn.fn_by_arbitrary_args_bound_or_ignored(
           get.m3u_file.stream_creation_specifier,
-          {a_use, flag_profile_name} 
+          {consts.use_singleton, flag_profile_name} 
         )
       )
     end,
@@ -2505,7 +2505,7 @@ get = {
   },
   whisper_file = {
     table_by_transcribed = function(path, format, prompt, iso639_1)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_year(rest, "rest")({
+      return transf.fn.rt_by_memoized_1_year(rest, "rest")({
         api_name = "openai",
         endpoint = "audio/transcriptions",
         request_table_type = "form",
@@ -2884,7 +2884,7 @@ get = {
     str_and_t__arr_arr_by_joined = function(arr, joiner)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.arr.str_and_t_by_joined, {a_use, joiner})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.arr.str_and_t_by_joined, {consts.use_singleton, joiner})
       )
     end,
     str_key_t_value_assoc = function(arr, joiner)
@@ -2895,7 +2895,7 @@ get = {
     assoc_arr_by_arr = function(arr_arr, arr2)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, a_use})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(transf.two_arrs.assoc_by_zip_stop_shortest, {arr2, consts.use_singleton})
       )
     end,
     arr_value_assoc_by_first_element = function(arr_arr)
@@ -3032,17 +3032,17 @@ get = {
   },
   sgml_document = {
     content_starting_lt_ending_gt_str_or_nil_by_query_selector_all = function(str, selector)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "htmlq" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_doc(str)
       )
     end,
     str_or_nil_by_query_selector_all = function(str, selector)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "htmlq --text" .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_doc(str)
       )
     end,
     str_or_nil_by_attribute_query_selector_all = function(str, selector, attribute)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "htmlq --attribute " .. transf.str.str_by_single_quoted_escaped(attribute) .. transf.str.str_by_single_quoted_escaped(selector) .. transf.str.here_doc(str)
       )
     end,
@@ -3215,7 +3215,7 @@ get = {
     any_arr_by_result = function(arr, value)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr, 
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.retriever_specifier.any_by_result, {a_use, value})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.retriever_specifier.any_by_result, {consts.use_singleton, value})
       )
     end,
     str_by_results_joined = function(arr, value)
@@ -3349,13 +3349,13 @@ get = {
     created_item_specifier_w_creation_specifier = function(arr, creation_specifier)
       return get.arr.t_or_nil_by_first_match_w_fn(
         arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table.bool_by_key_equals_value, {a_use, "creation_specifier", creation_specifier})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table.bool_by_key_equals_value, {consts.use_singleton, "creation_specifier", creation_specifier})
       )
     end,
     pos_int_w_creation_specifier = function(arr, creation_specifier)
       return get.arr.pos_int_or_nil_by_first_match_w_fn(
         arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table.bool_by_key_equals_value, {a_use, "creation_specifier", creation_specifier})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table.bool_by_key_equals_value, {consts.use_singleton, "creation_specifier", creation_specifier})
       )
     end,
   },
@@ -3484,11 +3484,38 @@ get = {
     end,
   },
   fn = {
+    rt_and_timestamp_s_by_in_memory_memo = function(fn, params)
+      memstore[fn] = memstore[fn] or {}
+      local node = memstore[fn]
+      for i=1, #params do
+        local param = params[i]
+        if param == nil then param = consts.nil_singleton 
+        elseif is.any.table(param) then -- otherwise referential equality fucks us up
+          param = shelve.marshal(param)
+        end
+        node = node.children and node.children[param]
+        if not node then return nil end
+      end
+      return get.table.table_by_copy(node.results, true), node.created_at
+    end,
+
+    rt_and_timestamp_s_by_db_memo = function(fn,  params)
+      local fnname = transf.fn.fnname(fn)
+      local queryarr = transf.any_and_arr.arr(
+        fnname,
+        params
+      )
+      local timestamp_queryarr = transf.arr_and_any.arr(
+        queryarr,
+        "createdat"
+      )
+      return transf.not_userdata_or_fn_arr.not_userdata_or_fn_or_nil_by_redis(queryarr), transf.not_userdata_or_fn_arr.not_userdata_or_fn_or_nil_by_redis( timestamp_queryarr )
+    end,
     fn_by_1st_n_bound = hs.fnutils.partial,
 
     --- binds arguments to a function
     --- @param func function
-    --- @param arg_spec any | any[] List of arguments to bind. Use a_use to consume an argument passed at runtime.
+    --- @param arg_spec any | any[] List of arguments to bind. Use consts.use_singleton to consume an argument passed at runtime.
     --- @param ignore_spec? integer | integer[] List of arguments to ignore (by index).
     --- @return function
     fn_by_arbitrary_args_bound_or_ignored = function(func, arg_spec, ignore_spec)
@@ -3510,7 +3537,7 @@ get = {
         end
         local new_args = {}
         for index, arg in transf.arr.pos_int_vt_stateless_iter(arg_spec) do -- for all arg_lists to bind
-          if arg == a_use then
+          if arg == consts.use_singleton then
             new_args[index] = act.arr.shift(args)
           else
             new_args[index] = arg
@@ -3528,165 +3555,63 @@ get = {
       return get.fn.fn_by_arbitrary_args_bound_or_ignored(
         func,
         transf.any_and_arr.arr(
-          a_use,
+          consts.use_singleton,
           transf.n_anys.arr(...)
         )
       )
     end,
-    --- @class memoOpts
-    --- @field is_async? boolean whether we are memoizing an async function. Defaults to false
-    --- @field invalidation_mode? "invalidate" | "reset" | "none" whether and in what way to invalidate the cache. Defaults to "none"
-    --- @field interval? number how often to invalidate the cache, in seconds. Defaults to 0
-    --- @field strify_table_params? boolean whether to strify table params before using them as keys in the cache. Defaults to false. However, this is ignored if mode = "fs", as we need to strify the params to use them as a path
-    --- @field table_param_subset? "json" | "no-fn-userdata-loops" | "any" whether table params that will be strified will only contain jsonifiable values, anything that a lua table can contain but functions, userdata, and loops, or anything that a lua table can contain. Speed: "json" > "no-fn-userdata-loops" > "any". Defaults to "json"
 
     --- memoize a function if it's not already memoized, or return the memoized version if it is
     --- @generic I, O
     --- @param fn fun(...: I): O
-    --- @param opts? memoOpts
-    --- @param fnname? str the name of the function. Optional, but required for fsmemoization and switches to fsmemoization if provided, since we need to use the function name to create a unique cache path. We can't rely on an automatically generated identifier, since this may change between sessions
+    --- @param interval? number how often to invalidate the cache, in seconds, or 0 to never invalidate
     --- @return fun(...: I): (O), hs.timer?
-    rt_or_nil_by_memoized = function(fn, opts, fnname)
-      local fnid = fnname or transf.fn.fnid(fn) -- get a unique id for the function, using lua's tostr function, which uses the memory address of the function and thus is unique for each function
-    
-      local opts_as_str_or_nil
-      if memoized[fnid] then 
-        return memoized[fnid]
-      elseif opts == nil then
-        -- no-op: we only need to make the else block isn't executed if opts is nil, since that will result in an infinite loop
-      else
-        opts_as_str_or_nil = get.fn.rt_or_nil_by_memoized(json.encode)(opts)
-        if memoized_w_opts[fnid] then
-          if memoized_w_opts[fnid][opts_as_str_or_nil] then -- if the function is already memoized with the same options, return the memoized version.  This allows us to use memoized functions immediately as `get.fn.rt_or_nil_by_memoized(fn)(...)` without having to assign it to a variable first
-            return memoized_w_opts[fnid][opts_as_str_or_nil]
-          end
-        else
-          memoized_w_opts[fnid] = {}
-        end
+    rt_by_memoized = function(fn, interval)
+
+      if memoized[fn] then -- already memoized
+        return memoized[fn]
       end
-    
-      local opts_as_str = opts_as_str_or_nil or "noopts"
     
       --- set default options
-      opts = get.table.table_by_copy(opts) or {}
-      local mode, fnidentifier_type
-      if fnname then
-        mode = "fs"
-        fnidentifier_type = "fnname"
-      else
-        mode = "mem"
-        fnidentifier_type = "fnid"
-      end
-      opts.is_async = get.any.default_if_nil(opts.is_async, false)
-      opts.invalidation_mode = opts.invalidation_mode or "none"
-      opts.interval = opts.interval or 0
-      opts.strify_table_params = get.any.default_if_nil(opts.strify_table_params, false)
-      opts.table_param_subset = opts.table_param_subset or "json"
-    
-      -- initialize the cache if using memory
-      if mode == "mem" then
-        memstore[fnid] = memstore[fnid] or {}
-      end
-      
-      -- create some variables that will be used later
-    
-      local timer
-      
-      local created_at = get[fnidentifier_type].timestamp_s_by_created_time(fnid, opts_as_str)
-    
-      -- create a timer to invalidate the cache if needed
-      if opts.invalidation_mode == "reset" then
-        timer = hs.timer.doEvery(opts.interval, function()
-          dothis[fnidentifier_type].reset_by_opts(fnid, opts_as_str)
-        end)
-      end
+      interval = interval or 0
+      local worth_checking_db = (interval == 0 or interval > 60 * 60) -- only check db if we're memoizing for at least an hour
+
+      memstore[fn] = memstore[fn] or {}
     
       -- create the memoized function
       local memoized_func = function(...)
         local params = {...}
-        local callback = nil
-        if opts.is_async then -- assume that async functions always have a callback as the last argument
-          callback = params[#params]
-          params[#params] = nil
-        end 
     
-    
-    
-        local result 
-    
-        if opts.invalidation_mode == "invalidate" then
-          if created_at + opts.interval < os.time() then -- cache is invalid, so we need to recalculate
-            dothis[fnidentifier_type].reset_by_opts(fnid)
-            if mode == "fs" then
-              dothis[fnidentifier_type].set_timestamp_s_created_time(fnid, opts_as_str, os.time())
-            end
-            created_at = os.time()
-          end
-    
-        else
-    
-          -- get the result from the cache
-          result = get[fnidentifier_type].rt_by_memo(fnid, opts_as_str, params, opts)
-        end
-    
-        if not opts.is_async then
-          if not result then  -- no result yet, so we need to call the original function and store the result in the cache
-            -- print("cache miss for", fnid)
-            result = { fn(...) }
-            dothis[fnidentifier_type].put_memo(fnid, opts_as_str, params, result, opts)
-          else
-            -- print("cache hit for", fnid)
-            -- inspPrint(result)
-          end
-          return transf.arr.n_anys(result) -- we're sure to have a result now, so we can return it
-        else
-          --- @cast callback fun(...: any)
-          if result then -- if we have a result, we can call the callback immediately
-            callback(transf.arr.n_anys(result))
-          else -- else we need to call the original function and wrap the callback to store the result in the cache before calling it
-            fn(transf.arr.n_anys(params), function(...)
-              local result = {...}
-              dothis[fnidentifier_type].put_memo(fnid, opts_as_str, params, result, opts)
-              callback(transf.arr.n_anys(result))
-            end)
+        local no_need_to_add_to_db = false
+        local retval, created_at = get.fn.rt_and_timestamp_s_by_in_memory_memo(fn, params)
+
+        if not retval and worth_checking_db then -- check the db
+          retval, created_at = get.fn.rt_and_timestamp_s_by_db_memo(fn, params)
+          if retval then -- for future use, store in memory
+            dothis.fn.put_memo_and_created_at_in_memory(fn, params, retval)
+            no_need_to_add_to_db = true
           end
         end
+    
+        if retval and interval > 0 then 
+          if created_at + interval < os.time() then -- cache is invalid, so we need to recalculate
+            retval = nil
+            no_need_to_add_to_db = false
+          end
+        end
+    
+        if not retval then  -- no result
+          retval = { fn(...) } -- calculate it
+          dothis.fn.put_memo_and_created_at_in_memory(fn, params, retval)
+          if not no_need_to_add_to_db and worth_checking_db then
+            dothis.fn.put_memo_and_created_at_in_db_low_priority(fn, params, retval)
+          end
+        end
+        return transf.arr.n_anys(retval) -- we're sure to have a result now, so we can return it
+
       end
-      if opts_as_str_or_nil == nil then
-        memoized[fnid] = memoized_func
-      else
-        memoized_w_opts[fnid][opts_as_str] = memoized_func
-      end
-      return memoized_func, timer
-    end,
-    rt_or_nil_by_memoized_invalidate = function(fn, interval, fnname)
-      return get.fn.rt_or_nil_by_memoized(fn, {
-        invalidation_mode = "invalidate",
-        interval = interval
-      }, fnname)
-    end,
-    rt_or_nil_by_memoized_invalidate_1_day = function(fn, fnname)
-      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 60 * 24, fnname)
-    end,
-    rt_or_nil_by_memoized_invalidate_1_week = function(fn, fnname)
-      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 60 * 24 * 7, fnname)
-    end,
-    rt_or_nil_by_memoized_invalidate_1_month = function(fn, fnname)
-      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 60 * 24 * 30, fnname)
-    end,
-    rt_or_nil_by_memoized_invalidate_1_year = function(fn, fnname)
-      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 60 * 24 * 365, fnname)
-    end,
-    rt_or_nil_by_memoized_invalidate_5_minutes = function(fn, fnname)
-      return get.fn.rt_or_nil_by_memoized_invalidate(fn, 60 * 5, fnname)
-    end,
-    rt_or_nil_by_memoized_invalidate_strify_json = function(fn, interval, fnname)
-      return get.fn.rt_or_nil_by_memoized(fn, {
-        invalidation_mode = "invalidate",
-        interval = interval,
-        strify_table_params = true,
-        table_param_subset = "json"
-      }, fnname)
+      memoized[fn] = memoized_func
+      return memoized_func
     end,
   },
   n_any_arg_fn = {
@@ -3697,67 +3622,8 @@ get = {
       end
     end,
   },
-  fnname = {
-    json_string_by_response = function (fnname, argsb64, bodyb64, method)
-      local args = transf.base64_url_str.str_by_decode_to_utf8(argsb64)
-      local body = transf.base64_url_str.str_by_decode_to_utf8(bodyb64)
-      local mainargs = args or body
-      local parsedargs = transf.json_str.not_userdata_or_fn(mainargs)
-      local ns, typ, unnamespaced_fnname = get.str.n_strs_by_split_w_str(fnname, ".", 3)
-      local fn = ns[typ][unnamespaced_fnname]
-      local res = fn(transf.arr.n_anys(parsedargs))
-      return transf.not_userdata_or_fn.json_str(res)
-    end,
-    local_absolute_path_by_in_cache_w_str_and_arr_or_nil = function(fnname, optsstr, args)
-      local path = transf.fnname.local_absolute_path_by_in_cache(fnname)
 
-      if optsstr then
-        path = path .. optsstr .. "/"
-      end
-      if args then 
-        -- encode args to json and hash it, to use as the key for the cache
-        local hash = transf.not_userdata_or_fn.hex_str_by_md5(args)
-        path = path .. hash
-      end
-      return path
-    end,
-    rt_by_memo = function(fnid, opts_as_str, params, opts)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, params)
-      local raw_cnt = transf.file.str_by_contents(cache_path)
-      if not raw_cnt then return nil end
-      return json.decode(raw_cnt)
-    end,
-    timestamp_s_by_created_time = function(fnid, opts_as_str)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~") -- this is a special path that is used to store the time the cache was created
-      return get.str_or_number.number_or_nil(transf.file.str_by_contents(cache_path)) or os.time() -- if the file doesn't exist, return the current time
-    end,
-  },
-  fnid = {
-    rt_by_memo = function(fnid, opts_as_str, params, opts)
-      memstore[fnid] = memstore[fnid] or {}
-      memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
-      local node = memstore[fnid][opts_as_str]
-      for i=1, #params do
-        local param = params[i]
-        if param == nil then param = nil_singleton 
-        elseif opts.strify_table_params and is.any.table(param) then
-          if opts.table_param_subset == "json" then
-            param = json.encode(param)
-          elseif opts.table_param_subset == "no-fn-userdata-loops" then
-            param = shelve.marshal(param)
-          elseif opts.table_param_subset == "any" then
-            param = hs.inspect(param, { depth = 4 })
-          end
-        end
-        node = node.children and node.children[param]
-        if not node then return nil end
-      end
-      return get.table.table_by_copy(node.results, true)
-    end,
-    timestamp_s_by_created_time = function() -- no special functionality here, just needs to exist for polymorphic implementation with fscache
-      return os.time()
-    end
-  },
+
   input_spec = {
     declared_input_spec = function(input_spec, type)
       local cpy = get.table.table_by_copy(input_spec)
@@ -3791,7 +3657,7 @@ get = {
     tree_node_arr = function(tree_node_like_arr, treeify_spec)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         tree_node_like_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.tree_node_like.tree_node, {a_use, treeify_spec})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.tree_node_like.tree_node, {consts.use_singleton, treeify_spec})
       )
     end,
   },
@@ -3840,7 +3706,7 @@ get = {
     path_key_haver_arr_by_take_last = function(arr, title_key)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.assoc_arr.path_key_haver_by_take_last, {a_use, title_key})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.assoc_arr.path_key_haver_by_take_last, {consts.use_singleton, title_key})
       )
     end,
   },
@@ -3978,7 +3844,7 @@ get = {
   },
   discord_export_chat_message = {
     timestamp_ms_or_nil_by_replying_to = function(msg, obj)
-      return get.fn.rt_or_nil_by_memoized(
+      return get.fn.rt_by_memoized(
         get.export_chat_main_object.any_key_timestamp_ms_value_assoc_by_id
       )(obj, "discord")[msg.reference.messageId]
     end,
@@ -4035,7 +3901,7 @@ get = {
   },
   telegram_export_chat_message = {
     timestamp_ms_or_nil_by_replying_to = function(msg, obj)
-      return get.fn.rt_or_nil_by_memoized(
+      return get.fn.rt_by_memoized(
         get.export_chat_main_object.any_key_timestamp_ms_value_assoc_by_id
       )(obj, "telegram")[msg.reply_to_message_id]
     end,

@@ -511,7 +511,7 @@ is = {
       return get.str.bool_by_matches_whole_onig(str, "[a-z0-9]+-[a-z0-9,]+")
     end,
     url = function(str)
-      return get.fn.rt_or_nil_by_memoized(
+      return get.fn.rt_by_memoized(
         transf.str.bool_by_evaled_env_bash_success,
         {},
         "is.printable_ascii_str.url")(
@@ -1271,7 +1271,7 @@ is = {
     dynamic_time_machine_volume_local_extant_path = function(path)
       return get.str.bool_by_startswith(
         path,
-        "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. get.fn.rt_or_nil_by_memoized(hs.host.localizedName)() .. "/" .. os.date("%Y-%m-%d-%H")
+        "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. get.fn.rt_by_memoized(hs.host.localizedName)() .. "/" .. os.date("%Y-%m-%d-%H")
       )
     end,
     static_time_machine_volume_local_extant_path = function(path)
@@ -1540,11 +1540,11 @@ is = {
     end,
   },
   plaintext_assoc_file = {
-    yaml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "yaml"}),
-    json_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "json"}),
-    toml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "toml"}),
-    ini_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "ini"}),
-    ics_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "ics"}),
+    yaml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {consts.use_singleton, "yaml"}),
+    json_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {consts.use_singleton, "json"}),
+    toml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {consts.use_singleton, "toml"}),
+    ini_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {consts.use_singleton, "ini"}),
+    ics_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {consts.use_singleton, "ics"}),
   },
   plaintext_table_file = {
 
@@ -2502,6 +2502,14 @@ is = {
     thing_name_hierarchy = function(t)
       return t == thing_name_hierarchy
     end
+  },
+  empty_table = {
+    nil_singleton = function(t)
+      return t == consts.nil_singleton
+    end,
+    use_singleton = function(t)
+      return t == consts.use_singleton
+    end,
   },
   only_pos_int_key_table = {
     --- an empty only_pos_int_key_table is never a hole_y_arrlike and always an arr

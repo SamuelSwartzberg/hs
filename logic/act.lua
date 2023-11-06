@@ -185,7 +185,7 @@ act = {
     choose_action = function(any)
       dothis.any.choose_action_specifier(
         any, 
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.action_specifier.execute, {a_use, any})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.action_specifier.execute, {consts.use_singleton, any})
       )
     end,
   },
@@ -244,12 +244,12 @@ act = {
     end,
   },
   stream_created_item_specifier = {
-    set_playback_seconds_plus_15 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, 15}),
-    set_playback_seconds_minus_15 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, -15}),
-    set_playback_seconds_plus_60 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, 60}),
-    set_playback_seconds_minus_60 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {a_use, -60}),
-    set_playback_percent_plus_5 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_percent, {a_use, 5}),
-    set_playback_percent_minus_5 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_percent, {a_use, -5}),
+    set_playback_seconds_plus_15 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {consts.use_singleton, 15}),
+    set_playback_seconds_minus_15 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {consts.use_singleton, -15}),
+    set_playback_seconds_plus_60 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {consts.use_singleton, 60}),
+    set_playback_seconds_minus_60 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_seconds_relative, {consts.use_singleton, -60}),
+    set_playback_percent_plus_5 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_percent, {consts.use_singleton, 5}),
+    set_playback_percent_minus_5 = get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.stream_created_item_specifier.set_playback_percent, {consts.use_singleton, -5}),
     set_state_transitioned_state = function(spec)
       spec.inner_item.state = transf.stream_created_item_specifier.stream_state_by_transitioned(spec)
     end,
@@ -753,7 +753,7 @@ act = {
         dothis[
           spec.mode .. "_input_spec"
         ].exec_position_change_state_spec(spec, position_change_state_spec)
-      end, POLLING_INTERVAL)
+      end, consts.number_by_polling_interval)
       timer:start()
     end,
   },
@@ -1547,7 +1547,42 @@ act = {
       end
     end,
   },
+  two_strs = {
+    set_key_redis_raw = function(key, str)
+      dynamic_permanents.table_by_redis_client:set(key, str)
+    end,
+  },
+  not_userdata_or_fn_arr_and_not_userdata_or_fn = {
+    set_key_redis = function(arr, val)
+      dothis.two_strs.set_key_redis_raw(
+        transf.not_userdata_or_fn_arr.str_by_redis_key(arr),
+        transf.not_userdata_or_fn.str_by_marshalled(val)
+      )
+    end,
+  },
   ["nil"] = {
+    start_redis = function()
+      act.str.env_bash_eval_async("redis-server /Users/sam/me/spec/dotconfig/redis/redis.conf")
+      hs.timer.doWhile(
+        function()
+          return dynamic_permanents.table_by_redis_client == nil
+        end, function()
+          local succ, client = pcall(redis.connect, '127.0.0.1', 6379)
+          if succ then
+            dynamic_permanents.table_by_redis_client = client
+          end
+        end
+      )
+    end,
+    create_fn_key_fnname_value_assoc = function()
+      for _, fncontainer in transf.arr.pos_int_vt_stateless_iter({"transf", "get", "act", "dothis"}) do
+        for from, fntable in transf.table.kt_vt_stateless_iter(_G[fncontainer]) do
+          for to, fn in transf.table.kt_vt_stateless_iter(fntable) do
+            dynamic_permanents.fn_key_fnname_value_assoc[fn] = fncontainer .. "." .. from .. "." .. to
+          end
+        end
+      end
+    end,
     url_by_launch_decoding_fetching_server = function()
       return act.absolute_path_and_fnname.url_by_serve(
         "/decode_and_fetch",

@@ -39,6 +39,7 @@ mimetypes = require "mimetypes"
 combine = require "combine"
 --- @type shelve
 shelve = require "shelve"
-
+--- @type redis
+redis = require "redis"
 --- @type hashings 
 hashings = require("hashings")

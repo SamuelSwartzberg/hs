@@ -350,7 +350,7 @@ dothis = {
       end -- else: don't do anything: QR code creation is deterministic, so we don't need to do it again. This relies on the path not changing, which our consumers are responsible for.
     end,
     alert = function(str, duration)
-      return hs.alert.show(str, {textSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3} --[[ @as table ]], duration)
+      return hs.alert.show(str, {extSize = 12, textFont = "Noto Sans Mono", atScreenEdge = 1, radius = 3} --[[ @as table ]], duration)
     end,
     say = function(str, lang)
       speak:voice(tblmap.iso_639_1_language_code.mac_voice_name_by_default[lang]):speak(transf.str.line_by_folded(str))
@@ -696,7 +696,7 @@ dothis = {
         arr,
         get.fn.fn_by_arbitrary_args_bound_or_ignored(
           dothis.local_extant_path.link_into_local_absolute_path,
-          {a_use, tgt}
+          {consts.use_singleton, tgt}
         )
       )
     end,
@@ -817,13 +817,13 @@ dothis = {
     copy_into_absolute_path = function(arr, tgt)
       dothis.arr.each(
         arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.extant_path.copy_into_absolute_path, {a_use, tgt})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.extant_path.copy_into_absolute_path, {consts.use_singleton, tgt})
       )
     end,
     move_into_absolute_path = function(arr, tgt)
       dothis.arr.each(
         arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.extant_path.move_into_absolute_path, {a_use, tgt})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.extant_path.move_into_absolute_path, {consts.use_singleton, tgt})
       )
     end,
     zip_to_absolute_path = function(arr, tgt)
@@ -992,7 +992,7 @@ dothis = {
     open_all = function(path, browser)
       dothis.arr.each(
         transf.plaintext_file.noempty_noindent_nohashcomment_line_arr(path),
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.url_or_local_path.open_browser, {a_use, browser})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(dothis.url_or_local_path.open_browser, {consts.use_singleton, browser})
       )
     end,
   },
@@ -2001,47 +2001,65 @@ dothis = {
   },
 
   fn = {
-  },
-  fnid = {
-    put_memo = function(fnid, opts_as_str, params, result, opts)
-      memstore[fnid] = memstore[fnid] or {}
-      memstore[fnid][opts_as_str] = memstore[fnid][opts_as_str] or {}
-      local node = memstore[fnid][opts_as_str]
+    put_memo_and_created_at_in_memory = function(fn, params, result)
+      memstore[fn] = memstore[fn] or {}
+      local node = memstore[fn]
       for i=1, #params do
         local param = params[i]
-        if param == nil then param = nil_singleton 
-        elseif opts.strify_table_params and is.any.table(param) then
-          if opts.table_param_subset == "json" then
-            param = json.encode(param)
-          elseif opts.table_param_subset == "no-fn-userdata-loops" then
-            param = shelve.marshal(param)
-          elseif opts.table_param_subset == "any" then
-            param = hs.inspect(param, { depth = 4 })
-          end
+        if param == nil then param = consts.nil_singleton 
+        elseif is.any.table(param) then -- otherwise referential equality fucks us up
+          param = shelve.marshal(param)
         end
+        node = node.children and node.children[param]
+        if not node then return nil end
         node.children = node.children or {}
         node.children[param] = node.children[param] or {}
         node = node.children[param]
       end
       node.results = get.table.table_by_copy(result, true)
+      node.created_at = os.time()
     end,
-    reset_by_opts = function(fnid, opts_as_str)
-      memstore[fnid] = memstore[fnid] or {}
-      memstore[fnid][opts_as_str] = {}
+    put_memo_and_created_at_in_db_low_priority = function(fn, params, result)
+      local fnname = transf.fn.fnname(fn)
+      local queryarr = transf.any_and_arr.arr(
+        fnname,
+        params
+      )
+      local timestamp_queryarr = transf.arr_and_any.arr(
+        queryarr,
+        "createdat"
+      )
+      act.not_userdata_or_fn_arr_and_not_userdata_or_fn.set_key_redis(
+        queryarr,
+        result
+      )
+      act.not_userdata_or_fn_arr_and_not_userdata_or_fn.set_key_redis(
+        timestamp_queryarr,
+        os.time()
+      )
     end,
   },
-  fnname = {
-    put_memo = function(fnid, opts_as_str, params, result, opts)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, params)
-      dothis.absolute_path.write_file(cache_path, json.encode(result))
+  fnid = {
+    put_memo = function(fnid, strifystrat, params, result)
+      memstore[fnid] = memstore[fnid] or {}
+      memstore[fnid][strifystrat] = memstore[fnid][strifystrat] or {}
+      local node = memstore[fnid][strifystrat]
+      for i=1, #params do
+        local param = params[i]
+        if param == nil then param = consts.nil_singleton 
+        elseif strifystrat ~= "raw" and is.any.table(param) then
+          if strifystrat == "json" then
+            param = json.encode(param)
+          elseif strifystrat == "no-fn-userdata-loops" then
+            param = shelve.marshal(param)
+          elseif strifystrat == "any" then
+            param = hs.inspect(param, { depth = 4 })
+          end
+        end
+        
+      end
+      
     end,
-    reset_by_opts = function(fnid, opts_as_str)
-      local cache_path = get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str)
-      act.absolute_path.delete(cache_path)
-    end,
-    set_timestamp_s_created_time = function(fnid, opts_as_str, created_time)
-      dothis.absolute_path.write_file(get.fnname.local_absolute_path_by_in_cache_w_str_and_arr_or_nil(fnid, opts_as_str, "~~~created~~~"), transf.any.str(created_time))
-    end
   },
   fn_queue_specifier = {
     push = function(qspec, fn)

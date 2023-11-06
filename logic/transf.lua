@@ -74,7 +74,7 @@ transf = {
       return codepoint:sub(3)
     end,
     unicode_prop_table = function(codepoint)
-      return get.fn.rt_or_nil_by_memoized(transf.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_by_memoized(transf.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.str.str_by_single_quoted_escaped(
           codepoint
@@ -84,7 +84,7 @@ transf = {
   },
   indicated_utf8_hex_str = {
     unicode_prop_table = function(str)
-      return get.fn.rt_or_nil_by_memoized(transf.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_by_memoized(transf.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.str.str_by_single_quoted_escaped(
           str
@@ -510,7 +510,7 @@ transf = {
       )
     end,
     unicode_prop_table_arr_from_unicode_codepoint_arr = function(arr)
-      return get.fn.rt_or_nil_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.str.str_by_single_quoted_escaped(
           get.str_or_number_arr.str_by_joined(
@@ -527,7 +527,7 @@ transf = {
       )
     end,
     unicode_prop_table_arr_from_utf8_arr = function(arr)
-      return get.fn.rt_or_nil_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)(
+      return get.fn.rt_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)(
         "uni print -compact -format=all -as=json" 
         .. transf.str.str_by_single_quoted_escaped(
           get.str_or_number_arr.str_by_joined(
@@ -535,6 +535,25 @@ transf = {
             " "
           )
         )
+      )
+    end,
+  },
+  not_userdata_or_fn_arr = {
+    str_arr_by_marshalled = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        transf.not_userdata_or_fn.str_by_marshalled
+      )
+    end,
+    str_by_redis_key  = function(arr)
+      return get.str_or_number_arr.str_by_joined(
+        transf.not_userdata_or_fn.str_arr_by_marshalled(arr),
+        consts.printable_ascii_not_whitespace_str_by_unique_record_separator
+      )
+    end,
+    not_userdata_or_fn_or_nil_by_redis = function(arr)
+      return transf.str.not_userdata_or_fn_or_nil_by_redis(
+        transf.not_userdata_or_fn_arr.str_by_redis_key(arr)
       )
     end,
   },
@@ -707,7 +726,7 @@ transf = {
   },
   char = {
     unicode_prop_table = function(char)
-      return get.fn.rt_or_nil_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.str.str_by_single_quoted_escaped(char))[1]
+      return get.fn.rt_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.str.str_by_single_quoted_escaped(char))[1]
     end
   },
   ascii_char = {
@@ -2010,7 +2029,7 @@ transf = {
     lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc = function(assoc)
       return hs.fnutils.map(
         assoc,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.str.str_arr_by_split_w_ascii_char, {a_use, ","})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.str.str_arr_by_split_w_ascii_char, {consts.use_singleton, ","})
       )
     end,
     fs_tag_kv_arr = function(assoc)
@@ -2139,7 +2158,7 @@ transf = {
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("zbarimg -q --raw " .. transf.str.str_by_single_quoted_escaped(path))
     end,
     hs_image = function(path)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_week(hs.image.imageFromPath, "hs.image.imageFromPath")(path)
+      return transf.fn.rt_by_memoized_1_week(hs.image.imageFromPath, "hs.image.imageFromPath")(path)
     end,
     booru_post_url = function(path)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
@@ -2150,7 +2169,7 @@ transf = {
     end,
     image_data_url = function(path)
       local ext = transf.path.extension(path)
-      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
+      return get.fn.rt_by_memoized(hs.image.encodeAsURLString)(transf.local_image_file.hs_image(path), ext)
     end,
     multiline_str_by_local_ai_tags = function (path)
       local fetchpath = transf.str.str_by_single_quoted_escaped(path)
@@ -2160,7 +2179,7 @@ transf = {
           act.local_svg_file.to_png_in_cache(path)
         end
       end
-      return get.fn.rt_or_nil_by_memoized(
+      return get.fn.rt_by_memoized(
         transf.str.str_or_nil_by_evaled_env_bash_stripped,
         nil,
         "transf.str.str_or_nil_by_evaled_env_bash_stripped"
@@ -2208,7 +2227,7 @@ transf = {
       return transf.decoded_email_header_block.line_key_line_value_assoc(transf.maildir_file.decoded_email_header_block_by_all_useful(path))
     end,
     rendered_body = function(path)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "mshow -R" .. transf.str.str_by_single_quoted_escaped(path)
       )
     end,
@@ -2247,7 +2266,7 @@ transf = {
       return transf.mime_part_block.leaflike_arr_by_attachments(transf.maildir_file.mime_part_block(path))
     end,
     line_by_summary = function(path)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.str.str_by_single_quoted_escaped(path))
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mscan -f %D **%f** %200s" .. transf.str.str_by_single_quoted_escaped(path))
     end,
     maildir_file_and_line_by_summary = function(path)
       return path, transf.maildir_file.line_by_summary(path)
@@ -3078,7 +3097,7 @@ transf = {
     interval_specifier_by_earliest_start = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_smaller_key, {a_use, a_use, "start"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_smaller_key, {consts.use_singleton, consts.use_singleton, "start"})
       )
     end,
     t_by_earliest_start = function(interval_specifier_arr)
@@ -3089,7 +3108,7 @@ transf = {
     interval_specifier_by_latest_start = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key, {a_use, a_use, "start"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key, {consts.use_singleton, consts.use_singleton, "start"})
       )
     end,
     t_by_latest_start = function(interval_specifier_arr)
@@ -3100,7 +3119,7 @@ transf = {
     interval_specifier_by_latest_stop = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key, {a_use, a_use, "stop"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key, {consts.use_singleton, consts.use_singleton, "stop"})
       )
     end,
     t_by_latest_stop = function(interval_specifier_arr)
@@ -3111,7 +3130,7 @@ transf = {
     interval_specifier_by_earliest_stop = function(interval_specifier_arr)
       return hs.fnutils.reduce(
         interval_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_smaller_key, {a_use, a_use, "stop"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_smaller_key, {consts.use_singleton, consts.use_singleton, "stop"})
       )
     end,
     t_by_earliest_stop = function(interval_specifier_arr)
@@ -3408,7 +3427,7 @@ transf = {
   },
   cleaned_iban = {
     iban_data_spec = function(iban)
-      local res = get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest, "rest")({
+      local res = transf.fn.rt_by_memoized_1_month(rest, "rest")({
         host = "openiban.com/",
         endpoint = "validate/" .. iban,
         params = { getBIC = "true" },
@@ -3482,7 +3501,7 @@ transf = {
 
   uuid = {
     raw_contact_or_nil = function(uuid)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "khard show --format=yaml uid:" .. uuid)
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "khard show --format=yaml uid:" .. uuid)
     end,
     contact_table_or_nil = function(uuid)
       local raw_contact = transf.uuid.raw_contact_or_nil(uuid)
@@ -3834,7 +3853,7 @@ transf = {
   },
   youtube_video_id = {
     youtube_video_item = function(id)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest)({
+      return transf.fn.rt_by_memoized_1_month(rest)({
         api_name = "youtube",
         endpoint = "videos",
         params = {
@@ -3865,7 +3884,7 @@ transf = {
       return "https://www.youtube.com/watch?v=" .. id
     end,
     youtube_caption_item_arr = function(id)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest)({
+      return transf.fn.rt_by_memoized_1_month(rest)({
         api_name = "youtube",
         endpoint = "captions",
         params = {
@@ -3950,7 +3969,7 @@ transf = {
       return "https://www.youtube.com/channel/" .. id
     end,
     youtube_channel_item = function(id)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest, "rest")({
+      return transf.fn.rt_by_memoized_1_month(rest, "rest")({
         api_name = "youtube",
         endpoint = "channels",
         params = {
@@ -3965,7 +3984,7 @@ transf = {
   },
   handle = {
     youtube_channel_item = function(handle)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_month(rest, "rest")({
+      return transf.fn.rt_by_memoized_1_month(rest, "rest")({
         api_name = "youtube",
         endpoint = "channels",
         params = { handle = handle}
@@ -3997,7 +4016,7 @@ transf = {
   },
   str = {
     str_or_nil_by_raw_syn_output = function(str)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.str.str_by_single_quoted_escaped(str) )
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.str.str_by_single_quoted_escaped(str) )
     end,
     str_key_syn_specifier_value_assoc = function(str)
       local synonym_parts = get.str.str_arr_by_split_w_str(transf.str.str_or_nil_by_raw_syn_output(str), "\n\n")
@@ -4019,7 +4038,7 @@ transf = {
       return synonym_tables
     end,
     str_or_nil_by_raw_av_output = function (str)
-      get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+      get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "synonym" .. transf.str.str_by_single_quoted_escaped(str)
       )
     end,
@@ -4192,6 +4211,21 @@ transf = {
       else return {res} end
     end,
     window_or_nil_by_title = hs.window.get,
+    not_userdata_or_fn_or_nil_by_unmarshal = function(str)
+      return shelve.unmarshal(str)
+    end,
+    str_or_nil_by_raw_redis = function(str)
+      return dynamic_permanents.table_by_redis_client:get(str)
+    end,
+    not_userdata_or_fn_or_nil_by_redis = function(str)
+      local res = transf.str.str_or_nil_by_raw_redis(str)
+      if res then
+        return shelve.unmarshal(res)
+      else
+        return nil
+      end
+    end,
+
     in_cache_local_absolute_path = function(data, type)
       return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.str.leaflike_by_safe_filename(data)
     end,
@@ -4199,10 +4233,10 @@ transf = {
       return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.str.leaflike_by_safe_filename(data)
     end,
     multiline_str_by_qr_utf8_image_bow = function(data)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.str.str_by_single_quoted_escaped(data))
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.str.str_by_single_quoted_escaped(data))
     end,
     multiline_str_by_qr_utf8_image_wob = function(data)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_err_by_evaled_env_bash, {
+      return get.fn.rt_by_memoized(transf.str.str_or_err_by_evaled_env_bash, {
         strify_table_params = true,
         table_param_subset = "json"
       })("qrencode -l M -m 2 -t UTF8i " .. transf.str.str_by_single_quoted_escaped(data))
@@ -4312,7 +4346,7 @@ transf = {
       end
     end,
     unicode_prop_table_arr = function(str)
-      return get.fn.rt_or_nil_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.str.str_by_single_quoted_escaped(str))
+      return get.fn.rt_by_memoized(transf.str.table_or_err_by_evaled_env_bash_parsed_json)("uni identify -compact -format=all -as=json".. transf.str.str_by_single_quoted_escaped(str))
     end,
     str_by_single_quoted_escaped = function(str)
       return " '" .. get.str.str_and_int_by_replaced_eutf8_w_regex_str(str, "'", "\\'") .. "'"
@@ -4483,7 +4517,7 @@ transf = {
       })
     end,
     raw_contact_or_nil = function(searchstr)
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("khard show --format=yaml " .. searchstr )
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("khard show --format=yaml " .. searchstr )
     end,
     contact_table = function(searchstr)
       local raw_contact = transf.str.raw_contact_or_nil(searchstr)
@@ -7852,11 +7886,11 @@ transf = {
       return "https://web.archive.org/web/*/" .. url
     end,
     str_or_nil_by_default_negotiation_contents = function(url)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
+      return transf.fn.rt_by_memoized_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
           "curl -L" .. transf.str.str_by_single_quoted_escaped(url)
     end,
     str_or_nil_by_default_negotiation_contents_safer = function(url)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
+      return transf.fn.rt_by_memoized_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
           "curl -Lf" .. transf.str.str_by_single_quoted_escaped(url)
     end,
     sgml_document_or_nil = function(url)
@@ -7875,7 +7909,7 @@ transf = {
       return transf.not_userdata_or_fn.in_cache_local_absolute_path(transf.urllike_with_no_scheme.url_by_ensure_scheme(url), "url")
     end,
     url_table = function(url)
-      return get.fn.rt_or_nil_by_memoized(
+      return get.fn.rt_by_memoized(
         transf.str.table_or_nil_by_evaled_env_bash_parsed_json,
         {},
         "transf.str.table_or_nil_by_evaled_env_bash_parsed_json"
@@ -8063,7 +8097,7 @@ transf = {
       )
     end,
     hs_image = function(url)
-      return get.fn.rt_or_nil_by_memoized_invalidate_1_week(hs.image.imageFromURL, "hs.image.imageFromURL")(url)
+      return transf.fn.rt_by_memoized_1_week(hs.image.imageFromURL, "hs.image.imageFromURL")(url)
     end,
     multiline_str_by_qr_data = function(url)
       local path = transf.url.in_cache_local_absolute_path(url)
@@ -8072,7 +8106,7 @@ transf = {
     end,
     data_url = function(url)
       local ext = transf.path.extension(url)
-      return get.fn.rt_or_nil_by_memoized(hs.image.encodeAsURLstr)(transf.image_url.hs_image(url), ext)
+      return get.fn.rt_by_memoized(hs.image.encodeAsURLstr)(transf.image_url.hs_image(url), ext)
     end,
   },
   hs_image = {
@@ -8136,6 +8170,7 @@ transf = {
       return transf.str.str_by_single_quoted_escaped(json.encode(t))
     end,
     json_str = json.encode,
+    str_by_marshalled = shelve.marshal,
     json_str_by_pretty = function(t)
       if is.any.table(t) then
         return transf.table.json_str_by_pretty(t)
@@ -8796,7 +8831,7 @@ transf = {
       return get.str.bool_by_startswith(transf["nil"].line_by_mullvad_status(),"Connected")
     end,
     multiline_str_by_mullvad_relay_list = function()
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mullvad relay list")
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("mullvad relay list")
     end,
     relay_identifier_arr = function()
       return 
@@ -8825,7 +8860,7 @@ transf = {
       )
     end,
     str_by_khard_list_output = function()
-      return get.fn.rt_or_nil_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
+      return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)(
         "khard list --parsable"
       )
     end,
@@ -9029,13 +9064,13 @@ transf = {
     retriever_specifier_by_highest_precedence = function(retriever_specifier_arr)
       return hs.fnutils.reduce(
         retriever_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key {a_use, a_use, "precedence"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key {consts.use_singleton, consts.use_singleton, "precedence"})
       )
     end,
     retriever_specifier_arr_by_precedence_ordered = function(retriever_specifier_arr)
       return get.arr.arr_by_sorted(
         retriever_specifier_arr,
-        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key) {a_use, a_use, "precedence"})
+        get.fn.fn_by_arbitrary_args_bound_or_ignored(get.table_and_table.table_by_larger_key) {consts.use_singleton, consts.use_singleton, "precedence"})
     end
   },
   ipc_socket_id = {
@@ -9426,7 +9461,7 @@ transf = {
       local total_delta = transf.declared_position_change_input_spec.hs_geometry_point_by_start(declared_position_change_input_spec) - starting_point
       local starting_position_change_state_spec = {}
       starting_position_change_state_spec.num_steps = math.ceil(
-        transf.declared_position_change_input_spec.pos_number_by_duration(declared_position_change_input_spec) / POLLING_INTERVAL
+        transf.declared_position_change_input_spec.pos_number_by_duration(declared_position_change_input_spec) / consts.number_by_polling_interval
       )
 
       --- Function that calculates the initial delta value given a certain distance, factor of deceleration and number of steps.
@@ -9798,6 +9833,27 @@ transf = {
     end,
   },
   fn = {
+    rt_by_memoized = function (fn)
+      return get.fn.rt_by_memoized(fn, 0)
+    end,
+    rt_by_memoized_1_day = function(fn)
+      return get.fn.rt_by_memoized(fn, 60 * 60 * 24)
+    end,
+    rt_by_memoized_1_week = function(fn)
+      return get.fn.rt_by_memoized(fn, 60 * 60 * 24 * 7)
+    end,
+    rt_by_memoized_1_month = function(fn)
+      return get.fn.rt_by_memoized(fn, 60 * 60 * 24 * 30)
+    end,
+    rt_by_memoized_1_year = function(fn)
+      return get.fn.rt_by_memoized(fn, 60 * 60 * 24 * 365)
+    end,
+    rt_by_memoized_5_minutes = function(fn)
+      return get.fn.rt_by_memoized(fn, 60 * 5)
+    end,
+    fnname = function(fn)
+      return dynamic_permanents.fn_key_fnname_value_assoc[fn]
+    end,
     rt_or_nil_ret_fn_by_pcall = function(fn)
       return function(...)
         local succ, res = pcall(fn, ...)
