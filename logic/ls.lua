@@ -1037,7 +1037,7 @@ ls = {
             "scroll",
           "digitally paginated paged media",
   },
-  csl_type = {
+  csl_type_arr = {
     "article",
     "article-journal",
     "article-magazine",
@@ -1084,9 +1084,9 @@ ls = {
     "treaty",
     "webpage",
   },
-  csl_title_keys = { "title", "title-short" },
-  git_remote_types = {"github", "gitlab", "bitbucket"},
-  useless_files = {".git", "node_modules", ".vscode"},
+  csl_title_key_arr = { "title", "title-short" },
+  git_remote_type_arr = {"github", "gitlab", "bitbucket"},
+  name_of_useless_file_arr = {".git", "node_modules", ".vscode"},
   youtube_upload_status_arr = {
     "deleted",
     "failed",
@@ -1121,25 +1121,25 @@ ls = {
     "danbooru",
     "gelbooru" 
   },
-  likely_main_branch_name = {
+  likely_main_branch_name_arr = {
     "main",
     "master",
     "trunk",
     "develop",
     "dev",
   },
-  plaintext_table_extension = {"csv", "tsv"},
-  plaintext_assoc_extension = { "", "yaml", "json", "toml", "ini", "ics"},
-  image_extension = {"png", "jpg", "gif", "webp", "svg"},
-  db_extension = {"db", "dbf", "mdb", "accdb", "db3", "sdb", "sqlite", "sqlite3", "nsf", "fp7", "fp5", "fp3", "fdb", "gdb", "dta", "pdb", "mde", "adf", "mdf", "ldf", "myd", "myi", "frm", "ibd", "ndf", "db2", "dbase", "tps", "dat", "dbase3", "dbase4", "dbase5", "edb", "kdb", "kdbx", "sdf", "ora", "dbk", "rdb", "rpd", "dbc", "dbx", "btr", "btrieve", "db3", "s3db", "sl3", "db2", "s2db", "sqlite2", "sl2"},
-  sql_extension = {"db", "sdb", "sqlite", "db3", "s3db", "sqlite3", "sl3", "db2", "s2db", "sqlite2", "sl2", "sql", "mdf", "ldf", "ndf", "myd", "frm", "ibd", "ora", "rdb"},
-  sqlite_extension = {"db", "sdb", "sqlite", "db3", "s3db", "sqlite3", "sl3", "db2", "s2db", "sqlite2", "sl2"},
-  bin_extension = {"jpg", "jpeg", "png", "gif", "pdf", "mp3", "mp4", "mov", "avi", "zip", "gz", 
+  plaintext_table_extension_arr = {"csv", "tsv"},
+  plaintext_assoc_extension_arr = { "", "yaml", "json", "toml", "ini", "ics"},
+  image_extension_arr = {"png", "jpg", "gif", "webp", "svg"},
+  db_extension_arr = {"db", "dbf", "mdb", "accdb", "db3", "sdb", "sqlite", "sqlite3", "nsf", "fp7", "fp5", "fp3", "fdb", "gdb", "dta", "pdb", "mde", "adf", "mdf", "ldf", "myd", "myi", "frm", "ibd", "ndf", "db2", "dbase", "tps", "dat", "dbase3", "dbase4", "dbase5", "edb", "kdb", "kdbx", "sdf", "ora", "dbk", "rdb", "rpd", "dbc", "dbx", "btr", "btrieve", "db3", "s3db", "sl3", "db2", "s2db", "sqlite2", "sl2"},
+  sql_extension_arr = {"db", "sdb", "sqlite", "db3", "s3db", "sqlite3", "sl3", "db2", "s2db", "sqlite2", "sl2", "sql", "mdf", "ldf", "ndf", "myd", "frm", "ibd", "ora", "rdb"},
+  sqlite_extension_arr = {"db", "sdb", "sqlite", "db3", "s3db", "sqlite3", "sl3", "db2", "s2db", "sqlite2", "sl2"},
+  bin_extension_arr = {"jpg", "jpeg", "png", "gif", "pdf", "mp3", "mp4", "mov", "avi", "zip", "gz", 
   "tar", "tgz", "rar", "7z", "dmg", "exe", "app", "pkg", "m4a", "wav", "doc", 
   "docx", "xls", "xlsx", "ppt", "pptx", "psd", "ai", "mpg", "mpeg", "flv", "swf",
   "sketch", "db", "sql", "sqlite", "sqlite3", "sqlitedb", "odt", "odp", "ods", 
   "odg", "odf", "odc", "odm", "odb", "jar", "pyc"},
-  audio_extension = {
+  audio_extension_arr = {
     "3gp",
     "aa",
     "aac",
@@ -1184,7 +1184,7 @@ ls = {
     "webm",
     "8svx"
   },
-  video_extension = {
+  video_extension_arr = {
     "3g2",
     "3gp",
     "amv",
@@ -1226,7 +1226,7 @@ ls = {
     "yuv"
   },
 
-  whisper_audio_extension = {
+  whisper_extension_arr = {
     "mp3",
     "mp4",
     "mpeg",
@@ -1235,7 +1235,7 @@ ls = {
     "wav",
     "webm"
   },
-  hydrusable_extension = {
+  hydrusable_extension_arr = {
     "jpg",
     "png",
     "gif",

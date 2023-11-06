@@ -1820,7 +1820,7 @@ transf = {
     end,
     git_remote_type = function(path)
       local git_remote_type = transf.in_git_dir.alphanum_minus_or_nil_by_remote_sld(path)
-      if get.arr.bool_by_contains(ls.git_remote_types, git_remote_type ) then
+      if get.arr.bool_by_contains(ls.git_remote_type_arr, git_remote_type ) then
         return git_remote_type
       else
         return tblmap.host.git_remote_type[transf.in_git_dir.host_by_remote(path)] -- we'll hardcode known hosts there
@@ -7472,7 +7472,7 @@ transf = {
   },
   csl_table = {
     str_or_nil_by_main_title = function(csl_table)
-      return get.assoc.vt_by_first_match_w_kv_arr(csl_table, ls.csl_title_keys)
+      return get.assoc.vt_by_first_match_w_kv_arr(csl_table, ls.csl_title_key_arr)
     end,
     dtprts__arr_arr_by_issued = function(csl_table)
       return csl_table.issued

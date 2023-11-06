@@ -235,10 +235,62 @@ is = {
     citable_filename = function(str)
       return 
         get.str.bool_by_contains_w_str(str, "!citid:")
-    end
+    end,
+    name_of_useless_file = function(str)
+      return get.arr.bool_by_contains(ls.name_of_useless_file_arr, str)
+    end,
   },
   extension = {
+    bin_extension = function(str)
+      return get.arr.bool_by_contains(ls.bin_extension_arr, str)
+    end,
+    plaintext_extension = function(str)
+      return not is.extension.bin_extension(str)
+    end,
+    image_extension = function(str)
+      return get.arr.bool_by_contains(ls.image_extension_arr, str)
+    end,
+    hydrusable_extension = function(str)
+      return get.arr.bool_by_contains(ls.hydrusable_extension_arr, str)
+    end,
+  },
+  bin_extension = {
+    db_extension = function(str)
+      return get.arr.bool_by_contains(ls.db_extension_arr, str)
+    end,
+    playable_extension = function(str)
+      return get.arr.bool_by_contains(ls.audio_extension_arr, str) or get.arr.bool_by_contains(ls.video_extension_arr, str)
+    end,
+  },
+  playable_extension = {
+    audio_extension = function(str)
+      return get.arr.bool_by_contains(ls.audio_extension_arr, str)
+    end,
+    video_extension = function(str)
+      return get.arr.bool_by_contains(ls.video_extension_arr, str)
+    end,
+    whisper_extension = function(str)
+      return get.arr.bool_by_contains(ls.whisper_extension_arr, str)
+    end,
+  },
+  db_extension = {
+    sql_extension = function(str)
+      return get.arr.bool_by_contains(ls.sql_extension_arr, str)
+    end,
+  },
 
+  sql_extension = {
+    sqlite_extension = function(str)
+      return get.arr.bool_by_contains(ls.sqlite_extension_arr, str)
+    end,
+  },
+  plaintext_extension = {
+    plaintext_table_extension = function(str)
+      return get.arr.bool_by_contains(ls.plaintext_table_extension_arr, str)
+    end,
+    plaintext_assoc_extension = function(str)
+      return get.arr.bool_by_contains(ls.plaintext_assoc_extension_arr, str)
+    end,
   },
   trimmed_line = {
     displayname_email = function(str)
@@ -878,7 +930,7 @@ is = {
     end,
     git_remote_type = function(str)
       return get.arr.bool_by_contains(
-        ls.git_remote_types,
+        ls.git_remote_type_arr,
         str
       )
     end,
@@ -936,7 +988,7 @@ is = {
       return get.str.bool_by_matches_part_eutf8(transf.path.leaflike_by_leaf(path), ":%d+$")
     end,
     useless_file_leaf_path = function(path)
-      return get.arr.bool_by_contains(ls.useless_files, transf.path.leaflike_by_leaf(path))
+      return get.arr.bool_by_contains(ls.name_of_useless_file_arr, transf.path.leaflike_by_leaf(path))
     end,
     not_useless_file_leaf_path = function(path)
       return not is.path.useless_file_leaf_path(path)
@@ -1427,7 +1479,7 @@ is = {
   },
   playable_file = {
     whisper_file = function(path)
-      return get.path.bool_by_is_normalized_extension_w_str_arr(path, ls.whisper_audio_extension)
+      return get.path.bool_by_is_normalized_extension_w_str_arr(path, ls.whisper_extension)
     end,
   },
   shell_script_file = {
@@ -1527,6 +1579,11 @@ is = {
     end,
     
   },
+  csl_key = {
+    csl_title_key = function(str)
+      return get.arr.bool_by_contains(ls.csl_title_key_arr, str)
+    end,
+  },
   lower_alphanum_minus_underscore = {
    
     
@@ -1565,7 +1622,7 @@ is = {
       )
     end,
     csl_type = function(str)
-      return get.arr.bool_by_contains(ls.csl_type, str)
+      return get.arr.bool_by_contains(ls.csl_type_arr, str)
     end,
   },
   alphanum_underscore = {
@@ -1850,7 +1907,9 @@ is = {
     youtube_privacy_status = function(str)
       return get.arr.bool_by_contains(ls.youtube_privacy_status_arr, str)
     end,
-
+    likely_main_branch_name = function(str)
+      return get.arr.bool_by_contains(ls.likely_main_branch_name_arr, str)
+    end,
   },
   youtube_upload_status  = {
     youtube_exists_upload_status = function(str)
@@ -2034,7 +2093,7 @@ is = {
     whisper_url = function(url)
       return get.path.bool_by_is_normalized_extension_w_str_arr(
         transf.path_url.path(url),
-        ls.whisper_audio_extension
+        ls.whisper_extension
       )
     end,
   },

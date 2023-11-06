@@ -100,7 +100,28 @@ thing_name_hierarchy = {
           mod_symbol = "leaf",
           path_component = {
             leaflike = {
-              extension = "leaf",
+              name_of_useless_file = "leaf",
+              extension = {
+                bin_extension = {
+                  db_extension = {
+                    sql_extension = {
+                      sqlite_extension = "leaf",
+                    },
+                    
+                  },
+                  playable_extension = {
+                    whisper_extension = "leaf",
+                    video_extension = "leaf",
+                    audio_extension = "leaf",
+                  }
+                },
+                plaintext_extension = {
+                  plaintext_table_extension = "leaf",
+                  plaintext_assoc_extension = "leaf",
+                },
+                image_extension = "leaf",
+                hydrusable_extension = "leaf",
+              },
               citable_filename = "leaf"
             },
           },
@@ -650,6 +671,7 @@ thing_name_hierarchy = {
                                     youtube_exists_upload_status = "leaf",
                                   },
                                   youtube_privacy_status = "leaf",
+                                  likely_main_branch_name = "leaf",
                                 },
                                 iso_3366_1_alpha_2_country_code = "leaf",
                                 iso_3366_1_alpha_3_country_code = "leaf",
