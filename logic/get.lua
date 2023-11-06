@@ -2505,7 +2505,7 @@ get = {
   },
   whisper_file = {
     table_by_transcribed = function(path, format, prompt, iso639_1)
-      return transf.fn.rt_by_memoized_1_year(rest, "rest")({
+      return transf.fn.rt_by_memoized_1_year(rest)({
         api_name = "openai",
         endpoint = "audio/transcriptions",
         request_table_type = "form",
@@ -3485,8 +3485,8 @@ get = {
   },
   fn = {
     rt_and_timestamp_s_by_in_memory_memo = function(fn, params)
-      memstore[fn] = memstore[fn] or {}
-      local node = memstore[fn]
+      dynamic_permanents.fn_key_int_key_table_value_assoc_value_assoc_by_memstore[fn] = dynamic_permanents.fn_key_int_key_table_value_assoc_value_assoc_by_memstore[fn] or {}
+      local node = dynamic_permanents.fn_key_int_key_table_value_assoc_value_assoc_by_memstore[fn]
       for i=1, #params do
         local param = params[i]
         if param == nil then param = consts.nil_singleton 
@@ -3568,15 +3568,15 @@ get = {
     --- @return fun(...: I): (O), hs.timer?
     rt_by_memoized = function(fn, interval)
 
-      if memoized[fn] then -- already memoized
-        return memoized[fn]
+      if dynamic_permanents.fn_key_fn_value_assoc_by_memoized_container[fn] then -- already memoized
+        return dynamic_permanents.fn_key_fn_value_assoc_by_memoized_container[fn]
       end
     
       --- set default options
       interval = interval or 0
       local worth_checking_db = (interval == 0 or interval > 60 * 60) -- only check db if we're memoizing for at least an hour
 
-      memstore[fn] = memstore[fn] or {}
+      dynamic_permanents.fn_key_int_key_table_value_assoc_value_assoc_by_memstore[fn] = dynamic_permanents.fn_key_int_key_table_value_assoc_value_assoc_by_memstore[fn] or {}
     
       -- create the memoized function
       local memoized_func = function(...)
@@ -3610,7 +3610,7 @@ get = {
         return transf.arr.n_anys(retval) -- we're sure to have a result now, so we can return it
 
       end
-      memoized[fn] = memoized_func
+      dynamic_permanents.fn_key_fn_value_assoc_by_memoized_container[fn] = memoized_func
       return memoized_func
     end,
   },

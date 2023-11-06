@@ -1,15 +1,6 @@
---- @type hs
-hs = hs
+require("type-imports")
 hs.ipc.cliInstall("/opt/homebrew") -- install the homebrew cli, stupidly has to be done on every launch
-
---- typedef for placeholder var `_`
---- @type any
-_=nil
-
 require("package-imports")
-require("types")
-require("external-typings")
-require("globals")
 require("logic")
 
 comp = transf.dir.plaintext_dictonary_read_assoc(env.MCOMPOSITE)
@@ -20,14 +11,8 @@ timer_arr_refresher = hs.timer.doEvery(1, get.fn.fn_by_1st_n_bound(act.timer_spe
 
 env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
 
-watcher_arr = {}
-hotkey_arr = {}
-pasteboard_arr = {}
-stream_arr = {}
-source_id_arr = {}
-
 dothis.created_item_specifier_arr.create(
-  hotkey_arr,
+  dynamic_permanents.hotkey_created_item_specifier_arr,
   {
     key = "r",
     fn = hs.reload
@@ -35,7 +20,7 @@ dothis.created_item_specifier_arr.create(
 )
 
 dothis.created_item_specifier_arr.create_all(
-  watcher_arr,
+  dynamic_permanents.watcher_created_item_specifier_arr,
   {
     {
       type = "watcher",
@@ -72,9 +57,8 @@ dothis.created_item_specifier_arr.create_all(
   
 )
 
-main_qspec = {}
 main_qspec = {
-  fn_arr = {},
+  
   hotkey_created_item_specifier = act.creation_specifier.create({
     type = "hotkey",
     key = "/",

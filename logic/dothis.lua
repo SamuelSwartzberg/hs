@@ -2002,8 +2002,8 @@ dothis = {
 
   fn = {
     put_memo_and_created_at_in_memory = function(fn, params, result)
-      memstore[fn] = memstore[fn] or {}
-      local node = memstore[fn]
+      dynamic_permanents.fn_key_int_key_table_value_assoc_value_assoc_by_memstore[fn] = dynamic_permanents.fn_key_int_key_table_value_assoc_value_assoc_by_memstore[fn] or {}
+      local node = dynamic_permanents.fn_key_int_key_table_value_assoc_value_assoc_by_memstore[fn]
       for i=1, #params do
         local param = params[i]
         if param == nil then param = consts.nil_singleton 
@@ -2037,28 +2037,6 @@ dothis = {
         timestamp_queryarr,
         os.time()
       )
-    end,
-  },
-  fnid = {
-    put_memo = function(fnid, strifystrat, params, result)
-      memstore[fnid] = memstore[fnid] or {}
-      memstore[fnid][strifystrat] = memstore[fnid][strifystrat] or {}
-      local node = memstore[fnid][strifystrat]
-      for i=1, #params do
-        local param = params[i]
-        if param == nil then param = consts.nil_singleton 
-        elseif strifystrat ~= "raw" and is.any.table(param) then
-          if strifystrat == "json" then
-            param = json.encode(param)
-          elseif strifystrat == "no-fn-userdata-loops" then
-            param = shelve.marshal(param)
-          elseif strifystrat == "any" then
-            param = hs.inspect(param, { depth = 4 })
-          end
-        end
-        
-      end
-      
     end,
   },
   fn_queue_specifier = {

@@ -513,8 +513,7 @@ is = {
     url = function(str)
       return get.fn.rt_by_memoized(
         transf.str.bool_by_evaled_env_bash_success,
-        {},
-        "is.printable_ascii_str.url")(
+      )(
         "url_parser_cli " .. transf.str.str_by_single_quoted_escaped(str)
       )
     end,

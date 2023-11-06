@@ -2158,7 +2158,7 @@ transf = {
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("zbarimg -q --raw " .. transf.str.str_by_single_quoted_escaped(path))
     end,
     hs_image = function(path)
-      return transf.fn.rt_by_memoized_1_week(hs.image.imageFromPath, "hs.image.imageFromPath")(path)
+      return transf.fn.rt_by_memoized_1_week(hs.image.imageFromPath)(path)
     end,
     booru_post_url = function(path)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
@@ -2180,9 +2180,7 @@ transf = {
         end
       end
       return get.fn.rt_by_memoized(
-        transf.str.str_or_nil_by_evaled_env_bash_stripped,
-        nil,
-        "transf.str.str_or_nil_by_evaled_env_bash_stripped"
+        transf.str.str_or_nil_by_evaled_env_bash_stripped
     )
       (
         "hydrus_get_tags " .. fetchpath
@@ -3427,7 +3425,7 @@ transf = {
   },
   cleaned_iban = {
     iban_data_spec = function(iban)
-      local res = transf.fn.rt_by_memoized_1_month(rest, "rest")({
+      local res = transf.fn.rt_by_memoized_1_month(rest)({
         host = "openiban.com/",
         endpoint = "validate/" .. iban,
         params = { getBIC = "true" },
@@ -3969,7 +3967,7 @@ transf = {
       return "https://www.youtube.com/channel/" .. id
     end,
     youtube_channel_item = function(id)
-      return transf.fn.rt_by_memoized_1_month(rest, "rest")({
+      return transf.fn.rt_by_memoized_1_month(rest)({
         api_name = "youtube",
         endpoint = "channels",
         params = {
@@ -3984,7 +3982,7 @@ transf = {
   },
   handle = {
     youtube_channel_item = function(handle)
-      return transf.fn.rt_by_memoized_1_month(rest, "rest")({
+      return transf.fn.rt_by_memoized_1_month(rest)({
         api_name = "youtube",
         endpoint = "channels",
         params = { handle = handle}
@@ -7886,11 +7884,11 @@ transf = {
       return "https://web.archive.org/web/*/" .. url
     end,
     str_or_nil_by_default_negotiation_contents = function(url)
-      return transf.fn.rt_by_memoized_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
+      return transf.fn.rt_by_memoized_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped)
           "curl -L" .. transf.str.str_by_single_quoted_escaped(url)
     end,
     str_or_nil_by_default_negotiation_contents_safer = function(url)
-      return transf.fn.rt_by_memoized_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped, "run")
+      return transf.fn.rt_by_memoized_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped)
           "curl -Lf" .. transf.str.str_by_single_quoted_escaped(url)
     end,
     sgml_document_or_nil = function(url)
@@ -7910,9 +7908,7 @@ transf = {
     end,
     url_table = function(url)
       return get.fn.rt_by_memoized(
-        transf.str.table_or_nil_by_evaled_env_bash_parsed_json,
-        {},
-        "transf.str.table_or_nil_by_evaled_env_bash_parsed_json"
+        transf.str.table_or_nil_by_evaled_env_bash_parsed_json
       )(
         "url_parser_cli --json" .. transf.str.str_by_single_quoted_escaped(url)
       )
@@ -8097,7 +8093,7 @@ transf = {
       )
     end,
     hs_image = function(url)
-      return transf.fn.rt_by_memoized_1_week(hs.image.imageFromURL, "hs.image.imageFromURL")(url)
+      return transf.fn.rt_by_memoized_1_week(hs.image.imageFromURL)(url)
     end,
     multiline_str_by_qr_data = function(url)
       local path = transf.url.in_cache_local_absolute_path(url)
@@ -9934,9 +9930,6 @@ transf = {
     
   },
   fnname = {
-    local_absolute_path_by_in_cache = function(fnname)
-      return transf.str.in_cache_local_absolute_path(fnname, "fsmemoize")
-    end,
     
   },
   discord_export_dir = {

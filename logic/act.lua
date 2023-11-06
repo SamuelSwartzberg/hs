@@ -1148,7 +1148,7 @@ act = {
     add_to_clipboard = hs.pasteboard.setContents,
     add_to_pasteboard_arr = function(str)
       dothis.arr.move_to_front_or_unshift(
-        pasteboard_arr,
+        dynamic_permanents.str_arr_by_pasteboard_arr,
         str
       )
     end,
@@ -1673,13 +1673,13 @@ act = {
       )
     end,
     activate_next_source_id = function()
-      act.source_id_arr.activate_next(source_id_arr)
+      act.source_id_arr.activate_next(dynamic_permanents.source_id_arr)
     end,
     maintain_state_stream_arr = function()
-      act.stream_created_item_specifier_arr.maintain_state(stream_arr)
+      act.stream_created_item_specifier_arr.maintain_state(dynamic_permanents.stream_created_item_specifier_arr)
     end,
     choose_action_on_first_running_stream = function()
-      local strm = transf.stream_created_item_specifier_arr.stream_created_item_specifier_by_first_running(stream_arr)
+      local strm = transf.stream_created_item_specifier_arr.stream_created_item_specifier_by_first_running(dynamic_permanents.stream_created_item_specifier_arr)
       if strm then
         act.any.choose_action(strm)
       else
@@ -1688,12 +1688,12 @@ act = {
     end,
     choose_stream_and_then_action = function()
       act.arr.choose_item_and_action(
-        stream_arr
+        dynamic_permanents.stream_created_item_specifier_arr
       )
     end,
     choose_action_on_first_item_in_pasteboard_arr = function()
       act.any.choose_action(
-        pasteboard_arr[1]
+        dynamic_permanents.str_arr_by_pasteboard_arr[1]
       )
     end,
     vdirsyncer_sync = function()
@@ -1732,8 +1732,8 @@ act = {
         transf["nil"].running_application_by_frontmost()
       )
     end,
-    purge_memstore_cache = function()
-      memstore = {}
+    purge_memstore = function()
+      dynamic_permanents.fn_key_int_key_table_value_assoc_value_assoc_by_memstore = {}
     end,
     purge_fsmemoize_cache = function()
       dothis.absolute_path.delete(
@@ -2223,16 +2223,4 @@ act = {
       )
     end,
   },
-  fnid = {
-    reset_by_all = function(fnid)
-      memstore[fnid] = nil
-    end,
-  },
-  fnname = {
-    reset_by_all = function(fnname)
-      dothis.absolute_path.delete(
-        transf.fnname.local_absolute_path_by_in_cache(fnname)
-      )
-    end,
-  } 
 }
