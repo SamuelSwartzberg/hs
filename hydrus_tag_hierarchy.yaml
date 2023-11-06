@@ -542,6 +542,26 @@ things:
           smartphone mockup:
       user interface object:
         user interface component:
+          grid interface component:
+            thumbnail grid overview:
+          messenger interface component:
+            messenger overview screen:
+            messenger chat screen:
+            messenger chat message:
+            messenger chatlog:
+          shopping interface component:
+            product page:
+          forum interface component:
+            forum post:
+            forum thread:
+            forum board overview:
+          post-based social interface component:
+            post-based social interface feed:
+            post-based social interface post:
+            post-based social interface comment thread:
+            post-based social interface comment:
+              post-based social interface toplevel comment:
+              post-based social interface reply:
           icon:
             _s: general:icon (computing)
           camera user interface component:
@@ -559,12 +579,6 @@ things:
             __ex: the user interface of an app or program covering the entire screen. Protyptically in the kind of screenshots cmd+shift+5 can take
     abstract virtual object:
       thing on the web:
-        page type:
-          social page:
-            post:
-            thread:
-          shopping page:
-            product page:
         web host:
           aws:
         web service:
@@ -576,17 +590,45 @@ things:
             gitlab:
             bitbucket:
           booru:
+            booru post:
             danbooru:
             gelbooru:
             realbooru:
             xbooru:
             aibooru:
-          social media:
+          messenger:
+            messenger conversation:
+            messenger message:
+            whatsapp:
+              whatsapp conversation:
+                _p: messenger conversation
+              whatsapp message:
+                _p: messenger message
+            telegram:
+              telegram conversation:
+                _p: messenger conversation
+              telegram message:
+                _p: messenger message
+            signal:
+              signal conversation:
+                _p: messenger conversation
+              signal message:
+                _p: messenger message
             discord:
               discord channel:
                 midjourney discord channel:
+              discord conversation:
+                _p: messenger conversation
+              discord message:
+                _p: messenger message
+          social media:
+            social media post:
             reddit:
+              _s: proxsrc:reddit
               subreddit:
+              reddit post:
+                _s: proxsrc:reddit post
+                _p: social media post
             twitter:
           ai sharing site:
             pornpendotai: 

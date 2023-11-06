@@ -2079,14 +2079,6 @@ get = {
     end,
   },
   path = {
-    bool_by_extension_group = function(path, filetype)
-      local extension = transf.path.extension_by_normalized(path)
-      if get.arr.bool_by_contains(ls.extension[filetype], extension) then
-        return true
-      else
-        return false
-      end
-    end,
     path_by_with_different_extension = function(path, ext)
       return transf.path.path_by_without_extension(path) .. "." .. ext
     end,
@@ -2096,13 +2088,13 @@ get = {
     bool_by_is_extension = function(path, ext)
       return transf.path.extension(path) == ext
     end,
-    bool_by_is_normalized_extension = function(path, ext)
+    bool_by_is_normalized_extension_w_str = function(path, ext)
       return transf.path.extension_by_normalized(path) == ext
     end,
     bool_by_is_extension_in = function(path, exts)
       return get.arr.bool_by_contains(exts, transf.path.extension(path))
     end,
-    bool_by_is_standartized_extension_in = function(path, exts)
+    bool_by_is_normalized_extension_w_str_arr = function(path, exts)
       return get.arr.bool_by_contains(exts, transf.path.extension_by_normalized(path))
     end,
     bool_by_is_filename = function(path, filename)
@@ -2586,7 +2578,7 @@ get = {
       return get.str.str_by_sub_eutf8(prefixed_header, #header + 2) -- +2 for the colon and the space
     end,
     addresses = function(path, header, only)
-      if not get.arr.bool_by_contains(ls.email_headers_containin_emails, header) then
+      if not get.arr.bool_by_contains(ls.lower_strict_kebap_case_arr_by_email_headers_containin_emails, header) then
         error("Header can't contain email addresses")
       end
       only = get.any.default_if_nil(only, true)
@@ -2725,10 +2717,10 @@ get = {
   },
   dcmp_name = {
     dcmp_name_by_next = function(component, n)
-      return get.arr.t_or_nil_by_next_w_index(ls.dcmp_names, transf.dcmp_name.date_component_index(component) + n)
+      return get.arr.t_or_nil_by_next_w_index(ls.dcmp_name_arr, transf.dcmp_name.date_component_index(component) + n)
     end,
     dcmp_name_by_previous = function(component, n)
-      return get.arr.t_or_nil_by_previous(ls.dcmp_names, transf.dcmp_name.date_component_index(component) - n)
+      return get.arr.t_or_nil_by_previous(ls.dcmp_name_arr, transf.dcmp_name.date_component_index(component) - n)
     end,
   },
   timestamp_s = {

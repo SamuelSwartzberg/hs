@@ -334,6 +334,11 @@ thing_name_hierarchy = {
                   separated_nonindicated_oct_number_str = "leaf",
                   separated_nonindicated_dec_number_str = "leaf",
                 },
+                alphanum_minus_underscore_space_str = {
+                  alphanum_space_str = {
+                    vcard_addr_key = "leaf",
+                  },
+                },
                 printable_ascii_not_whitespace_str = {
                   startswith_percent_printable_ascii_not_whitespace = {
                     rfc3339like_dt_format_str = "leaf",
@@ -509,6 +514,7 @@ thing_name_hierarchy = {
                             ipv6 = "leaf",
                           },
                           alphanum_minus_underscore = {
+                            csl_key = "leaf",
                             lower_alphanum_minus_underscore = {
                               
                             },
@@ -575,7 +581,9 @@ thing_name_hierarchy = {
                             alphanum_underscore = {
                               lower_alphanum_underscore = {
                                 general_name = {
-                                  thing_name = "leaf"
+                                  thing_name_with_optional_explanation = {
+                                    thing_name = "leaf"
+                                  }
                                 },
                               },
                               upper_alphanum_underscore = "leaf",
@@ -600,6 +608,8 @@ thing_name_hierarchy = {
                                     search_engine_id = "leaf",
                                     creation_specifier_type = "leaf",
                                     bin_specifier_name = "leaf",
+                                    unicode_char_prop = "leaf",
+                                    unicode_emoji_prop = "leaf",
                                   },
                                   mixed_strict_snake_case = {
                                     camel_strict_snake_case = {
@@ -636,14 +646,18 @@ thing_name_hierarchy = {
                                     danbooru_category_name = "leaf",
                                   },
                                   type_name = "leaf",
+                                  youtube_upload_status = {
+                                    youtube_exists_upload_status = "leaf",
+                                  },
+                                  youtube_privacy_status = "leaf",
                                 },
                                 iso_3366_1_alpha_2_country_code = "leaf",
                                 iso_3366_1_alpha_3_country_code = "leaf",
                                 iso_639_1_language_code = "leaf",
                                 iso_639_3_language_code = "leaf",
                                 mullvad_city_code = "leaf",
-                                youtube_upload_status = "leaf",
-                                youtube_privacy_status = "leaf",
+                                menu_item_key = "leaf",
+                                vcard_key_with_vcard_type = "leaf",
                               },
                               hex_str = {
                                 byte_hex_str = "leaf",

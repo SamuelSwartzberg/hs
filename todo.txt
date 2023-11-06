@@ -5,11 +5,9 @@ refac:
   - fix static type errors in remaining files
   - write tests with busted
   - many names don't yet corrrespond to the new schema
-  - replace package methods with my own
   - fix logging dirs, etc, to now use json
   - hydrus
     - now that some namespaces don't exist, we need a cleverer way to tell gpt4 what to extract from the filename in case of existing files, and also apply this to youtube import
-    - split notes from others
     - also, existing files do have metadata in filename
     - is there a nice, current way to fetch artist and copyright and autoincorporate them in the structure?
     - children via structure
@@ -24,7 +22,6 @@ post 'lua is working':
       - js to rewrite filenames on e.g. g.e-hentai to whatever I choose for hydrus
       - need to think on how to handle other file transmission & parsing (e.g. downloads, images from phone)
       - parse manga panels -> add to hydrus
-      - needs auto tagging capabilities based on ai
       - deal with low-tagging boorus and other sources
       - way to add url and make ai add tags later
     - shrinking, moving other documents

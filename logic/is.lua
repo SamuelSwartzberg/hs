@@ -237,6 +237,9 @@ is = {
         get.str.bool_by_contains_w_str(str, "!citid:")
     end
   },
+  extension = {
+
+  },
   trimmed_line = {
     displayname_email = function(str)
       return get.str.bool_by_matches_whole_eutf8(str, ".- <.-@.+>")
@@ -358,6 +361,19 @@ is = {
     end,
     phone_number = function(str)
       return #str <= 25 and get.str.bool_by_matches_part_onig(str, "\\d{2}") -- will have many false positives, but that's fine
+    end,
+    alphanum_minus_underscore_space_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, "[a-zA-Z0-9 _-]+")
+    end,
+  },
+  alphanum_minus_underscore_space_str =  {
+    alphanum_space_str = function(str)
+      return get.str.bool_by_not_contains_w_str_arr(str, {"_", "-"})
+    end,
+  },
+  alphanum_space_str = {
+    vcard_addr_key = function(str)
+      return get.arr.bool_by_contains(ls.vcard_addr_key_arr, str)
     end,
   },
   separated_nonindicated_number_str = {
@@ -888,7 +904,7 @@ is = {
   },
   actual_youtube_video_id = {
     extant_youtube_video_id = function(id)
-      return get.arr.bool_by_contains(ls.youtube.extant_upload_status, transf.youtube_video_id.youtube_upload_status(id))
+      return get.arr.bool_by_contains(ls.youtube_exists_upload_status_arr, transf.youtube_video_id.youtube_upload_status(id))
     end,
     private_youtube_video_id = function(id)
       return transf.youtube_video_id.privacy_status(id) == "private"
@@ -1381,37 +1397,37 @@ is = {
       return not is.file.bin_file(path)
     end,
     image_file = function(path)
-      return get.path.bool_by_extension_group(path, "image")
+      return get.path.bool_by_is_normalized_extension_w_str_arr(path, ls.image_extension)
     end,
     hydrusable_file = function(path)
-      return get.path.bool_by_extension_group(path, "hydrus")
+      return get.path.bool_by_is_normalized_extension_w_str_arr(path, ls.hydrusable_extension)
     end,
     bin_file = function(path)
-      return get.arr.bool_by_contains(ls.extension.bin, transf.path.extension_by_normalized(path))
+      return get.arr.bool_by_contains(ls.bin_extension, path)
     end,
   },
   bin_file = {
     db_file = function(path)
-      return get.path.bool_by_is_standartized_extension_in(
+      return get.path.bool_by_is_normalized_extension_w_str_arr(
         path,
-        ls.extension.db
+        ls.db_extension
       )
     end,
     playable_file = function (path)
-      return get.path.bool_by_extension_group(path, "audio") or get.path.bool_by_extension_group(path, "video")
+      return get.path.bool_by_is_normalized_extension_w_str_arr(path, ls.audio_extension) or get.path.bool_by_is_normalized_extension_w_str_arr(path, ls.video_extension)
     end,
   },
   db_file = {
     sqlite_file = function(path)
-      return get.path.bool_by_is_standartized_extension_in(
+      return get.path.bool_by_is_normalized_extension_w_str_arr(
         path,
-        ls.extension.sqlite
+        ls.sqlite_extension
       )
     end,
   },
   playable_file = {
     whisper_file = function(path)
-      return get.path.bool_by_extension_group(path, "whisper_audio")
+      return get.path.bool_by_is_normalized_extension_w_str_arr(path, ls.whisper_audio_extension)
     end,
   },
   shell_script_file = {
@@ -1434,15 +1450,15 @@ is = {
       )
     end,
     plaintext_assoc_file = function(path)
-      get.path.bool_by_is_standartized_extension_in(
+      get.path.bool_by_is_normalized_extension_w_str_arr(
         path,
-        ls.extension["plaintext_assoc"]
+        ls["plaintext_assoc_extension"]
       )
     end,
     plaintext_table_file = function(path)
-      get.path.bool_by_is_standartized_extension_in(
+      get.path.bool_by_is_normalized_extension_w_str_arr(
         path,
-        ls.extension["plaintext_table"]
+        ls["plaintext_table_extension"]
       )
     end,
     m3u_file = function(path)
@@ -1461,7 +1477,7 @@ is = {
       return get.path.is_leaf(path, "citations")
     end,
     md_file = function(path)
-      return get.path.bool_by_is_normalized_extension(path, "md")
+      return get.path.bool_by_is_normalized_extension_w_str(path, "md")
     end,
   },
   script_file = {
@@ -1472,11 +1488,11 @@ is = {
     end,
   },
   plaintext_assoc_file = {
-    yaml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "yaml"}),
-    json_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "json"}),
-    toml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "toml"}),
-    ini_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "ini"}),
-    ics_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension, {a_use, "ics"}),
+    yaml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "yaml"}),
+    json_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "json"}),
+    toml_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "toml"}),
+    ini_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "ini"}),
+    ics_file = get.fn.fn_by_arbitrary_args_bound_or_ignored(get.path.bool_by_is_normalized_extension_w_str, {a_use, "ics"}),
   },
   plaintext_table_file = {
 
@@ -1506,7 +1522,9 @@ is = {
     snakekebap_case = function(str)
       return get.str.bool_by_not_matches_part_onig(str, "^\\d")
     end,
-    locale_str
+    csl_key = function(str)
+      return get.arr.bool_by_contains(ls.csl_key_arr, str)
+    end,
     
   },
   lower_alphanum_minus_underscore = {
@@ -1582,13 +1600,13 @@ is = {
   },
   lower_strict_snake_case = {
     citable_object_id_indication_name = function(str)
-      return get.arr.bool_by_contains(ls.citable_object_id_indication_name, str)
+      return get.arr.bool_by_contains(ls.citable_object_id_indication_name_arr, str)
     end,
     client_id = function(str)
       return get.table.bool_by_has_key(fstblmap.client_id.contact_uuid, str)
     end,
     client_project_kind = function(str)
-      return get.arr.bool_by_contains(ls.client_project_kind, str)
+      return get.arr.bool_by_contains(ls.client_project_kind_arr, str)
     end,
     billing_unit = function(str)
       return get.arr.bool_by_contains(ls.billing_unit_arr, str)
@@ -1626,6 +1644,12 @@ is = {
     bin_specifier_name = function(str)
       return get.arr.bool_by_contains(ls.bin_specifier_name_arr, str)
     end,
+    unicode_char_prop = function(str)
+      return get.arr.bool_by_contains(ls.unicode_char_prop_arr, str)
+    end,
+    unicode_emoji_prop = function(str)
+      return get.arr.bool_by_contains(ls.unicode_emoji_prop_arr, str)
+    end,
   },
   root_hydrus_tag_namespace = {
     global_value_taking_root_hydrus_tag_namespace = function(str)
@@ -1652,7 +1676,12 @@ is = {
     
   },
   general_name = {
-    thing_name = transf["nil"]["true"]
+    thing_name_with_optional_explanation = transf["nil"]["true"]
+  },
+  thing_name_with_optional_explanation = {
+    thing_name = function(str)
+      return get.str.bool_by_not_contains_w_str_arr(str, {"_by_", "_w_"})
+    end,
   },
   thing_name = {
     assc_thing_name = function(str)
@@ -1741,28 +1770,28 @@ is = {
     mullvad_city_code = function(str)
       return #str == 3
     end,
-    youtube_upload_status = function(str)
-      return get.arr.bool_by_contains(ls.youtube_upload_status_arr, str)
-    end,
-    youtube_privacy_status = function(str)
-      return get.arr.bool_by_contains(ls.youtube_privacy_status_arr, str)
-    end,
     http_authentication_scheme = function(str)
       return get.arr.bool_by_contains(ls.http_authentication_scheme_arr, str)
+    end,
+    menu_item_key = function(str)
+      return get.arr.bool_by_contains(ls.menu_item_key_arr, str)
+    end,
+    vcard_key_with_vcard_type = function(str)
+      return get.arr.bool_by_contains(ls.vcard_key_with_vcard_type_arr, str)
     end,
   },
   lower_alpha_str = {
     fs_attr_name = function(str)
-      return get.arr.bool_by_contains(ls.fs_attr_name, str)
+      return get.arr.bool_by_contains(ls.fs_attr_name_arr, str)
     end,
     local_o_remote_str = function(str)
       return str == "local" or str == "remote"
     end,
     dcmp_name = function(str)
-      return get.arr.bool_by_contains(ls.dcmp_names, str)
+      return get.arr.bool_by_contains(ls.dcmp_name_arr, str)
     end,
     dcmp_name_long = function(str)
-      return get.arr.bool_by_contains(ls.dcmp_names_long, str)
+      return get.arr.bool_by_contains(ls.dcmp_name_long_arr, str)
     end,
     mod_char = function(str)
       return get.arr.bool_by_contains(ls.mod_char_arr, str)
@@ -1777,13 +1806,13 @@ is = {
       return get.arr.bool_by_contains(ls.project_type_arr, str)
     end,
     vcard_phone_type = function(str)
-      return get.arr.bool_by_contains(ls.vcard.vcard_phone_type, str)
+      return get.arr.bool_by_contains(ls.vcard_phone_type_arr, str)
     end,
     vcard_email_type = function(str)
-      return get.arr.bool_by_contains(ls.vcard.vcard_email_type, str)
+      return get.arr.bool_by_contains(ls.vcard_email_type_arr, str)
     end,
     vcard_address_type = function(str)
-      return get.arr.bool_by_contains(ls.vcard.vcard_address_type, str)
+      return get.arr.bool_by_contains(ls.vcard_address_type_arr, str)
     end,
     audiodevice_subtype = function(str)
       return str == "input" or str == "output"
@@ -1792,7 +1821,7 @@ is = {
       return str == "totp" or str == "hotp"
     end,
     llm_chat_role = function(str)
-      return get.arr.bool_by_contains(ls.llm_chat_role, str)
+      return get.arr.bool_by_contains(ls.llm_chat_role_arr, str)
     end,
     stream_state = function(str)
       return get.arr.bool_by_contains(ls.stream_state_arr, str)
@@ -1815,8 +1844,18 @@ is = {
     mac_plist_type_name = function(str)
       return get.arr.bool_by_contains(ls.mac_plist_type_name_arr, str)
     end,
-    
+    youtube_upload_status = function(str)
+      return get.arr.bool_by_contains(ls.youtube_upload_status_arr, str)
+    end,
+    youtube_privacy_status = function(str)
+      return get.arr.bool_by_contains(ls.youtube_privacy_status_arr, str)
+    end,
 
+  },
+  youtube_upload_status  = {
+    youtube_exists_upload_status = function(str)
+      return get.str.bool_by_contains(ls.youtube_exists_upload_status_arr, str)
+    end,
   },
   external_tag_namespace = {
     danbooru_category_name = function(str)
@@ -1979,23 +2018,23 @@ is = {
   },
   extension_url = {
     image_url = function(url)
-      return get.path.bool_by_is_extension_in(transf.path_url.path(url), ls.extension.image)
+      return get.path.bool_by_is_extension_in(transf.path_url.path(url), ls.image_extension)
     end,
     playable_url = function(url)
-      return get.path.bool_by_extension_group(
+      return get.path.bool_by_is_normalized_extension_w_str_arr(
         transf.path_url.path(url),
-        "audio"
-      ) or get.path.bool_by_extension_group(
+        ls.audio_extension
+      ) or get.path.bool_by_is_normalized_extension_w_str_arr(
         transf.path_url.path(url),
-        "video"
+        ls.video_extension
       )
     end
   },
   playable_url = {
     whisper_url = function(url)
-      return get.path.bool_by_extension_group(
+      return get.path.bool_by_is_normalized_extension_w_str_arr(
         transf.path_url.path(url),
-        "whisper_audio"
+        ls.whisper_audio_extension
       )
     end,
   },
@@ -2375,10 +2414,10 @@ is = {
       return get.mac_application_name.running_application(name) ~= nil
     end,
     jxa_browser_name = function(name)
-      return get.arr.bool_by_contains(ls.jxa_browser_name, name)
+      return get.arr.bool_by_contains(ls.jxa_browser_name_arr, name)
     end,
     jxa_tabbable_name = function(name)
-      return get.arr.bool_by_contains(ls.jxa_tabbable_name, name)
+      return get.arr.bool_by_contains(ls.jxa_tabbable_name_arr, name)
     end,
     jxa_browser_tabbable_name = function(name)
       return is.mac_application_name.jxa_browser_name(name) and is.mac_application_name.jxa_tabbable_name(name)
