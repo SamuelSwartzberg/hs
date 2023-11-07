@@ -31,11 +31,11 @@ act = {
   vdirsyncer_pair_specifier = {
     write_to_config = function(spec)
       dothis.absolute_path.append_file_if_file(
-        env.VDIRSYNCER_CONFIG .. "/config",
+        dynamic_permanents.str_key_str_value_assoc_by_env.VDIRSYNCER_CONFIG .. "/config",
         "\n\n" .. transf.vdirsyncer_pair_specifier.ini_str(spec)
       )
       dothis.absolute_path.append_file_if_file(
-        env.KHAL_CONFIG .. "/config",
+        dynamic_permanents.str_key_str_value_assoc_by_env.KHAL_CONFIG .. "/config",
         "\n\n" .. transf.url.ini_str_by_khal_config_section(spec.remote_storage_url)
       )
       dothis.absolute_path.create_dir(
@@ -51,14 +51,14 @@ act = {
         )
       )
       dothis.in_git_dir.commit_self(
-        env.KHAL_CONFIG .. "/config",
+        dynamic_permanents.str_key_str_value_assoc_by_env.KHAL_CONFIG .. "/config",
         "Add web calendar " .. name
       )
     end,
   },
   url = {
     download_into_downloads_async = function(url)
-      dothis.url.download_into_async(url, env.DOWNLOADS)
+      dothis.url.download_into_async(url, dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS)
     end,
     create_as_url_file_in_murls = function(url)
       act.url_arr.create_as_url_files_in_murls({url})
@@ -157,11 +157,11 @@ act = {
       dothis.url_arr.open_all(url_arr, "Firefox")
     end,
     create_as_url_files_in_murls = function(url_arr)
-      local path = transf.local_absolute_path.local_absolute_path_by_prompted_multiple_from_default(env.MURLS)
+      local path = transf.local_absolute_path.local_absolute_path_by_prompted_multiple_from_default(dynamic_permanents.str_key_str_value_assoc_by_env.MURLS)
       dothis.url_arr.create_as_url_files(url_arr, path)
     end,
     create_as_session_in_msessions = function(url_arr)
-      dothis.url_arr.create_as_session(url_arr, env.MSESSIONS)
+      dothis.url_arr.create_as_session(url_arr, dynamic_permanents.str_key_str_value_assoc_by_env.MSESSIONS)
     end,
     create_as_stream_foreground = function(url_arr)
       dothis.created_item_specifier_arr.create(
@@ -388,7 +388,7 @@ act = {
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open " .. transf.str.str_by_single_quoted_escaped(path), do_after)
     end,
     open_gui_editor = function(path, do_after)
-      dothis.local_path.open_app(path, env.GUI_EDITOR, do_after)
+      dothis.local_path.open_app(path, dynamic_permanents.str_key_str_value_assoc_by_env.GUI_EDITOR, do_after)
     end,
     open_and_reveal = function(path)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("open -R " .. transf.str.str_by_single_quoted_escaped(path))
@@ -580,7 +580,7 @@ act = {
     edit_mcitations_csl_file = function(indicated_citable_object_id)
       dothis.local_path.open_app(
         transf.indicated_citable_object_id.mcitations_csl_file(indicated_citable_object_id),
-        env.GUI_EDITOR
+        dynamic_permanents.str_key_str_value_assoc_by_env.GUI_EDITOR
       )
     end,
     open_mpapers_citable_object_file = function(indicated_citable_object_id)
@@ -815,7 +815,7 @@ act = {
     open_go_to = function(specifier)
       dothis.local_path.open_app(
         transf.intra_file_location_spec.path(specifier),
-        env.GUI_EDITOR,
+        dynamic_permanents.str_key_str_value_assoc_by_env.GUI_EDITOR,
         get.fn.fn_by_1st_n_bound(act.intra_file_location_spec.go_to, specifier)
       )
     end
@@ -994,7 +994,7 @@ act = {
     write_env_and_check = function(str)
       dothis.envlike_str.write_and_check(
         str,
-        env.ENVFILE
+        dynamic_permanents.str_key_str_value_assoc_by_env.ENVFILE
       )
     end,
   },
@@ -1047,7 +1047,7 @@ act = {
         function(res)
           if not res then
             dothis.absolute_path.write_file(
-              env.FAILED_EMAILS .. "/" .. transf["nil"].full_rfc3339like_dt_by_current(), 
+              dynamic_permanents.str_key_str_value_assoc_by_env.FAILED_EMAILS .. "/" .. transf["nil"].full_rfc3339like_dt_by_current(), 
               transf.file.str_by_contents(path)
             )
             act.absolute_path.delete(path)
@@ -1062,7 +1062,7 @@ act = {
                 )
               ) ..
               "| msed".. transf.str.str_by_single_quoted_escaped("/Status/a/S/") ..
-              "| mdeliver -c" .. transf.str.str_by_single_quoted_escaped(env.MBSYNC_ARCHIVE),
+              "| mdeliver -c" .. transf.str.str_by_single_quoted_escaped(dynamic_permanents.str_key_str_value_assoc_by_env.MBSYNC_ARCHIVE),
               function()
                 act.absolute_path.delete(path)
                 if do_after then
@@ -1125,23 +1125,23 @@ act = {
     end,
     log_in_diary = function(str)
       dothis.entry_logging_dir.log_str(
-        env.MENTRY_LOGS,
+        dynamic_permanents.str_key_str_value_assoc_by_env.MENTRY_LOGS,
         str
       )
     end,
     create_snippet = function(str)
-      local path = get.local_extant_path.local_absolute_path_by_default_prompted_multiple(env.MCOMPOSITE .. "/snippets")
+      local path = get.local_extant_path.local_absolute_path_by_default_prompted_multiple(dynamic_permanents.str_key_str_value_assoc_by_env.MCOMPOSITE .. "/snippets")
       dothis.absolute_path.write_file_if_nonextant_path(path, str)
     end,
     push_qf_music = function(str)
       dothis.plaintext_file.append_line_and_commit(
-        env.MQF .. "/music",
+        dynamic_permanents.str_key_str_value_assoc_by_env.MQF .. "/music",
         str
       )
     end,
     push_qf_things = function(str)
       dothis.plaintext_file.append_line_and_commit(
-        env.MQF .. "/things",
+        dynamic_permanents.str_key_str_value_assoc_by_env.MQF .. "/things",
         str
       )
     end,
@@ -1160,7 +1160,7 @@ act = {
     open_temp_file = function(str, do_after)
       dothis.local_path.open_app(
         act.str.write_to_temp_file(str),
-        env.GUI_EDITOR,
+        dynamic_permanents.str_key_str_value_assoc_by_env.GUI_EDITOR,
         do_after
       )
     end,
@@ -1297,7 +1297,7 @@ act = {
       dothis.extant_path.move_to_absolute_path(path, transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path))
     end,
     move_to_downloads = function(path)
-      dothis.extant_path.move_to_absolute_path(path, env.DOWNLOADS)
+      dothis.extant_path.move_to_absolute_path(path, dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS)
     end,
     move_to_parent_path_with_extension_if_any = function(path)
       dothis.extant_path.move_to_absolute_path(path, transf.path.path_by_parent_path_with_extension_if_any(path))
@@ -1561,6 +1561,9 @@ act = {
     end,
   },
   ["nil"] = {
+    fill_dynamic_permanent_env = function()
+      dynamic_permanents.dynamic_permanents.str_key_str_value_assoc_by_env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
+    end,
     start_redis = function()
       act.str.env_bash_eval_async("redis-server /Users/sam/me/spec/dotconfig/redis/redis.conf")
       hs.timer.doWhile(
@@ -1582,6 +1585,19 @@ act = {
           end
         end
       end
+    end,
+    fill_dynamic_permanent_fstblmap = function()
+      dynamic_permanents.str_key_assoc_by_fstblmap = transf.dir.plaintext_dictonary_read_assoc(dynamic_permanents.str_key_str_value_assoc_by_env.MDICTIONARIES .. "/mappings")
+    end,
+    fill_dynamic_permanent_mcomposite = function()
+      dynamic_permanents.str_key_assoc_by_mcomposite = transf.dir.plaintext_dictonary_read_assoc(dynamic_permanents.str_key_str_value_assoc_by_env.MCOMPOSITE)
+    end,
+    fill_dynamic_permanents = function()
+      dothis["nil"].fill_dynamic_permanent_env()
+      dothis["nil"].start_redis()
+      dothis["nil"].create_fn_key_fnname_value_assoc()
+      dothis["nil"].fill_dynamic_permanent_fstblmap()
+      dothis["nil"].fill_dynamic_permanent_mcomposite()
     end,
     url_by_launch_decoding_fetching_server = function()
       return act.absolute_path_and_fnname.url_by_serve(
@@ -1610,14 +1626,14 @@ act = {
       )
     end,
     choose_item_and_action_on_screenshot_children = function()
-      act.dir.choose_item_and_action_by_children(env.SCREENSHOTS)
+      act.dir.choose_item_and_action_by_children(dynamic_permanents.str_key_str_value_assoc_by_env.SCREENSHOTS)
     end,
     show_2_by_4_grid = function()
       act.hs_geometry_size_like.show_grid({w=2, h=4})
     end,
     choose_default_search_and_create_background_stream = function()
       dothis.arr.choose_item(
-        transf.json_file.not_userdata_or_fn(env.MSPEC .. "/lists/video_searches.json"),
+        transf.json_file.not_userdata_or_fn(dynamic_permanents.str_key_str_value_assoc_by_env.MSPEC .. "/lists/video_searches.json"),
         function(arr)
           local hashes = transf.arr.hydrus_file_hash_arr_by_search_motion_only(arr)
           act.hydrus_file_hash_arr.create_stream_background(hashes)
@@ -1636,7 +1652,7 @@ act = {
     end,
     choose_inbox_email_and_action = function()
       act.arr.choose_item_and_action(
-        get.maildir_dir.maildir_file_arr_by_sorted_filtered(env.MBSYNC_INBOX, true)
+        get.maildir_dir.maildir_file_arr_by_sorted_filtered(dynamic_permanents.str_key_str_value_assoc_by_env.MBSYNC_INBOX, true)
       )
     end,
     choose_input_audiodevice_specifier_and_set_default = function()
@@ -1651,7 +1667,7 @@ act = {
     end,
     choose_item_and_action_by_env_var = function()
       dothis.table.choose_w_vt_fn(
-        env
+        dynamic_permanents.str_key_str_value_assoc_by_env
       )
     end,
     sox_rec_toggle_and_act = function()
@@ -1725,7 +1741,7 @@ act = {
       end
     end,
     choose_item_and_action_on_local_extant_path_in_downloads = function()
-      act.extant_path.choose_item_and_action_by_children(env.DOWNLOADS)
+      act.extant_path.choose_item_and_action_by_children(dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS)
     end,
     choose_action_on_running_application_by_frontmost = function()
       act.any.choose_action(
@@ -1737,7 +1753,7 @@ act = {
     end,
     purge_fsmemoize_cache = function()
       dothis.absolute_path.delete(
-        dothis.absolute_path.empty_dir(env.XDG_CACHE_HOME .. "/hs/fsmemoize")
+        dothis.absolute_path.empty_dir(dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/hs/fsmemoize")
       )
     end,
     omegat_create_all_translated_documents = function()
@@ -1761,10 +1777,10 @@ act = {
     -- expects to be called on a watcher for tachiyomi state
     tachiyomi_backup = function()
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
-        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_fn(env.TMP_TACHIYOMI_JSON))
+        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_fn(dynamic_permanents.str_key_str_value_assoc_by_env.TMP_TACHIYOMI_JSON))
         tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
         dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-          env.MMANGA_LOGS,
+          dynamic_permanents.str_key_str_value_assoc_by_env.MMANGA_LOGS,
           tmst_assoc
         )
         act.backuped_thing_identifier.write_current_timestamp_ms("tachiyomi")
@@ -1777,7 +1793,7 @@ act = {
         return -- don't try to backup while firefox is running
       end
       dothis.sqlite_file.query_w_table_arg_fn(
-        env.MAC_FIREFOX_PLACES_SQULITE,
+        dynamic_permanents.str_key_str_value_assoc_by_env.MAC_FIREFOX_PLACES_SQULITE,
         "SELECT json_group_object(visit_date/1000, json_object('title', title, 'url', url))" .. 
         "FROM moz_places " ..
         "INNER JOIN moz_historyvisits ON moz_places.id = moz_historyvisits.place_id " ..
@@ -1785,7 +1801,7 @@ act = {
         "ORDER BY timestamp DESC;",
         function(tbl)
           dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-            env.MBROWSER_LOGS,
+            dynamic_permanents.str_key_str_value_assoc_by_env.MBROWSER_LOGS,
             tbl
           )
           act.backuped_thing_identifier.write_current_timestamp_ms("firefox")
@@ -1796,7 +1812,7 @@ act = {
       act["nil"].newpipe_extract_backup(nil, function()
         local timestamp = transf.backuped_thing_identifier.timestamp_ms("newpipe")
         dothis.sqlite_file.query_w_table_arg_fn(
-          env.env.NEWPIPE_STATE_DIR .. "/history.db",
+          dynamic_permanents.str_key_str_value_assoc_by_env.env.NEWPIPE_STATE_DIR .. "/history.db",
           "SELECT json_group_object(access_date, json_object('title', title, 'url', url, 'timestamp_ms', access_date ))" .. 
           "FROM stream_history " ..
           "INNER JOIN streams ON stream_history.stream_id = streams.uid " ..
@@ -1804,7 +1820,7 @@ act = {
           "ORDER BY timestamp DESC;",
           function(tbl)
             dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-              env.MMEDIA_LOGS,
+              dynamic_permanents.str_key_str_value_assoc_by_env.MMEDIA_LOGS,
               tbl
             )
             act.backuped_thing_identifier.write_current_timestamp_ms("newpipe")
@@ -1813,7 +1829,7 @@ act = {
       end)
     end,
     facebook_preprocess_backup = function()
-      local dlchildren = transf.dir.absolute_path_arr_by_children(env.DOWNLOADS)
+      local dlchildren = transf.dir.absolute_path_arr_by_children(dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS)
       local fbfiles = get.path_arr.path_arr_by_filter_to_filename_starting(dlchildren, "facebook-samswartzberg")
       local fbzips = get.path_arr.path_arr_by_filter_to_same_extension(fbfiles, "zip")
       local newest_fbzip = transf.extant_path_arr.extant_path_by_newest_creation(fbzips)
@@ -1989,7 +2005,7 @@ act = {
   backuped_thing_identifier = {
     write_current_timestamp_ms = function(identifier)
       dothis.local_file.write_file(
-        transf.path.path_by_ending_with_slash(env.MLAST_BACKUP) .. identifier,
+        transf.path.path_by_ending_with_slash(dynamic_permanents.str_key_str_value_assoc_by_env.MLAST_BACKUP) .. identifier,
         (os.time() - 30) * 1000
       )
     end,
@@ -2100,7 +2116,7 @@ act = {
       local edited_tags = transf.str_value_assoc.str_value_assoc_by_prompted_once_from_default(deduced_tags)
       local plspec = {}
       plspec.tag = transf.two_arr_or_nils.arr(edited_tags, transf.str.two_strs__arr_ar_by_prompted_multiple("tag"))
-      plspec.path  = get.local_extant_path.dir_by_default_prompted_once(env.MAUDIOVISUAL)
+      plspec.path  = get.local_extant_path.dir_by_default_prompted_once(dynamic_permanents.str_key_str_value_assoc_by_env.MAUDIOVISUAL)
       plspec.path = transf.str.str_by_prompted_once_from_default(plspec.path)
       plspec.extension = "m3u"
       dothis.absolute_path.write_file(transf.path_leaf_specifier.absolute_path(plspec), url)
@@ -2138,7 +2154,7 @@ act = {
     process_to_new_location_logs = function(path)
       local timestamp_ms_key_location_log_spec_value_assoc = transf.old_location_logs_proc_dir.timestamp_ms_key_location_log_spec_value_assoc_by_path(path)
       dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-        env.MMOMENTS .. "/location_logs",
+        dynamic_permanents.str_key_str_value_assoc_by_env.MMOMENTS .. "/location_logs",
         timestamp_ms_key_location_log_spec_value_assoc
       )
     end,
@@ -2147,7 +2163,7 @@ act = {
     process_to_new_media_logs = function(path)
       local timestamp_ms_key_media_log_spec_value_assoc = transf.old_media_logs_proc_dir.timestamp_ms_key_media_log_spec_value_assoc(path)
       dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-        env.MMOMENTS .. "/media_logs",
+        dynamic_permanents.str_key_str_value_assoc_by_env.MMOMENTS .. "/media_logs",
         timestamp_ms_key_media_log_spec_value_assoc
       )
     end,
@@ -2164,7 +2180,7 @@ act = {
         end
       )
       dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-        env.MMOMENTS .. "/entries",
+        dynamic_permanents.str_key_str_value_assoc_by_env.MMOMENTS .. "/entries",
         assoc
       )
     end,
@@ -2173,7 +2189,7 @@ act = {
     process_to_git_logs = function(path)
       local timestamp_ms_key_git_log_spec_value_assoc = transf.git_tmp_log_dir.timestamp_ms_key_assoc_value_assoc(path)
       dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-        env.MMOMENTS .. "/git_logs",
+        dynamic_permanents.str_key_str_value_assoc_by_env.MMOMENTS .. "/git_logs",
         timestamp_ms_key_git_log_spec_value_assoc
       )
       act.dir.empty_dir(path)
@@ -2183,7 +2199,7 @@ act = {
     process_to_media_logs = function(path)
       local timestamp_ms_key_media_log_spec_value_assoc = transf.mpv_tmp_log_dir.timestamp_ms_key_media_log_spec_value_assoc(path)
       dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-        env.MMOMENTS .. "/media_logs",
+        dynamic_permanents.str_key_str_value_assoc_by_env.MMOMENTS .. "/media_logs",
         timestamp_ms_key_media_log_spec_value_assoc
       )
       act.dir.empty_dir(path)

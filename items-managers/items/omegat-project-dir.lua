@@ -16,7 +16,7 @@ OmegatProjectDirItemSpecifier = {
       end,
       ["send-rechnung-email"] = function(self)
         ar(
-          get.maildir_dir.email_file_arr_by_sorted_filtered(env.MBSYNC_ARCHIVE, true, "from:" .. self:get("local-data-object").email)
+          get.maildir_dir.email_file_arr_by_sorted_filtered(dynamic_permanents.str_key_str_value_assoc_by_env.MBSYNC_ARCHIVE, true, "from:" .. self:get("local-data-object").email)
         )
           :get("to-string-item-array")
           :doThis("to-summary-line-body-path-table-parallel", function(table)
@@ -32,7 +32,7 @@ OmegatProjectDirItemSpecifier = {
    
       end,
       ["file-rechnung"] = function(self)
-        local rechnung_target = get.dir.extant_path_by_child_w_fn(env.MDIARY .. "/moments/work", {_stop =  "translation"}) .. "/rechnungen"
+        local rechnung_target = get.dir.extant_path_by_child_w_fn(dynamic_permanents.str_key_str_value_assoc_by_env.MDIARY .. "/moments/work", {_stop =  "translation"}) .. "/rechnungen"
 
         self:get("str-item", "rechnung-pdf-path"):doThis("move-into-dir", rechnung_target)
       end,
@@ -45,7 +45,7 @@ OmegatProjectDirItemSpecifier = {
             local client = self:get("local-data-object").client
             local path = transf.path_leaf_specifier.absolute_path({
               date = os.date(tblmap.date_component_name.rfc3339like_dt_format_string["day"]),
-              path = env.MDIARY .. "/i_made_this/translations/",
+              path = dynamic_permanents.str_key_str_value_assoc_by_env.MDIARY .. "/i_made_this/translations/",
               ["general-name"] = -- todo filename of odt,
               extension = "odt",
               tag = {

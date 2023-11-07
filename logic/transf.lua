@@ -750,7 +750,7 @@ transf = {
     end,
     local_plaintext_file_or_nil_by_wordlist = function(leaf)
       return get.extant_path.absolute_path_by_descendant_with_filename(
-        env.HOME .. "/.local/git_packages/github.com/kkrypt0nn/wordlists",
+        dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/.local/git_packages/github.com/kkrypt0nn/wordlists",
         leaf
       )
     end,
@@ -1301,10 +1301,10 @@ transf = {
   },
   in_home_local_absolute_path = {
     http_protocol_url_by_local_http_server = function(path)
-      return env.FS_HTTP_SERVER .. path
+      return dynamic_permanents.str_key_str_value_assoc_by_env.FS_HTTP_SERVER .. path
     end,
     local_nonabsolute_path_by_relative_to_home = function(path)
-      return get.local_absolute_path.local_nonabsolute_path_by_from(path, env.HOME)
+      return get.local_absolute_path.local_nonabsolute_path_by_from(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOME)
     end,
     labelled_remote_path = function(path)
       return transf.local_nonabsolute_path_relative_to_home.labelled_remote_absolute_path(transf.in_home_local_absolute_path.local_nonabsolute_path_by_relative_to_home(path))
@@ -1315,7 +1315,7 @@ transf = {
       return "hsftp:/home/" .. path
     end,
     local_absolute_path = function(path)
-      return env.HOME .. "/" .. path
+      return dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/" .. path
     end,
   },
   path_arr = {
@@ -2369,7 +2369,7 @@ transf = {
   backuped_thing_identifier = {
     timestamp_ms = function(identifier)
       return  transf.absolute_path.str_or_nil_by_file_contents(
-        transf.path.path_by_ending_with_slash(env.MLAST_BACKUP) .. identifier
+        transf.path.path_by_ending_with_slash(dynamic_permanents.str_key_str_value_assoc_by_env.MLAST_BACKUP) .. identifier
       ) or 0
     end
   },
@@ -4225,10 +4225,10 @@ transf = {
     end,
 
     in_cache_local_absolute_path = function(data, type)
-      return env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.str.leaflike_by_safe_filename(data)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/hs/" .. (type or "default") .. "/" .. transf.str.leaflike_by_safe_filename(data)
     end,
     in_tmp_local_absolute_path = function(data, type) -- in contrast to the above method, we also ensure that it's unique by using a timestamp
-      return env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.str.leaflike_by_safe_filename(data)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.TMPDIR .. "/hs/" .. (type or "default") .. "/" .. os.time() .. "-" .. transf.str.leaflike_by_safe_filename(data)
     end,
     multiline_str_by_qr_utf8_image_bow = function(data)
       return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)("qrencode -l M -m 2 -t UTF8 " .. transf.str.str_by_single_quoted_escaped(data))
@@ -4880,7 +4880,7 @@ transf = {
       return get.auth_pass_item_name.local_absolute_path(auth_pass_item_name, "security_question")
     end,
     line_by_username_or_default = function(auth_pass_item_name)
-      return transf.auth_pass_item_name.line_by_username(auth_pass_item_name) or env.MAIN_EMAIL
+      return transf.auth_pass_item_name.line_by_username(auth_pass_item_name) or dynamic_permanents.str_key_str_value_assoc_by_env.MAIN_EMAIL
     end,
     line_by_username = function(auth_pass_item_name)
       local path = transf.auth_pass_item_name.local_absolute_path_by_username(auth_pass_item_name)
@@ -6785,7 +6785,7 @@ transf = {
       )
     end,
     mcitations_csl_file_or_nil = function(id)
-      return get.local_extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MCITATIONS, id)
+      return get.local_extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(dynamic_permanents.str_key_str_value_assoc_by_env.MCITATIONS, id)
     end,
     csl_table_or_nil = function(id)
       local path = transf.filename_safe_indicated_citable_object_id.mcitations_csl_file_or_nil(id)
@@ -6798,10 +6798,10 @@ transf = {
       end
     end,
     mpapers_citable_object_file_or_nil = function(id)
-      return get.local_extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MPAPERS, id)
+      return get.local_extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(dynamic_permanents.str_key_str_value_assoc_by_env.MPAPERS, id)
     end,
     mpapernotes_citable_object_notes_file_or_nil = function(id)
-      return get.local_extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(env.MPAPERNOTES, id)
+      return get.local_extant_path.absolute_path_or_nil_by_descendant_with_filename_ending(dynamic_permanents.str_key_str_value_assoc_by_env.MPAPERNOTES, id)
     end,
   },
   citable_filename = {
@@ -6941,7 +6941,7 @@ transf = {
       return transf.client_project_dir.assoc_by_metadata(dir).client
     end,
     contact_uuid_by_client = function(dir)
-      return fstblmap.client_id.contact_uuid(
+      return dynamic_permanents.str_key_assoc_by_fstblmap.client_id.contact_uuid(
         transf.client_project_dir.client_id_by_client(dir)
       )
     end,
@@ -6956,11 +6956,11 @@ transf = {
     end,
     contact_uuid_by_creator = function(dir)
       if transf.client_project_dir.client_id_by_creator(dir) then
-        return fstblmap.client_id.contact_uuid(
+        return dynamic_permanents.str_key_assoc_by_fstblmap.client_id.contact_uuid(
           transf.client_project_dir.client_id_by_creator(dir)
         )
       else
-        return env.SELF_UUID
+        return dynamic_permanents.str_key_str_value_assoc_by_env.SELF_UUID
       end
     end,
     line_by_main_name_client = function(dir)
@@ -7430,7 +7430,7 @@ transf = {
   },
   mac_application_name = {
     local_absolute_path_by_application_support_dir = function(app_name)
-      return env.MAC_APPLICATION_SUPPORT .. "/" .. app_name
+      return dynamic_permanents.str_key_str_value_assoc_by_env.MAC_APPLICATION_SUPPORT .. "/" .. app_name
     end,
     installed_app_dir = function(app_name)
       return "/Applications/" .. app_name .. ".app"
@@ -7813,7 +7813,7 @@ transf = {
   },
   lower_strict_snake_case = {
     local_absolute_path_by_csl_file = function(style)
-      return env.GIT_PACKAGES .. "/citation-style-language/styles/" .. style .. ".csl"
+      return dynamic_permanents.str_key_str_value_assoc_by_env.GIT_PACKAGES .. "/citation-style-language/styles/" .. style .. ".csl"
     end,
   },
   dtprts__arr = {
@@ -8001,7 +8001,7 @@ transf = {
     end,
     vdirsyncer_pair_specifier = function(url)
       local name = transf.url.calendar_name_by_for_webcal(url)
-      local local_storage_path =  env.XDG_STATE_HOME .. "/vdirsyncer/" .. name
+      local local_storage_path =  dynamic_permanents.str_key_str_value_assoc_by_env.XDG_STATE_HOME .. "/vdirsyncer/" .. name
       return  {
         name = name,
         collections = "noquote:null",
@@ -8014,7 +8014,7 @@ transf = {
       }
     end,
     local_absolute_path_by_webcal_storage_location = function(url)
-      return env.XDG_STATE_HOME .. "/vdirsyncer/" .. transf.url.calendar_name_by_for_webcal(url)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.XDG_STATE_HOME .. "/vdirsyncer/" .. transf.url.calendar_name_by_for_webcal(url)
     end,
     ini_str_by_khal_config_section = function(url)
       return transf.assoc_value_assoc.ini_str({
@@ -8781,10 +8781,10 @@ transf = {
       return transf.str.bool_by_evaled_env_bash_success("pgrep -x rec")
     end,
     passw_pass_item_name_arr = function()
-      return transf.dir.leaflike_arr_by_children_filenames(env.MPASSPASSW)
+      return transf.dir.leaflike_arr_by_children_filenames(dynamic_permanents.str_key_str_value_assoc_by_env.MPASSPASSW)
     end,
     otp_pass_item_name_arr = function()
-      return transf.dir.leaflike_arr_by_children_filenames(env.MPASSOTP)
+      return transf.dir.leaflike_arr_by_children_filenames(dynamic_permanents.str_key_str_value_assoc_by_env.MPASSOTP)
     end,
     digit_str_by_next_free_port = function()
       return transf.str.str_or_err_by_evaled_env_bash_stripped_noempty("nextport")
@@ -8875,7 +8875,7 @@ transf = {
       )
     end,
     telegram_raw_export_dir_by_current = function()
-      return env.DOWNLOADS .. "/Telegram Desktop/DataExport_" .. transf.timestamp_s.rfc3339like_ymd(
+      return dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS .. "/Telegram Desktop/DataExport_" .. transf.timestamp_s.rfc3339like_ymd(
         transf["nil"].timestamp_s_by_current()
       )
     end,
@@ -8886,7 +8886,7 @@ transf = {
       )
     end,
     installed_app_dir_arr = function()
-      return transf.local_dir.local_extant_path_arr_by_descendants(env.APPLICATIONS)
+      return transf.local_dir.local_extant_path_arr_by_descendants(dynamic_permanents.str_key_str_value_assoc_by_env.APPLICATIONS)
     end,
     mac_application_name_arr = function()
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
@@ -9628,7 +9628,7 @@ transf = {
   
       prompt_args                        = prompt_args or {}
       prompt_args.message                = get.any.default_if_nil(transf.any.str_or_nil(prompt_args.message), "Choose a file or folder.")
-      prompt_args.default                = get.any.default_if_nil(transf.any.str_or_nil(prompt_args.default), env.HOME)
+      prompt_args.default                = get.any.default_if_nil(transf.any.str_or_nil(prompt_args.default), dynamic_permanents.str_key_str_value_assoc_by_env.HOME)
       prompt_args.can_choose_files       = get.any.default_if_nil(prompt_args.can_choose_files, true)
       prompt_args.can_choose_directories = get.any.default_if_nil(prompt_args.can_choose_directories, true)
       prompt_args.multiple  = get.any.default_if_nil(prompt_args.multiple, false)
@@ -10258,7 +10258,7 @@ transf = {
   },
   api_name = {
     local_absolute_path_by_api_details_location_dir = function(api_name)
-      return env.MAPI .. "/" .. api_name .. "/"
+      return dynamic_permanents.str_key_str_value_assoc_by_env.MAPI .. "/" .. api_name .. "/"
     end,
     local_absolute_path_by_api_key_file = function(api_name)
       return transf.api_name.local_absolute_path_by_api_details_location_dir(api_name) .. "key"

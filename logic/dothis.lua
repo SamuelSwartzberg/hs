@@ -21,11 +21,11 @@ dothis = {
         
         if mgr then
           message = message .. " for " .. mgr
-          local mgr_backup = st(env.MDEPENDENCIES .. "/" .. mgr)
+          local mgr_backup = st(dynamic_permanents.str_key_str_value_assoc_by_env.MDEPENDENCIES .. "/" .. mgr)
           mgr_backup:doThis("git-commit-self", message)
           mgr_backup:doThis("git-push")
         else 
-          local mdependencies = st(env.MDEPENDENCIES)
+          local mdependencies = st(dynamic_permanents.str_key_str_value_assoc_by_env.MDEPENDENCIES)
           mdependencies:doThis("git-commit-all", message)
           mdependencies:doThis("git-push")
         end
@@ -61,7 +61,7 @@ dothis = {
       end)
     end,
     to_file_in_downloads = function(source, format, metadata)
-      dothis.md_file.to_file_in_target(source, env.DOWNLOADS, format, metadata)
+      dothis.md_file.to_file_in_target(source, dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS, format, metadata)
     end,
   },
   contact_uuid = {
@@ -146,7 +146,7 @@ dothis = {
   hydrus_file_hash_arr = {
     create_stream = function(arr, flag_profile_name)
       dothis.created_item_specifier_arr.create(
-        stream_arr,
+        dynamic_permanents.stream_created_item_specifier_arr,
         get.hydrus_file_hash_arr.stream_creation_specifier(arr, flag_profile_name)
       )
     end,
@@ -251,7 +251,7 @@ dothis = {
     end,
       
     add_event_from_url = function(url, calendar)
-      local temp_path_arg = transf.str.str_by_single_quoted_escaped(env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
+      local temp_path_arg = transf.str.str_by_single_quoted_escaped(dynamic_permanents.str_key_str_value_assoc_by_env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
       dothis.str.env_bash_eval('curl' .. transf.str.str_by_single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg)
     end,
     add_to_hydrus = function(url, str_arr, do_after)
@@ -540,7 +540,7 @@ dothis = {
       )
     end,
     serve = function(path, port)
-      port = port or env.FS_HTTP_SERVER_PORT
+      port = port or dynamic_permanents.str_key_str_value_assoc_by_env.FS_HTTP_SERVER_PORT
       dothis.created_item_specifier_arr.create_or_recreate(
         task_created_item_specifier_arr,
         {
@@ -998,7 +998,7 @@ dothis = {
   },
   maildir_file ={
     download_attachment_to_cache = function(path, name, do_after)
-      local cache_path = env.XDG_CACHE_HOME .. '/hs/email_attachments'
+      local cache_path = dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. '/hs/email_attachments'
       local att_path = cache_path .. '/' .. name
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         'cd ' .. transf.single_quoted_escaped(cache_path) .. ' && mshow -x'
@@ -1110,7 +1110,7 @@ dothis = {
   youtube_channel_id = {
     add_to_newsboat_urls_file = function(channel_id, category)
       dothis.newsboat_urls_file.append_newsboat_url_specifier(
-        env.NEWSBOAT_URLS,
+        dynamic_permanents.str_key_str_value_assoc_by_env.NEWSBOAT_URLS,
         {
           url = transf.youtube_channel_id.youtube_channel_video_feed_url(channel_id),
           title = transf.youtube_channel_id.line_by_channel_title(channel_id),
@@ -1130,7 +1130,7 @@ dothis = {
   sgml_url = {
     add_to_newsboat_urls_file = function(url, category)
       dothis.newsboat_urls_file.append_newsboat_url_specifier(
-        env.NEWSBOAT_URLS,
+        dynamic_permanents.str_key_str_value_assoc_by_env.NEWSBOAT_URLS,
         {
           url = url,
           title = transf.url.str_or_nil_by_sgml_title(url),
@@ -1162,24 +1162,24 @@ dothis = {
     end,
     copy_hook = function(path, type, name)
       type = type or "default"
-      local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
+      local source_hook = dynamic_permanents.str_key_str_value_assoc_by_env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
       act.local_extant_path.make_executable(source_hook)
       dothis.extant_path.copy_to_absolute_path(source_hook, get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     link_hook = function(path, type, name)
       type = type or "default"
-      local source_hook = env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
+      local source_hook = dynamic_permanents.str_key_str_value_assoc_by_env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
       act.local_extant_path.make_executable(source_hook)
       dothis.local_extant_path.link_to_nosudo_nonextant_path(source_hook, get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     link_all_hooks = function(path, type)
-      local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
+      local source_hooks = transf.path.join(dynamic_permanents.str_key_str_value_assoc_by_env.GITCONFIGHOOKS, type)
       for _, hook in transf.arr.pos_int_vt_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.link_hook(path, type, hook)
       end
     end,
     copy_all_hooks = function(path, type)
-      local source_hooks = transf.path.join(env.GITCONFIGHOOKS, type)
+      local source_hooks = transf.path.join(dynamic_permanents.str_key_str_value_assoc_by_env.GITCONFIGHOOKS, type)
       for _, hook in transf.arr.pos_int_vt_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.copy_hook(path, type, hook)
       end
@@ -1449,7 +1449,7 @@ dothis = {
     save_mcitations_csl_file = function(citable_object_id, indication)
       local csl_table = transf[indication].csl_table_by_online(citable_object_id)
       dothis.absolute_path.write_file(
-        env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table) .. ".json",
+        dynamic_permanents.str_key_str_value_assoc_by_env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table) .. ".json",
         transf.not_userdata_or_fn.json_str(csl_table)
       )
     end,
@@ -1894,7 +1894,7 @@ dothis = {
   },
   hotkey_created_item_specifier_arr = {
     create_or_recreate_all = function (arr, key_partial_creation_specifier_assoc)
-      local creation_specifier_arr = get.assoc_table.assoc_arr(key_partial_creation_specifier_assoc, "key")
+      local creation_specifier_arr = get.assoc_table.assoc_arr_by_put_root_key_on_item_as_w_any(key_partial_creation_specifier_assoc, "key")
       dothis.created_item_specifier_arr.create_or_recreate_all(
         arr,
         creation_specifier_arr

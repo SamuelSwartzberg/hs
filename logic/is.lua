@@ -1006,13 +1006,13 @@ is = {
   },
   citable_path = {
     mpapers_citable_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.MPAPERS)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.MPAPERS)
     end,
     mcitations_citable_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.MCITATIONS)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.MCITATIONS)
     end,
     mpapernotes_citable_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.MPAPERNOTES)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.MPAPERNOTES)
     end,
     mpapers_citable_object_file = function(path)
       return is.citable_path.mpapers_citable_local_absolute_path(path) and is.local_absolute_path.local_file(path)
@@ -1168,7 +1168,7 @@ is = {
       return get.str.bool_by_startswith(path, "/Volumes/")
     end,
     in_home_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.HOME)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOME)
     end,
     in_global_tmp_path = function(path)
       return get.str.bool_by_startswith(path, "/tmp/")
@@ -1181,19 +1181,19 @@ is = {
   },
   in_home_local_absolute_path = {
     in_me_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.ME)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.ME)
     end,
     in_cache_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME)
     end,
     in_tmp_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.TMPDIR)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.TMPDIR)
     end,
     in_downloads_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.DOWNLOADS)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS)
     end,
     in_home_proc_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.HOME .. "/proc/")
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/")
     end,
   },
   in_tmp_local_absolute_path = {
@@ -1201,64 +1201,64 @@ is = {
   },
   in_home_proc_local_absolute_path = {
     old_location_logs_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/old/location_logs/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/old/location_logs/"
     end,
     old_media_logs_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/old/media_logs/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/old/media_logs/"
     end,
     hydrus_noai_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/hydrus/noai/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/hydrus/noai/"
     end,
     hydrus_ai_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.HOME .. "/proc/hydrus/ai/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/hydrus/ai/"
     end,
   },
   in_downloads_local_absolute_path = {
     telegram_raw_export_dir = function(path)
-      return get.str.bool_by_startswith(path, env.DOWNLOADS .. "/Telegram Desktop/DataExport_")
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS .. "/Telegram Desktop/DataExport_")
     end,
   },
   in_me_local_absolute_path = {
     in_mcitations_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.MCITATIONS)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.MCITATIONS)
     end,
     in_mpapers_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.MPAPERS)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.MPAPERS)
     end,
     in_menv_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.MENV)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.MENV)
     end,
   },
   in_cache_local_absolute_path = {
     in_hs_cache_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME .. "/hs")
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/hs")
     end,
   },
   in_hs_cache_local_absolute_path = {
     in_cache_export_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME .. "/export/")
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/export/")
     end,
   },
   in_cache_export_local_absolute_path = {
     export_dir = function(path)
-      return transf.path.path_by_ending_with_slash(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path)) == env.XDG_CACHE_HOME .. "/export/"
+      return transf.path.path_by_ending_with_slash(transf.path.trimmed_noweirdwhitespace_line_by_parent_path(path)) == dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/export/"
     end,
     discord_export_child_dir = function(path)
-      return get.str.bool_by_startswith(path, env.XDG_CACHE_HOME .. "/hs/export/discord/")
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/hs/export/discord/")
     end,
   },
   export_dir = {
     telegram_export_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/telegram/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/hs/export/telegram/"
     end,
     discord_export_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/discord/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/hs/export/discord/"
     end,
     facebook_export_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/facebook/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/hs/export/facebook/"
     end,
     signal_export_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == env.XDG_CACHE_HOME .. "/hs/export/signal/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/hs/export/signal/"
     end,
   },
 
@@ -1274,7 +1274,7 @@ is = {
       )
     end,
     static_time_machine_volume_local_extant_path = function(path)
-      return path == env.TMBACKUPVOL .. "/"
+      return path == dynamic_permanents.str_key_str_value_assoc_by_env.TMBACKUPVOL .. "/"
     end
       
   },
@@ -1604,19 +1604,19 @@ is = {
   lower_strict_snakekebap_case = {
     auth_pass_item_name = function(str)
       return get.extant_path.bool_by_file_descendant_with_filename(
-        transf.path.path_by_ending_with_slash(env.MPASS) .. "p", 
+        transf.path.path_by_ending_with_slash(dynamic_permanents.str_key_str_value_assoc_by_env.MPASS) .. "p", 
         str
       )
     end,
     cc_pass_item_name = function(str)
       return get.local_extant_path.bool_by_file_descendant_with_filename(
-        transf.path.path_by_ending_with_slash(env.MPASS) .. "cc", 
+        transf.path.path_by_ending_with_slash(dynamic_permanents.str_key_str_value_assoc_by_env.MPASS) .. "cc", 
         str
       )
     end,
     pass_item_name = function(str)
       return get.local_extant_path.absolute_path_by_descendant_with_filename(
-        env.MPASS,
+        dynamic_permanents.str_key_str_value_assoc_by_env.MPASS,
         str
       )
     end,
@@ -1659,7 +1659,7 @@ is = {
       return get.arr.bool_by_contains(ls.citable_object_id_indication_name_arr, str)
     end,
     client_id = function(str)
-      return get.table.bool_by_has_key(fstblmap.client_id.contact_uuid, str)
+      return get.table.bool_by_has_key(dynamic_permanents.str_key_assoc_by_fstblmap.client_id.contact_uuid, str)
     end,
     client_project_kind = function(str)
       return get.arr.bool_by_contains(ls.client_project_kind_arr, str)

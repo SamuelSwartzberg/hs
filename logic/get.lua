@@ -70,7 +70,7 @@ get = {
       return transf.fn.rt_by_memoized_1_day(transf.str.str_or_nil_by_evaled_env_bash_stripped)("pass show " .. typepath .. "/" .. item)
     end,
     local_absolute_path = function(item, typepath, ext)
-      return env.PASSWORD_STORE_DIR .. "/" .. typepath .. "/" .. item .. "." .. (ext or "gpg")
+      return dynamic_permanents.str_key_str_value_assoc_by_env.PASSWORD_STORE_DIR .. "/" .. typepath .. "/" .. item .. "." .. (ext or "gpg")
     end,
     bool_by_exists_as = function(item, typepath, ext)
       return is.local_absolute_path.local_extant_path(get.pass_item_name.local_absolute_path(item, typepath, ext))
@@ -771,7 +771,7 @@ get = {
     end,
   },
   assoc_table = {
-    assoc_arr = function(assoc, key)
+    assoc_arr_by_put_root_key_on_item_as_w_any = function(assoc, key)
       local res = {}
       for k, v in transf.table.stateless_key_value_iter(assoc) do
         local copied = get.table.table_by_copy(v, true)
@@ -3115,7 +3115,7 @@ get = {
       return get.project_dir.local_absolute_path_local_subtype_project_material(dir, type, "universal")
     end,
     local_absolute_path_by_global_project_material = function(dir, type)
-      return transf.path.path_by_ending_with_slash(env.MPROJECT_MATERIALS) .. type .. "/"
+      return transf.path.path_by_ending_with_slash(dynamic_permanents.str_key_str_value_assoc_by_env.MPROJECT_MATERIALS) .. type .. "/"
     end,
     local_absolute_path_by_global_subtype_project_material = function(dir, type, subtype)
       return get.project_dir.local_absolute_path_by_global_project_material(dir, type) .. subtype .. "/"
@@ -3793,7 +3793,7 @@ get = {
       return res
     end,
     local_dir_by_target_backup_location = function(obj, typ)
-      return env.MCHATS .. "/" .. transf.export_chat_main_object.backuped_thing_identifier(obj, typ)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.MCHATS .. "/" .. transf.export_chat_main_object.backuped_thing_identifier(obj, typ)
     end,
     logging_dir = function(obj, typ)
       return transf.export_chat_main_object.dir_by_target_backup_location(obj, typ) .. "/_logs"

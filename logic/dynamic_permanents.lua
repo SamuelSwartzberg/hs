@@ -8,7 +8,11 @@ dynamic_permanents = {
   stream_created_item_specifier_arr = {},
   str_arr_by_pasteboard_arr = {},
   source_id_arr = {},
+  timer_spec_arr = {},
   fn_queue_specifier = {
     fn_arr = {},
   },
+  str_key_assoc_by_mcomposite = nil, -- filled later
+  str_key_assoc_by_fstblmap = nil, -- filled later
+  str_key_str_value_assoc_by_env = nil, -- filled later
 }

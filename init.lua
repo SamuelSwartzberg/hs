@@ -3,13 +3,9 @@ hs.ipc.cliInstall("/opt/homebrew") -- install the homebrew cli, stupidly has to 
 require("package-imports")
 require("logic")
 
-comp = transf.dir.plaintext_dictonary_read_assoc(env.MCOMPOSITE)
-fstblmap = transf.dir.plaintext_dictonary_read_assoc(env.MDICTIONARIES .. "/mappings")
+act["nil"].fill_dynamic_permanents()
 
-timer_arr = {}
-timer_arr_refresher = hs.timer.doEvery(1, get.fn.fn_by_1st_n_bound(act.timer_spec_arr.fire_all_if_ready_and_space_if_necessary, timer_arr))
-
-env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
+timer_arr_refresher = hs.timer.doEvery(1, get.fn.fn_by_1st_n_bound(act.timer_spec_arr.fire_all_if_ready_and_space_if_necessary, dynamic_permanents.timer_spec_arr))
 
 dothis.created_item_specifier_arr.create(
   dynamic_permanents.hotkey_created_item_specifier_arr,
@@ -47,7 +43,7 @@ dothis.created_item_specifier_arr.create_all(
         elseif event == hs.fs.volume.didUnmount then
           if is.volume_local_extant_path.dynamic_time_machine_volume_local_extant_path(information.path) then
             hs.timer.doAfter(30, 
-              get.fn.fn_by_1st_n_bound(act.volume_local_extant_path.eject_or_msg, env.TMBACKUPVOL)
+              get.fn.fn_by_1st_n_bound(act.volume_local_extant_path.eject_or_msg, dynamic_permanents.str_key_str_value_assoc_by_env.TMBACKUPVOL)
             )
           end
         end
@@ -156,7 +152,7 @@ local keymap = {
     explanation = "Choose a project and choose an action on it.",
     fn = function()
       act.arr.choose_item_and_action(
-        transf.local_extant_path.project_dir_arr_by_descendants_depth_3(env.ME)
+        transf.local_extant_path.project_dir_arr_by_descendants_depth_3(dynamic_permanents.str_key_str_value_assoc_by_env.ME)
       )
     end,
   },
@@ -180,7 +176,7 @@ local keymap = {
       act.arr.choose_item_and_action(
         transf.path_arr.csl_table_arr_by_filtered_mapped(
           transf.extant_path.file_arr_by_descendants(
-            env.MCITATIONS
+            dynamic_permanents.str_key_str_value_assoc_by_env.MCITATIONS
           )
         )
       )
@@ -236,7 +232,7 @@ System:get("manager", "creatable"):doThis("create-all", keymap)
 
 System:get("manager", "creatable"):doThis("create-all", {
   
-  { type = "task", args = {"jcwserve", env.JSON_SHELL_API_LAYER_SERVER_PORT} },
+  { type = "task", args = {"jcwserve", dynamic_permanents.str_key_str_value_assoc_by_env.JSON_SHELL_API_LAYER_SERVER_PORT} },
   { type = "task", args = "oauth2callback"}
 })
 
@@ -246,7 +242,7 @@ System:get("manager", "timer"):doThis("create-all", {
   act["nil"].newsboat_reload,
   dothis.vdirsyncer.sync,
   hs.fnutils.partial(act.local_nonabsolute_path_relative_to_home.copy_local_to_labelled_remote, "me/state/todo"),
-  st(env.MEDIA_QUEUE):get("timer-that-does", { 
+  st(dynamic_permanents.str_key_str_value_assoc_by_env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
   { 
@@ -255,8 +251,8 @@ System:get("manager", "timer"):doThis("create-all", {
   },
   {
     fn = function()
-      act.env_yaml_file_container.write_env_and_check(env.ENVFILE)
-      env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
+      act.env_yaml_file_container.write_env_and_check(dynamic_permanents.str_key_str_value_assoc_by_env.ENVFILE)
+      dynamic_permanents.str_key_str_value_assoc_by_env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
     end,
     interval = "*/5 * * * *",
   },
@@ -271,6 +267,6 @@ System:get("manager", "timer"):doThis("create-all", {
   CreateApplicationItem("Signal"):get("backup-timer"),
   CreateApplicationItem("Discord"):get("backup-timer"),]]
 }) 
-processSetupDirectivesInFiles(env.MACTABLE_PATHS)
+processSetupDirectivesInFiles(dynamic_permanents.str_key_str_value_assoc_by_env.MACTABLE_PATHS)
 
 hs.alert.show("Config loaded")
