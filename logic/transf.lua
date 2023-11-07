@@ -8952,19 +8952,30 @@ transf = {
       )
     end,
   },
+  two_device_itentifiers = {
+    bool_by_match = function(d1, d2)
+      local parts1 = get.device_identifier.alphanum_minus_underscore_arr_by_parts(d1)
+      local parts2 = get.device_identifier.alphanum_minus_underscore_arr_by_parts(d2)
+      for i = 1, #parts1 do
+        if parts1[i] == parts2[i] then
+          return true
+        elseif parts2[i] == "" then
+          return true
+        else
+          return false
+        end
+      end
+    end,
+  },
   device_identifier = {
     five_alphanum_minus_underscores = function(device_identifier)
       return get.str.n_strs_by_split_w_str(device_identifier, ":")
     end,
+    alphanum_minus_underscore_arr_by_parts = function(device_identifier)
+      return get.str.str_arr_by_split_w_ascii_char(device_identifier, ":")
+    end,
     bool_by_device_identifier_matches_device = function(device_identifier)
-      local linux_chassis, kernel_name, os_common_subname, machine_arch, host_name = transf.device_identifier.five_alphanum_minus_underscores(device_identifier)
-      return 
-        (linux_chassis == "" or linux_chassis == transf["nil"].linux_chassis()) and
-        (kernel_name == "" or kernel_name == transf["nil"].kernel_name()) and
-        (os_common_subname == "" or os_common_subname == transf["nil"].os_common_subname()) and
-        (machine_arch == "" or machine_arch == transf["nil"].machine_arch()) and
-        (host_name == "" or host_name == transf["nil"].host_name())
-        
+      return transf.two_device_itentifiers.bool_by_match(transf["nil"].device_identifier(), device_identifier)
     end,
   },
   package_manager_name = {
