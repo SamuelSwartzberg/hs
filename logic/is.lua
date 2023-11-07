@@ -784,6 +784,9 @@ is = {
     end,
   },
   colon_alphanum_minus_underscore = {
+    device_identifier = function(str)
+      return get.str.pos_int_by_amount_contained_nooverlap(str, ":") >= 4 -- linux_chassis:kernel_name:os_common_subname:machine_arch:host_name (perhaps more in the future)
+    end,
     alphanum_minus_underscore = function(str)
       return get.str.bool_by_not_contains_w_str(str, ":")
     end,
@@ -867,6 +870,12 @@ is = {
     
     kebap_case = function(str)
       return get.str.bool_by_not_matches_part_onig(str, "^\\d")
+    end,
+    kernel_name = function(str)
+      return get.arr.bool_by_contains(ls.kernel_name_arr, str)
+    end,
+    os_common_subname = function(str)
+      return get.arr.bool_by_contains(ls.os_common_subname_arr, str)
     end,
   },
   kebap_case = {
@@ -1270,7 +1279,7 @@ is = {
     dynamic_time_machine_volume_local_extant_path = function(path)
       return get.str.bool_by_startswith(
         path,
-        "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. get.fn.rt_by_memoized(hs.host.localizedName)() .. "/" .. os.date("%Y-%m-%d-%H")
+        "/Volumes/com.apple.TimeMachine.localsnapshots/Backups.backupdb/" .. transf["nil"].alphanum_minus_by_localized_name() .. "/" .. os.date("%Y-%m-%d-%H")
       )
     end,
     static_time_machine_volume_local_extant_path = function(path)
@@ -1585,7 +1594,9 @@ is = {
   },
   lower_alphanum_minus_underscore = {
    
-    
+    machine_arch = function(str)
+      return get.arr.bool_by_contains(ls.machine_arch_arr, str)
+    end,
     
   },
   snakekebap_case = {
@@ -1908,6 +1919,9 @@ is = {
     end,
     likely_main_branch_name = function(str)
       return get.arr.bool_by_contains(ls.likely_main_branch_name_arr, str)
+    end,
+    linux_chassis  = function(str)
+      return get.arr.bool_by_contains(ls.linux_chassis_arr, str)
     end,
   },
   youtube_upload_status  = {
@@ -2307,6 +2321,16 @@ is = {
     end,
     one = function(num)
       return num == 1
+    end,
+  },
+  sme_5_pos_int = {
+    sme_4_pos_int = function(num)
+      return num <= 4
+    end,
+  },
+  sme_4_pos_int = {
+    sme_3_pos_int = function(num)
+      return num <= 3
     end,
   },
   mult_anys = {
@@ -2782,6 +2806,9 @@ is = {
     bin_specifier = function(t)
       return t.vt ~= nil and t.vf ~= nil
     end,
+    keymap_spec = function(t)
+      return t.map and t.modifiers
+    end,
     
   },
   plist_single_dk_spec = {
@@ -2855,6 +2882,9 @@ is = {
   creation_specifier = {
     fireable_creation_specifier = function(t)
       return t.fn ~= nil
+    end,
+    task_creation_specifier = function(t)
+      return t.args ~= nil
     end,
   },
   fireable_creation_specifier = {

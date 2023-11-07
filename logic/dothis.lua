@@ -542,7 +542,7 @@ dothis = {
     serve = function(path, port)
       port = port or dynamic_permanents.str_key_str_value_assoc_by_env.FS_HTTP_SERVER_PORT
       dothis.created_item_specifier_arr.create_or_recreate(
-        task_created_item_specifier_arr,
+        dynamic_permanents.task_created_item_specifier_arr,
         {
           type = "task",
           args = "http-server -a 127.0.0.1 -p '" .. port .. "' -c-1 '" .. path .. "'"
@@ -568,6 +568,36 @@ dothis = {
     copy_to_absolute_path = function(path, tgt)
       if is.absolute_path.extant_path(path) then
         dothis.extant_path.copy_to_absolute_path(path, tgt)
+      end
+    end,
+    copy_descendant_file_arr_into_absolute_path = function(path, tgt)
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.copy_descendant_file_arr_into_absolute_path(path, tgt)
+      end
+    end,
+    copy_descendants_into_absolute_path_preserving_structure = function(path, tgt)
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.copy_descendants_into_absolute_path_preserving_structure(path, tgt)
+      end
+    end,
+    move_to_absolute_path = function(path, tgt)
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.move_to_absolute_path(path, tgt)
+      end
+    end,
+    move_into_absolute_path = function(path, tgt)
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.move_into_absolute_path(path, tgt)
+      end
+    end,
+    move_descendant_file_arr_into_absolute_path = function(path, tgt)
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.move_descendant_file_arr_into_absolute_path(path, tgt)
+      end
+    end,
+    move_descendants_into_absolute_path_preserving_structure = function(path, tgt)
+      if is.absolute_path.extant_path(path) then
+        dothis.extant_path.move_descendants_into_absolute_path_preserving_structure(path, tgt)
       end
     end,
     write_file = function(path, contents)
@@ -771,6 +801,10 @@ dothis = {
         tgt
       )
     end,
+    copy_descendants_into_absolute_path_preserving_structure = function(path, tgt)
+      act.absolute_path.create_parent_dir(tgt)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone copy " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
+    end,
     move_to_absolute_path = function(path, tgt)
       act.absolute_path.create_parent_dir(tgt)
       transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone moveto " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
@@ -784,6 +818,11 @@ dothis = {
         transf.extant_path.file_arr_by_descendants(path),
         tgt
       )
+    end,
+    move_descendants_into_absolute_path_preserving_structure = function(path, tgt)
+      act.absolute_path.create_parent_dir(tgt)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone move " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
+      act.extant_path.empty_dir(path)
     end,
     zip_to_absolute_path = function(path, tgt)
       if is.path.remote_path(path) then
@@ -1074,7 +1113,11 @@ dothis = {
           dothis.dir.choose_leaf_or_dotdot_until_file_w_file_arg_fn(local_extant_path, fn)
         end
       end)
-    end
+    end,
+    sync_contents_to_absolute_path = function(path, tgt)
+      act.absolute_path.create_dir(tgt)
+      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone sync " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
+    end,
     
   },
   maildir_dir = {
@@ -1893,8 +1936,14 @@ dothis = {
     end
   },
   hotkey_created_item_specifier_arr = {
-    create_or_recreate_all = function (arr, key_partial_creation_specifier_assoc)
-      local creation_specifier_arr = get.assoc_table.assoc_arr_by_put_root_key_on_item_as_w_any(key_partial_creation_specifier_assoc, "key")
+    create_or_recreate_all = function (arr, keymap_spec)
+      local creation_specifier_arr = get.assoc_table.assoc_arr_by_put_root_key_on_item_as_w_any(keymap_spec.map, "key")
+      dothis.arr.each(
+        creation_specifier_arr,
+        function(creation_specifier)
+          creation_specifier.modifiers = keymap_spec.modifiers
+        end
+      )
       dothis.created_item_specifier_arr.create_or_recreate_all(
         arr,
         creation_specifier_arr

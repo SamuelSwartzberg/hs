@@ -1651,6 +1651,65 @@ ls = {
   dynamic_structure_name_arr = {
     "latex",
     "omegat"
+  },
+  linux_chassis_arr = {
+    "desktop",
+    "laptop",
+    "convertible",
+    "server",
+    "tablet",
+    "handset",
+    "watch",
+    "embedded",
+    "vm",
+    "container"
+  },
+  kernel_name_arr = {
+    "Darwin",
+    "Linux",
+    "Windows",
+    "FreeBSD",
+    "NetBSD",
+    "OpenBSD",
+    "SunOS",
+    "AIX",
+    "HP-UX",
+  },
+  os_common_subname_arr = {
+    "Android"
+  },
+  machine_arch_arr = {
+    "x86_64",
+    "x86",
+    "arm64",
+    "aarch64",
+    "arm",
+    "ppc64",
+    "ppc",
+    "s390x",
+    "s390",
+    "mips64",
+    "mips",
+    "sparc64",
+    "sparc",
+    "riscv64",
+    "riscv",
+  },
+  watcher_creation_specifier_arr = {
+    {
+      type = "watcher",
+      watcher_type = hs.application.watcher,
+      fn = act.mac_application_name_and_sme_6_pos_int.start_ff_backup_on_ff_quit
+    },{ 
+      type = "watcher",
+      watcher_type = hs.pasteboard.watcher, 
+      fn = act.str.add_to_pasteboard_arr
+    },
+    {
+      type = "watcher",
+      watcher_type = hs.fs.volume,
+      fn = act.sme_3_pos_int_and_table.manage_timemachine_backup
+    },
   }
 }
 

@@ -14,7 +14,8 @@ refac:
   - memoization: instead of reading the things in fscache from disk every time, why don't we write it to disk once while memoizing and then read the entire cache from disk on startup?
 post 'lua is working':  
   - add/rename missing m3us
-  - restructure external server: /io/[push|pull]/[pmac|pandroid], /mirror/[pmac|pandroid], /share/*
+  - restructure external server: /io/[push|pull]/[mobile|desktop]/[mac|android]/<device_name>, /mirror/[mobile|desktop]/[mac|android]/<device_name>, /share/*
+  - switch to rclone crypt, https://github.com/newhinton/Round-Sync on android
   - history
     - move images to hydrus
       - date string parsing
@@ -28,7 +29,6 @@ post 'lua is working':
     - consider how to integrate email into history
     - is self-renaming of dated dirs implemented?
     - import/sync strava
-    - must run cd '$NEWPIPE_STATE_DIR' && unzip *.zip && rm *.zip *.settings regularly, currently extracted due to refactor
   - process bookmarks to sessions, urls
   - old contact importing
     - refac contacts to use yaml in notes field for met data
@@ -59,5 +59,6 @@ post 'stuff is implemented':
     - more memoization
     - more item cache
   - clean up android
+    - degoogle phone
 after new computer:
   - set up windows virtualized env, transfer stuff from my windows laptop over there

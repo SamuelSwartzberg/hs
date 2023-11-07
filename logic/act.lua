@@ -309,6 +309,13 @@ act = {
     end,
 
   },
+  created_item_specifier_arr = {
+    choose_item_and_action_on_creation_specifiers = function(arr)
+      act.arr.choose_item_and_action(
+        transf.created_item_specifier_arr.creation_specifier_arr(arr)
+      )
+    end,
+  },
   local_image_file = {
     add_hs_image_to_clipboard = function(path)
       act.hs_image.add_to_clipboard(
@@ -459,21 +466,6 @@ act = {
       act.str.env_bash_eval_sync("rclone mkdir " .. transf.str.str_by_single_quoted_escaped(path))
     end,
   },
-  local_nonabsolute_path_relative_to_home = {
-    copy_local_to_labelled_remote = function(path)
-      dothis.absolute_path.copy_to_absolute_path(
-        transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path),
-        transf.labelled_remote_path.labelled_remote_absolute_path(path)
-      )
-    end,
-    copy_labelled_remote_to_local = function(path)
-      dothis.absolute_path.copy_to_absolute_path(
-        transf.labelled_remote_path.labelled_remote_absolute_path(path),
-        transf.local_nonabsolute_path_relative_to_home.local_absolute_path(path)
-      )
-    end,
-
-  },
   local_absolute_path = {
     start_recording_to = function(path, do_after)
       act.absolute_path.create_parent_dir(path)
@@ -511,6 +503,18 @@ act = {
       transf.str.str_or_nil_by_evaled_env_bash_stripped("rm -rf " .. transf.str.str_by_single_quoted_escaped(
         transf.path.path_by_ending_with_slash(path) .. "*"
       ) .. "/*")
+    end,
+    sync_local_to_labelled_remote = function(path)
+      dothis.dir.sync_contents_to_absolute_path(
+        path,
+        transf.local_absolute_path.labelled_remote_absolute_path(path)
+      )
+    end,
+    sync_labelled_remote_to_local = function(path)
+      dothis.dir.sync_contents_to_absolute_path(
+        transf.local_absolute_path.labelled_remote_absolute_path(path),
+        path
+      )
     end,
   },
   in_git_dir = {
@@ -601,7 +605,13 @@ act = {
   str_arr = {
     fill_with = function(arr)
       dothis.str_arr.join_and_paste(arr, "\t")
-    end
+    end,
+    choose_item_and_paste = function(arr)
+      dothis.arr.choose_item(
+        arr,
+        act.str.paste
+      )
+    end,
   },
   assoc = {
     
@@ -1414,6 +1424,29 @@ act = {
       end
     end,
   },
+  sme_3_pos_int_and_table = {
+    manage_timemachine_backup = function(event, information)
+      if event == hs.fs.volume.didMount then
+        if is.volume_local_extant_path.static_time_machine_volume_local_extant_path(information.path) then
+          hs.alert.show("Starting backup...")
+          act.str.env_bash_eval_async("tmutil startbackup")
+        end
+      elseif event == hs.fs.volume.didUnmount then
+        if is.volume_local_extant_path.dynamic_time_machine_volume_local_extant_path(information.path) then
+          hs.timer.doAfter(30, 
+            get.fn.fn_by_1st_n_bound(act.volume_local_extant_path.eject_or_msg, dynamic_permanents.str_key_str_value_assoc_by_env.TMBACKUPVOL)
+          )
+        end
+      end
+    end
+  },
+  mac_application_name_and_sme_6_pos_int = {
+    start_ff_backup_on_ff_quit = function(mac_application_name, hs_applicaton_event_type)
+      if mac_application_name == "Firefox" and hs_applicaton_event_type == hs.application.watcher.terminated then
+        hs.timer.doAfter(3, act["nil"].ff_backup)
+      end
+    end
+  },
   volume_local_extant_path_arr = {
     choose_item_and_eject_or_msg = function(arr)
       dothis.arr.choose_item(
@@ -1436,7 +1469,7 @@ act = {
   hotkey_creation_specifier = {
     create_inner_item = function(spec)
       local hotkey = hs.hotkey.new(
-        spec.modifiers or {"cmd", "shift", "alt"},
+        spec.modifiers,
         spec.key, 
         spec.fn
       )
@@ -1565,7 +1598,10 @@ act = {
       dynamic_permanents.dynamic_permanents.str_key_str_value_assoc_by_env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
     end,
     start_redis = function()
-      act.str.env_bash_eval_async("redis-server /Users/sam/me/spec/dotconfig/redis/redis.conf")
+      dothis.created_item_specifier_arr.create_or_recreate(
+        dynamic_permanents.task_created_item_specifier_arr,
+        consts.task_creation_specifier_by_redis_server
+      )
       hs.timer.doWhile(
         function()
           return dynamic_permanents.table_by_redis_client == nil
@@ -1592,12 +1628,44 @@ act = {
     fill_dynamic_permanent_mcomposite = function()
       dynamic_permanents.str_key_assoc_by_mcomposite = transf.dir.plaintext_dictonary_read_assoc(dynamic_permanents.str_key_str_value_assoc_by_env.MCOMPOSITE)
     end,
-    fill_dynamic_permanents = function()
+    fill_initial_dynamic_permanents = function()
       dothis["nil"].fill_dynamic_permanent_env()
       dothis["nil"].start_redis()
       dothis["nil"].create_fn_key_fnname_value_assoc()
       dothis["nil"].fill_dynamic_permanent_fstblmap()
       dothis["nil"].fill_dynamic_permanent_mcomposite()
+    end,
+    create_fn_queue_specifier = function ()
+      dynamic_permanents.fn_queue_specifier = {
+        fn_arr = {},
+        hotkey_created_item_specifier = dothis.created_item_specifier_arr.create_or_recreate(consts.hotkey_creation_specifier_by_pop_fn_queue)
+      }
+    end,
+    create_hotkeys = function()
+      dothis.created_item_specifier_arr.create_or_recreate(
+        dynamic_permanents.hotkey_created_item_specifier_arr,
+        consts.hotkey_creation_specifier_by_reload
+      )
+      dothis.created_item_specifier_arr.create_all(
+        dynamic_permanents.hotkey_created_item_specifier_arr,
+        consts.keymap_spec_by_cmd_shift_alt
+      )
+      dothis.created_item_specifier_arr.create_all(
+        dynamic_permanents.hotkey_created_item_specifier_arr,
+        consts.keymap_spec_by_cmd_alt
+      )
+    end,
+    create_watchers = function()
+      dothis.created_item_specifier_arr.create_all(
+        dynamic_permanents.watcher_created_item_specifier_arr,
+        ls.watcher_creation_specifier_arr
+      )
+    end,
+    start_oauth2callback_server = function()
+      dothis.created_item_specifier_arr.create_or_recreate(
+        dynamic_permanents.task_created_item_specifier_arr,
+        consts.task_creation_specifier_by_oauth2callback_server
+      )
     end,
     url_by_launch_decoding_fetching_server = function()
       return act.absolute_path_and_fnname.url_by_serve(
@@ -1628,6 +1696,21 @@ act = {
     choose_item_and_action_on_screenshot_children = function()
       act.dir.choose_item_and_action_by_children(dynamic_permanents.str_key_str_value_assoc_by_env.SCREENSHOTS)
     end,
+    choose_item_and_action_on_hotkey_creation_specifier_arr = function()
+      act.created_item_specifier_arr.choose_item_and_action_on_creation_specifiers(
+        dynamic_permanents.hotkey_creation_specifier_arr
+      )
+    end,
+    choose_item_and_paste_on_pasteboard_arr  = function()
+      act.str_arr.choose_item_and_paste(
+        dynamic_permanents.str_arr_by_pasteboard_arr
+      )
+    end,
+    choose_item_and_action_on_pasteboard_arr = function()
+      act.str_arr.choose_item_and_action(
+        dynamic_permanents.str_arr_by_pasteboard_arr
+      )
+    end,
     show_2_by_4_grid = function()
       act.hs_geometry_size_like.show_grid({w=2, h=4})
     end,
@@ -1640,9 +1723,18 @@ act = {
         end
       )
     end,
+    choose_item_and_action_on_mcitation_csl_table = function()
+      act.arr.choose_item_and_action(
+        transf.path_arr.csl_table_arr_by_filtered_mapped(
+          transf.extant_path.file_arr_by_descendants(
+            dynamic_permanents.str_key_str_value_assoc_by_env.MCITATIONS
+          )
+        )
+      )
+    end,
     pop_main_qspec = function()
       act.fn_queue_specifier.pop(
-        main_qspec
+        dynamic_permanents.fn_queue_specifier
       )
     end,
     choose_item_and_set_active_relay_identifier = function()
@@ -1715,6 +1807,18 @@ act = {
     vdirsyncer_sync = function()
       act.str.env_bash_eval_async("vdirsyncer sync")
     end,
+    pull_from_labelled_remote = function()
+      local paths_to_pull = transf.extant_path.absolute_path_arr_by_descendants_depth_2_leaf_matching_device_identifier("crhsftp:pull")
+      dothis.arr.each(
+        paths_to_pull,
+        function(path)
+          dothis.extant_path.move_descendants_into_absolute_path_preserving_structure(
+            path,
+            dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROCPULL .. "/" .. transf.path.path_component_or_nil_by_parent_leaf(path)
+          )
+        end
+      )
+    end,
     newsboat_reload = function()
       act.str.env_bash_eval_async("newsboat -x reload")
     end,
@@ -1776,6 +1880,7 @@ act = {
     end,
     -- expects to be called on a watcher for tachiyomi state
     tachiyomi_backup = function()
+
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
         local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_fn(dynamic_permanents.str_key_str_value_assoc_by_env.TMP_TACHIYOMI_JSON))
         tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
@@ -1809,30 +1914,30 @@ act = {
       )
     end,
     newpipe_backup = function()
-      act["nil"].newpipe_extract_backup(nil, function()
-        local timestamp = transf.backuped_thing_identifier.timestamp_ms("newpipe")
-        dothis.sqlite_file.query_w_table_arg_fn(
-          dynamic_permanents.str_key_str_value_assoc_by_env.env.NEWPIPE_STATE_DIR .. "/history.db",
-          "SELECT json_group_object(access_date, json_object('title', title, 'url', url, 'timestamp_ms', access_date ))" .. 
-          "FROM stream_history " ..
-          "INNER JOIN streams ON stream_history.stream_id = streams.uid " ..
-          "WHERE access_date > " .. timestamp  .. " " ..
-          "ORDER BY timestamp DESC;",
-          function(tbl)
-            dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-              dynamic_permanents.str_key_str_value_assoc_by_env.MMEDIA_LOGS,
-              tbl
-            )
-            act.backuped_thing_identifier.write_current_timestamp_ms("newpipe")
-          end
-        )
-      end)
+      act["nil"].newpipe_extract_backup()
+      local timestamp = transf.backuped_thing_identifier.timestamp_ms("newpipe")
+      dothis.sqlite_file.query_w_table_arg_fn(
+        transf.str.in_cache_local_absolute_path("newpipe", "export") .. "/history.db",
+        "SELECT json_group_object(access_date, json_object('title', title, 'url', url, 'timestamp_ms', access_date ))" .. 
+        "FROM stream_history " ..
+        "INNER JOIN streams ON stream_history.stream_id = streams.uid " ..
+        "WHERE access_date > " .. timestamp  .. " " ..
+        "ORDER BY timestamp DESC;",
+        function(tbl)
+          dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+            dynamic_permanents.str_key_str_value_assoc_by_env.MMEDIA_LOGS,
+            tbl
+          )
+          act.backuped_thing_identifier.write_current_timestamp_ms("newpipe")
+          act.local_dir.empty_dir(transf.str.in_cache_local_absolute_path("newpipe", "export"))
+        end
+      )
     end,
     facebook_preprocess_backup = function()
       local dlchildren = transf.dir.absolute_path_arr_by_children(dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS)
       local fbfiles = get.path_arr.path_arr_by_filter_to_filename_starting(dlchildren, "facebook-samswartzberg")
       local fbzips = get.path_arr.path_arr_by_filter_to_same_extension(fbfiles, "zip")
-      local newest_fbzip = transf.extant_path_arr.extant_path_by_newest_creation(fbzips)
+      local newest_fbzip = transf.local_extant_path_arr.local_extant_path_by_newest_creation(fbzips)
       local tmploc = transf.str.in_tmp_local_absolute_path("facebook", "export")
       dothis.local_zip_file.unzip_to_absolute_path(newest_fbzip, tmploc)
       act.file.delete_file(newest_fbzip)
@@ -1872,8 +1977,13 @@ act = {
     firefox_dump_state = function(_, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped('lz4jsoncat "$MAC_FIREFOX_PLACES_SESSIONSTORE_RECOVERY" > "$TMP_FIREFOX_STATE_JSON', do_after)
     end,
-    newpipe_extract_backup = function(_, do_after)
-      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped('cd "$NEWPIPE_STATE_DIR" && unzip *.zip && rm *.zip *.settings', do_after)
+    newpipe_extract_backup = function()
+      local newpipe_dir = dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROCPULL .. "/handset:Linux:Android:arm64:TODO NAME/backup/newpipe"
+      dothis.local_zip_file.unzip_to_absolute_path(
+        transf.dir.extant_path_by_newest_child(newpipe_dir),
+        transf.str.in_cache_local_absolute_path("newpipe", "export")
+      )
+      act.local_dir.empty_dir(newpipe_dir)
     end,
    
     telegram_generate_backup = function(_, do_after)

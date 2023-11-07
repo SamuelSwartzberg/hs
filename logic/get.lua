@@ -2100,8 +2100,32 @@ get = {
     bool_by_is_filename = function(path, filename)
       return transf.path.leaflike_by_filename(path) == filename
     end,
+    bool_by_is_filename_in = function(path, filenames)
+      return get.arr.bool_by_contains(filenames, transf.path.leaflike_by_filename(path))
+    end,
+    bool_by_filename_matches_part_onig = function(path, regex)
+      return get.str.bool_by_matches_part_onig(transf.path.leaflike_by_filename(path), regex)
+    end,
+    bool_by_filename_matches_part_eutf8 = function(path, regex)
+      return get.str.bool_by_matches_part_eutf8(transf.path.leaflike_by_filename(path), regex)
+    end,
+    bool_by_filename_matches_whole_onig = function(path, regex)
+      return get.str.bool_by_matches_whole_onig(transf.path.leaflike_by_filename(path), regex)
+    end,
     bool_by_is_leaf = function(path, leaf)
       return transf.path.leaflike_by_leaf(path) == leaf
+    end,
+    bool_by_is_leaf_in = function(path, leaves)
+      return get.arr.bool_by_contains(leaves, transf.path.leaflike_by_leaf(path))
+    end,
+    bool_by_leaf_matches_part_onig = function(path, regex)
+      return get.str.bool_by_matches_part_onig(transf.path.leaflike_by_leaf(path), regex)
+    end,
+    bool_by_leaf_matches_part_eutf8 = function(path, regex)
+      return get.str.bool_by_matches_part_eutf8(transf.path.leaflike_by_leaf(path), regex)
+    end,
+    bool_by_leaf_matches_whole_onig = function(path, regex)
+      return get.str.bool_by_matches_whole_onig(transf.path.leaflike_by_leaf(path), regex)
     end,
     window_by_leaf_as_title = function(path, app_name)
       return get.str.window_by_title(
@@ -2341,7 +2365,79 @@ get = {
   local_dir = {
     str_or_nil_by_evaled_env_bash_stripped = function(path, cmd)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped("cd " .. transf.str.str_by_single_quoted_escaped(path) .. " && " .. cmd)
-    end
+    end,
+    local_extant_path_or_nil_by_newest_child_with_filename = function(path, filename)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_filename(
+        transf.dir.absolute_path_arr_by_children(path), 
+        filename
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_different_filename = function(path, filename)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_different_filename(
+        transf.dir.absolute_path_arr_by_children(path), 
+        filename
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_filename_matches_part_onig = function(path, regex)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_filename_matches_part_onig(
+        transf.dir.absolute_path_arr_by_children(path), 
+        regex
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_filename_matches_part_eutf8 = function(path, regex)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_filename_matches_part_eutf8(
+        transf.dir.absolute_path_arr_by_children(path), 
+        regex
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_filename_matches_whole_onig = function(path, regex)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_filename_matches_whole_onig(
+        transf.dir.absolute_path_arr_by_children(path), 
+        regex
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_extension = function(path, extension)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_extension(
+        transf.dir.absolute_path_arr_by_children(path), 
+        extension
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_different_extension = function(path, extension)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_different_extension(
+        transf.dir.absolute_path_arr_by_children(path), 
+        extension
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_leaf = function(path, leaf)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_leaf(
+        transf.dir.absolute_path_arr_by_children(path), 
+        leaf
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_different_leaf = function(path, leaf)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_different_leaf(
+        transf.dir.absolute_path_arr_by_children(path), 
+        leaf
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_leaf_matches_part_onig = function(path, regex)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_leaf_matches_part_onig(
+        transf.dir.absolute_path_arr_by_children(path), 
+        regex
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_leaf_matches_part_eutf8 = function(path, regex)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_leaf_matches_part_eutf8(
+        transf.dir.absolute_path_arr_by_children(path), 
+        regex
+      )
+    end,
+    local_extant_path_or_nil_by_newest_child_with_leaf_matches_whole_onig = function(path, regex)
+      return get.local_extant_path_arr.local_extant_path_or_nil_by_newest_with_leaf_matches_whole_onig(
+        transf.dir.absolute_path_arr_by_children(path), 
+        regex
+      )
+    end,
   },
   local_extant_path = {
     str_or_nil_by_evaled_env_bash_stripped = function(path, cmd)
@@ -2353,6 +2449,9 @@ get = {
     end,
     str_w_fs_attr_name = function(path, attr)
       return hs.fs.attributes(hs.fs.pathToAbsolute(path), attr)
+    end,
+    number_or_nil_w_fs_attr_name = function(path, attr)
+      return transf.str.number_or_nil_by_base_10(get.local_extant_path.str_w_fs_attr_name(path, attr))
     end,
     local_absolute_path_by_default_prompted_once = function(path, message)
       return transf.prompt_spec.any({
@@ -2411,6 +2510,7 @@ get = {
     extant_path_by_child_having_leaf_ending = function(dir, leaf_ending)
       return get.path_arr.path_or_nil_by_first_having_leaf_ending(transf.dir.absolute_path_arr_by_children(dir), leaf_ending)
     end,
+
   },
   git_root_dir = {
     in_git_dir_by_hook_path = function(path, hook)
@@ -2644,6 +2744,21 @@ get = {
         return not get.path.bool_by_is_filename(path, filename)
       end)
     end,
+    path_arr_by_filter_to_filename_matches_part_onig = function(path_arr, onig)
+      return get.arr.arr_by_filtered(path_arr, function(path)
+        return get.path.bool_by_filename_matches_part_onig(path, onig)
+      end)
+    end,
+    path_arr_by_filter_to_filename_matches_part_eutf8 = function(path_arr, eutf8)
+      return get.arr.arr_by_filtered(path_arr, function(path)
+        return get.path.bool_by_filename_matches_part_eutf8(path, eutf8)
+      end)
+    end,
+    path_arr_by_filter_to_filename_matches_whole_onig = function(path_arr, onig)
+      return get.arr.arr_by_filtered(path_arr, function(path)
+        return get.path.bool_by_filename_matches_whole_onig(path, onig)
+      end)
+    end,
     path_arr_by_filter_to_same_extension = function(path_arr, extension)
       return get.arr.arr_by_filtered(path_arr, function(path)
         return get.path.bool_by_is_extension(path, extension)
@@ -2664,29 +2779,54 @@ get = {
         return get.str.bool_by_startswith(transf.path.leaflike_by_filename(path), leaf_starting)
       end)
     end,
+    path_arr_by_filter_to_same_leaf = function(path_arr, leaf)
+      return get.arr.arr_by_filtered(path_arr, function(path)
+        return get.path.bool_by_is_leaf(path, leaf)
+      end)
+    end,
+    path_arr_by_filter_to_different_leaf = function(path_arr, leaf)
+      return get.arr.arr_by_filtered(path_arr, function(path)
+        return not get.path.bool_by_is_leaf(path, leaf)
+      end)
+    end,
+    path_arr_by_filter_to_leaf_matches_part_onig = function(path_arr, onig)
+      return get.arr.arr_by_filtered(path_arr, function(path)
+        return get.path.bool_by_leaf_matches_part_onig(path, onig)
+      end)
+    end,
+    path_arr_by_filter_to_leaf_matches_part_eutf8 = function(path_arr, eutf8)
+      return get.arr.arr_by_filtered(path_arr, function(path)
+        return get.path.bool_by_leaf_matches_part_eutf8(path, eutf8)
+      end)
+    end,
+    path_arr_by_filter_to_leaf_matches_whole_onig = function(path_arr, onig)
+      return get.arr.arr_by_filtered(path_arr, function(path)
+        return get.path.bool_by_leaf_matches_whole_onig(path, onig)
+      end)
+    end,
 
     path_or_nil_by_first_ending_find_ending_w_str = function(path_arr, ending)
       return get.str_arr.str_or_nil_by_first_match_ending_w_str(path_arr, ending)
     end,
-    bool_by_contains_leaf = function(path_arr, leaf)
-      return get.arr.bool_by_contains(transf.path_arr.leaflike_arr_by_leaves(path_arr), leaf)
-    end,
     bool_by_contains_extension = function(path_arr, extension)
       return get.arr.bool_by_contains(transf.path_arr.extensions_arr(path_arr), extension)
+    end,
+    bool_by_contains_leaf = function(path_arr, leaf)
+      return get.arr.bool_by_contains(transf.path_arr.leaflike_arr_by_leaves(path_arr), leaf)
     end,
     path_or_nil_by_first_having_leaf = function(path_arr, leaf)
       return get.arr.t_or_nil_by_first_match_w_fn(path_arr, function(path)
         return get.path.leaf(path) == leaf
       end)
     end,
-    path_or_nil_by_first_having_extension = function(path_arr, extension)
-      return get.arr.t_or_nil_by_first_match_w_fn(path_arr, function(path)
-        return get.path.extension(path) == extension
-      end)
-    end,
     path_or_nil_by_first_having_leaf_ending = function(path_arr, leaf_ending)
       return get.arr.t_or_nil_by_first_match_w_fn(path_arr, function(path)
         return get.str.bool_by_endswith(get.path.leaf(path), leaf_ending)
+      end)
+    end,
+    path_or_nil_by_first_having_extension = function(path_arr, extension)
+      return get.arr.t_or_nil_by_first_match_w_fn(path_arr, function(path)
+        return get.path.extension(path) == extension
       end)
     end,
     path_or_nil_by_first_having_filename = function(path_arr, filename)
@@ -2702,12 +2842,77 @@ get = {
   },
   local_extant_path_arr = {
     local_extant_path_arr_by_sorted_via_attr = function(arr, attr)
-      return dothis.arr.sort(arr, function(a, b)
-        return get.local_extant_path.attr(a, attr) < get.local_extant_path.attr(b, attr)
+      return get.arr.arr_by_sorted(arr, function(a, b)
+        return get.two_local_extant_paths.bool_by_second_has_larger_attr(a, b, attr)
       end)
     end,
-    local_extant_path_by_largest_of_attr = function(arr, attr)
-      return get.local_extant_path_arr.local_extant_path_arr_by_sorted_via_attr(arr, attr)[1]
+    local_extant_path_or_nil_by_largest_of_attr = function(arr, attr)
+      local sorted = get.local_extant_path_arr.local_extant_path_arr_by_sorted_via_attr(arr, attr)
+      if #sorted == 0 then
+        return nil
+      else
+        return sorted[1]
+      end
+    end,
+    local_extant_path_or_nil_by_newest_with_filename = function(arr, filename)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_same_filename(arr, filename)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_different_filename = function(arr, filename)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_different_filename(arr, filename)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_filename_matches_part_onig = function(arr, onig)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_filename_matches_part_onig(arr, onig)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_filename_matches_part_eutf8 = function(arr, eutf8)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_filename_matches_part_eutf8(arr, eutf8)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_filename_matches_whole_onig = function(arr, onig)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_filename_matches_whole_onig(arr, onig)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_extension = function(arr, extension)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_same_extension(arr, extension)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_different_extension = function(arr, extension)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_different_extension(arr, extension)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_leaf = function(arr, leaf)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_same_leaf(arr, leaf)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_different_leaf = function(arr, leaf)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_different_leaf(arr, leaf)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_leaf_matches_part_onig = function(arr, onig)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_leaf_matches_part_onig(arr, onig)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_leaf_matches_part_eutf8 = function(arr, eutf8)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_leaf_matches_part_eutf8(arr, eutf8)
+      )
+    end,
+    local_extant_path_or_nil_by_newest_with_leaf_matches_whole_onig = function(arr, onig)
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(
+        get.path_arr.path_arr_by_filter_to_leaf_matches_whole_onig(arr, onig)
+      )
     end,
   },
   host = {
@@ -3769,6 +3974,20 @@ get = {
           0
         )
       )
+    end,
+  },
+  two_local_extant_paths = {
+    bool_by_first_has_larger_attr = function(path1, path2, attr)
+      local n1 = get.local_extant_path.number_or_nil_w_fs_attr_name(path1, attr)
+      local n2 = get.local_extant_path.number_or_nil_w_fs_attr_name(path2, attr)
+      if n1 and n2 then
+        return n1 > n2
+      else
+        error("attr can't be converted to number")
+      end
+    end,
+    bool_by_second_has_larger_attr = function(path1, path2, attr)
+      return get.two_local_extant_paths.bool_by_second_has_larger_attr(path2, path1, attr)
     end,
   },
   not_userdata_or_fn = {

@@ -522,6 +522,7 @@ thing_name_hierarchy = {
                           calendar_name = {
                             writeable_calendar_name = "leaf",
                           },
+                          device_identifier = "leaf",
                           colon_alphanum_minus = {
                             colon_minus_num = {
                               colon_num = {
@@ -537,7 +538,7 @@ thing_name_hierarchy = {
                           alphanum_minus_underscore = {
                             csl_key = "leaf",
                             lower_alphanum_minus_underscore = {
-                              
+                              machine_arch = "leaf",
                             },
                             snakekebap_case = {
                               strict_snakekebap_case = {
@@ -579,6 +580,8 @@ thing_name_hierarchy = {
                               num_minus = {
                                 digit_interval_str = "leaf",
                               },
+                              kernel_name = "leaf",
+                              os_common_subname = "leaf",
                               upper_alphanum_minus ="leaf",
                               kebap_case = {
                                 strict_kebap_case = {
@@ -672,6 +675,7 @@ thing_name_hierarchy = {
                                   },
                                   youtube_privacy_status = "leaf",
                                   likely_main_branch_name = "leaf",
+                                  linux_chassis = "leaf",
                                 },
                                 iso_3366_1_alpha_2_country_code = "leaf",
                                 iso_3366_1_alpha_3_country_code = "leaf",
@@ -942,6 +946,7 @@ thing_name_hierarchy = {
         danbooru_hydrus_inference_specifier = "leaf",
         composite_tag_specifier = "leaf",
         bin_specifier = "leaf",
+        keymap_spec = "leaf",
       }
     },
     primitive = {
@@ -973,7 +978,11 @@ thing_name_hierarchy = {
                           sme_8_pos_int = {
                             sme_7_pos_int = {
                               sme_6_pos_int = {
-                                sme_5_pos_int = "leaf",
+                                sme_5_pos_int = {
+                                  sme_4_pos_int = {
+                                    sme_3_pos_int = "leaf"
+                                  }
+                                },
                                 weekday_int_start_0 = "leaf",
                                 date_component_index = "leaf",
                                 zero = "leaf",

@@ -1055,6 +1055,10 @@ transf = {
       local new_path = parent_path .. extension
       return new_path
     end,
+    bool_by_leaf_matches_device_identifier =  function(path)
+      local leaf = transf.path.leaflike_by_leaf(path)
+      return is.str.device_identifier(leaf) and transf.device_identifier.bool_by_device_identifier_matches_device(leaf)
+    end,
 
   },
 
@@ -1163,6 +1167,9 @@ transf = {
     file_url = function(path)
       return "file://" .. path
     end,
+    labelled_remote_absolute_path = function(path)
+      return "crhsftp:mirror/desktop/mac/primary_mac" .. path
+    end,
     local_absolute_path_by_prompted_multiple_from_default = function(path)
       return transf.prompt_spec.any_arr({
         prompter = transf.str_prompt_args_spec.str_or_nil_and_bool,
@@ -1181,6 +1188,7 @@ transf = {
     end,
 
   },
+
   volume_local_extant_path = {
 
   },
@@ -1198,6 +1206,19 @@ transf = {
       return get.local_extant_path.absolute_path_arr(
         path,
         {recursion = 3}
+      )
+    end,
+    absolute_path_arr_by_descendants_depth_2 = function(path)
+      return get.local_extant_path.absolute_path_arr(
+        path,
+        {recursion = 2}
+      )
+    end,
+    absolute_path_arr_by_descendants_depth_2_leaf_matching_device_identifier = function(path)
+      return transf.path_arr.path_arr_by_filtered_leaf_matches_device_identifier(
+        transf.extant_path.absolute_path_arr_by_descendants_depth_2(
+          path
+        )
       )
     end,
     file_arr_by_descendants = function(path)
@@ -1297,7 +1318,7 @@ transf = {
       return transf.local_extant_path_arr.installed_app_dir_arr_by_filter(
         transf.extant_path.dir_arr_by_descendants(path)
       )
-    end
+    end,
   },
   in_home_local_absolute_path = {
     http_protocol_url_by_local_http_server = function(path)
@@ -1306,14 +1327,8 @@ transf = {
     local_nonabsolute_path_by_relative_to_home = function(path)
       return get.local_absolute_path.local_nonabsolute_path_by_from(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOME)
     end,
-    labelled_remote_path = function(path)
-      return transf.local_nonabsolute_path_relative_to_home.labelled_remote_absolute_path(transf.in_home_local_absolute_path.local_nonabsolute_path_by_relative_to_home(path))
-    end
   },
   local_nonabsolute_path_relative_to_home = {
-    labelled_remote_absolute_path = function(path)
-      return "hsftp:/home/" .. path
-    end,
     local_absolute_path = function(path)
       return dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/" .. path
     end,
@@ -1362,11 +1377,11 @@ transf = {
         transf.path_arr.citable_path_arr_by_filtered(path_arr)
       )
     end,
+    path_arr_by_filtered_leaf_matches_device_identifier = function(path_arr)
+      return get.arr.arr_by_filtered(path_arr, transf.path.bool_by_leaf_matches_device_identifier)
+    end,
   },
   extant_path_arr = {
-    extant_path_by_newest_creation = function(path_arr)
-      return get.local_extant_path_arr.extant_by_largest_of_attr(path_arr, "creation")
-    end,
     dir_arr_by_filter = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, is.extant_path.dir)
     end,
@@ -1392,6 +1407,9 @@ transf = {
   local_extant_path_arr = {
     installed_app_dir_arr_by_filter = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, is.local_extant_path.installed_app_dir)
+    end,
+    local_extant_path_by_newest_creation = function(path_arr)
+      return get.local_extant_path_arr.extant_by_largest_of_attr(path_arr, "creation")
     end,
   },
   dir_arr = {
@@ -1682,7 +1700,7 @@ transf = {
       return transf.path_arr.extensions_arr(transf.dir.absolute_path_arr_by_children(dir))
     end,
     extant_path_by_newest_child = function(dir)
-      return transf.extant_path_arr.extant_path_by_newest_creation(transf.dir.absolute_path_arr_by_children(dir))
+      return transf.local_extant_path_arr.local_extant_path_by_newest_creation(transf.dir.absolute_path_arr_by_children(dir))
     end,
     absolute_path_arr_by_grandchildren = function(dir)
       return get.arr_arr.arr_by_mapped_w_t_arg_t_ret_fn_and_flatten(transf.dir.absolute_path_arr_by_children(dir), transf.dir.absolute_path_arr_by_children)
@@ -4013,6 +4031,9 @@ transf = {
     end,
   },
   str = {
+    number_or_nil_by_base_10 = function(str)
+      return get.str.number_or_nil(str, 10)
+    end,
     str_or_nil_by_raw_syn_output = function(str)
       return get.fn.rt_by_memoized(transf.str.str_or_nil_by_evaled_env_bash_stripped)( "syn -p" .. transf.str.str_by_single_quoted_escaped(str) )
     end,
@@ -8744,6 +8765,29 @@ transf = {
     one = function()
       return 1
     end,
+    linux_chassis = function()
+      return "laptop"
+    end,
+    kernel_name = function()
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("uname -s")
+    end,
+    machine_arch = function()
+      return transf.str.str_or_nil_by_evaled_env_bash_stripped("uname -m")
+    end,
+    os_common_subname = function()
+      return ""
+    end,
+    device_identifier = function()
+      return 
+        transf["nil"].linux_chassis() .. ":" ..
+        transf["nil"].kernel_name() .. ":" ..
+        transf["nil"].machine_arch() .. ":" ..
+        transf["nil"].os_common_subname() .. ":" ..
+        transf["nil"].alphanum_minus_by_localized_name()
+    end,
+    alphanum_minus_by_localized_name = function()
+      return transf.fn.rt_by_memoized(hs.host.localizedName)()
+    end,
     n_anys_arg_n_anys_or_error_ret_fn_by_poisonable = function()
       local dirty = false
       local returnfn
@@ -8906,6 +8950,21 @@ transf = {
           return get.audiodevice.audiodevice_specifier(device, type)
         end
       )
+    end,
+  },
+  device_identifier = {
+    five_alphanum_minus_underscores = function(device_identifier)
+      return get.str.n_strs_by_split_w_str(device_identifier, ":")
+    end,
+    bool_by_device_identifier_matches_device = function(device_identifier)
+      local linux_chassis, kernel_name, os_common_subname, machine_arch, host_name = transf.device_identifier.five_alphanum_minus_underscores(device_identifier)
+      return 
+        (linux_chassis == "" or linux_chassis == transf["nil"].linux_chassis()) and
+        (kernel_name == "" or kernel_name == transf["nil"].kernel_name()) and
+        (os_common_subname == "" or os_common_subname == transf["nil"].os_common_subname()) and
+        (machine_arch == "" or machine_arch == transf["nil"].machine_arch()) and
+        (host_name == "" or host_name == transf["nil"].host_name())
+        
     end,
   },
   package_manager_name = {
@@ -9269,7 +9328,12 @@ transf = {
     end,
   },
   created_item_specifier_arr = {
-    
+    creation_specifier_arr = function(created_item_specifier_arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        created_item_specifier_arr,
+        transf.created_item_specifier.creation_specifier
+      )
+    end,
   },
   stream_created_item_specifier_arr = {
     stream_created_item_specifier_by_first_running = function(stream_created_item_specifier_arr)
