@@ -1880,7 +1880,14 @@ act = {
     end,
     -- expects to be called on a watcher for tachiyomi state
     tachiyomi_backup = function()
-      
+      local backup_origin_path = get.dir.extant_path_arr_by_grandchildren_with_device_identifier_slash_current_device_identifier(
+        dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROCPULL,
+        "::Android::"
+      )[1] .. "/backup/tachiyomi"
+      dothis.local_zip_file.unzip_to_absolute_path(
+        backup_origin_path,
+        transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "tachiyomi")
+      )
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
         local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_or_fn(dynamic_permanents.str_key_str_value_assoc_by_env.TMP_TACHIYOMI_JSON))
         tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
@@ -1917,7 +1924,7 @@ act = {
       act["nil"].newpipe_extract_backup()
       local timestamp = transf.backuped_thing_identifier.timestamp_ms("newpipe")
       dothis.sqlite_file.query_w_table_arg_fn(
-        transf.str.in_cache_local_absolute_path("newpipe", "export") .. "/history.db",
+        transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "newpipe") .. "/history.db",
         "SELECT json_group_object(access_date, json_object('title', title, 'url', url, 'timestamp_ms', access_date ))" .. 
         "FROM stream_history " ..
         "INNER JOIN streams ON stream_history.stream_id = streams.uid " ..
@@ -1929,7 +1936,7 @@ act = {
             tbl
           )
           act.backuped_thing_identifier.write_current_timestamp_ms("newpipe")
-          act.local_dir.empty_dir(transf.str.in_cache_local_absolute_path("newpipe", "export"))
+          act.local_dir.empty_dir(transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "newpipe"))
         end
       )
     end,
@@ -1981,13 +1988,13 @@ act = {
       local newpipe_dir = dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROCPULL .. "/handset:Linux:Android:arm64:TODO NAME/backup/newpipe"
       dothis.local_zip_file.unzip_to_absolute_path(
         transf.dir.extant_path_by_newest_child(newpipe_dir),
-        transf.str.in_cache_local_absolute_path("newpipe", "export")
+        transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "newpipe")
       )
       act.local_dir.empty_dir(newpipe_dir)
     end,
    
     telegram_generate_backup = function(_, do_after)
-      dothis.fn_queue_specifier.push(main_qspec,
+      dothis.fn_queue_specifier.push(dynamic_permanents.fn_queue_specifier,
         function()
           local window = transf.running_application.main_window(
             transf.mac_application_name.running_application_or_nil("Telegram")
@@ -2021,10 +2028,10 @@ act = {
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "sigtop export-messages -f json" ..
         transf.str.str_by_single_quoted_escaped(
-          transf.str.in_cache_local_absolute_path("signal", "export") .. "/chats"
+          transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "signal") .. "/chats"
         ) .. "&& sigtop export-attachments" ..
         transf.str.str_by_single_quoted_escaped(
-          transf.str.in_cache_local_absolute_path("signal", "export") .. "/media"
+          transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "signal") .. "/media"
         ),
         do_after
       )
@@ -2065,7 +2072,7 @@ act = {
     discord_generate_backup = function(_, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "dscexport exportdm --media --reuse-media -f json --dateformat unix -o" .. transf.str.str_by_single_quoted_escaped(
-          transf.str.in_cache_local_absolute_path("discord", "export")
+          transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "discord")
         ),
         do_after
       )
@@ -2087,7 +2094,7 @@ act = {
       end
       dothis.extant_path.move_to_absolute_path(
         dir,
-        transf.str.in_cache_local_absolute_path("telegram", "export")
+        transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "telegram")
       )
 
     end,
@@ -2108,7 +2115,7 @@ act = {
       end
       dothis.extant_path.move_to_absolute_path(
         actual_dir,
-        transf.str.in_cache_local_absolute_path("facebook", "export")
+        transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "facebook")
       )
     end
   },
@@ -2318,7 +2325,7 @@ act = {
   backup_type = {
     log = function(typ)
       dothis.export_dir.log(
-        transf.str.in_cache_local_absolute_path(typ, "export"),
+        transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", typ),
         typ
       )
     end

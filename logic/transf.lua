@@ -1055,7 +1055,7 @@ transf = {
       local new_path = parent_path .. extension
       return new_path
     end,
-    bool_by_leaf_matches_device_identifier =  function(path)
+    bool_by_leaf_matches_current_device_identifier =  function(path)
       local leaf = transf.path.leaflike_by_leaf(path)
       return is.str.device_identifier(leaf) and transf.device_identifier.bool_by_device_identifier_matches_device(leaf)
     end,
@@ -1215,7 +1215,7 @@ transf = {
       )
     end,
     absolute_path_arr_by_descendants_depth_2_leaf_matching_device_identifier = function(path)
-      return transf.path_arr.path_arr_by_filtered_leaf_matches_device_identifier(
+      return transf.path_arr.path_arr_by_filtered_leaf_matches_current_device_identifier(
         transf.extant_path.absolute_path_arr_by_descendants_depth_2(
           path
         )
@@ -1334,6 +1334,10 @@ transf = {
     end,
   },
   path_arr = {
+    --- if none of the parents are the root path, this is guaranteed to be a path_arr
+    trimmed_noweirdwhitespace_line_arr_by_parent_path_arr = function(path_arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.trimmed_noweirdwhitespace_line_by_parent_path)
+    end,
     leaflike_arr_by_leaves = function(path_arr)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(path_arr, transf.path.leaflike_by_leaf)
     end,
@@ -1377,8 +1381,8 @@ transf = {
         transf.path_arr.citable_path_arr_by_filtered(path_arr)
       )
     end,
-    path_arr_by_filtered_leaf_matches_device_identifier = function(path_arr)
-      return get.arr.arr_by_filtered(path_arr, transf.path.bool_by_leaf_matches_device_identifier)
+    path_arr_by_filtered_leaf_matches_current_device_identifier = function(path_arr)
+      return get.arr.arr_by_filtered(path_arr, transf.path.bool_by_leaf_matches_current_device_identifier)
     end,
   },
   extant_path_arr = {
@@ -1749,7 +1753,12 @@ transf = {
     absolute_path_by_using_union_rfc3339like_dt_o_interval = function(path)
       local path_leaf_specifier = transf.dir.path_leaf_specifier_by_using_union_rfc3339like_dt_or_interval(path)
       return transf.path_leaf_specifier.absolute_path(path_leaf_specifier)
-    end
+    end,
+    extant_path_arr_by_children_with_leaf_matches_current_device_identifier = function(path)
+      return transf.path_arr.path_arr_by_filtered_leaf_matches_current_device_identifier(
+        transf.dir.absolute_path_arr_by_children(path)
+      )
+    end,
   },
   absolute_path_key_leaf_str_or_nested_value_assoc = {
     leaflike_key_leaf_str_or_nested_value_assoc_by_extract_leaf = function(assoc)
@@ -2491,9 +2500,9 @@ transf = {
   },
   local_svg_file = {
     local_absolute_path_by_png_in_cache = function(path)
-      return transf.str.in_cache_local_absolute_path(
-        transf.path.leaflike_by_filename(path) .. ".png",
-        "svgconv"
+      return transf.n_leaflikes.local_absolute_path_by_namespaced_cache(
+        "svgconv",
+        transf.path.leaflike_by_filename(path) .. ".png"
       )
     end,
   },
@@ -4261,7 +4270,7 @@ transf = {
       })("qrencode -l M -m 2 -t UTF8i " .. transf.str.str_by_single_quoted_escaped(data))
     end,
     multiline_str_by_qr_png_in_cache = function(data)
-      local path = transf.str.in_cache_local_absolute_path(data, "qr")
+      local path = transf.n_leaflikes.local_absolute_path_by_namespaced_cache("qr", data)
       dothis.str.generate_qr_png(data, path)
       return path
     end,
@@ -5359,6 +5368,26 @@ transf = {
       local l1 = transf.str.noempty_trimmed_line_by_folded_or_default(s1)
       local l2 = transf.str.line_by_folded(s2)
       return transf.noempty_trimmed_line_and_line.ini_kv_line(l1, l2)
+    end,
+  },
+  n_leaflikes = {
+    local_absolute_path_by_schema = function(...)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.HOMELOCAL .. "/schema/" .. get.str_or_number_arr.str_by_joined({...}, "/")
+    end,
+    local_absolute_path_by_local_proc = function(...)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.HOMELOCAL .. "/proc/local/" .. get.str_or_number_arr.str_by_joined({...}, "/")
+    end,
+    local_absolute_path_by_namespaced_tmp = function(...)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.TMPDIR .. "/hs/" .. get.str_or_number_arr.str_by_joined({...}, "/")
+    end,
+    local_absolute_path_by_namespaced_cache = function(...)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CACHE_HOME .. "/hs/" .. get.str_or_number_arr.str_by_joined({...}, "/")
+    end,
+    local_absolute_path_by_namespaced_config = function(...)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.XDG_CONFIG_HOME .. "/hs/" .. get.str_or_number_arr.str_by_joined({...}, "/")
+    end,
+    local_absolute_path_by_namespaced_data = function(...)
+      return dynamic_permanents.str_key_str_value_assoc_by_env.XDG_DATA_HOME .. "/hs/" .. get.str_or_number_arr.str_by_joined({...}, "/")
     end,
   },
   noempty_trimmed_line_and_line = {

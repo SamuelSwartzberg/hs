@@ -2188,7 +2188,13 @@ get = {
       end
       
       return res
-    end
+    end,
+    bool_by_leaf_matches_device_identifier = function(path, device_identifier)
+      return transf.two_device_itentifiers.bool_by_match(
+        transf.path.leaflike_by_leaf(path),
+        device_identifier
+      )
+    end,
   },
   local_absolute_path = {
     local_nonabsolute_path_by_from = function(path, starting_point)
@@ -2438,6 +2444,7 @@ get = {
         regex
       )
     end,
+
   },
   local_extant_path = {
     str_or_nil_by_evaled_env_bash_stripped = function(path, cmd)
@@ -2510,7 +2517,18 @@ get = {
     extant_path_by_child_having_leaf_ending = function(dir, leaf_ending)
       return get.path_arr.path_or_nil_by_first_having_leaf_ending(transf.dir.absolute_path_arr_by_children(dir), leaf_ending)
     end,
-
+    extant_path_arr_by_children_with_leaf_matches_device_identifier = function(path, device_identifier)
+      return get.path_arr.path_arr_by_filter_to_leaf_matches_device_identifier(
+        transf.dir.absolute_path_arr_by_children(path), 
+        device_identifier
+      )
+    end,
+    extant_path_arr_by_grandchildren_with_device_identifier_slash_current_device_identifier = function(path, device_identifier)
+      return get.path_arr.path_arr_by_filter_to_grandchildren_with_device_identifier_slash_current_device_identifier(
+        transf.dir.absolute_path_arr_by_children(path), 
+        device_identifier
+      )
+    end,
   },
   git_root_dir = {
     in_git_dir_by_hook_path = function(path, hook)
@@ -2804,6 +2822,11 @@ get = {
         return get.path.bool_by_leaf_matches_whole_onig(path, onig)
       end)
     end,
+    path_arr_by_filter_to_leaf_matches_device_identifier = function(path_arr, device_identifier)
+      return get.arr.arr_by_filtered(path_arr, function(path)
+        return get.path.bool_by_leaf_matches_device_identifier(path, device_identifier)
+      end)
+    end,
 
     path_or_nil_by_first_ending_find_ending_w_str = function(path_arr, ending)
       return get.str_arr.str_or_nil_by_first_match_ending_w_str(path_arr, ending)
@@ -2838,6 +2861,15 @@ get = {
       return get.arr.t_or_nil_by_first_match_w_fn(path_arr, function(path)
         return get.str.bool_by_endswith(get.path.filename(path), filename_ending)
       end)
+    end,
+    path_arr_by_filter_to_grandchildren_with_device_identifier_slash_current_device_identifier = function(path_arr, device_identifier)
+      return 
+        transf.path_arr.path_arr_by_filtered_leaf_matches_current_device_identifier(path_arr)
+        and
+        get.path_arr.path_arr_by_filter_to_leaf_matches_device_identifier(
+          transf.path_arr.trimmed_noweirdwhitespace_line_arr_by_parent_path_arr(path_arr),
+          device_identifier
+        )
     end,
   },
   local_extant_path_arr = {

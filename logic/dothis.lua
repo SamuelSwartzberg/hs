@@ -212,7 +212,7 @@ dothis = {
     end,
     add_to_hydrus = function(url, str_arr, do_after)
       local video_id = transf.youtube_video_url.youtube_video_id(url)
-      local cache_path = transf.str.in_cache_local_absolute_path(video_id, "ytdl")
+      local cache_path = transf.n_leaflikes.local_absolute_path_by_namespaced_cache("ytdl", video_id)
       dothis.youtube_video_url.download_to_max_info(
         url,
         cache_path,
