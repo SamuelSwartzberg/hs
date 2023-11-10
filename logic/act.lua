@@ -1892,18 +1892,44 @@ act = {
         dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROCPULL,
         "::Android::"
       )[1] .. "/backup/tachiyomi"
+      local backup_target_path = transf.n_leaflikes.local_absolute_path_by_local_proc("backup", "tachiyomi", "raw_protobuf")
+      local backup_json_path = transf.n_leaflikes.local_absolute_path_by_local_proc("backup", "tachiyomi", "json")
       dothis.local_zip_file.unzip_to_absolute_path(
         backup_origin_path,
-        transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "tachiyomi")
+        backup_target_path
       )
-      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
-        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(dynamic_permanents.str_key_str_value_assoc_by_env.TMP_TACHIYOMI_JSON))
-        tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
-        dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
-          dynamic_permanents.str_key_str_value_assoc_by_env.MMANGA_LOGS,
-          tmst_assoc
+      local backup_proto_path = get.local_dir.local_extant_path_or_nil_by_newest_child_with_leaf_matches_whole_onig_str(
+        backup_target_path,
+        "tachiyomi_.*\\.proto"
+      )
+      local protobuf_location = transf.n_leaflikes.local_absolute_path_by_schema(
+        "protobuf",
+        "tachiyomi_schema.proto"
+      )
+      local quoted_protobuf_location = transf.str.str_by_single_quoted_escaped(protobuf_location)
+      if not is.local_absolute_path.local_extant_path(protobuf_location) then
+        act.str.env_bash_eval_sync(
+          "deno run --allow-net --allow-write" ..
+          transf.str.str_by_single_quoted_escaped(
+            transf.owner_item_urllike.absolute_path_or_nil_by_installed_location(
+              "github.com/clementd64/tachiyomi-backup-models"
+            )
+          ) 
+           .. quoted_protobuf_location ..
+          " && sed -i '/var mediaIdInt: Int =/d' " .. quoted_protobuf_location
         )
-        act.backuped_thing_identifier.write_current_timestamp_ms("tachiyomi")
+      end
+
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        transf.owner_item_urllike.absolute_path_or_nil_by_installed_location("github.com/hq6/ProtobufJson") .. "/ProtobufJson ToJson --proto_path=" .. transf.str.str_by_single_quoted_escaped(transf.n_leaflikes.local_absolute_path_by_schema("protobuf")) .. "tachiyomi_schema.proto Backup < " .. transf.str.str_by_single_quoted_escaped(backup_proto_path) .. " > " .. transf.str.str_by_single_quoted_escaped(backup_json_path),
+        function()
+          local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(backup_json_path))
+          tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
+          dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
+            dynamic_permanents.str_key_str_value_assoc_by_env.MMANGA_LOGS,
+            tmst_assoc
+          )
+          act.backuped_thing_identifier.write_current_timestamp_ms("tachiyomi")
       end)
     end,
     --- do once ff is quit

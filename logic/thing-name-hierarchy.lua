@@ -471,7 +471,9 @@ thing_name_hierarchy = {
                         local_hydrus_file_url = "leaf",
                       },
                     },
-                    urllike_with_no_scheme = "leaf",
+                    urllike_with_no_scheme = {
+                      owner_item_urllike = "leaf",
+                    },
                     query_k_o_v = "leaf",
                     query_mapping = "leaf",
                     query_str = "leaf",

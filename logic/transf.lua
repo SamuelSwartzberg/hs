@@ -1939,6 +1939,14 @@ transf = {
 
 
   },
+  owner_item_urllike = {
+    absolute_path_or_nil_by_installed_location = function(owner_item_urllike)
+      return get.package_manager_name_or_nil.absolute_path_or_nil_by_first_package_path(
+        "gp",
+        owner_item_urllike
+      )
+    end,
+  },
   in_git_dir_arr = {
     in_has_changes_git_dir_arr_by_filtered = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, is.in_git_dir.in_has_changes_git_dir)

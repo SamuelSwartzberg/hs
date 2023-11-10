@@ -527,7 +527,7 @@ is = {
       return get.str.bool_by_contains_w_str(str, "=")
     end,
     urllike_with_no_scheme = function(str)
-      return is.printable_ascii_no_nonspace_whitespace_str.url("https://" .. str)
+      return is.urlcharset_str.url("https://" .. str)
     end,
     percent_encoded_octet = function(str)
       return #str == 3 and get.str.bool_by_startswith(str, "%") and is.printable_ascii_not_whitespace_str.nonindicated_number_str(str:sub(2, 3))
@@ -611,6 +611,11 @@ is = {
         is.printable_ascii_not_whitespace_str.indicated_accession(str) or
         is.printable_ascii_not_whitespace_str.indicated_issn_full(str) or
         is.printable_ascii_not_whitespace_str.indicated_urlmd5(str)
+    end,
+  },
+  urllike_with_no_scheme = {
+    owner_item_urllike = function(str)
+      return is.url.owner_item_url("https://" .. str)
     end,
   },
   indicated_citable_object_id = {
