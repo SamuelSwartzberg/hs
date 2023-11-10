@@ -174,7 +174,7 @@ dothis = {
       dothis.alphanum_minus_underscore.add_as_pass_item_name(name, type, json.encode(data))
     end,
     add_as_pass_item_name = function(name, type, data)
-      dothis.str.env_bash_eval("yes " .. transf.not_userdata_o_fn.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
+      dothis.str.env_bash_eval("yes " .. transf.any.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
     end,
     add_as_passw_pass_item_name = function(name, password)
       dothis.alphanum_minus_underscore.add_as_pass_item_name(name, "p/passw", password)
@@ -454,7 +454,7 @@ dothis = {
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped_noempty(
         str,
         function(str_or_nil)
-          str_or_nil = transf.fn.rt_or_nil_ret_fn_by_pcall(transf.json_str.not_userdata_o_fn)(str_or_nil)
+          str_or_nil = transf.fn.rt_or_nil_ret_fn_by_pcall(transf.json_str.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table)(str_or_nil)
           if fn then
             fn(str_or_nil)
           end
@@ -465,7 +465,7 @@ dothis = {
       dothis.str.env_bash_eval_w_str_arg_fn_str_arg_fn_by_stripped_noempty(
         str,
         function(str)
-          local succ, res = pcall(transf.json_str.not_userdata_o_fn, str)
+          local succ, res = pcall(transf.json_str.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table, str)
           if succ then
             if succfn then succfn(res) end
           else
@@ -1321,7 +1321,7 @@ dothis = {
       local newcnt = transf.two_table_or_nils.table_by_take_new(tblcnt, table)
       dothis.local_file.write_file(
         path,
-        transf.not_userdata_o_fn.json_str_or_err(newcnt)
+        transf.any.json_str_or_err(newcnt)
       )
     end
   },
@@ -1504,7 +1504,7 @@ dothis = {
       local csl_table = transf[indication].csl_table_by_online(citable_object_id)
       dothis.absolute_path.write_file(
         dynamic_permanents.str_key_str_value_assoc_by_env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table) .. ".json",
-        transf.not_userdata_o_fn.json_str_or_err(csl_table)
+        transf.any.json_str_or_err(csl_table)
       )
     end,
   },
@@ -2089,11 +2089,11 @@ dothis = {
         queryarr,
         "createdat"
       )
-      act.not_userdata_o_fn_arr_and_not_userdata_o_fn.set_key_redis(
+      act.arr_and_any.set_key_redis(
         queryarr,
         result
       )
-      act.not_userdata_o_fn_arr_and_not_userdata_o_fn.set_key_redis(
+      act.arr_and_any.set_key_redis(
         timestamp_queryarr,
         os.time()
       )

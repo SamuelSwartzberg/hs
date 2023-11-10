@@ -3746,7 +3746,7 @@ get = {
         queryarr,
         "createdat"
       )
-      return transf.not_userdata_o_fn_arr.not_userdata_o_fn_or_err_or_nil_by_redis(queryarr), transf.not_userdata_o_fn_arr.not_userdata_o_fn_or_err_or_nil_by_redis( timestamp_queryarr )
+      return transf.arr.not_userdata_o_fn_or_err_or_nil_by_redis(queryarr), transf.arr.not_userdata_o_fn_or_err_or_nil_by_redis( timestamp_queryarr )
     end,
     fn_by_1st_n_bound = hs.fnutils.partial,
 
@@ -4022,9 +4022,9 @@ get = {
       return get.two_local_extant_paths.bool_by_second_has_larger_attr(path2, path1, attr)
     end,
   },
-  not_userdata_o_fn = {
+  not_userdata_o_fn_even_nested = {
     base32_crock_str_by_md5_w_pos_int = function(any, length)
-      return transf.not_userdata_o_fn.base32_crock_str_or_err_by_md5(any):sub(1, length)
+      return transf.not_userdata_o_fn_even_nested.base32_crock_str_or_err_by_md5(any):sub(1, length)
     end,
   },
   export_chat_main_object = {

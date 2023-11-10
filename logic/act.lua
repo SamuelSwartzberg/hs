@@ -1585,11 +1585,19 @@ act = {
       dynamic_permanents.table_by_redis_client:set(key, str)
     end,
   },
-  not_userdata_o_fn_arr_and_not_userdata_o_fn = {
+  arr_and_any = {
     set_key_redis = function(arr, val)
-      dothis.two_strs.set_key_redis_raw(
-        transf.not_userdata_o_fn_arr.str_or_err_by_redis_key(arr),
-        transf.not_userdata_o_fn.str_or_nil_by_marshalled(val)
+      act.two_strs.set_key_redis_raw(
+        transf.arr.str_or_err_by_redis_key(arr),
+        transf.any.str_or_nil_by_marshalled(val)
+      )
+    end,
+  },
+  not_userdata_o_fn_even_nested_arr_and_not_userdata_o_fn_even_nested = {
+    set_key_redis = function(arr, val)
+      act.two_strs.set_key_redis_raw(
+        transf.not_userdata_o_fn_even_nested_arr.str_by_redis_key(arr),
+        transf.not_userdata_o_fn_even_nested.str_by_marshalled(val)
       )
     end,
   },
@@ -1716,7 +1724,7 @@ act = {
     end,
     choose_default_search_and_create_background_stream = function()
       dothis.arr.choose_item(
-        transf.json_file.not_userdata_o_fn(dynamic_permanents.str_key_str_value_assoc_by_env.MSPEC .. "/lists/video_searches.json"),
+        transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(dynamic_permanents.str_key_str_value_assoc_by_env.MSPEC .. "/lists/video_searches.json"),
         function(arr)
           local hashes = transf.arr.hydrus_file_hash_arr_by_search_motion_only(arr)
           act.hydrus_file_hash_arr.create_stream_background(hashes)
@@ -1889,7 +1897,7 @@ act = {
         transf.n_leaflikes.local_absolute_path_by_namespaced_cache("export", "tachiyomi")
       )
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("jsonify-tachiyomi-backup", function()
-        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_o_fn(dynamic_permanents.str_key_str_value_assoc_by_env.TMP_TACHIYOMI_JSON))
+        local tmst_assoc = transf.tachiyomi_json_table.timestamp_ms_key_assoc_value_assoc(transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(dynamic_permanents.str_key_str_value_assoc_by_env.TMP_TACHIYOMI_JSON))
         tmst_assoc = get.timestamp_ms_key_assoc_value_assoc.timestamp_ms_key_assoc_value_assoc_by_filtered_timestamp(tmst_assoc, "tachiyomi")
         dothis.logging_dir.log_timestamp_ms_key_assoc_value_assoc(
           dynamic_permanents.str_key_str_value_assoc_by_env.MMANGA_LOGS,

@@ -538,37 +538,6 @@ transf = {
       )
     end,
   },
-  not_userdata_o_fn_arr = {
-    str_arr_or_err_by_marshalled = function(arr)
-      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
-        arr,
-        transf.not_userdata_o_fn.str_or_err_by_marshalled
-      )
-    end,
-    hex_str_arr_or_err_by_md5 = function(arr)
-      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
-        arr,
-        transf.not_userdata_o_fn.hex_str_or_err_by_md5
-      )
-    end,
-    str_arr_or_err_by_hex_str_md5_if_not_str = function(arr)
-      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
-        arr,
-        transf.not_userdata_o_fn.str_or_err_by_hex_str_md5_if_not_str
-      )
-    end,
-    str_or_err_by_redis_key  = function(arr)
-      return get.str_or_number_arr.str_by_joined(
-        transf.not_userdata_o_fn_arr.str_arr_or_err_by_marshalled(arr),
-        consts.printable_ascii_not_whitespace_str_by_unique_record_separator
-      )
-    end,
-    not_userdata_o_fn_or_err_or_nil_by_redis = function(arr)
-      return transf.str.not_userdata_o_fn_even_nested_or_nil_by_redis(
-        transf.not_userdata_o_fn_arr.str_or_err_by_redis_key(arr)
-      )
-    end,
-  },
   not_userdata_o_fn_even_nested_arr = {
     str_arr_by_marshalled = function(arr)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
@@ -715,7 +684,7 @@ transf = {
         api_name = "hydrus",
         endpoint = "get_files/search_files",
         params = {
-          tags = transf.not_userdata_o_fn.json_str_or_err(
+          tags = transf.any.json_str_or_err(
             arr
           ),
           return_hashes = true,
@@ -735,11 +704,40 @@ transf = {
         api_name = "hydrus",
         endpoint = "get_files/search_files",
         params = {
-          tags = transf.not_userdata_o_fn.json_str_or_err(
+          tags = transf.any.json_str_or_err(
             arr
           ),
         }
       }).file_ids
+    end,
+    str_arr_or_err_by_marshalled = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        transf.any.str_or_err_by_marshalled
+      )
+    end,
+    hex_str_arr_or_err_by_md5 = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        transf.any.hex_str_or_err_by_md5
+      )
+    end,
+    str_arr_or_err_by_hex_str_md5_if_not_str = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        transf.any.str_or_err_by_hex_str_md5_if_not_str
+      )
+    end,
+    str_or_err_by_redis_key  = function(arr)
+      return get.str_or_number_arr.str_by_joined(
+        transf.arr.str_arr_or_err_by_marshalled(arr),
+        consts.printable_ascii_not_whitespace_str_by_unique_record_separator
+      )
+    end,
+    not_userdata_o_fn_or_err_or_nil_by_redis = function(arr)
+      return transf.str.not_userdata_o_fn_even_nested_or_nil_by_redis(
+        transf.arr.str_or_err_by_redis_key(arr)
+      )
     end,
   },
   only_pos_int_key_table = {
@@ -2419,8 +2417,8 @@ transf = {
     end,
   },
   json_file = {
-    not_userdata_o_fn = function(path)
-      return transf.json_str.not_userdata_o_fn(transf.file.str_by_contents(path))
+    not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table = function(path)
+      return transf.json_str.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(transf.file.str_by_contents(path))
     end,
     table_or_nil = function(path)
       return transf.json_str.table_or_nil(transf.file.str_by_contents(path))
@@ -3526,7 +3524,7 @@ transf = {
 
       -- The raw contact data, which is in yaml str format, is transformed into a table. 
       -- This is done because table format is easier to handle and manipulate in Lua.
-      local contact_table = transf.yaml_str.not_userdata_o_fn(raw_contact)
+      local contact_table = transf.yaml_str.not_userdata_o_fn_even_nested_notblkeytblval(raw_contact)
 
       -- In the vCard standard, some properties can have vcard_types. 
       -- For example, a phone number can be 'work' or 'home'. 
@@ -3788,7 +3786,7 @@ transf = {
       return contact_table.Note
     end,
     contact_note_spec_by_note = function (contact_table)
-      return transf.yaml_str.not_userdata_o_fn(
+      return transf.yaml_str.not_userdata_o_fn_even_nested_notblkeytblval(
         transf.contact_table.yaml_str_or_nil_by_note(contact_table) or "{}"
       )
     end,
@@ -4229,7 +4227,7 @@ transf = {
     end,
     not_userdata_o_fn_or_err_by_evaled_env_bash_parsed_json = function(str)
       local res = transf.str.str_or_err_by_evaled_env_bash_stripped_noempty(str)
-      return transf.json_str.not_userdata_o_fn(res)
+      return transf.json_str.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(res)
     end,
     not_userdata_o_fn_or_nil_by_evaled_env_bash_parsed_json = function(str)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
@@ -4252,7 +4250,7 @@ transf = {
     table_or_err_by_evaled_env_bash_parsed_json_err_error_key = function(str)
       local res = transf.str.table_or_err_by_evaled_env_bash_parsed_json(str)
       if res.error then
-        error("Error for command " .. str .. ":\n\n" .. transf.not_userdata_o_fn.json_str_or_err_by_pretty(res.error))
+        error("Error for command " .. str .. ":\n\n" .. transf.any.json_str_or_err_by_pretty(res.error))
       else
         return res
       end
@@ -5009,8 +5007,8 @@ transf = {
       end
     end,
   },
-  lyaml_not_userdata_o_fn = {
-    not_userdata_o_fn = function(t)
+  lyaml_not_userdata_o_fn_even_nested_notblkeytblval = {
+    not_userdata_o_fn_even_nested_notblkeytblval = function(t)
       if not is.any.table(t) then
         return t
       end
@@ -5018,29 +5016,29 @@ transf = {
         if v == yaml.null then
           t[k] = nil
         elseif is.any.table(v) then
-          t[k] = transf.lyaml_not_userdata_o_fn.not_userdata_o_fn(v)
+          t[k] = transf.lyaml_not_userdata_o_fn_even_nested_notblkeytblval.not_userdata_o_fn_even_nested_notblkeytblval(v)
         end
       end
     end
   },
   yaml_str = {
-    not_userdata_o_fn = function(str)
+    not_userdata_o_fn_even_nested_notblkeytblval = function(str)
       local res = yaml.load(str)
-      res = transf.lyaml_not_userdata_o_fn.not_userdata_o_fn(res)
+      res = transf.lyaml_not_userdata_o_fn_even_nested_notblkeytblval.not_userdata_o_fn_even_nested_notblkeytblval(res)
       return res
     end,
     json_str = function(str)
-      return transf.not_userdata_o_fn.json_str_or_err(
-        transf.yaml_str.not_userdata_o_fn(str)
+      return transf.any.json_str_or_err(
+        transf.yaml_str.not_userdata_o_fn_even_nested_notblkeytblval(str)
       )
     end,
   },
   json_str = {
-    not_userdata_o_fn = function(str)
+    not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table = function(str)
       return transf.fn.rt_or_nil_ret_fn_by_pcall(json.decode)(str)
     end,
     table_or_nil = function(str)
-      local res =  transf.not_userdata_o_fn.json_str_or_err(str)
+      local res =  transf.json_str.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(str)
       if is.any.table(res) then
         return res
       else
@@ -5048,8 +5046,8 @@ transf = {
       end
     end,
     yaml_str = function(str)
-      return transf.not_userdata_o_fn.yaml_str_or_err(
-        transf.json_str.not_userdata_o_fn(str)
+      return transf.any.yaml_str_or_err(
+        transf.json_str.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(str)
       )
     end,
   },
@@ -5057,8 +5055,8 @@ transf = {
     assoc = toml.decode
   },
   yaml_file = {
-    not_userdata_o_fn = function(path)
-      return transf.yaml_str.not_userdata_o_fn(transf.plaintext_file.str_by_contents(path))
+    not_userdata_o_fn_even_nested_notblkeytblval = function(path)
+      return transf.yaml_str.not_userdata_o_fn_even_nested_notblkeytblval(transf.plaintext_file.str_by_contents(path))
     end
   },
   
@@ -5072,9 +5070,9 @@ transf = {
   plaintext_assoc_file = {
     not_userdata_o_fn = function(file)
       if is.plaintext_assoc_file.yaml_file(file) then
-        return transf.yaml_file.not_userdata_o_fn(file)
+        return transf.yaml_file.not_userdata_o_fn_even_nested_notblkeytblval(file)
       elseif is.plaintext_assoc_file.json_file(file) then
-        return transf.json_file.not_userdata_o_fn(file)
+        return transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(file)
       elseif is.plaintext_assoc_file.ini_file(file) then
         return transf.ini_file.str_key_str_or_nested_1_value_assoc(file)
       elseif is.plaintext_assoc_file.toml_file(file) then
@@ -5442,7 +5440,7 @@ transf = {
   },
   n_not_userdata_o_fns = {
     str_arr_by_hex_str_md5_if_not_str = function(...)
-      return transf.not_userdata_o_fn_arr.str_arr_or_err_by_hex_str_md5_if_not_str({...})
+      return transf.arr.str_arr_or_err_by_hex_str_md5_if_not_str({...})
     end,
     local_absolute_path_by_namespaced_tmp_session = function(...)
       return transf.n_leaflikes.local_absolute_path_by_namespaced_tmp_session(
@@ -6191,9 +6189,9 @@ transf = {
         "shell-input",
         tbl
       ) .. ".yaml"
-      transf.not_userdata_o_fn.yaml_str_or_err(tbl)
+      transf.any.yaml_str_or_err(tbl)
       transf.str.str_or_nil_by_evaled_env_bash_stripped("align " .. transf.str.str_by_single_quoted_escaped(tmp))
-      local res = transf.yaml_file.not_userdata_o_fn(tmp)
+      local res = transf.yaml_file.not_userdata_o_fn_even_nested_notblkeytblval(tmp)
       act.local_extant_path.delete(tmp)
       return res
     end,
@@ -6203,7 +6201,7 @@ transf = {
     end,
     
     ics_str = function(t)
-      local tmpdir_ics_path = transf.not_userdata_o_fn.in_tmp_local_absolute_path(t) .. ".ics"
+      local tmpdir_ics_path = transf.any.in_tmp_local_absolute_path(t) .. ".ics"
       dothis.table.write_ics_file(t, tmpdir_ics_path)
       local contents = transf.file.str_by_contents(tmpdir_ics_path)
       act.absolute_path.delete(tmpdir_ics_path)
@@ -6912,7 +6910,7 @@ transf = {
     csl_table_or_nil = function(id)
       local path = transf.filename_safe_indicated_citable_object_id.mcitations_csl_file_or_nil(id)
       if path then
-        return transf.json_file.not_userdata_o_fn(
+        return transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(
           path
         )
       else
@@ -7055,7 +7053,7 @@ transf = {
       return transf.path.path_by_ending_with_slash(dir) .. "client_project_data.yaml"
     end,
     assoc_by_metadata = function(dir)
-      return transf.yaml_file.not_userdata_o_fn(
+      return transf.yaml_file.not_userdata_o_fn_even_nested_notblkeytblval(
         transf.client_project_dir.yaml_file_by_metadata_file(dir)
       )
     end,
@@ -7598,7 +7596,7 @@ transf = {
         "\n"
       )
     end,
-    json_str = transf.not_userdata_o_fn.json_str_or_err,
+    json_str = transf.any.json_str_or_err,
     indicated_citable_object_id_arr = function(arr)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
@@ -7837,7 +7835,7 @@ transf = {
     hex_str_or_nil_by_urlmd5 = function(csl_table)
       local url = transf.csl_table.url_or_nil(csl_table)
       if url then
-        return transf.not_userdata_o_fn.hex_str_or_err_by_md5(url)
+        return transf.any.hex_str_or_err_by_md5(url)
       end
     end,
     indicated_urlmd5_or_nil = function(csl_table)
@@ -7890,7 +7888,7 @@ transf = {
     end,
     bib_str = function(csl_table)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
-        "pandoc -f csljson -t biblatex" .. transf.str.here_doc(transf.not_userdata_o_fn.json_str_or_err(csl_table))
+        "pandoc -f csljson -t biblatex" .. transf.str.here_doc(transf.any.json_str_or_err(csl_table))
       )
     end,
     str_by_apa_citation = function(csl_table)
@@ -8119,7 +8117,7 @@ transf = {
       return get.str.no_prefix_str(rejoined, "//")
     end,
     calendar_name_by_for_webcal = function(url)
-      return "webcal_readonly_" .. transf.not_userdata_o_fn.hex_str_or_err_by_md5(url)
+      return "webcal_readonly_" .. transf.any.hex_str_or_err_by_md5(url)
     end,
     vdirsyncer_pair_specifier = function(url)
       local name = transf.url.calendar_name_by_for_webcal(url)
@@ -8256,57 +8254,7 @@ transf = {
     end
   },
   not_userdata_o_fn = {
-    hex_str_or_err_by_md5 = function(thing)
-      return transf.str.hex_str_by_md5(
-        transf.not_userdata_o_fn.str_or_err_by_marshalled(thing)
-      )
-    end,
-    base32_crock_str_or_err_by_md5 = function(thing)
-      return transf.str.base32_crock_str_by_md5(
-        transf.not_userdata_o_fn.str_or_err_by_marshalled(thing)
-      )
-    end,
-    str_or_err_by_hex_str_md5_if_not_str  = function(thing)
-      if is.any.str(thing) then
-        return thing
-      else
-        return transf.not_userdata_o_fn.hex_str_or_err_by_md5(thing)
-      end
-    end,
-    str_or_err_by_base32_crock_str_md5_if_not_str  = function(thing)
-      if is.any.str(thing) then
-        return thing
-      else
-        return transf.not_userdata_o_fn.base32_crock_str_or_err_by_md5(thing)
-      end
-    end,
-    str_or_err_by_single_quoted_escaped_json = function(t)
-      return transf.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table.str_by_single_quoted_escaped_json(
-        t
-      )
-    end,
-    json_str_or_err = json.encode,
-    json_str_or_nil = function(t)
-      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(transf.not_userdata_o_fn.json_str_or_err)(t)
-    end,
-    str_or_nil_by_marshalled = shelve.marshal,
-    str_or_err_by_marshalled = function(t)
-      return transf.n_anys_or_nil_ret_fn.n_anys_or_err_ret_fn_by_pcall(transf.not_userdata_o_fn.str_or_nil_by_marshalled)(t)
-    end,
-    json_str_or_err_by_pretty = function(t)
-      return transf.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table.json_str_by_pretty(t)
-    end,
-    json_str_or_nil_by_pretty = function(t)
-      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(transf.not_userdata_o_fn.json_str_or_err_by_pretty)(t)
-    end,
-    --- @param tbl any
-    --- @return str
-    yaml_str_or_err = function(tbl)
-      transf.not_userdata_o_fn_even_nested_notblkeytblval.yaml_str(tbl)
-    end,
-    yaml_str_or_nil = function(tbl)
-      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(transf.not_userdata_o_fn.yaml_str_or_err)(tbl)
-    end,
+   
   },
   not_userdata_o_fn_even_nested = {
     str_by_marshalled = shelve.marshal,
@@ -8364,6 +8312,57 @@ transf = {
     end,
   },
   any = {
+    hex_str_or_err_by_md5 = function(thing)
+      return transf.str.hex_str_by_md5(
+        transf.any.str_or_err_by_marshalled(thing)
+      )
+    end,
+    base32_crock_str_or_err_by_md5 = function(thing)
+      return transf.str.base32_crock_str_by_md5(
+        transf.any.str_or_err_by_marshalled(thing)
+      )
+    end,
+    str_or_err_by_hex_str_md5_if_not_str  = function(thing)
+      if is.any.str(thing) then
+        return thing
+      else
+        return transf.any.hex_str_or_err_by_md5(thing)
+      end
+    end,
+    str_or_err_by_base32_crock_str_md5_if_not_str  = function(thing)
+      if is.any.str(thing) then
+        return thing
+      else
+        return transf.any.base32_crock_str_or_err_by_md5(thing)
+      end
+    end,
+    str_or_err_by_single_quoted_escaped_json = function(t)
+      return transf.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table.str_by_single_quoted_escaped_json(
+        t
+      )
+    end,
+    json_str_or_err = json.encode,
+    json_str_or_nil = function(t)
+      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(transf.any.json_str_or_err)(t)
+    end,
+    str_or_nil_by_marshalled = shelve.marshal,
+    str_or_err_by_marshalled = function(t)
+      return transf.n_anys_or_nil_ret_fn.n_anys_or_err_ret_fn_by_pcall(transf.any.str_or_nil_by_marshalled)(t)
+    end,
+    json_str_or_err_by_pretty = function(t)
+      return transf.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table.json_str_by_pretty(t)
+    end,
+    json_str_or_nil_by_pretty = function(t)
+      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(transf.any.json_str_or_err_by_pretty)(t)
+    end,
+    --- @param tbl any
+    --- @return str
+    yaml_str_or_err = function(tbl)
+      return transf.not_userdata_o_fn_even_nested_notblkeytblval.yaml_str(tbl)
+    end,
+    yaml_str_or_nil = function(tbl)
+      return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(transf.any.yaml_str_or_err)(tbl)
+    end,
     str_by_inspect = function(thing)
       return hs.inspect(thing, {depth = 5})
     end,
@@ -8375,7 +8374,7 @@ transf = {
       elseif is.any.not_table(strable) then
         return transf.any.str(strable)
       else
-        local succ, json = pcall(transf.not_userdata_o_fn.json_str_or_err, strable)
+        local succ, json = pcall(transf.any.json_str_or_err, strable)
         if succ then
           return json
         else
@@ -9168,7 +9167,7 @@ transf = {
   action_specifier = {
     chooser_item_specifier = function(action_specifier)
       local str = get.str.str_by_with_suffix(action_specifier.d, ".")
-      str = str .. " #" .. get.not_userdata_o_fn.base32_crock_str_by_md5_w_pos_int(action_specifier.d, 3) -- shortcode for easy use
+      str = str .. " #" .. get.not_userdata_o_fn_even_nested.base32_crock_str_by_md5_w_pos_int(action_specifier.d, 3) -- shortcode for easy use
       return {text = str}
     end
   },
@@ -9619,22 +9618,22 @@ transf = {
           content = "Return a json object. The field names will be those listed in the first message. The information is to be extracted from the dictionary in the third message. The second message contains explanations for what the fields mean/should contain, and may be empty. If there seems to be no data for a field, just leave it blank."
         }, {
           role = "user",
-          content = transf.not_userdata_o_fn.json_str_or_err_by_pretty(
+          content = transf.any.json_str_or_err_by_pretty(
             spec.form_fields
           )
         }, {
           role = "user",
-          content = transf.not_userdata_o_fn.json_str_or_err_by_pretty(
+          content = transf.any.json_str_or_err_by_pretty(
             spec.explanations
           )
         }, {
           role = "user",
-          content = transf.not_userdata_o_fn.json_str_or_err_by_pretty(
+          content = transf.any.json_str_or_err_by_pretty(
             spec.in_fields
           )
         }
       })
-      return transf.json_str.not_userdata_o_fn(res)
+      return transf.json_str.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(res)
     end,
   },
   position_change_state_spec = {
@@ -10177,7 +10176,7 @@ transf = {
       local json_file = get.dir.extant_path_by_child_having_extension(dir, "json")
       local media_dir = get.dir.extant_path_by_child_having_extension(dir, "_Files")
       if not json_file or not media_dir then error("Could not find json or media dir in " .. dir) end
-      return {transf.json_file.not_userdata_o_fn(json_file), media_dir}
+      return {transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(json_file), media_dir}
     end,
   },
   discord_export_chat_main_object = {
@@ -10231,7 +10230,7 @@ transf = {
         chat_dirs,
         function(chat_dir)
           local media_dir = transf.path.path_by_ending_with_slash(chat_dir) .. "media"
-          local main_obj = transf.json_file.not_userdata_o_fn(
+          local main_obj = transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(
             transf.path.path_by_ending_with_slash(chat_dir) .. "message_1.json"
           )
           return {
@@ -10296,7 +10295,7 @@ transf = {
           local filename = transf.path.leaflike_by_filename(chat_json_file)
           local author = filename:match("^([^(]+)")
           local media_dir = dir .. "/media/" .. filename
-          local messages = transf.json_file.not_userdata_o_fn(chat_json_file)
+          local messages = transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(chat_json_file)
           return {
             {
               author = author,
@@ -10357,7 +10356,7 @@ transf = {
   telegram_export_dir = {
     export_chat_main_object_and_local_dir__arr_arr_by_media_dir = function(dir)
       local json_file = get.dir.extant_path_by_child_having_leaf(dir, "result.json")
-      local export_json = transf.json_file.not_userdata_o_fn(json_file)
+      local export_json = transf.json_file.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table(json_file)
 
       local chats = export_json.chats.list
 
