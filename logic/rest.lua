@@ -273,7 +273,7 @@ function rest(specifier, do_after, have_tried_access_refresh)
     local auth_header = specifier.auth_header .. get.str.str_by_with_suffix(specifier.auth_process or "Basic", " ")
     dothis.arr.push(curl_command, "-H")
     dothis.arr.push(curl_command, 
-      transf.str.str_by_single_quoted_escaped(auth_header .. transf.str.base64_url_str_by_utf8(specifier.username .. ":" .. specifier.password)))
+      transf.str.str_by_single_quoted_escaped(auth_header .. transf.str.base64_url_str_by_string_as_binary(specifier.username .. ":" .. specifier.password)))
   end
 
   -- assembole other parts of curl commmand

@@ -7,6 +7,7 @@ consts = {
   number_by_polling_interval = 0.01,
   nil_singleton = {},
   use_singleton = {},
+  pos_int_by_unique_session_id = math.random(1, 1000000000),
   keymap_spec_by_cmd_shift_alt = {
     modifiers = { "cmd", "shift", "alt" },
     map = {

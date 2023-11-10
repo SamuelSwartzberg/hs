@@ -43,3 +43,5 @@ shelve = require "shelve"
 redis = require "redis"
 --- @type hashings 
 hashings = require("hashings")
+md5 = hashings("md5")
+

@@ -1060,7 +1060,7 @@ is = {
   },
   labelled_remote_extant_path = {
     labelled_remote_dir = function(path)
-      return get.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json_in_key("rclone lsjson --stat" .. transf.str.str_by_single_quoted_escaped(path))
+      return get.str.not_userdata_o_fn_or_nil_by_evaled_env_bash_parsed_json_in_key("rclone lsjson --stat" .. transf.str.str_by_single_quoted_escaped(path))
     end,
     labelled_remote_file = function(path)
       return not is.labelled_remote_extant_path.labelled_remote_dir(path)
@@ -1201,25 +1201,43 @@ is = {
     in_downloads_local_absolute_path = function(path)
       return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS)
     end,
-    in_home_proc_local_absolute_path = function(path)
-      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/")
+    in_proc_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC)
     end,
   },
   in_tmp_local_absolute_path = {
     
   },
-  in_home_proc_local_absolute_path = {
+  in_proc_local_absolute_path = {
+    in_proc_pull_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/pull/")
+    end,
+    in_proc_local_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/")
+    end,
+  },
+  in_proc_local_local_absolute_path = {
+    in_proc_old_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/old/")
+    end,
+    in_proc_hydrus_local_absolute_path = function(path)
+      return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/hydrus/")
+    end,
+  },
+  in_proc_old_local_absolute_path = {
     old_location_logs_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/old/location_logs/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/old/location_logs/"
     end,
     old_media_logs_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/old/media_logs/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/old/media_logs/"
     end,
+  },
+  in_proc_hydrus_local_absolute_path = {
     hydrus_noai_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/hydrus/noai/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/hydrus/noai/"
     end,
     hydrus_ai_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/proc/hydrus/ai/"
+      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/hydrus/ai/"
     end,
   },
   in_downloads_local_absolute_path = {
@@ -2432,7 +2450,7 @@ is = {
     lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = function(val)
       return is.any.lower_alphanum_underscore(val) or is.any.lower_alphanum_underscore_arr(val)
     end,
-    not_userdata_or_fn = function(val)
+    not_userdata_o_fn = function(val)
       return not is.any.userdata(val) and not is.any.fn(val)
     end,
     having_metatable = function(val)
@@ -2448,6 +2466,15 @@ is = {
       return is.any.operational_addable(val) and is.any.operational_comparable(val)
     end,
 
+  },
+  not_userdata_o_fn = {
+    not_userdata_fn_even_nested = transf["nil"]["true"], -- the way to check this would be to iterate through keys and values, possibly recursively, and check that none of them are userdata or fn. But the performance cost isn't worth it. ≙ marshalable with shelve
+  },
+  not_userdata_fn_even_nested = {
+    not_userdata_o_fn_even_nested_notblkeytblval = transf["nil"]["true"], -- see above + testing keys for being tables. ≙ yaml convertable
+  },
+  not_userdata_o_fn_even_nested_notblkeytblval = {
+    not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table = transf["nil"]["true"], -- see above + testing keys for only being pos ints or strs. ≙ json convertable
   },
   bool = {
     ["true"] = function(val)
@@ -3054,7 +3081,7 @@ is = {
   },
   ipc_socket_id = {
     mpv_ipc_socket_id = function(mpv_ipc_socket_id)
-      return get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(mpv_ipc_socket_id, {
+      return get.ipc_socket_id.not_userdata_o_fn_or_nil_by_response(mpv_ipc_socket_id, {
         command = {"get_property", "pid"}
       }) ~= nil
     end,

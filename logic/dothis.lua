@@ -174,7 +174,7 @@ dothis = {
       dothis.alphanum_minus_underscore.add_as_pass_item_name(name, type, json.encode(data))
     end,
     add_as_pass_item_name = function(name, type, data)
-      dothis.str.env_bash_eval("yes " .. transf.not_userdata_or_fn.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
+      dothis.str.env_bash_eval("yes " .. transf.not_userdata_o_fn.single_quoted_escaped(data) .. " | pass add " .. type .. "/" .. name)
     end,
     add_as_passw_pass_item_name = function(name, password)
       dothis.alphanum_minus_underscore.add_as_pass_item_name(name, "p/passw", password)
@@ -278,10 +278,21 @@ dothis = {
       )
     end,
   },
+  not_userdata_o_fn = {
+
+  },
+  not_userdata_o_fn_even_nested = {
+
+  },
+  not_userdata_o_fn_even_nested_notblkeytblval = {
+    write_yaml_to_path  = function(data, path)
+      dothis.absolute_path.write_file(path, yaml.dump(data))
+    end,
+  },
   table = {
     write_ics_file = function(tbl, path)
-      local tmpdir_json_path = transf.not_userdata_or_fn.in_tmp_local_absolute_path(tbl) .. ".json"
-      local tmpdir_ics_path = transf.not_userdata_or_fn.in_tmp_local_absolute_path(tbl) .. ".ics"
+      local tmpdir_json_path = transf.n_not_userdata_o_fns.local_absolute_path_by_namespaced_tmp_once("table_as_json", tbl) .. ".json"
+      local tmpdir_ics_path = transf.n_not_userdata_o_fns.local_absolute_path_by_namespaced_tmp_once("table_as_ics", tbl) .. ".ics"
       dothis.absolute_path.write_file(tmpdir_json_path, json.encode(tbl))
       act.str.env_bash_eval_sync(
         "ical2json" ..
@@ -439,22 +450,22 @@ dothis = {
         failfn
       )
     end,
-    env_bash_eval_w_not_userdata_or_fn_or_nil_arg_fn_by_parsed_json = function(str, fn)
+    env_bash_eval_w_not_userdata_o_fn_or_nil_arg_fn_by_parsed_json = function(str, fn)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped_noempty(
         str,
         function(str_or_nil)
-          str_or_nil = transf.fn.rt_or_nil_ret_fn_by_pcall(transf.json_str.not_userdata_or_fn)(str_or_nil)
+          str_or_nil = transf.fn.rt_or_nil_ret_fn_by_pcall(transf.json_str.not_userdata_o_fn)(str_or_nil)
           if fn then
             fn(str_or_nil)
           end
         end
       )
     end,
-    env_bash_eval_w_not_userdata_or_fn_arg_fn_str_arg_fn_by_parsed_json = function(str, succfn, failfn)
+    env_bash_eval_w_not_userdata_o_fn_arg_fn_str_arg_fn_by_parsed_json = function(str, succfn, failfn)
       dothis.str.env_bash_eval_w_str_arg_fn_str_arg_fn_by_stripped_noempty(
         str,
         function(str)
-          local succ, res = pcall(transf.json_str.not_userdata_or_fn, str)
+          local succ, res = pcall(transf.json_str.not_userdata_o_fn, str)
           if succ then
             if succfn then succfn(res) end
           else
@@ -465,7 +476,7 @@ dothis = {
       )
     end,
     env_bash_eval_w_table_or_nil_arg_fn_by_parsed_json = function(str, fn)
-      dothis.str.env_bash_eval_w_not_userdata_or_fn_or_nil_arg_fn_by_parsed_json(
+      dothis.str.env_bash_eval_w_not_userdata_o_fn_or_nil_arg_fn_by_parsed_json(
         str,
         function(arg)
           if not is.any.table(arg) then arg = nil end
@@ -474,7 +485,7 @@ dothis = {
       )
     end,
     env_bash_eval_w_table_arg_fn_str_arg_fn = function(str, succfn, failfn)
-      dothis.str.env_bash_eval_w_not_userdata_or_fn_arg_fn_str_arg_fn_by_parsed_json(
+      dothis.str.env_bash_eval_w_not_userdata_o_fn_arg_fn_str_arg_fn_by_parsed_json(
         str,
         function(arg)
           if not is.any.table(arg) then 
@@ -1310,7 +1321,7 @@ dothis = {
       local newcnt = transf.two_table_or_nils.table_by_take_new(tblcnt, table)
       dothis.local_file.write_file(
         path,
-        transf.not_userdata_or_fn.json_str(newcnt)
+        transf.not_userdata_o_fn.json_str_or_err(newcnt)
       )
     end
   },
@@ -1493,7 +1504,7 @@ dothis = {
       local csl_table = transf[indication].csl_table_by_online(citable_object_id)
       dothis.absolute_path.write_file(
         dynamic_permanents.str_key_str_value_assoc_by_env.MCITATIONS .. "/" .. transf.csl_table.citable_filename(csl_table) .. ".json",
-        transf.not_userdata_or_fn.json_str(csl_table)
+        transf.not_userdata_o_fn.json_str_or_err(csl_table)
       )
     end,
   },
@@ -1863,10 +1874,10 @@ dothis = {
   },
   mpv_ipc_socket_id = {
     set = function(id, key, ...)
-      get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(id, { command = { "set_property", key, ... } })
+      get.ipc_socket_id.not_userdata_o_fn_or_nil_by_response(id, { command = { "set_property", key, ... } })
     end,
     cycle = function(id, key)
-      get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(id, { command = { "cycle", key } })
+      get.ipc_socket_id.not_userdata_o_fn_or_nil_by_response(id, { command = { "cycle", key } })
     end,
     cycle_inf_no = function(id, key)
       dothis.mpv_ipc_socket_id.set(
@@ -1879,7 +1890,7 @@ dothis = {
       )
     end,
     exec = function(id, ...)
-      get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(id, { command = { ... } })
+      get.ipc_socket_id.not_userdata_o_fn_or_nil_by_response(id, { command = { ... } })
     end,
     set_playlist_index = function(id, index)
       dothis.mpv_ipc_socket_id.set(id, "playlist-pos", index)
@@ -2078,11 +2089,11 @@ dothis = {
         queryarr,
         "createdat"
       )
-      act.not_userdata_or_fn_arr_and_not_userdata_or_fn.set_key_redis(
+      act.not_userdata_o_fn_arr_and_not_userdata_o_fn.set_key_redis(
         queryarr,
         result
       )
-      act.not_userdata_or_fn_arr_and_not_userdata_or_fn.set_key_redis(
+      act.not_userdata_o_fn_arr_and_not_userdata_o_fn.set_key_redis(
         timestamp_queryarr,
         os.time()
       )

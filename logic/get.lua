@@ -75,8 +75,8 @@ get = {
     bool_by_exists_as = function(item, typepath, ext)
       return is.local_absolute_path.local_extant_path(get.pass_item_name.local_absolute_path(item, typepath, ext))
     end,
-    not_userdata_or_fn_by_parsed_json = function(item, typepath)
-      return transf.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json("pass show " .. typepath .. "/" .. item)
+    not_userdata_o_fn_by_parsed_json = function(item, typepath)
+      return transf.str.not_userdata_o_fn_or_nil_by_evaled_env_bash_parsed_json("pass show " .. typepath .. "/" .. item)
     end,
     
   },
@@ -401,11 +401,11 @@ get = {
     end,
   },
   contact_table = {
-    not_userdata_or_fn_by_encrypted_data = function(contact_table, type)
-      return get.pass_item_name.not_userdata_or_fn_by_parsed_json(contact_table.uid, "contacts/" .. type)
+    not_userdata_o_fn_by_encrypted_data = function(contact_table, type)
+      return get.pass_item_name.not_userdata_o_fn_by_parsed_json(contact_table.uid, "contacts/" .. type)
     end,
     line_or_nil_by_tax_number = function(contact_table, type)
-      return transf.str_or_nil.line_or_nil_by_folded(get.contact_table.not_userdata_or_fn_by_encrypted_data(contact_table, "taxnr/" .. type))
+      return transf.str_or_nil.line_or_nil_by_folded(get.contact_table.not_userdata_o_fn_by_encrypted_data(contact_table, "taxnr/" .. type))
     end,
     number_or_nil_by_rate = function(contact_table, type)
       return transf.nonindicated_number_str.number_by_base_10(contact_table.Private[type .. "-rate"])
@@ -1844,13 +1844,13 @@ get = {
       end
       return "---\n" .. final_metadata .. "\n---\n" .. final_contents
     end,
-    not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+    not_userdata_o_fn_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
       local tbl = transf.str.table_or_err_by_evaled_env_bash_parsed_json(str)
       return get.table.vt_or_err(tbl, key)
     end,
-    not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json_in_key = function(str, key)
+    not_userdata_o_fn_or_nil_by_evaled_env_bash_parsed_json_in_key = function(str, key)
       return transf.n_anys_or_err_ret_fn.n_anys_or_nil_ret_fn_by_pcall(
-        get.str.not_userdata_or_fn_or_err_by_evaled_env_bash_parsed_json_in_key
+        get.str.not_userdata_o_fn_or_err_by_evaled_env_bash_parsed_json_in_key
       )(str, key)
     end,
     str_or_err_by_evaled_env_bash_parsed_json_in_key = function(str, key)
@@ -2616,7 +2616,7 @@ get = {
   csl_table_or_csl_table_arr = {
     str_by_raw_citation = function(csl_table, style)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
-        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.lower_strict_snake_case.local_absolute_path_by_csl_file(style) .. transf.not_userdata_or_fn.here_doc_by_json(csl_table)
+        "pandoc --citeproc -f csljson -t plain --csl=" .. transf.lower_strict_snake_case.local_absolute_path_by_csl_file(style) .. transf.not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table.here_doc_by_json(csl_table)
       )
     end,
     
@@ -3558,8 +3558,8 @@ get = {
     end
   },
   ipc_socket_id = {
-    not_userdata_or_fn_or_nil_by_response = function(ipc_socket_id, request_table)
-      return get.str.not_userdata_or_fn_or_nil_by_evaled_env_bash_parsed_json_in_key(
+    not_userdata_o_fn_or_nil_by_response = function(ipc_socket_id, request_table)
+      return get.str.not_userdata_o_fn_or_nil_by_evaled_env_bash_parsed_json_in_key(
         "echo '" .. json.encode(request_table) .. "' | /opt/homebrew/bin/socat UNIX-CONNECT:" .. transf.ipc_socket_id.ipc_socket_path(ipc_socket_id) .. " STDIO",
         "data"
       )
@@ -3567,7 +3567,7 @@ get = {
   },
   mpv_ipc_socket_id = {
     str = function(id, key)
-      return get.ipc_socket_id.not_userdata_or_fn_or_nil_by_response(id, {
+      return get.ipc_socket_id.not_userdata_o_fn_or_nil_by_response(id, {
         command = { "get_property", key }
       } )
     end,
@@ -3746,7 +3746,7 @@ get = {
         queryarr,
         "createdat"
       )
-      return transf.not_userdata_or_fn_arr.not_userdata_or_fn_or_nil_by_redis(queryarr), transf.not_userdata_or_fn_arr.not_userdata_or_fn_or_nil_by_redis( timestamp_queryarr )
+      return transf.not_userdata_o_fn_arr.not_userdata_o_fn_or_err_or_nil_by_redis(queryarr), transf.not_userdata_o_fn_arr.not_userdata_o_fn_or_err_or_nil_by_redis( timestamp_queryarr )
     end,
     fn_by_1st_n_bound = hs.fnutils.partial,
 
@@ -4022,9 +4022,9 @@ get = {
       return get.two_local_extant_paths.bool_by_second_has_larger_attr(path2, path1, attr)
     end,
   },
-  not_userdata_or_fn = {
+  not_userdata_o_fn = {
     base32_crock_str_by_md5_w_pos_int = function(any, length)
-      return transf.not_userdata_or_fn.base32_crock_str_by_md5(any):sub(1, length)
+      return transf.not_userdata_o_fn.base32_crock_str_or_err_by_md5(any):sub(1, length)
     end,
   },
   export_chat_main_object = {

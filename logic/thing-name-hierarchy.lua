@@ -32,6 +32,14 @@ thing_name_hierarchy = {
     },
     operational_comparable = "leaf",
     operational_addable = "leaf",
+    operational_addcomparable = "leaf",
+    not_userdata_o_fn = {
+      not_userdata_fn_even_nested = {
+        not_userdata_o_fn_even_nested_notblkeytblval = {
+          not_userdata_o_fn_even_nested_only_pos_int_or_str_key_table = "leaf"
+        }
+      }
+    },
     lower_alphanum_underscore_or_lower_alphanum_underscore_arr_ = "leaf",
     str = {
       content_starting_lt_ending_gt_str = {
@@ -244,11 +252,18 @@ thing_name_hierarchy = {
                   root_local_absolute_path = "leaf",
                   in_volume_local_absolute_path = "leaf",
                   in_home_local_absolute_path = {
-                    in_home_proc_local_absolute_path = {
-                      old_location_logs_proc_dir = "leaf",
-                      old_media_logs_proc_dir = "leaf",
-                      hydrus_noai_proc_dir = "leaf",
-                      hydrus_ai_proc_dir = "leaf",
+                    in_proc_local_absolute_path = {
+                      in_proc_pull_local_absolute_path = "leaf",
+                      in_proc_local_local_absolute_path = {
+                        in_proc_old_local_absolute_path = {
+                          old_location_logs_proc_dir = "leaf",
+                          old_media_logs_proc_dir = "leaf",
+                        },
+                        in_proc_hydrus_local_absolute_path = {
+                          hydrus_noai_proc_dir = "leaf",
+                          hydrus_ai_proc_dir = "leaf",
+                        }
+                      },
                     },
                     in_me_local_absolute_path = {
                       in_mcitations_local_absolute_path = "leaf",
