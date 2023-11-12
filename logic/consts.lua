@@ -168,4 +168,22 @@ consts = {
     key = "/",
     fn = act["nil"].pop_main_qspec
   },
+  timer_spec_arr = {
+    {
+      fn = act["nil"].process_hydrus_urls,
+      interval = tblmap.dcmp_name.timestamp_s.hour
+    }, { 
+      fn = act["nil"].mbsync_sync, 
+      interval = tblmap.dcmp_name.timestamp_s.min
+    }, {
+      fn = act["nil"].mirror_up,
+      interval = tblmap.dcmp_name.timestamp_s.min
+    }, {
+      fn = act["nil"].pull_from_labelled_remote,
+      interval = tblmap.dcmp_name.timestamp_s.min
+    }, {
+      fn = act["nil"].sync_shared,
+      interval = tblmap.dcmp_name.timestamp_s.min
+    }
+  }
 }

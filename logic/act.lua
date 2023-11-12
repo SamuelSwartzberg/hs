@@ -60,15 +60,66 @@ act = {
     download_into_downloads_async = function(url)
       dothis.url.download_into_async(url, dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS)
     end,
+    download_into_cache_async = function(url)
+      dothis.url.download_into_async(url, transf.url.local_absolute_path_by_in_cache(url))
+    end,
+    download_pdf_into_cache_async = function(url)
+      dothis.url.download_pdf_to_async(url, transf.url.local_absolute_path_by_in_url_pdf_cache(url))
+    end,
     create_as_url_file_in_murls = function(url)
       act.url_arr.create_as_url_files_in_murls({url})
+    end,
+    save_url_to_proc_for_hydrus_pdf = function(url)
+      dothis.str.write_into(
+        url,
+        transf.n_not_userdata_o_fn_even_nesteds.local_absolute_path_by_local_proc("local", "hydrus", "url", "pdf") .. ".url2"
+      )
+    end,
+    add_pdf_to_hydrus = function(url)
+      local path = transf.url.local_absolute_path_by_in_url_pdf_cache(url)
+      dothis.url.download_pdf_to(
+        url,
+        path,
+        function()
+          dothis.local_hydrusable_file.add_to_hydrus_by_path(path)
+        end
+      )
     end,
     subscribe_to_calendar = function(url)
       local pair_spec = transf.url.vdirsyncer_pair_specifier(url)
       act.vdirsyncer_pair_specifier.write_to_config(pair_spec)
     end,
+  },
+  url_file = {
+    add_to_hydrus = function(path)
+      dothis.url_file.add_to_hydrus_policy_ai(path)
+    end,
+    add_pdf_to_hydrus = function(path)
+      act.ur.add_pdf_to_hydrus(transf.file.str_by_contents(path))
+    end,
+  }, 
+  hydrusable_url = {
+    add_to_hydrus_now = function(url, do_after)
+      dothis.hydrusable_url.add_to_hydrus(url, {"date:"..transf["nil"].full_rfc3339like_dt_by_current()}, do_after)
+    end,
     add_to_hydrus = function(url, do_after)
-      dothis.url.add_to_hydrus(url, {"date:"..transf["nil"].full_rfc3339like_dt_by_current()}, do_after)
+      rest({
+        api_name = "hydrus",
+        endpoint = "add_urls/add_url",
+        request_table = {url = url},
+        request_verb = "POST",
+      }, function(res)
+        local hash_arr = transf.url.hydrus_file_hash_arr_by_hydrus_matching_files(url)
+        if do_after and #hash_arr > 0 then
+          do_after(hash_arr)
+        end
+      end)
+    end,
+    save_url_to_proc_for_hydrus_general = function(url)
+      dothis.str.write_into(
+        url,
+        transf.n_not_userdata_o_fn_even_nesteds.local_absolute_path_by_local_proc("local", "hydrus", "url", "general") .. ".url2"
+      )
     end,
   },
   ics_file = {
@@ -87,7 +138,7 @@ act = {
     end,
   },
   hydrus_file_hash_arr = {
-    add_tags_to_hydrus_item = function(arr, do_after)
+    add_ai_tags_to_hydrus_items = function(arr, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
         "hydrus_add_tags" .. transf.str.here_doc(
           transf.str_arr.multiline_str(arr)
@@ -110,7 +161,7 @@ act = {
   },
   hydrus_file_hash = {
     add_tags_to_hydrus_item_by_ai_tags = function(str, do_after)
-      act.hydrus_file_hash_arr.add_tags_to_hydrus_item({str}, do_after)
+      act.hydrus_file_hash_arr.add_ai_tags_to_hydrus_items({str}, do_after)
     end,
     write_stream_metadata_to_cache = function(hash)
       local path = transf.n_leaflikes.local_absolute_path_by_namespaced_cache(
@@ -356,33 +407,29 @@ act = {
         end
       end)
     end,
-    add_to_hydrus_by_path_or_url_ai = function(path_or_url, do_after)
-      dothis.local_hydrusable_file.add_to_hydrus_by_path_or_url(path_or_url, true, do_after)
-    end,
-    add_to_hydrus_by_path_or_url_noai = function(path_or_url, do_after)
-      dothis.local_hydrusable_file.add_to_hydrus_by_path_or_url(path_or_url, false, do_after)
-    end,
+    add_to_hydrus_by_path_or_url = function(path, do_after)
+      local booru_url
+      local is_image = is.local_file.local_image_file(path)
+      if is_image then
+        booru_url = transf.local_image_file.canon_booru_post_url(path)
+      end
+      if booru_url then
+        --- if there's a booru post url, the only thing we will take from the file is the date
+        local date = transf.local_file.rfc3339like_dt_by_any_source(path)
+        dothis.hydrusable_url.add_to_hydrus(
+          booru_url,
+          { "date:" .. date },
+          do_after
+        )
+      else
+        dothis.local_hydrusable_file.add_to_hydrus_by_path_policy_ai(
+          path,
+          transf.local_file.line_arr_by_file_tags(path),
+          do_after
+        )
+      end
+    end
     
-  },
-  hydrus_noai_proc_dir = {
-    add_all_to_hydrus = function(path)
-      local files = transf.extant_path.file_arr_by_descendants(path)
-      dothis.arr.each(
-        files,
-        dothis.local_hydrusable_file.add_to_hydrus_by_path_or_url
-      )
-    end
-  },
-  hydrus_ai_proc_dir = {
-    add_all_to_hydrus = function(path)
-      local files = transf.extant_path.file_arr_by_descendants(path)
-      dothis.arr.each(
-        files,
-        function(file)
-          dothis.local_hydrusable_file.add_to_hydrus_by_path_or_url(file, true)
-        end
-      )
-    end
   },
   otp_url = {
     add_otp_pass_item_with_prompted_name = function(url)
@@ -1335,6 +1382,22 @@ act = {
       )
     end,
   },
+  two_extant_paths = {
+    bisync = function(path1, path2)
+      act.str.env_bash_eval_sync(
+        "rclone bisync" ..
+        transf.str.str_by_single_quoted_escaped(path1) ..
+        transf.str.str_by_single_quoted_escaped(path2)
+      )
+    end,
+  },
+  two_absolute_paths = {
+    bisync = function(path1, path2)
+      if is.absolute_path.extant_path(path1) and is.absolute_path.extant_path(path2) then
+        dothis.two_extant_paths.bisync(path1, path2)
+      end -- else do nothing. This is particularly necessary because bisync is finnicky: one error and you have to manually restart the whole thing by running it with --resync.
+    end,
+  },
   audio_file = {
     play = function(path, do_after)
       dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped("play " .. transf.str.str_by_single_quoted_escaped(path), do_after)
@@ -1421,6 +1484,29 @@ act = {
     delete_file_if_empty_file = function(path)
       if is.file.empty_file(path) then
         act.file.delete_file(path)
+      end
+    end,
+    dispatch_messages_by_path = function(path)
+      local function_container_name = transf.path.path_component_or_nil_by_grandparent_leaf(path)
+      local thing_name1 = transf.path.path_component_or_nil_by_parent_leaf(path)
+      local thing_name2 = transf.path.leaflike_by_filename(path)
+      if not tblmap.function_container_name.thing_name_key_thing_name_with_optional_explanation_key_boolean_value_assoc_value_assoc[function_container_name][thing_name1][thing_name2] then -- whitelist
+        print("Not dispatching message for " .. path .. " because it is not whitelisted.")
+      end
+      local fn =_G[
+        function_container_name
+      ][
+        thing_name1
+      ][
+        thing_name2
+      ]
+      if not fn then
+        print("Not dispatching message for " .. path .. " because there is no such function.")
+      end
+      local contents = transf.file.str_by_contents(path)
+      local items = transf.str.str_arr_by_split_markor_seperator(contents)
+      for _, item in transf.arr.pos_int_vt_stateless_iter(items) do
+        fn(item)
       end
     end,
   },
@@ -1552,7 +1638,7 @@ act = {
   },
   timer_spec = {
     set_next_timestamp_s = function(spec)
-      spec.next_timestamp_s = transf.cronspec_str.timestamp_s_by_next(spec.cronspec_str)
+      spec.next_timestamp_s = os.time() + spec.interval
     end,
     fire = function(spec)
       spec.fn()
@@ -1602,6 +1688,47 @@ act = {
     end,
   },
   ["nil"] = {
+    process_hydrus_urls = function ()
+      dothis.arr.each(
+        get.extant_path.absolute_path_by_descendant_with_extension(
+          transf.n_not_userdata_o_fn_even_nesteds.local_absolute_path_by_local_proc("local", "hydrus", "url", "general"),
+          "url2"
+        ),
+        act.url_file.add_to_hydrus
+      )
+
+      dothis.arr.each(
+        get.extant_path.absolute_path_by_descendant_with_extension(
+          transf.n_not_userdata_o_fn_even_nesteds.local_absolute_path_by_local_proc("local", "hydrus", "url", "pdf"),
+          "url2"
+        ),
+        act.url_file.add_pdf_to_hydrus
+      )
+
+      dothis.arr.each(
+        transf.extant_path.file_arr_by_descendants(
+          transf.n_not_userdata_o_fn_even_nesteds.local_absolute_path_by_local_proc("local", "hydrus", "file")
+        ),
+        act.local_hydrusable_file.add_to_hydrus_by_path_or_url
+      )
+    end,
+    mirror_up = function()
+      act.local_dir.sync_local_to_labelled_remote(dynamic_permanents.str_key_str_value_assoc_by_env.ME)
+    end,
+    sync_shared = function()
+      act.two_extant_paths.bisync(
+        dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/.local/shared/crhsftp",
+        "crhsftp:share"
+      )
+    end,
+    dispatch_messages = function()
+      dothis.arr.each(
+        transf.extant_path.file_arr_by_descendants(
+          dynamic_permanents.str_key_str_value_assoc_by_env.HOME .. "/.local/shared/syncthing/messages"
+        ),
+        act.file.dispatch_messages_by_path
+      )
+    end,
     fill_dynamic_permanent_env = function()
       dynamic_permanents.dynamic_permanents.str_key_str_value_assoc_by_env = transf.str.table_or_err_by_evaled_env_bash_parsed_json("env | jc --ini")
     end,
@@ -1826,9 +1953,6 @@ act = {
           )
         end
       )
-    end,
-    newsboat_reload = function()
-      act.str.env_bash_eval_async("newsboat -x reload")
     end,
     mullvad_connect = function()
       act.str.env_bash_eval_async("mullvad connect")
@@ -2262,16 +2386,6 @@ act = {
     end,
   },
   youtube_video_url = {
-    add_as_m3u = function(url)
-      local deduced_tags = transf.youtube_video_url.lower_alphanum_underscore_key_lower_alphanum_underscore_or_lower_alphanum_underscore_arr_value_assoc(url)
-      local edited_tags = transf.str_value_assoc.str_value_assoc_by_prompted_once_from_default(deduced_tags)
-      local plspec = {}
-      plspec.tag = transf.two_arr_or_nils.arr(edited_tags, transf.str.two_strs__arr_ar_by_prompted_multiple("tag"))
-      plspec.path  = get.local_extant_path.dir_by_default_prompted_once(dynamic_permanents.str_key_str_value_assoc_by_env.MAUDIOVISUAL)
-      plspec.path = transf.str.str_by_prompted_once_from_default(plspec.path)
-      plspec.extension = "m3u"
-      dothis.absolute_path.write_file(transf.path_leaf_specifier.absolute_path(plspec), url)
-    end,
     add_to_hydrus = function(url, do_after)
       dothis.youtube_video_url.add_to_hydrus(url, {}, do_after)
     end,

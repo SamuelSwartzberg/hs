@@ -1287,10 +1287,15 @@ get = {
         get.str.str_arr_by_split_w_str(str, sep, n)
       )
     end,
+    not_starting_o_ending_with_whitespace_str_arr_by_split_w_str_filter_empty = function(str, sep, n)
+      return transf.str_arr.not_starting_o_ending_with_whitespace_str_arr(
+        get.str.not_empty_str_arr_by_split_w_str(str, sep, n)
+      )
+    end,
     str_arr_by_split_w_str = plstringx.split,
-    not_empty_str_arr_by_split_w_str = function(str, sep)
+    not_empty_str_arr_by_split_w_str = function(str, sep, n)
       return transf.str_arr.not_empty_str_arr_by_filtered(
-        get.str.str_arr_by_split_w_str(str, sep)
+        get.str.str_arr_by_split_w_str(str, sep, n)
       )
     end,
     --- don't split on the edge of the str, i.e. don't return empty strs at the start or end

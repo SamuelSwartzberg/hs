@@ -19,15 +19,11 @@ act["nil"].create_fn_queue_specifier()
 
 
 System:get("manager", "timer"):doThis("create-all", {
-  act["nil"].newsboat_reload,
   dothis.vdirsyncer.sync,
   st(dynamic_permanents.str_key_str_value_assoc_by_env.MEDIA_QUEUE):get("timer-that-does", { 
     interval = "*/3 * * * * *", 
     key = "lines-as-stream-queue" }),
-  { 
-    fn = act["nil"].mbsync_sync, 
-    interval = "* * * * *"
-  },
+  
   {
     fn = function()
       act.env_yaml_file_container.write_env_and_check(dynamic_permanents.str_key_str_value_assoc_by_env.ENVFILE)

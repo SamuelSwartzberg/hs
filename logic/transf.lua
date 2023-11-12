@@ -557,6 +557,12 @@ transf = {
         transf.not_userdata_o_fn_even_nested.str_by_hex_str_md5_if_not_str
       )
     end,
+    leaflike_arr_by_base64_url_str_md5_if_not_leaflike = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        transf.not_userdata_o_fn_even_nested.leaflike_by_base64_url_str_md5_if_not_leaflike
+      )
+    end,
     str_by_redis_key  = function(arr)
       return get.str_or_number_arr.str_by_joined(
         transf.not_userdata_o_fn_even_nested_arr.str_arr_by_marshalled(arr),
@@ -722,10 +728,22 @@ transf = {
         transf.any.hex_str_or_err_by_md5
       )
     end,
+    base64_url_str_arr_or_err_by_md5 = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        transf.any.base64_url_str_or_err_by_md5
+      )
+    end,
     str_arr_or_err_by_hex_str_md5_if_not_str = function(arr)
       return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
         arr,
         transf.any.str_or_err_by_hex_str_md5_if_not_str
+      )
+    end,
+    leaflike_arr_or_err_by_base64_url_str_md5_if_not_leaflike = function(arr)
+      return get.arr.only_pos_int_key_table_by_mapped_w_t_arg_t_ret_fn(
+        arr,
+        transf.any.leaflike_or_err_by_base64_url_str_md5_if_not_leaflike
       )
     end,
     str_or_err_by_redis_key  = function(arr)
@@ -897,6 +915,12 @@ transf = {
     end,
     path_component_or_nil_by_parent_leaf = function(path)
       local pcomponents = transf.path.path_component_arr(path)
+      act.arr.pop(pcomponents)
+      return pcomponents[#pcomponents]
+    end,
+    path_component_or_nil_by_grandparent_leaf = function(path)
+      local pcomponents = transf.path.path_component_arr(path)
+      act.arr.pop(pcomponents)
       act.arr.pop(pcomponents)
       return pcomponents[#pcomponents]
     end,
@@ -1209,7 +1233,7 @@ transf = {
       return "file://" .. path
     end,
     labelled_remote_absolute_path = function(path)
-      return "crhsftp:mirror/desktop/mac/primary_mac" .. path
+      return "crhsftp:mirror/" .. transf["nil"].device_identifier() .. "/" .. path
     end,
     local_absolute_path_by_prompted_multiple_from_default = function(path)
       return transf.prompt_spec.any_arr({
@@ -2236,7 +2260,7 @@ transf = {
     hs_image = function(path)
       return transf.fn.rt_by_memoized_1_week(hs.image.imageFromPath)(path)
     end,
-    booru_post_url = function(path)
+    canon_booru_post_url = function(path)
       return transf.str.str_or_nil_by_evaled_env_bash_stripped(
         "saucenao --file" ..
         transf.str.str_by_single_quoted_escaped(path)
@@ -2704,7 +2728,7 @@ transf = {
    
   },
   old_location_logs_proc_dir = {
-    old_location_log_spec_arr = function(path)
+    old_location_2log_spec_arr = function(path)
       return transf.plaintext_assoc_file_arr.not_userdata_o_fn_arr(
         transf.dir.absolute_path_arr_by_grandchildren(path)
       )
@@ -2727,15 +2751,6 @@ transf = {
       end
       return res
     end,
-  },
-  newsboat_url_specifier = {
-    newsboat_url_line = function(specifier)
-      return ('%s\t"~%s"\t"_%s"'):format(
-        specifier.url,
-        specifier.title,
-        ((specifier.category and #specifier.category > 0) and specifier.category) or "edu"
-      )
-    end
   },
   semver_str = {
     semver_component_specifier = function(str)
@@ -4131,6 +4146,9 @@ transf = {
     str_by_long_flag = function(word)
       return "--" .. word
     end,
+    str_arr_by_split_markor_seperator = function(str)
+      return get.str.not_starting_o_ending_with_whitespace_str_arr_by_split_w_str_filter_empty(str, "----")
+    end,
     bool_by_starts_2underscore = function(word)
       return get.str.bool_by_startswith(word, "__") and not get.str.bool_by_startswith(word, "___")
     end,
@@ -4834,6 +4852,9 @@ transf = {
     base32_crock_str_by_md5 = function(str)
       return transf.str.base32_crock_str_by_string_as_binary(transf.str.str_by_md5_as_binary(str))
     end,
+    base64_url_str_by_md5 = function(str)
+      return transf.str.base64_url_str_by_string_as_binary(transf.str.str_by_md5_as_binary(str))
+    end,
 
   },
   danbooru_tag_record = {
@@ -5446,23 +5467,28 @@ transf = {
       return dynamic_permanents.str_key_str_value_assoc_by_env.XDG_DATA_HOME .. "/hs/" .. get.str_or_number_arr.str_by_joined({...}, "/")
     end,
   },
-  n_not_userdata_o_fns = {
-    str_arr_by_hex_str_md5_if_not_str = function(...)
-      return transf.arr.str_arr_or_err_by_hex_str_md5_if_not_str({...})
+  n_not_userdata_o_fn_even_nesteds = {
+    leaflike_arr_by_base64_url_str_md5_if_not_leaflike = function(...)
+      return transf.not_userdata_o_fn_even_nested_arr.leaflike_arr_by_base64_url_str_md5_if_not_leaflike({...})
     end,
     local_absolute_path_by_namespaced_tmp_session = function(...)
       return transf.n_leaflikes.local_absolute_path_by_namespaced_tmp_session(
-        transf.n_not_userdata_o_fns.str_arr_by_hex_str_md5_if_not_str(...)
+        transf.n_not_userdata_o_fn_even_nesteds.leaflike_arr_by_base64_url_str_md5_if_not_leaflike(...)
       )
     end,
     local_absolute_path_by_namespaced_tmp_once = function(...)
       return transf.n_leaflikes.local_absolute_path_by_namespaced_tmp_once(
-        transf.n_not_userdata_o_fns.str_arr_by_hex_str_md5_if_not_str(...)
+        transf.n_not_userdata_o_fn_even_nesteds.leaflike_arr_by_base64_url_str_md5_if_not_leaflike(...)
       )
     end,
     local_absolute_path_by_namespaced_cache = function(...)
       return transf.n_leaflikes.local_absolute_path_by_namespaced_cache(
-        transf.n_not_userdata_o_fns.str_arr_by_hex_str_md5_if_not_str(...)
+        transf.n_not_userdata_o_fn_even_nesteds.leaflike_arr_by_base64_url_str_md5_if_not_leaflike(...)
+      )
+    end,
+    local_absolute_path_by_local_proc = function(...)
+      return transf.n_leaflikes.local_absolute_path_by_local_proc(
+        transf.n_not_userdata_o_fn_even_nesteds.leaflike_arr_by_base64_url_str_md5_if_not_leaflike(...)
       )
     end,
 
@@ -8032,7 +8058,10 @@ transf = {
       return get.url.str_or_nil_by_query_selector_all(url, "meta[name=description]")
     end,
     local_absolute_path_by_in_cache = function(url)
-      return transf.n_not_userdata_o_fns.local_absolute_path_by_namespaced_cache("url", transf.urllike_with_no_scheme.url_by_ensure_scheme(url))
+      return transf.n_not_userdata_o_fn_even_nesteds.local_absolute_path_by_namespaced_cache("url", url)
+    end,
+    local_absolute_path_by_in_url_pdf_cache = function(url)
+      return transf.n_not_userdata_o_fn_even_nesteds.local_absolute_path_by_namespaced_cache("url_pdf", url) .. ".pdf"
     end,
     url_table = function(url)
       return get.fn.rt_by_memoized(
@@ -8189,7 +8218,28 @@ transf = {
         return url_file_status.hash
       end)
     end,
+    hydrus_url_spec_or_nil = function(url)
+      return rest({
+        api_name = "hydrus",
+        endpoint = "/add_urls/get_url_info",
+        method = "GET",
+        params = {
+          url = url,
+        }
+      })
+    end,
+    sme_5_pos_int_or_nil_by_hydrus_url_type = function(url)
+      local url_spec = transf.url.hydrus_url_spec_or_nil(url)
+      if url_spec then
+        return url_spec.url_type
+      end
+    end,
 
+  },
+  hydrus_url_spec = {
+    sme_5_pos_int_by_url_type = function(url_spec)
+      return url_spec.url_type
+    end,
   },
   path_url = {
     path_component_by_initial = function(url)
@@ -8290,6 +8340,20 @@ transf = {
         return transf.not_userdata_o_fn_even_nested.base32_crock_str_by_md5(thing)
       end
     end,
+    str_by_base64_url_str_md5_if_not_str  = function(thing)
+      if is.any.str(thing) then
+        return thing
+      else
+        return transf.not_userdata_o_fn_even_nested.base64_url_str_by_md5(thing)
+      end
+    end,
+    leaflike_by_base64_url_str_md5_if_not_leaflike  = function(thing)
+      if is.any.leaflike(thing) then
+        return thing
+      else
+        return transf.not_userdata_o_fn_even_nested.base64_url_str_by_md5(thing)
+      end
+    end,
   },
   not_userdata_o_fn_even_nested_notblkeytblval = {
     --- wraps yaml.dump into a more intuitive form which always encodes a single document
@@ -8330,6 +8394,11 @@ transf = {
         transf.any.str_or_err_by_marshalled(thing)
       )
     end,
+    base64_url_str_or_err_by_md5 = function(thing)
+      return transf.str.base64_url_str_by_md5(
+        transf.any.str_or_err_by_marshalled(thing)
+      )
+    end,
     str_or_err_by_hex_str_md5_if_not_str  = function(thing)
       if is.any.str(thing) then
         return thing
@@ -8342,6 +8411,20 @@ transf = {
         return thing
       else
         return transf.any.base32_crock_str_or_err_by_md5(thing)
+      end
+    end,
+    str_or_err_by_base64_url_str_md5_if_not_str  = function(thing)
+      if is.any.str(thing) then
+        return thing
+      else
+        return transf.any.base64_url_str_or_err_by_md5(thing)
+      end
+    end,
+    leaflike_or_err_by_base64_url_str_md5_if_not_leaflike  = function(thing)
+      if is.any.leaflike(thing) then
+        return thing
+      else
+        return transf.any.base64_url_str_or_err_by_md5(thing)
       end
     end,
     str_or_err_by_single_quoted_escaped_json = function(t)

@@ -11,18 +11,23 @@ refac:
     - also, existing files do have metadata in filename
     - is there a nice, current way to fetch artist and copyright and autoincorporate them in the structure?
     - children via structure
-  - memoization: instead of reading the things in fscache from disk every time, why don't we write it to disk once while memoizing and then read the entire cache from disk on startup?
+build:
+  - syncing:
+    - masterless file sharing
+      - functions for pushing files to shared?
+    - hydrus queue structuring
+      - pull integration into universal proc files
+      - universal proc file handling
+      - url classes and handling
+    - backup processing -> moving into structure after arrival
+use:
 post 'lua is working':  
   - add/rename missing m3us
-  - restructure external server: /io/[push|pull]/[mobile|desktop]/[mac|android]/<device_name>, /mirror/[mobile|desktop]/[mac|android]/<device_name>, /share/*
-  - switch to rclone crypt, https://github.com/newhinton/Round-Sync on android
   - history
     - move images to hydrus
       - date string parsing
       - eliminate binres images
-      - js to rewrite filenames on e.g. g.e-hentai to whatever I choose for hydrus
       - need to think on how to handle other file transmission & parsing (e.g. downloads, images from phone)
-      - parse manga panels -> add to hydrus
       - deal with low-tagging boorus and other sources
       - way to add url and make ai add tags later
     - shrinking, moving other documents
@@ -33,19 +38,13 @@ post 'lua is working':
   - old contact importing
     - refac contacts to use yaml in notes field for met data
     - contact em 
-    - contact freiland aktzeichen host (ask first if still hosting)
-  - newsboat formatting, interface
   - health data downsync:
     - strava
     - other devices: general heartrate? Blood pressure? steps
     - dna test?
     - regular blood test?
     - family health data
-  - health check for MAUDIOVISUAL urls, to find decayed urls and to replace them -> Perhaps better\: cache MAUDIOVISUAL urls, allow playing of those local files as dropin (however, we also query a lot from yt, so we need to cache that - ideally permanently). However\: Cache should be conceptualized as temporary, but this cache as permanent. So we need some solution to say 'don't delete this cache', or a different kind of cache. Okay, I have an idea: Fetch url, urlmd5 it, create entry in dir. When playing, check whether we have corresponding file, either use it or download it (only non-playlists).
-  - sub, MAUDIOVISUAL syncing to phone (newpipe, antennapod)
   - danbooru search links need their query to count as 'seen' for other queries
-  - convenient way to deal with anonymous but permanent email addresses (read about best practices first)
-  - html to pdf
   - citations
     - add citations and test citation usage workflow
     - rename, sort books based on what is needed for citation workflow, and what is desirable
@@ -58,7 +57,12 @@ post 'stuff is implemented':
     - fix memory leak
     - more memoization
     - more item cache
-  - clean up android
+  - privacy
+    - switch discord -> matrix + ephemeral video hosting
+    - find out how to do pseudo/anonymity well
+       - convenient way to deal with anonymous but permanent email addresses (read about best practices first)
+    - switch vcal, vcard host (e.g. etesync?)
+    - switch email provider + encrypted email
     - degoogle phone
 after new computer:
   - set up windows virtualized env, transfer stuff from my windows laptop over there

@@ -706,4 +706,13 @@ tblmap = {
       }
     }
   },
+  function_container_name = {
+    thing_name_key_thing_name_with_optional_explanation_key_boolean_value_assoc_value_assoc = {
+      act = {
+        hydrusable_url = {
+          save_url_to_proc_for_hydrus_general = true,
+        }
+      }
+    }
+  }
 }

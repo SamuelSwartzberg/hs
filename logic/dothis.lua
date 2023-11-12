@@ -154,6 +154,14 @@ dothis = {
       act.hydrus_file_hash_arr.write_stream_metadata_to_cache(arr)
       dothis.hydrus_file_hash_arr.create_stream(arr, flag_profile_name)
     end,
+    add_tags_and_notes = function(arr, str_arr, do_after)
+      dothis.arr.each(
+        arr,
+        function(str)
+          dothis.hydrus_file_hash.add_tags_and_notes(str, str_arr, do_after)
+        end
+      )
+    end,
 
   },
   pass_item_name = {
@@ -249,24 +257,19 @@ dothis = {
     download_pdf_to_sync = function(url, target)
       act.str.env_bash_eval_sync("pdfgen" .. transf.str.str_by_single_quoted_escaped(url) .. transf.str.str_by_single_quoted_escaped(target))
     end,
+    download_pdf_to_async = function(url, target)
+      act.str.env_bash_eval_async("pdfgen" .. transf.str.str_by_single_quoted_escaped(url) .. transf.str.str_by_single_quoted_escaped(target))
+    end,
+    download_pdf_to = function(url, target, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "pdfgen" .. transf.str.str_by_single_quoted_escaped(url) .. transf.str.str_by_single_quoted_escaped(target),
+        do_after or function() end
+      )
+    end,
       
     add_event_from_url = function(url, calendar)
       local temp_path_arg = transf.str.str_by_single_quoted_escaped(dynamic_permanents.str_key_str_value_assoc_by_env.TMPDIR .. "/event_downloaded_at_" .. os.time() .. ".ics")
       dothis.str.env_bash_eval('curl' .. transf.str.str_by_single_quoted_escaped(url) .. ' -o' .. temp_path_arg .. '&& khal import --include-calendar ' .. calendar .. temp_path_arg)
-    end,
-    add_to_hydrus = function(url, str_arr, do_after)
-      local request_table = { url = url }
-      if str_arr then
-        request_table.service_keys_to_additional_tags = {
-          ["6c6f63616c2074616773"] = str_arr
-        }
-      end
-      rest({
-        api_name = "hydrus",
-        endpoint = "add_urls/add_url",
-        request_table = request_table,
-        request_verb = "POST",
-      }, do_after)
     end,
   },
   otp_url = {
@@ -276,6 +279,53 @@ dothis = {
         transf.str.str_by_single_quoted_escaped(url) ..
         "| pass otp insert otp/" .. name
       )
+    end,
+  },
+  hydrusable_url = {
+    add_to_hydrus = function(url, str_arr, do_after)
+      act.hydrusable_url.add_to_hydrus(
+        url,
+        function(hash_arr)
+          dothis.hydrus_file_hash_arr.add_tags_and_notes(hash_arr, str_arr, function()
+            do_after(hash_arr)
+          end)
+        end
+      )
+      
+    end,
+    add_to_hydrus_optional_ai = function(url, use_ai_tags, str_arr, do_after)
+      if use_ai_tags then
+        dothis.hydrusable_url.add_to_hydrus(url, str_arr, function(hash_arr)
+          act.hydrus_file_hash_arr.add_ai_tags_to_hydrus_items(
+            hash_arr,
+            function()
+              if do_after then
+                do_after(hash_arr)
+              end
+            end
+          )
+        end)
+      else
+        dothis.hydrusable_url.add_to_hydrus(url, str_arr, do_after)
+      end
+    end,
+    add_to_hydrus_policy_ai = function(url, str_arr, do_after)
+      local use_ai_tags = not is.url.canon_booru_post_url(url)
+      dothis.hydrusable_url.add_to_hydrus_optional_ai(url, use_ai_tags, str_arr, do_after)
+    end,
+  },
+  url_file = {
+    add_to_hydrus_policy_ai = function(path, str_arr, do_after)
+      str_arr = str_arr or {}
+      dothis.arr.push(str_arr, {"date:" .. transf.local_file.rfc3339like_dt_by_any_source(path)})
+      local url = transf.plaintext_file.str_by_contents(path)
+      if is.url.hydrusable_url(url) then
+        dothis.hydrusable_url.add_to_hydrus_policy_ai(
+          url,
+          str_arr,
+          do_after
+        )
+      end
     end,
   },
   not_userdata_o_fn = {
@@ -291,8 +341,8 @@ dothis = {
   },
   table = {
     write_ics_file = function(tbl, path)
-      local tmpdir_json_path = transf.n_not_userdata_o_fns.local_absolute_path_by_namespaced_tmp_once("table_as_json", tbl) .. ".json"
-      local tmpdir_ics_path = transf.n_not_userdata_o_fns.local_absolute_path_by_namespaced_tmp_once("table_as_ics", tbl) .. ".ics"
+      local tmpdir_json_path = transf.n_not_userdata_o_fn_even_nesteds.local_absolute_path_by_namespaced_tmp_once("table_as_json", tbl) .. ".json"
+      local tmpdir_ics_path = transf.n_not_userdata_o_fn_even_nesteds.local_absolute_path_by_namespaced_tmp_once("table_as_ics", tbl) .. ".ics"
       dothis.absolute_path.write_file(tmpdir_json_path, json.encode(tbl))
       act.str.env_bash_eval_sync(
         "ical2json" ..
@@ -355,6 +405,13 @@ dothis = {
     end,
   },
   str = {
+    write_into = function(str, path)
+      dothis.absolute_path.write_file(
+        transf.path.path_by_ending_with_slash(path)
+        .. transf.not_userdata_o_fn_even_nested.leaflike_by_base64_url_str_md5_if_not_leaflike(path),
+        str
+      )
+    end,
     generate_qr_png = function(data, path)
       if not is.path.extant_path(path) then
         transf.str.str_or_nil_by_evaled_env_bash_stripped("qrencode -l M -m 2 -t PNG -o" .. transf.str.str_by_single_quoted_escaped(path) .. transf.str.str_by_single_quoted_escaped(data))
@@ -800,7 +857,7 @@ dothis = {
     
     copy_to_absolute_path = function(path, tgt)
       act.absolute_path.create_parent_dir(tgt)
-      transf.str.str_or_nil_by_evaled_env_bash_stripped("rclone copyto " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
+      act.str.env_bash_eval_sync("rclone copyto " .. transf.str.str_by_single_quoted_escaped(path) .. " " .. transf.str.str_by_single_quoted_escaped(tgt))
     end,
     copy_into_absolute_path = function(path, tgt)
       local finaltgt = transf.path.path_by_ending_with_slash(tgt) .. transf.path.leaflike_by_leaf(path)
@@ -911,15 +968,6 @@ dothis = {
         name
       )
     end,
-    add_to_hydrus_by_url = function(path, str_arr)
-      local booru_url = transf.local_image_file.booru_post_url(path)
-      if booru_url then
-        act.url.add_to_hydrus(
-          booru_url,
-          str_arr
-        )
-      end
-    end,
   },
   local_hydrusable_file = {
     add_to_hydrus_by_path = function(path, str_arr, do_after)
@@ -932,6 +980,40 @@ dothis = {
         end
       )
     end,
+    add_to_hydrus_by_path_optional_ai = function(path, use_ai_tags, str_arr, do_after)
+      if use_ai_tags then
+        dothis.local_hydrusable_file.add_to_hydrus_by_path(
+          path,
+          str_arr,
+          function(hash)
+            act.hydrus_file_hash.add_tags_to_hydrus_item_by_ai_tags(
+              hash,
+              function()
+                if do_after then do_after(hash) end
+              end
+            )
+          end
+        )
+      else
+        dothis.local_hydrusable_file.add_to_hydrus_by_path(
+          path,
+          str_arr,
+          do_after
+        )
+      end
+    end,
+    add_to_hydrus_by_path_policy_ai = function(path, str_arr, do_after)
+      local useai = not get.arr.bool_by_contains(
+        transf.path.path_component_arr(path),
+        "__noai"
+      )
+      dothis.local_hydrusable_file.add_to_hydrus_by_path_optional_ai(
+        path,
+        useai,
+        str_arr,
+        do_after
+      )
+    end,
     --- implements smart adding of image files to hydrus
     --- caveat: must be images in danbooru or similar enough to images that might be found in danbooru
     --- for ai tags to work
@@ -939,39 +1021,6 @@ dothis = {
     --- - real life photos mostly work
     --- - screenshots etc. don't work
     --- - physical documents don't really work
-    add_to_hydrus_by_path_or_url = function(path, use_ai_tags, do_after)
-      local booru_url
-      local is_image = is.local_file.local_image_file(path)
-      if is_image then
-        booru_url = transf.local_image_file.booru_post_url(path)
-      end
-      if booru_url then
-        --- if there's a booru post url, the only thing we will take from the file is the date
-        local date = transf.local_file.rfc3339like_dt_by_any_source(path)
-        dothis.url.add_to_hydrus(
-          booru_url,
-          { "date:" .. date },
-          do_after
-        )
-      else
-        dothis.local_hydrusable_file.add_to_hydrus_by_path(
-          path,
-          transf.local_file.line_arr_by_file_tags(path),
-          function(sha)
-            if use_ai_tags then
-              act.hydrus_file_hash.add_tags_to_hydrus_item_by_ai_tags(
-                sha,
-                function()
-                  if do_after then do_after(sha) end
-                end
-              )
-            else
-              if do_after then do_after(sha) end
-            end
-          end
-        )
-      end
-    end
   },
   local_zip_file = {
     unzip_to_absolute_path = function(path, tgt)
@@ -1156,42 +1205,11 @@ dothis = {
         fn, error)
     end,
   },
-  newsboat_urls_file = {
-    append_newsboat_url_specifier = function(path, specifier)
-      dothis.plaintext_file.append_line(path, transf.newsboat_url_specifier.newsboat_url_line(specifier))
-    end,
-  },
   youtube_channel_id = {
-    add_to_newsboat_urls_file = function(channel_id, category)
-      dothis.newsboat_urls_file.append_newsboat_url_specifier(
-        dynamic_permanents.str_key_str_value_assoc_by_env.NEWSBOAT_URLS,
-        {
-          url = transf.youtube_channel_id.youtube_channel_video_feed_url(channel_id),
-          title = transf.youtube_channel_id.line_by_channel_title(channel_id),
-          category = category,
-        }
-      )
-    end,
   },
   youtube_channel_url = {
-    add_to_newsboat_urls_file = function(channel_url, category)
-      dothis.youtube_channel_id.add_to_newsboat_urls_file(
-        transf.youtube_channel_url.channel_id(channel_url),
-        category
-      )
-    end,
   },
   sgml_url = {
-    add_to_newsboat_urls_file = function(url, category)
-      dothis.newsboat_urls_file.append_newsboat_url_specifier(
-        dynamic_permanents.str_key_str_value_assoc_by_env.NEWSBOAT_URLS,
-        {
-          url = url,
-          title = transf.url.str_or_nil_by_sgml_title(url),
-          category = category,
-        }
-      )
-    end,
   },
   audiodevice = {
     set_default = function(device, type)
@@ -1673,12 +1691,6 @@ dothis = {
 
   },
   handle = {
-    add_to_newsboat_urls_file = function(handle, category)
-      dothis.youtube_channel_id.add_to_newsboat_urls_file(
-        transf.handle.youtube_channel_id(handle),
-        category
-      )
-    end
   },
   youtube_playlist_creation_specifier = {
     --- @param spec {title?: str, description?: str, privacyStatus?: str, youtube_video_id_arr?: str[]}

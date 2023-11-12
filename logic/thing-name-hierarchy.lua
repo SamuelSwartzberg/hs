@@ -195,6 +195,7 @@ thing_name_hierarchy = {
                     image_file = "leaf",
                     hydrusable_file = "leaf",
                     plaintext_file = { 
+                      url_file = "leaf",
                       script_file = {
                         shell_script_file = {
                           shell_script_file_with_errors = "leaf",
@@ -215,7 +216,6 @@ thing_name_hierarchy = {
                       m3u_file = "leaf",
                       gitignore_file = "leaf",
                       log_file = "leaf",
-                      newsboat_urls_file = "leaf",
                       md_file = "leaf"
                     },
                     bin_file = {
@@ -259,10 +259,7 @@ thing_name_hierarchy = {
                           old_location_logs_proc_dir = "leaf",
                           old_media_logs_proc_dir = "leaf",
                         },
-                        in_proc_hydrus_local_absolute_path = {
-                          hydrus_noai_proc_dir = "leaf",
-                          hydrus_ai_proc_dir = "leaf",
-                        }
+                        in_proc_hydrus_local_absolute_path = "leaf"
                       },
                     },
                     in_me_local_absolute_path = {
@@ -432,10 +429,13 @@ thing_name_hierarchy = {
                         host_url = {
                           pornpen_url = "leaf",
                           hydrus_url = "leaf",
-                          booru_url = {
+                          canon_booru_url = {
                             danbooru_url = "leaf",
-                            yandere_url = "leaf",
                             gelbooru_url = "leaf",
+                            canon_booru_post_url = {
+                              danbooru_post_url = "leaf",
+                              gelbooru_post_url = "leaf",
+                            }
                           },
                           youtube_url = {
                             youtube_path_url = {
@@ -460,7 +460,6 @@ thing_name_hierarchy = {
                       username_url = "leaf",
                       password_url = "leaf",
                       userinfo_url = "leaf",
-                      booru_post_url = "leaf",
                       pornpen_post_url = "leaf",
                       github_url = {
                         github_path_url = {
@@ -470,6 +469,12 @@ thing_name_hierarchy = {
                       hydrus_style_file_url = {
                         local_hydrus_file_url = "leaf",
                       },
+                      hydrusable_url = {
+                        hydrusable_post_url = "leaf",
+                        hydrusable_file_url = "leaf",
+                        hydrusable_page_url = "leaf",
+                        hydrusable_gallery_url = "leaf",
+                      }
                     },
                     urllike_with_no_scheme = {
                       owner_item_urllike = "leaf",
@@ -622,6 +627,7 @@ thing_name_hierarchy = {
                             alphanum_underscore = {
                               lower_alphanum_underscore = {
                                 general_name = {
+                                  function_container_name = "leaf",
                                   thing_name_with_optional_explanation = {
                                     thing_name = "leaf"
                                   }
@@ -873,7 +879,6 @@ thing_name_hierarchy = {
         syn_specifier = "leaf",
         vdirsyncer_pair_specifier = "leaf",
         email_speciier = "leaf",
-        newsboat_urls_specifier = "leaf",
         semver_component_specifier = "leaf",
         reaction_spec = "leaf",
         export_chat_main_object = {
@@ -958,6 +963,7 @@ thing_name_hierarchy = {
         hydrus_rel_spec = "leaf",
         hydrus_metadata_spec = "leaf",
         hydrus_internal_tag_spec = "leaf",
+        hydrus_url_spec = "leaf",
         danbooru_tag_record = "leaf",
         danbooru_tag_implication_record = "leaf",
         danbooru_hydrus_inference_specifier = "leaf",

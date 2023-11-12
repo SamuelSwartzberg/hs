@@ -1710,6 +1710,13 @@ ls = {
       watcher_type = hs.fs.volume,
       fn = act.sme_3_pos_int_and_table.manage_timemachine_backup
     },
+  },
+  function_container_name_arr = {
+    "act",
+    "dothis",
+    "transf",
+    "get",
+    "is"
   }
 }
 

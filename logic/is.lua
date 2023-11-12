@@ -1237,14 +1237,6 @@ is = {
       return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/old/media_logs/"
     end,
   },
-  in_proc_hydrus_local_absolute_path = {
-    hydrus_noai_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/hydrus/noai/"
-    end,
-    hydrus_ai_proc_dir = function(path)
-      return transf.path.path_by_ending_with_slash(path) == dynamic_permanents.str_key_str_value_assoc_by_env.HOMEPROC .. "/local/hydrus/ai/"
-    end,
-  },
   in_downloads_local_absolute_path = {
     telegram_raw_export_dir = function(path)
       return get.str.bool_by_startswith(path, dynamic_permanents.str_key_str_value_assoc_by_env.DOWNLOADS .. "/Telegram Desktop/DataExport_")
@@ -1527,6 +1519,9 @@ is = {
     end,
   },
   plaintext_file = {
+    url_file = function(path)
+      return get.path.bool_by_is_extension(path, "url2")
+    end,
     script_file = function(path)
       return is.str.script_str(
         transf.plaintext_file.str_by_contents(path)
@@ -1552,9 +1547,6 @@ is = {
     end,
     log_file = function(path)
       return get.path.bool_by_is_extension(path, "log")
-    end,
-    newsboat_urls_file = function(path)
-      return get.path.is_leaf(path, "urls")
     end,
     citations_file = function (path)
       return get.path.is_leaf(path, "citations")
@@ -1766,7 +1758,11 @@ is = {
     
   },
   general_name = {
-    thing_name_with_optional_explanation = transf["nil"]["true"]
+    thing_name_with_optional_explanation = transf["nil"]["true"],
+    function_container_name = function (str)
+      return get.arr.bool_by_contains(ls.function_container_name_arr, str)
+      
+    end
   },
   thing_name_with_optional_explanation = {
     thing_name = function(str)
@@ -1986,14 +1982,7 @@ is = {
       return transf.url.fragment(url) == nil
     end,
 
-    booru_post_url = function(url)
-      return 
-        (is.url.query_url(url) and is.query_url.gelbooru_style_post_url(url)) or
-        (is.url.path_url(url) and (
-          is.path_url.danbooru_style_post_url(url) or
-          is.path_url.yandere_style_post_url(url)
-        ))
-    end,
+   
     pornpen_post_url = function(url)
       return is.url.pornpen_style_post_url(url) and is.url.porpen_url(url)
     end,
@@ -2006,7 +1995,33 @@ is = {
     hydrus_style_file_url = function(url)
       return is.url.hydrus_style_file_endpoint_url(url) and is.url.hydrus_style_single_hash_url(url)
     end,
+    hydrusable_url = function(url)
+      local url_type = transf.url.sme_5_pos_int_or_nil_by_hydrus_url_type(url)
+      return url_type ~= nil and url_type ~= 5
+    end,
 
+  },
+  canon_booru_post_url = {
+    gelbooru_post_url = function(url)
+      return is.canon_booru_url.gelbooru_url(url)
+    end,
+    danbooru_post_url = function(url)
+      return is.canon_booru_url.danbooru_url(url)
+    end,
+  },
+  hydrusable_url = {
+    hydrusable_post_url = function(url)
+      return transf.url.sme_5_pos_int_or_nil_by_hydrus_url_type(url) == 0
+    end,
+    hydrusable_file_url = function(url)
+      return transf.url.sme_5_pos_int_or_nil_by_hydrus_url_type(url) == 2
+    end,
+    hydrusable_page_url = function(url)
+      return transf.url.sme_5_pos_int_or_nil_by_hydrus_url_type(url) == 3
+    end,
+    hydrusable_gallery_url = function(url)
+      return transf.url.sme_5_pos_int_or_nil_by_hydrus_url_type(url) == 4
+    end,
   },
   hydrus_style_file_url = {
     local_hydrus_file_url = function(url)
@@ -2139,8 +2154,9 @@ is = {
     end,
   },
   host_url = {
-    booru_url = function(url)
-      return get.arr.booru_hosts(ls.url.booru, transf.host_url.host(url))
+    canon_booru_url = function(url)
+      return  transf.host_url.host(url) == "danbooru.donmai.us" or 
+              transf.host_url.host(url) == "gelbooru.com"
     end,
     youtube_url = function(url)
       return transf.host_url.host(url) == "youtube.com"
@@ -2152,15 +2168,17 @@ is = {
       return transf.host_url.host(url) == "127.0.0.1:45869"
     end,
   },
-  booru_url = {
+  canon_booru_url = {
     danbooru_url = function(url)
       return transf.url.host(url) == "danbooru.donmai.us"
     end,
     gelbooru_url = function(url)
       return transf.url.host(url) == "gelbooru.com"
     end,
-    safebooru_url = function(url)
-      return transf.url.host(url) == "safebooru.org"
+    canon_booru_post_url = function(url)
+      return 
+        is.url.gelbooru_style_post_url(url) or
+        is.url.danbooru_style_post_url(url) 
     end,
   },
   youtube_url = {
@@ -2694,9 +2712,6 @@ is = {
     val_dep_spec = function(t)
       return t.value and t.dependencies
     end,
-    newsboat_urls_specifier = function(t)
-      return t.url and t.title
-    end,
     str_format_part_specifier = function(t)
       return t.str_format_part or t.value or t.fallback
     end,
@@ -2822,6 +2837,9 @@ is = {
     end,
     hydrus_internal_tag_spec = function(t)
       return t.storage_tags and t.display_tags
+    end,
+    hydrus_url_spec = function(t)
+      return t.normalised_url and t.url_type
     end,
     danbooru_tag_record = function(t)
       return t.id and t.name and t.category and t.post_count -- there are more, but this should be enough
