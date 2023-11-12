@@ -821,6 +821,9 @@ is = {
       return get.str.bool_by_not_contains_w_ascii_str(str, "-")
     end,
     slice_notationn = transf['nil']['true'], -- too lazy or now
+    int_ratio_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.int_ratio_str)
+    end,
   },
   colon_num = {
     hour = function(str)
@@ -1816,6 +1819,9 @@ is = {
     end,
     token_type = function(str)
       return get.arr.bool_by_contains(ls.token_type_arr, str)
+    end,
+    pos_int_dimensions_str = function(str)
+      return get.str.bool_by_matches_whole_onig(str, r.g.pos_int_dimensions_str)
     end,
   },
   indicated_hex_str = {

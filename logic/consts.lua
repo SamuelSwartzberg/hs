@@ -185,5 +185,12 @@ consts = {
       fn = act["nil"].sync_shared,
       interval = tblmap.dcmp_name.timestamp_s.min
     }
+  },
+  plist_single_dkv_spec_arr = {
+    {
+      domain = "com.apple.screencapture",
+      key = "location",
+      value = dynamic_permanents.str_key_str_value_assoc_by_env.SCREENSHOTS
+    }
   }
 }

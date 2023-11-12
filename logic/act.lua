@@ -191,6 +191,25 @@ act = {
       hs.grid.setGrid(grid)
       hs.grid.show()
     end,
+    write_wallpaper_to_cache = function(size_like, do_after)
+      local hash = transf.hs_geometry_size_like.hydrus_file_hash_by_find_random_wallpaper(size_like)
+      dothis.hydrus_file_hash.save_to_by_hydrus_item(
+        hash,
+        transf.hs_geometry_size_like.local_absolute_path_by_wallpaper_in_cache(size_like),
+        do_after
+      )
+    end,
+    find_and_set_wallpaper = function(size_like)
+      dothis.hs_geometry_size_like.write_wallpaper_to_cache(
+        size_like,
+        function()
+          act.local_image_file.set_as_wallpaper_of_screen_with_filename_pos_int_dimensions_str_if_any(
+            transf.hs_geometry_size_like.local_absolute_path_by_wallpaper_in_cache(size_like)
+          )
+        end
+      )
+    end,
+
   },
   url_or_local_path = {
     open_ff = function(url)
@@ -367,6 +386,11 @@ act = {
       )
     end,
   },
+  hs_screen_and_local_image_file = {
+    set_as_wallpaper = function(screen, path)
+      screen:desktopImageURL(transf.local_absolute_path.file_url(path))
+    end
+  },
   local_image_file = {
     add_hs_image_to_clipboard = function(path)
       act.hs_image.add_to_clipboard(
@@ -388,6 +412,15 @@ act = {
       act.otp_url.add_otp_pass_item_with_prompted_name(
         transf.local_image_file.multiline_str_by_qr_data(path)
       )
+    end,
+    set_as_wallpaper_of_screen_with_filename_pos_int_dimensions_str_if_any = function(path)
+      local filename = transf.path.leaflike_by_filename(path)
+      if is.str.pos_int_dimensions_str(filename) then
+        local screen = transf.pos_int_dimensions_str.n_hs_screens_or_nil_by_screen_of_size(filename)
+        if screen then
+          act.hs_screen_and_local_image_file.set_as_wallpaper(screen, path)
+        end
+      end
     end,
   },
   local_hydrusable_file ={
@@ -1913,6 +1946,12 @@ act = {
       dothis.arr.choose_item(
         transf["nil"].otp_pass_item_name_arr(),
         act.str.paste
+      )
+    end,
+    find_and_set_wallpaper_for_all_screens = function()
+      dothis.arr.each(
+        transf["nil"].hs_geometry_size_arr_by_screen(),
+        act.hs_geometry_size_like.find_and_set_wallpaper
       )
     end,
     activate_next_source_id = function()

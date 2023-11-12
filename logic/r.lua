@@ -44,6 +44,8 @@ r = {
     assc_thing_name_by_extract_key_value = "^(\\w+)_key(?:_(\\w+)_value)?_assoc$",
     shell_shebang = "^#!\\s*/.*?(?:ba|z|fi|da|k|t?c)sh\\s+",
     semver_str = "(\\d+)(?:\\.(\\d+)(?:\\.(\\d+)(?:\\-([\\w.-]+))?(?:\\+([\\w.-]+))?)?)?",
+    pos_int_dimensions_str = "(\\d+)x(\\d+)",
+    int_ratio_str = "(-?\\d+):(-?\\d+)",
   },
   lua = {  }
 }

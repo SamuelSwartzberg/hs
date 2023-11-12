@@ -513,11 +513,52 @@ speak = hs.speech.new()
 --- @field setStyle fun(self: hs.styledtext, attributes: table, starts?: integer, ends?: integer, clear?: boolean): hs.styledtext
 
 --- @class hs.screen
+--- @field watcher hs.screen.watcher
+--- @field strictScreenInDirection boolean|nil If set to true, the methods hs.screen:toEast(), :toNorth() etc. will disregard screens that lie perpendicularly to the desired axis
+--- @field accessibilitySettings fun(): table
+--- @field find fun(hint: number|string|hs_geometry_like): hs.screen | hs.screen[] | nil
+--- @field restoreGamma fun(): nil
+--- @field screenPositions fun(): table
 --- @field allScreens fun(): hs.screen[]
---- @field mainScreen fun(): hs.screen
+--- @field mainScreen fun(): hs.screen Returns the 'main' screen, i.e. the one containing the currently focused window
 --- @field primaryScreen fun(): hs.screen
+--- @field absoluteToLocal fun(self: hs.screen, geom: hs_geometry_point_like | hs_geometry_rect_like): hs.geometry.point | hs.geometry.rect
+--- @field availableModes fun(self: hs.screen): table
+--- @field currentMode fun(self: hs.screen): table
+--- @field desktopImageURL fun(self: hs.screen, imageURL?: string): hs.screen | string
 --- @field frame fun(self: hs.screen): hs.geometry.rect
+--- @field fromUnitRect fun(self: hs.screen, unitrect: hs.geometry.rect): hs.geometry.rect
 --- @field fullFrame fun(self: hs.screen): hs.geometry.rect
+--- @field getBrightness fun(self: hs.screen): number | nil
+--- @field getForceToGray fun(): boolean
+--- @field getGamma fun(self: hs.screen): table | nil
+--- @field getInfo fun(self: hs.screen): table | nil
+--- @field getInvertedPolarity fun(): boolean
+--- @field getUUID fun(self: hs.screen): string
+--- @field id fun(self: hs.screen): number
+--- @field localToAbsolute fun(self: hs.screen,geom: hs_geometry_point_like | hs_geometry_rect_like): hs.geometry.point | hs.geometry.rect
+--- @field mirrorOf fun(self: hs.screen, aScreen: hs.screen, permanent?: boolean): boolean
+--- @field mirrorStop fun(self: hs.screen, permanent?: boolean): boolean
+--- @field name fun(self: hs.screen): string | nil
+--- @field next fun(self: hs.screen): hs.screen
+--- @field position fun(self: hs.screen): number, number
+--- @field previous fun(self: hs.screen): hs.screen
+--- @field rotate (fun(self: hs.screen): number) | fun(self: hs.screen, angle: number): hs.screen
+--- @field setBrightness fun(self: hs.screen, brightness: number): hs.screen
+--- @field setForceToGray fun(ForceToGray: boolean): nil
+--- @field setGamma fun(self: hs.screen, whitepoint: table, blackpoint: table): boolean
+--- @field setInvertedPolarity fun(InvertedPolarity: boolean): nil
+--- @field setMode fun(self: hs.screen, width: number, height: number, scale: number, frequency: number, depth: number): boolean
+--- @field setOrigin fun(self: hs.screen, x: number, y: number): boolean
+--- @field setPrimary fun(self: hs.screen): boolean
+--- @field shotAsJPG fun(self: hs.screen, filePath: string, screenRect?: hs.geometry.rect): nil
+--- @field shotAsPNG fun(self: hs.screen, filePath: string, screenRect?: hs.geometry.rect): nil
+--- @field snapshot fun(self: hs.screen, rect?: hs.geometry.rect): hs.image | nil
+--- @field toEast fun(self: hs.screen, from?: hs.geometry, strict?: boolean): hs.screen | nil
+--- @field toNorth fun(self: hs.screen, from?: hs.geometry, strict?: boolean): hs.screen | nil
+--- @field toSouth fun(self: hs.screen, from?: hs.geometry, strict?: boolean): hs.screen | nil
+--- @field toUnitRect fun(self: hs.screen, rect: hs.geometry.rect): hs.geometry.rect
+--- @field toWest fun(self: hs.screen, from?: hs.geometry, strict?: boolean): hs.screen | nil
 
 --- @class hs.drawing
 --- @field color hs.drawing.color

@@ -142,6 +142,32 @@ dothis = {
         path
       )
     end,
+    save_into_by_hydrus_item = function(str, path, do_after)
+      dothis.url.download_into(
+        get.sha256_hex_str.url_by_hydrus_item(str),
+        path,
+        do_after
+      )
+    end,
+    save_to_async_by_hydrus_item = function(str, path)
+      dothis.url.download_to_async(
+        get.sha256_hex_str.url_by_hydrus_item(str),
+        path
+      )
+    end,
+    save_to_sync_by_hydrus_item = function(str, path)
+      dothis.url.download_to_sync(
+        get.sha256_hex_str.url_by_hydrus_item(str),
+        path
+      )
+    end,
+    save_to_by_hydrus_item = function(str, path, do_after)
+      dothis.url.download_to(
+        get.sha256_hex_str.url_by_hydrus_item(str),
+        path,
+        do_after
+      )
+    end,
   },
   hydrus_file_hash_arr = {
     create_stream = function(arr, flag_profile_name)
@@ -248,11 +274,23 @@ dothis = {
     download_to_sync = function(url, target)
       act.str.env_bash_eval_sync("curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -o " .. transf.str.str_by_single_quoted_escaped(target))
     end,
+    download_to = function(url, target, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -o " .. transf.str.str_by_single_quoted_escaped(target),
+        do_after or function() end
+      )
+    end,
     download_into_async = function(url, target_dir)
       act.str.env_bash_eval_async("cd " .. transf.str.str_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -O")
     end,
     download_into_sync = function(url, target_dir)
       act.str.env_bash_eval_sync("cd " .. transf.str.str_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -O")
+    end,
+    download_into = function(url, target_dir, do_after)
+      dothis.str.env_bash_eval_w_str_or_nil_arg_fn_by_stripped(
+        "cd " .. transf.str.str_by_single_quoted_escaped(target_dir) .. "&& curl -L " .. transf.str.str_by_single_quoted_escaped(url) .. " -O",
+        do_after or function() end
+      )
     end,
     download_pdf_to_sync = function(url, target)
       act.str.env_bash_eval_sync("pdfgen" .. transf.str.str_by_single_quoted_escaped(url) .. transf.str.str_by_single_quoted_escaped(target))
@@ -1234,24 +1272,24 @@ dothis = {
     end,
     copy_hook = function(path, type, name)
       type = type or "default"
-      local source_hook = dynamic_permanents.str_key_str_value_assoc_by_env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
+      local source_hook = dynamic_permanents.str_key_str_value_assoc_by_env.GIT_CONFIG_HOOKS .. "/" .. type .. "/" .. name
       act.local_extant_path.make_executable(source_hook)
       dothis.extant_path.copy_to_absolute_path(source_hook, get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     link_hook = function(path, type, name)
       type = type or "default"
-      local source_hook = dynamic_permanents.str_key_str_value_assoc_by_env.GITCONFIGHOOKS .. "/" .. type .. "/" .. name
+      local source_hook = dynamic_permanents.str_key_str_value_assoc_by_env.GIT_CONFIG_HOOKS .. "/" .. type .. "/" .. name
       act.local_extant_path.make_executable(source_hook)
       dothis.local_extant_path.link_to_nosudo_nonextant_path(source_hook, get.git_root_dir.in_git_dir_by_hook_path(path, name))
     end,
     link_all_hooks = function(path, type)
-      local source_hooks = transf.path.join(dynamic_permanents.str_key_str_value_assoc_by_env.GITCONFIGHOOKS, type)
+      local source_hooks = transf.path.join(dynamic_permanents.str_key_str_value_assoc_by_env.GIT_CONFIG_HOOKS, type)
       for _, hook in transf.arr.pos_int_vt_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.link_hook(path, type, hook)
       end
     end,
     copy_all_hooks = function(path, type)
-      local source_hooks = transf.path.join(dynamic_permanents.str_key_str_value_assoc_by_env.GITCONFIGHOOKS, type)
+      local source_hooks = transf.path.join(dynamic_permanents.str_key_str_value_assoc_by_env.GIT_CONFIG_HOOKS, type)
       for _, hook in transf.arr.pos_int_vt_stateless_iter(get.dir.files(source_hooks)) do
         dothis.git_root_dir.copy_hook(path, type, hook)
       end

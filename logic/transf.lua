@@ -143,7 +143,16 @@ transf = {
         return ""
       end
     end,
-    
+
+    two_ints_by_largest_numerator_denominator = function(num)
+      local factor = 10^transf.number.pos_int_by_float_part_length(num)
+      return num*factor, factor
+    end,
+    two_ints_by_smallest_numerator_denominator = function(num)
+      return transf.two_ints.pos_int_by_gcd(
+        transf.number.two_ints_by_largest_numerator_denominator(num)
+      )
+    end,
     nonindicated_dec_number_str = function(num)
       return transf.number.sign_indicator(num) .. transf.pos_number.nonindicated_dec_number_str(transf.number.pos_number(num))
     end,
@@ -241,11 +250,17 @@ transf = {
     pos_float_by_abs_float_part = function(num)
       return transf.number.pos_number(num) - transf.number.pos_int_by_abs_int_part(num)
     end,
+    digit_str_by_float_part = function(num)
+      return transf.number.nonindicated_dec_number_str(
+        transf.number.pos_float_by_abs_float_part(num)
+      )
+    end,
+    pos_int_by_float_part_length = function(num)
+      return #transf.number.digit_str_by_float_part(num)
+    end,
     pos_int_by_float_part = function(num)
       return transf.nonindicated_number_str.number_by_base_10(
-        transf.number.nonindicated_dec_number_str(
-          transf.number.pos_float_by_abs_float_part(num)
-        ):sub(3)
+        transf.number.digit_str_by_float_part(num)
       )
     end,
     number_by_1_added = function(num)
@@ -386,6 +401,9 @@ transf = {
         transf.pos_int.int_by_smallest_of_length(int),
         transf.pos_int.int_by_largest_of_length(int)
       )
+    end,
+    pos_int_by_random_of_1_to = function(int)
+      return math.random(int)
     end,
   },
   pos_int = {
@@ -599,6 +617,10 @@ transf = {
     t_by_last = function(arr)
       return arr[#arr]
     end,
+    t_by_random = function (arr)
+      local index = transf.int.pos_int_by_random_of_1_to(#arr)
+      return arr[index]
+    end,
     pos_int_by_length = function(arr)
       return #arr
     end,
@@ -701,6 +723,14 @@ transf = {
       return transf.arr.hydrus_file_hash_arr_by_search(
         transf.any_and_arr.arr(
           "system:filetype is animation, video",
+          arr
+        )
+      )
+    end,
+    hydrus_file_hash_arr_by_search_image_only = function(arr)
+      return transf.arr.hydrus_file_hash_arr_by_search(
+        transf.any_and_arr.arr(
+          "system:filetype is image",
           arr
         )
       )
@@ -5609,6 +5639,19 @@ transf = {
       return a + b
     end,
   },
+  two_ints = {
+    pos_int_by_gcd = function(a, b)
+      while b ~= 0 do
+        local old_a = a
+        a = b
+        b = old_a % b
+      end
+      return a
+    end,
+    int_by_random = function(a, b)
+      return math.random(a, b)
+    end,
+  },
   two_dcmp_names = {
     bool_by_first_larger = function(a, b)
       return tblmap.dcmp_name.date_component_index[a] > tblmap.ddcmp_name.date_component_index[b]
@@ -9064,6 +9107,13 @@ transf = {
 
       return getIdentifier
     end,
+    hs_screen_arr = function()
+      return hs.screen.allScreens()
+    end,
+    hs_geometry_size_arr_by_screen = function()
+      return get.arr.arr_by_mapped_w_t_arg_t_ret_fn(transf["nil"].hs_screen_arr(), transf.hs_screen.hs_geometry_size_by_full)
+    end,
+
     bool_by_random = function()
       return math.random() < 0.5
     end,
@@ -9659,6 +9709,148 @@ transf = {
       elseif is.any.hs_geometry_point(functional_addable) then
         return "hs_geometry_point"
       end
+    end,
+  },
+  hs_geometry_point_like = {
+    hs_geometry_point = function(pt)
+      return hs.geometry.point(pt.x, pt.y)
+    end,
+    n_hs_screens_or_nil_by_screen_containing = function(pt)
+      return hs.screen.find(transf.hs_geometry_point_like.hs_geometry_point(pt)) -- here and below, the reason we have to convert to a hs.geometry.point first is because a point-like could also be a rect, and then we wouldn't be getting the screen based on what we're expecting, introducing logic errors
+    end,
+  },
+  hs_geometry_rect_like = {
+    hs_geometry_rect = function(rect)
+      return hs.geometry.rect(rect.x, rect.y, rect.w, rect.h)
+    end,
+    hs_screen_or_nil_by_screen_containing_largest_part = function(rect)
+      return hs.screen.find(transf.hs_geometry_rect_like.hs_geometry_rect(rect))
+    end,
+  },
+  hs_geometry_size_like = {
+    hs_geometry_size = function(size)
+      return hs.geometry.size(size.w, size.h)
+    end,
+    n_hs_screens_or_nil_by_screen_of_size = function(size)
+      return hs.screen.find(transf.hs_geometry_size_like.hs_geometry_size(size))
+    end,
+    pos_int_dimensions_str = function(size)
+      return size.w .. "x" .. size.h
+    end,
+    int_ratio_str = function(size)
+      local num, dem = transf.hs_geometry_size_like.two_ints_by_width_to_height_numerator_and_denominator(size)
+      return num .. ":" .. dem
+    end,
+    number_by_width_to_height_ratio = function(size)
+      return size.w / size.h
+    end,
+    two_ints_by_width_to_height_numerator_and_denominator = function(size)
+      return transf.number.two_ints_by_smallest_numerator_denominator(
+        transf.hs_geometry_size_like.number_by_width_to_height_ratio(size)
+      )
+    end,
+    hs_geometry_size_by_height_width_flipped = function(size)
+      return hs.geometry.size(size.h, size.w)
+    end,
+    arr_by_hydrus_search_equal = function(size)
+      return {
+        "system:height = " .. size.h,
+        "system:width = " .. size.w
+      }
+    end,
+    arr_by_hydrus_search_larger_same_ratio = function(size)
+      return {
+        "system:height > " .. size.h,
+        "system:width > " .. size.w,
+        "system:ratio = " .. transf.hs_geometry_size_like.int_ratio_str(size)
+      }
+    end,
+    arr_by_hydrus_search_larger_similar_ratio = function(size)
+      return {
+        "system:height > " .. size.h,
+        "system:width > " .. size.w,
+        "system:ratio ≈ " .. transf.hs_geometry_size_like.int_ratio_str(size)
+      }
+    end,
+    arr_by_hydrus_search_wider_or_equal_max_50_percent_taller_aspect_ratio = function(size)
+      return {
+        "system:height > " .. size.h,
+        "system:width > " .. size.w - 1,
+        "system:ratio taller than " .. transf.hs_geometry_size_like.int_ratio_str(size),
+        "system:ratio wider than " .. transf.hs_geometry_size_like.int_ratio_str(
+          transf.two_hs_geometry_size_likes.hs_geometry_size_by_product(
+            size,
+            {
+              w = 1,
+              h = 1.5
+            }
+          )
+        )
+      }
+    end,
+    arr_by_hydrus_search_taller_or_equal_max_50_percent_wider_aspect_ratio = function(size)
+      return {
+        "system:height > " .. size.h - 1,
+        "system:width > " .. size.w,
+        "system:ratio taller than " .. transf.hs_geometry_size_like.int_ratio_str(
+          transf.two_hs_geometry_size_likes.hs_geometry_size_by_product(
+            size,
+            {
+              w = 1.5,
+              h = 1
+            }
+          )
+        ),
+        "system:ratio wider than " .. transf.hs_geometry_size_like.int_ratio_str(size)
+      }
+    end,
+    arr_by_hydrus_search_roughly_same_or_reasonably_bigger = function(size)
+      return transf.n_anys.arr(
+        transf.hs_geometry_size_like.arr_by_hydrus_search_equal(size),
+        transf.hs_geometry_size_like.arr_by_hydrus_search_larger_similar_ratio(size),
+        transf.hs_geometry_size_like.arr_by_hydrus_search_wider_or_equal_max_50_percent_taller_aspect_ratio(size),
+        transf.hs_geometry_size_like.arr_by_hydrus_search_taller_or_equal_max_50_percent_wider_aspect_ratio(size)
+      )
+    end,
+    hydrus_file_hash_arr_by_find_wallpaper = function(size)
+      local query = transf.hs_geometry_size_like.arr_by_hydrus_search_roughly_same_or_reasonably_bigger(size)
+      query = transf.two_arrs.arr_by_appended(query,{
+        "-rating:explicit",
+        "-rating:questionable",
+        -- will probably refine later, so that only visually interesting images are returned
+      })
+      return transf.arr.hydrus_file_hash_arr_by_search_image_only(query)
+    end,
+    hydrus_file_hash_by_find_random_wallpaper = function(size)
+      local file_hash_arr = transf.hs_geometry_size_like.hydrus_file_hash_arr_by_find_wallpaper(size)
+      return transf.arr.t_by_random(file_hash_arr)
+    end,
+    local_absolute_path_by_wallpaper_in_cache = function(size)
+      return transf.n_leaflikes.local_absolute_path_by_namespaced_cache(
+        "wallpaper",
+        transf.hs_geometry_size_like.pos_int_dimensions_str(size)
+      )
+    end,
+  },
+  hs_geometry_size = {
+    
+  },
+  two_hs_geometry_size_likes = {
+    hs_geometry_size_by_product = function(size1, size2)
+      return hs.geometry.size(size1.w * size2.w, size1.h * size2.h)
+    end,
+  },
+  hs_screen = {
+    hs_geometry_size_by_full = function(screen)
+      return screen:fullFrame()
+    end,
+  },
+  pos_int_dimensions_str = {
+    hs_geometry_size = function(pos_int_dimensions_str)
+      return hs.geometry.new(pos_int_dimensions_str)
+    end,
+    n_hs_screens_or_nil_by_screen_of_size = function(pos_int_dimensions_str)
+      return transf.hs_geometry_size_like.n_hs_screens_or_nil_by_screen_of_size(transf.pos_int_dimensions_str.hs_geometry_size(pos_int_dimensions_str))
     end,
   },
   hs_geometry_point_or_nil = {

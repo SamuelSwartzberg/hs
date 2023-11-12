@@ -553,6 +553,7 @@ thing_name_hierarchy = {
                                 hour_minute_second = "leaf",
                                 twod_locator = "leaf"
                               },
+                              int_ratio_str = "leaf",
                               slice_notation = "leaf",  
                             },
                             ipv6 = "leaf",
@@ -738,6 +739,7 @@ thing_name_hierarchy = {
                               indicated_oct_str = "leaf",
                               indicated_dec_str = "leaf",
                               token_type = "leaf",
+                              pos_int_dimensions_str = "leaf",
                             },
                           }
                         },
