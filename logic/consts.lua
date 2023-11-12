@@ -191,10 +191,6 @@ consts = {
       domain = "com.apple.screencapture",
       key = "location",
       value = dynamic_permanents.str_key_str_value_assoc_by_env.SCREENSHOTS
-    }, {
-      domain = "org.hammerspoon.hammerspoon",
-      key = "MJConfigFile",
-      
     }
   }
 }
