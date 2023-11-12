@@ -1982,7 +1982,7 @@ act = {
       act.str.env_bash_eval_async("vdirsyncer sync")
     end,
     pull_from_labelled_remote = function()
-      local paths_to_pull = transf.extant_path.absolute_path_arr_by_descendants_depth_2_leaf_matching_device_identifier("crhsftp:pull")
+      local paths_to_pull = transf.extant_path.absolute_path_arr_by_descendants_depth_2_leaf_matching_device_identifier_and_parent_leaf_not_matching_device_identifier("crhsftp:pull")
       dothis.arr.each(
         paths_to_pull,
         function(path)

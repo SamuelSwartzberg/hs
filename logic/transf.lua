@@ -1154,6 +1154,10 @@ transf = {
       local leaf = transf.path.leaflike_by_leaf(path)
       return is.str.device_identifier(leaf) and transf.device_identifier.bool_by_device_identifier_matches_device(leaf)
     end,
+    bool_by_parent_leaf_doesnt_match_current_device_identifier = function(path)
+      local parent_leaf = transf.path.path_component_or_nil_by_parent_leaf(path)
+      return not is.str.device_identifier(parent_leaf) or not transf.device_identifier.bool_by_device_identifier_matches_device(parent_leaf)
+    end,
 
   },
 
@@ -1311,6 +1315,20 @@ transf = {
     end,
     absolute_path_arr_by_descendants_depth_2_leaf_matching_device_identifier = function(path)
       return transf.path_arr.path_arr_by_filtered_leaf_matches_current_device_identifier(
+        transf.extant_path.absolute_path_arr_by_descendants_depth_2(
+          path
+        )
+      )
+    end,
+    absolute_path_arr_by_descendants_depth_2_parent_leaf_not_matching_device_identifier = function(path)
+      return transf.path_arr.path_arr_by_filtered_parent_leaf_doesnt_match_current_device_identifier(
+        transf.extant_path.absolute_path_arr_by_descendants_depth_2(
+          path
+        )
+      )
+    end,
+    absolute_path_arr_by_descendants_depth_2_leaf_matching_device_identifier_and_parent_leaf_not_matching_device_identifier = function(path)
+      return transf.path_arr.path_arr_by_filtered_leaf_matches_current_device_identifier_and_parent_leaf_doesnt_match_current_device_identifier(
         transf.extant_path.absolute_path_arr_by_descendants_depth_2(
           path
         )
@@ -1478,6 +1496,14 @@ transf = {
     end,
     path_arr_by_filtered_leaf_matches_current_device_identifier = function(path_arr)
       return get.arr.arr_by_filtered(path_arr, transf.path.bool_by_leaf_matches_current_device_identifier)
+    end,
+    path_arr_by_filtered_parent_leaf_doesnt_match_current_device_identifier = function(path_arr)
+      return get.arr.arr_by_filtered(path_arr, transf.path.bool_by_parent_leaf_doesnt_match_current_device_identifier)
+    end,
+    path_arr_by_filtered_leaf_matches_current_device_identifier_and_parent_leaf_doesnt_match_current_device_identifier = function(path_arr)
+      return transf.path_arr.path_arr_by_filtered_leaf_matches_current_device_identifier(
+        transf.path_arr.path_arr_by_filtered_parent_leaf_doesnt_match_current_device_identifier(path_arr)
+      )
     end,
   },
   extant_path_arr = {
